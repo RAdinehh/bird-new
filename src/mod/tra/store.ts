@@ -8,6 +8,48 @@ export type PaymentMethod = 'cash' | 'card' | 'check' | 'installment' | 'mixed';
 export type InvoiceStatus = 'paid' | 'partial' | 'unpaid' | 'overdue';
 export type DealType = 'consignment' | 'partnership' | 'barter' | 'conditional';
 
+// ===== انواع جدید (فاز A-F) =====
+
+export type PaymentTerms = 'cash' | 'installment' | 'custom';
+export type WorkflowStatus = 'draft' | 'confirmed' | 'received' | 'paid';
+export type CheckStatus = 'pending' | 'cleared' | 'bounced';
+
+export interface Installment {
+  id: string;
+  dueDate: string;
+  amount: number;
+  paid: boolean;
+  paidDate: string;
+}
+
+export interface Deferral {
+  id: string;
+  fromDate: string;
+  toDate: string;
+  reason: string;
+  createdAt: string;
+}
+
+export const PAYMENT_TERMS_LABEL: Record<PaymentTerms, string> = {
+  cash: '💵 نقدی',
+  installment: '📅 قسطی',
+  custom: '✏️ توافقی',
+};
+
+export const WORKFLOW_LABEL: Record<WorkflowStatus, string> = {
+  draft: '📝 پیش‌نویس',
+  confirmed: '✅ تأیید شده',
+  received: '📦 دریافت شده',
+  paid: '💰 پرداخت شده',
+};
+
+export const CHECK_STATUS_LABEL: Record<CheckStatus, string> = {
+  pending: '🟡 در جریان',
+  cleared: '✅ نقد شد',
+  bounced: '❌ برگشتی',
+};
+
+
 export interface InvoiceItem {
   id: string;
   description: string;
@@ -17,6 +59,9 @@ export interface InvoiceItem {
   total: number;
   itemId?: string;       // اگر پر باشد، به انبار وصل است
   movementId?: string;   // کد movement ساخته‌شده در انبار
+  // فاز E — تخفیف هر قلم
+  discountType?: '' | 'percent' | 'amount';
+  discountValue?: number;
 }
 
 export interface Payment {
@@ -28,6 +73,11 @@ export interface Payment {
   bank: string;
   dueDate: string;
   notes: string;
+  // فاز F — چک کامل
+  status?: CheckStatus;
+  clearedDate?: string;
+  bouncedDate?: string;
+  bouncedInvoiceId?: string;
 }
 
 export interface Invoice {
@@ -49,6 +99,31 @@ export interface Invoice {
   notes: string;
   createdAt: string;
   updatedAt: string;
+
+  // ===== فاز A — شرایط پرداخت =====
+  paymentTerms?: PaymentTerms;
+  installmentCount?: number;
+  installmentGapDays?: number;
+  customDueDate?: string;
+  paymentNote?: string;
+
+  // ===== فاز B — Workflow =====
+  workflowStatus?: WorkflowStatus;
+  confirmedAt?: string;
+  receivedAt?: string;
+  receivedNote?: string;
+  paidAt?: string;
+  paidNote?: string;
+
+  // ===== فاز C — پیش‌فروش =====
+  isPreorder?: boolean;
+  deliveryDate?: string;
+  advancePayment?: number;
+  advancePercent?: number;
+
+  // ===== فاز D — سرسید و تعویق =====
+  deferrals?: Deferral[];
+  remindersMuted?: boolean;
 }
 
 export interface Deal {
@@ -151,18 +226,62 @@ export const useTra = create<State>()(
     }),
     {
       name: 'pm-tra',
-      version: 2,
+      version: 3,
       migrate: (persisted: any, version: number) => {
-        if (version < 2 && persisted?.invoices) {
-          persisted.invoices = persisted.invoices.map((inv: any) => ({
+        if (!persisted?.invoices) return persisted;
+
+        persisted.invoices = persisted.invoices.map((inv: any) => {
+          // مقادیر پیش‌فرض بر اساس وضعیت فعلی
+          const payments = inv.payments || [];
+          const total = inv.total || 0;
+          const paidSum = payments.reduce((a: number, p: any) => a + (p.amount || 0), 0);
+          const isPaid = total > 0 && paidSum >= total;
+
+          // وضعیت workflow خودکار
+          let workflowStatus = 'confirmed';
+          if (isPaid) workflowStatus = 'paid';
+          else if (payments.length > 0) workflowStatus = 'confirmed';
+
+          return {
             ...inv,
+            // فاز A
+            paymentTerms: inv.paymentTerms || (inv.dueDate === inv.date ? 'cash' : 'custom'),
+            installmentCount: inv.installmentCount ?? 1,
+            installmentGapDays: inv.installmentGapDays ?? 30,
+            customDueDate: inv.customDueDate || inv.dueDate || '',
+            paymentNote: inv.paymentNote || '',
+            // فاز B
+            workflowStatus,
+            confirmedAt: inv.confirmedAt || inv.createdAt,
+            receivedAt: inv.receivedAt || '',
+            receivedNote: inv.receivedNote || '',
+            paidAt: inv.paidAt || '',
+            paidNote: inv.paidNote || '',
+            // فاز C
+            isPreorder: inv.isPreorder ?? false,
+            deliveryDate: inv.deliveryDate || '',
+            advancePayment: inv.advancePayment ?? 0,
+            advancePercent: inv.advancePercent ?? 0,
+            // فاز D
+            deferrals: inv.deferrals || [],
+            remindersMuted: inv.remindersMuted ?? false,
+            // گسترش Payment
+            payments: (inv.payments || []).map((p: any) => ({
+              ...p,
+              status: p.status || 'pending',
+              clearedDate: p.clearedDate || '',
+              bouncedDate: p.bouncedDate || '',
+              bouncedInvoiceId: p.bouncedInvoiceId || '',
+            })),
+            // گسترش InvoiceItem
             items: (inv.items || []).map((it: any) => ({
               ...it,
-              itemId: it.itemId || '',
-              movementId: it.movementId || '',
+              discountType: it.discountType || '',
+              discountValue: it.discountValue ?? 0,
             })),
-          }));
-        }
+          };
+        });
+
         return persisted;
       }
     }
