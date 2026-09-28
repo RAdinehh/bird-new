@@ -89,7 +89,6 @@ export interface Invoice {
   category: string;
   items: InvoiceItem[];
   discount: number;
-  tax: number;
   shipping: number;
   total: number;
   payments: Payment[];

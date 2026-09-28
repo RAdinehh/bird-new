@@ -15,7 +15,7 @@ interface F {
   id?: string;
   number: string; date: string; partyId: string; category: string;
   items: InvoiceItem[];
-  discount: string; tax: string; shipping: string;
+  discount: string; shipping: string;
   dueDate: string;
   payments: Payment[];
   notes: string;
@@ -24,7 +24,7 @@ interface F {
 const empty = (): F => ({
   number: '', date: '', partyId: '', category: 'egg',
   items: [],
-  discount: '', tax: '', shipping: '',
+  discount: '', shipping: '',
   dueDate: '',
   payments: [],
   notes: ''
@@ -61,7 +61,6 @@ export default function PurchasesPage() {
       id: inv.id, number: inv.number, date: inv.date, partyId: inv.partyId, category: inv.category,
       items: inv.items || [],
       discount: inv.discount ? toFa(inv.discount) : '',
-      tax: inv.tax ? toFa(inv.tax) : '',
       shipping: inv.shipping ? toFa(inv.shipping) : '',
       dueDate: inv.dueDate || '',
       payments: inv.payments || [],
@@ -73,7 +72,7 @@ export default function PurchasesPage() {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
 
   const subtotal = useMemo(() => itemsSum(form.items), [form.items]);
-  const total = useMemo(() => subtotal - num(form.discount) + num(form.tax) + num(form.shipping), [subtotal, form]);
+  const total = useMemo(() => subtotal - num(form.discount) + num(form.shipping), [subtotal, form]);
   const paid = useMemo(() => paidSum(form.payments), [form.payments]);
   const rem = Math.max(0, total - paid);
 
@@ -117,7 +116,6 @@ export default function PurchasesPage() {
       category: form.category,
       items: form.items,
       discount: num(form.discount),
-      tax: num(form.tax),
       shipping: num(form.shipping),
       total,
       payments: form.payments,
@@ -215,7 +213,6 @@ export default function PurchasesPage() {
 
                 <SectionTitle>💰 مالی</SectionTitle>
                 {inv.discount > 0 ? <Row l="تخفیف" v={`${toFa(inv.discount.toLocaleString('fa-IR'))} ت`} /> : null}
-                {inv.tax > 0 ? <Row l="مالیات" v={`${toFa(inv.tax.toLocaleString('fa-IR'))} ت`} /> : null}
                 {inv.shipping > 0 ? <Row l="حمل" v={`${toFa(inv.shipping.toLocaleString('fa-IR'))} ت`} /> : null}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                   <span>قیمت نهایی:</span>
@@ -349,11 +346,10 @@ export default function PurchasesPage() {
         <Btn size="sm" full onClick={addItem}>+ افزودن قلم</Btn>
 
         <SectionTitle>💰 مالی</SectionTitle>
-        <Grid3>
+        <Grid2>
           <Field label="تخفیف"><Input mode="number" value={form.discount} onChange={e => setForm({...form, discount: e.target.value})} unit="ت" /></Field>
-          <Field label="مالیات"><Input mode="number" value={form.tax} onChange={e => setForm({...form, tax: e.target.value})} unit="ت" /></Field>
           <Field label="حمل"><Input mode="number" value={form.shipping} onChange={e => setForm({...form, shipping: e.target.value})} unit="ت" /></Field>
-        </Grid3>
+        </Grid2>
         <Field label="قیمت نهایی" hint="خودکار">
           <Input readOnly dir="ltr" value={toFa(total.toLocaleString('fa-IR'))} unit="ت" />
         </Field>
