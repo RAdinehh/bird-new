@@ -212,68 +212,14 @@ export default function ContactsPage() {
           </Field>
           <Field label="نام" required><Input placeholder="..." value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
           <Grid2>
-            <Field label="تلفن اصلی"><Input placeholder="۰۹..." inputMode="tel" dir="ltr" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></Field>
-            <Field label="تلفن دوم"><Input placeholder="۰۹..." inputMode="tel" dir="ltr" value={form.phone2} onChange={e => setForm({...form, phone2: e.target.value})} /></Field>
+            <Field label="تلفن"><Input placeholder="۰۹..." inputMode="tel" dir="ltr" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></Field>
           </Grid2>
           <Grid2>
-            <Field label="ایمیل"><Input placeholder="..." dir="ltr" value={form.email} onChange={e => setForm({...form, email: e.target.value})} /></Field>
-            <Field label="کد ملی"><Input placeholder="..." inputMode="numeric" dir="ltr" value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} /></Field>
+                        <Field label="کد ملی"><Input placeholder="..." inputMode="numeric" dir="ltr" value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} /></Field>
           </Grid2>
           <Grid2>
-            <Field label="شهر"><Input placeholder="..." value={form.city} onChange={e => setForm({...form, city: e.target.value})} /></Field>
-            <Field label="آدرس"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
+                        <Field label="آدرس"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
           </Grid2>
-
-          {form.roles.includes('customer') && (
-            <DepBox title="اطلاعات مشتری">
-              <Grid2>
-                <Field label="نوع مشتری"><Select value={form.customerType} onChange={e => setForm({...form, customerType: e.target.value})}>{CUSTOMER_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</Select></Field>
-                <Field label="امتیاز اعتبار"><Input placeholder="۵" inputMode="numeric" dir="ltr" value={form.trustScore} onChange={e => setForm({...form, trustScore: e.target.value})} /></Field>
-              </Grid2>
-              <Field label="تخفیف پیش‌فرض"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.defaultDiscount} onChange={e => setForm({...form, defaultDiscount: e.target.value})} unit="٪" /></Field>
-            </DepBox>
-          )}
-
-          {form.roles.includes('supplier') && (
-            <DepBox title="اطلاعات فروشنده">
-              <Field label="چه چیزی می‌فروشد؟" hint="چند مورد قابل انتخاب">
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {SUPPLIER_TYPES.map(([v, l]) => (
-                    <button key={v} onClick={() => toggleSupType(v)} style={{
-                      padding: '5px 10px', fontSize: 'var(--fs-sm)',
-                      background: form.supplierTypes.includes(v) ? 'var(--accent-soft)' : 'var(--btn-bg)',
-                      border: `1px solid ${form.supplierTypes.includes(v) ? 'var(--accent-border)' : 'var(--border)'}`,
-                      borderRadius: 'var(--r-sm)', color: form.supplierTypes.includes(v) ? 'var(--accent)' : 'var(--muted)',
-                      fontWeight: form.supplierTypes.includes(v) ? 600 : 500, cursor: 'pointer', fontFamily: 'inherit'
-                    }}>{l}</button>
-                  ))}
-                </div>
-              </Field>
-            </DepBox>
-          )}
-
-          {form.roles.includes('worker') && (
-            <DepBox title="اطلاعات کارگر">
-              <Grid2>
-                <Field label="سمت"><Input placeholder="مثلاً: کارگر عمومی" value={form.position} onChange={e => setForm({...form, position: e.target.value})} /></Field>
-                <Field label="تاریخ شروع"><Input placeholder="۱۴۰۵/۰۷/۰۴" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} /></Field>
-              </Grid2>
-              <Grid2>
-                <Field label="نوع حقوق"><Select value={form.salaryType} onChange={e => setForm({...form, salaryType: e.target.value})}>{SALARY_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</Select></Field>
-                <Field label="مبلغ حقوق"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.salaryAmount} onChange={e => setForm({...form, salaryAmount: e.target.value})} unit="ت" /></Field>
-              </Grid2>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)' }}>
-                <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>بیمه دارد</div>
-                <button onClick={() => setForm({...form, insurance: !form.insurance})} style={{
-                  width: 38, height: 22, borderRadius: 11,
-                  background: form.insurance ? 'var(--accent)' : 'var(--dim)',
-                  position: 'relative', border: 'none', cursor: 'pointer', padding: 0
-                }}>
-                  <span style={{ position: 'absolute', top: 2, right: form.insurance ? 18 : 2, width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'right .2s' }} />
-                </button>
-              </div>
-            </DepBox>
-          )}
 
           <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
           {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
