@@ -44,7 +44,7 @@ interface State {
   addItem: (i: Omit<Item, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateItem: (id: string, patch: Partial<Item>) => void;
   deleteItem: (id: string) => void;
-  addMovement: (m: Omit<Movement, 'id' | 'createdAt'>) => void;
+  addMovement: (m: Omit<Movement, 'id' | 'createdAt'>) => string;
   deleteMovement: (id: string) => void;
 }
 
@@ -65,15 +65,16 @@ export const useWhs = create<State>()(
 
       addMovement: (m) => {
         const item = get().items.find(x => x.id === m.itemId);
-        if (item === undefined) return;
+        if (item === undefined) return '';
 
         let newStock = item.currentStock;
         if (m.type === 'in') newStock += m.quantity;
         else if (m.type === 'out') newStock = Math.max(0, newStock - m.quantity);
         else newStock = m.quantity;
 
+        const newId = uuid();
         set({
-          movements: [...get().movements, { ...m, id: uuid(), createdAt: now() }],
+          movements: [...get().movements, { ...m, id: newId, createdAt: now() }],
           items: get().items.map(x => x.id === m.itemId ? {
             ...x,
             currentStock: newStock,
@@ -81,6 +82,7 @@ export const useWhs = create<State>()(
             updatedAt: now()
           } : x)
         });
+        return newId;
       },
 
       deleteMovement: (id) => {

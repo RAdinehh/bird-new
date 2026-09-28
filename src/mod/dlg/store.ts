@@ -9,6 +9,11 @@ export interface Death {
   notes: string;
 }
 
+export interface WeightSample {
+  id: string;
+  weight: number; // kg
+}
+
 export interface Vaccine {
   id: string;
   name: string;
@@ -39,7 +44,11 @@ export interface DailyLog {
 
   // محیط
   temperature: number | null;
+  temperatureMin: number | null;
+  temperatureMax: number | null;
   humidity: number | null;
+  humidityMin: number | null;
+  humidityMax: number | null;
   ventilation: string; // ok | low | high
   litter: string; // dry | wet | clumped
 
@@ -54,6 +63,8 @@ export interface DailyLog {
   feedAmount: number | null;    // kg
   feedRemaining: number | null; // kg
   waterAmount: number | null;   // L
+  feedItemId: string;           // کد آیتم انبار (feed)
+  feedMovementId: string;       // کد رکورد خروجی در انبار
 
   // تلفات
   deathsCount: number;
@@ -153,4 +164,35 @@ export const DEATH_CAUSES: [string, string][] = [
 
 export function causeLabel(key: string): string {
   return DEATH_CAUSES.find(x => x[0] === key)?.[1] || '—';
+}
+
+
+// === کمک‌کننده‌ها برای وزن‌کشی ===
+
+/** میانگین وزن نمونه‌ها (kg) */
+export function avgWeight(samples: WeightSample[]): number {
+  if (samples.length === 0) return 0;
+  const sum = samples.reduce((a, x) => a + x.weight, 0);
+  return Math.round((sum / samples.length) * 1000) / 1000;
+}
+
+/** مجموع وزن نمونه‌ها (kg) */
+export function sumWeight(samples: WeightSample[]): number {
+  return Math.round(samples.reduce((a, x) => a + x.weight, 0) * 1000) / 1000;
+}
+
+/** ضریب تغییرات (CV%) */
+export function cvWeight(samples: WeightSample[]): number {
+  if (samples.length < 2) return 0;
+  const mean = samples.reduce((a, x) => a + x.weight, 0) / samples.length;
+  if (mean === 0) return 0;
+  const variance = samples.reduce((a, x) => a + Math.pow(x.weight - mean, 2), 0) / samples.length;
+  const std = Math.sqrt(variance);
+  return Math.round((std / mean) * 10000) / 100;
+}
+
+/** حجم کل آب مصرفی از فیلدهای دستی */
+export function totalWater(count: number | null, volume: number | null): number | null {
+  if (count === null || volume === null) return null;
+  return Math.round(count * volume * 100) / 100;
 }
