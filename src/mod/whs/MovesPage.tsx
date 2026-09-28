@@ -69,6 +69,11 @@ export default function MovesPage() {
   const currentStock = selectedItem ? selectedItem.currentStock : 0;
 
   const save = () => {
+    if ((form.reason === 'purchase' || form.reason === 'sale') && !form.partyId) {
+      setErr(form.reason === 'purchase' ? 'فروشنده اجباری است' : 'مشتری اجباری است');
+      return;
+    }
+
     if (form.itemId === '') { setErr('کالا اجباری است'); return; }
     if (form.date.trim() === '') { setErr('تاریخ اجباری است'); return; }
     const qty = num(form.quantity);
@@ -92,6 +97,22 @@ export default function MovesPage() {
     addMovement(data);
     setOpen(false);
   };
+
+    // فیلتر مخاطبین بر اساس دلیل
+  const isPurchase = form.reason === 'purchase';
+  const isSale = form.reason === 'sale';
+  const isAdjustment = form.reason === 'adjustment';
+  const filteredContacts = isPurchase
+    ? contacts.filter(c => c.roles.includes('supplier'))
+    : isSale
+      ? contacts.filter(c => c.roles.includes('customer'))
+      : contacts;
+  const partyRequired = isPurchase || isSale;
+  const partyLabel = isPurchase
+    ? 'فروشنده'
+    : isSale
+      ? 'مشتری'
+      : 'طرف معامله';
 
   const target = delId ? movements.find(m => m.id === delId) : null;
 
@@ -252,22 +273,42 @@ export default function MovesPage() {
           </Field>
         </Grid2>
 
-        <Field label="طرف معامله" hint="اختیاری — از مخاطبین">
-          <SmartSelect
-            value={form.partyId}
-            onChange={v => setForm({ ...form, partyId: v })}
-            options={contacts.map(c => ({
-              value: c.id,
-              label: c.name,
-              subtitle: c.roles.length > 0
-                ? c.roles.map(r => r === 'customer' ? 'مشتری' : r === 'supplier' ? 'فروشنده' : 'کارگر').join('، ')
-                : undefined,
-            }))}
-            placeholder="— بدون مخاطب —"
-            modalTitle="انتخاب مخاطب"
-            autoThreshold={6}
-          />
-        </Field>
+        {!isAdjustment && (
+          <Field
+            label={partyLabel}
+            required={partyRequired}
+            hint={partyRequired ? undefined : 'اختیاری — از مخاطبین'}
+          >
+            {filteredContacts.length === 0 ? (
+              <div style={{
+                padding: '10px 12px',
+                background: 'var(--warn-soft)',
+                border: '1px dashed var(--warn)',
+                borderRadius: 'var(--r-sm)',
+                fontSize: 'var(--fs-xs)',
+                color: 'var(--warn)',
+                fontWeight: 600,
+              }}>
+                ⚠️ {isPurchase ? 'هیچ فروشنده‌ای تعریف نشده' : isSale ? 'هیچ مشتری‌ای تعریف نشده' : 'مخاطبی تعریف نشده'} — از بخش «مخاطبین» اضافه کنید
+              </div>
+            ) : (
+              <SmartSelect
+                value={form.partyId}
+                onChange={v => setForm({ ...form, partyId: v })}
+                options={filteredContacts.map(c => ({
+                  value: c.id,
+                  label: c.name,
+                  subtitle: c.roles.length > 0
+                    ? c.roles.map(r => r === 'customer' ? 'مشتری' : r === 'supplier' ? 'فروشنده' : 'کارگر').join('، ')
+                    : undefined,
+                }))}
+                placeholder={partyRequired ? `— انتخاب ${partyLabel} —` : '— بدون مخاطب —'}
+                modalTitle={`انتخاب ${partyLabel}`}
+                autoThreshold={6}
+              />
+            )}
+          </Field>
+        )}
 
         <Field label="یادداشت">
           <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
