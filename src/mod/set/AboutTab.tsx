@@ -168,6 +168,7 @@ export default function AboutTab() {
       <Section title="🎓 راهنما و آموزش">
         <Btn full onClick={() => setOpenFaq(true)}>❓ سؤالات متداول ({toFa(FAQS.length)})</Btn>
         <Btn full onClick={() => setOpenGuide(true)}>📖 راهنمای کاربری</Btn>
+        <Btn full onClick={resetHelpBanners}>📖 نمایش مجدد راهنماهای صفحه‌ها</Btn>
         <Btn full onClick={() => { localStorage.removeItem('pm-onboarding-done'); showAlert('آموزش اولیه بازنشانی شد — صفحه را رفرش کنید'); }}>🔄 بازنشانی آموزش اولیه</Btn>
       </Section>
 
@@ -330,52 +331,7 @@ export default function AboutTab() {
         با ❤ برای کسب‌وکار شما
       </div>
     
-        {/* راهنماهای پنهان‌شده */}
-        <div style={{
-          marginTop: 12,
-          padding: 12,
-          background: 'var(--input-bg)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--r-md)',
-        }}>
-          <div style={{
-            fontSize: 'var(--fs-sm)',
-            fontWeight: 700,
-            color: 'var(--text)',
-            marginBottom: 6,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}>
-            <span>📖</span>
-            <span>راهنماهای پنهان‌شده</span>
-          </div>
-          <div style={{
-            fontSize: 'var(--fs-xs)',
-            color: 'var(--muted)',
-            lineHeight: 1.7,
-            marginBottom: 10,
-          }}>
-            اگر بنرهای راهنما را در صفحات مختلف بستید، با زدن دکمه زیر همه‌شان دوباره فعال می‌شوند.
-          </div>
-          <button
-            type="button"
-            onClick={resetHelpBanners}
-            style={{
-              padding: '8px 16px',
-              background: 'var(--accent)',
-              color: 'white',
-              border: 'none',
-              borderRadius: 'var(--r-sm)',
-              fontSize: 'var(--fs-sm)',
-              fontWeight: 700,
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-            }}
-          >
-            📖 نمایش مجدد همه راهنماها
-          </button>
-        </div>
+        
 </div>
   );
 }
