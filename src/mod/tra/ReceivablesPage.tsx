@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
-import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSum, checkTone, CHECK_STATUS_LABEL, WORKFLOW_LABEL, workflowTone, calcDueDate, type Invoice, type Payment, type Deferral } from './store';
+import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSum, WORKFLOW_LABEL, type Invoice, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Input, Modal, PageContainer } from '../../shr/components/ui';
 import DatePicker from '../../shr/components/DatePicker';
-import { toFa, toEn } from '../../shr/utils/fa';
+import { toFa } from '../../shr/utils/fa';
 import { showSuccess } from '../../cor/store/dialog';
 
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
-type QuickFilter = 'all' | 'overdue' | 'soon' | 'checks';
+type QuickFilter = 'all' | 'overdue' | 'soon';
 
 export default function ReceivablesPage() {
   const { invoices, updateInvoice } = useTra();
@@ -19,14 +19,13 @@ export default function ReceivablesPage() {
   const [deferModal, setDeferModal] = useState<{ id: string; oldDate: string } | null>(null);
   const [deferDate, setDeferDate] = useState('');
   const [deferReason, setDeferReason] = useState('');
+  const [showUpcoming, setShowUpcoming] = useState(false);
 
-  // فاکتورهای معوق (مانده > 0)
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i) > 0),
     [invoices, kind]
   );
 
-  // ============ محاسبه روز تا سرسید ============
   const daysUntilDue = (inv: Invoice): number | null => {
     if (!inv.dueDate) return null;
     const parts = inv.dueDate.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString()).split('/');
@@ -35,7 +34,6 @@ export default function ReceivablesPage() {
     return Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   };
 
-  // ============ سه سطح هشدار ============
   const dueTone = (days: number | null): 'green' | 'amber' | 'orange' | 'red' => {
     if (days === null) return 'green';
     if (days < 0) return 'red';
@@ -52,7 +50,6 @@ export default function ReceivablesPage() {
     return `${toFa(days)} روز مانده`;
   };
 
-  // ============ فیلتر بر اساس وضعیت ============
   const filtered = useMemo(() => {
     if (quickFilter === 'overdue') {
       return openInvoices.filter(i => {
@@ -69,30 +66,14 @@ export default function ReceivablesPage() {
     return openInvoices;
   }, [openInvoices, quickFilter]);
 
-  // ============ سرسیدهای نزدیک (بالای صفحه) ============
   const upcoming = useMemo(() => {
     return openInvoices
       .filter(i => i.dueDate && !i.remindersMuted)
       .map(i => ({ inv: i, days: daysUntilDue(i) }))
       .filter(x => x.days !== null && x.days <= 7)
-      .sort((a, b) => (a.days ?? 0) - (b.days ?? 0))
-      .slice(0, 5);
+      .sort((a, b) => (a.days ?? 0) - (b.days ?? 0));
   }, [openInvoices]);
 
-  // ============ چک‌های در جریان ============
-  const pendingCheckList = useMemo(() => {
-    const list: { inv: Invoice; pay: Payment }[] = [];
-    openInvoices.forEach(inv => {
-      (inv.payments || []).forEach(p => {
-        if (p.method === 'check' && (!p.status || p.status === 'pending')) {
-          list.push({ inv, pay: p });
-        }
-      });
-    });
-    return list.sort((a, b) => (a.pay.dueDate || '').localeCompare(b.pay.dueDate || ''));
-  }, [openInvoices]);
-
-  // ============ بکت‌ها ============
   const byBucket = useMemo(() => {
     const map: Record<string, Invoice[]> = {
       '0-15': [], '16-30': [], '31-60': [], '61-90': [], '+90': []
@@ -113,13 +94,16 @@ export default function ReceivablesPage() {
     const d = daysUntilDue(i);
     return d !== null && d < 0;
   }).length;
+  const soonCount = openInvoices.filter(i => {
+    const d = daysUntilDue(i);
+    return d !== null && d >= 0 && d <= 7;
+  }).length;
 
   const toggleBucket = (key: BucketKey) => {
     setExpandedBucket(expandedBucket === key ? null : key);
     setExpandedInvoice(null);
   };
 
-  // ============ تعویق ============
   const openDefer = (inv: Invoice) => {
     setDeferModal({ id: inv.id, oldDate: inv.dueDate || inv.date });
     setDeferDate(inv.dueDate || inv.date);
@@ -144,149 +128,150 @@ export default function ReceivablesPage() {
     });
     showSuccess('سرسید به تعویق افتاد');
     setDeferModal(null);
-    setDeferDate('');
-    setDeferReason('');
   };
 
   return (
     <PageContainer>
-      {/* سوییچ نوع */}
-      <div style={{ display: 'flex', gap: 6 }}>
-        <button onClick={() => setKind('sale')} style={chip(kind === 'sale')}>
-          📥 مطالبات (مشتریان)
+      {/* سوییچ نوع — فشرده */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
+        <button onClick={() => setKind('sale')} style={tab(kind === 'sale')}>
+          📥 مطالبات
         </button>
-        <button onClick={() => setKind('purchase')} style={chip(kind === 'purchase')}>
-          📤 بدهی (فروشندگان)
+        <button onClick={() => setKind('purchase')} style={tab(kind === 'purchase')}>
+          📤 بدهی
         </button>
       </div>
 
-      {/* خلاصه */}
+      {/* خلاصه — یه خط */}
       {totalOpen > 0 ? (
         <div style={{
-          padding: '14px 16px',
+          padding: '10px 14px',
           background: kind === 'sale' ? 'var(--accent-soft)' : 'var(--warn-soft)',
           border: `1px solid ${kind === 'sale' ? 'var(--accent-border)' : 'var(--warn)'}`,
-          borderRadius: 'var(--r-lg)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+          borderRadius: 'var(--r-md)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          <div style={{ fontSize: 'var(--fs-base)', color: kind === 'sale' ? 'var(--accent)' : 'var(--warn)', fontWeight: 700 }}>
+          <span style={{
+            fontSize: 'var(--fs-sm)', fontWeight: 700,
+            color: kind === 'sale' ? 'var(--accent)' : 'var(--warn)'
+          }}>
             {kind === 'sale' ? 'مجموع طلب' : 'مجموع بدهی'}
-          </div>
-          <div style={{ fontSize: 'var(--fs-xl)', color: kind === 'sale' ? 'var(--accent)' : 'var(--warn)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+          </span>
+          <span style={{
+            fontSize: 'var(--fs-lg)', fontWeight: 700,
+            color: kind === 'sale' ? 'var(--accent)' : 'var(--warn)',
+            fontVariantNumeric: 'tabular-nums'
+          }}>
             {toFa(totalOpen.toLocaleString('fa-IR'))} ت
-          </div>
+          </span>
         </div>
       ) : null}
 
-      {/* ⏰ سرسیدهای نزدیک */}
+      {/* ⏰ سرسیدهای نزدیک — collapsible */}
       {upcoming.length > 0 ? (
-        <div>
-          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 6 }}>
-            ⏰ سرسیدهای نزدیک ({toFa(upcoming.length)})
+        <div style={{
+          background: 'var(--card)',
+          border: '1px solid var(--amber)',
+          borderRadius: 'var(--r-md)',
+          overflow: 'hidden',
+        }}>
+          <div
+            onClick={() => setShowUpcoming(!showUpcoming)}
+            style={{
+              padding: '8px 12px',
+              display: 'flex', alignItems: 'center', gap: 8,
+              cursor: 'pointer',
+              background: 'var(--warn-soft)',
+            }}
+          >
+            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--warn)' }}>
+              ⏰ {toFa(upcoming.length)} سرسید نزدیک
+            </span>
+            <div style={{ flex: 1 }} />
+            <svg width="12" height="12" viewBox="0 0 24 24"
+              fill="none" stroke="var(--warn)" strokeWidth="2.5" strokeLinecap="round"
+              style={{
+                transform: showUpcoming ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform .2s',
+              }}>
+              <path d="m6 9 6 6 6-6" />
+            </svg>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            {upcoming.map(({ inv, days }) => {
-              const party = contacts.find(c => c.id === inv.partyId);
-              const tone = dueTone(days);
-              return (
-                <div key={inv.id} style={{
-                  padding: '9px 12px',
-                  background: `var(--${tone}-soft, var(--input-bg))`,
-                  border: `1px solid var(--${tone})`,
-                  borderRadius: 'var(--r-md)',
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8,
-                }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${tone})` }}>
-                      {party?.name || '—'}
+
+          <div style={{
+            display: 'grid',
+            gridTemplateRows: showUpcoming ? '1fr' : '0fr',
+            transition: 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
+          }}>
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ padding: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {upcoming.map(({ inv, days }) => {
+                  const party = contacts.find(c => c.id === inv.partyId);
+                  const tone = dueTone(days);
+                  return (
+                    <div key={inv.id} style={{
+                      padding: '6px 10px',
+                      background: `var(--${tone}-soft, var(--input-bg))`,
+                      border: `1px solid var(--${tone})`,
+                      borderRadius: 'var(--r-sm)',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8,
+                    }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: `var(--${tone})` }}>
+                          {party?.name || '—'}
+                        </div>
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1 }}>
+                          {dueLabel(days)}
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${tone})`, flexShrink: 0 }}>
+                        {toFa(remaining(inv).toLocaleString('fa-IR'))} ت
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => openDefer(inv)}
+                        style={{
+                          padding: '3px 8px',
+                          background: 'transparent',
+                          border: `1px solid var(--${tone})`,
+                          borderRadius: 'var(--r-sm)',
+                          color: `var(--${tone})`,
+                          fontSize: 'var(--fs-xs)', fontWeight: 600,
+                          cursor: 'pointer', fontFamily: 'inherit',
+                          flexShrink: 0,
+                        }}
+                      >
+                        ⏰
+                      </button>
                     </div>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                      {dueLabel(days)} · {toFa(inv.dueDate || '')}
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${tone})` }}>
-                      {toFa(remaining(inv).toLocaleString('fa-IR'))} ت
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => openDefer(inv)}
-                      style={{
-                        marginTop: 4, padding: '3px 8px',
-                        background: 'transparent', border: `1px solid var(--${tone})`,
-                        borderRadius: 'var(--r-sm)', color: `var(--${tone})`,
-                        fontSize: 'var(--fs-xs)', fontWeight: 600,
-                        cursor: 'pointer', fontFamily: 'inherit'
-                      }}
-                    >
-                      تعویق
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       ) : null}
 
-      {/* 🏦 چک‌های در جریان */}
-      {pendingCheckList.length > 0 ? (
-        <div>
-          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 6 }}>
-            🏦 چک‌های در جریان ({toFa(pendingCheckList.length)})
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            {pendingCheckList.map(({ inv, pay }) => {
-              const party = contacts.find(c => c.id === inv.partyId);
-              return (
-                <div key={pay.id} style={{
-                  padding: '9px 12px',
-                  background: 'var(--input-bg)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-md)',
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8,
-                }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
-                      {party?.name || '—'}
-                    </div>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                      چک {pay.checkNo || '—'} · {pay.bank || '—'} · سرسید {toFa(pay.dueDate || '—')}
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--amber)', flexShrink: 0 }}>
-                    {toFa(pay.amount.toLocaleString('fa-IR'))} ت
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-
-      {/* فیلتر سریع */}
-      {openInvoices.length > 0 ? (
+      {/* فیلتر سریع — فقط اگه لازم بود */}
+      {(overdueCount > 0 || soonCount > 0) ? (
         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
           <button onClick={() => setQuickFilter('all')} style={filterChip(quickFilter === 'all')}>
             همه ({toFa(openInvoices.length)})
           </button>
           {overdueCount > 0 ? (
-            <button onClick={() => setQuickFilter('overdue')} style={filterChip(quickFilter === 'overdue', 'red')}>
-              🔴 عقب‌افتاده ({toFa(overdueCount)})
+            <button onClick={() => setQuickFilter('overdue')} style={filterChip(quickFilter === 'overdue', 'danger')}>
+              🔴 {toFa(overdueCount)}
             </button>
           ) : null}
-          <button onClick={() => setQuickFilter('soon')} style={filterChip(quickFilter === 'soon', 'amber')}>
-            🟡 نزدیک
-          </button>
-          {pendingCheckList.length > 0 ? (
-            <button onClick={() => setQuickFilter('checks')} style={filterChip(quickFilter === 'checks', 'blue')}>
-              🏦 چک
+          {soonCount > 0 ? (
+            <button onClick={() => setQuickFilter('soon')} style={filterChip(quickFilter === 'soon', 'warn')}>
+              🟡 {toFa(soonCount)}
             </button>
           ) : null}
         </div>
       ) : null}
 
-      {/* اگه خالی بود */}
+      {/* خالی */}
       {totalOpen === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>}
@@ -295,73 +280,64 @@ export default function ReceivablesPage() {
         />
       ) : null}
 
-      {/* Buckets */}
+      {/* Buckets — فقط اگه پر باشن */}
       {totalOpen > 0 ? (
         <>
           {AGING_BUCKETS.map(({ key, label, color }) => {
             const items = byBucket[key] || [];
+            if (items.length === 0) return null; // ← خالی‌ها پنهان
             const sum = bucketSum(key);
             const isOpen = expandedBucket === key;
-            const isEmpty = items.length === 0;
 
             return (
               <div key={key} style={{
                 background: 'var(--card)',
                 border: '1px solid var(--border)',
-                borderRadius: 'var(--r-lg)',
+                borderRadius: 'var(--r-md)',
                 overflow: 'hidden',
-                opacity: isEmpty ? 0.45 : 1,
-                transition: 'opacity .2s'
               }}>
-                {/* هدر Bucket */}
                 <div
-                  onClick={() => !isEmpty && toggleBucket(key as BucketKey)}
+                  onClick={() => toggleBucket(key as BucketKey)}
                   style={{
-                    padding: '12px 16px',
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    cursor: isEmpty ? 'default' : 'pointer'
+                    padding: '8px 12px',
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    cursor: 'pointer',
                   }}
                 >
                   <div style={{
-                    width: 10, height: 10, borderRadius: '50%',
-                    background: `var(--${color})`,
-                    flexShrink: 0
+                    width: 8, height: 8, borderRadius: '50%',
+                    background: `var(--${color})`, flexShrink: 0
                   }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700 }}>
-                      {label}
-                    </div>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                      {toFa(items.length)} فاکتور
-                    </div>
+                  <div style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
+                    {label}
+                    <span style={{ color: 'var(--muted)', fontWeight: 400, marginRight: 6 }}>
+                      · {toFa(items.length)}
+                    </span>
                   </div>
-                  <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: `var(--${color})`, fontVariantNumeric: 'tabular-nums' }}>
+                  <div style={{
+                    fontSize: 'var(--fs-sm)', fontWeight: 700,
+                    color: `var(--${color})`, fontVariantNumeric: 'tabular-nums'
+                  }}>
                     {toFa(sum.toLocaleString('fa-IR'))} ت
                   </div>
-                  {!isEmpty ? (
-                    <svg
-                      width="14" height="14" viewBox="0 0 24 24"
-                      fill="none" stroke={isOpen ? `var(--${color})` : 'var(--dim)'}
-                      strokeWidth="2.5" strokeLinecap="round"
-                      style={{
-                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                        transition: 'transform .25s', flexShrink: 0
-                      }}
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  ) : null}
+                  <svg width="12" height="12" viewBox="0 0 24 24"
+                    fill="none" stroke={isOpen ? `var(--${color})` : 'var(--dim)'}
+                    strokeWidth="2.5" strokeLinecap="round"
+                    style={{
+                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform .2s',
+                    }}>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
                 </div>
 
-                {/* فاکتورهای این Bucket */}
                 <div style={{
                   display: 'grid',
                   gridTemplateRows: isOpen ? '1fr' : '0fr',
                   transition: 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
-                  willChange: 'grid-template-rows'
                 }}>
                   <div style={{ overflow: 'hidden' }}>
-                    <div style={{ padding: '0 16px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ padding: '0 12px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
                       {items.map(inv => {
                         const party = contacts.find(c => c.id === inv.partyId);
                         const rem = remaining(inv);
@@ -374,11 +350,11 @@ export default function ReceivablesPage() {
                             key={inv.id}
                             onClick={() => setExpandedInvoice(invOpen ? null : inv.id)}
                             style={{
-                              padding: '10px 12px',
+                              padding: '8px 10px',
                               background: 'var(--input-bg)',
                               border: '1px solid var(--border)',
-                              borderRadius: 'var(--r-md)',
-                              cursor: 'pointer'
+                              borderRadius: 'var(--r-sm)',
+                              cursor: 'pointer',
                             }}
                           >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
@@ -390,32 +366,33 @@ export default function ReceivablesPage() {
                                   {party?.name || '—'}
                                 </div>
                                 <div style={{
-                                  fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2,
+                                  fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1,
                                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
                                 }}>
-                                  {toFa(inv.date)} · {toFa(days)} روز پیش
-                                  {inv.number ? ` · ${inv.number}` : ''}
+                                  {toFa(days)} روز · {inv.number || ''}
+                                  {dUntil !== null ? ` · ${dueLabel(dUntil)}` : ''}
                                 </div>
                               </div>
                               <div style={{
-                                fontSize: 'var(--fs-base)', fontWeight: 700,
-                                color: `var(--${color})`, fontVariantNumeric: 'tabular-nums', flexShrink: 0
+                                fontSize: 'var(--fs-sm)', fontWeight: 700,
+                                color: `var(--${color})`,
+                                fontVariantNumeric: 'tabular-nums',
+                                flexShrink: 0
                               }}>
                                 {toFa(rem.toLocaleString('fa-IR'))} ت
                               </div>
                             </div>
 
-                            {/* جزئیات بیشتر */}
                             <div style={{
                               display: 'grid',
                               gridTemplateRows: invOpen ? '1fr' : '0fr',
-                              transition: 'grid-template-rows 200ms cubic-bezier(.16,1,.3,1)'
+                              transition: 'grid-template-rows 200ms cubic-bezier(.16,1,.3,1)',
                             }}>
                               <div style={{ overflow: 'hidden' }}>
                                 <div style={{
-                                  paddingTop: 8, marginTop: 8,
+                                  paddingTop: 6, marginTop: 6,
                                   borderTop: '1px dashed var(--border)',
-                                  display: 'flex', flexDirection: 'column', gap: 5
+                                  display: 'flex', flexDirection: 'column', gap: 3
                                 }}>
                                   <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} ت`} />
                                   <Line l="پرداخت‌شده" v={`${toFa(paidSum(inv.payments || []).toLocaleString('fa-IR'))} ت`} />
@@ -423,15 +400,11 @@ export default function ReceivablesPage() {
                                   {inv.workflowStatus ? (
                                     <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus]} />
                                   ) : null}
-                                  {inv.isPreorder && inv.deliveryDate ? (
-                                    <Line l="📅 تاریخ تحویل" v={toFa(inv.deliveryDate)} />
-                                  ) : null}
                                   {inv.deferrals && inv.deferrals.length > 0 ? (
-                                    <Line l="تعداد تعویق" v={toFa(inv.deferrals.length)} />
+                                    <Line l="تعویق‌ها" v={toFa(inv.deferrals.length)} />
                                   ) : null}
 
-                                  {/* دکمه تعویق */}
-                                  <div style={{ marginTop: 6, display: 'flex', gap: 5 }}>
+                                  <div style={{ marginTop: 4 }}>
                                     <Btn size="sm" onClick={(e) => { e.stopPropagation(); openDefer(inv); }}>
                                       ⏰ تعویق
                                     </Btn>
@@ -459,7 +432,7 @@ export default function ReceivablesPage() {
         footer={
           <BtnRow>
             <Btn onClick={() => setDeferModal(null)}>لغو</Btn>
-            <Btn variant="primary" onClick={doDefer}>تأیید تعویق</Btn>
+            <Btn variant="primary" onClick={doDefer}>تأیید</Btn>
           </BtnRow>
         }
       >
@@ -469,7 +442,7 @@ export default function ReceivablesPage() {
               <DatePicker value={deferDate} onChange={v => setDeferDate(v)} />
             </Field>
             <Field label="دلیل تعویق">
-              <Input placeholder="مثلاً: مشکل مالی موقت" value={deferReason} onChange={e => setDeferReason(e.target.value)} />
+              <Input placeholder="..." value={deferReason} onChange={e => setDeferReason(e.target.value)} />
             </Field>
           </>
         ) : null}
@@ -487,27 +460,27 @@ function Line({ l, v }: { l: string; v: string }) {
   );
 }
 
-function chip(active: boolean): React.CSSProperties {
+function tab(active: boolean): React.CSSProperties {
   return {
     flex: 1,
-    padding: '8px 12px', fontSize: 'var(--fs-sm)',
+    padding: '7px 12px', fontSize: 'var(--fs-sm)',
     background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
     border: `1px solid ${active ? 'var(--accent-border)' : 'var(--border)'}`,
     borderRadius: 'var(--r-sm)',
     color: active ? 'var(--accent)' : 'var(--muted)',
     fontWeight: active ? 700 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap'
+    fontFamily: 'inherit', whiteSpace: 'nowrap',
   };
 }
 
 function filterChip(active: boolean, color = 'accent'): React.CSSProperties {
   return {
-    padding: '5px 11px', fontSize: 'var(--fs-xs)',
+    padding: '4px 10px', fontSize: 'var(--fs-xs)',
     background: active ? `var(--${color}-soft, var(--accent-soft))` : 'var(--btn-bg)',
     border: `1px solid ${active ? `var(--${color})` : 'var(--border)'}`,
     borderRadius: 'var(--r-sm)',
     color: active ? `var(--${color})` : 'var(--muted)',
     fontWeight: active ? 700 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap'
+    fontFamily: 'inherit', whiteSpace: 'nowrap',
   };
 }
