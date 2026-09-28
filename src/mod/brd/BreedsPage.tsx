@@ -4,7 +4,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, 
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
-import { showConfirmAsync } from '../../cor/store/dialog';
+import { showAlert } from '../../cor/store/dialog';
 
 export default function BreedsPage() {
   const { birds, breeds: _breedsRaw, dedupeBreeds, addBreed, updateBreed, deleteBreed } = useBrd();
@@ -59,6 +59,20 @@ export default function BreedsPage() {
   };
 
   const save = async () => {
+
+    // 🔒 جلوگیری قاطع از نام تکراری نژاد
+    if (!form.id) {
+      const _trimmed = form.name.trim();
+      const _dup = breeds.find((x: any) => x.birdId === form.birdId && x.name.trim() === _trimmed);
+      if (_dup) {
+        showAlert(
+          `نژادای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
+        );
+        return;
+      }
+    }
+
     if (!form.name.trim()) { setErr('نام نژاد اجباری است'); return; }
     const payload = {
       birdId: form.birdId,

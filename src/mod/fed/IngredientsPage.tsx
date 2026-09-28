@@ -6,6 +6,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, 
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
+import { showAlert } from '../../cor/store/dialog';
 
 interface F {
   id?: string;
@@ -122,7 +123,21 @@ export default function IngredientsPage() {
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
 
-  const save = () => {
+  const save = async () => {
+
+    // 🔒 جلوگیری قاطع از نام تکراری ماده اولیه
+    if (!form.id) {
+      const _trimmed = form.name.trim();
+      const _dup = ingredients.find((x: any) => x.name.trim() === _trimmed);
+      if (_dup) {
+        showAlert(
+          `ماده اولیهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
+        );
+        return;
+      }
+    }
+
     if (form.name.trim() === '') { setErr('نام ماده اجباری است'); return; }
     const data = {
       name: form.name.trim(), category: form.category,

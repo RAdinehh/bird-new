@@ -3,6 +3,7 @@ import { useFed, STAGE_LABEL, STAGE_LABEL_LONG, type Requirement } from './store
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { showAlert } from '../../cor/store/dialog';
 
 interface F {
   id?: string;
@@ -74,7 +75,21 @@ export default function RequirementsPage() {
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
 
-  const save = () => {
+  const save = async () => {
+
+    // 🔒 جلوگیری قاطع از نام تکراری نیاز
+    if (!form.id) {
+      const _trimmed = form.name.trim();
+      const _dup = requirements.find((x: any) => x.name.trim() === _trimmed);
+      if (_dup) {
+        showAlert(
+          `نیازای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
+        );
+        return;
+      }
+    }
+
     if (form.name.trim() === '') { setErr('نام نیاز اجباری است'); return; }
 
     const data = {

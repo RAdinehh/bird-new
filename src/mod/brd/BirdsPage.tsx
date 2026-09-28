@@ -4,7 +4,7 @@ import { findBirdPreset } from './presets';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showConfirmAsync } from '../../cor/store/dialog';
+import { showAlert } from '../../cor/store/dialog';
 
 interface F { id?: string; name: string; cycleDays: string; fcrStandard: string; }
 const empty: F = { name: '', cycleDays: '', fcrStandard: '' };
@@ -33,7 +33,21 @@ export default function BirdsPage() {
     setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '' });
     setError(''); setOpen(true);
   };
-  const save = () => {
+  const save = async () => {
+
+    // 🔒 جلوگیری قاطع از نام تکراری پرنده
+    if (!form.id) {
+      const _trimmed = form.name.trim();
+      const _dup = birds.find((x: any) => x.name.trim() === _trimmed);
+      if (_dup) {
+        showAlert(
+          `پرندهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
+        );
+        return;
+      }
+    }
+
     if (!form.name.trim()) { setError('نام پرنده اجباری است'); return; }
     const payload = {
       name: form.name.trim(), nameEn: '',

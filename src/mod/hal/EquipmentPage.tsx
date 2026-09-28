@@ -4,6 +4,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, S
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
+import { showAlert } from '../../cor/store/dialog';
 
 export default function EquipmentPage() {
   const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
@@ -32,7 +33,21 @@ export default function EquipmentPage() {
     setErr(''); setOpen(true);
   };
 
-  const save = () => {
+  const save = async () => {
+
+    // 🔒 جلوگیری قاطع از نام تکراری تجهیزات
+    if (!form.id) {
+      const _trimmed = form.name.trim();
+      const _dup = equipment.find((x: any) => x.hallId === form.hallId && x.name.trim() === _trimmed);
+      if (_dup) {
+        showAlert(
+          `تجهیزاتای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
+        );
+        return;
+      }
+    }
+
     if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
     const data = {
       hallId: form.hallId, type: form.type, name: form.name.trim(),

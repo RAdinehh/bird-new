@@ -4,6 +4,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, 
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
+import { showAlert } from '../../cor/store/dialog';
 
 export default function ZonesPage() {
   const { halls: _hallsRaw, zones: _zonesRaw, addZone, updateZone, deleteZone } = useHal();
@@ -49,7 +50,21 @@ export default function ZonesPage() {
   const openNew = () => { setForm({ id:'', hallId: halls[0].id, name:'', capacity:'', notes:'' }); setErr(''); setOpen(true); };
   const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId, name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setOpen(true); };
 
-  const save = () => {
+  const save = async () => {
+
+    // 🔒 جلوگیری قاطع از نام تکراری بخش
+    if (!form.id) {
+      const _trimmed = form.name.trim();
+      const _dup = zones.find((x: any) => x.hallId === form.hallId && x.name.trim() === _trimmed);
+      if (_dup) {
+        showAlert(
+          `بخشای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
+        );
+        return;
+      }
+    }
+
     if (!form.name.trim()) { setErr('نام بخش اجباری است'); return; }
     const data = { hallId: form.hallId, name: form.name.trim(), capacity: form.capacity ? parseInt(toEn(form.capacity)) || null : null, notes: form.notes.trim() };
     if (form.id) updateZone(form.id, data); else addZone(data);
