@@ -437,6 +437,10 @@ export default function SalesPage() {
               <Field label="قیمت"><Input mode="number" value={String(it.unitPrice)} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
             </Grid3>
 
+            <Field label="حمل قلم" hint="هزینه حمل این قلم">
+              <Input mode="number" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} unit="ت" />
+            </Field>
+
             {/* تخفیف هر قلم */}
             {it.discountType ? (
               <div style={{ padding: '8px 10px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 6 }}>
