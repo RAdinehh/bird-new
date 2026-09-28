@@ -18,6 +18,7 @@ interface Props {
   category: string;
   item: any;
   updateItem: (patch: any) => void;
+  isPurchase?: boolean;   // true = خرید، false/undefined = فروش
 }
 
 // ============ helper ============
@@ -318,7 +319,7 @@ function VaccineForm({ item, updateItem }: { item: any; updateItem: (p: any) => 
 }
 
 // ============ Main Component ==========
-export default function ItemDetailsForm({ category, item, updateItem }: Props) {
+export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false }: Props) {
   const { birds, breeds } = useBrd();
   const { flocks } = useFlk();
 
@@ -390,16 +391,18 @@ export default function ItemDetailsForm({ category, item, updateItem }: Props) {
         </Grid2>
 
         <Grid2>
-          <Field label="گله مبدأ" hint="اگر فروش از گله خودت است">
-            <SmartSelect
-              value={item.flockId || ''}
-              onChange={v => updateItem({ flockId: v })}
-              options={flocks.map(f => ({ value: f.id, label: f.name }))}
-              placeholder="— بدون گله —"
-              modalTitle="انتخاب گله"
-              autoThreshold={6}
-            />
-          </Field>
+          {!isPurchase && (
+            <Field label="گله مبدأ" hint="اگر فروش از گله خودت است">
+              <SmartSelect
+                value={item.flockId || ''}
+                onChange={v => updateItem({ flockId: v })}
+                options={flocks.map(f => ({ value: f.id, label: f.name }))}
+                placeholder="— بدون گله —"
+                modalTitle="انتخاب گله"
+                autoThreshold={6}
+              />
+            </Field>
+          )}
           <Field label="سن (روز)">
             <Input
               mode="number"
@@ -449,16 +452,18 @@ export default function ItemDetailsForm({ category, item, updateItem }: Props) {
   if (eggCategories.includes(category)) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <Field label="گله مبدأ" required>
-          <SmartSelect
-            value={item.flockId || ''}
-            onChange={v => updateItem({ flockId: v })}
-            options={flocks.map(f => ({ value: f.id, label: f.name }))}
-            placeholder="— انتخاب کنید —"
-            modalTitle="انتخاب گله"
-            autoThreshold={6}
-          />
-        </Field>
+        {!isPurchase && (
+          <Field label="گله مبدأ" required>
+            <SmartSelect
+              value={item.flockId || ''}
+              onChange={v => updateItem({ flockId: v })}
+              options={flocks.map(f => ({ value: f.id, label: f.name }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب گله"
+              autoThreshold={6}
+            />
+          </Field>
+        )}
 
         <Grid2>
           <Field label="مبنای قیمت">

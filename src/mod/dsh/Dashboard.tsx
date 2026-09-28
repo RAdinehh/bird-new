@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTra, remaining } from '../tra/store';
+import { useCtc } from '../ctc/store';
 import { useEgg, calcStock, henDayRate, healthyCount } from '../egg/store';
 import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
 import { useInc, daysToHatch, isLockdown, isHatchWindow } from '../inc/store';
@@ -46,6 +47,7 @@ export default function Dashboard() {
   const nav = useNavigate();
 
   const { invoices } = useTra();
+  const { contacts } = useCtc();
   const { productions } = useEgg();
   const { flocks } = useFlk();
   const { eggEntries } = useInc();
@@ -73,6 +75,43 @@ export default function Dashboard() {
   const waterToday = todayLogs.reduce((a, l) => a + (l.waterAmount || 0), 0);
   const tempToday = todayLogs.length > 0 ? (todayLogs[0].temperature || 0) : 0;
   const humidToday = todayLogs.length > 0 ? (todayLogs[0].humidity || 0) : 0;
+
+  // ============ سرسیدهای نزدیک ============
+  const daysUntilDue = (dueDate: string): number | null => {
+    if (!dueDate) return null;
+    const parts = dueDate.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString()).split('/');
+    if (parts.length !== 3) return null;
+    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    return Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  };
+
+  const upcomingDues = useMemo(() => {
+    return invoices
+      .filter(i => remaining(i) > 0 && i.dueDate && !i.remindersMuted)
+      .map(i => ({ inv: i, days: daysUntilDue(i.dueDate) }))
+      .filter(x => x.days !== null && x.days <= 7)
+      .sort((a, b) => (a.days ?? 0) - (b.days ?? 0))
+      .slice(0, 5);
+  }, [invoices]);
+
+  const pendingChecks = useMemo(() => {
+    const list: { inv: any; pay: any }[] = [];
+    invoices.filter(i => remaining(i) > 0).forEach(inv => {
+      (inv.payments || []).forEach((p: any) => {
+        if (p.method === 'check' && (!p.status || p.status === 'pending')) {
+          list.push({ inv, pay: p });
+        }
+      });
+    });
+    return list.sort((a, b) => (a.pay.dueDate || '').localeCompare(b.pay.dueDate || '')).slice(0, 5);
+  }, [invoices]);
+
+  const monthStats = useMemo(() => {
+    const monthInvoices = invoices.filter(i => i.date && i.date.startsWith(thisMonth));
+    const purchases = monthInvoices.filter(i => i.type === 'purchase').reduce((a, i) => a + (i.total || 0), 0);
+    const sales = monthInvoices.filter(i => i.type === 'sale').reduce((a, i) => a + (i.total || 0), 0);
+    return { purchases, sales, profit: sales - purchases };
+  }, [invoices, thisMonth]);
 
   // ============ ۲. سلامت گله ============
   const aliveCount = useMemo(() =>
@@ -212,6 +251,116 @@ export default function Dashboard() {
 
   return (
     <PageContainer>
+      {/* ⏰ سرسیدهای نزدیک */}
+      {upcomingDues.length > 0 && (
+        <div>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 6 }}>
+            ⏰ سرسیدهای نزدیک ({toFa(upcomingDues.length)})
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {upcomingDues.map(({ inv, days }) => {
+              const party = contacts.find((c: any) => c.id === inv.partyId);
+              const tone = (days ?? 0) < 0 ? 'danger' : (days ?? 0) <= 2 ? 'warn' : 'amber';
+              return (
+                <div
+                  key={inv.id}
+                  onClick={() => nav('/tra?tab=receivables')}
+                  style={{
+                    padding: '8px 12px',
+                    background: `var(--${tone}-soft, var(--input-bg))`,
+                    border: `1px solid var(--${tone})`,
+                    borderRadius: 'var(--r-md)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    fontSize: 'var(--fs-sm)',
+                  }}
+                >
+                  <span style={{ fontWeight: 600, color: `var(--${tone})` }}>
+                    {party?.name || '—'}
+                  </span>
+                  <span style={{ color: `var(--${tone})`, fontSize: 'var(--fs-xs)' }}>
+                    {(days ?? 0) < 0 ? `${toFa(Math.abs(days ?? 0))} روز گذشته` : (days === 0 ? 'امروز' : `${toFa(days ?? 0)} روز مانده`)}
+                  </span>
+                  <span style={{ fontWeight: 700, color: `var(--${tone})` }}>
+                    {toFa(remaining(inv).toLocaleString('fa-IR'))} ت
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 🏦 چک‌های در جریان */}
+      {pendingChecks.length > 0 && (
+        <div>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 6 }}>
+            🏦 چک‌های در جریان ({toFa(pendingChecks.length)})
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {pendingChecks.map(({ inv, pay }) => {
+              const party = contacts.find((c: any) => c.id === inv.partyId);
+              return (
+                <div
+                  key={pay.id}
+                  onClick={() => nav('/tra?tab=receivables')}
+                  style={{
+                    padding: '8px 12px',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--r-md)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    fontSize: 'var(--fs-sm)',
+                  }}
+                >
+                  <span style={{ fontWeight: 600 }}>{party?.name || '—'}</span>
+                  <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>
+                    چک {pay.checkNo || '—'} · {pay.bank || '—'}
+                  </span>
+                  <span style={{ fontWeight: 700, color: 'var(--amber)' }}>
+                    {toFa(pay.amount.toLocaleString('fa-IR'))} ت
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 💰 مالی این ماه */}
+      <div>
+        <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 6 }}>
+          💰 مالی این ماه
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <div style={{ padding: '10px 12px', background: 'var(--danger-soft)', borderRadius: 'var(--r-md)' }}>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 600 }}>خرید</div>
+            <div style={{ fontSize: 'var(--fs-md)', color: 'var(--danger)', fontWeight: 700 }}>
+              {toFa(monthStats.purchases.toLocaleString('fa-IR'))} ت
+            </div>
+          </div>
+          <div style={{ padding: '10px 12px', background: 'var(--accent-soft)', borderRadius: 'var(--r-md)' }}>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600 }}>فروش</div>
+            <div style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700 }}>
+              {toFa(monthStats.sales.toLocaleString('fa-IR'))} ت
+            </div>
+          </div>
+          <div style={{ padding: '10px 12px', background: monthStats.profit >= 0 ? 'var(--accent-soft)' : 'var(--danger-soft)', borderRadius: 'var(--r-md)', gridColumn: '1 / -1' }}>
+            <div style={{ fontSize: 'var(--fs-xs)', color: monthStats.profit >= 0 ? 'var(--accent)' : 'var(--danger)', fontWeight: 600 }}>
+              {monthStats.profit >= 0 ? '📈 سود' : '📉 زیان'}
+            </div>
+            <div style={{ fontSize: 'var(--fs-lg)', color: monthStats.profit >= 0 ? 'var(--accent)' : 'var(--danger)', fontWeight: 700 }}>
+              {toFa(Math.abs(monthStats.profit).toLocaleString('fa-IR'))} ت
+            </div>
+          </div>
+        </div>
+      </div>
+
       {activeFlocks.length === 0 && invoices.length === 0 ? (
         <div style={{
           padding: 40, textAlign: 'center',
