@@ -122,7 +122,7 @@ export default function BreedsPage() {
               options={birds.map(c => ({
                 value: c.id,
                 label: c.name,
-                subtitle: (b => b.name)(c),
+                subtitle: (b => b.nameEn || undefined)(c),
               }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب پرنده"
