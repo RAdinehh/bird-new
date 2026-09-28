@@ -6,6 +6,7 @@ import { useBrd } from '../brd/store';
 import { useFed } from '../fed/store';
 import { useHal } from '../hal/store';
 import { feedSystemFromHall, waterSystemFromHall, FEED_SYSTEM_LABEL, WATER_SYSTEM_LABEL } from '../../shr/utils/systemType';
+import SmartSelect from '../../shr/components/SmartSelect';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
@@ -425,9 +426,17 @@ export default function DailyLogsPage() {
           footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 <Grid2>
             <Field label="گله" required>
-              <Select value={form.flockId} onChange={e => onFlockChange(e.target.value)}>
-                {activeFlocks.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
-              </Select>
+              <SmartSelect
+                value={form.flockId}
+                onChange={onFlockChange}
+                options={activeFlocks.map(f => ({
+                  value: f.id,
+                  label: f.name,
+                  subtitle: f.currentCount ? `${toFa(f.currentCount)} پرنده` : undefined,
+                }))}
+                placeholder="— انتخاب گله —"
+                modalTitle="انتخاب گله"
+              />
             </Field>
             <Field label="ساعت ورود">
               <TimePicker value={form.entryTime} onChange={v => setForm({ ...form, entryTime: v })} placeholder="انتخاب ساعت" />
@@ -515,12 +524,11 @@ export default function DailyLogsPage() {
           <SectionTitle>🌾 تغذیه</SectionTitle>
 
           <Field label="منبع دان مصرفی" hint="از جیره‌ها یا دان تکی انبار">
-            <Select
+            <SmartSelect
               value={form.feedSourceType && form.feedSourceId
                 ? (form.feedSourceType === 'formula' ? 'f:' : 'i:') + form.feedSourceId
                 : ''}
-              onChange={e => {
-                const val = e.target.value;
+              onChange={val => {
                 if (val.startsWith('f:')) {
                   const id = val.slice(2);
                   const f = formulas.find(x => x.id === id);
@@ -533,19 +541,26 @@ export default function DailyLogsPage() {
                   setForm(prev => ({ ...prev, feedSourceType: '', feedSourceId: '', feedType: '' }));
                 }
               }}
-            >
-              <option value="">— انتخاب کنید —</option>
-              {formulas.length > 0 && (
-                <optgroup label="📋 جیره‌ها">
-                  {formulas.map(f => <option key={f.id} value={'f:' + f.id}>{f.name}</option>)}
-                </optgroup>
-              )}
-              {feedItems.length > 0 && (
-                <optgroup label="🌾 دان تکی (انبار)">
-                  {feedItems.map(it => <option key={it.id} value={'i:' + it.id}>{it.name}</option>)}
-                </optgroup>
-              )}
-            </Select>
+              options={[
+                ...formulas.map(f => ({
+                  value: 'f:' + f.id,
+                  label: f.name,
+                  subtitle: `${f.lines.length} ماده`,
+                  group: 'formula',
+                })),
+                ...feedItems.map(it => ({
+                  value: 'i:' + it.id,
+                  label: it.name,
+                  subtitle: `موجودی ${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`,
+                  group: 'item',
+                })),
+              ]}
+              groupLabels={{ formula: '📋 جیره‌ها', item: '🌾 دان تکی' }}
+              groupIcons={{ formula: '📋', item: '🌾' }}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب منبع دان"
+              autoThreshold={6}
+            />
           </Field>
 
           {form.feedSourceType === 'formula' && form.feedSourceId && (() => {
