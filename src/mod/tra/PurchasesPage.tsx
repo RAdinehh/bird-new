@@ -449,6 +449,17 @@ export default function PurchasesPage() {
               <Input mode="number" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} unit="ت" />
             </Field>
 
+            <Field label="فروشنده این قلم" hint="خالی = اصلی فاکتور">
+              <SmartSelect
+                value={it.itemPartyId || ''}
+                onChange={v => updateItem(it.id, { itemPartyId: v })}
+                options={suppliers.map(c => ({ value: c.id, label: c.name }))}
+                placeholder="— همان اصلی —"
+                modalTitle="انتخاب فروشنده"
+                autoThreshold={6}
+              />
+            </Field>
+
             {/* تخفیف هر قلم (اختیاری) */}
             {it.discountType ? (
               <div style={{ padding: '8px 10px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 6 }}>
