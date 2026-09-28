@@ -7,12 +7,13 @@ import { toFa, toEn } from '../../shr/utils/fa';
 interface F {
   id?: string; name: string; phone: string; phone2: string; email: string;
   address: string; city: string; nationalId: string; roles: Role[]; notes: string;
-  customerType: string; trustScore: string; defaultDiscount: string;
+  customerType: string;
+  customerTypes: string[]; trustScore: string; defaultDiscount: string;
   supplierTypes: string[]; position: string; startDate: string; salaryType: string; salaryAmount: string; insurance: boolean;
 }
 const empty: F = {
   name:'', phone:'', phone2:'', email:'', address:'', city:'', nationalId:'', roles: ['customer'], notes: '',
-  customerType:'wholesale', trustScore:'', defaultDiscount:'', supplierTypes: [],
+  customerType:'wholesale', customerTypes: [], trustScore:'', defaultDiscount:'', supplierTypes: [],
   position:'', startDate:'', salaryType:'monthly', salaryAmount:'', insurance:false
 };
 type TabId = 'all' | 'customer' | 'supplier' | 'worker';
@@ -32,7 +33,7 @@ export default function ContactsPage() {
     setForm({
       id: p.id, name: p.name, phone: p.phone, phone2: p.phone2, email: p.email,
       address: p.address, city: p.city, nationalId: p.nationalId, roles: p.roles, notes: p.notes,
-      customerType: p.customerType || 'wholesale', trustScore: p.trustScore ? toFa(p.trustScore) : '', defaultDiscount: p.defaultDiscount ? toFa(p.defaultDiscount) : '',
+      customerType: p.customerType || 'wholesale', customerTypes: p.customerTypes || (p.customerType ? [p.customerType] : []), trustScore: p.trustScore ? toFa(p.trustScore) : '', defaultDiscount: p.defaultDiscount ? toFa(p.defaultDiscount) : '',
       supplierTypes: p.supplierTypes || [], position: p.position, startDate: p.startDate,
       salaryType: p.salaryType || 'monthly', salaryAmount: p.salaryAmount ? toFa(p.salaryAmount) : '', insurance: p.insurance
     });
@@ -47,7 +48,8 @@ export default function ContactsPage() {
     const data: Omit<Person, 'id'|'createdAt'|'updatedAt'> = {
       name: form.name.trim(), phone: form.phone.trim(), phone2: form.phone2.trim(), email: form.email.trim(),
       address: form.address.trim(), city: form.city.trim(), nationalId: form.nationalId.trim(),
-      roles: form.roles, notes: form.notes.trim(), customerType: form.customerType,
+      roles: form.roles, notes: form.notes.trim(), customerType: form.customerTypes[0] || '',
+      customerTypes: form.customerTypes,
       trustScore: form.trustScore ? parseInt(toEn(form.trustScore)) || null : null,
       defaultDiscount: num(form.defaultDiscount), supplierTypes: form.supplierTypes,
       position: form.position.trim(), startDate: form.startDate.trim(), salaryType: form.salaryType,
@@ -210,15 +212,42 @@ export default function ContactsPage() {
               ))}
             </div>
           </Field>
-          <Field label="نام" required><Input placeholder="..." value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
+
+          {form.roles.includes('customer') && (
+            <Field label="نوع مشتری" hint="می‌تواند چند مورد باشد">
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {CUSTOMER_TYPES.map(([v, l]) => (
+                  <button key={v} type="button"
+                    onClick={() => {
+                      setForm(f => ({
+                        ...f,
+                        customerTypes: f.customerTypes.includes(v)
+                          ? f.customerTypes.filter(x => x !== v)
+                          : [...f.customerTypes, v]
+                      }));
+                    }}
+                    style={{
+                      padding: '6px 12px', fontSize: 'var(--fs-sm)',
+                      background: form.customerTypes.includes(v) ? 'var(--accent-soft)' : 'var(--btn-bg)',
+                      border: `1px solid ${form.customerTypes.includes(v) ? 'var(--accent-border)' : 'var(--border)'}`,
+                      borderRadius: 'var(--r-sm)',
+                      color: form.customerTypes.includes(v) ? 'var(--accent)' : 'var(--muted)',
+                      fontWeight: form.customerTypes.includes(v) ? 600 : 500,
+                      cursor: 'pointer', fontFamily: 'inherit'
+                    }}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </Field>
+          )}
           <Grid2>
+            <Field label="نام" required><Input placeholder="..." value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
             <Field label="تلفن"><Input placeholder="۰۹..." inputMode="tel" dir="ltr" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></Field>
           </Grid2>
           <Grid2>
-                        <Field label="کد ملی"><Input placeholder="..." inputMode="numeric" dir="ltr" value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} /></Field>
-          </Grid2>
-          <Grid2>
-                        <Field label="آدرس"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
+            <Field label="کد ملی"><Input placeholder="..." inputMode="numeric" dir="ltr" value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} /></Field>
+            <Field label="آدرس"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
           </Grid2>
 
           <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>

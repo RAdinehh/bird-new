@@ -17,7 +17,8 @@ export interface Person {
   notes: string;
 
   // مشتری
-  customerType: string;      // wholesale | retail | restaurant | shop
+  customerType: string;        // [قدیمی] wholesale | retail | ...
+  customerTypes: string[];     // [جدید] چندتایی: wholesale, retail, ...
   trustScore: number | null; // 1-10
   defaultDiscount: number | null;
 
@@ -52,7 +53,19 @@ export const useCtc = create<State>()(
       update: (id, patch) => set({ contacts: get().contacts.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       remove: (id) => set({ contacts: get().contacts.filter(x => x.id !== id) })
     }),
-    { name: 'pm-ctc' }
+    {
+      name: 'pm-ctc',
+      version: 2,
+      migrate: (persisted: any, version: number) => {
+        if (version < 2 && persisted?.people) {
+          persisted.people = persisted.people.map((p: any) => ({
+            ...p,
+            customerTypes: p.customerTypes || (p.customerType ? [p.customerType] : []),
+          }));
+        }
+        return persisted;
+      }
+    }
   )
 );
 
