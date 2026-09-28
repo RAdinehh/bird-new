@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment , calcDueDate } from './store';
+import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment , calcDueDate , type WorkflowStatus, nextWorkflowStatus, workflowTone, WORKFLOW_LABEL, prevWorkflowStatus } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui'
@@ -49,6 +49,9 @@ export default function PurchasesPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [filterCat, setFilterCat] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [transferModal, setTransferModal] = useState<{ id: string; to: WorkflowStatus } | null>(null);
+  const [transferNote, setTransferNote] = useState('');
+  const [transferDate, setTransferDate] = useState('');
   const [printId, setPrintId] = useState<string | null>(null);
 
   const list = useMemo(() => {
@@ -79,6 +82,29 @@ export default function PurchasesPage() {
       notes: inv.notes || ''
     });
     setErr(''); setOpen(true);
+  };
+
+  const doTransfer = () => {
+    if (!transferModal) return;
+    const inv = invoices.find(i => i.id === transferModal.id);
+    if (!inv) return;
+
+    const patch: Partial<Invoice> = { workflowStatus: transferModal.to };
+
+    if (transferModal.to === 'confirmed') {
+      patch.confirmedAt = transferDate || new Date().toISOString();
+    } else if (transferModal.to === 'received') {
+      patch.receivedAt = transferDate || new Date().toISOString();
+      patch.receivedNote = transferNote;
+    } else if (transferModal.to === 'paid') {
+      patch.paidAt = transferDate || new Date().toISOString();
+      patch.paidNote = transferNote;
+    }
+
+    updateInvoice(inv.id, patch);
+    setTransferModal(null);
+    setTransferNote('');
+    setTransferDate('');
   };
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
@@ -201,7 +227,16 @@ export default function PurchasesPage() {
                 subtitle={`${sup?.name || '—'} · ${toFa(inv.date)}${inv.number ? ` · ${inv.number}` : ''}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : inv.id)}
-                badge={<Tag tone={st === 'paid' ? 'green' : st === 'partial' ? 'amber' : 'red'}>{STATUS_LABEL[st]}</Tag>}
+                badge={
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <Tag tone={workflowTone(inv.workflowStatus)}>
+                      {WORKFLOW_LABEL[inv.workflowStatus || 'draft']}
+                    </Tag>
+                    <Tag tone={st === 'paid' ? 'green' : st === 'partial' ? 'amber' : 'red'}>
+                      {STATUS_LABEL[st]}
+                    </Tag>
+                  </div>
+                }
                 summary={
                   <>
                     <span>کل: <b style={{ color: 'var(--text)' }}>{toFa(inv.total.toLocaleString('fa-IR'))} ت</b></span>
@@ -215,6 +250,23 @@ export default function PurchasesPage() {
                 <Row l="تاریخ" v={toFa(inv.date)} />
                 {inv.number ? <Row l="شماره" v={inv.number} /> : null}
                 {inv.dueDate ? <Row l="سرسید" v={toFa(inv.dueDate)} /> : null}
+
+                {/* دکمه‌های workflow */}
+                {nextWorkflowStatus(inv.workflowStatus) && (
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+                    <Btn
+                      size="sm"
+                      variant="primary"
+                      full
+                      onClick={() => {
+                        const next = nextWorkflowStatus(inv.workflowStatus);
+                        if (next) setTransferModal({ id: inv.id, to: next });
+                      }}
+                    >
+                      ▶️ {WORKFLOW_LABEL[nextWorkflowStatus(inv.workflowStatus)!]}
+                    </Btn>
+                  </div>
+                )}
 
                 {inv.items.length > 0 ? (
                   <>

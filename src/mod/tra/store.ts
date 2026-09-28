@@ -396,6 +396,33 @@ export function calcDueDate(
   return customDueDate || invoiceDate;
 }
 
+
+
+/** مرحله بعدی workflow */
+export function nextWorkflowStatus(current?: WorkflowStatus): WorkflowStatus | null {
+  if (!current || current === 'draft') return 'confirmed';
+  if (current === 'confirmed') return 'received';
+  if (current === 'received') return 'paid';
+  return null;
+}
+
+/** مرحله قبلی workflow */
+export function prevWorkflowStatus(current?: WorkflowStatus): WorkflowStatus | null {
+  if (!current || current === 'draft') return null;
+  if (current === 'confirmed') return 'draft';
+  if (current === 'received') return 'confirmed';
+  if (current === 'paid') return 'received';
+  return null;
+}
+
+/** رنگ بج workflow */
+export function workflowTone(status?: WorkflowStatus): 'gray' | 'blue' | 'amber' | 'green' {
+  if (!status || status === 'draft') return 'gray';
+  if (status === 'confirmed') return 'blue';
+  if (status === 'received') return 'amber';
+  return 'green';
+}
+
 export function itemTotal(q: number, p: number): number {
   return (q || 0) * (p || 0);
 }
