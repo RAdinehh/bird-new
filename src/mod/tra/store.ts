@@ -322,6 +322,40 @@ export const STATUS_LABEL: Record<InvoiceStatus, string> = {
   paid: 'پرداخت‌شده', partial: 'نیمه‌پرداخت', unpaid: 'پرداخت‌نشده', overdue: 'سرسید گذشته'
 };
 
+
+
+/** محاسبه تاریخ سرسید از شرایط پرداخت */
+export function calcDueDate(
+  terms: PaymentTerms | undefined,
+  invoiceDate: string,
+  customDueDate?: string,
+  gapDays?: number
+): string {
+  if (!invoiceDate) return customDueDate || '';
+
+  if (terms === 'cash') {
+    return invoiceDate;
+  }
+  if (terms === 'custom') {
+    return customDueDate || invoiceDate;
+  }
+  if (terms === 'installment') {
+    // آخرین قسط = تاریخ فاکتور + (تعداد اقساط × فاصله)
+    // ولی سرسید اولین قسط = تاریخ + فاصله
+    const gap = gapDays || 30;
+    const parts = invoiceDate.split('/').map(Number);
+    if (parts.length !== 3) return invoiceDate;
+    // محاسبه سرسید اول (تاریخ + فاصله)
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    d.setDate(d.getDate() + gap);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}/${m}/${day}`;
+  }
+  return customDueDate || invoiceDate;
+}
+
 export function itemTotal(q: number, p: number): number {
   return (q || 0) * (p || 0);
 }

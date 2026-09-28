@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment } from './store';
+import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment , calcDueDate } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { useCtc } from '../ctc/store';
@@ -15,6 +15,11 @@ interface F {
   number: string; date: string; partyId: string; category: string;
   items: InvoiceItem[];
   discount: string; shipping: string;
+  paymentTerms: 'cash' | 'installment' | 'custom';
+  installmentCount: string;
+  installmentGapDays: string;
+  customDueDate: string;
+  paymentNote: string;
   dueDate: string;
   payments: Payment[];
   notes: string;
@@ -24,6 +29,8 @@ const empty = (): F => ({
   number: '', date: '', partyId: '', category: 'chick',
   items: [],
   discount: '', shipping: '',
+  paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
+  customDueDate: '', paymentNote: '',
   dueDate: '',
   payments: [],
   notes: ''
@@ -62,6 +69,11 @@ export default function SalesPage() {
       discount: inv.discount ? toFa(inv.discount) : '',
       shipping: inv.shipping ? toFa(inv.shipping) : '',
       dueDate: inv.dueDate || '',
+      paymentTerms: inv.paymentTerms || 'cash',
+      installmentCount: inv.installmentCount ? toFa(inv.installmentCount) : '1',
+      installmentGapDays: inv.installmentGapDays ? toFa(inv.installmentGapDays) : '30',
+      customDueDate: inv.customDueDate || '',
+      paymentNote: inv.paymentNote || '',
       payments: inv.payments || [],
       notes: inv.notes || ''
     });
@@ -119,6 +131,11 @@ export default function SalesPage() {
       total,
       payments: form.payments,
       dueDate: form.dueDate.trim(),
+      paymentTerms: form.paymentTerms,
+      installmentCount: form.paymentTerms === 'installment' ? (parseInt(toEn(form.installmentCount)) || 1) : undefined,
+      installmentGapDays: form.paymentTerms === 'installment' ? (parseInt(toEn(form.installmentGapDays)) || 30) : undefined,
+      customDueDate: form.paymentTerms === 'custom' ? form.customDueDate : '',
+      paymentNote: form.paymentNote.trim(),
       relatedFlockId: '',
       relatedEntryId: '',
       notes: form.notes.trim()
@@ -347,7 +364,54 @@ export default function SalesPage() {
           <Input readOnly dir="ltr" value={toFa(total.toLocaleString('fa-IR'))} unit="ت" />
         </Field>
 
-        <Field label="سرسید"><DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})} /></Field>
+        <SectionTitle>📅 شرایط پرداخت</SectionTitle>
+        <Field label="نوع پرداخت" required>
+          <Select value={form.paymentTerms} onChange={e => {
+            const terms = e.target.value as 'cash' | 'installment' | 'custom';
+            setForm(f => {
+              const newForm = { ...f, paymentTerms: terms };
+              // محاسبه خودکار سرسید
+              if (terms === 'cash') newForm.dueDate = f.date;
+              else if (terms === 'installment') {
+                newForm.dueDate = calcDueDate(terms, f.date, '', parseInt(toEn(f.installmentGapDays)) || 30);
+              } else if (terms === 'custom') {
+                newForm.dueDate = f.customDueDate || f.date;
+              }
+              return newForm;
+            });
+          }}>
+            <option value="cash">💵 نقدی</option>
+            <option value="installment">📅 قسطی</option>
+            <option value="custom">✏️ توافقی</option>
+          </Select>
+        </Field>
+
+        {form.paymentTerms === 'installment' && (
+          <Grid2>
+            <Field label="تعداد اقساط" required>
+              <Input mode="number" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" />
+            </Field>
+            <Field label="فاصله بین اقساط" required>
+              <Input mode="number" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" />
+            </Field>
+          </Grid2>
+        )}
+
+        {form.paymentTerms === 'custom' && (
+          <Field label="تاریخ سرسید (توافقی)" required>
+            <DatePicker value={form.customDueDate} onChange={v => setForm({...form, customDueDate: v, dueDate: v})} />
+          </Field>
+        )}
+
+        {form.paymentTerms !== 'custom' && (
+          <Field label="سرسید (خودکار)" hint="به‌طور خودکار محاسبه شد">
+            <Input readOnly value={form.dueDate} dir="ltr" />
+          </Field>
+        )}
+
+        <Field label="یادداشت پرداخت" hint="مثلاً: توافق شد اول ماه پرداخت شود">
+          <Input placeholder="..." value={form.paymentNote} onChange={e => setForm({...form, paymentNote: e.target.value})} />
+        </Field>
 
         <SectionTitle>💳 دریافت‌ها — {toFa(paid.toLocaleString('fa-IR'))} از {toFa(total.toLocaleString('fa-IR'))}</SectionTitle>
 
