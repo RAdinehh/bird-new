@@ -6,6 +6,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
 interface F {
   id?: string;
@@ -73,7 +74,19 @@ export default function ItemsPage() {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
   const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
 
-  const save = () => {
+  const save = async () => {
+    // چک تکراری کالا (فقط برای جدید)
+    if (!form.id) {
+      const _dup = items.find((x: any) => x.name.trim() === form.name.trim());
+      if (_dup) {
+        const _ok = await showConfirmAsync(
+          `کالاای با نام «${_dup.name}» قبلاً ثبت شده. باز هم اضافه شود؟`,
+          '⚠️ نام تکراری'
+        );
+        if (!_ok) return;
+      }
+    }
+
     if (form.name.trim() === '') { setErr('نام قلم اجباری است'); return; }
     const isMed = form.category === 'medicine' || form.category === 'vaccine';
 

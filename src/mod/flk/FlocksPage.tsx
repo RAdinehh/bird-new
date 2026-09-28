@@ -10,6 +10,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import DependentSelect from '../../shr/components/DependentSelect';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
 interface F {
   id?: string;
@@ -78,7 +79,19 @@ export default function FlocksPage() {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
-  const save = () => {
+  const save = async () => {
+    // چک تکراری گله (فقط برای جدید)
+    if (!form.id) {
+      const _dup = flocks.find((x: any) => x.name.trim() === form.name.trim());
+      if (_dup) {
+        const _ok = await showConfirmAsync(
+          `گلهای با نام «${_dup.name}» قبلاً ثبت شده. باز هم اضافه شود؟`,
+          '⚠️ نام تکراری'
+        );
+        if (!_ok) return;
+      }
+    }
+
     if (!form.name.trim()) { setErr('نام گله اجباری است'); return; }
     if (!form.birdId) { setErr('پرنده اجباری است'); return; }
     if (!form.startDate.trim() && !form.hatchDate.trim() && !form.purchaseDate.trim()) {

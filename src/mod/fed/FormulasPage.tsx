@@ -7,6 +7,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
 interface F {
   id?: string;
@@ -92,7 +93,19 @@ export default function FormulasPage() {
     setForm(f => ({ ...f, lines: newLines }));
   };
 
-  const save = () => {
+  const save = async () => {
+    // چک تکراری جیره (فقط برای جدید)
+    if (!form.id) {
+      const _dup = formulas.find((x: any) => x.name.trim() === form.name.trim());
+      if (_dup) {
+        const _ok = await showConfirmAsync(
+          `جیرهای با نام «${_dup.name}» قبلاً ثبت شده. باز هم اضافه شود؟`,
+          '⚠️ نام تکراری'
+        );
+        if (!_ok) return;
+      }
+    }
+
     if (form.name.trim() === '') { setErr('نام جیره اجباری است'); return; }
     if (form.lines.length === 0) { setErr('حداقل یک ماده اضافه کنید'); return; }
     const v = formulaValid(form.lines, ingredients);

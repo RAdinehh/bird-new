@@ -3,6 +3,7 @@ import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITT
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
 interface F { id?: string; name: string; code: string; length: string; width: string; height: string; capacity: string; targetTemp: string; targetHumidity: string; ventilation: string; light: string; ventilationSystem: string; feederType: string; drinkerType: string; litterType: string; address: string; builtAt: string; lastSanitizedAt: string; notes: string; }
 const empty: F = { name:'', code:'', length:'', width:'', height:'', capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'', ventilationSystem:'tunnel', feederType:'chain', drinkerType:'nipple', litterType:'wood_shavings', address:'', builtAt:'', lastSanitizedAt:'', notes:'' };
@@ -28,7 +29,19 @@ export default function HallsPage() {
     setErr(''); setOpen(true);
   };
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
-  const save = () => {
+  const save = async () => {
+    // چک تکراری سالن (فقط برای جدید)
+    if (!form.id) {
+      const _dup = halls.find((x: any) => x.name.trim() === form.name.trim());
+      if (_dup) {
+        const _ok = await showConfirmAsync(
+          `سالنای با نام «${_dup.name}» قبلاً ثبت شده. باز هم اضافه شود؟`,
+          '⚠️ نام تکراری'
+        );
+        if (!_ok) return;
+      }
+    }
+
     if (!form.name.trim()) { setErr('نام سالن اجباری است'); return; }
     const data = {
       name: form.name.trim(), code: form.code.trim(),
