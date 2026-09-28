@@ -4,6 +4,7 @@ import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui'
 import SmartSelect from '../../shr/components/SmartSelect';
+import ItemDetailsForm from '../../shr/components/ItemDetailsForm';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import InvoicePrint from './InvoicePrint';
@@ -523,6 +524,14 @@ export default function PurchasesPage() {
                 )}
               </>
             )}
+
+            
+            {/* فیلدهای اختصاصی دسته */}
+            <ItemDetailsForm
+              category={form.category}
+              item={it}
+              updateItem={(patch: any) => updateItem(it.id, patch)}
+            />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
               <span>جمع:</span>

@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment, calcDueDate, type WorkflowStatus, nextWorkflowStatus, workflowTone, WORKFLOW_LABEL, prevWorkflowStatus, calcItemTotal, calcItemDiscount , checkTone, CHECK_STATUS_LABEL, type CheckStatus } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import SmartSelect from '../../shr/components/SmartSelect';
+import ItemDetailsForm from '../../shr/components/ItemDetailsForm';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui'
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -493,6 +494,14 @@ export default function SalesPage() {
                 )}
               </>
             )}
+
+            
+            {/* فیلدهای اختصاصی دسته */}
+            <ItemDetailsForm
+              category={form.category}
+              item={it}
+              updateItem={(patch: any) => updateItem(it.id, patch)}
+            />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
               <span>جمع:</span>
