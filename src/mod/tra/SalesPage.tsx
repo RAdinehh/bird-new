@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment , calcDueDate , type WorkflowStatus, nextWorkflowStatus, workflowTone, WORKFLOW_LABEL, prevWorkflowStatus , calcItemTotal, calcItemDiscount } from './store';
+import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment, calcDueDate, type WorkflowStatus, nextWorkflowStatus, workflowTone, WORKFLOW_LABEL, prevWorkflowStatus, calcItemTotal, calcItemDiscount } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { useCtc } from '../ctc/store';
@@ -166,7 +166,7 @@ export default function SalesPage() {
   const rem = Math.max(0, total - paid);
 
   const addItem = () => {
-    setForm(f => ({ ...f, items: [...f.items, { id: crypto.randomUUID(), description:'', unit:'عدد', quantity:1, unitPrice:0, total:0, itemId:'', movementId:'' }] }));
+    setForm(f => ({ ...f, items: [...f.items, { id: crypto.randomUUID(), description:'', unit:'عدد', quantity:1, unitPrice:0, total:0, itemId:'', movementId:'', discountType:'', discountValue:0 }] }));
   };
   const updateItem = (id: string, patch: Partial<InvoiceItem>) => {
     setForm(f => ({
@@ -174,7 +174,7 @@ export default function SalesPage() {
       items: f.items.map(x => {
         if (x.id === id) {
           const nx = { ...x, ...patch };
-          nx.total = itemTotal(nx.quantity, nx.unitPrice);
+          nx.total = calcItemTotal(nx.quantity, nx.unitPrice, nx.discountType, nx.discountValue);
           return nx;
         }
         return x;
@@ -435,6 +435,34 @@ export default function SalesPage() {
               <Field label="تعداد"><Input mode="number" value={String(it.quantity)} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
               <Field label="قیمت"><Input mode="number" value={String(it.unitPrice)} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
             </Grid3>
+
+            {/* تخفیف هر قلم */}
+            {it.discountType ? (
+              <div style={{ padding: '8px 10px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>💰 تخفیف قلم</span>
+                  <button type="button" onClick={() => updateItem(it.id, { discountType: '', discountValue: 0 })} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12 }}>حذف تخفیف</button>
+                </div>
+                <Grid2>
+                  <Field label="نوع">
+                    <Select value={it.discountType || 'percent'} onChange={e => updateItem(it.id, { discountType: e.target.value as 'percent' | 'amount' })}>
+                      <option value="percent">درصد (٪)</option>
+                      <option value="amount">مبلغ (ت)</option>
+                    </Select>
+                  </Field>
+                  <Field label="مقدار">
+                    <Input mode="number" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} unit={it.discountType === 'percent' ? '٪' : 'ت'} />
+                  </Field>
+                </Grid2>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600, textAlign: 'left' }}>
+                  تخفیف: {toFa(calcItemDiscount(it.quantity, it.unitPrice, it.discountType, it.discountValue).toLocaleString('fa-IR'))} ت
+                </div>
+              </div>
+            ) : (
+              <button type="button" onClick={() => updateItem(it.id, { discountType: 'percent', discountValue: 0 })} style={{ padding: '4px 10px', background: 'transparent', border: '1px dashed var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', alignSelf: 'flex-start' }}>
+                + افزودن تخفیف
+              </button>
+            )}
 
             {/* اتصال به انبار (اختیاری) */}
             {whsItems.length > 0 && (

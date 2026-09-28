@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment , calcDueDate , type WorkflowStatus, nextWorkflowStatus, workflowTone, WORKFLOW_LABEL, prevWorkflowStatus , calcItemTotal, calcItemDiscount } from './store';
+import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment, calcDueDate, type WorkflowStatus, nextWorkflowStatus, workflowTone, WORKFLOW_LABEL, prevWorkflowStatus, calcItemTotal, calcItemDiscount } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui'
@@ -167,7 +167,7 @@ export default function PurchasesPage() {
   const rem = Math.max(0, total - paid);
 
   const addItem = () => {
-    setForm(f => ({ ...f, items: [...f.items, { id: crypto.randomUUID(), description:'', unit:'عدد', quantity:1, unitPrice:0, total:0, itemId:'', movementId:'' }] }));
+    setForm(f => ({ ...f, items: [...f.items, { id: crypto.randomUUID(), description:'', unit:'عدد', quantity:1, unitPrice:0, total:0, itemId:'', movementId:'', discountType:'', discountValue:0 }] }));
   };
   const updateItem = (id: string, patch: Partial<InvoiceItem>) => {
     setForm(f => ({
@@ -175,7 +175,7 @@ export default function PurchasesPage() {
       items: f.items.map(x => {
         if (x.id === id) {
           const nx = { ...x, ...patch };
-          nx.total = itemTotal(nx.quantity, nx.unitPrice);
+          nx.total = calcItemTotal(nx.quantity, nx.unitPrice, nx.discountType, nx.discountValue);
           return nx;
         }
         return x;
