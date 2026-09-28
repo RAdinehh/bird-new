@@ -1,7 +1,7 @@
 import { useSet } from './store';
 import { useState } from 'react';
 import { Btn, Modal, Tag } from '../../shr/components/ui';
-import { showConfirmAsync, showAlert } from '../../cor/store/dialog';;
+import { showConfirmAsync, showAlert, showSuccess } from '../../cor/store/dialog';
 import { toFa } from '../../shr/utils/fa';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -117,6 +117,17 @@ const GUIDE_SECTIONS: { title: string; icon: string; items: string[] }[] = [
 ];
 
 export default function AboutTab() {
+
+  const resetHelpBanners = () => {
+    try {
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('help-banner-'));
+      keys.forEach(k => localStorage.removeItem(k));
+      showSuccess('همه راهنماها دوباره فعال شدند. اکنون در صفحات مربوطه نمایش داده می‌شوند.');
+    } catch (e) {
+      // silent
+    }
+  };
+
   const reset = useSet(s => s.reset);
   const [openFaq, setOpenFaq] = useState(false);
   const [openGuide, setOpenGuide] = useState(false);
@@ -318,6 +329,53 @@ export default function AboutTab() {
         <br />
         با ❤ برای کسب‌وکار شما
       </div>
-    </div>
+    
+        {/* راهنماهای پنهان‌شده */}
+        <div style={{
+          marginTop: 12,
+          padding: 12,
+          background: 'var(--input-bg)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-md)',
+        }}>
+          <div style={{
+            fontSize: 'var(--fs-sm)',
+            fontWeight: 700,
+            color: 'var(--text)',
+            marginBottom: 6,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}>
+            <span>📖</span>
+            <span>راهنماهای پنهان‌شده</span>
+          </div>
+          <div style={{
+            fontSize: 'var(--fs-xs)',
+            color: 'var(--muted)',
+            lineHeight: 1.7,
+            marginBottom: 10,
+          }}>
+            اگر بنرهای راهنما را در صفحات مختلف بستید، با زدن دکمه زیر همه‌شان دوباره فعال می‌شوند.
+          </div>
+          <button
+            type="button"
+            onClick={resetHelpBanners}
+            style={{
+              padding: '8px 16px',
+              background: 'var(--accent)',
+              color: 'white',
+              border: 'none',
+              borderRadius: 'var(--r-sm)',
+              fontSize: 'var(--fs-sm)',
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            📖 نمایش مجدد همه راهنماها
+          </button>
+        </div>
+</div>
   );
 }

@@ -9,6 +9,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import InvoicePrint from './InvoicePrint';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 interface F {
   id?: string;
@@ -137,6 +138,13 @@ export default function PurchasesPage() {
 
   return (
     <PageContainer>
+        <HelpBanner
+          id="purchases-intro"
+          icon="📥"
+          title="ثبت خرید از فروشنده"
+          description="اگر می‌خواهید این خرید به انبار اضافه شود، در بخش اقلام گزینه «اتصال به انبار» را فعال کنید. قیمت و تعداد از فاکتور به‌طور خودکار به انبار منتقل می‌شود."
+          tone="success"
+        />
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
         <button onClick={() => setFilterCat('')} style={chip(filterCat === '')}>
           همه ({toFa(invoices.filter(i => i.type === 'purchase').length)})

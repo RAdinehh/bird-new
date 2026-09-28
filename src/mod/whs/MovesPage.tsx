@@ -7,6 +7,8 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
+import HelpBanner from '../../shr/components/HelpBanner';
+import { useNavigate } from 'react-router-dom';
 
 interface F {
   id?: string;
@@ -21,6 +23,7 @@ interface F {
 }
 
 export default function MovesPage() {
+  const navigate = useNavigate();
   const { items, movements, addMovement, deleteMovement } = useWhs();
   const { contacts } = useCtc();
 
@@ -94,6 +97,15 @@ export default function MovesPage() {
 
   return (
     <PageContainer>
+        <HelpBanner
+          id="moves-intro"
+          icon="⚠️"
+          title="این صفحه فقط برای اصلاح دستی است"
+          description="موارد استفاده: ضایعات (دان خراب شد)، شمارش دستی، هدیه، مرجوعی. برای خرید از فروشنده یا فروش به مشتری، از بخش «معاملات» استفاده کنید."
+          tone="warn"
+        actionLabel="برو به معاملات ←"
+        onAction={() => navigate('/tra/purchases')}
+        />
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
         <button onClick={() => setFilterType('')} style={chip(filterType === '')}>
           همه ({toFa(movements.length)})

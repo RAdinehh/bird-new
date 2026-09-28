@@ -7,6 +7,8 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showConfirmAsync , showAlert} from '../../cor/store/dialog';
+import HelpBanner from '../../shr/components/HelpBanner';
+import { useNavigate } from 'react-router-dom';
 
 interface F {
   id?: string;
@@ -33,6 +35,7 @@ const empty = (): F => ({
 });
 
 export default function ItemsPage() {
+  const navigate = useNavigate();
   const { items, movements, addItem, updateItem, deleteItem } = useWhs();
   const { contacts } = useCtc();
   const suppliers = contacts.filter(c => c.roles.includes('supplier'));
@@ -119,6 +122,15 @@ export default function ItemsPage() {
 
   return (
     <PageContainer>
+        <HelpBanner
+          id="items-intro"
+          icon="📦"
+          title="اینجا فقط کالاها تعریف می‌شوند"
+          description="موجودی و قیمت از اینجا مدیریت می‌شود. برای ثبت خرید از فروشنده به بخش «معاملات → خرید» بروید. برای ضایعات یا اصلاح دستی به «انبار → ورود/خروج» بروید."
+          tone="info"
+        actionLabel="برو به خرید ←"
+        onAction={() => navigate('/tra/purchases')}
+        />
       {/* فیلتر دسته */}
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
         <button onClick={() => setFilterCat('')} style={chip(filterCat === '')}>
