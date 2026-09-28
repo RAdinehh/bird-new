@@ -97,6 +97,13 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
+          onFocus={e => {
+            // auto-select محتوا با کلیک
+            const t = e.target;
+            if (!t.readOnly && !t.disabled) {
+              setTimeout(() => t.select(), 0);
+            }
+          }}
           inputMode={effectiveMode === 'number' ? 'numeric' : rest.inputMode}
           style={{
             flex: '1 1 0%', width: '100%', minWidth: 0,

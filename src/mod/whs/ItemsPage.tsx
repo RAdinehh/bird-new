@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useWhs, CATEGORY_LABEL, CATEGORY_ICON, UNIT_LABEL, STORAGE_LABEL, stockWarning, expiryWarning, daysToExpiry, type Item, type ItemCategory, type ItemUnit } from './store';
+import { useWhs, CATEGORY_LABEL, CATEGORY_ICON, CATEGORY_DEFAULTS, UNIT_LABEL, STORAGE_LABEL, stockWarning, expiryWarning, daysToExpiry, type Item, type ItemCategory, type ItemUnit } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -16,8 +16,7 @@ interface F {
   category: ItemCategory;
   unit: ItemUnit;
   minStock: string;
-  currentStock: string;
-  lastPrice: string;
+  initialStock: string;
   supplierId: string;
   expireDate: string;
   withdrawalDays: string;
@@ -28,7 +27,7 @@ interface F {
 
 const empty = (): F => ({
   name: '', category: 'feed', unit: 'kg',
-  minStock: '', currentStock: '', lastPrice: '',
+  minStock: '', initialStock: '',
   supplierId: '', expireDate: '',
   withdrawalDays: '', batchNo: '', storage: 'room',
   notes: ''
@@ -62,8 +61,7 @@ export default function ItemsPage() {
     setForm({
       id: it.id, name: it.name, category: it.category, unit: it.unit,
       minStock: it.minStock ? toFa(it.minStock) : '',
-      currentStock: it.currentStock ? toFa(it.currentStock) : '',
-      lastPrice: it.lastPrice ? toFa(it.lastPrice) : '',
+      initialStock: '',
       supplierId: it.supplierId || '',
       expireDate: it.expireDate || '',
       withdrawalDays: it.withdrawalDays === null || it.withdrawalDays === undefined ? '' : toFa(it.withdrawalDays),
@@ -94,25 +92,36 @@ export default function ItemsPage() {
     if (form.name.trim() === '') { setErr('نام قلم اجباری است'); return; }
     const isMed = form.category === 'medicine' || form.category === 'vaccine';
 
-    const data = {
-      name: form.name.trim(),
-      category: form.category,
-      unit: form.unit,
-      minStock: num(form.minStock),
-      currentStock: num(form.currentStock),
-      lastPrice: num(form.lastPrice),
-      supplierId: form.supplierId,
-      expireDate: isMed ? form.expireDate : '',
-      withdrawalDays: isMed && form.withdrawalDays.trim() !== '' ? int(form.withdrawalDays) : null,
-      batchNo: isMed ? form.batchNo.trim() : '',
-      storage: isMed ? form.storage : 'room',
-      notes: form.notes.trim()
-    };
-
     if (form.id === undefined) {
-      addItem(data);
+      // ایجاد جدید: موجودی اولیه از فرم + قیمت صفر
+      addItem({
+        name: form.name.trim(),
+        category: form.category,
+        unit: form.unit,
+        minStock: num(form.minStock),
+        currentStock: num(form.initialStock),   // ← موجودی اولیه
+        lastPrice: 0,                            // ← صفر (بعد از خرید پر میشه)
+        supplierId: form.supplierId,
+        expireDate: isMed ? form.expireDate : '',
+        withdrawalDays: isMed && form.withdrawalDays.trim() !== '' ? int(form.withdrawalDays) : null,
+        batchNo: isMed ? form.batchNo.trim() : '',
+        storage: form.storage,
+        notes: form.notes.trim()
+      });
     } else {
-      updateItem(form.id, data);
+      // ویرایش: currentStock و lastPrice نباید تغییر کنن
+      updateItem(form.id, {
+        name: form.name.trim(),
+        category: form.category,
+        unit: form.unit,
+        minStock: num(form.minStock),
+        supplierId: form.supplierId,
+        expireDate: isMed ? form.expireDate : '',
+        withdrawalDays: isMed && form.withdrawalDays.trim() !== '' ? int(form.withdrawalDays) : null,
+        batchNo: isMed ? form.batchNo.trim() : '',
+        storage: form.storage,
+        notes: form.notes.trim()
+      });
     }
     setOpen(false);
   };
@@ -273,7 +282,18 @@ export default function ItemsPage() {
 
         <Grid2>
           <Field label="دسته" required>
-            <Select value={form.category} onChange={e => setForm({ ...form, category: e.target.value as ItemCategory })}>
+            <Select value={form.category} onChange={e => {
+              const newCat = e.target.value as ItemCategory;
+              const def = CATEGORY_DEFAULTS[newCat];
+              setForm(f => ({
+                ...f,
+                category: newCat,
+                unit: def.unit,
+                storage: def.storage,
+                expireDate: def.needsExpiry ? f.expireDate : '',
+                withdrawalDays: def.needsWithdrawal ? f.withdrawalDays : '',
+              }));
+            }}>
               {(Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c =>
                 <option key={c} value={c}>{CATEGORY_ICON[c]} {CATEGORY_LABEL[c]}</option>
               )}
@@ -289,15 +309,15 @@ export default function ItemsPage() {
         </Grid2>
 
         <Grid3>
-          <Field label="موجودی فعلی">
-            <Input mode="number" value={form.currentStock} onChange={e => setForm({ ...form, currentStock: e.target.value })} />
-          </Field>
+          {!form.id && (
+            <Field label="موجودی اولیه" hint="اگه الان موجودی داری، اینجا وارد کن — بعد از این، فقط از معاملات به‌روز میشه">
+              <Input mode="number" value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={UNIT_LABEL[form.unit]} />
+            </Field>
+          )}
           <Field label="حداقل موجودی" hint="برای هشدار">
             <Input mode="number" value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} />
           </Field>
-          <Field label="قیمت آخرین خرید">
-            <Input mode="number" value={form.lastPrice} onChange={e => setForm({ ...form, lastPrice: e.target.value })} unit="ت" />
-          </Field>
+          
         </Grid3>
 
         <Field label="تأمین‌کننده" hint="از مخاطبین">

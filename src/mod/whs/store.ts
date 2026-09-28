@@ -123,6 +123,23 @@ export const CATEGORY_ICON: Record<ItemCategory, string> = {
   consumable: '📦'
 };
 
+
+
+/** پیش‌فرض‌های هر دسته — قابل ویرایش در فرم */
+export const CATEGORY_DEFAULTS: Record<ItemCategory, {
+  unit: ItemUnit;
+  storage: string;
+  needsExpiry: boolean;
+  needsWithdrawal: boolean;
+}> = {
+  feed:       { unit: 'kg',   storage: 'room',   needsExpiry: false, needsWithdrawal: false },
+  medicine:   { unit: 'ml',   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true  },
+  vaccine:    { unit: 'vial', storage: 'fridge', needsExpiry: true,  needsWithdrawal: true  },
+  herbal:     { unit: 'g',    storage: 'room',   needsExpiry: false, needsWithdrawal: false },
+  equipment:  { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false },
+  consumable: { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false },
+};
+
 export const UNIT_LABEL: Record<ItemUnit, string> = {
   kg: 'کیلوگرم', g: 'گرم', L: 'لیتر', ml: 'میلی‌لیتر',
   pcs: 'عدد', vial: 'ویال', pack: 'بسته'
