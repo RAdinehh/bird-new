@@ -1,0 +1,714 @@
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTra, remaining } from '../tra/store';
+import { useEgg, calcStock, henDayRate, healthyCount } from '../egg/store';
+import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
+import { useInc, daysToHatch, isLockdown, isHatchWindow } from '../inc/store';
+import { useWhs, stockWarning, expiryWarning } from '../whs/store';
+import { useAlt, activeAlerts, LEVEL_ICON, LEVEL_LABEL, countByLevel } from '../alt/store';
+import { runRules } from '../alt/rules';
+import { useBrd } from '../brd/store';
+import { useDlg } from '../dlg/store';
+import { PageContainer, Tag } from '../../shr/components/ui';
+import { LineChart } from '../../shr/components/Charts';
+import { toFa } from '../../shr/utils/fa';
+
+function toEnNum(s: string): number {
+  return parseInt(s.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))) || 0;
+}
+
+function monthKey(date: string): string {
+  if (date === '' || date == null) return '';
+  const parts = date.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).split('/');
+  if (parts.length !== 3) return '';
+  return parts[0] + '/' + parts[1];
+}
+
+function currentMonth(): string {
+  const d = new Date();
+  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+function todayJalali(): string {
+  const d = new Date();
+  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+}
+
+function dateDiffDays(jalaliDate: string): number {
+  if (jalaliDate === '' || jalaliDate == null) return 999;
+  const parts = jalaliDate.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).split('/');
+  if (parts.length !== 3) return 999;
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  return Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export default function Dashboard() {
+  const nav = useNavigate();
+
+  const { invoices } = useTra();
+  const { productions } = useEgg();
+  const { flocks } = useFlk();
+  const { eggEntries } = useInc();
+  const { items: whsItems } = useWhs();
+  const { alerts } = useAlt();
+  const { birds } = useBrd();
+  const { logs } = useDlg();
+
+  useEffect(() => { runRules(); }, []);
+
+  const today = todayJalali();
+  const thisMonth = currentMonth();
+
+  // ============ گله‌های فعال ============
+  const activeFlocks = useMemo(() => flocks.filter(f => f.status === 'active'), [flocks]);
+
+  // ============ ۱. امروز در یک نگاه ============
+  const todayProd = useMemo(() => productions.filter(p => p.date === today), [productions, today]);
+  const eggsToday = todayProd.reduce((a, p) => a + (p.totalCount || 0), 0);
+  const brokenToday = todayProd.reduce((a, p) => a + (p.brokenCount || 0), 0);
+
+  const todayLogs = useMemo(() => logs.filter(l => l.date === today), [logs, today]);
+  const deathsToday = todayLogs.reduce((a, l) => a + (l.deaths || []).reduce((b, x) => b + (x.count || 0), 0), 0);
+  const feedToday = todayLogs.reduce((a, l) => a + (l.feedAmount || 0), 0);
+  const waterToday = todayLogs.reduce((a, l) => a + (l.waterAmount || 0), 0);
+  const tempToday = todayLogs.length > 0 ? (todayLogs[0].temperature || 0) : 0;
+  const humidToday = todayLogs.length > 0 ? (todayLogs[0].humidity || 0) : 0;
+
+  // ============ ۲. سلامت گله ============
+  const aliveCount = useMemo(() =>
+    activeFlocks.reduce((a, f) => a + (f.currentCount || f.initialCount || 0), 0),
+    [activeFlocks]
+  );
+
+  const totalInitial = useMemo(() =>
+    activeFlocks.reduce((a, f) => a + (f.initialCount || 0), 0),
+    [activeFlocks]
+  );
+
+  const survivalRate = totalInitial > 0 ? (aliveCount / totalInitial) * 100 : 100;
+  const cumulativeMortality = totalInitial > 0 ? ((totalInitial - aliveCount) / totalInitial) * 100 : 0;
+
+  // Hen-Day — میانگین ۷ روز اخیر
+  const henDay7 = useMemo(() => {
+    const last7: any[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+      const prods = productions.filter(p => p.date === key);
+      prods.forEach(p => last7.push(p));
+    }
+    if (last7.length === 0 || aliveCount === 0) return 0;
+    const totalHealthy = last7.reduce((a, p) => a + healthyCount(p), 0);
+    const days = new Set(last7.map(p => p.date)).size;
+    if (days === 0) return 0;
+    return (totalHealthy / (aliveCount * days)) * 100;
+  }, [productions, aliveCount]);
+
+  // تخم شکسته درصد — ۷ روز
+  const brokenRate7 = useMemo(() => {
+    const last7 = productions.filter(p => dateDiffDays(p.date) <= 7);
+    const total = last7.reduce((a, p) => a + (p.totalCount || 0) + (p.brokenCount || 0), 0);
+    const broken = last7.reduce((a, p) => a + (p.brokenCount || 0), 0);
+    if (total === 0) return 0;
+    return (broken / total) * 100;
+  }, [productions]);
+
+  // ============ ۳. عملکرد تولیدی ============
+  // روند ۷ روزه تخم
+  const eggTrend = useMemo(() => {
+    const days: { label: string; value: number }[] = [];
+    const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+      const prods = productions.filter(p => p.date === key);
+      const total = prods.reduce((a, p) => a + (p.totalCount || 0), 0);
+      days.push({ label: toFa(String(d.getDate())), value: total });
+    }
+    return days;
+  }, [productions]);
+
+  // FCR ماه
+  const fcr = useMemo(() => {
+    const monthLogs = logs.filter(l => monthKey(l.date) === thisMonth);
+    const monthProd = productions.filter(p => monthKey(p.date) === thisMonth);
+    const feed = monthLogs.reduce((a, l) => a + (l.feedAmount || 0), 0);
+    const eggsWeight = monthProd.reduce((a, p) => a + (p.totalCount || 0) * 0.06, 0);
+    if (eggsWeight <= 0) return 0;
+    return Math.round((feed / eggsWeight) * 100) / 100;
+  }, [logs, productions, thisMonth]);
+
+  // نسبت آب به دان
+  const waterFeedRatio = useMemo(() => {
+    const last7 = logs.filter(l => dateDiffDays(l.date) <= 7);
+    const water = last7.reduce((a, l) => a + (l.waterAmount || 0), 0);
+    const feed = last7.reduce((a, l) => a + (l.feedAmount || 0), 0);
+    if (feed === 0) return 0;
+    return Math.round((water / feed) * 10) / 10;
+  }, [logs]);
+
+  // ============ ۴. مالی ============
+  const salesThisMonth = useMemo(() =>
+    invoices.filter(i => i.type === 'sale' && monthKey(i.date) === thisMonth)
+      .reduce((a, i) => a + (i.total || 0), 0),
+    [invoices, thisMonth]
+  );
+
+  const purchasesThisMonth = useMemo(() =>
+    invoices.filter(i => i.type === 'purchase' && monthKey(i.date) === thisMonth)
+      .reduce((a, i) => a + (i.total || 0), 0),
+    [invoices, thisMonth]
+  );
+
+  const profit = salesThisMonth - purchasesThisMonth;
+
+  const receivables = useMemo(() =>
+    invoices.filter(i => i.type === 'sale').reduce((a, i) => a + remaining(i), 0),
+    [invoices]
+  );
+
+  const inventoryValue = useMemo(() =>
+    whsItems.reduce((a, i) => a + ((i.currentStock || 0) * (i.lastPrice || 0)), 0),
+    [whsItems]
+  );
+
+  // هزینه هر تخم این ماه
+  const costPerEgg = useMemo(() => {
+    if (salesThisMonth === 0) return 0;
+    const monthProd = productions.filter(p => monthKey(p.date) === thisMonth);
+    const eggs = monthProd.reduce((a, p) => a + (p.totalCount || 0), 0);
+    if (eggs === 0) return 0;
+    return Math.round(purchasesThisMonth / eggs);
+  }, [productions, purchasesThisMonth, thisMonth, salesThisMonth]);
+
+  // ============ ۵. هشدارها ============
+  const active = useMemo(() => {
+    const list = activeAlerts(alerts);
+    const order: any = { critical: 0, important: 1, info: 2 };
+    return list.sort((a, b) => order[a.level] - order[b.level]).slice(0, 4);
+  }, [alerts]);
+
+  const counts = countByLevel(alerts);
+
+  const stockAlerts = useMemo(() =>
+    whsItems.filter(i => stockWarning(i) !== 'ok' || expiryWarning(i) !== 'ok').length,
+    [whsItems]
+  );
+
+  const activeEntries = useMemo(() =>
+    eggEntries.filter(e => e.status !== 'done' && e.status !== 'hatched'),
+    [eggEntries]
+  );
+
+  const hasData = aliveCount > 0 || invoices.length > 0 || productions.length > 0;
+
+  // رنگ تلفات
+  const deathTone: 'accent' | 'warn' | 'danger' = deathsToday === 0 ? 'accent' : deathsToday <= 3 ? 'warn' : 'danger';
+  const survivalTone: 'accent' | 'warn' | 'danger' = survivalRate >= 95 ? 'accent' : survivalRate >= 90 ? 'warn' : 'danger';
+  const henDayTone: 'accent' | 'warn' | 'danger' = henDay7 >= 80 ? 'accent' : henDay7 >= 60 ? 'warn' : 'danger';
+  const brokenTone: 'accent' | 'warn' | 'danger' = brokenRate7 <= 3 ? 'accent' : brokenRate7 <= 6 ? 'warn' : 'danger';
+
+  return (
+    <PageContainer>
+      {activeFlocks.length === 0 && invoices.length === 0 ? (
+        <div style={{
+          padding: 40, textAlign: 'center',
+          background: 'var(--card)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-lg)'
+        }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>🐔</div>
+          <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, marginBottom: 8 }}>خوش آمدید</div>
+          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.8, maxWidth: 300, margin: '0 auto' }}>
+            برای شروع، از منوی بالا اولین پرنده یا سالن خود را بسازید.
+          </div>
+        </div>
+      ) : null}
+
+      {/* ============ ۱. امروز در یک نگاه ============ */}
+      {hasData ? (
+        <>
+          <SectionTitle>📅 امروز در یک نگاه</SectionTitle>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <KpiCard
+              icon="🥚"
+              label="تخم امروز"
+              value={eggsToday}
+              unit="عدد"
+              color="accent"
+              onClick={() => nav('/egg')}
+            />
+            <KpiCard
+              icon="💀"
+              label="تلفات امروز"
+              value={deathsToday}
+              unit="پرنده"
+              color={deathTone}
+              onClick={() => nav('/dlg')}
+            />
+            <KpiCard
+              icon="🌾"
+              label="دان امروز"
+              value={feedToday}
+              unit="kg"
+              color="warn"
+              onClick={() => nav('/dlg')}
+            />
+            <KpiCard
+              icon="🌡"
+              label="دمای سالن"
+              value={tempToday}
+              unit={tempToday > 0 ? '°C' : 'ثبت نشده'}
+              color={tempToday > 26 || (tempToday > 0 && tempToday < 18) ? 'warn' : 'info'}
+              noFormat
+              onClick={() => nav('/dlg')}
+            />
+          </div>
+
+          {/* ============ ۲. سلامت گله ============ */}
+          <SectionTitle>❤️ سلامت گله</SectionTitle>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <MiniStat
+              label="نرخ زنده‌مانی"
+              value={survivalRate}
+              suffix="٪"
+              color={survivalTone}
+            />
+            <MiniStat
+              label="تلفات تجمعی"
+              value={cumulativeMortality}
+              suffix="٪"
+              color={cumulativeMortality <= 5 ? 'accent' : cumulativeMortality <= 10 ? 'warn' : 'danger'}
+            />
+            <MiniStat
+              label="Hen-Day ۷ روز"
+              value={henDay7}
+              suffix="٪"
+              color={henDayTone}
+            />
+            <MiniStat
+              label="تخم شکسته"
+              value={brokenRate7}
+              suffix="٪"
+              color={brokenTone}
+            />
+          </div>
+
+          {/* ============ ۳. عملکرد تولیدی ============ */}
+          <SectionTitle>📊 عملکرد تولیدی</SectionTitle>
+          <div style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-lg)',
+            padding: '14px 16px'
+          }}>
+            <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 4 }}>
+              🥚 روند تخم‌گذاری ۷ روز اخیر
+            </div>
+            <LineChart data={eggTrend} color="var(--accent)" height={120} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+            <MiniStat
+              label="FCR ماه"
+              value={fcr}
+              suffix=""
+              color={fcr === 0 ? 'info' : fcr <= 1.9 ? 'accent' : fcr <= 2.3 ? 'warn' : 'danger'}
+            />
+            <MiniStat
+              label="آب/دان"
+              value={waterFeedRatio}
+              suffix=""
+              color={waterFeedRatio === 0 ? 'info' : waterFeedRatio >= 1.6 && waterFeedRatio <= 2.2 ? 'accent' : 'warn'}
+            />
+            <MiniStat
+              label="هزینه/تخم"
+              value={costPerEgg}
+              suffix="ت"
+              color="info"
+              noFormat
+            />
+          </div>
+
+          {/* ============ ۴. مالی ============ */}
+          <SectionTitle>💰 مالی این ماه</SectionTitle>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <KpiCard
+              icon="📥"
+              label="فروش ماه"
+              value={salesThisMonth}
+              unit="تومان"
+              color="accent"
+              onClick={() => nav('/tra')}
+            />
+            <KpiCard
+              icon="📤"
+              label="خرید ماه"
+              value={purchasesThisMonth}
+              unit="تومان"
+              color="warn"
+              onClick={() => nav('/tra')}
+            />
+            <KpiCard
+              icon={profit >= 0 ? '📈' : '📉'}
+              label={profit >= 0 ? 'سود ماه' : 'زیان ماه'}
+              value={Math.abs(profit)}
+              unit="تومان"
+              color={profit >= 0 ? 'accent' : 'danger'}
+              onClick={() => nav('/rep')}
+            />
+            <KpiCard
+              icon="📦"
+              label="ارزش انبار"
+              value={inventoryValue}
+              unit="تومان"
+              color="info"
+              onClick={() => nav('/whs')}
+            />
+          </div>
+
+          {receivables > 0 ? (
+            <div
+              onClick={() => nav('/tra')}
+              style={{
+                padding: '12px 14px',
+                background: 'var(--accent-soft)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: 'var(--r-md)',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
+                📥 طلب از مشتریان
+              </span>
+              <span style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                {toFa(receivables.toLocaleString('fa-IR'))} ت
+              </span>
+            </div>
+          ) : null}
+        </>
+      ) : null}
+
+      {/* ============ ۵. هشدارها ============ */}
+      {active.length > 0 ? (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 4px 8px' }}>
+            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>
+              🔔 هشدارهای فعال ({toFa(counts.total)})
+            </span>
+            <span onClick={() => nav('/alt')} style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', cursor: 'pointer' }}>
+              مشاهده همه ←
+            </span>
+          </div>
+          <div style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-lg)',
+            overflow: 'hidden'
+          }}>
+            {active.map((a, i) => (
+              <div
+                key={a.id}
+                onClick={() => nav('/alt')}
+                style={{
+                  padding: '10px 14px',
+                  borderBottom: i < active.length - 1 ? '1px solid var(--border)' : 'none',
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  cursor: 'pointer'
+                }}
+              >
+                <span style={{ fontSize: 16, flexShrink: 0 }}>{LEVEL_ICON[a.level]}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: 'var(--fs-sm)', fontWeight: 600,
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                  }}>
+                    {a.title}
+                  </div>
+                  <div style={{
+                    fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2,
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                  }}>
+                    {a.message}
+                  </div>
+                </div>
+                <Tag tone={a.level === 'critical' ? 'red' : a.level === 'important' ? 'amber' : 'blue'}>
+                  {LEVEL_LABEL[a.level]}
+                </Tag>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : null}
+
+      {/* ============ ۶. گله‌ها ============ */}
+      {activeFlocks.length > 0 ? (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 4px 8px' }}>
+            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>
+              🐔 گله‌های فعال
+            </span>
+            <span onClick={() => nav('/flk')} style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', cursor: 'pointer' }}>
+              مشاهده همه ←
+            </span>
+          </div>
+          <div style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-lg)',
+            overflow: 'hidden'
+          }}>
+            {activeFlocks.slice(0, 3).map((f, i) => {
+              const age = getAgeDays(f);
+              const lc = getLifecycle(f.type, age);
+              const bird = birds.find(b => b.id === f.birdId);
+              const flockCount = f.currentCount || f.initialCount || 0;
+              const flockProds = productions.filter(p => p.flockId === f.id && dateDiffDays(p.date) <= 7);
+              const flockHenDay = flockProds.length > 0 && flockCount > 0
+                ? (flockProds.reduce((a, p) => a + healthyCount(p), 0) / (flockCount * flockProds.length)) * 100
+                : 0;
+
+              return (
+                <div
+                  key={f.id}
+                  onClick={() => nav('/flk')}
+                  style={{
+                    padding: '10px 14px',
+                    borderBottom: i < Math.min(activeFlocks.length, 3) - 1 ? '1px solid var(--border)' : 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 'var(--r-md)',
+                      background: 'var(--accent-soft)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 16, flexShrink: 0
+                    }}>🐔</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: 'var(--fs-sm)', fontWeight: 600,
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                      }}>
+                        {f.name}
+                      </div>
+                      <div style={{
+                        fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2,
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                      }}>
+                        {bird?.name || '—'} · {toFa(age)} روز · {toFa(flockCount)} پرنده
+                        {flockHenDay > 0 ? ' · ' + toFa(flockHenDay.toFixed(0)) + '٪' : ''}
+                      </div>
+                    </div>
+                    <Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : 'blue'}>
+                      {lc.label}
+                    </Tag>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      ) : null}
+
+      {/* ============ ۷. جوجه‌کشی فعال ============ */}
+      {activeEntries.length > 0 ? (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 4px 8px' }}>
+            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>
+              🥚 جوجه‌کشی فعال ({toFa(activeEntries.length)})
+            </span>
+            <span onClick={() => nav('/inc')} style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', cursor: 'pointer' }}>
+              مشاهده ←
+            </span>
+          </div>
+          <div style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-lg)',
+            overflow: 'hidden'
+          }}>
+            {activeEntries.slice(0, 2).map((e, i) => {
+              const days = daysToHatch(e.expectedHatchDate);
+              const locked = isLockdown(e);
+              const window = isHatchWindow(e);
+              const bird = birds.find(b => b.id === e.birdId);
+
+              return (
+                <div
+                  key={e.id}
+                  onClick={() => nav('/inc')}
+                  style={{
+                    padding: '10px 14px',
+                    borderBottom: i < Math.min(activeEntries.length, 2) - 1 ? '1px solid var(--border)' : 'none',
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 'var(--r-md)',
+                    background: window ? 'var(--purple-soft)' : locked ? 'var(--warn-soft)' : 'var(--accent-soft)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 16, flexShrink: 0
+                  }}>🥚</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontSize: 'var(--fs-sm)', fontWeight: 600,
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                    }}>
+                      {toFa(e.count || 0)} تخم — {bird?.name || '—'}
+                    </div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
+                      {window ? '🐣 پنجره هچ' : locked ? '🔒 Lock-down' : toFa(days) + ' روز مانده'}
+                    </div>
+                  </div>
+                  {window ? <Tag tone="purple">هچ</Tag> : locked ? <Tag tone="amber">قفل</Tag> : <Tag tone="blue">{toFa(days)} روز</Tag>}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      ) : null}
+
+      {/* ============ ۸. هشدار انبار ============ */}
+      {stockAlerts > 0 ? (
+        <div
+          onClick={() => nav('/whs')}
+          style={{
+            padding: '12px 14px',
+            background: 'var(--warn-soft)',
+            border: '1px solid var(--warn)',
+            borderRadius: 'var(--r-md)',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 700 }}>
+            📦 هشدار انبار
+          </span>
+          <span style={{ fontSize: 'var(--fs-md)', color: 'var(--warn)', fontWeight: 700 }}>
+            {toFa(stockAlerts)} قلم
+          </span>
+        </div>
+      ) : null}
+
+      {/* ============ ۹. دسترسی سریع ============ */}
+      <SectionTitle>⚡ دسترسی سریع</SectionTitle>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+        <QuickAction icon="📋" label="ثبت روزانه" onClick={() => nav('/dlg')} />
+        <QuickAction icon="🥚" label="جوجه‌کشی" onClick={() => nav('/inc')} />
+        <QuickAction icon="🛒" label="معاملات" onClick={() => nav('/tra')} />
+        <QuickAction icon="🥚" label="تخم" onClick={() => nav('/egg')} />
+        <QuickAction icon="🌾" label="جیره" onClick={() => nav('/fed')} />
+        <QuickAction icon="📊" label="گزارش" onClick={() => nav('/rep')} />
+      </div>
+    </PageContainer>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)',
+      padding: '8px 4px 8px', letterSpacing: '.5px'
+    }}>{children}</div>
+  );
+}
+
+function KpiCard({ icon, label, value, unit, color, onClick, noFormat }: {
+  icon: string;
+  label: string;
+  value: number;
+  unit: string;
+  color: 'accent' | 'warn' | 'danger' | 'info';
+  onClick?: () => void;
+  noFormat?: boolean;
+}) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        background: 'var(--card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r-lg)',
+        padding: '12px 14px',
+        cursor: onClick ? 'pointer' : 'default'
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+        <span style={{ fontSize: 16 }}>{icon}</span>
+        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+          {label}
+        </span>
+      </div>
+      <div style={{
+        fontSize: 'var(--fs-xl)',
+        fontWeight: 700,
+        color: 'var(--' + color + ')',
+        fontVariantNumeric: 'tabular-nums',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+      }}>
+        {noFormat ? toFa(String(value)) : toFa(value.toLocaleString('fa-IR'))}
+      </div>
+      {unit ? (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{unit}</div>
+      ) : null}
+    </div>
+  );
+}
+
+function MiniStat({ label, value, suffix, color, noFormat }: {
+  label: string;
+  value: number;
+  suffix: string;
+  color: 'accent' | 'warn' | 'danger' | 'info';
+  noFormat?: boolean;
+}) {
+  return (
+    <div style={{
+      padding: '10px 12px',
+      background: 'var(--' + color + '-soft)',
+      border: '1px solid var(--' + color + ')',
+      borderRadius: 'var(--r-md)',
+      textAlign: 'center'
+    }}>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--' + color + ')', fontWeight: 700 }}>
+        {label}
+      </div>
+      <div style={{
+        fontSize: 'var(--fs-md)', fontWeight: 700,
+        color: 'var(--' + color + ')',
+        marginTop: 4,
+        fontVariantNumeric: 'tabular-nums'
+      }}>
+        {noFormat ? toFa(String(Math.round(value))) : toFa((Math.round(value * 100) / 100).toLocaleString('fa-IR'))}{suffix}
+      </div>
+    </div>
+  );
+}
+
+function QuickAction({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        background: 'var(--card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r-md)',
+        padding: '12px 8px',
+        textAlign: 'center',
+        cursor: 'pointer'
+      }}
+    >
+      <div style={{ fontSize: 22 }}>{icon}</div>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', marginTop: 4, fontWeight: 600 }}>
+        {label}
+      </div>
+    </div>
+  );
+}

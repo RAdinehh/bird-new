@@ -1,0 +1,219 @@
+import { useState } from 'react';
+import { useSet } from './store';
+import { Field, Grid2, Grid3, Input, Select } from '../../shr/components/ui';
+import { toFa } from '../../shr/utils/fa';
+import SettingsGroup from './SettingsGroup';
+
+function ToggleRow({ label, sub, value, onChange }: any) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '10px 12px', background: 'var(--input-bg)',
+      border: '1px solid var(--border)', borderRadius: 'var(--r-md)', gap: 10
+    }}>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>{label}</div>
+        {sub ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{sub}</div> : null}
+      </div>
+      <button type="button" onClick={onChange} style={{
+        width: 44, height: 24, borderRadius: 12,
+        background: value ? 'var(--accent)' : 'var(--dim)',
+        position: 'relative', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0
+      }}>
+        <span style={{
+          position: 'absolute', top: 2, right: value ? 22 : 2,
+          width: 20, height: 20, borderRadius: '50%', background: '#fff',
+          transition: 'right .2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)'
+        }} />
+      </button>
+    </div>
+  );
+}
+
+export default function ProfileTab() {
+  const { user, farm, bank, units, defaults, security, updateSection } = useSet();
+
+  const U = (k: string, label: string, opts: [string, string][]) => (
+    <Field label={label}>
+      <Select value={(units as any)[k]} onChange={e => updateSection('units', { [k]: e.target.value } as any)}>
+        {opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+      </Select>
+    </Field>
+  );
+
+  const userSummary = user.name || 'نام وارد نشده';
+  const farmSummary = farm.name || 'نام مرغداری وارد نشده';
+  const bankSummary = bank.bankName ? `بانک ${bank.bankName}` : 'اطلاعات بانکی خالی';
+  const unitSummary = units.currency === 'toman' ? 'تومان · متر · کیلوگرم' : 'ریال · متر · کیلوگرم';
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+
+      <SettingsGroup icon="👤" title="پروفایل کاربر" subtitle={userSummary} defaultOpen={!user.name} tone="accent">
+        <Field label="نام و نام خانوادگی">
+          <Input value={user.name} onChange={e => updateSection('user', { name: e.target.value })} placeholder="نام شما" />
+        </Field>
+        <Grid2>
+          <Field label="شماره تماس">
+            <Input value={user.phone} onChange={e => updateSection('user', { phone: e.target.value })} placeholder="۰۹..." inputMode="tel" dir="ltr" />
+          </Field>
+          <Field label="ایمیل">
+            <Input value={user.email} onChange={e => updateSection('user', { email: e.target.value })} dir="ltr" />
+          </Field>
+        </Grid2>
+        <Field label="نقش">
+          <Select value={user.role} onChange={e => updateSection('user', { role: e.target.value })}>
+            <option value="owner">مالک</option>
+            <option value="manager">مدیر</option>
+            <option value="worker">کارگر</option>
+          </Select>
+        </Field>
+      </SettingsGroup>
+
+      <SettingsGroup icon="🏠" title="اطلاعات مرغداری" subtitle={farmSummary} defaultOpen={!farm.name} tone="info">
+        <Field label="نام مرغداری">
+          <Input value={farm.name} onChange={e => updateSection('farm', { name: e.target.value })} placeholder="مثلاً: مرغداری سبز دشت" />
+        </Field>
+        <Grid2>
+          <Field label="نوع مرغداری">
+            <Select value={farm.type} onChange={e => updateSection('farm', { type: e.target.value })}>
+              <option value="layer">تخم‌گذار</option>
+              <option value="broiler">گوشتی</option>
+              <option value="breeder">مادر</option>
+              <option value="hatchery">جوجه‌کشی</option>
+              <option value="mixed">مخلوط</option>
+            </Select>
+          </Field>
+          <Field label="شماره پروانه">
+            <Input value={farm.licenseNo} onChange={e => updateSection('farm', { licenseNo: e.target.value })} dir="ltr" />
+          </Field>
+        </Grid2>
+        <Grid3>
+          <Field label="استان">
+            <Input value={farm.province} onChange={e => updateSection('farm', { province: e.target.value })} />
+          </Field>
+          <Field label="شهر">
+            <Input value={farm.city} onChange={e => updateSection('farm', { city: e.target.value })} />
+          </Field>
+          <Field label="کد پستی">
+            <Input value={farm.postalCode} onChange={e => updateSection('farm', { postalCode: e.target.value })} dir="ltr" inputMode="numeric" />
+          </Field>
+        </Grid3>
+        <Field label="آدرس">
+          <Input value={farm.address} onChange={e => updateSection('farm', { address: e.target.value })} placeholder="آدرس کامل" />
+        </Field>
+        <Grid2>
+          <Field label="تلفن ثابت">
+            <Input value={farm.phone} onChange={e => updateSection('farm', { phone: e.target.value })} dir="ltr" inputMode="tel" />
+          </Field>
+          <Field label="تاریخ تأسیس">
+            <Input value={farm.establishedAt} onChange={e => updateSection('farm', { establishedAt: e.target.value })} placeholder="۱۴۰۰/۰۱/۰۱" />
+          </Field>
+        </Grid2>
+      </SettingsGroup>
+
+      <SettingsGroup icon="🏦" title="اطلاعات بانکی" subtitle={bankSummary} tone="purple">
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+          این اطلاعات در فاکتورهای چاپی نمایش داده می‌شود
+        </div>
+        <Field label="نام بانک">
+          <Input value={bank.bankName} onChange={e => updateSection('bank', { bankName: e.target.value })} placeholder="مثلاً: ملت" />
+        </Field>
+        <Field label="شماره کارت">
+          <Input value={bank.cardNo} onChange={e => updateSection('bank', { cardNo: e.target.value })} dir="ltr" inputMode="numeric" placeholder="۶۰۳۷..." />
+        </Field>
+        <Field label="شماره شبا">
+          <Input value={bank.sheba} onChange={e => updateSection('bank', { sheba: e.target.value })} dir="ltr" placeholder="IR..." />
+        </Field>
+        <Field label="صاحب حساب">
+          <Input value={bank.accountHolder} onChange={e => updateSection('bank', { accountHolder: e.target.value })} />
+        </Field>
+      </SettingsGroup>
+
+      <SettingsGroup icon="📏" title="استانداردها و واحدها" subtitle={unitSummary} tone="warn">
+        <Grid2>
+          {U('currency', 'واحد پول', [['toman', 'تومان'], ['rial', 'ریال']])}
+          {U('length', 'واحد طول', [['m', 'متر'], ['cm', 'سانتی‌متر']])}
+        </Grid2>
+        <Grid2>
+          {U('weight', 'واحد وزن', [['g', 'گرم'], ['kg', 'کیلوگرم'], ['t', 'تن']])}
+          {U('volume', 'واحد حجم', [['ml', 'میلی‌لیتر'], ['L', 'لیتر']])}
+        </Grid2>
+        <Grid2>
+          {U('temperature', 'واحد دما', [['c', 'سلسیوس'], ['f', 'فارنهایت']])}
+          {U('area', 'واحد مساحت', [['m2', 'متر مربع'], ['ha', 'هکتار']])}
+        </Grid2>
+        <Grid2>
+          {U('dateFormat', 'فرمت تاریخ', [['jalali', 'شمسی'], ['gregorian', 'میلادی']])}
+          {U('numberFormat', 'فرمت عدد', [['fa', 'فارسی (۱۲۳)'], ['en', 'لاتین (123)']])}
+        </Grid2>
+        <Grid2>
+          {U('thousandSep', 'جداکننده هزار', [['،', '،'], [',', ','], ['.', '.']])}
+          {U('decimals', 'دقت اعشار', [['0', '۰ رقم'], ['1', '۱ رقم'], ['2', '۲ رقم'], ['3', '۳ رقم']])}
+        </Grid2>
+      </SettingsGroup>
+
+      <SettingsGroup icon="🐔" title="پیش‌فرض‌های کشاورزی" subtitle={`Setter ${toFa(defaults.setterTemp)}° · Hatcher ${toFa(defaults.hatcherTemp)}°`} tone="accent">
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+          این مقادیر در فرم‌های جدید پیش‌فرض می‌شوند
+        </div>
+        <Grid2>
+          <Field label="نوع پرنده پیش‌فرض">
+            <Input value={defaults.birdType} onChange={e => updateSection('defaults', { birdType: e.target.value })} placeholder="مرغ" />
+          </Field>
+          <Field label="اندازه‌ی گله">
+            <Input value={defaults.flockSize} onChange={e => updateSection('defaults', { flockSize: e.target.value })} inputMode="numeric" dir="ltr" />
+          </Field>
+        </Grid2>
+        <Field label="طول دوره‌ی جوجه‌کشی">
+          <Input value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} inputMode="numeric" dir="ltr" unit="روز" />
+        </Field>
+        <Grid2>
+          <Field label="دمای Setter"><Input value={defaults.setterTemp} onChange={e => updateSection('defaults', { setterTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" /></Field>
+          <Field label="دمای Hatcher"><Input value={defaults.hatcherTemp} onChange={e => updateSection('defaults', { hatcherTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" /></Field>
+        </Grid2>
+        <Grid2>
+          <Field label="رطوبت Setter"><Input value={defaults.setterHumidity} onChange={e => updateSection('defaults', { setterHumidity: e.target.value })} inputMode="numeric" dir="ltr" unit="٪" /></Field>
+          <Field label="رطوبت Hatcher"><Input value={defaults.hatcherHumidity} onChange={e => updateSection('defaults', { hatcherHumidity: e.target.value })} inputMode="numeric" dir="ltr" unit="٪" /></Field>
+        </Grid2>
+        <Field label="روز شروع Lock-down">
+          <Input value={defaults.lockdownDay} onChange={e => updateSection('defaults', { lockdownDay: e.target.value })} inputMode="numeric" dir="ltr" unit="روز" />
+        </Field>
+      </SettingsGroup>
+
+      <SettingsGroup icon="🔒" title="امنیت" subtitle={security.pinEnabled ? 'قفل با PIN فعال' : 'قفل غیرفعال'} tone="danger">
+        <ToggleRow
+          label="قفل با PIN"
+          sub="در ورود، رمز خواسته شود"
+          value={security.pinEnabled}
+          onChange={() => updateSection('security', { pinEnabled: !security.pinEnabled })}
+        />
+        {security.pinEnabled ? (
+          <>
+            <Field label="PIN چهاررقمی">
+              <Input
+                value={security.pin}
+                onChange={e => updateSection('security', { pin: e.target.value.replace(/[^0-9۰-۹]/g, '').slice(0, 4) })}
+                placeholder="••••"
+                inputMode="numeric"
+                type="password"
+                dir="ltr"
+              />
+            </Field>
+            <Field label="قفل خودکار پس از">
+              <Select value={String(security.autoLockMin)} onChange={e => updateSection('security', { autoLockMin: parseInt(e.target.value) })}>
+                <option value="1">۱ دقیقه</option>
+                <option value="5">۵ دقیقه</option>
+                <option value="15">۱۵ دقیقه</option>
+                <option value="30">۳۰ دقیقه</option>
+                <option value="60">۱ ساعت</option>
+                <option value="0">غیرفعال</option>
+              </Select>
+            </Field>
+          </>
+        ) : null}
+      </SettingsGroup>
+
+    </div>
+  );
+}

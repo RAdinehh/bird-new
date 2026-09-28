@@ -1,0 +1,13 @@
+node_modules
+dist
+*.log
+.DS_Store
+.env
+.env.local
+*.save
+*.save.*
+backup-*
+*-backup-*
+project.txt
+project-final.txt
+unfinished.txt

@@ -1,0 +1,240 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { v4 as uuid } from 'uuid';
+import { parse, differenceInDays, addDays } from 'date-fns-jalali';
+import { toEn } from '../../shr/utils/fa';
+
+/* ============ انواع ============ */
+export type DeviceMode = 'setter' | 'hatcher' | 'setter+hatcher';
+export type DeviceStatus = 'active' | 'idle' | 'maintenance' | 'broken';
+export type DealType = 'personal' | 'partnership' | 'rent' | 'consignment';
+export type EntryStatus = 'incubating' | 'candled' | 'locked' | 'hatched' | 'done';
+
+export interface Device {
+  id: string; name: string; code: string;
+  capacity: number | null;
+  mode: DeviceMode;
+  status: DeviceStatus;
+  temp: number | null;
+  humidity: number | null;
+  rotationEnabled: boolean;
+  purchasedAt: string; price: number | null;
+  warranty: number | null;
+  notes: string;
+  createdAt: string; updatedAt: string;
+}
+
+export interface HatchGroup {
+  id: string; name: string;
+  targetHatchDate: string; // تاریخ هچ هدف
+  notes: string;
+  createdAt: string; updatedAt: string;
+}
+
+export interface EggEntry {
+  id: string;
+  deviceId: string;
+  hatchGroupId: string;
+  birdId: string; breedId: string;
+  count: number | null;
+  entryDate: string;   // تاریخ ورود به دستگاه
+  expectedHatchDate: string; // محاسبه‌شده
+  source: string;      // own | purchase | partnership
+  dealType: DealType;
+  dealData: Record<string, any>;
+  trayNumbers: string;
+  unitPrice: number | null;
+  totalPrice: number | null;
+  status: EntryStatus;
+  notes: string;
+  createdAt: string; updatedAt: string;
+}
+
+export interface Candling {
+  id: string;
+  eggEntryId: string;
+  stage: 1 | 2 | 3;
+  date: string;
+  alive: number | null;
+  infertile: number | null;
+  dead: number | null;
+  broken: number | null;
+  infertileReason: string;
+  deadReason: string;
+  notes: string;
+  createdAt: string;
+}
+
+export interface HatchResult {
+  id: string;
+  eggEntryId: string;
+  date: string;
+  hatched: number | null;
+  unhatched: number | null;
+  deadInShell: number | null;
+  pipped: number | null;
+  other: number | null;
+  notes: string;
+  createdAt: string;
+}
+
+/* ============ Store ============ */
+interface State {
+  devices: Device[];
+  hatchGroups: HatchGroup[];
+  eggEntries: EggEntry[];
+  candlings: Candling[];
+  hatches: HatchResult[];
+
+  addDevice: (d: Omit<Device, 'id'|'createdAt'|'updatedAt'>) => void;
+  updateDevice: (id: string, patch: Partial<Device>) => void;
+  deleteDevice: (id: string) => void;
+
+  addGroup: (g: Omit<HatchGroup, 'id'|'createdAt'|'updatedAt'>) => void;
+  updateGroup: (id: string, patch: Partial<HatchGroup>) => void;
+  deleteGroup: (id: string) => void;
+
+  addEntry: (e: Omit<EggEntry, 'id'|'createdAt'|'updatedAt'>) => void;
+  updateEntry: (id: string, patch: Partial<EggEntry>) => void;
+  deleteEntry: (id: string) => void;
+
+  addCandling: (c: Omit<Candling, 'id'|'createdAt'>) => void;
+  updateCandling: (id: string, patch: Partial<Candling>) => void;
+  deleteCandling: (id: string) => void;
+
+  addHatch: (h: Omit<HatchResult, 'id'|'createdAt'>) => void;
+  updateHatch: (id: string, patch: Partial<HatchResult>) => void;
+  deleteHatch: (id: string) => void;
+}
+
+const now = () => new Date().toISOString();
+
+export const useInc = create<State>()(
+  persist(
+    (set, get) => ({
+      devices: [], hatchGroups: [], eggEntries: [], candlings: [], hatches: [],
+
+      addDevice: (d) => set({ devices: [...get().devices, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
+      updateDevice: (id, patch) => set({ devices: get().devices.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
+      deleteDevice: (id) => set({
+        devices: get().devices.filter(x => x.id !== id),
+        eggEntries: get().eggEntries.filter(x => x.deviceId !== id)
+      }),
+
+      addGroup: (g) => set({ hatchGroups: [...get().hatchGroups, {...g, id: uuid(), createdAt: now(), updatedAt: now()}] }),
+      updateGroup: (id, patch) => set({ hatchGroups: get().hatchGroups.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
+      deleteGroup: (id) => set({ hatchGroups: get().hatchGroups.filter(x => x.id !== id) }),
+
+      addEntry: (e) => set({ eggEntries: [...get().eggEntries, {...e, id: uuid(), createdAt: now(), updatedAt: now()}] }),
+      updateEntry: (id, patch) => set({ eggEntries: get().eggEntries.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
+      deleteEntry: (id) => set({
+        eggEntries: get().eggEntries.filter(x => x.id !== id),
+        candlings: get().candlings.filter(x => x.eggEntryId !== id),
+        hatches: get().hatches.filter(x => x.eggEntryId !== id)
+      }),
+
+      addCandling: (c) => set({ candlings: [...get().candlings, {...c, id: uuid(), createdAt: now()}] }),
+      updateCandling: (id, patch) => set({ candlings: get().candlings.map(x => x.id === id ? {...x, ...patch} : x) }),
+      deleteCandling: (id) => set({ candlings: get().candlings.filter(x => x.id !== id) }),
+
+      addHatch: (h) => set({ hatches: [...get().hatches, {...h, id: uuid(), createdAt: now()}] }),
+      updateHatch: (id, patch) => set({ hatches: get().hatches.map(x => x.id === id ? {...x, ...patch} : x) }),
+      deleteHatch: (id) => set({ hatches: get().hatches.filter(x => x.id !== id) })
+    }),
+    { name: 'pm-inc' }
+  )
+);
+
+/* ============ برچسب‌ها ============ */
+export const DEVICE_MODE_LABEL: Record<DeviceMode, string> = {
+  'setter': 'Setter',
+  'hatcher': 'Hatcher',
+  'setter+hatcher': 'Setter + Hatcher'
+};
+
+export const DEVICE_STATUS_LABEL: Record<DeviceStatus, string> = {
+  active: 'فعال', idle: 'خاموش', maintenance: 'تعمیر', broken: 'خراب'
+};
+
+export const DEAL_LABEL: Record<DealType, string> = {
+  personal: 'مالکیت',
+  partnership: 'شراکتی',
+  rent: 'اجاره‌ای',
+  consignment: 'امانی'
+};
+
+export const ENTRY_STATUS_LABEL: Record<EntryStatus, string> = {
+  incubating: 'در دستگاه',
+  candled: 'کندلینگ‌شده',
+  locked: 'Lock-down',
+  hatched: 'هچ‌شده',
+  done: 'تمام‌شده'
+};
+
+/* ============ محاسبات ============ */
+export function jalaliToDate(s: string): Date | null {
+  if (!s) return null;
+  const en = toEn(s);
+  const p = en.split('/').map(x => parseInt(x));
+  if (p.length !== 3 || p.some(isNaN)) return null;
+  try {
+    const d = parse(`${p[0]}/${String(p[1]).padStart(2,'0')}/${String(p[2]).padStart(2,'0')}`, 'yyyy/MM/dd', new Date());
+    return isNaN(d.getTime()) ? null : d;
+  } catch { return null; }
+}
+
+export function daysAgo(s: string): number {
+  const d = jalaliToDate(s);
+  if (!d) return 0;
+  return differenceInDays(new Date(), d);
+}
+
+export function addDaysJalali(s: string, days: number): string {
+  const d = jalaliToDate(s);
+  if (!d) return '';
+  const r = addDays(d, days);
+  // format yyyy/MM/dd به شمسی
+  const y = r.getFullYear(), m = r.getMonth() + 1, day = r.getDate();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${y}/${pad(m)}/${pad(day)}`;
+}
+
+/** روزهای باقی‌مانده تا هچ */
+export function daysToHatch(expectedHatchDate: string): number {
+  const d = jalaliToDate(expectedHatchDate);
+  if (!d) return 0;
+  return differenceInDays(d, new Date());
+}
+
+/** Lock-down شده؟ (روز ۱۸ به بعد) */
+export function isLockdown(entry: EggEntry): boolean {
+  const age = daysAgo(entry.entryDate);
+  return age >= 18;
+}
+
+/** پنجره هچ باز است؟ (۲ روز قبل از هچ) */
+export function isHatchWindow(entry: EggEntry): boolean {
+  const days = daysToHatch(entry.expectedHatchDate);
+  return days <= 2 && days >= -1;
+}
+
+/** طول دوره بر اساس پرنده (پیش‌فرض ۲۱ روز برای مرغ) */
+export function incubationDays(birdName: string): number {
+  const n = (birdName || '').toLowerCase();
+  if (n.includes('بوقلمون') || n.includes('booghalamoon')) return 28;
+  if (n.includes('اردک') || n.includes('ordak')) return 28;
+  if (n.includes('غاز') || n.includes('ghaz')) return 30;
+  return 21; // مرغ
+}
+
+/** محاسبه‌ی نرخ هچ */
+export function hatchRate(hatched: number, total: number): number {
+  if (!total) return 0;
+  return (hatched / total) * 100;
+}
+
+/** محاسبه‌ی هزینه‌ی هر جوجه */
+export function costPerChick(totalCost: number, hatched: number): number {
+  if (!hatched) return 0;
+  return totalCost / hatched;
+}

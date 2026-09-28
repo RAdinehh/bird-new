@@ -1,0 +1,448 @@
+# PROJECT-LOG — حافظه پروژه
+
+نسخه: ۰.۵.۰ | تاریخ: ۱۴۰۵/۰۷/۰۵
+
+## ⚠️ قبل از هر کار، ۴ سند را بخوان
+doc/DESIGN.md · doc/SCHEMA.md · doc/WORKFLOW.md · این فایل
+
+قبل از هر کد → پیش‌نمایش بده.
+هیچ کدی بدون تأیید کاربر نوشته نمی‌شود.
+
+---
+
+## 🎯 هدف پروژه
+
+نرم‌افزار مدیریت مرغداری — PWA آفلاین، فارسی، RTL، تقویم شمسی
+- کاربر: خودش کارگر است
+- محیط: Termux + nano + مرورگر موبایل
+- داده: localStorage، بدون بک‌اند
+- تعداد ماژول: ۱۵
+
+---
+
+## 📦 Tech Stack
+
+- Frontend: React 18 + TypeScript strict
+- Build: Vite 6
+- Style: Tailwind v3.4.15 (نه v4)
+- State: Zustand + persist
+- Router: React Router v6
+- Date: date-fns-jalali
+- ID: UUID v4 (crypto.randomUUID)
+- Font: Vazirmatn از CDN
+
+---
+
+## ✅ کامل‌شده
+
+### زیرساخت
+- ۴ سند قانون اساسی (DESIGN, SCHEMA, WORKFLOW, PROJECT-LOG)
+- Layout کامل: Header + BottomNav + MenuDrawer + Router
+- سیستم تم روشن/تیره
+- applyTheme: رنگ اصلی (۴ رنگ) + اندازه فونت (۴ حالت) + انیمیشن + کنتراست بالا + کم‌مصرف
+- ۱۵ store ماژول‌محور
+
+### کامپوننت‌های مشترک
+- ExpandableCard — کارت بازشو
+- DatePicker — تقویم شمسی (سال/ماه/روز)
+- TimePicker — انتخاب ساعت با دقیقه دستی
+- ProgressTracker + MiniProgress — نوار پیشرفت
+- Charts: BarChart، DualBarChart، LineChart، PieChart (SVG، بدون dependency)
+- DialogHost — مودال سفارشی جایگزین alert
+- HelpModal — راهنمای ۷ مرحله‌ای
+- ShortcutsModal — لیست میان‌برها
+- ui.tsx: Btn، Input (با autoClamp)، Select، Field، Grid2/3، Card، Tag، Empty، Modal، Chip، BtnRow
+
+### Utility
+- fa.ts: toFa، toEn، formatNumWhileTyping، numberToWords، parseFaNum
+- smart.ts: clampPercent، complement
+- backup.ts: exportAll، importAll، getStats، downloadBackup، readFile
+- export.ts: toCSV، downloadCSV، printHTML، printTemplate
+
+### Hook
+- useKeyboard: میان‌برهای Ctrl+H، ?، Ctrl+1..9، Ctrl+F، Esc
+
+---
+
+## 📋 ماژول‌های کامل (۱۵)
+
+| # | ماژول | تب‌ها | وضعیت |
+|---|---|---|---|
+| ۱ | تنظیمات (set) | پروفایل، ظاهر، ماژول‌ها، اعلان‌ها، پشتیبان، درباره | ✅ |
+| ۲ | پرنده و نژاد (brd) | پرنده، نژاد | ✅ |
+| ۳ | سالن (hal) | سالن، بخش، تجهیزات | ✅ |
+| ۴ | مخاطبین (ctc) | همه، مشتری، فروشنده، کارگر | ✅ |
+| ۵ | گله (flk) | فعال، تخم‌گذار، گوشتی، مادر، آرشیو | ✅ |
+| ۶ | جوجه‌کشی (inc) | دستگاه، ورودی تخم، کندلینگ، هچ | ✅ |
+| ۷ | تخم (egg) | تخم‌گذاری، انبار و فروش | ✅ |
+| ۸ | ثبت روزانه (dlg) | امروز، تاریخچه | ✅ |
+| ۹ | معاملات (tra) | خرید، فروش، معاملات خاص، مطالبات | ✅ |
+| ۱۰ | انبار (whs) | اقلام، ورود/خروج، هشدارها | ✅ |
+| ۱۱ | جیره‌نویسی (fed) | مواد اولیه، نیازها، جیره‌ها | ✅ |
+| ۱۲ | گزارش (rep) | مالی، تولید، گله، مقایسه | ✅ |
+| ۱۳ | هشدار (alt) | فعال، تاریخچه | ✅ |
+| ۱۴ | داشبورد (dsh) | بدون تب | ✅ |
+| ۱۵ | آرشیو (arc) | بدون تب | ✅ |
+
+---
+
+## 🧠 قواعد هوشمندسازی (فعال)
+
+- درصد: فقط ۰-۱۰۰
+- درصد مکمل شراکتی: خودکار ۱۰۰ - شریک
+- تلفات ≤ تعداد زنده گله
+- تخم ≤ ظرفیت دستگاه
+- هچ‌شده ≤ سالم کندلینگ
+- پرداخت ≤ قیمت نهایی
+- جمع کندلینگ ≤ تعداد کل تخم
+- تخم‌گذاری ≤ تعداد گله (هر مرغ ۱ تخم در روز)
+- فیلد سن تخم‌گذاری قابل ویرایش (پیش‌فرض ۱۴۰ روز)
+- وقتی گله به سن نرسیده: فیلدهای تخم‌گذاری غیرفعال + ProgressTracker
+- عدد → حروف فارسی در ≥ ۱۰۰٬۰۰۰
+
+---
+
+## 🎨 قواعد طراحی (قفل‌شده)
+
+- همه کارت‌ها: ExpandableCard
+- انیمیشن: grid-template-rows 0fr→1fr
+- Easing: cubic-bezier(.16,1,.3,1)
+- فقط یکی باز هم‌زمان
+- فلش چرخان چپ + نوار رنگی راست + بج شماره
+- RTL: تأیید راست، لغو چپ
+- ورودی عدد: dir=ltr
+- فیلد کوتاه: ۲-۳ ستونه
+- ورودی عدد: mode=number با autoClamp (اختیاری)
+- مودال: از پایین، max 90vh
+- Toast: بدون translateY(-20px)
+
+---
+
+## 🎨 Design Tokens
+
+### فونت (نسخه نهایی)
+--fs-xs: ۱۱px · --fs-sm: ۱۲.۵px · --fs-base: ۱۳px
+--fs-md: ۱۴px · --fs-lg: ۱۵.۵px · --fs-xl: ۱۹px · --fs-2xl: ۲۳px
+
+### رنگ
+روشن: bg=#f1f5f9 · accent=#16a34a
+تیره: bg=#0f172a · accent=#22c55e
+۴ رنگ برند: سبز (پیش‌فرض)، آبی، نارنجی، بنفش
+
+### فاصله
+--sp-1 (۴px) تا --sp-8 (۳۲px)
+
+### گوشه
+--r-sm (۸px) تا --r-2xl (۲۰px)
+
+### انیمیشن
+--dur-fast ۱۵۰ms · --dur-base ۲۰۰ms · --dur-slow ۲۵۰ms · --dur-enter ۳۰۰ms
+
+---
+
+## 🗂 ساختار پوشه
+
+src/
+├── cor/
+│   ├── store/{theme.ts, ui.ts, dialog.ts}
+│   ├── router/AppRouter.tsx
+│   └── theme/applyTheme.ts
+├── shr/
+│   ├── components/
+│   │   ├── ui.tsx · ExpandableCard.tsx
+│   │   ├── DatePicker.tsx · TimePicker.tsx
+│   │   ├── ProgressTracker.tsx · Charts.tsx
+│   │   ├── DialogHost.tsx · HelpModal.tsx · ShortcutsModal.tsx
+│   │   ├── Header.tsx · BottomNav.tsx · MenuDrawer.tsx
+│   ├── styles/global.css
+│   ├── hooks/useKeyboard.ts
+│   └── utils/{fa.ts, smart.ts, backup.ts, export.ts}
+└── mod/
+    ├── set/ · brd/ · hal/ · ctc/ · flk/
+    ├── inc/ · egg/ · dlg/ · tra/ · whs/
+    ├── fed/ · rep/ · alt/ · arc/ · dsh/
+
+---
+
+## 🚧 کارهای نیمه‌کاره (نیاز به تکمیل)
+
+### ۱. منوی پایین (BottomNav)
+**وضعیت:** بازطراحی شد ولی کاربر راضی نیست
+- ✅ آیکون‌ها یکدست خطی شدند
+- ✅ Animated bounce روی لمس
+- ⏳ کاربر می‌گوید: «هنوز زنده نیست»
+- **راه‌حل بعدی:** افکت ripple هنگام لمس، انیمیشن smooth‌تر برای pill
+
+### ۲. DialogHost (مودال سفارشی)
+**وضعیت:** ساخته شد ولی اندازه/رنگ مشکل دارد
+- ✅ جایگزین alert شد
+- ⏳ کاربر می‌گوید: «بزرگ و رنگ‌های زننده»
+- **راه‌حل فعلی:** کوچک‌تر (۳۰۰px)، آیکون ۴۸px، رنگ ملایم
+- ⚠️ **هنوز `confirm()` در بعضی جاها باقی مانده** — باید جایگزین شود
+- مکان‌های احتمالی: `deleteBird`, `deleteHall`, `deleteFlock`, ...
+
+### ۳. تنظیمات — گروه‌بندی
+**وضعیت:** نیمه‌کاره
+- ✅ ProfileTab با SettingsGroup
+- ✅ AppearanceTab با SettingsGroup
+- ✅ NotificationsTab با SettingsGroup
+- ✅ ModulesTab گروه‌بندی دسته‌ای
+- ✅ BackupTab نیمه‌گروه‌بندی (پیست‌های قبلی ممکن است باقی‌مانده باشد)
+- ⏳ AboutTab نیاز به بررسی دارد
+
+### ۴. MenuDrawer
+**وضعیت:** بازطراحی شد ولی ممکن است صفحه سفید بدهد
+- ✅ هدر گرادیانی
+- ✅ گروه‌بندی رنگی
+- ⏳ تست نهایی + اجتناب از خطای undefined selector
+
+### ۵. میان‌برهای کیبورد
+**وضعیت:** ساخته شد
+- ✅ Ctrl+H, ?, Ctrl+1..9, Ctrl+F, Esc
+- ⏳ تست کامل انجام نشده
+
+### ۶. PWA
+**وضعیت:** فقط کد نوشته شد، تست نشده
+- ✅ vite-plugin-pwa نصب شد
+- ✅ vite.config.ts پیکربندی شد
+- ✅ manifest + icon.svg
+- ✅ registerSW در main.tsx
+- ⏳ تست نصب روی گوشی انجام نشده
+
+---
+
+## 🎯 کارهای باقی‌مانده (اولویت‌دار)
+
+### اولویت 🔴 بحرانی
+۱. **جایگزینی `confirm()` با `showConfirm`** در همه‌ی ماژول‌ها
+   - فایل‌های دارای `confirm()`:
+     - `mod/brd/BirdsPage.tsx`, `BreedsPage.tsx`
+     - `mod/hal/HallsPage.tsx`, `ZonesPage.tsx`, `EquipmentPage.tsx`
+     - `mod/ctc/ContactsPage.tsx`
+     - `mod/flk/FlocksPage.tsx`
+     - `mod/inc/DevicesPage.tsx`, `EggEntriesPage.tsx`, `CandlingsPage.tsx`, `HatchesPage.tsx`
+     - `mod/egg/ProductionsPage.tsx`, `StockPage.tsx`
+     - `mod/dlg/DailyLogsPage.tsx`
+     - `mod/tra/PurchasesPage.tsx`, `SalesPage.tsx`, `DealsPage.tsx`
+     - `mod/whs/ItemsPage.tsx`, `MovesPage.tsx`
+     - `mod/fed/IngredientsPage.tsx`, `RequirementsPage.tsx`, `FormulasPage.tsx`
+
+۲. **تست PWA روی گوشی** — نصب، آفلاین، Service Worker
+
+۳. **تست کامل همه‌ی ماژول‌ها** — یک رکورد اضافه/ویرایش/حذف
+
+### اولویت 🟠 مهم
+۴. **رفرش خودکار داده‌های زنده** (هر ۳۰ ثانیه KPI، هر ۱ دقیقه پایش)
+
+۵. **مهاجرت داده‌ها** — نسخه‌دار (version + schemaVersion) در SCHEMA
+   - تست import فایل قدیمی
+
+۶. **پشتیبان خودکار** — هر ۲۴ ساعت خودکار در localStorage
+
+۷. **چند فایل پیوست** — IndexedDB برای عکس، PDF، صدا
+
+### اولویت 🟡 متوسط
+۸. **Onboarding کامل** — الان ۷ مرحله است، ممکن است کافی نباشد
+
+۹. **میان‌برهای کیبورد** — تست در کامپیوتر
+
+۱۰. **جلوه‌های بصری** — Skeleton loader در حال بارگذاری
+
+۱۱. **رفع `window.alert` در همه‌ی ماژول‌ها** (تست شده که `alert()` هنوز کار می‌کند)
+
+۱۲. **FAB شناور** برای افزودن سریع در صفحات لیست
+
+۱۳. **جستجوی سراسری** در هدر
+
+### اولویت 🟢 کم
+۱۴. **حالت خالی زیباتر** با تصویر
+
+۱۵. **نمودارهای بیشتر** — Recharts در آینده
+
+۱۶. **خروجی PDF پیشرفته** — نمودار در PDF
+
+۱۷. **چند زبانه** — i18n (فعلاً فقط فارسی)
+
+۱۸. **چند کاربر** — ۱-۲ دوست در آینده
+
+---
+
+## 🎨 نکات مهم طراحی (بازبینی)
+
+### مودال DialogHost
+- عرض ۳۰۰px، max-width
+- آیکون ۴۸px در دایره soft (بدون border)
+- عنوان `--fs-md`، پیام `--fs-sm`
+- دکمه تأیید: **سبز برند** (فقط danger قرمز)
+- دکمه ارتفاع ۴۰px
+- انیمیشن scale از ۰٫۹۲
+
+### BottomNav
+- آیکون‌های **فقط خطی** (outlined) — بدون filled
+- Active pill ۵۶×۳۲ با soft background
+- Bounce animation روی لمس (۰٫۸۸ → ۱٫۰۸ → ۱٫۰)
+- نقطه‌ی ۴px زیر لیبل فعال
+- نقطه نباید با متن لیبل تداخل کند — فاصله ۲px
+
+### ExpandableCard
+- accent: accent | warn | dim | purple | info | green | amber | blue | gray
+- نوار راست ۴px
+- انیمیشن grid-template-rows
+
+---
+
+## اجرا
+
+cd ~/Bird-new
+npm run dev
+# مرورگر: localhost:3000
+
+## Build
+
+npm run build
+# خروجی در dist/
+
+---
+
+## نکات AI بعدی
+
+1. کاربر کدنویس نیست — فقط کپی/پیست
+2. محیط: Termux + nano + موبایل
+3. قبل از هر ماژول: تحلیل + تأیید کاربر
+4. همیشه ExpandableCard برای کارت‌ها
+5. فیلد عددی با mode=number
+6. پیام‌های طولانی در چت می‌شکنند — بلوک کوچک بده
+7. پس از هر ماژول این فایل را به‌روز کن
+8. قواعد قفل‌شده را تغییر نده
+9. از python3 برای جایگزینی امن استفاده کن
+10. بعد از تغییرات، کاربر refresh می‌کند
+
+---
+
+## مسائل شناخته‌شده
+
+1. confirm() هنوز در بعضی ماژول‌ها
+2. Zustand selector ممکن است undefined بدهد
+3. alert مرورگر در بعضی جاها
+4. فیلد عددی بدون autoClamp آزاد است
+5. MenuDrawer ممکن است سفید شود
+6. BottomNav احساس بی‌جانی
+
+---
+
+## گام‌های بعدی
+
+### مرحله A — تثبیت (ضروری)
+1. جایگزینی confirm() در 19 فایل با showConfirm
+2. تست PWA روی گوشی
+3. تست کامل همه ماژول‌ها
+
+### مرحله B — بهبود UX
+4. Ripple روی BottomNav
+5. Skeleton loader
+6. جستجوی سراسری
+7. FAB شناور
+
+### مرحله C — پیشرفته
+8. Recharts برای نمودارها
+9. IndexedDB برای فایل‌ها
+10. پشتیبان خودکار
+11. رفرش خودکار KPIها
+
+---
+
+## آمار فعلی
+
+- ماژول کامل: 15
+- فایل‌های tsx: ~50
+- فایل‌های ts: ~18
+- کامپوننت مشترک: 12
+- Store: 15
+- سطر کد: ~10500
+
+---
+
+## مراجع استاندارد
+
+- Material Design 3
+- Apple HIG
+- SAP Fiori
+- Petersime / Pas Reform
+- Hy-Line / Lohmann
+- Nielsen Norman
+
+---
+
+
+---
+
+## 📋 چیزهایی که از سند اصلی پیاده نشد
+
+### 🔴 اولویت بالا
+1. تقویم‌های تخصصی (بخش 14 سند)
+   - تقویم هچ (همه بچ‌های فعال)
+   - تقویم واکسیناسیون
+   - تقویم سرسید پرداخت
+   - تقویم کارهای روزانه
+   - تقویم مالی
+2. PWA + تست روی گوشی (بخش 24)
+   - کد نوشته شد ولی تست نشده
+   - GitHub هم راه‌اندازی نشده
+
+### 🟠 اولویت مهم
+3. مدیریت اسناد (بخش 15)
+   - آپلود عکس، PDF، صدا با IndexedDB
+   - اتصال فایل به رکورد (گله، سالن، مشتری)
+   - گالری، جستجو، فیلتر
+4. تحلیل پیشرفته (بخش 20)
+   - Pareto (20٪ مشتریان = 80٪ فروش)
+   - Heatmap
+   - Benchmarking
+   - پیش‌بینی وزن/تخم‌گذاری/سود
+5. رفرش خودکار (بخش 3.8)
+   - KPI هر 30 ثانیه
+   - پایش لحظه‌ای هر 1 دقیقه
+6. پشتیبان خودکار (بخش 17.1)
+   - هر 24 ساعت
+   - 5 نسخه اخیر در localStorage
+
+### 🟡 اولویت متوسط
+7. اعلان‌های بیرونی (بخش 13)
+   - پیامک (SMS)
+   - ایمیل
+   - تلگرام
+   - فقط درون‌برنامه داریم
+8. Error Boundary (بخش 18.3)
+   - جلوگیری از صفحه سفید
+   - Fallback UI
+9. تست واحد با Vitest (بخش 19.1)
+
+### 🟢 اولویت کم
+10. Demo Mode (بخش 21.5)
+    - داده‌ی نمونه برای آموزش
+    - قابل حذف
+11. Tooltip و Walkthrough (بخش 21.2-21.3)
+12. میان‌برهای عملیاتی (بخش 22.3)
+    - Ctrl+D تلفات، Ctrl+E تخم‌گذاری، Ctrl+W وزن، Ctrl+V واکسن، Ctrl+B پشتیبان
+13. چند زبانه (i18n)
+14. چند کاربر (1-2 دوست)
+15. مهاجرت به SQLite محلی
+
+---
+
+## 📊 آمار پیاده‌سازی
+
+- از 27 بخش سند اصلی: 16 بخش کامل پیاده شد
+- 8 بخش نیمه‌کاره یا کد-فقط
+- 3 بخش پیاده نشد
+
+## 🎯 گام بعدی پیشنهادی
+
+ترتیب پیشنهادی انجام:
+1. تقویم‌های تخصصی (بخش 14) — بازخورد کاربر بالا
+2. مدیریت اسناد (بخش 15) — نگهداری مدارک
+3. PWA روی گوشی (بخش 24) — تست + GitHub
+4. رفرش + پشتیبان خودکار (بخش 3.8 و 17.1)
+5. تحلیل پیشرفته (بخش 20)
+
+پایان نسخه 0.5.0

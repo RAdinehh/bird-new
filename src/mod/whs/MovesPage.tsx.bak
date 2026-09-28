@@ -1,0 +1,280 @@
+import { useState, useMemo } from 'react';
+import { useWhs, UNIT_LABEL, MOVEMENT_REASON, CATEGORY_ICON, type Movement, type MovementType, type MovementReason } from './store';
+import { useCtc } from '../ctc/store';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import ExpandableCard from '../../shr/components/ExpandableCard';
+import DatePicker from '../../shr/components/DatePicker';
+import { toFa, toEn } from '../../shr/utils/fa';
+
+interface F {
+  id?: string;
+  itemId: string;
+  type: MovementType;
+  quantity: string;
+  unitPrice: string;
+  reason: MovementReason;
+  date: string;
+  partyId: string;
+  notes: string;
+}
+
+export default function MovesPage() {
+  const { items, movements, addMovement, deleteMovement } = useWhs();
+  const { contacts } = useCtc();
+
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState<F>({
+    itemId: '', type: 'in', quantity: '', unitPrice: '',
+    reason: 'purchase', date: '', partyId: '', notes: ''
+  });
+  const [err, setErr] = useState('');
+  const [delId, setDelId] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState<MovementType | ''>('');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const list = useMemo(() => {
+    let arr = [...movements];
+    if (filterType) arr = arr.filter(m => m.type === filterType);
+    return arr.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 100);
+  }, [movements, filterType]);
+
+  const openNew = () => {
+    if (items.length === 0) { alert('اول یک قلم در انبار بسازید'); return; }
+    setForm({
+      itemId: items[0].id, type: 'in', quantity: '', unitPrice: '',
+      reason: 'purchase', date: '', partyId: '', notes: ''
+    });
+    setErr(''); setOpen(true);
+  };
+
+  const openEdit = (m: Movement) => {
+    setForm({
+      id: m.id, itemId: m.itemId, type: m.type,
+      quantity: m.quantity ? toFa(m.quantity) : '',
+      unitPrice: m.unitPrice ? toFa(m.unitPrice) : '',
+      reason: m.reason, date: m.date,
+      partyId: m.partyId || '', notes: m.notes || ''
+    });
+    setErr(''); setOpen(true);
+  };
+
+  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
+
+  const selectedItem = items.find(i => i.id === form.itemId);
+  const currentStock = selectedItem ? selectedItem.currentStock : 0;
+
+  const save = () => {
+    if (form.itemId === '') { setErr('کالا اجباری است'); return; }
+    if (form.date.trim() === '') { setErr('تاریخ اجباری است'); return; }
+    const qty = num(form.quantity);
+    if (qty <= 0) { setErr('تعداد باید بیشتر از صفر باشد'); return; }
+    if (form.type === 'out' && qty > currentStock) {
+      setErr(`موجودی (${toFa(currentStock)}) کافی نیست`);
+      return;
+    }
+
+    const data = {
+      itemId: form.itemId,
+      type: form.type,
+      quantity: qty,
+      unitPrice: num(form.unitPrice),
+      reason: form.reason,
+      date: form.date.trim(),
+      partyId: form.partyId,
+      notes: form.notes.trim()
+    };
+
+    addMovement(data);
+    setOpen(false);
+  };
+
+  const target = delId ? movements.find(m => m.id === delId) : null;
+
+  return (
+    <PageContainer>
+      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+        <button onClick={() => setFilterType('')} style={chip(filterType === '')}>
+          همه ({toFa(movements.length)})
+        </button>
+        <button onClick={() => setFilterType('in')} style={chip(filterType === 'in')}>
+          📥 ورود ({toFa(movements.filter(m => m.type === 'in').length)})
+        </button>
+        <button onClick={() => setFilterType('out')} style={chip(filterType === 'out')}>
+          📤 خروج ({toFa(movements.filter(m => m.type === 'out').length)})
+        </button>
+      </div>
+
+      {list.length === 0 ? (
+        <Empty
+          icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4M17 8v12M17 20l4-4M17 20l-4-4"/></svg>}
+          title="گردشی ثبت نشده"
+          desc="ورود یا خروج کالا از انبار را ثبت کنید."
+          action={<Btn variant="primary" onClick={openNew}>+ ثبت گردش</Btn>}
+        />
+      ) : (
+        <>
+          {list.map((m, i) => {
+            const item = items.find(x => x.id === m.itemId);
+            const party = contacts.find(c => c.id === m.partyId);
+            const isOpen = expandedId === m.id;
+            const accent = m.type === 'in' ? 'accent' : 'warn';
+            const total = m.quantity * m.unitPrice;
+
+            return (
+              <ExpandableCard
+                key={m.id}
+                accent={accent}
+                index={toFa(i + 1)}
+                iconEmoji={m.type === 'in' ? '📥' : '📤'}
+                title={`${m.type === 'in' ? 'ورود' : 'خروج'} ${toFa(m.quantity)} ${item ? UNIT_LABEL[item.unit] : ''} — ${item?.name || '—'}`}
+                subtitle={`${toFa(m.date)} · ${MOVEMENT_REASON[m.reason]}`}
+                isOpen={isOpen}
+                onToggle={() => setExpandedId(isOpen ? null : m.id)}
+                badge={<Tag tone={m.type === 'in' ? 'green' : 'amber'}>{m.type === 'in' ? 'ورود' : 'خروج'}</Tag>}
+                summary={
+                  <>
+                    <span>مقدار: <b style={{ color: 'var(--text)' }}>{toFa(m.quantity)}</b></span>
+                    {m.unitPrice > 0 ? <span>قیمت: <b style={{ color: 'var(--text)' }}>{toFa(m.unitPrice.toLocaleString('fa-IR'))}</b></span> : null}
+                    {total > 0 ? <span>جمع: <b style={{ color: 'var(--text)' }}>{toFa(total.toLocaleString('fa-IR'))} ت</b></span> : null}
+                  </>
+                }
+              >
+                <SectionTitle>📋 اطلاعات گردش</SectionTitle>
+                <Row l="کالا" v={item ? `${CATEGORY_ICON[item.category]} ${item.name}` : '—'} />
+                <Row l="نوع" v={m.type === 'in' ? 'ورود' : 'خروج'} />
+                <Row l="دلیل" v={MOVEMENT_REASON[m.reason]} />
+                <Row l="تاریخ" v={toFa(m.date)} />
+                <Row l="مقدار" v={`${toFa(m.quantity)} ${item ? UNIT_LABEL[item.unit] : ''}`} />
+                {party ? <Row l="طرف معامله" v={party.name} /> : null}
+
+                {m.unitPrice > 0 ? (
+                  <>
+                    <SectionTitle>💰 مالی</SectionTitle>
+                    <Row l="قیمت واحد" v={`${toFa(m.unitPrice.toLocaleString('fa-IR'))} ت`} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                      <span>جمع کل:</span>
+                      <span>{toFa(total.toLocaleString('fa-IR'))} ت</span>
+                    </div>
+                  </>
+                ) : null}
+
+                {m.notes ? (
+                  <>
+                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{m.notes}</div>
+                  </>
+                ) : null}
+
+                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+                  <Btn size="sm" onClick={() => setDelId(m.id)} style={{ flex: 1 }}>حذف</Btn>
+                </div>
+              </ExpandableCard>
+            );
+          })}
+          <Btn variant="primary" full onClick={openNew}>+ ثبت گردش</Btn>
+        </>
+      )}
+
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title="ثبت گردش انبار"
+        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
+      >
+        <Field label="نوع گردش" required>
+          <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as MovementType })}>
+            <option value="in">📥 ورود به انبار</option>
+            <option value="out">📤 خروج از انبار</option>
+          </Select>
+        </Field>
+
+        <Field label="کالا" required hint={selectedItem ? `موجودی فعلی: ${toFa(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined}>
+          <Select value={form.itemId} onChange={e => setForm({ ...form, itemId: e.target.value })}>
+            {items.map(it => (
+              <option key={it.id} value={it.id}>
+                {CATEGORY_ICON[it.category]} {it.name} ({toFa(it.currentStock)} {UNIT_LABEL[it.unit]})
+              </option>
+            ))}
+          </Select>
+        </Field>
+
+        <Grid2>
+          <Field label="تعداد" required>
+            <Input
+              mode="number"
+              value={form.quantity}
+              onChange={e => setForm({ ...form, quantity: e.target.value })}
+              unit={selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}
+              max={form.type === 'out' ? currentStock : undefined}
+            />
+          </Field>
+          <Field label="قیمت واحد">
+            <Input mode="number" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} unit="ت" />
+          </Field>
+        </Grid2>
+
+        <Grid2>
+          <Field label="دلیل" required>
+            <Select value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value as MovementReason })}>
+              {(Object.keys(MOVEMENT_REASON) as MovementReason[]).map(r =>
+                <option key={r} value={r}>{MOVEMENT_REASON[r]}</option>
+              )}
+            </Select>
+          </Field>
+          <Field label="تاریخ" required>
+            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })} />
+          </Field>
+        </Grid2>
+
+        <Field label="طرف معامله" hint="اختیاری — از مخاطبین">
+          <Select value={form.partyId} onChange={e => setForm({ ...form, partyId: e.target.value })}>
+            <option value="">—</option>
+            {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </Select>
+        </Field>
+
+        <Field label="یادداشت">
+          <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+        </Field>
+
+        {err ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div> : null}
+      </Modal>
+
+      <Modal
+        open={delId !== null}
+        onClose={() => setDelId(null)}
+        title="حذف گردش"
+        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteMovement(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
+      >
+        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف این گردش؟</div>
+      </Modal>
+    </PageContainer>
+  );
+}
+
+function Row({ l, v }: { l: string; v: string }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+      <span style={{ color: 'var(--muted)' }}>{l}:</span>
+      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
+  );
+}
+
+function chip(active: boolean): React.CSSProperties {
+  return {
+    padding: '6px 11px', fontSize: 'var(--fs-sm)',
+    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
+    border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+    borderRadius: 'var(--r-sm)',
+    color: active ? 'var(--accent)' : 'var(--muted)',
+    fontWeight: active ? 600 : 500, cursor: 'pointer',
+    fontFamily: 'inherit', whiteSpace: 'nowrap'
+  };
+}
