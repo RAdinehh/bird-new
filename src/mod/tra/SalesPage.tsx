@@ -162,7 +162,16 @@ export default function SalesPage() {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
 
   const subtotal = useMemo(() => itemsSum(form.items), [form.items]);
-  const total = useMemo(() => subtotal - num(form.discount) + num(form.shipping), [subtotal, form]);
+  const total = useMemo(() => {
+    return form.items.reduce((acc, it) => {
+      const base = (it.quantity || 0) * (it.unitPrice || 0);
+      let disc = 0;
+      if (it.discountType === 'percent') disc = base * ((it.discountValue || 0) / 100);
+      else if (it.discountType === 'amount') disc = it.discountValue || 0;
+      const net = Math.max(0, base - disc);
+      return acc + net + (it.shipping || 0);
+    }, 0);
+  }, [form.items]);
   const paid = useMemo(() => paidSum(form.payments), [form.payments]);
   const rem = Math.max(0, total - paid);
 
