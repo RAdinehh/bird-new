@@ -456,6 +456,27 @@ export function calcItemDiscount(
   return Math.max(0, base - net);
 }
 
+
+
+/** رنگ بج وضعیت چک */
+export function checkTone(status?: CheckStatus): 'gray' | 'green' | 'red' {
+  if (!status || status === 'pending') return 'gray';
+  if (status === 'cleared') return 'green';
+  return 'red';
+}
+
+/** جمع پرداخت‌های چک در جریان (نگهداری شده) */
+export function pendingChecksSum(payments: Payment[]): number {
+  return payments
+    .filter(p => p.method === 'check' && (!p.status || p.status === 'pending'))
+    .reduce((a, p) => a + (p.amount || 0), 0);
+}
+
+/** لیست چک‌های سرسید نزدیک */
+export function pendingChecks(payments: Payment[]): Payment[] {
+  return payments.filter(p => p.method === 'check' && (!p.status || p.status === 'pending'));
+}
+
 export function itemTotal(q: number, p: number): number {
   return (q || 0) * (p || 0);
 }

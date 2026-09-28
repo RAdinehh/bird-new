@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment, calcDueDate, type WorkflowStatus, nextWorkflowStatus, workflowTone, WORKFLOW_LABEL, prevWorkflowStatus, calcItemTotal, calcItemDiscount } from './store';
+import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment, calcDueDate, type WorkflowStatus, nextWorkflowStatus, workflowTone, WORKFLOW_LABEL, prevWorkflowStatus, calcItemTotal, calcItemDiscount , checkTone, CHECK_STATUS_LABEL, type CheckStatus } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui'
@@ -655,11 +655,26 @@ export default function PurchasesPage() {
             </Grid2>
             <Field label="تاریخ"><DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} /></Field>
             {p.method === 'check' ? (
-              <Grid3>
+              <>
+                <Grid3>
                 <Field label="شماره چک"><Input placeholder="..." dir="ltr" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} /></Field>
                 <Field label="بانک"><Input placeholder="..." value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
                 <Field label="سرسید چک"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })} /></Field>
               </Grid3>
+                <Field label="وضعیت چک">
+                  <Select value={p.status || 'pending'} onChange={e => updatePayment(p.id, { status: e.target.value as CheckStatus })}>
+                    <option value="pending">🟡 در جریان</option>
+                    <option value="cleared">✅ نقد شد</option>
+                    <option value="bounced">❌ برگشتی</option>
+                  </Select>
+                </Field>
+
+                {p.status === 'cleared' && (
+                  <Field label="تاریخ نقد">
+                    <DatePicker value={p.clearedDate || ''} onChange={v => updatePayment(p.id, { clearedDate: v })} />
+                  </Field>
+                )}
+              </>
             ) : null}
           </div>
         ))}
