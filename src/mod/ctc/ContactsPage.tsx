@@ -3,6 +3,7 @@ import { useCtc, type Person, type Role, ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TY
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
 interface F {
   id?: string; name: string; phone: string; phone2: string; email: string;
@@ -42,9 +43,41 @@ export default function ContactsPage() {
   const toggleRole = (r: Role) => setForm(f => ({ ...f, roles: f.roles.includes(r) ? f.roles.filter(x => x !== r) : [...f.roles, r] }));
   const toggleSupType = (t: string) => setForm(f => ({ ...f, supplierTypes: f.supplierTypes.includes(t) ? f.supplierTypes.filter(x => x !== t) : [...f.supplierTypes, t] }));
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
-  const save = () => {
+  const save = async () => {
     if (!form.name.trim()) { setErr('نام اجباری است'); return; }
     if (form.roles.length === 0) { setErr('حداقل یک نقش انتخاب کنید'); return; }
+
+    // === چک تکراری (فقط برای جدید) ===
+    if (!form.id) {
+      const trimmedName = form.name.trim();
+      const trimmedPhone = form.phone.trim();
+
+      const nameDup = contacts.find(c => c.name.trim() === trimmedName);
+      const phoneDup = trimmedPhone
+        ? contacts.find(c => c.phone.trim() === trimmedPhone)
+        : null;
+
+      if (nameDup && phoneDup && nameDup.id === phoneDup.id) {
+        const ok = await showConfirmAsync(
+          `شخصی با همین نام و شماره تلفن قبلاً ثبت شده («${nameDup.name}»). باز هم اضافه شود؟`,
+          '⚠️ تکرار کامل'
+        );
+        if (!ok) return;
+      } else if (nameDup) {
+        const ok = await showConfirmAsync(
+          `شخصی با نام «${nameDup.name}» قبلاً ثبت شده. باز هم اضافه شود؟`,
+          '⚠️ نام تکراری'
+        );
+        if (!ok) return;
+      } else if (phoneDup) {
+        const ok = await showConfirmAsync(
+          `شخصی با این شماره تلفن قبلاً ثبت شده («${phoneDup.name}»). باز هم اضافه شود؟`,
+          '⚠️ تلفن تکراری'
+        );
+        if (!ok) return;
+      }
+    }
+
     const data: Omit<Person, 'id'|'createdAt'|'updatedAt'> = {
       name: form.name.trim(), phone: form.phone.trim(), phone2: form.phone2.trim(), email: form.email.trim(),
       address: form.address.trim(), city: form.city.trim(), nationalId: form.nationalId.trim(),
