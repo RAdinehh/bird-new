@@ -107,8 +107,8 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
 
       <table style="width: 60%; margin-right: auto; margin-left: auto;">
         <tr><td>جمع کل اقلام:</td><td style="text-align: left;">${toFa(invoice.items.reduce((a, x) => a + x.total, 0).toLocaleString('fa-IR'))} ت</td></tr>
-        ${invoice.discount > 0 ? '<tr><td>تخفیف:</td><td style="text-align: left;">' + toFa(invoice.discount.toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}
-        ${invoice.shipping > 0 ? '<tr><td>حمل:</td><td style="text-align: left;">' + toFa(invoice.shipping.toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}
+        ${(invoice.discount || 0) > 0 ? '<tr><td>تخفیف:</td><td style="text-align: left;">' + toFa((invoice.discount || 0).toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}
+        ${(invoice.shipping || 0) > 0 ? '<tr><td>حمل:</td><td style="text-align: left;">' + toFa((invoice.shipping || 0).toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}
         <tr class="total-row"><td>قیمت نهایی:</td><td style="text-align: left;">${toFa(invoice.total.toLocaleString('fa-IR'))} ت</td></tr>
         <tr><td>پرداخت‌شده:</td><td style="text-align: left;">${toFa(paid.toLocaleString('fa-IR'))} ت</td></tr>
         ${rem > 0 ? '<tr class="total-row"><td>مانده:</td><td style="text-align: left; color: #d97706;">' + toFa(rem.toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}

@@ -92,8 +92,8 @@ export interface Invoice {
   partyId: string;
   category: string;
   items: InvoiceItem[];
-  discount: number;
-  shipping: number;
+  discount?: number;
+  shipping?: number;
   total: number;
   payments: Payment[];
   dueDate: string;

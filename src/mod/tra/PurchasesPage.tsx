@@ -16,7 +16,6 @@ interface F {
   id?: string;
   date: string; partyId: string; category: string;
   items: InvoiceItem[];
-  discount: string; shipping: string;
   paymentTerms: 'cash' | 'installment' | 'custom';
   installmentCount: string;
   installmentGapDays: string;
@@ -35,7 +34,6 @@ interface F {
 const empty = (): F => ({
    date: '', partyId: '', category: 'egg',
   items: [],
-  discount: '', shipping: '',
   paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
   customDueDate: '', paymentNote: '',
   isPreorder: false, deliveryDate: '',
@@ -116,8 +114,6 @@ export default function PurchasesPage() {
     setForm({
       id: inv.id,  date: inv.date, partyId: inv.partyId, category: inv.category,
       items: inv.items || [],
-      discount: inv.discount ? toFa(inv.discount) : '',
-      shipping: inv.shipping ? toFa(inv.shipping) : '',
       dueDate: inv.dueDate || '',
       paymentTerms: inv.paymentTerms || 'cash',
       installmentCount: inv.installmentCount ? toFa(inv.installmentCount) : '1',
@@ -215,8 +211,6 @@ export default function PurchasesPage() {
       partyId: form.partyId,
       category: form.category,
       items: form.items,
-      discount: num(form.discount),
-      shipping: num(form.shipping),
       total,
       payments: form.payments,
       dueDate: form.dueDate.trim(),
@@ -362,8 +356,8 @@ export default function PurchasesPage() {
                 ) : null}
 
                 <SectionTitle>💰 مالی</SectionTitle>
-                {inv.discount > 0 ? <Row l="تخفیف" v={`${toFa(inv.discount.toLocaleString('fa-IR'))} ت`} /> : null}
-                {inv.shipping > 0 ? <Row l="حمل" v={`${toFa(inv.shipping.toLocaleString('fa-IR'))} ت`} /> : null}
+                {(inv.discount || 0) > 0 ? <Row l="تخفیف" v={`${toFa((inv.discount || 0).toLocaleString('fa-IR'))} ت`} /> : null}
+                {(inv.shipping || 0) > 0 ? <Row l="حمل" v={`${toFa((inv.shipping || 0).toLocaleString('fa-IR'))} ت`} /> : null}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                   <span>قیمت نهایی:</span>
                   <span>{toFa(inv.total.toLocaleString('fa-IR'))} ت</span>
@@ -566,16 +560,7 @@ export default function PurchasesPage() {
 
         <Btn size="sm" full onClick={addItem}>+ افزودن قلم</Btn>
 
-        <SectionTitle>💰 مالی</SectionTitle>
-        <Grid2>
-          <Field label="تخفیف"><Input mode="number" value={form.discount} onChange={e => setForm({...form, discount: e.target.value})} unit="ت" /></Field>
-          <Field label="حمل"><Input mode="number" value={form.shipping} onChange={e => setForm({...form, shipping: e.target.value})} unit="ت" /></Field>
-        </Grid2>
-        <Field label="قیمت نهایی" hint="خودکار">
-          <Input readOnly dir="ltr" value={toFa(total.toLocaleString('fa-IR'))} unit="ت" />
-        </Field>
-
-        <SectionTitle>📦 نوع سفارش</SectionTitle>
+                <SectionTitle>📦 نوع سفارش</SectionTitle>
         <Field label="نوع سفارش">
           <Select value={form.isPreorder ? 'preorder' : 'stock'} onChange={e => {
             const isPre = e.target.value === 'preorder';
@@ -661,10 +646,6 @@ export default function PurchasesPage() {
             </Field>
           </Grid2>
         )}
-
-        <Field label="یادداشت پرداخت" hint="مثلاً: توافق شد اول ماه پرداخت شود">
-          <Input placeholder="..." value={form.paymentNote} onChange={e => setForm({...form, paymentNote: e.target.value})} />
-        </Field>
 
         <SectionTitle>💳 پرداخت‌ها — {toFa(paid.toLocaleString('fa-IR'))} از {toFa(total.toLocaleString('fa-IR'))}</SectionTitle>
 
