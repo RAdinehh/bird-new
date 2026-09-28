@@ -31,6 +31,7 @@ interface State {
   updateBreed: (id: string, patch: Partial<Breed>) => void;
   deleteBreed: (id: string) => void;
   dedupeBirds: () => void;
+  dedupeBreeds: () => void;
 }
 
 const now = () => new Date().toISOString();
@@ -58,6 +59,17 @@ export const useBrd = create<State>()(
       updateBreed: (id, patch) => set({
         breeds: get().breeds.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x)
       }),
+      dedupeBreeds: () => {
+        const seen = new Set<string>();
+        const cleaned = get().breeds.filter(b => {
+          const key = b.birdId + '|' + b.name.trim().toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        set({ breeds: cleaned });
+      },
+
       dedupeBirds: () => {
         const seen = new Set<string>();
         const cleaned = get().birds.filter(b => {

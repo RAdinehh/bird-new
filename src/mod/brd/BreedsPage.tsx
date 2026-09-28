@@ -1,14 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useBrd, type Breed } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
 export default function BreedsPage() {
-  const { birds, breeds, addBreed, updateBreed, deleteBreed } = useBrd();
+  const { birds, breeds, dedupeBreeds, addBreed, updateBreed, deleteBreed } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', birdId:'', name:'', fcr:'' });
+
+  // پاک کردن نژادهای تکراری (یک بار)
+  useEffect(() => {
+    useBrd.getState().dedupeBreeds();
+  }, []);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [filterBird, setFilterBird] = useState('');
@@ -36,7 +42,7 @@ export default function BreedsPage() {
     setErr(''); setOpen(true);
   };
 
-  const save = () => {
+  const save = async () => {
     if (!form.name.trim()) { setErr('نام نژاد اجباری است'); return; }
     const payload = {
       birdId: form.birdId,
