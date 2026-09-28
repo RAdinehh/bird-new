@@ -423,6 +423,39 @@ export function workflowTone(status?: WorkflowStatus): 'gray' | 'blue' | 'amber'
   return 'green';
 }
 
+
+
+/** محاسبه جمع قلم با تخفیف */
+export function calcItemTotal(
+  quantity: number,
+  unitPrice: number,
+  discountType?: string,
+  discountValue?: number
+): number {
+  const base = (quantity || 0) * (unitPrice || 0);
+  if (!discountType || !discountValue) return base;
+
+  let discount = 0;
+  if (discountType === 'percent') {
+    discount = base * (discountValue / 100);
+  } else if (discountType === 'amount') {
+    discount = discountValue;
+  }
+  return Math.max(0, base - discount);
+}
+
+/** محاسبه مبلغ تخفیف قلم */
+export function calcItemDiscount(
+  quantity: number,
+  unitPrice: number,
+  discountType?: string,
+  discountValue?: number
+): number {
+  const base = (quantity || 0) * (unitPrice || 0);
+  const net = calcItemTotal(quantity, unitPrice, discountType, discountValue);
+  return Math.max(0, base - net);
+}
+
 export function itemTotal(q: number, p: number): number {
   return (q || 0) * (p || 0);
 }
