@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { useWhs, UNIT_LABEL, MOVEMENT_REASON, CATEGORY_ICON, type Movement, type MovementType, type MovementReason } from './store';
+import { useWhs, UNIT_LABEL, MOVEMENT_REASON, CATEGORY_ICON, CATEGORY_LABEL, type Movement, type MovementType, type MovementReason } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 interface F {
   id?: string;
@@ -190,13 +191,25 @@ export default function MovesPage() {
         </Field>
 
         <Field label="کالا" required hint={selectedItem ? `موجودی فعلی: ${toFa(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined}>
-          <Select value={form.itemId} onChange={e => setForm({ ...form, itemId: e.target.value })}>
-            {items.map(it => (
-              <option key={it.id} value={it.id}>
-                {CATEGORY_ICON[it.category]} {it.name} ({toFa(it.currentStock)} {UNIT_LABEL[it.unit]})
-              </option>
-            ))}
-          </Select>
+          <SmartSelect
+            value={form.itemId}
+            onChange={v => setForm({ ...form, itemId: v })}
+            options={items.map(it => ({
+              value: it.id,
+              label: it.name,
+              subtitle: `${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`,
+              group: it.category,
+            }))}
+            groupLabels={Object.fromEntries(
+              Object.entries(CATEGORY_LABEL).map(([k, v]) => [k, v])
+            ) as Record<string, string>}
+            groupIcons={Object.fromEntries(
+              Object.entries(CATEGORY_ICON).map(([k, v]) => [k, v])
+            ) as Record<string, string>}
+            placeholder="— انتخاب کالا —"
+            modalTitle="انتخاب کالای انبار"
+            autoThreshold={6}
+          />
         </Field>
 
         <Grid2>
@@ -228,10 +241,20 @@ export default function MovesPage() {
         </Grid2>
 
         <Field label="طرف معامله" hint="اختیاری — از مخاطبین">
-          <Select value={form.partyId} onChange={e => setForm({ ...form, partyId: e.target.value })}>
-            <option value="">—</option>
-            {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </Select>
+          <SmartSelect
+            value={form.partyId}
+            onChange={v => setForm({ ...form, partyId: v })}
+            options={contacts.map(c => ({
+              value: c.id,
+              label: c.name,
+              subtitle: c.roles.length > 0
+                ? c.roles.map(r => r === 'customer' ? 'مشتری' : r === 'supplier' ? 'فروشنده' : 'کارگر').join('، ')
+                : undefined,
+            }))}
+            placeholder="— بدون مخاطب —"
+            modalTitle="انتخاب مخاطب"
+            autoThreshold={6}
+          />
         </Field>
 
         <Field label="یادداشت">
