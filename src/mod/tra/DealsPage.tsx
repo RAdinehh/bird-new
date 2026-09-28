@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useTra, DEAL_LABEL, type Deal, type DealType } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui'
+import SmartSelect from '../../shr/components/SmartSelect';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -210,9 +211,18 @@ export default function DealsPage() {
         </Grid2>
 
         <Field label="طرف معامله" required>
-          <Select value={form.partyId} onChange={e => setForm({...form, partyId: e.target.value})}>
-            {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </Select>
+          <SmartSelect
+              value={form.partyId}
+              onChange={v => setForm({...form, partyId: v})}
+              options={contacts.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: c.phone || undefined,
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب طرف معامله"
+              autoThreshold={6}
+            />
         </Field>
 
         <Field label="توضیحات" required>

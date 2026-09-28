@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui'
+import SmartSelect from '../../shr/components/SmartSelect';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import InvoicePrint from './InvoicePrint';
@@ -262,9 +263,18 @@ export default function SalesPage() {
 
         <Grid2>
           <Field label="مشتری" required>
-            <Select value={form.partyId} onChange={e => setForm({...form, partyId: e.target.value})}>
-              {customers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </Select>
+            <SmartSelect
+              value={form.partyId}
+              onChange={v => setForm({...form, partyId: v})}
+              options={customers.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: c.phone || undefined,
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب مشتری"
+              autoThreshold={6}
+            />
           </Field>
           <Field label="دسته">
             <Select value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
