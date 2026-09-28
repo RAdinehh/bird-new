@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useFed, CATEGORY_LABEL, CATEGORY_ICON, type Ingredient, type IngredientCategory } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { INGREDIENT_STANDARDS } from './standards';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 
@@ -10,11 +11,11 @@ interface F {
   name: string;
   category: IngredientCategory;
   protein: string; energy: string; fat: string; fiber: string;
-  calcium: string; phosphorus: string;
-  methionine: string; lysine: string;
+  calcium: string; phosphorus: string; methionine: string; lysine: string;
   minPercent: string; maxPercent: string;
   price: string;
   stockItemId: string;
+  standardKey: string;
   notes: string;
 }
 
@@ -23,7 +24,7 @@ const empty = (): F => ({
   protein: '', energy: '', fat: '', fiber: '',
   calcium: '', phosphorus: '', methionine: '', lysine: '',
   minPercent: '', maxPercent: '',
-  price: '', stockItemId: '', notes: ''
+  price: '', stockItemId: '', standardKey: '', notes: ''
 });
 
 export default function IngredientsPage() {
@@ -36,16 +37,61 @@ export default function IngredientsPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [filterCat, setFilterCat] = useState<IngredientCategory | ''>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [showHidden, setShowHidden] = useState(false);
+
+  // === Seed خودکار مواد CORE (فقط یک بار) ===
+  useEffect(() => {
+    // اول: پاک کردن تکرارها
+    useFed.getState().dedupeCore();
+
+    // دوم: اضافه کردن مواد کم
+    const state = useFed.getState();
+    const existingKeys = state.ingredients
+      .filter(i => i.standardKey)
+      .map(i => i.standardKey);
+
+    INGREDIENT_STANDARDS.forEach(s => {
+      if (existingKeys.includes(s.key)) return;
+      state.addIngredient({
+        name: s.name,
+        category: s.category,
+        protein: s.protein, energy: s.energy, fat: s.fat, fiber: s.fiber,
+        calcium: s.calcium, phosphorus: s.phosphorus,
+        methionine: s.methionine, lysine: s.lysine,
+        minPercent: s.minPercent, maxPercent: s.maxPercent,
+        price: 0, stockItemId: '',
+        isCore: true, standardKey: s.key,
+        notes: s.notes || '',
+      });
+    });
+  }, []);
 
   const list = useMemo(() => {
     let arr = ingredients;
+    if (!showHidden) arr = arr.filter(i => !i.isHidden);
     if (filterCat) arr = arr.filter(i => i.category === filterCat);
     return arr;
-  }, [ingredients, filterCat]);
+  }, [ingredients, filterCat, showHidden]);
+
+  const hiddenCount = useMemo(() => ingredients.filter(i => i.isHidden).length, [ingredients]);
 
   const openNew = () => {
-    setForm(empty());
-    setErr(''); setOpen(true);
+    setForm(empty()); setErr(''); setOpen(true);
+  };
+
+  // === انتخاب از کتابخانه ===
+  const pickFromLibrary = (key: string) => {
+    const s = INGREDIENT_STANDARDS.find(x => x.key === key);
+    if (!s) return;
+    setForm({
+      name: s.name, category: s.category,
+      protein: toFa(s.protein), energy: toFa(s.energy),
+      fat: toFa(s.fat), fiber: toFa(s.fiber),
+      calcium: toFa(s.calcium), phosphorus: toFa(s.phosphorus),
+      methionine: toFa(s.methionine), lysine: toFa(s.lysine),
+      minPercent: toFa(s.minPercent), maxPercent: toFa(s.maxPercent),
+      price: '', stockItemId: '', standardKey: s.key, notes: s.notes || ''
+    });
   };
 
   const openEdit = (it: Ingredient) => {
@@ -63,39 +109,33 @@ export default function IngredientsPage() {
       maxPercent: it.maxPercent ? toFa(it.maxPercent) : '',
       price: it.price ? toFa(it.price) : '',
       stockItemId: it.stockItemId || '',
+      standardKey: it.standardKey || '',
       notes: it.notes || ''
     });
     setErr(''); setOpen(true);
+  };
+
+  const toggleHide = (it: Ingredient) => {
+    updateIngredient(it.id, { isHidden: !it.isHidden });
   };
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
 
   const save = () => {
     if (form.name.trim() === '') { setErr('نام ماده اجباری است'); return; }
-
     const data = {
-      name: form.name.trim(),
-      category: form.category,
-      protein: num(form.protein),
-      energy: num(form.energy),
-      fat: num(form.fat),
-      fiber: num(form.fiber),
-      calcium: num(form.calcium),
-      phosphorus: num(form.phosphorus),
-      methionine: num(form.methionine),
-      lysine: num(form.lysine),
-      minPercent: num(form.minPercent),
-      maxPercent: num(form.maxPercent),
-      price: num(form.price),
-      stockItemId: form.stockItemId,
+      name: form.name.trim(), category: form.category,
+      protein: num(form.protein), energy: num(form.energy),
+      fat: num(form.fat), fiber: num(form.fiber),
+      calcium: num(form.calcium), phosphorus: num(form.phosphorus),
+      methionine: num(form.methionine), lysine: num(form.lysine),
+      minPercent: num(form.minPercent), maxPercent: num(form.maxPercent),
+      price: num(form.price), stockItemId: form.stockItemId,
+      standardKey: form.standardKey,
       notes: form.notes.trim()
     };
-
-    if (form.id === undefined) {
-      addIngredient(data);
-    } else {
-      updateIngredient(form.id, data);
-    }
+    if (form.id === undefined) addIngredient(data);
+    else updateIngredient(form.id, data);
     setOpen(false);
   };
 
@@ -118,6 +158,23 @@ export default function IngredientsPage() {
         })}
       </div>
 
+      {hiddenCount > 0 && (
+        <button
+          onClick={() => setShowHidden(!showHidden)}
+          style={{
+            padding: '6px 11px', fontSize: 'var(--fs-sm)',
+            background: showHidden ? 'var(--warn-soft)' : 'var(--btn-bg)',
+            border: '1px solid ' + (showHidden ? 'var(--warn)' : 'var(--border)'),
+            borderRadius: 'var(--r-sm)',
+            color: showHidden ? 'var(--warn)' : 'var(--muted)',
+            fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+            marginTop: 4
+          }}
+        >
+          👁️ {showHidden ? 'مخفی کردن' : 'نمایش'} پنهان‌شده‌ها ({toFa(hiddenCount)})
+        </button>
+      )}
+
       {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
@@ -130,23 +187,31 @@ export default function IngredientsPage() {
           {list.map((it, i) => {
             const isOpen = expandedId === it.id;
             const stockItem = items.find(x => x.id === it.stockItemId);
+            const livePrice = stockItem?.lastPrice || 0;
+            const displayPrice = livePrice > 0 ? livePrice : it.price;
 
             return (
               <ExpandableCard
                 key={it.id}
-                accent="accent"
+                accent={it.isHidden ? 'dim' : (it.isCore ? 'blue' : 'accent')}
                 index={toFa(i + 1)}
                 iconEmoji={CATEGORY_ICON[it.category]}
                 title={it.name}
                 subtitle={`${CATEGORY_LABEL[it.category]} · پروتئین ${toFa(it.protein)}٪`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : it.id)}
-                badge={it.price > 0 ? <Tag tone="blue">{toFa(it.price.toLocaleString('fa-IR'))} ت/kg</Tag> : undefined}
+                badge={
+                  it.isHidden
+                    ? <Tag tone="gray">پنهان</Tag>
+                    : it.isCore
+                    ? <Tag tone="blue">پیش‌فرض</Tag>
+                    : (displayPrice > 0 ? <Tag tone="green">{toFa(displayPrice.toLocaleString('fa-IR'))} ت</Tag> : undefined)
+                }
                 summary={
                   <>
-                    <span>پروتئین: <b style={{ color: 'var(--text)' }}>{toFa(it.protein)}٪</b></span>
-                    <span>انرژی: <b style={{ color: 'var(--text)' }}>{toFa(it.energy)}</b></span>
-                    {it.price > 0 ? <span>قیمت: <b style={{ color: 'var(--text)' }}>{toFa(it.price.toLocaleString('fa-IR'))}</b></span> : null}
+                    <span>پروتئین: <b>{toFa(it.protein)}٪</b></span>
+                    <span>انرژی: <b>{toFa(it.energy)}</b></span>
+                    {displayPrice > 0 && <span>قیمت: <b>{toFa(displayPrice.toLocaleString('fa-IR'))}</b></span>}
                   </>
                 }
               >
@@ -168,33 +233,46 @@ export default function IngredientsPage() {
                   <Row l="لیزین" v={`${toFa(it.lysine)} ٪`} />
                 </Grid2>
 
-                {(it.minPercent > 0 || it.maxPercent > 0) ? (
+                {(it.minPercent > 0 || it.maxPercent > 0) && (
                   <>
                     <SectionTitle>⚖ محدوده استفاده</SectionTitle>
-                    {it.minPercent > 0 ? <Row l="حداقل" v={`${toFa(it.minPercent)} ٪`} /> : null}
-                    {it.maxPercent > 0 ? <Row l="حداکثر" v={`${toFa(it.maxPercent)} ٪`} /> : null}
+                    {it.minPercent > 0 && <Row l="حداقل" v={`${toFa(it.minPercent)} ٪`} />}
+                    {it.maxPercent > 0 && <Row l="حداکثر" v={`${toFa(it.maxPercent)} ٪`} />}
                   </>
-                ) : null}
+                )}
 
                 <SectionTitle>💰 مالی و انبار</SectionTitle>
-                {it.price > 0 ? <Row l="قیمت هر کیلوگرم" v={`${toFa(it.price.toLocaleString('fa-IR'))} ت`} /> : null}
-                {stockItem ? <Row l="کالای انبار" v={`${stockItem.name} (${toFa(stockItem.currentStock)} ${UNIT_LABEL[stockItem.unit]})`} /> : null}
+                {livePrice > 0 && <Row l="قیمت انبار" v={`${toFa(livePrice.toLocaleString('fa-IR'))} ت/kg`} />}
+                {!livePrice && it.price > 0 && <Row l="قیمت دستی" v={`${toFa(it.price.toLocaleString('fa-IR'))} ت/kg`} />}
+                {stockItem ? (
+                  <Row l="کالای انبار" v={`${stockItem.name} (${toFa(stockItem.currentStock)} ${UNIT_LABEL[stockItem.unit]})`} />
+                ) : (
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', padding: '6px 10px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)' }}>
+                    ⚠️ به انبار وصل نیست — موقع مصرف، موجودی کم نمیشه
+                  </div>
+                )}
 
-                {it.notes ? (
+                {it.notes && (
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
                   </>
-                ) : null}
+                )}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(it)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(it.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={() => openEdit(it)} style={{ flex: 1 }}>ویرایش مقادیر</Btn>
+                  {it.isCore ? (
+                    <Btn size="sm" onClick={() => toggleHide(it)} style={{ flex: 1 }}>
+                      {it.isHidden ? '👁️ نمایش' : '👁️‍🗨️ پنهان'}
+                    </Btn>
+                  ) : (
+                    <Btn size="sm" onClick={() => setDelId(it.id)} style={{ flex: 1 }}>حذف</Btn>
+                  )}
                 </div>
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ افزودن ماده</Btn>
+          <Btn variant="primary" full onClick={openNew}>+ افزودن ماده اولیه جدید</Btn>
         </>
       )}
 
@@ -204,6 +282,17 @@ export default function IngredientsPage() {
         title={form.id ? 'ویرایش ماده' : 'افزودن ماده اولیه'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
+        {!form.id && (
+          <Field label="انتخاب سریع از کتابخانه" hint="یکی از مواد پیش‌فرض را انتخاب کنید">
+            <Select value={form.standardKey} onChange={e => pickFromLibrary(e.target.value)}>
+              <option value="">— انتخاب از کتابخانه (اختیاری) —</option>
+              {INGREDIENT_STANDARDS.map(s => (
+                <option key={s.key} value={s.key}>{CATEGORY_ICON[s.category]} {s.name}</option>
+              ))}
+            </Select>
+          </Field>
+        )}
+
         <Field label="نام ماده" required>
           <Input placeholder="ذرت، سویا، کنجاله..." value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
         </Field>
@@ -216,12 +305,12 @@ export default function IngredientsPage() {
               )}
             </Select>
           </Field>
-          <Field label="قیمت هر کیلوگرم">
+          <Field label="قیمت دستی (اختیاری)" hint="اگر پر شود، بر قیمت انبار اولویت دارد">
             <Input mode="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} unit="ت" />
           </Field>
         </Grid2>
 
-        <SectionTitle>🥗 ترکیبات (درصد یا واحد)</SectionTitle>
+        <SectionTitle>🥗 ترکیبات</SectionTitle>
         <Grid2>
           <Field label="پروتئین خام"><Input mode="number" value={form.protein} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" /></Field>
           <Field label="انرژی (kcal/kg)"><Input mode="number" value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} /></Field>
@@ -245,8 +334,8 @@ export default function IngredientsPage() {
           <Field label="حداکثر" hint="۰ = بدون محدودیت"><Input mode="number" value={form.maxPercent} onChange={e => setForm({ ...form, maxPercent: e.target.value })} unit="٪" max={100} /></Field>
         </Grid2>
 
-        <SectionTitle>📦 اتصال به انبار (اختیاری)</SectionTitle>
-        <Field label="کالای مرتبط در انبار" hint="اگر انبار متصل شود، موجودی خودکار کم می‌شود">
+        <SectionTitle>📦 اتصال به انبار</SectionTitle>
+        <Field label="کالای مرتبط" hint="اگر وصل شود، موجودی خودکار کم و قیمت از انبار خونده می‌شود">
           <Select value={form.stockItemId} onChange={e => setForm({ ...form, stockItemId: e.target.value })}>
             <option value="">— بدون اتصال —</option>
             {items.map(si => (
@@ -259,7 +348,7 @@ export default function IngredientsPage() {
           <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
         </Field>
 
-        {err ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div> : null}
+        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
       </Modal>
 
       <Modal

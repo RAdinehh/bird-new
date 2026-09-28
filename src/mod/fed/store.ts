@@ -20,6 +20,9 @@ export interface Ingredient {
   maxPercent: number;
   price: number;
   stockItemId: string;
+  isCore?: boolean;         // true = ماده پیش‌فرض
+  isHidden?: boolean;       // true = پنهان شده از لیست
+  standardKey?: string;     // کد استاندارد در standards.ts
   notes: string;
   createdAt: string;
   updatedAt: string;
@@ -66,6 +69,7 @@ interface State {
   addIngredient: (i: Omit<Ingredient, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateIngredient: (id: string, patch: Partial<Ingredient>) => void;
   deleteIngredient: (id: string) => void;
+  dedupeCore: () => void;
   addRequirement: (r: Omit<Requirement, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateRequirement: (id: string, patch: Partial<Requirement>) => void;
   deleteRequirement: (id: string) => void;
@@ -85,6 +89,17 @@ export const useFed = create<State>()(
 
       addIngredient: (i) => set({ ingredients: [...get().ingredients, { ...i, id: uuid(), createdAt: now(), updatedAt: now() }] }),
       updateIngredient: (id, patch) => set({ ingredients: get().ingredients.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) }),
+      dedupeCore: () => {
+        const seen = new Set<string>();
+        const cleaned = get().ingredients.filter(i => {
+          if (!i.standardKey) return true;
+          if (seen.has(i.standardKey)) return false;
+          seen.add(i.standardKey);
+          return true;
+        });
+        set({ ingredients: cleaned });
+      },
+
       deleteIngredient: (id) => set({
         ingredients: get().ingredients.filter(x => x.id !== id),
         formulas: get().formulas.map(f => ({ ...f, lines: f.lines.filter(l => l.ingredientId !== id) }))
@@ -123,11 +138,21 @@ export const CATEGORY_ICON: Record<IngredientCategory, string> = {
 export const STAGE_LABEL: Record<string, string> = {
   starter: 'استارتر',
   grower: 'گروور',
-  developer: 'پرورش',
-  prelayer: 'پیش‌تخم‌گذار',
-  layer: 'تخم‌گذار',
+  developer: 'دولوپر',
+  prelayer: 'پریلیر',
+  layer: 'لیر',
   finisher: 'فینیشر',
-  breeder: 'مادر'
+  breeder: 'بریدر'
+};
+
+export const STAGE_LABEL_LONG: Record<string, string> = {
+  starter: 'استارتر (آغازین، ۰-۳ هفته)',
+  grower: 'گروور (رشد، ۳-۶ هفته)',
+  developer: 'دولوپر (پرورش، ۶-۱۸ هفته)',
+  prelayer: 'پریلیر (پیش‌تخم‌گذار، ۱۶-۲۰ هفته)',
+  layer: 'لیر (تخم‌گذار، ۱۸+ هفته)',
+  finisher: 'فینیشر (پایانی/پروار)',
+  breeder: 'بریدر (مادر، تولید تخم نطفه‌دار)'
 };
 
 /** محاسبه‌ی مجموع درصدهای یک جیره */

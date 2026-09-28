@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useFed, STAGE_LABEL, type Requirement } from './store';
+import { useFed, STAGE_LABEL, STAGE_LABEL_LONG, type Requirement } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -24,11 +24,19 @@ const empty = (): F => ({
 });
 
 const PRESETS: Record<string, Partial<F>> = {
-  'مرغ-starter': { protein: '22', energy: '2950', calcium: '1', phosphorus: '0.45', methionine: '0.5', lysine: '1.35' },
-  'مرغ-grower': { protein: '19', energy: '2850', calcium: '0.9', phosphorus: '0.4', methionine: '0.4', lysine: '1.1' },
-  'مرغ-developer': { protein: '17', energy: '2750', calcium: '1', phosphorus: '0.4', methionine: '0.35', lysine: '0.9' },
-  'مرغ-layer': { protein: '16.5', energy: '2750', calcium: '3.8', phosphorus: '0.45', methionine: '0.38', lysine: '0.85' },
-  'مرغ-finisher': { protein: '18', energy: '3100', calcium: '1', phosphorus: '0.45', methionine: '0.5', lysine: '1.2' }
+  // === مرغ تخم‌گذار ===
+  'مرغ-starter':   { protein: '22',   energy: '2950', calcium: '1',   phosphorus: '0.45', methionine: '0.5',  lysine: '1.35' },
+  'مرغ-grower':    { protein: '19',   energy: '2850', calcium: '0.9', phosphorus: '0.4',  methionine: '0.4',  lysine: '1.1' },
+  'مرغ-developer': { protein: '17',   energy: '2750', calcium: '1',   phosphorus: '0.4',  methionine: '0.35', lysine: '0.9' },
+  'مرغ-prelayer':  { protein: '16.5', energy: '2750', calcium: '2.5', phosphorus: '0.45', methionine: '0.38', lysine: '0.85' },
+  'مرغ-layer':     { protein: '16.5', energy: '2800', calcium: '3.8', phosphorus: '0.45', methionine: '0.38', lysine: '0.85' },
+  'مرغ-breeder':   { protein: '16.5', energy: '2800', calcium: '3.2', phosphorus: '0.45', methionine: '0.4',  lysine: '0.85' },
+  // === مرغ گوشتی ===
+  'گوشتی-starter':   { protein: '22', energy: '3000', calcium: '1',   phosphorus: '0.45', methionine: '0.5',  lysine: '1.2' },
+  'گوشتی-grower':    { protein: '20', energy: '3100', calcium: '0.9', phosphorus: '0.4',  methionine: '0.45', lysine: '1.1' },
+  'گوشتی-finisher':  { protein: '18', energy: '3200', calcium: '0.8', phosphorus: '0.35', methionine: '0.4',  lysine: '1.0' },
+  // === فینیشر مرغ تخم‌گذار (کمتر رایجه) ===
+  'مرغ-finisher':  { protein: '18',   energy: '3100', calcium: '1',   phosphorus: '0.45', methionine: '0.5',  lysine: '1.2' },
 };
 
 export default function RequirementsPage() {
@@ -187,7 +195,7 @@ export default function RequirementsPage() {
           <Field label="مرحله">
             <Select value={form.stage} onChange={e => setForm({ ...form, stage: e.target.value })}>
               {(Object.keys(STAGE_LABEL)).map(s =>
-                <option key={s} value={s}>{STAGE_LABEL[s]}</option>
+                <option key={s} value={s}>{STAGE_LABEL_LONG[s]}</option>
               )}
             </Select>
           </Field>
@@ -195,7 +203,7 @@ export default function RequirementsPage() {
 
         {presetAvailable ? (
           <Btn size="sm" full onClick={applyPreset}>
-            ✨ پر کردن خودکار با مقادیر پیش‌فرض {form.birdType} — {STAGE_LABEL[form.stage]}
+            ✨ پر کردن خودکار با مقادیر پیش‌فرض
           </Btn>
         ) : null}
 

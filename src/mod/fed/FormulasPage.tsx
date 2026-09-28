@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { format as formatJalali } from 'date-fns-jalali';
 import { useFed, STAGE_LABEL, formulaTotal, calcNutrients, formulaValid, type Formula, type FormulaLine } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -37,7 +38,7 @@ export default function FormulasPage() {
 
   const openNew = () => {
     if (ingredients.length === 0) { showAlert('اول مواد اولیه بسازید'); return; }
-    setForm({ ...empty(), date: new Date().toISOString().slice(0, 10) });
+    setForm({ ...empty(), date: formatJalali(new Date(), 'yyyy/MM/dd') });
     setErr(''); setOpen(true);
   };
 
@@ -215,7 +216,7 @@ export default function FormulasPage() {
         open={open}
         onClose={() => setOpen(false)}
         title={form.id ? 'ویرایش جیره' : 'ساخت جیره جدید'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn onClick={() => setOpen(false)}>لغو</Btn><Btn variant="primary" onClick={save}>ذخیره</Btn></BtnRow>}
       >
         <Field label="نام جیره" required>
           <Input placeholder="مثلاً: جیره لیر زمستان" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
@@ -272,21 +273,29 @@ export default function FormulasPage() {
               <Select value={line.ingredientId} onChange={e => updateLine(line.id, { ingredientId: e.target.value })}>
                 {available.map(i => <option key={i.id} value={i.id}>{i.name} ({toFa(i.protein)}٪ پروتئین)</option>)}
               </Select>
-              <Grid2>
-                <Field label="درصد در جیره">
-                  <Input
-                    mode="number"
-                    value={String(line.percent)}
-                    onChange={e => updateLine(line.id, { percent: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
-                    unit="٪"
-                    max={100}
-                    min={0}
-                  />
-                </Field>
-                <Field label="سهم پروتئین">
-                  <Input readOnly dir="ltr" value={toFa(((ing.protein * line.percent) / 100).toFixed(2))} unit="٪" />
-                </Field>
-              </Grid2>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+                <div style={{ flex: 1 }}>
+                  <Field label="درصد در جیره">
+                    <Input
+                      mode="number"
+                      value={String(line.percent)}
+                      onChange={e => updateLine(line.id, { percent: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
+                      unit="٪"
+                      max={100}
+                      min={0}
+                    />
+                  </Field>
+                </div>
+                <div style={{
+                  paddingBottom: 12,
+                  fontSize: 'var(--fs-xs)',
+                  fontWeight: 600,
+                  color: (100 - total) < 0 ? 'var(--danger)' : 'var(--muted)',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {toFa((100 - total).toFixed(2))}٪ مانده
+                </div>
+              </div>
               {ing.maxPercent > 0 && line.percent > ing.maxPercent ? (
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>⚠ حداکثر {toFa(ing.maxPercent)}٪ برای این ماده</div>
               ) : null}
@@ -338,7 +347,7 @@ export default function FormulasPage() {
         open={delId !== null}
         onClose={() => setDelId(null)}
         title="حذف جیره"
-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteFormula(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn onClick={() => setDelId(null)}>لغو</Btn><Btn variant="danger" onClick={() => { if (delId) deleteFormula(delId); setDelId(null); }}>حذف کن</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.name}</b>؟</div>
       </Modal>

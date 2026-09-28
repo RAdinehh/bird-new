@@ -62,9 +62,20 @@ export interface DailyLog {
   feedType: string;
   feedAmount: number | null;    // kg
   feedRemaining: number | null; // kg
+  feedSourceType: 'formula' | 'item' | '';
+  feedSourceId: string;
+  feedMethod: 'manual' | 'auto' | '';
+  feedMovementIds: string[];
+
+  // آب
   waterAmount: number | null;   // L
-  feedItemId: string;           // کد آیتم انبار (feed)
-  feedMovementId: string;       // کد رکورد خروجی در انبار
+  waterMethod: 'manual' | 'nipple' | 'trough' | 'tank' | '';
+  waterFillCount: number | null;
+  waterFillVolume: number | null;
+
+  // وزن‌کشی
+  weightSamples: WeightSample[];
+  weightGender: '' | 'male' | 'female' | 'mixed';
 
   // تلفات
   deathsCount: number;
@@ -96,7 +107,32 @@ export const useDlg = create<State>()(
       update: (id, patch) => set({ logs: get().logs.map(x => x.id === id ? { ...x, ...patch } : x) }),
       remove: (id) => set({ logs: get().logs.filter(x => x.id !== id) })
     }),
-    { name: 'pm-dlg' }
+    {
+      name: 'pm-dlg',
+      version: 3,
+      migrate: (persisted: any, version: number) => {
+        if (version < 2 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => ({
+            ...l,
+            feedSourceType: l.feedItemId ? 'item' : '',
+            feedSourceId: l.feedItemId || '',
+            feedMovementIds: l.feedMovementId ? [l.feedMovementId] : [],
+          }));
+        }
+        if (version < 3 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => ({
+            ...l,
+            feedMethod: l.feedMethod || '',
+            waterMethod: l.waterMethod || '',
+            waterFillCount: l.waterFillCount ?? null,
+            waterFillVolume: l.waterFillVolume ?? null,
+            weightSamples: l.weightSamples || [],
+            weightGender: l.weightGender || '',
+          }));
+        }
+        return persisted;
+      }
+    }
   )
 );
 
