@@ -21,6 +21,11 @@ interface F {
   installmentGapDays: string;
   customDueDate: string;
   paymentNote: string;
+  isPreorder: boolean;
+  deliveryDate: string;
+  advanceType: 'percent' | 'amount';
+  advanceValue: string;
+  advanceNote: string;
   dueDate: string;
   payments: Payment[];
   notes: string;
@@ -32,6 +37,8 @@ const empty = (): F => ({
   discount: '', shipping: '',
   paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
   customDueDate: '', paymentNote: '',
+  isPreorder: false, deliveryDate: '',
+  advanceType: 'percent', advanceValue: '', advanceNote: '',
   dueDate: '',
   payments: [],
   notes: ''
@@ -77,6 +84,13 @@ export default function PurchasesPage() {
       installmentCount: inv.installmentCount ? toFa(inv.installmentCount) : '1',
       installmentGapDays: inv.installmentGapDays ? toFa(inv.installmentGapDays) : '30',
       customDueDate: inv.customDueDate || '',
+      isPreorder: inv.isPreorder ?? false,
+      deliveryDate: inv.deliveryDate || '',
+      advanceType: (inv.advancePercent && inv.advancePercent > 0) ? 'percent' : 'amount',
+      advanceValue: (inv.advancePercent && inv.advancePercent > 0)
+        ? toFa(inv.advancePercent)
+        : (inv.advancePayment ? toFa(inv.advancePayment) : ''),
+      advanceNote: '',
       paymentNote: inv.paymentNote || '',
       payments: inv.payments || [],
       notes: inv.notes || ''
@@ -163,6 +177,14 @@ export default function PurchasesPage() {
       installmentGapDays: form.paymentTerms === 'installment' ? (parseInt(toEn(form.installmentGapDays)) || 30) : undefined,
       customDueDate: form.paymentTerms === 'custom' ? form.customDueDate : '',
       paymentNote: form.paymentNote.trim(),
+      isPreorder: form.isPreorder,
+      deliveryDate: form.isPreorder ? form.deliveryDate : '',
+      advancePercent: form.isPreorder && form.advanceType === 'percent'
+        ? (parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0)
+        : 0,
+      advancePayment: form.isPreorder && form.advanceType === 'amount'
+        ? (parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0)
+        : 0,
       relatedFlockId: '',
       relatedEntryId: '',
       notes: form.notes.trim()
@@ -250,6 +272,17 @@ export default function PurchasesPage() {
                 <Row l="تاریخ" v={toFa(inv.date)} />
                 {inv.number ? <Row l="شماره" v={inv.number} /> : null}
                 {inv.dueDate ? <Row l="سرسید" v={toFa(inv.dueDate)} /> : null}
+                {inv.isPreorder && inv.deliveryDate ? (
+                  <>
+                    <Row l="📅 تاریخ تحویل" v={toFa(inv.deliveryDate)} />
+                    {inv.advancePercent && inv.advancePercent > 0 ? (
+                      <Row l="💵 پیش‌پرداخت" v={`${toFa(inv.advancePercent)}٪`} />
+                    ) : null}
+                    {inv.advancePayment && inv.advancePayment > 0 ? (
+                      <Row l="💵 پیش‌پرداخت" v={`${toFa(inv.advancePayment.toLocaleString('fa-IR'))} ت`} />
+                    ) : null}
+                  </>
+                ) : null}
 
                 {/* دکمه‌های workflow */}
                 {nextWorkflowStatus(inv.workflowStatus) && (
@@ -419,6 +452,47 @@ export default function PurchasesPage() {
         <Field label="قیمت نهایی" hint="خودکار">
           <Input readOnly dir="ltr" value={toFa(total.toLocaleString('fa-IR'))} unit="ت" />
         </Field>
+
+        <SectionTitle>📦 نوع سفارش</SectionTitle>
+        <Field label="نوع سفارش">
+          <Select value={form.isPreorder ? 'preorder' : 'stock'} onChange={e => {
+            const isPre = e.target.value === 'preorder';
+            setForm(f => ({ ...f, isPreorder: isPre }));
+          }}>
+            <option value="stock">📦 از موجودی (فوری)</option>
+            <option value="preorder">📅 پیش‌فروش (تاریخ تحویل)</option>
+          </Select>
+        </Field>
+
+        {form.isPreorder && (
+          <>
+            <Field label="تاریخ تحویل" required>
+              <DatePicker value={form.deliveryDate} onChange={v => setForm({...form, deliveryDate: v})} />
+            </Field>
+
+            <SectionTitle>💵 پیش‌پرداخت</SectionTitle>
+            <Grid2>
+              <Field label="نوع پیش‌پرداخت">
+                <Select value={form.advanceType} onChange={e => setForm({...form, advanceType: e.target.value as 'percent' | 'amount'})}>
+                  <option value="percent">درصد (٪)</option>
+                  <option value="amount">مبلغ ثابت (ت)</option>
+                </Select>
+              </Field>
+              <Field label="مقدار" hint={form.advanceType === 'percent' ? 'درصد از کل' : 'مبلغ به تومان'}>
+                <Input
+                  mode="number"
+                  value={form.advanceValue}
+                  onChange={e => setForm({...form, advanceValue: e.target.value})}
+                  unit={form.advanceType === 'percent' ? '٪' : 'ت'}
+                />
+              </Field>
+            </Grid2>
+
+            <Field label="یادداشت پیش‌فروش">
+              <Input placeholder="مثلاً: تحویل درب مرغداری" value={form.advanceNote} onChange={e => setForm({...form, advanceNote: e.target.value})} />
+            </Field>
+          </>
+        )}
 
         <SectionTitle>📅 شرایط پرداخت</SectionTitle>
         <Field label="نوع پرداخت" required>
