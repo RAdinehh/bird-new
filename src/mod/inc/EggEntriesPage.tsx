@@ -9,6 +9,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { clampPercent, complement } from '../../shr/utils/smart';
 import { showAlert } from '../../cor/store/dialog';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 interface F {
   id?: string; deviceId: string; birdId: string; breedId: string;
@@ -233,17 +234,34 @@ export default function EggEntriesPage() {
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
         <Field label="دستگاه" required>
-          <Select value={form.deviceId} onChange={e => setForm({...form, deviceId: e.target.value})}>
-            {devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-          </Select>
+<SmartSelect
+              value={form.deviceId}
+              onChange={v => setForm(f => ({ ...f, deviceId: v }))}
+              options={devices.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (d => d.name)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب دستگاه"
+              autoThreshold={6}
+            />
         </Field>
 
         <Grid2>
           <Field label="پرنده" required>
-            <Select value={form.birdId} onChange={e => setForm({...form, birdId: e.target.value, breedId: ''})}>
-              <option value="">—</option>
-              {birds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </Select>
+<SmartSelect
+              value={form.birdId}
+              onChange={v => setForm(f => ({ ...f, birdId: v }))}
+              options={birds.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (b => b.name)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب پرنده"
+              autoThreshold={6}
+            />
           </Field>
           <Field label="نژاد">
             <Select value={form.breedId} onChange={e => setForm({...form, breedId: e.target.value})}>

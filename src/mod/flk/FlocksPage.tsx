@@ -8,6 +8,7 @@ import { MiniProgress } from '../../shr/components/ProgressTracker';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 interface F {
   id?: string;
@@ -418,10 +419,18 @@ export default function FlocksPage() {
 
           <Grid2>
             <Field label="پرنده" required>
-              <Select value={form.birdId} onChange={e => setForm({ ...form, birdId: e.target.value, breedId: '' })}>
-                <option value="">— انتخاب کنید —</option>
-                {birds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </Select>
+<SmartSelect
+              value={form.birdId}
+              onChange={v => setForm(f => ({ ...f, birdId: v }))}
+              options={birds.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (b => b.name)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب پرنده"
+              autoThreshold={6}
+            />
             </Field>
             <Field label="نژاد">
               <Select value={form.breedId} onChange={e => setForm({ ...form, breedId: e.target.value })}>
@@ -433,10 +442,18 @@ export default function FlocksPage() {
 
           <Grid2>
             <Field label="سالن" required>
-              <Select value={form.hallId} onChange={e => setForm({ ...form, hallId: e.target.value, zoneId: '' })}>
-                <option value="">— انتخاب کنید —</option>
-                {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-              </Select>
+<SmartSelect
+              value={form.hallId}
+              onChange={v => setForm(f => ({ ...f, hallId: v }))}
+              options={halls.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (h => h.name)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب سالن"
+              autoThreshold={6}
+            />
             </Field>
             <Field label="بخش">
               <Select value={form.zoneId} onChange={e => setForm({ ...form, zoneId: e.target.value })}>

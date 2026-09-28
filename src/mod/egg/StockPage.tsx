@@ -6,6 +6,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 interface F {
   id?: string;
@@ -210,9 +211,18 @@ export default function StockPage() {
       >
         <Grid2>
           <Field label="مشتری" required>
-            <Select value={form.customerId} onChange={e => setForm({ ...form, customerId: e.target.value })}>
-              {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </Select>
+<SmartSelect
+              value={form.customerId}
+              onChange={v => setForm(f => ({ ...f, customerId: v }))}
+              options={customers.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (c => c.phone || undefined)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب مشتری"
+              autoThreshold={6}
+            />
           </Field>
           <Field label="تاریخ" required>
             <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })} />

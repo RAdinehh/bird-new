@@ -3,6 +3,7 @@ import { useHal, type Zone } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 export default function ZonesPage() {
   const { halls, zones, addZone, updateZone, deleteZone } = useHal();
@@ -110,9 +111,18 @@ export default function ZonesPage() {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش بخش' : 'افزودن بخش'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="سالن" required>
-          <Select value={form.hallId} onChange={e => setForm({...form, hallId: e.target.value})}>
-            {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-          </Select>
+<SmartSelect
+              value={form.hallId}
+              onChange={v => setForm(f => ({ ...f, hallId: v }))}
+              options={halls.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (h => h.name)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب سالن"
+              autoThreshold={6}
+            />
         </Field>
         <Grid2>
           <Field label="نام بخش" required><Input placeholder="مثلاً: بخش A" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>

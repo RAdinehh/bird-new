@@ -3,6 +3,7 @@ import { useBrd, type Breed } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 export default function BreedsPage() {
   const { birds, breeds, addBreed, updateBreed, deleteBreed } = useBrd();
@@ -115,9 +116,18 @@ export default function BreedsPage() {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش نژاد' : 'افزودن نژاد'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="پرنده" required hint="نژاد به این پرنده متصل می‌شود">
-          <Select value={form.birdId} onChange={e => setForm({ ...form, birdId: e.target.value })}>
-            {birds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-          </Select>
+<SmartSelect
+              value={form.birdId}
+              onChange={v => setForm(f => ({ ...f, birdId: v }))}
+              options={birds.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (b => b.name)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب پرنده"
+              autoThreshold={6}
+            />
         </Field>
         <Grid2>
           <Field label="نام نژاد" required>

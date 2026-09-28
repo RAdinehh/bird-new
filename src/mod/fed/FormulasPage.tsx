@@ -6,6 +6,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 interface F {
   id?: string;
@@ -224,12 +225,18 @@ export default function FormulasPage() {
 
         <Grid2>
           <Field label="نیاز مرجع" hint="برای مقایسه">
-            <Select value={form.requirementId} onChange={e => setForm({ ...form, requirementId: e.target.value })}>
-              <option value="">— بدون نیاز —</option>
-              {requirements.map(r => (
-                <option key={r.id} value={r.id}>{r.name} ({r.birdType} · {STAGE_LABEL[r.stage] || r.stage})</option>
-              ))}
-            </Select>
+<SmartSelect
+              value={form.requirementId}
+              onChange={v => setForm(f => ({ ...f, requirementId: v }))}
+              options={requirements.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (r => r.name)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب نیاز"
+              autoThreshold={6}
+            />
           </Field>
           <Field label="تاریخ">
             <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })} />

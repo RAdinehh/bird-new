@@ -3,6 +3,7 @@ import { useHal, type Equipment, EQUIP_LABELS } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 export default function EquipmentPage() {
   const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
@@ -178,9 +179,18 @@ export default function EquipmentPage() {
             </Select>
           </Field>
           <Field label="سالن" required>
-            <Select value={form.hallId} onChange={e => setForm({...form, hallId: e.target.value})}>
-              {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-            </Select>
+<SmartSelect
+              value={form.hallId}
+              onChange={v => setForm(f => ({ ...f, hallId: v }))}
+              options={halls.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (h => h.name)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب سالن"
+              autoThreshold={6}
+            />
           </Field>
         </Grid2>
         <Field label="نام تجهیز" required>

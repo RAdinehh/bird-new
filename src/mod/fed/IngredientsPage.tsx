@@ -5,6 +5,7 @@ import { INGREDIENT_STANDARDS } from './standards';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 interface F {
   id?: string;
@@ -336,12 +337,18 @@ export default function IngredientsPage() {
 
         <SectionTitle>📦 اتصال به انبار</SectionTitle>
         <Field label="کالای مرتبط" hint="اگر وصل شود، موجودی خودکار کم و قیمت از انبار خونده می‌شود">
-          <Select value={form.stockItemId} onChange={e => setForm({ ...form, stockItemId: e.target.value })}>
-            <option value="">— بدون اتصال —</option>
-            {items.map(si => (
-              <option key={si.id} value={si.id}>{si.name} ({toFa(si.currentStock)} {UNIT_LABEL[si.unit]})</option>
-            ))}
-          </Select>
+<SmartSelect
+              value={form.stockItemId}
+              onChange={v => setForm(f => ({ ...f, stockItemId: v }))}
+              options={items.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (i => i.name)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب کالا"
+              autoThreshold={6}
+            />
         </Field>
 
         <Field label="یادداشت">

@@ -5,6 +5,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, S
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 interface F {
   id?: string;
@@ -274,10 +275,18 @@ export default function ItemsPage() {
         </Grid3>
 
         <Field label="تأمین‌کننده" hint="از مخاطبین">
-          <Select value={form.supplierId} onChange={e => setForm({ ...form, supplierId: e.target.value })}>
-            <option value="">— انتخاب کنید —</option>
-            {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </Select>
+<SmartSelect
+              value={form.supplierId}
+              onChange={v => setForm(f => ({ ...f, supplierId: v }))}
+              options={suppliers.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (s => s.phone || undefined)(c),
+              }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب فروشنده"
+              autoThreshold={6}
+            />
         </Field>
 
         {isMedicine ? (
