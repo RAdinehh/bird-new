@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment , calcDueDate , type WorkflowStatus, nextWorkflowStatus, workflowTone, WORKFLOW_LABEL, prevWorkflowStatus } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import SmartSelect from '../../shr/components/SmartSelect';
@@ -55,6 +55,44 @@ export default function SalesPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [filterCat, setFilterCat] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // همگام‌سازی خودکار سرسید (syncDueDateEffect)
+  useEffect(() => {
+    if (!open) return;
+    setForm(f => {
+      if (!f.date) return f;
+      let newDue = f.dueDate;
+      if (f.paymentTerms === 'cash') {
+        newDue = f.date;
+      } else if (f.paymentTerms === 'custom') {
+        newDue = f.customDueDate || f.date;
+      } else if (f.paymentTerms === 'installment') {
+        const gap = parseInt(toEn(f.installmentGapDays)) || 30;
+        newDue = calcDueDate('installment', f.date, '', gap);
+      }
+      if (newDue !== f.dueDate) return { ...f, dueDate: newDue };
+      return f;
+    });
+  }, [open, form.date, form.paymentTerms, form.customDueDate, form.installmentGapDays]);
+
+  // همگام‌سازی خودکار سرسید
+  useEffect(() => {
+    if (!open) return;
+    setForm(f => {
+      if (f.paymentTerms === 'cash' && f.date !== f.dueDate) {
+        return { ...f, dueDate: f.date };
+      }
+      if (f.paymentTerms === 'custom') {
+        return { ...f, dueDate: f.customDueDate || f.date };
+      }
+      if (f.paymentTerms === 'installment') {
+        const gap = parseInt(toEn(f.installmentGapDays)) || 30;
+        const newDate = calcDueDate('installment', f.date, '', gap);
+        if (newDate !== f.dueDate) return { ...f, dueDate: newDate };
+      }
+      return f;
+    });
+  }, [open, form.date, form.paymentTerms, form.customDueDate, form.installmentGapDays, form.installmentCount]);
   const [transferModal, setTransferModal] = useState<{ id: string; to: WorkflowStatus } | null>(null);
   const [transferNote, setTransferNote] = useState('');
   const [transferDate, setTransferDate] = useState('');
@@ -357,29 +395,29 @@ export default function SalesPage() {
         title={form.id ? 'ویرایش فروش' : 'ثبت فروش'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
-        <Field label="تاریخ" required><DatePicker value={form.date} onChange={v => setForm({...form, date: v})} /></Field>
-
         <Grid2>
-          <Field label="مشتری" required>
-            <SmartSelect
-              value={form.partyId}
-              onChange={v => setForm({...form, partyId: v})}
-              options={customers.map(c => ({
-                value: c.id,
-                label: c.name,
-                subtitle: c.phone || undefined,
-              }))}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب مشتری"
-              autoThreshold={6}
-            />
-          </Field>
+          <Field label="تاریخ" required><DatePicker value={form.date} onChange={v => setForm({...form, date: v})} /></Field>
           <Field label="دسته">
             <Select value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
               {CATEGORIES.sale.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </Select>
           </Field>
         </Grid2>
+
+        <Field label="مشتری" required>
+          <SmartSelect
+            value={form.partyId}
+            onChange={v => setForm({...form, partyId: v})}
+            options={customers.map(c => ({
+              value: c.id,
+              label: c.name,
+              subtitle: c.phone || undefined,
+            }))}
+            placeholder="— انتخاب کنید —"
+            modalTitle="انتخاب مشتری"
+            autoThreshold={6}
+          />
+        </Field>
 
         <SectionTitle>
           📦 اقلام — جمع: {toFa(subtotal.toLocaleString('fa-IR'))} ت
@@ -488,26 +526,39 @@ export default function SalesPage() {
         )}
 
         <SectionTitle>📅 شرایط پرداخت</SectionTitle>
-        <Field label="نوع پرداخت" required>
-          <Select value={form.paymentTerms} onChange={e => {
-            const terms = e.target.value as 'cash' | 'installment' | 'custom';
-            setForm(f => {
-              const newForm = { ...f, paymentTerms: terms };
-              // محاسبه خودکار سرسید
-              if (terms === 'cash') newForm.dueDate = f.date;
-              else if (terms === 'installment') {
-                newForm.dueDate = calcDueDate(terms, f.date, '', parseInt(toEn(f.installmentGapDays)) || 30);
-              } else if (terms === 'custom') {
-                newForm.dueDate = f.customDueDate || f.date;
-              }
-              return newForm;
-            });
-          }}>
-            <option value="cash">💵 نقدی</option>
-            <option value="installment">📅 قسطی</option>
-            <option value="custom">✏️ توافقی</option>
-          </Select>
-        </Field>
+        <Grid2>
+          <Field label="نوع پرداخت" required>
+            <Select value={form.paymentTerms} onChange={e => {
+              const terms = e.target.value as 'cash' | 'installment' | 'custom';
+              setForm(f => {
+                const newForm = { ...f, paymentTerms: terms };
+                if (terms === 'cash') newForm.dueDate = f.date;
+                else if (terms === 'installment') {
+                  newForm.dueDate = calcDueDate(terms, f.date, '', parseInt(toEn(f.installmentGapDays)) || 30);
+                } else if (terms === 'custom') {
+                  newForm.dueDate = f.customDueDate || f.date;
+                }
+                return newForm;
+              });
+            }}>
+              <option value="cash">💵 نقدی</option>
+              <option value="installment">📅 قسطی</option>
+              <option value="custom">✏️ توافقی</option>
+            </Select>
+          </Field>
+
+          {form.paymentTerms !== 'custom' && (
+            <Field label="سرسید (خودکار)" hint="خودکار محاسبه شد">
+              <Input readOnly value={form.dueDate} dir="ltr" />
+            </Field>
+          )}
+
+          {form.paymentTerms === 'custom' && (
+            <Field label="تاریخ سرسید (توافقی)" required>
+              <DatePicker value={form.customDueDate} onChange={v => setForm({...form, customDueDate: v, dueDate: v})} />
+            </Field>
+          )}
+        </Grid2>
 
         {form.paymentTerms === 'installment' && (
           <Grid2>
@@ -518,18 +569,6 @@ export default function SalesPage() {
               <Input mode="number" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" />
             </Field>
           </Grid2>
-        )}
-
-        {form.paymentTerms === 'custom' && (
-          <Field label="تاریخ سرسید (توافقی)" required>
-            <DatePicker value={form.customDueDate} onChange={v => setForm({...form, customDueDate: v, dueDate: v})} />
-          </Field>
-        )}
-
-        {form.paymentTerms !== 'custom' && (
-          <Field label="سرسید (خودکار)" hint="به‌طور خودکار محاسبه شد">
-            <Input readOnly value={form.dueDate} dir="ltr" />
-          </Field>
         )}
 
         <Field label="یادداشت پرداخت" hint="مثلاً: توافق شد اول ماه پرداخت شود">
