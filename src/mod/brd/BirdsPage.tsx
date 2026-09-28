@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useBrd, type Bird } from './store';
 import { findBirdPreset } from './presets';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Tag } from '../../shr/components/ui';
@@ -10,17 +10,23 @@ interface F { id?: string; name: string; cycleDays: string; fcrStandard: string;
 const empty: F = { name: '', cycleDays: '', fcrStandard: '' };
 
 export default function BirdsPage() {
-  const { birds, breeds, addBird, updateBird, deleteBird, dedupeBirds } = useBrd();
-
-  // پاک کردن تکرارهای قبلی (یک بار)
-  useEffect(() => {
-    useBrd.getState().dedupeBirds();
-  }, []);
+  const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird, dedupeBirds } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [error, setError] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // فیلتر تکرارها تو render
+  const birds = useMemo(() => {
+    const seen = new Set<string>();
+    return _birdsRaw.filter(b => {
+      const k = (b.name || '').trim().toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }, [_birdsRaw]);
 
   const openNew = () => { setForm(empty); setError(''); setOpen(true); };
   const openEdit = (b: Bird) => {

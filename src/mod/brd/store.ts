@@ -85,6 +85,33 @@ export const useBrd = create<State>()(
         breeds: get().breeds.filter(x => x.id !== id)
       })
     }),
-    { name: 'pm-brd' }
+    {
+      name: 'pm-brd',
+      version: 2,
+      migrate: (persisted: any, version: number) => {
+        // پاک کردن تکرارهای پرنده و نژاد
+        if (persisted) {
+          if (Array.isArray(persisted.birds)) {
+            const seen = new Set<string>();
+            persisted.birds = persisted.birds.filter((b: any) => {
+              const key = (b.name || '').trim().toLowerCase();
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+          }
+          if (Array.isArray(persisted.breeds)) {
+            const seen = new Set<string>();
+            persisted.breeds = persisted.breeds.filter((b: any) => {
+              const key = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase();
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+          }
+        }
+        return persisted;
+      }
+    }
   )
 );

@@ -38,8 +38,8 @@ type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'archived';
 
 export default function FlocksPage() {
   const { flocks, add, update, remove, archive, restore } = useFlk();
-  const { birds, breeds } = useBrd();
-  const { halls, zones } = useHal();
+  const { birds: _birdsRaw, breeds } = useBrd();
+  const { halls: _hallsRaw, zones } = useHal();
 
   const [tab, setTab] = useState<TabId>('all');
   const [q, setQ] = useState('');
@@ -49,6 +49,27 @@ export default function FlocksPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [archId, setArchId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // فیلتر تکرارها تو render
+  const birds = useMemo(() => {
+    const seen = new Set<string>();
+    return _birdsRaw.filter(b => {
+      const k = (b.name || '').trim().toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }, [_birdsRaw]);
+
+  const halls = useMemo(() => {
+    const seen = new Set<string>();
+    return _hallsRaw.filter(h => {
+      const k = (h.name || '').trim().toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }, [_hallsRaw]);
 
   const openNew = () => {
     if (birds.length === 0) { showAlert('اول پرنده بسازید'); return; }
@@ -79,16 +100,17 @@ export default function FlocksPage() {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
-  const save = async () => {
-    // چک تکراری گله (فقط برای جدید)
+  const save = () => {
+    // 🔒 جلوگیری قاطع از نام تکراری گله
     if (!form.id) {
-      const _dup = flocks.find((x: any) => x.name.trim() === form.name.trim());
+      const _trimmed = form.name.trim();
+      const _dup = flocks.find((x: any) => x.name.trim() === _trimmed);
       if (_dup) {
-        const _ok = await showConfirmAsync(
-          `گلهای با نام «${_dup.name}» قبلاً ثبت شده. باز هم اضافه شود؟`,
-          '⚠️ نام تکراری'
+        showAlert(
+          `گلهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
         );
-        if (!_ok) return;
+        return;
       }
     }
 
@@ -439,7 +461,6 @@ export default function FlocksPage() {
               options={birds.map(c => ({
                 value: c.id,
                 label: c.name,
-                subtitle: (b => b.name)(c),
               }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب پرنده"
@@ -468,7 +489,6 @@ export default function FlocksPage() {
               options={halls.map(c => ({
                 value: c.id,
                 label: c.name,
-                subtitle: (h => h.name)(c),
               }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب سالن"

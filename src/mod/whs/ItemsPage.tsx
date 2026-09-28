@@ -6,7 +6,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
-import { showConfirmAsync } from '../../cor/store/dialog';
+import { showConfirmAsync , showAlert} from '../../cor/store/dialog';
 
 interface F {
   id?: string;
@@ -74,16 +74,17 @@ export default function ItemsPage() {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
   const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
 
-  const save = async () => {
-    // چک تکراری کالا (فقط برای جدید)
+  const save = () => {
+    // 🔒 جلوگیری قاطع از نام تکراری کالا
     if (!form.id) {
-      const _dup = items.find((x: any) => x.name.trim() === form.name.trim());
+      const _trimmed = form.name.trim();
+      const _dup = items.find((x: any) => x.name.trim() === _trimmed);
       if (_dup) {
-        const _ok = await showConfirmAsync(
-          `کالاای با نام «${_dup.name}» قبلاً ثبت شده. باز هم اضافه شود؟`,
-          '⚠️ نام تکراری'
+        showAlert(
+          `کالاای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
         );
-        if (!_ok) return;
+        return;
       }
     }
 

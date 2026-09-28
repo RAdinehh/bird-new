@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useHal, type Zone } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -6,13 +6,33 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 
 export default function ZonesPage() {
-  const { halls, zones, addZone, updateZone, deleteZone } = useHal();
+  const { halls: _hallsRaw, zones: _zonesRaw, addZone, updateZone, deleteZone } = useHal();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [filter, setFilter] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const halls = useMemo(() => {
+    const seen = new Set<string>();
+    return _hallsRaw.filter(h => {
+      const k = (h.name || '').trim().toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }, [_hallsRaw]);
+
+  const zones = useMemo(() => {
+    const seen = new Set<string>();
+    return _zonesRaw.filter(z => {
+      const k = (z.hallId || '') + '|' + (z.name || '').trim().toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }, [_zonesRaw]);
 
   if (halls.length === 0) {
     return (

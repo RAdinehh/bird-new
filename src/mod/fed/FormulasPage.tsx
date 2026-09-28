@@ -93,16 +93,17 @@ export default function FormulasPage() {
     setForm(f => ({ ...f, lines: newLines }));
   };
 
-  const save = async () => {
-    // چک تکراری جیره (فقط برای جدید)
+  const save = () => {
+    // 🔒 جلوگیری قاطع از نام تکراری جیره
     if (!form.id) {
-      const _dup = formulas.find((x: any) => x.name.trim() === form.name.trim());
+      const _trimmed = form.name.trim();
+      const _dup = formulas.find((x: any) => x.name.trim() === _trimmed);
       if (_dup) {
-        const _ok = await showConfirmAsync(
-          `جیرهای با نام «${_dup.name}» قبلاً ثبت شده. باز هم اضافه شود؟`,
-          '⚠️ نام تکراری'
+        showAlert(
+          `جیرهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
         );
-        if (!_ok) return;
+        return;
       }
     }
 

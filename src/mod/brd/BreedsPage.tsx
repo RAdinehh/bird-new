@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useBrd, type Breed } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -7,18 +7,34 @@ import SmartSelect from '../../shr/components/SmartSelect';
 import { showConfirmAsync } from '../../cor/store/dialog';
 
 export default function BreedsPage() {
-  const { birds, breeds, dedupeBreeds, addBreed, updateBreed, deleteBreed } = useBrd();
+  const { birds, breeds: _breedsRaw, dedupeBreeds, addBreed, updateBreed, deleteBreed } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', birdId:'', name:'', fcr:'' });
-
-  // پاک کردن نژادهای تکراری (یک بار)
-  useEffect(() => {
-    useBrd.getState().dedupeBreeds();
-  }, []);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [filterBird, setFilterBird] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // فیلتر تکرارها تو render (per bird + name)
+  const _birdsUnique = useMemo(() => {
+    const seen = new Set<string>();
+    return birds.filter(b => {
+      const k = (b.name || '').trim().toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }, [birds]);
+
+  const breeds = useMemo(() => {
+    const seen = new Set<string>();
+    return _breedsRaw.filter(b => {
+      const k = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }, [_breedsRaw]);
 
   if (birds.length === 0) {
     return (
@@ -60,7 +76,7 @@ export default function BreedsPage() {
     <PageContainer>
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
         <button onClick={() => setFilterBird('')} style={chip(!filterBird)}>همه</button>
-        {birds.map(b => (
+        {_birdsUnique.map(b => (
           <button key={b.id} onClick={() => setFilterBird(b.id)} style={chip(filterBird === b.id)}>{b.name}</button>
         ))}
       </div>

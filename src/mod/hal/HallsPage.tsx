@@ -1,20 +1,30 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showConfirmAsync } from '../../cor/store/dialog';
+import { showConfirmAsync , showAlert} from '../../cor/store/dialog';
 
 interface F { id?: string; name: string; code: string; length: string; width: string; height: string; capacity: string; targetTemp: string; targetHumidity: string; ventilation: string; light: string; ventilationSystem: string; feederType: string; drinkerType: string; litterType: string; address: string; builtAt: string; lastSanitizedAt: string; notes: string; }
 const empty: F = { name:'', code:'', length:'', width:'', height:'', capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'', ventilationSystem:'tunnel', feederType:'chain', drinkerType:'nipple', litterType:'wood_shavings', address:'', builtAt:'', lastSanitizedAt:'', notes:'' };
 
 export default function HallsPage() {
-  const { halls, zones, equipment, addHall, updateHall, deleteHall } = useHal();
+  const { halls: _hallsRaw, zones, equipment, addHall, updateHall, deleteHall } = useHal();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const halls = useMemo(() => {
+    const seen = new Set<string>();
+    return _hallsRaw.filter(h => {
+      const k = (h.name || '').trim().toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }, [_hallsRaw]);
 
   const openNew = () => { setForm(empty); setErr(''); setOpen(true); };
   const openEdit = (h: Hall) => {
@@ -29,16 +39,17 @@ export default function HallsPage() {
     setErr(''); setOpen(true);
   };
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
-  const save = async () => {
-    // چک تکراری سالن (فقط برای جدید)
+  const save = () => {
+    // 🔒 جلوگیری قاطع از نام تکراری سالن
     if (!form.id) {
-      const _dup = halls.find((x: any) => x.name.trim() === form.name.trim());
+      const _trimmed = form.name.trim();
+      const _dup = halls.find((x: any) => x.name.trim() === _trimmed);
       if (_dup) {
-        const _ok = await showConfirmAsync(
-          `سالنای با نام «${_dup.name}» قبلاً ثبت شده. باز هم اضافه شود؟`,
-          '⚠️ نام تکراری'
+        showAlert(
+          `سالنای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
         );
-        if (!_ok) return;
+        return;
       }
     }
 

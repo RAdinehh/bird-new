@@ -3,7 +3,7 @@ import { useInc, DEVICE_MODE_LABEL, DEVICE_STATUS_LABEL, type Device, type Devic
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showConfirmAsync } from '../../cor/store/dialog';
+import { showConfirmAsync , showAlert} from '../../cor/store/dialog';
 
 interface F { id?: string; name: string; code: string; capacity: string; mode: DeviceMode; status: DeviceStatus; temp: string; humidity: string; rotationEnabled: boolean; purchasedAt: string; price: string; warranty: string; notes: string; }
 const empty: F = { name:'', code:'', capacity:'', mode:'setter+hatcher', status:'idle', temp:'', humidity:'', rotationEnabled:true, purchasedAt:'', price:'', warranty:'', notes:'' };
@@ -32,16 +32,17 @@ export default function DevicesPage() {
   };
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
-  const save = async () => {
-    // چک تکراری دستگاه (فقط برای جدید)
+  const save = () => {
+    // 🔒 جلوگیری قاطع از نام تکراری دستگاه
     if (!form.id) {
-      const _dup = devices.find((x: any) => x.name.trim() === form.name.trim());
+      const _trimmed = form.name.trim();
+      const _dup = devices.find((x: any) => x.name.trim() === _trimmed);
       if (_dup) {
-        const _ok = await showConfirmAsync(
-          `دستگاهای با نام «${_dup.name}» قبلاً ثبت شده. باز هم اضافه شود؟`,
-          '⚠️ نام تکراری'
+        showAlert(
+          `دستگاهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+          '❌ نام تکراری'
         );
-        if (!_ok) return;
+        return;
       }
     }
 
