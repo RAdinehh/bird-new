@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { useWhs } from '../whs/store';
+import type { ItemCategoryFields } from '../../shr/utils/itemDetails';
 
 export type InvoiceType = 'purchase' | 'sale';
 export type PaymentMethod = 'cash' | 'card' | 'check' | 'installment' | 'mixed';
@@ -50,18 +51,21 @@ export const CHECK_STATUS_LABEL: Record<CheckStatus, string> = {
 };
 
 
-export interface InvoiceItem {
+export interface InvoiceItem extends ItemCategoryFields {
   id: string;
   description: string;
   unit: string;
   quantity: number;
   unitPrice: number;
   total: number;
-  itemId?: string;       // اگر پر باشد، به انبار وصل است
-  movementId?: string;   // کد movement ساخته‌شده در انبار
-  // فاز E — تخفیف هر قلم
+  itemId?: string;
+  movementId?: string;
+  // تخفیف و حمل قلم
   discountType?: '' | 'percent' | 'amount';
   discountValue?: number;
+  shipping?: number;
+  // فروشنده/خریدار قلم
+  itemPartyId?: string;
 }
 
 export interface Payment {
@@ -238,7 +242,7 @@ export const useTra = create<State>()(
     }),
     {
       name: 'pm-tra',
-      version: 3,
+      version: 4,
       migrate: (persisted: any, version: number) => {
         if (!persisted?.invoices) return persisted;
 
