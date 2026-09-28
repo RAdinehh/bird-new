@@ -13,7 +13,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 
 interface F {
   id?: string;
-  number: string; date: string; partyId: string; category: string;
+  date: string; partyId: string; category: string;
   items: InvoiceItem[];
   discount: string; shipping: string;
   paymentTerms: 'cash' | 'installment' | 'custom';
@@ -27,7 +27,7 @@ interface F {
 }
 
 const empty = (): F => ({
-  number: '', date: '', partyId: '', category: 'egg',
+   date: '', partyId: '', category: 'egg',
   items: [],
   discount: '', shipping: '',
   paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
@@ -59,13 +59,13 @@ export default function PurchasesPage() {
 
   const openNew = () => {
     if (suppliers.length === 0) { showAlert('اول یک فروشنده در مخاطبین بسازید'); return; }
-    setForm({ ...empty(), partyId: suppliers[0].id, number: 'P-' + Date.now().toString().slice(-6) });
+    setForm({ ...empty(), partyId: suppliers[0].id });
     setErr(''); setOpen(true);
   };
 
   const openEdit = (inv: Invoice) => {
     setForm({
-      id: inv.id, number: inv.number, date: inv.date, partyId: inv.partyId, category: inv.category,
+      id: inv.id,  date: inv.date, partyId: inv.partyId, category: inv.category,
       items: inv.items || [],
       discount: inv.discount ? toFa(inv.discount) : '',
       shipping: inv.shipping ? toFa(inv.shipping) : '',
@@ -122,7 +122,7 @@ export default function PurchasesPage() {
 
     const data = {
       type: 'purchase' as const,
-      number: form.number.trim(),
+
       date: form.date.trim(),
       partyId: form.partyId,
       category: form.category,
@@ -280,10 +280,7 @@ export default function PurchasesPage() {
         title={form.id ? 'ویرایش خرید' : 'ثبت خرید'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
-        <Grid2>
-          <Field label="شماره فاکتور"><Input placeholder="..." dir="ltr" value={form.number} onChange={e => setForm({...form, number: e.target.value})} /></Field>
-          <Field label="تاریخ" required><DatePicker value={form.date} onChange={v => setForm({...form, date: v})} /></Field>
-        </Grid2>
+        <Field label="تاریخ" required><DatePicker value={form.date} onChange={v => setForm({...form, date: v})} /></Field>
 
         <Grid2>
           <Field label="فروشنده" required>

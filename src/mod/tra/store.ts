@@ -83,7 +83,7 @@ export interface Payment {
 export interface Invoice {
   id: string;
   type: InvoiceType;
-  number: string;
+  number?: string;   // خودکار تولید میشه
   date: string;
   partyId: string;
   category: string;
@@ -196,9 +196,22 @@ export const useTra = create<State>()(
       invoices: [],
       deals: [],
       addInvoice: (i) => {
-        const baseInv = { ...i, id: uuid(), createdAt: now(), updatedAt: now() } as Invoice;
+        const existing = get().invoices;
+        const number = (i.number && i.number.trim() !== '')
+          ? i.number
+          : generateInvoiceNumber(i.type, i.date, existing);
+
+        const terms = (i as any).paymentTerms || 'cash';
+        const workflowStatus: WorkflowStatus = terms === 'cash' ? 'paid' : 'draft';
+
+        const baseInv = {
+          ...i, number, workflowStatus,
+          confirmedAt: workflowStatus !== 'draft' ? now() : '',
+          paidAt: workflowStatus === 'paid' ? now() : '',
+          id: uuid(), createdAt: now(), updatedAt: now()
+        } as Invoice;
         const items = applyInvoiceMovements(baseInv);
-        set({ invoices: [...get().invoices, { ...baseInv, items }] });
+        set({ invoices: [...existing, { ...baseInv, items }] });
       },
       updateInvoice: (id, patch) => {
         const prev = get().invoices.find(x => x.id === id);
@@ -325,6 +338,33 @@ export const STATUS_LABEL: Record<InvoiceStatus, string> = {
 
 
 /** محاسبه تاریخ سرسید از شرایط پرداخت */
+
+
+/** تولید شماره فاکتور خودکار: P140507001 */
+export function generateInvoiceNumber(
+  type: InvoiceType,
+  date: string,
+  existingInvoices: Invoice[]
+): string {
+  const parts = (date || '').split('/');
+  const year = parts[0] || '1400';
+  const month = (parts[1] || '01').padStart(2, '0');
+  const prefix = type === 'purchase' ? 'P' : 'S';
+  const pattern = `${prefix}${year}${month}`;
+
+  let maxNum = 0;
+  existingInvoices.forEach(inv => {
+    if (inv.type !== type) return;
+    if (!inv.number || !inv.number.startsWith(pattern)) return;
+    const suffix = inv.number.slice(pattern.length);
+    const n = parseInt(suffix, 10);
+    if (!isNaN(n) && n > maxNum) maxNum = n;
+  });
+
+  const nextNum = String(maxNum + 1).padStart(3, '0');
+  return `${pattern}${nextNum}`;
+}
+
 export function calcDueDate(
   terms: PaymentTerms | undefined,
   invoiceDate: string,
