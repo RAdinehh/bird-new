@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useTra, CATEGORIES, PAYMENT_LABEL, itemTotal, itemsSum, paidSum, invoiceStatus, remaining, STATUS_LABEL, type Invoice, type InvoiceItem, type Payment } from './store';
+import { useWhs, UNIT_LABEL } from '../whs/store';
+import SmartSelect from '../../shr/components/SmartSelect';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui'
-import SmartSelect from '../../shr/components/SmartSelect';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import InvoicePrint from './InvoicePrint';
@@ -31,6 +32,7 @@ const empty = (): F => ({
 export default function SalesPage() {
   const { invoices, addInvoice, updateInvoice, deleteInvoice } = useTra();
   const { contacts } = useCtc();
+  const { items: whsItems } = useWhs();
   const customers = contacts.filter(c => c.roles.includes('customer'));
 
   const [open, setOpen] = useState(false);
@@ -75,7 +77,7 @@ export default function SalesPage() {
   const rem = Math.max(0, total - paid);
 
   const addItem = () => {
-    setForm(f => ({ ...f, items: [...f.items, { id: crypto.randomUUID(), description:'', unit:'عدد', quantity:1, unitPrice:0, total:0 }] }));
+    setForm(f => ({ ...f, items: [...f.items, { id: crypto.randomUUID(), description:'', unit:'عدد', quantity:1, unitPrice:0, total:0, itemId:'', movementId:'' }] }));
   };
   const updateItem = (id: string, patch: Partial<InvoiceItem>) => {
     setForm(f => ({
@@ -299,6 +301,37 @@ export default function SalesPage() {
               <Field label="تعداد"><Input mode="number" value={String(it.quantity)} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
               <Field label="قیمت"><Input mode="number" value={String(it.unitPrice)} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
             </Grid3>
+
+            {/* اتصال به انبار (اختیاری) */}
+            {whsItems.length > 0 && (
+              <>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={!!it.itemId}
+                    onChange={e => updateItem(it.id, { itemId: e.target.checked ? (whsItems[0]?.id || '') : '' })}
+                    style={{ cursor: 'pointer', accentColor: 'var(--accent)' }}
+                  />
+                  اتصال به انبار
+                </label>
+                {it.itemId && (
+                  <SmartSelect
+                    value={it.itemId}
+                    onChange={v => updateItem(it.id, { itemId: v })}
+                    options={whsItems.map(w => ({
+                      value: w.id,
+                      label: w.name,
+                      subtitle: `موجودی ${toFa(w.currentStock)} ${UNIT_LABEL[w.unit]}`,
+                      group: w.category,
+                    }))}
+                    placeholder="— انتخاب کالا —"
+                    modalTitle="انتخاب کالای انبار"
+                    autoThreshold={6}
+                  />
+                )}
+              </>
+            )}
+
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
               <span>جمع:</span>
               <span>{toFa(it.total.toLocaleString('fa-IR'))} ت</span>

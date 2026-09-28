@@ -9,6 +9,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
+import DependentSelect from '../../shr/components/DependentSelect';
 
 interface F {
   id?: string;
@@ -421,7 +422,7 @@ export default function FlocksPage() {
             <Field label="پرنده" required>
 <SmartSelect
               value={form.birdId}
-              onChange={v => setForm(f => ({ ...f, birdId: v }))}
+              onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))}
               options={birds.map(c => ({
                 value: c.id,
                 label: c.name,
@@ -433,10 +434,16 @@ export default function FlocksPage() {
             />
             </Field>
             <Field label="نژاد">
-              <Select value={form.breedId} onChange={e => setForm({ ...form, breedId: e.target.value })}>
-                <option value="">—</option>
-                {breedsForBird.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </Select>
+              <DependentSelect
+                value={form.breedId}
+                onChange={v => setForm(f => ({ ...f, breedId: v }))}
+                parentValue={form.birdId}
+                parentLabel="پرنده"
+                options={breedsForBird.map(b => ({ value: b.id, label: b.name }))}
+                emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
+                placeholder="— انتخاب نژاد —"
+                modalTitle="انتخاب نژاد"
+              />
             </Field>
           </Grid2>
 
@@ -444,7 +451,7 @@ export default function FlocksPage() {
             <Field label="سالن" required>
 <SmartSelect
               value={form.hallId}
-              onChange={v => setForm(f => ({ ...f, hallId: v }))}
+              onChange={v => setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
               options={halls.map(c => ({
                 value: c.id,
                 label: c.name,

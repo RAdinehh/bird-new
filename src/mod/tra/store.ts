@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
+import { useWhs } from '../whs/store';
 
 export type InvoiceType = 'purchase' | 'sale';
 export type PaymentMethod = 'cash' | 'card' | 'check' | 'installment' | 'mixed';
@@ -14,6 +15,8 @@ export interface InvoiceItem {
   quantity: number;
   unitPrice: number;
   total: number;
+  itemId?: string;       // اگر پر باشد، به انبار وصل است
+  movementId?: string;   // کد movement ساخته‌شده در انبار
 }
 
 export interface Payment {
@@ -74,6 +77,43 @@ interface State {
   deleteDeal: (id: string) => void;
 }
 
+
+/** ساخت یا حذف movementهای انبار برای فاکتور */
+function applyInvoiceMovements(inv: Invoice, prevItems?: InvoiceItem[]): InvoiceItem[] {
+  const whs = useWhs.getState();
+
+  // ۱. حذف movementهای قبلی (در حالت ویرایش)
+  if (prevItems) {
+    prevItems.forEach(it => {
+      if (it.movementId) {
+        try { whs.deleteMovement(it.movementId); } catch (e) {}
+      }
+    });
+  }
+
+  // ۲. ساخت movementهای جدید
+  return inv.items.map(it => {
+    if (!it.itemId || !it.quantity || it.quantity <= 0) {
+      return { ...it, movementId: '' };
+    }
+    try {
+      const mid = whs.addMovement({
+        itemId: it.itemId,
+        type: inv.type === 'purchase' ? 'in' : 'out',
+        quantity: it.quantity,
+        unitPrice: it.unitPrice,
+        reason: inv.type === 'purchase' ? 'purchase' : 'sale',
+        date: inv.date,
+        partyId: inv.partyId,
+        notes: `فاکتور ${inv.number || ''} — ${it.description}`,
+      });
+      return { ...it, movementId: mid };
+    } catch (e) {
+      return { ...it, movementId: '' };
+    }
+  });
+}
+
 const now = () => new Date().toISOString();
 
 export const useTra = create<State>()(
@@ -81,14 +121,51 @@ export const useTra = create<State>()(
     (set, get) => ({
       invoices: [],
       deals: [],
-      addInvoice: (i) => set({ invoices: [...get().invoices, {...i, id: uuid(), createdAt: now(), updatedAt: now()}] }),
-      updateInvoice: (id, patch) => set({ invoices: get().invoices.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
-      deleteInvoice: (id) => set({ invoices: get().invoices.filter(x => x.id !== id) }),
+      addInvoice: (i) => {
+        const baseInv = { ...i, id: uuid(), createdAt: now(), updatedAt: now() } as Invoice;
+        const items = applyInvoiceMovements(baseInv);
+        set({ invoices: [...get().invoices, { ...baseInv, items }] });
+      },
+      updateInvoice: (id, patch) => {
+        const prev = get().invoices.find(x => x.id === id);
+        if (!prev) return;
+        const merged = { ...prev, ...patch, updatedAt: now() } as Invoice;
+        const items = applyInvoiceMovements(merged, prev.items);
+        set({ invoices: get().invoices.map(x => x.id === id ? { ...merged, items } : x) });
+      },
+      deleteInvoice: (id) => {
+        const inv = get().invoices.find(x => x.id === id);
+        if (inv) {
+          const whs = useWhs.getState();
+          inv.items.forEach(it => {
+            if (it.movementId) {
+              try { whs.deleteMovement(it.movementId); } catch (e) {}
+            }
+          });
+        }
+        set({ invoices: get().invoices.filter(x => x.id !== id) });
+      },
       addDeal: (d) => set({ deals: [...get().deals, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       updateDeal: (id, patch) => set({ deals: get().deals.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       deleteDeal: (id) => set({ deals: get().deals.filter(x => x.id !== id) })
     }),
-    { name: 'pm-tra' }
+    {
+      name: 'pm-tra',
+      version: 2,
+      migrate: (persisted: any, version: number) => {
+        if (version < 2 && persisted?.invoices) {
+          persisted.invoices = persisted.invoices.map((inv: any) => ({
+            ...inv,
+            items: (inv.items || []).map((it: any) => ({
+              ...it,
+              itemId: it.itemId || '',
+              movementId: it.movementId || '',
+            })),
+          }));
+        }
+        return persisted;
+      }
+    }
   )
 );
 
