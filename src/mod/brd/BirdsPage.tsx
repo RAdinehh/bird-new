@@ -1,14 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useBrd, type Bird } from './store';
+import { findBirdPreset } from './presets';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
-interface F { id?: string; name: string; nameEn: string; cycleDays: string; fcrStandard: string; }
-const empty: F = { name: '', nameEn: '', cycleDays: '', fcrStandard: '' };
+interface F { id?: string; name: string; cycleDays: string; fcrStandard: string; }
+const empty: F = { name: '', cycleDays: '', fcrStandard: '' };
 
 export default function BirdsPage() {
-  const { birds, breeds, addBird, updateBird, deleteBird } = useBrd();
+  const { birds, breeds, addBird, updateBird, deleteBird, dedupeBirds } = useBrd();
+
+  // پاک کردن تکرارهای قبلی (یک بار)
+  useEffect(() => {
+    useBrd.getState().dedupeBirds();
+  }, []);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [error, setError] = useState('');
@@ -17,13 +24,13 @@ export default function BirdsPage() {
 
   const openNew = () => { setForm(empty); setError(''); setOpen(true); };
   const openEdit = (b: Bird) => {
-    setForm({ id: b.id, name: b.name, nameEn: b.nameEn, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '' });
+    setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '' });
     setError(''); setOpen(true);
   };
   const save = () => {
     if (!form.name.trim()) { setError('نام پرنده اجباری است'); return; }
     const payload = {
-      name: form.name.trim(), nameEn: form.nameEn.trim(),
+      name: form.name.trim(), nameEn: '',
       cycleDays: form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null,
       fcrStandard: form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null
     };
@@ -53,7 +60,7 @@ export default function BirdsPage() {
                 index={toFa(i + 1)}
                 iconEmoji="🐔"
                 title={b.name}
-                subtitle={b.nameEn || '—'}
+                subtitle={b.nameEn || ''}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
                 badge={<Tag tone="blue">{toFa(birdBreeds.length)} نژاد</Tag>}
@@ -107,19 +114,47 @@ export default function BirdsPage() {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش پرنده' : 'افزودن پرنده'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="نام پرنده" required>
-          <Input placeholder="مثلاً: مرغ" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} error={error || undefined} />
+          <Input
+          placeholder="مثلاً: مرغ"
+          value={form.name}
+          onChange={e => {
+            const newName = e.target.value;
+            const preset = findBirdPreset(newName);
+            setForm(f => ({
+              ...f,
+              name: newName,
+              cycleDays: preset?.cycleDays ? toFa(preset.cycleDays) : f.cycleDays,
+              fcrStandard: preset?.fcrStandard ? toFa(preset.fcrStandard) : f.fcrStandard,
+            }));
+          }}
+          error={error || undefined}
+        />
         </Field>
-        <Grid2>
-          <Field label="نام انگلیسی">
-            <Input placeholder="Chicken" dir="ltr" value={form.nameEn} onChange={e => setForm({ ...form, nameEn: e.target.value })} />
-          </Field>
-          <Field label="چرخه (روز)">
-            <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.cycleDays} onChange={e => setForm({ ...form, cycleDays: e.target.value })} />
-          </Field>
-        </Grid2>
+        <Field label="چرخه زندگی (روز)" hint="از شروع تا پایان دوره">
+          <Input
+            placeholder="۰"
+            inputMode="numeric"
+            dir="ltr"
+            value={form.cycleDays}
+            onChange={e => setForm({ ...form, cycleDays: e.target.value })}
+          />
+        </Field>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 8 }}>
+          💡 <b>چرخه زندگی</b> یعنی چند روز طول می‌کشد تا این پرنده دوره‌اش کامل شود. مثال: جوجه گوشتی ۴۲ روز، مرغ تخم‌گذار ۵۰۰ روز.
+        </div>
+
         <Field label="FCR استاندارد" hint="ضریب تبدیل غذایی مرجع">
-          <Input placeholder="۲٫۰" inputMode="decimal" dir="ltr" value={form.fcrStandard} onChange={e => setForm({ ...form, fcrStandard: e.target.value })} />
+          <Input
+            placeholder="۲٫۰"
+            inputMode="decimal"
+            dir="ltr"
+            value={form.fcrStandard}
+            onChange={e => setForm({ ...form, fcrStandard: e.target.value })}
+          />
         </Field>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 8 }}>
+          💡 <b>FCR</b> یعنی چند کیلو دان لازم است تا پرنده ۱ کیلو وزن اضافه کند. هرچه کمتر، بهتر. مثال: ۱.۶ عالی، ۱.۸ متوسط، ۲.۰+ ضعیف.
+        </div>
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف پرنده"

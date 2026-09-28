@@ -131,7 +131,7 @@ export default function BreedsPage() {
         </Field>
         <Grid2>
           <Field label="نام نژاد" required>
-            <Input placeholder="مثلاً: لگهورن" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            <Input placeholder="مثلاً: مرندی" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </Field>
           <Field label="FCR">
             <Input placeholder="۲٫۰" inputMode="decimal" dir="ltr" value={form.fcr} onChange={e => setForm({ ...form, fcr: e.target.value })} />
