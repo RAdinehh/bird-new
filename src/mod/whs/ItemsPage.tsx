@@ -327,7 +327,7 @@ export default function ItemsPage() {
             </Field>
           )}
           <Field label="حداقل موجودی" hint="برای هشدار">
-            <NumField value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
+            <NumField unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
           </Field>
           
         </Grid3>
