@@ -611,7 +611,7 @@ export function Chip({
 // ═══════════════════════════════════════════
 
 export function NumField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode'>) {
-  return <Input mode="number" dir="ltr" inputMode="numeric" autoClamp {...props} />;
+  return <Input mode="number" dir="ltr" inputMode="numeric" min={0} autoClamp {...props} />;
 }
 
 export function MoneyField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'showWords'>) {
