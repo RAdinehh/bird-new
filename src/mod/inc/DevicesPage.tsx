@@ -330,10 +330,32 @@ export default function DevicesPage() {
         </Grid2>
 
         <SectionTitle>📊 ظرفیت بر اساس پرنده</SectionTitle>
-        <Select onChange={e => { if (e.target.value) { addCapacity(e.target.value); e.target.value = ''; } }} value="">
-          <option value="">+ افزودن پرنده از لیست...</option>
-          {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
-        </Select>
+        {birds.length === 0 ? (
+          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+            هنوز پرنده‌ای در ماژول «پرنده و نژاد» ثبت نشده
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {birds.map(b => (
+              <button
+                key={b.id}
+                type="button"
+                onClick={() => addCapacity(b.name)}
+                style={{
+                  padding: '6px 12px',
+                  background: 'var(--btn-bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-md)',
+                  color: 'var(--text)',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  fontSize: 'var(--fs-sm)',
+                  fontWeight: 600,
+                }}
+              >+ {b.name}</button>
+            ))}
+          </div>
+        )}
         {form.capacityByBird.length > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
             {form.capacityByBird.map(c => (
