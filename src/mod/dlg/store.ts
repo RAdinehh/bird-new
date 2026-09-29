@@ -9,6 +9,8 @@ export interface Death {
   notes: string;
 }
 
+export type LogStatus = 'active' | 'archived';
+
 export interface WeightSample {
   id: string;
   weight: number; // kg
@@ -92,15 +94,18 @@ export interface DailyLog {
   notes: string;
 
   // متادیتا
+  status: LogStatus;
   createdAt: string;
   updatedAt: string;
 }
 
 interface State {
   logs: DailyLog[];
-  add: (l: Omit<DailyLog, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  add: (l: Omit<DailyLog, 'id' | 'createdAt' | 'updatedAt' | 'status'>) => void;
   update: (id: string, patch: Partial<DailyLog>) => void;
   remove: (id: string) => void;
+  archive: (id: string) => void;
+  restore: (id: string) => void;
 }
 
 export const useDlg = create<State>()(
@@ -111,6 +116,7 @@ export const useDlg = create<State>()(
         logs: [...get().logs, {
           ...l,
           id: uuid(),
+          status: 'active',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }]
@@ -120,11 +126,21 @@ export const useDlg = create<State>()(
           ? { ...x, ...patch, updatedAt: new Date().toISOString() }
           : x)
       }),
-      remove: (id) => set({ logs: get().logs.filter(x => x.id !== id) })
+      remove: (id) => set({ logs: get().logs.filter(x => x.id !== id) }),
+      archive: (id) => set({
+        logs: get().logs.map(x => x.id === id
+          ? { ...x, status: 'archived' as LogStatus, updatedAt: new Date().toISOString() }
+          : x)
+      }),
+      restore: (id) => set({
+        logs: get().logs.map(x => x.id === id
+          ? { ...x, status: 'active' as LogStatus, updatedAt: new Date().toISOString() }
+          : x)
+      })
     }),
     {
       name: 'pm-dlg',
-      version: 4,
+      version: 5,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
@@ -150,6 +166,12 @@ export const useDlg = create<State>()(
             ...l,
             createdAt: l.createdAt || new Date().toISOString(),
             updatedAt: l.updatedAt || new Date().toISOString(),
+          }));
+        }
+        if (version < 5 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => ({
+            ...l,
+            status: l.status || 'active',
           }));
         }
         return persisted;

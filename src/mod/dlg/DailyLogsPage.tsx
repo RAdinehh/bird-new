@@ -47,10 +47,10 @@ const newLog = (flockId = ''): F => ({
   notes: ''
 });
 
-type TabId = 'today' | 'history';
+type TabId = 'today' | 'history' | 'archive';
 
 export default function DailyLogsPage() {
-  const { logs, add, update, remove } = useDlg();
+  const { logs, add, update, remove, archive, restore } = useDlg();
   const { flocks } = useFlk();
   const { birds, breeds } = useBrd();
   const { items: whsItems, addMovement, deleteMovement } = useWhs();
@@ -70,12 +70,13 @@ export default function DailyLogsPage() {
   const today = new Date();
   const todayStr = `${today.getFullYear()}/${String(today.getMonth()+1).padStart(2,'0')}/${String(today.getDate()).padStart(2,'0')}`;
 
-  const todaysLogs = useMemo(() => logs.filter(l => l.date === todayStr), [logs, todayStr]);
-  const historicalLogs = useMemo(() => logs.filter(l => l.date !== todayStr).sort((a, b) => b.date.localeCompare(a.date)), [logs, todayStr]);
+  const todaysLogs = useMemo(() => logs.filter(l => l.date === todayStr && (l.status || 'active') === 'active'), [logs, todayStr]);
+  const historicalLogs = useMemo(() => logs.filter(l => l.date !== todayStr && (l.status || 'active') === 'active').sort((a, b) => b.date.localeCompare(a.date)), [logs, todayStr]);
 
   const tabs: { id: TabId; label: string }[] = [
     { id: 'today', label: 'امروز' },
-    { id: 'history', label: 'تاریخچه' }
+    { id: 'history', label: 'تاریخچه' },
+    { id: 'archive', label: 'آرشیو' }
   ];
 
   const detectSystems = (flockId: string) => {
@@ -198,7 +199,7 @@ export default function DailyLogsPage() {
       ? Math.round(((hMin + hMax) / 2) * 10) / 10
       : num(form.humidity);
 
-    const data: Omit<DailyLog, 'id' | 'createdAt' | 'updatedAt'> = {
+    const data: Omit<DailyLog, 'id' | 'createdAt' | 'updatedAt' | 'status'> = {
       flockId: form.flockId, date: form.date, entryTime: form.entryTime,
       temperature: calcTemp,
       temperatureMin: tMin,
@@ -377,7 +378,12 @@ export default function DailyLogsPage() {
     );
   };
 
-  const currentList = tab === 'today' ? todaysLogs : historicalLogs;
+  const archivedLogs = useMemo(
+    () => logs.filter(l => l.status === 'archived').sort((a, b) => b.date.localeCompare(a.date)),
+    [logs]
+  );
+
+  const currentList = tab === 'today' ? todaysLogs : tab === 'history' ? historicalLogs : archivedLogs;
 
   return (
     <div>
@@ -400,7 +406,11 @@ export default function DailyLogsPage() {
               color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
               padding: '1px 5px', borderRadius: 8, fontWeight: 700
             }}>
-              {toFa(t.id === 'today' ? todaysLogs.length : logs.length - todaysLogs.length)}
+              {toFa(
+                t.id === 'today' ? todaysLogs.length
+                : t.id === 'history' ? historicalLogs.length
+                : archivedLogs.length
+              )}
             </span>
             {tab === t.id && <div style={{ position: 'absolute', bottom: 0, right: 14, left: 14, height: 2.5, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />}
           </div>
