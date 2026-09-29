@@ -437,18 +437,20 @@ export default function DevicesPage() {
 
       <Modal open={!!maintDeviceId} onClose={() => setMaintDeviceId(null)} title="ثبت تعمیر"
         footer={<BtnRow><Btn variant="primary" onClick={() => { if (maintDeviceId) addMaintenance(maintDeviceId); }}>ذخیره</Btn><Btn onClick={() => setMaintDeviceId(null)}>لغو</Btn></BtnRow>}>
-        <Field label="تاریخ" required>
-          <DatePicker value={maintForm.date} onChange={v => setMaintForm({ ...maintForm, date: v })} />
-        </Field>
-        <Field label="نوع تعمیر" required>
-          <Input placeholder="مثلاً: تعویض فن، تعمیر موتور..." value={maintForm.type} onChange={e => setMaintForm({ ...maintForm, type: e.target.value })} />
-        </Field>
-        <Field label="هزینه">
-          <MoneyField placeholder="۰" value={maintForm.cost} onChange={e => setMaintForm({ ...maintForm, cost: e.target.value })} />
-        </Field>
-        <Field label="توضیحات">
-          <Input placeholder="جزئیات..." value={maintForm.description} onChange={e => setMaintForm({ ...maintForm, description: e.target.value })} />
-        </Field>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
+          <Field label="تاریخ" required>
+            <DatePicker value={maintForm.date} onChange={v => setMaintForm({ ...maintForm, date: v })} />
+          </Field>
+          <Field label="نوع تعمیر" required>
+            <Input placeholder="تعویض فن..." value={maintForm.type} onChange={e => setMaintForm({ ...maintForm, type: e.target.value })} />
+          </Field>
+          <Field label="هزینه">
+            <MoneyField placeholder="۰" value={maintForm.cost} onChange={e => setMaintForm({ ...maintForm, cost: e.target.value })} />
+          </Field>
+          <Field label="توضیحات">
+            <Input placeholder="جزئیات..." value={maintForm.description} onChange={e => setMaintForm({ ...maintForm, description: e.target.value })} />
+          </Field>
+        </div>
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف دستگاه"
