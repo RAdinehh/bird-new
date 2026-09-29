@@ -92,3 +92,19 @@ margin دستی ممنوع
 رنگ هاردکد ممنوع
 !important ممنوع
 انیمیشن بیشتر از ۳۰۰ms ممنوع
+
+
+## توکن‌های تکمیلی (v1.0.1)
+
+### رنگ‌های soft (پس‌زمینه‌ی ملایم)
+--accent-soft, --warn-soft, --danger-soft, --info-soft, --purple-soft
+
+### رنگ‌های border و bg اختصاصی
+--accent-border, --border-solid, --input-bg, --btn-bg, --card-solid, --header-bg
+
+### عناصر
+--avatar-text, --shadow
+
+### Z-index (طبق لایه‌بندی استاندارد)
+--z-header: 12, --z-sticky: 20, --z-fab: 30
+--z-drawer: 50, --z-modal: 100, --z-toast: 200

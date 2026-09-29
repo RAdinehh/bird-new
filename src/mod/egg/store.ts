@@ -14,6 +14,7 @@ export interface EggProduction {
   dirtyCount: number;
   avgWeight: number | null;
   notes: string;
+  sourceLogId?: string;   // لینک به dlg (اختیاری)
   createdAt: string;
 }
 
@@ -43,7 +44,8 @@ interface State {
   packShikan: number;
   packBox: number;
   packCarton: number;
-  addProduction: (p: Omit<EggProduction, 'id' | 'createdAt'>) => void;
+  addProduction: (p: Omit<EggProduction, 'id' | 'createdAt'>) => string;
+  findByLogId: (logId: string) => EggProduction | undefined;
   updateProduction: (id: string, patch: Partial<EggProduction>) => void;
   deleteProduction: (id: string) => void;
   addSale: (s: Omit<EggSale, 'id' | 'createdAt'>) => void;
@@ -61,8 +63,15 @@ export const useEgg = create<State>()(
       packBox: 0,
       packCarton: 0,
 
-      addProduction: (p) => set({ productions: [...get().productions, { ...p, id: uuid(), createdAt: now() }] }),
-      updateProduction: (id, patch) => set({ productions: get().productions.map(x => x.id === id ? { ...x, ...patch } : x) }),
+      addProduction: (p) => {
+        const newProd = { ...p, id: uuid(), createdAt: now() };
+        set({ productions: [...get().productions, newProd] });
+        return newProd.id;
+      },
+      findByLogId: (logId) => get().productions.find(x => x.sourceLogId === logId),
+      updateProduction: (id, patch) => set({
+        productions: get().productions.map(x => x.id === id ? { ...x, ...patch } : x)
+      }),
       deleteProduction: (id) => set({ productions: get().productions.filter(x => x.id !== id) }),
 
       addSale: (s) => set({ sales: [...get().sales, { ...s, id: uuid(), createdAt: now() }] }),

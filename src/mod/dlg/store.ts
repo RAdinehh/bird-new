@@ -107,7 +107,7 @@ export interface DailyLog {
 
 interface State {
   logs: DailyLog[];
-  add: (l: Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'lightHours' | 'eggsCount' | 'brokenEggs' | 'dirtyEggs'>) => void;
+  add: (l: Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'>) => string;
   update: (id: string, patch: Partial<DailyLog>) => void;
   remove: (id: string) => void;
   archive: (id: string) => void;
@@ -118,8 +118,8 @@ export const useDlg = create<State>()(
   persist(
     (set, get) => ({
       logs: [],
-      add: (l) => set({
-        logs: [...get().logs, {
+      add: (l) => {
+        const newLog = {
           ...l,
           id: uuid(),
           status: 'active',
@@ -129,8 +129,10 @@ export const useDlg = create<State>()(
           dirtyEggs: (l as any).dirtyEggs ?? null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-        } as DailyLog]
-      }),
+        } as DailyLog;
+        set({ logs: [...get().logs, newLog] });
+        return newLog.id;
+      },
       update: (id, patch) => set({
         logs: get().logs.map(x => x.id === id
           ? { ...x, ...patch, updatedAt: new Date().toISOString() }

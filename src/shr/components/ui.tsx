@@ -18,7 +18,7 @@ export function Btn({ variant = 'ghost', size = 'md', full, style, children, ...
       padding: size === 'sm' ? '0 12px' : '0 16px',
       borderRadius: 'var(--r-md)', fontFamily: 'inherit',
       fontSize: size === 'sm' ? 'var(--fs-sm)' : 'var(--fs-base)',
-      fontWeight: 600, cursor: 'pointer',
+      fontWeight: 600, cursor: (rest as any).disabled || (rest as any).loading ? 'not-allowed' :  'pointer',
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
       width: full ? '100%' : undefined,
       ...variants[variant], ...style
@@ -93,6 +93,7 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
         display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden'
       }}>
         <input
+          dir={(rest as any).dir || undefined}
           {...rest}
           value={value}
           onChange={handleChange}

@@ -61,6 +61,14 @@
   --dur-base: 200ms;
   --dur-slow: 250ms;
   --dur-enter: 300ms;
+
+  /* Z-index (طبق DESIGN.md) */
+  --z-header: 12;
+  --z-sticky: 20;
+  --z-fab: 30;
+  --z-drawer: 50;
+  --z-modal: 100;
+  --z-toast: 200;
 }
 
 [data-theme="dark"] {

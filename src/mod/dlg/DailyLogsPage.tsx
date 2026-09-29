@@ -5,6 +5,7 @@ import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useBrd } from '../brd/store';
 import { useFed } from '../fed/store';
 import { useHal } from '../hal/store';
+import { useEgg } from '../egg/store';
 import { feedSystemFromHall, waterSystemFromHall, FEED_SYSTEM_LABEL, WATER_SYSTEM_LABEL } from '../../shr/utils/systemType';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
@@ -20,6 +21,7 @@ interface F {
   temperature: string; temperatureMin: string; temperatureMax: string;
   humidity: string; humidityMin: string; humidityMax: string;
   ventilation: string; litter: string;
+  lightHours: string;
   behavior: string; distribution: string; appearance: string; sound: string;
   feedType: string; feedAmount: string; feedRemaining: string;
   feedSourceType: 'formula' | 'item' | ''; feedSourceId: string; feedMovementIds: string[];
@@ -27,6 +29,7 @@ interface F {
   waterMethod: 'manual' | 'nipple' | 'trough' | 'tank' | '';
   waterAmount: string; waterFillCount: string; waterFillVolume: string;
   weightSamples: { id: string; weight: string }[];
+  eggsCount: string; brokenEggs: string; dirtyEggs: string;
   weightGender: '' | 'male' | 'female' | 'mixed';
   deaths: Death[];
   vaccines: Vaccine[]; medications: Medication[]; activities: Activity[];
@@ -37,12 +40,13 @@ const newLog = (flockId = ''): F => ({
   flockId, date: '', entryTime: '',
   temperature: '', temperatureMin: '', temperatureMax: '',
   humidity: '', humidityMin: '', humidityMax: '',
-  ventilation: 'ok', litter: 'dry',
+  ventilation: 'ok', litter: 'dry', lightHours: '',
   behavior: 'active', distribution: 'uniform', appearance: '', sound: 'normal',
   feedType: '', feedAmount: '', feedRemaining: '',
   feedSourceType: '', feedSourceId: '', feedMovementIds: [], feedMethod: '',
   waterMethod: '', waterAmount: '', waterFillCount: '', waterFillVolume: '',
   weightSamples: [], weightGender: '',
+  eggsCount: '', brokenEggs: '', dirtyEggs: '',
   deaths: [], vaccines: [], medications: [], activities: [],
   notes: ''
 });
@@ -56,6 +60,7 @@ export default function DailyLogsPage() {
   const { items: whsItems, addMovement, deleteMovement } = useWhs();
   const { formulas, ingredients } = useFed();
   const { halls } = useHal();
+  const { addProduction, updateProduction, deleteProduction, findByLogId } = useEgg();
 
   const feedItems = whsItems.filter(x => x.category === 'feed');
 
@@ -111,6 +116,7 @@ export default function DailyLogsPage() {
       humidityMin: l.humidityMin ? toFa(l.humidityMin) : '',
       humidityMax: l.humidityMax ? toFa(l.humidityMax) : '',
       ventilation: l.ventilation, litter: l.litter,
+      lightHours: l.lightHours ? toFa(l.lightHours) : '',
       behavior: l.behavior, distribution: l.distribution,
       appearance: l.appearance, sound: l.sound,
       feedType: l.feedType,
@@ -125,6 +131,9 @@ export default function DailyLogsPage() {
       waterFillCount: l.waterFillCount !== null ? toFa(l.waterFillCount) : '',
       waterFillVolume: l.waterFillVolume !== null ? toFa(l.waterFillVolume) : '',
       weightSamples: (l.weightSamples || []).map(w => ({ id: w.id, weight: toFa(w.weight) })),
+      eggsCount: l.eggsCount ? toFa(l.eggsCount) : '',
+      brokenEggs: l.brokenEggs ? toFa(l.brokenEggs) : '',
+      dirtyEggs: l.dirtyEggs ? toFa(l.dirtyEggs) : '',
       weightGender: l.weightGender || '',
       deaths: l.deaths || [], vaccines: l.vaccines || [],
       medications: l.medications || [], activities: l.activities || [],
@@ -134,6 +143,7 @@ export default function DailyLogsPage() {
   };
 
   const selectedFlock = activeFlocks.find(f => f.id === form.flockId);
+  const isLayerFlock = selectedFlock?.type === 'layer' || selectedFlock?.type === 'breeder';
   const flockAliveCount = selectedFlock?.currentCount || selectedFlock?.initialCount || 0;
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
@@ -204,7 +214,7 @@ export default function DailyLogsPage() {
       ? Math.round(((hMin + hMax) / 2) * 10) / 10
       : num(form.humidity);
 
-    const data: Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'lightHours' | 'eggsCount' | 'brokenEggs' | 'dirtyEggs'> = {
+    const data: Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'> = {
       flockId: form.flockId, date: form.date, entryTime: form.entryTime,
       temperature: calcTemp,
       temperatureMin: tMin,
@@ -213,6 +223,7 @@ export default function DailyLogsPage() {
       humidityMin: hMin,
       humidityMax: hMax,
       ventilation: form.ventilation, litter: form.litter,
+      lightHours: int(form.lightHours),
       behavior: form.behavior, distribution: form.distribution,
       appearance: form.appearance.trim(), sound: form.sound,
       feedType: form.feedType.trim(), feedAmount: feedAmt,
@@ -225,6 +236,9 @@ export default function DailyLogsPage() {
       waterAmount: calcWater,
       waterFillCount: int(form.waterFillCount),
       waterFillVolume: num(form.waterFillVolume),
+      eggsCount: int(form.eggsCount),
+      brokenEggs: int(form.brokenEggs),
+      dirtyEggs: int(form.dirtyEggs),
       weightSamples: form.weightSamples
         .map(w => ({ id: w.id, weight: parseFloat(toEn(w.weight).replace('٫','.')) || 0 }))
         .filter(w => w.weight > 0),
@@ -233,7 +247,40 @@ export default function DailyLogsPage() {
       vaccines: form.vaccines, medications: form.medications,
       activities: form.activities, notes: form.notes.trim()
     };
-    if (form.id) update(form.id, data); else add(data);
+    let logId: string;
+    if (form.id) {
+      update(form.id, data);
+      logId = form.id;
+    } else {
+      logId = add(data);
+    }
+
+    // === sync با egg ===
+    try {
+      const eggs = int(form.eggsCount) || 0;
+      const existingProd = findByLogId(logId);
+      if (isLayerFlock && eggs > 0) {
+        const prodData = {
+          flockId: form.flockId,
+          date: form.date,
+          totalCount: eggs,
+          brokenCount: int(form.brokenEggs) || 0,
+          softCount: 0,
+          dirtyCount: int(form.dirtyEggs) || 0,
+          avgWeight: null,
+          notes: '',
+          sourceLogId: logId,
+        };
+        if (existingProd) {
+          updateProduction(existingProd.id, prodData);
+        } else {
+          addProduction(prodData);
+        }
+      } else if (existingProd) {
+        deleteProduction(existingProd.id);
+      }
+    } catch (e) { /* silent */ }
+
     setOpen(false);
   };
 
@@ -674,7 +721,24 @@ export default function DailyLogsPage() {
             </>
           )}
 
-          <SectionTitle>⚖️ وزن‌کشی (اختیاری)</SectionTitle>
+          {isLayerFlock && (
+          <>
+            <SectionTitle>🥚 تخم‌گذاری</SectionTitle>
+            <Grid3>
+              <Field label="تعداد تخم">
+                <Input mode="number" value={form.eggsCount} onChange={e => setForm({...form, eggsCount: e.target.value})} unit="عدد" />
+              </Field>
+              <Field label="شکسته">
+                <Input mode="number" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} />
+              </Field>
+              <Field label="کثیف">
+                <Input mode="number" value={form.dirtyEggs} onChange={e => setForm({...form, dirtyEggs: e.target.value})} />
+              </Field>
+            </Grid3>
+          </>
+        )}
+
+        <SectionTitle>⚖️ وزن‌کشی (اختیاری)</SectionTitle>
 
           {form.weightSamples.length > 0 && (
             <Grid2>
@@ -813,6 +877,8 @@ export default function DailyLogsPage() {
             if (delId) {
               const log = logs.find(l => l.id === delId);
               if (log?.feedMovementIds) log.feedMovementIds.forEach(id => deleteMovement(id));
+              const prod = findByLogId(delId);
+              if (prod) deleteProduction(prod.id);
               remove(delId);
             }
             setDelId(null);
