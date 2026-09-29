@@ -327,11 +327,11 @@ export default function DevicesPage() {
 
         <SectionTitle>📊 ظرفیت بر اساس پرنده</SectionTitle>
         {form.capacityByBird.map(c => (
-          <div key={c.birdName} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', gap: 8, alignItems: 'center', marginBottom: 6 }}>
-            <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 80 }}>
+          <div key={c.birdName} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
+            <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" style={{ flex: 1 }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, minWidth: 70, maxWidth: 100 }}>
               <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.birdName}</span>
-              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 2, flexShrink: 0 }}>✕</button>
+              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: 2, flexShrink: 0 }}>✕</button>
             </div>
           </div>
         ))}
@@ -352,8 +352,7 @@ export default function DevicesPage() {
           />
         </Grid2>
 
-        {form.status === 'active' && (
-          <>
+        {<>
             <SectionTitle>🌡 شرایط عملیاتی</SectionTitle>
             <Grid2>
               <Field label="دمای هدف" hint="°C">
@@ -362,8 +361,7 @@ export default function DevicesPage() {
               <Field label="رطوبت هدف" hint="٪">
                 <NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={0} max={100} />
               </Field>
-            </Grid2></>
-        )}
+            </Grid2></>}
 
         <SectionTitle>⚙ مشخصات فنی</SectionTitle>
         <Grid2>
