@@ -7,7 +7,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
-import { addMonths, parse as parseJ } from 'date-fns-jalali';
+import { addMonths, parse as parseJ, format as formatJ } from 'date-fns-jalali';
 
 const STATUS_FA: Record<DeviceStatus, string> = {
   active: '✅ فعال',
@@ -137,10 +137,7 @@ export default function DevicesPage() {
       if (isNaN(date.getTime())) return null;
       const months = parseInt(toEn(form.warranty)) || 0;
       const end = addMonths(date, months);
-      const y = end.getFullYear();
-      const m = String(end.getMonth() + 1).padStart(2, '0');
-      const d = String(end.getDate()).padStart(2, '0');
-      return y + '/' + m + '/' + d;
+      return formatJ(end, 'yyyy/MM/dd');
     } catch { return null; }
   }, [form.purchasedAt, form.warranty]);
 
@@ -336,10 +333,10 @@ export default function DevicesPage() {
           </div>
         )}
         {form.capacityByBird.map(c => (
-          <div key={c.birdName} style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: 10, background: 'var(--input-bg)', borderRadius: 'var(--r-md)', marginBottom: 6 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{c.birdName}</span>
-              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 4 }}>✕</button>
+          <div key={c.birdName} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', minWidth: 0 }}>
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.birdName}</span>
+              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 4, flexShrink: 0 }}>✕</button>
             </div>
             <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
           </div>
