@@ -2,7 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { useFed, CATEGORY_LABEL, CATEGORY_ICON, type Ingredient, type IngredientCategory } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { INGREDIENT_STANDARDS } from './standards';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import HelpBanner from '../../shr/components/HelpBanner';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
@@ -159,6 +160,13 @@ export default function IngredientsPage() {
 
   return (
     <PageContainer>
+        <HelpBanner
+          id="ingredients-intro"
+          icon="🌾"
+          title="مواد اولیه جیره"
+          description="ذرت، کنجاله، سبوس و... را اینجا تعریف کنید. درصد پروتئین و انرژی هر ماده برای ساخت جیره لازم است."
+          tone="info"
+        />
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
         <button onClick={() => setFilterCat('')} style={chip(filterCat === '')}>
           همه ({toFa(ingredients.length)})

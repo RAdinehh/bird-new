@@ -3,6 +3,7 @@ import { useEgg, healthyCount, henDayRate, brokenRate, type EggProduction } from
 import { useFlk, getAgeDays } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import HelpBanner from '../../shr/components/HelpBanner';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import ProgressTracker from '../../shr/components/ProgressTracker';
@@ -146,6 +147,13 @@ export default function ProductionsPage() {
 
   return (
     <PageContainer>
+        <HelpBanner
+          id="egg-prod-intro"
+          icon="🥚"
+          title="ثبت تخم‌گذاری روزانه"
+          description="هر روز تعداد تخم‌های تولیدی گله را ثبت کنید. نرخ تخم‌گذاری و روند تولید خودکار محاسبه می‌شود."
+          tone="info"
+        />
       {activeFlocks.length > 0 && productions.length > 0 ? (
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
           <button onClick={() => setFilterFlock('')} style={chip(filterFlock === '')}>همه</button>

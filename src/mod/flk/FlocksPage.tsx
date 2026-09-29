@@ -7,7 +7,8 @@ import {
 } from './store';
 import { useBrd } from '../brd/store';
 import { useHal } from '../hal/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import HelpBanner from '../../shr/components/HelpBanner';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { MiniProgress } from '../../shr/components/ProgressTracker';
 import DatePicker from '../../shr/components/DatePicker';
@@ -211,6 +212,13 @@ export default function FlocksPage() {
       </div>
 
       <PageContainer>
+        <HelpBanner
+          id="flk-intro"
+          icon="🐔"
+          title="مدیریت گله‌ها"
+          description="اینجا گله‌های فعال، تخم‌گذار و گوشتی را تعریف و مدیریت می‌کنید. با تعریف گله، امکان ثبت روزانه فعال می‌شود."
+          tone="info"
+        />
         {/* گله‌های نزدیک به تخم‌گذاری */}
         {(() => {
           const upcoming = flocks.filter(f => {

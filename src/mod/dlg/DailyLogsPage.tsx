@@ -21,6 +21,7 @@ import {
   NumField, PageContainer, PercentField, Select,
   Tag, Textarea
 } from '../../shr/components/ui';
+import HelpBanner from '../../shr/components/HelpBanner';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
@@ -491,6 +492,13 @@ export default function DailyLogsPage() {
       </div>
 
       <PageContainer>
+        <HelpBanner
+          id="dlg-intro"
+          icon="📋"
+          title="ثبت روزانه هر گله"
+          description="دما، رطوبت، دان، آب، تلفات، وزن‌کشی و تخم را ثبت کنید. برای هر گله یک ثبت جدا انجام دهید."
+          tone="info"
+        />
         {currentList.length === 0 ? (
           <Empty
             icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>}
