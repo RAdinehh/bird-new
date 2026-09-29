@@ -74,6 +74,8 @@ export default function DevicesPage() {
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [maintDeviceId, setMaintDeviceId] = useState<string | null>(null);
+  const [maintForm, setMaintForm] = useState({ date: '', type: '', cost: '', description: '' });
 
   const openNew = () => { setForm(empty); setErr(''); setOpen(true); };
 
@@ -176,6 +178,33 @@ export default function DevicesPage() {
     setOpen(false);
   };
 
+
+  const addMaintenance = (deviceId: string) => {
+    const dev = devices.find(d => d.id === deviceId);
+    if (!dev) return;
+    if (!maintForm.date || !maintForm.type) { showAlert('تاریخ و نوع تعمیر اجباری است'); return; }
+    const log = {
+      id: Date.now().toString(),
+      date: maintForm.date,
+      type: maintForm.type.trim(),
+      cost: parseFloat(toEn(maintForm.cost).replace('٫', '.')) || null,
+      description: maintForm.description.trim(),
+    };
+    const logs = [...(dev.maintenanceLogs || []), log];
+    updateDevice(deviceId, { maintenanceLogs: logs } as any);
+    setMaintForm({ date: '', type: '', cost: '', description: '' });
+    setMaintDeviceId(null);
+    showAlert('تعمیر ثبت شد', '✅');
+  };
+
+  const removeMaintenance = (deviceId: string, logId: string) => {
+    const dev = devices.find(d => d.id === deviceId);
+    if (!dev) return;
+    if (!confirm('حذف این رکورد تعمیر؟')) return;
+    const logs = (dev.maintenanceLogs || []).filter(l => l.id !== logId);
+    updateDevice(deviceId, { maintenanceLogs: logs } as any);
+  };
+
   const target = delId ? devices.find(d => d.id === delId) : null;
   const accentFor = (s: DeviceStatus): any => s === 'active' ? 'accent' : s === 'idle' ? 'dim' : 'warn';
 
@@ -244,6 +273,25 @@ export default function DevicesPage() {
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
                   </>
                 )}
+
+                
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🛠 تعمیرات</div>
+                {(d.maintenanceLogs || []).length === 0 ? (
+                  <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 8, textAlign: 'center' }}>تعمیری ثبت نشده</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {(d.maintenanceLogs || []).slice().reverse().slice(0, 5).map(m => (
+                      <div key={m.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                          <span style={{ fontWeight: 600 }}>{m.type}</span>
+                          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(m.date)}{m.cost ? ' · ' + toFa(m.cost.toLocaleString('fa-IR')) + ' ت' : ''}</span>
+                        </div>
+                        <button type="button" onClick={() => removeMaintenance(d.id, m.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 4 }}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <Btn size="sm" full onClick={() => { setMaintDeviceId(d.id); setMaintForm({ date: '', type: '', cost: '', description: '' }); }}>+ ثبت تعمیر</Btn>
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
