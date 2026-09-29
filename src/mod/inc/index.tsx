@@ -28,7 +28,9 @@ export default function Inc() {
             cursor: 'pointer', position: 'relative', whiteSpace: 'nowrap'
           }}>
             {t.label}
-            {tab === t.id && <div style={{ position: 'absolute', bottom: 0, right: 12, left: 12, height: 2.5, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />}
+            {tab === t.id && <div style={{ position: 'absolute', bottom: 0,
+               right: 12, left: 12, height: 2.5, background: 'var(--accent)',
+               borderRadius: '3px 3px 0 0' }} />}
           </div>
         ))}
       </div>

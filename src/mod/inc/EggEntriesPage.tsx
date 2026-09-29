@@ -1,6 +1,10 @@
 import ProgressTracker from '../../shr/components/ProgressTracker';
 import { useState, useMemo } from 'react';
-import { useInc, DEAL_LABEL, ENTRY_STATUS_LABEL, addDaysJalali, daysAgo, daysToHatch, isLockdown, isHatchWindow, incubationDays, type EggEntry, type DealType } from './store';
+import {
+  useInc, DEAL_LABEL, ENTRY_STATUS_LABEL, addDaysJalali,
+  daysAgo, daysToHatch, isLockdown, isHatchWindow,
+  incubationDays, type EggEntry, type DealType
+} from './store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -17,7 +21,9 @@ interface F {
   dealType: DealType; dealData: Record<string, string>;
   unitPrice: string; notes: string;
 }
-const empty = (): F => ({ deviceId:'', birdId:'', breedId:'', count:'', entryDate:'', trayNumbers:'', dealType:'personal', dealData:{}, unitPrice:'', notes:'' });
+const empty = (): F => ({ deviceId:'', birdId:'', breedId:'', count:'',
+   entryDate:'', trayNumbers:'', dealType:'personal', dealData:{}, unitPrice:'',
+   notes:'' });
 
 export default function EggEntriesPage() {
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
@@ -168,7 +174,9 @@ export default function EggEntriesPage() {
                   <Row l="نوع" v={DEAL_LABEL[e.dealType]} />
                   {e.dealType === 'partnership' && e.dealData.partnerName && <Row l="شریک" v={String(e.dealData.partnerName)} />}
                   {e.dealType === 'partnership' && e.dealData.partnerPercent && <Row l="درصد شریک" v={`${toFa(e.dealData.partnerPercent)}٪`} />}
-                  {e.dealType === 'rent' && e.dealData.rentAmount && <Row l="اجاره" v={`${toFa(Number(e.dealData.rentAmount).toLocaleString('fa-IR'))} ت`} />}
+                  {e.dealType === 'rent' &&
+                    e.dealData.rentAmount &&
+                    <Row l="اجاره" v={`${toFa(Number(e.dealData.rentAmount).toLocaleString('fa-IR'))} ت`} />}
                   {e.dealType === 'consignment' && e.dealData.consigneeName && <Row l="امانت‌دار" v={String(e.dealData.consigneeName)} />}
                 </div>
 
@@ -178,7 +186,10 @@ export default function EggEntriesPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {e.unitPrice && <Row l="قیمت هر تخم" v={`${toFa(e.unitPrice.toLocaleString('fa-IR'))} ت`} />}
                       {e.totalPrice && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between',
+                           fontSize: 'var(--fs-sm)', padding: '8px 10px',
+                           background: 'var(--accent-soft)', color: 'var(--accent)',
+                           borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                           <span>جمع کل:</span><span>{toFa(e.totalPrice.toLocaleString('fa-IR'))} ت</span>
                         </div>
                       )}
@@ -191,7 +202,9 @@ export default function EggEntriesPage() {
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🔍 کندلینگ</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {myCandlings.sort((a, b) => a.stage - b.stage).map(c => (
-                        <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                        <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between',
+                           fontSize: 'var(--fs-sm)', padding: '6px 10px',
+                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                           <span style={{ color: 'var(--muted)' }}>مرحله {toFa(c.stage)}:</span>
                           <span style={{ fontWeight: 600 }}>سالم {toFa(c.alive || 0)}</span>
                         </div>
@@ -204,7 +217,10 @@ export default function EggEntriesPage() {
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🐣 نتیجه هچ</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between',
+                         fontSize: 'var(--fs-sm)', padding: '8px 10px',
+                         background: 'var(--accent-soft)', color: 'var(--accent)',
+                         borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                         <span>جوجه هچ‌شده:</span><span>{toFa(myHatch.hatched || 0)}</span>
                       </div>
                       {myHatch.unhatched ? <Row l="هچ‌نشده" v={toFa(myHatch.unhatched)} /> : null}
@@ -215,7 +231,9 @@ export default function EggEntriesPage() {
                 {e.notes && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
                   </>
                 )}
 
@@ -384,7 +402,8 @@ export default function EggEntriesPage() {
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>
@@ -393,8 +412,12 @@ function Row({ l, v }: { l: string; v: string }) {
 
 function DepBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'var(--accent-soft)', border: '1px dashed var(--accent-border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+    <div style={{ background: 'var(--accent-soft)', border: '1px dashed var(--accent-border)',
+       borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex',
+       flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700,
+         display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8,
+         borderBottom: '1px solid var(--border)' }}>
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)' }} />
         {title}
       </div>

@@ -110,7 +110,9 @@ export default function HatchesPage() {
                 {h.notes && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
                   </>
                 )}
 
@@ -161,7 +163,10 @@ export default function HatchesPage() {
 
 function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: accent ? 'var(--accent)' : undefined, fontWeight: accent ? 700 : undefined }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+       padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
+       borderRadius: 'var(--r-sm)', color: accent ? 'var(--accent)' : undefined,
+       fontWeight: accent ? 700 : undefined }}>
       <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: accent ? 'var(--accent)' : 'var(--text)' }}>{v}</span>
     </div>

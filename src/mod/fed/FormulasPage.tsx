@@ -173,14 +173,19 @@ export default function FormulasPage() {
                   const ing = ingredients.find(x => x.id === line.ingredientId);
                   if (ing === undefined) return null;
                   return (
-                    <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                    <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between',
+                       fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>
                       <span>{ing.name}</span>
                       <span style={{ fontWeight: 600 }}>{toFa(line.percent)}٪</span>
                     </div>
                   );
                 })}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between',
+                   fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)',
+                   color: 'var(--accent)', borderRadius: 'var(--r-sm)',
+                   fontWeight: 700 }}>
                   <span>مجموع:</span>
                   <span>{toFa(total.toFixed(2))}٪</span>
                 </div>
@@ -202,7 +207,10 @@ export default function FormulasPage() {
                 {n.price > 0 ? (
                   <>
                     <SectionTitle>💰 مالی</SectionTitle>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between',
+                       fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)',
+                       color: 'var(--accent)', borderRadius: 'var(--r-sm)',
+                       fontWeight: 700 }}>
                       <span>هزینه هر کیلوگرم:</span>
                       <span>{toFa(n.price.toLocaleString('fa-IR'))} ت</span>
                     </div>
@@ -212,7 +220,9 @@ export default function FormulasPage() {
                 {f.notes ? (
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
                   </>
                 ) : null}
 
@@ -286,10 +296,14 @@ export default function FormulasPage() {
           const usedIds = form.lines.filter(l => l.id !== line.id).map(l => l.ingredientId);
           const available = ingredients.filter(i => !usedIds.includes(i.id));
           return (
-            <div key={line.id} style={{ padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={line.id} style={{ padding: '10px 12px', background: 'var(--input-bg)',
+               border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
+               display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>ماده {toFa(idx + 1)}</span>
-                <button type="button" onClick={() => removeLine(line.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14 }}>✕</button>
+                <button type="button" onClick={() => removeLine(line.id)} style={{ background: 'none',
+                   border: 'none', color: 'var(--danger)', cursor: 'pointer',
+                   fontFamily: 'inherit', fontSize: 14 }}>✕</button>
               </div>
               <Select value={line.ingredientId} onChange={e => updateLine(line.id, { ingredientId: e.target.value })}>
                 {available.map(i => <option key={i.id} value={i.id}>{i.name} ({toFa(i.protein)}٪ پروتئین)</option>)}
@@ -343,7 +357,9 @@ export default function FormulasPage() {
         </Grid2>
 
         {nutrients.price > 0 ? (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between',
+             fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)',
+             color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
             <span>💰 هزینه هر کیلوگرم:</span>
             <span>{toFa(nutrients.price.toLocaleString('fa-IR'))} ت</span>
           </div>
@@ -377,7 +393,8 @@ export default function FormulasPage() {
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>
@@ -386,7 +403,8 @@ function Row({ l, v }: { l: string; v: string }) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
+    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)',
+       fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
   );
 }
 

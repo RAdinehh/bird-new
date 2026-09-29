@@ -48,7 +48,8 @@ export default function ZonesPage() {
   }
 
   const openNew = () => { setForm({ id:'', hallId: halls[0].id, name:'', capacity:'', notes:'' }); setErr(''); setOpen(true); };
-  const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId, name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setOpen(true); };
+  const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId,
+     name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setOpen(true); };
 
   const save = async () => {
 
@@ -66,7 +67,8 @@ export default function ZonesPage() {
     }
 
     if (!form.name.trim()) { setErr('نام بخش اجباری است'); return; }
-    const data = { hallId: form.hallId, name: form.name.trim(), capacity: form.capacity ? parseInt(toEn(form.capacity)) || null : null, notes: form.notes.trim() };
+    const data = { hallId: form.hallId, name: form.name.trim(), capacity: form.capacity ? parseInt(toEn(form.capacity)) || null : null,
+       notes: form.notes.trim() };
     if (form.id) updateZone(form.id, data); else addZone(data);
     setOpen(false);
   };
@@ -113,15 +115,21 @@ export default function ZonesPage() {
               >
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🗂 مشخصات بخش</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>نام بخش:</span>
                     <span style={{ fontWeight: 600 }}>{z.name}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>سالن:</span>
                     <span style={{ fontWeight: 600 }}>{hall?.name || '—'}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>ظرفیت:</span>
                     <span style={{ fontWeight: 600 }}>{z.capacity ? `${toFa(z.capacity)} پرنده` : '—'}</span>
                   </div>
@@ -129,7 +137,9 @@ export default function ZonesPage() {
                 {z.notes && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{z.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{z.notes}</div>
                   </>
                 )}
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>

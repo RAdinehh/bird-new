@@ -27,9 +27,12 @@ export default function EquipmentPage() {
     );
   }
 
-  const openNew = () => { setForm({ id:'', hallId: halls[0].id, type:'lamp', name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'' }); setErr(''); setOpen(true); };
+  const openNew = () => { setForm({ id:'', hallId: halls[0].id, type:'lamp',
+     name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'' }); setErr(''); setOpen(true); };
   const openEdit = (e: Equipment) => {
-    setForm({ id: e.id, hallId: e.hallId, type: e.type, name: e.name, count: e.count ? toFa(e.count) : '', unitPrice: e.unitPrice ? toFa(e.unitPrice) : '', purchasedAt: e.purchasedAt, warranty: e.warranty ? toFa(e.warranty) : '', notes: e.notes });
+    setForm({ id: e.id, hallId: e.hallId, type: e.type, name: e.name, count: e.count ? toFa(e.count) : '',
+       unitPrice: e.unitPrice ? toFa(e.unitPrice) : '', purchasedAt: e.purchasedAt,
+       warranty: e.warranty ? toFa(e.warranty) : '', notes: e.notes });
     setErr(''); setOpen(true);
   };
 
@@ -119,16 +122,22 @@ export default function EquipmentPage() {
               >
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🔧 مشخصات</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>نوع:</span>
                     <span style={{ fontWeight: 600 }}>{meta.name}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>سالن:</span>
                     <span style={{ fontWeight: 600 }}>{hall?.name || '—'}</span>
                   </div>
                   {e.count && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between',
+                       fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>
                       <span style={{ color: 'var(--muted)' }}>تعداد:</span>
                       <span style={{ fontWeight: 600 }}>{toFa(e.count)} عدد</span>
                     </div>
@@ -140,25 +149,34 @@ export default function EquipmentPage() {
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {e.unitPrice && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between',
+                           fontSize: 'var(--fs-sm)', padding: '6px 10px',
+                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                           <span style={{ color: 'var(--muted)' }}>قیمت واحد:</span>
                           <span style={{ fontWeight: 600 }}>{toFa(e.unitPrice.toLocaleString('fa-IR'))} ت</span>
                         </div>
                       )}
                       {value > 0 && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between',
+                           fontSize: 'var(--fs-sm)', padding: '6px 10px',
+                           background: 'var(--accent-soft)', color: 'var(--accent)',
+                           borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                           <span>ارزش کل:</span>
                           <span>{toFa(value.toLocaleString('fa-IR'))} ت</span>
                         </div>
                       )}
                       {e.purchasedAt && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between',
+                           fontSize: 'var(--fs-sm)', padding: '6px 10px',
+                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                           <span style={{ color: 'var(--muted)' }}>تاریخ خرید:</span>
                           <span style={{ fontWeight: 600 }}>{toFa(e.purchasedAt)}</span>
                         </div>
                       )}
                       {e.warranty && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between',
+                           fontSize: 'var(--fs-sm)', padding: '6px 10px',
+                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                           <span style={{ color: 'var(--muted)' }}>گارانتی:</span>
                           <span style={{ fontWeight: 600 }}>{toFa(e.warranty)} ماه</span>
                         </div>
@@ -170,7 +188,9 @@ export default function EquipmentPage() {
                 {e.notes && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
                   </>
                 )}
 

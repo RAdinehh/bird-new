@@ -118,7 +118,9 @@ export default function DevicesPage() {
                 {d.notes && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
                   </>
                 )}
 
@@ -161,9 +163,13 @@ export default function DevicesPage() {
           <Field label="دمای هدف"><NumField placeholder="۳۷٫۸" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={-10} /></Field>
           <Field label="رطوبت هدف"><NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={-10} /></Field>
         </Grid2>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+           padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)',
+           borderRadius: 'var(--r-md)' }}>
           <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>چرخش خودکار</div>
-          <button onClick={() => setForm({...form, rotationEnabled: !form.rotationEnabled})} style={{ width: 38, height: 22, borderRadius: 11, background: form.rotationEnabled ? 'var(--accent)' : 'var(--dim)', position: 'relative', border: 'none', cursor: 'pointer', padding: 0 }}>
+          <button onClick={() => setForm({...form, rotationEnabled: !form.rotationEnabled})} style={{ width: 38,
+             height: 22, borderRadius: 11, background: form.rotationEnabled ? 'var(--accent)' : 'var(--dim)',
+             position: 'relative', border: 'none', cursor: 'pointer', padding: 0 }}>
             <span style={{ position: 'absolute', top: 2, right: form.rotationEnabled ? 18 : 2, width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'right .2s' }} />
           </button>
         </div>
@@ -189,7 +195,8 @@ export default function DevicesPage() {
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>

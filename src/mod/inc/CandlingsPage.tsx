@@ -18,14 +18,18 @@ export default function CandlingsPage() {
   const { eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
   const { birds } = useBrd();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ id:'', eggEntryId:'', stage:'1', date:'', alive:'', infertile:'', dead:'', broken:'', infertileReason:'', deadReason:'', notes:'' });
+  const [form, setForm] = useState({ id:'', eggEntryId:'', stage:'1', date:'',
+     alive:'', infertile:'', dead:'', broken:'', infertileReason:'', deadReason:'',
+     notes:'' });
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const openNew = () => {
     if (eggEntries.length === 0) { showAlert('اول یک ورودی تخم ثبت کنید'); return; }
-    setForm({ id:'', eggEntryId: eggEntries[0].id, stage:'1', date:'', alive:'', infertile:'', dead:'', broken:'', infertileReason:'', deadReason:'', notes:'' });
+    setForm({ id:'', eggEntryId: eggEntries[0].id, stage:'1', date:'', alive:'',
+       infertile:'', dead:'', broken:'', infertileReason:'', deadReason:'',
+       notes:'' });
     setErr(''); setOpen(true);
   };
   const openEdit = (c: Candling) => {
@@ -107,7 +111,9 @@ export default function CandlingsPage() {
                 {c.notes && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{c.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{c.notes}</div>
                   </>
                 )}
 
@@ -190,7 +196,10 @@ export default function CandlingsPage() {
 
 function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: accent ? 'var(--accent)' : undefined, fontWeight: accent ? 700 : undefined }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+       padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
+       borderRadius: 'var(--r-sm)', color: accent ? 'var(--accent)' : undefined,
+       fontWeight: accent ? 700 : undefined }}>
       <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: accent ? 'var(--accent)' : 'var(--text)' }}>{v}</span>
     </div>

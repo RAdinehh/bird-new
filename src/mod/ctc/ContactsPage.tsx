@@ -1,6 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useCtc, type Person, type Role, ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES, SALARY_TYPES, avatarLetter } from './store';
-import { Btn, BtnRow, DigitField, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, PhoneField, Select, Tag } from '../../shr/components/ui';
+import {
+  Btn, BtnRow, DigitField, Empty,
+  Field, Grid2, Grid3, Input,
+  Modal, NumField, PageContainer, PhoneField,
+  Select, Tag
+} from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -34,7 +39,9 @@ export default function ContactsPage() {
     setForm({
       id: p.id, name: p.name, phone: p.phone, phone2: p.phone2, email: p.email,
       address: p.address, city: p.city, nationalId: p.nationalId, roles: p.roles, notes: p.notes,
-      customerType: p.customerType || 'wholesale', customerTypes: p.customerTypes || (p.customerType ? [p.customerType] : []), trustScore: p.trustScore ? toFa(p.trustScore) : '', defaultDiscount: p.defaultDiscount ? toFa(p.defaultDiscount) : '',
+      customerType: p.customerType ||
+        'wholesale', customerTypes: p.customerTypes ||
+        (p.customerType ? [p.customerType] : []), trustScore: p.trustScore ? toFa(p.trustScore) : '', defaultDiscount: p.defaultDiscount ? toFa(p.defaultDiscount) : '',
       supplierTypes: p.supplierTypes || [], position: p.position, startDate: p.startDate,
       salaryType: p.salaryType || 'monthly', salaryAmount: p.salaryAmount ? toFa(p.salaryAmount) : '', insurance: p.insurance
     });
@@ -112,7 +119,9 @@ export default function ContactsPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)', padding: '0 12px', background: 'var(--header-bg)', position: 'sticky', top: 52, zIndex: 11, overflowX: 'auto', scrollbarWidth: 'none' }}>
+      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
+         padding: '0 12px', background: 'var(--header-bg)', position: 'sticky',
+         top: 52, zIndex: 11, overflowX: 'auto', scrollbarWidth: 'none' }}>
         {tabs.map(t => (
           <div key={t.id} onClick={() => setTab(t.id)} style={{
             padding: '11px 12px', fontSize: 'var(--fs-base)', fontWeight: 600,
@@ -121,16 +130,24 @@ export default function ContactsPage() {
             display: 'flex', alignItems: 'center', gap: 5
           }}>
             {t.label}
-            <span style={{ fontSize: 10, background: tab === t.id ? 'var(--accent-soft)' : 'var(--input-bg)', color: tab === t.id ? 'var(--accent)' : 'var(--muted)', padding: '1px 5px', borderRadius: 8, fontWeight: 700 }}>{toFa(tabCount(t.id))}</span>
-            {tab === t.id && <div style={{ position: 'absolute', bottom: 0, right: 12, left: 12, height: 2.5, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />}
+            <span style={{ fontSize: 10, background: tab === t.id ? 'var(--accent-soft)' : 'var(--input-bg)',
+               color: tab === t.id ? 'var(--accent)' : 'var(--muted)', padding: '1px 5px',
+               borderRadius: 8, fontWeight: 700 }}>{toFa(tabCount(t.id))}</span>
+            {tab === t.id && <div style={{ position: 'absolute', bottom: 0,
+               right: 12, left: 12, height: 2.5, background: 'var(--accent)',
+               borderRadius: '3px 3px 0 0' }} />}
           </div>
         ))}
       </div>
 
       <PageContainer>
-        <div style={{ height: 38, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ height: 38, background: 'var(--input-bg)', border: '1px solid var(--border)',
+           borderRadius: 'var(--r-md)', padding: '0 12px', display: 'flex',
+           alignItems: 'center', gap: 8 }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="جستجو..." style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)', minWidth: 0 }} />
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder="جستجو..." style={{ flex: 1,
+             background: 'none', border: 'none', outline: 'none', color: 'var(--text)',
+             fontFamily: 'inherit', fontSize: 'var(--fs-base)', minWidth: 0 }} />
         </div>
 
         {list.length === 0 ? (
@@ -169,7 +186,9 @@ export default function ContactsPage() {
                   {(p.city || p.address) && (
                     <>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📍 آدرس</div>
-                      <div style={{ fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
+                      <div style={{ fontSize: 'var(--fs-sm)', padding: '8px 10px',
+                         background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
+                         lineHeight: 1.7 }}>
                         {p.city && <div>{p.city}</div>}
                         {p.address && <div style={{ color: 'var(--muted)' }}>{p.address}</div>}
                       </div>
@@ -192,7 +211,9 @@ export default function ContactsPage() {
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📦 کالاهای فروشنده</div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                         {p.supplierTypes.map(t => (
-                          <span key={t} style={{ padding: '4px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 6, fontSize: 'var(--fs-xs)', fontWeight: 600 }}>
+                          <span key={t} style={{ padding: '4px 10px', background: 'var(--accent-soft)',
+                             color: 'var(--accent)', borderRadius: 6, fontSize: 'var(--fs-xs)',
+                             fontWeight: 600 }}>
                             {SUPPLIER_TYPES.find(x => x[0] === t)?.[1] || t}
                           </span>
                         ))}
@@ -215,7 +236,9 @@ export default function ContactsPage() {
                   {p.notes && (
                     <>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                      <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{p.notes}</div>
+                      <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                         padding: '8px 10px', background: 'var(--input-bg)',
+                         borderRadius: 'var(--r-sm)' }}>{p.notes}</div>
                     </>
                   )}
 
@@ -298,7 +321,9 @@ export default function ContactsPage() {
 
 function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+       padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
+       borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: accent ? 'var(--accent)' : 'var(--text)' }}>{v}</span>
     </div>
@@ -307,8 +332,12 @@ function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
 
 function DepBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'var(--accent-soft)', border: '1px dashed var(--accent-border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+    <div style={{ background: 'var(--accent-soft)', border: '1px dashed var(--accent-border)',
+       borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex',
+       flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700,
+         display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8,
+         borderBottom: '1px solid var(--border)' }}>
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)' }} />
         {title}
       </div>

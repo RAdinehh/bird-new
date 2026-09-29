@@ -205,7 +205,10 @@ export default function ProductionsPage() {
                 <Row l="جمع کل" v={toFa((p.totalCount || 0) + (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0))} />
 
                 {rate > 0 ? (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)',
+                     color: 'var(--accent)', borderRadius: 'var(--r-sm)',
+                     fontWeight: 700 }}>
                     <span>نرخ تخم‌گذاری (Hen-Day):</span>
                     <span>{toFa(rate.toFixed(1))}٪</span>
                   </div>
@@ -221,7 +224,9 @@ export default function ProductionsPage() {
                 {p.notes ? (
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{p.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{p.notes}</div>
                   </>
                 ) : null}
 
@@ -254,7 +259,10 @@ export default function ProductionsPage() {
         </Grid2>
 
         {flockCount > 0 ? (
-          <div style={{ padding: '8px 12px', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, textAlign: 'center' }}>
+          <div style={{ padding: '8px 12px', background: 'var(--info-soft)',
+             border: '1px solid var(--info)', borderRadius: 'var(--r-md)',
+             fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600,
+             textAlign: 'center' }}>
             تعداد گله: {toFa(flockCount)} پرنده
           </div>
         ) : null}
@@ -290,7 +298,10 @@ export default function ProductionsPage() {
         </Grid2>
 
         {flockCount > 0 && healthy > flockCount ? (
-          <div style={{ padding: '8px 12px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, textAlign: 'center' }}>
+          <div style={{ padding: '8px 12px', background: 'var(--danger-soft)',
+             border: '1px solid var(--danger)', borderRadius: 'var(--r-md)',
+             fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700,
+             textAlign: 'center' }}>
             ❌ تخم سالم نمی‌تواند از تعداد گله ({toFa(flockCount)}) بیشتر باشد
           </div>
         ) : null}
@@ -340,7 +351,9 @@ export default function ProductionsPage() {
                 <span style={{ fontWeight: 700, color: 'var(--info)' }}>{toFa(int(form.dirtyCount))}</span>
               </div>
             ) : null}
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 6, marginTop: 2 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between',
+               borderTop: '1px solid var(--accent-border)', paddingTop: 6,
+               marginTop: 2 }}>
               <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>جمع کل:</span>
               <span style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700 }}>{toFa(totalEggs)} عدد</span>
             </div>
@@ -379,7 +392,9 @@ export default function ProductionsPage() {
 
 function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+       padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
+       borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: accent ? 'var(--accent)' : 'var(--text)' }}>{v}</span>
     </div>
@@ -388,7 +403,8 @@ function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
+    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)',
+       fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
   );
 }
 

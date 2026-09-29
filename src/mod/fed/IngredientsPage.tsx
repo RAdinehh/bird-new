@@ -263,7 +263,9 @@ export default function IngredientsPage() {
                 {stockItem ? (
                   <Row l="کالای انبار" v={`${stockItem.name} (${toFa(stockItem.currentStock)} ${UNIT_LABEL[stockItem.unit]})`} />
                 ) : (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', padding: '6px 10px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)',
+                     padding: '6px 10px', background: 'var(--warn-soft)',
+                     borderRadius: 'var(--r-sm)' }}>
                     ⚠️ به انبار وصل نیست — موقع مصرف، موجودی کم نمیشه
                   </div>
                 )}
@@ -271,7 +273,9 @@ export default function IngredientsPage() {
                 {it.notes && (
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
                   </>
                 )}
 
@@ -390,7 +394,8 @@ export default function IngredientsPage() {
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>
@@ -399,7 +404,8 @@ function Row({ l, v }: { l: string; v: string }) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
+    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)',
+       fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
   );
 }
 

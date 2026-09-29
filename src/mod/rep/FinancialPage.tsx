@@ -74,7 +74,8 @@ export default function FinancialPage() {
       {(receivables > 0 || payables > 0) ? (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
           {receivables > 0 ? (
-            <div style={{ padding: '12px 14px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)' }}>
+            <div style={{ padding: '12px 14px', background: 'var(--accent-soft)',
+               border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)' }}>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>📥 طلب از مشتریان</div>
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
                 {toFa(receivables.toLocaleString('fa-IR'))}

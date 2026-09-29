@@ -181,7 +181,10 @@ export default function StockPage() {
 
                 <SectionTitle>💰 مالی</SectionTitle>
                 <Row l="قیمت واحد" v={`${toFa(s.unitPrice.toLocaleString('fa-IR'))} ت`} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between',
+                   fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)',
+                   color: 'var(--accent)', borderRadius: 'var(--r-sm)',
+                   fontWeight: 700 }}>
                   <span>جمع کل:</span>
                   <span>{toFa(s.totalPrice.toLocaleString('fa-IR'))} ت</span>
                 </div>
@@ -189,7 +192,9 @@ export default function StockPage() {
                 {s.notes ? (
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{s.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{s.notes}</div>
                   </>
                 ) : null}
 
@@ -271,7 +276,9 @@ export default function StockPage() {
         </Field>
 
         {total > 0 ? (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-md)', padding: '10px 12px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-md)', fontWeight: 700 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between',
+             fontSize: 'var(--fs-md)', padding: '10px 12px', background: 'var(--accent-soft)',
+             color: 'var(--accent)', borderRadius: 'var(--r-md)', fontWeight: 700 }}>
             <span>جمع کل:</span>
             <span>{toFa(total.toLocaleString('fa-IR'))} ت</span>
           </div>
@@ -308,7 +315,8 @@ export default function StockPage() {
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>
@@ -317,6 +325,7 @@ function Row({ l, v }: { l: string; v: string }) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
+    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)',
+       fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
   );
 }

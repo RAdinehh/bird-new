@@ -31,9 +31,15 @@ export default function HallsPage() {
     setForm({
       id: h.id, name: h.name, code: h.code,
       length: h.length ? toFa(h.length) : '', width: h.width ? toFa(h.width) : '', height: h.height ? toFa(h.height) : '',
-      capacity: h.capacity ? toFa(h.capacity) : '', targetTemp: h.targetTemp ? toFa(h.targetTemp) : '', targetHumidity: h.targetHumidity ? toFa(h.targetHumidity) : '',
+      capacity: h.capacity ? toFa(h.capacity) : '', targetTemp: h.targetTemp ? toFa(h.targetTemp) : '',
+         targetHumidity: h.targetHumidity ? toFa(h.targetHumidity) : '',
+        
       ventilation: h.ventilation ? toFa(h.ventilation) : '', light: h.light ? toFa(h.light) : '',
-      ventilationSystem: h.ventilationSystem || 'tunnel', feederType: h.feederType || 'chain', drinkerType: h.drinkerType || 'nipple', litterType: h.litterType || 'wood_shavings',
+      ventilationSystem: h.ventilationSystem ||
+        'tunnel', feederType: h.feederType ||
+        'chain', drinkerType: h.drinkerType ||
+        'nipple', litterType: h.litterType ||
+        'wood_shavings',
       address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, notes: h.notes
     });
     setErr(''); setOpen(true);
@@ -132,14 +138,17 @@ export default function HallsPage() {
                 {h.address && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📍 آدرس</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.address}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', padding: '8px 10px',
+                       background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.address}</div>
                   </>
                 )}
 
                 {h.notes && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
                   </>
                 )}
 
@@ -161,13 +170,15 @@ export default function HallsPage() {
           <Field label="کد سالن"><Input placeholder="H-01" dir="ltr" value={form.code} onChange={e => setForm({...form, code: e.target.value})} /></Field>
           <Field label="ظرفیت"><NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} /></Field>
         </Grid2>
-        <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
+           color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
         <Grid3>
           <Field label="طول"><NumField placeholder="۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} /></Field>
           <Field label="عرض"><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} /></Field>
           <Field label="ارتفاع"><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} /></Field>
         </Grid3>
-        <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>شرایط</div>
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
+           color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>شرایط</div>
         <Grid2>
           <Field label="دمای هدف"><NumField placeholder="۲۲" value={form.targetTemp} onChange={e => setForm({...form, targetTemp: e.target.value})} unit="°C" min={-10} /></Field>
           <Field label="رطوبت هدف"><NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => setForm({...form, targetHumidity: e.target.value})} unit="٪" min={-10} /></Field>
@@ -184,7 +195,8 @@ export default function HallsPage() {
           <Field label="دانخوری"><Select value={form.feederType} onChange={e => setForm({...form, feederType: e.target.value})}>{Object.entries(FEEDER_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></Field>
           <Field label="آبخوری"><Select value={form.drinkerType} onChange={e => setForm({...form, drinkerType: e.target.value})}>{Object.entries(DRINKER_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></Field>
         </Grid2>
-        <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>زمان‌ها</div>
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
+           color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>زمان‌ها</div>
         <Grid2>
           <Field label="تاریخ ساخت"><Input placeholder="۱۴۰۰/۰۱/۰۱" value={form.builtAt} onChange={e => setForm({...form, builtAt: e.target.value})} /></Field>
           <Field label="آخرین ضدعفونی"><Input placeholder="۱۴۰۵/۰۷/۰۱" value={form.lastSanitizedAt} onChange={e => setForm({...form, lastSanitizedAt: e.target.value})} /></Field>
@@ -207,7 +219,10 @@ export default function HallsPage() {
 
 function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: accent ? 'var(--accent)' : undefined, fontWeight: accent ? 700 : undefined }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+       padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
+       borderRadius: 'var(--r-sm)', color: accent ? 'var(--accent)' : undefined,
+       fontWeight: accent ? 700 : undefined }}>
       <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600 }}>{v}</span>
     </div>

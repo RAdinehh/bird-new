@@ -1,6 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useBrd, type Breed } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
+import {
+  Btn, BtnRow, Empty, Field,
+  Grid2, Input, Modal, NumField,
+  PageContainer, Select, Tag
+} from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
@@ -124,15 +128,21 @@ export default function BreedsPage() {
               >
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🧬 مشخصات نژاد</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>نام نژاد:</span>
                     <span style={{ fontWeight: 600 }}>{b.name}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>پرنده:</span>
                     <span style={{ fontWeight: 600 }}>{bird?.name || '—'}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>FCR:</span>
                     <span style={{ fontWeight: 600 }}>{b.fcr ? toFa(b.fcr) : '—'}</span>
                   </div>
