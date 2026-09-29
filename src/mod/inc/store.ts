@@ -8,7 +8,8 @@ import { toEn } from '../../shr/utils/fa';
 export type DeviceMode = 'setter' | 'hatcher' | 'setter+hatcher';
 export type DeviceStatus = 'active' | 'idle' | 'maintenance' | 'broken';
 export type DealType = 'own' | 'purchase' | 'partnership' | 'rent' | 'consignment';
-export type EntryStatus = 'incubating' | 'candled' | 'locked' | 'hatched' | 'done';
+export type DealStatus = 'active' | 'withdrawn';
+export type EntryStatus = 'incubating' | 'candled' | 'locked' | 'hatched' | 'done' | 'failed';
 
 export interface DeviceCapacity {
   birdName: string;
@@ -49,6 +50,9 @@ export interface EggEntry {
   expectedHatchDate: string; // محاسبه‌شده
   source: string;      // own | purchase | partnership
   dealType: DealType;
+  dealStatus: DealStatus;
+  dealWithdrawnAt: string;
+  dealWithdrawnReason: string;
   dealData: Record<string, any>;
   trayNumbers: string;
   unitPrice: number | null;
@@ -178,8 +182,8 @@ export const ENTRY_STATUS_LABEL: Record<EntryStatus, string> = {
   candled: 'کندلینگ‌شده',
   locked: 'Lock-down',
   hatched: 'هچ‌شده',
-  done: 'تمام‌شده'
-};
+  done: 'تمام‌شده',
+  failed: 'ناموفق'};
 
 /* ============ محاسبات ============ */
 export function jalaliToDate(s: string): Date | null {

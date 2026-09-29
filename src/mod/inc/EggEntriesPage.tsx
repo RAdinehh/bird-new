@@ -21,10 +21,13 @@ interface F {
   id?: string; deviceId: string; birdId: string; breedId: string;
   count: string; entryDate: string; trayNumbers: string;
   dealType: DealType; dealData: Record<string, string>;
+  dealStatus: 'active' | 'withdrawn';
+  dealWithdrawnAt: string;
+  dealWithdrawnReason: string;
   unitPrice: string; shippingCost: string; notes: string;
 }
 const empty = (): F => ({ deviceId:'', birdId:'', breedId:'', count:'',
-   entryDate:'', trayNumbers:'', dealType:'own', dealData:{}, unitPrice:'', shippingCost:'',
+   entryDate:'', trayNumbers:'', dealType:'own', dealData:{}, dealStatus:'active', dealWithdrawnAt:'', dealWithdrawnReason:'', unitPrice:'', shippingCost:'',
    notes:'' });
 
 export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initialDevice?: string; onGoTo?: (t: any) => void } = {}) {
@@ -57,6 +60,9 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       id: e.id, deviceId: e.deviceId, birdId: e.birdId, breedId: e.breedId,
       count: e.count ? toFa(e.count) : '', entryDate: e.entryDate, trayNumbers: e.trayNumbers,
       dealType: e.dealType,
+      dealStatus: e.dealStatus || 'active',
+      dealWithdrawnAt: e.dealWithdrawnAt || '',
+      dealWithdrawnReason: e.dealWithdrawnReason || '',
       dealData: Object.fromEntries(Object.entries(e.dealData || {}).map(([k, v]) => [k, v == null ? '' : String(v)])),
       unitPrice: e.unitPrice ? toFa(e.unitPrice) : '', shippingCost: e.shippingCost ? toFa(e.shippingCost) : '', notes: e.notes
     });
@@ -92,7 +98,11 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       birdId: form.birdId, breedId: form.breedId,
       count, entryDate: form.entryDate, expectedHatchDate,
       source: form.dealType === 'own' ? 'own' : 'external',
-      dealType: form.dealType, dealData,
+      dealType: form.dealType,
+      dealStatus: form.dealStatus,
+      dealWithdrawnAt: form.dealWithdrawnAt,
+      dealWithdrawnReason: form.dealWithdrawnReason,
+      dealData,
       trayNumbers: form.trayNumbers.trim(),
       unitPrice,
       totalPrice: count && unitPrice ? count * unitPrice : null,
@@ -405,6 +415,25 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               </Field>
             </Grid2>
           </DepBox>
+        )}
+
+        {(form.dealType === 'partnership' || form.dealType === 'consignment') && (
+          <div style={{ padding: 10, background: form.dealStatus === 'withdrawn' ? 'var(--danger-soft)' : 'var(--input-bg)', border: '1px solid ' + (form.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--border)'), borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginTop: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input type="checkbox" checked={form.dealStatus === 'withdrawn'} onChange={e => setForm({...form, dealStatus: e.target.checked ? 'withdrawn' : 'active'})} style={{ width: 18, height: 18, accentColor: 'var(--danger)' }} />
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: form.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--text)' }}>شریک/صاحب کنار کشید</span>
+            </div>
+            {form.dealStatus === 'withdrawn' && (
+              <Grid2>
+                <Field label="تاریخ کنارکشیدن">
+                  <DatePicker value={form.dealWithdrawnAt} onChange={v => setForm({...form, dealWithdrawnAt: v})} />
+                </Field>
+                <Field label="دلیل">
+                  <Input placeholder="..." value={form.dealWithdrawnReason} onChange={e => setForm({...form, dealWithdrawnReason: e.target.value})} />
+                </Field>
+              </Grid2>
+            )}
+          </div>
         )}
 
         <Grid2>
