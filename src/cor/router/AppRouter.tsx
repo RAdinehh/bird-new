@@ -36,7 +36,8 @@ export default function AppRouter() {
       <Route path="/sal" element={<Navigate to="/set?tab=about" replace />} />
       <Route path="/dea" element={<Navigate to="/tra?tab=deals" replace />} />
       <Route path="/tra" element={<Tra />} />
-      <Route path="/cus" element={<Navigate to="/ctc?tab=customer" replace />} />
+      <Route path="/ctc" element={<Cus />} />
+      <Route path="/cus" element={<Navigate to="/ctc" replace />} />
       <Route path="/wrk" element={<Navigate to="/ctc?tab=worker" replace />} />
       <Route path="/rep" element={<Rep />} />
       <Route path="/alt" element={<Alt />} />
