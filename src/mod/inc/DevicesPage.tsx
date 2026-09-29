@@ -327,30 +327,18 @@ export default function DevicesPage() {
 
         <SectionTitle>📊 ظرفیت بر اساس پرنده</SectionTitle>
         {form.capacityByBird.map(c => (
-          <div key={c.birdName} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
-            <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" style={{ flex: 1 }} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, minWidth: 70, maxWidth: 100 }}>
+          <div key={c.birdName} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+            <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.birdName}</span>
-              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: 2, flexShrink: 0 }}>✕</button>
+              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: 2 }}>✕</button>
             </div>
           </div>
         ))}
-        <Grid2>
-          <Select onChange={e => { if (e.target.value) { addCapacity(e.target.value); e.target.value = ''; } }} value="">
-            <option value="">+ انتخاب از لیست پرنده‌ها...</option>
-            {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
-          </Select>
-          <Input
-            id="custom-bird-input"
-            placeholder="یا نام دلخواه..."
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const v = (e.target as HTMLInputElement).value.trim();
-                if (v) { addCapacity(v); (e.target as HTMLInputElement).value = ''; }
-              }
-            }}
-          />
-        </Grid2>
+        <Select onChange={e => { if (e.target.value) { addCapacity(e.target.value); e.target.value = ''; } }} value="">
+          <option value="">+ انتخاب از لیست پرنده‌ها...</option>
+          {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+        </Select>
 
         {<>
             <SectionTitle>🌡 شرایط عملیاتی</SectionTitle>
