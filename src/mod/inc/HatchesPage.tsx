@@ -130,6 +130,44 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(h)} style={{ flex: 1 }}>ویرایش</Btn>
+                  {(h.hatched || 0) > 0 && (
+                    <>
+                      <Btn size="sm" variant="primary" onClick={() => {
+                        const entry = eggEntries.find(e => e.id === h.eggEntryId);
+                        const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
+                        if (!bird) { showAlert('پرنده پیدا نشد'); return; }
+                        const count = h.hatched || 0;
+                        const name = prompt('نام گله جدید:', 'گله ' + (bird.name || '') + ' ' + toFa(new Date().getFullYear()));
+                        if (!name) return;
+                        const today = new Date();
+                        const y = today.getFullYear();
+                        const mm = String(today.getMonth() + 1).padStart(2, '0');
+                        const dd = String(today.getDate()).padStart(2, '0');
+                        const startDate = y + '/' + mm + '/' + dd;
+                        addFlock({
+                          name, type: 'layer',
+                          birdId: bird.id, breedId: entry?.breedId || '',
+                          hallId: '', zoneId: '',
+                          initialCount: count, currentCount: count,
+                          maleCount: null, femaleCount: null,
+                          layingStartDay: 140,
+                          vaccineScheduleId: '',
+                          hatchDate: startDate, purchaseDate: '', startDate,
+                          endDate: '', source: 'hatch',
+                          purchasePrice: null, deliveryCost: null, otherCosts: null,
+                          status: 'active', notes: 'از هچ ' + toFa(h.date),
+                        });
+                        showAlert('گله ساخته شد با ' + toFa(count) + ' پرنده', '✅ موفق');
+                        setTimeout(() => nav('/flk'), 500);
+                      }} style={{ flex: 1 }}>🐔 گله</Btn>
+                      <Btn size="sm" onClick={() => {
+                        const entry = eggEntries.find(e => e.id === h.eggEntryId);
+                        const count = h.hatched || 0;
+                        showAlert('برای ثبت فروش ' + toFa(count) + ' جوجه، از بخش معاملات استفاده کنید.', '📥 ثبت فروش');
+                        setTimeout(() => nav('/tra'), 800);
+                      }} style={{ flex: 1 }}>📥 فروش</Btn>
+                    </>
+                  )}
                   <Btn size="sm" onClick={() => setDelId(h.id)} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
