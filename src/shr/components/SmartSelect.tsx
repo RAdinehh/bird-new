@@ -278,7 +278,6 @@ export default function SmartSelect({
             value={query}
             onChange={e => setQuery(e.target.value)}
             aria-label="جستجو در گزینه‌ها"
-            autoFocus
           />
         </div>
 

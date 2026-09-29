@@ -71,6 +71,34 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+
+    // همه فیلدهای قابل فوکوس
+    const all = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        'input:not([disabled]):not([readonly]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])'
+      )
+    ).filter(el => {
+      // visible check
+      if (!el.offsetParent && el.offsetWidth === 0) return false;
+      // تو modal‌های بسته نباشه
+      const style = window.getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden') return false;
+      return true;
+    });
+
+    const current = e.currentTarget;
+    const idx = all.indexOf(current);
+
+    if (idx >= 0 && idx < all.length - 1) {
+      all[idx + 1].focus();
+    } else {
+      current.blur();
+    }
+  };
+
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     // در blur: اگر مقدار خارج از محدوده بود، اصلاح کن
     if ((min !== undefined || max !== undefined) && value) {
@@ -103,19 +131,11 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
         borderRadius: 'var(--r-md)', padding: '0 12px',
         display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden'
       }}>
-        <input
-          dir={(rest as any).dir || undefined}
+        <input enterKeyHint="next" onKeyDown={handleKeyDown}           dir={(rest as any).dir || undefined}
           {...rest}
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
-          onFocus={e => {
-            // auto-select محتوا با کلیک
-            const t = e.target;
-            if (!t.readOnly && !t.disabled) {
-              setTimeout(() => t.select(), 0);
-            }
-          }}
           inputMode={effectiveMode === 'number' ? 'numeric' : rest.inputMode}
           style={{
             flex: '1 1 0%', width: '100%', minWidth: 0,
