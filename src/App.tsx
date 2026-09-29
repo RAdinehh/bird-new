@@ -11,7 +11,7 @@ import ShortcutsModal from './shr/components/ShortcutsModal';
 import DialogHost from './shr/components/DialogHost';
 import AppRouter from './cor/router/AppRouter';
 import { useKeyboard } from './shr/hooks/useKeyboard';
-import { Btn } from './shr/components/ui';
+import OnboardingModal from './shr/components/OnboardingModal';
 
 const TITLES: Record<string, string> = {
   '/': 'داشبورد', '/brd': 'پرنده‌ها و نژادها', '/hal': 'سالن‌ها', '/flk': 'گله‌ها',
@@ -46,58 +46,15 @@ function Layout() {
   );
 }
 
-function OnboardingBanner() {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const done = localStorage.getItem(FIRST_VISIT_KEY);
-    if (!done) setShow(true);
-  }, []);
-
-  const dismiss = () => {
-    localStorage.setItem(FIRST_VISIT_KEY, '1');
-    setShow(false);
-  };
-
-  if (!show) return null;
-
-  return (
-    <div style={{
-      position: 'fixed',
-      bottom: 90, left: 16, right: 16,
-      maxWidth: 448, margin: '0 auto',
-      background: 'var(--card-solid)',
-      border: '1px solid var(--accent-border)',
-      borderRadius: 'var(--r-lg)',
-      padding: '14px 16px',
-      boxShadow: 'var(--shadow)',
-      zIndex: 30,
-      display: 'flex', flexDirection: 'column', gap: 10
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 20 }}>👋</span>
-        <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, flex: 1 }}>
-          اولین بار است وارد می‌شوید؟
-        </span>
-      </div>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
-        ✨ ویژگی‌های جدید: معاملات پیشرفته (قسطی، چک، پیش‌فروش)، نمودار، تقویم شمسی، اسناد آفلاین.
-        <br />
-        برای دیدن راهنمای کامل، دکمه «؟» در هدر را بزنید.
-      </div>
-      <div style={{ display: 'flex', gap: 6 }}>
-        <Btn variant="primary" size="sm" onClick={() => { dismiss(); window.dispatchEvent(new KeyboardEvent('keydown', { key: 'h', ctrlKey: true })); }} style={{ flex: 1 }}>
-          دیدن راهنما
-        </Btn>
-        <Btn size="sm" onClick={dismiss} style={{ flex: 1 }}>رد کردن</Btn>
-      </div>
-    </div>
-  );
-}
 
 export default function App() {
   const { theme } = useTheme();
   const settings = useSet();
+  const [showOnb, setShowOnb] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem('pm-onboarding-v2-done')) setShowOnb(true);
+  }, []);
 
   // اعمال تم
   useEffect(() => {
@@ -126,7 +83,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <Layout />
-      <OnboardingBanner />
     </BrowserRouter>
   );
 }
