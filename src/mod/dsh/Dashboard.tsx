@@ -64,6 +64,12 @@ function moneyUnit(change: number): string {
 }
 
 export default function Dashboard() {
+
+  const [, _setTick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => _setTick(x => x + 1), 30000);
+    return () => clearInterval(t);
+  }, []);
   const nav = useNavigate();
   const [selectedFlockId, setSelectedFlockId] = useState<string>('');
   const [trendDays, setTrendDays] = useState<7 | 30 | 90>(7);
