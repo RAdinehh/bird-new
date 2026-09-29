@@ -349,6 +349,10 @@ export function Modal({
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
   const focusedRef = useRef(false);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const preventCloseRef = useRef(preventClose);
+  preventCloseRef.current = preventClose;
   const titleId = useRef<string>('modal-title-' + Math.random().toString(36).slice(2, 9));
 
   // Esc + body scroll lock + focus return
@@ -358,8 +362,8 @@ export function Modal({
     previousFocus.current = document.activeElement as HTMLElement;
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !preventClose) {
-        onClose();
+      if (e.key === 'Escape' && !preventCloseRef.current) {
+        onCloseRef.current();
       }
     };
     document.addEventListener('keydown', onKey);
@@ -386,7 +390,7 @@ export function Modal({
         /* silent */
       }
     };
-  }, [open, onClose, preventClose]);
+  }, [open]);
 
   // Focus trap: Tab / Shift+Tab
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
