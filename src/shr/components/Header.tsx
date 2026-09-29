@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../cor/store/theme';
 import { useUI } from '../../cor/store/ui';
 import { useAlt, countByLevel } from '../../mod/alt/store';
+import { useTra } from '../../mod/tra/store';
 import { toFa } from '../utils/fa';
 
 export default function Header({ title }: { title: string }) {
@@ -9,7 +10,23 @@ export default function Header({ title }: { title: string }) {
   const { openMenu, openHelp } = useUI();
   const nav = useNavigate();
   const alerts = useAlt(s => s.alerts);
+  const invoices = useTra(s => s.invoices);
   const counts = countByLevel(alerts);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const in7Days = new Date(today);
+  in7Days.setDate(in7Days.getDate() + 7);
+
+  const dueSoon = (invoices || []).filter(inv => {
+    if (!inv.dueDate) return false;
+    if (inv.workflowStatus === 'paid') return false;
+    try {
+      const [y, m, d] = inv.dueDate.split('/').map(Number);
+      const due = new Date(y, m - 1, d);
+      return due >= today && due <= in7Days;
+    } catch { return false; }
+  }).length;
 
   const IconBtn = ({ onClick, children, badge, badgeColor }: any) => (
     <button
@@ -86,8 +103,8 @@ export default function Header({ title }: { title: string }) {
 
       <IconBtn
         onClick={() => nav('/alt')}
-        badge={counts.total > 0 ? toFa(counts.total) : null}
-        badgeColor={counts.critical > 0 ? 'var(--danger)' : 'var(--warn)'}
+        badge={(counts.total + dueSoon) > 0 ? toFa(counts.total + dueSoon) : null}
+        badgeColor={counts.critical > 0 ? 'var(--danger)' : dueSoon > 0 ? 'var(--warn)' : 'var(--info)'}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
