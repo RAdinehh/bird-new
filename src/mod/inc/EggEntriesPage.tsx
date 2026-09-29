@@ -35,6 +35,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
   const { birds, breeds } = useBrd();
   const { flocks } = useFlk();
+  const { contacts } = useCtc();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
@@ -71,6 +72,9 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     });
     setErr(''); setOpen(true);
   };
+
+  const suppliers = (contacts || []).filter((p: any) => (p.roles || []).includes('supplier'));
+  const allPersons = contacts || [];
 
   const setD = (k: string, v: string) => setForm(f => ({ ...f, dealData: { ...f.dealData, [k]: v } }));
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
@@ -372,17 +376,21 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
         {form.dealType === 'purchase' && (
           <DepBox title="📥 اطلاعات خرید">
-            <Field label="نام فروشنده" required>
-              <Input placeholder="شرکت / شخص..." value={form.dealData.sellerName || ''} onChange={e => setD('sellerName', e.target.value)} />
+            <Field label="فروشنده" required>
+              {suppliers.length === 0 ? (
+                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+                  هنوز فروشنده‌ای در مخاطبین نیست
+                </div>
+              ) : (
+                <Select value={form.dealData.sellerId || ''} onChange={e => setD('sellerId', e.target.value)}>
+                  <option value="">— انتخاب فروشنده —</option>
+                  {suppliers.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </Select>
+              )}
             </Field>
-            <Grid2>
-              <Field label="تماس فروشنده">
-                <Input placeholder="۰۹..." dir="ltr" value={form.dealData.sellerPhone || ''} onChange={e => setD('sellerPhone', e.target.value)} />
-              </Field>
-              <Field label="تاریخ خرید">
-                <DatePicker value={form.dealData.purchaseDate || ''} onChange={v => setD('purchaseDate', v)} />
-              </Field>
-            </Grid2>
+            <Field label="تاریخ خرید">
+              <DatePicker value={form.dealData.purchaseDate || ''} onChange={v => setD('purchaseDate', v)} />
+            </Field>
             <Grid2>
               <Field label="قیمت هر تخم">
                 <MoneyField placeholder="۰" value={form.dealData.purchasePrice || ''} onChange={e => setD('purchasePrice', e.target.value)} />
@@ -399,8 +407,18 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
         {form.dealType === 'partnership' && (
           <DepBox title="اطلاعات شراکت">
-            <Field label="نام شریک"><Input placeholder="..." value={form.dealData.partnerName || ''} onChange={e => setD('partnerName', e.target.value)} /></Field>
-            <Field label="تماس شریک"><Input placeholder="۰۹..." dir="ltr" value={form.dealData.partnerPhone || ''} onChange={e => setD('partnerPhone', e.target.value)} /></Field>
+            <Field label="شریک" required>
+              {allPersons.length === 0 ? (
+                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+                  هنوز مخاطبی ثبت نشده
+                </div>
+              ) : (
+                <Select value={form.dealData.partnerId || ''} onChange={e => setD('partnerId', e.target.value)}>
+                  <option value="">— انتخاب شریک —</option>
+                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </Select>
+              )}
+            </Field>
             <Grid2>
               <Field label="درصد شریک" hint="۰ تا ۱۰۰">
                 <NumField
@@ -430,6 +448,18 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
         {form.dealType === 'rent' && (
           <DepBox title="اطلاعات اجاره">
+            <Field label="اجاره‌دهنده" required>
+              {allPersons.length === 0 ? (
+                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+                  هنوز مخاطبی ثبت نشده
+                </div>
+              ) : (
+                <Select value={form.dealData.lessorId || ''} onChange={e => setD('lessorId', e.target.value)}>
+                  <option value="">— انتخاب اجاره‌دهنده —</option>
+                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </Select>
+              )}
+            </Field>
             <Grid2>
               <Field label="مبلغ اجاره"><MoneyField placeholder="۰" value={form.dealData.rentAmount || ''} onChange={e => setD('rentAmount', e.target.value)} /></Field>
               <Field label="سرسید"><Input placeholder="۱۴۰۵/۰۸/۰۱" value={form.dealData.rentDueDate || ''} onChange={e => setD('rentDueDate', e.target.value)} /></Field>
@@ -439,7 +469,18 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
         {form.dealType === 'consignment' && (
           <DepBox title="اطلاعات امانت">
-            <Field label="نام امانت‌دار"><Input placeholder="..." value={form.dealData.consigneeName || ''} onChange={e => setD('consigneeName', e.target.value)} /></Field>
+            <Field label="امانت‌دار" required>
+              {allPersons.length === 0 ? (
+                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+                  هنوز مخاطبی ثبت نشده
+                </div>
+              ) : (
+                <Select value={form.dealData.consigneeId || ''} onChange={e => setD('consigneeId', e.target.value)}>
+                  <option value="">— انتخاب امانت‌دار —</option>
+                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </Select>
+              )}
+            </Field>
             <Grid2>
               <Field label="درصد امانت‌دار" hint="۰ تا ۱۰۰">
                 <NumField
