@@ -88,11 +88,16 @@ export default function DailyLogsPage() {
     };
   };
 
+  const currentTime = () => {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  };
+
   const openNew = () => {
     if (activeFlocks.length === 0) { showAlert('اول یک گله بسازید'); return; }
     const flock = activeFlocks[0];
     const sys = detectSystems(flock.id);
-    setForm({ ...newLog(flock.id), date: todayStr, ...sys });
+    setForm({ ...newLog(flock.id), date: todayStr, entryTime: currentTime(), ...sys });
     setErr(''); setOpen(true);
   };
 
