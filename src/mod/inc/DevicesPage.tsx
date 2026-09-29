@@ -328,9 +328,9 @@ export default function DevicesPage() {
 
         <SectionTitle>📊 ظرفیت بر اساس پرنده</SectionTitle>
         {form.capacityByBird.map(c => (
-          <div key={c.birdName} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, alignItems: 'center', marginBottom: 6, padding: '4px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+          <div key={c.birdName} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', gap: 8, alignItems: 'center', marginBottom: 6 }}>
             <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 80 }}>
               <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.birdName}</span>
               <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 2, flexShrink: 0 }}>✕</button>
             </div>
@@ -352,11 +352,6 @@ export default function DevicesPage() {
             }}
           />
         </Grid2>
-        <Btn variant="primary" size="sm" onClick={() => {
-          const el = document.getElementById('custom-bird-input') as HTMLInputElement;
-          const v = el?.value.trim();
-          if (v) { addCapacity(v); el.value = ''; }
-        }} style={{ alignSelf: 'flex-start' }}>+ افزودن پرنده دلخواه</Btn>
 
         {form.status === 'active' && (
           <>
@@ -431,7 +426,24 @@ export default function DevicesPage() {
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center' }}>✕ {err}</div>}
       </Modal>
 
-      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف دستگاه"
+      
+      <Modal open={!!maintDeviceId} onClose={() => setMaintDeviceId(null)} title="ثبت تعمیر"
+        footer={<BtnRow><Btn variant="primary" onClick={() => { if (maintDeviceId) addMaintenance(maintDeviceId); }}>ذخیره</Btn><Btn onClick={() => setMaintDeviceId(null)}>لغو</Btn></BtnRow>}>
+        <Field label="تاریخ" required>
+          <DatePicker value={maintForm.date} onChange={v => setMaintForm({ ...maintForm, date: v })} />
+        </Field>
+        <Field label="نوع تعمیر" required>
+          <Input placeholder="مثلاً: تعویض فن، تعمیر موتور..." value={maintForm.type} onChange={e => setMaintForm({ ...maintForm, type: e.target.value })} />
+        </Field>
+        <Field label="هزینه">
+          <MoneyField placeholder="۰" value={maintForm.cost} onChange={e => setMaintForm({ ...maintForm, cost: e.target.value })} />
+        </Field>
+        <Field label="توضیحات">
+          <Input placeholder="جزئیات..." value={maintForm.description} onChange={e => setMaintForm({ ...maintForm, description: e.target.value })} />
+        </Field>
+      </Modal>
+
+<Modal open={!!delId} onClose={() => setDelId(null)} title="حذف دستگاه"
         footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteDevice(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
           حذف <b>{target?.name}</b>؟
