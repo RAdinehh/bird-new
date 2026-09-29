@@ -3,6 +3,7 @@ import { useTheme } from '../../cor/store/theme';
 import { useUI } from '../../cor/store/ui';
 import { useAlt, countByLevel } from '../../mod/alt/store';
 import { useTra } from '../../mod/tra/store';
+import { useSet } from '../../mod/set/store';
 import { toFa } from '../utils/fa';
 
 export default function Header({ title }: { title: string }) {
@@ -11,6 +12,7 @@ export default function Header({ title }: { title: string }) {
   const nav = useNavigate();
   const alerts = useAlt(s => s.alerts);
   const invoices = useTra(s => s.invoices);
+  const reminders = useSet(s => s.dueDateReminders) || [7, 3, 1];
   const counts = countByLevel(alerts);
 
   const today = new Date();
@@ -24,7 +26,10 @@ export default function Header({ title }: { title: string }) {
     try {
       const [y, m, d] = inv.dueDate.split('/').map(Number);
       const due = new Date(y, m - 1, d);
-      return due >= today && due <= in7Days;
+      due.setHours(0, 0, 0, 0);
+      const daysDiff = Math.round((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      // اگه daysDiff یکی از reminderها باشه → هشدار
+      return reminders.includes(daysDiff);
     } catch { return false; }
   }).length;
 
