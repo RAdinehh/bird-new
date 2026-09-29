@@ -8,7 +8,7 @@ import {
 import { useBrd } from '../brd/store';
 import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { MiniProgress } from '../../shr/components/ProgressTracker';
 import DatePicker from '../../shr/components/DatePicker';
@@ -21,18 +21,20 @@ interface F {
   id?: string; deviceId: string; birdId: string; breedId: string;
   count: string; entryDate: string; trayNumbers: string;
   dealType: DealType; dealData: Record<string, string>;
+  flockId: string;
   dealStatus: 'active' | 'withdrawn';
   dealWithdrawnAt: string;
   dealWithdrawnReason: string;
   unitPrice: string; shippingCost: string; notes: string;
 }
 const empty = (): F => ({ deviceId:'', birdId:'', breedId:'', count:'',
-   entryDate:'', trayNumbers:'', dealType:'own', dealData:{}, dealStatus:'active', dealWithdrawnAt:'', dealWithdrawnReason:'', unitPrice:'', shippingCost:'',
+   entryDate:'', trayNumbers:'', dealType:'own', flockId:'', dealData:{}, dealStatus:'active', dealWithdrawnAt:'', dealWithdrawnReason:'', unitPrice:'', shippingCost:'',
    notes:'' });
 
 export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initialDevice?: string; onGoTo?: (t: any) => void } = {}) {
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
   const { birds, breeds } = useBrd();
+  const { flocks } = useFlk();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
@@ -60,6 +62,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       id: e.id, deviceId: e.deviceId, birdId: e.birdId, breedId: e.breedId,
       count: e.count ? toFa(e.count) : '', entryDate: e.entryDate, trayNumbers: e.trayNumbers,
       dealType: e.dealType,
+      flockId: (e as any).flockId || '',
       dealStatus: e.dealStatus || 'active',
       dealWithdrawnAt: e.dealWithdrawnAt || '',
       dealWithdrawnReason: e.dealWithdrawnReason || '',
@@ -99,6 +102,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       count, entryDate: form.entryDate, expectedHatchDate,
       source: form.dealType === 'own' ? 'own' : 'external',
       dealType: form.dealType,
+      flockId: form.flockId,
       dealStatus: form.dealStatus,
       dealWithdrawnAt: form.dealWithdrawnAt,
       dealWithdrawnReason: form.dealWithdrawnReason,
@@ -287,6 +291,18 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش ورودی تخم' : 'ورود تخم به دستگاه'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
+        <SectionTitle>🥚 منبع تخم</SectionTitle>
+        <Field label="نوع منبع" required>
+          <Select value={form.dealType} onChange={e => setForm({...form, dealType: e.target.value as DealType, dealData: {}, flockId: ''})}>
+            <option value="own">🏠 گله خودم</option>
+            <option value="partnership">🤝 شراکتی</option>
+            <option value="purchase">📥 خریداری</option>
+            <option value="rent">🏢 اجاره‌ای</option>
+            <option value="consignment">📦 امانی</option>
+          </Select>
+        </Field>
+
+<SectionTitle>📦 دستگاه و ظرفیت</SectionTitle>
         <Field label="دستگاه" required>
 <SmartSelect
               value={form.deviceId}
@@ -302,16 +318,13 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             />
         </Field>
 
+        <SectionTitle>📋 مشخصات تخم</SectionTitle>
         <Grid2>
           <Field label="پرنده" required>
-<SmartSelect
+            <SmartSelect
               value={form.birdId}
-              onChange={v => setForm(f => ({ ...f, birdId: v }))}
-              options={birds.map(c => ({
-                value: c.id,
-                label: c.name,
-                subtitle: (b => b.name)(c),
-              }))}
+              onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))}
+              options={birds.map(c => ({ value: c.id, label: c.name }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب پرنده"
               autoThreshold={6}
@@ -334,19 +347,29 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           </Field>
         </Grid2>
 
+        <SectionTitle>📅 زمان‌بندی</SectionTitle>
         <Field label="تاریخ ورود" required>
           <DatePicker value={form.entryDate} onChange={v => setForm({...form, entryDate: v})} placeholder="انتخاب تاریخ ورود" />
         </Field>
 
-        <Field label="نوع معامله" required>
-          <Select value={form.dealType} onChange={e => setForm({...form, dealType: e.target.value as DealType, dealData: {}})}>
-            <option value="own">🏠 گله خودم</option>
-            <option value="partnership">🤝 شراکتی</option>
-            <option value="purchase">📥 خریداری</option>
-            <option value="rent">🏢 اجاره‌ای</option>
-            <option value="consignment">امانی</option>
-          </Select>
-        </Field>
+        {form.dealType === 'own' && (
+          <DepBox title="🏠 گله مبدأ">
+            <Field label="انتخاب گله" required hint="گله‌ای که تخم از آن آمده">
+              {flocks.length === 0 ? (
+                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+                  هنوز گله‌ای ثبت نشده — اول از ماژول گله اضافه کنید
+                </div>
+              ) : (
+                <Select value={form.flockId} onChange={e => setForm({ ...form, flockId: e.target.value })}>
+                  <option value="">— انتخاب گله —</option>
+                  {flocks.filter((fl: any) => fl.status === 'active').map((fl: any) => (
+                    <option key={fl.id} value={fl.id}>{fl.name}</option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+          </DepBox>
+        )}
 
         {form.dealType === 'purchase' && (
           <DepBox title="📥 اطلاعات خرید">
@@ -468,7 +491,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         )}
 
         <Grid2>
-          <Field label="قیمت هر تخم" hint="اگر خریداری شده">
+          <SectionTitle>💰 مالی</SectionTitle>
+        <Field label="قیمت هر تخم" hint="اگر خریداری شده">
             <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
           </Field>
           <Field label="هزینه حمل" hint="اختیاری">
@@ -476,6 +500,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           </Field>
         </Grid2>
 
+        <SectionTitle>📝 یادداشت</SectionTitle>
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
       </Modal>
