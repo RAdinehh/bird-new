@@ -44,6 +44,25 @@ function dateDiffDays(jalaliDate: string): number {
   return Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+
+function fcrBg(diff: number): string {
+  if (diff <= 0) return 'var(--accent-soft)';
+  if (diff <= 10) return 'var(--warn-soft)';
+  return 'var(--danger-soft)';
+}
+
+function fcrBorder(diff: number): string {
+  if (diff <= 0) return 'var(--accent-border)';
+  if (diff <= 10) return 'var(--warn)';
+  return 'var(--danger)';
+}
+
+function moneyUnit(change: number): string {
+  if (change === 0) return 'تومان';
+  const sign = change > 0 ? '+' : '';
+  return `تومان · ${sign}${toFa(change)}٪`;
+}
+
 export default function Dashboard() {
   const nav = useNavigate();
   const [selectedFlockId, setSelectedFlockId] = useState<string>('');
@@ -300,7 +319,9 @@ export default function Dashboard() {
       : `${d.getFullYear()}/${String(d.getMonth()).padStart(2, '0')}`;
 
     const prevSales = invoices.filter(i => i.type === 'sale' && i.date && i.date.startsWith(prevMonth)).reduce((a, i) => a + (i.total || 0), 0);
-    const prevPurchases = invoices.filter(i => i.type === 'purchase' && i.date && i.date.startsWith(prevMonth)).reduce((a, i) => a + (i.total || 0), 0);
+    const prevPurchases = invoices
+      .filter(i => i.type === 'purchase' && i.date && i.date.startsWith(prevMonth))
+      .reduce((a, i) => a + (i.total || 0), 0);
 
     const salesChange = prevSales > 0 ? ((salesThisMonth - prevSales) / prevSales) * 100 : 0;
     const purchaseChange = prevPurchases > 0 ? ((purchasesThisMonth - prevPurchases) / prevPurchases) * 100 : 0;
