@@ -20,6 +20,7 @@ export interface Flock {
   maleCount: number | null;
   femaleCount: number | null;
   layingStartDay: number; // سن شروع تخم‌گذاری (روز) — قابل ویرایش کاربر
+  vaccineScheduleId: string; // شناسه قالب واکسن (اختیاری)
   hatchDate: string;      // تاریخ هچ (اگر از جوجه‌کشی خودت)
   purchaseDate: string;   // تاریخ خرید
   startDate: string;      // تاریخ شروع نگهداری

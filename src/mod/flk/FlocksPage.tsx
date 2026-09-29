@@ -6,6 +6,7 @@ import {
   LAYING_START_DAY, getLayingStartDay
 } from './store';
 import { useBrd } from '../brd/store';
+import { VACCINE_SCHEDULES, schedulesByType } from '../cal/vaccineSchedules';
 import { useHal } from '../hal/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';;
@@ -25,6 +26,7 @@ interface F {
   initialCount: string; currentCount: string;
   maleCount: string; femaleCount: string;
   layingStartDay: string;
+  vaccineScheduleId: string;
   hatchDate: string; purchaseDate: string; startDate: string;
   source: string;
   purchasePrice: string; deliveryCost: string; otherCosts: string;
@@ -35,6 +37,7 @@ const empty = (): F => ({
   name: '', type: 'layer', birdId: '', breedId: '', hallId: '', zoneId: '',
   initialCount: '', currentCount: '', maleCount: '', femaleCount: '',
   layingStartDay: '',
+  vaccineScheduleId: '',
   hatchDate: '', purchaseDate: '', startDate: '',
   source: 'purchase', purchasePrice: '', deliveryCost: '', otherCosts: '',
   status: 'active', notes: ''
@@ -93,6 +96,7 @@ export default function FlocksPage() {
       maleCount: f.maleCount ? toFa(f.maleCount) : '',
       femaleCount: f.femaleCount ? toFa(f.femaleCount) : '',
       layingStartDay: f.layingStartDay ? toFa(f.layingStartDay) : '',
+      vaccineScheduleId: f.vaccineScheduleId || '',
       hatchDate: f.hatchDate || '', purchaseDate: f.purchaseDate || '', startDate: f.startDate || '',
       source: f.source,
       purchasePrice: f.purchasePrice ? toFa(f.purchasePrice) : '',
@@ -139,6 +143,7 @@ export default function FlocksPage() {
       purchasePrice: num(form.purchasePrice),
       deliveryCost: num(form.deliveryCost),
       otherCosts: num(form.otherCosts),
+      vaccineScheduleId: form.vaccineScheduleId,
       status: form.status, notes: form.notes.trim()
     };
     if (form.id) update(form.id, data); else add(data);
