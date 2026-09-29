@@ -166,7 +166,7 @@ export default function ProfileTab() {
           </Field>
         </Grid2>
         <Field label="طول دوره‌ی جوجه‌کشی">
-          <Input value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} inputMode="numeric" dir="ltr" unit="روز" min={0} />
+          <Input value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} inputMode="numeric" dir="ltr" unit="روز" min={1} />
         </Field>
         <Grid2>
           <Field label="دمای Setter"><Input value={defaults.setterTemp} onChange={e => updateSection('defaults', { setterTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" min={-10} /></Field>

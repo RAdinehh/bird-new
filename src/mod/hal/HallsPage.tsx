@@ -163,9 +163,9 @@ export default function HallsPage() {
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
         <Grid3>
-          <Field label="طول"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={0} /></Field>
-          <Field label="عرض"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={0} /></Field>
-          <Field label="ارتفاع"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={0} /></Field>
+          <Field label="طول"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} /></Field>
+          <Field label="عرض"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} /></Field>
+          <Field label="ارتفاع"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} /></Field>
         </Grid3>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>شرایط</div>
         <Grid2>
