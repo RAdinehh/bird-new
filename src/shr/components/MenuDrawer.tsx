@@ -76,7 +76,7 @@ export default function MenuDrawer() {
       tone: 'warn',
       items: [
         { to: '/tra', label: 'معاملات', icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' },
-        { to: '/cus', label: 'مخاطبین', icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' }
+        { to: '/ctc', label: 'مخاطبین', icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' }
       ]
     },
     {

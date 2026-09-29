@@ -16,7 +16,7 @@ import OnboardingModal from './shr/components/OnboardingModal';
 const TITLES: Record<string, string> = {
   '/': 'داشبورد', '/brd': 'پرنده‌ها و نژادها', '/hal': 'سالن‌ها', '/flk': 'گله‌ها',
   '/inc': 'جوجه‌کشی', '/egg': 'تخم‌ها', '/dlg': 'ثبت روزانه', '/whs': 'انبار',
-  '/fed': 'جیره‌نویسی', '/rep': 'گزارش‌ها',
+  '/fed': 'جیره‌نویسی', '/rep': 'گزارش‌ها', '/ctc': 'مخاطبین',
   '/alt': 'هشدارها',
   '/cal': 'تقویم',
   '/doc': 'اسناد و فایل‌ها', '/arc': 'آرشیو', '/set': 'تنظیمات', '/tra': 'معاملات'

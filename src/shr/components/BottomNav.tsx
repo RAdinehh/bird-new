@@ -23,7 +23,7 @@ const ICONS: Record<string, string> = {
 };
 
 const PATHS: Record<string, string> = {
-  dsh: '/', brd: '/brd', hal: '/hal', ctc: '/cus', flk: '/flk',
+  dsh: '/', brd: '/brd', hal: '/hal', ctc: '/ctc', flk: '/flk',
   inc: '/inc', egg: '/egg', dlg: '/dlg', whs: '/whs', fed: '/fed',
   tra: '/tra', rep: '/rep', alt: '/alt', arc: '/arc', set: '/set',
   cal: '/cal', doc: '/doc'
