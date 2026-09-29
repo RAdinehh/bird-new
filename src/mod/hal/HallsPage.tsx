@@ -169,8 +169,8 @@ export default function HallsPage() {
         </Grid3>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>شرایط</div>
         <Grid2>
-          <Field label="دمای هدف"><Input placeholder="۲۲" inputMode="decimal" dir="ltr" value={form.targetTemp} onChange={e => setForm({...form, targetTemp: e.target.value})} unit="°C" min={0} /></Field>
-          <Field label="رطوبت هدف"><Input placeholder="۶۰" inputMode="numeric" dir="ltr" value={form.targetHumidity} onChange={e => setForm({...form, targetHumidity: e.target.value})} unit="٪" min={0} /></Field>
+          <Field label="دمای هدف"><Input placeholder="۲۲" inputMode="decimal" dir="ltr" value={form.targetTemp} onChange={e => setForm({...form, targetTemp: e.target.value})} unit="°C" min={-10} /></Field>
+          <Field label="رطوبت هدف"><Input placeholder="۶۰" inputMode="numeric" dir="ltr" value={form.targetHumidity} onChange={e => setForm({...form, targetHumidity: e.target.value})} unit="٪" min={-10} /></Field>
         </Grid2>
         <Grid2>
           <Field label="تهویه"><Input placeholder="۱۲" inputMode="decimal" dir="ltr" value={form.ventilation} onChange={e => setForm({...form, ventilation: e.target.value})} unit="m³/min" min={0} /></Field>

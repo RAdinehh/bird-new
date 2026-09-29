@@ -158,8 +158,8 @@ export default function DevicesPage() {
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="دمای هدف"><Input placeholder="۳۷٫۸" inputMode="decimal" dir="ltr" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={0} /></Field>
-          <Field label="رطوبت هدف"><Input placeholder="۵۵" inputMode="numeric" dir="ltr" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={0} /></Field>
+          <Field label="دمای هدف"><Input placeholder="۳۷٫۸" inputMode="decimal" dir="ltr" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={-10} /></Field>
+          <Field label="رطوبت هدف"><Input placeholder="۵۵" inputMode="numeric" dir="ltr" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={-10} /></Field>
         </Grid2>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)' }}>
           <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>چرخش خودکار</div>
