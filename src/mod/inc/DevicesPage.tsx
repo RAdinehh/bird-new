@@ -327,18 +327,13 @@ export default function DevicesPage() {
         </Grid2>
 
         <SectionTitle>📊 ظرفیت بر اساس پرنده</SectionTitle>
-        {form.capacityByBird.length === 0 && (
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center', padding: 8 }}>
-            هنوز پرنده‌ای اضافه نشده
-          </div>
-        )}
         {form.capacityByBird.map(c => (
-          <div key={c.birdName} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 8, alignItems: 'center', marginBottom: 6 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', minWidth: 0 }}>
-              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.birdName}</span>
-              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 4, flexShrink: 0 }}>✕</button>
-            </div>
+          <div key={c.birdName} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, alignItems: 'center', marginBottom: 6, padding: '4px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
             <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.birdName}</span>
+              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 2, flexShrink: 0 }}>✕</button>
+            </div>
           </div>
         ))}
         <Grid2>
