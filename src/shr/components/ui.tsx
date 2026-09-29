@@ -197,21 +197,45 @@ export function Card({ accent = 'accent', onClick, children, style }: CardProps)
   );
 }
 
-export function Tag({ tone = 'gray', children }: { tone?: 'green'|'amber'|'red'|'blue'|'gray'|'purple'; children: React.ReactNode }) {
-  const tones = {
+export function Tag({
+  tone = 'gray',
+  children,
+}: {
+  tone?: 'green' | 'amber' | 'red' | 'blue' | 'gray' | 'purple' | 'accent' | 'warn' | 'danger' | 'info' | 'dim';
+  children: React.ReactNode;
+}) {
+  const tones: Record<string, { bg: string; color: string }> = {
     green: { bg: 'var(--accent-soft)', color: 'var(--accent)' },
+    accent: { bg: 'var(--accent-soft)', color: 'var(--accent)' },
     amber: { bg: 'var(--warn-soft)', color: 'var(--warn)' },
+    warn: { bg: 'var(--warn-soft)', color: 'var(--warn)' },
     red: { bg: 'var(--danger-soft)', color: 'var(--danger)' },
+    danger: { bg: 'var(--danger-soft)', color: 'var(--danger)' },
     blue: { bg: 'var(--info-soft)', color: 'var(--info)' },
+    info: { bg: 'var(--info-soft)', color: 'var(--info)' },
     gray: { bg: 'var(--input-bg)', color: 'var(--muted)' },
-    purple: { bg: 'var(--purple-soft)', color: 'var(--purple)' }
+    dim: { bg: 'var(--input-bg)', color: 'var(--dim)' },
+    purple: { bg: 'var(--purple-soft)', color: 'var(--purple)' },
   };
+  const t = tones[tone] || tones.gray;
   return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      fontSize: 'var(--fs-xs)', fontWeight: 700, padding: '3px 8px', borderRadius: 6,
-      background: tones[tone].bg, color: tones[tone].color
-    }}>{children}</span>
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        fontSize: 'var(--fs-xs)',
+        fontWeight: 700,
+        padding: '3px 8px',
+        borderRadius: 'var(--r-sm)',
+        background: t.bg,
+        color: t.color,
+        whiteSpace: 'nowrap',
+        lineHeight: 1.5,
+      }}
+    >
+      {children}
+    </span>
   );
 }
 
