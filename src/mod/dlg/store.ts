@@ -53,6 +53,7 @@ export interface DailyLog {
   humidityMax: number | null;
   ventilation: string; // ok | low | high
   litter: string; // dry | wet | clumped
+  lightHours: number | null;   // ← جدید: ساعت نوردهی
 
   // پرنده
   behavior: string; // active | lethargic | excited
@@ -79,6 +80,11 @@ export interface DailyLog {
   weightSamples: WeightSample[];
   weightGender: '' | 'male' | 'female' | 'mixed';
 
+  // تخم‌گذاری (اختصاصی layer/breeder)
+  eggsCount: number | null;
+  brokenEggs: number | null;
+  dirtyEggs: number | null;
+
   // تلفات
   deathsCount: number;
   deaths: Death[];
@@ -101,7 +107,7 @@ export interface DailyLog {
 
 interface State {
   logs: DailyLog[];
-  add: (l: Omit<DailyLog, 'id' | 'createdAt' | 'updatedAt' | 'status'>) => void;
+  add: (l: Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'lightHours' | 'eggsCount' | 'brokenEggs' | 'dirtyEggs'>) => void;
   update: (id: string, patch: Partial<DailyLog>) => void;
   remove: (id: string) => void;
   archive: (id: string) => void;
@@ -117,9 +123,13 @@ export const useDlg = create<State>()(
           ...l,
           id: uuid(),
           status: 'active',
+          lightHours: (l as any).lightHours ?? null,
+          eggsCount: (l as any).eggsCount ?? null,
+          brokenEggs: (l as any).brokenEggs ?? null,
+          dirtyEggs: (l as any).dirtyEggs ?? null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-        }]
+        } as DailyLog]
       }),
       update: (id, patch) => set({
         logs: get().logs.map(x => x.id === id
@@ -140,7 +150,7 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
-      version: 5,
+      version: 6,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
@@ -172,6 +182,15 @@ export const useDlg = create<State>()(
           persisted.logs = persisted.logs.map((l: any) => ({
             ...l,
             status: l.status || 'active',
+          }));
+        }
+        if (version < 6 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => ({
+            ...l,
+            lightHours: l.lightHours ?? null,
+            eggsCount: l.eggsCount ?? null,
+            brokenEggs: l.brokenEggs ?? null,
+            dirtyEggs: l.dirtyEggs ?? null,
           }));
         }
         return persisted;
@@ -275,4 +294,22 @@ export function cvWeight(samples: WeightSample[]): number {
 export function totalWater(count: number | null, volume: number | null): number | null {
   if (count === null || volume === null) return null;
   return Math.round(count * volume * 100) / 100;
+}
+
+
+/** تشخیص هشدار روشنایی (طبق استاندارد Hy-Line) */
+export function lightWarning(hours: number | null, flockType: string): 'ok' | 'warn' | 'danger' {
+  if (hours === null || hours === undefined || hours === 0) return 'ok';
+  // تخم‌گذار: ۱۴-۱۷ ساعت
+  if (flockType === 'layer' || flockType === 'breeder') {
+    if (hours < 12 || hours > 18) return 'danger';
+    if (hours < 14 || hours > 17) return 'warn';
+    return 'ok';
+  }
+  // گوشتی: ۱۸-۲۳ ساعت
+  if (flockType === 'broiler') {
+    if (hours < 18 || hours > 24) return 'danger';
+    return 'ok';
+  }
+  return 'ok';
 }

@@ -204,7 +204,7 @@ export default function DailyLogsPage() {
       ? Math.round(((hMin + hMax) / 2) * 10) / 10
       : num(form.humidity);
 
-    const data: Omit<DailyLog, 'id' | 'createdAt' | 'updatedAt' | 'status'> = {
+    const data: Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'lightHours' | 'eggsCount' | 'brokenEggs' | 'dirtyEggs'> = {
       flockId: form.flockId, date: form.date, entryTime: form.entryTime,
       temperature: calcTemp,
       temperatureMin: tMin,
