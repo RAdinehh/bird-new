@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSet } from '../../mod/set/store';
 
 type AccentKey = 'accent' | 'warn' | 'dim' | 'purple' | 'info' | 'green' | 'amber' | 'blue' | 'gray';
 
@@ -11,6 +12,7 @@ interface Props {
   subtitle: string;
   badge?: React.ReactNode;
   summary?: React.ReactNode;
+  compact?: boolean;
   isOpen: boolean;
   onToggle: () => void;
   children: React.ReactNode;
@@ -30,9 +32,23 @@ const COLORS: Record<AccentKey, { c: string; s: string }> = {
 };
 
 export default function ExpandableCard({
-  accent = 'accent', index, iconEmoji = '📋',
+  accent = 'accent', index, iconEmoji = '📋', compact = false,
   title, subtitle, badge, summary, isOpen, onToggle, children
 }: Props) {
+  // lowPowerMode از تنظیمات + prefers-reduced-motion از سیستم
+  const lowPower = useSet((st: any) => st.lowPowerMode);
+  const [prefersReduced, setPrefersReduced] = useState(false);
+  useEffect(() => {
+    try {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setPrefersReduced(mq.matches);
+      const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    } catch {}
+  }, []);
+  const noAnim = !!(lowPower || prefersReduced);
+
   const safeAccent = COLORS[accent] ? accent : 'accent';
   const { c: color, s: soft } = COLORS[safeAccent];
 
@@ -40,7 +56,7 @@ export default function ExpandableCard({
     <div style={{
       position: 'relative',
       background: 'var(--card)',
-      backdropFilter: 'blur(8px)',
+      backdropFilter: noAnim ? 'none' : 'blur(8px)',
       border: `1px solid ${isOpen ? color : 'var(--border)'}`,
       borderRadius: 'var(--r-lg)',
       overflow: 'hidden',
@@ -62,7 +78,7 @@ export default function ExpandableCard({
           }
         }}
         style={{
-          padding: '12px 18px 12px 16px',
+          padding: compact ? '8px 14px 8px 12px' : '12px 18px 12px 16px',
           cursor: 'pointer',
           outline: 'none',
         }}
@@ -78,7 +94,7 @@ export default function ExpandableCard({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 42, height: 42, borderRadius: 'var(--r-md)',
+            width: compact ? 34 : 42, height: compact ? 34 : 42, borderRadius: 'var(--r-md)',
             background: soft, color: color,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 18, flexShrink: 0, position: 'relative'
@@ -96,19 +112,19 @@ export default function ExpandableCard({
           </div>
 
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
-            <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{subtitle}</div>
+            <div style={{ fontSize: compact ? 'var(--fs-sm)' : 'var(--fs-md)', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
+            <div style={{ fontSize: compact ? 'var(--fs-xs)' : 'var(--fs-sm)', color: 'var(--muted)', marginTop: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{subtitle}</div>
           </div>
 
           {badge}
 
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isOpen ? color : 'var(--dim)'} strokeWidth="2.5" strokeLinecap="round"
-            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform var(--dur-slow)', flexShrink: 0 }}>
+            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: noAnim ? 'none' : 'transform var(--dur-slow)', flexShrink: 0 }}>
             <path d="m6 9 6 6 6-6" />
           </svg>
         </div>
 
-        {summary && (
+        {summary && !compact && (
           <div style={{
             display: 'flex', gap: 14, marginTop: 10, paddingTop: 10,
             borderTop: '1px dashed var(--border)',
@@ -120,7 +136,7 @@ export default function ExpandableCard({
       <div style={{
         display: 'grid',
         gridTemplateRows: isOpen ? '1fr' : '0fr',
-        transition: 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
+        transition: noAnim ? 'none' : 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
         willChange: 'grid-template-rows'
       }}>
         <div style={{ overflow: 'hidden' }}>
