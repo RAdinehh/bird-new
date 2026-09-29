@@ -16,8 +16,7 @@ import { Btn } from './shr/components/ui';
 const TITLES: Record<string, string> = {
   '/': 'داشبورد', '/brd': 'پرنده‌ها و نژادها', '/hal': 'سالن‌ها', '/flk': 'گله‌ها',
   '/inc': 'جوجه‌کشی', '/egg': 'تخم‌ها', '/dlg': 'ثبت روزانه', '/whs': 'انبار',
-  '/fed': 'جیره‌نویسی', '/med': 'دارو و واکسن', '/tmd': 'طب سنتی', '/sal': 'فروش',
-  '/dea': 'معاملات خاص', '/cus': 'مخاطبین', '/wrk': 'کارگران', '/rep': 'گزارش‌ها',
+  '/fed': 'جیره‌نویسی', '/rep': 'گزارش‌ها',
   '/alt': 'هشدارها',
   '/cal': 'تقویم',
   '/doc': 'اسناد و فایل‌ها', '/arc': 'آرشیو', '/set': 'تنظیمات', '/tra': 'معاملات'
@@ -82,7 +81,9 @@ function OnboardingBanner() {
         </span>
       </div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
-        برای آشنایی با نرم‌افزار، راهنمای کوتاه را ببینید یا دکمه‌ی «؟» را در هدر بزنید.
+        ✨ ویژگی‌های جدید: معاملات پیشرفته (قسطی، چک، پیش‌فروش)، نمودار، تقویم شمسی، اسناد آفلاین.
+        <br />
+        برای دیدن راهنمای کامل، دکمه «؟» در هدر را بزنید.
       </div>
       <div style={{ display: 'flex', gap: 6 }}>
         <Btn variant="primary" size="sm" onClick={() => { dismiss(); window.dispatchEvent(new KeyboardEvent('keydown', { key: 'h', ctrlKey: true })); }} style={{ flex: 1 }}>
