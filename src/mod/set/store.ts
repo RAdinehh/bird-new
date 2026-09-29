@@ -1,6 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+
+export interface IncubationProfile {
+  id: string;
+  birdName: string;
+  setterTemp: number;
+  setterHumidity: number;
+  hatcherTemp: number;
+  hatcherHumidity: number;
+  totalDays: number;
+  lockdownDay: number;
+}
+
 export interface Settings {
   schemaVersion: number;
   // پروفایل کاربر
@@ -55,6 +67,7 @@ export interface Settings {
   autoBackup: { enabled: boolean; intervalHours: number; maxVersions: number; };
   encryption: { enabled: boolean; password: string; };
   auditLog: { enabled: boolean; maxEntries: number; };
+  incubationProfiles?: IncubationProfile[];
 }
 
 const defaultSettings: Settings = {
@@ -87,6 +100,15 @@ const defaultSettings: Settings = {
   autoBackup: { enabled: true, intervalHours: 24, maxVersions: 5 },
   encryption: { enabled: false, password: '' },
   auditLog: { enabled: true, maxEntries: 100 },
+  incubationProfiles: [
+    { id: 'chicken',  birdName: '🐔 مرغ',      setterTemp: 37.7, setterHumidity: 50, hatcherTemp: 37.2, hatcherHumidity: 62, totalDays: 21, lockdownDay: 18 },
+    { id: 'turkey',   birdName: '🦃 بوقلمون',  setterTemp: 37.6, setterHumidity: 53, hatcherTemp: 37.1, hatcherHumidity: 68, totalDays: 28, lockdownDay: 25 },
+    { id: 'duck',     birdName: '🦆 اردک',     setterTemp: 37.6, setterHumidity: 57, hatcherTemp: 37.2, hatcherHumidity: 72, totalDays: 28, lockdownDay: 25 },
+    { id: 'goose',    birdName: '🦢 غاز',      setterTemp: 37.6, setterHumidity: 57, hatcherTemp: 37.1, hatcherHumidity: 72, totalDays: 30, lockdownDay: 27 },
+    { id: 'quail',    birdName: '🐦 بلدرچین',  setterTemp: 37.6, setterHumidity: 53, hatcherTemp: 37.2, hatcherHumidity: 68, totalDays: 18, lockdownDay: 15 },
+    { id: 'pheasant', birdName: '🐦 قرقاول',   setterTemp: 37.6, setterHumidity: 53, hatcherTemp: 37.2, hatcherHumidity: 68, totalDays: 24, lockdownDay: 21 },
+    { id: 'pigeon',   birdName: '🕊 کبوتر',    setterTemp: 37.6, setterHumidity: 53, hatcherTemp: 37.2, hatcherHumidity: 68, totalDays: 17, lockdownDay: 14 },
+  ],
 };
 
 interface State extends Settings {

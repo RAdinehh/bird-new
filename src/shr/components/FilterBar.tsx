@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
 interface FilterChip {
-  key: string;
+  id: string;
   label: string;
   value: string;
   onClear: () => void;
 }
 
-export function FilterChip({ label, value, onClear }: FilterChip) {
+export function FilterChip({ id: _id, label, value, onClear }: FilterChip) {
   return (
     <div style={{
       display: 'inline-flex',
@@ -64,7 +64,7 @@ export function FilterBar({ chips, onClearAll }: BarProps) {
       <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, flexShrink: 0 }}>
         فیلترها:
       </span>
-      {chips.map((c, i) => <FilterChip key={i} {...c} />)}
+      {chips.map(c => <FilterChip key={c.id} {...c} />)}
       {chips.length > 1 && onClearAll && (
         <button
           type="button"

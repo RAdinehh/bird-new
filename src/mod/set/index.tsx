@@ -6,6 +6,7 @@ import NotificationsTab from './NotificationsTab';
 import BackupTab from './BackupTab';
 import AboutTab from './AboutTab';
 import LogsTab from './LogsTab';
+import IncubationProfilesTab from './IncubationProfilesTab';
 
 const tabs = [
   { id: 'profile', label: 'پروفایل' },
@@ -13,6 +14,7 @@ const tabs = [
   { id: 'modules', label: 'ماژول‌ها' },
   { id: 'notifications', label: 'اعلان‌ها' },
   { id: 'backup', label: 'پشتیبان' },
+  { id: 'incubation', label: '🐣 انکوباسیون' },
   { id: 'logs', label: 'لاگ خطاها' },
   { id: 'about', label: 'درباره' }
 ] as const;
@@ -48,6 +50,7 @@ export default function Set() {
         {tab === 'modules' && <ModulesTab />}
         {tab === 'notifications' && <NotificationsTab />}
         {tab === 'backup' && <BackupTab />}
+        {tab === 'incubation' && <IncubationProfilesTab />}
         {tab === 'logs' && <LogsTab />}
         {tab === 'about' && <AboutTab />}
       </div>
