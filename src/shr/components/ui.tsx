@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, {useRef, useCallback, useEffect, forwardRef} from 'react';
 import { formatNumWhileTyping, numberToWords, parseFaNum } from '../utils/fa';
 
 type BtnVariant = 'primary' | 'ghost' | 'danger' | 'outline';
@@ -9,7 +9,7 @@ interface BtnProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   icon?: React.ReactNode;
 }
-export function Btn({ variant = 'ghost', size = 'md', full, style, children, icon, loading, disabled, ...rest }: BtnProps) {
+export const Btn = forwardRef<HTMLButtonElement, BtnProps>(({  variant = 'ghost', size = 'md', full, style, children, icon, loading, disabled, ...rest  }, ref) => {
   const variants: Record<BtnVariant, React.CSSProperties> = {
     primary: { background: 'var(--accent)', color: 'var(--avatar-text)' },
     ghost: { background: 'var(--btn-bg)', color: 'var(--muted)', border: '1px solid var(--border)' },
@@ -18,7 +18,7 @@ export function Btn({ variant = 'ghost', size = 'md', full, style, children, ico
   };
   const isDisabled = disabled || loading;
   return (
-    <button {...rest} disabled={isDisabled} style={{
+    <button ref={ref} {...rest} disabled={isDisabled} style={{
       height: size === 'sm' ? 32 : 38,
       padding: size === 'sm' ? '0 12px' : '0 16px',
       borderRadius: 'var(--r-md)', fontFamily: 'inherit',
@@ -34,7 +34,8 @@ export function Btn({ variant = 'ghost', size = 'md', full, style, children, ico
       {children}
     </button>
   );
-}
+});
+Btn.displayName = 'Btn';
 
 export function BtnRow({ children }: { children: React.ReactNode }) {
   return <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>{children}</div>;
