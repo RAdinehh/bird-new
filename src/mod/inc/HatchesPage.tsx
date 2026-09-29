@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useInc, hatchRate, costPerChick, type HatchResult } from './store';
 import { useBrd } from '../brd/store';
+import { useFlk } from '../flk/store';
+import { useNavigate } from 'react-router-dom';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
@@ -10,6 +12,8 @@ import { showAlert } from '../../cor/store/dialog';
 export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any) => void } = {}) {
   const { eggEntries, hatches, candlings, addHatch, updateHatch, deleteHatch } = useInc();
   const { birds } = useBrd();
+  const nav = useNavigate();
+  const { add: addFlock } = useFlk();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', eggEntryId:'', date:'', hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', notes:'' });
   const [err, setErr] = useState('');
