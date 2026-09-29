@@ -605,3 +605,94 @@ export function Chip({
     </button>
   );
 }
+
+// ═══════════════════════════════════════════
+// فاز ۰.۹ — کامپوننت‌های تقویتی
+// ═══════════════════════════════════════════
+
+export function NumField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode'>) {
+  return <Input mode="number" dir="ltr" inputMode="numeric" autoClamp {...props} />;
+}
+
+export function MoneyField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'showWords'>) {
+  return <Input mode="number" dir="ltr" inputMode="numeric" unit="تومان" min={0} showWords autoClamp {...props} />;
+}
+
+export function PercentField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'max'>) {
+  return <Input mode="number" dir="ltr" inputMode="numeric" unit="٪" min={0} max={100} autoClamp {...props} />;
+}
+
+export function PhoneField(props: Omit<InputProps, 'unit' | 'inputMode'>) {
+  return <Input dir="ltr" inputMode="numeric" maxLength={11} placeholder="۰۹۱۲۳۴۵۶۷۸۹" {...props} />;
+}
+
+interface TextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
+  error?: string;
+  warn?: string;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+}
+
+export function Textarea({ error, warn, style, rows = 3, ...rest }: TextareaProps) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+      <textarea rows={rows} {...rest} style={{
+        width: '100%', minWidth: 0, minHeight: 80,
+        background: 'var(--input-bg)',
+        border: '1px solid ' + (error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)'),
+        borderRadius: 'var(--r-md)', padding: '10px 12px',
+        color: 'var(--text)', fontFamily: 'inherit',
+        fontSize: 'var(--fs-base)', outline: 'none',
+        resize: 'vertical', ...style
+      }} />
+      {error && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {error}</div>}
+      {warn && !error && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠ {warn}</div>}
+    </div>
+  );
+}
+
+export function Checkbox({ checked, onChange, label, disabled, ariaLabel }: {
+  checked: boolean; onChange: (v: boolean) => void;
+  label?: string; disabled?: boolean; ariaLabel?: string;
+}) {
+  return (
+    <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8,
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      opacity: disabled ? 0.55 : 1, userSelect: 'none' }}>
+      <input type="checkbox" checked={checked}
+        onChange={e => onChange(e.target.checked)} disabled={disabled}
+        aria-label={ariaLabel || label}
+        style={{ width: 18, height: 18, accentColor: 'var(--accent)',
+          cursor: disabled ? 'not-allowed' : 'pointer', margin: 0 }} />
+      {label && <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)' }}>{label}</span>}
+    </label>
+  );
+}
+
+export function RadioGroup<T extends string | number>({
+  value, onChange, options, direction = 'column', disabled, name
+}: {
+  value: T; onChange: (v: T) => void;
+  options: { value: T; label: string }[];
+  direction?: 'row' | 'column'; disabled?: boolean; name?: string;
+}) {
+  const groupName = name || 'radio-' + Math.random().toString(36).slice(2, 8);
+  return (
+    <div role="radiogroup" style={{ display: 'flex',
+      flexDirection: direction === 'row' ? 'row' : 'column',
+      gap: direction === 'row' ? 16 : 8, flexWrap: 'wrap' }}>
+      {options.map(opt => (
+        <label key={String(opt.value)} style={{ display: 'inline-flex',
+          alignItems: 'center', gap: 8,
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.55 : 1, userSelect: 'none' }}>
+          <input type="radio" name={groupName} value={String(opt.value)}
+            checked={value === opt.value} onChange={() => onChange(opt.value)}
+            disabled={disabled}
+            style={{ width: 18, height: 18, accentColor: 'var(--accent)',
+              cursor: disabled ? 'not-allowed' : 'pointer', margin: 0 }} />
+          <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)' }}>{opt.label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
