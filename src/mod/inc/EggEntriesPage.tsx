@@ -341,11 +341,42 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         <Field label="نوع معامله" required>
           <Select value={form.dealType} onChange={e => setForm({...form, dealType: e.target.value as DealType, dealData: {}})}>
             <option value="own">🏠 گله خودم</option>
-            <option value="partnership">شراکتی</option>
-            <option value="rent">اجاره‌ای</option>
+            <option value="partnership">🤝 شراکتی</option>
+            <option value="purchase">📥 خریداری</option>
+            <option value="rent">🏢 اجاره‌ای</option>
             <option value="consignment">امانی</option>
           </Select>
         </Field>
+
+        {form.dealType === 'purchase' && (
+          <DepBox title="📥 اطلاعات خرید">
+            <Field label="نام فروشنده" required>
+              <Input placeholder="شرکت / شخص..." value={form.dealData.sellerName || ''} onChange={e => setD('sellerName', e.target.value)} />
+            </Field>
+            <Grid2>
+              <Field label="تماس فروشنده">
+                <Input placeholder="۰۹..." dir="ltr" value={form.dealData.sellerPhone || ''} onChange={e => setD('sellerPhone', e.target.value)} />
+              </Field>
+              <Field label="تاریخ خرید">
+                <DatePicker value={form.dealData.purchaseDate || ''} onChange={v => setD('purchaseDate', v)} />
+              </Field>
+            </Grid2>
+            <Field label="شماره فاکتور">
+              <Input placeholder="اختیاری" value={form.dealData.invoiceNo || ''} onChange={e => setD('invoiceNo', e.target.value)} />
+            </Field>
+            <Grid2>
+              <Field label="قیمت هر تخم">
+                <MoneyField placeholder="۰" value={form.dealData.purchasePrice || ''} onChange={e => setD('purchasePrice', e.target.value)} />
+              </Field>
+              <Field label="هزینه حمل">
+                <MoneyField placeholder="۰" value={form.dealData.shippingCost || ''} onChange={e => setD('shippingCost', e.target.value)} />
+              </Field>
+            </Grid2>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', padding: 8, background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', fontWeight: 600 }}>
+              💡 این خرید به عنوان هزینه در گزارش مالی ثبت می‌شود
+            </div>
+          </DepBox>
+        )}
 
         {form.dealType === 'partnership' && (
           <DepBox title="اطلاعات شراکت">

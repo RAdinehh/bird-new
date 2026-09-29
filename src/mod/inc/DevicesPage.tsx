@@ -234,10 +234,10 @@ export default function DevicesPage() {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش دستگاه' : 'افزودن دستگاه'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
+        <SectionTitle>📋 مشخصات اصلی</SectionTitle>
         <Field label="نام دستگاه" required>
           <Input placeholder="مثلاً: دستگاه ۱" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
         </Field>
-
         <Grid2>
           <Field label="حالت" required>
             <Select value={form.mode} onChange={e => setForm({...form, mode: e.target.value as DeviceMode})}>
@@ -256,26 +256,29 @@ export default function DevicesPage() {
           </Field>
         </Grid2>
 
-        <Field label="ظرفیت بر اساس پرنده">
-          {form.capacityByBird.map(c => (
-            <div key={c.birdName} style={{ display: 'flex', gap: 4, marginBottom: 6, alignItems: 'center' }}>
-              <div style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{c.birdName}</div>
-              <div style={{ width: 130 }}>
-                <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} />
-              </div>
-              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--danger)', cursor: 'pointer', width: 38, height: 38, fontFamily: 'inherit', fontSize: 14 }}>✕</button>
+        <SectionTitle>📊 ظرفیت بر اساس پرنده</SectionTitle>
+        {form.capacityByBird.length === 0 && (
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center', padding: 8 }}>
+            هنوز پرنده‌ای اضافه نشده
+          </div>
+        )}
+        {form.capacityByBird.map(c => (
+          <div key={c.birdName} style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: 10, background: 'var(--input-bg)', borderRadius: 'var(--r-md)', marginBottom: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{c.birdName}</span>
+              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 4 }}>✕</button>
             </div>
-          ))}
-          <Select onChange={e => { if (e.target.value) { addCapacity(e.target.value); e.target.value = ''; } }} value="">
-            <option value="">+ افزودن پرنده...</option>
-            {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
-            {profiles.filter(p => !birds.some(b => b.name === p.birdName)).map(p => <option key={p.id} value={p.birdName}>{p.birdName}</option>)}
-          </Select>
-        </Field>
+            <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
+          </div>
+        ))}
+        <Select onChange={e => { if (e.target.value) { addCapacity(e.target.value); e.target.value = ''; } }} value="">
+          <option value="">+ افزودن پرنده...</option>
+          {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+        </Select>
 
         {form.status === 'active' && (
           <>
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 8 }}>🌡 شرایط عملیاتی</div>
+            <SectionTitle>🌡 شرایط عملیاتی</SectionTitle>
             <Grid2>
               <Field label="دمای هدف" hint="°C">
                 <NumField placeholder="۳۷٫۸" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={20} max={45} />
@@ -293,7 +296,7 @@ export default function DevicesPage() {
           </>
         )}
 
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 8 }}>💰 مالی</div>
+        <SectionTitle>💰 مالی</SectionTitle>
         <Grid2>
           <Field label="قیمت خرید">
             <MoneyField placeholder="۰" value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
@@ -306,16 +309,15 @@ export default function DevicesPage() {
           <NumField placeholder="۲۴" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} />
         </Field>
         {warrantyEnd && (
-          <div style={{ padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 600 }}>
+          <div style={{ padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 600, textAlign: 'center' }}>
             ✅ گارانتی تا: {toFa(warrantyEnd)}
           </div>
         )}
 
-        <Field label="یادداشت">
-          <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
-        </Field>
+        <SectionTitle>📝 یادداشت</SectionTitle>
+        <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
 
-        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
+        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center' }}>✕ {err}</div>}
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف دستگاه"
@@ -334,5 +336,11 @@ function Row({ l, v }: { l: string; v: string }) {
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ paddingTop: 12, marginTop: 6, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
   );
 }
