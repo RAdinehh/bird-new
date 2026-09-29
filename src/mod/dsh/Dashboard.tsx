@@ -14,6 +14,7 @@ import { useDlg } from '../dlg/store';
 import { PageContainer, Tag } from '../../shr/components/ui';
 import { LineChart } from '../../shr/components/Charts';
 import { toFa } from '../../shr/utils/fa';
+import BenchmarkCard from './BenchmarkCard';
 
 function toEnNum(s: string): number {
   return parseInt(s.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))) || 0;
@@ -737,6 +738,7 @@ export default function Dashboard() {
           )}
 
           <SectionTitle>📅 امروز در یک نگاه</SectionTitle>
+          <BenchmarkCard />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
             <KpiCard
               icon="🥚"
