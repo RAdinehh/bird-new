@@ -111,8 +111,7 @@ function HerbalForm({ item, updateItem }: { item: any; updateItem: (p: any) => v
             mode="number"
             value={h.doseValue !== null ? String(h.doseValue) : ''}
             onChange={e => setH({ doseValue: parseFloat(e.target.value) || null })}
-            unit={h.doseUnit}
-          />
+            unit={h.doseUnit} min={0} />
         </Field>
         <Field label="واحد">
           <Select value={h.doseUnit} onChange={e => setH({ doseUnit: e.target.value })}>
@@ -136,8 +135,7 @@ function HerbalForm({ item, updateItem }: { item: any; updateItem: (p: any) => v
             mode="number"
             value={h.durationDays !== null ? String(h.durationDays) : ''}
             onChange={e => setH({ durationDays: parseInt(e.target.value) || null })}
-            unit="روز"
-          />
+            unit="روز" min={0} />
         </Field>
       </Grid2>
 
@@ -204,8 +202,7 @@ function ChemicalForm({ item, updateItem }: { item: any; updateItem: (p: any) =>
             mode="number"
             value={c.doseValue !== null ? String(c.doseValue) : ''}
             onChange={e => setC({ doseValue: parseFloat(e.target.value) || null })}
-            unit={c.doseUnit}
-          />
+            unit={c.doseUnit} min={0} />
         </Field>
         <Field label="واحد">
           <Select value={c.doseUnit} onChange={e => setC({ doseUnit: e.target.value })}>
@@ -230,8 +227,7 @@ function ChemicalForm({ item, updateItem }: { item: any; updateItem: (p: any) =>
           mode="number"
           value={c.withdrawalDays !== null ? String(c.withdrawalDays) : ''}
           onChange={e => setC({ withdrawalDays: parseInt(e.target.value) || null })}
-          unit="روز"
-        />
+          unit="روز" min={0} />
       </Field>
     </div>
   );
@@ -284,8 +280,7 @@ function VaccineForm({ item, updateItem }: { item: any; updateItem: (p: any) => 
             mode="number"
             value={v.targetAge !== null ? String(v.targetAge) : ''}
             onChange={e => setV({ targetAge: parseInt(e.target.value) || null })}
-            unit="روز"
-          />
+            unit="روز" min={0} />
         </Field>
       </Grid2>
 
@@ -295,8 +290,7 @@ function VaccineForm({ item, updateItem }: { item: any; updateItem: (p: any) => 
             mode="number"
             value={v.doseValue !== null ? String(v.doseValue) : ''}
             onChange={e => setV({ doseValue: parseFloat(e.target.value) || null })}
-            unit={v.doseUnit}
-          />
+            unit={v.doseUnit} min={0} />
         </Field>
         <Field label="واحد">
           <Select value={v.doseUnit} onChange={e => setV({ doseUnit: e.target.value })}>
@@ -310,8 +304,7 @@ function VaccineForm({ item, updateItem }: { item: any; updateItem: (p: any) => 
             mode="number"
             value={v.immunityMonths !== null ? String(v.immunityMonths) : ''}
             onChange={e => setV({ immunityMonths: parseInt(e.target.value) || null })}
-            unit="ماه"
-          />
+            unit="ماه" min={0} />
         </Field>
       </Grid3>
     </div>
@@ -408,8 +401,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               mode="number"
               value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''}
               onChange={e => updateItem({ ageDays: parseInt(e.target.value) || null })}
-              unit="روز"
-            />
+              unit="روز" min={0} />
           </Field>
         </Grid2>
 
@@ -417,13 +409,13 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {category === 'adult' && (
           <Grid3>
             <Field label="تعداد نر">
-              <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: parseInt(e.target.value) || null })} />
+              <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: parseInt(e.target.value) || null })} min={0} />
             </Field>
             <Field label="تعداد ماده">
-              <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: parseInt(e.target.value) || null })} />
+              <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: parseInt(e.target.value) || null })} min={0} />
             </Field>
             <Field label="نامعلوم">
-              <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: parseInt(e.target.value) || null })} />
+              <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: parseInt(e.target.value) || null })} min={0} />
             </Field>
           </Grid3>
         )}
@@ -439,7 +431,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
             {item.priceUnit === 'per_kg' && (
               <Field label="وزن زنده (کیلو)">
-                <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFloat(e.target.value) || null })} unit="kg" />
+                <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFloat(e.target.value) || null })} unit="kg" min={0} />
               </Field>
             )}
           </Grid2>
@@ -474,7 +466,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
           {item.priceUnit === 'per_kg' && (
             <Field label="وزن کل (کیلو)">
-              <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFloat(e.target.value) || null })} unit="kg" />
+              <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFloat(e.target.value) || null })} unit="kg" min={0} />
             </Field>
           )}
         </Grid2>
@@ -495,8 +487,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               mode="number"
               value={item.warrantyMonths !== null && item.warrantyMonths !== undefined ? String(item.warrantyMonths) : ''}
               onChange={e => updateItem({ warrantyMonths: parseInt(e.target.value) || null })}
-              unit="ماه"
-            />
+              unit="ماه" min={0} />
           </Field>
         </Grid2>
       </div>

@@ -212,9 +212,9 @@ export default function EquipmentPage() {
           <Input placeholder="مثلاً: لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
         </Field>
         <Grid3>
-          <Field label="تعداد"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" /></Field>
-          <Field label="قیمت واحد"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} unit="ت" /></Field>
-          <Field label="گارانتی"><Input placeholder="۶" inputMode="numeric" dir="ltr" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" /></Field>
+          <Field label="تعداد"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" min={0} /></Field>
+          <Field label="قیمت واحد"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} unit="ت" min={0} /></Field>
+          <Field label="گارانتی"><Input placeholder="۶" inputMode="numeric" dir="ltr" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
         </Grid3>
         <Field label="تاریخ خرید"><Input placeholder="۱۴۰۵/۰۷/۰۴" value={form.purchasedAt} onChange={e => setForm({...form, purchasedAt: e.target.value})} /></Field>
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>

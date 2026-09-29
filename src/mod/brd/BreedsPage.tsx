@@ -170,7 +170,7 @@ export default function BreedsPage() {
             <Input placeholder="مثلاً: مرندی" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </Field>
           <Field label="FCR">
-            <Input placeholder="۲٫۰" inputMode="decimal" dir="ltr" value={form.fcr} onChange={e => setForm({ ...form, fcr: e.target.value })} />
+            <Input placeholder="۲٫۰" inputMode="decimal" dir="ltr" value={form.fcr} onChange={e => setForm({ ...form, fcr: e.target.value })} min={0} />
           </Field>
         </Grid2>
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}

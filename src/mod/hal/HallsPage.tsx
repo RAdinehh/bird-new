@@ -159,22 +159,22 @@ export default function HallsPage() {
         <Field label="نام سالن" required><Input placeholder="مثلاً: سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
         <Grid2>
           <Field label="کد سالن"><Input placeholder="H-01" dir="ltr" value={form.code} onChange={e => setForm({...form, code: e.target.value})} /></Field>
-          <Field label="ظرفیت"><Input placeholder="۱۰۰۰" inputMode="numeric" dir="ltr" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" /></Field>
+          <Field label="ظرفیت"><Input placeholder="۱۰۰۰" inputMode="numeric" dir="ltr" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} /></Field>
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
         <Grid3>
-          <Field label="طول"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" /></Field>
-          <Field label="عرض"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" /></Field>
-          <Field label="ارتفاع"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" /></Field>
+          <Field label="طول"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={0} /></Field>
+          <Field label="عرض"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={0} /></Field>
+          <Field label="ارتفاع"><Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={0} /></Field>
         </Grid3>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>شرایط</div>
         <Grid2>
-          <Field label="دمای هدف"><Input placeholder="۲۲" inputMode="decimal" dir="ltr" value={form.targetTemp} onChange={e => setForm({...form, targetTemp: e.target.value})} unit="°C" /></Field>
-          <Field label="رطوبت هدف"><Input placeholder="۶۰" inputMode="numeric" dir="ltr" value={form.targetHumidity} onChange={e => setForm({...form, targetHumidity: e.target.value})} unit="٪" /></Field>
+          <Field label="دمای هدف"><Input placeholder="۲۲" inputMode="decimal" dir="ltr" value={form.targetTemp} onChange={e => setForm({...form, targetTemp: e.target.value})} unit="°C" min={0} /></Field>
+          <Field label="رطوبت هدف"><Input placeholder="۶۰" inputMode="numeric" dir="ltr" value={form.targetHumidity} onChange={e => setForm({...form, targetHumidity: e.target.value})} unit="٪" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="تهویه"><Input placeholder="۱۲" inputMode="decimal" dir="ltr" value={form.ventilation} onChange={e => setForm({...form, ventilation: e.target.value})} unit="m³/min" /></Field>
-          <Field label="روشنایی"><Input placeholder="۲۰" inputMode="decimal" dir="ltr" value={form.light} onChange={e => setForm({...form, light: e.target.value})} unit="lux" /></Field>
+          <Field label="تهویه"><Input placeholder="۱۲" inputMode="decimal" dir="ltr" value={form.ventilation} onChange={e => setForm({...form, ventilation: e.target.value})} unit="m³/min" min={0} /></Field>
+          <Field label="روشنایی"><Input placeholder="۲۰" inputMode="decimal" dir="ltr" value={form.light} onChange={e => setForm({...form, light: e.target.value})} unit="lux" min={0} /></Field>
         </Grid2>
         <Grid2>
           <Field label="سیستم تهویه"><Select value={form.ventilationSystem} onChange={e => setForm({...form, ventilationSystem: e.target.value})}>{Object.entries(VENT_SYS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></Field>

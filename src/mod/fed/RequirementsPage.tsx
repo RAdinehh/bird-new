@@ -224,16 +224,16 @@ export default function RequirementsPage() {
 
         <SectionTitle>🥗 نیازهای مغذی</SectionTitle>
         <Grid2>
-          <Field label="پروتئین خام"><Input mode="number" value={form.protein} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" /></Field>
-          <Field label="انرژی"><Input mode="number" value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} unit="kcal" /></Field>
+          <Field label="پروتئین خام"><Input mode="number" value={form.protein} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="انرژی"><Input mode="number" value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} unit="kcal" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="کلسیم"><Input mode="number" value={form.calcium} onChange={e => setForm({ ...form, calcium: e.target.value })} unit="٪" /></Field>
-          <Field label="فسفر"><Input mode="number" value={form.phosphorus} onChange={e => setForm({ ...form, phosphorus: e.target.value })} unit="٪" /></Field>
+          <Field label="کلسیم"><Input mode="number" value={form.calcium} onChange={e => setForm({ ...form, calcium: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="فسفر"><Input mode="number" value={form.phosphorus} onChange={e => setForm({ ...form, phosphorus: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="متیونین"><Input mode="number" value={form.methionine} onChange={e => setForm({ ...form, methionine: e.target.value })} unit="٪" /></Field>
-          <Field label="لیزین"><Input mode="number" value={form.lysine} onChange={e => setForm({ ...form, lysine: e.target.value })} unit="٪" /></Field>
+          <Field label="متیونین"><Input mode="number" value={form.methionine} onChange={e => setForm({ ...form, methionine: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="لیزین"><Input mode="number" value={form.lysine} onChange={e => setForm({ ...form, lysine: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
 
         <Field label="یادداشت">

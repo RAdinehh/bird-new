@@ -322,32 +322,32 @@ export default function IngredientsPage() {
             </Select>
           </Field>
           <Field label="قیمت دستی (اختیاری)" hint="اگر پر شود، بر قیمت انبار اولویت دارد">
-            <Input mode="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} unit="ت" />
+            <Input mode="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} unit="ت" min={0} />
           </Field>
         </Grid2>
 
         <SectionTitle>🥗 ترکیبات</SectionTitle>
         <Grid2>
-          <Field label="پروتئین خام"><Input mode="number" value={form.protein} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" /></Field>
-          <Field label="انرژی (kcal/kg)"><Input mode="number" value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} /></Field>
+          <Field label="پروتئین خام"><Input mode="number" value={form.protein} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="انرژی (kcal/kg)"><Input mode="number" value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="چربی"><Input mode="number" value={form.fat} onChange={e => setForm({ ...form, fat: e.target.value })} unit="٪" /></Field>
-          <Field label="فیبر"><Input mode="number" value={form.fiber} onChange={e => setForm({ ...form, fiber: e.target.value })} unit="٪" /></Field>
+          <Field label="چربی"><Input mode="number" value={form.fat} onChange={e => setForm({ ...form, fat: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="فیبر"><Input mode="number" value={form.fiber} onChange={e => setForm({ ...form, fiber: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="کلسیم"><Input mode="number" value={form.calcium} onChange={e => setForm({ ...form, calcium: e.target.value })} unit="٪" /></Field>
-          <Field label="فسفر"><Input mode="number" value={form.phosphorus} onChange={e => setForm({ ...form, phosphorus: e.target.value })} unit="٪" /></Field>
+          <Field label="کلسیم"><Input mode="number" value={form.calcium} onChange={e => setForm({ ...form, calcium: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="فسفر"><Input mode="number" value={form.phosphorus} onChange={e => setForm({ ...form, phosphorus: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="متیونین"><Input mode="number" value={form.methionine} onChange={e => setForm({ ...form, methionine: e.target.value })} unit="٪" /></Field>
-          <Field label="لیزین"><Input mode="number" value={form.lysine} onChange={e => setForm({ ...form, lysine: e.target.value })} unit="٪" /></Field>
+          <Field label="متیونین"><Input mode="number" value={form.methionine} onChange={e => setForm({ ...form, methionine: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="لیزین"><Input mode="number" value={form.lysine} onChange={e => setForm({ ...form, lysine: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
 
         <SectionTitle>⚖ محدوده استفاده در جیره</SectionTitle>
         <Grid2>
-          <Field label="حداقل" hint="۰ = بدون محدودیت"><Input mode="number" value={form.minPercent} onChange={e => setForm({ ...form, minPercent: e.target.value })} unit="٪" /></Field>
-          <Field label="حداکثر" hint="۰ = بدون محدودیت"><Input mode="number" value={form.maxPercent} onChange={e => setForm({ ...form, maxPercent: e.target.value })} unit="٪" max={100} /></Field>
+          <Field label="حداقل" hint="۰ = بدون محدودیت"><Input mode="number" value={form.minPercent} onChange={e => setForm({ ...form, minPercent: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="حداکثر" hint="۰ = بدون محدودیت"><Input mode="number" value={form.maxPercent} onChange={e => setForm({ ...form, maxPercent: e.target.value })} unit="٪" max={100} min={0} /></Field>
         </Grid2>
 
         <SectionTitle>📦 اتصال به انبار</SectionTitle>

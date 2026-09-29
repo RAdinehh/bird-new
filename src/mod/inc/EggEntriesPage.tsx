@@ -309,8 +309,7 @@ export default function EggEntriesPage() {
                     const v = clampPercent(raw);
                     setD('partnerPercent', v === null ? '' : String(v));
                   }}
-                  unit="٪"
-                />
+                  unit="٪" min={0} />
               </Field>
               <Field label="درصد من" hint="خودکار">
                 <Input
@@ -330,7 +329,7 @@ export default function EggEntriesPage() {
         {form.dealType === 'rent' && (
           <DepBox title="اطلاعات اجاره">
             <Grid2>
-              <Field label="مبلغ اجاره"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.dealData.rentAmount || ''} onChange={e => setD('rentAmount', e.target.value)} unit="ت" /></Field>
+              <Field label="مبلغ اجاره"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.dealData.rentAmount || ''} onChange={e => setD('rentAmount', e.target.value)} unit="ت" min={0} /></Field>
               <Field label="سرسید"><Input placeholder="۱۴۰۵/۰۸/۰۱" value={form.dealData.rentDueDate || ''} onChange={e => setD('rentDueDate', e.target.value)} /></Field>
             </Grid2>
           </DepBox>
@@ -351,8 +350,7 @@ export default function EggEntriesPage() {
                     const v = clampPercent(raw);
                     setD('consigneePercent', v === null ? '' : String(v));
                   }}
-                  unit="٪"
-                />
+                  unit="٪" min={0} />
               </Field>
               <Field label="درصد من" hint="خودکار">
                 <Input
@@ -370,7 +368,7 @@ export default function EggEntriesPage() {
         )}
 
         <Field label="قیمت هر تخم" hint="اگر خریداری شده">
-          <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} unit="ت" />
+          <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} unit="ت" min={0} />
         </Field>
 
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>

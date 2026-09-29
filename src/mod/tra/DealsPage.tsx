@@ -231,14 +231,14 @@ export default function DealsPage() {
 
         <Grid2>
           <Field label="ارزش (تومان)">
-            <Input mode="number" value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="ت" />
+            <Input mode="number" value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="ت" min={0} />
           </Field>
           <Field label="درصد" hint="۰ تا ۱۰۰">
             <Input mode="number" value={form.percent} onChange={e => {
               const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
               const v = Math.max(0, Math.min(100, raw));
               setForm({...form, percent: v === 0 ? '' : String(v)});
-            }} unit="٪" />
+            }} unit="٪" min={0} />
           </Field>
         </Grid2>
 

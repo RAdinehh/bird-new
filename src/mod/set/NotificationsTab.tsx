@@ -84,8 +84,7 @@ function NumField({ label, hint, value, onChange, unit, min, max }: {
         value={local}
         onChange={e => handleChange(e.target.value)}
         unit={unit}
-        inputMode="numeric"
-      />
+        inputMode="numeric" min={0} />
     </Field>
   );
 }

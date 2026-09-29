@@ -767,8 +767,7 @@ export default function DailyLogsPage() {
                   dir="ltr"
                   value={w.weight}
                   onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
-                  unit="kg"
-                />
+                  unit="kg" min={0} />
               </div>
               <button type="button" onClick={() => setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) }))}
                 style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', width: 38, height: 38, flexShrink: 0 }}>✕</button>

@@ -252,11 +252,10 @@ export default function MovesPage() {
               value={form.quantity}
               onChange={e => setForm({ ...form, quantity: e.target.value })}
               unit={selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}
-              max={form.type === 'out' ? currentStock : undefined}
-            />
+              max={form.type === 'out' ? currentStock : undefined} min={0} />
           </Field>
           <Field label="قیمت واحد">
-            <Input mode="number" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} unit="ت" />
+            <Input mode="number" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} unit="ت" min={0} />
           </Field>
         </Grid2>
 

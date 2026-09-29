@@ -140,12 +140,12 @@ export default function HatchesPage() {
         </Field>
         <Grid2>
           <Field label="جوجه هچ‌شده" required hint={maxHatched ? `حداکثر: ${toFa(maxHatched)}` : undefined}><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.hatched} onChange={e => setForm({...form, hatched: e.target.value})} max={maxHatched || undefined} min={0} /></Field>
-          <Field label="هچ‌نشده"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.unhatched} onChange={e => setForm({...form, unhatched: e.target.value})} /></Field>
+          <Field label="هچ‌نشده"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.unhatched} onChange={e => setForm({...form, unhatched: e.target.value})} min={0} /></Field>
         </Grid2>
         <Grid3>
-          <Field label="مرده در پوسته"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.deadInShell} onChange={e => setForm({...form, deadInShell: e.target.value})} /></Field>
-          <Field label="نوک‌زده"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.pipped} onChange={e => setForm({...form, pipped: e.target.value})} /></Field>
-          <Field label="سایر"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.other} onChange={e => setForm({...form, other: e.target.value})} /></Field>
+          <Field label="مرده در پوسته"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.deadInShell} onChange={e => setForm({...form, deadInShell: e.target.value})} min={0} /></Field>
+          <Field label="نوک‌زده"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.pipped} onChange={e => setForm({...form, pipped: e.target.value})} min={0} /></Field>
+          <Field label="سایر"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.other} onChange={e => setForm({...form, other: e.target.value})} min={0} /></Field>
         </Grid3>
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}

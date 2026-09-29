@@ -276,10 +276,10 @@ export default function ContactsPage() {
           )}
           <Grid2>
             <Field label="نام" required><Input placeholder="..." value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
-            <Field label="تلفن"><Input placeholder="۰۹..." inputMode="tel" dir="ltr" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></Field>
+            <Field label="تلفن"><Input placeholder="۰۹..." inputMode="tel" dir="ltr" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} min={0} /></Field>
           </Grid2>
           <Grid2>
-            <Field label="کد ملی"><Input placeholder="..." inputMode="numeric" dir="ltr" value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} /></Field>
+            <Field label="کد ملی"><Input placeholder="..." inputMode="numeric" dir="ltr" value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} min={0} /></Field>
             <Field label="آدرس"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
           </Grid2>
 

@@ -55,7 +55,7 @@ export default function ProfileTab() {
         </Field>
         <Grid2>
           <Field label="شماره تماس">
-            <Input value={user.phone} onChange={e => updateSection('user', { phone: e.target.value })} placeholder="۰۹..." inputMode="tel" dir="ltr" />
+            <Input value={user.phone} onChange={e => updateSection('user', { phone: e.target.value })} placeholder="۰۹..." inputMode="tel" dir="ltr" min={0} />
           </Field>
           <Field label="ایمیل">
             <Input value={user.email} onChange={e => updateSection('user', { email: e.target.value })} dir="ltr" />
@@ -96,7 +96,7 @@ export default function ProfileTab() {
             <Input value={farm.city} onChange={e => updateSection('farm', { city: e.target.value })} />
           </Field>
           <Field label="کد پستی">
-            <Input value={farm.postalCode} onChange={e => updateSection('farm', { postalCode: e.target.value })} dir="ltr" inputMode="numeric" />
+            <Input value={farm.postalCode} onChange={e => updateSection('farm', { postalCode: e.target.value })} dir="ltr" inputMode="numeric" min={0} />
           </Field>
         </Grid3>
         <Field label="آدرس">
@@ -104,7 +104,7 @@ export default function ProfileTab() {
         </Field>
         <Grid2>
           <Field label="تلفن ثابت">
-            <Input value={farm.phone} onChange={e => updateSection('farm', { phone: e.target.value })} dir="ltr" inputMode="tel" />
+            <Input value={farm.phone} onChange={e => updateSection('farm', { phone: e.target.value })} dir="ltr" inputMode="tel" min={0} />
           </Field>
           <Field label="تاریخ تأسیس">
             <Input value={farm.establishedAt} onChange={e => updateSection('farm', { establishedAt: e.target.value })} placeholder="۱۴۰۰/۰۱/۰۱" />
@@ -120,7 +120,7 @@ export default function ProfileTab() {
           <Input value={bank.bankName} onChange={e => updateSection('bank', { bankName: e.target.value })} placeholder="مثلاً: ملت" />
         </Field>
         <Field label="شماره کارت">
-          <Input value={bank.cardNo} onChange={e => updateSection('bank', { cardNo: e.target.value })} dir="ltr" inputMode="numeric" placeholder="۶۰۳۷..." />
+          <Input value={bank.cardNo} onChange={e => updateSection('bank', { cardNo: e.target.value })} dir="ltr" inputMode="numeric" placeholder="۶۰۳۷..." min={0} />
         </Field>
         <Field label="شماره شبا">
           <Input value={bank.sheba} onChange={e => updateSection('bank', { sheba: e.target.value })} dir="ltr" placeholder="IR..." />
@@ -162,22 +162,22 @@ export default function ProfileTab() {
             <Input value={defaults.birdType} onChange={e => updateSection('defaults', { birdType: e.target.value })} placeholder="مرغ" />
           </Field>
           <Field label="اندازه‌ی گله">
-            <Input value={defaults.flockSize} onChange={e => updateSection('defaults', { flockSize: e.target.value })} inputMode="numeric" dir="ltr" />
+            <Input value={defaults.flockSize} onChange={e => updateSection('defaults', { flockSize: e.target.value })} inputMode="numeric" dir="ltr" min={0} />
           </Field>
         </Grid2>
         <Field label="طول دوره‌ی جوجه‌کشی">
-          <Input value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} inputMode="numeric" dir="ltr" unit="روز" />
+          <Input value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} inputMode="numeric" dir="ltr" unit="روز" min={0} />
         </Field>
         <Grid2>
-          <Field label="دمای Setter"><Input value={defaults.setterTemp} onChange={e => updateSection('defaults', { setterTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" /></Field>
-          <Field label="دمای Hatcher"><Input value={defaults.hatcherTemp} onChange={e => updateSection('defaults', { hatcherTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" /></Field>
+          <Field label="دمای Setter"><Input value={defaults.setterTemp} onChange={e => updateSection('defaults', { setterTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" min={0} /></Field>
+          <Field label="دمای Hatcher"><Input value={defaults.hatcherTemp} onChange={e => updateSection('defaults', { hatcherTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="رطوبت Setter"><Input value={defaults.setterHumidity} onChange={e => updateSection('defaults', { setterHumidity: e.target.value })} inputMode="numeric" dir="ltr" unit="٪" /></Field>
-          <Field label="رطوبت Hatcher"><Input value={defaults.hatcherHumidity} onChange={e => updateSection('defaults', { hatcherHumidity: e.target.value })} inputMode="numeric" dir="ltr" unit="٪" /></Field>
+          <Field label="رطوبت Setter"><Input value={defaults.setterHumidity} onChange={e => updateSection('defaults', { setterHumidity: e.target.value })} inputMode="numeric" dir="ltr" unit="٪" min={0} /></Field>
+          <Field label="رطوبت Hatcher"><Input value={defaults.hatcherHumidity} onChange={e => updateSection('defaults', { hatcherHumidity: e.target.value })} inputMode="numeric" dir="ltr" unit="٪" min={0} /></Field>
         </Grid2>
         <Field label="روز شروع Lock-down">
-          <Input value={defaults.lockdownDay} onChange={e => updateSection('defaults', { lockdownDay: e.target.value })} inputMode="numeric" dir="ltr" unit="روز" />
+          <Input value={defaults.lockdownDay} onChange={e => updateSection('defaults', { lockdownDay: e.target.value })} inputMode="numeric" dir="ltr" unit="روز" min={0} />
         </Field>
       </SettingsGroup>
 
@@ -197,8 +197,7 @@ export default function ProfileTab() {
                 placeholder="••••"
                 inputMode="numeric"
                 type="password"
-                dir="ltr"
-              />
+                dir="ltr" min={0} />
             </Field>
             <Field label="قفل خودکار پس از">
               <Select value={String(security.autoLockMin)} onChange={e => updateSection('security', { autoLockMin: parseInt(e.target.value) })}>
