@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useFlk, type Flock, type FlockType, type FlockStatus, SOURCE_LABEL, getAgeDays, getLifecycle, formatAge, sexRatio, daysUntilLaying, isLayingReady, calcCosts, LAYING_START_DAY, getLayingStartDay } from './store';
 import { useBrd } from '../brd/store';
 import { useHal } from '../hal/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { MiniProgress } from '../../shr/components/ProgressTracker';
 import DatePicker from '../../shr/components/DatePicker';
@@ -577,14 +577,14 @@ export default function FlocksPage() {
 
           <Grid2>
             <Field label="قیمت هر پرنده">
-              <NumField placeholder="۰" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} unit="ت" min={0} />
+              <MoneyField placeholder="۰" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
             </Field>
             <Field label="هزینه حمل">
-              <NumField placeholder="۰" value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} unit="ت" min={0} />
+              <MoneyField placeholder="۰" value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
             </Field>
           </Grid2>
           <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه">
-            <NumField placeholder="۰" value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} unit="ت" min={0} />
+            <MoneyField placeholder="۰" value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} />
           </Field>
 
           {liveCosts.total > 0 && (

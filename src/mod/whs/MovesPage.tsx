@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useWhs, UNIT_LABEL, MOVEMENT_REASON, CATEGORY_ICON, CATEGORY_LABEL, type Movement, type MovementType, type MovementReason } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -254,7 +254,7 @@ export default function MovesPage() {
               max={form.type === 'out' ? currentStock : undefined} min={0} />
           </Field>
           <Field label="قیمت واحد">
-            <NumField value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} unit="ت" min={0} />
+            <MoneyField value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
           </Field>
         </Grid2>
 
