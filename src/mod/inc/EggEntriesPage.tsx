@@ -1,5 +1,5 @@
 import ProgressTracker from '../../shr/components/ProgressTracker';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   useInc, DEAL_LABEL, ENTRY_STATUS_LABEL, addDaysJalali,
   daysAgo, daysToHatch, isLockdown, isHatchWindow,
@@ -27,7 +27,7 @@ const empty = (): F => ({ deviceId:'', birdId:'', breedId:'', count:'',
    entryDate:'', trayNumbers:'', dealType:'own', dealData:{}, unitPrice:'', shippingCost:'',
    notes:'' });
 
-export default function EggEntriesPage() {
+export default function EggEntriesPage({ initialDevice = '' }: { initialDevice?: string } = {}) {
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
   const { birds, breeds } = useBrd();
   const [open, setOpen] = useState(false);
@@ -36,6 +36,15 @@ export default function EggEntriesPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterDev, setFilterDev] = useState('');
+
+  useEffect(() => {
+    if (initialDevice && devices.length > 0 && birds.length > 0) {
+      setForm({ ...empty(), deviceId: initialDevice, birdId: birds[0].id });
+      setErr('');
+      setOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialDevice]);
 
   const openNew = () => {
     if (devices.length === 0) { showAlert('اول یک دستگاه بسازید'); return; }

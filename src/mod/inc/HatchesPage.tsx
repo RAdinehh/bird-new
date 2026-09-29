@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useInc, hatchRate, costPerChick, type HatchResult } from './store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
@@ -7,7 +7,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 
-export default function HatchesPage() {
+export default function HatchesPage({ initialEntry = '' }: { initialEntry?: string } = {}) {
   const { eggEntries, hatches, candlings, addHatch, updateHatch, deleteHatch } = useInc();
   const { birds } = useBrd();
   const [open, setOpen] = useState(false);
@@ -15,6 +15,14 @@ export default function HatchesPage() {
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialEntry) {
+      const exists = eggEntries.find(e => e.id === initialEntry);
+      if (exists) { setForm(f => ({ ...f, eggEntryId: initialEntry })); setOpen(true); }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialEntry]);
 
   const openNew = () => {
     if (eggEntries.length === 0) { showAlert('اول یک ورودی تخم بسازید'); return; }

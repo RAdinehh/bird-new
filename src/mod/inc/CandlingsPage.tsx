@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useInc, type Candling } from './store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
@@ -14,7 +14,7 @@ const DEAD_REASONS: [string, string][] = [
   ['', '—'], ['temp_fluctuation', 'نوسان دما'], ['humidity', 'رطوبت نامناسب'], ['ventilation', 'تهویه ضعیف'], ['genetics', 'ژنتیک'], ['infection', 'عفونت']
 ];
 
-export default function CandlingsPage() {
+export default function CandlingsPage({ initialEntry = '' }: { initialEntry?: string } = {}) {
   const { eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
   const { birds } = useBrd();
   const [open, setOpen] = useState(false);
@@ -24,6 +24,14 @@ export default function CandlingsPage() {
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialEntry) {
+      const exists = eggEntries.find(e => e.id === initialEntry);
+      if (exists) { setForm(f => ({ ...f, eggEntryId: initialEntry })); setOpen(true); }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialEntry]);
 
   const openNew = () => {
     if (eggEntries.length === 0) { showAlert('اول یک ورودی تخم ثبت کنید'); return; }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import DevicesPage from './DevicesPage';
 import EggEntriesPage from './EggEntriesPage';
 import CandlingsPage from './CandlingsPage';
@@ -13,7 +13,19 @@ const tabs = [
 type TabId = typeof tabs[number]['id'];
 
 export default function Inc() {
-  const [tab, setTab] = useState<TabId>('devices');
+  const [params, setParams] = useSearchParams();
+  const tabParam = params.get('tab') as TabId;
+  const validTabs: TabId[] = ['devices', 'eggs', 'candlings', 'hatches'];
+  const tab: TabId = validTabs.includes(tabParam) ? tabParam : 'devices';
+  const setTab = (t: TabId) => {
+    setParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.set('tab', t);
+      next.delete('entry');
+      next.delete('device');
+      return next;
+    });
+  };
   return (
     <div>
       <div style={{
@@ -35,9 +47,9 @@ export default function Inc() {
         ))}
       </div>
       {tab === 'devices' && <DevicesPage />}
-      {tab === 'eggs' && <EggEntriesPage />}
-      {tab === 'candlings' && <CandlingsPage />}
-      {tab === 'hatches' && <HatchesPage />}
+      {tab === 'eggs' && <EggEntriesPage initialDevice={params.get('device') || ''} />}
+      {tab === 'candlings' && <CandlingsPage initialEntry={params.get('entry') || ''} />}
+      {tab === 'hatches' && <HatchesPage initialEntry={params.get('entry') || ''} />}
     </div>
   );
 }
