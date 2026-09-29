@@ -326,15 +326,15 @@ export default function DevicesPage() {
         </Grid2>
 
         <SectionTitle>📊 ظرفیت بر اساس پرنده</SectionTitle>
-        {form.capacityByBird.map(c => (
-          <div key={c.birdName} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, alignItems: 'center', marginBottom: 6 }}>
-            <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>{form.capacityByBird.map(c => (
+          <div key={c.birdName} style={{ padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
               <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.birdName}</span>
-              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: 2 }}>✕</button>
+              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: 0 }}>✕</button>
             </div>
+            <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
           </div>
-        ))}
+        ))}</div>
         <Select onChange={e => { if (e.target.value) { addCapacity(e.target.value); e.target.value = ''; } }} value="">
           <option value="">+ انتخاب از لیست پرنده‌ها...</option>
           {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
