@@ -291,32 +291,31 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش ورودی تخم' : 'ورود تخم به دستگاه'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
-        <SectionTitle>🥚 منبع تخم</SectionTitle>
-        <Field label="نوع منبع" required>
-          <Select value={form.dealType} onChange={e => setForm({...form, dealType: e.target.value as DealType, dealData: {}, flockId: ''})}>
-            <option value="own">🏠 گله خودم</option>
-            <option value="partnership">🤝 شراکتی</option>
-            <option value="purchase">📥 خریداری</option>
-            <option value="rent">🏢 اجاره‌ای</option>
-            <option value="consignment">📦 امانی</option>
-          </Select>
-        </Field>
-
-<SectionTitle>📦 دستگاه و ظرفیت</SectionTitle>
-        <Field label="دستگاه" required>
-<SmartSelect
+        <SectionTitle>📦 دستگاه و منبع</SectionTitle>
+        <Grid2>
+          <Field label="دستگاه" required>
+            <SmartSelect
               value={form.deviceId}
               onChange={v => setForm(f => ({ ...f, deviceId: v }))}
-              options={devices.map(c => ({
-                value: c.id,
-                label: c.name,
-                subtitle: (d => d.name)(c),
-              }))}
+              options={devices.map(c => ({ value: c.id, label: c.name }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب دستگاه"
               autoThreshold={6}
             />
-        </Field>
+          </Field>
+          <Field label="نوع منبع" required>
+            <Select value={form.dealType} onChange={e => setForm({...form, dealType: e.target.value as DealType, dealData: {}, flockId: ''})}>
+              <option value="own">🏠 گله خودم</option>
+              <option value="partnership">🤝 شراکتی</option>
+              <option value="purchase">📥 خریداری</option>
+              <option value="rent">🏢 اجاره‌ای</option>
+              <option value="consignment">📦 امانی</option>
+            </Select>
+          </Field>
+        </Grid2>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 2px' }}>
+          {maxCapacity > 0 ? 'ظرفیت دستگاه: ' + toFa(maxCapacity) + ' تخم' : ''}
+        </div>
 
         <SectionTitle>📋 مشخصات تخم</SectionTitle>
         <Grid2>
