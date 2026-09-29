@@ -47,6 +47,7 @@ function dateDiffDays(jalaliDate: string): number {
 export default function Dashboard() {
   const nav = useNavigate();
   const [selectedFlockId, setSelectedFlockId] = useState<string>('');
+  const [trendDays, setTrendDays] = useState<7 | 30 | 90>(7);
 
   const { invoices } = useTra();
   const { contacts } = useCtc();
@@ -170,7 +171,7 @@ export default function Dashboard() {
   const eggTrend = useMemo(() => {
     const days: { label: string; value: number }[] = [];
     const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
-    for (let i = 6; i >= 0; i--) {
+    for (let i = trendDays - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const key = d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
@@ -179,7 +180,7 @@ export default function Dashboard() {
       days.push({ label: toFa(String(d.getDate())), value: total });
     }
     return days;
-  }, [productions]);
+  }, [productions, trendDays]);
 
   // FCR ماه
   const fcr = useMemo(() => {
@@ -800,8 +801,37 @@ export default function Dashboard() {
             borderRadius: 'var(--r-lg)',
             padding: '10px 12px'
           }}>
-            <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 4 }}>
-              🥚 روند تخم‌گذاری ۷ روز اخیر
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 6,
+              gap: 8,
+            }}>
+              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
+                🥚 روند تخم‌گذاری
+              </div>
+              <div style={{ display: 'flex', gap: 3 }}>
+                {([7, 30, 90] as const).map(d => (
+                  <button
+                    key={d}
+                    onClick={() => setTrendDays(d)}
+                    style={{
+                      padding: '3px 8px',
+                      fontSize: 'var(--fs-xs)',
+                      background: trendDays === d ? 'var(--accent-soft)' : 'var(--btn-bg)',
+                      border: `1px solid ${trendDays === d ? 'var(--accent-border)' : 'var(--border)'}`,
+                      borderRadius: 'var(--r-sm)',
+                      color: trendDays === d ? 'var(--accent)' : 'var(--muted)',
+                      fontWeight: trendDays === d ? 700 : 500,
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    {toFa(d)}
+                  </button>
+                ))}
+              </div>
             </div>
             <LineChart data={eggTrend} color="var(--accent)" height={120} />
           </div>
