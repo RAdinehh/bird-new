@@ -49,7 +49,33 @@ export default function ExpandableCard({
     }}>
       <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: color, zIndex: 1 }} />
 
-      <div onClick={onToggle} style={{ padding: '12px 18px 12px 16px', cursor: 'pointer' }}>
+      <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={isOpen}
+        aria-label={`${isOpen ? 'بستن' : 'باز کردن'} ${title}`}
+        onClick={onToggle}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onToggle();
+          }
+        }}
+        style={{
+          padding: '12px 18px 12px 16px',
+          cursor: 'pointer',
+          outline: 'none',
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.outline = '2px solid var(--accent)';
+          e.currentTarget.style.outlineOffset = '2px';
+          e.currentTarget.style.borderRadius = 'var(--r-md)';
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.outline = 'none';
+          e.currentTarget.style.outlineOffset = '0';
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
             width: 42, height: 42, borderRadius: 'var(--r-md)',
