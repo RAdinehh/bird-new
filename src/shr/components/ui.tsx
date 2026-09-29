@@ -622,8 +622,12 @@ export function PercentField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode
   return <Input mode="number" dir="ltr" inputMode="numeric" unit="٪" min={0} max={100} autoClamp {...props} />;
 }
 
-export function PhoneField(props: Omit<InputProps, 'unit' | 'inputMode'>) {
-  return <Input dir="ltr" inputMode="numeric" maxLength={11} placeholder="۰۹۱۲۳۴۵۶۷۸۹" {...props} />;
+export function PhoneField({ maxLength = 11, ...props }: Omit<InputProps, 'unit' | 'inputMode'> & { maxLength?: number }) {
+  return <Input dir="ltr" inputMode="numeric" maxLength={maxLength} {...props} />;
+}
+
+export function DigitField({ maxLength, ...props }: Omit<InputProps, 'unit' | 'inputMode' | 'mode' | 'min' | 'max'> & { maxLength: number }) {
+  return <Input dir="ltr" inputMode="numeric" maxLength={maxLength} {...props} />;
 }
 
 interface TextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {

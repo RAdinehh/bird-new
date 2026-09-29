@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useCtc, type Person, type Role, ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES, SALARY_TYPES, avatarLetter } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, DigitField, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, PhoneField, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -276,10 +276,10 @@ export default function ContactsPage() {
           )}
           <Grid2>
             <Field label="نام" required><Input placeholder="..." value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
-            <Field label="تلفن"><Input placeholder="۰۹..." inputMode="tel" dir="ltr" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} min={0} /></Field>
+            <Field label="تلفن"><PhoneField placeholder="۰۹..." value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></Field>
           </Grid2>
           <Grid2>
-            <Field label="کد ملی"><NumField placeholder="..." value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} min={0} /></Field>
+            <Field label="کد ملی"><DigitField maxLength={10} placeholder="..." value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} /></Field>
             <Field label="آدرس"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
           </Grid2>
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSet } from './store';
-import { Field, Grid2, Grid3, Input, NumField, Select } from '../../shr/components/ui';
+import { Field, Grid2, Grid3, Input, NumField, PhoneField, DigitField, Select } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 
@@ -55,7 +55,7 @@ export default function ProfileTab() {
         </Field>
         <Grid2>
           <Field label="شماره تماس">
-            <Input value={user.phone} onChange={e => updateSection('user', { phone: e.target.value })} placeholder="۰۹..." inputMode="tel" dir="ltr" min={0} />
+            <PhoneField value={user.phone} onChange={e => updateSection('user', { phone: e.target.value })} placeholder="۰۹..." />
           </Field>
           <Field label="ایمیل">
             <Input value={user.email} onChange={e => updateSection('user', { email: e.target.value })} dir="ltr" />
@@ -96,7 +96,7 @@ export default function ProfileTab() {
             <Input value={farm.city} onChange={e => updateSection('farm', { city: e.target.value })} />
           </Field>
           <Field label="کد پستی">
-            <NumField value={farm.postalCode} onChange={e => updateSection('farm', { postalCode: e.target.value })} min={0} />
+            <DigitField maxLength={10} value={farm.postalCode} onChange={e => updateSection('farm', { postalCode: e.target.value })} />
           </Field>
         </Grid3>
         <Field label="آدرس">
@@ -104,7 +104,7 @@ export default function ProfileTab() {
         </Field>
         <Grid2>
           <Field label="تلفن ثابت">
-            <Input value={farm.phone} onChange={e => updateSection('farm', { phone: e.target.value })} dir="ltr" inputMode="tel" min={0} />
+            <PhoneField value={farm.phone} onChange={e => updateSection('farm', { phone: e.target.value })} />
           </Field>
           <Field label="تاریخ تأسیس">
             <Input value={farm.establishedAt} onChange={e => updateSection('farm', { establishedAt: e.target.value })} placeholder="۱۴۰۰/۰۱/۰۱" />
@@ -120,7 +120,7 @@ export default function ProfileTab() {
           <Input value={bank.bankName} onChange={e => updateSection('bank', { bankName: e.target.value })} placeholder="مثلاً: ملت" />
         </Field>
         <Field label="شماره کارت">
-          <NumField value={bank.cardNo} onChange={e => updateSection('bank', { cardNo: e.target.value })} placeholder="۶۰۳۷..." min={0} />
+          <DigitField maxLength={16} value={bank.cardNo} onChange={e => updateSection('bank', { cardNo: e.target.value })} placeholder="۶۰۳۷..." />
         </Field>
         <Field label="شماره شبا">
           <Input value={bank.sheba} onChange={e => updateSection('bank', { sheba: e.target.value })} dir="ltr" placeholder="IR..." />
