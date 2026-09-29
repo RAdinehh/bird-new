@@ -1,13 +1,36 @@
+# Dependencies
 node_modules
+
+# Build
 dist
+*.tsbuildinfo
+
+# Cache
+.vite
 *.log
+
+# Editor / OS
 .DS_Store
+*.swp
+*~
+
+# Env
 .env
 .env.local
+
+# Backup files
+*.bak
+*.bak-*
 *.save
 *.save.*
+
+# Archive
+archive/
 backup-*
 *-backup-*
+
+# Old files
+AI-PACKAGE.txt
 project.txt
 project-final.txt
 unfinished.txt
