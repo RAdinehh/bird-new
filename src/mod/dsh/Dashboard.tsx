@@ -9,6 +9,7 @@ import { useWhs, stockWarning, expiryWarning } from '../whs/store';
 import { useAlt, activeAlerts, LEVEL_ICON, LEVEL_LABEL, countByLevel } from '../alt/store';
 import { runRules } from '../alt/rules';
 import { useBrd } from '../brd/store';
+import { findBirdPreset } from '../brd/presets';
 import { useDlg } from '../dlg/store';
 import { PageContainer, Tag } from '../../shr/components/ui';
 import { LineChart } from '../../shr/components/Charts';
@@ -45,6 +46,7 @@ function dateDiffDays(jalaliDate: string): number {
 
 export default function Dashboard() {
   const nav = useNavigate();
+  const [selectedFlockId, setSelectedFlockId] = useState<string>('');
 
   const { invoices } = useTra();
   const { contacts } = useCtc();
@@ -53,7 +55,7 @@ export default function Dashboard() {
   const { eggEntries } = useInc();
   const { items: whsItems } = useWhs();
   const { alerts } = useAlt();
-  const { birds } = useBrd();
+  const { birds, breeds } = useBrd();
   const { logs } = useDlg();
 
   useEffect(() => { runRules(); }, []);
@@ -63,6 +65,16 @@ export default function Dashboard() {
 
   // ============ گله‌های فعال ============
   const activeFlocks = useMemo(() => flocks.filter(f => f.status === 'active'), [flocks]);
+
+  // انتخاب خودکار اولین گله فعال
+  useEffect(() => {
+    if (!selectedFlockId && activeFlocks.length > 0) {
+      setSelectedFlockId(activeFlocks[0].id);
+    }
+    if (selectedFlockId && !activeFlocks.find(f => f.id === selectedFlockId) && activeFlocks.length > 0) {
+      setSelectedFlockId(activeFlocks[0].id);
+    }
+  }, [activeFlocks, selectedFlockId]);
 
   // ============ ۱. امروز در یک نگاه ============
   const todayProd = useMemo(() => productions.filter(p => p.date === today), [productions, today]);
@@ -298,6 +310,55 @@ export default function Dashboard() {
     };
   }, [invoices, salesThisMonth, purchasesThisMonth]);
 
+  // ============ Benchmark نژاد ============
+  const benchmarkData = useMemo(() => {
+    const flock = activeFlocks.find(f => f.id === selectedFlockId);
+    if (!flock) return null;
+
+    const bird = birds.find(b => b.id === flock.birdId);
+    const breed = breeds.find(b => b.id === flock.breedId);
+
+    // استاندارد: اول breed.fcr، بعد preset نژاد پرنده
+    const preset = bird ? findBirdPreset(bird.name) : undefined;
+    const fcrStandard = breed?.fcr || preset?.fcrStandard || 0;
+
+    // داده‌های این گله
+    const flockLogs = logs.filter((l: any) => l.flockId === flock.id);
+    const flockProd = productions.filter((p: any) => p.flockId === flock.id);
+
+    const totalFeed = flockLogs.reduce((a, l) => a + (l.feedAmount || 0), 0);
+    const totalEggs = flockProd.reduce((a, p) => a + (p.totalCount || 0), 0);
+    const eggMass = totalEggs * 0.06; // kg (میانگین ۶۰ گرم)
+
+    const fcrActual = eggMass > 0 ? totalFeed / eggMass : 0;
+
+    // Hen-Day این گله
+    const aliveCount = flock.currentCount || flock.initialCount || 0;
+    const flockHenDay = (() => {
+      const last7 = flockProd.filter((p: any) => dateDiffDays(p.date) <= 7);
+      if (last7.length === 0 || aliveCount === 0) return 0;
+      const sum = last7.reduce((a, p) => a + (p.totalCount || 0), 0);
+      const days = 7;
+      return (sum / aliveCount / days) * 100;
+    })();
+
+    // مقایسه
+    const fcrDiff = fcrStandard > 0 && fcrActual > 0
+      ? ((fcrActual - fcrStandard) / fcrStandard) * 100
+      : 0;
+
+    return {
+      flock,
+      bird,
+      breed,
+      fcrStandard,
+      fcrActual: Math.round(fcrActual * 100) / 100,
+      fcrDiff: Math.round(fcrDiff),
+      henDay: Math.round(flockHenDay * 10) / 10,
+      hasData: fcrStandard > 0 && fcrActual > 0,
+    };
+  }, [selectedFlockId, activeFlocks, birds, breeds, logs, productions]);
+
   // ============ هشدارهای تجمیعی ============
   const aggregatedAlerts = useMemo(() => {
     const list: { icon: string; label: string; count: number; tone: string; route: string }[] = [];
@@ -511,6 +572,142 @@ export default function Dashboard() {
       {/* ============ ۱. امروز در یک نگاه ============ */}
       {hasData ? (
         <>
+          {benchmarkData && activeFlocks.length > 0 && (
+            <div style={{
+              background: 'var(--card)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-lg)',
+              padding: '10px 12px',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 8,
+                gap: 8,
+              }}>
+                <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+                  🎯 Benchmark گله
+                </div>
+                {activeFlocks.length > 1 && (
+                  <select
+                    value={selectedFlockId}
+                    onChange={e => setSelectedFlockId(e.target.value)}
+                    style={{
+                      padding: '4px 8px',
+                      fontSize: 'var(--fs-xs)',
+                      background: 'var(--input-bg)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--r-sm)',
+                      color: 'var(--text)',
+                      fontFamily: 'inherit',
+                      maxWidth: 140,
+                    }}
+                  >
+                    {activeFlocks.map(f => (
+                      <option key={f.id} value={f.id}>{f.name}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {benchmarkData.hasData ? (
+                <>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 4,
+                    marginBottom: 6,
+                  }}>
+                    <div style={{
+                      padding: '6px 10px',
+                      background: 'var(--input-bg)',
+                      borderRadius: 'var(--r-sm)',
+                    }}>
+                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+                        FCR فعلی
+                      </div>
+                      <div style={{
+                        fontSize: 'var(--fs-md)',
+                        fontWeight: 700,
+                        color: benchmarkData.fcrDiff <= 0 ? 'var(--accent)' : benchmarkData.fcrDiff <= 10 ? 'var(--warn)' : 'var(--danger)',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}>
+                        {toFa(benchmarkData.fcrActual)}
+                      </div>
+                    </div>
+                    <div style={{
+                      padding: '6px 10px',
+                      background: 'var(--input-bg)',
+                      borderRadius: 'var(--r-sm)',
+                    }}>
+                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+                        FCR استاندارد
+                      </div>
+                      <div style={{
+                        fontSize: 'var(--fs-md)',
+                        fontWeight: 700,
+                        color: 'var(--text)',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}>
+                        {toFa(benchmarkData.fcrStandard)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    padding: '6px 10px',
+                    background: benchmarkData.fcrDiff <= 0 ? 'var(--accent-soft)' : benchmarkData.fcrDiff <= 10 ? 'var(--warn-soft)' : 'var(--danger-soft)',
+                    border: `1px solid ${benchmarkData.fcrDiff <= 0 ? 'var(--accent-border)' : benchmarkData.fcrDiff <= 10 ? 'var(--warn)' : 'var(--danger)'}`,
+                    borderRadius: 'var(--r-sm)',
+                    fontSize: 'var(--fs-xs)',
+                    fontWeight: 700,
+                    color: benchmarkData.fcrDiff <= 0 ? 'var(--accent)' : benchmarkData.fcrDiff <= 10 ? 'var(--warn)' : 'var(--danger)',
+                    textAlign: 'center',
+                  }}>
+                    {benchmarkData.fcrDiff <= 0
+                      ? `✅ بهتر از استاندارد (${toFa(Math.abs(benchmarkData.fcrDiff))}٪)`
+                      : `⚠️ ${toFa(benchmarkData.fcrDiff)}٪ بالاتر از استاندارد`}
+                  </div>
+
+                  {benchmarkData.henDay > 0 && (
+                    <div style={{
+                      marginTop: 6,
+                      padding: '6px 10px',
+                      background: 'var(--input-bg)',
+                      borderRadius: 'var(--r-sm)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: 'var(--fs-xs)',
+                    }}>
+                      <span style={{ color: 'var(--muted)' }}>Hen-Day این گله</span>
+                      <span style={{
+                        fontWeight: 700,
+                        color: benchmarkData.henDay >= 80 ? 'var(--accent)' : benchmarkData.henDay >= 60 ? 'var(--warn)' : 'var(--danger)',
+                      }}>
+                        {toFa(benchmarkData.henDay)}٪
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div style={{
+                  padding: '10px 12px',
+                  background: 'var(--input-bg)',
+                  borderRadius: 'var(--r-sm)',
+                  fontSize: 'var(--fs-xs)',
+                  color: 'var(--muted)',
+                  textAlign: 'center',
+                }}>
+                  ⚠️ داده کافی برای Benchmark وجود ندارد
+                  <div style={{ marginTop: 4 }}>
+                    (نیاز به: ثبت روزانه + تخم‌گذاری + FCR نژاد)
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <SectionTitle>📅 امروز در یک نگاه</SectionTitle>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
             <KpiCard
