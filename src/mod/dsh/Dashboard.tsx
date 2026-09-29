@@ -223,6 +223,81 @@ export default function Dashboard() {
   }, [productions, purchasesThisMonth, thisMonth, salesThisMonth]);
 
   // ============ ۵. هشدارها ============
+  // ============ KPIهای جهانی ============
+  // مصرف دان/پرنده/روز (گرم)
+  const feedPerBirdGrams = useMemo(() => {
+    if (aliveCount === 0) return 0;
+    const last7 = logs.filter(l => dateDiffDays(l.date) <= 7);
+    if (last7.length === 0) return 0;
+    const totalFeed = last7.reduce((a, l) => a + (l.feedAmount || 0), 0);
+    const days = 7;
+    // totalFeed (kg) / aliveCount / days * 1000 (گرم)
+    return Math.round((totalFeed / aliveCount / days) * 1000);
+  }, [logs, aliveCount]);
+
+  // مصرف آب/پرنده/روز (میلی‌لیتر)
+  const waterPerBirdMl = useMemo(() => {
+    if (aliveCount === 0) return 0;
+    const last7 = logs.filter(l => dateDiffDays(l.date) <= 7);
+    if (last7.length === 0) return 0;
+    const totalWater = last7.reduce((a, l) => a + (l.waterAmount || 0), 0);
+    const days = 7;
+    // totalWater (L) / aliveCount / days * 1000 (ml)
+    return Math.round((totalWater / aliveCount / days) * 1000);
+  }, [logs, aliveCount]);
+
+  // ADG و CV% از آخرین وزن‌کشی
+  const weightMetrics = useMemo(() => {
+    const lastWeightLog = [...logs]
+      .filter(l => l.weightSamples && l.weightSamples.length > 0)
+      .sort((a, b) => b.date.localeCompare(a.date))[0];
+
+    if (!lastWeightLog || !lastWeightLog.weightSamples) {
+      return { avgWeight: 0, cv: 0, adg: 0, hasData: false };
+    }
+
+    const samples = lastWeightLog.weightSamples;
+    const weights = samples.map(s => s.weight).filter(w => w > 0);
+    if (weights.length === 0) return { avgWeight: 0, cv: 0, adg: 0, hasData: false };
+
+    const mean = weights.reduce((a, w) => a + w, 0) / weights.length;
+    const variance = weights.reduce((a, w) => a + Math.pow(w - mean, 2), 0) / weights.length;
+    const stdDev = Math.sqrt(variance);
+    const cv = mean > 0 ? (stdDev / mean) * 100 : 0;
+
+    // ADG: میانگین وزن / سن گله (روز)
+    const flockId = lastWeightLog.flockId;
+    const flock = activeFlocks.find(f => f.id === flockId);
+    const ageDays = flock ? getAgeDays(flock) : 0;
+    const adg = ageDays > 0 ? (mean * 1000) / ageDays : 0; // گرم در روز
+
+    return {
+      avgWeight: Math.round(mean * 1000) / 1000,
+      cv: Math.round(cv * 10) / 10,
+      adg: Math.round(adg * 10) / 10,
+      hasData: true,
+    };
+  }, [logs, activeFlocks]);
+
+  // مقایسه ماه قبل
+  const momComparison = useMemo(() => {
+    const d = new Date();
+    const prevMonth = d.getMonth() === 0
+      ? `${d.getFullYear() - 1}/12`
+      : `${d.getFullYear()}/${String(d.getMonth()).padStart(2, '0')}`;
+
+    const prevSales = invoices.filter(i => i.type === 'sale' && i.date && i.date.startsWith(prevMonth)).reduce((a, i) => a + (i.total || 0), 0);
+    const prevPurchases = invoices.filter(i => i.type === 'purchase' && i.date && i.date.startsWith(prevMonth)).reduce((a, i) => a + (i.total || 0), 0);
+
+    const salesChange = prevSales > 0 ? ((salesThisMonth - prevSales) / prevSales) * 100 : 0;
+    const purchaseChange = prevPurchases > 0 ? ((purchasesThisMonth - prevPurchases) / prevPurchases) * 100 : 0;
+
+    return {
+      salesChange: Math.round(salesChange),
+      purchaseChange: Math.round(purchaseChange),
+    };
+  }, [invoices, salesThisMonth, purchasesThisMonth]);
+
   // ============ هشدارهای تجمیعی ============
   const aggregatedAlerts = useMemo(() => {
     const list: { icon: string; label: string; count: number; tone: string; route: string }[] = [];
@@ -471,6 +546,24 @@ export default function Dashboard() {
               noFormat
               onClick={() => nav('/dlg')}
             />
+            <KpiCard
+              icon="🌾"
+              label="دان/پرنده"
+              value={feedPerBirdGrams}
+              unit="گرم در روز"
+              color={feedPerBirdGrams > 0 && feedPerBirdGrams <= 150 ? 'accent' : 'warn'}
+              noFormat
+              onClick={() => nav('/dlg')}
+            />
+            <KpiCard
+              icon="💧"
+              label="آب/پرنده"
+              value={waterPerBirdMl}
+              unit="میلی‌لیتر در روز"
+              color={waterPerBirdMl > 0 && waterPerBirdMl <= 300 ? 'info' : 'warn'}
+              noFormat
+              onClick={() => nav('/dlg')}
+            />
           </div>
 
           {/* ============ ۲. سلامت گله ============ */}
@@ -538,22 +631,45 @@ export default function Dashboard() {
             />
           </div>
 
+          {weightMetrics.hasData && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
+              <MiniStat
+                label="میانگین وزن"
+                value={weightMetrics.avgWeight}
+                suffix="kg"
+                color="info"
+              />
+              <MiniStat
+                label="ADG"
+                value={weightMetrics.adg}
+                suffix="گرم/روز"
+                color="accent"
+              />
+              <MiniStat
+                label="CV"
+                value={weightMetrics.cv}
+                suffix="٪"
+                color={weightMetrics.cv <= 10 ? 'accent' : weightMetrics.cv <= 15 ? 'warn' : 'danger'}
+              />
+            </div>
+          )}
+
           {/* ============ ۴. مالی ============ */}
           <SectionTitle>💰 مالی این ماه</SectionTitle>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
             <KpiCard
               icon="📥"
-              label="فروش ماه"
+              label={`فروش ماه ${momComparison.salesChange !== 0 ? (momComparison.salesChange > 0 ? '📈' : '📉') : ''}`}
               value={salesThisMonth}
-              unit="تومان"
+              unit={`تومان${momComparison.salesChange !== 0 ? ` · ${momComparison.salesChange > 0 ? '+' : ''}${toFa(momComparison.salesChange)}٪` : ''}`}
               color="accent"
               onClick={() => nav('/tra')}
             />
             <KpiCard
               icon="📤"
-              label="خرید ماه"
+              label={`خرید ماه ${momComparison.purchaseChange !== 0 ? (momComparison.purchaseChange > 0 ? '📈' : '📉') : ''}`}
               value={purchasesThisMonth}
-              unit="تومان"
+              unit={`تومان${momComparison.purchaseChange !== 0 ? ` · ${momComparison.purchaseChange > 0 ? '+' : ''}${toFa(momComparison.purchaseChange)}٪` : ''}`}
               color="warn"
               onClick={() => nav('/tra')}
             />
