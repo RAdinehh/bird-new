@@ -11,6 +11,14 @@ export type DealType = 'own' | 'purchase' | 'partnership' | 'rent' | 'consignmen
 export type DealStatus = 'active' | 'withdrawn';
 export type EntryStatus = 'incubating' | 'candled' | 'locked' | 'hatched' | 'done' | 'failed';
 
+export interface MaintenanceLog {
+  id: string;
+  date: string;
+  type: string;
+  cost: number | null;
+  description: string;
+}
+
 export interface DeviceCapacity {
   birdName: string;
   capacity: number | null;
@@ -25,9 +33,16 @@ export interface Device {
   status: DeviceStatus;
   temp: number | null;
   humidity: number | null;
-  rotationEnabled: boolean;
   purchasedAt: string; price: number | null;
   warranty: number | null;
+  racks: number | null;
+  trays: number | null;
+  fans: number | null;
+  tempSensors: number | null;
+  humiditySensors: number | null;
+  motorPower: number | null;
+  extraCost: number | null;
+  maintenanceLogs: MaintenanceLog[];
   equipmentId: string;
   notes: string;
   createdAt: string; updatedAt: string;

@@ -30,10 +30,16 @@ interface F {
   status: DeviceStatus;
   temp: string;
   humidity: string;
-  rotationEnabled: boolean;
   purchasedAt: string;
   price: string;
   warranty: string;
+  racks: string;
+  trays: string;
+  fans: string;
+  tempSensors: string;
+  humiditySensors: string;
+  motorPower: string;
+  extraCost: string;
   notes: string;
 }
 
@@ -44,10 +50,16 @@ const empty: F = {
   status: 'active',
   temp: '',
   humidity: '',
-  rotationEnabled: true,
   purchasedAt: '',
   price: '',
   warranty: '',
+  racks: '',
+  trays: '',
+  fans: '',
+  tempSensors: '',
+  humiditySensors: '',
+  motorPower: '',
+  extraCost: '',
   notes: '',
 };
 
@@ -72,10 +84,16 @@ export default function DevicesPage() {
       mode: d.mode, status: d.status,
       temp: d.temp ? toFa(d.temp) : '',
       humidity: d.humidity ? toFa(d.humidity) : '',
-      rotationEnabled: d.rotationEnabled,
       purchasedAt: d.purchasedAt,
       price: d.price ? toFa(d.price) : '',
       warranty: d.warranty ? toFa(d.warranty) : '',
+      racks: d.racks ? String(d.racks) : '',
+      trays: d.trays ? String(d.trays) : '',
+      fans: d.fans ? String(d.fans) : '',
+      tempSensors: d.tempSensors ? String(d.tempSensors) : '',
+      humiditySensors: d.humiditySensors ? String(d.humiditySensors) : '',
+      motorPower: d.motorPower ? String(d.motorPower) : '',
+      extraCost: d.extraCost ? toFa(d.extraCost) : '',
       notes: d.notes,
     });
     setErr(''); setOpen(true);
@@ -140,10 +158,17 @@ export default function DevicesPage() {
       status: form.status,
       temp: isActive ? num(form.temp) : null,
       humidity: isActive ? num(form.humidity) : null,
-      rotationEnabled: form.rotationEnabled,
       purchasedAt: form.purchasedAt.trim(),
       price: num(form.price),
       warranty: int(form.warranty),
+      racks: int(form.racks),
+      trays: int(form.trays),
+      fans: int(form.fans),
+      tempSensors: int(form.tempSensors),
+      humiditySensors: int(form.humiditySensors),
+      motorPower: num(form.motorPower),
+      extraCost: num(form.extraCost),
+      maintenanceLogs: [],
       equipmentId: '',
       notes: form.notes.trim(),
     };
@@ -271,10 +296,27 @@ export default function DevicesPage() {
             <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
           </div>
         ))}
-        <Select onChange={e => { if (e.target.value) { addCapacity(e.target.value); e.target.value = ''; } }} value="">
-          <option value="">+ افزودن پرنده...</option>
-          {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
-        </Select>
+        <Grid2>
+          <Select onChange={e => { if (e.target.value) { addCapacity(e.target.value); e.target.value = ''; } }} value="">
+            <option value="">+ انتخاب از لیست پرنده‌ها...</option>
+            {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+          </Select>
+          <Input
+            id="custom-bird-input"
+            placeholder="یا نام دلخواه..."
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const v = (e.target as HTMLInputElement).value.trim();
+                if (v) { addCapacity(v); (e.target as HTMLInputElement).value = ''; }
+              }
+            }}
+          />
+        </Grid2>
+        <Btn variant="primary" size="sm" onClick={() => {
+          const el = document.getElementById('custom-bird-input') as HTMLInputElement;
+          const v = el?.value.trim();
+          if (v) { addCapacity(v); el.value = ''; }
+        }} style={{ alignSelf: 'flex-start' }}>+ افزودن پرنده دلخواه</Btn>
 
         {form.status === 'active' && (
           <>
@@ -286,15 +328,34 @@ export default function DevicesPage() {
               <Field label="رطوبت هدف" hint="٪">
                 <NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={0} max={100} />
               </Field>
-            </Grid2>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)' }}>
-              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>🔄 چرخش خودکار</div>
-              <button onClick={() => setForm({...form, rotationEnabled: !form.rotationEnabled})} style={{ width: 38, height: 22, borderRadius: 11, background: form.rotationEnabled ? 'var(--accent)' : 'var(--dim)', position: 'relative', border: 'none', cursor: 'pointer', padding: 0 }}>
-                <span style={{ position: 'absolute', top: 2, right: form.rotationEnabled ? 18 : 2, width: 18, height: 18, borderRadius: '50%', background: '#fff' }} />
-              </button>
-            </div>
-          </>
+            </Grid2></>
         )}
+
+        <SectionTitle>⚙ مشخصات فنی</SectionTitle>
+        <Grid2>
+          <Field label="تعداد راگ" hint="قفسه">
+            <NumField placeholder="۰" value={form.racks} onChange={e => setForm({...form, racks: e.target.value})} unit="عدد" min={0} />
+          </Field>
+          <Field label="تعداد سبد" hint="Tray">
+            <NumField placeholder="۰" value={form.trays} onChange={e => setForm({...form, trays: e.target.value})} unit="عدد" min={0} />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="تعداد فن">
+            <NumField placeholder="۰" value={form.fans} onChange={e => setForm({...form, fans: e.target.value})} unit="عدد" min={0} />
+          </Field>
+          <Field label="توان موتور">
+            <NumField placeholder="۰" value={form.motorPower} onChange={e => setForm({...form, motorPower: e.target.value})} unit="W" min={0} />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="سنسور دما">
+            <NumField placeholder="۰" value={form.tempSensors} onChange={e => setForm({...form, tempSensors: e.target.value})} unit="عدد" min={0} />
+          </Field>
+          <Field label="سنسور رطوبت">
+            <NumField placeholder="۰" value={form.humiditySensors} onChange={e => setForm({...form, humiditySensors: e.target.value})} unit="عدد" min={0} />
+          </Field>
+        </Grid2>
 
         <SectionTitle>💰 مالی</SectionTitle>
         <Grid2>
@@ -305,9 +366,14 @@ export default function DevicesPage() {
             <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} />
           </Field>
         </Grid2>
-        <Field label="گارانتی (ماه)">
-          <NumField placeholder="۲۴" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} />
-        </Field>
+        <Grid2>
+          <Field label="گارانتی (ماه)">
+            <NumField placeholder="۲۴" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} />
+          </Field>
+          <Field label="هزینه جانبی" hint="نصب، حمل">
+            <MoneyField placeholder="۰" value={form.extraCost} onChange={e => setForm({...form, extraCost: e.target.value})} />
+          </Field>
+        </Grid2>
         {warrantyEnd && (
           <div style={{ padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 600, textAlign: 'center' }}>
             ✅ گارانتی تا: {toFa(warrantyEnd)}
