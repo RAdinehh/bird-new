@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useFlk, type Flock, type FlockType, type FlockStatus, SOURCE_LABEL, getAgeDays, getLifecycle, formatAge, sexRatio, daysUntilLaying, isLayingReady, calcCosts, LAYING_START_DAY, getLayingStartDay } from './store';
 import { useBrd } from '../brd/store';
 import { useHal } from '../hal/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { MiniProgress } from '../../shr/components/ProgressTracker';
 import DatePicker from '../../shr/components/DatePicker';
@@ -505,10 +505,10 @@ export default function FlocksPage() {
 
           <Grid2>
             <Field label="تعداد اولیه" required>
-              <Input placeholder="۸۵۰" inputMode="numeric" dir="ltr" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={0} />
+              <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={0} />
             </Field>
             <Field label="تعداد فعلی">
-              <Input placeholder="۸۳۲" inputMode="numeric" dir="ltr" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={0} />
+              <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={0} />
             </Field>
           </Grid2>
 
@@ -516,10 +516,10 @@ export default function FlocksPage() {
             <DepBox title="اطلاعات گله مادر" tone="purple">
               <Grid2>
                 <Field label="تعداد خروس">
-                  <Input placeholder="۸۰" inputMode="numeric" dir="ltr" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} />
+                  <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} />
                 </Field>
                 <Field label="تعداد مرغ">
-                  <Input placeholder="۸۰۰" inputMode="numeric" dir="ltr" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} />
+                  <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} />
                 </Field>
               </Grid2>
               {form.maleCount && form.femaleCount && (
@@ -536,8 +536,7 @@ export default function FlocksPage() {
                 label="سن تخم‌گذاری"
                 hint={'پیش‌فرض ' + toFa(LAYING_START_DAY) + ' روز — اگر نژاد شما فرق دارد، عدد خودتان را وارد کنید'}
               >
-                <Input
-                  mode="number"
+                <NumField
                   value={form.layingStartDay}
                   onChange={e => setForm({ ...form, layingStartDay: e.target.value })}
                   placeholder={toFa(LAYING_START_DAY)}
@@ -578,14 +577,14 @@ export default function FlocksPage() {
 
           <Grid2>
             <Field label="قیمت هر پرنده">
-              <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} unit="ت" min={0} />
+              <NumField placeholder="۰" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} unit="ت" min={0} />
             </Field>
             <Field label="هزینه حمل">
-              <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} unit="ت" min={0} />
+              <NumField placeholder="۰" value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} unit="ت" min={0} />
             </Field>
           </Grid2>
           <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه">
-            <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} unit="ت" min={0} />
+            <NumField placeholder="۰" value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} unit="ت" min={0} />
           </Field>
 
           {liveCosts.total > 0 && (

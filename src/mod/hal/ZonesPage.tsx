@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useHal, type Zone } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
@@ -161,7 +161,7 @@ export default function ZonesPage() {
         </Field>
         <Grid2>
           <Field label="نام بخش" required><Input placeholder="مثلاً: بخش A" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
-          <Field label="ظرفیت"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} /></Field>
+          <Field label="ظرفیت"><NumField placeholder="۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} /></Field>
         </Grid2>
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}

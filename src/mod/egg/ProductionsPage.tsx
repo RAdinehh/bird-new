@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useEgg, healthyCount, henDayRate, brokenRate, type EggProduction } from './store';
 import { useFlk, getAgeDays } from '../flk/store';
 import { useBrd } from '../brd/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import ProgressTracker from '../../shr/components/ProgressTracker';
@@ -266,8 +266,7 @@ export default function ProductionsPage() {
             label="درصد تخم‌گذاری"
             hint={flockCount > 0 && form.percent !== '' ? toFa(form.percent) + '٪ از ' + toFa(flockCount) : 'اختیاری'}
           >
-            <Input
-              mode="number"
+            <NumField
               value={form.percent}
               onChange={e => onPercentChange(e.target.value)}
               unit="٪"
@@ -280,8 +279,7 @@ export default function ProductionsPage() {
             required
             hint={flockCount > 0 ? 'حداکثر ' + toFa(flockCount) : undefined}
           >
-            <Input
-              mode="number"
+            <NumField
               value={form.totalCount}
               onChange={e => onCountChange(e.target.value)}
               unit="عدد"
@@ -299,14 +297,14 @@ export default function ProductionsPage() {
 
         <Grid2>
           <Field label="تخم شکسته">
-            <Input mode="number" value={form.brokenCount} onChange={e => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
+            <NumField value={form.brokenCount} onChange={e => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
           </Field>
           <Field label="تخم نرم">
-            <Input mode="number" value={form.softCount} onChange={e => setForm({ ...form, softCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
+            <NumField value={form.softCount} onChange={e => setForm({ ...form, softCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
           </Field>
         </Grid2>
         <Field label="تخم کثیف">
-          <Input mode="number" value={form.dirtyCount} onChange={e => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
+          <NumField value={form.dirtyCount} onChange={e => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
         </Field>
 
         {/* کادر خلاصه‌ی محاسبات */}
@@ -357,7 +355,7 @@ export default function ProductionsPage() {
 
         <SectionTitle>⚖ وزن</SectionTitle>
         <Field label="وزن میانگین تخم" hint="اختیاری">
-          <Input mode="number" value={form.avgWeight} onChange={e => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
+          <NumField value={form.avgWeight} onChange={e => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
         </Field>
 
         <Field label="یادداشت">

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useFed, CATEGORY_LABEL, CATEGORY_ICON, type Ingredient, type IngredientCategory } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { INGREDIENT_STANDARDS } from './standards';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
@@ -322,32 +322,32 @@ export default function IngredientsPage() {
             </Select>
           </Field>
           <Field label="قیمت دستی (اختیاری)" hint="اگر پر شود، بر قیمت انبار اولویت دارد">
-            <Input mode="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} unit="ت" min={0} />
+            <NumField value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} unit="ت" min={0} />
           </Field>
         </Grid2>
 
         <SectionTitle>🥗 ترکیبات</SectionTitle>
         <Grid2>
-          <Field label="پروتئین خام"><Input mode="number" value={form.protein} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" min={0} /></Field>
-          <Field label="انرژی (kcal/kg)"><Input mode="number" value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} min={0} /></Field>
+          <Field label="پروتئین خام"><NumField value={form.protein} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="انرژی (kcal/kg)"><NumField value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="چربی"><Input mode="number" value={form.fat} onChange={e => setForm({ ...form, fat: e.target.value })} unit="٪" min={0} /></Field>
-          <Field label="فیبر"><Input mode="number" value={form.fiber} onChange={e => setForm({ ...form, fiber: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="چربی"><NumField value={form.fat} onChange={e => setForm({ ...form, fat: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="فیبر"><NumField value={form.fiber} onChange={e => setForm({ ...form, fiber: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="کلسیم"><Input mode="number" value={form.calcium} onChange={e => setForm({ ...form, calcium: e.target.value })} unit="٪" min={0} /></Field>
-          <Field label="فسفر"><Input mode="number" value={form.phosphorus} onChange={e => setForm({ ...form, phosphorus: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="کلسیم"><NumField value={form.calcium} onChange={e => setForm({ ...form, calcium: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="فسفر"><NumField value={form.phosphorus} onChange={e => setForm({ ...form, phosphorus: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="متیونین"><Input mode="number" value={form.methionine} onChange={e => setForm({ ...form, methionine: e.target.value })} unit="٪" min={0} /></Field>
-          <Field label="لیزین"><Input mode="number" value={form.lysine} onChange={e => setForm({ ...form, lysine: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="متیونین"><NumField value={form.methionine} onChange={e => setForm({ ...form, methionine: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="لیزین"><NumField value={form.lysine} onChange={e => setForm({ ...form, lysine: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
 
         <SectionTitle>⚖ محدوده استفاده در جیره</SectionTitle>
         <Grid2>
-          <Field label="حداقل" hint="۰ = بدون محدودیت"><Input mode="number" value={form.minPercent} onChange={e => setForm({ ...form, minPercent: e.target.value })} unit="٪" min={0} /></Field>
-          <Field label="حداکثر" hint="۰ = بدون محدودیت"><Input mode="number" value={form.maxPercent} onChange={e => setForm({ ...form, maxPercent: e.target.value })} unit="٪" max={100} min={0} /></Field>
+          <Field label="حداقل" hint="۰ = بدون محدودیت"><NumField value={form.minPercent} onChange={e => setForm({ ...form, minPercent: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="حداکثر" hint="۰ = بدون محدودیت"><NumField value={form.maxPercent} onChange={e => setForm({ ...form, maxPercent: e.target.value })} unit="٪" max={100} min={0} /></Field>
         </Grid2>
 
         <SectionTitle>📦 اتصال به انبار</SectionTitle>

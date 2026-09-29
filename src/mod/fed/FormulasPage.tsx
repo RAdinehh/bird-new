@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { format as formatJalali } from 'date-fns-jalali';
 import { useFed, STAGE_LABEL, formulaTotal, calcNutrients, formulaValid, type Formula, type FormulaLine } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -297,8 +297,7 @@ export default function FormulasPage() {
               <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
                 <div style={{ flex: 1 }}>
                   <Field label="درصد در جیره">
-                    <Input
-                      mode="number"
+                    <NumField
                       value={String(line.percent)}
                       onChange={e => updateLine(line.id, { percent: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
                       unit="٪"

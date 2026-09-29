@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useHal, type Equipment, EQUIP_LABELS } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
@@ -212,9 +212,9 @@ export default function EquipmentPage() {
           <Input placeholder="مثلاً: لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
         </Field>
         <Grid3>
-          <Field label="تعداد"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" min={0} /></Field>
-          <Field label="قیمت واحد"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} unit="ت" min={0} /></Field>
-          <Field label="گارانتی"><Input placeholder="۶" inputMode="numeric" dir="ltr" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
+          <Field label="تعداد"><NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" min={0} /></Field>
+          <Field label="قیمت واحد"><NumField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} unit="ت" min={0} /></Field>
+          <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
         </Grid3>
         <Field label="تاریخ خرید"><Input placeholder="۱۴۰۵/۰۷/۰۴" value={form.purchasedAt} onChange={e => setForm({...form, purchasedAt: e.target.value})} /></Field>
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>

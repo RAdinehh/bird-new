@@ -2,7 +2,7 @@ import ProgressTracker from '../../shr/components/ProgressTracker';
 import { useState, useMemo } from 'react';
 import { useInc, DEAL_LABEL, ENTRY_STATUS_LABEL, addDaysJalali, daysAgo, daysToHatch, isLockdown, isHatchWindow, incubationDays, type EggEntry, type DealType } from './store';
 import { useBrd } from '../brd/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { MiniProgress } from '../../shr/components/ProgressTracker';
 import DatePicker from '../../shr/components/DatePicker';
@@ -273,7 +273,7 @@ export default function EggEntriesPage() {
 
         <Grid2>
           <Field label="تعداد تخم" required hint={maxCapacity ? `ظرفیت دستگاه: ${toFa(maxCapacity)}` : undefined}>
-            <Input placeholder="۳۰۰" inputMode="numeric" dir="ltr" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" max={maxCapacity || undefined} min={0} />
+            <NumField placeholder="۳۰۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" max={maxCapacity || undefined} min={0} />
           </Field>
           <Field label="طبقات (Tray)">
             <Input placeholder="۱-۲-۳" dir="ltr" value={form.trayNumbers} onChange={e => setForm({...form, trayNumbers: e.target.value})} />
@@ -299,10 +299,8 @@ export default function EggEntriesPage() {
             <Field label="تماس شریک"><Input placeholder="۰۹..." dir="ltr" value={form.dealData.partnerPhone || ''} onChange={e => setD('partnerPhone', e.target.value)} /></Field>
             <Grid2>
               <Field label="درصد شریک" hint="۰ تا ۱۰۰">
-                <Input
+                <NumField
                   placeholder="۵۰"
-                  inputMode="numeric"
-                  dir="ltr"
                   value={form.dealData.partnerPercent || ''}
                   onChange={e => {
                     const raw = parseInt(toEn(e.target.value)) || 0;
@@ -329,7 +327,7 @@ export default function EggEntriesPage() {
         {form.dealType === 'rent' && (
           <DepBox title="اطلاعات اجاره">
             <Grid2>
-              <Field label="مبلغ اجاره"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.dealData.rentAmount || ''} onChange={e => setD('rentAmount', e.target.value)} unit="ت" min={0} /></Field>
+              <Field label="مبلغ اجاره"><NumField placeholder="۰" value={form.dealData.rentAmount || ''} onChange={e => setD('rentAmount', e.target.value)} unit="ت" min={0} /></Field>
               <Field label="سرسید"><Input placeholder="۱۴۰۵/۰۸/۰۱" value={form.dealData.rentDueDate || ''} onChange={e => setD('rentDueDate', e.target.value)} /></Field>
             </Grid2>
           </DepBox>
@@ -340,10 +338,8 @@ export default function EggEntriesPage() {
             <Field label="نام امانت‌دار"><Input placeholder="..." value={form.dealData.consigneeName || ''} onChange={e => setD('consigneeName', e.target.value)} /></Field>
             <Grid2>
               <Field label="درصد امانت‌دار" hint="۰ تا ۱۰۰">
-                <Input
+                <NumField
                   placeholder="۲۰"
-                  inputMode="numeric"
-                  dir="ltr"
                   value={form.dealData.consigneePercent || ''}
                   onChange={e => {
                     const raw = parseInt(toEn(e.target.value)) || 0;
@@ -368,7 +364,7 @@ export default function EggEntriesPage() {
         )}
 
         <Field label="قیمت هر تخم" hint="اگر خریداری شده">
-          <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} unit="ت" min={0} />
+          <NumField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} unit="ت" min={0} />
         </Field>
 
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>

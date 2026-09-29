@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useWhs, CATEGORY_LABEL, CATEGORY_ICON, CATEGORY_DEFAULTS, UNIT_LABEL, STORAGE_LABEL, stockWarning, expiryWarning, daysToExpiry, type Item, type ItemCategory, type ItemUnit } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -311,11 +311,11 @@ export default function ItemsPage() {
         <Grid3>
           {!form.id && (
             <Field label="موجودی اولیه" hint="اگه الان موجودی داری، اینجا وارد کن — بعد از این، فقط از معاملات به‌روز میشه">
-              <Input mode="number" value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={UNIT_LABEL[form.unit]} min={0} />
+              <NumField value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={UNIT_LABEL[form.unit]} min={0} />
             </Field>
           )}
           <Field label="حداقل موجودی" hint="برای هشدار">
-            <Input mode="number" value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
+            <NumField value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
           </Field>
           
         </Grid3>
@@ -348,7 +348,7 @@ export default function ItemsPage() {
             </Grid2>
             <Grid2>
               <Field label="دوره منع مصرف" hint="روز">
-                <Input mode="number" value={form.withdrawalDays} onChange={e => setForm({ ...form, withdrawalDays: e.target.value })} unit="روز" min={0} />
+                <NumField value={form.withdrawalDays} onChange={e => setForm({ ...form, withdrawalDays: e.target.value })} unit="روز" min={0} />
               </Field>
               <Field label="نگهداری">
                 <Select value={form.storage} onChange={e => setForm({ ...form, storage: e.target.value })}>

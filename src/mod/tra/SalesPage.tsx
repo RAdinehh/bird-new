@@ -7,10 +7,7 @@ import {
 } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useCtc } from '../ctc/store';
-import {
-  Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal,
-  PageContainer, Select, Tag,
-} from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import SmartSelect from '../../shr/components/SmartSelect';
 import DatePicker from '../../shr/components/DatePicker';
@@ -353,16 +350,16 @@ export default function SalesPage() {
 
             <Grid3>
               <Field label="واحد"><Input placeholder="شانه" value={it.unit} onChange={e => updateItem(it.id, { unit: e.target.value })} /></Field>
-              <Field label="تعداد"><Input mode="number" value={String(it.quantity)} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} /></Field>
-              <Field label="قیمت"><Input mode="number" value={String(it.unitPrice)} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} /></Field>
+              <Field label="تعداد"><NumField value={String(it.quantity)} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} /></Field>
+              <Field label="قیمت"><NumField value={String(it.unitPrice)} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} /></Field>
             </Grid3>
 
             <Grid2>
               <Field label="تخفیف">
-                <Input mode="number" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} unit="ت" min={0} />
+                <NumField value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} unit="ت" min={0} />
               </Field>
               <Field label="حمل">
-                <Input mode="number" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} unit="ت" min={0} />
+                <NumField value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} unit="ت" min={0} />
               </Field>
             </Grid2>
 
@@ -429,7 +426,7 @@ export default function SalesPage() {
                 </Select>
               </Field>
               <Field label="مقدار">
-                <Input mode="number" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
+                <NumField value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
               </Field>
             </Grid2>
           </>
@@ -459,10 +456,10 @@ export default function SalesPage() {
         {form.paymentTerms === 'installment' && (
           <Grid2>
             <Field label="تعداد اقساط" required>
-              <Input mode="number" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
+              <NumField value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
             </Field>
             <Field label="فاصله" required>
-              <Input mode="number" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
+              <NumField value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
             </Field>
           </Grid2>
         )}
@@ -483,7 +480,7 @@ export default function SalesPage() {
                 </Select>
               </Field>
               <Field label="مبلغ">
-                <Input mode="number" value={String(p.amount)} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} unit="ت" min={0} />
+                <NumField value={String(p.amount)} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} unit="ت" min={0} />
               </Field>
             </Grid2>
             <Field label="تاریخ">

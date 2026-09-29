@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useInc, type Candling } from './store';
 import { useBrd } from '../brd/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -157,12 +157,12 @@ export default function CandlingsPage() {
           </div>
         )}
         <Grid2>
-          <Field label="سالم"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.alive} onChange={e => setForm({...form, alive: e.target.value})} max={totalCount} min={0} /></Field>
-          <Field label="بی‌نطفه"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.infertile} onChange={e => setForm({...form, infertile: e.target.value})} max={totalCount} min={0} /></Field>
+          <Field label="سالم"><NumField placeholder="۰" value={form.alive} onChange={e => setForm({...form, alive: e.target.value})} max={totalCount} min={0} /></Field>
+          <Field label="بی‌نطفه"><NumField placeholder="۰" value={form.infertile} onChange={e => setForm({...form, infertile: e.target.value})} max={totalCount} min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="مرده"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.dead} onChange={e => setForm({...form, dead: e.target.value})} max={totalCount} min={0} /></Field>
-          <Field label="شکسته"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.broken} onChange={e => setForm({...form, broken: e.target.value})} max={totalCount} min={0} /></Field>
+          <Field label="مرده"><NumField placeholder="۰" value={form.dead} onChange={e => setForm({...form, dead: e.target.value})} max={totalCount} min={0} /></Field>
+          <Field label="شکسته"><NumField placeholder="۰" value={form.broken} onChange={e => setForm({...form, broken: e.target.value})} max={totalCount} min={0} /></Field>
         </Grid2>
         <Grid2>
           <Field label="دلیل بی‌نطفه">

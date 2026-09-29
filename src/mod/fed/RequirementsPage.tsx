@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useFed, STAGE_LABEL, STAGE_LABEL_LONG, type Requirement } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
@@ -224,16 +224,16 @@ export default function RequirementsPage() {
 
         <SectionTitle>🥗 نیازهای مغذی</SectionTitle>
         <Grid2>
-          <Field label="پروتئین خام"><Input mode="number" value={form.protein} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" min={0} /></Field>
-          <Field label="انرژی"><Input mode="number" value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} unit="kcal" min={0} /></Field>
+          <Field label="پروتئین خام"><NumField value={form.protein} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="انرژی"><NumField value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} unit="kcal" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="کلسیم"><Input mode="number" value={form.calcium} onChange={e => setForm({ ...form, calcium: e.target.value })} unit="٪" min={0} /></Field>
-          <Field label="فسفر"><Input mode="number" value={form.phosphorus} onChange={e => setForm({ ...form, phosphorus: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="کلسیم"><NumField value={form.calcium} onChange={e => setForm({ ...form, calcium: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="فسفر"><NumField value={form.phosphorus} onChange={e => setForm({ ...form, phosphorus: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="متیونین"><Input mode="number" value={form.methionine} onChange={e => setForm({ ...form, methionine: e.target.value })} unit="٪" min={0} /></Field>
-          <Field label="لیزین"><Input mode="number" value={form.lysine} onChange={e => setForm({ ...form, lysine: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="متیونین"><NumField value={form.methionine} onChange={e => setForm({ ...form, methionine: e.target.value })} unit="٪" min={0} /></Field>
+          <Field label="لیزین"><NumField value={form.lysine} onChange={e => setForm({ ...form, lysine: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
 
         <Field label="یادداشت">

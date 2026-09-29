@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useEgg, calcStock, toPieces, saleTotal, EGG_TYPE_LABEL, UNIT_LABEL, PAYMENT_LABEL, type EggSale, type EggType } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -247,7 +247,7 @@ export default function StockPage() {
             </Select>
           </Field>
           <Field label="تعداد" required>
-            <Input mode="number" value={form.count} onChange={e => setForm({ ...form, count: e.target.value })} max={100000} min={0} />
+            <NumField value={form.count} onChange={e => setForm({ ...form, count: e.target.value })} max={100000} min={0} />
           </Field>
         </Grid2>
 
@@ -267,7 +267,7 @@ export default function StockPage() {
         ) : null}
 
         <Field label="قیمت واحد" required hint={`قیمت هر ${UNIT_LABEL[form.unit].split(' ')[0]}`}>
-          <Input mode="number" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} unit="ت" min={0} />
+          <NumField value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} unit="ت" min={0} />
         </Field>
 
         {total > 0 ? (
