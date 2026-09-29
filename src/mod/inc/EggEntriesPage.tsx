@@ -50,8 +50,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const { birds, breeds } = useBrd();
   const { flocks } = useFlk();
   const { contacts } = useCtc();
-  const { addInvoice } = useTra();
-  const { addProduction } = useEgg();
+  const { addInvoice, deleteInvoice } = useTra();
+  const { addProduction, deleteProduction } = useEgg();
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
@@ -189,7 +189,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         } else if (form.dealType === 'rent' && form.dealData.lessorId && form.dealData.rentAmount) {
           const rentAmount = parseFloat(toEn(form.dealData.rentAmount).replace('٫', '.')) || 0;
           if (rentAmount > 0) {
-            addInvoice({
+            const rentInvId = addInvoice({
               type: 'purchase',
               date: form.entryDate,
               partyId: form.dealData.lessorId,

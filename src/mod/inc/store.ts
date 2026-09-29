@@ -74,6 +74,8 @@ export interface EggEntry {
   totalPrice: number | null;
   shippingCost: number | null;
   status: EntryStatus;
+  generatedInvoiceId: string;
+  generatedProductionId: string;
   notes: string;
   createdAt: string; updatedAt: string;
 }
@@ -122,7 +124,7 @@ interface State {
   updateGroup: (id: string, patch: Partial<HatchGroup>) => void;
   deleteGroup: (id: string) => void;
 
-  addEntry: (e: Omit<EggEntry, 'id'|'createdAt'|'updatedAt'>) => void;
+  addEntry: (e: Omit<EggEntry, 'id'|'createdAt'|'updatedAt'>) => string;
   updateEntry: (id: string, patch: Partial<EggEntry>) => void;
   deleteEntry: (id: string) => void;
 
@@ -153,7 +155,11 @@ export const useInc = create<State>()(
       updateGroup: (id, patch) => set({ hatchGroups: get().hatchGroups.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       deleteGroup: (id) => set({ hatchGroups: get().hatchGroups.filter(x => x.id !== id) }),
 
-      addEntry: (e) => set({ eggEntries: [...get().eggEntries, {...e, id: uuid(), createdAt: now(), updatedAt: now()}] }),
+      addEntry: (e) => {
+        const id = uuid();
+        set({ eggEntries: [...get().eggEntries, {...e, id, createdAt: now(), updatedAt: now()}] });
+        return id;
+      },
       updateEntry: (id, patch) => set({ eggEntries: get().eggEntries.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       deleteEntry: (id) => set({
         eggEntries: get().eggEntries.filter(x => x.id !== id),

@@ -147,7 +147,7 @@ export interface Deal {
 interface State {
   invoices: Invoice[];
   deals: Deal[];
-  addInvoice: (i: Omit<Invoice, 'id'|'createdAt'|'updatedAt'>) => void;
+  addInvoice: (i: Omit<Invoice, 'id'|'createdAt'|'updatedAt'>) => string;
   updateInvoice: (id: string, patch: Partial<Invoice>) => void;
   deleteInvoice: (id: string) => void;
   addDeal: (d: Omit<Deal, 'id'|'createdAt'|'updatedAt'>) => void;
@@ -200,22 +200,10 @@ export const useTra = create<State>()(
       invoices: [],
       deals: [],
       addInvoice: (i) => {
-        const existing = get().invoices;
-        const number = (i.number && i.number.trim() !== '')
-          ? i.number
-          : generateInvoiceNumber(i.type, i.date, existing);
-
-        const terms = (i as any).paymentTerms || 'cash';
-        const workflowStatus: WorkflowStatus = terms === 'cash' ? 'paid' : 'draft';
-
-        const baseInv = {
-          ...i, number, workflowStatus,
-          confirmedAt: workflowStatus !== 'draft' ? now() : '',
-          paidAt: workflowStatus === 'paid' ? now() : '',
-          id: uuid(), createdAt: now(), updatedAt: now()
-        } as Invoice;
-        const items = applyInvoiceMovements(baseInv);
-        set({ invoices: [...existing, { ...baseInv, items }] });
+        const id = uuid();
+        const num = 'INV-' + Date.now().toString(36).toUpperCase();
+        set({ invoices: [...get().invoices, { ...i, id, number: i.number || num, createdAt: now(), updatedAt: now() } as any] });
+        return id;
       },
       updateInvoice: (id, patch) => {
         const prev = get().invoices.find(x => x.id === id);
