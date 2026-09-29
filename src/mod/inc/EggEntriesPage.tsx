@@ -1,5 +1,5 @@
 import ProgressTracker from '../../shr/components/ProgressTracker';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   useInc, DEAL_LABEL, ENTRY_STATUS_LABEL, addDaysJalali,
   daysAgo, daysToHatch, isLockdown, isHatchWindow,
@@ -18,32 +18,76 @@ import { clampPercent, complement } from '../../shr/utils/smart';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 
-interface F {
-  id?: string;
-  deviceId: string;
+const DRAFT_KEY = (devId: string) => 'pm-inc-egg-draft-' + devId;
+
+interface DraftRow {
+  _id: string;
+  dealType: DealType;
   birdId: string;
   breedId: string;
+  flockId: string;
   count: string;
-  entryDate: string;
   trayNumbers: string;
-  dealType: DealType;
+  unitPrice: string;
+  shippingCost: string;
+  entryDate: string;
+  notes: string;
   dealData: Record<string, string>;
   dealStatus: 'active' | 'withdrawn';
   dealWithdrawnAt: string;
   dealWithdrawnReason: string;
-  flockId: string;
-  unitPrice: string;
-  shippingCost: string;
-  notes: string;
 }
 
-const empty = (): F => ({
-  deviceId: '', birdId: '', breedId: '', count: '',
-  entryDate: '', trayNumbers: '',
-  dealType: 'own', dealData: {}, dealStatus: 'active',
-  dealWithdrawnAt: '', dealWithdrawnReason: '', flockId: '',
-  unitPrice: '', shippingCost: '', notes: '',
+const makeRow = (): DraftRow => ({
+  _id: 'r-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+  dealType: 'own',
+  birdId: '',
+  breedId: '',
+  flockId: '',
+  count: '',
+  trayNumbers: '',
+  unitPrice: '',
+  shippingCost: '',
+  entryDate: '',
+  notes: '',
+  dealData: {},
+  dealStatus: 'active',
+  dealWithdrawnAt: '',
+  dealWithdrawnReason: '',
 });
+
+function calcDeviceUsage(
+  device: any,
+  entries: any[],
+  newEntry?: { birdName: string; count: number }
+): { used: number; total: number; percent: number } {
+  const caps: any[] = device?.capacityByBird || [];
+  if (caps.length === 0) return { used: 0, total: 0, percent: 0 };
+  const refCap = Math.max(...caps.map(c => c.capacity || 0));
+  if (refCap === 0) return { used: 0, total: 0, percent: 0 };
+  const byBird: Record<string, number> = {};
+  caps.forEach(c => {
+    if (!c.birdName) return;
+    const factor = (c.capacity && c.capacity > 0) ? (refCap / c.capacity) : 1;
+    byBird[c.birdName] = factor;
+  });
+  let used = 0;
+  entries.forEach(e => {
+    if (e.status === 'failed') return;
+    const factor = byBird[e.__birdName || ''];
+    if (!factor) return;
+    used += (e.count || 0) * factor;
+  });
+  if (newEntry) {
+    const factor = byBird[newEntry.birdName];
+    if (factor) used += newEntry.count * factor;
+  }
+  return {
+    used: Math.round(used * 10) / 10,
+    total: refCap,
+    percent: Math.round((used / refCap) * 100),
+  };
+}
 
 export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initialDevice?: string; onGoTo?: (t: any) => void } = {}) {
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
@@ -54,8 +98,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const { addProduction, deleteProduction } = useEgg();
 
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<F>(empty());
-  const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterDev, setFilterDev] = useState('');
@@ -63,166 +105,251 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const [filterStatus, setFilterStatus] = useState('');
   const [q, setQ] = useState('');
 
+  // ═══ Bulk mode state ═══
+  const [multiDeviceId, setMultiDeviceId] = useState('');
+  const [draftRows, setDraftRows] = useState<DraftRow[]>([]);
+  const [currentRow, setCurrentRow] = useState<DraftRow>(() => makeRow());
+  const [editingRowId, setEditingRowId] = useState<string | null>(null);
+
+  // ═══ Draft Auto-Load when device changes ═══
+  useEffect(() => {
+    if (!open || !multiDeviceId) return;
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY(multiDeviceId));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) setDraftRows(parsed);
+      } else {
+        setDraftRows([]);
+      }
+    } catch {}
+    setCurrentRow(makeRow());
+    setEditingRowId(null);
+  }, [open, multiDeviceId]);
+
+  // ═══ Draft Auto-Save ═══
+  useEffect(() => {
+    if (!open || !multiDeviceId) return;
+    try {
+      if (draftRows.length === 0) localStorage.removeItem(DRAFT_KEY(multiDeviceId));
+      else localStorage.setItem(DRAFT_KEY(multiDeviceId), JSON.stringify(draftRows));
+    } catch {}
+  }, [draftRows, open, multiDeviceId]);
+
   const suppliers = useMemo(() => (contacts || []).filter((p: any) => (p.roles || []).includes('supplier')), [contacts]);
   const allPersons = contacts || [];
 
-  const openNew = () => {
+  const openMulti = () => {
     if (devices.length === 0) { showAlert('اول یک دستگاه بسازید'); return; }
     if (birds.length === 0) { showAlert('اول پرنده بسازید'); return; }
-    setForm({ ...empty(), deviceId: initialDevice || devices[0].id, birdId: birds[0].id });
-    setErr(''); setOpen(true);
+    setMultiDeviceId(initialDevice || devices[0].id);
+    setDraftRows([]);
+    setCurrentRow({ ...makeRow(), birdId: birds[0].id, entryDate: todayJalali() });
+    setEditingRowId(null);
+    setOpen(true);
+  };
+
+  const setD = (k: string, v: string) => setCurrentRow(f => ({ ...f, dealData: { ...f.dealData, [k]: v } }));
+  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
+  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
+
+  const addRowToList = () => {
+    if (!currentRow.count.trim()) { showAlert('تعداد تخم اجباری است'); return; }
+    if (!currentRow.entryDate.trim()) { showAlert('تاریخ ورود اجباری است'); return; }
+    if (currentRow.dealType === 'purchase' && !currentRow.dealData.sellerId) { showAlert('فروشنده اجباری است'); return; }
+    if (currentRow.dealType === 'partnership' && !currentRow.dealData.partnerId) { showAlert('شریک اجباری است'); return; }
+    if (currentRow.dealType === 'own' && !currentRow.flockId) { showAlert('گله اجباری است'); return; }
+
+    if (editingRowId) {
+      setDraftRows(rows => rows.map(r => r._id === editingRowId ? { ...currentRow, _id: editingRowId } : r));
+      setEditingRowId(null);
+    } else {
+      setDraftRows(rows => [...rows, currentRow]);
+    }
+    setCurrentRow({ ...makeRow(), birdId: currentRow.birdId, entryDate: currentRow.entryDate });
+  };
+
+  const editRow = (row: DraftRow) => {
+    setCurrentRow({ ...row });
+    setEditingRowId(row._id);
+  };
+
+  const removeRow = (id: string) => {
+    if (!confirm('حذف این ردیف؟')) return;
+    setDraftRows(rows => rows.filter(r => r._id !== id));
+    if (editingRowId === id) { setCurrentRow(makeRow()); setEditingRowId(null); }
+  };
+
+  const saveAll = () => {
+    if (draftRows.length === 0) { showAlert('حداقل یک ردیف اضافه کنید'); return; }
+    const device = devices.find(d => d.id === multiDeviceId);
+    if (!device) return;
+
+    let savedCount = 0;
+    draftRows.forEach(row => {
+      try {
+        const bird = birds.find(b => b.id === row.birdId);
+        const birdName = bird?.name || 'مرغ';
+        const expectedHatchDate = addDaysJalali(row.entryDate, incubationDays(birdName));
+        const dealData: Record<string, any> = {};
+        for (const [k, v] of Object.entries(row.dealData)) {
+          const n = parseFloat(toEn(v).replace('٫', '.'));
+          dealData[k] = !isNaN(n) && String(n) === toEn(v).replace('٫', '.') ? n : v;
+        }
+        const count = int(row.count);
+        const unitPrice = num(row.unitPrice);
+        const shippingCost = num(row.shippingCost);
+        const data = {
+          deviceId: multiDeviceId,
+          hatchGroupId: '',
+          birdId: row.birdId,
+          breedId: row.breedId,
+          count,
+          entryDate: row.entryDate,
+          expectedHatchDate,
+          source: row.dealType === 'own' ? 'own' : 'external',
+          dealType: row.dealType,
+          dealStatus: row.dealStatus,
+          dealWithdrawnAt: row.dealWithdrawnAt,
+          dealWithdrawnReason: row.dealWithdrawnReason,
+          dealData,
+          flockId: row.flockId,
+          trayNumbers: row.trayNumbers.trim(),
+          unitPrice,
+          totalPrice: count && unitPrice ? count * unitPrice : null,
+          shippingCost,
+          status: 'incubating' as const,
+          notes: row.notes.trim(),
+          generatedInvoiceId: '',
+          generatedProductionId: '',
+        };
+        const newId = addEntry(data as any);
+
+        // ═══ اتصالات خودکار ═══
+        const refIds: any = {};
+        try {
+          if (row.dealType === 'purchase' && row.dealData.sellerId) {
+            const totalAmount = ((count || 0) * (unitPrice || 0)) + (shippingCost || 0);
+            if (totalAmount > 0) {
+              const invId = addInvoice({
+                type: 'purchase', date: row.entryDate, partyId: row.dealData.sellerId, category: 'egg',
+                items: [{ id: 'egg-' + Date.now(), name: 'تخم نطفه‌دار', quantity: count || 0, unit: 'عدد', unitPrice: unitPrice || 0, total: (count || 0) * (unitPrice || 0) }],
+                total: totalAmount, payments: [], dueDate: row.entryDate,
+                relatedFlockId: '', relatedEntryId: newId, notes: 'خرید تخم — ' + (device.name || ''),
+              } as any);
+              refIds.generatedInvoiceId = invId || '';
+            }
+          } else if (row.dealType === 'own' && row.flockId) {
+            const prodId = addProduction({
+              flockId: row.flockId, date: row.entryDate, totalCount: count || 0,
+              brokenCount: 0, softCount: 0, dirtyCount: 0, avgWeight: null,
+              notes: 'ورودی به جوجه‌کشی — ' + (device.name || ''),
+            } as any);
+            refIds.generatedProductionId = prodId || '';
+          } else if (row.dealType === 'rent' && row.dealData.lessorId && row.dealData.rentAmount) {
+            const rentAmount = parseFloat(toEn(row.dealData.rentAmount).replace('٫', '.')) || 0;
+            if (rentAmount > 0) {
+              const invId = addInvoice({
+                type: 'purchase', date: row.entryDate, partyId: row.dealData.lessorId, category: 'service',
+                items: [{ id: 'rent-' + Date.now(), name: 'اجاره دستگاه', quantity: 1, unit: 'خدمت', unitPrice: rentAmount, total: rentAmount }],
+                total: rentAmount, payments: [], dueDate: row.dealData.rentDueDate || row.entryDate,
+                relatedFlockId: '', relatedEntryId: newId, notes: 'اجاره — ' + (device.name || ''),
+              } as any);
+              refIds.generatedInvoiceId = invId || '';
+            }
+          }
+        } catch {}
+        if (newId && (refIds.generatedInvoiceId || refIds.generatedProductionId)) {
+          updateEntry(newId, refIds);
+        }
+        savedCount++;
+      } catch (err) {}
+    });
+
+    // پاک کردن draft
+    try { localStorage.removeItem(DRAFT_KEY(multiDeviceId)); } catch {}
+    setDraftRows([]);
+    setOpen(false);
+    showAlert(savedCount + ' ورودی ثبت شد', '✅ موفق');
+    if (onGoTo && confirm('به کندلینگ برو؟')) {
+      setTimeout(() => onGoTo('candlings'), 100);
+    }
   };
 
   const openEdit = (e: EggEntry) => {
-    setForm({
-      id: e.id, deviceId: e.deviceId, birdId: e.birdId, breedId: e.breedId,
-      count: e.count ? toFa(e.count) : '',
-      entryDate: e.entryDate,
-      trayNumbers: e.trayNumbers,
+    const row: DraftRow = {
+      _id: e.id,
       dealType: e.dealType,
+      birdId: e.birdId,
+      breedId: e.breedId,
+      flockId: (e as any).flockId || '',
+      count: e.count ? toFa(e.count) : '',
+      trayNumbers: e.trayNumbers,
+      unitPrice: e.unitPrice ? toFa(e.unitPrice) : '',
+      shippingCost: (e as any).shippingCost ? toFa((e as any).shippingCost) : '',
+      entryDate: e.entryDate,
+      notes: e.notes,
       dealData: Object.fromEntries(Object.entries(e.dealData || {}).map(([k, v]) => [k, v == null ? '' : String(v)])),
       dealStatus: (e as any).dealStatus || 'active',
       dealWithdrawnAt: (e as any).dealWithdrawnAt || '',
       dealWithdrawnReason: (e as any).dealWithdrawnReason || '',
-      flockId: (e as any).flockId || '',
-      unitPrice: e.unitPrice ? toFa(e.unitPrice) : '',
-      shippingCost: (e as any).shippingCost ? toFa((e as any).shippingCost) : '',
-      notes: e.notes,
-    });
-    setErr(''); setOpen(true);
-  };
-
-  const setD = (k: string, v: string) => setForm(f => ({ ...f, dealData: { ...f.dealData, [k]: v } }));
-  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
-  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
-
-  const selectedDevice = devices.find(d => d.id === form.deviceId);
-  const selectedBird = birds.find(b => b.id === form.birdId);
-  const maxCapacity = useMemo(() => {
-    if (!selectedDevice || !selectedBird) return 0;
-    const cap = (selectedDevice.capacityByBird || []).find(c => c.birdName === selectedBird.name);
-    return cap?.capacity || 0;
-  }, [selectedDevice, selectedBird]);
-
-  const save = () => {
-    if (!form.count.trim() || !form.entryDate.trim()) { setErr('تعداد و تاریخ ورود اجباری است'); return; }
-    if (maxCapacity && (parseInt(toEn(form.count)) || 0) > maxCapacity) {
-      if (!confirm('تعداد (' + toFa(parseInt(toEn(form.count))) + ') از ظرفیت (' + toFa(maxCapacity) + ') بیشتر است. ادامه؟')) return;
-    }
-    const bird = birds.find(b => b.id === form.birdId);
-    const birdName = bird?.name || 'مرغ';
-    const expectedHatchDate = addDaysJalali(form.entryDate, incubationDays(birdName));
-    const dealData: Record<string, any> = {};
-    for (const [k, v] of Object.entries(form.dealData)) {
-      const n = parseFloat(toEn(v).replace('٫', '.'));
-      dealData[k] = !isNaN(n) && String(n) === toEn(v).replace('٫', '.') ? n : v;
-    }
-    const count = int(form.count);
-    const unitPrice = num(form.unitPrice);
-    const data = {
-      deviceId: form.deviceId,
-      hatchGroupId: '',
-      birdId: form.birdId,
-      breedId: form.breedId,
-      count,
-      entryDate: form.entryDate,
-      expectedHatchDate,
-      source: form.dealType === 'own' ? 'own' : 'external',
-      dealType: form.dealType,
-      dealStatus: form.dealStatus,
-      dealWithdrawnAt: form.dealWithdrawnAt,
-      dealWithdrawnReason: form.dealWithdrawnReason,
-      dealData,
-      flockId: form.flockId,
-      trayNumbers: form.trayNumbers.trim(),
-      unitPrice,
-      totalPrice: count && unitPrice ? count * unitPrice : null,
-      shippingCost: num(form.shippingCost),
-      status: 'incubating' as const,
-      notes: form.notes.trim(),
     };
-    if (form.id) updateEntry(form.id, data as any);
-    else {
-      addEntry(data as any);
-      // ═══ اتصال خودکار به ماژول‌های دیگر ═══
-      try {
-        const countNum = parseInt(toEn(form.count)) || 0;
-        const unitPriceNum = parseFloat(toEn(form.unitPrice).replace('٫', '.')) || 0;
-        const shippingNum = parseFloat(toEn(form.shippingCost).replace('٫', '.')) || 0;
-        const deviceName = devices.find(d => d.id === form.deviceId)?.name || '';
-
-        if (form.dealType === 'purchase' && form.dealData.sellerId) {
-          const totalAmount = (countNum * unitPriceNum) + shippingNum;
-          if (totalAmount > 0) {
-            addInvoice({
-              type: 'purchase',
-              date: form.entryDate,
-              partyId: form.dealData.sellerId,
-              category: 'egg',
-              items: [{
-                id: 'egg-' + Date.now(),
-                name: 'تخم نطفه‌دار',
-                quantity: countNum,
-                unit: 'عدد',
-                unitPrice: unitPriceNum,
-                total: countNum * unitPriceNum,
-              }],
-              total: totalAmount,
-              payments: [],
-              dueDate: form.entryDate,
-              relatedFlockId: '',
-              relatedEntryId: '',
-              notes: 'خرید تخم — ' + deviceName,
-            } as any);
-          }
-        } else if (form.dealType === 'own' && form.flockId) {
-          addProduction({
-            flockId: form.flockId,
-            date: form.entryDate,
-            totalCount: countNum,
-            brokenCount: 0,
-            softCount: 0,
-            dirtyCount: 0,
-            avgWeight: null,
-            notes: 'ورودی به جوجه‌کشی — ' + deviceName,
-          });
-        } else if (form.dealType === 'rent' && form.dealData.lessorId && form.dealData.rentAmount) {
-          const rentAmount = parseFloat(toEn(form.dealData.rentAmount).replace('٫', '.')) || 0;
-          if (rentAmount > 0) {
-            const rentInvId = addInvoice({
-              type: 'purchase',
-              date: form.entryDate,
-              partyId: form.dealData.lessorId,
-              category: 'service',
-              items: [{
-                id: 'rent-' + Date.now(),
-                name: 'اجاره دستگاه جوجه‌کشی',
-                quantity: 1,
-                unit: 'خدمت',
-                unitPrice: rentAmount,
-                total: rentAmount,
-              }],
-              total: rentAmount,
-              payments: [],
-              dueDate: form.dealData.rentDueDate || form.entryDate,
-              relatedFlockId: '',
-              relatedEntryId: '',
-              notes: 'اجاره — ' + deviceName,
-            } as any);
-          }
-        }
-      } catch (e) { /* silent */ }
-      setOpen(false);
-      if (onGoTo && confirm('ورودی ثبت شد. به کندلینگ برو؟')) {
-        setTimeout(() => onGoTo('candlings'), 100);
-        return;
-      }
-    }
-    setOpen(false);
+    setMultiDeviceId(e.deviceId);
+    setDraftRows([row]);
+    setCurrentRow(row);
+    setEditingRowId(row._id);
+    setOpen(true);
   };
 
-  const breedsForBird = breeds.filter(b => b.birdId === form.birdId);
+  const deleteEntryWithCascade = (id: string) => {
+    const entry = eggEntries.find(e => e.id === id) as any;
+    if (!entry) return;
+    let delInv = false, delProd = false;
+    if (entry.generatedInvoiceId) {
+      delInv = confirm('این ورودی یک فاکتور در معاملات ساخته.\nتایید: فاکتور هم حذف شود\nلغو: فقط ورودی حذف شود');
+    }
+    if (entry.generatedProductionId) {
+      delProd = confirm('این ورودی یک رکورد تولید تخم ساخته.\nتایید: آن هم حذف شود\nلغو: فقط ورودی حذف شود');
+    }
+    if (delInv && entry.generatedInvoiceId) { try { deleteInvoice(entry.generatedInvoiceId); } catch {} }
+    if (delProd && entry.generatedProductionId) { try { deleteProduction(entry.generatedProductionId); } catch {} }
+    deleteEntry(id);
+    setDelId(null);
+  };
 
+  const breedsForBird = breeds.filter(b => b.birdId === currentRow.birdId);
+
+  // ═══ محاسبه استفاده دستگاه در فرم ═══
+  const draftUsage = useMemo(() => {
+    const device = devices.find(d => d.id === multiDeviceId);
+    if (!device) return { used: 0, total: 0, percent: 0 };
+    const allEntries = eggEntries.map(x => ({ ...x, __birdName: (birds.find(b => b.id === x.birdId)?.name) || '' }));
+    let used = 0;
+    const refCap = Math.max(...(device.capacityByBird || []).map((c: any) => c.capacity || 0));
+    if (refCap === 0) return { used: 0, total: 0, percent: 0 };
+    // فعلی
+    allEntries.forEach(e => {
+      if (e.status === 'failed') return;
+      const cap = (device.capacityByBird || []).find((c: any) => c.birdName === e.__birdName);
+      if (!cap?.capacity) return;
+      used += (e.count || 0) * (refCap / cap.capacity);
+    });
+    // draft
+    draftRows.forEach(r => {
+      const bird = birds.find(b => b.id === r.birdId);
+      if (!bird) return;
+      const cap = (device.capacityByBird || []).find((c: any) => c.birdName === bird.name);
+      if (!cap?.capacity) return;
+      used += (parseInt(toEn(r.count)) || 0) * (refCap / cap.capacity);
+    });
+    return {
+      used: Math.round(used * 10) / 10,
+      total: refCap,
+      percent: Math.round((used / refCap) * 100),
+    };
+  }, [multiDeviceId, draftRows, eggEntries, birds, devices]);
+
+  // ═══ فیلتر لیست ═══
   const list = useMemo(() => {
     return eggEntries.filter(e => {
       if (filterDev && e.deviceId !== filterDev) return false;
@@ -242,6 +369,32 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   }, [eggEntries, filterDev, filterSource, filterStatus, q, devices, birds, contacts]);
 
   const target = delId ? eggEntries.find(e => e.id === delId) : null;
+  const multiDevice = devices.find(d => d.id === multiDeviceId);
+
+  const renderRowSummary = (row: DraftRow, idx: number) => {
+    const bird = birds.find(b => b.id === row.birdId);
+    const sellerName = (row.dealData.sellerId && (contacts.find((c: any) => c.id === row.dealData.sellerId) as any)?.name) || '';
+    const partnerName = (row.dealData.partnerId && (contacts.find((c: any) => c.id === row.dealData.partnerId) as any)?.name) || '';
+    const flockName = row.flockId ? flocks.find((f: any) => f.id === row.flockId)?.name : '';
+    const consigneeName = (row.dealData.consigneeId && (contacts.find((c: any) => c.id === row.dealData.consigneeId) as any)?.name) || '';
+    const lessorName = (row.dealData.lessorId && (contacts.find((c: any) => c.id === row.dealData.lessorId) as any)?.name) || '';
+    const party = sellerName || partnerName || flockName || consigneeName || lessorName || '—';
+
+    return (
+      <div key={row._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+          <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {toFa(idx + 1)}. {DEAL_LABEL[row.dealType]} · {bird?.name || '—'} · {toFa(row.count || 0)} تخم
+          </span>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {party} · {toFa(row.entryDate)}
+          </span>
+        </div>
+        <button type="button" onClick={() => editRow(row)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--accent)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: '2px 6px' }}>✏️</button>
+        <button type="button" onClick={() => removeRow(row._id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 2 }}>✕</button>
+      </div>
+    );
+  };
 
   return (
     <PageContainer>
@@ -285,7 +438,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><ellipse cx="12" cy="14" rx="7" ry="9"/></svg>}
           title={eggEntries.length === 0 ? 'هنوز تخمی وارد دستگاه نشده' : 'ورودی مطابق فیلتر نیست'}
           desc={devices.length === 0 ? 'اول یک دستگاه بسازید.' : 'اولین بچ خود را ثبت کنید.'}
-          action={<Btn variant="primary" onClick={openNew}>+ ورود تخم</Btn>} />
+          action={<Btn variant="primary" onClick={openMulti}>+ ورود تخم</Btn>} />
       ) : (
         <>
           {list.map((e, i) => {
@@ -296,8 +449,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             const remain = daysToHatch(e.expectedHatchDate);
             const locked = isLockdown(e);
             const hatchWindow = isHatchWindow(e);
-            const myCandlings = candlings.filter(c => c.eggEntryId === e.id);
-            const __birdName = bird?.name || '';
             const myHatch = hatches.find(h => h.eggEntryId === e.id);
             const isOpen = expandedId === e.id;
 
@@ -333,17 +484,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   const b = birds.find(x => x.id === e.birdId);
                   const total = incubationDays(b?.name || 'مرغ');
                   return <ProgressTracker current={age} target={total} label={hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : 'در حال انکوباسیون'} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
-                })()}
-
-                {(() => {
-                  const usage = calcDeviceUsage(dev, eggEntries.map(x => ({ ...x, __birdName: (birds.find(b => b.id === x.birdId)?.name) || '' })), null);
-                  if (usage.total === 0) return null;
-                  return (
-                    <div style={{ fontSize: 'var(--fs-xs)', color: usage.percent > 100 ? 'var(--danger)' : 'var(--muted)', fontWeight: 600, padding: '4px 0', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>📊 ظرفیت دستگاه:</span>
-                      <span>{toFa(usage.used)} / {toFa(usage.total)} واحد ({toFa(usage.percent)}٪)</span>
-                    </div>
-                  );
                 })()}
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📋 مشخصات</div>
@@ -403,20 +543,36 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ ورود تخم</Btn>
+          <Btn variant="primary" full onClick={openMulti}>+ ورود تخم</Btn>
         </>
       )}
 
-      <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش ورودی تخم' : 'ورود تخم به دستگاه'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+      <Modal open={open} onClose={() => setOpen(false)} title={editingRowId ? 'ویرایش ردیف' : 'ورود تخم به دستگاه'}
+        footer={<BtnRow><Btn variant="primary" onClick={saveAll}>💾 ذخیره همه ({toFa(draftRows.length)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
-        <SectionTitle>📦 دستگاه و منبع</SectionTitle>
+        <SectionTitle>📦 دستگاه</SectionTitle>
+        <Field label="انتخاب دستگاه" required>
+          <SmartSelect value={multiDeviceId} onChange={v => { setMultiDeviceId(v); }} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
+        </Field>
+        {draftUsage.total > 0 && (
+          <div style={{ fontSize: 'var(--fs-xs)', color: draftUsage.percent > 100 ? 'var(--danger)' : 'var(--muted)', fontWeight: 600, padding: '4px 2px' }}>
+            📊 استفاده: {toFa(draftUsage.used)} / {toFa(draftUsage.total)} واحد ({toFa(draftUsage.percent)}٪)
+            {draftUsage.percent > 100 ? ' ⚠️ بیشتر از ظرفیت' : ''}
+          </div>
+        )}
+
+        {draftRows.length > 0 && (
+          <>
+            <SectionTitle>📋 ردیف‌های تخم</SectionTitle>
+            {draftRows.map((r, i) => renderRowSummary(r, i))}
+          </>
+        )}
+
+        <SectionTitle>{editingRowId ? '✏️ ویرایش ردیف' : '➕ ردیف جدید'}</SectionTitle>
+
         <Grid2>
-          <Field label="دستگاه" required>
-            <SmartSelect value={form.deviceId} onChange={v => setForm(f => ({ ...f, deviceId: v }))} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
-          </Field>
           <Field label="نوع منبع" required>
-            <Select value={form.dealType} onChange={e => setForm({ ...form, dealType: e.target.value as DealType, dealData: {}, flockId: '' })}>
+            <Select value={currentRow.dealType} onChange={e => setCurrentRow(f => ({ ...f, dealType: e.target.value as DealType, dealData: {}, flockId: '' }))}>
               <option value="own">🏠 گله خودم</option>
               <option value="partnership">🤝 شراکتی</option>
               <option value="purchase">📥 خریداری</option>
@@ -424,27 +580,22 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               <option value="consignment">📦 امانی</option>
             </Select>
           </Field>
+          <Field label="تاریخ ورود" required>
+            <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ" />
+          </Field>
         </Grid2>
-        {maxCapacity > 0 && (
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 4px' }}>ظرفیت دستگاه: {toFa(maxCapacity)} تخم</div>
-        )}
 
-        {form.dealType === 'own' && (
-          <Field label="انتخاب گله" hint="گله‌ای که تخم از آن آمده">
+        {currentRow.dealType === 'own' && (
+          <Field label="انتخاب گله" required>
             {flocks.filter((fl: any) => fl.status === 'active').length === 0 ? (
               <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-                هنوز گله فعالی ثبت نشده — اول از ماژول گله اضافه کنید
+                گله فعالی نیست
               </div>
             ) : (
-              <Select value={form.flockId} onChange={e => {
+              <Select value={currentRow.flockId} onChange={e => {
                 const fid = e.target.value;
                 const fl = flocks.find((x: any) => x.id === fid);
-                setForm(f => ({
-                  ...f,
-                  flockId: fid,
-                  birdId: fl?.birdId || f.birdId,
-                  breedId: fl?.breedId || f.breedId,
-                }));
+                setCurrentRow(f => ({ ...f, flockId: fid, birdId: fl?.birdId || f.birdId, breedId: fl?.breedId || f.breedId }));
               }}>
                 <option value="">— انتخاب گله —</option>
                 {flocks.filter((fl: any) => fl.status === 'active').map((fl: any) => <option key={fl.id} value={fl.id}>{fl.name}</option>)}
@@ -453,123 +604,97 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           </Field>
         )}
 
-        {form.dealType === 'purchase' && (
-          <DepBox title="📥 اطلاعات خرید">
+        {currentRow.dealType === 'purchase' && (
+          <DepBox title="📥 خرید">
             <Field label="فروشنده" required>
               {suppliers.length === 0 ? (
                 <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-                  هنوز فروشنده‌ای در مخاطبین نیست
+                  فروشنده‌ای در مخاطبین نیست
                 </div>
               ) : (
-                <Select value={form.dealData.sellerId || ''} onChange={e => setD('sellerId', e.target.value)}>
-                  <option value="">— انتخاب فروشنده —</option>
+                <Select value={currentRow.dealData.sellerId || ''} onChange={e => setD('sellerId', e.target.value)}>
+                  <option value="">— انتخاب —</option>
                   {suppliers.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </Select>
               )}
             </Field>
-            <Field label="تاریخ خرید">
-              <DatePicker value={form.dealData.purchaseDate || ''} onChange={v => setD('purchaseDate', v)} />
-            </Field>
           </DepBox>
         )}
 
-        {form.dealType === 'partnership' && (
-          <DepBox title="🤝 اطلاعات شراکت">
+        {currentRow.dealType === 'partnership' && (
+          <DepBox title="🤝 شراکت">
             <Field label="شریک" required>
-              {allPersons.length === 0 ? (
-                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-                  هنوز مخاطبی ثبت نشده
-                </div>
-              ) : (
-                <Select value={form.dealData.partnerId || ''} onChange={e => setD('partnerId', e.target.value)}>
-                  <option value="">— انتخاب شریک —</option>
-                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </Select>
-              )}
+              <Select value={currentRow.dealData.partnerId || ''} onChange={e => setD('partnerId', e.target.value)}>
+                <option value="">— انتخاب —</option>
+                {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </Select>
             </Field>
             <Grid2>
-              <Field label="درصد شریک" hint="۰ تا ۱۰۰">
-                <NumField placeholder="۵۰" value={form.dealData.partnerPercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('partnerPercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
+              <Field label="درصد شریک" hint="٪">
+                <NumField value={currentRow.dealData.partnerPercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('partnerPercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
               </Field>
               <Field label="درصد من" hint="خودکار">
-                <Input readOnly dir="ltr" value={toFa(complement(parseInt(toEn(form.dealData.partnerPercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
+                <Input readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.partnerPercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
               </Field>
             </Grid2>
           </DepBox>
         )}
 
-        {form.dealType === 'rent' && (
-          <DepBox title="🏢 اطلاعات اجاره">
+        {currentRow.dealType === 'rent' && (
+          <DepBox title="🏢 اجاره">
             <Field label="اجاره‌دهنده" required>
-              {allPersons.length === 0 ? (
-                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-                  هنوز مخاطبی ثبت نشده
-                </div>
-              ) : (
-                <Select value={form.dealData.lessorId || ''} onChange={e => setD('lessorId', e.target.value)}>
-                  <option value="">— انتخاب اجاره‌دهنده —</option>
-                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </Select>
-              )}
+              <Select value={currentRow.dealData.lessorId || ''} onChange={e => setD('lessorId', e.target.value)}>
+                <option value="">— انتخاب —</option>
+                {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </Select>
             </Field>
             <Grid2>
-              <Field label="مبلغ اجاره"><MoneyField placeholder="۰" value={form.dealData.rentAmount || ''} onChange={e => setD('rentAmount', e.target.value)} /></Field>
-              <Field label="سرسید"><Input placeholder="۱۴۰۵/۰۸/۰۱" value={form.dealData.rentDueDate || ''} onChange={e => setD('rentDueDate', e.target.value)} /></Field>
+              <Field label="مبلغ اجاره"><MoneyField value={currentRow.dealData.rentAmount || ''} onChange={e => setD('rentAmount', e.target.value)} /></Field>
+              <Field label="سرسید"><Input value={currentRow.dealData.rentDueDate || ''} onChange={e => setD('rentDueDate', e.target.value)} /></Field>
             </Grid2>
           </DepBox>
         )}
 
-        {form.dealType === 'consignment' && (
-          <DepBox title="📦 اطلاعات امانت">
+        {currentRow.dealType === 'consignment' && (
+          <DepBox title="📦 امانت">
             <Field label="امانت‌دار" required>
-              {allPersons.length === 0 ? (
-                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-                  هنوز مخاطبی ثبت نشده
-                </div>
-              ) : (
-                <Select value={form.dealData.consigneeId || ''} onChange={e => setD('consigneeId', e.target.value)}>
-                  <option value="">— انتخاب امانت‌دار —</option>
-                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </Select>
-              )}
+              <Select value={currentRow.dealData.consigneeId || ''} onChange={e => setD('consigneeId', e.target.value)}>
+                <option value="">— انتخاب —</option>
+                {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </Select>
             </Field>
             <Grid2>
-              <Field label="درصد امانت‌دار" hint="۰ تا ۱۰۰">
-                <NumField placeholder="۲۰" value={form.dealData.consigneePercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('consigneePercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
+              <Field label="درصد امانت‌دار" hint="٪">
+                <NumField value={currentRow.dealData.consigneePercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('consigneePercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
               </Field>
               <Field label="درصد من" hint="خودکار">
-                <Input readOnly dir="ltr" value={toFa(complement(parseInt(toEn(form.dealData.consigneePercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
+                <Input readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.consigneePercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
               </Field>
             </Grid2>
           </DepBox>
         )}
 
-        {(form.dealType === 'partnership' || form.dealType === 'consignment') && (
-          <div style={{ padding: 10, background: form.dealStatus === 'withdrawn' ? 'var(--danger-soft)' : 'var(--input-bg)', border: '1px solid ' + (form.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--border)'), borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input type="checkbox" checked={form.dealStatus === 'withdrawn'} onChange={e => setForm({ ...form, dealStatus: e.target.checked ? 'withdrawn' : 'active' })} style={{ width: 18, height: 18, accentColor: 'var(--danger)' }} />
-              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: form.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--text)' }}>شریک/صاحب کنار کشید</span>
-            </div>
-            {form.dealStatus === 'withdrawn' && (
+        {(currentRow.dealType === 'partnership' || currentRow.dealType === 'consignment') && (
+          <div style={{ padding: 10, background: currentRow.dealStatus === 'withdrawn' ? 'var(--danger-soft)' : 'var(--input-bg)', border: '1px solid ' + (currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--border)'), borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+              <input type="checkbox" checked={currentRow.dealStatus === 'withdrawn'} onChange={e => setCurrentRow(f => ({ ...f, dealStatus: e.target.checked ? 'withdrawn' : 'active' }))} style={{ width: 18, height: 18, accentColor: 'var(--danger)' }} />
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--text)' }}>کنار کشید</span>
+            </label>
+            {currentRow.dealStatus === 'withdrawn' && (
               <Grid2>
-                <Field label="تاریخ کنارکشیدن">
-                  <DatePicker value={form.dealWithdrawnAt} onChange={v => setForm({ ...form, dealWithdrawnAt: v })} />
-                </Field>
-                <Field label="دلیل">
-                  <Input placeholder="..." value={form.dealWithdrawnReason} onChange={e => setForm({ ...form, dealWithdrawnReason: e.target.value })} />
-                </Field>
+                <Field label="تاریخ"><DatePicker value={currentRow.dealWithdrawnAt} onChange={v => setCurrentRow(f => ({ ...f, dealWithdrawnAt: v }))} /></Field>
+                <Field label="دلیل"><Input value={currentRow.dealWithdrawnReason} onChange={e => setCurrentRow(f => ({ ...f, dealWithdrawnReason: e.target.value }))} /></Field>
               </Grid2>
             )}
           </div>
         )}
 
-        <SectionTitle>📋 مشخصات تخم</SectionTitle>
         <Grid2>
-          <Field label="پرنده" required hint={form.dealType === 'own' && form.flockId ? 'خودکار از گله' : undefined}>
-            <SmartSelect value={form.birdId} onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
+          <Field label="پرنده" required>
+            <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="—" modalTitle="انتخاب پرنده" autoThreshold={6} />
           </Field>
           <Field label="نژاد">
-            <Select value={form.breedId} onChange={e => setForm({ ...form, breedId: e.target.value })}>
+            <Select value={currentRow.breedId} onChange={e => setCurrentRow(f => ({ ...f, breedId: e.target.value }))}>
               <option value="">—</option>
               {breedsForBird.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
             </Select>
@@ -577,100 +702,66 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         </Grid2>
         <Grid2>
           <Field label="تعداد تخم" required>
-            <NumField placeholder="۳۰۰" value={form.count} onChange={e => setForm({ ...form, count: e.target.value })} unit="عدد" min={0} />
+            <NumField value={currentRow.count} onChange={e => setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} />
           </Field>
           <Field label="طبقات (Tray)">
-            <Input placeholder="۱-۲-۳" dir="ltr" value={form.trayNumbers} onChange={e => setForm({ ...form, trayNumbers: e.target.value })} />
+            <Input placeholder="۱-۲-۳" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
           </Field>
         </Grid2>
-        {(form.dealType === 'purchase' || form.dealType === 'partnership') ? (
+
+        {(currentRow.dealType === 'purchase' || currentRow.dealType === 'partnership') && (
           <>
             <Grid2>
-              <Field label="تاریخ ورود" required>
-                <DatePicker value={form.entryDate} onChange={v => setForm({ ...form, entryDate: v })} placeholder="انتخاب تاریخ" />
-              </Field>
               <Field label="قیمت هر تخم">
-                <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
+                <MoneyField value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
+              </Field>
+              <Field label="هزینه حمل">
+                <MoneyField value={currentRow.shippingCost} onChange={e => setCurrentRow(f => ({ ...f, shippingCost: e.target.value }))} />
               </Field>
             </Grid2>
-            <Field label="هزینه حمل">
-              <MoneyField placeholder="۰" value={form.shippingCost} onChange={e => setForm({ ...form, shippingCost: e.target.value })} />
-            </Field>
+            {(() => {
+              const cnt = parseInt(toEn(currentRow.count)) || 0;
+              const up = parseFloat(toEn(currentRow.unitPrice).replace('٫', '.')) || 0;
+              const sh = parseFloat(toEn(currentRow.shippingCost).replace('٫', '.')) || 0;
+              const total = (cnt * up) + sh;
+              if (total > 0) {
+                return (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                    <span>💰 جمع ردیف:</span>
+                    <span>{toFa(total.toLocaleString('fa-IR'))} ت</span>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </>
-        ) : (
-          <Field label="تاریخ ورود" required>
-            <DatePicker value={form.entryDate} onChange={v => setForm({ ...form, entryDate: v })} placeholder="انتخاب تاریخ" />
-          </Field>
         )}
-        <SectionTitle>📝 یادداشت</SectionTitle>
-        <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
 
-        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center' }}>✕ {err}</div>}
+        <Field label="یادداشت">
+          <Input placeholder="..." value={currentRow.notes} onChange={e => setCurrentRow(f => ({ ...f, notes: e.target.value }))} />
+        </Field>
+
+        <Btn variant="primary" full onClick={addRowToList}>
+          {editingRowId ? '💾 به‌روزرسانی ردیف' : '+ افزودن به لیست'}
+        </Btn>
+        {editingRowId && (
+          <Btn full onClick={() => { setEditingRowId(null); setCurrentRow(makeRow()); }}>لغو ویرایش</Btn>
+        )}
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف ورودی تخم"
-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteEntry(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="danger" onClick={() => delId && deleteEntryWithCascade(delId)}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-          حذف این ورودی؟
-          <br /><span style={{ color: 'var(--muted)', fontSize: 'var(--fs-base)' }}>تمام کندلینگ‌ها و هچ‌های مربوط هم حذف می‌شوند.</span>
+          حذف <b>{toFa(target?.count || 0)} تخم</b>؟
         </div>
       </Modal>
     </PageContainer>
   );
 }
 
-
-
-// محاسبه استفاده دستگاه بر اساس ضریب هر پرنده
-// ضریب پرنده = ظرفیت مرغ / ظرفیت آن پرنده
-function calcDeviceUsage(
-  device: any,
-  entries: any[],
-  excludeEntryId: string | null,
-  newEntry?: { birdName: string; count: number }
-): { used: number; total: number; percent: number; byBird: Record<string, { used: number; cap: number }> } {
-  const caps: any[] = device?.capacityByBird || [];
-  if (caps.length === 0) return { used: 0, total: 0, percent: 0, byBird: {} };
-
-  // ظرفیت مرجع = بیشترین ظرفیت (معمولاً مرغ)
-  const refCap = Math.max(...caps.map(c => c.capacity || 0));
-  if (refCap === 0) return { used: 0, total: 0, percent: 0, byBird: {} };
-
-  const byBird: Record<string, { used: number; cap: number; factor: number }> = {};
-  caps.forEach(c => {
-    if (!c.birdName) return;
-    const factor = (c.capacity && c.capacity > 0) ? (refCap / c.capacity) : 1;
-    byBird[c.birdName] = { used: 0, cap: c.capacity || 0, factor };
-  });
-
-  let used = 0;
-  entries.forEach(e => {
-    if (excludeEntryId && e.id === excludeEntryId) return;
-    if (e.status === 'failed') return;
-    const bird = (e as any).__birdName || '';
-    if (!bird) return;
-    const b = byBird[bird];
-    if (!b) return;
-    const units = (e.count || 0) * b.factor;
-    b.used += units;
-    used += units;
-  });
-
-  if (newEntry) {
-    const b = byBird[newEntry.birdName];
-    if (b) {
-      const units = newEntry.count * b.factor;
-      b.used += units;
-      used += units;
-    }
-  }
-
-  return {
-    used: Math.round(used * 10) / 10,
-    total: refCap,
-    percent: Math.round((used / refCap) * 100),
-    byBird,
-  };
+function todayJalali(): string {
+  const d = new Date();
+  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
 }
 
 function Row({ l, v }: { l: string; v: string }) {
@@ -685,8 +776,7 @@ function Row({ l, v }: { l: string; v: string }) {
 function DepBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ background: 'var(--accent-soft)', border: '1px dashed var(--accent-border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)' }} />
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
         {title}
       </div>
       {children}
