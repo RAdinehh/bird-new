@@ -384,9 +384,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 <DatePicker value={form.dealData.purchaseDate || ''} onChange={v => setD('purchaseDate', v)} />
               </Field>
             </Grid2>
-            <Field label="شماره فاکتور">
-              <Input placeholder="اختیاری" value={form.dealData.invoiceNo || ''} onChange={e => setD('invoiceNo', e.target.value)} />
-            </Field>
             <Grid2>
               <Field label="قیمت هر تخم">
                 <MoneyField placeholder="۰" value={form.dealData.purchasePrice || ''} onChange={e => setD('purchasePrice', e.target.value)} />
