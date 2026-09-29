@@ -4,7 +4,49 @@ import { salesInMonth, purchasesInMonth, cashInMonth, cashOutMonth, lastMonths, 
 import { BarChart, DualBarChart, LineChart, PieChart } from '../../shr/components/Charts';
 import { PageContainer } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
+import { pareto } from '../../shr/utils/pareto';
 import ExportButtons from './ExportButtons';
+
+
+function ParetoCard({ invoices }: { invoices: any[] }) {
+  const data = useMemo(() => {
+    const map: Record<string, number> = {};
+    invoices.filter((i: any) => i.type === 'purchase').forEach((inv: any) => {
+      (inv.items || []).forEach((it: any) => {
+        const name = it.name || 'سایر';
+        const amount = it.total || ((it.quantity || 0) * (it.unitPrice || 0));
+        map[name] = (map[name] || 0) + amount;
+      });
+    });
+    const arr = Object.entries(map).map(([label, value]) => ({ label, value }));
+    return pareto(arr);
+  }, [invoices]);
+
+  if (data.length === 0) return null;
+  const top80 = data.filter((d, i) => i === 0 || data[i - 1].cumulative <= 80);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)' }}>
+      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>📊 تحلیل Pareto — اقلام پرهزینه</div>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
+        {toFa(top80.length)} قلم اول = حدود ۸۰٪ کل خرید
+      </div>
+      {data.slice(0, 6).map((d, i) => (
+        <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+            <span style={{ fontWeight: d.cumulative <= 80 ? 700 : 400 }}>{d.label}</span>
+            <span style={{ direction: 'ltr', color: d.cumulative <= 80 ? 'var(--danger)' : 'var(--muted)', fontWeight: 600 }}>
+              {toFa(d.percent)}٪
+            </span>
+          </div>
+          <div style={{ height: 4, background: 'var(--input-bg)', borderRadius: 2, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: d.percent + '%', background: d.cumulative <= 80 ? 'var(--danger)' : 'var(--muted)' }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function FinancialPage() {
   const { invoices } = useTra();
@@ -52,6 +94,7 @@ export default function FinancialPage() {
   if (invoices.length === 0) {
     return (
       <PageContainer>
+      <ParetoCard invoices={invoices} />
         <div style={{ padding: 60, textAlign: 'center', fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.8 }}>
           هنوز معامله‌ای ثبت نشده
           <br />
