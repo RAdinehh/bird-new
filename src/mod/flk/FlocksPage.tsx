@@ -505,10 +505,10 @@ export default function FlocksPage() {
 
           <Grid2>
             <Field label="تعداد اولیه" required>
-              <Input placeholder="۸۵۰" inputMode="numeric" dir="ltr" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" />
+              <Input placeholder="۸۵۰" inputMode="numeric" dir="ltr" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={0} />
             </Field>
             <Field label="تعداد فعلی">
-              <Input placeholder="۸۳۲" inputMode="numeric" dir="ltr" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" />
+              <Input placeholder="۸۳۲" inputMode="numeric" dir="ltr" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={0} />
             </Field>
           </Grid2>
 
@@ -516,10 +516,10 @@ export default function FlocksPage() {
             <DepBox title="اطلاعات گله مادر" tone="purple">
               <Grid2>
                 <Field label="تعداد خروس">
-                  <Input placeholder="۸۰" inputMode="numeric" dir="ltr" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} />
+                  <Input placeholder="۸۰" inputMode="numeric" dir="ltr" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} />
                 </Field>
                 <Field label="تعداد مرغ">
-                  <Input placeholder="۸۰۰" inputMode="numeric" dir="ltr" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} />
+                  <Input placeholder="۸۰۰" inputMode="numeric" dir="ltr" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} />
                 </Field>
               </Grid2>
               {form.maleCount && form.femaleCount && (
@@ -578,14 +578,14 @@ export default function FlocksPage() {
 
           <Grid2>
             <Field label="قیمت هر پرنده">
-              <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} unit="ت" />
+              <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} unit="ت" min={0} />
             </Field>
             <Field label="هزینه حمل">
-              <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} unit="ت" />
+              <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} unit="ت" min={0} />
             </Field>
           </Grid2>
           <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه">
-            <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} unit="ت" />
+            <Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} unit="ت" min={0} />
           </Field>
 
           {liveCosts.total > 0 && (
