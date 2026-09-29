@@ -371,8 +371,17 @@ export default function DailyLogsPage() {
         )}
 
         <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-          <Btn size="sm" onClick={() => openEdit(l)} style={{ flex: 1 }}>ویرایش</Btn>
-          <Btn size="sm" onClick={() => setDelId(l.id)} style={{ flex: 1 }}>حذف</Btn>
+          {(l.status || 'active') === 'active' ? (
+            <>
+              <Btn size="sm" onClick={() => openEdit(l)} style={{ flex: 1 }}>ویرایش</Btn>
+              <Btn size="sm" onClick={() => archive(l.id)} style={{ flex: 1 }}>📦 آرشیو</Btn>
+            </>
+          ) : (
+            <>
+              <Btn size="sm" variant="primary" onClick={() => restore(l.id)} style={{ flex: 1 }}>♻️ بازگردانی</Btn>
+              <Btn size="sm" onClick={() => setDelId(l.id)} style={{ flex: 1 }}>🗑 حذف</Btn>
+            </>
+          )}
         </div>
       </ExpandableCard>
     );
