@@ -297,6 +297,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             const locked = isLockdown(e);
             const hatchWindow = isHatchWindow(e);
             const myCandlings = candlings.filter(c => c.eggEntryId === e.id);
+            const __birdName = bird?.name || '';
             const myHatch = hatches.find(h => h.eggEntryId === e.id);
             const isOpen = expandedId === e.id;
 
@@ -332,6 +333,17 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   const b = birds.find(x => x.id === e.birdId);
                   const total = incubationDays(b?.name || 'مرغ');
                   return <ProgressTracker current={age} target={total} label={hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : 'در حال انکوباسیون'} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
+                })()}
+
+                {(() => {
+                  const usage = calcDeviceUsage(dev, eggEntries.map(x => ({ ...x, __birdName: (birds.find(b => b.id === x.birdId)?.name) || '' })), null);
+                  if (usage.total === 0) return null;
+                  return (
+                    <div style={{ fontSize: 'var(--fs-xs)', color: usage.percent > 100 ? 'var(--danger)' : 'var(--muted)', fontWeight: 600, padding: '4px 0', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>📊 ظرفیت دستگاه:</span>
+                      <span>{toFa(usage.used)} / {toFa(usage.total)} واحد ({toFa(usage.percent)}٪)</span>
+                    </div>
+                  );
                 })()}
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📋 مشخصات</div>
@@ -605,6 +617,60 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       </Modal>
     </PageContainer>
   );
+}
+
+
+
+// محاسبه استفاده دستگاه بر اساس ضریب هر پرنده
+// ضریب پرنده = ظرفیت مرغ / ظرفیت آن پرنده
+function calcDeviceUsage(
+  device: any,
+  entries: any[],
+  excludeEntryId: string | null,
+  newEntry?: { birdName: string; count: number }
+): { used: number; total: number; percent: number; byBird: Record<string, { used: number; cap: number }> } {
+  const caps: any[] = device?.capacityByBird || [];
+  if (caps.length === 0) return { used: 0, total: 0, percent: 0, byBird: {} };
+
+  // ظرفیت مرجع = بیشترین ظرفیت (معمولاً مرغ)
+  const refCap = Math.max(...caps.map(c => c.capacity || 0));
+  if (refCap === 0) return { used: 0, total: 0, percent: 0, byBird: {} };
+
+  const byBird: Record<string, { used: number; cap: number; factor: number }> = {};
+  caps.forEach(c => {
+    if (!c.birdName) return;
+    const factor = (c.capacity && c.capacity > 0) ? (refCap / c.capacity) : 1;
+    byBird[c.birdName] = { used: 0, cap: c.capacity || 0, factor };
+  });
+
+  let used = 0;
+  entries.forEach(e => {
+    if (excludeEntryId && e.id === excludeEntryId) return;
+    if (e.status === 'failed') return;
+    const bird = (e as any).__birdName || '';
+    if (!bird) return;
+    const b = byBird[bird];
+    if (!b) return;
+    const units = (e.count || 0) * b.factor;
+    b.used += units;
+    used += units;
+  });
+
+  if (newEntry) {
+    const b = byBird[newEntry.birdName];
+    if (b) {
+      const units = newEntry.count * b.factor;
+      b.used += units;
+      used += units;
+    }
+  }
+
+  return {
+    used: Math.round(used * 10) / 10,
+    total: refCap,
+    percent: Math.round((used / refCap) * 100),
+    byBird,
+  };
 }
 
 function Row({ l, v }: { l: string; v: string }) {
