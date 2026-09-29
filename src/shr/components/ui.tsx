@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import { formatNumWhileTyping, numberToWords, parseFaNum } from '../utils/fa';
 
 type BtnVariant = 'primary' | 'ghost' | 'danger' | 'outline';
@@ -234,45 +234,213 @@ export function Empty({ icon, title, desc, action }: EmptyProps) {
   );
 }
 
-interface ModalProps { open: boolean; onClose: () => void; title: string; children: React.ReactNode; footer?: React.ReactNode; }
-export function Modal({ open, onClose, title, children, footer }: ModalProps) {
+interface ModalProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+  size?: 'sm' | 'md' | 'lg';
+  preventClose?: boolean;
+}
+
+const MODAL_SIZES: Record<'sm' | 'md' | 'lg', number> = {
+  sm: 320,
+  md: 480,
+  lg: 640,
+};
+
+export function Modal({
+  open, onClose, title, children, footer,
+  size = 'md', preventClose = false,
+}: ModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocus = useRef<HTMLElement | null>(null);
+  const titleId = useRef<string>('modal-title-' + Math.random().toString(36).slice(2, 9));
+
+  // Esc + body scroll lock + focus return
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    if (open) { document.addEventListener('keydown', onKey); document.body.style.overflow = 'hidden'; }
-    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
-  }, [open, onClose]);
+    if (!open) return;
+
+    previousFocus.current = document.activeElement as HTMLElement;
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !preventClose) {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+
+    // autofocus اولین input یا دکمه
+    setTimeout(() => {
+      const firstInput = modalRef.current?.querySelector(
+        'input:not([type="hidden"]):not([disabled]), textarea, select, button'
+      ) as HTMLElement | null;
+      firstInput?.focus();
+    }, 100);
+
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+      // برگشت focus
+      try {
+        previousFocus.current?.focus();
+      } catch {
+        /* silent */
+      }
+    };
+  }, [open, onClose, preventClose]);
+
+  // Focus trap: Tab / Shift+Tab
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key !== 'Tab') return;
+    const focusables = modalRef.current?.querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (!focusables || focusables.length === 0) return;
+
+    const first = focusables[0] as HTMLElement;
+    const last = focusables[focusables.length - 1] as HTMLElement;
+    const active = document.activeElement;
+
+    if (e.shiftKey) {
+      if (active === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }, []);
+
+  // تشخیص prefers-reduced-motion
+  const [prefersReduced, setPrefersReduced] = React.useState(false);
+  useEffect(() => {
+    try {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setPrefersReduced(mq.matches);
+      const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    } catch {
+      /* silent */
+    }
+  }, []);
+  const noAnim = prefersReduced;
 
   if (!open) return null;
+
+  const maxWidth = MODAL_SIZES[size] || MODAL_SIZES.md;
+
   return (
-    <div onClick={(e) => { if (e.target === e.currentTarget) onClose(); }} style={{
-      position: 'fixed', inset: 0, background: 'var(--overlay)', zIndex: 100,
-      display: 'flex', alignItems: 'flex-end', justifyContent: 'center'
-    }}>
-      <div style={{
-        background: 'var(--card-solid)', borderTopLeftRadius: 'var(--r-2xl)',
-        borderTopRightRadius: 'var(--r-2xl)', width: '100%', maxWidth: 480, maxHeight: '90vh',
-        display: 'flex', flexDirection: 'column', overflow: 'hidden',
-        animation: 'pmSlideUp var(--dur-enter) var(--ease-out)'
-      }}>
-        <div style={{
-          padding: '14px 20px', borderBottom: '1px solid var(--border)',
-          display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0
-        }}>
-          <div style={{ flex: 1, fontSize: 'var(--fs-lg)', fontWeight: 700 }}>{title}</div>
-          <button onClick={onClose} style={{
-            width: 32, height: 32, borderRadius: 'var(--r-md)',
-            background: 'var(--btn-bg)', border: '1px solid var(--border)',
-            color: 'var(--muted)', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'inherit', fontSize: 14
-          }}>✕</button>
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !preventClose) onClose();
+      }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'var(--overlay)',
+        zIndex: 100,
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+      }}
+    >
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId.current}
+        onKeyDown={handleKeyDown}
+        style={{
+          background: 'var(--card-solid)',
+          borderTopLeftRadius: 'var(--r-2xl)',
+          borderTopRightRadius: 'var(--r-2xl)',
+          width: '100%',
+          maxWidth,
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          animation: noAnim ? 'none' : 'pmSlideUp var(--dur-enter) var(--ease-out)',
+        }}
+      >
+        {/* Header */}
+        <div
+          style={{
+            padding: '14px 20px',
+            borderBottom: '1px solid var(--border)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            flexShrink: 0,
+          }}
+        >
+          <div
+            id={titleId.current}
+            style={{ flex: 1, fontSize: 'var(--fs-lg)', fontWeight: 700 }}
+          >
+            {title}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="بستن"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 'var(--r-md)',
+              background: 'var(--btn-bg)',
+              border: '1px solid var(--border)',
+              color: 'var(--muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'inherit',
+              fontSize: 14,
+              outline: 'none',
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            ✕
+          </button>
         </div>
-        <div style={{
-          padding: '20px', overflowY: 'auto',
-          display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)'
-        }}>{children}</div>
+
+        {/* Body */}
+        <div
+          style={{
+            padding: '20px',
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--sp-3)',
+          }}
+        >
+          {children}
+        </div>
+
+        {/* Footer */}
         {footer && (
-          <div style={{ padding: '12px 20px 24px', borderTop: '1px solid var(--border)', flexShrink: 0 }}>{footer}</div>
+          <div
+            style={{
+              padding: '12px 20px 24px',
+              borderTop: '1px solid var(--border)',
+              flexShrink: 0,
+            }}
+          >
+            {footer}
+          </div>
         )}
       </div>
     </div>
