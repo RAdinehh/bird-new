@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';;
 import Dashboard from '../../mod/dsh/Dashboard';
 import Settings from '../../mod/set';
 import Brd from '../../mod/brd';
@@ -10,11 +10,7 @@ import Dlg from '../../mod/dlg';
 import Whs from '../../mod/whs';
 import Fed from '../../mod/fed';
 import Med from '../../mod/whs';
-import Tmd from '../../mod/tmd/Placeholder';
-import Sal from '../../mod/sal/Placeholder';
-import Dea from '../../mod/dea/Placeholder';
 import Cus from '../../mod/ctc';
-import Wrk from '../../mod/wrk/Placeholder';
 import Rep from '../../mod/rep';
 import Alt from '../../mod/alt';
 import Cal from '../../mod/cal';
@@ -35,13 +31,13 @@ export default function AppRouter() {
       <Route path="/dlg" element={<Dlg />} />
       <Route path="/whs" element={<Whs />} />
       <Route path="/fed" element={<Fed />} />
-      <Route path="/med" element={<Med />} />
-      <Route path="/tmd" element={<Tmd />} />
-      <Route path="/sal" element={<Sal />} />
-      <Route path="/dea" element={<Dea />} />
+      <Route path="/med" element={<Navigate to="/whs?tab=medicines" replace />} />
+      <Route path="/tmd" element={<Navigate to="/whs/items" replace />} />
+      <Route path="/sal" element={<Navigate to="/set?tab=about" replace />} />
+      <Route path="/dea" element={<Navigate to="/tra?tab=deals" replace />} />
       <Route path="/tra" element={<Tra />} />
-      <Route path="/cus" element={<Cus />} />
-      <Route path="/wrk" element={<Wrk />} />
+      <Route path="/cus" element={<Navigate to="/ctc?tab=customer" replace />} />
+      <Route path="/wrk" element={<Navigate to="/ctc?tab=worker" replace />} />
       <Route path="/rep" element={<Rep />} />
       <Route path="/alt" element={<Alt />} />
       <Route path="/cal" element={<Cal />} />
