@@ -276,14 +276,13 @@ export default function DevicesPage() {
                 {(d.maintenanceLogs || []).length === 0 ? (
                   <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 8, textAlign: 'center' }}>تعمیری ثبت نشده</div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {(d.maintenanceLogs || []).slice().reverse().slice(0, 5).map(m => (
-                      <div key={m.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-                          <span style={{ fontWeight: 600 }}>{m.type}</span>
-                          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(m.date)}{m.cost ? ' · ' + toFa(m.cost.toLocaleString('fa-IR')) + ' ت' : ''}</span>
-                        </div>
-                        <button type="button" onClick={() => removeMaintenance(d.id, m.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 4 }}>✕</button>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                    {(d.maintenanceLogs || []).slice().reverse().slice(0, 6).map(m => (
+                      <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 3, fontSize: 'var(--fs-sm)', padding: '8px 24px 8px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', position: 'relative', minWidth: 0 }}>
+                        <button type="button" onClick={() => removeMaintenance(d.id, m.id)} style={{ position: 'absolute', top: 4, left: 4, background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: 2, lineHeight: 1 }}>✕</button>
+                        <span style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.type}</span>
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(m.date)}</span>
+                        {m.cost ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600 }}>{toFa(m.cost.toLocaleString('fa-IR'))} ت</span> : null}
                       </div>
                     ))}
                   </div>
