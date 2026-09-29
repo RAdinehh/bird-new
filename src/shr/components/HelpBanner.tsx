@@ -1,37 +1,89 @@
 import { useState, useEffect } from 'react';
+import { useSet } from '../../mod/set/store';
 
 interface Props {
-  id: string;              // کد یکتا برای ذخیره در localStorage
-  icon?: string;           // ایموجی
+  id: string;
+  icon?: string;
   title: string;
   description: string;
   tone?: 'info' | 'warn' | 'success' | 'danger';
-  actionLabel?: string;    // دکمه اختیاری
+  actionLabel?: string;
   onAction?: () => void;
 }
 
 const TONE_COLORS: Record<string, { bg: string; border: string; fg: string; icon: string }> = {
-  info:    { bg: 'var(--info-soft)',   border: 'var(--info)',   fg: 'var(--info)',   icon: 'ℹ️' },
-  warn:    { bg: 'var(--warn-soft)',   border: 'var(--warn)',   fg: 'var(--warn)',   icon: '⚠️' },
-  success: { bg: 'var(--accent-soft)', border: 'var(--accent-border)', fg: 'var(--accent)', icon: '✅' },
-  danger:  { bg: 'var(--danger-soft)', border: 'var(--danger)', fg: 'var(--danger)', icon: '❌' },
+  info: {
+    bg: 'var(--info-soft)',
+    border: 'var(--info)',
+    fg: 'var(--info)',
+    icon: 'ℹ️',
+  },
+  warn: {
+    bg: 'var(--warn-soft)',
+    border: 'var(--warn)',
+    fg: 'var(--warn)',
+    icon: '⚠️',
+  },
+  success: {
+    bg: 'var(--accent-soft)',
+    border: 'var(--accent-border)',
+    fg: 'var(--accent)',
+    icon: '✅',
+  },
+  danger: {
+    bg: 'var(--danger-soft)',
+    border: 'var(--danger)',
+    fg: 'var(--danger)',
+    icon: '❌',
+  },
 };
 
+function useNoAnim() {
+  const lowPower = useSet((st: any) => st.lowPowerMode);
+  const [prefersReduced, setPrefersReduced] = useState(false);
+  useEffect(() => {
+    try {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setPrefersReduced(mq.matches);
+      const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    } catch {
+      /* silent */
+    }
+  }, []);
+  return !!(lowPower || prefersReduced);
+}
+
 export default function HelpBanner({
-  id, icon, title, description, tone = 'info', actionLabel, onAction
+  id,
+  icon,
+  title,
+  description,
+  tone = 'info',
+  actionLabel,
+  onAction,
 }: Props) {
+  const noAnim = useNoAnim();
+
   const [hidden, setHidden] = useState(false);
   const storageKey = 'help-banner-' + id;
 
   useEffect(() => {
     try {
       if (localStorage.getItem(storageKey) === 'hidden') setHidden(true);
-    } catch {}
+    } catch {
+      /* silent */
+    }
   }, [storageKey]);
 
   const dismiss = () => {
     setHidden(true);
-    try { localStorage.setItem(storageKey, 'hidden'); } catch {}
+    try {
+      localStorage.setItem(storageKey, 'hidden');
+    } catch {
+      /* silent */
+    }
   };
 
   if (hidden) return null;
@@ -39,20 +91,27 @@ export default function HelpBanner({
   const c = TONE_COLORS[tone] || TONE_COLORS.info;
 
   return (
-    <div style={{
-      padding: '10px 12px',
-      background: c.bg,
-      border: '1px solid ' + c.border,
-      borderRadius: 'var(--r-md)',
-      marginBottom: 10,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 6,
-      position: 'relative',
-    }}>
+    <div
+      role="region"
+      aria-label={title}
+      style={{
+        padding: '10px 12px',
+        background: c.bg,
+        border: `1px solid ${c.border}`,
+        borderRadius: 'var(--r-md)',
+        marginBottom: 10,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 6,
+        position: 'relative',
+        transition: noAnim ? 'none' : 'opacity var(--dur-base)',
+      }}
+    >
+      {/* دکمه بستن */}
       <button
         type="button"
         onClick={dismiss}
+        aria-label="بستن راهنما"
         style={{
           position: 'absolute',
           top: 6,
@@ -65,32 +124,55 @@ export default function HelpBanner({
           fontSize: 14,
           opacity: 0.6,
           padding: 4,
+          outline: 'none',
+          borderRadius: 'var(--r-sm)',
+          width: 24,
+          height: 24,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
-        title="بستن"
-      >✕</button>
+        onFocus={(e) => {
+          e.currentTarget.style.opacity = '1';
+          e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.opacity = '0.6';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+      >
+        ✕
+      </button>
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        paddingLeft: 20,
-        fontSize: 'var(--fs-sm)',
-        fontWeight: 700,
-        color: c.fg,
-      }}>
-        <span>{icon || c.icon}</span>
+      {/* عنوان */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          paddingLeft: 20,
+          fontSize: 'var(--fs-sm)',
+          fontWeight: 700,
+          color: c.fg,
+        }}
+      >
+        <span aria-hidden="true">{icon || c.icon}</span>
         <span>{title}</span>
       </div>
 
-      <div style={{
-        fontSize: 'var(--fs-xs)',
-        lineHeight: 1.7,
-        color: c.fg,
-        paddingLeft: 20,
-      }}>
+      {/* متن */}
+      <div
+        style={{
+          fontSize: 'var(--fs-xs)',
+          lineHeight: 1.7,
+          color: c.fg,
+          paddingLeft: 20,
+        }}
+      >
         {description}
       </div>
 
+      {/* دکمه action */}
       {actionLabel && onAction && (
         <button
           type="button"
@@ -101,13 +183,20 @@ export default function HelpBanner({
             marginTop: 2,
             padding: '5px 12px',
             background: c.fg,
-            color: 'white',
+            color: 'var(--avatar-text)',
             border: 'none',
             borderRadius: 'var(--r-sm)',
             fontSize: 'var(--fs-xs)',
             fontWeight: 700,
             cursor: 'pointer',
             fontFamily: 'inherit',
+            outline: 'none',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.boxShadow = 'none';
           }}
         >
           {actionLabel}

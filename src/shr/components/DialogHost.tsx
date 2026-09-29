@@ -1,214 +1,242 @@
-import { useDialog } from '../../cor/store/dialog';
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { useDialog, type DialogType } from '../../cor/store/dialog';
+import { Btn } from './ui';
+import { useSet } from '../../mod/set/store';
+
+const TYPE_CONFIG: Record<DialogType, { icon: string; color: string }> = {
+  alert: { icon: '⚠', color: 'warn' },
+  confirm: { icon: '❓', color: 'accent' },
+  success: { icon: '✅', color: 'accent' },
+  error: { icon: '✕', color: 'danger' },
+  danger: { icon: '🚨', color: 'danger' },
+  info: { icon: 'ℹ️', color: 'info' },
+};
+
+function useNoAnim() {
+  const lowPower = useSet((st: any) => st.lowPowerMode);
+  const [prefersReduced, setPrefersReduced] = useState(false);
+  useEffect(() => {
+    try {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setPrefersReduced(mq.matches);
+      const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    } catch {
+      /* silent */
+    }
+  }, []);
+  return !!(lowPower || prefersReduced);
+}
 
 export default function DialogHost() {
   const { open, config, close } = useDialog();
+  const noAnim = useNoAnim();
+
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocus = useRef<HTMLElement | null>(null);
+  const confirmBtnId = useRef('dialog-confirm-' + Math.random().toString(36).slice(2, 9));
+  const titleId = useRef('dialog-title-' + Math.random().toString(36).slice(2, 9));
+  const messageId = useRef('dialog-msg-' + Math.random().toString(36).slice(2, 9));
+
+  const handleConfirm = useCallback(() => {
+    try {
+      config?.onConfirm?.();
+    } catch {
+      /* silent */
+    }
+    close();
+  }, [config, close]);
+
+  const handleCancel = useCallback(() => {
+    try {
+      config?.onCancel?.();
+    } catch {
+      /* silent */
+    }
+    close();
+  }, [config, close]);
+
+  // Focus + Esc + scroll lock
+  useEffect(() => {
+    if (!open) return;
+
+    previousFocus.current = document.activeElement as HTMLElement;
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleCancel();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(() => {
+      const btn = document.getElementById(confirmBtnId.current);
+      btn?.focus();
+    }, 100);
+
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+      try {
+        previousFocus.current?.focus();
+      } catch {
+        /* silent */
+      }
+    };
+  }, [open, handleCancel]);
+
+  // Focus trap
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key !== 'Tab') return;
+    const focusables = modalRef.current?.querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (!focusables || focusables.length === 0) return;
+
+    const first = focusables[0] as HTMLElement;
+    const last = focusables[focusables.length - 1] as HTMLElement;
+    const active = document.activeElement;
+
+    if (e.shiftKey) {
+      if (active === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }, []);
 
   if (!open || !config) return null;
 
-  const { type, title, message, confirmText, cancelText, onConfirm, onCancel } = config;
+  const type: DialogType = config.type || 'info';
+  const cfg = TYPE_CONFIG[type] || TYPE_CONFIG.info;
+
+  const color = `var(--${cfg.color})`;
+  const soft = `var(--${cfg.color}-soft)`;
+
   const isConfirm = type === 'confirm' || type === 'danger';
 
-  const iconMap: Record<string, string> = {
-    alert: '⚠',
-    success: '✓',
-    error: '✕',
-    info: 'ℹ',
-    confirm: '؟',
-    danger: '🗑'
-  };
-
-  const toneMap: Record<string, string> = {
-    alert: 'warn',
-    success: 'accent',
-    error: 'danger',
-    info: 'info',
-    confirm: 'info',
-    danger: 'danger'
-  };
-
-  const tone = toneMap[type] || 'info';
-  const icon = iconMap[type] || 'ℹ';
-
-  // دکمه‌ی تأیید: فقط برای danger قرمز، بقیه سبز (رنگ برند)
-  const confirmBtnBg = type === 'danger' ? 'var(--danger)' : 'var(--accent)';
-  const confirmBtnText = type === 'danger' ? '#fff' : 'var(--avatar-text)';
-
-  const handleConfirm = () => {
-    close();
-    setTimeout(() => { if (onConfirm) onConfirm(); }, 120);
-  };
-
-  const handleCancel = () => {
-    close();
-    setTimeout(() => { if (onCancel) onCancel(); }, 120);
-  };
-
-  const handleBackdrop = () => {
-    if (isConfirm) handleCancel();
-    else handleConfirm();
-  };
-
   return (
-    <>
-      <style>{`
-        @keyframes pmDlgFade {
-          from { opacity: 0; }
-          to { opacity: 1; }
+    <div
+      role="presentation"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleCancel();
         }
-        @keyframes pmDlgScale {
-          0% { transform: scale(.92); opacity: 0; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-      `}</style>
-
+      }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'var(--overlay)',
+        zIndex: 200,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+      }}
+    >
       <div
-        onClick={handleBackdrop}
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId.current}
+        aria-describedby={config.message ? messageId.current : undefined}
+        onKeyDown={handleKeyDown}
         style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'var(--overlay)',
-          zIndex: 200,
+          background: 'var(--card-solid)',
+          borderRadius: 'var(--r-2xl)',
+          width: '100%',
+          maxWidth: 320,
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          padding: 24,
-          animation: 'pmDlgFade .15s ease-out'
+          padding: '20px 20px 16px',
+          gap: 12,
+          animation: noAnim
+            ? 'none'
+            : 'pmScaleIn var(--dur-enter) var(--ease-out)',
+          boxShadow: 'var(--shadow)',
         }}
       >
         <div
-          onClick={e => e.stopPropagation()}
+          aria-hidden="true"
           style={{
-            background: 'var(--card-solid)',
-            border: '1px solid var(--border)',
-            borderRadius: 16,
-            padding: '20px 20px 16px',
-            width: '100%',
-            maxWidth: 300,
-            boxShadow: '0 16px 48px rgba(0,0,0,.25)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 10,
-            animation: 'pmDlgScale .22s cubic-bezier(.16,1,.3,1)'
-          }}
-        >
-          {/* آیکون کوچک و ملایم */}
-          <div style={{
             width: 48,
             height: 48,
             borderRadius: '50%',
-            background: 'var(--' + tone + '-soft)',
+            background: soft,
+            color: color,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 22,
-            color: 'var(--' + tone + ')',
-            fontWeight: 600,
-            flexShrink: 0
-          }}>
-            {icon}
-          </div>
+            fontSize: 24,
+            fontWeight: 700,
+            flexShrink: 0,
+          }}
+        >
+          {cfg.icon}
+        </div>
 
-          {/* عنوان */}
-          {title ? (
-            <div style={{
+        {config.title && (
+          <div
+            id={titleId.current}
+            style={{
               fontSize: 'var(--fs-md)',
               fontWeight: 700,
-              color: 'var(--text)',
               textAlign: 'center',
-              lineHeight: 1.5
-            }}>
-              {title}
-            </div>
-          ) : null}
+              color: 'var(--text)',
+              lineHeight: 1.5,
+            }}
+          >
+            {config.title}
+          </div>
+        )}
 
-          {/* پیام */}
-          {message ? (
-            <div style={{
+        {config.message && (
+          <div
+            id={messageId.current}
+            style={{
               fontSize: 'var(--fs-sm)',
               color: 'var(--muted)',
               textAlign: 'center',
               lineHeight: 1.8,
-              maxWidth: '100%',
-              wordBreak: 'break-word',
-              whiteSpace: 'pre-line'
-            }}>
-              {message}
-            </div>
-          ) : null}
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {config.message}
+          </div>
+        )}
 
-          {/* دکمه‌ها */}
-          <div style={{
+        <div
+          style={{
             display: 'flex',
             gap: 8,
             width: '100%',
-            marginTop: 6
-          }}>
-            {isConfirm ? (
-              <>
-                <button
-                  type="button"
-                  onClick={handleConfirm}
-                  style={{
-                    flex: 1,
-                    height: 40,
-                    background: confirmBtnBg,
-                    color: confirmBtnText,
-                    border: 'none',
-                    borderRadius: 10,
-                    fontFamily: 'inherit',
-                    fontSize: 'var(--fs-sm)',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: 'transform .1s'
-                  }}
-                >
-                  {confirmText || 'تأیید'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  style={{
-                    flex: 1,
-                    height: 40,
-                    background: 'var(--btn-bg)',
-                    color: 'var(--muted)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 10,
-                    fontFamily: 'inherit',
-                    fontSize: 'var(--fs-sm)',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'transform .1s'
-                  }}
-                >
-                  {cancelText || 'لغو'}
-                </button>
-              </>
-            ) : (
-              <button
-                type="button"
-                onClick={handleConfirm}
-                style={{
-                  flex: 1,
-                  height: 40,
-                  background: confirmBtnBg,
-                  color: confirmBtnText,
-                  border: 'none',
-                  borderRadius: 10,
-                  fontFamily: 'inherit',
-                  fontSize: 'var(--fs-sm)',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'transform .1s'
-                }}
-              >
-                {confirmText || 'تأیید'}
-              </button>
-            )}
-          </div>
+            marginTop: 4,
+          }}
+        >
+          {isConfirm && (
+            <Btn onClick={handleCancel} style={{ flex: 1 }}>
+              {config.cancelText || 'لغو'}
+            </Btn>
+          )}
+          <Btn
+            id={confirmBtnId.current}
+            variant={type === 'danger' ? 'danger' : 'primary'}
+            onClick={handleConfirm}
+            style={{ flex: 1 }}
+          >
+            {config.confirmText || 'تأیید'}
+          </Btn>
         </div>
       </div>
-    </>
+    </div>
   );
 }
