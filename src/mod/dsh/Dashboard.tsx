@@ -223,6 +223,47 @@ export default function Dashboard() {
   }, [productions, purchasesThisMonth, thisMonth, salesThisMonth]);
 
   // ============ ۵. هشدارها ============
+  // ============ هشدارهای تجمیعی ============
+  const aggregatedAlerts = useMemo(() => {
+    const list: { icon: string; label: string; count: number; tone: string; route: string }[] = [];
+
+    // ۱. انبار: انقضا
+    const expiring = whsItems.filter(i => {
+      const w = expiryWarning(i);
+      return w === 'soon' || w === 'expired';
+    }).length;
+    if (expiring > 0) list.push({ icon: '💊', label: 'قلم نزدیک انقضا', count: expiring, tone: 'danger', route: '/whs' });
+
+    // ۲. انبار: زیر حد
+    const lowStock = whsItems.filter(i => {
+      const w = stockWarning(i);
+      return w === 'low' || w === 'critical';
+    }).length;
+    if (lowStock > 0) list.push({ icon: '🌾', label: 'قلم زیر حد موجودی', count: lowStock, tone: 'warn', route: '/whs' });
+
+    // ۳. جوجه‌کشی: هچ نزدیک
+    const nearHatch = eggEntries.filter(e => {
+      const d = daysToHatch(e as any);
+      return d !== null && d !== undefined && d >= 0 && d <= 3 && e.status !== 'done' && e.status !== 'hatched';
+    }).length;
+    if (nearHatch > 0) list.push({ icon: '🐣', label: 'هچ در ۳ روز آینده', count: nearHatch, tone: 'info', route: '/inc' });
+
+    // ۴. هشدارهای بحرانی
+    const critical = activeAlerts(alerts).filter(a => a.level === 'critical').length;
+    if (critical > 0) list.push({ icon: '🚨', label: 'هشدار بحرانی', count: critical, tone: 'danger', route: '/alt' });
+
+    // ۵. گله آماده تخم‌گذاری
+    const readyFlocks = activeFlocks.filter(f => {
+      if (f.type !== 'layer' && f.type !== 'breeder') return false;
+      const age = getAgeDays(f);
+      const start = f.layingStartDay || 140;
+      return age >= start && age <= start + 7;
+    }).length;
+    if (readyFlocks > 0) list.push({ icon: '🥚', label: 'گله آماده تخم‌گذاری', count: readyFlocks, tone: 'accent', route: '/flk' });
+
+    return list;
+  }, [whsItems, eggEntries, alerts, activeFlocks]);
+
   const active = useMemo(() => {
     const list = activeAlerts(alerts);
     const order: any = { critical: 0, important: 1, info: 2 };
@@ -251,6 +292,51 @@ export default function Dashboard() {
 
   return (
     <PageContainer>
+      {/* 🚨 هشدارهای تجمیعی */}
+      {aggregatedAlerts.length > 0 && (
+        <div style={{
+          background: 'var(--card)',
+          border: '1px solid var(--danger)',
+          borderRadius: 'var(--r-lg)',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            padding: '8px 12px',
+            background: 'var(--danger-soft)',
+            fontSize: 'var(--fs-sm)',
+            fontWeight: 700,
+            color: 'var(--danger)',
+          }}>
+            🚨 هشدارهای فوری ({toFa(aggregatedAlerts.length)})
+          </div>
+          <div style={{ padding: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {aggregatedAlerts.map((a, i) => (
+              <div
+                key={i}
+                onClick={() => nav(a.route)}
+                style={{
+                  padding: '6px 10px',
+                  background: `var(--${a.tone}-soft)`,
+                  borderRadius: 'var(--r-sm)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  fontSize: 'var(--fs-sm)',
+                }}
+              >
+                <span style={{ color: `var(--${a.tone})`, fontWeight: 600 }}>
+                  {a.icon} {a.label}
+                </span>
+                <span style={{ fontWeight: 700, color: `var(--${a.tone})` }}>
+                  {toFa(a.count)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ⏰ سرسیدهای نزدیک */}
       {upcomingDues.length > 0 && (
         <div>
