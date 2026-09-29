@@ -1,5 +1,5 @@
 import ProgressTracker from '../../shr/components/ProgressTracker';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
   useInc, DEAL_LABEL, ENTRY_STATUS_LABEL, addDaysJalali,
   daysAgo, daysToHatch, isLockdown, isHatchWindow,
@@ -8,9 +8,8 @@ import {
 import { useBrd } from '../brd/store';
 import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';;
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
-import { MiniProgress } from '../../shr/components/ProgressTracker';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { clampPercent, complement } from '../../shr/utils/smart';
@@ -18,78 +17,94 @@ import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 
 interface F {
-  id?: string; deviceId: string; birdId: string; breedId: string;
-  count: string; entryDate: string; trayNumbers: string;
-  dealType: DealType; dealData: Record<string, string>;
-  flockId: string;
+  id?: string;
+  deviceId: string;
+  birdId: string;
+  breedId: string;
+  count: string;
+  entryDate: string;
+  trayNumbers: string;
+  dealType: DealType;
+  dealData: Record<string, string>;
   dealStatus: 'active' | 'withdrawn';
   dealWithdrawnAt: string;
   dealWithdrawnReason: string;
-  unitPrice: string; shippingCost: string; notes: string;
+  flockId: string;
+  unitPrice: string;
+  shippingCost: string;
+  notes: string;
 }
-const empty = (): F => ({ deviceId:'', birdId:'', breedId:'', count:'',
-   entryDate:'', trayNumbers:'', dealType:'own', flockId:'', dealData:{}, dealStatus:'active', dealWithdrawnAt:'', dealWithdrawnReason:'', unitPrice:'', shippingCost:'',
-   notes:'' });
+
+const empty = (): F => ({
+  deviceId: '', birdId: '', breedId: '', count: '',
+  entryDate: '', trayNumbers: '',
+  dealType: 'own', dealData: {}, dealStatus: 'active',
+  dealWithdrawnAt: '', dealWithdrawnReason: '', flockId: '',
+  unitPrice: '', shippingCost: '', notes: '',
+});
 
 export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initialDevice?: string; onGoTo?: (t: any) => void } = {}) {
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
   const { birds, breeds } = useBrd();
   const { flocks } = useFlk();
   const { contacts } = useCtc();
+
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterDev, setFilterDev] = useState('');
+  const [filterSource, setFilterSource] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [q, setQ] = useState('');
 
-  useEffect(() => {
-    if (initialDevice && devices.length > 0 && birds.length > 0) {
-      setForm({ ...empty(), deviceId: initialDevice, birdId: birds[0].id });
-      setErr('');
-      setOpen(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialDevice]);
+  const suppliers = useMemo(() => (contacts || []).filter((p: any) => (p.roles || []).includes('supplier')), [contacts]);
+  const allPersons = contacts || [];
 
   const openNew = () => {
     if (devices.length === 0) { showAlert('اول یک دستگاه بسازید'); return; }
     if (birds.length === 0) { showAlert('اول پرنده بسازید'); return; }
-    setForm({ ...empty(), deviceId: devices[0].id, birdId: birds[0].id });
+    setForm({ ...empty(), deviceId: initialDevice || devices[0].id, birdId: birds[0].id });
     setErr(''); setOpen(true);
   };
+
   const openEdit = (e: EggEntry) => {
     setForm({
       id: e.id, deviceId: e.deviceId, birdId: e.birdId, breedId: e.breedId,
-      count: e.count ? toFa(e.count) : '', entryDate: e.entryDate, trayNumbers: e.trayNumbers,
+      count: e.count ? toFa(e.count) : '',
+      entryDate: e.entryDate,
+      trayNumbers: e.trayNumbers,
       dealType: e.dealType,
-      flockId: (e as any).flockId || '',
-      dealStatus: e.dealStatus || 'active',
-      dealWithdrawnAt: e.dealWithdrawnAt || '',
-      dealWithdrawnReason: e.dealWithdrawnReason || '',
       dealData: Object.fromEntries(Object.entries(e.dealData || {}).map(([k, v]) => [k, v == null ? '' : String(v)])),
-      unitPrice: e.unitPrice ? toFa(e.unitPrice) : '', shippingCost: e.shippingCost ? toFa(e.shippingCost) : '', notes: e.notes
+      dealStatus: (e as any).dealStatus || 'active',
+      dealWithdrawnAt: (e as any).dealWithdrawnAt || '',
+      dealWithdrawnReason: (e as any).dealWithdrawnReason || '',
+      flockId: (e as any).flockId || '',
+      unitPrice: e.unitPrice ? toFa(e.unitPrice) : '',
+      shippingCost: (e as any).shippingCost ? toFa((e as any).shippingCost) : '',
+      notes: e.notes,
     });
     setErr(''); setOpen(true);
   };
 
-  const suppliers = (contacts || []).filter((p: any) => (p.roles || []).includes('supplier'));
-  const allPersons = contacts || [];
-
   const setD = (k: string, v: string) => setForm(f => ({ ...f, dealData: { ...f.dealData, [k]: v } }));
-  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
+  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
   const selectedDevice = devices.find(d => d.id === form.deviceId);
   const selectedBird = birds.find(b => b.id === form.birdId);
-  const maxCapacity = (() => {
+  const maxCapacity = useMemo(() => {
     if (!selectedDevice || !selectedBird) return 0;
-    const cap = selectedDevice.capacityByBird?.find(c => c.birdName === selectedBird.name);
+    const cap = (selectedDevice.capacityByBird || []).find(c => c.birdName === selectedBird.name);
     return cap?.capacity || 0;
-  })();
+  }, [selectedDevice, selectedBird]);
+
   const save = () => {
     if (!form.count.trim() || !form.entryDate.trim()) { setErr('تعداد و تاریخ ورود اجباری است'); return; }
-    if (maxCapacity && (parseInt(toEn(form.count))||0) > maxCapacity) { setErr(`تعداد از ظرفیت دستگاه (${toFa(maxCapacity)}) بیشتر است`); return; }
+    if (maxCapacity && (parseInt(toEn(form.count)) || 0) > maxCapacity) {
+      if (!confirm('تعداد (' + toFa(parseInt(toEn(form.count))) + ') از ظرفیت (' + toFa(maxCapacity) + ') بیشتر است. ادامه؟')) return;
+    }
     const bird = birds.find(b => b.id === form.birdId);
     const birdName = bird?.name || 'مرغ';
     const expectedHatchDate = addDaysJalali(form.entryDate, incubationDays(birdName));
@@ -101,26 +116,30 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     const count = int(form.count);
     const unitPrice = num(form.unitPrice);
     const data = {
-      deviceId: form.deviceId, hatchGroupId: '',
-      birdId: form.birdId, breedId: form.breedId,
-      count, entryDate: form.entryDate, expectedHatchDate,
+      deviceId: form.deviceId,
+      hatchGroupId: '',
+      birdId: form.birdId,
+      breedId: form.breedId,
+      count,
+      entryDate: form.entryDate,
+      expectedHatchDate,
       source: form.dealType === 'own' ? 'own' : 'external',
       dealType: form.dealType,
-      flockId: form.flockId,
       dealStatus: form.dealStatus,
       dealWithdrawnAt: form.dealWithdrawnAt,
       dealWithdrawnReason: form.dealWithdrawnReason,
       dealData,
+      flockId: form.flockId,
       trayNumbers: form.trayNumbers.trim(),
       unitPrice,
       totalPrice: count && unitPrice ? count * unitPrice : null,
       shippingCost: num(form.shippingCost),
       status: 'incubating' as const,
-      notes: form.notes.trim()
+      notes: form.notes.trim(),
     };
-    if (form.id) updateEntry(form.id, data);
+    if (form.id) updateEntry(form.id, data as any);
     else {
-      addEntry(data);
+      addEntry(data as any);
       setOpen(false);
       if (onGoTo && confirm('ورودی ثبت شد. به کندلینگ برو؟')) {
         setTimeout(() => onGoTo('candlings'), 100);
@@ -130,24 +149,69 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     setOpen(false);
   };
 
-  const list = filterDev ? eggEntries.filter(e => e.deviceId === filterDev) : eggEntries;
-  const target = delId ? eggEntries.find(e => e.id === delId) : null;
   const breedsForBird = breeds.filter(b => b.birdId === form.birdId);
+
+  const list = useMemo(() => {
+    return eggEntries.filter(e => {
+      if (filterDev && e.deviceId !== filterDev) return false;
+      if (filterSource && e.dealType !== filterSource) return false;
+      if (filterStatus && e.status !== filterStatus) return false;
+      if (q.trim()) {
+        const t = q.trim().toLowerCase();
+        const dev = devices.find(d => d.id === e.deviceId);
+        const bird = birds.find(b => b.id === e.birdId);
+        const partnerName = (e.dealData?.partnerId && (contacts.find((c: any) => c.id === e.dealData.partnerId) as any)?.name) || e.dealData?.partnerName || '';
+        const sellerName = (e.dealData?.sellerId && (contacts.find((c: any) => c.id === e.dealData.sellerId) as any)?.name) || e.dealData?.sellerName || '';
+        const haystack = [dev?.name, bird?.name, partnerName, sellerName, e.trayNumbers, e.notes].filter(Boolean).join(' ').toLowerCase();
+        if (!haystack.includes(t)) return false;
+      }
+      return true;
+    });
+  }, [eggEntries, filterDev, filterSource, filterStatus, q, devices, birds, contacts]);
+
+  const target = delId ? eggEntries.find(e => e.id === delId) : null;
 
   return (
     <PageContainer>
       {devices.length > 0 && eggEntries.length > 0 && (
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-          <button onClick={() => setFilterDev('')} style={chip(!filterDev)}>همه</button>
-          {devices.map(d => (
-            <button key={d.id} onClick={() => setFilterDev(d.id)} style={chip(filterDev === d.id)}>{d.name}</button>
-          ))}
-        </div>
+        <>
+          <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (گله، فروشنده، شریک، یادداشت...)" />
+          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+            <button onClick={() => { setFilterDev(''); setFilterSource(''); setFilterStatus(''); }} style={chip(!filterDev && !filterSource && !filterStatus)}>همه</button>
+            {devices.map(d => (
+              <button key={d.id} onClick={() => setFilterDev(filterDev === d.id ? '' : d.id)} style={chip(filterDev === d.id)}>{d.name}</button>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+            <span style={{ color: 'var(--muted)', alignSelf: 'center', fontSize: 'var(--fs-xs)' }}>منبع:</span>
+            {[
+              { id: 'own', label: '🏠 خودم' },
+              { id: 'purchase', label: '📥 خریداری' },
+              { id: 'partnership', label: '🤝 شراکتی' },
+              { id: 'rent', label: '🏢 اجاره' },
+              { id: 'consignment', label: '📦 امانی' },
+            ].map(src => (
+              <button key={src.id} onClick={() => setFilterSource(filterSource === src.id ? '' : src.id)} style={chip(filterSource === src.id)}>{src.label}</button>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+            <span style={{ color: 'var(--muted)', alignSelf: 'center', fontSize: 'var(--fs-xs)' }}>وضعیت:</span>
+            {[
+              { id: 'incubating', label: 'در انکوباسیون' },
+              { id: 'candled', label: 'کندل‌شده' },
+              { id: 'locked', label: 'Lock-down' },
+              { id: 'hatched', label: 'هچ‌شده' },
+              { id: 'failed', label: 'ناموفق' },
+            ].map(st => (
+              <button key={st.id} onClick={() => setFilterStatus(filterStatus === st.id ? '' : st.id)} style={chip(filterStatus === st.id)}>{st.label}</button>
+            ))}
+          </div>
+        </>
       )}
 
       {list.length === 0 ? (
-        <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><ellipse cx="12" cy="14" rx="7" ry="9"/></svg>}
-          title={eggEntries.length === 0 ? 'هنوز تخمی وارد دستگاه نشده' : 'ورودی در این دستگاه نیست'}
+        <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><ellipse cx="12" cy="14" rx="7" ry="9"/></svg>}
+          title={eggEntries.length === 0 ? 'هنوز تخمی وارد دستگاه نشده' : 'ورودی مطابق فیلتر نیست'}
           desc={devices.length === 0 ? 'اول یک دستگاه بسازید.' : 'اولین بچ خود را ثبت کنید.'}
           action={<Btn variant="primary" onClick={openNew}>+ ورود تخم</Btn>} />
       ) : (
@@ -172,13 +236,18 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             let statusTone: any = 'green';
             if (hatchWindow) { statusLabel = 'پنجره هچ'; statusTone = 'purple'; }
             else if (locked) { statusLabel = 'Lock-down'; statusTone = 'amber'; }
-            else if (remain > 0) { statusLabel = `${toFa(remain)} روز مانده`; statusTone = 'blue'; }
+            else if (remain > 0) { statusLabel = toFa(remain) + ' روز مانده'; statusTone = 'blue'; }
             else if (myHatch) { statusLabel = 'هچ‌شده'; statusTone = 'green'; }
+
+            const partnerName = (e.dealData?.partnerId && (contacts.find((c: any) => c.id === e.dealData.partnerId) as any)?.name) || e.dealData?.partnerName || '';
+            const sellerName = (e.dealData?.sellerId && (contacts.find((c: any) => c.id === e.dealData.sellerId) as any)?.name) || e.dealData?.sellerName || '';
+            const consigneeName = (e.dealData?.consigneeId && (contacts.find((c: any) => c.id === e.dealData.consigneeId) as any)?.name) || e.dealData?.consigneeName || '';
+            const lessorName = (e.dealData?.lessorId && (contacts.find((c: any) => c.id === e.dealData.lessorId) as any)?.name) || '';
 
             return (
               <ExpandableCard key={e.id} accent={accent} index={toFa(i + 1)} iconEmoji="🥚"
-                title={`${toFa(e.count || 0)} تخم · ${bird?.name || '—'}${breed ? ` (${breed.name})` : ''}`}
-                subtitle={`${dev?.name || '—'} · روز ${toFa(age)} از ${toFa(incubationDays(bird?.name || 'مرغ'))}`}
+                title={toFa(e.count || 0) + ' تخم · ' + (bird?.name || '—') + (breed ? ' (' + breed.name + ')' : '')}
+                subtitle={(dev?.name || '—') + ' · روز ' + toFa(age) + ' از ' + toFa(incubationDays(bird?.name || 'مرغ'))}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : e.id)}
                 badge={<Tag tone={statusTone}>{statusLabel}</Tag>}
                 summary={<>
@@ -187,64 +256,49 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   <span>{DEAL_LABEL[e.dealType]}</span>
                 </>}
               >
-                {/* نوار پیشرفت انکوباسیون */}
                 {(() => {
-                  const bird = birds.find(b => b.id === e.birdId);
-                  const total = incubationDays(bird?.name || 'مرغ');
-                  return (
-                    <ProgressTracker
-                      current={age}
-                      target={total}
-                      label={hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : 'در حال انکوباسیون'}
-                      unit="روز"
-                      color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'}
-                    />
-                  );
+                  const b = birds.find(x => x.id === e.birdId);
+                  const total = incubationDays(b?.name || 'مرغ');
+                  return <ProgressTracker current={age} target={total} label={hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : 'در حال انکوباسیون'} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
                 })()}
 
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📋 مشخصات</div>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📋 مشخصات</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="دستگاه" v={dev?.name || '—'} />
-                  <Row l="پرنده" v={`${bird?.name || '—'}${breed ? ` · ${breed.name}` : ''}`} />
-                  <Row l="تعداد" v={`${toFa(e.count || 0)} تخم`} />
+                  <Row l="پرنده" v={(bird?.name || '—') + (breed ? ' · ' + breed.name : '')} />
+                  <Row l="تعداد" v={toFa(e.count || 0) + ' تخم'} />
                   <Row l="تاریخ ورود" v={toFa(e.entryDate)} />
                   <Row l="هچ پیش‌بینی" v={toFa(e.expectedHatchDate)} />
                   {e.trayNumbers && <Row l="طبقات" v={e.trayNumbers} />}
                   <Row l="وضعیت" v={ENTRY_STATUS_LABEL[e.status]} />
                 </div>
 
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🤝 معامله</div>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🤝 منبع</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="نوع" v={DEAL_LABEL[e.dealType]} />
-                  {e.dealType === 'purchase' && (e.dealData.sellerId || e.dealData.sellerName) && (
-                    <Row l="فروشنده" v={String((contacts.find((c: any) => c.id === e.dealData.sellerId)?.name) || e.dealData.sellerName || '—')} />
-                  )}
-                  {e.dealType === 'rent' && e.dealData.lessorId && (
-                    <Row l="اجاره‌دهنده" v={String(contacts.find((c: any) => c.id === e.dealData.lessorId)?.name || '—')} />
-                  )}
-                  {e.dealType === 'partnership' && (e.dealData.partnerId || e.dealData.partnerName) && (
-                    <Row l="شریک" v={String((contacts.find((c: any) => c.id === e.dealData.partnerId)?.name) || e.dealData.partnerName || '—')} />
-                  )}
-                  {e.dealType === 'partnership' && e.dealData.partnerPercent && <Row l="درصد شریک" v={`${toFa(e.dealData.partnerPercent)}٪`} />}
-                  {e.dealType === 'rent' &&
-                    e.dealData.rentAmount &&
-                    <Row l="اجاره" v={`${toFa(Number(e.dealData.rentAmount).toLocaleString('fa-IR'))} ت`} />}
-                  {e.dealType === 'consignment' && (e.dealData.consigneeId || e.dealData.consigneeName) && (
-                    <Row l="امانت‌دار" v={String((contacts.find((c: any) => c.id === e.dealData.consigneeId)?.name) || e.dealData.consigneeName || '—')} />
+                  {e.dealType === 'own' && (e as any).flockId && <Row l="گله" v={(flocks.find((f: any) => f.id === (e as any).flockId)?.name) || '—'} />}
+                  {e.dealType === 'purchase' && sellerName && <Row l="فروشنده" v={String(sellerName)} />}
+                  {e.dealType === 'partnership' && partnerName && <Row l="شریک" v={String(partnerName)} />}
+                  {e.dealType === 'partnership' && e.dealData.partnerPercent && <Row l="درصد شریک" v={toFa(e.dealData.partnerPercent) + '٪'} />}
+                  {e.dealType === 'rent' && lessorName && <Row l="اجاره‌دهنده" v={String(lessorName)} />}
+                  {e.dealType === 'rent' && e.dealData.rentAmount && <Row l="اجاره" v={toFa(Number(e.dealData.rentAmount).toLocaleString('fa-IR')) + ' ت'} />}
+                  {e.dealType === 'consignment' && consigneeName && <Row l="امانت‌دار" v={String(consigneeName)} />}
+                  {(e as any).dealStatus === 'withdrawn' && (
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)' }}>
+                      ⚠️ کنار کشیده {((e as any).dealWithdrawnAt ? ' (' + toFa((e as any).dealWithdrawnAt) + ')' : '')}
+                    </div>
                   )}
                 </div>
 
-                {(e.unitPrice || e.totalPrice) && (
+                {(e.unitPrice || e.totalPrice || (e as any).shippingCost) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>💰 مالی</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {e.unitPrice && <Row l="قیمت هر تخم" v={`${toFa(e.unitPrice.toLocaleString('fa-IR'))} ت`} />}
+                      {e.unitPrice && <Row l="قیمت هر تخم" v={toFa(e.unitPrice.toLocaleString('fa-IR')) + ' ت'} />}
+                      {(e as any).shippingCost && <Row l="هزینه حمل" v={toFa((e as any).shippingCost.toLocaleString('fa-IR')) + ' ت'} />}
                       {e.totalPrice && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: '8px 10px',
-                           background: 'var(--accent-soft)', color: 'var(--accent)',
-                           borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                          <span>جمع کل:</span><span>{toFa(e.totalPrice.toLocaleString('fa-IR'))} ت</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                          <span>جمع تخم:</span><span>{toFa(e.totalPrice.toLocaleString('fa-IR'))} ت</span>
                         </div>
                       )}
                     </div>
@@ -253,12 +307,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
                 {myCandlings.length > 0 && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🔍 کندلینگ</div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🔍 کندلینگ</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {myCandlings.sort((a, b) => a.stage - b.stage).map(c => (
-                        <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: '6px 10px',
-                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                        <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                           <span style={{ color: 'var(--muted)' }}>مرحله {toFa(c.stage)}:</span>
                           <span style={{ fontWeight: 600 }}>سالم {toFa(c.alive || 0)}</span>
                         </div>
@@ -269,12 +321,9 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
                 {myHatch && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🐣 نتیجه هچ</div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🐣 نتیجه هچ</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between',
-                         fontSize: 'var(--fs-sm)', padding: '8px 10px',
-                         background: 'var(--accent-soft)', color: 'var(--accent)',
-                         borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                         <span>جوجه هچ‌شده:</span><span>{toFa(myHatch.hatched || 0)}</span>
                       </div>
                       {myHatch.unhatched ? <Row l="هچ‌نشده" v={toFa(myHatch.unhatched)} /> : null}
@@ -284,10 +333,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
                 {e.notes && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: '8px 10px', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📝 یادداشت</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
                   </>
                 )}
 
@@ -308,17 +355,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         <SectionTitle>📦 دستگاه و منبع</SectionTitle>
         <Grid2>
           <Field label="دستگاه" required>
-            <SmartSelect
-              value={form.deviceId}
-              onChange={v => setForm(f => ({ ...f, deviceId: v }))}
-              options={devices.map(c => ({ value: c.id, label: c.name }))}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب دستگاه"
-              autoThreshold={6}
-            />
+            <SmartSelect value={form.deviceId} onChange={v => setForm(f => ({ ...f, deviceId: v }))} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
           </Field>
           <Field label="نوع منبع" required>
-            <Select value={form.dealType} onChange={e => setForm({...form, dealType: e.target.value as DealType, dealData: {}, flockId: ''})}>
+            <Select value={form.dealType} onChange={e => setForm({ ...form, dealType: e.target.value as DealType, dealData: {}, flockId: '' })}>
               <option value="own">🏠 گله خودم</option>
               <option value="partnership">🤝 شراکتی</option>
               <option value="purchase">📥 خریداری</option>
@@ -327,61 +367,23 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             </Select>
           </Field>
         </Grid2>
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 2px' }}>
-          {maxCapacity > 0 ? 'ظرفیت دستگاه: ' + toFa(maxCapacity) + ' تخم' : ''}
-        </div>
-
-        <SectionTitle>📋 مشخصات تخم</SectionTitle>
-        <Grid2>
-          <Field label="پرنده" required>
-            <SmartSelect
-              value={form.birdId}
-              onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))}
-              options={birds.map(c => ({ value: c.id, label: c.name }))}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب پرنده"
-              autoThreshold={6}
-            />
-          </Field>
-          <Field label="نژاد">
-            <Select value={form.breedId} onChange={e => setForm({...form, breedId: e.target.value})}>
-              <option value="">—</option>
-              {breedsForBird.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </Select>
-          </Field>
-        </Grid2>
-
-        <Grid2>
-          <Field label="تعداد تخم" required hint={maxCapacity ? `ظرفیت دستگاه: ${toFa(maxCapacity)}` : undefined}>
-            <NumField placeholder="۳۰۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" max={maxCapacity || undefined} min={0} />
-          </Field>
-          <Field label="طبقات (Tray)">
-            <Input placeholder="۱-۲-۳" dir="ltr" value={form.trayNumbers} onChange={e => setForm({...form, trayNumbers: e.target.value})} />
-          </Field>
-        </Grid2>
-
-        <SectionTitle>📅 زمان‌بندی</SectionTitle>
-        <Field label="تاریخ ورود" required>
-          <DatePicker value={form.entryDate} onChange={v => setForm({...form, entryDate: v})} placeholder="انتخاب تاریخ ورود" />
-        </Field>
+        {maxCapacity > 0 && (
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 4px' }}>ظرفیت دستگاه: {toFa(maxCapacity)} تخم</div>
+        )}
 
         {form.dealType === 'own' && (
-          <DepBox title="🏠 گله مبدأ">
-            <Field label="انتخاب گله" required hint="گله‌ای که تخم از آن آمده">
-              {flocks.length === 0 ? (
-                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-                  هنوز گله‌ای ثبت نشده — اول از ماژول گله اضافه کنید
-                </div>
-              ) : (
-                <Select value={form.flockId} onChange={e => setForm({ ...form, flockId: e.target.value })}>
-                  <option value="">— انتخاب گله —</option>
-                  {flocks.filter((fl: any) => fl.status === 'active').map((fl: any) => (
-                    <option key={fl.id} value={fl.id}>{fl.name}</option>
-                  ))}
-                </Select>
-              )}
-            </Field>
-          </DepBox>
+          <Field label="انتخاب گله" hint="گله‌ای که تخم از آن آمده">
+            {flocks.filter((fl: any) => fl.status === 'active').length === 0 ? (
+              <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+                هنوز گله فعالی ثبت نشده — اول از ماژول گله اضافه کنید
+              </div>
+            ) : (
+              <Select value={form.flockId} onChange={e => setForm({ ...form, flockId: e.target.value })}>
+                <option value="">— انتخاب گله —</option>
+                {flocks.filter((fl: any) => fl.status === 'active').map((fl: any) => <option key={fl.id} value={fl.id}>{fl.name}</option>)}
+              </Select>
+            )}
+          </Field>
         )}
 
         {form.dealType === 'purchase' && (
@@ -401,22 +403,11 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             <Field label="تاریخ خرید">
               <DatePicker value={form.dealData.purchaseDate || ''} onChange={v => setD('purchaseDate', v)} />
             </Field>
-            <Grid2>
-              <Field label="قیمت هر تخم">
-                <MoneyField placeholder="۰" value={form.dealData.purchasePrice || ''} onChange={e => setD('purchasePrice', e.target.value)} />
-              </Field>
-              <Field label="هزینه حمل">
-                <MoneyField placeholder="۰" value={form.dealData.shippingCost || ''} onChange={e => setD('shippingCost', e.target.value)} />
-              </Field>
-            </Grid2>
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', padding: 8, background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', fontWeight: 600 }}>
-              💡 این خرید به عنوان هزینه در گزارش مالی ثبت می‌شود
-            </div>
           </DepBox>
         )}
 
         {form.dealType === 'partnership' && (
-          <DepBox title="اطلاعات شراکت">
+          <DepBox title="🤝 اطلاعات شراکت">
             <Field label="شریک" required>
               {allPersons.length === 0 ? (
                 <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
@@ -431,33 +422,17 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             </Field>
             <Grid2>
               <Field label="درصد شریک" hint="۰ تا ۱۰۰">
-                <NumField
-                  placeholder="۵۰"
-                  value={form.dealData.partnerPercent || ''}
-                  onChange={e => {
-                    const raw = parseInt(toEn(e.target.value)) || 0;
-                    const v = clampPercent(raw);
-                    setD('partnerPercent', v === null ? '' : String(v));
-                  }}
-                  unit="٪" min={0} />
+                <NumField placeholder="۵۰" value={form.dealData.partnerPercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('partnerPercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
               </Field>
               <Field label="درصد من" hint="خودکار">
-                <Input
-                  readOnly
-                  dir="ltr"
-                  value={(() => {
-                    const p = parseInt(toEn(form.dealData.partnerPercent || '0')) || 0;
-                    return toFa(complement(p) ?? 100) + '٪';
-                  })()}
-                  unit="٪"
-                />
+                <Input readOnly dir="ltr" value={toFa(complement(parseInt(toEn(form.dealData.partnerPercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
               </Field>
             </Grid2>
           </DepBox>
         )}
 
         {form.dealType === 'rent' && (
-          <DepBox title="اطلاعات اجاره">
+          <DepBox title="🏢 اطلاعات اجاره">
             <Field label="اجاره‌دهنده" required>
               {allPersons.length === 0 ? (
                 <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
@@ -478,7 +453,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         )}
 
         {form.dealType === 'consignment' && (
-          <DepBox title="اطلاعات امانت">
+          <DepBox title="📦 اطلاعات امانت">
             <Field label="امانت‌دار" required>
               {allPersons.length === 0 ? (
                 <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
@@ -493,63 +468,70 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             </Field>
             <Grid2>
               <Field label="درصد امانت‌دار" hint="۰ تا ۱۰۰">
-                <NumField
-                  placeholder="۲۰"
-                  value={form.dealData.consigneePercent || ''}
-                  onChange={e => {
-                    const raw = parseInt(toEn(e.target.value)) || 0;
-                    const v = clampPercent(raw);
-                    setD('consigneePercent', v === null ? '' : String(v));
-                  }}
-                  unit="٪" min={0} />
+                <NumField placeholder="۲۰" value={form.dealData.consigneePercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('consigneePercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
               </Field>
               <Field label="درصد من" hint="خودکار">
-                <Input
-                  readOnly
-                  dir="ltr"
-                  value={(() => {
-                    const p = parseInt(toEn(form.dealData.consigneePercent || '0')) || 0;
-                    return toFa(complement(p) ?? 100) + '٪';
-                  })()}
-                  unit="٪"
-                />
+                <Input readOnly dir="ltr" value={toFa(complement(parseInt(toEn(form.dealData.consigneePercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
               </Field>
             </Grid2>
           </DepBox>
         )}
 
         {(form.dealType === 'partnership' || form.dealType === 'consignment') && (
-          <div style={{ padding: 10, background: form.dealStatus === 'withdrawn' ? 'var(--danger-soft)' : 'var(--input-bg)', border: '1px solid ' + (form.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--border)'), borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginTop: 6 }}>
+          <div style={{ padding: 10, background: form.dealStatus === 'withdrawn' ? 'var(--danger-soft)' : 'var(--input-bg)', border: '1px solid ' + (form.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--border)'), borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input type="checkbox" checked={form.dealStatus === 'withdrawn'} onChange={e => setForm({...form, dealStatus: e.target.checked ? 'withdrawn' : 'active'})} style={{ width: 18, height: 18, accentColor: 'var(--danger)' }} />
+              <input type="checkbox" checked={form.dealStatus === 'withdrawn'} onChange={e => setForm({ ...form, dealStatus: e.target.checked ? 'withdrawn' : 'active' })} style={{ width: 18, height: 18, accentColor: 'var(--danger)' }} />
               <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: form.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--text)' }}>شریک/صاحب کنار کشید</span>
             </div>
             {form.dealStatus === 'withdrawn' && (
               <Grid2>
                 <Field label="تاریخ کنارکشیدن">
-                  <DatePicker value={form.dealWithdrawnAt} onChange={v => setForm({...form, dealWithdrawnAt: v})} />
+                  <DatePicker value={form.dealWithdrawnAt} onChange={v => setForm({ ...form, dealWithdrawnAt: v })} />
                 </Field>
                 <Field label="دلیل">
-                  <Input placeholder="..." value={form.dealWithdrawnReason} onChange={e => setForm({...form, dealWithdrawnReason: e.target.value})} />
+                  <Input placeholder="..." value={form.dealWithdrawnReason} onChange={e => setForm({ ...form, dealWithdrawnReason: e.target.value })} />
                 </Field>
               </Grid2>
             )}
           </div>
         )}
 
+        <SectionTitle>📋 مشخصات تخم</SectionTitle>
         <Grid2>
-          <SectionTitle>💰 مالی</SectionTitle>
-        <Field label="قیمت هر تخم" hint="اگر خریداری شده">
-            <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
+          <Field label="پرنده" required>
+            <SmartSelect value={form.birdId} onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
           </Field>
-          <Field label="هزینه حمل" hint="اختیاری">
-            <MoneyField placeholder="۰" value={form.shippingCost || ''} onChange={e => setForm({...form, shippingCost: e.target.value})} />
+          <Field label="نژاد">
+            <Select value={form.breedId} onChange={e => setForm({ ...form, breedId: e.target.value })}>
+              <option value="">—</option>
+              {breedsForBird.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </Select>
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="تعداد تخم" required>
+            <NumField placeholder="۳۰۰" value={form.count} onChange={e => setForm({ ...form, count: e.target.value })} unit="عدد" min={0} />
+          </Field>
+          <Field label="طبقات (Tray)">
+            <Input placeholder="۱-۲-۳" dir="ltr" value={form.trayNumbers} onChange={e => setForm({ ...form, trayNumbers: e.target.value })} />
           </Field>
         </Grid2>
 
+        <SectionTitle>📅 زمان‌بندی</SectionTitle>
+        <Field label="تاریخ ورود" required>
+          <DatePicker value={form.entryDate} onChange={v => setForm({ ...form, entryDate: v })} placeholder="انتخاب تاریخ ورود" />
+        </Field>
+
+        <SectionTitle>💰 مالی</SectionTitle>
+        <Grid2>
+          <Field label="قیمت هر تخم"><MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} /></Field>
+          <Field label="هزینه حمل"><MoneyField placeholder="۰" value={form.shippingCost} onChange={e => setForm({ ...form, shippingCost: e.target.value })} /></Field>
+        </Grid2>
+
         <SectionTitle>📝 یادداشت</SectionTitle>
-        <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
-        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
+        <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+
+        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center' }}>✕ {err}</div>}
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف ورودی تخم"
@@ -565,8 +547,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>
@@ -575,12 +556,8 @@ function Row({ l, v }: { l: string; v: string }) {
 
 function DepBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'var(--accent-soft)', border: '1px dashed var(--accent-border)',
-       borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex',
-       flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700,
-         display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8,
-         borderBottom: '1px solid var(--border)' }}>
+    <div style={{ background: 'var(--accent-soft)', border: '1px dashed var(--accent-border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)' }} />
         {title}
       </div>
@@ -593,7 +570,7 @@ function chip(active: boolean): React.CSSProperties {
   return {
     padding: '6px 11px', fontSize: 'var(--fs-sm)',
     background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
-    border: `1px solid ${active ? 'var(--accent-border)' : 'var(--border)'}`,
+    border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
     borderRadius: 'var(--r-sm)',
     color: active ? 'var(--accent)' : 'var(--muted)',
     fontWeight: active ? 600 : 500, cursor: 'pointer',
