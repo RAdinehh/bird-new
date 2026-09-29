@@ -45,7 +45,7 @@ export default function ExpandableCard({
       borderRadius: 'var(--r-lg)',
       overflow: 'hidden',
       marginBottom: 8,
-      transition: 'border-color .2s'
+      transition: 'border-color var(--dur-base)'
     }}>
       <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: color, zIndex: 1 }} />
 
@@ -58,7 +58,7 @@ export default function ExpandableCard({
             fontSize: 18, flexShrink: 0, position: 'relative'
           }}>
             {iconEmoji}
-            {index !== undefined && (
+            {index !== undefined && index !== '' && (
               <span style={{
                 position: 'absolute', top: -4, left: -4, width: 18, height: 18, borderRadius: '50%',
                 background: color, color: 'var(--avatar-text)',
@@ -77,7 +77,7 @@ export default function ExpandableCard({
           {badge}
 
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isOpen ? color : 'var(--dim)'} strokeWidth="2.5" strokeLinecap="round"
-            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform .25s', flexShrink: 0 }}>
+            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform var(--dur-slow)', flexShrink: 0 }}>
             <path d="m6 9 6 6 6-6" />
           </svg>
         </div>
