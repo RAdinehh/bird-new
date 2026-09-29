@@ -296,47 +296,35 @@ export function collectEvents(): CalEvent[] {
     });
   } catch (e) { /* ignore */ }
 
-
-  // ============ ۶. داروهای گیاهی انبار ============
+  // ============ ۶. مصرف دارو گیاهی (از ثبت روزانه) ============
   try {
     const whsItems = useWhs.getState().items || [];
-    whsItems.forEach((item: any) => {
-      if (item.category !== 'herbal') return;
-      if (!item.expireDate) return;
-      const days = daysToExpiry(item.expireDate);
-      if (days !== null && days >= -14) {
-        events.push({
-          id: 'herbal-exp-' + item.id,
-          date: item.expireDate,
-          type: 'herbal',
-          title: '🌿 انقضای ' + item.name,
-          subtitle: days < 0 ? 'منقضی شده' : days + ' روز مانده',
-          status: days < 0 ? 'overdue' : (days <= 30 ? 'today' : 'future'),
-          icon: '🌿',
-          refId: item.id,
-        });
-      }
-    });
+    const herbalNames = new Set(
+      whsItems
+        .filter((it: any) => it.category === 'herbal')
+        .map((it: any) => it.name)
+    );
 
-    // داروهای گیاهی ثبت‌شده در ثبت روزانه
-    const logs = useDlg.getState().logs || [];
-    logs.forEach((log: any) => {
-      const meds = log.medications || [];
-      meds.forEach((m: any, i: number) => {
-        if (!m.name) return;
-        if (m.medicineType !== 'herbal') return;
-        events.push({
-          id: 'herbal-log-' + log.id + '-' + i,
-          date: log.date,
-          type: 'herbal',
-          title: '🌿 ' + m.name,
-          subtitle: (m.dose || '') + (m.method ? ' — ' + m.method : ''),
-          status: statusOf(log.date),
-          icon: '🌿',
-          refId: log.id,
+    if (herbalNames.size > 0) {
+      const logs = useDlg.getState().logs || [];
+      logs.forEach((log: any) => {
+        const meds = log.medications || [];
+        meds.forEach((m: any, i: number) => {
+          if (!m.name) return;
+          if (!herbalNames.has(m.name)) return;
+          events.push({
+            id: 'herbal-log-' + log.id + '-' + i,
+            date: log.date,
+            type: 'herbal',
+            title: '🌿 ' + m.name,
+            subtitle: (m.dose || '') + (m.method ? ' — ' + m.method : ''),
+            status: statusOf(log.date),
+            icon: '🌿',
+            refId: log.id,
+          });
         });
       });
-    });
+    }
   } catch (e) { /* ignore */ }
 
   return events;
