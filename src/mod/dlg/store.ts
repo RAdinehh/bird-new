@@ -90,11 +90,15 @@ export interface DailyLog {
 
   // یادداشت
   notes: string;
+
+  // متادیتا
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface State {
   logs: DailyLog[];
-  add: (l: Omit<DailyLog, 'id'>) => void;
+  add: (l: Omit<DailyLog, 'id' | 'createdAt' | 'updatedAt'>) => void;
   update: (id: string, patch: Partial<DailyLog>) => void;
   remove: (id: string) => void;
 }
@@ -103,13 +107,24 @@ export const useDlg = create<State>()(
   persist(
     (set, get) => ({
       logs: [],
-      add: (l) => set({ logs: [...get().logs, { ...l, id: uuid() }] }),
-      update: (id, patch) => set({ logs: get().logs.map(x => x.id === id ? { ...x, ...patch } : x) }),
+      add: (l) => set({
+        logs: [...get().logs, {
+          ...l,
+          id: uuid(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }]
+      }),
+      update: (id, patch) => set({
+        logs: get().logs.map(x => x.id === id
+          ? { ...x, ...patch, updatedAt: new Date().toISOString() }
+          : x)
+      }),
       remove: (id) => set({ logs: get().logs.filter(x => x.id !== id) })
     }),
     {
       name: 'pm-dlg',
-      version: 3,
+      version: 4,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
@@ -128,6 +143,13 @@ export const useDlg = create<State>()(
             waterFillVolume: l.waterFillVolume ?? null,
             weightSamples: l.weightSamples || [],
             weightGender: l.weightGender || '',
+          }));
+        }
+        if (version < 4 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => ({
+            ...l,
+            createdAt: l.createdAt || new Date().toISOString(),
+            updatedAt: l.updatedAt || new Date().toISOString(),
           }));
         }
         return persisted;
