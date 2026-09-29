@@ -254,10 +254,10 @@ export default function Dashboard() {
       {/* ⏰ سرسیدهای نزدیک */}
       {upcomingDues.length > 0 && (
         <div>
-          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 6 }}>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 4 }}>
             ⏰ سرسیدهای نزدیک ({toFa(upcomingDues.length)})
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {upcomingDues.map(({ inv, days }) => {
               const party = contacts.find((c: any) => c.id === inv.partyId);
               const tone = (days ?? 0) < 0 ? 'danger' : (days ?? 0) <= 2 ? 'warn' : 'amber';
@@ -296,10 +296,10 @@ export default function Dashboard() {
       {/* 🏦 چک‌های در جریان */}
       {pendingChecks.length > 0 && (
         <div>
-          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 6 }}>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 4 }}>
             🏦 چک‌های در جریان ({toFa(pendingChecks.length)})
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {pendingChecks.map(({ inv, pay }) => {
               const party = contacts.find((c: any) => c.id === inv.partyId);
               return (
@@ -334,7 +334,7 @@ export default function Dashboard() {
 
       {activeFlocks.length === 0 && invoices.length === 0 ? (
         <div style={{
-          padding: 40, textAlign: 'center',
+          padding: 24, textAlign: 'center',
           background: 'var(--card)',
           border: '1px solid var(--border)',
           borderRadius: 'var(--r-lg)'
@@ -351,7 +351,7 @@ export default function Dashboard() {
       {hasData ? (
         <>
           <SectionTitle>📅 امروز در یک نگاه</SectionTitle>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
             <KpiCard
               icon="🥚"
               label="تخم امروز"
@@ -389,7 +389,7 @@ export default function Dashboard() {
 
           {/* ============ ۲. سلامت گله ============ */}
           <SectionTitle>❤️ سلامت گله</SectionTitle>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
             <MiniStat
               label="نرخ زنده‌مانی"
               value={survivalRate}
@@ -422,7 +422,7 @@ export default function Dashboard() {
             background: 'var(--card)',
             border: '1px solid var(--border)',
             borderRadius: 'var(--r-lg)',
-            padding: '14px 16px'
+            padding: '10px 12px'
           }}>
             <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 4 }}>
               🥚 روند تخم‌گذاری ۷ روز اخیر
@@ -430,7 +430,7 @@ export default function Dashboard() {
             <LineChart data={eggTrend} color="var(--accent)" height={120} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
             <MiniStat
               label="FCR ماه"
               value={fcr}
@@ -454,7 +454,7 @@ export default function Dashboard() {
 
           {/* ============ ۴. مالی ============ */}
           <SectionTitle>💰 مالی این ماه</SectionTitle>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
             <KpiCard
               icon="📥"
               label="فروش ماه"
@@ -493,7 +493,7 @@ export default function Dashboard() {
             <div
               onClick={() => nav('/tra')}
               style={{
-                padding: '12px 14px',
+                padding: '8px 10px',
                 background: 'var(--accent-soft)',
                 border: '1px solid var(--accent-border)',
                 borderRadius: 'var(--r-md)',
@@ -717,7 +717,7 @@ export default function Dashboard() {
 
       {/* ============ ۹. دسترسی سریع ============ */}
       <SectionTitle>⚡ دسترسی سریع</SectionTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
         <QuickAction icon="📋" label="ثبت روزانه" onClick={() => nav('/dlg')} />
         <QuickAction icon="🥚" label="جوجه‌کشی" onClick={() => nav('/inc')} />
         <QuickAction icon="🛒" label="معاملات" onClick={() => nav('/tra')} />
@@ -791,7 +791,7 @@ function MiniStat({ label, value, suffix, color, noFormat }: {
 }) {
   return (
     <div style={{
-      padding: '10px 12px',
+      padding: '7px 10px',
       background: 'var(--' + color + '-soft)',
       border: '1px solid var(--' + color + ')',
       borderRadius: 'var(--r-md)',
@@ -820,7 +820,7 @@ function QuickAction({ icon, label, onClick }: { icon: string; label: string; on
         background: 'var(--card)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-md)',
-        padding: '12px 8px',
+        padding: '8px 6px',
         textAlign: 'center',
         cursor: 'pointer'
       }}
