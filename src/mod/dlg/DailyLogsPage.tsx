@@ -761,10 +761,8 @@ export default function DailyLogsPage() {
           {form.weightSamples.map((w, i) => (
             <div key={w.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
               <div style={{ flex: 1 }}>
-                <Input
+                <NumField
                   placeholder="وزن (kg)"
-                  inputMode="decimal"
-                  dir="ltr"
                   value={w.weight}
                   onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
                   unit="kg" min={0} />
@@ -796,7 +794,7 @@ export default function DailyLogsPage() {
               </div>
               <Grid2>
                 <Field label="تعداد">
-                  <Input placeholder="۰" inputMode="numeric" dir="ltr" value={String(d.count || '')}
+                  <NumField placeholder="۰" value={String(d.count || '')}
                     onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
                     min={0} max={flockAliveCount || undefined} />
                 </Field>
