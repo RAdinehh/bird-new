@@ -239,20 +239,67 @@ export function Tag({
   );
 }
 
-interface EmptyProps { icon: React.ReactNode; title: string; desc: string; action?: React.ReactNode; }
-export function Empty({ icon, title, desc, action }: EmptyProps) {
+interface EmptyProps {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  action?: React.ReactNode;
+  tone?: 'accent' | 'warn' | 'info' | 'danger';
+}
+
+export function Empty({ icon, title, desc, action, tone = 'accent' }: EmptyProps) {
+  const toneBg: Record<string, string> = {
+    accent: 'var(--accent-soft)',
+    warn: 'var(--warn-soft)',
+    info: 'var(--info-soft)',
+    danger: 'var(--danger-soft)',
+  };
+  const toneColor: Record<string, string> = {
+    accent: 'var(--accent)',
+    warn: 'var(--warn)',
+    info: 'var(--info)',
+    danger: 'var(--danger)',
+  };
+
   return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center',
-      justifyContent: 'center', padding: '48px 20px', textAlign: 'center', gap: 12
-    }}>
-      <div style={{
-        width: 64, height: 64, borderRadius: 'var(--r-xl)',
-        background: 'var(--accent-soft)', color: 'var(--accent)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center'
-      }}>{icon}</div>
+    <div
+      role="status"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '40px 20px',
+        textAlign: 'center',
+        gap: 12,
+      }}
+    >
+      <div
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 'var(--r-xl)',
+          background: toneBg[tone],
+          color: toneColor[tone],
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        aria-hidden="true"
+      >
+        {icon}
+      </div>
       <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700 }}>{title}</div>
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--muted)', lineHeight: 1.8, maxWidth: 280 }}>{desc}</div>
+      <div
+        style={{
+          fontSize: 'var(--fs-base)',
+          color: 'var(--muted)',
+          lineHeight: 1.8,
+          maxWidth: 280,
+        }}
+      >
+        {desc}
+      </div>
       {action}
     </div>
   );
@@ -475,15 +522,65 @@ export function PageContainer({ children }: { children: React.ReactNode }) {
   return <div style={{ padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>{children}</div>;
 }
 
-export function Chip({ active, onClick, children }: { active?: boolean; onClick?: () => void; children: React.ReactNode }) {
+export function Chip({
+  active,
+  onClick,
+  children,
+  tone = 'accent',
+}: {
+  active?: boolean;
+  onClick?: () => void;
+  children: React.ReactNode;
+  tone?: 'accent' | 'warn' | 'danger' | 'info' | 'purple';
+}) {
+  const activeBg: Record<string, string> = {
+    accent: 'var(--accent-soft)',
+    warn: 'var(--warn-soft)',
+    danger: 'var(--danger-soft)',
+    info: 'var(--info-soft)',
+    purple: 'var(--purple-soft)',
+  };
+  const activeBorder: Record<string, string> = {
+    accent: 'var(--accent-border)',
+    warn: 'var(--warn)',
+    danger: 'var(--danger)',
+    info: 'var(--info)',
+    purple: 'var(--purple)',
+  };
+  const activeColor: Record<string, string> = {
+    accent: 'var(--accent)',
+    warn: 'var(--warn)',
+    danger: 'var(--danger)',
+    info: 'var(--info)',
+    purple: 'var(--purple)',
+  };
+
   return (
-    <button onClick={onClick} style={{
-      padding: '6px 11px', fontSize: 'var(--fs-sm)',
-      background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
-      border: `1px solid ${active ? 'var(--accent-border)' : 'var(--border)'}`,
-      borderRadius: 'var(--r-sm)', color: active ? 'var(--accent)' : 'var(--muted)',
-      fontWeight: active ? 600 : 500, cursor: 'pointer', fontFamily: 'inherit',
-      display: 'inline-flex', alignItems: 'center', gap: 5
-    }}>{children}</button>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      style={{
+        padding: '6px 11px',
+        fontSize: 'var(--fs-sm)',
+        background: active ? activeBg[tone] : 'var(--btn-bg)',
+        border: '1px solid ' + (active ? activeBorder[tone] : 'var(--border)'),
+        borderRadius: 'var(--r-sm)',
+        color: active ? activeColor[tone] : 'var(--muted)',
+        fontWeight: active ? 600 : 500,
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        whiteSpace: 'nowrap',
+        outline: 'none',
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.boxShadow = 'none';
+      }}
+    >
+      {children}
+    </button>
   );
 }
