@@ -437,7 +437,7 @@ export default function DevicesPage() {
 
       <Modal open={!!maintDeviceId} onClose={() => setMaintDeviceId(null)} title="ثبت تعمیر"
         footer={<BtnRow><Btn variant="primary" onClick={() => { if (maintDeviceId) addMaintenance(maintDeviceId); }}>ذخیره</Btn><Btn onClick={() => setMaintDeviceId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           <Field label="تاریخ" required>
             <DatePicker value={maintForm.date} onChange={v => setMaintForm({ ...maintForm, date: v })} />
           </Field>
