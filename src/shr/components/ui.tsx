@@ -9,24 +9,30 @@ interface BtnProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   icon?: React.ReactNode;
 }
-export function Btn({ variant = 'ghost', size = 'md', full, style, children, ...rest }: BtnProps) {
+export function Btn({ variant = 'ghost', size = 'md', full, style, children, icon, loading, disabled, ...rest }: BtnProps) {
   const variants: Record<BtnVariant, React.CSSProperties> = {
     primary: { background: 'var(--accent)', color: 'var(--avatar-text)' },
     ghost: { background: 'var(--btn-bg)', color: 'var(--muted)', border: '1px solid var(--border)' },
     danger: { background: 'var(--danger)', color: '#fff' },
     outline: { background: 'transparent', color: 'var(--accent)', border: '1.5px solid var(--accent-border)' }
   };
+  const isDisabled = disabled || loading;
   return (
-    <button {...rest} style={{
+    <button {...rest} disabled={isDisabled} style={{
       height: size === 'sm' ? 32 : 38,
       padding: size === 'sm' ? '0 12px' : '0 16px',
       borderRadius: 'var(--r-md)', fontFamily: 'inherit',
       fontSize: size === 'sm' ? 'var(--fs-sm)' : 'var(--fs-base)',
-      fontWeight: 600, cursor: (rest as any).disabled || (rest as any).loading ? 'not-allowed' :  'pointer',
+      fontWeight: 600,
+      cursor: isDisabled ? 'not-allowed' : 'pointer',
+      opacity: isDisabled ? 0.55 : 1,
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
       width: full ? '100%' : undefined,
       ...variants[variant], ...style
-    }}>{children}</button>
+    }}>
+      {loading ? <span style={{ display: 'inline-flex' }}>⏳</span> : icon ? <span style={{ display: 'inline-flex' }}>{icon}</span> : null}
+      {children}
+    </button>
   );
 }
 
