@@ -708,3 +708,10 @@ export function RadioGroup<T extends string | number>({
     </div>
   );
 }
+
+
+export function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
+  );
+}

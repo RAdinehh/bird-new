@@ -2,12 +2,12 @@ import { useState, useMemo } from 'react';
 import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity } from './store';
 import { useSet } from '../set/store';
 import { useBrd } from '../brd/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
-import { addMonths, parse as parseJ, format as formatJ } from 'date-fns-jalali';
+import { parse as parseJ, addMonths, format as formatJ } from 'date-fns-jalali';
 
 const STATUS_FA: Record<DeviceStatus, string> = {
   active: '✅ فعال',
@@ -63,6 +63,22 @@ const empty: F = {
   notes: '',
 };
 
+function normalizeBird(name: string): string {
+  return (name || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\s+/g, ' ').trim();
+}
+
+function warrantyInfo(purchasedAt: string, months: number | null): { end: string; expired: boolean } | null {
+  if (!purchasedAt || !months) return null;
+  try {
+    const d = parseJ(toEn(purchasedAt), 'yyyy/MM/dd', new Date());
+    if (isNaN(d.getTime())) return null;
+    const end = formatJ(addMonths(d, months), 'yyyy/MM/dd');
+    const t = new Date();
+    const today = t.getFullYear() + '/' + String(t.getMonth() + 1).padStart(2, '0') + '/' + String(t.getDate()).padStart(2, '0');
+    return { end, expired: end < today };
+  } catch { return null; }
+}
+
 export default function DevicesPage() {
   const { devices, eggEntries, addDevice, updateDevice, deleteDevice } = useInc();
   const settings = useSet();
@@ -76,6 +92,9 @@ export default function DevicesPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [maintDeviceId, setMaintDeviceId] = useState<string | null>(null);
   const [maintForm, setMaintForm] = useState({ date: '', type: '', cost: '', description: '' });
+
+  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
+  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
   const openNew = () => { setForm(empty); setErr(''); setOpen(true); };
 
@@ -101,45 +120,28 @@ export default function DevicesPage() {
     setErr(''); setOpen(true);
   };
 
-  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
-  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
-
   const addCapacity = (birdName: string) => {
     if (!birdName.trim()) return;
-    if (form.capacityByBird.some(c => c.birdName === birdName)) return;
-    setForm(f => ({ ...f, capacityByBird: [...f.capacityByBird, { birdName, capacity: null }] }));
-    const profile = profiles.find(p => p.birdName === birdName);
-    if (profile) {
-      setForm(f => ({
-        ...f,
-        capacityByBird: [...f.capacityByBird, { birdName, capacity: null }],
-        temp: f.temp || String(profile.setterTemp),
-        humidity: f.humidity || String(profile.setterHumidity),
-      }));
-    }
+    if (form.capacityByBird.some(c => normalizeBird(c.birdName) === normalizeBird(birdName))) return;
+    const profile = profiles.find(p => normalizeBird(p.birdName) === normalizeBird(birdName));
+    setForm(f => ({
+      ...f,
+      capacityByBird: [...f.capacityByBird, { birdName, capacity: null }],
+      temp: f.temp || (profile ? String(profile.setterTemp) : ''),
+      humidity: f.humidity || (profile ? String(profile.setterHumidity) : ''),
+    }));
   };
 
   const removeCapacity = (birdName: string) => {
-    setForm(f => ({ ...f, capacityByBird: f.capacityByBird.filter(c => c.birdName !== birdName) }));
+    setForm(f => ({ ...f, capacityByBird: f.capacityByBird.filter(c => normalizeBird(c.birdName) !== normalizeBird(birdName)) }));
   };
 
   const updateCapacity = (birdName: string, capacity: number | null) => {
     setForm(f => ({
       ...f,
-      capacityByBird: f.capacityByBird.map(c => c.birdName === birdName ? { ...c, capacity } : c),
+      capacityByBird: f.capacityByBird.map(c => normalizeBird(c.birdName) === normalizeBird(birdName) ? { ...c, capacity } : c),
     }));
   };
-
-  const warrantyEnd = useMemo(() => {
-    if (!form.purchasedAt || !form.warranty) return null;
-    try {
-      const date = parseJ(toEn(form.purchasedAt), 'yyyy/MM/dd', new Date());
-      if (isNaN(date.getTime())) return null;
-      const months = parseInt(toEn(form.warranty)) || 0;
-      const end = addMonths(date, months);
-      return formatJ(end, 'yyyy/MM/dd');
-    } catch { return null; }
-  }, [form.purchasedAt, form.warranty]);
 
   const save = () => {
     if (!form.id) {
@@ -147,7 +149,6 @@ export default function DevicesPage() {
       if (dup) { showAlert('دستگاهی با نام «' + dup.name + '» قبلاً ثبت شده', '❌ نام تکراری'); return; }
     }
     if (!form.name.trim()) { setErr('نام دستگاه اجباری است'); return; }
-    const isActive = form.status === 'active';
     const data = {
       name: form.name.trim(),
       code: '',
@@ -155,8 +156,8 @@ export default function DevicesPage() {
       capacityByBird: form.capacityByBird,
       mode: form.mode,
       status: form.status,
-      temp: isActive ? num(form.temp) : null,
-      humidity: isActive ? num(form.humidity) : null,
+      temp: num(form.temp),
+      humidity: num(form.humidity),
       purchasedAt: form.purchasedAt.trim(),
       price: num(form.price),
       warranty: int(form.warranty),
@@ -175,7 +176,6 @@ export default function DevicesPage() {
     setOpen(false);
   };
 
-
   const addMaintenance = (deviceId: string) => {
     const dev = devices.find(d => d.id === deviceId);
     if (!dev) return;
@@ -187,7 +187,7 @@ export default function DevicesPage() {
       cost: parseFloat(toEn(maintForm.cost).replace('٫', '.')) || null,
       description: maintForm.description.trim(),
     };
-    const logs = [...(dev.maintenanceLogs || []), log];
+    const logs = [...((dev as any).maintenanceLogs || []), log];
     updateDevice(deviceId, { maintenanceLogs: logs } as any);
     setMaintForm({ date: '', type: '', cost: '', description: '' });
     setMaintDeviceId(null);
@@ -198,19 +198,19 @@ export default function DevicesPage() {
     const dev = devices.find(d => d.id === deviceId);
     if (!dev) return;
     if (!confirm('حذف این رکورد تعمیر؟')) return;
-    const logs = (dev.maintenanceLogs || []).filter(l => l.id !== logId);
+    const logs = ((dev as any).maintenanceLogs || []).filter((l: any) => l.id !== logId);
     updateDevice(deviceId, { maintenanceLogs: logs } as any);
   };
 
   const target = delId ? devices.find(d => d.id === delId) : null;
   const accentFor = (s: DeviceStatus): any => s === 'active' ? 'accent' : s === 'idle' ? 'dim' : 'warn';
+  const warrantyForm = warrantyInfo(form.purchasedAt, parseInt(toEn(form.warranty)) || null);
 
   return (
     <PageContainer>
       {devices.length === 0 ? (
-        <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h8"/></svg>}
-          title="هنوز دستگاهی نساخته‌اید"
-          desc="اولین دستگاه جوجه‌کشی خود را اضافه کنید."
+        <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>}
+          title="هنوز دستگاهی نساخته‌اید" desc="اولین دستگاه جوجه‌کشی خود را اضافه کنید."
           action={<Btn variant="primary" onClick={openNew}>+ افزودن دستگاه</Btn>} />
       ) : (
         <>
@@ -220,11 +220,11 @@ export default function DevicesPage() {
             const activeEntries = entries.filter(e => e.status === 'incubating' || e.status === 'candled' || e.status === 'locked').length;
             const isOpen = expandedId === d.id;
             const caps = d.capacityByBird || [];
-            const totalCap = caps.reduce((a, c) => a + (c.capacity || 0), 0);
+            const logs: any[] = (d as any).maintenanceLogs || [];
+            const w = warrantyInfo(d.purchasedAt, d.warranty);
             return (
               <ExpandableCard key={d.id} accent={accentFor(d.status)} index={toFa(i + 1)} iconEmoji="🥚"
-                title={d.name}
-                subtitle={MODE_FA[d.mode] + ' · ' + STATUS_FA[d.status]}
+                title={d.name} subtitle={MODE_FA[d.mode] + ' · ' + STATUS_FA[d.status]}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : d.id)}
                 badge={activeEntries > 0 ? <Tag tone="green">{toFa(activeEntries)} ورودی فعال</Tag> : undefined}
                 summary={<>
@@ -233,21 +233,21 @@ export default function DevicesPage() {
                   {d.humidity && <span>💧 {toFa(d.humidity)}٪</span>}
                 </>}
               >
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 ظرفیت</div>
-                {caps.length === 0 ? (
-                  <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 8 }}>ظرفیتی تعریف نشده</div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {caps.map(c => (
-                      <div key={c.birdName} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
-                        <span>{c.birdName}</span>
-                        <span style={{ fontWeight: 600 }}>{c.capacity ? toFa(c.capacity) : '—'} تخم</span>
-                      </div>
-                    ))}
-                  </div>
+                {caps.length > 0 && (
+                  <>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 ظرفیت</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                      {caps.map(c => (
+                        <div key={c.birdName} style={{ padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                          <span>{c.birdName}</span>
+                          <span style={{ fontWeight: 600 }}>{c.capacity ? toFa(c.capacity) : '—'}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
 
-                {d.status === 'active' && (d.temp || d.humidity) && (
+                {(d.temp || d.humidity) && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🌡 شرایط</div>
                     {d.temp && <Row l="دمای هدف" v={toFa(d.temp) + ' °C'} />}
@@ -261,25 +261,22 @@ export default function DevicesPage() {
                     {d.price && <Row l="قیمت" v={toFa(d.price.toLocaleString('fa-IR')) + ' ت'} />}
                     {d.purchasedAt && <Row l="تاریخ خرید" v={toFa(d.purchasedAt)} />}
                     {d.warranty && <Row l="گارانتی" v={toFa(d.warranty) + ' ماه'} />}
+                    {w && w.expired && (
+                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)', textAlign: 'center' }}>
+                        ⏰ گارانتی تمام شده ({toFa(w.end)})
+                      </div>
+                    )}
                   </>
                 )}
 
-                {d.notes && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
-                  </>
-                )}
-
-                
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🛠 تعمیرات</div>
-                {(d.maintenanceLogs || []).length === 0 ? (
+                {logs.length === 0 ? (
                   <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 8, textAlign: 'center' }}>تعمیری ثبت نشده</div>
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                    {(d.maintenanceLogs || []).slice().reverse().slice(0, 6).map(m => (
-                      <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 3, fontSize: 'var(--fs-sm)', padding: '8px 24px 8px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', position: 'relative', minWidth: 0 }}>
-                        <button type="button" onClick={() => removeMaintenance(d.id, m.id)} style={{ position: 'absolute', top: 4, left: 4, background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: 2, lineHeight: 1 }}>✕</button>
+                    {logs.slice().reverse().slice(0, 6).map((m: any) => (
+                      <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 3, fontSize: 'var(--fs-sm)', padding: '8px 24px 8px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', position: 'relative' }}>
+                        <button type="button" onClick={() => removeMaintenance(d.id, m.id)} style={{ position: 'absolute', top: 4, left: 4, background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 12, padding: 2 }}>✕</button>
                         <span style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.type}</span>
                         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(m.date)}</span>
                         {m.cost ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600 }}>{toFa(m.cost.toLocaleString('fa-IR'))} ت</span> : null}
@@ -288,6 +285,13 @@ export default function DevicesPage() {
                   </div>
                 )}
                 <Btn size="sm" full onClick={() => { setMaintDeviceId(d.id); setMaintForm({ date: '', type: '', cost: '', description: '' }); }}>+ ثبت تعمیر</Btn>
+
+                {d.notes && (
+                  <>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📝 یادداشت</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
+                  </>
+                )}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
@@ -330,14 +334,13 @@ export default function DevicesPage() {
           <option value="">+ افزودن پرنده از لیست...</option>
           {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
         </Select>
-
         {form.capacityByBird.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
             {form.capacityByBird.map(c => (
               <div key={c.birdName} style={{ padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.birdName}</span>
-                  <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: 0 }}>✕</button>
+                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{c.birdName}</span>
+                  <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 12, padding: 0 }}>✕</button>
                 </div>
                 <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
               </div>
@@ -345,17 +348,15 @@ export default function DevicesPage() {
           </div>
         )}
 
-        <>
-            <SectionTitle>🌡 شرایط عملیاتی</SectionTitle>
-            <Grid2>
-              <Field label="دمای هدف" hint="°C">
-                <NumField placeholder="۳۷٫۸" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={20} max={45} />
-              </Field>
-              <Field label="رطوبت هدف" hint="٪">
-                <NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={0} max={100} />
-              </Field>
-            </Grid2>
-          </>
+        <SectionTitle>🌡 شرایط عملیاتی</SectionTitle>
+        <Grid2>
+          <Field label="دمای هدف" hint="°C">
+            <NumField placeholder="۳۷٫۸" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={20} max={45} />
+          </Field>
+          <Field label="رطوبت هدف" hint="٪">
+            <NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={0} max={100} />
+          </Field>
+        </Grid2>
 
         <SectionTitle>⚙ مشخصات فنی</SectionTitle>
         <Grid2>
@@ -400,16 +401,11 @@ export default function DevicesPage() {
             <MoneyField placeholder="۰" value={form.extraCost} onChange={e => setForm({...form, extraCost: e.target.value})} />
           </Field>
         </Grid2>
-        {warrantyEnd && (() => {
-          const today = new Date();
-          const todayStr = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
-          const isExpired = warrantyEnd < todayStr;
-          return (
-            <div style={{ padding: '8px 12px', background: isExpired ? 'var(--danger-soft)' : 'var(--accent-soft)', border: '1px solid ' + (isExpired ? 'var(--danger)' : 'var(--accent-border)'), borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: isExpired ? 'var(--danger)' : 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
-              {isExpired ? '⏰ گارانتی تمام شده: ' : '✅ گارانتی تا: '}{toFa(warrantyEnd)}
-            </div>
-          );
-        })()}
+        {warrantyForm && (
+          <div style={{ padding: '8px 12px', background: warrantyForm.expired ? 'var(--danger-soft)' : 'var(--accent-soft)', border: '1px solid ' + (warrantyForm.expired ? 'var(--danger)' : 'var(--accent-border)'), borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: warrantyForm.expired ? 'var(--danger)' : 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
+            {warrantyForm.expired ? '⏰ گارانتی تمام شده: ' : '✅ گارانتی تا: '}{toFa(warrantyForm.end)}
+          </div>
+        )}
 
         <SectionTitle>📝 یادداشت</SectionTitle>
         <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
@@ -417,7 +413,6 @@ export default function DevicesPage() {
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center' }}>✕ {err}</div>}
       </Modal>
 
-      
       <Modal open={!!maintDeviceId} onClose={() => setMaintDeviceId(null)} title="ثبت تعمیر"
         footer={<BtnRow><Btn variant="primary" onClick={() => { if (maintDeviceId) addMaintenance(maintDeviceId); }}>ذخیره</Btn><Btn onClick={() => setMaintDeviceId(null)}>لغو</Btn></BtnRow>}>
         <Field label="تاریخ" required>
@@ -434,7 +429,7 @@ export default function DevicesPage() {
         </Field>
       </Modal>
 
-<Modal open={!!delId} onClose={() => setDelId(null)} title="حذف دستگاه"
+      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف دستگاه"
         footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteDevice(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
           حذف <b>{target?.name}</b>؟
@@ -450,11 +445,5 @@ function Row({ l, v }: { l: string; v: string }) {
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>
-  );
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ paddingTop: 12, marginTop: 6, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
   );
 }
