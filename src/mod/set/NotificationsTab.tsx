@@ -51,7 +51,7 @@ function ToggleRow({ label, sub, value, onChange, disabled }: any) {
 }
 
 /** فیلد عددی با تبدیل خودکار فارسی/انگلیسی */
-function NumField({ label, hint, value, onChange, unit, min, max }: {
+function LocalNumField({ label, hint, value, onChange, unit, min, max }: {
   label: string;
   hint?: string;
   value: number;
@@ -232,7 +232,7 @@ export default function NotificationsTab() {
           وقتی این آستانه‌ها رد شوند، هشدار خودکار ایجاد می‌شود.
         </div>
 
-        <NumField
+        <LocalNumField
           label="افت تخم‌گذاری بیش از"
           hint="درصد افت نسبت به میانگین"
           value={th.eggDropPercent}
@@ -242,7 +242,7 @@ export default function NotificationsTab() {
           max={100}
         />
 
-        <NumField
+        <LocalNumField
           label="تلفات بیش از"
           hint="در هزار پرنده"
           value={th.mortalityPerThousand}
@@ -252,7 +252,7 @@ export default function NotificationsTab() {
           max={1000}
         />
 
-        <NumField
+        <LocalNumField
           label="انحراف دما بیش از"
           hint="درجه سلسیوس"
           value={th.tempDeviation}
@@ -262,7 +262,7 @@ export default function NotificationsTab() {
           max={30}
         />
 
-        <NumField
+        <LocalNumField
           label="انحراف رطوبت بیش از"
           hint="درصد"
           value={th.humidityDeviation}
@@ -298,6 +298,60 @@ export default function NotificationsTab() {
       }}>
         💡 اعلان‌ها فعلاً درون‌برنامه هستند. پیامک، ایمیل و تلگرام در نسخه‌های بعدی.
       </div>
+
+        <SettingsGroup
+          icon="⏰"
+          title="یادآور سرسید فاکتور"
+          subtitle={`${toFa((s.dueDateReminders || [7, 3, 1]).length)} یادآور فعال`}
+          tone="info"
+        >
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 4px 8px', lineHeight: 1.7 }}>
+            قبل از رسیدن سرسید فاکتورهای پرداخت‌نشده، هشدار نمایش داده می‌شود.
+          </div>
+          <Grid2>
+            <ToggleRow
+              label="۷ روز قبل"
+              sub="یادآوری زودهنگام"
+              value={(s.dueDateReminders || []).includes(7)}
+              onChange={() => {
+                const cur = s.dueDateReminders || [7, 3, 1];
+                const next = cur.includes(7) ? cur.filter((x) => x !== 7) : [...cur, 7].sort((a: number, b: number) => b - a);
+                s.update({ dueDateReminders: next });
+              }}
+            />
+            <ToggleRow
+              label="۳ روز قبل"
+              sub="یادآوری میانی"
+              value={(s.dueDateReminders || []).includes(3)}
+              onChange={() => {
+                const cur = s.dueDateReminders || [7, 3, 1];
+                const next = cur.includes(3) ? cur.filter((x) => x !== 3) : [...cur, 3].sort((a: number, b: number) => b - a);
+                s.update({ dueDateReminders: next });
+              }}
+            />
+            <ToggleRow
+              label="۱ روز قبل"
+              sub="یادآوری نزدیک"
+              value={(s.dueDateReminders || []).includes(1)}
+              onChange={() => {
+                const cur = s.dueDateReminders || [7, 3, 1];
+                const next = cur.includes(1) ? cur.filter((x) => x !== 1) : [...cur, 1].sort((a: number, b: number) => b - a);
+                s.update({ dueDateReminders: next });
+              }}
+            />
+            <ToggleRow
+              label="روز سرسید"
+              sub="در روز پرداخت"
+              value={(s.dueDateReminders || []).includes(0)}
+              onChange={() => {
+                const cur = s.dueDateReminders || [7, 3, 1];
+                const next = cur.includes(0) ? cur.filter((x) => x !== 0) : [...cur, 0].sort((a: number, b: number) => b - a);
+                s.update({ dueDateReminders: next });
+              }}
+            />
+          </Grid2>
+        </SettingsGroup>
+
     </div>
   );
 }

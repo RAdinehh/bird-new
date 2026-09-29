@@ -48,7 +48,8 @@ export interface Settings {
   channels: { inApp: boolean; sound: boolean; vibration: boolean; sms: boolean; email: boolean; telegram: boolean; };
   alerts: { critical: boolean; important: boolean; info: boolean; };
   quietHours: { enabled: boolean; from: string; to: string; weekends: boolean; };
-  thresholds: { eggDropPercent: number; mortalityPerThousand: number; tempDeviation: number; humidityDeviation: number; };
+  thresholds: { eggDropPercent: number; mortalityPerThousand: number; tempDeviation: number; humidityDeviation: number; },
+  dueDateReminders: number[];
 
   // پشتیبان
   autoBackup: { enabled: boolean; intervalHours: number; maxVersions: number; };
@@ -81,6 +82,7 @@ const defaultSettings: Settings = {
   alerts: { critical: true, important: true, info: true },
   quietHours: { enabled: false, from: '22:00', to: '07:00', weekends: true },
   thresholds: { eggDropPercent: 10, mortalityPerThousand: 5, tempDeviation: 2, humidityDeviation: 10 },
+  dueDateReminders: [7, 3, 1],
 
   autoBackup: { enabled: true, intervalHours: 24, maxVersions: 5 },
   encryption: { enabled: false, password: '' },
