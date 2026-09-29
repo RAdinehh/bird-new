@@ -8,7 +8,7 @@ import { getSchedule } from './vaccineSchedules';
 import { toEn } from '../../shr/utils/fa';
 import { format, parse, differenceInDays } from 'date-fns-jalali';
 
-export type EventType = 'hatch' | 'vaccine' | 'payment' | 'daily' | 'finance';
+export type EventType = 'hatch' | 'vaccine' | 'herbal' | 'payment' | 'daily' | 'finance';
 export type EventStatus = 'past' | 'today' | 'future' | 'overdue';
 
 export interface CalEvent {
@@ -296,6 +296,49 @@ export function collectEvents(): CalEvent[] {
     });
   } catch (e) { /* ignore */ }
 
+
+  // ============ ۶. داروهای گیاهی انبار ============
+  try {
+    const whsItems = useWhs.getState().items || [];
+    whsItems.forEach((item: any) => {
+      if (item.category !== 'herbal') return;
+      if (!item.expireDate) return;
+      const days = daysToExpiry(item.expireDate);
+      if (days !== null && days >= -14) {
+        events.push({
+          id: 'herbal-exp-' + item.id,
+          date: item.expireDate,
+          type: 'herbal',
+          title: '🌿 انقضای ' + item.name,
+          subtitle: days < 0 ? 'منقضی شده' : days + ' روز مانده',
+          status: days < 0 ? 'overdue' : (days <= 30 ? 'today' : 'future'),
+          icon: '🌿',
+          refId: item.id,
+        });
+      }
+    });
+
+    // داروهای گیاهی ثبت‌شده در ثبت روزانه
+    const logs = useDlg.getState().logs || [];
+    logs.forEach((log: any) => {
+      const meds = log.medications || [];
+      meds.forEach((m: any, i: number) => {
+        if (!m.name) return;
+        if (m.medicineType !== 'herbal') return;
+        events.push({
+          id: 'herbal-log-' + log.id + '-' + i,
+          date: log.date,
+          type: 'herbal',
+          title: '🌿 ' + m.name,
+          subtitle: (m.dose || '') + (m.method ? ' — ' + m.method : ''),
+          status: statusOf(log.date),
+          icon: '🌿',
+          refId: log.id,
+        });
+      });
+    });
+  } catch (e) { /* ignore */ }
+
   return events;
 }
 
@@ -309,6 +352,7 @@ export function eventsOfDay(all: CalEvent[], date: string): CalEvent[] {
 export const TYPE_COLORS: Record<EventType, { dot: string; bg: string; text: string }> = {
   hatch:   { dot: 'var(--purple)', bg: 'var(--purple-soft)', text: 'var(--purple)' },
   vaccine: { dot: 'var(--info)',   bg: 'var(--info-soft)',   text: 'var(--info)' },
+  herbal:  { dot: 'var(--accent)', bg: 'var(--accent-soft)', text: 'var(--accent)' },
   payment: { dot: 'var(--warn)',   bg: 'var(--warn-soft)',   text: 'var(--warn)' },
   daily:   { dot: 'var(--accent)', bg: 'var(--accent-soft)', text: 'var(--accent)' },
   finance: { dot: 'var(--danger)', bg: 'var(--danger-soft)', text: 'var(--danger)' }
@@ -317,6 +361,7 @@ export const TYPE_COLORS: Record<EventType, { dot: string; bg: string; text: str
 export const TYPE_LABELS: Record<EventType, string> = {
   hatch: 'جوجه‌کشی',
   vaccine: 'واکسن',
+  herbal: '🌿 گیاهی',
   payment: 'مالی',
   daily: 'روزانه',
   finance: 'سایر'

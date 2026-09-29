@@ -9,6 +9,7 @@ const FILTERS: { id: EventType | 'all'; label: string; icon: string }[] = [
   { id: 'all', label: 'همه', icon: '📋' },
   { id: 'hatch', label: 'جوجه‌کشی', icon: '🐣' },
   { id: 'vaccine', label: 'واکسن', icon: '💉' },
+  { id: 'herbal', label: 'گیاهی', icon: '🌿' },
   { id: 'payment', label: 'مالی', icon: '💰' },
   { id: 'daily', label: 'روزانه', icon: '📋' }
 ];
