@@ -11,6 +11,7 @@ import ShortcutsModal from './shr/components/ShortcutsModal';
 import DialogHost from './shr/components/DialogHost';
 import AppRouter from './cor/router/AppRouter';
 import { useKeyboard } from './shr/hooks/useKeyboard';
+import { useAutoBackup } from './shr/hooks/useAutoBackup';
 import OnboardingModal from './shr/components/OnboardingModal';
 
 const TITLES: Record<string, string> = {
@@ -28,6 +29,7 @@ function Layout() {
   const loc = useLocation();
   const title = TITLES[loc.pathname] ?? 'مدیریت مرغداری';
   useKeyboard();
+  useAutoBackup();
 
   return (
     <div style={{
