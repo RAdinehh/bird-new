@@ -1,5 +1,9 @@
 import { useState, useMemo } from 'react';
-import { useWhs, CATEGORY_LABEL, CATEGORY_ICON, CATEGORY_DEFAULTS, UNIT_LABEL, STORAGE_LABEL, stockWarning, expiryWarning, daysToExpiry, type Item, type ItemCategory, type ItemUnit } from './store';
+import {
+  useWhs, CATEGORY_LABEL, CATEGORY_ICON, CATEGORY_DEFAULTS,
+  UNIT_LABEL, STORAGE_LABEL, stockWarning, expiryWarning,
+  daysToExpiry, type Item, type ItemCategory, type ItemUnit
+} from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -213,7 +217,10 @@ export default function ItemsPage() {
                 {sup ? <Row l="تأمین‌کننده" v={sup.name} /> : null}
 
                 {it.currentStock > 0 && it.lastPrice > 0 ? (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: '8px 10px',
+                     background: 'var(--accent-soft)', color: 'var(--accent)',
+                     borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                     <span>ارزش موجودی:</span>
                     <span>{toFa((it.currentStock * it.lastPrice).toLocaleString('fa-IR'))} ت</span>
                   </div>
@@ -244,7 +251,10 @@ export default function ItemsPage() {
                   <>
                     <SectionTitle>📋 آخرین گردش‌ها ({toFa(myMovements.length)})</SectionTitle>
                     {myMovements.slice(-3).reverse().map(m => (
-                      <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between' }}>
+                      <div key={m.id} style={{ fontSize: 'var(--fs-sm)',
+                         padding: '6px 10px', background: 'var(--input-bg)',
+                         borderRadius: 'var(--r-sm)', display: 'flex',
+                         justifyContent: 'space-between' }}>
                         <span>{m.type === 'in' ? '📥' : '📤'} {toFa(m.quantity)} {UNIT_LABEL[it.unit]}</span>
                         <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{toFa(m.date)}</span>
                       </div>
@@ -255,7 +265,9 @@ export default function ItemsPage() {
                 {it.notes ? (
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+                       padding: '8px 10px', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
                   </>
                 ) : null}
 
@@ -385,7 +397,9 @@ export default function ItemsPage() {
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between',
+       fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+       borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>
