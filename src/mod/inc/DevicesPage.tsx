@@ -1,15 +1,62 @@
-import { useState } from 'react';
-import { useInc, DEVICE_MODE_LABEL, DEVICE_STATUS_LABEL, type Device, type DeviceMode, type DeviceStatus } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
+import { useState, useMemo } from 'react';
+import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity } from './store';
+import { useSet } from '../set/store';
+import { useBrd } from '../brd/store';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showConfirmAsync , showAlert} from '../../cor/store/dialog';
+import { showAlert } from '../../cor/store/dialog';
+import { addMonths, parse as parseJ } from 'date-fns-jalali';
 
-interface F { id?: string; name: string; code: string; capacity: string; mode: DeviceMode; status: DeviceStatus; temp: string; humidity: string; rotationEnabled: boolean; purchasedAt: string; price: string; warranty: string; notes: string; }
-const empty: F = { name:'', code:'', capacity:'', mode:'setter+hatcher', status:'idle', temp:'', humidity:'', rotationEnabled:true, purchasedAt:'', price:'', warranty:'', notes:'' };
+const STATUS_FA: Record<DeviceStatus, string> = {
+  active: '✅ فعال',
+  idle: '⏸ غیرفعال',
+  maintenance: '🔧 تعمیر',
+  broken: '❌ خراب',
+};
+
+const MODE_FA: Record<DeviceMode, string> = {
+  'setter': 'ستر',
+  'hatcher': 'هچر',
+  'setter+hatcher': 'ستر + هچر',
+};
+
+interface F {
+  id?: string;
+  name: string;
+  capacityByBird: DeviceCapacity[];
+  mode: DeviceMode;
+  status: DeviceStatus;
+  temp: string;
+  humidity: string;
+  rotationEnabled: boolean;
+  purchasedAt: string;
+  price: string;
+  warranty: string;
+  notes: string;
+}
+
+const empty: F = {
+  name: '',
+  capacityByBird: [],
+  mode: 'setter+hatcher',
+  status: 'active',
+  temp: '',
+  humidity: '',
+  rotationEnabled: true,
+  purchasedAt: '',
+  price: '',
+  warranty: '',
+  notes: '',
+};
 
 export default function DevicesPage() {
   const { devices, eggEntries, addDevice, updateDevice, deleteDevice } = useInc();
+  const settings = useSet();
+  const { birds } = useBrd();
+  const profiles: any[] = (settings as any).incubationProfiles || [];
+
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
@@ -17,57 +64,102 @@ export default function DevicesPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const openNew = () => { setForm(empty); setErr(''); setOpen(true); };
+
   const openEdit = (d: Device) => {
     setForm({
-      id: d.id, name: d.name, code: d.code,
-      capacity: d.capacity ? toFa(d.capacity) : '',
+      id: d.id, name: d.name,
+      capacityByBird: d.capacityByBird || [],
       mode: d.mode, status: d.status,
       temp: d.temp ? toFa(d.temp) : '',
       humidity: d.humidity ? toFa(d.humidity) : '',
       rotationEnabled: d.rotationEnabled,
-      purchasedAt: d.purchasedAt, price: d.price ? toFa(d.price) : '',
-      warranty: d.warranty ? toFa(d.warranty) : '', notes: d.notes
+      purchasedAt: d.purchasedAt,
+      price: d.price ? toFa(d.price) : '',
+      warranty: d.warranty ? toFa(d.warranty) : '',
+      notes: d.notes,
     });
     setErr(''); setOpen(true);
   };
-  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
-  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
-  const save = () => {
-    // 🔒 جلوگیری قاطع از نام تکراری دستگاه
-    if (!form.id) {
-      const _trimmed = form.name.trim();
-      const _dup = devices.find((x: any) => x.name.trim() === _trimmed);
-      if (_dup) {
-        showAlert(
-          `دستگاهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
-          '❌ نام تکراری'
-        );
-        return;
-      }
-    }
 
+  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
+  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
+
+  const addCapacity = (birdName: string) => {
+    if (!birdName.trim()) return;
+    if (form.capacityByBird.some(c => c.birdName === birdName)) return;
+    setForm(f => ({ ...f, capacityByBird: [...f.capacityByBird, { birdName, capacity: null }] }));
+    const profile = profiles.find(p => p.birdName === birdName);
+    if (profile) {
+      setForm(f => ({
+        ...f,
+        capacityByBird: [...f.capacityByBird, { birdName, capacity: null }],
+        temp: f.temp || String(profile.setterTemp),
+        humidity: f.humidity || String(profile.setterHumidity),
+      }));
+    }
+  };
+
+  const removeCapacity = (birdName: string) => {
+    setForm(f => ({ ...f, capacityByBird: f.capacityByBird.filter(c => c.birdName !== birdName) }));
+  };
+
+  const updateCapacity = (birdName: string, capacity: number | null) => {
+    setForm(f => ({
+      ...f,
+      capacityByBird: f.capacityByBird.map(c => c.birdName === birdName ? { ...c, capacity } : c),
+    }));
+  };
+
+  const warrantyEnd = useMemo(() => {
+    if (!form.purchasedAt || !form.warranty) return null;
+    try {
+      const date = parseJ(toEn(form.purchasedAt), 'yyyy/MM/dd', new Date());
+      if (isNaN(date.getTime())) return null;
+      const months = parseInt(toEn(form.warranty)) || 0;
+      const end = addMonths(date, months);
+      const y = end.getFullYear();
+      const m = String(end.getMonth() + 1).padStart(2, '0');
+      const d = String(end.getDate()).padStart(2, '0');
+      return y + '/' + m + '/' + d;
+    } catch { return null; }
+  }, [form.purchasedAt, form.warranty]);
+
+  const save = () => {
+    if (!form.id) {
+      const dup = devices.find((x: any) => x.name.trim() === form.name.trim());
+      if (dup) { showAlert('دستگاهی با نام «' + dup.name + '» قبلاً ثبت شده', '❌ نام تکراری'); return; }
+    }
     if (!form.name.trim()) { setErr('نام دستگاه اجباری است'); return; }
+    const isActive = form.status === 'active';
     const data = {
-      name: form.name.trim(), code: form.code.trim(),
-      capacity: int(form.capacity),
-      mode: form.mode, status: form.status,
-      temp: num(form.temp), humidity: num(form.humidity),
+      name: form.name.trim(),
+      code: '',
+      capacity: null,
+      capacityByBird: form.capacityByBird,
+      mode: form.mode,
+      status: form.status,
+      temp: isActive ? num(form.temp) : null,
+      humidity: isActive ? num(form.humidity) : null,
       rotationEnabled: form.rotationEnabled,
-      purchasedAt: form.purchasedAt.trim(), price: num(form.price),
-      warranty: int(form.warranty), notes: form.notes.trim()
+      purchasedAt: form.purchasedAt.trim(),
+      price: num(form.price),
+      warranty: int(form.warranty),
+      equipmentId: '',
+      notes: form.notes.trim(),
     };
     if (form.id) updateDevice(form.id, data); else addDevice(data);
     setOpen(false);
   };
-  const target = delId ? devices.find(d => d.id === delId) : null;
 
-  const accentFor = (s: DeviceStatus): any => s === 'active' ? 'accent' : s === 'idle' ? 'dim' : s === 'maintenance' ? 'warn' : 'warn';
+  const target = delId ? devices.find(d => d.id === delId) : null;
+  const accentFor = (s: DeviceStatus): any => s === 'active' ? 'accent' : s === 'idle' ? 'dim' : 'warn';
 
   return (
     <PageContainer>
       {devices.length === 0 ? (
         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h8"/></svg>}
-          title="هنوز دستگاهی نساخته‌اید" desc="اولین دستگاه جوجه‌کشی خود را اضافه کنید."
+          title="هنوز دستگاهی نساخته‌اید"
+          desc="اولین دستگاه جوجه‌کشی خود را اضافه کنید."
           action={<Btn variant="primary" onClick={openNew}>+ افزودن دستگاه</Btn>} />
       ) : (
         <>
@@ -76,51 +168,55 @@ export default function DevicesPage() {
             const totalEggs = entries.reduce((a, e) => a + (e.count || 0), 0);
             const activeEntries = entries.filter(e => e.status === 'incubating' || e.status === 'candled' || e.status === 'locked').length;
             const isOpen = expandedId === d.id;
+            const caps = d.capacityByBird || [];
+            const totalCap = caps.reduce((a, c) => a + (c.capacity || 0), 0);
             return (
               <ExpandableCard key={d.id} accent={accentFor(d.status)} index={toFa(i + 1)} iconEmoji="🥚"
                 title={d.name}
-                subtitle={`${DEVICE_MODE_LABEL[d.mode]} · ${DEVICE_STATUS_LABEL[d.status]}${d.capacity ? ` · ظرفیت ${toFa(d.capacity)}` : ''}`}
+                subtitle={MODE_FA[d.mode] + ' · ' + STATUS_FA[d.status]}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : d.id)}
-                badge={activeEntries > 0 ? <Tag tone="green">{toFa(activeEntries)} بچ فعال</Tag> : undefined}
+                badge={activeEntries > 0 ? <Tag tone="green">{toFa(activeEntries)} ورودی فعال</Tag> : undefined}
                 summary={<>
-                  {totalEggs > 0 && <span>تخم‌ها: <b style={{ color: 'var(--text)' }}>{toFa(totalEggs)}</b></span>}
-                  {d.temp && <span>دما: <b style={{ color: 'var(--text)' }}>{toFa(d.temp)}°</b></span>}
-                  {d.humidity && <span>رطوبت: <b style={{ color: 'var(--text)' }}>{toFa(d.humidity)}٪</b></span>}
+                  {totalEggs > 0 && <span>تخم: <b>{toFa(totalEggs)}</b></span>}
+                  {d.temp && <span>🌡 {toFa(d.temp)}°</span>}
+                  {d.humidity && <span>💧 {toFa(d.humidity)}٪</span>}
                 </>}
               >
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>⚙ مشخصات دستگاه</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <Row l="نام" v={d.name} />
-                  {d.code && <Row l="کد" v={d.code} />}
-                  <Row l="حالت" v={DEVICE_MODE_LABEL[d.mode]} />
-                  <Row l="وضعیت" v={DEVICE_STATUS_LABEL[d.status]} />
-                  {d.capacity && <Row l="ظرفیت" v={`${toFa(d.capacity)} تخم مرغ`} />}
-                  <Row l="چرخش خودکار" v={d.rotationEnabled ? '✓ فعال' : '✕ غیرفعال'} />
-                </div>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 ظرفیت</div>
+                {caps.length === 0 ? (
+                  <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 8 }}>ظرفیتی تعریف نشده</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {caps.map(c => (
+                      <div key={c.birdName} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
+                        <span>{c.birdName}</span>
+                        <span style={{ fontWeight: 600 }}>{c.capacity ? toFa(c.capacity) : '—'} تخم</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 شرایط</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {d.temp && <Row l="دمای هدف" v={`${toFa(d.temp)} °C`} />}
-                  {d.humidity && <Row l="رطوبت هدف" v={`${toFa(d.humidity)} ٪`} />}
-                </div>
+                {d.status === 'active' && (d.temp || d.humidity) && (
+                  <>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🌡 شرایط</div>
+                    {d.temp && <Row l="دمای هدف" v={toFa(d.temp) + ' °C'} />}
+                    {d.humidity && <Row l="رطوبت هدف" v={toFa(d.humidity) + ' ٪'} />}
+                  </>
+                )}
 
                 {(d.purchasedAt || d.price || d.warranty) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {d.price && <Row l="قیمت خرید" v={`${toFa(d.price.toLocaleString('fa-IR'))} ت`} />}
-                      {d.purchasedAt && <Row l="تاریخ خرید" v={toFa(d.purchasedAt)} />}
-                      {d.warranty && <Row l="گارانتی" v={`${toFa(d.warranty)} ماه`} />}
-                    </div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>💰 مالی</div>
+                    {d.price && <Row l="قیمت" v={toFa(d.price.toLocaleString('fa-IR')) + ' ت'} />}
+                    {d.purchasedAt && <Row l="تاریخ خرید" v={toFa(d.purchasedAt)} />}
+                    {d.warranty && <Row l="گارانتی" v={toFa(d.warranty) + ' ماه'} />}
                   </>
                 )}
 
                 {d.notes && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: '8px 10px', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📝 یادداشت</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
                   </>
                 )}
 
@@ -137,48 +233,88 @@ export default function DevicesPage() {
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش دستگاه' : 'افزودن دستگاه'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-        <Field label="نام دستگاه" required><Input placeholder="مثلاً: دستگاه ۱" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
-        <Grid2>
-          <Field label="کد"><Input placeholder="D-01" dir="ltr" value={form.code} onChange={e => setForm({...form, code: e.target.value})} /></Field>
-          <Field label="ظرفیت"><NumField placeholder="۵۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="تخم" min={0} /></Field>
-        </Grid2>
+
+        <Field label="نام دستگاه" required>
+          <Input placeholder="مثلاً: دستگاه ۱" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+        </Field>
+
         <Grid2>
           <Field label="حالت" required>
             <Select value={form.mode} onChange={e => setForm({...form, mode: e.target.value as DeviceMode})}>
-              <option value="setter">فقط Setter</option>
-              <option value="hatcher">فقط Hatcher</option>
-              <option value="setter+hatcher">Setter + Hatcher</option>
+              <option value="setter">ستر</option>
+              <option value="hatcher">هچر</option>
+              <option value="setter+hatcher">ستر + هچر</option>
             </Select>
           </Field>
-          <Field label="وضعیت">
+          <Field label="وضعیت" required>
             <Select value={form.status} onChange={e => setForm({...form, status: e.target.value as DeviceStatus})}>
-              <option value="active">فعال</option>
-              <option value="idle">خاموش</option>
-              <option value="maintenance">در تعمیر</option>
-              <option value="broken">خراب</option>
+              <option value="active">✅ فعال</option>
+              <option value="idle">⏸ غیرفعال</option>
+              <option value="maintenance">🔧 تعمیر</option>
+              <option value="broken">❌ خراب</option>
             </Select>
           </Field>
         </Grid2>
+
+        <Field label="ظرفیت بر اساس پرنده">
+          {form.capacityByBird.map(c => (
+            <div key={c.birdName} style={{ display: 'flex', gap: 4, marginBottom: 6, alignItems: 'center' }}>
+              <div style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{c.birdName}</div>
+              <div style={{ width: 130 }}>
+                <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} />
+              </div>
+              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--danger)', cursor: 'pointer', width: 38, height: 38, fontFamily: 'inherit', fontSize: 14 }}>✕</button>
+            </div>
+          ))}
+          <Select onChange={e => { if (e.target.value) { addCapacity(e.target.value); e.target.value = ''; } }} value="">
+            <option value="">+ افزودن پرنده...</option>
+            {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+            {profiles.filter(p => !birds.some(b => b.name === p.birdName)).map(p => <option key={p.id} value={p.birdName}>{p.birdName}</option>)}
+          </Select>
+        </Field>
+
+        {form.status === 'active' && (
+          <>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 8 }}>🌡 شرایط عملیاتی</div>
+            <Grid2>
+              <Field label="دمای هدف" hint="°C">
+                <NumField placeholder="۳۷٫۸" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={20} max={45} />
+              </Field>
+              <Field label="رطوبت هدف" hint="٪">
+                <NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={0} max={100} />
+              </Field>
+            </Grid2>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)' }}>
+              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>🔄 چرخش خودکار</div>
+              <button onClick={() => setForm({...form, rotationEnabled: !form.rotationEnabled})} style={{ width: 38, height: 22, borderRadius: 11, background: form.rotationEnabled ? 'var(--accent)' : 'var(--dim)', position: 'relative', border: 'none', cursor: 'pointer', padding: 0 }}>
+                <span style={{ position: 'absolute', top: 2, right: form.rotationEnabled ? 18 : 2, width: 18, height: 18, borderRadius: '50%', background: '#fff' }} />
+              </button>
+            </div>
+          </>
+        )}
+
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 8 }}>💰 مالی</div>
         <Grid2>
-          <Field label="دمای هدف"><NumField placeholder="۳۷٫۸" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={-10} /></Field>
-          <Field label="رطوبت هدف"><NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={-10} /></Field>
+          <Field label="قیمت خرید">
+            <MoneyField placeholder="۰" value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
+          </Field>
+          <Field label="تاریخ خرید">
+            <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} />
+          </Field>
         </Grid2>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-           padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)',
-           borderRadius: 'var(--r-md)' }}>
-          <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>چرخش خودکار</div>
-          <button onClick={() => setForm({...form, rotationEnabled: !form.rotationEnabled})} style={{ width: 38,
-             height: 22, borderRadius: 11, background: form.rotationEnabled ? 'var(--accent)' : 'var(--dim)',
-             position: 'relative', border: 'none', cursor: 'pointer', padding: 0 }}>
-            <span style={{ position: 'absolute', top: 2, right: form.rotationEnabled ? 18 : 2, width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'right .2s' }} />
-          </button>
-        </div>
-        <Grid3>
-          <Field label="قیمت خرید"><MoneyField placeholder="۰" value={form.price} onChange={e => setForm({...form, price: e.target.value})} /></Field>
-          <Field label="تاریخ خرید"><Input placeholder="۱۴۰۵/۰۷/۰۴" value={form.purchasedAt} onChange={e => setForm({...form, purchasedAt: e.target.value})} /></Field>
-          <Field label="گارانتی"><NumField placeholder="۱۲" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
-        </Grid3>
-        <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
+        <Field label="گارانتی (ماه)">
+          <NumField placeholder="۲۴" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} />
+        </Field>
+        {warrantyEnd && (
+          <div style={{ padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 600 }}>
+            ✅ گارانتی تا: {toFa(warrantyEnd)}
+          </div>
+        )}
+
+        <Field label="یادداشت">
+          <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+        </Field>
+
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
       </Modal>
 
@@ -186,7 +322,6 @@ export default function DevicesPage() {
         footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteDevice(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
           حذف <b>{target?.name}</b>؟
-          <br /><span style={{ color: 'var(--muted)', fontSize: 'var(--fs-base)' }}>تمام ورودی‌های تخم و کندلینگ‌های آن هم حذف می‌شوند.</span>
         </div>
       </Modal>
     </PageContainer>
@@ -195,8 +330,7 @@ export default function DevicesPage() {
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>

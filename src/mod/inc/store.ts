@@ -10,9 +10,16 @@ export type DeviceStatus = 'active' | 'idle' | 'maintenance' | 'broken';
 export type DealType = 'personal' | 'partnership' | 'rent' | 'consignment';
 export type EntryStatus = 'incubating' | 'candled' | 'locked' | 'hatched' | 'done';
 
-export interface Device {
-  id: string; name: string; code: string;
+export interface DeviceCapacity {
+  birdName: string;
   capacity: number | null;
+}
+
+export interface Device {
+  id: string; name: string;
+  code: string;                    // deprecated
+  capacity: number | null;         // deprecated — برای سازگاری
+  capacityByBird: DeviceCapacity[];
   mode: DeviceMode;
   status: DeviceStatus;
   temp: number | null;
@@ -20,6 +27,7 @@ export interface Device {
   rotationEnabled: boolean;
   purchasedAt: string; price: number | null;
   warranty: number | null;
+  equipmentId: string;
   notes: string;
   createdAt: string; updatedAt: string;
 }
