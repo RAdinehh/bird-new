@@ -414,11 +414,16 @@ export default function DevicesPage() {
             <MoneyField placeholder="۰" value={form.extraCost} onChange={e => setForm({...form, extraCost: e.target.value})} />
           </Field>
         </Grid2>
-        {warrantyEnd && (
-          <div style={{ padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 600, textAlign: 'center' }}>
-            ✅ گارانتی تا: {toFa(warrantyEnd)}
-          </div>
-        )}
+        {warrantyEnd && (() => {
+          const today = new Date();
+          const todayStr = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+          const isExpired = warrantyEnd < todayStr;
+          return (
+            <div style={{ padding: '8px 12px', background: isExpired ? 'var(--danger-soft)' : 'var(--accent-soft)', border: '1px solid ' + (isExpired ? 'var(--danger)' : 'var(--accent-border)'), borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: isExpired ? 'var(--danger)' : 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
+              {isExpired ? '⏰ گارانتی تمام شده: ' : '✅ گارانتی تا: '}{toFa(warrantyEnd)}
+            </div>
+          );
+        })()}
 
         <SectionTitle>📝 یادداشت</SectionTitle>
         <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
