@@ -216,12 +216,22 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🤝 معامله</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="نوع" v={DEAL_LABEL[e.dealType]} />
-                  {e.dealType === 'partnership' && e.dealData.partnerName && <Row l="شریک" v={String(e.dealData.partnerName)} />}
+                  {e.dealType === 'purchase' && (e.dealData.sellerId || e.dealData.sellerName) && (
+                    <Row l="فروشنده" v={String((contacts.find((c: any) => c.id === e.dealData.sellerId)?.name) || e.dealData.sellerName || '—')} />
+                  )}
+                  {e.dealType === 'rent' && e.dealData.lessorId && (
+                    <Row l="اجاره‌دهنده" v={String(contacts.find((c: any) => c.id === e.dealData.lessorId)?.name || '—')} />
+                  )}
+                  {e.dealType === 'partnership' && (e.dealData.partnerId || e.dealData.partnerName) && (
+                    <Row l="شریک" v={String((contacts.find((c: any) => c.id === e.dealData.partnerId)?.name) || e.dealData.partnerName || '—')} />
+                  )}
                   {e.dealType === 'partnership' && e.dealData.partnerPercent && <Row l="درصد شریک" v={`${toFa(e.dealData.partnerPercent)}٪`} />}
                   {e.dealType === 'rent' &&
                     e.dealData.rentAmount &&
                     <Row l="اجاره" v={`${toFa(Number(e.dealData.rentAmount).toLocaleString('fa-IR'))} ت`} />}
-                  {e.dealType === 'consignment' && e.dealData.consigneeName && <Row l="امانت‌دار" v={String(e.dealData.consigneeName)} />}
+                  {e.dealType === 'consignment' && (e.dealData.consigneeId || e.dealData.consigneeName) && (
+                    <Row l="امانت‌دار" v={String((contacts.find((c: any) => c.id === e.dealData.consigneeId)?.name) || e.dealData.consigneeName || '—')} />
+                  )}
                 </div>
 
                 {(e.unitPrice || e.totalPrice) && (
