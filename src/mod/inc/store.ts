@@ -7,7 +7,7 @@ import { toEn } from '../../shr/utils/fa';
 /* ============ انواع ============ */
 export type DeviceMode = 'setter' | 'hatcher' | 'setter+hatcher';
 export type DeviceStatus = 'active' | 'idle' | 'maintenance' | 'broken';
-export type DealType = 'personal' | 'partnership' | 'rent' | 'consignment';
+export type DealType = 'own' | 'purchase' | 'partnership' | 'rent' | 'consignment';
 export type EntryStatus = 'incubating' | 'candled' | 'locked' | 'hatched' | 'done';
 
 export interface DeviceCapacity {
@@ -53,6 +53,7 @@ export interface EggEntry {
   trayNumbers: string;
   unitPrice: number | null;
   totalPrice: number | null;
+  shippingCost: number | null;
   status: EntryStatus;
   notes: string;
   createdAt: string; updatedAt: string;
@@ -165,10 +166,11 @@ export const DEVICE_STATUS_LABEL: Record<DeviceStatus, string> = {
 };
 
 export const DEAL_LABEL: Record<DealType, string> = {
-  personal: 'مالکیت',
-  partnership: 'شراکتی',
-  rent: 'اجاره‌ای',
-  consignment: 'امانی'
+  own: '🏠 گله خودم',
+  purchase: '📥 خریداری',
+  partnership: '🤝 شراکتی',
+  rent: '🏢 اجاره‌ای',
+  consignment: '📦 امانی'
 };
 
 export const ENTRY_STATUS_LABEL: Record<EntryStatus, string> = {
@@ -228,11 +230,23 @@ export function isHatchWindow(entry: EggEntry): boolean {
 
 /** طول دوره بر اساس پرنده (پیش‌فرض ۲۱ روز برای مرغ) */
 export function incubationDays(birdName: string): number {
+  try {
+    const stored = localStorage.getItem('pm-settings');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const profiles = parsed?.state?.incubationProfiles || parsed?.incubationProfiles || [];
+      const found = profiles.find((p: any) => p.birdName === birdName || p.birdName?.includes(birdName));
+      if (found?.totalDays) return found.totalDays;
+    }
+  } catch {}
   const n = (birdName || '').toLowerCase();
-  if (n.includes('بوقلمون') || n.includes('booghalamoon')) return 28;
-  if (n.includes('اردک') || n.includes('ordak')) return 28;
-  if (n.includes('غاز') || n.includes('ghaz')) return 30;
-  return 21; // مرغ
+  if (n.includes('بوقلمون')) return 28;
+  if (n.includes('اردک')) return 28;
+  if (n.includes('غاز')) return 30;
+  if (n.includes('بلدرچین')) return 18;
+  if (n.includes('قرقاول')) return 24;
+  if (n.includes('کبوتر')) return 17;
+  return 21;
 }
 
 /** محاسبه‌ی نرخ هچ */

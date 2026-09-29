@@ -6,6 +6,8 @@ import {
   incubationDays, type EggEntry, type DealType
 } from './store';
 import { useBrd } from '../brd/store';
+import { useFlk } from '../flk/store';
+import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { MiniProgress } from '../../shr/components/ProgressTracker';
@@ -19,10 +21,10 @@ interface F {
   id?: string; deviceId: string; birdId: string; breedId: string;
   count: string; entryDate: string; trayNumbers: string;
   dealType: DealType; dealData: Record<string, string>;
-  unitPrice: string; notes: string;
+  unitPrice: string; shippingCost: string; notes: string;
 }
 const empty = (): F => ({ deviceId:'', birdId:'', breedId:'', count:'',
-   entryDate:'', trayNumbers:'', dealType:'personal', dealData:{}, unitPrice:'',
+   entryDate:'', trayNumbers:'', dealType:'own', dealData:{}, unitPrice:'', shippingCost:'',
    notes:'' });
 
 export default function EggEntriesPage() {
@@ -47,7 +49,7 @@ export default function EggEntriesPage() {
       count: e.count ? toFa(e.count) : '', entryDate: e.entryDate, trayNumbers: e.trayNumbers,
       dealType: e.dealType,
       dealData: Object.fromEntries(Object.entries(e.dealData || {}).map(([k, v]) => [k, v == null ? '' : String(v)])),
-      unitPrice: e.unitPrice ? toFa(e.unitPrice) : '', notes: e.notes
+      unitPrice: e.unitPrice ? toFa(e.unitPrice) : '', shippingCost: e.shippingCost ? toFa(e.shippingCost) : '', notes: e.notes
     });
     setErr(''); setOpen(true);
   };
@@ -57,7 +59,12 @@ export default function EggEntriesPage() {
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
   const selectedDevice = devices.find(d => d.id === form.deviceId);
-  const maxCapacity = selectedDevice?.capacity || 0;
+  const selectedBird = birds.find(b => b.id === form.birdId);
+  const maxCapacity = (() => {
+    if (!selectedDevice || !selectedBird) return 0;
+    const cap = selectedDevice.capacityByBird?.find(c => c.birdName === selectedBird.name);
+    return cap?.capacity || 0;
+  })();
   const save = () => {
     if (!form.count.trim() || !form.entryDate.trim()) { setErr('تعداد و تاریخ ورود اجباری است'); return; }
     if (maxCapacity && (parseInt(toEn(form.count))||0) > maxCapacity) { setErr(`تعداد از ظرفیت دستگاه (${toFa(maxCapacity)}) بیشتر است`); return; }
@@ -75,10 +82,12 @@ export default function EggEntriesPage() {
       deviceId: form.deviceId, hatchGroupId: '',
       birdId: form.birdId, breedId: form.breedId,
       count, entryDate: form.entryDate, expectedHatchDate,
-      source: form.dealType === 'personal' ? 'own' : 'external',
+      source: form.dealType === 'own' ? 'own' : 'external',
       dealType: form.dealType, dealData,
       trayNumbers: form.trayNumbers.trim(),
-      unitPrice, totalPrice: count && unitPrice ? count * unitPrice : null,
+      unitPrice,
+      totalPrice: count && unitPrice ? count * unitPrice : null,
+      shippingCost: num(form.shippingCost),
       status: 'incubating' as const,
       notes: form.notes.trim()
     };
@@ -304,7 +313,7 @@ export default function EggEntriesPage() {
 
         <Field label="نوع معامله" required>
           <Select value={form.dealType} onChange={e => setForm({...form, dealType: e.target.value as DealType, dealData: {}})}>
-            <option value="personal">مالکیت — ۱۰۰٪ مال خودم</option>
+            <option value="own">🏠 گله خودم</option>
             <option value="partnership">شراکتی</option>
             <option value="rent">اجاره‌ای</option>
             <option value="consignment">امانی</option>
@@ -381,9 +390,14 @@ export default function EggEntriesPage() {
           </DepBox>
         )}
 
-        <Field label="قیمت هر تخم" hint="اگر خریداری شده">
-          <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
-        </Field>
+        <Grid2>
+          <Field label="قیمت هر تخم" hint="اگر خریداری شده">
+            <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
+          </Field>
+          <Field label="هزینه حمل" hint="اختیاری">
+            <MoneyField placeholder="۰" value={form.shippingCost || ''} onChange={e => setForm({...form, shippingCost: e.target.value})} />
+          </Field>
+        </Grid2>
 
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
