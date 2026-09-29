@@ -166,14 +166,14 @@ export default function ProfileTab() {
           </Field>
         </Grid2>
         <Field label="طول دوره‌ی جوجه‌کشی">
-          <Input value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} inputMode="numeric" dir="ltr" unit="روز" {min={1}} />
+          <Input value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} inputMode="numeric" dir="ltr" unit="روز" min={0} />
         </Field>
         <Grid2>
-          <Field label="دمای Setter"><Input value={defaults.setterTemp} onChange={e => updateSection('defaults', { setterTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" {min={-10}} /></Field>
-          <Field label="دمای Hatcher"><Input value={defaults.hatcherTemp} onChange={e => updateSection('defaults', { hatcherTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" {min={-10}} /></Field>
+          <Field label="دمای Setter"><Input value={defaults.setterTemp} onChange={e => updateSection('defaults', { setterTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" min={0} /></Field>
+          <Field label="دمای Hatcher"><Input value={defaults.hatcherTemp} onChange={e => updateSection('defaults', { hatcherTemp: e.target.value })} inputMode="decimal" dir="ltr" unit="°C" min={0} /></Field>
         </Grid2>
         <Grid2>
-          <Field label="رطوبت Setter"><Input value={defaults.setterHumidity} onChange={e => updateSection('defaults', { setterHumidity: e.target.value })} inputMode="numeric" dir="ltr" unit="٪" {min={-10}} /></Field>
+          <Field label="رطوبت Setter"><Input value={defaults.setterHumidity} onChange={e => updateSection('defaults', { setterHumidity: e.target.value })} inputMode="numeric" dir="ltr" unit="٪" min={0} /></Field>
           <Field label="رطوبت Hatcher"><Input value={defaults.hatcherHumidity} onChange={e => updateSection('defaults', { hatcherHumidity: e.target.value })} inputMode="numeric" dir="ltr" unit="٪" min={0} /></Field>
         </Grid2>
         <Field label="روز شروع Lock-down">

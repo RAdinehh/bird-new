@@ -158,8 +158,8 @@ export default function DevicesPage() {
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="دمای هدف"><Input placeholder="۳۷٫۸" inputMode="decimal" dir="ltr" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" {min={-10}} /></Field>
-          <Field label="رطوبت هدف"><Input placeholder="۵۵" inputMode="numeric" dir="ltr" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" {min={-10}} /></Field>
+          <Field label="دمای هدف"><Input placeholder="۳۷٫۸" inputMode="decimal" dir="ltr" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={0} /></Field>
+          <Field label="رطوبت هدف"><Input placeholder="۵۵" inputMode="numeric" dir="ltr" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={0} /></Field>
         </Grid2>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)' }}>
           <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>چرخش خودکار</div>
@@ -168,7 +168,7 @@ export default function DevicesPage() {
           </button>
         </div>
         <Grid3>
-          <Field label="قیمت خرید"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.price} onChange={e => setForm({...form, price: e.target.value})} unit="ت" {min={1}} /></Field>
+          <Field label="قیمت خرید"><Input placeholder="۰" inputMode="numeric" dir="ltr" value={form.price} onChange={e => setForm({...form, price: e.target.value})} unit="ت" min={0} /></Field>
           <Field label="تاریخ خرید"><Input placeholder="۱۴۰۵/۰۷/۰۴" value={form.purchasedAt} onChange={e => setForm({...form, purchasedAt: e.target.value})} /></Field>
           <Field label="گارانتی"><Input placeholder="۱۲" inputMode="numeric" dir="ltr" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
         </Grid3>

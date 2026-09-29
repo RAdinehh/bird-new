@@ -268,7 +268,7 @@ export default function NotificationsTab() {
           value={th.humidityDeviation}
           onChange={n => s.updateSection('thresholds', { humidityDeviation: n })}
           unit="٪"
-          {min={-10}}
+          min={0}
           max={100}
         />
 
