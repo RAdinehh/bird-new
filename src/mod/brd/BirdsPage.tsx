@@ -1,8 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useBrd, type Bird } from './store';
 import { findBirdPreset } from './presets';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Tag } from '../../shr/components/ui';
-import ExpandableCard from '../../shr/components/ExpandableCard';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Tag } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 
@@ -151,10 +150,8 @@ export default function BirdsPage() {
         />
         </Field>
         <Field label="چرخه زندگی (روز)" hint="از شروع تا پایان دوره">
-          <Input
+          <NumField
             placeholder="۰"
-            inputMode="numeric"
-            dir="ltr"
             value={form.cycleDays}
             onChange={e => setForm({ ...form, cycleDays: e.target.value })} min={1} />
         </Field>
@@ -163,10 +160,8 @@ export default function BirdsPage() {
         </div>
 
         <Field label="FCR استاندارد" hint="ضریب تبدیل غذایی مرجع">
-          <Input
+          <NumField
             placeholder="۲٫۰"
-            inputMode="decimal"
-            dir="ltr"
             value={form.fcrStandard}
             onChange={e => setForm({ ...form, fcrStandard: e.target.value })} min={1} />
         </Field>

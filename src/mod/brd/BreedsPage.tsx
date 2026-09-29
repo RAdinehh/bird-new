@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useBrd, type Breed } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
-import ExpandableCard from '../../shr/components/ExpandableCard';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
@@ -170,7 +169,7 @@ export default function BreedsPage() {
             <Input placeholder="مثلاً: مرندی" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </Field>
           <Field label="FCR">
-            <Input placeholder="۲٫۰" inputMode="decimal" dir="ltr" value={form.fcr} onChange={e => setForm({ ...form, fcr: e.target.value })} min={0} />
+            <NumField placeholder="۲٫۰" value={form.fcr} onChange={e => setForm({ ...form, fcr: e.target.value })} min={0} />
           </Field>
         </Grid2>
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}

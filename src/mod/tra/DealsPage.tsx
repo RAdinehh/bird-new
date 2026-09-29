@@ -1,8 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useTra, DEAL_LABEL, type Deal, type DealType } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui'
-import SmartSelect from '../../shr/components/SmartSelect';;
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -231,10 +230,10 @@ export default function DealsPage() {
 
         <Grid2>
           <Field label="ارزش (تومان)">
-            <Input mode="number" value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="ت" min={0} />
+            <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="ت" min={0} />
           </Field>
           <Field label="درصد" hint="۰ تا ۱۰۰">
-            <Input mode="number" value={form.percent} onChange={e => {
+            <NumField value={form.percent} onChange={e => {
               const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
               const v = Math.max(0, Math.min(100, raw));
               setForm({...form, percent: v === 0 ? '' : String(v)});
