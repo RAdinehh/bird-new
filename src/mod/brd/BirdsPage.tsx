@@ -156,7 +156,7 @@ export default function BirdsPage() {
             inputMode="numeric"
             dir="ltr"
             value={form.cycleDays}
-            onChange={e => setForm({ ...form, cycleDays: e.target.value })} min={0} />
+            onChange={e => setForm({ ...form, cycleDays: e.target.value })} {min={1}} />
         </Field>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 8 }}>
           💡 <b>چرخه زندگی</b> یعنی چند روز طول می‌کشد تا این پرنده دوره‌اش کامل شود. مثال: جوجه گوشتی ۴۲ روز، مرغ تخم‌گذار ۵۰۰ روز.
@@ -168,7 +168,7 @@ export default function BirdsPage() {
             inputMode="decimal"
             dir="ltr"
             value={form.fcrStandard}
-            onChange={e => setForm({ ...form, fcrStandard: e.target.value })} min={0} />
+            onChange={e => setForm({ ...form, fcrStandard: e.target.value })} {min={1}} />
         </Field>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 8 }}>
           💡 <b>FCR</b> یعنی چند کیلو دان لازم است تا پرنده ۱ کیلو وزن اضافه کند. هرچه کمتر، بهتر. مثال: ۱.۶ عالی، ۱.۸ متوسط، ۲.۰+ ضعیف.
