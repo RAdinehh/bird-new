@@ -571,17 +571,25 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             <Input placeholder="۱-۲-۳" dir="ltr" value={form.trayNumbers} onChange={e => setForm({ ...form, trayNumbers: e.target.value })} />
           </Field>
         </Grid2>
-        <Grid2>
+        {(form.dealType === 'purchase' || form.dealType === 'partnership') ? (
+          <>
+            <Grid2>
+              <Field label="تاریخ ورود" required>
+                <DatePicker value={form.entryDate} onChange={v => setForm({ ...form, entryDate: v })} placeholder="انتخاب تاریخ" />
+              </Field>
+              <Field label="قیمت هر تخم">
+                <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
+              </Field>
+            </Grid2>
+            <Field label="هزینه حمل">
+              <MoneyField placeholder="۰" value={form.shippingCost} onChange={e => setForm({ ...form, shippingCost: e.target.value })} />
+            </Field>
+          </>
+        ) : (
           <Field label="تاریخ ورود" required>
             <DatePicker value={form.entryDate} onChange={v => setForm({ ...form, entryDate: v })} placeholder="انتخاب تاریخ" />
           </Field>
-          <Field label="قیمت هر تخم">
-            <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
-          </Field>
-        </Grid2>
-        <Field label="هزینه حمل">
-          <MoneyField placeholder="۰" value={form.shippingCost} onChange={e => setForm({ ...form, shippingCost: e.target.value })} />
-        </Field>
+        )}
         <SectionTitle>📝 یادداشت</SectionTitle>
         <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
 
