@@ -326,21 +326,26 @@ export default function DevicesPage() {
         </Grid2>
 
         <SectionTitle>📊 ظرفیت بر اساس پرنده</SectionTitle>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>{form.capacityByBird.map(c => (
-          <div key={c.birdName} style={{ padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.birdName}</span>
-              <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: 0 }}>✕</button>
-            </div>
-            <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
-          </div>
-        ))}</div>
         <Select onChange={e => { if (e.target.value) { addCapacity(e.target.value); e.target.value = ''; } }} value="">
-          <option value="">+ انتخاب از لیست پرنده‌ها...</option>
+          <option value="">+ افزودن پرنده از لیست...</option>
           {birds.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
         </Select>
 
-        {<>
+        {form.capacityByBird.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {form.capacityByBird.map(c => (
+              <div key={c.birdName} style={{ padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.birdName}</span>
+                  <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: 0 }}>✕</button>
+                </div>
+                <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        <>
             <SectionTitle>🌡 شرایط عملیاتی</SectionTitle>
             <Grid2>
               <Field label="دمای هدف" hint="°C">
@@ -349,7 +354,8 @@ export default function DevicesPage() {
               <Field label="رطوبت هدف" hint="٪">
                 <NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={0} max={100} />
               </Field>
-            </Grid2></>}
+            </Grid2>
+          </>
 
         <SectionTitle>⚙ مشخصات فنی</SectionTitle>
         <Grid2>
