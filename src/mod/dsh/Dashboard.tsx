@@ -332,35 +332,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* 💰 مالی این ماه */}
-      <div>
-        <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 6 }}>
-          💰 مالی این ماه
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-          <div style={{ padding: '10px 12px', background: 'var(--danger-soft)', borderRadius: 'var(--r-md)' }}>
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 600 }}>خرید</div>
-            <div style={{ fontSize: 'var(--fs-md)', color: 'var(--danger)', fontWeight: 700 }}>
-              {toFa(monthStats.purchases.toLocaleString('fa-IR'))} ت
-            </div>
-          </div>
-          <div style={{ padding: '10px 12px', background: 'var(--accent-soft)', borderRadius: 'var(--r-md)' }}>
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600 }}>فروش</div>
-            <div style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700 }}>
-              {toFa(monthStats.sales.toLocaleString('fa-IR'))} ت
-            </div>
-          </div>
-          <div style={{ padding: '10px 12px', background: monthStats.profit >= 0 ? 'var(--accent-soft)' : 'var(--danger-soft)', borderRadius: 'var(--r-md)', gridColumn: '1 / -1' }}>
-            <div style={{ fontSize: 'var(--fs-xs)', color: monthStats.profit >= 0 ? 'var(--accent)' : 'var(--danger)', fontWeight: 600 }}>
-              {monthStats.profit >= 0 ? '📈 سود' : '📉 زیان'}
-            </div>
-            <div style={{ fontSize: 'var(--fs-lg)', color: monthStats.profit >= 0 ? 'var(--accent)' : 'var(--danger)', fontWeight: 700 }}>
-              {toFa(Math.abs(monthStats.profit).toLocaleString('fa-IR'))} ت
-            </div>
-          </div>
-        </div>
-      </div>
-
       {activeFlocks.length === 0 && invoices.length === 0 ? (
         <div style={{
           padding: 40, textAlign: 'center',
