@@ -3,6 +3,8 @@ import { useDlg } from '../dlg/store';
 import { useTra, remaining } from '../tra/store';
 import { useWhs, expiryWarning, daysToExpiry } from '../whs/store';
 import { useBrd } from '../brd/store';
+import { useFlk, getEffectiveStartDate } from '../flk/store';
+import { getSchedule } from './vaccineSchedules';
 import { toEn } from '../../shr/utils/fa';
 import { format, parse, differenceInDays } from 'date-fns-jalali';
 
@@ -56,6 +58,15 @@ export function statusOf(date: string): EventStatus {
   if (diff === 0) return 'today';
   if (diff <= 30) return 'future';
   return 'future';
+}
+
+
+/** اضافه n روز به تاریخ شمسی */
+function addDaysJalali(dateStr: string, days: number): string {
+  const d = jalaliToDate(dateStr);
+  if (!d) return '';
+  d.setDate(d.getDate() + days);
+  return format(d, 'yyyy/MM/dd');
 }
 
 /** جمع‌آوری همه‌ی رویدادها از همه‌ی storeها */
@@ -249,6 +260,41 @@ export function collectEvents(): CalEvent[] {
 
   // مرتب‌سازی بر اساس تاریخ
   events.sort((a, b) => jalaliToKey(a.date).localeCompare(jalaliToKey(b.date)));
+
+
+  // ============ ۵. واکسن‌های قالب گله ============
+  try {
+    const flocks = useFlk.getState().flocks || [];
+    flocks.forEach((flock: any) => {
+      if (flock.status !== 'active') return;
+      if (!flock.vaccineScheduleId) return;
+
+      const schedule = getSchedule(flock.vaccineScheduleId);
+      if (!schedule) return;
+
+      const startDate = getEffectiveStartDate(flock);
+      if (!startDate) return;
+
+      schedule.items.forEach((item, idx) => {
+        const date = addDaysJalali(startDate, item.day);
+        if (!date) return;
+        const diff = daysFromToday(date);
+        // فقط رویدادهای آینده یا ۱۴ روز گذشته
+        if (diff < -14) return;
+
+        events.push({
+          id: 'vac-sched-' + flock.id + '-' + idx,
+          date,
+          type: 'vaccine',
+          title: '💉 ' + item.name,
+          subtitle: flock.name + ' — روز ' + item.day + ' · ' + item.method,
+          status: diff < 0 ? 'past' : diff === 0 ? 'today' : 'future',
+          icon: '💉',
+          refId: flock.id,
+        });
+      });
+    });
+  } catch (e) { /* ignore */ }
 
   return events;
 }
