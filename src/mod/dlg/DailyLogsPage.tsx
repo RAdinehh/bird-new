@@ -1,5 +1,12 @@
 import { useState, useMemo } from 'react';
-import { useDlg, type DailyLog, type Death, type Vaccine, type Medication, type Activity, VENTILATION_LABEL, LITTER_LABEL, BEHAVIOR_LABEL, DISTRIBUTION_LABEL, SOUND_LABEL, DEATH_CAUSES, causeLabel, tempWarning, humidityWarning, waterFeedRatio, mortalityRate, avgWeight, sumWeight, cvWeight, totalWater } from './store';
+import {
+  useDlg, type DailyLog, type Death, type Vaccine,
+  type Medication, type Activity, VENTILATION_LABEL, LITTER_LABEL,
+  BEHAVIOR_LABEL, DISTRIBUTION_LABEL, SOUND_LABEL, DEATH_CAUSES,
+  causeLabel, tempWarning, humidityWarning, waterFeedRatio,
+  mortalityRate, avgWeight, sumWeight, cvWeight,
+  totalWater
+} from './store';
 import { useFlk } from '../flk/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useBrd } from '../brd/store';
@@ -8,7 +15,12 @@ import { useHal } from '../hal/store';
 import { useEgg } from '../egg/store';
 import { feedSystemFromHall, waterSystemFromHall, FEED_SYSTEM_LABEL, WATER_SYSTEM_LABEL } from '../../shr/utils/systemType';
 import SmartSelect from '../../shr/components/SmartSelect';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, PercentField, Select, Tag, Textarea } from '../../shr/components/ui';
+import {
+  Btn, BtnRow, Empty, Field,
+  Grid2, Grid3, Input, Modal,
+  NumField, PageContainer, PercentField, Select,
+  Tag, Textarea
+} from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
@@ -752,7 +764,9 @@ export default function DailyLogsPage() {
               </Field>
               <Field label="خلاصه">
                 <div style={{ padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
-                  {form.weightSamples.length >= 2 ? <>میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))} kg · CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))}٪</> : <>💡 حداقل ۲ نمونه اضافه کن تا میانگین محاسبه شود</>}
+                  {form.weightSamples.length >= 2 ? <>میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) ||
+                    0 }))))} kg · CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) ||
+                    0 }))))}٪</> : <>💡 حداقل ۲ نمونه اضافه کن تا میانگین محاسبه شود</>}
                 </div>
               </Field>
             </Grid2>

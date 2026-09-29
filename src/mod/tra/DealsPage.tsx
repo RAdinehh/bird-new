@@ -1,7 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useTra, DEAL_LABEL, type Deal, type DealType } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
+import {
+  Btn, BtnRow, Empty, Field,
+  Grid2, Input, Modal, NumField,
+  PageContainer, Select, Tag
+} from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';

@@ -1,5 +1,10 @@
 import { useState, useMemo } from 'react';
-import { useFlk, type Flock, type FlockType, type FlockStatus, SOURCE_LABEL, getAgeDays, getLifecycle, formatAge, sexRatio, daysUntilLaying, isLayingReady, calcCosts, LAYING_START_DAY, getLayingStartDay } from './store';
+import {
+  useFlk, type Flock, type FlockType, type FlockStatus,
+  SOURCE_LABEL, getAgeDays, getLifecycle, formatAge,
+  sexRatio, daysUntilLaying, isLayingReady, calcCosts,
+  LAYING_START_DAY, getLayingStartDay
+} from './store';
 import { useBrd } from '../brd/store';
 import { useHal } from '../hal/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;

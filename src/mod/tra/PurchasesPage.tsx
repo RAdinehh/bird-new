@@ -364,10 +364,14 @@ export default function PurchasesPage() {
 
             <Grid2>
               <Field label="تخفیف">
-                <MoneyField value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                <MoneyField value={String(it.discountValue ||
+                  '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) ||
+                  0 })} />
               </Field>
               <Field label="حمل">
-                <MoneyField value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                <MoneyField value={String(it.shipping ||
+                  '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) ||
+                  0 })} />
               </Field>
             </Grid2>
 
