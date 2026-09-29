@@ -47,9 +47,9 @@ export default function Inc() {
         ))}
       </div>
       {tab === 'devices' && <DevicesPage />}
-      {tab === 'eggs' && <EggEntriesPage initialDevice={params.get('device') || ''} />}
-      {tab === 'candlings' && <CandlingsPage initialEntry={params.get('entry') || ''} />}
-      {tab === 'hatches' && <HatchesPage initialEntry={params.get('entry') || ''} />}
+      {tab === 'eggs' && <EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={setTab} />}
+      {tab === 'candlings' && <CandlingsPage initialEntry={params.get('entry') || ''} onGoTo={setTab} />}
+      {tab === 'hatches' && <HatchesPage initialEntry={params.get('entry') || ''} onGoTo={setTab} />}
     </div>
   );
 }

@@ -27,7 +27,7 @@ const empty = (): F => ({ deviceId:'', birdId:'', breedId:'', count:'',
    entryDate:'', trayNumbers:'', dealType:'own', dealData:{}, unitPrice:'', shippingCost:'',
    notes:'' });
 
-export default function EggEntriesPage({ initialDevice = '' }: { initialDevice?: string } = {}) {
+export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initialDevice?: string; onGoTo?: (t: any) => void } = {}) {
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
   const { birds, breeds } = useBrd();
   const [open, setOpen] = useState(false);
@@ -100,7 +100,15 @@ export default function EggEntriesPage({ initialDevice = '' }: { initialDevice?:
       status: 'incubating' as const,
       notes: form.notes.trim()
     };
-    if (form.id) updateEntry(form.id, data); else addEntry(data);
+    if (form.id) updateEntry(form.id, data);
+    else {
+      addEntry(data);
+      setOpen(false);
+      if (onGoTo && confirm('ورودی ثبت شد. به کندلینگ برو؟')) {
+        setTimeout(() => onGoTo('candlings'), 100);
+        return;
+      }
+    }
     setOpen(false);
   };
 

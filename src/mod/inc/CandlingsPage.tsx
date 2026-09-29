@@ -14,7 +14,7 @@ const DEAD_REASONS: [string, string][] = [
   ['', '—'], ['temp_fluctuation', 'نوسان دما'], ['humidity', 'رطوبت نامناسب'], ['ventilation', 'تهویه ضعیف'], ['genetics', 'ژنتیک'], ['infection', 'عفونت']
 ];
 
-export default function CandlingsPage({ initialEntry = '' }: { initialEntry?: string } = {}) {
+export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any) => void } = {}) {
   const { eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
   const { birds } = useBrd();
   const [open, setOpen] = useState(false);
