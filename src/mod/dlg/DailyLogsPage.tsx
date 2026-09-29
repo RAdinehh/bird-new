@@ -8,7 +8,7 @@ import { useHal } from '../hal/store';
 import { useEgg } from '../egg/store';
 import { feedSystemFromHall, waterSystemFromHall, FEED_SYSTEM_LABEL, WATER_SYSTEM_LABEL } from '../../shr/utils/systemType';
 import SmartSelect from '../../shr/components/SmartSelect';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, PercentField, Select, Tag, Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
@@ -529,20 +529,20 @@ export default function DailyLogsPage() {
           <SectionTitle>🌡 شرایط محیطی</SectionTitle>
 
           <Grid2>
-            <Field label="حداقل دما">
-              <Input placeholder="۲۰" inputMode="decimal" dir="ltr" value={form.temperatureMin} onChange={e => setForm({ ...form, temperatureMin: e.target.value })} unit="°C" />
+            <Field label="حداقل دما" hint="۱۵-۳۰ درجه">
+              <NumField placeholder="۲۰" value={form.temperatureMin} onChange={e => setForm({ ...form, temperatureMin: e.target.value })} unit="°C" min={-10} max={50} />
             </Field>
-            <Field label="حداکثر دما">
-              <Input placeholder="۲۵" inputMode="decimal" dir="ltr" value={form.temperatureMax} onChange={e => setForm({ ...form, temperatureMax: e.target.value })} unit="°C" />
+            <Field label="حداکثر دما" hint="۱۵-۳۰ درجه">
+              <NumField placeholder="۲۵" value={form.temperatureMax} onChange={e => setForm({ ...form, temperatureMax: e.target.value })} unit="°C" min={-10} max={50} />
             </Field>
           </Grid2>
 
           <Grid2>
-            <Field label="حداقل رطوبت">
-              <Input placeholder="۵۰" inputMode="numeric" dir="ltr" value={form.humidityMin} onChange={e => setForm({ ...form, humidityMin: e.target.value })} unit="٪" />
+            <Field label="حداقل رطوبت" hint="۴۰-۷۰٪">
+              <PercentField placeholder="۵۰" value={form.humidityMin} onChange={e => setForm({ ...form, humidityMin: e.target.value })} />
             </Field>
-            <Field label="حداکثر رطوبت">
-              <Input placeholder="۷۰" inputMode="numeric" dir="ltr" value={form.humidityMax} onChange={e => setForm({ ...form, humidityMax: e.target.value })} unit="٪" />
+            <Field label="حداکثر رطوبت" hint="۴۰-۷۰٪">
+              <PercentField placeholder="۷۰" value={form.humidityMax} onChange={e => setForm({ ...form, humidityMax: e.target.value })} />
             </Field>
           </Grid2>
 
@@ -589,7 +589,7 @@ export default function DailyLogsPage() {
           </Grid3>
 
           <Field label="ظاهر عمومی">
-            <Input placeholder="رنگ پر، چشم، تاج، منقار..." value={form.appearance} onChange={e => setForm({ ...form, appearance: e.target.value })} />
+            <Textarea rows={2} placeholder="رنگ پر، چشم، تاج، منقار..." value={form.appearance} onChange={e => setForm({ ...form, appearance: e.target.value })} />
           </Field>
 
           <SectionTitle>🌾 تغذیه</SectionTitle>
@@ -680,10 +680,10 @@ export default function DailyLogsPage() {
 
           <Grid2>
             <Field label="مقدار دان مصرفی">
-              <Input placeholder="۵۰" inputMode="decimal" dir="ltr" value={form.feedAmount} onChange={e => setForm({ ...form, feedAmount: e.target.value })} unit="kg" />
+              <NumField placeholder="۵۰" value={form.feedAmount} onChange={e => setForm({ ...form, feedAmount: e.target.value })} unit="kg" min={0} />
             </Field>
             <Field label="دان باقیمانده">
-              <Input placeholder="۰" inputMode="decimal" dir="ltr" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" />
+              <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
             </Field>
           </Grid2>
 
@@ -696,10 +696,10 @@ export default function DailyLogsPage() {
               </div>
               <Grid2>
                 <Field label="تعداد بار">
-                  <Input placeholder="۵" inputMode="numeric" dir="ltr" value={form.waterFillCount} onChange={e => setForm({ ...form, waterFillCount: e.target.value })} unit="بار" />
+                  <NumField placeholder="۵" value={form.waterFillCount} onChange={e => setForm({ ...form, waterFillCount: e.target.value })} unit="بار" min={0} />
                 </Field>
                 <Field label="حجم هر بار">
-                  <Input placeholder="۲۰" inputMode="decimal" dir="ltr" value={form.waterFillVolume} onChange={e => setForm({ ...form, waterFillVolume: e.target.value })} unit="L" />
+                  <NumField placeholder="۲۰" value={form.waterFillVolume} onChange={e => setForm({ ...form, waterFillVolume: e.target.value })} unit="L" min={0} />
                 </Field>
               </Grid2>
               {(form.waterFillCount && form.waterFillVolume) && (
@@ -716,7 +716,7 @@ export default function DailyLogsPage() {
                 ⚠️ سیستم {WATER_SYSTEM_LABEL[form.waterMethod as 'nipple' | 'trough' | 'tank']} — فعلاً فقط دستی پیاده شده
               </div>
               <Field label="مقدار آب مصرفی (تخمینی)">
-                <Input placeholder="۱۰۰" inputMode="decimal" dir="ltr" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" />
+                <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
               </Field>
             </>
           )}
@@ -726,13 +726,13 @@ export default function DailyLogsPage() {
             <SectionTitle>🥚 تخم‌گذاری</SectionTitle>
             <Grid3>
               <Field label="تعداد تخم">
-                <Input mode="number" value={form.eggsCount} onChange={e => setForm({...form, eggsCount: e.target.value})} unit="عدد" />
+                <NumField placeholder="۰" value={form.eggsCount} onChange={e => setForm({...form, eggsCount: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
               </Field>
               <Field label="شکسته">
-                <Input mode="number" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} />
+                <NumField placeholder="۰" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} unit="عدد" min={0} />
               </Field>
               <Field label="کثیف">
-                <Input mode="number" value={form.dirtyEggs} onChange={e => setForm({...form, dirtyEggs: e.target.value})} />
+                <NumField placeholder="۰" value={form.dirtyEggs} onChange={e => setForm({...form, dirtyEggs: e.target.value})} unit="عدد" min={0} />
               </Field>
             </Grid3>
           </>
@@ -752,7 +752,7 @@ export default function DailyLogsPage() {
               </Field>
               <Field label="خلاصه">
                 <div style={{ padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
-                  میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))} kg · CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))}٪
+                  {form.weightSamples.length >= 2 ? <>میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))} kg · CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))}٪</> : <>💡 حداقل ۲ نمونه اضافه کن تا میانگین محاسبه شود</>}
                 </div>
               </Field>
             </Grid2>
@@ -762,7 +762,7 @@ export default function DailyLogsPage() {
             <div key={w.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
               <div style={{ flex: 1 }}>
                 <Input
-                  placeholder={`نمونه ${toFa(i + 1)}`}
+                  placeholder="وزن (kg)"
                   inputMode="decimal"
                   dir="ltr"
                   value={w.weight}
@@ -791,7 +791,7 @@ export default function DailyLogsPage() {
           {form.deaths.map((d, i) => (
             <div key={d.id} style={{ padding: '10px 12px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700 }}>رکورد {toFa(i + 1)}</span>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700 }}>{d.count === 0 && !d.cause ? "رکورد جدید" : "رکورد " + toFa(i + 1)}</span>
                 <button type="button" onClick={() => setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) }))}
                   style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14 }}>✕</button>
               </div>
@@ -808,7 +808,7 @@ export default function DailyLogsPage() {
                 </Field>
               </Grid2>
               <Field label="توضیحات">
-                <Input placeholder="جزئیات..." value={d.notes || ''}
+                <Textarea rows={2} placeholder="جزئیات..." value={d.notes || ''}
                   onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />
               </Field>
             </div>
@@ -866,7 +866,7 @@ export default function DailyLogsPage() {
 
           <SectionTitle>📝 یادداشت</SectionTitle>
           <Field label="یادداشت">
-            <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+            <Textarea rows={3} placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
           {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
