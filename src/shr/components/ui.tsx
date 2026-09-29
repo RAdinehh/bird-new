@@ -348,6 +348,7 @@ export function Modal({
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
+  const focusedRef = useRef(false);
   const titleId = useRef<string>('modal-title-' + Math.random().toString(36).slice(2, 9));
 
   // Esc + body scroll lock + focus return
@@ -364,13 +365,16 @@ export function Modal({
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
 
-    // autofocus اولین input یا دکمه
-    setTimeout(() => {
-      const firstInput = modalRef.current?.querySelector(
-        'input:not([type="hidden"]):not([disabled]), textarea, select, button'
-      ) as HTMLElement | null;
-      firstInput?.focus();
-    }, 100);
+    // autofocus فقط بار اول
+    if (!focusedRef.current) {
+      focusedRef.current = true;
+      setTimeout(() => {
+        const firstInput = modalRef.current?.querySelector(
+          'input:not([type="hidden"]):not([disabled]), textarea, select, button'
+        ) as HTMLElement | null;
+        firstInput?.focus();
+      }, 100);
+    }
 
     return () => {
       document.removeEventListener('keydown', onKey);
