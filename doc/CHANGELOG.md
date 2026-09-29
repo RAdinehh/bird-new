@@ -1,5 +1,35 @@
 # CHANGELOG — تاریخچه نسخه‌ها
 
+## [0.8.0] — ۱۴۰۵/۰۷/۰۷
+
+### افزوده‌شده
+- ۹ کامپوننت جدید: NumField, MoneyField, PercentField, PhoneField, DigitField, Textarea, Checkbox, RadioGroup
+- Header 🔔 هوشمند (alerts + سرسید نزدیک)
+- OnboardingModal ۳ مرحله‌ای با انتخاب نوع فعالیت
+- تنظیمات یادآور سرسید (۷/۳/۱/۰ روز)
+- HelpBanner در ۷ ماژول کلیدی
+- Redirect هوشمند ۶ Placeholder
+
+### تغییر یافته
+- 122 فیلد ورودی مدرن‌سازی شد
+- منوی مخاطبین مستقیم به /ctc
+- SCHEMA.md v2.0 (همگام با کد)
+
+### رفع‌شده
+- Modal autofocus (کیبورد بسته می‌شد)
+- Route /ctc گم‌شده
+- ۲۲ فایل بدون min در فیلدهای عددی
+
+### مستندات جدید
+- AUDIT-REPORT.md
+- TECH-DEBT.md
+- BASELINE.md
+- STANDARDS.md
+- COMPONENTS.md
+- README.md
+
+---
+
 ## [0.7.0] — ۱۴۰۵/۰۷/۰۷
 
 ### افزوده‌شده
