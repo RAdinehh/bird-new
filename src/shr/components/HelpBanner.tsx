@@ -12,30 +12,10 @@ interface Props {
 }
 
 const TONE_COLORS: Record<string, { bg: string; border: string; fg: string; icon: string }> = {
-  info: {
-    bg: 'var(--info-soft)',
-    border: 'var(--info)',
-    fg: 'var(--info)',
-    icon: 'ℹ️',
-  },
-  warn: {
-    bg: 'var(--warn-soft)',
-    border: 'var(--warn)',
-    fg: 'var(--warn)',
-    icon: '⚠️',
-  },
-  success: {
-    bg: 'var(--accent-soft)',
-    border: 'var(--accent-border)',
-    fg: 'var(--accent)',
-    icon: '✅',
-  },
-  danger: {
-    bg: 'var(--danger-soft)',
-    border: 'var(--danger)',
-    fg: 'var(--danger)',
-    icon: '❌',
-  },
+  info: { bg: 'var(--info-soft)', border: 'var(--info)', fg: 'var(--info)', icon: 'ℹ️' },
+  warn: { bg: 'var(--warn-soft)', border: 'var(--warn)', fg: 'var(--warn)', icon: '⚠️' },
+  success: { bg: 'var(--accent-soft)', border: 'var(--accent-border)', fg: 'var(--accent)', icon: '✅' },
+  danger: { bg: 'var(--danger-soft)', border: 'var(--danger)', fg: 'var(--danger)', icon: '❌' },
 };
 
 function useNoAnim() {
@@ -56,16 +36,9 @@ function useNoAnim() {
 }
 
 export default function HelpBanner({
-  id,
-  icon,
-  title,
-  description,
-  tone = 'info',
-  actionLabel,
-  onAction,
+  id, icon, title, description, tone = 'info', actionLabel, onAction,
 }: Props) {
   const noAnim = useNoAnim();
-
   const [hidden, setHidden] = useState(false);
   const storageKey = 'help-banner-' + id;
 
@@ -107,7 +80,6 @@ export default function HelpBanner({
         transition: noAnim ? 'none' : 'opacity var(--dur-base)',
       }}
     >
-      {/* دکمه بستن */}
       <button
         type="button"
         onClick={dismiss}
@@ -132,11 +104,11 @@ export default function HelpBanner({
           alignItems: 'center',
           justifyContent: 'center',
         }}
-        onFocus={(e) => {
+        onFocus={e => {
           e.currentTarget.style.opacity = '1';
           e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
         }}
-        onBlur={(e) => {
+        onBlur={e => {
           e.currentTarget.style.opacity = '0.6';
           e.currentTarget.style.boxShadow = 'none';
         }}
@@ -144,7 +116,6 @@ export default function HelpBanner({
         ✕
       </button>
 
-      {/* عنوان */}
       <div
         style={{
           display: 'flex',
@@ -160,7 +131,6 @@ export default function HelpBanner({
         <span>{title}</span>
       </div>
 
-      {/* متن */}
       <div
         style={{
           fontSize: 'var(--fs-xs)',
@@ -172,7 +142,6 @@ export default function HelpBanner({
         {description}
       </div>
 
-      {/* دکمه action */}
       {actionLabel && onAction && (
         <button
           type="button"
@@ -192,10 +161,10 @@ export default function HelpBanner({
             fontFamily: 'inherit',
             outline: 'none',
           }}
-          onFocus={(e) => {
+          onFocus={e => {
             e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
           }}
-          onBlur={(e) => {
+          onBlur={e => {
             e.currentTarget.style.boxShadow = 'none';
           }}
         >
