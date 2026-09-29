@@ -8,6 +8,8 @@ import {
 import { useBrd } from '../brd/store';
 import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
+import { useTra } from '../tra/store';
+import { useEgg } from '../egg/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
@@ -48,6 +50,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const { birds, breeds } = useBrd();
   const { flocks } = useFlk();
   const { contacts } = useCtc();
+  const { addInvoice } = useTra();
+  const { addProduction } = useEgg();
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
@@ -140,6 +144,74 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     if (form.id) updateEntry(form.id, data as any);
     else {
       addEntry(data as any);
+      // ═══ اتصال خودکار به ماژول‌های دیگر ═══
+      try {
+        const countNum = parseInt(toEn(form.count)) || 0;
+        const unitPriceNum = parseFloat(toEn(form.unitPrice).replace('٫', '.')) || 0;
+        const shippingNum = parseFloat(toEn(form.shippingCost).replace('٫', '.')) || 0;
+        const deviceName = devices.find(d => d.id === form.deviceId)?.name || '';
+
+        if (form.dealType === 'purchase' && form.dealData.sellerId) {
+          const totalAmount = (countNum * unitPriceNum) + shippingNum;
+          if (totalAmount > 0) {
+            addInvoice({
+              type: 'purchase',
+              date: form.entryDate,
+              partyId: form.dealData.sellerId,
+              category: 'egg',
+              items: [{
+                id: 'egg-' + Date.now(),
+                name: 'تخم نطفه‌دار',
+                quantity: countNum,
+                unit: 'عدد',
+                unitPrice: unitPriceNum,
+                total: countNum * unitPriceNum,
+              }],
+              total: totalAmount,
+              payments: [],
+              dueDate: form.entryDate,
+              relatedFlockId: '',
+              relatedEntryId: '',
+              notes: 'خرید تخم — ' + deviceName,
+            } as any);
+          }
+        } else if (form.dealType === 'own' && form.flockId) {
+          addProduction({
+            flockId: form.flockId,
+            date: form.entryDate,
+            totalCount: countNum,
+            brokenCount: 0,
+            softCount: 0,
+            dirtyCount: 0,
+            avgWeight: null,
+            notes: 'ورودی به جوجه‌کشی — ' + deviceName,
+          });
+        } else if (form.dealType === 'rent' && form.dealData.lessorId && form.dealData.rentAmount) {
+          const rentAmount = parseFloat(toEn(form.dealData.rentAmount).replace('٫', '.')) || 0;
+          if (rentAmount > 0) {
+            addInvoice({
+              type: 'purchase',
+              date: form.entryDate,
+              partyId: form.dealData.lessorId,
+              category: 'service',
+              items: [{
+                id: 'rent-' + Date.now(),
+                name: 'اجاره دستگاه جوجه‌کشی',
+                quantity: 1,
+                unit: 'خدمت',
+                unitPrice: rentAmount,
+                total: rentAmount,
+              }],
+              total: rentAmount,
+              payments: [],
+              dueDate: form.dealData.rentDueDate || form.entryDate,
+              relatedFlockId: '',
+              relatedEntryId: '',
+              notes: 'اجاره — ' + deviceName,
+            } as any);
+          }
+        }
+      } catch (e) { /* silent */ }
       setOpen(false);
       if (onGoTo && confirm('ورودی ثبت شد. به کندلینگ برو؟')) {
         setTimeout(() => onGoTo('candlings'), 100);
@@ -305,32 +377,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   </>
                 )}
 
-                {myCandlings.length > 0 && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🔍 کندلینگ</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {myCandlings.sort((a, b) => a.stage - b.stage).map(c => (
-                        <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                          <span style={{ color: 'var(--muted)' }}>مرحله {toFa(c.stage)}:</span>
-                          <span style={{ fontWeight: 600 }}>سالم {toFa(c.alive || 0)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-
-                {myHatch && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🐣 نتیجه هچ</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                        <span>جوجه هچ‌شده:</span><span>{toFa(myHatch.hatched || 0)}</span>
-                      </div>
-                      {myHatch.unhatched ? <Row l="هچ‌نشده" v={toFa(myHatch.unhatched)} /> : null}
-                    </div>
-                  </>
-                )}
-
                 {e.notes && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📝 یادداشت</div>
@@ -378,7 +424,16 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 هنوز گله فعالی ثبت نشده — اول از ماژول گله اضافه کنید
               </div>
             ) : (
-              <Select value={form.flockId} onChange={e => setForm({ ...form, flockId: e.target.value })}>
+              <Select value={form.flockId} onChange={e => {
+                const fid = e.target.value;
+                const fl = flocks.find((x: any) => x.id === fid);
+                setForm(f => ({
+                  ...f,
+                  flockId: fid,
+                  birdId: fl?.birdId || f.birdId,
+                  breedId: fl?.breedId || f.breedId,
+                }));
+              }}>
                 <option value="">— انتخاب گله —</option>
                 {flocks.filter((fl: any) => fl.status === 'active').map((fl: any) => <option key={fl.id} value={fl.id}>{fl.name}</option>)}
               </Select>
@@ -498,7 +553,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
         <SectionTitle>📋 مشخصات تخم</SectionTitle>
         <Grid2>
-          <Field label="پرنده" required>
+          <Field label="پرنده" required hint={form.dealType === 'own' && form.flockId ? 'خودکار از گله' : undefined}>
             <SmartSelect value={form.birdId} onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
           </Field>
           <Field label="نژاد">
