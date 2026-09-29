@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useFed, CATEGORY_LABEL, CATEGORY_ICON, type Ingredient, type IngredientCategory } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { INGREDIENT_STANDARDS } from './standards';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
@@ -322,7 +322,7 @@ export default function IngredientsPage() {
             </Select>
           </Field>
           <Field label="قیمت دستی (اختیاری)" hint="اگر پر شود، بر قیمت انبار اولویت دارد">
-            <NumField value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} unit="ت" min={0} />
+            <MoneyField value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
           </Field>
         </Grid2>
 

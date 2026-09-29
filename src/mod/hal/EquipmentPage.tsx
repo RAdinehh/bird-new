@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useHal, type Equipment, EQUIP_LABELS } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
@@ -213,7 +213,7 @@ export default function EquipmentPage() {
         </Field>
         <Grid3>
           <Field label="تعداد"><NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" min={0} /></Field>
-          <Field label="قیمت واحد"><NumField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} unit="ت" min={0} /></Field>
+          <Field label="قیمت واحد"><MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} /></Field>
           <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
         </Grid3>
         <Field label="تاریخ خرید"><Input placeholder="۱۴۰۵/۰۷/۰۴" value={form.purchasedAt} onChange={e => setForm({...form, purchasedAt: e.target.value})} /></Field>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useInc, DEVICE_MODE_LABEL, DEVICE_STATUS_LABEL, type Device, type DeviceMode, type DeviceStatus } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync , showAlert} from '../../cor/store/dialog';
@@ -168,7 +168,7 @@ export default function DevicesPage() {
           </button>
         </div>
         <Grid3>
-          <Field label="قیمت خرید"><NumField placeholder="۰" value={form.price} onChange={e => setForm({...form, price: e.target.value})} unit="ت" min={0} /></Field>
+          <Field label="قیمت خرید"><MoneyField placeholder="۰" value={form.price} onChange={e => setForm({...form, price: e.target.value})} /></Field>
           <Field label="تاریخ خرید"><Input placeholder="۱۴۰۵/۰۷/۰۴" value={form.purchasedAt} onChange={e => setForm({...form, purchasedAt: e.target.value})} /></Field>
           <Field label="گارانتی"><NumField placeholder="۱۲" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
         </Grid3>
