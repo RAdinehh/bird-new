@@ -3,7 +3,11 @@ import { formatNumWhileTyping, numberToWords, parseFaNum } from '../utils/fa';
 
 type BtnVariant = 'primary' | 'ghost' | 'danger' | 'outline';
 interface BtnProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: BtnVariant; size?: 'md' | 'sm'; full?: boolean;
+  variant?: BtnVariant;
+  size?: 'md' | 'sm';
+  full?: boolean;
+  loading?: boolean;
+  icon?: React.ReactNode;
 }
 export function Btn({ variant = 'ghost', size = 'md', full, style, children, ...rest }: BtnProps) {
   const variants: Record<BtnVariant, React.CSSProperties> = {
