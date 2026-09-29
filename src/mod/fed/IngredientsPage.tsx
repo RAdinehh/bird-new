@@ -333,7 +333,7 @@ export default function IngredientsPage() {
         <SectionTitle>🥗 ترکیبات</SectionTitle>
         <Grid2>
           <Field label="پروتئین خام"><NumField value={form.protein} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" min={0} /></Field>
-          <Field label="انرژی (kcal/kg)"><NumField value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} min={0} /></Field>
+          <Field label="انرژی (kcal/kg)"><NumField value={form.energy} onChange={e => setForm({ ...form, energy: e.target.value })} min={0} unit="kcal" /></Field>
         </Grid2>
         <Grid2>
           <Field label="چربی"><NumField value={form.fat} onChange={e => setForm({ ...form, fat: e.target.value })} unit="٪" min={0} /></Field>

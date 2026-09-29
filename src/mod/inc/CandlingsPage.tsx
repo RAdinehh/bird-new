@@ -163,12 +163,12 @@ export default function CandlingsPage() {
           </div>
         )}
         <Grid2>
-          <Field label="سالم"><NumField placeholder="۰" value={form.alive} onChange={e => setForm({...form, alive: e.target.value})} max={totalCount} min={0} /></Field>
-          <Field label="بی‌نطفه"><NumField placeholder="۰" value={form.infertile} onChange={e => setForm({...form, infertile: e.target.value})} max={totalCount} min={0} /></Field>
+          <Field label="سالم"><NumField placeholder="۰" value={form.alive} onChange={e => setForm({...form, alive: e.target.value})} max={totalCount} min={0} unit="عدد" /></Field>
+          <Field label="بی‌نطفه"><NumField placeholder="۰" value={form.infertile} onChange={e => setForm({...form, infertile: e.target.value})} max={totalCount} min={0} unit="عدد" /></Field>
         </Grid2>
         <Grid2>
-          <Field label="مرده"><NumField placeholder="۰" value={form.dead} onChange={e => setForm({...form, dead: e.target.value})} max={totalCount} min={0} /></Field>
-          <Field label="شکسته"><NumField placeholder="۰" value={form.broken} onChange={e => setForm({...form, broken: e.target.value})} max={totalCount} min={0} /></Field>
+          <Field label="مرده"><NumField placeholder="۰" value={form.dead} onChange={e => setForm({...form, dead: e.target.value})} max={totalCount} min={0} unit="عدد" /></Field>
+          <Field label="شکسته"><NumField placeholder="۰" value={form.broken} onChange={e => setForm({...form, broken: e.target.value})} max={totalCount} min={0} unit="عدد" /></Field>
         </Grid2>
         <Grid2>
           <Field label="دلیل بی‌نطفه">

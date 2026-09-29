@@ -796,7 +796,7 @@ export default function DailyLogsPage() {
                 <Field label="تعداد">
                   <NumField placeholder="۰" value={String(d.count || '')}
                     onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
-                    min={0} max={flockAliveCount || undefined} />
+                    min={0} max={flockAliveCount || undefined} unit="پرنده" />
                 </Field>
                 <Field label="علت">
                   <Select value={d.cause || ''} onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, cause: e.target.value } : x) }))}>

@@ -162,7 +162,7 @@ export default function ProfileTab() {
             <Input value={defaults.birdType} onChange={e => updateSection('defaults', { birdType: e.target.value })} placeholder="مرغ" />
           </Field>
           <Field label="اندازه‌ی گله">
-            <NumField value={defaults.flockSize} onChange={e => updateSection('defaults', { flockSize: e.target.value })} min={0} />
+            <NumField value={defaults.flockSize} onChange={e => updateSection('defaults', { flockSize: e.target.value })} min={0} unit="پرنده" />
           </Field>
         </Grid2>
         <Field label="طول دوره‌ی جوجه‌کشی">

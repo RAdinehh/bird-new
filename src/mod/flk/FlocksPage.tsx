@@ -516,10 +516,10 @@ export default function FlocksPage() {
             <DepBox title="اطلاعات گله مادر" tone="purple">
               <Grid2>
                 <Field label="تعداد خروس">
-                  <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} />
+                  <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} unit="پرنده" />
                 </Field>
                 <Field label="تعداد مرغ">
-                  <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} />
+                  <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} unit="پرنده" />
                 </Field>
               </Grid2>
               {form.maleCount && form.femaleCount && (

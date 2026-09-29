@@ -141,13 +141,13 @@ export default function HatchesPage() {
           <DatePicker value={form.date} onChange={v => setForm({...form, date: v})} placeholder="انتخاب تاریخ" />
         </Field>
         <Grid2>
-          <Field label="جوجه هچ‌شده" required hint={maxHatched ? `حداکثر: ${toFa(maxHatched)}` : undefined}><NumField placeholder="۰" value={form.hatched} onChange={e => setForm({...form, hatched: e.target.value})} max={maxHatched || undefined} min={0} /></Field>
-          <Field label="هچ‌نشده"><NumField placeholder="۰" value={form.unhatched} onChange={e => setForm({...form, unhatched: e.target.value})} min={0} /></Field>
+          <Field label="جوجه هچ‌شده" required hint={maxHatched ? `حداکثر: ${toFa(maxHatched)}` : undefined}><NumField placeholder="۰" value={form.hatched} onChange={e => setForm({...form, hatched: e.target.value})} max={maxHatched || undefined} min={0} unit="عدد" /></Field>
+          <Field label="هچ‌نشده"><NumField placeholder="۰" value={form.unhatched} onChange={e => setForm({...form, unhatched: e.target.value})} min={0} unit="عدد" /></Field>
         </Grid2>
         <Grid3>
-          <Field label="مرده در پوسته"><NumField placeholder="۰" value={form.deadInShell} onChange={e => setForm({...form, deadInShell: e.target.value})} min={0} /></Field>
-          <Field label="نوک‌زده"><NumField placeholder="۰" value={form.pipped} onChange={e => setForm({...form, pipped: e.target.value})} min={0} /></Field>
-          <Field label="سایر"><NumField placeholder="۰" value={form.other} onChange={e => setForm({...form, other: e.target.value})} min={0} /></Field>
+          <Field label="مرده در پوسته"><NumField placeholder="۰" value={form.deadInShell} onChange={e => setForm({...form, deadInShell: e.target.value})} min={0} unit="عدد" /></Field>
+          <Field label="نوک‌زده"><NumField placeholder="۰" value={form.pipped} onChange={e => setForm({...form, pipped: e.target.value})} min={0} unit="عدد" /></Field>
+          <Field label="سایر"><NumField placeholder="۰" value={form.other} onChange={e => setForm({...form, other: e.target.value})} min={0} unit="عدد" /></Field>
         </Grid3>
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}

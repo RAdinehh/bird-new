@@ -165,7 +165,7 @@ export default function BirdsPage() {
           <NumField
             placeholder="۰"
             value={form.cycleDays}
-            onChange={e => setForm({ ...form, cycleDays: e.target.value })} min={1} />
+            onChange={e => setForm({ ...form, cycleDays: e.target.value })} min={1} unit="روز" />
         </Field>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7,
            padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
@@ -177,7 +177,7 @@ export default function BirdsPage() {
           <NumField
             placeholder="۲٫۰"
             value={form.fcrStandard}
-            onChange={e => setForm({ ...form, fcrStandard: e.target.value })} min={1} />
+            onChange={e => setForm({ ...form, fcrStandard: e.target.value })} min={1} unit="FCR" />
         </Field>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7,
            padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
