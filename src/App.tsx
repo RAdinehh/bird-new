@@ -12,6 +12,8 @@ import AppRouter from './cor/router/AppRouter';
 import { useKeyboard } from './shr/hooks/useKeyboard';
 import { useAutoBackup } from './shr/hooks/useAutoBackup';
 import OnboardingModal from './shr/components/OnboardingModal';
+import LockScreen from './shr/components/LockScreen';
+import { useAutoLock } from './shr/hooks/useAutoLock';
 
 const TITLES: Record<string, string> = {
   '/': 'داشبورد', '/brd': 'پرنده‌ها و نژادها', '/hal': 'سالن‌ها', '/flk': 'گله‌ها',
@@ -52,6 +54,7 @@ export default function App() {
   const settings = useSet();
   const theme = settings.theme;  // single source of truth
   const [showOnb, setShowOnb] = useState(false);
+  const { locked, unlock } = useAutoLock();
 
   useEffect(() => {
     if (!localStorage.getItem('pm-onboarding-v2-done')) setShowOnb(true);
@@ -82,6 +85,9 @@ export default function App() {
     settings.highContrast,
     settings.density
   ]);
+
+  // قفل خودکار
+  if (locked) return <LockScreen onUnlock={unlock} />;
 
   return (
     <BrowserRouter>
