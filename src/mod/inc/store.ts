@@ -29,6 +29,7 @@ export interface DeviceCapacity {
   setterHumidity?: number;
   hatcherTemp?: number;
   hatcherHumidity?: number;
+  totalDays?: number;
   lockdownDay?: number;
 }
 
@@ -326,6 +327,7 @@ export function fillCapacityFromProfile(birdName: string): Partial<DeviceCapacit
       setterHumidity: found.setterHumidity,
       hatcherTemp: found.hatcherTemp,
       hatcherHumidity: found.hatcherHumidity,
+      totalDays: found.totalDays,
       lockdownDay: found.lockdownDay,
     };
   } catch { return null; }
