@@ -26,44 +26,6 @@ export default function NotificationsTab() {
         tone="accent"
        defaultOpen>
         <SubSection label="نحوه‌ی ارسال اعلان" icon="📡" />
-        <ToggleRow
-          label="درون‌برنامه (Toast)"
-          sub="همیشه فعال"
-          value={ch.inApp}
-          onChange={() => s.updateSection('channels', { inApp: !ch.inApp })}
-          disabled
-        />
-        <ToggleRow
-          label="صدا"
-          sub="برای هشدارهای بحرانی"
-          value={ch.sound}
-          onChange={() => s.updateSection('channels', { sound: !ch.sound })}
-        />
-        <ToggleRow
-          label="ویبره"
-          sub="در گوشی‌های پشتیبان"
-          value={ch.vibration}
-          onChange={() => s.updateSection('channels', { vibration: !ch.vibration })}
-        />
-        <ToggleRow
-          label="پیامک"
-          sub="در نسخه‌های بعدی"
-          value={ch.sms}
-          onChange={() => s.updateSection('channels', { sms: !ch.sms })}
-        />
-        <ToggleRow
-          label="ایمیل"
-          sub="در نسخه‌های بعدی"
-          value={ch.email}
-          onChange={() => s.updateSection('channels', { email: !ch.email })}
-        />
-        <ToggleRow
-          label="تلگرام"
-          sub="در نسخه‌های بعدی"
-          value={ch.telegram}
-          onChange={() => s.updateSection('channels', { telegram: !ch.telegram })}
-        />
-      
         <SubSection label="انواع هشدار" icon="🔔" />
         <SubSection label="چه سطحی هشدار بده" icon="🎯" />
         <ToggleRow
