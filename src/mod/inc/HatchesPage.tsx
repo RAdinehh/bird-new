@@ -59,10 +59,8 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     } else {
       newSet.add(id);
       const entry = eggEntries.find(e => e.id === id);
-      const myCand = candlings.filter(c => c.eggEntryId === id).sort((a,b) => b.stage - a.stage)[0];
-      const aliveAfter = myCand?.alive || entry?.count || 0;
-      // auto-fill با ۱۰۰٪ نطفه‌دار (کاربر خودش تلفات می‌زنه)
-      setEntriesData({ ...entriesData, [id]: { ...emptyRow(), hatched: aliveAfter > 0 ? String(aliveAfter) : '' } });
+      const calc = calcCurrentFertile(id, entry?.count || 0, candlings);
+      setEntriesData({ ...entriesData, [id]: { ...emptyRow(), hatched: calc.fertile > 0 ? String(calc.fertile) : '' } });
       setSelectedIds(newSet);
     }
   };
@@ -363,8 +361,9 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                   const dev = devices.find(d => d.id === e.deviceId);
                   const isSel = selectedIds.has(e.id);
                   const d = dataFor(e.id);
+                  const calc = calcCurrentFertile(e.id, e.count || 0, candlings);
+                  const aliveAfter = calc.fertile;
                   const myCand = candlings.filter(c => c.eggEntryId === e.id).sort((a,b) => b.stage - a.stage)[0];
-                  const aliveAfter = myCand?.alive || e.count || 0;
                   const sumE = (parseInt(toEn(d.hatched))||0) + (parseInt(toEn(d.unhatched))||0) + (parseInt(toEn(d.deadInShell))||0) + (parseInt(toEn(d.pipped))||0) + (parseInt(toEn(d.other))||0);
                   const rem = (e.count || 0) - sumE;
                   return (
@@ -376,7 +375,24 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, transform: isSel ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform .2s' }}>▶</span>
                       </div>
 
-                      {myCand && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '4px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>پس از کندلینگ روز {toFa(myCand.stage)}: نطفه‌دار {toFa(aliveAfter)}</div>}
+                      {calc.byStage.length > 0 && (
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
+                          {calc.byStage.map((st, i) => (
+                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span>کندلینگ روز {toFa(st.stage)}:</span>
+                              <span>بی‌نطفه {toFa(st.infertile)} · مرده {toFa(st.dead)} · شکسته {toFa(st.broken)}</span>
+                            </div>
+                          ))}
+                          <div style={{ paddingTop: 4, marginTop: 4, borderTop: '1px dashed var(--border)', display: 'flex', justifyContent: 'space-between', color: 'var(--accent)', fontWeight: 700 }}>
+                            <span>📊 مجموع تلفات کندلینگ:</span>
+                            <span>{toFa(calc.totalLoss)}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--accent)', fontWeight: 700 }}>
+                            <span>🧬 نطفه‌دار فعلی:</span>
+                            <span>{toFa(calc.fertile)}</span>
+                          </div>
+                        </div>
+                      )}
 
                       {isSel && (
                         <>
@@ -393,7 +409,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                             return (
                               <>
                                 <div style={{ padding: '6px 10px', background: myCand ? 'var(--accent-soft)' : 'var(--warn-soft)', border: '1px solid ' + (myCand ? 'var(--accent-border)' : 'var(--warn)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: myCand ? 'var(--accent)' : 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
-                                  {myCand ? '🧬 سقف این هچ: ' + toFa(base) + ' (نطفه‌دار از کندلینگ روز ' + toFa(myCand.stage) + ')' : '⚠️ بدون کندلینگ — سقف: ' + toFa(base) + ' تخم'}
+                                  {calc.byStage.length > 0 ? '🧬 سقف این هچ: ' + toFa(base) + ' (نطفه‌دار فعلی)' : '⚠️ بدون کندلینگ — سقف: ' + toFa(base) + ' تخم'}
                                 </div>
                                 <Grid2>
                                   <Field label="جوجه هچ‌شده" required>
@@ -662,6 +678,28 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
 
 // نرخ هچ بر اساس نطفه‌داری — اگه نطفه‌داری پایین باشه، نرخ هچ هم کمتر
+
+
+// نطفه‌دار فعلی = کل تخم − مجموع همه تلفات کندلینگ‌ها
+function calcCurrentFertile(entryId: string, entryTotal: number, allCandlings: any[]): { fertile: number; totalLoss: number; byStage: any[] } {
+  const myCandlings = allCandlings.filter(c => c.eggEntryId === entryId).sort((a, b) => a.stage - b.stage);
+  let totalInfertile = 0;
+  let totalDead = 0;
+  let totalBroken = 0;
+  const byStage = myCandlings.map(c => {
+    totalInfertile += c.infertile || 0;
+    totalDead += c.dead || 0;
+    totalBroken += c.broken || 0;
+    return { stage: c.stage, alive: c.alive || 0, infertile: c.infertile || 0, dead: c.dead || 0, broken: c.broken || 0 };
+  });
+  const totalLoss = totalInfertile + totalDead + totalBroken;
+  return {
+    fertile: Math.max(0, entryTotal - totalLoss),
+    totalLoss,
+    byStage,
+  };
+}
+
 function smartHatchRate(fertilityRate: number): number {
   if (fertilityRate >= 92) return 0.94;
   if (fertilityRate >= 85) return 0.92;
