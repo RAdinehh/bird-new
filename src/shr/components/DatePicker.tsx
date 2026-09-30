@@ -162,20 +162,19 @@ export default function DatePicker({
         title="انتخاب تاریخ"
         size="sm"
         footer={
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 6 }}>
             <Btn
               onClick={() => { if (isInRange(todayStr)) { onChange(todayStr); setOpen(false); } }}
-              style={{ flex: 1 }}
+              style={{ flex: 1, height: 34 }}
             >امروز</Btn>
             <Btn
               onClick={() => { onChange(''); setOpen(false); }}
-              style={{ flex: 1 }}
-            >پاک کردن</Btn>
+              style={{ flex: 1, height: 34 }}
+            >پاک</Btn>
           </div>
-        }
-      >
+        }>
         {/* ═══ هدر فشرده: ‹ ماه سال › با Select مستقیم ═══ */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0 0 4px' }}>
           <button
             type="button"
             onClick={() => setCursor(subMonths(cursor, 1))}
@@ -209,7 +208,7 @@ export default function DatePicker({
         {/* ═══ روزهای هفته ═══ */}
         <div role="row" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginTop: 4 }}>
           {WEEKDAYS.map((w, i) => (
-            <div key={i} role="columnheader" style={{ textAlign: 'center', fontSize: 'var(--fs-xs)', color: i === 6 ? 'var(--danger)' : 'var(--dim)', padding: '2px 0', fontWeight: 700 }}>
+            <div key={i} role="columnheader" style={{ textAlign: 'center', fontSize: 10, color: i === 6 ? 'var(--danger)' : 'var(--dim)', padding: '2px 0', fontWeight: 700 }}>
               {w}
             </div>
           ))}
@@ -239,7 +238,8 @@ export default function DatePicker({
                 aria-selected={isSelected}
                 aria-current={isToday ? 'date' : undefined}
                 style={{
-                  aspectRatio: '1',
+                  height: 36,
+                  padding: 0,
                   background: isSelected ? 'var(--accent)' : 'transparent',
                   border: isToday && !isSelected ? '1.5px solid var(--accent)' : '1px solid transparent',
                   borderRadius: 'var(--r-sm)',

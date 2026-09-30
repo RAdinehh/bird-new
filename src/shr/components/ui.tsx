@@ -463,7 +463,7 @@ export function Modal({
           borderTopRightRadius: 'var(--r-2xl)',
           width: '100%',
           maxWidth,
-          maxHeight: '90vh',
+          maxHeight: '85vh',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -473,7 +473,7 @@ export function Modal({
         {/* Header */}
         <div
           style={{
-            padding: '14px 20px',
+            padding: '10px 14px',
             borderBottom: '1px solid var(--border)',
             display: 'flex',
             alignItems: 'center',
@@ -520,7 +520,7 @@ export function Modal({
         {/* Body */}
         <div
           style={{
-            padding: '20px',
+            padding: '14px',
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
@@ -534,7 +534,7 @@ export function Modal({
         {footer && (
           <div
             style={{
-              padding: '12px 20px 24px',
+              padding: '10px 14px 18px',
               borderTop: '1px solid var(--border)',
               flexShrink: 0,
             }}

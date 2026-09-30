@@ -14,13 +14,13 @@ interface Props {
   compact?: boolean;
 }
 
-const SIZE = 260;
+const SIZE = 220;
 const CX = SIZE / 2;
 const CY = SIZE / 2;
-const R_INNER = 72;
-const R_OUTER = 112;
+const R_INNER = 60;
+const R_OUTER = 94;
 const R_MID = (R_INNER + R_OUTER) / 2;
-const R_MIN = 100;
+const R_MIN = 78;
 
 function polar(angleDeg: number, radius: number) {
   const rad = (angleDeg * Math.PI) / 180;
@@ -204,16 +204,16 @@ export default function TimePicker({
         footer={
           <div style={{ display: 'flex', gap: 8 }}>
             {step === 'minute' && (
-              <Btn onClick={() => setStep('hour')} style={{ flex: 1 }}>‹ ساعت</Btn>
+              <Btn onClick={() => setStep('hour')} style={{ flex: 1, height: 34 }}>‹ ساعت</Btn>
             )}
-            <Btn onClick={setNow} style={{ flex: 1 }}>🕐 الان</Btn>
-            <Btn onClick={() => { onChange(''); setOpen(false); }} style={{ flex: 1 }}>پاک</Btn>
+            <Btn onClick={setNow} style={{ flex: 1, height: 34 }}>🕐 الان</Btn>
+            <Btn onClick={() => { onChange(''); setOpen(false); }} style={{ flex: 1, height: 34 }}>پاک</Btn>
           </div>
         }
       >
         {/* ═══ نمایش دیجیتال ═══ */}
-        <div aria-live="polite" aria-atomic="true" style={{ textAlign: 'center', padding: '4px 0 8px' }}>
-          <div style={{ fontSize: 36, fontWeight: 700, color: 'var(--accent)', fontVariantNumeric: 'tabular-nums', letterSpacing: 3, direction: 'ltr' }}>
+        <div aria-live="polite" aria-atomic="true" style={{ textAlign: 'center', padding: '2px 0 6px' }}>
+          <div style={{ fontSize: 30, fontWeight: 700, color: 'var(--accent)', fontVariantNumeric: 'tabular-nums', letterSpacing: 3, direction: 'ltr' }}>
             {toFa(String(hour).padStart(2, '0'))}:{toFa(String(minute).padStart(2, '0'))}
           </div>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
@@ -247,10 +247,10 @@ export default function TimePicker({
                 const aO = hour === hO;
                 return (
                   <g key={i}>
-                    <circle cx={pI.x} cy={pI.y} r={15} fill={aI ? 'var(--accent)' : 'transparent'} />
-                    <text x={pI.x} y={pI.y} textAnchor="middle" dominantBaseline="central" fontSize={13} fontWeight={aI ? 700 : 500} fill={aI ? '#fff' : 'var(--text)'} style={{ pointerEvents: 'none' }}>{toFa(hI)}</text>
-                    <circle cx={pO.x} cy={pO.y} r={15} fill={aO ? 'var(--accent)' : 'transparent'} />
-                    <text x={pO.x} y={pO.y} textAnchor="middle" dominantBaseline="central" fontSize={13} fontWeight={aO ? 700 : 500} fill={aO ? '#fff' : 'var(--text)'} style={{ pointerEvents: 'none' }}>{toFa(hO)}</text>
+                    <circle cx={pI.x} cy={pI.y} r={13} fill={aI ? 'var(--accent)' : 'transparent'} />
+                    <text x={pI.x} y={pI.y} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={aI ? 700 : 500} fill={aI ? '#fff' : 'var(--text)'} style={{ pointerEvents: 'none' }}>{toFa(hI)}</text>
+                    <circle cx={pO.x} cy={pO.y} r={13} fill={aO ? 'var(--accent)' : 'transparent'} />
+                    <text x={pO.x} y={pO.y} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={aO ? 700 : 500} fill={aO ? '#fff' : 'var(--text)'} style={{ pointerEvents: 'none' }}>{toFa(hO)}</text>
                   </g>
                 );
               })}
@@ -267,8 +267,8 @@ export default function TimePicker({
                 const active = Math.floor(minute / 5) === i;
                 return (
                   <g key={i}>
-                    <circle cx={p.x} cy={p.y} r={15} fill={active ? 'var(--accent)' : 'transparent'} />
-                    <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fontSize={13} fontWeight={active ? 700 : 500} fill={active ? '#fff' : 'var(--text)'} style={{ pointerEvents: 'none' }}>{toFa(String(m).padStart(2, '0'))}</text>
+                    <circle cx={p.x} cy={p.y} r={13} fill={active ? 'var(--accent)' : 'transparent'} />
+                    <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={active ? 700 : 500} fill={active ? '#fff' : 'var(--text)'} style={{ pointerEvents: 'none' }}>{toFa(String(m).padStart(2, '0'))}</text>
                   </g>
                 );
               })}
@@ -286,7 +286,7 @@ export default function TimePicker({
           variant="primary"
           full
           onClick={() => commitNow(hour, minute)}
-          style={{ marginTop: 8 }}
+          style={{ marginTop: 6, height: 34 }}
         >
           ✓ تأیید {toFa(String(hour).padStart(2, '0'))}:{toFa(String(minute).padStart(2, '0'))}
         </Btn>
