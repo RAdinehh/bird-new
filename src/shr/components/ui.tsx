@@ -55,15 +55,22 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
   // اگر inputMode عددی بود، خودکار حالت number فعال شود
   const effectiveMode = mode === 'text' && rest.inputMode === 'numeric' ? 'number' : mode;
 
+  // Local editing state — preserves what user types (esp. decimal separator)
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [localValue, setLocalValue] = React.useState<string>('');
+  const parentValueStr = (value === undefined || value === null) ? '' : String(value);
+  const displayValue = isEditing ? localValue : parentValueStr;
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
     if (effectiveMode === 'number') v = formatNumWhileTyping(v);
+    setLocalValue(v);
     if (autoClamp && (min !== undefined || max !== undefined) && v) {
       const n = parseFaNum(v);
       let cn = n;
       if (min !== undefined) cn = Math.max(min, cn);
       if (max !== undefined) cn = Math.min(max, cn);
-      if (cn !== n) v = formatNumWhileTyping(String(cn));
+      if (cn !== n) { v = formatNumWhileTyping(String(cn)); setLocalValue(v); }
     }
     if (onChange) {
       const fake = { ...e, target: { ...e.target, value: v } } as React.ChangeEvent<HTMLInputElement>;
@@ -99,7 +106,13 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
     }
   };
 
+  const handleFocus = (_e: React.FocusEvent<HTMLInputElement>) => {
+    setIsEditing(true);
+    setLocalValue(parentValueStr);
+  };
+
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsEditing(false);
     // در blur: اگر مقدار خارج از محدوده بود، اصلاح کن
     if ((min !== undefined || max !== undefined) && value) {
       const n = parseFaNum(String(value));
@@ -133,8 +146,9 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
       }}>
         <input enterKeyHint="next" onKeyDown={handleKeyDown}           dir={(rest as any).dir || undefined}
           {...rest}
-          value={value}
+          value={displayValue}
           onChange={handleChange}
+          onFocus={handleFocus}
           onBlur={handleBlur}
           inputMode={rest.inputMode || (effectiveMode === 'number' ? 'decimal' : undefined)}
           style={{
