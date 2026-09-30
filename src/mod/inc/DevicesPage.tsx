@@ -2,7 +2,7 @@
  * DevicesPage — دستگاه‌های انکوباسیون (ظرفیت، تعمیرات، گارانتی)
  */
 import { useState, useMemo } from 'react';
-import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity } from './store';
+import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity, fillCapacityFromProfile } from './store';
 import { useSet } from '../set/store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag, ErrorBox } from '../../shr/components/ui';
@@ -144,6 +144,22 @@ export default function DevicesPage() {
       capacityByBird: f.capacityByBird.map(c => normalizeBird(c.birdName) === normalizeBird(birdName) ? { ...c, capacity } : c),
     }));
   };
+
+  const updateCapacityFull = (birdName: string, patch: Partial<DeviceCapacity>) => {
+    setForm(f => ({
+      ...f,
+      capacityByBird: f.capacityByBird.map(c =>
+        normalizeBird(c.birdName) === normalizeBird(birdName) ? { ...c, ...patch } : c
+      ),
+    }));
+  };
+
+  const fillProfile = (birdName: string) => {
+    const p = fillCapacityFromProfile(birdName);
+    if (!p) { return; }
+    updateCapacityFull(birdName, p);
+  };
+
 
   const save = () => {
     if (!form.id) {
@@ -396,6 +412,25 @@ export default function DevicesPage() {
                   <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 'var(--fs-xs)', padding: 0 }}>✕</button>
                 </div>
                 <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
+                <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                  <NumField value={String(c.setterTemp ?? '')} onChange={e => updateCapacityFull(c.birdName, { setterTemp: parseFloat(toEn(e.target.value)) || 0 })} unit="°C" placeholder="دمای ستر" />
+                  <NumField value={String(c.setterHumidity ?? '')} onChange={e => updateCapacityFull(c.birdName, { setterHumidity: parseFloat(toEn(e.target.value)) || 0 })} unit="٪" placeholder="رطوبت ستر" />
+                  <NumField value={String(c.hatcherTemp ?? '')} onChange={e => updateCapacityFull(c.birdName, { hatcherTemp: parseFloat(toEn(e.target.value)) || 0 })} unit="°C" placeholder="دمای هچر" />
+                  <NumField value={String(c.hatcherHumidity ?? '')} onChange={e => updateCapacityFull(c.birdName, { hatcherHumidity: parseFloat(toEn(e.target.value)) || 0 })} unit="٪" placeholder="رطوبت هچر" />
+                  <NumField value={String(c.lockdownDay ?? '')} onChange={e => updateCapacityFull(c.birdName, { lockdownDay: parseInt(toEn(e.target.value)) || 0 })} unit="روز" placeholder="روز قفل" />
+                  <button type="button" onClick={() => fillProfile(c.birdName)} style={{
+                    gridColumn: '1 / -1',
+                    padding: '8px 12px',
+                    background: 'var(--accent-soft)',
+                    border: '1px solid var(--accent-border)',
+                    color: 'var(--accent)',
+                    borderRadius: 'var(--r-sm)',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    fontSize: 'var(--fs-sm)',
+                    fontWeight: 600,
+                  }}>🔄 پر کردن از پروفایل {c.birdName}</button>
+                </div>
               </div>
             ))}
           </div>

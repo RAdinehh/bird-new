@@ -25,6 +25,11 @@ export interface MaintenanceLog {
 export interface DeviceCapacity {
   birdName: string;
   capacity: number | null;
+  setterTemp?: number;
+  setterHumidity?: number;
+  hatcherTemp?: number;
+  hatcherHumidity?: number;
+  lockdownDay?: number;
 }
 
 export interface Device {
@@ -295,4 +300,33 @@ export function hatchRate(hatched: number, total: number): number {
 export function costPerChick(totalCost: number, hatched: number): number {
   if (!hatched) return 0;
   return totalCost / hatched;
+}
+
+
+/** پر کردن اتوماتیک از پروفایل انکوباسیون بر اساس نام پرنده */
+export function fillCapacityFromProfile(birdName: string): Partial<DeviceCapacity> | null {
+  try {
+    const raw = localStorage.getItem('pm-settings');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const profiles = parsed?.state?.incubationProfiles || parsed?.incubationProfiles || [];
+    const norm = (s: string) => String(s || '')
+      .replace(/[\u200c\u200f]/g, '')
+      .replace(/[🐔🦃🦆🦢🐦🕊️]/g, '')
+      .trim()
+      .toLowerCase();
+    const target = norm(birdName);
+    const found = profiles.find((p: any) => {
+      const pn = norm(p.birdName);
+      return pn === target || pn.includes(target) || target.includes(pn);
+    });
+    if (!found) return null;
+    return {
+      setterTemp: found.setterTemp,
+      setterHumidity: found.setterHumidity,
+      hatcherTemp: found.hatcherTemp,
+      hatcherHumidity: found.hatcherHumidity,
+      lockdownDay: found.lockdownDay,
+    };
+  } catch { return null; }
 }
