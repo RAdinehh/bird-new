@@ -1,3 +1,6 @@
+/**
+ * DailyLogsPage — ثبت روزانه (دمای سالن، آب، دان، تلفات)
+ */
 import { useState, useMemo } from 'react';
 import {
   useDlg, type DailyLog, type Death, type Vaccine,
@@ -27,6 +30,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import { Section, SectionTitle, Row } from './helpers';
 
 interface F {
   id?: string;
@@ -905,30 +909,6 @@ export default function DailyLogsPage() {
           <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف این ثبت؟</div>
         </Modal>
       </PageContainer>
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>{title}</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>{children}</div>
-    </>
-  );
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
-  );
-}
-
-function Row({ l, v, warn }: { l: string; v: string; warn?: boolean }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: warn ? 'var(--warn-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: warn ? 'var(--warn)' : undefined, fontWeight: warn ? 700 : undefined }}>
-      <span style={{ color: warn ? 'var(--warn)' : 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: warn ? 'var(--warn)' : 'var(--text)' }}>{v}</span>
     </div>
   );
 }
