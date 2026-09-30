@@ -12,13 +12,13 @@ interface Props {
   subtitle: string;
   badge?: React.ReactNode;
   summary?: React.ReactNode;
+  stats?: React.ReactNode;
   compact?: boolean;
   isOpen: boolean;
   onToggle: () => void;
   children: React.ReactNode;
 }
 
-// همه‌ی رنگ‌های ممکن
 const COLORS: Record<AccentKey, { c: string; s: string }> = {
   accent: { c: 'var(--accent)', s: 'var(--accent-soft)' },
   green:  { c: 'var(--accent)', s: 'var(--accent-soft)' },
@@ -28,14 +28,13 @@ const COLORS: Record<AccentKey, { c: string; s: string }> = {
   gray:   { c: 'var(--dim)',    s: 'var(--input-bg)' },
   purple: { c: 'var(--purple)', s: 'var(--purple-soft)' },
   info:   { c: 'var(--info)',   s: 'var(--info-soft)' },
-  blue:   { c: 'var(--info)',   s: 'var(--info-soft)' }
+  blue:   { c: 'var(--info)',   s: 'var(--info-soft)' },
 };
 
 export default function ExpandableCard({
   accent = 'accent', index, iconEmoji = '📋', compact = false,
-  title, subtitle, badge, summary, isOpen, onToggle, children
+  title, subtitle, badge, summary, stats, isOpen, onToggle, children,
 }: Props) {
-  // lowPowerMode از تنظیمات + prefers-reduced-motion از سیستم
   const lowPower = useSet((st: any) => st.lowPowerMode);
   const [prefersReduced, setPrefersReduced] = useState(false);
   useEffect(() => {
@@ -45,7 +44,7 @@ export default function ExpandableCard({
       const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
       mq.addEventListener('change', handler);
       return () => mq.removeEventListener('change', handler);
-    } catch {}
+    } catch { /* silent */ }
   }, []);
   const noAnim = !!(lowPower || prefersReduced);
 
@@ -57,11 +56,11 @@ export default function ExpandableCard({
       position: 'relative',
       background: 'var(--card)',
       backdropFilter: noAnim ? 'none' : 'blur(8px)',
-      border: `1px solid ${isOpen ? color : 'var(--border)'}`,
+      border: '1px solid ' + (isOpen ? color : 'var(--border)'),
       borderRadius: 'var(--r-lg)',
       overflow: 'hidden',
       marginBottom: 8,
-      transition: 'border-color var(--dur-base)'
+      transition: 'border-color var(--dur-base)',
     }}>
       <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: color, zIndex: 1 }} />
 
@@ -69,7 +68,7 @@ export default function ExpandableCard({
         role="button"
         tabIndex={0}
         aria-expanded={isOpen}
-        aria-label={`${isOpen ? 'بستن' : 'باز کردن'} ${title}`}
+        aria-label={(isOpen ? 'بستن ' : 'باز کردن ') + title}
         onClick={onToggle}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -77,19 +76,11 @@ export default function ExpandableCard({
             onToggle();
           }
         }}
+        className="ec-trigger"
         style={{
           padding: compact ? '8px 14px 8px 12px' : '12px 18px 12px 16px',
           cursor: 'pointer',
           outline: 'none',
-        }}
-        onFocus={(e) => {
-          e.currentTarget.style.outline = '2px solid var(--accent)';
-          e.currentTarget.style.outlineOffset = '2px';
-          e.currentTarget.style.borderRadius = 'var(--r-md)';
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.outline = 'none';
-          e.currentTarget.style.outlineOffset = '0';
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -97,7 +88,7 @@ export default function ExpandableCard({
             width: compact ? 34 : 42, height: compact ? 34 : 42, borderRadius: 'var(--r-md)',
             background: soft, color: color,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 18, flexShrink: 0, position: 'relative'
+            fontSize: 18, flexShrink: 0, position: 'relative',
           }}>
             {iconEmoji}
             {index !== undefined && index !== '' && (
@@ -106,7 +97,7 @@ export default function ExpandableCard({
                 background: color, color: 'var(--avatar-text)',
                 fontSize: 'var(--fs-xs)', fontWeight: 800,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                border: '2px solid var(--card-solid)'
+                border: '2px solid var(--card-solid)',
               }}>{index}</span>
             )}
           </div>
@@ -124,12 +115,17 @@ export default function ExpandableCard({
           </svg>
         </div>
 
-        {summary && !compact && (
+        {(summary || stats) && !compact && (
           <div style={{
-            display: 'flex', gap: 14, marginTop: 10, paddingTop: 10,
+            display: 'flex', gap: 10, marginTop: 8, paddingTop: 8,
             borderTop: '1px dashed var(--border)',
-            fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexWrap: 'wrap'
-          }}>{summary}</div>
+            fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexWrap: 'wrap',
+            alignItems: 'center',
+            lineHeight: 1.6,
+          }}>
+            {summary}
+            {stats}
+          </div>
         )}
       </div>
 
@@ -137,7 +133,7 @@ export default function ExpandableCard({
         display: 'grid',
         gridTemplateRows: isOpen ? '1fr' : '0fr',
         transition: noAnim ? 'none' : 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
-        willChange: 'grid-template-rows'
+        willChange: 'grid-template-rows',
       }}>
         <div style={{ overflow: 'hidden' }}>
           <div style={{ padding: '0 18px 14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -146,5 +142,25 @@ export default function ExpandableCard({
         </div>
       </div>
     </div>
+  );
+}
+
+// جعبه‌ی آماری inline برای استفاده در summary/stats (بدون افزایش ارتفاع)
+export function StatBox({ icon, value, label, tone = 'default' }: { icon?: string; value: string; label: string; tone?: 'default' | 'accent' | 'warn' | 'danger' | 'info' | 'purple' }) {
+  const colorMap: Record<string, string> = {
+    default: 'var(--text)',
+    accent: 'var(--accent)',
+    warn: 'var(--warn)',
+    danger: 'var(--danger)',
+    info: 'var(--info)',
+    purple: 'var(--purple)',
+  };
+  const fg = colorMap[tone] || colorMap.default;
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap' }}>
+      {icon && <span>{icon}</span>}
+      <span>{label}:</span>
+      <b style={{ color: fg, fontWeight: 700, direction: 'ltr' }}>{value}</b>
+    </span>
   );
 }
