@@ -17,7 +17,20 @@ export default function SettingsGroup({
   children,
   tone = 'accent'
 }: Props) {
-  const [open, setOpen] = useState(defaultOpen);
+    const STORAGE_KEY = 'pm-set-group-' + title;
+  const [open, setOpen] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved !== null) return saved === '1';
+    } catch {}
+    return defaultOpen;
+  });
+
+  const toggle = () => {
+    const next = !open;
+    setOpen(next);
+    try { localStorage.setItem(STORAGE_KEY, next ? '1' : '0'); } catch {}
+  };
 
   const color = 'var(--' + tone + ')';
   const soft = 'var(--' + tone + '-soft)';
@@ -32,7 +45,7 @@ export default function SettingsGroup({
       transition: 'border-color .2s'
     }}>
       <div
-        onClick={() => setOpen(!open)}
+        onClick={toggle}
         style={{
           padding: '13px 16px',
           display: 'flex',

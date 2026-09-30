@@ -59,8 +59,24 @@ const GROUPS: GroupDef[] = [
 
 const ALL_TABS = GROUPS.flatMap(g => g.tabs);
 
+const LAST_TAB_KEY = 'pm-set-last-tab';
+
+function getLastTab(): TabId {
+  try {
+    const saved = localStorage.getItem(LAST_TAB_KEY);
+    if (saved) return saved as TabId;
+  } catch {}
+  return 'profile';
+}
+
 export default function Set() {
-  const [tab, setTab] = useState<TabId>('profile');
+  const [tab, setTab] = useState<TabId>(getLastTab);
+
+  // Persist tab change
+  const changeTab = (id: TabId) => {
+    setTab(id);
+    try { localStorage.setItem(LAST_TAB_KEY, id); } catch {}
+  };
 
   return (
     <div>
@@ -93,7 +109,7 @@ export default function Set() {
                 <button
                   key={t.id}
                   type="button"
-                  onClick={() => setTab(t.id)}
+                  onClick={() => changeTab(t.id)}
                   style={{
                     padding: '10px var(--sp-2)',
                     fontSize: 'var(--fs-sm)',
