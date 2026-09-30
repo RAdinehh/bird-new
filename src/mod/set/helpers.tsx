@@ -1,7 +1,7 @@
 /**
  * helpers.tsx — ماژول set
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { clearLogs, exportLogs, getLogs, logCount, type LogEntry } from '../../cor/logger/logger';
 import { showAlert, showConfirmAsync, showSuccess } from '../../cor/store/dialog';
@@ -127,32 +127,70 @@ export function LocalNumField({ label, hint, value, onChange, unit, min, max }: 
   min?: number;
   max?: number;
 }) {
-  const [local, setLocal] = useState(toFa(String(value)));
+  const [local, setLocal] = useState(toFa(String(value ?? 0)));
+  const editingRef = useRef(false);
 
+  // فقط وقتی از بیرون تغییر کنه (نه در حال تایپ)
   useEffect(() => {
-    setLocal(toFa(String(value)));
+    if (editingRef.current) return;
+    setLocal(toFa(String(value ?? 0)));
   }, [value]);
 
   const handleChange = (raw: string) => {
+    editingRef.current = true;
     setLocal(raw);
     const en = toEn(raw).replace(/[^0-9.-]/g, '');
-    if (en === '') { onChange(0); return; }
+    // حالت‌های ناقص — صفر بذار ولی local رو دست نزن
+    if (en === '' || en === '-' || en === '.' || en === '-.') {
+      onChange(0);
+      return;
+    }
     let n = parseFloat(en);
     if (isNaN(n)) return;
-    if (min !== undefined && n < min) n = min;
-    if (max !== undefined && n > max) n = max;
+    if (min !== undefined) n = Math.max(min, n);
+    if (max !== undefined) n = Math.min(max, n);
     onChange(n);
   };
 
+  const handleBlur = () => {
+    editingRef.current = false;
+    setLocal(toFa(String(value ?? 0)));
+  };
+
   return (
-    <Field label={label} hint={hint}>
-      <Input
-        mode="text"
-        value={local}
-        onChange={e => handleChange(e.target.value)}
-        unit={unit}
-        inputMode="numeric" min={0} />
-    </Field>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+      <label style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+        {label}
+      </label>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        background: 'var(--input-bg)', border: '1px solid var(--border)',
+        borderRadius: 'var(--r-md)', padding: '0 10px', height: 38,
+      }}>
+        <input
+          type="text"
+          inputMode="decimal"
+          value={local}
+          onChange={e => handleChange(e.target.value)}
+          onBlur={handleBlur}
+          dir="ltr"
+          style={{
+            flex: 1, border: 'none', outline: 'none',
+            background: 'transparent', color: 'var(--text)',
+            fontFamily: 'inherit', fontSize: 'var(--fs-base)',
+            textAlign: 'left', minWidth: 0,
+          }}
+        />
+        {unit ? (
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0 }}>
+            {unit}
+          </span>
+        ) : null}
+      </div>
+      {hint ? (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--dim)' }}>{hint}</div>
+      ) : null}
+    </div>
   );
 }
 
