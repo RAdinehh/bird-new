@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { parse as parseJ, differenceInDays as diffDaysJ } from 'date-fns-jalali';
+import { format as formatJ, parse as parseJ, differenceInDays as diffDaysJ } from 'date-fns-jalali';
 import { useNavigate } from 'react-router-dom';
 import { useTra, remaining } from '../tra/store';
 import { useCtc } from '../ctc/store';
@@ -29,20 +29,18 @@ function monthKey(date: string): string {
 }
 
 function currentMonth(): string {
-  const d = new Date();
-  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0');
+  return formatJ(new Date(), 'yyyy/MM');
 }
 
 function todayJalali(): string {
-  const d = new Date();
-  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+  return formatJ(new Date(), 'yyyy/MM/dd');
 }
 
 function dateDiffDays(jalaliDate: string): number {
   if (jalaliDate === '' || jalaliDate == null) return 999;
-  const parts = jalaliDate.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).split('/');
-  if (parts.length !== 3) return 999;
-  const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  const en = jalaliDate.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+  const d = parseJ(en, 'yyyy/MM/dd', new Date());
+  if (isNaN(d.getTime())) return 999;
   return Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
 }
 
