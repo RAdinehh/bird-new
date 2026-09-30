@@ -642,25 +642,11 @@ export function Chip({
 // فاز ۰.۹ — کامپوننت‌های تقویتی
 // ═══════════════════════════════════════════
 
-export function NumField({ value, ...props }: Omit<InputProps, 'mode' | 'dir' | 'inputMode'>) {
-  const displayValue = value !== undefined && value !== null && String(value) !== ''
-    ? formatNumWhileTyping(String(value))
-    : '';
-  return <Input mode="number" dir="ltr" inputMode="numeric" min={0} autoClamp value={displayValue} {...props} />;
-}
-
 export function MoneyField({ value, ...props }: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'showWords'>) {
   const displayValue = value !== undefined && value !== null && String(value) !== ''
     ? formatNumWhileTyping(String(value))
     : '';
   return <Input mode="number" dir="ltr" inputMode="numeric" unit="تومان" min={0} showWords autoClamp value={displayValue} {...props} />;
-}
-
-export function PercentField({ value, ...props }: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'max'>) {
-  const displayValue = value !== undefined && value !== null && String(value) !== ''
-    ? formatNumWhileTyping(String(value))
-    : '';
-  return <Input mode="number" dir="ltr" inputMode="numeric" unit="٪" min={0} max={100} autoClamp value={displayValue} {...props} />;
 }
 
 export function PhoneField({ maxLength = 11, ...props }: Omit<InputProps, 'unit' | 'inputMode'> & { maxLength?: number }) {
@@ -670,6 +656,15 @@ export function PhoneField({ maxLength = 11, ...props }: Omit<InputProps, 'unit'
 export function DigitField({ maxLength, ...props }: Omit<InputProps, 'unit' | 'inputMode' | 'mode' | 'min' | 'max'> & { maxLength: number }) {
   return <Input dir="ltr" inputMode="numeric" maxLength={maxLength} {...props} />;
 }
+
+export function NumField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode'>) {
+  return <Input mode="number" dir="ltr" inputMode="decimal" min={0} {...props} />;
+}
+
+export function PercentField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'max'>) {
+  return <Input mode="number" dir="ltr" inputMode="decimal" unit="٪" min={0} max={100} {...props} />;
+}
+
 
 interface TextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
   error?: string;
