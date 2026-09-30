@@ -20,6 +20,7 @@ import InvoicePrint from './InvoicePrint';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import { Row, SectionTitle, chip } from './helpers';
+import { format as formatJ } from 'date-fns-jalali';
 
 interface F {
   id?: string;
@@ -108,7 +109,8 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
   // ==== Handlers ====
   const openNew = () => {
     if (parties.length === 0) { showAlert(isPurchase ? 'اول یک فروشنده بسازید' : 'اول یک مشتری بسازید'); return; }
-    setForm({ ...empty(isPurchase), partyId: parties[0].id });
+    const today = formatJ(new Date(), 'yyyy/MM/dd');
+    setForm({ ...empty(isPurchase), date: today, partyId: parties[0].id });
     setErr(''); setOpen(true);
   };
 
