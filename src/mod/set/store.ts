@@ -38,7 +38,7 @@ export interface Settings {
     setterHumidity: string; hatcherHumidity: string; lockdownDay: string;
   };
   // امنیت
-  security: { pinEnabled: boolean; pin: string; autoLockMin: number; };
+  security: { pinEnabled: boolean; pin: string; recoveryHash?: string; autoLockMin: number; };
 
   // ظاهر
   theme: 'light' | 'dark';
