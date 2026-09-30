@@ -30,7 +30,11 @@ export function KpiCard({ icon, label, value, unit, color, onClick, noFormat }: 
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-lg)',
         padding: 'var(--pad-card)',
-        cursor: onClick ? 'pointer' : 'default'
+        cursor: onClick ? 'pointer' : 'default',
+        minHeight: 92,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
@@ -40,13 +44,13 @@ export function KpiCard({ icon, label, value, unit, color, onClick, noFormat }: 
         </span>
       </div>
       <div style={{
-        fontSize: 'var(--fs-xl)',
+        fontSize: 'clamp(14px, 4vw, var(--fs-xl))',
         fontWeight: 700,
         color: 'var(--' + color + ')',
         fontVariantNumeric: 'tabular-nums',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis'
+        lineHeight: 1.15,
+        wordBreak: 'break-word',
+        overflowWrap: 'anywhere'
       }}>
         {noFormat ? toFa(String(value)) : toFa(value.toLocaleString('fa-IR'))}
       </div>
@@ -66,7 +70,7 @@ export function MiniStat({ label, value, suffix, color, noFormat }: {
 }) {
   return (
     <div style={{
-      padding: '7px 10px',
+      padding: 'var(--pad-inner)',
       background: 'var(--' + color + '-soft)',
       border: '1px solid var(--' + color + ')',
       borderRadius: 'var(--r-md)',
@@ -76,10 +80,12 @@ export function MiniStat({ label, value, suffix, color, noFormat }: {
         {label}
       </div>
       <div style={{
-        fontSize: 'var(--fs-md)', fontWeight: 700,
+        fontSize: 'clamp(13px, 3.5vw, var(--fs-md))', fontWeight: 700,
         color: 'var(--' + color + ')',
         marginTop: 4,
-        fontVariantNumeric: 'tabular-nums'
+        fontVariantNumeric: 'tabular-nums',
+        lineHeight: 1.2,
+        wordBreak: 'break-word'
       }}>
         {noFormat ? toFa(String(Math.round(value))) : toFa((Math.round(value * 100) / 100).toLocaleString('fa-IR'))}{suffix}
       </div>
