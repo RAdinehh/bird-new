@@ -258,3 +258,105 @@ button:active:not(:disabled),
   flex-direction: column;
   gap: var(--sp-2);
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   🎨 Design Tokens v2 — قاعده‌محور (Fluid Design)
+   ───────────────────────────────────────────────────────────
+   اصل: قاعده، نه اندازه.
+   - فونت بر اساس vw (عرض viewport)
+   - Spacing بر اساس vw
+   - روی هر گوشی، خودش تنظیم می‌شه
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Typography Scale (نسبت طلایی) ─── */
+  /* قاعده: base = clamp(13px, 3.6vw, 15px) */
+  --fluid-base: clamp(13px, 3.6vw, 15px);
+  --fluid-ratio: 1.2;
+
+  --fs-xs:   calc(var(--fluid-base) * 0.75);   /* ~11px */
+  --fs-sm:   calc(var(--fluid-base) * 0.85);   /* ~12px */
+  --fs-base: var(--fluid-base);                /* ~14px */
+  --fs-md:   calc(var(--fluid-base) * 1.15);   /* ~16px */
+  --fs-lg:   calc(var(--fluid-base) * 1.3);    /* ~18px */
+  --fs-xl:   calc(var(--fluid-base) * 1.5);    /* ~21px */
+  --fs-hero: calc(var(--fluid-base) * 2.2);    /* ~30px */
+
+  /* ─── Spacing Scale (بر پایه واحد ۴px) ─── */
+  /* قاعده: sp-unit = max(4px, 1vw) */
+  --sp-unit: max(4px, 1vw);
+
+  --sp-1: calc(var(--sp-unit) * 1);   /* ~4px */
+  --sp-2: calc(var(--sp-unit) * 2);   /* ~8px */
+  --sp-3: calc(var(--sp-unit) * 3);   /* ~12px */
+  --sp-4: calc(var(--sp-unit) * 4);   /* ~16px */
+  --sp-5: calc(var(--sp-unit) * 5);   /* ~20px */
+  --sp-6: calc(var(--sp-unit) * 6);   /* ~24px */
+  --sp-8: calc(var(--sp-unit) * 8);   /* ~32px */
+
+  /* ─── Padding Presets ─── */
+  --pad-tight:  var(--sp-1) var(--sp-2);   /* ~6px 8px */
+  --pad-normal: var(--sp-2) var(--sp-3);   /* ~8px 12px */
+  --pad-comfy:  var(--sp-3);               /* ~12px */
+  --pad-loose:  var(--sp-4);               /* ~16px */
+
+  /* ─── Gap Scale ─── */
+  --gap-xs: var(--sp-1);   /* ~4px */
+  --gap-sm: var(--sp-2);   /* ~8px */
+  --gap-md: var(--sp-3);   /* ~12px */
+  --gap-lg: var(--sp-4);   /* ~16px */
+
+  /* ─── Icon Scale ─── */
+  --icon-xs: calc(var(--fluid-base) * 0.85);   /* ~12px */
+  --icon-sm: calc(var(--fluid-base) * 1.0);    /* ~14px */
+  --icon-md: calc(var(--fluid-base) * 1.15);   /* ~16px */
+  --icon-lg: calc(var(--fluid-base) * 1.4);    /* ~20px */
+  --icon-xl: calc(var(--fluid-base) * 1.7);    /* ~24px */
+  --icon-hero: calc(var(--fluid-base) * 3.4);  /* ~48px */
+
+  /* ─── Touch Targets (a11y) ─── */
+  /* قاعده: min = max(44px, 9vw) */
+  --touch-min: max(44px, 9vw);
+  --icon-btn: max(36px, 8vw);
+
+  /* ─── Radius Scale (۴ سطح) ─── */
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+
+  /* ─── Animation ─── */
+  --anim-fast: 150ms ease;
+  --anim-base: 200ms ease;
+  --anim-slow: 300ms ease;
+
+  /* ─── Elevation ─── */
+  --elev-1: 0 1px 2px rgba(0,0,0,0.04);
+  --elev-2: 0 2px 6px rgba(0,0,0,0.06);
+  --elev-3: 0 4px 12px rgba(0,0,0,0.08);
+
+  /* ─── Container ─── */
+  --container: min(480px, 100vw - var(--sp-4) * 2);
+}
+
+/* ═══ Accessibility — focus-visible ═══ */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex="0"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* ═══ Reduced Motion ═══ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
