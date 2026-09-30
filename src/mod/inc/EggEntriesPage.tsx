@@ -21,6 +21,7 @@ import { clampPercent, complement } from '../../shr/utils/smart';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { todayJalali, Row, chip } from './helpers';
+import { useIncubationProfile } from './hooks';
 
 const DRAFT_KEY = (devId: string) => 'pm-inc-egg-draft-' + devId;
 
