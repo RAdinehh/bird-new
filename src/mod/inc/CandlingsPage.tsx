@@ -18,16 +18,13 @@ interface EntryData {
   alive: string;
   infertile: string;
   dead: string;
-  deadEarly: string;
-  deadMid: string;
-  deadLate: string;
   broken: string;
   infertileReason: string;
   deadReason: string;
   notes: string;
 }
 
-const emptyData = (): EntryData => ({ alive: '', infertile: '', dead: '', deadEarly: '', deadMid: '', deadLate: '', broken: '', infertileReason: '', deadReason: '', notes: '' });
+const emptyData = (): EntryData => ({ alive: '', infertile: '', dead: '', broken: '', infertileReason: '', deadReason: '', notes: '' });
 
 
 
@@ -146,16 +143,13 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
     if (editingId) {
       const d = entriesData[editingId] || emptyData();
-      const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.deadEarly))||0) + (parseInt(toEn(d.deadMid))||0) + (parseInt(toEn(d.deadLate))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
+      const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
       if (sum === 0) { setErr('حداقل یک مقدار وارد کنید'); return; }
       updateCandling(editingId, {
         stage: dayNum, date: modalDate,
         alive: parseInt(toEn(d.alive)) || null,
         infertile: parseInt(toEn(d.infertile)) || null,
-        dead: (parseInt(toEn(d.deadEarly)) || 0) + (parseInt(toEn(d.deadMid)) || 0) + (parseInt(toEn(d.deadLate)) || 0) || parseInt(toEn(d.dead)) || null,
-        deadEarly: parseInt(toEn(d.deadEarly)) || null,
-        deadMid: parseInt(toEn(d.deadMid)) || null,
-        deadLate: parseInt(toEn(d.deadLate)) || null,
+        dead: parseInt(toEn(d.dead)) || null,
         broken: parseInt(toEn(d.broken)) || null,
         infertileReason: d.infertileReason,
         deadReason: d.deadReason,
@@ -169,7 +163,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       const entry = eggEntries.find(e => e.id === id);
       if (!entry) return;
       const d = entriesData[id] || emptyData();
-      const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.deadEarly))||0) + (parseInt(toEn(d.deadMid))||0) + (parseInt(toEn(d.deadLate))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
+      const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
       if (sum === 0) { hasError = true; return; }
       const baseInfo = calcAvailableBase(id, dayNum, null, candlings, entry.count || 0);
       if (baseInfo.base && sum > baseInfo.base) { hasError = true; return; }
@@ -177,10 +171,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
         eggEntryId: id, stage: dayNum, date: modalDate,
         alive: parseInt(toEn(d.alive)) || null,
         infertile: parseInt(toEn(d.infertile)) || null,
-        dead: (parseInt(toEn(d.deadEarly)) || 0) + (parseInt(toEn(d.deadMid)) || 0) + (parseInt(toEn(d.deadLate)) || 0) || parseInt(toEn(d.dead)) || null,
-        deadEarly: parseInt(toEn(d.deadEarly)) || null,
-        deadMid: parseInt(toEn(d.deadMid)) || null,
-        deadLate: parseInt(toEn(d.deadLate)) || null,
+        dead: parseInt(toEn(d.dead)) || null,
         broken: parseInt(toEn(d.broken)) || null,
         infertileReason: d.infertileReason,
         deadReason: d.deadReason,
@@ -203,9 +194,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
         alive: c.alive ? toFa(c.alive) : '',
         infertile: c.infertile ? toFa(c.infertile) : '',
         dead: c.dead ? toFa(c.dead) : '',
-        deadEarly: (c as any).deadEarly ? toFa((c as any).deadEarly) : '',
-        deadMid: (c as any).deadMid ? toFa((c as any).deadMid) : '',
-        deadLate: (c as any).deadLate ? toFa((c as any).deadLate) : '',
         broken: c.broken ? toFa(c.broken) : '',
         infertileReason: c.infertileReason,
         deadReason: c.deadReason,
@@ -479,7 +467,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
               const bird = birds.find(b => b.id === e.birdId);
               const isSelected = selectedIds.has(e.id);
               const d = dataFor(e.id);
-              const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.deadEarly))||0) + (parseInt(toEn(d.deadMid))||0) + (parseInt(toEn(d.deadLate))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
+              const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
               const dayNum = parseInt(toEn(modalDay)) || 0;
               const baseInfo = calcAvailableBase(e.id, editingId ? (candlings.find(c => c.id === editingId)?.stage || dayNum) : dayNum, editingId, candlings, e.count || 0);
               const remaining = baseInfo.base - sum;
@@ -538,12 +526,8 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                         <Field label="بی‌نطفه"><NumField placeholder="۰" value={d.infertile} onChange={ev => updateEntryData(e.id, { infertile: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
                       </Grid2>
                       <Grid2>
+                        <Field label="مرده"><NumField placeholder="۰" value={d.dead} onChange={ev => updateEntryData(e.id, { dead: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
                         <Field label="شکسته"><NumField placeholder="۰" value={d.broken} onChange={ev => updateEntryData(e.id, { broken: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
-                        <Field label="مرگ زودرس (۰-۷)"><NumField placeholder="۰" value={d.deadEarly} onChange={ev => updateEntryData(e.id, { deadEarly: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
-                      </Grid2>
-                      <Grid2>
-                        <Field label="مرگ میانی (۸-۱۴)"><NumField placeholder="۰" value={d.deadMid} onChange={ev => updateEntryData(e.id, { deadMid: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
-                        <Field label="مرگ پایانی (۱۵-۲۱)"><NumField placeholder="۰" value={d.deadLate} onChange={ev => updateEntryData(e.id, { deadLate: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
                       </Grid2>
 
                       <div style={{

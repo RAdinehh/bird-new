@@ -88,9 +88,9 @@ export interface Candling {
   alive: number | null;
   infertile: number | null;
   dead: number | null;
-  deadEarly: number | null;
-  deadMid: number | null;
-  deadLate: number | null;
+  deadEarly?: number | null;
+  deadMid?: number | null;
+  deadLate?: number | null;
   broken: number | null;
   infertileReason: string;
   deadReason: string;
