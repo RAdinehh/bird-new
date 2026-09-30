@@ -50,8 +50,15 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   const toggleEntry = (id: string) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
-      if (next.has(id)) { next.delete(id); setEntriesData(d => { const nd = { ...d }; delete nd[id]; return nd; }); }
-      else { next.add(id); setEntriesData(d => ({ ...d, [id]: emptyRow() })); }
+      if (next.has(id)) { setEntriesData(d => { const nd = { ...d }; delete nd[id]; return nd; }); }
+      else {
+        // پیش‌پر کردن هوشمند
+        const entry = eggEntries.find(e => e.id === id);
+        const myCand = candlings.filter(c => c.eggEntryId === id).sort((a,b) => b.stage - a.stage)[0];
+        const aliveAfter = myCand?.alive || entry?.count || 0;
+        const estimated = estimateHatched(aliveAfter, entry?.count || 0, { ds: 0, pp: 0, uh: 0, ot: 0 });
+        setEntriesData(d => ({ ...d, [id]: { ...emptyRow(), hatched: estimated > 0 ? String(estimated) : '' } }));
+      }
       return next;
     });
   };
@@ -642,6 +649,26 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
       </Modal>
     </PageContainer>
   );
+}
+
+
+
+// نرخ هچ بر اساس نطفه‌داری — اگه نطفه‌داری پایین باشه، نرخ هچ هم کمتر
+function smartHatchRate(fertilityRate: number): number {
+  if (fertilityRate >= 92) return 0.94;
+  if (fertilityRate >= 85) return 0.92;
+  if (fertilityRate >= 75) return 0.88;
+  if (fertilityRate >= 65) return 0.83;
+  return 0.78;
+}
+
+// محاسبه هچ‌شده تخمینی از کندلینگ
+function estimateHatched(aliveAfter: number, entryTotal: number, losses: { ds: number; pp: number; uh: number; ot: number }): number {
+  const fertility = entryTotal > 0 ? (aliveAfter / entryTotal * 100) : 0;
+  const rate = smartHatchRate(fertility);
+  const fromAlive = Math.round(aliveAfter * rate);
+  const lossesSum = losses.ds + losses.pp + losses.uh + losses.ot;
+  return Math.max(0, fromAlive - lossesSum);
 }
 
 function Row({ l, v }: { l: string; v: string }) {
