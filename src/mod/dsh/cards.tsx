@@ -29,7 +29,7 @@ export function KpiCard({ icon, label, value, unit, color, onClick, noFormat }: 
         background: 'var(--card)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-md)',
-        padding: '8px 10px',
+        padding: 'var(--pad-normal)',
         cursor: onClick ? 'pointer' : 'default',
         display: 'flex',
         alignItems: 'center',
@@ -37,7 +37,7 @@ export function KpiCard({ icon, label, value, unit, color, onClick, noFormat }: 
         minHeight: 44
       }}
     >
-      <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>{icon}</span>
+      <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0, lineHeight: 1 }}>{icon}</span>
       <span style={{
         fontSize: 'var(--fs-xs)',
         color: 'var(--muted)',

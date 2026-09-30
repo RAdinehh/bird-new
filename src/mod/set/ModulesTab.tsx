@@ -25,7 +25,7 @@ export default function ModulesTab() {
         background: 'var(--info-soft)',
         border: '1px solid var(--info)',
         borderRadius: 'var(--r-md)',
-        padding: '12px 14px',
+        padding: 'var(--pad-comfy)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center'
@@ -50,7 +50,7 @@ export default function ModulesTab() {
             alignItems: 'center',
             gap: 6
           }}>
-            <span style={{ fontSize: 14 }}>{g.icon}</span>
+            <span style={{ fontSize: 'var(--fs-base)' }}>{g.icon}</span>
             <span>{g.title}</span>
           </div>
 
@@ -69,7 +69,7 @@ export default function ModulesTab() {
               return (
                 <div key={id} style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '12px 14px',
+                  padding: 'var(--pad-comfy)',
                   borderBottom: idx < g.ids.length - 1 ? '1px solid var(--border)' : 'none',
                   opacity: isEnabled ? 1 : 0.5
                 }}>
@@ -78,7 +78,7 @@ export default function ModulesTab() {
                     borderRadius: 'var(--r-md)',
                     background: 'var(--input-bg)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 18, flexShrink: 0
+                    fontSize: 'var(--fs-md)', flexShrink: 0
                   }}>{m.icon}</div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>

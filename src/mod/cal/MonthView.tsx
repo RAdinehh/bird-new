@@ -56,7 +56,7 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
         background: 'var(--card)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-lg)',
-        padding: '10px 12px'
+        padding: 'var(--pad-normal)'
       }}>
         <button type="button" onClick={goPrev} style={navBtn}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -196,7 +196,7 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
         display: 'flex',
         flexWrap: 'wrap',
         gap: 10,
-        padding: '8px 12px',
+        padding: 'var(--pad-normal)',
         background: 'var(--input-bg)',
         borderRadius: 'var(--r-md)',
         justifyContent: 'center'

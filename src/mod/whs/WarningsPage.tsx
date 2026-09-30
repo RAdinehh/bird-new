@@ -113,7 +113,7 @@ function WarningGroup({ title, icon, color, items, renderLine }: {
         borderBottom: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', gap: 10
       }}>
-        <span style={{ fontSize: 20 }}>{icon}</span>
+        <span style={{ fontSize: 'var(--fs-lg)' }}>{icon}</span>
         <div style={{ flex: 1, fontSize: 'var(--fs-base)', fontWeight: 700 }}>{title}</div>
         <Tag tone={tone}>{toFa(items.length)}</Tag>
       </div>
@@ -127,7 +127,7 @@ function WarningGroup({ title, icon, color, items, renderLine }: {
             borderBottom: '1px solid var(--border)'
           }}
         >
-          <span style={{ fontSize: 18, flexShrink: 0 }}>{CATEGORY_ICON[it.category]}</span>
+          <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>{CATEGORY_ICON[it.category]}</span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
               fontSize: 'var(--fs-sm)', fontWeight: 600,

@@ -8,7 +8,7 @@ function ToggleRow({ label, sub, value, onChange, disabled }: any) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '10px 12px',
+      padding: 'var(--pad-normal)',
       background: 'var(--input-bg)',
       border: '1px solid var(--border)',
       borderRadius: 'var(--r-md)',
@@ -225,7 +225,7 @@ export default function NotificationsTab() {
           fontSize: 'var(--fs-xs)',
           color: 'var(--muted)',
           lineHeight: 1.7,
-          padding: '8px 10px',
+          padding: 'var(--pad-normal)',
           background: 'var(--input-bg)',
           borderRadius: 'var(--r-sm)'
         }}>
@@ -287,7 +287,7 @@ export default function NotificationsTab() {
       </SettingsGroup>
 
       <div style={{
-        padding: '12px 14px',
+        padding: 'var(--pad-comfy)',
         background: 'var(--info-soft)',
         border: '1px solid var(--info)',
         borderRadius: 'var(--r-md)',

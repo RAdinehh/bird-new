@@ -272,7 +272,7 @@ export default function IngredientsPage() {
                   <Row l="کالای انبار" v={`${stockItem.name} (${toFa(stockItem.currentStock)} ${UNIT_LABEL[stockItem.unit]})`} />
                 ) : (
                   <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)',
-                     padding: '6px 10px', background: 'var(--warn-soft)',
+                     padding: 'var(--pad-tight)', background: 'var(--warn-soft)',
                      borderRadius: 'var(--r-sm)' }}>
                     ⚠️ به انبار وصل نیست — موقع مصرف، موجودی کم نمیشه
                   </div>
@@ -282,7 +282,7 @@ export default function IngredientsPage() {
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: '8px 10px', background: 'var(--input-bg)',
+                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
                   </>
                 )}
@@ -403,7 +403,7 @@ export default function IngredientsPage() {
 function Row({ l, v }: { l: string; v: string }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+       padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>

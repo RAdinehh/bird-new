@@ -49,7 +49,7 @@ export default function LogsTab() {
         background: 'var(--card)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-lg)',
-        padding: '12px 14px',
+        padding: 'var(--pad-comfy)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between'
@@ -103,17 +103,17 @@ export default function LogsTab() {
                 </>}
               >
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>⏰ زمان</div>
-                <div style={{ fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                   {timeStr}
                 </div>
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>📋 نوع</div>
-                <div style={{ fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                   {log.type}
                 </div>
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>💬 پیام</div>
-                <div style={{ fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 'var(--r-sm)', lineHeight: 1.7, wordBreak: 'break-word' }}>
+                <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 'var(--r-sm)', lineHeight: 1.7, wordBreak: 'break-word' }}>
                   {log.message}
                 </div>
 
@@ -123,7 +123,7 @@ export default function LogsTab() {
                     <div style={{
                       fontSize: 10,
                       fontFamily: 'monospace',
-                      padding: '8px 10px',
+                      padding: 'var(--pad-normal)',
                       background: 'var(--input-bg)',
                       borderRadius: 'var(--r-sm)',
                       color: 'var(--muted)',
@@ -142,7 +142,7 @@ export default function LogsTab() {
                 {log.url ? (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>🔗 URL</div>
-                    <div style={{ fontSize: 'var(--fs-xs)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', direction: 'ltr', textAlign: 'left', wordBreak: 'break-all' }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', direction: 'ltr', textAlign: 'left', wordBreak: 'break-all' }}>
                       {log.url}
                     </div>
                   </>

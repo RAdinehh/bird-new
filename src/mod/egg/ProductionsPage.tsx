@@ -214,7 +214,7 @@ export default function ProductionsPage() {
 
                 {rate > 0 ? (
                   <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)',
+                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
                      color: 'var(--accent)', borderRadius: 'var(--r-sm)',
                      fontWeight: 700 }}>
                     <span>نرخ تخم‌گذاری (Hen-Day):</span>
@@ -233,7 +233,7 @@ export default function ProductionsPage() {
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: '8px 10px', background: 'var(--input-bg)',
+                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{p.notes}</div>
                   </>
                 ) : null}
@@ -267,7 +267,7 @@ export default function ProductionsPage() {
         </Grid2>
 
         {flockCount > 0 ? (
-          <div style={{ padding: '8px 12px', background: 'var(--info-soft)',
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)',
              border: '1px solid var(--info)', borderRadius: 'var(--r-md)',
              fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600,
              textAlign: 'center' }}>
@@ -306,7 +306,7 @@ export default function ProductionsPage() {
         </Grid2>
 
         {flockCount > 0 && healthy > flockCount ? (
-          <div style={{ padding: '8px 12px', background: 'var(--danger-soft)',
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)',
              border: '1px solid var(--danger)', borderRadius: 'var(--r-md)',
              fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700,
              textAlign: 'center' }}>
@@ -329,7 +329,7 @@ export default function ProductionsPage() {
         {/* کادر خلاصه‌ی محاسبات */}
         {totalEggs > 0 ? (
           <div style={{
-            padding: '10px 12px',
+            padding: 'var(--pad-normal)',
             background: 'var(--accent-soft)',
             border: '1px solid var(--accent-border)',
             borderRadius: 'var(--r-md)',
@@ -401,7 +401,7 @@ export default function ProductionsPage() {
 function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
+       padding: 'var(--pad-tight)', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
        borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: accent ? 'var(--accent)' : 'var(--text)' }}>{v}</span>

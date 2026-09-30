@@ -218,7 +218,7 @@ export default function ItemsPage() {
 
                 {it.currentStock > 0 && it.lastPrice > 0 ? (
                   <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: '8px 10px',
+                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
                      background: 'var(--accent-soft)', color: 'var(--accent)',
                      borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                     <span>ارزش موجودی:</span>
@@ -233,7 +233,7 @@ export default function ItemsPage() {
                     {it.expireDate ? <Row l="تاریخ انقضا" v={toFa(it.expireDate)} /> : null}
                     {days !== null ? (
                       <div style={{
-                        display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px',
+                        display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
                         background: days < 0 ? 'var(--danger-soft)' : days <= 30 ? 'var(--warn-soft)' : 'var(--input-bg)',
                         color: days < 0 ? 'var(--danger)' : days <= 30 ? 'var(--warn)' : 'var(--muted)',
                         borderRadius: 'var(--r-sm)', fontWeight: 700
@@ -252,7 +252,7 @@ export default function ItemsPage() {
                     <SectionTitle>📋 آخرین گردش‌ها ({toFa(myMovements.length)})</SectionTitle>
                     {myMovements.slice(-3).reverse().map(m => (
                       <div key={m.id} style={{ fontSize: 'var(--fs-sm)',
-                         padding: '6px 10px', background: 'var(--input-bg)',
+                         padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                          borderRadius: 'var(--r-sm)', display: 'flex',
                          justifyContent: 'space-between' }}>
                         <span>{m.type === 'in' ? '📥' : '📤'} {toFa(m.quantity)} {UNIT_LABEL[it.unit]}</span>
@@ -266,7 +266,7 @@ export default function ItemsPage() {
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: '8px 10px', background: 'var(--input-bg)',
+                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
                   </>
                 ) : null}
@@ -398,7 +398,7 @@ export default function ItemsPage() {
 function Row({ l, v }: { l: string; v: string }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between',
-       fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
        borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>

@@ -29,7 +29,7 @@ export default function DayView({ date, events, onBack, onChanged }: Props) {
         background: 'var(--card)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-lg)',
-        padding: '12px 14px'
+        padding: 'var(--pad-comfy)'
       }}>
         <button type="button" onClick={onBack} style={{
           width: 34, height: 34, borderRadius: 10,
@@ -118,7 +118,7 @@ function AutoEventCard({ event }: { event: CalEvent }) {
       background: 'var(--card)',
       border: '1px solid var(--border)',
       borderRadius: 'var(--r-lg)',
-      padding: '12px 14px',
+      padding: 'var(--pad-comfy)',
       display: 'flex',
       gap: 12,
       alignItems: 'flex-start',
@@ -136,7 +136,7 @@ function AutoEventCard({ event }: { event: CalEvent }) {
         background: colors.bg,
         color: colors.text,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 18, flexShrink: 0
+        fontSize: 'var(--fs-md)', flexShrink: 0
       }}>
         {event.icon}
       </div>

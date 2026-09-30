@@ -97,19 +97,19 @@ export default function BirdsPage() {
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات کامل</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>نام انگلیسی:</span>
                     <span style={{ fontWeight: 600 }}>{b.nameEn || '—'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>چرخه زندگی:</span>
                     <span style={{ fontWeight: 600 }}>{b.cycleDays ? `${toFa(b.cycleDays)} روز` : '—'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>FCR استاندارد:</span>
                     <span style={{ fontWeight: 600 }}>{b.fcrStandard ? toFa(b.fcrStandard) : '—'}</span>
@@ -168,7 +168,7 @@ export default function BirdsPage() {
             onChange={e => setForm({ ...form, cycleDays: e.target.value })} min={1} unit="روز" />
         </Field>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7,
-           padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
+           padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
            marginBottom: 8 }}>
           💡 <b>چرخه زندگی</b> یعنی چند روز طول می‌کشد تا این پرنده دوره‌اش کامل شود. مثال: جوجه گوشتی ۴۲ روز، مرغ تخم‌گذار ۵۰۰ روز.
         </div>
@@ -180,7 +180,7 @@ export default function BirdsPage() {
             onChange={e => setForm({ ...form, fcrStandard: e.target.value })} min={1} unit="FCR" />
         </Field>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7,
-           padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
+           padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
            marginBottom: 8 }}>
           💡 <b>FCR</b> یعنی چند کیلو دان لازم است تا پرنده ۱ کیلو وزن اضافه کند. هرچه کمتر، بهتر. مثال: ۱.۶ عالی، ۱.۸ متوسط، ۲.۰+ ضعیف.
         </div>

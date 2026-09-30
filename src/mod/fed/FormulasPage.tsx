@@ -174,7 +174,7 @@ export default function FormulasPage() {
                   if (ing === undefined) return null;
                   return (
                     <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>
                       <span>{ing.name}</span>
                       <span style={{ fontWeight: 600 }}>{toFa(line.percent)}٪</span>
@@ -183,7 +183,7 @@ export default function FormulasPage() {
                 })}
 
                 <div style={{ display: 'flex', justifyContent: 'space-between',
-                   fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)',
+                   fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
                    color: 'var(--accent)', borderRadius: 'var(--r-sm)',
                    fontWeight: 700 }}>
                   <span>مجموع:</span>
@@ -208,7 +208,7 @@ export default function FormulasPage() {
                   <>
                     <SectionTitle>💰 مالی</SectionTitle>
                     <div style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)',
+                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
                        color: 'var(--accent)', borderRadius: 'var(--r-sm)',
                        fontWeight: 700 }}>
                       <span>هزینه هر کیلوگرم:</span>
@@ -221,7 +221,7 @@ export default function FormulasPage() {
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: '8px 10px', background: 'var(--input-bg)',
+                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
                   </>
                 ) : null}
@@ -273,7 +273,7 @@ export default function FormulasPage() {
 
         {total !== 100 && form.lines.length > 0 ? (
           <div style={{
-            padding: '8px 12px',
+            padding: 'var(--pad-normal)',
             background: total > 100 ? 'var(--danger-soft)' : 'var(--warn-soft)',
             border: '1px solid ' + (total > 100 ? 'var(--danger)' : 'var(--warn)'),
             borderRadius: 'var(--r-md)',
@@ -296,14 +296,14 @@ export default function FormulasPage() {
           const usedIds = form.lines.filter(l => l.id !== line.id).map(l => l.ingredientId);
           const available = ingredients.filter(i => !usedIds.includes(i.id));
           return (
-            <div key={line.id} style={{ padding: '10px 12px', background: 'var(--input-bg)',
+            <div key={line.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
                display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>ماده {toFa(idx + 1)}</span>
                 <button type="button" onClick={() => removeLine(line.id)} style={{ background: 'none',
                    border: 'none', color: 'var(--danger)', cursor: 'pointer',
-                   fontFamily: 'inherit', fontSize: 14 }}>✕</button>
+                   fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
               </div>
               <Select value={line.ingredientId} onChange={e => updateLine(line.id, { ingredientId: e.target.value })}>
                 {available.map(i => <option key={i.id} value={i.id}>{i.name} ({toFa(i.protein)}٪ پروتئین)</option>)}
@@ -358,7 +358,7 @@ export default function FormulasPage() {
 
         {nutrients.price > 0 ? (
           <div style={{ display: 'flex', justifyContent: 'space-between',
-             fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)',
+             fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
              color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
             <span>💰 هزینه هر کیلوگرم:</span>
             <span>{toFa(nutrients.price.toLocaleString('fa-IR'))} ت</span>
@@ -394,7 +394,7 @@ export default function FormulasPage() {
 function Row({ l, v }: { l: string; v: string }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+       padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>
@@ -420,7 +420,7 @@ function NutrientRow({ l, value, target, unit }: { l: string; value: number; tar
   const color = tone === 'ok' ? 'var(--accent)' : tone === 'low' ? 'var(--danger)' : 'var(--warn)';
 
   return (
-    <div style={{ padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
         <span style={{ color: 'var(--muted)' }}>{l}:</span>
         <span style={{ fontWeight: 600, color: color }}>{toFa(value)} {unit}</span>

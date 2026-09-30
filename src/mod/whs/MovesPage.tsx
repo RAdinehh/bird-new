@@ -187,7 +187,7 @@ export default function MovesPage() {
                     <SectionTitle>💰 مالی</SectionTitle>
                     <Row l="قیمت واحد" v={`${toFa(m.unitPrice.toLocaleString('fa-IR'))} ت`} />
                     <div style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: '8px 10px',
+                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
                        background: 'var(--accent-soft)', color: 'var(--accent)',
                        borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                       <span>جمع کل:</span>
@@ -200,7 +200,7 @@ export default function MovesPage() {
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: '8px 10px', background: 'var(--input-bg)',
+                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{m.notes}</div>
                   </>
                 ) : null}
@@ -284,7 +284,7 @@ export default function MovesPage() {
           >
             {filteredContacts.length === 0 ? (
               <div style={{
-                padding: '10px 12px',
+                padding: 'var(--pad-normal)',
                 background: 'var(--warn-soft)',
                 border: '1px dashed var(--warn)',
                 borderRadius: 'var(--r-sm)',
@@ -335,7 +335,7 @@ export default function MovesPage() {
 function Row({ l, v }: { l: string; v: string }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between',
-       fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)',
+       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
        borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>

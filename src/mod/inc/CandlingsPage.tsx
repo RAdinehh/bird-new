@@ -265,7 +265,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       {/* ═══ خلاصه کل ═══ */}
       {summary.totalCandlings > 0 && (
         <div style={{
-          padding: '12px 14px',
+          padding: 'var(--pad-comfy)',
           background: 'var(--card)',
           border: '1px solid var(--border)',
           borderRadius: 'var(--r-lg)',
@@ -374,7 +374,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                     type="button"
                     onClick={() => openNew(entryId)}
                     style={{
-                      padding: '6px 10px',
+                      padding: 'var(--pad-tight)',
                       background: 'var(--input-bg)',
                       border: '1px dashed var(--border)',
                       borderRadius: 'var(--r-sm)',
@@ -392,28 +392,28 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                 {/* ═══ تجمیع با درصد ═══ */}
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 تجمیع ({toFa(list.length)} کندلینگ)</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>🧬 نطفه‌داری</span>
                     <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(fertilePercent.toFixed(1))}٪</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>📉 تلفات کل</span>
                     <span style={{ fontWeight: 700, color: lossPercent > 10 ? 'var(--danger)' : 'var(--text)' }}>{toFa(lossPercent.toFixed(1))}٪</span>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'var(--muted)' }}>✅ سالم</span>
                       <span style={{ fontWeight: 700 }}>{toFa(agg.alive)}</span>
                     </div>
-                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'var(--muted)' }}>⚪ بی‌نطفه</span>
                       <span style={{ fontWeight: 700 }}>{toFa(agg.infertile)}</span>
                     </div>
-                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'var(--muted)' }}>💀 مرده</span>
                       <span style={{ fontWeight: 700 }}>{toFa(agg.dead)}</span>
                     </div>
-                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'var(--muted)' }}>🥚 شکسته</span>
                       <span style={{ fontWeight: 700 }}>{toFa(agg.broken)}</span>
                     </div>
@@ -506,7 +506,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                   {/* مبنا */}
                   <div style={{
                     fontSize: 'var(--fs-xs)',
-                    padding: '6px 10px',
+                    padding: 'var(--pad-tight)',
                     background: 'var(--info-soft)',
                     border: '1px solid var(--info)',
                     borderRadius: 'var(--r-sm)',
@@ -531,7 +531,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                       </Grid2>
 
                       <div style={{
-                        padding: '6px 10px',
+                        padding: 'var(--pad-tight)',
                         background: remaining < 0 ? 'var(--danger-soft)' : remaining === 0 ? 'var(--accent-soft)' : 'var(--input-bg)',
                         border: '1px solid ' + (remaining < 0 ? 'var(--danger)' : remaining === 0 ? 'var(--accent-border)' : 'var(--border)'),
                         borderRadius: 'var(--r-sm)',

@@ -146,7 +146,7 @@ export default function ReceivablesPage() {
       {/* خلاصه — یه خط */}
       {totalOpen > 0 ? (
         <div style={{
-          padding: '10px 14px',
+          padding: 'var(--pad-comfy)',
           background: kind === 'sale' ? 'var(--accent-soft)' : 'var(--warn-soft)',
           border: `1px solid ${kind === 'sale' ? 'var(--accent-border)' : 'var(--warn)'}`,
           borderRadius: 'var(--r-md)',
@@ -192,7 +192,7 @@ export default function ReceivablesPage() {
           <div
             onClick={() => setShowUpcoming(!showUpcoming)}
             style={{
-              padding: '8px 12px',
+              padding: 'var(--pad-normal)',
               display: 'flex', alignItems: 'center', gap: 8,
               cursor: 'pointer',
               background: 'var(--warn-soft)',
@@ -224,7 +224,7 @@ export default function ReceivablesPage() {
                   const tone = dueTone(days);
                   return (
                     <div key={inv.id} style={{
-                      padding: '6px 10px',
+                      padding: 'var(--pad-tight)',
                       background: `var(--${tone}-soft, var(--input-bg))`,
                       border: `1px solid var(--${tone})`,
                       borderRadius: 'var(--r-sm)',
@@ -313,7 +313,7 @@ export default function ReceivablesPage() {
                 <div
                   onClick={() => toggleBucket(key as BucketKey)}
                   style={{
-                    padding: '8px 12px',
+                    padding: 'var(--pad-normal)',
                     display: 'flex', alignItems: 'center', gap: 8,
                     cursor: 'pointer',
                   }}
@@ -364,7 +364,7 @@ export default function ReceivablesPage() {
                             key={inv.id}
                             onClick={() => setExpandedInvoice(invOpen ? null : inv.id)}
                             style={{
-                              padding: '8px 10px',
+                              padding: 'var(--pad-normal)',
                               background: 'var(--input-bg)',
                               border: '1px solid var(--border)',
                               borderRadius: 'var(--r-sm)',

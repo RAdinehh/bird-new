@@ -7,7 +7,7 @@ function ToggleRow({ label, sub, value, onChange }: any) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '10px 12px', background: 'var(--input-bg)',
+      padding: 'var(--pad-normal)', background: 'var(--input-bg)',
       border: '1px solid var(--border)', borderRadius: 'var(--r-md)', gap: 10
     }}>
       <div style={{ minWidth: 0, flex: 1 }}>
@@ -41,7 +41,7 @@ function ColorBtn({ color, active, onClick }: any) {
       border: active ? '3px solid var(--text)' : '3px solid transparent',
       cursor: 'pointer', padding: 0,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      color: '#fff', fontSize: 22, fontWeight: 700
+      color: '#fff', fontSize: 'var(--fs-xl)', fontWeight: 700
     }}>
       {active ? '✓' : ''}
     </button>
@@ -72,7 +72,7 @@ export default function AppearanceTab() {
               color: s.theme === v ? 'var(--accent)' : 'var(--muted)',
               fontWeight: 600, fontSize: 'var(--fs-base)'
             }}>
-              <span style={{ fontSize: 24 }}>{ic}</span>
+              <span style={{ fontSize: 'var(--fs-xl)' }}>{ic}</span>
               <span>{l}</span>
             </button>
           ))}
@@ -135,7 +135,7 @@ export default function AppearanceTab() {
                 color: i === 0 ? 'var(--accent)' : 'var(--dim)',
                 fontWeight: i === 0 ? 600 : 400
               }}>
-                <span style={{ fontSize: 16 }}>{m ? m.icon : '❓'}</span>
+                <span style={{ fontSize: 'var(--fs-md)' }}>{m ? m.icon : '❓'}</span>
                 <span style={{ fontSize: 9, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
                   {m ? m.name : '—'}
                 </span>

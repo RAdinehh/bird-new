@@ -320,7 +320,7 @@ export default function DailyLogsPage() {
         </>}
       >
         {(tWarn !== 'ok' || hWarn !== 'ok') && (
-          <div style={{ padding: '8px 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>
             ⚠ {tWarn !== 'ok' ? `دما ${tWarn === 'danger' ? 'خطرناک' : 'نامناسب'}` : ''}
             {tWarn !== 'ok' && hWarn !== 'ok' ? ' · ' : ''}
             {hWarn !== 'ok' ? `رطوبت ${hWarn === 'danger' ? 'خطرناک' : 'نامناسب'}` : ''}
@@ -350,7 +350,7 @@ export default function DailyLogsPage() {
             <Row l="توزیع" v={DISTRIBUTION_LABEL[l.distribution] || '—'} />
             <Row l="صدا" v={SOUND_LABEL[l.sound] || '—'} />
           </Grid3>
-          {l.appearance && <div style={{ fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>{l.appearance}</div>}
+          {l.appearance && <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>{l.appearance}</div>}
         </Section>
 
         {(l.feedAmount !== null || l.waterAmount !== null) && (
@@ -383,12 +383,12 @@ export default function DailyLogsPage() {
 
         {l.deaths && l.deaths.length > 0 && (
           <Section title="💀 تلفات">
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
               <span>مجموع:</span>
               <span>{toFa(l.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده</span>
             </div>
             {l.deaths.map(d => (
-              <div key={d.id} style={{ fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <div key={d.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span><b>{toFa(d.count)}</b> پرنده</span>
                   <span style={{ color: 'var(--warn)', fontSize: 'var(--fs-xs)', fontWeight: 600 }}>{causeLabel(d.cause)}</span>
@@ -402,7 +402,7 @@ export default function DailyLogsPage() {
         {l.vaccines.length > 0 && (
           <Section title="💉 واکسن">
             {l.vaccines.map(v => (
-              <div key={v.id} style={{ fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', color: 'var(--accent)' }}>
+              <div key={v.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', color: 'var(--accent)' }}>
                 <b>{v.name}</b>{v.dose ? ` — دوز ${v.dose}` : ''}{v.method ? ` · ${v.method}` : ''}
               </div>
             ))}
@@ -412,7 +412,7 @@ export default function DailyLogsPage() {
         {l.medications.length > 0 && (
           <Section title="💊 دارو">
             {l.medications.map(m => (
-              <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--info-soft)', borderRadius: 'var(--r-sm)', color: 'var(--info)' }}>
+              <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--info-soft)', borderRadius: 'var(--r-sm)', color: 'var(--info)' }}>
                 <b>{m.name}</b>{m.dose ? ` — ${m.dose}` : ''}{m.withdrawalDays ? ` · منع مصرف ${toFa(m.withdrawalDays)} روز` : ''}
               </div>
             ))}
@@ -422,7 +422,7 @@ export default function DailyLogsPage() {
         {l.activities.length > 0 && (
           <Section title="🔧 فعالیت‌ها">
             {l.activities.map(a => (
-              <div key={a.id} style={{ fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+              <div key={a.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                 <b>{a.type}</b>{a.notes ? ` — ${a.notes}` : ''}
               </div>
             ))}
@@ -431,7 +431,7 @@ export default function DailyLogsPage() {
 
         {l.notes && (
           <Section title="📝 یادداشت">
-            <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{l.notes}</div>
+            <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{l.notes}</div>
           </Section>
         )}
 
@@ -539,7 +539,7 @@ export default function DailyLogsPage() {
           </Field>
 
           {flockAliveCount > 0 && (
-            <div style={{ padding: '8px 12px', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, textAlign: 'center' }}>
+            <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, textAlign: 'center' }}>
               تعداد زنده گله: {toFa(flockAliveCount)} پرنده
               {form.feedMethod && ` · دانخوری: ${FEED_SYSTEM_LABEL[form.feedMethod as 'manual' | 'auto'] || '—'}`}
               {form.waterMethod && ` · آبخوری: ${WATER_SYSTEM_LABEL[form.waterMethod as 'manual' | 'nipple' | 'trough' | 'tank'] || '—'}`}
@@ -659,7 +659,7 @@ export default function DailyLogsPage() {
             if (!f) return null;
             const used = num(form.feedAmount) || 0;
             return (
-              <div style={{ padding: '10px 12px', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 4 }}>مواد اولیه این جیره:</div>
                 {f.lines.length === 0 && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠️ این جیره خطی ندارد</div>}
                 {f.lines.map(line => {
@@ -690,7 +690,7 @@ export default function DailyLogsPage() {
             const after = it.currentStock - used;
             const warn = after < it.minStock;
             return (
-              <div style={{ padding: '8px 12px', background: warn ? 'var(--warn-soft)' : 'var(--info-soft)', border: `1px solid ${warn ? 'var(--warn)' : 'var(--info)'}`, borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: warn ? 'var(--warn)' : 'var(--info)', fontWeight: 600 }}>
+              <div style={{ padding: 'var(--pad-normal)', background: warn ? 'var(--warn-soft)' : 'var(--info-soft)', border: `1px solid ${warn ? 'var(--warn)' : 'var(--info)'}`, borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: warn ? 'var(--warn)' : 'var(--info)', fontWeight: 600 }}>
                 موجودی فعلی: {toFa(it.currentStock)} {UNIT_LABEL[it.unit]}
                 {used > 0 && ` · بعد از مصرف: ${toFa(after)} ${UNIT_LABEL[it.unit]}`}
                 {warn && ' ⚠️ زیر حد هشدار'}
@@ -711,7 +711,7 @@ export default function DailyLogsPage() {
 
           {form.waterMethod === 'manual' && (
             <>
-              <div style={{ padding: '8px 12px', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600 }}>
+              <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600 }}>
                 💡 حالت دستی: تعداد بار × حجم هر بار
               </div>
               <Grid2>
@@ -723,7 +723,7 @@ export default function DailyLogsPage() {
                 </Field>
               </Grid2>
               {(form.waterFillCount && form.waterFillVolume) && (
-                <div style={{ padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
+                <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
                   مجموع آب مصرفی: {toFa((int(form.waterFillCount) || 0) * (num(form.waterFillVolume) || 0))} لیتر
                 </div>
               )}
@@ -732,7 +732,7 @@ export default function DailyLogsPage() {
 
           {form.waterMethod !== 'manual' && form.waterMethod !== '' && (
             <>
-              <div style={{ padding: '8px 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600 }}>
+              <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600 }}>
                 ⚠️ سیستم {WATER_SYSTEM_LABEL[form.waterMethod as 'nipple' | 'trough' | 'tank']} — فعلاً فقط دستی پیاده شده
               </div>
               <Field label="مقدار آب مصرفی (تخمینی)">
@@ -771,7 +771,7 @@ export default function DailyLogsPage() {
                 </Select>
               </Field>
               <Field label="خلاصه">
-                <div style={{ padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
+                <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
                   {form.weightSamples.length >= 2 ? <>میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) ||
                     0 }))))} kg · CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) ||
                     0 }))))}٪</> : <>💡 حداقل ۲ نمونه اضافه کن تا میانگین محاسبه شود</>}
@@ -801,18 +801,18 @@ export default function DailyLogsPage() {
           <SectionTitle>💀 تلفات</SectionTitle>
 
           {form.deaths.length > 0 && (
-            <div style={{ padding: '8px 12px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--danger)', fontWeight: 700, textAlign: 'center' }}>
+            <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--danger)', fontWeight: 700, textAlign: 'center' }}>
               مجموع: {toFa(form.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده
               {flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''}
             </div>
           )}
 
           {form.deaths.map((d, i) => (
-            <div key={d.id} style={{ padding: '10px 12px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700 }}>{d.count === 0 && !d.cause ? "رکورد جدید" : "رکورد " + toFa(i + 1)}</span>
                 <button type="button" onClick={() => setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) }))}
-                  style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14 }}>✕</button>
+                  style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
               </div>
               <Grid2>
                 <Field label="تعداد">
@@ -843,7 +843,7 @@ export default function DailyLogsPage() {
             + افزودن واکسن
           </Btn>
           {form.vaccines.map((v, i) => (
-            <div key={v.id} style={{ padding: '10px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>واکسن {toFa(i + 1)}</span>
                 <button onClick={() => setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) }))} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
@@ -859,7 +859,7 @@ export default function DailyLogsPage() {
             + افزودن دارو
           </Btn>
           {form.medications.map((m, i) => (
-            <div key={m.id} style={{ padding: '10px 12px', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 700 }}>دارو {toFa(i + 1)}</span>
                 <button onClick={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
@@ -926,7 +926,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 function Row({ l, v, warn }: { l: string; v: string; warn?: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: warn ? 'var(--warn-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: warn ? 'var(--warn)' : undefined, fontWeight: warn ? 700 : undefined }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: warn ? 'var(--warn-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: warn ? 'var(--warn)' : undefined, fontWeight: warn ? 700 : undefined }}>
       <span style={{ color: warn ? 'var(--warn)' : 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: warn ? 'var(--warn)' : 'var(--text)' }}>{v}</span>
     </div>

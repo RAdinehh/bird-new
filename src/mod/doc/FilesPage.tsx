@@ -74,7 +74,7 @@ export default function FilesPage() {
         background: 'var(--card)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-lg)',
-        padding: '12px 14px',
+        padding: 'var(--pad-comfy)',
       }}>
         <div style={{
           display: 'flex',
@@ -392,7 +392,7 @@ function GridCard({ file, onPreview, onDelete }: { file: DocFile; onPreview: () 
           CATEGORY_ICON[file.category]
         )}
       </button>
-      <div style={{ padding: '8px 10px', flex: 1 }}>
+      <div style={{ padding: 'var(--pad-normal)', flex: 1 }}>
         <div style={{
           fontSize: 'var(--fs-xs)',
           fontWeight: 700,
@@ -419,7 +419,7 @@ function ListCard({ file, onPreview, onDelete }: { file: DocFile; onPreview: () 
       background: 'var(--card)',
       border: '1px solid var(--border)',
       borderRadius: 'var(--r-lg)',
-      padding: '10px 12px',
+      padding: 'var(--pad-normal)',
       display: 'flex',
       alignItems: 'center',
       gap: 12
@@ -436,7 +436,7 @@ function ListCard({ file, onPreview, onDelete }: { file: DocFile; onPreview: () 
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 22,
+          fontSize: 'var(--fs-xl)',
           flexShrink: 0,
           padding: 0,
           overflow: 'hidden'
@@ -479,7 +479,7 @@ const iconBtn: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontSize: 14,
+  fontSize: 'var(--fs-base)',
   padding: 0,
   flexShrink: 0
 };

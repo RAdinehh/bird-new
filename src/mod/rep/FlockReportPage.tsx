@@ -121,7 +121,7 @@ export default function FlockReportPage() {
               width: 40, height: 40, borderRadius: 'var(--r-md)',
               background: 'var(--accent-soft)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 18, position: 'relative'
+              fontSize: 'var(--fs-md)', position: 'relative'
             }}>
               🐔
               <span style={{
@@ -176,7 +176,7 @@ export default function FlockReportPage() {
 function Stat({ label, value, color }: { label: string; value: string; color: 'accent' | 'warn' | 'danger' | 'info' }) {
   return (
     <div style={{
-      padding: '8px 10px',
+      padding: 'var(--pad-normal)',
       background: 'var(--' + color + '-soft)',
       borderRadius: 'var(--r-sm)',
       border: '1px solid var(--' + color + ')'

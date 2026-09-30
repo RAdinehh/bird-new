@@ -129,7 +129,7 @@ export default function BackupTab() {
       <SettingsGroup icon="📊" title="آمار فعلی" subtitle={formatSize(stats.totalSize)} tone="accent" defaultOpen>
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '10px 12px',
+          padding: 'var(--pad-normal)',
           background: 'var(--accent-soft)',
           border: '1px solid var(--accent-border)',
           borderRadius: 'var(--r-md)'
@@ -146,7 +146,7 @@ export default function BackupTab() {
           {stats.byModule.map(m => (
             <div key={m.key} style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '8px 12px',
+              padding: 'var(--pad-normal)',
               background: 'var(--input-bg)',
               borderRadius: 'var(--r-sm)',
               marginBottom: 4,
@@ -273,7 +273,7 @@ export default function BackupTab() {
         {preview ? (
           <>
             <div style={{
-              padding: '12px 14px',
+              padding: 'var(--pad-comfy)',
               background: 'var(--info-soft)',
               border: '1px solid var(--info)',
               borderRadius: 'var(--r-md)',
@@ -294,7 +294,7 @@ export default function BackupTab() {
             </Field>
 
             <div style={{
-              padding: '10px 12px',
+              padding: 'var(--pad-normal)',
               background: 'var(--warn-soft)',
               border: '1px solid var(--warn)',
               borderRadius: 'var(--r-md)',
@@ -337,7 +337,7 @@ export default function BackupTab() {
 
 function RowToggle({ label, sub, value, onChange }: { label: string; sub?: string; value: boolean; onChange: () => void }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', gap: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', gap: 10 }}>
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>{label}</div>
         {sub ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{sub}</div> : null}

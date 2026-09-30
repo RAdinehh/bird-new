@@ -156,7 +156,7 @@ export default function AlertsPage() {
                 >
                   <SectionTitle>📋 جزئیات</SectionTitle>
                   <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                     padding: '8px 10px', background: 'var(--input-bg)',
+                     padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     {a.message}
                   </div>
@@ -248,7 +248,7 @@ function CountBox({ label, count, color, icon }: { label: string; count: number;
       borderRadius: 'var(--r-md)',
       opacity: count === 0 ? 0.4 : 1
     }}>
-      <div style={{ fontSize: 20 }}>{icon}</div>
+      <div style={{ fontSize: 'var(--fs-lg)' }}>{icon}</div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--' + color + ')', fontWeight: 700, marginTop: 4 }}>
         {label}
       </div>
@@ -262,7 +262,7 @@ function CountBox({ label, count, color, icon }: { label: string; count: number;
 function Row({ l, v }: { l: string; v: string }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+       padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>

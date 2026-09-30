@@ -50,7 +50,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
         background: 'var(--card)',
         border: '1px solid ' + (event.done ? 'var(--border)' : (status === 'overdue' ? 'var(--danger)' : 'var(--border)')),
         borderRadius: 'var(--r-lg)',
-        padding: '12px 14px',
+        padding: 'var(--pad-comfy)',
         display: 'flex',
         gap: 12,
         alignItems: 'flex-start',

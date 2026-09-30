@@ -188,7 +188,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
               background: 'var(--btn-bg)', border: '1px solid var(--border)',
               color: 'var(--muted)', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'inherit', fontSize: 14
+              fontFamily: 'inherit', fontSize: 'var(--fs-base)'
             }}
           >✕</button>
         </div>
@@ -204,10 +204,10 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
             padding: '20px',
             borderRadius: 8,
             boxShadow: '0 4px 12px rgba(0,0,0,.15)',
-            fontSize: 11
+            fontSize: 'var(--fs-xs)'
           }}>
             <div style={{ textAlign: 'center', marginBottom: 10 }}>
-              <div style={{ fontSize: 16, fontWeight: 700 }}>{settings.farm.name || 'مرغداری'}</div>
+              <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>{settings.farm.name || 'مرغداری'}</div>
               <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>{title} — {invoice.number}</div>
             </div>
 
@@ -235,7 +235,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
               </tbody>
             </table>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, padding: '8px 10px', background: '#f1f5f9', borderRadius: 6, fontSize: 11, fontWeight: 700 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, padding: 'var(--pad-normal)', background: '#f1f5f9', borderRadius: 6, fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
               <span>قیمت نهایی:</span>
               <span>{toFa(invoice.total.toLocaleString('fa-IR'))} ت</span>
             </div>

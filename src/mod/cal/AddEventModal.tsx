@@ -99,7 +99,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
       {err ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div> : null}
 
       <div style={{
-        padding: '8px 12px',
+        padding: 'var(--pad-normal)',
         background: 'var(--info-soft)',
         border: '1px solid var(--info)',
         borderRadius: 'var(--r-md)',

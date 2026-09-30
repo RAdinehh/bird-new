@@ -50,7 +50,7 @@ export default function SettingsGroup({
           border: '1px solid ' + (open ? border : 'transparent'),
           color: color,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 18,
+          fontSize: 'var(--fs-md)',
           flexShrink: 0
         }}>{icon}</div>
 

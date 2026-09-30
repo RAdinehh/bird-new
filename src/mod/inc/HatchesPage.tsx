@@ -244,7 +244,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                   <StatBox icon="🥚" label="تخم" value={toFa(total)} />
                 </>}
               >
-                {isComplete && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', textAlign: 'center' }}>✅ تکمیل — همه تخم‌ها شمارش شدن</div>}
+                {isComplete && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, padding: 'var(--pad-tight)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', textAlign: 'center' }}>✅ تکمیل — همه تخم‌ها شمارش شدن</div>}
 
                 {total > 0 && (h.hatched || 0) > 0 && (
                   <>
@@ -306,7 +306,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                 {h.notes && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
                   </>
                 )}
 
@@ -380,7 +380,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                       </div>
 
                       {calc.byStage.length > 0 && (
-                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
                           {calc.byStage.map((st, i) => (
                             <div key={i} style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span>کندلینگ روز {toFa(st.stage)}:</span>
@@ -412,7 +412,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                             const ok = remaining >= 0;
                             return (
                               <>
-                                <div style={{ padding: '6px 10px', background: myCand ? 'var(--accent-soft)' : 'var(--warn-soft)', border: '1px solid ' + (myCand ? 'var(--accent-border)' : 'var(--warn)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: myCand ? 'var(--accent)' : 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
+                                <div style={{ padding: 'var(--pad-tight)', background: myCand ? 'var(--accent-soft)' : 'var(--warn-soft)', border: '1px solid ' + (myCand ? 'var(--accent-border)' : 'var(--warn)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: myCand ? 'var(--accent)' : 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
                                   {calc.byStage.length > 0 ? '🧬 سقف این هچ: ' + toFa(base) + ' (نطفه‌دار فعلی)' : '⚠️ بدون کندلینگ — سقف: ' + toFa(base) + ' تخم'}
                                 </div>
                                 <Grid2>
@@ -439,7 +439,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                                     <NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" />
                                   </Field>
                                 </Grid2>
-                                <div style={{ padding: '8px 12px', background: !ok ? 'var(--danger-soft)' : remaining === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
+                                <div style={{ padding: 'var(--pad-normal)', background: !ok ? 'var(--danger-soft)' : remaining === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
                                   <span>📊 مجموع: {toFa(sum)} / {toFa(base)}</span>
                                   <span>
                                     {ok && remaining > 0 && '⏳ ' + toFa(remaining) + ' باقی'}
@@ -454,7 +454,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                             const hatchedNum = parseInt(toEn(d.hatched)) || 0;
                             if (hatchedNum === 0) {
                               return (
-                                <div style={{ padding: '10px 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
+                                <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
                                   ⬆️ اول «جوجه هچ‌شده» را وارد کن — سپس می‌توانی کیفیت، جنسیت و وزن را تکمیل کنی
                                 </div>
                               );
@@ -474,7 +474,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                                       <Field label="درجه A"><NumField value={d.gradeA} onChange={ev => updateData(e.id, { gradeA: ev.target.value })} max={hatchedNum - gB} min={0} unit="عدد" /></Field>
                                       <Field label="درجه B"><NumField value={d.gradeB} onChange={ev => updateData(e.id, { gradeB: ev.target.value })} max={hatchedNum - gA} min={0} unit="عدد" /></Field>
                                     </Grid2>
-                                    <div style={{ padding: '6px 10px', background: !gradesOk ? 'var(--danger-soft)' : gradesRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
+                                    <div style={{ padding: 'var(--pad-tight)', background: !gradesOk ? 'var(--danger-soft)' : gradesRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
                                       A + B: {toFa(gradesUsed)} / {toFa(hatchedNum)}{!gradesOk ? ' 🔴 ' + toFa(Math.abs(gradesRem)) + ' اضافی' : gradesRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(gradesRem) + ' باقی'}
                                     </div>
                                   </>
@@ -499,7 +499,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                                       <Field label="? نامعلوم"><NumField value={d.unknownCount} onChange={ev => updateData(e.id, { unknownCount: ev.target.value })} max={hatchedNum - m - f_} min={0} unit="عدد" /></Field>
                                       <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
                                     </Grid2>
-                                    <div style={{ padding: '6px 10px', background: !genderOk ? 'var(--danger-soft)' : genderRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
+                                    <div style={{ padding: 'var(--pad-tight)', background: !genderOk ? 'var(--danger-soft)' : genderRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
                                       ♂ + ♀ + ?: {toFa(genderUsed)} / {toFa(hatchedNum)}{!genderOk ? ' 🔴 ' + toFa(Math.abs(genderRem)) + ' اضافی' : genderRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(genderRem) + ' باقی'}
                                     </div>
                                   </>
@@ -509,7 +509,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                             );
                           })()}
                           <Field label="یادداشت"><Input value={d.notes || ''} onChange={ev => updateData(e.id, { notes: ev.target.value })} placeholder="..." /></Field>
-                          <div style={{ padding: '6px 10px', background: rem < 0 ? 'var(--danger-soft)' : rem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
+                          <div style={{ padding: 'var(--pad-tight)', background: rem < 0 ? 'var(--danger-soft)' : rem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
                             این هچ: {toFa(sumE)} از {toFa(e.count || 0)}{rem > 0 && ' · باقی: ' + toFa(rem)}{rem < 0 && ' — بیشتر!'}{rem === 0 && ' ✅'}
                           </div>
                         </>
@@ -541,7 +541,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
               const hatchedNum = parseInt(toEn(dataFor(formEntryId).hatched)) || 0;
               if (hatchedNum === 0) {
                 return (
-                  <div style={{ padding: '10px 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
+                  <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
                     ⬆️ اول «جوجه هچ‌شده» را وارد کن
                   </div>
                 );
@@ -561,7 +561,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                           <Field label="درجه A"><NumField value={dataFor(formEntryId).gradeA} onChange={ev => updateData(formEntryId, { gradeA: ev.target.value })} max={hatchedNum - gB} min={0} unit="عدد" /></Field>
                           <Field label="درجه B"><NumField value={dataFor(formEntryId).gradeB} onChange={ev => updateData(formEntryId, { gradeB: ev.target.value })} max={hatchedNum - gA} min={0} unit="عدد" /></Field>
                         </Grid2>
-                        <div style={{ padding: '6px 10px', background: !gradesOk ? 'var(--danger-soft)' : gradesRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
+                        <div style={{ padding: 'var(--pad-tight)', background: !gradesOk ? 'var(--danger-soft)' : gradesRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
                           A + B: {toFa(gradesUsed)} / {toFa(hatchedNum)}{!gradesOk ? ' 🔴 اضافی' : gradesRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(gradesRem) + ' باقی'}
                         </div>
                       </>
@@ -586,7 +586,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                           <Field label="? نامعلوم"><NumField value={dataFor(formEntryId).unknownCount} onChange={ev => updateData(formEntryId, { unknownCount: ev.target.value })} max={hatchedNum - m - f_} min={0} unit="عدد" /></Field>
                           <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={dataFor(formEntryId).avgWeight} onChange={ev => updateData(formEntryId, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
                         </Grid2>
-                        <div style={{ padding: '6px 10px', background: !genderOk ? 'var(--danger-soft)' : genderRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
+                        <div style={{ padding: 'var(--pad-tight)', background: !genderOk ? 'var(--danger-soft)' : genderRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
                           ♂ + ♀ + ?: {toFa(genderUsed)} / {toFa(hatchedNum)}{!genderOk ? ' 🔴 اضافی' : genderRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(genderRem) + ' باقی'}
                         </div>
                       </>
@@ -663,7 +663,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
           const cnt = parseInt(toEn(sellForm.count)) || 0;
           const up = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;
           const total = cnt * up;
-          if (total > 0) return <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع کل:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
+          if (total > 0) return <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع کل:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
           return null;
         })()}
       </Modal>
@@ -723,7 +723,7 @@ function estimateHatched(aliveAfter: number, entryTotal: number, losses: { ds: n
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>

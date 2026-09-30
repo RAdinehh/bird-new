@@ -75,7 +75,7 @@ export default function ComparePage() {
       {best && avgSales > 0 ? (
         <>
           <div style={{
-            padding: '12px 14px',
+            padding: 'var(--pad-comfy)',
             background: 'var(--accent-soft)',
             border: '1px solid var(--accent-border)',
             borderRadius: 'var(--r-md)',
@@ -94,7 +94,7 @@ export default function ComparePage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
             <div style={{
-              padding: '12px 14px',
+              padding: 'var(--pad-comfy)',
               background: 'var(--info-soft)',
               border: '1px solid var(--info)',
               borderRadius: 'var(--r-md)'
@@ -107,7 +107,7 @@ export default function ComparePage() {
               </div>
             </div>
             <div style={{
-              padding: '12px 14px',
+              padding: 'var(--pad-comfy)',
               background: 'var(--accent-soft)',
               border: '1px solid var(--accent-border)',
               borderRadius: 'var(--r-md)'

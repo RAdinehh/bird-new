@@ -8,7 +8,7 @@ function ToggleRow({ label, sub, value, onChange }: any) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '10px 12px', background: 'var(--input-bg)',
+      padding: 'var(--pad-normal)', background: 'var(--input-bg)',
       border: '1px solid var(--border)', borderRadius: 'var(--r-md)', gap: 10
     }}>
       <div style={{ minWidth: 0, flex: 1 }}>
@@ -113,7 +113,7 @@ export default function ProfileTab() {
       </SettingsGroup>
 
       <SettingsGroup icon="🏦" title="اطلاعات بانکی" subtitle={bankSummary} tone="purple">
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
           این اطلاعات در فاکتورهای چاپی نمایش داده می‌شود
         </div>
         <Field label="نام بانک">
@@ -154,7 +154,7 @@ export default function ProfileTab() {
       </SettingsGroup>
 
       <SettingsGroup icon="🐔" title="پیش‌فرض‌های کشاورزی" subtitle={`Setter ${toFa(defaults.setterTemp)}° · Hatcher ${toFa(defaults.hatcherTemp)}°`} tone="accent">
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
           این مقادیر در فرم‌های جدید پیش‌فرض می‌شوند
         </div>
         <Grid2>

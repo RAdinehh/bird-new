@@ -111,7 +111,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
       >
         {file === null ? (
           <>
-            <div style={{ fontSize: 36 }}>📎</div>
+            <div style={{ fontSize: 'var(--fs-hero)' }}>📎</div>
             <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--accent)' }}>
               برای انتخاب فایل بزنید
             </div>
@@ -121,7 +121,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
           </>
         ) : (
           <>
-            <div style={{ fontSize: 36 }}>
+            <div style={{ fontSize: 'var(--fs-hero)' }}>
               {category === 'image' ? '🖼' : category === 'pdf' ? '📄' : category === 'audio' ? '🎵' : category === 'video' ? '🎬' : category === 'excel' ? '📊' : '📎'}
             </div>
             <div style={{

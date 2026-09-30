@@ -241,13 +241,13 @@ export default function FlocksPage() {
               background: 'var(--info-soft)',
               border: '1px solid var(--info)',
               borderRadius: 'var(--r-lg)',
-              padding: '12px 14px'
+              padding: 'var(--pad-comfy)'
             }}>
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 marginBottom: 10
               }}>
-                <span style={{ fontSize: 16 }}>⏳</span>
+                <span style={{ fontSize: 'var(--fs-md)' }}>⏳</span>
                 <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--info)' }}>
                   نزدیک به شروع تخم‌گذاری ({toFa(upcoming.length)})
                 </span>
@@ -260,7 +260,7 @@ export default function FlocksPage() {
                   const bird = birds.find(b => b.id === f.birdId);
                   return (
                     <div key={f.id} style={{
-                      padding: '10px 12px',
+                      padding: 'var(--pad-normal)',
                       background: 'var(--card)',
                       border: '1px solid var(--border)',
                       borderRadius: 'var(--r-md)'
@@ -345,7 +345,7 @@ export default function FlocksPage() {
                   {/* شمارش معکوس */}
                   {!isArchived && !ready && (f.type === 'layer' || f.type === 'breeder') && (
                     <div style={{
-                      padding: '8px 12px',
+                      padding: 'var(--pad-normal)',
                       background: untilLay <= 30 ? 'var(--warn-soft)' : 'var(--info-soft)',
                       border: `1px dashed ${untilLay <= 30 ? 'var(--warn)' : 'var(--info)'}`,
                       borderRadius: 'var(--r-md)',
@@ -406,12 +406,12 @@ export default function FlocksPage() {
                         {costs.birdCost > 0 && <Row l="قیمت پرنده‌ها" v={`${toFa(costs.birdCost.toLocaleString('fa-IR'))} ت`} />}
                         {costs.delivery > 0 && <Row l="هزینه حمل" v={`${toFa(costs.delivery.toLocaleString('fa-IR'))} ت`} />}
                         {costs.other > 0 && <Row l="سایر" v={`${toFa(costs.other.toLocaleString('fa-IR'))} ت`} />}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                           <span>جمع کل:</span>
                           <span>{toFa(costs.total.toLocaleString('fa-IR'))} ت</span>
                         </div>
                         {costs.perBird > 0 && (
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                             <span>💰 هر پرنده:</span>
                             <span>{toFa(Math.round(costs.perBird).toLocaleString('fa-IR'))} ت</span>
                           </div>
@@ -424,7 +424,7 @@ export default function FlocksPage() {
                   {f.notes && (
                     <>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                      <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
+                      <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
                     </>
                   )}
 
@@ -541,7 +541,7 @@ export default function FlocksPage() {
                 </Field>
               </Grid2>
               {form.maleCount && form.femaleCount && (
-                <div style={{ padding: '8px 12px', background: 'var(--purple-soft)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--purple)', fontWeight: 600 }}>
+                <div style={{ padding: 'var(--pad-normal)', background: 'var(--purple-soft)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--purple)', fontWeight: 600 }}>
                   نسبت خروس به مرغ: {sexRatio(parseInt(toEn(form.maleCount)), parseInt(toEn(form.femaleCount)))}
                 </div>
               )}
@@ -607,7 +607,7 @@ export default function FlocksPage() {
 
           {liveCosts.total > 0 && (
             <div style={{
-              padding: '12px 14px', background: 'var(--accent-soft)',
+              padding: 'var(--pad-comfy)', background: 'var(--accent-soft)',
               border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)',
               display: 'flex', flexDirection: 'column', gap: 6, fontSize: 'var(--fs-sm)'
             }}>
@@ -669,7 +669,7 @@ export default function FlocksPage() {
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>

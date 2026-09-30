@@ -180,3 +180,24 @@ a:focus-visible,
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+/* ═══ Global Focus Ring (a11y) ═══ */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex="0"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+
+/* ═══ Press Effect ═══ */
+button:active:not(:disabled),
+[role="button"]:active,
+.pressable:active {
+  transform: scale(0.97);
+  transition: transform 80ms;
+}

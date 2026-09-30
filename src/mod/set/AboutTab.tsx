@@ -151,7 +151,7 @@ export default function AboutTab() {
           width: 72, height: 72, borderRadius: 'var(--r-xl)',
           background: 'linear-gradient(135deg, var(--accent), #16a34a)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 36, color: '#fff', fontWeight: 700
+          fontSize: 'var(--fs-hero)', color: '#fff', fontWeight: 700
         }}>🐔</div>
         <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700 }}>مدیریت مرغداری</div>
         <div style={{ fontSize: 'var(--fs-base)', color: 'var(--muted)' }}>نسخه ۰.۱.۰ — نمونه</div>
@@ -192,7 +192,7 @@ export default function AboutTab() {
                 <div
                   onClick={() => setExpandedFaq(isOpen ? null : i)}
                   style={{
-                    padding: '12px 14px',
+                    padding: 'var(--pad-comfy)',
                     display: 'flex', alignItems: 'center', gap: 8,
                     cursor: 'pointer'
                   }}
@@ -266,7 +266,7 @@ export default function AboutTab() {
                 borderBottom: '1px dashed var(--border)',
                 marginBottom: 8
               }}>
-                <span style={{ fontSize: 20 }}>{sec.icon}</span>
+                <span style={{ fontSize: 'var(--fs-lg)' }}>{sec.icon}</span>
                 <span style={{
                   fontSize: 'var(--fs-md)',
                   fontWeight: 700,
@@ -297,7 +297,7 @@ export default function AboutTab() {
           ))}
 
           <div style={{
-            padding: '12px 14px',
+            padding: 'var(--pad-comfy)',
             background: 'var(--accent-soft)',
             border: '1px solid var(--accent-border)',
             borderRadius: 'var(--r-md)',

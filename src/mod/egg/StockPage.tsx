@@ -182,7 +182,7 @@ export default function StockPage() {
                 <SectionTitle>💰 مالی</SectionTitle>
                 <Row l="قیمت واحد" v={`${toFa(s.unitPrice.toLocaleString('fa-IR'))} ت`} />
                 <div style={{ display: 'flex', justifyContent: 'space-between',
-                   fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)',
+                   fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
                    color: 'var(--accent)', borderRadius: 'var(--r-sm)',
                    fontWeight: 700 }}>
                   <span>جمع کل:</span>
@@ -193,7 +193,7 @@ export default function StockPage() {
                   <>
                     <SectionTitle>📝 یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: '8px 10px', background: 'var(--input-bg)',
+                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{s.notes}</div>
                   </>
                 ) : null}
@@ -258,7 +258,7 @@ export default function StockPage() {
 
         {pieces > 0 ? (
           <div style={{
-            padding: '8px 12px',
+            padding: 'var(--pad-normal)',
             background: pieces > selectedStock ? 'var(--danger-soft)' : 'var(--accent-soft)',
             border: '1px solid ' + (pieces > selectedStock ? 'var(--danger)' : 'var(--accent-border)'),
             borderRadius: 'var(--r-md)',
@@ -277,7 +277,7 @@ export default function StockPage() {
 
         {total > 0 ? (
           <div style={{ display: 'flex', justifyContent: 'space-between',
-             fontSize: 'var(--fs-md)', padding: '10px 12px', background: 'var(--accent-soft)',
+             fontSize: 'var(--fs-md)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
              color: 'var(--accent)', borderRadius: 'var(--r-md)', fontWeight: 700 }}>
             <span>جمع کل:</span>
             <span>{toFa(total.toLocaleString('fa-IR'))} ت</span>
@@ -316,7 +316,7 @@ export default function StockPage() {
 function Row({ l, v }: { l: string; v: string }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+       padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>

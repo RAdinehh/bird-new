@@ -96,7 +96,7 @@ export default function ProductionPage() {
       {/* میانگین روزانه */}
       {totalEggs > 0 ? (
         <div style={{
-          padding: '12px 14px',
+          padding: 'var(--pad-comfy)',
           background: 'var(--accent-soft)',
           border: '1px solid var(--accent-border)',
           borderRadius: 'var(--r-md)',

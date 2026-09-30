@@ -138,7 +138,7 @@ export default function HallsPage() {
                 {h.address && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📍 آدرس</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: '8px 10px',
+                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
                        background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.address}</div>
                   </>
                 )}
@@ -147,7 +147,7 @@ export default function HallsPage() {
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: '8px 10px', background: 'var(--input-bg)',
+                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
                   </>
                 )}
@@ -220,7 +220,7 @@ export default function HallsPage() {
 function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
+       padding: 'var(--pad-tight)', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
        borderRadius: 'var(--r-sm)', color: accent ? 'var(--accent)' : undefined,
        fontWeight: accent ? 700 : undefined }}>
       <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
