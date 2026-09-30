@@ -201,7 +201,7 @@ export default function DevicesPage() {
   const removeMaintenance = async (deviceId: string, logId: string) => {
     const dev = devices.find(d => d.id === deviceId);
     if (!dev) return;
-    if (!await showConfirmAsync('حذف این رکورد تعمیر؟', 'تأیید')) return;
+    if (!await showConfirmAsync('تأیید', 'حذف این رکورد تعمیر؟', { danger: true })) return;
     const logs = ((dev as any).maintenanceLogs || []).filter((l: any) => l.id !== logId);
     updateDevice(deviceId, { maintenanceLogs: logs } as any);
   };

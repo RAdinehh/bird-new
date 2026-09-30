@@ -144,8 +144,8 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   const doDelete = async (id: string) => {
     const h = hatches.find(x => x.id === id) as any;
     if (!h) return;
-    if (h.generatedFlockId && await showConfirmAsync('این هچ یک گله ساخته. گله هم حذف شود؟', 'تأیید')) { try { removeFlock(h.generatedFlockId); } catch {} }
-    if (h.generatedInvoiceId && await showConfirmAsync('این هچ یک فاکتور ساخته. فاکتور هم حذف شود؟', 'تأیید')) { try { deleteInvoice(h.generatedInvoiceId); } catch {} }
+    if (h.generatedFlockId && await showConfirmAsync('تأیید', 'این هچ یک گله ساخته. گله هم حذف شود؟', { danger: true })) { try { removeFlock(h.generatedFlockId); } catch {} }
+    if (h.generatedInvoiceId && await showConfirmAsync('تأیید', 'این هچ یک فاکتور ساخته. فاکتور هم حذف شود؟', { danger: true })) { try { deleteInvoice(h.generatedInvoiceId); } catch {} }
     deleteHatch(id); setDelId(null);
   };
 

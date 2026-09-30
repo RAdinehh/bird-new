@@ -348,7 +348,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                           const msg = subsequent.length > 0
                             ? 'این کندلینگ و ' + toFa(subsequent.length) + ' کندلینگ بعدی حذف می‌شوند.\n\nادامه؟'
                             : 'این کندلینگ حذف شود؟';
-                          if (await showConfirmAsync(msg, 'تأیید')) {
+                          if (await showConfirmAsync('تأیید', msg)) {
                             deleteCandling(c.id);
                             subsequent.forEach(s => deleteCandling(s.id));
                           }

@@ -28,7 +28,7 @@ export default function IncubationProfilesTab() {
   };
 
   const remove = async (id: string) => {
-    if (!await showConfirmAsync('حذف این پرنده؟', 'تأیید')) return;
+    if (!await showConfirmAsync('تأیید', 'حذف این پرنده؟', { danger: true })) return;
     s.update({ incubationProfiles: profiles.filter(p => p.id !== id) } as any);
   };
 

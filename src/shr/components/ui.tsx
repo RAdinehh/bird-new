@@ -373,10 +373,24 @@ export function Modal({
     if (!focusedRef.current) {
       focusedRef.current = true;
       setTimeout(() => {
-        const firstInput = modalRef.current?.querySelector(
-          'input:not([type="hidden"]):not([disabled]), textarea, select, button'
+        // ترجیح: input/textarea، نه دکمه X
+        let target = modalRef.current?.querySelector(
+          'input:not([type="hidden"]):not([disabled]), textarea, select'
         ) as HTMLElement | null;
-        firstInput?.focus();
+        // fallback: دکمه غیر از X
+        if (!target) {
+          const btns = modalRef.current?.querySelectorAll('button:not([disabled])');
+          if (btns) {
+            for (const btn of Array.from(btns)) {
+              const aria = btn.getAttribute('aria-label') || '';
+              if (aria !== 'بستن' && aria !== 'Close') {
+                target = btn as HTMLElement;
+                break;
+              }
+            }
+          }
+        }
+        target?.focus();
       }, 100);
     }
 

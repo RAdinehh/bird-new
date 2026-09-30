@@ -231,7 +231,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           'هچ ردیف‌های دیگر:\n' + conflicts.join('\n') + '\n\n' +
           '💡 برای هچ همزمان، پرنده دوره‌بلندتر رو زودتر وارد کن.\n\n' +
           'ادامه بدهم؟';
-        if (!await showConfirmAsync(msg, 'تأیید')) return;
+        if (!await showConfirmAsync('تأیید', msg)) return;
       }
     }
 
@@ -288,7 +288,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   };
 
   const removeRow = async (id: string) => {
-    if (!await showConfirmAsync('حذف این ردیف؟', 'تأیید')) return;
+    if (!await showConfirmAsync('تأیید', 'حذف این ردیف؟', { danger: true })) return;
     setDraftRows(rows => rows.filter(r => r._id !== id));
     if (editingRowId === id) { setCurrentRow(makeRow()); setEditingRowId(null); }
   };
@@ -385,7 +385,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     setDraftRows([]);
     setOpen(false);
     showAlert(savedCount + ' ورودی ثبت شد', '✅ موفق');
-    if (onGoTo && await showConfirmAsync('به کندلینگ برو؟', 'تأیید')) {
+    if (onGoTo && await showConfirmAsync('تأیید', 'به کندلینگ برو؟')) {
       setTimeout(() => onGoTo('candlings'), 100);
     }
   };
@@ -421,10 +421,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     if (!entry) return;
     let delInv = false, delProd = false;
     if (entry.generatedInvoiceId) {
-      delInv = await showConfirmAsync('این ورودی یک فاکتور در معاملات ساخته.\nتایید — فاکتور هم حذف شود\nلغو — فقط ورودی حذف شود', 'تأیید');
+      delInv = await showConfirmAsync('تأیید', 'این ورودی یک فاکتور در معاملات ساخته.\nتایید — فاکتور هم حذف شود\nلغو — فقط ورودی حذف شود', { danger: true });
     }
     if (entry.generatedProductionId) {
-      delProd = await showConfirmAsync('این ورودی یک رکورد تولید تخم ساخته.\nتایید — آن هم حذف شود\nلغو — فقط ورودی حذف شود', 'تأیید');
+      delProd = await showConfirmAsync('تأیید', 'این ورودی یک رکورد تولید تخم ساخته.\nتایید — آن هم حذف شود\nلغو — فقط ورودی حذف شود', { danger: true });
     }
     if (delInv && entry.generatedInvoiceId) { try { deleteInvoice(entry.generatedInvoiceId); } catch {} }
     if (delProd && entry.generatedProductionId) { try { deleteProduction(entry.generatedProductionId); } catch {} }
