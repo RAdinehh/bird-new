@@ -80,7 +80,8 @@ export default function IngredientsPage() {
   const hiddenCount = useMemo(() => ingredients.filter(i => i.isHidden).length, [ingredients]);
 
   const openNew = () => {
-    setForm(empty()); setErr(''); setOpen(true);
+    const lastR = ingredients.filter(x => x.category).slice().reverse()[0];
+    setForm({ ...empty(), ...(lastR?.category ? { category: lastR.category } : {}) }); setErr(''); setOpen(true);
   };
 
   // === انتخاب از کتابخانه ===

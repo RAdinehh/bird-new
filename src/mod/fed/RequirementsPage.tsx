@@ -56,8 +56,8 @@ export default function RequirementsPage() {
   );
 
   const openNew = () => {
-    setForm(empty());
-    setErr(''); setOpen(true);
+    const lastR = requirements.filter(x => x.birdType).slice().reverse()[0];
+    setForm({ ...empty(), ...(lastR?.birdType ? { birdType: lastR.birdType } : {}) }); setErr(''); setOpen(true);
   };
 
   const openEdit = (r: Requirement) => {

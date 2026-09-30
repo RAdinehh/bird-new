@@ -58,8 +58,8 @@ export default function ItemsPage() {
   }, [items, filterCat]);
 
   const openNew = () => {
-    setForm(empty());
-    setErr(''); setOpen(true);
+    const lastR = items.filter(x => x.category).slice().reverse()[0];
+    setForm({ ...empty(), ...(lastR?.category ? { category: lastR.category } : {}) }); setErr(''); setOpen(true);
   };
 
   const openEdit = (it: Item) => {
