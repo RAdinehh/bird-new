@@ -68,13 +68,13 @@ export default function ListCards({
                       key={a.id}
                       onClick={() => nav('/alt')}
                       style={{
-                        padding: '10px 14px',
+                        padding: 'var(--pad-card)',
                         borderBottom: i < active.length - 1 ? '1px solid var(--border)' : 'none',
                         display: 'flex', alignItems: 'center', gap: 10,
                         cursor: 'pointer'
                       }}
                     >
-                      <span style={{ fontSize: 16, flexShrink: 0 }}>{LEVEL_ICON[a.level]}</span>
+                      <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>{LEVEL_ICON[a.level]}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{
                           fontSize: 'var(--fs-sm)', fontWeight: 600,
@@ -130,7 +130,7 @@ export default function ListCards({
                         key={f.id}
                         onClick={() => nav('/flk')}
                         style={{
-                          padding: '10px 14px',
+                          padding: 'var(--pad-card)',
                           borderBottom: i < Math.min(activeFlocks.length, 3) - 1 ? '1px solid var(--border)' : 'none',
                           cursor: 'pointer'
                         }}
@@ -140,7 +140,7 @@ export default function ListCards({
                             width: 36, height: 36, borderRadius: 'var(--r-md)',
                             background: 'var(--accent-soft)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 16, flexShrink: 0
+                            fontSize: 'var(--fs-md)', flexShrink: 0
                           }}>🐔</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{
@@ -196,7 +196,7 @@ export default function ListCards({
                         key={e.id}
                         onClick={() => nav('/inc')}
                         style={{
-                          padding: '10px 14px',
+                          padding: 'var(--pad-card)',
                           borderBottom: i < Math.min(activeEntries.length, 2) - 1 ? '1px solid var(--border)' : 'none',
                           display: 'flex', alignItems: 'center', gap: 10,
                           cursor: 'pointer'
@@ -206,7 +206,7 @@ export default function ListCards({
                           width: 36, height: 36, borderRadius: 'var(--r-md)',
                           background: window ? 'var(--purple-soft)' : locked ? 'var(--warn-soft)' : 'var(--accent-soft)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 16, flexShrink: 0
+                          fontSize: 'var(--fs-md)', flexShrink: 0
                         }}>🥚</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{
@@ -232,7 +232,7 @@ export default function ListCards({
               <div
                 onClick={() => nav('/whs')}
                 style={{
-                  padding: '12px 14px',
+                  padding: 'var(--pad-card)',
                   background: 'var(--warn-soft)',
                   border: '1px solid var(--warn)',
                   borderRadius: 'var(--r-md)',

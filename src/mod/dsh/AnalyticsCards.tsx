@@ -99,7 +99,7 @@ export default function AnalyticsCards({
                   background: 'var(--card)',
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--r-lg)',
-                  padding: '10px 12px'
+                  padding: 'var(--pad-card)'
                 }}>
                   <div style={{
                     display: 'flex',
@@ -223,7 +223,7 @@ export default function AnalyticsCards({
                   <div
                     onClick={() => nav('/tra')}
                     style={{
-                      padding: '8px 10px',
+                      padding: 'var(--pad-inner)',
                       background: 'var(--accent-soft)',
                       border: '1px solid var(--accent-border)',
                       borderRadius: 'var(--r-md)',

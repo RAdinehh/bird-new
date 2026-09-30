@@ -15,7 +15,7 @@ function QuickAction({ icon, label, onClick }: { icon: string; label: string; on
         cursor: 'pointer'
       }}
     >
-      <div style={{ fontSize: 22 }}>{icon}</div>
+      <div style={{ fontSize: 'var(--fs-xl)' }}>{icon}</div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', marginTop: 4, fontWeight: 600 }}>
         {label}
       </div>

@@ -59,7 +59,7 @@ export default function TodayCard({
                     background: 'var(--card)',
                     border: '1px solid var(--border)',
                     borderRadius: 'var(--r-lg)',
-                    padding: '10px 12px',
+                    padding: 'var(--pad-card)',
                   }}>
                     <div style={{
                       display: 'flex',
@@ -102,7 +102,7 @@ export default function TodayCard({
                           marginBottom: 6,
                         }}>
                           <div style={{
-                            padding: '6px 10px',
+                            padding: 'var(--pad-inner)',
                             background: 'var(--input-bg)',
                             borderRadius: 'var(--r-sm)',
                           }}>
@@ -119,7 +119,7 @@ export default function TodayCard({
                             </div>
                           </div>
                           <div style={{
-                            padding: '6px 10px',
+                            padding: 'var(--pad-inner)',
                             background: 'var(--input-bg)',
                             borderRadius: 'var(--r-sm)',
                           }}>
@@ -138,7 +138,7 @@ export default function TodayCard({
                         </div>
 
                         <div style={{
-                          padding: '6px 10px',
+                          padding: 'var(--pad-inner)',
                           background: benchmarkData.fcrDiff <= 0 ? 'var(--accent-soft)' : benchmarkData.fcrDiff <= 10 ? 'var(--warn-soft)' : 'var(--danger-soft)',
                           border: `1px solid ${benchmarkData.fcrDiff <= 0 ? 'var(--accent-border)' : benchmarkData.fcrDiff <= 10 ? 'var(--warn)' : 'var(--danger)'}`,
                           borderRadius: 'var(--r-sm)',
@@ -155,7 +155,7 @@ export default function TodayCard({
                         {benchmarkData.henDay > 0 && (
                           <div style={{
                             marginTop: 6,
-                            padding: '6px 10px',
+                            padding: 'var(--pad-inner)',
                             background: 'var(--input-bg)',
                             borderRadius: 'var(--r-sm)',
                             display: 'flex',
@@ -174,7 +174,7 @@ export default function TodayCard({
                       </>
                     ) : (
                       <div style={{
-                        padding: '10px 12px',
+                        padding: 'var(--pad-card)',
                         background: 'var(--input-bg)',
                         borderRadius: 'var(--r-sm)',
                         fontSize: 'var(--fs-xs)',

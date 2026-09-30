@@ -29,12 +29,12 @@ export function KpiCard({ icon, label, value, unit, color, onClick, noFormat }: 
         background: 'var(--card)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-lg)',
-        padding: '12px 14px',
+        padding: 'var(--pad-card)',
         cursor: onClick ? 'pointer' : 'default'
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-        <span style={{ fontSize: 16 }}>{icon}</span>
+        <span style={{ fontSize: 'var(--fs-md)' }}>{icon}</span>
         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
           {label}
         </span>
@@ -95,7 +95,7 @@ export function MiniEmpty({ icon, title, hint }: { icon: string; title: string; 
       background: 'var(--card)', border: '1px solid var(--border)',
       borderRadius: 'var(--r-lg)',
     }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>{icon}</div>
+      <div style={{ fontSize: 'var(--fs-hero)', marginBottom: 12 }}>{icon}</div>
       <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 6 }}>{title}</div>
       <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.8 }}>{hint}</div>
     </div>

@@ -39,7 +39,7 @@ export default function TopAlerts({
                 overflow: 'hidden',
               }}>
                 <div style={{
-                  padding: '8px 12px',
+                  padding: 'var(--pad-inner)',
                   background: 'var(--danger-soft)',
                   fontSize: 'var(--fs-sm)',
                   fontWeight: 700,
@@ -53,7 +53,7 @@ export default function TopAlerts({
                       key={i}
                       onClick={() => nav(a.route)}
                       style={{
-                        padding: '6px 10px',
+                        padding: 'var(--pad-inner)',
                         background: `var(--${a.tone}-soft)`,
                         borderRadius: 'var(--r-sm)',
                         display: 'flex',
@@ -90,7 +90,7 @@ export default function TopAlerts({
                         key={inv.id}
                         onClick={() => nav('/tra?tab=receivables')}
                         style={{
-                          padding: '8px 12px',
+                          padding: 'var(--pad-inner)',
                           background: `var(--${tone}-soft, var(--input-bg))`,
                           border: `1px solid var(--${tone})`,
                           borderRadius: 'var(--r-md)',
@@ -131,7 +131,7 @@ export default function TopAlerts({
                         key={pay.id}
                         onClick={() => nav('/tra?tab=receivables')}
                         style={{
-                          padding: '8px 12px',
+                          padding: 'var(--pad-inner)',
                           background: 'var(--input-bg)',
                           border: '1px solid var(--border)',
                           borderRadius: 'var(--r-md)',
@@ -163,7 +163,7 @@ export default function TopAlerts({
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--r-lg)'
               }}>
-                <div style={{ fontSize: 48, marginBottom: 12 }}>🐔</div>
+                <div style={{ fontSize: 'var(--fs-hero)', marginBottom: 12 }}>🐔</div>
                 <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, marginBottom: 8 }}>خوش آمدید</div>
                 <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.8, maxWidth: 300, margin: '0 auto' }}>
                   برای شروع، از منوی بالا اولین پرنده یا سالن خود را بسازید.

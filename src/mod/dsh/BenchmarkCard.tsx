@@ -39,7 +39,7 @@ export default function BenchmarkCard() {
   const Row = ({ label, active, arch, cmp, lowerBetter }: any) => {
     const good = lowerBetter ? cmp < 0 : cmp > 0;
     return (
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--pad-inner)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
         <span style={{ flex: 1 }}>{label}</span>
         <span style={{ direction: 'ltr', width: 70, textAlign: 'center', fontWeight: 600 }}>{toFa(active.toFixed(1))}</span>
         <span style={{ direction: 'ltr', width: 70, textAlign: 'center', color: 'var(--muted)' }}>{toFa(arch.toFixed(1))}</span>
@@ -51,7 +51,7 @@ export default function BenchmarkCard() {
   };
 
   return (
-    <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ padding: 'var(--pad-card)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 8 }}>
       <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>📈 Benchmark — مقایسه گله‌ها</div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
         فعال ({toFa(active.length)}) vs آرشیو ({toFa(archived.length)})
