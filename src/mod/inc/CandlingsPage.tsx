@@ -64,6 +64,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
   const [q, setQ] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ candling: any } | null>(null);
 
   useEffect(() => {
     if (initialEntry) {
@@ -86,6 +87,12 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     const stages = candlings.filter(c => c.eggEntryId === eggEntryId).map(c => c.stage);
     if (stages.length === 0) return 7;
     return Math.max(...stages) + 3;
+  };
+
+  const undoDeleteCandling = () => {
+    if (!undoData) return;
+    try { addCandling(undoData.candling); } catch {}
+    setUndoData(null);
   };
 
   const openNew = (preEntryId?: string) => {
@@ -261,6 +268,23 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
   return (
     <PageContainer>
+      {undoData && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '10px 14px', marginBottom: 8,
+          background: 'var(--warn-soft)',
+          border: '1px solid var(--warn)',
+          borderRadius: 'var(--r-md)',
+          fontSize: 'var(--fs-sm)',
+        }}>
+          <span>کندلینگ حذف شد</span>
+          <button type="button" onClick={undoDeleteCandling} style={{
+            background: 'none', border: 'none',
+            color: 'var(--warn)', fontWeight: 700, cursor: 'pointer',
+            fontFamily: 'inherit', fontSize: 'var(--fs-sm)', padding: '4px 10px',
+          }}>بازگردانی</button>
+        </div>
+      )}
       {/* ═══ خلاصه کل ═══ */}
       {summary.totalCandlings > 0 && (
         <div style={{
@@ -289,7 +313,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       )}
 
       {candlings.length > 0 && (
-        <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (نام پرنده، دستگاه، تاریخ...)" />
+        <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (نام پرنده، دستگاه، تاریخ...)" aria-label="جستجو در کندلینگ‌ها" />
       )}
 
       {candlings.length === 0 ? (
@@ -497,7 +521,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                   gap: 8,
                 }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={isSelected} onChange={() => toggleEntry(e.id)} style={{ width: 18, height: 36, accentColor: 'var(--accent)' }} />
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleEntry(e.id)} aria-label="انتخاب این ورودی" style={{ width: 20, height: 20, accentColor: 'var(--accent)', cursor: 'pointer' }} />
                     <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
                       {bird?.name || '—'} · {toFa(e.count || 0)} تخم
                     </span>
@@ -514,10 +538,10 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                   <div style={{
                     fontSize: 'var(--fs-xs)',
                     padding: 'var(--pad-tight)',
-                    background: 'var(--info-soft)',
-                    border: '1px solid var(--info)',
+                    background: 'var(--accent-soft)',
+                    border: '1px solid var(--accent-border)',
                     borderRadius: 'var(--r-sm)',
-                    color: 'var(--info)',
+                    color: 'var(--accent)',
                     fontWeight: 700,
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -577,7 +601,16 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف کندلینگ"
-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteCandling(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="danger" onClick={() => {
+          if (!delId) return;
+          const item = candlings.find((x: any) => x.id === delId);
+          if (item) {
+            setUndoData({ candling: item });
+            setTimeout(() => setUndoData(cur => cur && cur.candling.id === item.id ? null : cur), 6000);
+          }
+          deleteCandling(delId);
+          setDelId(null);
+        }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف کندلینگ روز {toFa(target?.stage || 0)}؟</div>
       </Modal>
     </PageContainer>
