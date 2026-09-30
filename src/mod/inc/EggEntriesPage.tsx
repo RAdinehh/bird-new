@@ -129,6 +129,36 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     setEditingRowId(null);
   }, [open, multiDeviceId]);
 
+  // ═══ Migration خودکار: تاریخ میلادی → شمسی ═══
+  useEffect(() => {
+    const toJalali = (miladi: string): string => {
+      try {
+        const p = miladi.split('/').map(x => parseInt(x, 10));
+        if (p.length !== 3) return miladi;
+        const date = new Date(p[0], p[1] - 1, p[2]);
+        const fmt = new Intl.DateTimeFormat('en-US-u-ca-persian', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        const parts = fmt.formatToParts(date);
+        const jy = parseInt(parts.find(x => x.type === 'year')?.value || '0');
+        const jm = parseInt(parts.find(x => x.type === 'month')?.value || '0');
+        const jd = parseInt(parts.find(x => x.type === 'day')?.value || '0');
+        return jy + '/' + String(jm).padStart(2, '0') + '/' + String(jd).padStart(2, '0');
+      } catch { return miladi; }
+    };
+
+    eggEntries.forEach(e => {
+      const ed = String(e.entryDate || '');
+      const m = ed.match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
+      if (m && parseInt(m[1]) > 1900 && parseInt(m[1]) < 2100) {
+        const jalaliDate = toJalali(ed);
+        if (jalaliDate && jalaliDate !== ed) {
+          updateEntry(e.id, { entryDate: jalaliDate, expectedHatchDate: '' } as any);
+        }
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   // ═══ Draft Auto-Save ═══
   useEffect(() => {
     if (!open || !multiDeviceId) return;
@@ -543,19 +573,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               <button key={src.id} onClick={() => setFilterSource(filterSource === src.id ? '' : src.id)} style={chip(filterSource === src.id)}>{src.label}</button>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-            <span style={{ color: 'var(--muted)', alignSelf: 'center', fontSize: 'var(--fs-xs)' }}>وضعیت:</span>
-            {[
-              { id: 'incubating', label: 'در انکوباسیون' },
-              { id: 'candled', label: 'کندل‌شده' },
-              { id: 'locked', label: 'Lock-down' },
-              { id: 'hatched', label: 'هچ‌شده' },
-              { id: 'failed', label: 'ناموفق' },
-            ].map(st => (
-              <button key={st.id} onClick={() => setFilterStatus(filterStatus === st.id ? '' : st.id)} style={chip(filterStatus === st.id)}>{st.label}</button>
-            ))}
-          </div>
-        </>
+          </>
+
       )}
 
       {list.length === 0 ? (
