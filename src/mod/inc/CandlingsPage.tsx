@@ -328,7 +328,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                         onClick={() => openEdit(c)}
                         title={toFa(c.date)}
                         style={{
-                          padding: '6px 24px 6px 10px',
+                          padding: '6px 12px 6px 28px',
                           background: 'var(--accent-soft)',
                           border: '1px solid var(--accent-border)',
                           borderRadius: 'var(--r-sm)',
@@ -356,15 +356,23 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                         title="بازگردانی و حذف بعدی‌ها"
                         style={{
                           position: 'absolute',
-                          top: 2,
-                          left: 2,
-                          background: 'transparent',
-                          border: 'none',
+                          top: '50%',
+                          left: 4,
+                          transform: 'translateY(-50%)',
+                          background: 'var(--danger-soft)',
+                          border: '1px solid var(--danger)',
                           color: 'var(--danger)',
                           cursor: 'pointer',
-                          fontSize: 10,
-                          padding: 2,
+                          fontSize: 9,
+                          lineHeight: 1,
+                          padding: '2px 4px',
+                          borderRadius: 'var(--r-sm)',
                           fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minWidth: 16,
+                          height: 16,
                         }}
                       >✕</button>
                     </div>
