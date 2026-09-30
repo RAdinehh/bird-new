@@ -154,11 +154,51 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
   const addRowToList = () => {
+    const cnt = parseInt(toEn(currentRow.count)) || 0;
     if (!currentRow.count.trim()) { showAlert('تعداد تخم اجباری است'); return; }
+    if (cnt <= 0) { showAlert('تعداد باید بزرگتر از صفر باشد', '❌ خطا'); return; }
     if (!currentRow.entryDate.trim()) { showAlert('تاریخ ورود اجباری است'); return; }
     if (currentRow.dealType === 'purchase' && !currentRow.dealData.sellerId) { showAlert('فروشنده اجباری است'); return; }
     if (currentRow.dealType === 'partnership' && !currentRow.dealData.partnerId) { showAlert('شریک اجباری است'); return; }
     if (currentRow.dealType === 'own' && !currentRow.flockId) { showAlert('گله اجباری است'); return; }
+
+    // ═══ چک ظرفیت ═══
+    const device = devices.find(d => d.id === multiDeviceId);
+    if (device) {
+      const bird = birds.find(b => b.id === currentRow.birdId);
+      const refCap = Math.max(...(device.capacityByBird || []).map((c: any) => c.capacity || 0));
+      if (refCap > 0 && bird) {
+        // محاسبه استفاده با این ردیف جدید (نه ردیف فعلی)
+        let used = 0;
+        const allEntries = eggEntries.map(x => ({ ...x, __birdName: (birds.find(b => b.id === x.birdId)?.name) || '' }));
+        allEntries.forEach(e => {
+          if (e.status === 'failed') return;
+          const cap = (device.capacityByBird || []).find((c: any) => c.birdName === e.__birdName);
+          if (!cap?.capacity) return;
+          used += (e.count || 0) * (refCap / cap.capacity);
+        });
+        // ردیف‌های دیگر (به جز ردیف در حال ویرایش)
+        draftRows.forEach(r => {
+          if (editingRowId && r._id === editingRowId) return;
+          const b = birds.find(x => x.id === r.birdId);
+          if (!b) return;
+          const cap = (device.capacityByBird || []).find((c: any) => c.birdName === b.name);
+          if (!cap?.capacity) return;
+          used += (parseInt(toEn(r.count)) || 0) * (refCap / cap.capacity);
+        });
+        // این ردیف جدید
+        const thisCap = (device.capacityByBird || []).find((c: any) => c.birdName === bird.name);
+        if (thisCap?.capacity) {
+          used += cnt * (refCap / thisCap.capacity);
+        }
+        const percent = Math.round((used / refCap) * 100);
+        if (percent > 100) {
+          const extra = Math.round((used - refCap) * 10) / 10;
+          const ok = confirm('⚠️ با این ردیف، ظرفیت به ' + toFa(percent) + '٪ می‌رسد.\n' + 'واحد اضافی: ' + toFa(extra) + '\n\nادامه بدهم؟');
+          if (!ok) return;
+        }
+      }
+    }
 
     if (editingRowId) {
       setDraftRows(rows => rows.map(r => r._id === editingRowId ? { ...currentRow, _id: editingRowId } : r));
@@ -555,9 +595,22 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           <SmartSelect value={multiDeviceId} onChange={v => { setMultiDeviceId(v); }} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
         </Field>
         {draftUsage.total > 0 && (
-          <div style={{ fontSize: 'var(--fs-xs)', color: draftUsage.percent > 100 ? 'var(--danger)' : 'var(--muted)', fontWeight: 600, padding: '4px 2px' }}>
+          <div style={{
+            padding: '8px 12px',
+            background: draftUsage.percent > 100 ? 'var(--danger-soft)' : 'var(--input-bg)',
+            border: '1px solid ' + (draftUsage.percent > 100 ? 'var(--danger)' : 'var(--border)'),
+            borderRadius: 'var(--r-md)',
+            fontSize: 'var(--fs-sm)',
+            fontWeight: 700,
+            color: draftUsage.percent > 100 ? 'var(--danger)' : 'var(--text)',
+          }}>
             📊 استفاده: {toFa(draftUsage.used)} / {toFa(draftUsage.total)} واحد ({toFa(draftUsage.percent)}٪)
-            {draftUsage.percent > 100 ? ' ⚠️ بیشتر از ظرفیت' : ''}
+            {draftUsage.percent > 100 && (
+              <>
+                <br />⚠️ بیشتر از ظرفیت دستگاه! {toFa(Math.round((draftUsage.used - draftUsage.total) * 10) / 10)} واحد اضافی
+                <br />💡 یک ردیف یا تعدادش رو کم کن
+              </>
+            )}
           </div>
         )}
 
@@ -702,7 +755,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         </Grid2>
         <Grid2>
           <Field label="تعداد تخم" required>
-            <NumField value={currentRow.count} onChange={e => setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} />
+            <NumField value={currentRow.count} onChange={e => setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} autoClamp />
           </Field>
           <Field label="طبقات (Tray)">
             <Input placeholder="۱-۲-۳" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
