@@ -40,7 +40,7 @@ interface F {
   notes: string;
 }
 
-const empty = (): F => ({
+const empty = (isPurchase: boolean): F => ({
   date: '', partyId: '', category: isPurchase ? 'egg' : 'chick', items: [],
   paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
   customDueDate: '', isPreorder: false, deliveryDate: '',
@@ -57,7 +57,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
 
   // ==== State ====
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<F>(empty());
+  const [form, setForm] = useState<F>(empty(isPurchase));
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [filterCat, setFilterCat] = useState('');
@@ -108,7 +108,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
   // ==== Handlers ====
   const openNew = () => {
     if (parties.length === 0) { showAlert(isPurchase ? 'اول یک فروشنده بسازید' : 'اول یک مشتری بسازید'); return; }
-    setForm({ ...empty(), partyId: parties[0].id });
+    setForm({ ...empty(isPurchase), partyId: parties[0].id });
     setErr(''); setOpen(true);
   };
 
