@@ -8,6 +8,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { Row, SectionTitle, NutrientRow } from './helpers';
 
 interface F {
   id?: string;
@@ -388,49 +389,5 @@ export default function FormulasPage() {
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.name}</b>؟</div>
       </Modal>
     </PageContainer>
-  );
-}
-
-function Row({ l, v }: { l: string; v: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-      <span style={{ color: 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
-    </div>
-  );
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)',
-       fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
-  );
-}
-
-function NutrientRow({ l, value, target, unit }: { l: string; value: number; target?: number; unit: string }) {
-  let diff = 0;
-  let tone: 'ok' | 'low' | 'high' = 'ok';
-  if (target !== undefined && target > 0) {
-    diff = value - target;
-    const pct = (diff / target) * 100;
-    if (pct < -5) tone = 'low';
-    else if (pct > 5) tone = 'high';
-  }
-  const color = tone === 'ok' ? 'var(--accent)' : tone === 'low' ? 'var(--danger)' : 'var(--warn)';
-
-  return (
-    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-        <span style={{ color: 'var(--muted)' }}>{l}:</span>
-        <span style={{ fontWeight: 600, color: color }}>{toFa(value)} {unit}</span>
-      </div>
-      {target !== undefined && target > 0 ? (
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', marginTop: 2, color: 'var(--muted)' }}>
-          <span>هدف: {toFa(target)} {unit}</span>
-          <span style={{ color: color }}>{diff >= 0 ? '+' : ''}{toFa(diff.toFixed(2))}</span>
-        </div>
-      ) : null}
-    </div>
   );
 }
