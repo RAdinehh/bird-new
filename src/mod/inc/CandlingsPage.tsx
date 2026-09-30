@@ -313,11 +313,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                 subtitle={(dev?.name || '—') + ' · ' + toFa(entryTotal) + ' تخم · ' + toFa(entry?.entryDate || '—')}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : entryId)}
                 badge={<Tag tone={lossTone}>تلفات {toFa(lossPercent.toFixed(0))}٪</Tag>}
-                summary={<>
-                  <span>🧬 <b style={{ color: 'var(--accent)' }}>{toFa(fertilePercent.toFixed(0))}٪</b></span>
-                  <span>📉 <b style={{ color: lossPercent > 10 ? 'var(--danger)' : 'var(--text)' }}>{toFa(lossPercent.toFixed(0))}٪</b></span>
-                  <span>🔍 {toFa(list.length)} کندلینگ</span>
-                </>}
                 stats={<>
                   <StatBox icon="🧬" label="نطفه" value={toFa(Math.round(fertilePercent)) + '٪'} tone="accent" />
                   <Dot />

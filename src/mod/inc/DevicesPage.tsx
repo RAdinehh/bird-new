@@ -227,11 +227,6 @@ export default function DevicesPage() {
                 title={d.name} subtitle={MODE_FA[d.mode] + ' · ' + STATUS_FA[d.status]}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : d.id)}
                 badge={activeEntries > 0 ? <Tag tone="green">{toFa(activeEntries)} ورودی فعال</Tag> : undefined}
-                summary={<>
-                  {totalEggs > 0 && <span>تخم: <b>{toFa(totalEggs)}</b></span>}
-                  {d.temp && <span>🌡 {toFa(d.temp)}°</span>}
-                  {d.humidity && <span>💧 {toFa(d.humidity)}٪</span>}
-                </>}
               >
                 {caps.length > 0 && (
                   <>

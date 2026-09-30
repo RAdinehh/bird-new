@@ -238,7 +238,6 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                 subtitle={(dev?.name || '—') + ' · ' + toFa(h.date)}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
                 badge={<Tag tone={tone}>{toFa(hr.toFixed(1))}٪</Tag>}
-                summary={<><span>🐣 {toFa(h.hatched || 0)}</span><span>🥚 {toFa(total)}</span><span>📊 {toFa(hr.toFixed(0))}٪</span></>}
                 stats={<>
                   <StatBox icon="📊" label="نرخ" value={toFa(hr.toFixed(0)) + '٪'} tone={hr >= 70 ? 'accent' : 'warn'} />
                   <Dot />

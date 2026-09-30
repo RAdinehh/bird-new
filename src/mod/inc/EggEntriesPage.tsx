@@ -621,11 +621,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 subtitle={dev?.name || '—'}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : e.id)}
                 badge={<Tag tone={statusTone}>{statusLabel}</Tag>}
-                summary={<>
-                  <span>ورود: <b style={{ color: 'var(--text)' }}>{toFa(e.entryDate)}{(e as any).entryTime ? ' · ' + toFa((e as any).entryTime) : ''}</b></span>
-                  {expHatch && <span>هچ: <b style={{ color: 'var(--text)' }}>{toFa(expHatch)}</b></span>}
-                  <span>{DEAL_LABEL[e.dealType]}</span>
-                </>}
                 stats={<>
                   <StatBox icon="⏳" label="مانده" value={toFa(remain) + ' روز'} tone={remain <= 3 ? 'warn' : 'default'} />
                   <Dot />
