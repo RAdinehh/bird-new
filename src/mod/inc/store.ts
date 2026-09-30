@@ -229,7 +229,8 @@ export function jalaliToDate(s: string): Date | null {
 export function daysAgo(s: string): number {
   const d = jalaliToDate(s);
   if (!d) return 0;
-  return Math.max(0, diffDaysJ(new Date(), d));
+  const days = diffDaysJ(new Date(), d);
+  return Math.max(1, days + 1);  // روز اول انکوباسیون = ۱
 }
 
 export function addDaysJalali(s: string, days: number): string {
