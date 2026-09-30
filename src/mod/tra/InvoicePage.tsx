@@ -115,16 +115,28 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
       .filter(i => i.type === kind && i.partyId)
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
     const defaultParty = lastInv?.partyId || parties[0].id;
-    // آخرین دسته استفاده‌شده (اگه بود)
+    // آخرین دسته
     const lastCatInv = invoices
       .filter(i => i.type === kind && i.category)
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
     const defaultCat = lastCatInv?.category;
+    // آخرین شرایط پرداخت
+    const lastPayInv = invoices
+      .filter(i => i.type === kind && i.paymentTerms)
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    const defaultPaymentTerms = lastPayInv?.paymentTerms;
+    // آخرین آیتم‌های معامله (برای قیمت واحد)
+    const lastItems = lastInv?.items || [];
+    const defaultItems = lastItems.length > 0
+      ? lastItems.map(it => ({ ...it, id: crypto.randomUUID() }))
+      : [];
     setForm({
       ...empty(isPurchase),
       date: today,
       partyId: defaultParty,
       ...(defaultCat ? { category: defaultCat } : {}),
+      ...(defaultPaymentTerms ? { paymentTerms: defaultPaymentTerms } : {}),
+      ...(defaultItems.length > 0 ? { items: defaultItems } : {}),
     });
     setErr(''); setOpen(true);
   };
