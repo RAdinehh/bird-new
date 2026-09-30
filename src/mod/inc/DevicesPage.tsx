@@ -284,7 +284,32 @@ export default function DevicesPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 4 }}>
                     {logs.slice().reverse().slice(0, 6).map((m: any) => (
                       <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 3, fontSize: 'var(--fs-sm)', padding: '8px 24px 8px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', position: 'relative' }}>
-                        <button type="button" onClick={() => removeMaintenance(d.id, m.id)} style={{ position: 'absolute', top: 4, left: 4, background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 'var(--fs-xs)', padding: 2 }}>✕</button>
+                        <button
+                          type="button"
+                          onClick={() => removeMaintenance(d.id, m.id)}
+                          title="حذف"
+                          aria-label="حذف"
+                          style={{
+                            position: 'absolute',
+                            top: 3,
+                            left: 3,
+                            background: 'var(--danger-soft)',
+                            border: '1px solid var(--danger)',
+                            color: 'var(--danger)',
+                            cursor: 'pointer',
+                            borderRadius: 'var(--r-sm)',
+                            fontSize: 10,
+                            lineHeight: 1,
+                            padding: '2px 5px',
+                            fontWeight: 700,
+                            minWidth: 18,
+                            height: 18,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontFamily: 'inherit',
+                          }}
+                        >✕</button>
                         <span style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.type}</span>
                         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(m.date)}</span>
                         {m.cost ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600 }}>{toFa(m.cost.toLocaleString('fa-IR'))} ت</span> : null}

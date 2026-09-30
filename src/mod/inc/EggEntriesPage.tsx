@@ -775,7 +775,29 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   </div>
                   <div style={{ position: 'absolute', top: 6, left: 6, display: 'flex', gap: 2 }}>
                     <button type="button" onClick={() => editRow(r)} style={{ background: 'none', border: 'none', color: 'var(--text)', cursor: 'pointer', fontSize: 'var(--fs-xs)', padding: 3 }}>✏️</button>
-                    <button type="button" onClick={() => removeRow(r._id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 'var(--fs-xs)', padding: 3 }}>✕</button>
+                    <button
+                        type="button"
+                        onClick={() => removeRow(r._id)}
+                        title="حذف"
+                        aria-label="حذف"
+                        style={{
+                          background: 'var(--danger-soft)',
+                          border: '1px solid var(--danger)',
+                          color: 'var(--danger)',
+                          cursor: 'pointer',
+                          borderRadius: 'var(--r-sm)',
+                          fontSize: 11,
+                          lineHeight: 1,
+                          padding: '2px 6px',
+                          fontWeight: 700,
+                          minWidth: 20,
+                          height: 20,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontFamily: 'inherit',
+                        }}
+                      >✕</button>
                   </div>
                 </div>
               );
