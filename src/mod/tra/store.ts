@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ } from 'date-fns-jalali';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { useWhs } from '../whs/store';
@@ -489,18 +490,47 @@ export function invoiceStatus(inv: Invoice): InvoiceStatus {
   return 'unpaid';
 }
 
+
+
+// تبدیل تاریخ‌های میلادی ذخیره‌شده به شمسی
+function migrateInvDates(inv: any): any {
+  if (!inv) return inv;
+  const fix = (str: string) => {
+    if (!str) return str;
+    const en = String(str).replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const m = en.match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
+    if (!m) return str;
+    const y = parseInt(m[1], 10);
+    if (y >= 1900 && y <= 2100) {
+      try {
+        const d = new Date(y, parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+        return formatJ(d, 'yyyy/MM/dd');
+      } catch { return str; }
+    }
+    return str;
+  };
+  if (inv.date) inv.date = fix(inv.date);
+  if (inv.dueDate) inv.dueDate = fix(inv.dueDate);
+  if (inv.customDueDate) inv.customDueDate = fix(inv.customDueDate);
+  return inv;
+}
+
 export function remaining(inv: Invoice): number {
   const paid = paidSum(inv.payments || []);
   return Math.max(0, (inv.total || 0) - paid);
 }
 
 export function ageDays(inv: Invoice): number {
-  if (inv.date === '' || inv.date == null) return 0;
-  const parts = inv.date.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString()).split('/');
-  if (parts.length !== 3) return 0;
-  const d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
-  const diff = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
-  return diff > 0 ? diff : 0;
+  if (!inv.date) return 0;
+  try {
+    const en = inv.date.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const d = parseJ(en, 'yyyy/MM/dd', new Date());
+    if (isNaN(d.getTime())) return 0;
+    const diff = diffDaysJ(new Date(), d);
+    return diff > 0 ? diff : 0;
+  } catch {
+    return 0;
+  }
 }
 
 export function agingBucket(days: number): string {
