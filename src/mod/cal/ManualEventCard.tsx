@@ -124,7 +124,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
         footer={<BtnRow><Btn variant="primary" onClick={handleSave}>ذخیره</Btn><Btn onClick={() => setEditOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Field label="عنوان" required>
-          <Input value={title} onChange={e => setTitle(e.target.value)} />
+          <Input placeholder="عنوان..." value={title} onChange={e => setTitle(e.target.value)} />
         </Field>
         <Grid2>
           <Field label="تاریخ" required>

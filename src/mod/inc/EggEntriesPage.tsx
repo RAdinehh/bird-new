@@ -977,7 +977,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   <MoneyField placeholder="مثلاً: ۲٬۵۰۰٬۰۰۰" value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
                 </Field>
                 <Field label="هزینه حمل">
-                  <MoneyField value={currentRow.shippingCost} onChange={e => setCurrentRow(f => ({ ...f, shippingCost: e.target.value }))} />
+                  <MoneyField placeholder="مثلاً: ۵۰۰٬۰۰۰" value={currentRow.shippingCost} onChange={e => setCurrentRow(f => ({ ...f, shippingCost: e.target.value }))} />
                 </Field>
               </Grid2>
               {(() => {
