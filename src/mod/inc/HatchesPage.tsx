@@ -418,22 +418,22 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                             return (
                               <>
                                 <div style={{ padding: 'var(--pad-tight)', background: myCand ? 'var(--accent-soft)' : 'var(--warn-soft)', border: '1px solid ' + (myCand ? 'var(--accent-border)' : 'var(--warn)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: myCand ? 'var(--accent)' : 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
-                                  {calc.byStage.length > 0 ? '🧬 سقف این هچ: ' + toFa(base) + ' (نطفه‌دار فعلی)' : '⚠️ بدون کندلینگ — سقف: ' + toFa(base) + ' تخم'}
+                                  {calc.byStage.length > 0 ? '🧬 سقف این هچ — ' + toFa(base) + ' (نطفه‌دار فعلی)' : '⚠️ بدون کندلینگ — سقف — ' + toFa(base) + ' تخم'}
                                 </div>
                                 <Grid2>
                                   <Field label="جوجه هچ‌شده" required>
-                                    <NumField placeholder="مثلاً: ۴۵۰" value={d.hatched} onChange={ev => updateData(e.id, { hatched: ev.target.value })} max={Math.max(0, base - uh - ds - pp - ot)} min={0} unit="عدد" />
+                                    <NumField placeholder="مثلاً — ۴۵۰" value={d.hatched} onChange={ev => updateData(e.id, { hatched: ev.target.value })} max={Math.max(0, base - uh - ds - pp - ot)} min={0} unit="عدد" />
                                   </Field>
                                   <Field label="هچ‌نشده">
-                                    <NumField placeholder="مثلاً: ۲۰" value={d.unhatched} onChange={ev => updateData(e.id, { unhatched: ev.target.value })} max={Math.max(0, base - h - ds - pp - ot)} min={0} unit="عدد" />
+                                    <NumField placeholder="مثلاً — ۲۰" value={d.unhatched} onChange={ev => updateData(e.id, { unhatched: ev.target.value })} max={Math.max(0, base - h - ds - pp - ot)} min={0} unit="عدد" />
                                   </Field>
                                 </Grid2>
                                 <Grid2>
                                   <Field label="مرده در پوسته">
-                                    <NumField placeholder="مثلاً: ۱۰" value={d.deadInShell} onChange={ev => updateData(e.id, { deadInShell: ev.target.value })} max={Math.max(0, base - h - uh - pp - ot)} min={0} unit="عدد" />
+                                    <NumField placeholder="مثلاً — ۱۰" value={d.deadInShell} onChange={ev => updateData(e.id, { deadInShell: ev.target.value })} max={Math.max(0, base - h - uh - pp - ot)} min={0} unit="عدد" />
                                   </Field>
                                   <Field label="نوک‌زده">
-                                    <NumField placeholder="مثلاً: ۵" value={d.pipped} onChange={ev => updateData(e.id, { pipped: ev.target.value })} max={Math.max(0, base - h - uh - ds - ot)} min={0} unit="عدد" />
+                                    <NumField placeholder="مثلاً — ۵" value={d.pipped} onChange={ev => updateData(e.id, { pipped: ev.target.value })} max={Math.max(0, base - h - uh - ds - ot)} min={0} unit="عدد" />
                                   </Field>
                                 </Grid2>
                                 <Grid2>
@@ -441,7 +441,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                                     <NumField value={d.other} onChange={ev => updateData(e.id, { other: ev.target.value })} max={Math.max(0, base - h - uh - ds - pp)} min={0} unit="عدد" />
                                   </Field>
                                   <Field label="وزن متوسط" hint="۲۰-۶۰ گرم">
-                                    <NumField placeholder="مثلاً: ۱.۵" value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" />
+                                    <NumField placeholder="مثلاً — ۱.۵" value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" />
                                   </Field>
                                 </Grid2>
                                 <div style={{ padding: 'var(--pad-normal)', background: !ok ? 'var(--danger-soft)' : remaining === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
@@ -515,7 +515,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                           })()}
                           <Field label="یادداشت"><Input value={d.notes || ''} onChange={ev => updateData(e.id, { notes: ev.target.value })} placeholder="..." /></Field>
                           <div style={{ padding: 'var(--pad-tight)', background: rem < 0 ? 'var(--danger-soft)' : rem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
-                            این هچ: {toFa(sumE)} از {toFa(e.count || 0)}{rem > 0 && ' · باقی: ' + toFa(rem)}{rem < 0 && ' — بیشتر!'}{rem === 0 && ' ✅'}
+                            این هچ: {toFa(sumE)} از {toFa(e.count || 0)}{rem > 0 && ' · باقی — ' + toFa(rem)}{rem < 0 && ' — بیشتر!'}{rem === 0 && ' ✅'}
                           </div>
                         </>
                       )}
@@ -616,7 +616,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
       <Modal open={!!flockModal} onClose={() => setFlockModal(null)} title="🐔 ساخت گله جدید"
         footer={<BtnRow><Btn variant="primary" onClick={createFlock}>ساخت گله</Btn><Btn onClick={() => setFlockModal(null)}>لغو</Btn></BtnRow>}>
         <Field label="نام گله" required>
-          <Input placeholder="مثلاً: گله بهار ۱۴۰۵" value={flockForm.name} onChange={e => setFlockForm({...flockForm, name: e.target.value})} />
+          <Input placeholder="مثلاً — گله بهار ۱۴۰۵" value={flockForm.name} onChange={e => setFlockForm({...flockForm, name: e.target.value})} />
         </Field>
         <Grid2>
           <Field label="نوع" required>
@@ -627,7 +627,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
             </Select>
           </Field>
           <Field label="تعداد">
-            <Input placeholder="مثلاً: ۱۰۰" value={String(flockModal?.count || 0)} readOnly dir="ltr" unit="پرنده" />
+            <Input placeholder="مثلاً — ۱۰۰" value={String(flockModal?.count || 0)} readOnly dir="ltr" unit="پرنده" />
           </Field>
         </Grid2>
         <Grid2>

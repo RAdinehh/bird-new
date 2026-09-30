@@ -317,7 +317,7 @@ export default function DevicesPage() {
 
         <SectionTitle>📋 مشخصات اصلی</SectionTitle>
         <Field label="نام دستگاه" required>
-          <Input placeholder="مثلاً: دستگاه ۱" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+          <Input placeholder="مثلاً — دستگاه ۱" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
         </Field>
         <Grid2>
           <Field label="حالت" required>
@@ -433,7 +433,7 @@ export default function DevicesPage() {
         </Grid2>
         {warrantyForm && (
           <div style={{ padding: 'var(--pad-normal)', background: warrantyForm.expired ? 'var(--danger-soft)' : 'var(--accent-soft)', border: '1px solid ' + (warrantyForm.expired ? 'var(--danger)' : 'var(--accent-border)'), borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: warrantyForm.expired ? 'var(--danger)' : 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
-            {warrantyForm.expired ? '⏰ گارانتی تمام شده: ' : '✅ گارانتی تا: '}{toFa(warrantyForm.end)}
+            {warrantyForm.expired ? '⏰ گارانتی تمام شده — ' : '✅ گارانتی تا — '}{toFa(warrantyForm.end)}
           </div>
         )}
 

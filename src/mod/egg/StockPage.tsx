@@ -72,7 +72,7 @@ export default function StockPage() {
     const c = int(form.count);
     if (c <= 0) { setErr('تعداد باید بیشتر از صفر باشد'); return; }
     if (pieces > selectedStock) {
-      setErr(`موجودی کافی نیست — موجودی: ${toFa(selectedStock)} عدد`);
+      setErr(`موجودی کافی نیست — موجودی — ${toFa(selectedStock)} عدد`);
       return;
     }
     if (num(form.unitPrice) <= 0) { setErr('قیمت واحد اجباری است'); return; }
@@ -238,7 +238,7 @@ export default function StockPage() {
           </Field>
         </Grid2>
 
-        <Field label="نوع تخم" required hint={`موجودی این نوع: ${toFa(selectedStock)} عدد`}>
+        <Field label="نوع تخم" required hint={`موجودی این نوع — ${toFa(selectedStock)} عدد`}>
           <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as EggType })}>
             <option value="eating">🥚 خوراکی ({toFa(stock.eating)})</option>
             <option value="fertile">🌱 نطفه‌دار ({toFa(stock.fertile)})</option>
@@ -256,7 +256,7 @@ export default function StockPage() {
             </Select>
           </Field>
           <Field label="تعداد" required>
-            <NumField placeholder="مثلاً: ۱۰۰" value={form.count} onChange={e => setForm({ ...form, count: e.target.value })} max={100000} min={0} />
+            <NumField placeholder="مثلاً — ۱۰۰" value={form.count} onChange={e => setForm({ ...form, count: e.target.value })} max={100000} min={0} />
           </Field>
         </Grid2>
 
@@ -276,7 +276,7 @@ export default function StockPage() {
         ) : null}
 
         <Field label="قیمت واحد" required hint={`قیمت هر ${UNIT_LABEL[form.unit].split(' ')[0]}`}>
-          <MoneyField placeholder="مثلاً: ۵۰٬۰۰۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
+          <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
         </Field>
 
         {total > 0 ? (

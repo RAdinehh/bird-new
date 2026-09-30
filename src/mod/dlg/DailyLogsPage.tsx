@@ -546,8 +546,8 @@ export default function DailyLogsPage() {
           {flockAliveCount > 0 && (
             <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, textAlign: 'center' }}>
               تعداد زنده گله: {toFa(flockAliveCount)} پرنده
-              {form.feedMethod && ` · دانخوری: ${FEED_SYSTEM_LABEL[form.feedMethod as 'manual' | 'auto'] || '—'}`}
-              {form.waterMethod && ` · آبخوری: ${WATER_SYSTEM_LABEL[form.waterMethod as 'manual' | 'nipple' | 'trough' | 'tank'] || '—'}`}
+              {form.feedMethod && ` · دانخوری — ${FEED_SYSTEM_LABEL[form.feedMethod as 'manual' | 'auto'] || '—'}`}
+              {form.waterMethod && ` · آبخوری — ${WATER_SYSTEM_LABEL[form.waterMethod as 'manual' | 'nipple' | 'trough' | 'tank'] || '—'}`}
             </div>
           )}
 
@@ -697,7 +697,7 @@ export default function DailyLogsPage() {
             return (
               <div style={{ padding: 'var(--pad-normal)', background: warn ? 'var(--warn-soft)' : 'var(--info-soft)', border: `1px solid ${warn ? 'var(--warn)' : 'var(--info)'}`, borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: warn ? 'var(--warn)' : 'var(--info)', fontWeight: 600 }}>
                 موجودی فعلی: {toFa(it.currentStock)} {UNIT_LABEL[it.unit]}
-                {used > 0 && ` · بعد از مصرف: ${toFa(after)} ${UNIT_LABEL[it.unit]}`}
+                {used > 0 && ` · بعد از مصرف — ${toFa(after)} ${UNIT_LABEL[it.unit]}`}
                 {warn && ' ⚠️ زیر حد هشدار'}
               </div>
             );

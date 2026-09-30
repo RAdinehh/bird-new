@@ -245,7 +245,7 @@ export default function FormulasPage() {
         footer={<BtnRow><Btn onClick={() => setOpen(false)}>لغو</Btn><Btn variant="primary" onClick={save}>ذخیره</Btn></BtnRow>}
       >
         <Field label="نام جیره" required>
-          <Input placeholder="مثلاً: جیره لیر زمستان" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+          <Input placeholder="مثلاً — جیره لیر زمستان" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
         </Field>
 
         <Grid2>
@@ -312,7 +312,7 @@ export default function FormulasPage() {
               <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
                 <div style={{ flex: 1 }}>
                   <Field label="درصد در جیره">
-                    <NumField placeholder="مثلاً: ۱۰"
+                    <NumField placeholder="مثلاً — ۱۰"
                       value={String(line.percent)}
                       onChange={e => updateLine(line.id, { percent: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
                       unit="٪"

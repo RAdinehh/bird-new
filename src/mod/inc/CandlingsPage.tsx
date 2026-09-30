@@ -540,7 +540,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                         textAlign: 'center',
                       }}>
                         این کندلینگ: {toFa(sum)} از {toFa(baseInfo.base)}
-                        {remaining > 0 && ' · باقی: ' + toFa(remaining)}
+                        {remaining > 0 && ' · باقی — ' + toFa(remaining)}
                         {remaining < 0 && ' — بیشتر از مبنای مرحله قبل!'}
                         {remaining === 0 && ' ✅ کامل'}
                       </div>

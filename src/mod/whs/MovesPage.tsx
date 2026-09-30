@@ -123,7 +123,7 @@ export default function MovesPage() {
           id="moves-intro"
           icon="⚠️"
           title="این صفحه فقط برای اصلاح دستی است"
-          description="موارد استفاده: ضایعات (دان خراب شد)، شمارش دستی، هدیه، مرجوعی. برای خرید از فروشنده یا فروش به مشتری، از بخش «معاملات» استفاده کنید."
+          description="موارد استفاده — ضایعات (دان خراب شد)، شمارش دستی، هدیه، مرجوعی. برای خرید از فروشنده یا فروش به مشتری، از بخش «معاملات» استفاده کنید."
           tone="warn"
         actionLabel="برو به معاملات ←"
         onAction={() => navigate('/tra/purchases')}
@@ -229,7 +229,7 @@ export default function MovesPage() {
           </Select>
         </Field>
 
-        <Field label="کالا" required hint={selectedItem ? `موجودی فعلی: ${toFa(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined}>
+        <Field label="کالا" required hint={selectedItem ? `موجودی فعلی — ${toFa(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined}>
           <SmartSelect
             value={form.itemId}
             onChange={v => setForm({ ...form, itemId: v })}
@@ -253,14 +253,14 @@ export default function MovesPage() {
 
         <Grid2>
           <Field label="تعداد" required>
-            <NumField placeholder="مثلاً: ۱۰۰"
+            <NumField placeholder="مثلاً — ۱۰۰"
               value={form.quantity}
               onChange={e => setForm({ ...form, quantity: e.target.value })}
               unit={selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}
               max={form.type === 'out' ? currentStock : undefined} min={0} />
           </Field>
           <Field label="قیمت واحد">
-            <MoneyField placeholder="مثلاً: ۵۰٬۰۰۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
+            <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
           </Field>
         </Grid2>
 

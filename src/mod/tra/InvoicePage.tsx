@@ -369,12 +369,12 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
 
             <Grid2>
               <Field label="تخفیف">
-                <MoneyField placeholder="مثلاً: ۱۰٬۰۰۰" value={String(it.discountValue ||
+                <MoneyField placeholder="مثلاً — ۱۰٬۰۰۰" value={String(it.discountValue ||
                   '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) ||
                   0 })} />
               </Field>
               <Field label="حمل">
-                <MoneyField placeholder="مثلاً: ۵۰٬۰۰۰" value={String(it.shipping ||
+                <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={String(it.shipping ||
                   '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) ||
                   0 })} />
               </Field>
@@ -444,7 +444,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
                 </Select>
               </Field>
               <Field label="مقدار">
-                <NumField placeholder="مثلاً: ۱۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
+                <NumField placeholder="مثلاً — ۱۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
               </Field>
             </Grid2>
           </>
@@ -474,10 +474,10 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
         {form.paymentTerms === 'installment' && (
           <Grid2>
             <Field label="تعداد اقساط" required>
-              <NumField placeholder="مثلاً: ۱۰۰" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
+              <NumField placeholder="مثلاً — ۱۰۰" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
             </Field>
             <Field label="فاصله" required>
-              <NumField placeholder="مثلاً: ۷" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
+              <NumField placeholder="مثلاً — ۷" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
             </Field>
           </Grid2>
         )}
@@ -498,7 +498,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
                 </Select>
               </Field>
               <Field label="مبلغ">
-                <MoneyField placeholder="مثلاً: ۲٬۵۰۰٬۰۰۰" value={String(p.amount)} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={String(p.amount)} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
               </Field>
             </Grid2>
             <Field label="تاریخ">
@@ -507,8 +507,8 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
             {p.method === 'check' && (
               <>
                 <Grid3>
-                  <Field label="شماره چک"><Input placeholder="مثلاً: ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
-                  <Field label="بانک"><Input placeholder="مثلاً: ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
+                  <Field label="شماره چک"><Input placeholder="مثلاً — ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
+                  <Field label="بانک"><Input placeholder="مثلاً — ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
                   <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })} /></Field>
                 </Grid3>
                 <Field label="وضعیت چک">

@@ -233,7 +233,7 @@ export default function EquipmentPage() {
           </Field>
         </Grid2>
         <Field label="نام تجهیز" required>
-          <Input placeholder="مثلاً: لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+          <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
         </Field>
         <Grid3>
           <Field label="تعداد"><NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" min={0} /></Field>

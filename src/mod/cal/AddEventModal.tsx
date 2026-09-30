@@ -65,7 +65,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
     >
       <Field label="عنوان" required>
         <Input
-          placeholder="مثلاً: واکسن نیوکاسل"
+          placeholder="مثلاً — واکسن نیوکاسل"
           value={title}
           onChange={e => setTitle(e.target.value)}
         />

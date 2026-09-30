@@ -68,7 +68,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
           <h1>${farmName}</h1>
           <div class="farm-info">
             ${farmAddr ? farmAddr + '<br>' : ''}
-            ${farmPhone ? 'تلفن: ' + farmPhone : ''}
+            ${farmPhone ? 'تلفن — ' + farmPhone : ''}
           </div>
         </div>
         <div style="text-align: left;">
@@ -76,7 +76,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
           <div class="farm-info">
             شماره: ${invoice.number || '—'}<br>
             تاریخ: ${toFa(invoice.date)}<br>
-            ${invoice.dueDate ? 'سرسید: ' + toFa(invoice.dueDate) : ''}
+            ${invoice.dueDate ? 'سرسید — ' + toFa(invoice.dueDate) : ''}
           </div>
         </div>
       </div>
@@ -84,7 +84,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
       <div class="meta">
         <div>
           <b>${isSale ? 'مشتری:' : 'فروشنده:'}</b> ${party?.name || '—'}<br>
-          ${party?.phone ? 'تلفن: ' + party.phone : ''}<br>
+          ${party?.phone ? 'تلفن — ' + party.phone : ''}<br>
           ${party?.address ? party.address : ''}
         </div>
         <div style="text-align: left;">

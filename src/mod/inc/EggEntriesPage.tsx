@@ -204,7 +204,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       const brd = birds.find(b => b.id === currentRow.birdId);
       const ready = flockReadyForEggs(flk, brd);
       if (!ready.ready) {
-        showAlert('این گله هنوز به سن تخم‌گذاری نرسیده.\n\nسن فعلی: ' + toFa(ready.ageDays) + ' روز\nحداقل: ' + toFa(ready.minAge) + ' روز\n\n' + toFa(ready.daysLeft) + ' روز مانده', '⛔ گله آماده نیست');
+        showAlert('این گله هنوز به سن تخم‌گذاری نرسیده.\n\nسن فعلی — ' + toFa(ready.ageDays) + ' روز\nحداقل — ' + toFa(ready.minAge) + ' روز\n\n' + toFa(ready.daysLeft) + ' روز مانده', '⛔ گله آماده نیست');
         return;
       }
     }
@@ -227,7 +227,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       });
       if (conflicts.length > 0) {
         const msg = '⚠️ هچ همزمان نیست\n\n' +
-          'هچ این ردیف: ' + curHatchDate + '\n' +
+          'هچ این ردیف — ' + curHatchDate + '\n' +
           'هچ ردیف‌های دیگر:\n' + conflicts.join('\n') + '\n\n' +
           '💡 برای هچ همزمان، پرنده دوره‌بلندتر رو زودتر وارد کن.\n\n' +
           'ادامه بدهم؟';
@@ -267,7 +267,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         const percent = Math.round((used / refCap) * 100);
         if (percent > 100) {
           const extra = Math.round((used - refCap) * 10) / 10;
-          const ok = confirm('⚠️ با این ردیف، ظرفیت به ' + toFa(percent) + '٪ می‌رسد.\n' + 'واحد اضافی: ' + toFa(extra) + '\n\nادامه بدهم؟');
+          const ok = confirm('⚠️ با این ردیف، ظرفیت به ' + toFa(percent) + '٪ می‌رسد.\n' + 'واحد اضافی — ' + toFa(extra) + '\n\nادامه بدهم؟');
           if (!ok) return;
         }
       }
@@ -421,10 +421,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     if (!entry) return;
     let delInv = false, delProd = false;
     if (entry.generatedInvoiceId) {
-      delInv = confirm('این ورودی یک فاکتور در معاملات ساخته.\nتایید: فاکتور هم حذف شود\nلغو: فقط ورودی حذف شود');
+      delInv = confirm('این ورودی یک فاکتور در معاملات ساخته.\nتایید — فاکتور هم حذف شود\nلغو — فقط ورودی حذف شود');
     }
     if (entry.generatedProductionId) {
-      delProd = confirm('این ورودی یک رکورد تولید تخم ساخته.\nتایید: آن هم حذف شود\nلغو: فقط ورودی حذف شود');
+      delProd = confirm('این ورودی یک رکورد تولید تخم ساخته.\nتایید — آن هم حذف شود\nلغو — فقط ورودی حذف شود');
     }
     if (delInv && entry.generatedInvoiceId) { try { deleteInvoice(entry.generatedInvoiceId); } catch {} }
     if (delProd && entry.generatedProductionId) { try { deleteProduction(entry.generatedProductionId); } catch {} }
@@ -889,7 +889,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 <NumField value={currentRow.dealData.partnerPercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('partnerPercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
               </Field>
               <Field label="درصد من" hint="خودکار">
-                <Input placeholder="مثلاً: ۱۰" readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.partnerPercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
+                <Input placeholder="مثلاً — ۱۰" readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.partnerPercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
               </Field>
             </Grid2>
           )}
@@ -900,7 +900,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 <NumField value={currentRow.dealData.consigneePercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('consigneePercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
               </Field>
               <Field label="درصد من" hint="خودکار">
-                <Input placeholder="مثلاً: ۱۰" readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.consigneePercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
+                <Input placeholder="مثلاً — ۱۰" readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.consigneePercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
               </Field>
             </Grid2>
           )}
@@ -974,10 +974,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 8 }}>💰 مالی</div>
               <Grid2>
                 <Field label="قیمت هر تخم">
-                  <MoneyField placeholder="مثلاً: ۲٬۵۰۰٬۰۰۰" value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
+                  <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
                 </Field>
                 <Field label="هزینه حمل">
-                  <MoneyField placeholder="مثلاً: ۵۰۰٬۰۰۰" value={currentRow.shippingCost} onChange={e => setCurrentRow(f => ({ ...f, shippingCost: e.target.value }))} />
+                  <MoneyField placeholder="مثلاً — ۵۰۰٬۰۰۰" value={currentRow.shippingCost} onChange={e => setCurrentRow(f => ({ ...f, shippingCost: e.target.value }))} />
                 </Field>
               </Grid2>
               {(() => {

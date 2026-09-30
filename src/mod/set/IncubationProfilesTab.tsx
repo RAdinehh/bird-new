@@ -48,28 +48,28 @@ export default function IncubationProfilesTab() {
 
             <Grid2>
               <Field label="دما ستر" hint="°C">
-                <NumField placeholder="مثلاً: ۲۵" value={String(p.setterTemp)} onChange={e => update(p.id, { setterTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
+                <NumField placeholder="مثلاً — ۲۵" value={String(p.setterTemp)} onChange={e => update(p.id, { setterTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
               </Field>
               <Field label="رطوبت ستر" hint="٪">
-                <NumField placeholder="مثلاً: ۶۰" value={String(p.setterHumidity)} onChange={e => update(p.id, { setterHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
+                <NumField placeholder="مثلاً — ۶۰" value={String(p.setterHumidity)} onChange={e => update(p.id, { setterHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
               </Field>
             </Grid2>
 
             <Grid2>
               <Field label="دما هچر" hint="°C">
-                <NumField placeholder="مثلاً: ۲۵" value={String(p.hatcherTemp)} onChange={e => update(p.id, { hatcherTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
+                <NumField placeholder="مثلاً — ۲۵" value={String(p.hatcherTemp)} onChange={e => update(p.id, { hatcherTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
               </Field>
               <Field label="رطوبت هچر" hint="٪">
-                <NumField placeholder="مثلاً: ۶۰" value={String(p.hatcherHumidity)} onChange={e => update(p.id, { hatcherHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
+                <NumField placeholder="مثلاً — ۶۰" value={String(p.hatcherHumidity)} onChange={e => update(p.id, { hatcherHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
               </Field>
             </Grid2>
 
             <Grid2>
               <Field label="مدت کل" hint="روز">
-                <NumField placeholder="مثلاً: ۳۰" value={String(p.totalDays)} onChange={e => update(p.id, { totalDays: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
+                <NumField placeholder="مثلاً — ۳۰" value={String(p.totalDays)} onChange={e => update(p.id, { totalDays: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
               </Field>
               <Field label="Lock-down" hint="روز توقف چرخش">
-                <NumField placeholder="مثلاً: ۱۸" value={String(p.lockdownDay)} onChange={e => update(p.id, { lockdownDay: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
+                <NumField placeholder="مثلاً — ۱۸" value={String(p.lockdownDay)} onChange={e => update(p.id, { lockdownDay: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
               </Field>
             </Grid2>
           </div>
@@ -81,7 +81,7 @@ export default function IncubationProfilesTab() {
               <input
                 value={newName}
                 onChange={e => setNewName(e.target.value)}
-                placeholder="مثلاً: طوطی"
+                placeholder="مثلاً — طوطی"
                 onKeyDown={e => { if (e.key === 'Enter') add(); }}
                 style={{ height: 38, padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)', outline: 'none' }}
               />

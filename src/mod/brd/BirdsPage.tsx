@@ -146,7 +146,7 @@ export default function BirdsPage() {
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="نام پرنده" required>
           <Input
-          placeholder="مثلاً: مرغ"
+          placeholder="مثلاً — مرغ"
           value={form.name}
           onChange={e => {
             const newName = e.target.value;

@@ -174,7 +174,7 @@ export default function ZonesPage() {
             />
         </Field>
         <Grid2>
-          <Field label="نام بخش" required><Input placeholder="مثلاً: بخش A" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
+          <Field label="نام بخش" required><Input placeholder="مثلاً — بخش A" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
           <Field label="ظرفیت"><NumField placeholder="۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} /></Field>
         </Grid2>
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>

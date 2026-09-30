@@ -117,7 +117,7 @@ export default function BreedsPage() {
                 index={toFa(i + 1)}
                 iconEmoji="🧬"
                 title={b.name}
-                subtitle={`پرنده: ${bird?.name || '—'}`}
+                subtitle={`پرنده — ${bird?.name || '—'}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
                 badge={b.fcr ? <Tag tone="purple">FCR {toFa(b.fcr)}</Tag> : undefined}
@@ -176,7 +176,7 @@ export default function BreedsPage() {
         </Field>
         <Grid2>
           <Field label="نام نژاد" required>
-            <Input placeholder="مثلاً: مرندی" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            <Input placeholder="مثلاً — مرندی" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </Field>
           <Field label="FCR">
             <NumField placeholder="۲٫۰" value={form.fcr} onChange={e => setForm({ ...form, fcr: e.target.value })} min={0} unit="FCR" />

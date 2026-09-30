@@ -170,7 +170,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
       ) : null}
 
       {/* برچسب‌ها */}
-      <Field label="برچسب‌ها" hint="با کاما جدا کن: فاکتور، رسید، ۱۴۰۵">
+      <Field label="برچسب‌ها" hint="با کاما جدا کن — فاکتور، رسید، ۱۴۰۵">
         <Input value={tags} onChange={e => setTags(e.target.value)} placeholder="فاکتور، آذر ۱۴۰۵" />
       </Field>
 

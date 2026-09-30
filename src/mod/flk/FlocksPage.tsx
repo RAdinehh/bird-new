@@ -454,7 +454,7 @@ export default function FlocksPage() {
           footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
           <Field label="نام گله" required>
-            <Input placeholder="مثلاً: گله بهار ۱۴۰۵" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            <Input placeholder="مثلاً — گله بهار ۱۴۰۵" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </Field>
 
           <Grid2>

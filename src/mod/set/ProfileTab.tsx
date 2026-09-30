@@ -47,7 +47,7 @@ export default function ProfileTab() {
 
       <SettingsGroup icon="🏠" title="اطلاعات مرغداری" subtitle={farmSummary} defaultOpen={!farm.name} tone="info">
         <Field label="نام مرغداری">
-          <Input value={farm.name} onChange={e => updateSection('farm', { name: e.target.value })} placeholder="مثلاً: مرغداری سبز دشت" />
+          <Input value={farm.name} onChange={e => updateSection('farm', { name: e.target.value })} placeholder="مثلاً — مرغداری سبز دشت" />
         </Field>
         <Grid2>
           <Field label="نوع مرغداری">
@@ -60,12 +60,12 @@ export default function ProfileTab() {
             </Select>
           </Field>
           <Field label="شماره پروانه">
-            <Input placeholder="مثلاً: ۰۰۱" value={farm.licenseNo} onChange={e => updateSection('farm', { licenseNo: e.target.value })} dir="ltr" />
+            <Input placeholder="مثلاً — ۰۰۱" value={farm.licenseNo} onChange={e => updateSection('farm', { licenseNo: e.target.value })} dir="ltr" />
           </Field>
         </Grid2>
         <Grid3>
           <Field label="استان">
-            <Input placeholder="مثلاً: تهران" value={farm.province} onChange={e => updateSection('farm', { province: e.target.value })} />
+            <Input placeholder="مثلاً — تهران" value={farm.province} onChange={e => updateSection('farm', { province: e.target.value })} />
           </Field>
           <Field label="شهر">
             <Input value={farm.city} onChange={e => updateSection('farm', { city: e.target.value })} />
@@ -92,7 +92,7 @@ export default function ProfileTab() {
           این اطلاعات در فاکتورهای چاپی نمایش داده می‌شود
         </div>
         <Field label="نام بانک">
-          <Input value={bank.bankName} onChange={e => updateSection('bank', { bankName: e.target.value })} placeholder="مثلاً: ملت" />
+          <Input value={bank.bankName} onChange={e => updateSection('bank', { bankName: e.target.value })} placeholder="مثلاً — ملت" />
         </Field>
         <Field label="شماره کارت">
           <DigitField maxLength={16} value={bank.cardNo} onChange={e => updateSection('bank', { cardNo: e.target.value })} placeholder="۶۰۳۷..." />
@@ -101,7 +101,7 @@ export default function ProfileTab() {
           <Input value={bank.sheba} onChange={e => updateSection('bank', { sheba: e.target.value })} dir="ltr" placeholder="IR..." />
         </Field>
         <Field label="صاحب حساب">
-          <Input placeholder="مثلاً: علی رضایی" value={bank.accountHolder} onChange={e => updateSection('bank', { accountHolder: e.target.value })} />
+          <Input placeholder="مثلاً — علی رضایی" value={bank.accountHolder} onChange={e => updateSection('bank', { accountHolder: e.target.value })} />
         </Field>
       </SettingsGroup>
 
@@ -137,11 +137,11 @@ export default function ProfileTab() {
             <Input value={defaults.birdType} onChange={e => updateSection('defaults', { birdType: e.target.value })} placeholder="مرغ" />
           </Field>
           <Field label="اندازه‌ی گله">
-            <NumField placeholder="مثلاً: ۵۰۰" value={defaults.flockSize} onChange={e => updateSection('defaults', { flockSize: e.target.value })} min={0} unit="پرنده" />
+            <NumField placeholder="مثلاً — ۵۰۰" value={defaults.flockSize} onChange={e => updateSection('defaults', { flockSize: e.target.value })} min={0} unit="پرنده" />
           </Field>
         </Grid2>
         <Field label="طول دوره‌ی جوجه‌کشی">
-          <NumField placeholder="مثلاً: ۳" value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} unit="روز" min={1} />
+          <NumField placeholder="مثلاً — ۳" value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} unit="روز" min={1} />
         </Field>
         <Grid2>
           <Field label="دمای Setter"><NumField value={defaults.setterTemp} onChange={e => updateSection('defaults', { setterTemp: e.target.value })} unit="°C" min={-10} /></Field>
@@ -152,7 +152,7 @@ export default function ProfileTab() {
           <Field label="رطوبت Hatcher"><NumField value={defaults.hatcherHumidity} onChange={e => updateSection('defaults', { hatcherHumidity: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
         <Field label="روز شروع Lock-down">
-          <NumField placeholder="مثلاً: ۷" value={defaults.lockdownDay} onChange={e => updateSection('defaults', { lockdownDay: e.target.value })} unit="روز" min={0} />
+          <NumField placeholder="مثلاً — ۷" value={defaults.lockdownDay} onChange={e => updateSection('defaults', { lockdownDay: e.target.value })} unit="روز" min={0} />
         </Field>
       </SettingsGroup>
 
