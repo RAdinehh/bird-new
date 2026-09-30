@@ -6,6 +6,7 @@ import {
 } from './store';
 import UploadModal from './UploadModal';
 import { Btn, BtnRow, Empty, Modal, PageContainer } from '../../shr/components/ui';
+import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 
 type ViewMode = 'grid' | 'list';
@@ -74,51 +75,52 @@ export default function FilesPage() {
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-lg)',
         padding: '12px 14px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 10
       }}>
-        <div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>فایل‌ها</div>
-          <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)', marginTop: 2 }}>
-            {toFa(files.length)}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 10
+        }}>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>
+            📁 اسناد
           </div>
+          <button
+            type="button"
+            onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+            style={{
+              width: 36, height: 36,
+              borderRadius: 10,
+              background: 'var(--btn-bg)',
+              border: '1px solid var(--border)',
+              color: 'var(--muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            {viewMode === 'grid' ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+              </svg>
+            )}
+          </button>
         </div>
-        <div style={{ textAlign: 'left' }}>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>حجم مصرفی</div>
-          <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', marginTop: 2 }}>
-            {formatSize(totalBytes)}
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
+          <StatBox icon="📁" label="فایل‌ها" value={toFa(files.length)} tone="accent" />
+          <Dot />
+          <StatBox icon="💾" label="حجم" value={formatSize(totalBytes)} />
+          <Dot />
+          <StatBox icon="📂" label="دسته‌ها" value={toFa(Object.keys(counts).length - 1)} />
         </div>
-        <button
-          type="button"
-          onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-          style={{
-            width: 36, height: 36,
-            borderRadius: 10,
-            background: 'var(--btn-bg)',
-            border: '1px solid var(--border)',
-            color: 'var(--muted)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          {viewMode === 'grid' ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
-            </svg>
-          ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-            </svg>
-          )}
-        </button>
       </div>
 
       {/* جستجو */}
