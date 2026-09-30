@@ -3,92 +3,9 @@ import { useSet } from './store';
 import { Btn, Field, Grid2, Input } from '../../shr/components/ui';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
-
-function ToggleRow({ label, sub, value, onChange, disabled }: any) {
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: 'var(--pad-normal)',
-      background: 'var(--input-bg)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-md)',
-      gap: 10,
-      opacity: disabled ? 0.6 : 1
-    }}>
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>{label}</div>
-        {sub ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{sub}</div> : null}
-      </div>
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={disabled ? undefined : onChange}
-        style={{
-          width: 44, height: 24,
-          borderRadius: 12,
-          background: value ? 'var(--accent)' : 'var(--dim)',
-          position: 'relative',
-          border: 'none',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          padding: 0,
-          flexShrink: 0,
-          transition: 'background .2s'
-        }}
-      >
-        <span style={{
-          position: 'absolute',
-          top: 2,
-          right: value ? 22 : 2,
-          width: 20, height: 20,
-          borderRadius: '50%',
-          background: '#fff',
-          transition: 'right .2s',
-          boxShadow: '0 1px 3px rgba(0,0,0,.2)'
-        }} />
-      </button>
-    </div>
-  );
-}
+import { ToggleRow, LocalNumField } from './helpers';
 
 /** فیلد عددی با تبدیل خودکار فارسی/انگلیسی */
-function LocalNumField({ label, hint, value, onChange, unit, min, max }: {
-  label: string;
-  hint?: string;
-  value: number;
-  onChange: (n: number) => void;
-  unit?: string;
-  min?: number;
-  max?: number;
-}) {
-  const [local, setLocal] = useState(toFa(String(value)));
-
-  useEffect(() => {
-    setLocal(toFa(String(value)));
-  }, [value]);
-
-  const handleChange = (raw: string) => {
-    setLocal(raw);
-    const en = toEn(raw).replace(/[^0-9.-]/g, '');
-    if (en === '') { onChange(0); return; }
-    let n = parseFloat(en);
-    if (isNaN(n)) return;
-    if (min !== undefined && n < min) n = min;
-    if (max !== undefined && n > max) n = max;
-    onChange(n);
-  };
-
-  return (
-    <Field label={label} hint={hint}>
-      <Input
-        mode="text"
-        value={local}
-        onChange={e => handleChange(e.target.value)}
-        unit={unit}
-        inputMode="numeric" min={0} />
-    </Field>
-  );
-}
-
 export default function NotificationsTab() {
   const s = useSet();
   const ch = s.channels;

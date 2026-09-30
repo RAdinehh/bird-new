@@ -3,32 +3,7 @@ import { useSet } from './store';
 import { Field, Grid2, Grid3, Input, NumField, PhoneField, DigitField, Select } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
-
-function ToggleRow({ label, sub, value, onChange }: any) {
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-      border: '1px solid var(--border)', borderRadius: 'var(--r-md)', gap: 10
-    }}>
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>{label}</div>
-        {sub ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{sub}</div> : null}
-      </div>
-      <button type="button" onClick={onChange} style={{
-        width: 44, height: 24, borderRadius: 12,
-        background: value ? 'var(--accent)' : 'var(--dim)',
-        position: 'relative', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0
-      }}>
-        <span style={{
-          position: 'absolute', top: 2, right: value ? 22 : 2,
-          width: 20, height: 20, borderRadius: '50%', background: '#fff',
-          transition: 'right .2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)'
-        }} />
-      </button>
-    </div>
-  );
-}
+import { ToggleRow } from './helpers';
 
 export default function ProfileTab() {
   const { user, farm, bank, units, defaults, security, updateSection } = useSet();

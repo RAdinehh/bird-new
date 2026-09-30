@@ -3,26 +3,7 @@ import { useState } from 'react';
 import { Btn, Modal, Tag } from '../../shr/components/ui';
 import { showConfirmAsync, showAlert, showSuccess } from '../../cor/store/dialog';
 import { toFa } from '../../shr/utils/fa';
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', padding: '4px 4px 8px', letterSpacing: '.5px' }}>{title}</div>
-      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 'var(--sp-4)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function InfoRow({ label, value }: { label: string; value: any }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px dashed var(--border)' }}>
-      <span style={{ fontSize: 'var(--fs-base)', color: 'var(--muted)' }}>{label}</span>
-      <span style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>{value}</span>
-    </div>
-  );
-}
+import { Section, InfoRow } from './helpers';
 
 const FAQS: { q: string; a: string }[] = [
   { q: 'چطور اولین پرنده را اضافه کنم؟', a: 'از منو → پرنده‌ها و نژادها → پرنده‌ها → دکمه‌ی «+ افزودن پرنده». نام و چرخه زندگی را وارد کنید. بعد از پرنده، یک نژاد برایش بسازید.' },

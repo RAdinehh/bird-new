@@ -5,6 +5,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { Btn, BtnRow, Field, Grid2, Input, Modal, Select } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
+import { RowToggle, Line } from './helpers';
 
 export default function BackupTab() {
   const s = useSet();
@@ -334,34 +335,3 @@ export default function BackupTab() {
   );
 }
 
-
-function RowToggle({ label, sub, value, onChange }: { label: string; sub?: string; value: boolean; onChange: () => void }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', gap: 10 }}>
-      <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>{label}</div>
-        {sub ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{sub}</div> : null}
-      </div>
-      <button onClick={onChange} style={{
-        width: 38, height: 22, borderRadius: 11,
-        background: value ? 'var(--accent)' : 'var(--dim)',
-        position: 'relative', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0
-      }}>
-        <span style={{
-          position: 'absolute', top: 2, right: value ? 18 : 2,
-          width: 18, height: 18, borderRadius: '50%', background: '#fff',
-          transition: 'right .2s'
-        }} />
-      </button>
-    </div>
-  );
-}
-
-function Line({ l, v }: { l: string; v: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-      <span style={{ color: 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
-    </div>
-  );
-}

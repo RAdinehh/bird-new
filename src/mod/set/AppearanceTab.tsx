@@ -2,51 +2,7 @@ import { useSet, MODULE_LABELS } from './store';
 import { Btn, Field, Grid2, Select } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
-
-function ToggleRow({ label, sub, value, onChange }: any) {
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-      border: '1px solid var(--border)', borderRadius: 'var(--r-md)', gap: 10
-    }}>
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>{label}</div>
-        {sub ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{sub}</div> : null}
-      </div>
-      <button type="button" onClick={onChange} style={{
-        width: 44, height: 24, borderRadius: 12,
-        background: value ? 'var(--accent)' : 'var(--dim)',
-        position: 'relative', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0
-      }}>
-        <span style={{
-          position: 'absolute', top: 2, right: value ? 22 : 2,
-          width: 20, height: 20, borderRadius: '50%', background: '#fff',
-          transition: 'right .2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)'
-        }} />
-      </button>
-    </div>
-  );
-}
-
-function ColorBtn({ color, active, onClick }: any) {
-  const colors: Record<string, string> = {
-    green: '#16a34a', blue: '#0284c7', orange: '#ea580c', purple: '#7c3aed'
-  };
-  return (
-    <button type="button" onClick={onClick} style={{
-      flex: 1, height: 48,
-      borderRadius: 'var(--r-md)',
-      background: colors[color],
-      border: active ? '3px solid var(--text)' : '3px solid transparent',
-      cursor: 'pointer', padding: 0,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      color: '#fff', fontSize: 'var(--fs-xl)', fontWeight: 700
-    }}>
-      {active ? '✓' : ''}
-    </button>
-  );
-}
+import { ToggleRow, ColorBtn } from './helpers';
 
 export default function AppearanceTab() {
   const s = useSet();
