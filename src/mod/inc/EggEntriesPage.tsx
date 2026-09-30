@@ -566,7 +566,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             const bird = birds.find(b => b.id === e.birdId);
             const breed = breeds.find(b => b.id === e.breedId);
             const age = daysAgo(e.entryDate);
-            const remain = daysToHatch(e.expectedHatchDate);
+            const expHatch = addDaysJalali(e.entryDate, incubationDays(bird?.name || 'مرغ'));
+            const remain = daysToHatch(expHatch);
             const locked = isLockdown(e);
             const hatchWindow = isHatchWindow(e);
             const myHatch = hatches.find(h => h.eggEntryId === e.id);
@@ -576,12 +577,15 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             if (hatchWindow) accent = 'purple';
             else if (locked) accent = 'warn';
 
-            let statusLabel = ENTRY_STATUS_LABEL[e.status];
-            let statusTone: any = 'green';
-            if (hatchWindow) { statusLabel = 'پنجره هچ'; statusTone = 'purple'; }
-            else if (locked) { statusLabel = 'Lock-down'; statusTone = 'amber'; }
+            let statusLabel = '';
+            let statusTone: any = 'blue';
+            const totalDays = incubationDays(bird?.name || 'مرغ');
+            if (myHatch) { statusLabel = '✅ هچ‌شده'; statusTone = 'green'; }
+            else if (hatchWindow) { statusLabel = '🐣 پنجره هچ'; statusTone = 'purple'; }
+            else if (locked) { statusLabel = '🔒 Lock-down'; statusTone = 'amber'; }
             else if (remain > 0) { statusLabel = toFa(remain) + ' روز مانده'; statusTone = 'blue'; }
-            else if (myHatch) { statusLabel = 'هچ‌شده'; statusTone = 'green'; }
+            else if (remain === 0) { statusLabel = '🎯 امروز هچ'; statusTone = 'purple'; }
+            else { statusLabel = '⚠️ گذشته از موعد هچ'; statusTone = 'amber'; }
 
             const partnerName = (e.dealData?.partnerId && (contacts.find((c: any) => c.id === e.dealData.partnerId) as any)?.name) || e.dealData?.partnerName || '';
             const sellerName = (e.dealData?.sellerId && (contacts.find((c: any) => c.id === e.dealData.sellerId) as any)?.name) || e.dealData?.sellerName || '';
@@ -591,19 +595,20 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             return (
               <ExpandableCard key={e.id} accent={accent} index={toFa(i + 1)} iconEmoji="🥚"
                 title={toFa(e.count || 0) + ' تخم · ' + (bird?.name || '—') + (breed ? ' (' + breed.name + ')' : '')}
-                subtitle={(dev?.name || '—') + ' · روز ' + toFa(age) + ' از ' + toFa(incubationDays(bird?.name || 'مرغ'))}
+                subtitle={dev?.name || '—'}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : e.id)}
                 badge={<Tag tone={statusTone}>{statusLabel}</Tag>}
                 summary={<>
                   <span>ورود: <b style={{ color: 'var(--text)' }}>{toFa(e.entryDate)}</b></span>
-                  {e.expectedHatchDate && <span>هچ: <b style={{ color: 'var(--text)' }}>{toFa(e.expectedHatchDate)}</b></span>}
+                  {expHatch && <span>هچ: <b style={{ color: 'var(--text)' }}>{toFa(expHatch)}</b></span>}
                   <span>{DEAL_LABEL[e.dealType]}</span>
                 </>}
               >
                 {(() => {
                   const b = birds.find(x => x.id === e.birdId);
                   const total = incubationDays(b?.name || 'مرغ');
-                  return <ProgressTracker current={age} target={total} label={hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : 'در حال انکوباسیون'} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
+                  const lbl = hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : ('روز ' + toFa(age) + ' از ' + toFa(total));
+                  return <ProgressTracker current={age} target={total} label={lbl} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
                 })()}
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📋 مشخصات</div>
@@ -612,7 +617,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   <Row l="پرنده" v={(bird?.name || '—') + (breed ? ' · ' + breed.name : '')} />
                   <Row l="تعداد" v={toFa(e.count || 0) + ' تخم'} />
                   <Row l="تاریخ ورود" v={toFa(e.entryDate)} />
-                  <Row l="هچ پیش‌بینی" v={toFa(e.expectedHatchDate)} />
+                  <Row l="هچ پیش‌بینی" v={toFa(expHatch)} />
                   {e.trayNumbers && <Row l="طبقات" v={e.trayNumbers} />}
                   <Row l="وضعیت" v={ENTRY_STATUS_LABEL[e.status]} />
                 </div>
