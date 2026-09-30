@@ -544,7 +544,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             {party} · {toFa(row.entryDate)}
           </span>
         </div>
-        <button type="button" onClick={() => editRow(row)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--accent)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: '2px 6px' }}>✏️</button>
+        <button type="button" onClick={() => editRow(row)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--info)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: '2px 6px' }}>✏️</button>
         <button type="button" onClick={() => removeRow(row._id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 2 }}>✕</button>
       </div>
     );
@@ -669,7 +669,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                       {e.unitPrice && <Row l="قیمت هر تخم" v={toFa(e.unitPrice.toLocaleString('fa-IR')) + ' ت'} />}
                       {(e as any).shippingCost && <Row l="هزینه حمل" v={toFa((e as any).shippingCost.toLocaleString('fa-IR')) + ' ت'} />}
                       {e.totalPrice && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--info-soft)', color: 'var(--info)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                           <span>جمع تخم:</span><span>{toFa(e.totalPrice.toLocaleString('fa-IR'))} ت</span>
                         </div>
                       )}
@@ -699,7 +699,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         footer={<BtnRow><Btn variant="primary" onClick={saveAll} disabled={draftRows.length === 0}>💾 ذخیره همه ({toFa(draftRows.length)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
         {/* ═══ بنر راهنما ═══ */}
-        <div style={{ padding: '10px 12px', background: 'linear-gradient(135deg, var(--info-soft), var(--accent-soft))', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, lineHeight: 1.8 }}>
+        <div style={{ padding: '10px 12px', background: 'linear-gradient(135deg, var(--info-soft), var(--info-soft))', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, lineHeight: 1.8 }}>
           🎯 <b>هچ همزمان:</b> پرنده‌های دوره‌بلندتر رو اول وارد کن<br />
           <span style={{ opacity: 0.85 }}>ترتیب: غاز (۳۰) → بوقلمون (۲۸) → مرغ (۲۱)</span>
         </div>
@@ -713,11 +713,11 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           {liveUsage && liveUsage.total > 0 && (
             <div style={{
               padding: '8px 10px',
-              background: liveUsage.percent > 100 ? 'var(--danger-soft)' : liveUsage.percent > 90 ? 'var(--warn-soft)' : 'var(--accent-soft)',
-              border: '1px solid ' + (liveUsage.percent > 100 ? 'var(--danger)' : liveUsage.percent > 90 ? 'var(--warn)' : 'var(--accent-border)'),
+              background: liveUsage.percent > 100 ? 'var(--danger-soft)' : liveUsage.percent > 90 ? 'var(--warn-soft)' : 'var(--info-soft)',
+              border: '1px solid ' + (liveUsage.percent > 100 ? 'var(--danger)' : liveUsage.percent > 90 ? 'var(--warn)' : 'var(--info)'),
               borderRadius: 'var(--r-md)',
               fontSize: 'var(--fs-xs)',
-              color: liveUsage.percent > 100 ? 'var(--danger)' : liveUsage.percent > 90 ? 'var(--warn)' : 'var(--accent)',
+              color: liveUsage.percent > 100 ? 'var(--danger)' : liveUsage.percent > 90 ? 'var(--warn)' : 'var(--info)',
               fontWeight: 700,
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -770,7 +770,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                     <span>{toFa(r.entryDate)}{r.entryTime ? ' · ' + toFa(r.entryTime) : ''}</span>
                   </div>
                   <div style={{ position: 'absolute', top: 6, left: 6, display: 'flex', gap: 2 }}>
-                    <button type="button" onClick={() => editRow(r)} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 12, padding: 3 }}>✏️</button>
+                    <button type="button" onClick={() => editRow(r)} style={{ background: 'none', border: 'none', color: 'var(--info)', cursor: 'pointer', fontSize: 12, padding: 3 }}>✏️</button>
                     <button type="button" onClick={() => removeRow(r._id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 12, padding: 3 }}>✕</button>
                   </div>
                 </div>
@@ -780,8 +780,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         )}
 
         {/* ═══ فرم ردیف جدید ═══ */}
-        <div style={{ padding: '12px 14px', background: editingRowId ? 'var(--warn-soft)' : 'var(--accent-soft)', border: '1px dashed ' + (editingRowId ? 'var(--warn)' : 'var(--accent-border)'), borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 6 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: editingRowId ? 'var(--warn)' : 'var(--accent)', fontWeight: 700 }}>
+        <div style={{ padding: '12px 14px', background: editingRowId ? 'var(--warn-soft)' : 'var(--info-soft)', border: '1px dashed ' + (editingRowId ? 'var(--warn)' : 'var(--info)'), borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: editingRowId ? 'var(--warn)' : 'var(--info)', fontWeight: 700 }}>
             <span>{editingRowId ? '✏️' : '➕'}</span>
             <span>{editingRowId ? 'ویرایش ردیف انتخاب‌شده' : 'ردیف جدید'}</span>
           </div>
@@ -960,7 +960,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               if (liveUsage.percent > 90) {
                 return <div style={{ padding: '6px 10px', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>🟡 نزدیک به ظرفیت — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
               }
-              return <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>✅ قابل قبول — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
+              return <div style={{ padding: '6px 10px', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 700 }}>✅ قابل قبول — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
             })()}
           </div>
 
@@ -982,7 +982,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 const sh = parseFloat(toEn(currentRow.shippingCost).replace('٫', '.')) || 0;
                 const total = (cnt * up) + sh;
                 if (total > 0) {
-                  return <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع ردیف:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
+                  return <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--info-soft)', color: 'var(--info)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع ردیف:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
                 }
                 return null;
               })()}
@@ -1064,8 +1064,8 @@ function Row({ l, v }: { l: string; v: string }) {
 
 function DepBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'var(--accent-soft)', border: '1px dashed var(--accent-border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+    <div style={{ background: 'var(--info-soft)', border: '1px dashed var(--info)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 700, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
         {title}
       </div>
       {children}
@@ -1076,10 +1076,10 @@ function DepBox({ title, children }: { title: string; children: React.ReactNode 
 function chip(active: boolean): React.CSSProperties {
   return {
     padding: '6px 11px', fontSize: 'var(--fs-sm)',
-    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
-    border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+    background: active ? 'var(--info-soft)' : 'var(--btn-bg)',
+    border: '1px solid ' + (active ? 'var(--info)' : 'var(--border)'),
     borderRadius: 'var(--r-sm)',
-    color: active ? 'var(--accent)' : 'var(--muted)',
+    color: active ? 'var(--info)' : 'var(--muted)',
     fontWeight: active ? 600 : 500, cursor: 'pointer',
     fontFamily: 'inherit', whiteSpace: 'nowrap'
   };
