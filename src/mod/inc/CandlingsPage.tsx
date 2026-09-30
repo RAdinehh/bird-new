@@ -26,19 +26,23 @@ interface EntryData {
 
 const emptyData = (): EntryData => ({ alive: '', infertile: '', dead: '', broken: '', infertileReason: '', deadReason: '', notes: '' });
 
+function todayJalali(): string {
+  const d = new Date();
+  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+}
+
 export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any) => void } = {}) {
   const { devices, eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
   const { birds } = useBrd();
 
   const [open, setOpen] = useState(false);
   const [modalDevice, setModalDevice] = useState('');
-  const [modalStage, setModalStage] = useState('1');
+  const [modalDay, setModalDay] = useState('');
   const [modalDate, setModalDate] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [entriesData, setEntriesData] = useState<Record<string, EntryData>>({});
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -49,20 +53,21 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
         setModalDevice(entry.deviceId);
         setSelectedIds(new Set([initialEntry]));
         setEntriesData({ [initialEntry]: emptyData() });
+        // پیشنهاد روز: آخرین کندلینگ + ۳ روز
         const stages = candlings.filter(c => c.eggEntryId === initialEntry).map(c => c.stage);
-        const nextStage = stages.includes(1) ? (stages.includes(2) ? 3 : 2) : 1;
-        setModalStage(String(nextStage));
+        const nextDay = stages.length > 0 ? Math.max(...stages) + 3 : 7;
+        setModalDay(String(nextDay));
+        setModalDate(todayJalali());
         setOpen(true);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialEntry]);
 
-  const nextStageFor = (eggEntryId: string): number => {
+  const nextDayFor = (eggEntryId: string): number => {
     const stages = candlings.filter(c => c.eggEntryId === eggEntryId).map(c => c.stage);
-    if (stages.includes(1) && stages.includes(2)) return 3;
-    if (stages.includes(1)) return 2;
-    return 1;
+    if (stages.length === 0) return 7;
+    return Math.max(...stages) + 3;
   };
 
   const openNew = (preEntryId?: string) => {
@@ -75,14 +80,13 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     const data: Record<string, EntryData> = {};
     if (preEntryId) data[preEntryId] = emptyData();
     setEntriesData(data);
-    setModalStage(preEntryId ? String(nextStageFor(preEntryId)) : '1');
-    setModalDate('');
+    setModalDay(preEntryId ? String(nextDayFor(preEntryId)) : '7');
+    setModalDate(todayJalali());
     setEditingId(null);
     setErr('');
     setOpen(true);
   };
 
-  // ═══ ورودی‌های قابل انتخاب ═══
   const availableEntries = useMemo(() => {
     return eggEntries
       .filter(e => !modalDevice || e.deviceId === modalDevice)
@@ -110,19 +114,20 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
   const save = () => {
     if (!modalDate.trim()) { setErr('تاریخ اجباری است'); return; }
+    if (!modalDay.trim()) { setErr('روز انکوباسیون اجباری است'); return; }
+    const dayNum = parseInt(toEn(modalDay)) || 0;
+    if (dayNum <= 0 || dayNum > 30) { setErr('روز باید بین ۱ تا ۳۰ باشد'); return; }
     if (selectedIds.size === 0) { setErr('حداقل یک ورودی انتخاب کنید'); return; }
 
     let saved = 0;
     let hasError = false;
-    const ids = Array.from(selectedIds);
 
-    // اگه تو حالت ویرایش هستیم
     if (editingId) {
       const d = entriesData[editingId] || emptyData();
       const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
       if (sum === 0) { setErr('حداقل یک مقدار وارد کنید'); return; }
       updateCandling(editingId, {
-        stage: parseInt(modalStage) as 1|2|3,
+        stage: dayNum,
         date: modalDate,
         alive: parseInt(toEn(d.alive)) || null,
         infertile: parseInt(toEn(d.infertile)) || null,
@@ -136,7 +141,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       return;
     }
 
-    ids.forEach(id => {
+    Array.from(selectedIds).forEach(id => {
       const entry = eggEntries.find(e => e.id === id);
       if (!entry) return;
       const d = entriesData[id] || emptyData();
@@ -145,7 +150,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       if (entry.count && sum > entry.count) { hasError = true; return; }
       addCandling({
         eggEntryId: id,
-        stage: parseInt(modalStage) as 1|2|3,
+        stage: dayNum,
         date: modalDate,
         alive: parseInt(toEn(d.alive)) || null,
         infertile: parseInt(toEn(d.infertile)) || null,
@@ -161,9 +166,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     if (hasError && saved === 0) { setErr('هیچ کندلینگی ذخیره نشد — مقادیر را چک کنید'); return; }
     setOpen(false);
     showAlert(toFa(saved) + ' کندلینگ ثبت شد', '✅ موفق');
-    if (onGoTo && parseInt(modalStage) === 3) {
-      setTimeout(() => { if (confirm('به هچ برو؟')) onGoTo('hatches'); }, 300);
-    }
   };
 
   const openEdit = (c: Candling) => {
@@ -181,7 +183,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
         notes: c.notes,
       }
     });
-    setModalStage(String(c.stage));
+    setModalDay(String(c.stage));
     setModalDate(c.date);
     setErr('');
     setOpen(true);
@@ -189,14 +191,23 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
   const target = delId ? candlings.find(c => c.id === delId) : null;
 
-  // ═══ گروه‌بندی ═══
+  // ═══ گروه‌بندی + تجمیع ═══
   const grouped = useMemo(() => {
     const byEntry: Record<string, Candling[]> = {};
     candlings.forEach(c => {
       if (!byEntry[c.eggEntryId]) byEntry[c.eggEntryId] = [];
       byEntry[c.eggEntryId].push(c);
     });
-    return Object.entries(byEntry).filter(([entryId]) => {
+    return Object.entries(byEntry).map(([entryId, list]) => {
+      // تجمیع
+      const agg = list.reduce((acc, c) => ({
+        alive: acc.alive + (c.alive || 0),
+        infertile: acc.infertile + (c.infertile || 0),
+        dead: acc.dead + (c.dead || 0),
+        broken: acc.broken + (c.broken || 0),
+      }), { alive: 0, infertile: 0, dead: 0, broken: 0 });
+      return { entryId, list: list.sort((a, b) => a.stage - b.stage), agg };
+    }).filter(({ entryId, list }) => {
       if (!q.trim()) return true;
       const t = q.trim().toLowerCase();
       const entry = eggEntries.find(e => e.id === entryId);
@@ -204,7 +215,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
       const haystack = [bird?.name, dev?.name, entry?.entryDate].filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(t);
-    }).sort(([a], [b]) => {
+    }).sort(({ entryId: a }, { entryId: b }) => {
       const ea = eggEntries.find(e => e.id === a);
       const eb = eggEntries.find(e => e.id === b);
       return String(eb?.entryDate || '').localeCompare(String(ea?.entryDate || ''));
@@ -222,18 +233,17 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       {candlings.length === 0 ? (
         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>}
           title="کندلینگی ثبت نشده"
-          desc="کندلینگ در روزهای ۷، ۱۲ و ۱۸ انجام می‌شود."
+          desc="کندلینگ در روزهای دلخواه انجام می‌شود."
           action={<Btn variant="primary" onClick={() => openNew()}>+ ثبت کندلینگ</Btn>} />
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            {grouped.map(([entryId, list]) => {
+            {grouped.map(({ entryId, list, agg }) => {
               const entry = eggEntries.find(e => e.id === entryId);
               const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
               const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
               const entryTotal = entry?.count || 0;
-              const latestCandling = list.slice().sort((a, b) => b.stage - a.stage)[0];
-              const fertilePercent = entryTotal > 0 && latestCandling?.alive ? (latestCandling.alive / entryTotal) * 100 : 0;
+              const aggFertilePercent = entryTotal > 0 ? (agg.alive / entryTotal * 100) : 0;
 
               return (
                 <div key={entryId} style={{
@@ -260,37 +270,74 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
                     <span style={{ color: 'var(--muted)' }}>{toFa(entry?.entryDate || '—')}</span>
-                    {fertilePercent > 0 && (
-                      <Tag tone="green">{toFa(fertilePercent.toFixed(0))}٪ نطفه</Tag>
+                    {aggFertilePercent > 0 && (
+                      <Tag tone="green">{toFa(aggFertilePercent.toFixed(0))}٪ نطفه</Tag>
                     )}
                   </div>
 
                   {/* مراحل */}
                   <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-                    {[1, 2, 3].map(st => {
-                      const has = list.find(c => c.stage === st);
-                      return (
-                        <button
-                          key={st}
-                          type="button"
-                          onClick={() => has ? openEdit(has) : openNew(entryId)}
-                          style={{
-                            flex: 1,
-                            padding: '6px 4px',
-                            background: has ? 'var(--accent-soft)' : 'var(--input-bg)',
-                            border: '1px solid ' + (has ? 'var(--accent-border)' : 'var(--border)'),
-                            borderRadius: 'var(--r-sm)',
-                            fontSize: 'var(--fs-xs)',
-                            fontWeight: 700,
-                            color: has ? 'var(--accent)' : 'var(--muted)',
-                            cursor: 'pointer',
-                            fontFamily: 'inherit',
-                          }}
-                        >
-                          {has ? '✓ ' : '+ '}مرحله {toFa(st)}
-                        </button>
-                      );
-                    })}
+                    {list.map(c => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => openEdit(c)}
+                        title={'روز ' + toFa(c.stage) + ' · ' + toFa(c.date)}
+                        style={{
+                          padding: '4px 8px',
+                          background: 'var(--accent-soft)',
+                          border: '1px solid var(--accent-border)',
+                          borderRadius: 'var(--r-sm)',
+                          fontSize: 'var(--fs-xs)',
+                          fontWeight: 700,
+                          color: 'var(--accent)',
+                          cursor: 'pointer',
+                          fontFamily: 'inherit',
+                        }}
+                      >
+                        ✓ روز {toFa(c.stage)}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => openNew(entryId)}
+                      style={{
+                        padding: '4px 8px',
+                        background: 'var(--input-bg)',
+                        border: '1px dashed var(--border)',
+                        borderRadius: 'var(--r-sm)',
+                        fontSize: 'var(--fs-xs)',
+                        fontWeight: 700,
+                        color: 'var(--muted)',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      + کندلینگ
+                    </button>
+                  </div>
+
+                  {/* تجمیع */}
+                  <div style={{
+                    marginTop: 4,
+                    padding: '6px 8px',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--r-sm)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    fontSize: 'var(--fs-xs)',
+                  }}>
+                    <div style={{ fontWeight: 700, color: 'var(--muted)', marginBottom: 2 }}>📊 تجمیع ({toFa(list.length)} کندلینگ)</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--accent)', fontWeight: 700 }}>سالم: {toFa(agg.alive)}</span>
+                      <span style={{ color: 'var(--warn)', fontWeight: 700 }}>بی‌نطفه: {toFa(agg.infertile)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--danger)', fontWeight: 700 }}>مرده: {toFa(agg.dead)}</span>
+                      <span style={{ color: 'var(--muted)', fontWeight: 700 }}>شکسته: {toFa(agg.broken)}</span>
+                    </div>
                   </div>
                 </div>
               );
@@ -305,15 +352,11 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
         <SectionTitle>📅 زمان‌بندی</SectionTitle>
         <Grid2>
+          <Field label="روز انکوباسیون" required hint="مثلاً ۷، ۱۰، ۱۵">
+            <NumField value={modalDay} onChange={e => setModalDay(e.target.value)} unit="روز" min={1} max={30} autoClamp />
+          </Field>
           <Field label="تاریخ" required>
             <DatePicker value={modalDate} onChange={v => setModalDate(v)} placeholder="انتخاب" />
-          </Field>
-          <Field label="مرحله" required>
-            <Select value={modalStage} onChange={e => setModalStage(e.target.value)}>
-              <option value="1">مرحله ۱ (روز ۷)</option>
-              <option value="2">مرحله ۲ (روز ۱۲)</option>
-              <option value="3">مرحله ۳ (روز ۱۸)</option>
-            </Select>
           </Field>
         </Grid2>
 
@@ -337,6 +380,13 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
               const d = dataFor(e.id);
               const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
               const remaining = (e.count || 0) - sum;
+              const existingCandlings = candlings.filter(c => c.eggEntryId === e.id);
+              const alreadyAgg = existingCandlings.reduce((acc, c) => ({
+                alive: acc.alive + (c.alive || 0),
+                infertile: acc.infertile + (c.infertile || 0),
+                dead: acc.dead + (c.dead || 0),
+                broken: acc.broken + (c.broken || 0),
+              }), { alive: 0, infertile: 0, dead: 0, broken: 0 });
 
               return (
                 <div key={e.id} style={{
@@ -348,7 +398,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                   flexDirection: 'column',
                   gap: 8,
                 }}>
-                  {/* Header ورودی */}
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                     <input
                       type="checkbox"
@@ -362,7 +411,12 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                     <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(e.entryDate)}</span>
                   </label>
 
-                  {/* فیلدهای مقادیر (اگه انتخاب شده) */}
+                  {existingCandlings.length > 0 && (
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '4px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                      تجمیع قبلی: سالم {toFa(alreadyAgg.alive)} · بی‌نطفه {toFa(alreadyAgg.infertile)} · مرده {toFa(alreadyAgg.dead)}
+                    </div>
+                  )}
+
                   {isSelected && (
                     <>
                       <Grid2>
@@ -374,7 +428,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                         <Field label="شکسته"><NumField placeholder="۰" value={d.broken} onChange={ev => updateEntryData(e.id, { broken: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
                       </Grid2>
 
-                      {/* نوار جمع */}
                       <div style={{
                         padding: '6px 10px',
                         background: remaining < 0 ? 'var(--danger-soft)' : remaining === 0 ? 'var(--accent-soft)' : 'var(--input-bg)',
@@ -385,7 +438,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                         fontWeight: 700,
                         textAlign: 'center',
                       }}>
-                        جمع: {toFa(sum)} از {toFa(e.count || 0)}
+                        این کندلینگ: {toFa(sum)} از {toFa(e.count || 0)}
                         {remaining > 0 && ' · باقی: ' + toFa(remaining)}
                         {remaining < 0 && ' — بیشتر!'}
                         {remaining === 0 && ' ✅'}
@@ -416,7 +469,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف کندلینگ"
         footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteCandling(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف مرحله {toFa(target?.stage || 0)}؟</div>
+        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف کندلینگ روز {toFa(target?.stage || 0)}؟</div>
       </Modal>
     </PageContainer>
   );

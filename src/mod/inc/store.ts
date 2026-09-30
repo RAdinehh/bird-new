@@ -83,7 +83,7 @@ export interface EggEntry {
 export interface Candling {
   id: string;
   eggEntryId: string;
-  stage: 1 | 2 | 3;
+  stage: number;
   date: string;
   alive: number | null;
   infertile: number | null;
