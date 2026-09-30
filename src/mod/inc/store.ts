@@ -268,7 +268,10 @@ export function incubationDays(birdName: string): number {
     if (stored) {
       const parsed = JSON.parse(stored);
       const profiles = parsed?.state?.incubationProfiles || parsed?.incubationProfiles || [];
-      const found = profiles.find((p: any) => p.birdName === birdName || p.birdName?.includes(birdName));
+      // استفاده از تطبیق مشترک (بدون ایموجی/فاصله)
+      const norm = (s: string) => (s || '').replace(/[\u{1F300}-\u{1F9FF}]/gu, '').replace(/\s+/g, '').toLowerCase();
+      const target = norm(birdName);
+      const found = profiles.find((p: any) => norm(p.birdName) === target);
       if (found?.totalDays) return found.totalDays;
     }
   } catch {}

@@ -11,7 +11,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { parse as parseJ, addMonths, format as formatJ } from 'date-fns-jalali';
-import { Row } from './helpers';
+import { Row, normalizeBird } from './helpers';
 
 const STATUS_FA: Record<DeviceStatus, string> = {
   active: '✅ فعال',
@@ -67,9 +67,7 @@ const empty: F = {
   notes: '',
 };
 
-function normalizeBird(name: string): string {
-  return (name || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\s+/g, ' ').trim();
-}
+
 
 function warrantyInfo(purchasedAt: string, months: number | null): { end: string; expired: boolean } | null {
   if (!purchasedAt || !months) return null;
