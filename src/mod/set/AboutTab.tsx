@@ -123,23 +123,33 @@ export default function AboutTab() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}>
-      <div style={{
-        background: 'var(--card)', border: '1px solid var(--border)',
-        borderRadius: 'var(--r-lg)', padding: 'var(--sp-6)',
-        textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10
-      }}>
+      <Section title="🐔 درباره‌ی برنامه">
         <div style={{
-          width: 72, height: 72, borderRadius: 'var(--r-xl)',
-          background: 'linear-gradient(135deg, var(--accent), #16a34a)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 'var(--fs-hero)', color: '#fff', fontWeight: 700
-        }}>🐔</div>
-        <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700 }}>مدیریت مرغداری</div>
-        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--muted)' }}>نسخه ۰.۱.۰ — نمونه</div>
-        <Tag tone="green">آخرین نسخه</Tag>
-      </div>
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          padding: 'var(--pad-normal) 0',
+        }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: 'var(--r-lg)',
+            background: 'linear-gradient(135deg, var(--accent), #16a34a)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 28, color: '#fff', fontWeight: 700,
+            flexShrink: 0,
+          }} aria-hidden="true">🐔</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>
+              مدیریت مرغداری
+            </div>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
+              نسخه ۰.۹.۱ · PWA آفلاین
+            </div>
+          </div>
+          <Tag tone="green">آخرین</Tag>
+        </div>
+      </Section>
 
-      <Section title="📊 آمار استفاده">
+      <Section title="📊 آمار شما">
         <InfoRow label="پرنده‌ها" value={toFa(counts.birds)} />
         <InfoRow label="نژادها" value={toFa(counts.breeds)} />
         <InfoRow label="فروشندگان" value={toFa(counts.suppliers)} />
@@ -293,10 +303,14 @@ export default function AboutTab() {
         </div>
       </Modal>
 
-      <Section title="📞 پشتیبانی و اطلاعات">
+      <Section title="📞 ارتباط و اطلاعات">
         <SubSection label="ارتباط با ما" icon="📞" />
         <Btn full onClick={() => showAlert('ارسال بازخورد — در گام بعدی')}>✉ ارسال بازخورد</Btn>
         <Btn full onClick={() => showAlert('بررسی بروزرسانی — در گام بعدی')}>🔍 بررسی بروزرسانی</Btn>
+        <Btn full onClick={() => showAlert('شرایط استفاده — در گام بعدی')}>شرایط استفاده</Btn>
+        <Btn full onClick={() => showAlert('حریم خصوصی — در گام بعدی')}>سیاست حریم خصوصی</Btn>
+
+        <SubSection label="قوانین" icon="📜" />
         <Btn full onClick={() => showAlert('شرایط استفاده — در گام بعدی')}>شرایط استفاده</Btn>
         <Btn full onClick={() => showAlert('حریم خصوصی — در گام بعدی')}>سیاست حریم خصوصی</Btn>
 
