@@ -1,11 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useCtc, type Person, type Role, ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES, SALARY_TYPES, avatarLetter } from './store';
-import {
-  Btn, BtnRow, DigitField, Empty,
+import { Btn, BtnRow, DigitField, Empty,
   Field, Grid2, Grid3, Input,
   Modal, NumField, PageContainer, PhoneField,
-  Select, Tag
-} from '../../shr/components/ui';
+  Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -307,7 +305,7 @@ export default function ContactsPage() {
           </Grid2>
 
           <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
-          {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
+          <ErrorBox>{err}</ErrorBox>
         </Modal>
 
         <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف مخاطب"

@@ -18,12 +18,10 @@ import { useHal } from '../hal/store';
 import { useEgg } from '../egg/store';
 import { feedSystemFromHall, waterSystemFromHall, FEED_SYSTEM_LABEL, WATER_SYSTEM_LABEL } from '../../shr/utils/systemType';
 import SmartSelect from '../../shr/components/SmartSelect';
-import {
-  Btn, BtnRow, Empty, Field,
+import { Btn, BtnRow, Empty, Field,
   Grid2, Grid3, Input, Modal,
   NumField, PageContainer, PercentField, Select,
-  Tag, Textarea
-} from '../../shr/components/ui';
+  Tag, Textarea, ErrorBox } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
@@ -893,7 +891,7 @@ export default function DailyLogsPage() {
             <Textarea rows={3} placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
-          {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
+          <ErrorBox>{err}</ErrorBox>
         </Modal>
 
         <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف ثبت روزانه"

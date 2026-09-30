@@ -10,7 +10,7 @@ import {
 } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import SmartSelect from '../../shr/components/SmartSelect';
 import DatePicker from '../../shr/components/DatePicker';
@@ -539,7 +539,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
           <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
         </Field>
 
-        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
+        <ErrorBox>{err}</ErrorBox>
       </Modal>
 
       {/* Modal انتقال workflow */}

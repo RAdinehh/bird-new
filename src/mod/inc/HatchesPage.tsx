@@ -9,7 +9,7 @@ import { useHal } from '../hal/store';
 import { useCtc } from '../ctc/store';
 import { useTra } from '../tra/store';
 import { useNavigate } from 'react-router-dom';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -609,7 +609,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
           <DatePicker value={formDate} onChange={v => setFormDate(v)} placeholder="انتخاب تاریخ" />
         </Field>
 
-        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center' }}>✕ {err}</div>}
+        <ErrorBox>{err}</ErrorBox>
       </Modal>
 
       {/* ═══ Modal گله ═══ */}

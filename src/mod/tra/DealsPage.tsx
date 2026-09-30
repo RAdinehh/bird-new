@@ -4,11 +4,9 @@
 import { useState, useMemo } from 'react';
 import { useTra, DEAL_LABEL, type Deal, type DealType } from './store';
 import { useCtc } from '../ctc/store';
-import {
-  Btn, BtnRow, Empty, Field,
+import { Btn, BtnRow, Empty, Field,
   Grid2, Input, Modal, NumField,
-  PageContainer, Select, Tag
-} from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
+  PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -264,7 +262,7 @@ export default function DealsPage() {
           <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
         </Field>
 
-        {err ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div> : null}
+        <ErrorBox>{err}</ErrorBox>
       </Modal>
 
       <Modal

@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useInc, type Candling } from './store';
 import { useBrd } from '../brd/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, SectionTitle, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -573,7 +573,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
           </div>
         )}
 
-        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center' }}>✕ {err}</div>}
+        <ErrorBox>{err}</ErrorBox>
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف کندلینگ"

@@ -724,3 +724,62 @@ export function SectionTitle({ children }: { children: React.ReactNode }) {
     <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
   );
 }
+
+/** ErrorBox — نمایش خطا با کادر قرمز */
+export function ErrorBox({ children }: { children: React.ReactNode }) {
+  if (!children) return null;
+  return (
+    <div style={{
+      padding: '8px 12px',
+      background: 'var(--danger-soft)',
+      border: '1px solid var(--danger)',
+      borderRadius: 'var(--r-md)',
+      color: 'var(--danger)',
+      fontSize: 'var(--fs-sm)',
+      fontWeight: 600,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+    }}>
+      <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
+      <span style={{ flex: 1 }}>{children}</span>
+    </div>
+  );
+}
+
+
+/** DeleteBtn — دکمه حذف استاندارد (44×44 touch target) */
+export function DeleteBtn({ onClick, title = 'حذف', size = 'md' }: {
+  onClick: () => void; title?: string; size?: 'sm' | 'md';
+}) {
+  const dim = size === 'sm' ? 28 : 36;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      style={{
+        background: 'var(--danger-soft)',
+        border: '1px solid var(--danger)',
+        color: 'var(--danger)',
+        cursor: 'pointer',
+        borderRadius: 'var(--r-sm)',
+        width: dim,
+        height: dim,
+        minWidth: dim,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: size === 'sm' ? 11 : 13,
+        lineHeight: 1,
+        padding: 0,
+        flexShrink: 0,
+        fontFamily: 'inherit',
+        fontWeight: 700,
+      }}
+    >
+      ✕
+    </button>
+  );
+}

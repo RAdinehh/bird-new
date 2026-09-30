@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useManual, TYPE_OPTIONS } from './manual';
 import { todayJalali, type EventType } from './store';
-import { Btn, BtnRow, Field, Grid2, Input, Modal, Select } from '../../shr/components/ui';
+import { Btn, BtnRow, Field, Grid2, Input, Modal, Select, ErrorBox } from '../../shr/components/ui';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
 import { toFa } from '../../shr/utils/fa';
@@ -96,7 +96,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
         />
       </Field>
 
-      {err ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div> : null}
+      <ErrorBox>{err}</ErrorBox>
 
       <div style={{
         padding: 'var(--pad-normal)',

@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity } from './store';
 import { useSet } from '../set/store';
 import { useBrd } from '../brd/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -440,7 +440,7 @@ export default function DevicesPage() {
         <SectionTitle>📝 یادداشت</SectionTitle>
         <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
 
-        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center' }}>✕ {err}</div>}
+        <ErrorBox>{err}</ErrorBox>
       </Modal>
 
       <Modal open={!!maintDeviceId} onClose={() => setMaintDeviceId(null)} title="ثبت تعمیر"

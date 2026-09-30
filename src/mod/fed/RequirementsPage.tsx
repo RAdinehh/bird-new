@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useFed, STAGE_LABEL, STAGE_LABEL_LONG, type Requirement } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
@@ -243,7 +243,7 @@ export default function RequirementsPage() {
           <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
         </Field>
 
-        {err ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div> : null}
+        <ErrorBox>{err}</ErrorBox>
       </Modal>
 
       <Modal

@@ -8,7 +8,7 @@ import {
 import { useBrd } from '../brd/store';
 import { VACCINE_SCHEDULES, schedulesByType } from '../cal/vaccineSchedules';
 import { useHal } from '../hal/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { MiniProgress } from '../../shr/components/ProgressTracker';
@@ -645,7 +645,7 @@ export default function FlocksPage() {
             <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
-          {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
+          <ErrorBox>{err}</ErrorBox>
         </Modal>
 
         <Modal open={!!archId} onClose={() => setArchId(null)} title="آرشیو گله"
