@@ -41,15 +41,27 @@ export function ToggleRow({ label, sub, value, onChange }: any) {
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600 }}>{label}</div>
         {sub ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{sub}</div> : null}
       </div>
-      <button type="button" onClick={onChange} style={{
-        width: 44, height: 36, borderRadius: 12,
-        background: value ? 'var(--accent)' : 'var(--dim)',
-        position: 'relative', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0
-      }}>
-        <span style={{
-          position: 'absolute', top: 2, right: value ? 22 : 2,
-          width: 20, height: 36, borderRadius: '50%', background: '#fff',
-          transition: 'right .2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)'
+      <button
+        type="button"
+        onClick={onChange}
+        role="switch"
+        aria-checked={!!value}
+        aria-label={label}
+        style={{
+          width: 40, height: 24, borderRadius: 12,
+          background: value ? 'var(--accent)' : 'var(--border)',
+          position: 'relative', border: 'none', cursor: 'pointer',
+          padding: 0, flexShrink: 0, transition: 'background .2s',
+          fontFamily: 'inherit',
+        }}
+      >
+        <span aria-hidden="true" style={{
+          position: 'absolute', top: 3,
+          right: value ? 19 : 3,
+          width: 18, height: 18, borderRadius: '50%',
+          background: '#fff',
+          transition: 'right .2s',
+          boxShadow: '0 1px 3px rgba(0,0,0,.25)',
         }} />
       </button>
     </div>

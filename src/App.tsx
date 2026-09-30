@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, useLocation } from 'react-router-dom';
-import { useTheme } from './cor/store/theme';
 import { useSet } from './mod/set/store';
 import { applyTheme } from './cor/theme/applyTheme';
 import Header from './shr/components/Header';
@@ -50,8 +49,8 @@ function Layout() {
 
 
 export default function App() {
-  const { theme } = useTheme();
   const settings = useSet();
+  const theme = settings.theme;  // single source of truth
   const [showOnb, setShowOnb] = useState(false);
 
   useEffect(() => {
