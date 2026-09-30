@@ -136,7 +136,7 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
-          inputMode={effectiveMode === 'number' ? 'numeric' : rest.inputMode}
+          inputMode={rest.inputMode || (effectiveMode === 'number' ? 'decimal' : undefined)}
           style={{
             flex: '1 1 0%', width: '100%', minWidth: 0,
             background: 'none', border: 'none', outline: 'none',

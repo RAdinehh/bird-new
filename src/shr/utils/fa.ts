@@ -28,7 +28,7 @@ export function formatNumWhileTyping(s: string): string {
     cleaned = parts[0] + '.' + parts.slice(1).join('');
   }
   let [intPart = '', decPart = ''] = cleaned.split('.');
-  intPart = intPart.replace(/^0+/, '') || (cleaned.includes('.') ? '0' : '');
+  intPart = intPart.replace(/^0+(?=\d)/, '') || (cleaned.includes('.') ? '0' : '');
   if (!intPart && !decPart && !cleaned.includes('.')) return '';
   decPart = decPart.slice(0, 2);
   const withSep = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '٬');
