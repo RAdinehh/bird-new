@@ -17,6 +17,7 @@ import { LineChart } from '../../shr/components/Charts';
 import { toFa } from '../../shr/utils/fa';
 import BenchmarkCard from './BenchmarkCard';
 import { toEnNum, monthKey, currentMonth, todayJalali, dateDiffDays, fcrBg } from './utils';
+import QuickActions from './QuickActions';
 
 function fcrBorder(diff: number): string {
   if (diff <= 0) return 'var(--accent-border)';
@@ -1143,16 +1144,7 @@ export default function Dashboard() {
         </div>
       ) : null}
 
-      {/* ============ ۹. دسترسی سریع ============ */}
-      <SectionTitle>⚡ دسترسی سریع</SectionTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
-        <QuickAction icon="📋" label="ثبت روزانه" onClick={() => nav('/dlg')} />
-        <QuickAction icon="🥚" label="جوجه‌کشی" onClick={() => nav('/inc')} />
-        <QuickAction icon="🛒" label="معاملات" onClick={() => nav('/tra')} />
-        <QuickAction icon="🥚" label="تخم" onClick={() => nav('/egg')} />
-        <QuickAction icon="🌾" label="جیره" onClick={() => nav('/fed')} />
-        <QuickAction icon="📊" label="گزارش" onClick={() => nav('/rep')} />
-      </div>
+      <QuickActions />
     </PageContainer>
   );
 }
@@ -1235,27 +1227,6 @@ function MiniStat({ label, value, suffix, color, noFormat }: {
         fontVariantNumeric: 'tabular-nums'
       }}>
         {noFormat ? toFa(String(Math.round(value))) : toFa((Math.round(value * 100) / 100).toLocaleString('fa-IR'))}{suffix}
-      </div>
-    </div>
-  );
-}
-
-function QuickAction({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        background: 'var(--card)',
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--r-md)',
-        padding: '8px 6px',
-        textAlign: 'center',
-        cursor: 'pointer'
-      }}
-    >
-      <div style={{ fontSize: 22 }}>{icon}</div>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', marginTop: 4, fontWeight: 600 }}>
-        {label}
       </div>
     </div>
   );
