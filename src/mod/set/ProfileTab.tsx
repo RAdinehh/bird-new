@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSet } from './store';
 import { Field, Grid2, Grid3, Input, NumField, PhoneField, DigitField, Select } from '../../shr/components/ui';
-import { toFa } from '../../shr/utils/fa';
+import { toFa, parseFaNum } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow } from './helpers';
 import PinSetupModal from '../../shr/components/PinSetupModal';
@@ -181,7 +181,7 @@ export default function ProfileTab() {
                 type="password" min={0} />
             </Field>
             <Field label="قفل خودکار پس از">
-              <Select value={String(security.autoLockMin)} onChange={e => updateSection('security', { autoLockMin: parseInt(e.target.value) })}>
+              <Select value={String(security.autoLockMin)} onChange={e => updateSection('security', { autoLockMin: Math.round(parseFaNum(e.target.value)) })}>
                 <option value="1">۱ دقیقه</option>
                 <option value="5">۵ دقیقه</option>
                 <option value="15">۱۵ دقیقه</option>

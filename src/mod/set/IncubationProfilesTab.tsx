@@ -3,7 +3,7 @@ import { useSet, type IncubationProfile } from './store';
 import { Btn, Field, Grid2, NumField, Input, PageContainer } from '../../shr/components/ui';
 import SettingsGroup from './SettingsGroup';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
-import { toFa } from '../../shr/utils/fa';
+import { toFa, parseFaNum } from '../../shr/utils/fa';
 
 function SmallDeleteBtn({ onClick }: { onClick: () => void }) {
   return (
@@ -117,26 +117,26 @@ export default function IncubationProfilesTab() {
                 }}>
                   <Grid2>
                     <Field label="دمای ستر" hint="°C">
-                      <NumField value={String(p.setterTemp)} onChange={e => update(p.id, { setterTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
+                      <NumField value={String(p.setterTemp)} onChange={e => update(p.id, { setterTemp: parseFaNum(e.target.value) || 0 })} unit="°C" min={30} max={45} />
                     </Field>
                     <Field label="رطوبت ستر" hint="٪">
-                      <NumField value={String(p.setterHumidity)} onChange={e => update(p.id, { setterHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
+                      <NumField value={String(p.setterHumidity)} onChange={e => update(p.id, { setterHumidity: parseFaNum(e.target.value) || 0 })} unit="٪" min={0} max={100} />
                     </Field>
                   </Grid2>
                   <Grid2>
                     <Field label="دمای هچر" hint="°C">
-                      <NumField value={String(p.hatcherTemp)} onChange={e => update(p.id, { hatcherTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
+                      <NumField value={String(p.hatcherTemp)} onChange={e => update(p.id, { hatcherTemp: parseFaNum(e.target.value) || 0 })} unit="°C" min={30} max={45} />
                     </Field>
                     <Field label="رطوبت هچر" hint="٪">
-                      <NumField value={String(p.hatcherHumidity)} onChange={e => update(p.id, { hatcherHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
+                      <NumField value={String(p.hatcherHumidity)} onChange={e => update(p.id, { hatcherHumidity: parseFaNum(e.target.value) || 0 })} unit="٪" min={0} max={100} />
                     </Field>
                   </Grid2>
                   <Grid2>
                     <Field label="مدت کل" hint="روز">
-                      <NumField value={String(p.totalDays)} onChange={e => update(p.id, { totalDays: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
+                      <NumField value={String(p.totalDays)} onChange={e => update(p.id, { totalDays: Math.round(parseFaNum(e.target.value)) || 0 })} unit="روز" min={10} max={40} />
                     </Field>
                     <Field label="Lock-down" hint="روز توقف چرخش">
-                      <NumField value={String(p.lockdownDay)} onChange={e => update(p.id, { lockdownDay: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
+                      <NumField value={String(p.lockdownDay)} onChange={e => update(p.id, { lockdownDay: Math.round(parseFaNum(e.target.value)) || 0 })} unit="روز" min={10} max={40} />
                     </Field>
                   </Grid2>
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

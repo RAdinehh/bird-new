@@ -3,7 +3,7 @@ import DatePicker from './DatePicker';
 import SmartSelect from './SmartSelect';
 import { useBrd } from '../../mod/brd/store';
 import { useFlk } from '../../mod/flk/store';
-import { toFa } from '../utils/fa';
+import { toFa, parseFaNum } from '../utils/fa';
 import {
   MEDICINE_TYPE_LABEL, TEMPERAMENT_LABEL, PROPERTY_LABEL, FORM_LABEL,
   USE_METHOD_LABEL, TIME_LABEL, PRICE_UNIT_LABEL, SOURCE_TYPE_LABEL,
@@ -110,7 +110,7 @@ function HerbalForm({ item, updateItem }: { item: any; updateItem: (p: any) => v
           <Input
             mode="number"
             value={h.doseValue !== null ? String(h.doseValue) : ''}
-            onChange={e => setH({ doseValue: parseFloat(e.target.value) || null })}
+            onChange={e => setH({ doseValue: parseFaNum(e.target.value) || null })}
             unit={h.doseUnit} min={0} />
         </Field>
         <Field label="واحد">
@@ -134,7 +134,7 @@ function HerbalForm({ item, updateItem }: { item: any; updateItem: (p: any) => v
           <Input
             mode="number"
             value={h.durationDays !== null ? String(h.durationDays) : ''}
-            onChange={e => setH({ durationDays: parseInt(e.target.value) || null })}
+            onChange={e => setH({ durationDays: Math.round(parseFaNum(e.target.value)) || null })}
             unit="روز" min={0} />
         </Field>
       </Grid2>
@@ -201,7 +201,7 @@ function ChemicalForm({ item, updateItem }: { item: any; updateItem: (p: any) =>
           <Input
             mode="number"
             value={c.doseValue !== null ? String(c.doseValue) : ''}
-            onChange={e => setC({ doseValue: parseFloat(e.target.value) || null })}
+            onChange={e => setC({ doseValue: parseFaNum(e.target.value) || null })}
             unit={c.doseUnit} min={0} />
         </Field>
         <Field label="واحد">
@@ -226,7 +226,7 @@ function ChemicalForm({ item, updateItem }: { item: any; updateItem: (p: any) =>
         <Input
           mode="number"
           value={c.withdrawalDays !== null ? String(c.withdrawalDays) : ''}
-          onChange={e => setC({ withdrawalDays: parseInt(e.target.value) || null })}
+          onChange={e => setC({ withdrawalDays: Math.round(parseFaNum(e.target.value)) || null })}
           unit="روز" min={0} />
       </Field>
     </div>
@@ -279,7 +279,7 @@ function VaccineForm({ item, updateItem }: { item: any; updateItem: (p: any) => 
           <Input
             mode="number"
             value={v.targetAge !== null ? String(v.targetAge) : ''}
-            onChange={e => setV({ targetAge: parseInt(e.target.value) || null })}
+            onChange={e => setV({ targetAge: Math.round(parseFaNum(e.target.value)) || null })}
             unit="روز" min={0} />
         </Field>
       </Grid2>
@@ -289,7 +289,7 @@ function VaccineForm({ item, updateItem }: { item: any; updateItem: (p: any) => 
           <Input
             mode="number"
             value={v.doseValue !== null ? String(v.doseValue) : ''}
-            onChange={e => setV({ doseValue: parseFloat(e.target.value) || null })}
+            onChange={e => setV({ doseValue: parseFaNum(e.target.value) || null })}
             unit={v.doseUnit} min={0} />
         </Field>
         <Field label="واحد">
@@ -303,7 +303,7 @@ function VaccineForm({ item, updateItem }: { item: any; updateItem: (p: any) => 
           <Input
             mode="number"
             value={v.immunityMonths !== null ? String(v.immunityMonths) : ''}
-            onChange={e => setV({ immunityMonths: parseInt(e.target.value) || null })}
+            onChange={e => setV({ immunityMonths: Math.round(parseFaNum(e.target.value)) || null })}
             unit="ماه" min={0} />
         </Field>
       </Grid3>
@@ -400,7 +400,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input
               mode="number"
               value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''}
-              onChange={e => updateItem({ ageDays: parseInt(e.target.value) || null })}
+              onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })}
               unit="روز" min={0} />
           </Field>
         </Grid2>
@@ -409,13 +409,13 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {category === 'adult' && (
           <Grid3>
             <Field label="تعداد نر">
-              <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: parseInt(e.target.value) || null })} min={0} />
+              <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
             </Field>
             <Field label="تعداد ماده">
-              <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: parseInt(e.target.value) || null })} min={0} />
+              <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
             </Field>
             <Field label="نامعلوم">
-              <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: parseInt(e.target.value) || null })} min={0} />
+              <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
             </Field>
           </Grid3>
         )}
@@ -431,7 +431,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
             {item.priceUnit === 'per_kg' && (
               <Field label="وزن زنده (کیلو)">
-                <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFloat(e.target.value) || null })} unit="kg" min={0} />
+                <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
               </Field>
             )}
           </Grid2>
@@ -466,7 +466,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
           {item.priceUnit === 'per_kg' && (
             <Field label="وزن کل (کیلو)">
-              <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFloat(e.target.value) || null })} unit="kg" min={0} />
+              <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
             </Field>
           )}
         </Grid2>
@@ -486,7 +486,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input
               mode="number"
               value={item.warrantyMonths !== null && item.warrantyMonths !== undefined ? String(item.warrantyMonths) : ''}
-              onChange={e => updateItem({ warrantyMonths: parseInt(e.target.value) || null })}
+              onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })}
               unit="ماه" min={0} />
           </Field>
         </Grid2>

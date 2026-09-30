@@ -3,7 +3,7 @@ import { exportAll, validateBackup, importAll, getStats, downloadBackup, readFil
 import { useSet } from './store';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { Btn, BtnRow, Field, Grid2, Input, Modal, Select } from '../../shr/components/ui';
-import { toFa } from '../../shr/utils/fa';
+import { toFa, parseFaNum } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { RowToggle, Line, SubSection } from './helpers';
 
@@ -209,7 +209,7 @@ export default function BackupTab() {
         {s.autoBackup.enabled ? (
           <Grid2>
             <Field label="فاصله">
-              <Select value={String(s.autoBackup.intervalHours)} onChange={e => s.updateSection('autoBackup', { intervalHours: parseInt(e.target.value) })}>
+              <Select value={String(s.autoBackup.intervalHours)} onChange={e => s.updateSection('autoBackup', { intervalHours: Math.round(parseFaNum(e.target.value)) })}>
                 <option value="6">هر ۶ ساعت</option>
                 <option value="12">هر ۱۲ ساعت</option>
                 <option value="24">هر ۲۴ ساعت</option>
@@ -217,7 +217,7 @@ export default function BackupTab() {
               </Select>
             </Field>
             <Field label="حداکثر نسخه">
-              <Select value={String(s.autoBackup.maxVersions)} onChange={e => s.updateSection('autoBackup', { maxVersions: parseInt(e.target.value) })}>
+              <Select value={String(s.autoBackup.maxVersions)} onChange={e => s.updateSection('autoBackup', { maxVersions: Math.round(parseFaNum(e.target.value)) })}>
                 <option value="3">۳ نسخه</option>
                 <option value="5">۵ نسخه</option>
                 <option value="10">۱۰ نسخه</option>
