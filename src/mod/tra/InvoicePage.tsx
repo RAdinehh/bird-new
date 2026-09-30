@@ -110,7 +110,12 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
   const openNew = () => {
     if (parties.length === 0) { showAlert(isPurchase ? 'اول یک فروشنده بسازید' : 'اول یک مشتری بسازید'); return; }
     const today = formatJ(new Date(), 'yyyy/MM/dd');
-    setForm({ ...empty(isPurchase), date: today, partyId: parties[0].id });
+    // آخرین طرف این نوع معامله
+    const lastInv = invoices
+      .filter(i => i.type === kind && i.partyId)
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    const defaultParty = lastInv?.partyId || parties[0].id;
+    setForm({ ...empty(isPurchase), date: today, partyId: defaultParty });
     setErr(''); setOpen(true);
   };
 
