@@ -469,11 +469,12 @@ export default function DevicesPage() {
                 <div key={c.birdName} style={{
                   padding: '10px',
                   background: 'var(--card)',
-                  border: '1px solid var(--border)',
+                  border: '1px solid var(--accent)',
                   borderRadius: 'var(--r-md)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 6,
+                  boxShadow: '0 0 0 1px var(--accent-soft)',
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>{c.birdName}</span>
