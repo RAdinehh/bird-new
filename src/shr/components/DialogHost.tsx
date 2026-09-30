@@ -73,6 +73,11 @@ export default function DialogHost() {
     document.body.style.overflow = 'hidden';
 
     setTimeout(() => {
+      // برای danger، focus روی cancel (امن‌ترین)
+      if (type === 'danger' || type === 'confirm') {
+        const cancelBtn = modalRef.current?.querySelector('button:not([id])') as HTMLElement;
+        if (cancelBtn) { cancelBtn.focus(); return; }
+      }
       const btn = document.getElementById(confirmBtnId.current);
       btn?.focus();
     }, 100);
