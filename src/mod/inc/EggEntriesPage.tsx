@@ -591,8 +591,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             const age = daysAgo(e.entryDate);
             const expHatch = addDaysJalali(e.entryDate, incubationDays(bird?.name || 'مرغ'));
             const remain = daysToHatch(expHatch);
-            const locked = isLockdown(e);
-            const hatchWindow = isHatchWindow(e);
+            const locked = isLockdown({ ...e, expectedHatchDate: expHatch });
+            const hatchWindow = isHatchWindow({ ...e, expectedHatchDate: expHatch });
             const myHatch = hatches.find(h => h.eggEntryId === e.id);
             const isOpen = expandedId === e.id;
 
