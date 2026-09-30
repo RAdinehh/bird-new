@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Btn, Modal, Tag } from '../../shr/components/ui';
 import { showConfirmAsync, showAlert, showSuccess } from '../../cor/store/dialog';
 import { toFa } from '../../shr/utils/fa';
-import { Section, InfoRow } from './helpers';
+import { Section, InfoRow, SubSection } from './helpers';
 
 const FAQS: { q: string; a: string }[] = [
   { q: 'چطور اولین پرنده را اضافه کنم؟', a: 'از منو → پرنده‌ها و نژادها → پرنده‌ها → دکمه‌ی «+ افزودن پرنده». نام و چرخه زندگی را وارد کنید. بعد از پرنده، یک نژاد برایش بسازید.' },
@@ -147,6 +147,7 @@ export default function AboutTab() {
       </Section>
 
       <Section title="🎓 راهنما و آموزش">
+        <SubSection label="ابزارهای کمکی" icon="📚" />
         <Btn full onClick={() => setOpenFaq(true)}>❓ سؤالات متداول ({toFa(FAQS.length)})</Btn>
         <Btn full onClick={() => setOpenGuide(true)}>📖 راهنمای کاربری</Btn>
         <Btn full onClick={resetHelpBanners}>📖 نمایش مجدد راهنماهای صفحه‌ها</Btn>
@@ -293,16 +294,14 @@ export default function AboutTab() {
       </Modal>
 
       <Section title="📞 پشتیبانی و اطلاعات">
+        <SubSection label="ارتباط با ما" icon="📞" />
         <Btn full onClick={() => showAlert('ارسال بازخورد — در گام بعدی')}>✉ ارسال بازخورد</Btn>
         <Btn full onClick={() => showAlert('بررسی بروزرسانی — در گام بعدی')}>🔍 بررسی بروزرسانی</Btn>
         <Btn full onClick={() => showAlert('شرایط استفاده — در گام بعدی')}>شرایط استفاده</Btn>
-        <Btn full onClick={() => showAlert('حریم خصوصی — در گام بعدی')}>سیاست حریم خصوصی</Btn></Section>
+        <Btn full onClick={() => showAlert('حریم خصوصی — در گام بعدی')}>سیاست حریم خصوصی</Btn>
 
-      
-
-      <Section title="⚠ منطقه خطر">
-        <Btn full variant="danger" onClick={async () => { if (await showConfirmAsync('تأیید', 'بازنشانی تنظیمات به حالت اولیه؟', { danger: true, confirmText: 'بله' })) { reset(); location.reload(); } }}>بازنشانی تنظیمات</Btn>
-      </Section>
+        <SubSection label="عملیات حساس" icon="⚠️" />
+        <Btn full variant="danger" onClick={async () => { if (await showConfirmAsync('تأیید', 'بازنشانی تنظیمات به حالت اولیه؟', { danger: true, confirmText: 'بله' })) { reset(); location.reload(); } }}>بازنشانی تنظیمات</Btn></Section>
 
       <div style={{ textAlign: 'center', fontSize: 'var(--fs-xs)', color: 'var(--dim)', padding: '10px 0' }}>
         ساخته‌شده برای مرغداری ایران 🇮🇷
