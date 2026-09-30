@@ -1,13 +1,37 @@
 import { useState } from 'react';
 import { useSet, type IncubationProfile } from './store';
-import { Btn, Field, Grid2, NumField, PageContainer } from '../../shr/components/ui';
+import { Btn, Field, Grid2, NumField, Input, PageContainer } from '../../shr/components/ui';
 import SettingsGroup from './SettingsGroup';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import { toFa } from '../../shr/utils/fa';
+
+function SmallDeleteBtn({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="حذف"
+      title="حذف"
+      style={{
+        background: 'var(--danger-soft)',
+        border: '1px solid var(--danger)',
+        color: 'var(--danger)',
+        cursor: 'pointer',
+        borderRadius: 'var(--r-sm)',
+        width: 28, height: 28, minWidth: 28,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 11, lineHeight: 1, padding: 0,
+        fontFamily: 'inherit', fontWeight: 700, flexShrink: 0,
+      }}
+    >✕</button>
+  );
+}
 
 export default function IncubationProfilesTab() {
   const s = useSet();
   const profiles: IncubationProfile[] = (s as any).incubationProfiles || [];
   const [newName, setNewName] = useState('');
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const update = (id: string, patch: Partial<IncubationProfile>) => {
     const next = profiles.map(p => p.id === id ? { ...p, ...patch } : p);
@@ -34,56 +58,108 @@ export default function IncubationProfilesTab() {
 
   return (
     <PageContainer>
-      <SettingsGroup icon="🐣" title="برنامه‌های انکوباسیون" subtitle={`${profiles.length} پرنده`} defaultOpen tone="accent">
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.8, padding: '4px 2px 8px' }}>
-          💡 این تنظیمات هنگام ساخت دستگاه جوجه‌کشی خودکار پر می‌شوند. هر فیلد را می‌توانید دستی تغییر دهید.
+      <SettingsGroup icon="🐣" title="برنامه‌های انکوباسیون" subtitle={`${toFa(profiles.length)} پرنده`} defaultOpen tone="accent">
+        <div style={{
+          fontSize: 'var(--fs-xs)', color: 'var(--muted)',
+          lineHeight: 1.8, marginBottom: 'var(--gap-sm)',
+        }}>
+          💡 این تنظیمات هنگام ساخت دستگاه جوجه‌کشی خودکار پر می‌شوند.
         </div>
 
-        {profiles.map(p => (
-          <div key={p.id} style={{ padding: 12, background: 'var(--input-bg)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 'var(--gap-md)', marginBottom: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: 'var(--fs-md)' }}>{p.birdName}</span>
-              <button onClick={() => remove(p.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
+        {profiles.map(p => {
+          const open = openId === p.id;
+          return (
+            <div key={p.id} style={{
+              background: 'var(--input-bg)',
+              border: '1px solid ' + (open ? 'var(--accent-border)' : 'var(--border)'),
+              borderRadius: 'var(--r-md)',
+              marginBottom: 'var(--gap-xs)',
+              overflow: 'hidden',
+              transition: 'border-color .2s',
+            }}>
+              <button
+                type="button"
+                onClick={() => setOpenId(open ? null : p.id)}
+                aria-expanded={open}
+                style={{
+                  width: '100%',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '10px var(--sp-3)',
+                  background: 'transparent', border: 'none',
+                  cursor: 'pointer', fontFamily: 'inherit',
+                  textAlign: 'right',
+                }}
+              >
+                <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, flex: 1, color: 'var(--text)' }}>
+                  {p.birdName}
+                </span>
+                <span style={{
+                  fontSize: 'var(--fs-xs)', color: 'var(--muted)',
+                  display: 'flex', gap: 4, flexShrink: 0,
+                }}>
+                  <span>{toFa(p.setterTemp)}°/{toFa(p.setterHumidity)}٪</span>
+                  <span style={{ color: 'var(--dim)' }}>·</span>
+                  <span>{toFa(p.totalDays)} روز</span>
+                </span>
+                <span aria-hidden="true" style={{
+                  fontSize: 10, color: 'var(--muted)', flexShrink: 0,
+                  transform: open ? 'rotate(180deg)' : 'rotate(0)',
+                  transition: 'transform .2s',
+                }}>▼</span>
+              </button>
+
+              {open && (
+                <div style={{
+                  padding: 'var(--sp-3)',
+                  borderTop: '1px dashed var(--border)',
+                  display: 'flex', flexDirection: 'column', gap: 'var(--gap-sm)',
+                  background: 'var(--card)',
+                }}>
+                  <Grid2>
+                    <Field label="دمای ستر" hint="°C">
+                      <NumField value={String(p.setterTemp)} onChange={e => update(p.id, { setterTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
+                    </Field>
+                    <Field label="رطوبت ستر" hint="٪">
+                      <NumField value={String(p.setterHumidity)} onChange={e => update(p.id, { setterHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
+                    </Field>
+                  </Grid2>
+                  <Grid2>
+                    <Field label="دمای هچر" hint="°C">
+                      <NumField value={String(p.hatcherTemp)} onChange={e => update(p.id, { hatcherTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
+                    </Field>
+                    <Field label="رطوبت هچر" hint="٪">
+                      <NumField value={String(p.hatcherHumidity)} onChange={e => update(p.id, { hatcherHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
+                    </Field>
+                  </Grid2>
+                  <Grid2>
+                    <Field label="مدت کل" hint="روز">
+                      <NumField value={String(p.totalDays)} onChange={e => update(p.id, { totalDays: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
+                    </Field>
+                    <Field label="Lock-down" hint="روز توقف چرخش">
+                      <NumField value={String(p.lockdownDay)} onChange={e => update(p.id, { lockdownDay: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
+                    </Field>
+                  </Grid2>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <SmallDeleteBtn onClick={() => remove(p.id)} />
+                  </div>
+                </div>
+              )}
             </div>
+          );
+        })}
 
-            <Grid2>
-              <Field label="دما ستر" hint="°C">
-                <NumField placeholder="مثلاً — ۲۵" value={String(p.setterTemp)} onChange={e => update(p.id, { setterTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
-              </Field>
-              <Field label="رطوبت ستر" hint="٪">
-                <NumField placeholder="مثلاً — ۶۰" value={String(p.setterHumidity)} onChange={e => update(p.id, { setterHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
-              </Field>
-            </Grid2>
-
-            <Grid2>
-              <Field label="دما هچر" hint="°C">
-                <NumField placeholder="مثلاً — ۲۵" value={String(p.hatcherTemp)} onChange={e => update(p.id, { hatcherTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
-              </Field>
-              <Field label="رطوبت هچر" hint="٪">
-                <NumField placeholder="مثلاً — ۶۰" value={String(p.hatcherHumidity)} onChange={e => update(p.id, { hatcherHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
-              </Field>
-            </Grid2>
-
-            <Grid2>
-              <Field label="مدت کل" hint="روز">
-                <NumField placeholder="مثلاً — ۳۰" value={String(p.totalDays)} onChange={e => update(p.id, { totalDays: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
-              </Field>
-              <Field label="Lock-down" hint="روز توقف چرخش">
-                <NumField placeholder="مثلاً — ۱۸" value={String(p.lockdownDay)} onChange={e => update(p.id, { lockdownDay: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
-              </Field>
-            </Grid2>
-          </div>
-        ))}
-
-        <div style={{ paddingTop: 8, borderTop: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{
+          paddingTop: 'var(--sp-3)',
+          borderTop: '1px dashed var(--border)',
+          display: 'flex', flexDirection: 'column', gap: 'var(--gap-sm)',
+        }}>
           <Field label="افزودن پرنده جدید">
             <Grid2>
-              <input
+              <Input
                 value={newName}
                 onChange={e => setNewName(e.target.value)}
                 placeholder="مثلاً — طوطی"
-                onKeyDown={e => { if (e.key === 'Enter') add(); }}
-                style={{ height: 38, padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)', outline: 'none' }}
+                onKeyDown={(e: any) => { if (e.key === 'Enter') add(); }}
               />
               <Btn variant="primary" onClick={add}>+ افزودن</Btn>
             </Grid2>
