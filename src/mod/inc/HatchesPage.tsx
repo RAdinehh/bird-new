@@ -48,19 +48,23 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   const updateData = (id: string, patch: any) => setEntriesData(d => ({ ...d, [id]: { ...(d[id] || emptyRow()), ...patch } }));
 
   const toggleEntry = (id: string) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) { setEntriesData(d => { const nd = { ...d }; delete nd[id]; return nd; }); }
-      else {
-        // پیش‌پر کردن هوشمند
-        const entry = eggEntries.find(e => e.id === id);
-        const myCand = candlings.filter(c => c.eggEntryId === id).sort((a,b) => b.stage - a.stage)[0];
-        const aliveAfter = myCand?.alive || entry?.count || 0;
-        const estimated = estimateHatched(aliveAfter, entry?.count || 0, { ds: 0, pp: 0, uh: 0, ot: 0 });
-        setEntriesData(d => ({ ...d, [id]: { ...emptyRow(), hatched: estimated > 0 ? String(estimated) : '' } }));
-      }
-      return next;
-    });
+    const isSelected = selectedIds.has(id);
+    const newSet = new Set(selectedIds);
+    if (isSelected) {
+      newSet.delete(id);
+      const newData = { ...entriesData };
+      delete newData[id];
+      setEntriesData(newData);
+      setSelectedIds(newSet);
+    } else {
+      newSet.add(id);
+      const entry = eggEntries.find(e => e.id === id);
+      const myCand = candlings.filter(c => c.eggEntryId === id).sort((a,b) => b.stage - a.stage)[0];
+      const aliveAfter = myCand?.alive || entry?.count || 0;
+      const estimated = estimateHatched(aliveAfter, entry?.count || 0, { ds: 0, pp: 0, uh: 0, ot: 0 });
+      setEntriesData({ ...entriesData, [id]: { ...emptyRow(), hatched: estimated > 0 ? String(estimated) : '' } });
+      setSelectedIds(newSet);
+    }
   };
 
   const openNew = (preId?: string) => {
@@ -365,11 +369,12 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                   const rem = (e.count || 0) - sumE;
                   return (
                     <div key={e.id} style={{ border: '1px solid ' + (isSel ? 'var(--accent-border)' : 'var(--border)'), background: isSel ? 'var(--accent-soft)' : 'var(--card)', borderRadius: 'var(--r-md)', padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                        <input type="checkbox" checked={isSel} onChange={() => toggleEntry(e.id)} style={{ width: 18, height: 18, accentColor: 'var(--accent)' }} />
+                      <div onClick={() => toggleEntry(e.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', padding: 4, margin: -4, borderRadius: 'var(--r-sm)' }}>
+                        <input type="checkbox" checked={isSel} onChange={() => {}} onClick={(ev) => { ev.stopPropagation(); toggleEntry(e.id); }} style={{ width: 18, height: 18, accentColor: 'var(--accent)', cursor: 'pointer' }} />
                         <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{bird?.name || '—'} · {toFa(e.count || 0)} تخم</span>
                         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{dev?.name || ''}</span>
-                      </label>
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, transform: isSel ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform .2s' }}>▶</span>
+                      </div>
 
                       {myCand && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '4px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>پس از کندلینگ روز {toFa(myCand.stage)}: نطفه‌دار {toFa(aliveAfter)}</div>}
 
