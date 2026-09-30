@@ -396,16 +396,16 @@ export default function DevicesPage() {
           </div>
         )}
         {form.capacityByBird.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10, marginTop: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 6, marginTop: 6 }}>
             {form.capacityByBird.map(c => (
               <div key={c.birdName} style={{
-                padding: 'var(--sp-3)',
+                padding: '10px',
                 background: 'var(--card)',
                 border: '1px solid var(--border)',
-                borderRadius: 'var(--r-lg)',
+                borderRadius: 'var(--r-md)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 10,
+                gap: 6,
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>{c.birdName}</span>
@@ -426,7 +426,7 @@ export default function DevicesPage() {
                 </Field>
 
                 <button type="button" onClick={() => fillProfile(c.birdName)} style={{
-                  padding: '8px 12px',
+                  padding: '6px 10px',
                   background: 'var(--accent-soft)',
                   border: '1px solid var(--accent-border)',
                   color: 'var(--accent)',
@@ -437,7 +437,7 @@ export default function DevicesPage() {
                   fontWeight: 600,
                 }}>🔄 پر کردن از پروفایل</button>
 
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 6, borderTop: '1px dashed var(--border)' }}>🌡 ستر</div>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 2, borderTop: '1px dashed var(--border)' }}>🌡 ستر</div>
                 <Grid2>
                   <Field label="دما" hint="°C">
                     <NumField value={String(c.setterTemp ?? '')} onChange={e => updateCapacityFull(c.birdName, { setterTemp: parseFloat(toEn(e.target.value)) || 0 })} unit="°C" min={20} max={45} placeholder="۳۷٫۷" />
@@ -447,7 +447,7 @@ export default function DevicesPage() {
                   </Field>
                 </Grid2>
 
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 6, borderTop: '1px dashed var(--border)' }}>🐣 هچر</div>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 2, borderTop: '1px dashed var(--border)' }}>🐣 هچر</div>
                 <Grid2>
                   <Field label="دما" hint="°C">
                     <NumField value={String(c.hatcherTemp ?? '')} onChange={e => updateCapacityFull(c.birdName, { hatcherTemp: parseFloat(toEn(e.target.value)) || 0 })} unit="°C" min={20} max={45} placeholder="۳۷٫۲" />
