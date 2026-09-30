@@ -17,7 +17,7 @@ const DEAD_REASONS: [string, string][] = [
 const STAGE_LABEL: Record<number, string> = { 1: 'مرحله ۱ (روز ۷)', 2: 'مرحله ۲ (روز ۱۲)', 3: 'مرحله ۳ (روز ۱۸)' };
 
 export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any) => void } = {}) {
-  const { eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
+  const { devices, eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
   const { birds } = useBrd();
 
   const [open, setOpen] = useState(false);
@@ -26,6 +26,8 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [q, setQ] = useState('');
+  const [modalDeviceFilter, setModalDeviceFilter] = useState('');
+  const [modalBirdFilter, setModalBirdFilter] = useState('');
 
   useEffect(() => {
     if (initialEntry) {
@@ -98,6 +100,24 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       }
     }
   };
+
+  // ═══ ورودی‌های فیلترشده برای Modal ═══
+  const filteredEntries = useMemo(() => {
+    return eggEntries.filter(e => {
+      if (modalDeviceFilter && e.deviceId !== modalDeviceFilter) return false;
+      if (modalBirdFilter && e.birdId !== modalBirdFilter) return false;
+      return true;
+    }).sort((a, b) => String(b.entryDate).localeCompare(String(a.entryDate)));
+  }, [eggEntries, modalDeviceFilter, modalBirdFilter]);
+
+  const availableBirds = useMemo(() => {
+    const ids = new Set<string>();
+    eggEntries.forEach(e => {
+      if (modalDeviceFilter && e.deviceId !== modalDeviceFilter) return;
+      ids.add(e.birdId);
+    });
+    return Array.from(ids).map(id => birds.find(b => b.id === id)).filter(Boolean);
+  }, [eggEntries, modalDeviceFilter, birds]);
 
   const target = delId ? candlings.find(c => c.id === delId) : null;
 
@@ -243,17 +263,40 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
           <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>ورودی تخمی نیست</div>
         ) : (
           <>
-            <Field label="انتخاب ورودی" required>
-              <Select value={form.eggEntryId} onChange={e => {
-                const nextStage = nextStageFor(e.target.value);
-                setForm({...form, eggEntryId: e.target.value, stage: String(nextStage)});
-              }}>
-                {eggEntries.map(e => {
-                  const bird = birds.find(b => b.id === e.birdId);
-                  const stages = candlings.filter(c => c.eggEntryId === e.id).length;
-                  return <option key={e.id} value={e.id}>{bird?.name || '—'} · {toFa(e.entryDate)} · {toFa(e.count || 0)} تخم {stages > 0 ? '(' + toFa(stages) + ' مرحله)' : ''}</option>;
-                })}
+            <Field label="دستگاه" hint="فیلتر">
+              <Select value={modalDeviceFilter} onChange={e => { setModalDeviceFilter(e.target.value); setModalBirdFilter(''); }}>
+                <option value="">— همه دستگاه‌ها —</option>
+                {devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
               </Select>
+            </Field>
+
+            {modalDeviceFilter && availableBirds.length > 1 && (
+              <Field label="پرنده" hint="فیلتر">
+                <Select value={modalBirdFilter} onChange={e => setModalBirdFilter(e.target.value)}>
+                  <option value="">— همه پرنده‌ها —</option>
+                  {availableBirds.map(b => b && <option key={b.id} value={b.id}>{b.name}</option>)}
+                </Select>
+              </Field>
+            )}
+
+            <Field label="انتخاب ورودی" required>
+              {filteredEntries.length === 0 ? (
+                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
+                  ورودی مطابق فیلتر نیست
+                </div>
+              ) : (
+                <Select value={form.eggEntryId} onChange={e => {
+                  const nextStage = nextStageFor(e.target.value);
+                  setForm({...form, eggEntryId: e.target.value, stage: String(nextStage)});
+                }}>
+                  {filteredEntries.map(e => {
+                    const bird = birds.find(b => b.id === e.birdId);
+                    const dev = devices.find(d => d.id === e.deviceId);
+                    const stages = candlings.filter(c => c.eggEntryId === e.id).length;
+                    return <option key={e.id} value={e.id}>{bird?.name || '—'} · {toFa(e.entryDate)} · {toFa(e.count || 0)} تخم · {dev?.name || ''}{stages > 0 ? ' (' + toFa(stages) + ' مرحله)' : ''}</option>;
+                  })}
+                </Select>
+              )}
             </Field>
 
             {selectedEntry && (
