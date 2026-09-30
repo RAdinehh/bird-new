@@ -9,6 +9,7 @@ import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/Exp
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import { todayJalali } from './helpers';
 
 const INFERTILE_REASONS: [string, string][] = [
   ['', '—'], ['season', 'فصل'], ['rooster_age', 'سن خروس'], ['nutrition', 'تغذیه'], ['genetics', 'ژنتیک'], ['storage', 'نگهداری تخم']
@@ -46,11 +47,6 @@ function calcAvailableBase(entryId: string, currentStage: number, excludeCandlin
   }
   const prev = prevs[prevs.length - 1];
   return { base: prev.alive || 0, source: 'مرحله ' + prev.stage };
-}
-
-function todayJalali(): string {
-  const d = new Date();
-  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
 }
 
 export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any) => void } = {}) {

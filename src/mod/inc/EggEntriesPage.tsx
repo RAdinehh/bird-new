@@ -20,6 +20,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { clampPercent, complement } from '../../shr/utils/smart';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
+import { todayJalali, Row, chip } from './helpers';
 
 const DRAFT_KEY = (devId: string) => 'pm-inc-egg-draft-' + devId;
 
@@ -1024,13 +1025,6 @@ function nowTime(): string {
   return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
 }
 
-function todayJalali(): string {
-  const d = new Date();
-  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
-}
-
-
-
 // چک آماده بودن گله برای تخم‌گذاری
 function flockReadyForEggs(flock: any, bird: any): { ready: boolean; ageDays: number; minAge: number; daysLeft: number } {
   const startDate = flock?.hatchDate || flock?.purchaseDate || flock?.startDate || '';
@@ -1056,15 +1050,6 @@ function calcEntryDateForSyncHatch(targetHatchDate: string, totalDays: number): 
   return addDaysJalali(targetHatchDate, -totalDays);
 }
 
-function Row({ l, v }: { l: string; v: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-      <span style={{ color: 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
-    </div>
-  );
-}
-
 function DepBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
@@ -1074,16 +1059,4 @@ function DepBox({ title, children }: { title: string; children: React.ReactNode 
       {children}
     </div>
   );
-}
-
-function chip(active: boolean): React.CSSProperties {
-  return {
-    padding: '6px 11px', fontSize: 'var(--fs-sm)',
-    background: active ? 'var(--info-soft)' : 'var(--btn-bg)',
-    border: '1px solid ' + (active ? 'var(--info)' : 'var(--border)'),
-    borderRadius: 'var(--r-sm)',
-    color: active ? 'var(--info)' : 'var(--muted)',
-    fontWeight: active ? 600 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap'
-  };
 }
