@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { parse as parseJ, differenceInDays as diffDaysJ } from 'date-fns-jalali';
 import { useNavigate } from 'react-router-dom';
 import { useTra, remaining } from '../tra/store';
 import { useCtc } from '../ctc/store';
@@ -118,10 +119,14 @@ export default function Dashboard() {
   // ============ سرسیدهای نزدیک ============
   const daysUntilDue = (dueDate: string): number | null => {
     if (!dueDate) return null;
-    const parts = dueDate.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString()).split('/');
-    if (parts.length !== 3) return null;
-    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-    return Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    try {
+      const en = dueDate.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+      const d = parseJ(en, 'yyyy/MM/dd', new Date());
+      if (isNaN(d.getTime())) return null;
+      return diffDaysJ(d, new Date());
+    } catch {
+      return null;
+    }
   };
 
   const upcomingDues = useMemo(() => {
