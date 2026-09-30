@@ -3,6 +3,7 @@ import { useWhs, CATEGORY_ICON, UNIT_LABEL, stockWarning, expiryWarning, daysToE
 import { Empty, PageContainer, Tag } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
+import { WarningGroup } from './helpers';
 
 export default function WarningsPage() {
   const { items } = useWhs();
@@ -89,61 +90,5 @@ export default function WarningsPage() {
         />
       ) : null}
     </PageContainer>
-  );
-}
-
-function WarningGroup({ title, icon, color, items, renderLine }: {
-  title: string;
-  icon: string;
-  color: 'red' | 'amber';
-  items: Item[];
-  renderLine: (it: Item) => string;
-}) {
-  const tone: 'red' | 'amber' = color;
-
-  return (
-    <div style={{
-      background: 'var(--card)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-lg)',
-      overflow: 'hidden'
-    }}>
-      <div style={{
-        padding: '12px 16px',
-        borderBottom: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', gap: 10
-      }}>
-        <span style={{ fontSize: 'var(--fs-lg)' }}>{icon}</span>
-        <div style={{ flex: 1, fontSize: 'var(--fs-base)', fontWeight: 700 }}>{title}</div>
-        <Tag tone={tone}>{toFa(items.length)}</Tag>
-      </div>
-
-      {items.map(it => (
-        <div
-          key={it.id}
-          style={{
-            padding: '10px 16px',
-            display: 'flex', alignItems: 'center', gap: 10,
-            borderBottom: '1px solid var(--border)'
-          }}
-        >
-          <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>{CATEGORY_ICON[it.category]}</span>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{
-              fontSize: 'var(--fs-sm)', fontWeight: 600,
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-            }}>
-              {it.name}
-            </div>
-            <div style={{
-              fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2,
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-            }}>
-              {renderLine(it)}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
   );
 }
