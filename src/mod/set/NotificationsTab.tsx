@@ -5,7 +5,6 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow, LocalNumField, SubSection } from './helpers';
 
-/** فیلد عددی با تبدیل خودکار فارسی/انگلیسی */
 export default function NotificationsTab() {
   const s = useSet();
   const ch = s.channels;
@@ -22,12 +21,31 @@ export default function NotificationsTab() {
       <SettingsGroup
         icon="📡"
         title="نحوه‌ی اعلان"
-        subtitle={`${toFa(activeChannels)} کانال فعال از ۳`}
+        subtitle={`${toFa(activeChannels)} کانال · ${toFa(activeAlerts)} سطح فعال`}
         tone="accent"
-       defaultOpen>
-        <SubSection label="نحوه‌ی ارسال اعلان" icon="📡" />
-        <SubSection label="انواع هشدار" icon="🔔" />
-        <SubSection label="چه سطحی هشدار بده" icon="🎯" />
+        defaultOpen>
+
+        <SubSection label="کانال‌های ارسال" icon="📤" />
+        <ToggleRow
+          label="درون‌برنامه (Toast)"
+          sub="نمایش پیام کوتاه در بالای صفحه"
+          value={ch.inApp}
+          onChange={() => s.updateSection('channels', { inApp: !ch.inApp })}
+        />
+        <ToggleRow
+          label="صدا"
+          sub="پخش بوق کوتاه هنگام نمایش دیالوگ"
+          value={ch.sound}
+          onChange={() => s.updateSection('channels', { sound: !ch.sound })}
+        />
+        <ToggleRow
+          label="ویبره"
+          sub="لرزش کوتاه (فقط موبایل)"
+          value={ch.vibration}
+          onChange={() => s.updateSection('channels', { vibration: !ch.vibration })}
+        />
+
+        <SubSection label="سطوح هشدار" icon="🔔" />
         <ToggleRow
           label="🔴 بحرانی"
           sub="دما، تلفات بالا، آتش"
@@ -46,11 +64,11 @@ export default function NotificationsTab() {
           value={al.info}
           onChange={() => s.updateSection('alerts', { info: !al.info })}
         />
-      
+
         <SubSection label="ساعات سکوت" icon="🌙" />
         <ToggleRow
           label="فعال"
-          sub="در این ساعات اعلان نیاید"
+          sub="در این ساعات اعلان غیر‌بحرانی نیاید"
           value={qh.enabled}
           onChange={() => s.updateSection('quietHours', { enabled: !qh.enabled })}
         />
@@ -193,59 +211,63 @@ export default function NotificationsTab() {
             eggDropPercent: 10,
             mortalityPerThousand: 5,
             tempDeviation: 2,
-            humidityDeviation: 10
+            humidityDeviation: 10,
+            waterFeedMin: 1.6,
+            waterFeedMax: 2.2,
+            criticalTempHigh: 32,
+            criticalTempLow: 18
           })}
         >
           🔄 بازنشانی به پیش‌فرض
         </Btn>
-      
+
         <SubSection label="یادآور سرسید" icon="⏰" />
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 4px 8px', lineHeight: 1.7 }}>
-            قبل از رسیدن سرسید فاکتورهای پرداخت‌نشده، هشدار نمایش داده می‌شود.
-          </div>
-          <Grid2>
-            <ToggleRow
-              label="۷ روز قبل"
-              sub="یادآوری زودهنگام"
-              value={(s.dueDateReminders || []).includes(7)}
-              onChange={() => {
-                const cur = s.dueDateReminders || [7, 3, 1];
-                const next = cur.includes(7) ? cur.filter((x) => x !== 7) : [...cur, 7].sort((a: number, b: number) => b - a);
-                s.update({ dueDateReminders: next });
-              }}
-            />
-            <ToggleRow
-              label="۳ روز قبل"
-              sub="یادآوری میانی"
-              value={(s.dueDateReminders || []).includes(3)}
-              onChange={() => {
-                const cur = s.dueDateReminders || [7, 3, 1];
-                const next = cur.includes(3) ? cur.filter((x) => x !== 3) : [...cur, 3].sort((a: number, b: number) => b - a);
-                s.update({ dueDateReminders: next });
-              }}
-            />
-            <ToggleRow
-              label="۱ روز قبل"
-              sub="یادآوری نزدیک"
-              value={(s.dueDateReminders || []).includes(1)}
-              onChange={() => {
-                const cur = s.dueDateReminders || [7, 3, 1];
-                const next = cur.includes(1) ? cur.filter((x) => x !== 1) : [...cur, 1].sort((a: number, b: number) => b - a);
-                s.update({ dueDateReminders: next });
-              }}
-            />
-            <ToggleRow
-              label="روز سرسید"
-              sub="در روز پرداخت"
-              value={(s.dueDateReminders || []).includes(0)}
-              onChange={() => {
-                const cur = s.dueDateReminders || [7, 3, 1];
-                const next = cur.includes(0) ? cur.filter((x) => x !== 0) : [...cur, 0].sort((a: number, b: number) => b - a);
-                s.update({ dueDateReminders: next });
-              }}
-            />
-          </Grid2>
-        </SettingsGroup>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 4px 8px', lineHeight: 1.7 }}>
+          قبل از رسیدن سرسید فاکتورهای پرداخت‌نشده، هشدار نمایش داده می‌شود.
+        </div>
+        <Grid2>
+          <ToggleRow
+            label="۷ روز قبل"
+            sub="یادآوری زودهنگام"
+            value={(s.dueDateReminders || []).includes(7)}
+            onChange={() => {
+              const cur = s.dueDateReminders || [7, 3, 1];
+              const next = cur.includes(7) ? cur.filter((x) => x !== 7) : [...cur, 7].sort((a, b) => b - a);
+              s.update({ dueDateReminders: next });
+            }}
+          />
+          <ToggleRow
+            label="۳ روز قبل"
+            sub="یادآوری میانی"
+            value={(s.dueDateReminders || []).includes(3)}
+            onChange={() => {
+              const cur = s.dueDateReminders || [7, 3, 1];
+              const next = cur.includes(3) ? cur.filter((x) => x !== 3) : [...cur, 3].sort((a, b) => b - a);
+              s.update({ dueDateReminders: next });
+            }}
+          />
+          <ToggleRow
+            label="۱ روز قبل"
+            sub="یادآوری نزدیک"
+            value={(s.dueDateReminders || []).includes(1)}
+            onChange={() => {
+              const cur = s.dueDateReminders || [7, 3, 1];
+              const next = cur.includes(1) ? cur.filter((x) => x !== 1) : [...cur, 1].sort((a, b) => b - a);
+              s.update({ dueDateReminders: next });
+            }}
+          />
+          <ToggleRow
+            label="روز سرسید"
+            sub="در روز پرداخت"
+            value={(s.dueDateReminders || []).includes(0)}
+            onChange={() => {
+              const cur = s.dueDateReminders || [7, 3, 1];
+              const next = cur.includes(0) ? cur.filter((x) => x !== 0) : [...cur, 0].sort((a, b) => b - a);
+              s.update({ dueDateReminders: next });
+            }}
+          />
+        </Grid2>
+      </SettingsGroup>
 
     </div>
   );

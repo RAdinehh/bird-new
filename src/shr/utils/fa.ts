@@ -18,13 +18,25 @@ export const numFa = (n: any): string => {
 
 /** فرمت عدد هنگام تایپ: جداکننده هزار هر ۳ رقم + ارقام فارسی */
 export function formatNumWhileTyping(s: string): string {
-  const cleaned = String(s || '')
+  let cleaned = String(s || '')
     .replace(/[۰-۹]/g, d => String(FA.indexOf(d)))
-    .replace(/\D/g, '');
-  if (!cleaned) return '';
-  const noZero = cleaned.replace(/^0+/, '') || '0';
-  const withSep = noZero.replace(/\B(?=(\d{3})+(?!\d))/g, '٬');
-  return withSep.replace(/[0-9]/g, d => FA[+d]);
+    .replace(/[٬,]/g, '')
+    .replace(/٫/g, '.');
+  cleaned = cleaned.replace(/[^\d.]/g, '');
+  const parts = cleaned.split('.');
+  if (parts.length > 2) {
+    cleaned = parts[0] + '.' + parts.slice(1).join('');
+  }
+  let [intPart = '', decPart = ''] = cleaned.split('.');
+  intPart = intPart.replace(/^0+/, '') || (cleaned.includes('.') ? '0' : '');
+  if (!intPart && !decPart && !cleaned.includes('.')) return '';
+  decPart = decPart.slice(0, 2);
+  const withSep = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '٬');
+  let result = withSep.replace(/[0-9]/g, d => FA[+d]);
+  if (cleaned.includes('.')) {
+    result += '٫' + decPart.replace(/[0-9]/g, d => FA[+d]);
+  }
+  return result;
 }
 
 /** تبدیل عدد به حروف فارسی */
