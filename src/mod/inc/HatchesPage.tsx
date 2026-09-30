@@ -381,43 +381,46 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                       {isSel && (
                         <>
                           {(() => {
-                            const entryTotal = e.count || 0;
+                            const base = aliveAfter;
                             const h = parseInt(toEn(d.hatched)) || 0;
                             const uh = parseInt(toEn(d.unhatched)) || 0;
                             const ds = parseInt(toEn(d.deadInShell)) || 0;
                             const pp = parseInt(toEn(d.pipped)) || 0;
                             const ot = parseInt(toEn(d.other)) || 0;
                             const sum = h + uh + ds + pp + ot;
-                            const remaining = entryTotal - sum;
+                            const remaining = base - sum;
                             const ok = remaining >= 0;
                             return (
                               <>
+                                <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
+                                  🧬 سقف این هچ: {toFa(base)} (نطفه‌دار از کندلینگ)
+                                </div>
                                 <Grid2>
-                                  <Field label="جوجه هچ‌شده" required hint={'از نطفه‌دار: ' + toFa(aliveAfter)}>
-                                    <NumField value={d.hatched} onChange={ev => updateData(e.id, { hatched: ev.target.value })} max={Math.min(aliveAfter, entryTotal - uh - ds - pp - ot)} min={0} unit="عدد" />
+                                  <Field label="جوجه هچ‌شده" required>
+                                    <NumField value={d.hatched} onChange={ev => updateData(e.id, { hatched: ev.target.value })} max={Math.max(0, base - uh - ds - pp - ot)} min={0} unit="عدد" />
                                   </Field>
                                   <Field label="هچ‌نشده">
-                                    <NumField value={d.unhatched} onChange={ev => updateData(e.id, { unhatched: ev.target.value })} max={entryTotal - h - ds - pp - ot} min={0} unit="عدد" />
+                                    <NumField value={d.unhatched} onChange={ev => updateData(e.id, { unhatched: ev.target.value })} max={Math.max(0, base - h - ds - pp - ot)} min={0} unit="عدد" />
                                   </Field>
                                 </Grid2>
                                 <Grid2>
                                   <Field label="مرده در پوسته">
-                                    <NumField value={d.deadInShell} onChange={ev => updateData(e.id, { deadInShell: ev.target.value })} max={entryTotal - h - uh - pp - ot} min={0} unit="عدد" />
+                                    <NumField value={d.deadInShell} onChange={ev => updateData(e.id, { deadInShell: ev.target.value })} max={Math.max(0, base - h - uh - pp - ot)} min={0} unit="عدد" />
                                   </Field>
                                   <Field label="نوک‌زده">
-                                    <NumField value={d.pipped} onChange={ev => updateData(e.id, { pipped: ev.target.value })} max={entryTotal - h - uh - ds - ot} min={0} unit="عدد" />
+                                    <NumField value={d.pipped} onChange={ev => updateData(e.id, { pipped: ev.target.value })} max={Math.max(0, base - h - uh - ds - ot)} min={0} unit="عدد" />
                                   </Field>
                                 </Grid2>
                                 <Grid2>
                                   <Field label="سایر">
-                                    <NumField value={d.other} onChange={ev => updateData(e.id, { other: ev.target.value })} max={entryTotal - h - uh - ds - pp} min={0} unit="عدد" />
+                                    <NumField value={d.other} onChange={ev => updateData(e.id, { other: ev.target.value })} max={Math.max(0, base - h - uh - ds - pp)} min={0} unit="عدد" />
                                   </Field>
                                   <Field label="وزن متوسط" hint="۲۰-۶۰ گرم">
                                     <NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" />
                                   </Field>
                                 </Grid2>
                                 <div style={{ padding: '8px 12px', background: !ok ? 'var(--danger-soft)' : remaining === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
-                                  <span>📊 مجموع: {toFa(sum)} / {toFa(entryTotal)}</span>
+                                  <span>📊 مجموع: {toFa(sum)} / {toFa(base)}</span>
                                   <span>
                                     {ok && remaining > 0 && '⏳ ' + toFa(remaining) + ' باقی'}
                                     {ok && remaining === 0 && '✅ کامل'}
