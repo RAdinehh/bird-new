@@ -35,6 +35,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [deviceFilter, setDeviceFilter] = useState('');
+  const [postHatchAction, setPostHatchAction] = useState<{ hatchId: string; action: 'flock' | 'sale' } | null>(null);
 
   // گله‌سازی
   const [flockModal, setFlockModal] = useState<{ hatchId: string; count: number } | null>(null);
@@ -186,6 +187,39 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     showAlert('فاکتور فروش ثبت شد', '✅ موفق');
   };
 
+  // ═══ تخمین از کندلینگ ═══
+  const suggestionsFromCandling = useMemo(() => {
+    if (!selectedEntry) return null;
+    const myCandlings = candlings.filter(c => c.eggEntryId === form.eggEntryId).sort((a, b) => b.stage - a.stage);
+    const last = myCandlings[0];
+    if (!last) return null;
+    const total = selectedEntry.count || 0;
+    const alive = last.alive || 0;
+    const infertile = last.infertile || 0;
+    const dead = last.dead || 0;
+    const broken = last.broken || 0;
+    const expectedHatched = Math.round(alive * 0.92);
+    const expectedDeadInShell = Math.round(alive * 0.05);
+    const expectedUnhatched = Math.max(0, alive - expectedHatched - expectedDeadInShell);
+    return {
+      total, alive, infertile, dead, broken,
+      expectedHatched, expectedDeadInShell, expectedUnhatched,
+      fertilityRate: total > 0 ? (alive / total * 100) : 0,
+      candlingStage: last.stage,
+    };
+  }, [candlings, form.eggEntryId, selectedEntry]);
+
+  const applySuggestions = () => {
+    if (!suggestionsFromCandling) return;
+    setForm(f => ({
+      ...f,
+      hatched: String(suggestionsFromCandling.expectedHatched),
+      deadInShell: String(suggestionsFromCandling.expectedDeadInShell),
+      unhatched: String(suggestionsFromCandling.expectedUnhatched),
+    }));
+    showAlert('مقادیر تخمینی پر شد — می‌تونی دستی تغییر بدی', '📊 تخمین');
+  };
+
   const target = delId ? hatches.find(h => h.id === delId) : null;
 
   // ═══ گروه‌بندی + خلاصه ═══
@@ -262,6 +296,8 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
             const aliveAfterCandling = myCandling?.alive || total;
             const realRate = aliveAfterCandling ? ((h.hatched || 0) / aliveAfterCandling * 100) : 0;
             const tone = hr >= 70 ? 'green' : hr >= 50 ? 'amber' : 'red';
+            const sumH = (h.hatched||0) + (h.unhatched||0) + (h.deadInShell||0) + (h.pipped||0) + (h.other||0);
+            const isComplete = total > 0 && sumH >= total;
             return (
               <ExpandableCard key={h.id} accent="accent" index={toFa(i + 1)} iconEmoji="🐣"
                 title={toFa(h.hatched || 0) + ' جوجه · ' + (bird?.name || '—')}
@@ -274,6 +310,31 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                   <span>📊 {toFa(hr.toFixed(0))}٪</span>
                 </>}
               >
+                {isComplete && (
+                  <div style={{ padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', textAlign: 'center', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
+                    ✅ هچ تکمیل شد — همه تخم‌ها شمارش شدن
+                  </div>
+                )}
+
+                {total > 0 && (h.hatched || 0) > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 نمودار توزیع</div>
+                    <div style={{ display: 'flex', height: 12, borderRadius: 6, overflow: 'hidden', background: 'var(--input-bg)' }}>
+                      {(h.hatched || 0) > 0 && <div style={{ width: ((h.hatched||0)/total*100)+'%', background: 'var(--accent)' }} title={'هچ ' + toFa(h.hatched || 0)} />}
+                      {(h.deadInShell || 0) > 0 && <div style={{ width: ((h.deadInShell||0)/total*100)+'%', background: 'var(--danger)' }} title={'مرده ' + toFa(h.deadInShell || 0)} />}
+                      {(h.pipped || 0) > 0 && <div style={{ width: ((h.pipped||0)/total*100)+'%', background: 'var(--warn)' }} title={'نوک‌زده ' + toFa(h.pipped || 0)} />}
+                      {(h.unhatched || 0) > 0 && <div style={{ width: ((h.unhatched||0)/total*100)+'%', background: 'var(--muted)' }} title={'هچ‌نشده ' + toFa(h.unhatched || 0)} />}
+                      {(h.other || 0) > 0 && <div style={{ width: ((h.other||0)/total*100)+'%', background: 'var(--dim)' }} title={'سایر ' + toFa(h.other || 0)} />}
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: 'var(--fs-xs)' }}>
+                      {(h.hatched||0) > 0 && <span style={{ color: 'var(--accent)' }}>🟢 هچ {toFa(h.hatched||0)} ({toFa(((h.hatched||0)/total*100).toFixed(0))}٪)</span>}
+                      {(h.deadInShell||0) > 0 && <span style={{ color: 'var(--danger)' }}>🔴 مرده {toFa(h.deadInShell||0)}</span>}
+                      {(h.pipped||0) > 0 && <span style={{ color: 'var(--warn)' }}>🟡 نوک {toFa(h.pipped||0)}</span>}
+                      {(h.unhatched||0) > 0 && <span style={{ color: 'var(--muted)' }}>⚪ هچ‌نشده {toFa(h.unhatched||0)}</span>}
+                    </div>
+                  </div>
+                )}
+
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 نتیجه هچ</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="جوجه هچ‌شده" v={toFa(h.hatched || 0)} />
@@ -332,6 +393,16 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📝 یادداشت</div>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
                   </>
+                )}
+
+                {isComplete && (h.hatched || 0) > 0 && (
+                  <div style={{ padding: '12px 14px', background: 'var(--input-bg)', border: '1px dashed var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>🎯 مرحله بعد:</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                      <Btn onClick={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(new Date().getFullYear()), type: 'layer', hallId: '', zoneId: '' }); }}>🐔 ساخت گله</Btn>
+                      <Btn onClick={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}>📥 فروش جوجه</Btn>
+                    </div>
+                  </div>
                 )}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4, flexWrap: 'wrap' }}>
