@@ -170,7 +170,7 @@ export default function BackupTab() {
       </SettingsGroup>
 
       {/* پشتیبان دستی */}
-      <SettingsGroup icon="📤" title="پشتیبان‌گیری" tone="info">
+      <SettingsGroup icon="📤" title="پشتیبان‌گیری" tone="info" defaultOpen>
         <SubSection label="دانلود پشتیبان" icon="📤" />
         <Btn variant="primary" full onClick={handleExport}>
           📥 دریافت پشتیبان کامل (JSON)
@@ -182,10 +182,8 @@ export default function BackupTab() {
         <Btn full onClick={handleExportSettings}>
           ⚙ فقط تنظیمات
         </Btn>
-      </SettingsGroup>
-
-      {/* بازیابی */}
-      <SettingsGroup icon="📥" title="بازیابی از فایل" tone="purple">
+      
+        <SubSection label="بازیابی" icon="📥" />
         <input
           ref={fileRef}
           type="file"
@@ -199,10 +197,8 @@ export default function BackupTab() {
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
           قبل از بازیابی، پیش‌نمایش محتوا نمایش داده می‌شود
         </div>
-      </SettingsGroup>
-
-      {/* پشتیبان خودکار */}
-      <SettingsGroup icon="💾" title="پشتیبان خودکار" subtitle={s.autoBackup.enabled ? "فعال" : "غیرفعال"} tone="accent">
+      
+        <SubSection label="پشتیبان خودکار" icon="💾" />
         <SubSection label="تنظیمات خودکار" icon="💾" />
         <RowToggle
           label="فعال"
@@ -250,10 +246,8 @@ export default function BackupTab() {
             />
           </Field>
         ) : null}
-      </SettingsGroup>
-
-      {/* منطقه خطر */}
-      <SettingsGroup icon="⚠" title="منطقه خطر" tone="danger">
+      
+        <SubSection label="پاک کردن داده‌ها" icon="⚠" />
         <SubSection label="عملیات غیرقابل بازگشت" icon="⚠️" />
         <Btn full variant="danger" onClick={() => setShowReset(true)}>
           🗑 پاک کردن همه‌ی داده‌ها

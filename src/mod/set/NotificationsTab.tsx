@@ -21,10 +21,10 @@ export default function NotificationsTab() {
 
       <SettingsGroup
         icon="📡"
-        title="کانال‌های اعلان"
+        title="نحوه‌ی اعلان"
         subtitle={`${toFa(activeChannels)} کانال فعال از ۶`}
         tone="accent"
-      >
+       defaultOpen>
         <SubSection label="نحوه‌ی ارسال اعلان" icon="📡" />
         <ToggleRow
           label="درون‌برنامه (Toast)"
@@ -63,14 +63,8 @@ export default function NotificationsTab() {
           value={ch.telegram}
           onChange={() => s.updateSection('channels', { telegram: !ch.telegram })}
         />
-      </SettingsGroup>
-
-      <SettingsGroup
-        icon="🔔"
-        title="انواع هشدار"
-        subtitle={`${toFa(activeAlerts)} از ۳ نوع فعال`}
-        tone="warn"
-      >
+      
+        <SubSection label="انواع هشدار" icon="🔔" />
         <SubSection label="چه سطحی هشدار بده" icon="🎯" />
         <ToggleRow
           label="🔴 بحرانی"
@@ -90,14 +84,8 @@ export default function NotificationsTab() {
           value={al.info}
           onChange={() => s.updateSection('alerts', { info: !al.info })}
         />
-      </SettingsGroup>
-
-      <SettingsGroup
-        icon="🌙"
-        title="ساعات سکوت"
-        subtitle={qh.enabled ? `${toFa(qh.from)} تا ${toFa(qh.to)}` : 'غیرفعال'}
-        tone="purple"
-      >
+      
+        <SubSection label="ساعات سکوت" icon="🌙" />
         <ToggleRow
           label="فعال"
           sub="در این ساعات اعلان نیاید"
@@ -248,27 +236,8 @@ export default function NotificationsTab() {
         >
           🔄 بازنشانی به پیش‌فرض
         </Btn>
-      </SettingsGroup>
-
-      <div style={{
-        padding: 'var(--pad-comfy)',
-        background: 'var(--info-soft)',
-        border: '1px solid var(--info)',
-        borderRadius: 'var(--r-md)',
-        fontSize: 'var(--fs-xs)',
-        color: 'var(--info)',
-        lineHeight: 1.7,
-        textAlign: 'center'
-      }}>
-        💡 اعلان‌ها فعلاً درون‌برنامه هستند. پیامک، ایمیل و تلگرام در نسخه‌های بعدی.
-      </div>
-
-        <SettingsGroup
-          icon="⏰"
-          title="یادآور سرسید فاکتور"
-          subtitle={`${toFa((s.dueDateReminders || [7, 3, 1]).length)} یادآور فعال`}
-          tone="info"
-        >
+      
+        <SubSection label="یادآور سرسید" icon="⏰" />
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 4px 8px', lineHeight: 1.7 }}>
             قبل از رسیدن سرسید فاکتورهای پرداخت‌نشده، هشدار نمایش داده می‌شود.
           </div>
