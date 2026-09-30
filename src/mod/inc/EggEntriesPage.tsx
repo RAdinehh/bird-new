@@ -823,8 +823,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         )}
 
         {/* ═══ فرم ردیف جدید ═══ */}
-        <div style={{ padding: 'var(--pad-comfy)', background: editingRowId ? 'var(--warn-soft)' : 'var(--accent-soft)', border: '1px dashed ' + (editingRowId ? 'var(--warn)' : 'var(--accent)'), borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 6 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: editingRowId ? 'var(--warn)' : 'var(--accent)', fontWeight: 700 }}>
+        <div style={{ padding: 'var(--pad-comfy)', background: editingRowId ? 'var(--warn-soft)' : 'var(--input-bg)', border: '1px dashed ' + (editingRowId ? 'var(--warn)' : 'var(--border)'), borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: editingRowId ? 'var(--warn)' : 'var(--muted)', fontWeight: 700 }}>
             <span>{editingRowId ? '✏️' : '➕'}</span>
             <span>{editingRowId ? 'ویرایش ردیف انتخاب‌شده' : 'ردیف جدید'}</span>
           </div>
