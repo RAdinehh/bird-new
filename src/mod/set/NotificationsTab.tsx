@@ -4,17 +4,13 @@ import { Btn, Field, Grid2, Input } from '../../shr/components/ui';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow, LocalNumField, SubSection } from './helpers';
-import { playBeep, vibrate, unlockAudio, hasVibration } from '../../shr/utils/audio';
-import { showToast } from '../../cor/store/toast';
 
 export default function NotificationsTab() {
   const s = useSet();
-  const ch = s.channels;
   const al = s.alerts;
   const qh = s.quietHours;
   const th = s.thresholds;
 
-  const activeChannels = [ch.inApp, ch.sound, ch.vibration].filter(Boolean).length;
   const activeAlerts = [al.critical, al.important, al.info].filter(Boolean).length;
 
   return (
@@ -23,58 +19,10 @@ export default function NotificationsTab() {
       <SettingsGroup
         icon="📡"
         title="نحوه‌ی اعلان"
-        subtitle={`${toFa(activeChannels)} کانال · ${toFa(activeAlerts)} سطح فعال`}
+        subtitle={`${toFa(activeAlerts)} سطح هشدار فعال`}
         tone="accent"
         defaultOpen>
 
-        <SubSection label="کانال‌های ارسال" icon="📤" />
-        <ToggleRow
-          label="درون‌برنامه (Toast)"
-          sub="نمایش پیام کوتاه در بالای صفحه"
-          value={ch.inApp}
-          onChange={() => s.updateSection('channels', { inApp: !ch.inApp })}
-        />
-        <ToggleRow
-          label="صدا"
-          sub="پخش بوق کوتاه هنگام نمایش دیالوگ"
-          value={ch.sound}
-          onChange={() => s.updateSection('channels', { sound: !ch.sound })}
-        />
-        <ToggleRow
-          label="ویبره"
-          sub="لرزش کوتاه (فقط موبایل)"
-          value={ch.vibration}
-          onChange={() => s.updateSection('channels', { vibration: !ch.vibration })}
-        />
-
-        <SubSection label="تست کانال‌ها" icon="🧪" />
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <Btn
-            size="sm"
-            onClick={() => {
-              unlockAudio().then(() => {
-                playBeep('info');
-                showToast('🔊 تست صدا ارسال شد', 'info', 1500);
-              });
-            }}
-          >
-            🔊 تست صدا
-          </Btn>
-          <Btn
-            size="sm"
-            onClick={() => {
-              const ok = vibrate('info');
-              showToast(ok ? '📳 لرزش ارسال شد' : '⚠️ مرورگر ویبره ندارد', ok ? 'info' : 'warn', 1800);
-            }}
-          >
-            📳 تست ویبره
-          </Btn>
-        </div>
-        {!hasVibration() && (
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingTop: 4 }}>
-            ⓘ مرورگر فعلی از ویبره پشتیبانی نمی‌کند
-          </div>
-        )}
 
         <SubSection label="سطوح هشدار" icon="🔔" />
         <ToggleRow
