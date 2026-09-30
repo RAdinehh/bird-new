@@ -44,6 +44,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [q, setQ] = useState('');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -53,7 +54,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
         setModalDevice(entry.deviceId);
         setSelectedIds(new Set([initialEntry]));
         setEntriesData({ [initialEntry]: emptyData() });
-        // پیشنهاد روز: آخرین کندلینگ + ۳ روز
         const stages = candlings.filter(c => c.eggEntryId === initialEntry).map(c => c.stage);
         const nextDay = stages.length > 0 ? Math.max(...stages) + 3 : 7;
         setModalDay(String(nextDay));
@@ -127,8 +127,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
       if (sum === 0) { setErr('حداقل یک مقدار وارد کنید'); return; }
       updateCandling(editingId, {
-        stage: dayNum,
-        date: modalDate,
+        stage: dayNum, date: modalDate,
         alive: parseInt(toEn(d.alive)) || null,
         infertile: parseInt(toEn(d.infertile)) || null,
         dead: parseInt(toEn(d.dead)) || null,
@@ -149,9 +148,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       if (sum === 0) { hasError = true; return; }
       if (entry.count && sum > entry.count) { hasError = true; return; }
       addCandling({
-        eggEntryId: id,
-        stage: dayNum,
-        date: modalDate,
+        eggEntryId: id, stage: dayNum, date: modalDate,
         alive: parseInt(toEn(d.alive)) || null,
         infertile: parseInt(toEn(d.infertile)) || null,
         dead: parseInt(toEn(d.dead)) || null,
@@ -163,7 +160,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       saved++;
     });
 
-    if (hasError && saved === 0) { setErr('هیچ کندلینگی ذخیره نشد — مقادیر را چک کنید'); return; }
+    if (hasError && saved === 0) { setErr('هیچ کندلینگی ذخیره نشد'); return; }
     setOpen(false);
     showAlert(toFa(saved) + ' کندلینگ ثبت شد', '✅ موفق');
   };
@@ -191,7 +188,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
   const target = delId ? candlings.find(c => c.id === delId) : null;
 
-  // ═══ گروه‌بندی + تجمیع ═══
+  // ═══ گروه‌بندی + تجمیع + درصد ═══
   const grouped = useMemo(() => {
     const byEntry: Record<string, Candling[]> = {};
     candlings.forEach(c => {
@@ -199,15 +196,20 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       byEntry[c.eggEntryId].push(c);
     });
     return Object.entries(byEntry).map(([entryId, list]) => {
-      // تجمیع
       const agg = list.reduce((acc, c) => ({
         alive: acc.alive + (c.alive || 0),
         infertile: acc.infertile + (c.infertile || 0),
         dead: acc.dead + (c.dead || 0),
         broken: acc.broken + (c.broken || 0),
       }), { alive: 0, infertile: 0, dead: 0, broken: 0 });
-      return { entryId, list: list.sort((a, b) => a.stage - b.stage), agg };
-    }).filter(({ entryId, list }) => {
+      const total = agg.alive + agg.infertile + agg.dead + agg.broken;
+      const entry = eggEntries.find(e => e.id === entryId);
+      const entryTotal = entry?.count || 0;
+      const fertilePercent = total > 0 ? (agg.alive / total * 100) : 0;
+      const lossPercent = entryTotal > 0 ? ((total - agg.alive) / entryTotal * 100) : 0;
+      const deadPercent = total > 0 ? ((agg.dead + agg.infertile) / total * 100) : 0;
+      return { entryId, list: list.sort((a, b) => a.stage - b.stage), agg, total, entryTotal, fertilePercent, lossPercent, deadPercent };
+    }).filter(({ entryId }) => {
       if (!q.trim()) return true;
       const t = q.trim().toLowerCase();
       const entry = eggEntries.find(e => e.id === entryId);
@@ -222,10 +224,51 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     });
   }, [candlings, eggEntries, birds, devices, q]);
 
+  // ═══ خلاصه کل ═══
+  const summary = useMemo(() => {
+    const totalEntries = eggEntries.filter(e => e.status !== 'failed').length;
+    const totalCandlings = candlings.length;
+    const totalAlive = candlings.reduce((a, c) => a + (c.alive || 0), 0);
+    const totalInfertile = candlings.reduce((a, c) => a + (c.infertile || 0), 0);
+    const totalDead = candlings.reduce((a, c) => a + (c.dead || 0), 0);
+    const totalBroken = candlings.reduce((a, c) => a + (c.broken || 0), 0);
+    const grandTotal = totalAlive + totalInfertile + totalDead + totalBroken;
+    const fertilePercent = grandTotal > 0 ? (totalAlive / grandTotal * 100) : 0;
+    const lossPercent = grandTotal > 0 ? ((totalInfertile + totalDead + totalBroken) / grandTotal * 100) : 0;
+    return { totalEntries, totalCandlings, totalAlive, totalInfertile, totalDead, totalBroken, fertilePercent, lossPercent };
+  }, [eggEntries, candlings]);
+
   const dataFor = (id: string): EntryData => entriesData[id] || emptyData();
 
   return (
     <PageContainer>
+      {/* ═══ خلاصه کل ═══ */}
+      {summary.totalCandlings > 0 && (
+        <div style={{
+          padding: '12px 14px',
+          background: 'var(--card)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-lg)',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 8,
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>🧬 نطفه‌داری کل</span>
+            <span style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(summary.fertilePercent.toFixed(1))}٪</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>📉 تلفات کل</span>
+            <span style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--danger)' }}>{toFa(summary.lossPercent.toFixed(1))}٪</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gridColumn: '1 / -1', paddingTop: 6, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+            <span>📥 {toFa(summary.totalEntries)} ورودی</span>
+            <span>🔍 {toFa(summary.totalCandlings)} کندلینگ</span>
+            <span>✅ {toFa(summary.totalAlive)} سالم</span>
+          </div>
+        </div>
+      )}
+
       {candlings.length > 0 && (
         <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (نام پرنده، دستگاه، تاریخ...)" />
       )}
@@ -237,112 +280,111 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
           action={<Btn variant="primary" onClick={() => openNew()}>+ ثبت کندلینگ</Btn>} />
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            {grouped.map(({ entryId, list, agg }) => {
-              const entry = eggEntries.find(e => e.id === entryId);
-              const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
-              const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
-              const entryTotal = entry?.count || 0;
-              const aggFertilePercent = entryTotal > 0 ? (agg.alive / entryTotal * 100) : 0;
+          {grouped.map(({ entryId, list, agg, total, entryTotal, fertilePercent, lossPercent, deadPercent }, i) => {
+            const entry = eggEntries.find(e => e.id === entryId);
+            const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
+            const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
+            const isOpen = expandedId === entryId;
+            const lossTone = lossPercent > 20 ? 'danger' : lossPercent > 10 ? 'warn' : 'green';
 
-              return (
-                <div key={entryId} style={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-lg)',
-                  padding: '10px 12px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}>
-                  <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: 'var(--accent)' }} />
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
-                      🔍 {bird?.name || '—'}
-                    </span>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                      {dev?.name || '—'} · {toFa(entryTotal)} تخم
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
-                    <span style={{ color: 'var(--muted)' }}>{toFa(entry?.entryDate || '—')}</span>
-                    {aggFertilePercent > 0 && (
-                      <Tag tone="green">{toFa(aggFertilePercent.toFixed(0))}٪ نطفه</Tag>
-                    )}
-                  </div>
-
-                  {/* مراحل */}
-                  <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-                    {list.map(c => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => openEdit(c)}
-                        title={'روز ' + toFa(c.stage) + ' · ' + toFa(c.date)}
-                        style={{
-                          padding: '4px 8px',
-                          background: 'var(--accent-soft)',
-                          border: '1px solid var(--accent-border)',
-                          borderRadius: 'var(--r-sm)',
-                          fontSize: 'var(--fs-xs)',
-                          fontWeight: 700,
-                          color: 'var(--accent)',
-                          cursor: 'pointer',
-                          fontFamily: 'inherit',
-                        }}
-                      >
-                        ✓ روز {toFa(c.stage)}
-                      </button>
-                    ))}
+            return (
+              <ExpandableCard key={entryId} accent="accent" index={toFa(i + 1)} iconEmoji="🔍"
+                title={bird?.name || '—'}
+                subtitle={(dev?.name || '—') + ' · ' + toFa(entryTotal) + ' تخم · ' + toFa(entry?.entryDate || '—')}
+                isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : entryId)}
+                badge={<Tag tone={lossTone}>تلفات {toFa(lossPercent.toFixed(0))}٪</Tag>}
+                summary={<>
+                  <span>🧬 <b style={{ color: 'var(--accent)' }}>{toFa(fertilePercent.toFixed(0))}٪</b></span>
+                  <span>📉 <b style={{ color: lossPercent > 10 ? 'var(--danger)' : 'var(--text)' }}>{toFa(lossPercent.toFixed(0))}٪</b></span>
+                  <span>🔍 {toFa(list.length)} کندلینگ</span>
+                </>}
+              >
+                {/* ═══ دکمه‌های روز ═══ */}
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📅 کندلینگ‌های این ورودی</div>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  {list.map(c => (
                     <button
+                      key={c.id}
                       type="button"
-                      onClick={() => openNew(entryId)}
+                      onClick={() => openEdit(c)}
+                      title={toFa(c.date)}
                       style={{
-                        padding: '4px 8px',
-                        background: 'var(--input-bg)',
-                        border: '1px dashed var(--border)',
+                        padding: '6px 10px',
+                        background: 'var(--accent-soft)',
+                        border: '1px solid var(--accent-border)',
                         borderRadius: 'var(--r-sm)',
                         fontSize: 'var(--fs-xs)',
                         fontWeight: 700,
-                        color: 'var(--muted)',
+                        color: 'var(--accent)',
                         cursor: 'pointer',
                         fontFamily: 'inherit',
                       }}
                     >
-                      + کندلینگ
+                      ✓ روز {toFa(c.stage)}
                     </button>
-                  </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => openNew(entryId)}
+                    style={{
+                      padding: '6px 10px',
+                      background: 'var(--input-bg)',
+                      border: '1px dashed var(--border)',
+                      borderRadius: 'var(--r-sm)',
+                      fontSize: 'var(--fs-xs)',
+                      fontWeight: 700,
+                      color: 'var(--muted)',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    + کندلینگ جدید
+                  </button>
+                </div>
 
-                  {/* تجمیع */}
-                  <div style={{
-                    marginTop: 4,
-                    padding: '6px 8px',
-                    background: 'var(--input-bg)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--r-sm)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 2,
-                    fontSize: 'var(--fs-xs)',
-                  }}>
-                    <div style={{ fontWeight: 700, color: 'var(--muted)', marginBottom: 2 }}>📊 تجمیع ({toFa(list.length)} کندلینگ)</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--accent)', fontWeight: 700 }}>سالم: {toFa(agg.alive)}</span>
-                      <span style={{ color: 'var(--warn)', fontWeight: 700 }}>بی‌نطفه: {toFa(agg.infertile)}</span>
+                {/* ═══ تجمیع با درصد ═══ */}
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 تجمیع ({toFa(list.length)} کندلینگ)</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                    <span style={{ color: 'var(--muted)' }}>🧬 نطفه‌داری</span>
+                    <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(fertilePercent.toFixed(1))}٪</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+                    <span style={{ color: 'var(--muted)' }}>📉 تلفات کل</span>
+                    <span style={{ fontWeight: 700, color: lossPercent > 10 ? 'var(--danger)' : 'var(--text)' }}>{toFa(lossPercent.toFixed(1))}٪</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--muted)' }}>✅ سالم</span>
+                      <span style={{ fontWeight: 700 }}>{toFa(agg.alive)}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--danger)', fontWeight: 700 }}>مرده: {toFa(agg.dead)}</span>
-                      <span style={{ color: 'var(--muted)', fontWeight: 700 }}>شکسته: {toFa(agg.broken)}</span>
+                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--muted)' }}>⚪ بی‌نطفه</span>
+                      <span style={{ fontWeight: 700 }}>{toFa(agg.infertile)}</span>
+                    </div>
+                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--muted)' }}>💀 مرده</span>
+                      <span style={{ fontWeight: 700 }}>{toFa(agg.dead)}</span>
+                    </div>
+                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--muted)' }}>🥚 شکسته</span>
+                      <span style={{ fontWeight: 700 }}>{toFa(agg.broken)}</span>
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* ═══ نوار پیشرفت بصری ═══ */}
+                {total > 0 && (
+                  <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: 'var(--input-bg)' }}>
+                    <div style={{ width: (agg.alive / total * 100) + '%', background: 'var(--accent)' }} />
+                    <div style={{ width: (agg.infertile / total * 100) + '%', background: 'var(--warn)' }} />
+                    <div style={{ width: (agg.dead / total * 100) + '%', background: 'var(--danger)' }} />
+                    <div style={{ width: (agg.broken / total * 100) + '%', background: 'var(--muted)' }} />
+                  </div>
+                )}
+              </ExpandableCard>
+            );
+          })}
           <Btn variant="primary" full onClick={() => openNew()}>+ ثبت کندلینگ</Btn>
         </>
       )}
@@ -352,7 +394,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
         <SectionTitle>📅 زمان‌بندی</SectionTitle>
         <Grid2>
-          <Field label="روز انکوباسیون" required hint="مثلاً ۷، ۱۰، ۱۵">
+          <Field label="روز انکوباسیون" required hint="۷، ۱۰، ۱۵...">
             <NumField value={modalDay} onChange={e => setModalDay(e.target.value)} unit="روز" min={1} max={30} autoClamp />
           </Field>
           <Field label="تاریخ" required>
@@ -399,12 +441,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                   gap: 8,
                 }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => toggleEntry(e.id)}
-                      style={{ width: 18, height: 18, accentColor: 'var(--accent)' }}
-                    />
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleEntry(e.id)} style={{ width: 18, height: 18, accentColor: 'var(--accent)' }} />
                     <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
                       {bird?.name || '—'} · {toFa(e.count || 0)} تخم
                     </span>
