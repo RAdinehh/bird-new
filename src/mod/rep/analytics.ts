@@ -3,6 +3,7 @@ import { useEgg, healthyCount, henDayRate } from '../egg/store';
 import { useFlk, getAgeDays } from '../flk/store';
 import { useDlg } from '../dlg/store';
 import { toEn } from '../../shr/utils/fa';
+import { format as formatJ } from 'date-fns-jalali';
 
 /** تبدیل تاریخ شمسی به کلید ماه: 1405/07 */
 export function monthKey(date: string): string {
@@ -24,11 +25,12 @@ export function jalaliToDate(s: string): Date | null {
 
 /** لیست آخرین N ماه شمسی */
 export function lastMonths(n: number): string[] {
-  const now = new Date();
   const arr: string[] = [];
+  const now = new Date();
   for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    arr.push(d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0'));
+    const d = new Date(now);
+    d.setMonth(d.getMonth() - i);
+    arr.push(formatJ(d, 'yyyy/MM'));
   }
   return arr;
 }
