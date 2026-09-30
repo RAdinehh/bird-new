@@ -31,6 +31,7 @@ interface DraftRow {
   unitPrice: string;
   shippingCost: string;
   entryDate: string;
+  entryTime: string;
   notes: string;
   dealData: Record<string, string>;
   dealStatus: 'active' | 'withdrawn';
@@ -49,6 +50,7 @@ const makeRow = (): DraftRow => ({
   unitPrice: '',
   shippingCost: '',
   entryDate: '',
+  entryTime: '',
   notes: '',
   dealData: {},
   dealStatus: 'active',
@@ -144,7 +146,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     if (birds.length === 0) { showAlert('اول پرنده بسازید'); return; }
     setMultiDeviceId(initialDevice || devices[0].id);
     setDraftRows([]);
-    setCurrentRow({ ...makeRow(), birdId: birds[0].id, entryDate: todayJalali() });
+    setCurrentRow({ ...makeRow(), birdId: birds[0].id, entryDate: todayJalali(), entryTime: nowTime() });
     setEditingRowId(null);
     setOpen(true);
   };
@@ -243,7 +245,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     } else {
       setDraftRows(rows => [...rows, currentRow]);
     }
-    setCurrentRow({ ...makeRow(), birdId: currentRow.birdId, entryDate: currentRow.entryDate });
+    setCurrentRow({ ...makeRow(), birdId: currentRow.birdId, entryDate: todayJalali(), entryTime: nowTime() });
   };
 
   const editRow = (row: DraftRow) => {
@@ -283,6 +285,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           breedId: row.breedId,
           count,
           entryDate: row.entryDate,
+          entryTime: row.entryTime,
           expectedHatchDate,
           source: row.dealType === 'own' ? 'own' : 'external',
           dealType: row.dealType,
@@ -365,6 +368,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       unitPrice: e.unitPrice ? toFa(e.unitPrice) : '',
       shippingCost: (e as any).shippingCost ? toFa((e as any).shippingCost) : '',
       entryDate: e.entryDate,
+      entryTime: (e as any).entryTime || nowTime(),
       notes: e.notes,
       dealData: Object.fromEntries(Object.entries(e.dealData || {}).map(([k, v]) => [k, v == null ? '' : String(v)])),
       dealStatus: (e as any).dealStatus || 'active',
@@ -599,7 +603,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : e.id)}
                 badge={<Tag tone={statusTone}>{statusLabel}</Tag>}
                 summary={<>
-                  <span>ورود: <b style={{ color: 'var(--text)' }}>{toFa(e.entryDate)}</b></span>
+                  <span>ورود: <b style={{ color: 'var(--text)' }}>{toFa(e.entryDate)}{(e as any).entryTime ? ' · ' + toFa((e as any).entryTime) : ''}</b></span>
                   {expHatch && <span>هچ: <b style={{ color: 'var(--text)' }}>{toFa(expHatch)}</b></span>}
                   <span>{DEAL_LABEL[e.dealType]}</span>
                 </>}
@@ -727,6 +731,9 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           </Field>
           <Field label="تاریخ ورود" required>
             <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ" />
+          </Field>
+          <Field label="ساعت ورود">
+            <Input value={currentRow.entryTime} onChange={e => setCurrentRow(f => ({ ...f, entryTime: e.target.value }))} placeholder="۱۴:۳۵" dir="ltr" />
           </Field>
         </Grid2>
 
@@ -961,6 +968,13 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       </Modal>
     </PageContainer>
   );
+}
+
+
+
+function nowTime(): string {
+  const d = new Date();
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
 }
 
 function todayJalali(): string {
