@@ -18,7 +18,7 @@ import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/Exp
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { clampPercent, complement } from '../../shr/utils/smart';
-import { showAlert } from '../../cor/store/dialog';
+import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { todayJalali, Row, chip } from './helpers';
 
@@ -189,7 +189,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
-  const addRowToList = () => {
+  const addRowToList = async () => {
     const cnt = parseInt(toEn(currentRow.count)) || 0;
     if (!currentRow.count.trim()) { showAlert('تعداد تخم اجباری است'); return; }
     if (cnt <= 0) { showAlert('تعداد باید بزرگتر از صفر باشد', '❌ خطا'); return; }
@@ -231,7 +231,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           'هچ ردیف‌های دیگر:\n' + conflicts.join('\n') + '\n\n' +
           '💡 برای هچ همزمان، پرنده دوره‌بلندتر رو زودتر وارد کن.\n\n' +
           'ادامه بدهم؟';
-        if (!confirm(msg)) return;
+        if (!await showConfirmAsync(msg, 'تأیید')) return;
       }
     }
 
@@ -267,7 +267,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         const percent = Math.round((used / refCap) * 100);
         if (percent > 100) {
           const extra = Math.round((used - refCap) * 10) / 10;
-          const ok = confirm('⚠️ با این ردیف، ظرفیت به ' + toFa(percent) + '٪ می‌رسد.\n' + 'واحد اضافی — ' + toFa(extra) + '\n\nادامه بدهم؟');
+          const ok = await showConfirmAsync('⚠️ با این ردیف، ظرفیت به ' + toFa(percent) + '٪ می‌رسد.\n' + 'واحد اضافی — ' + toFa(extra) + '\n\nادامه بدهم؟', 'تأیید');
           if (!ok) return;
         }
       }
@@ -287,13 +287,13 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     setEditingRowId(row._id);
   };
 
-  const removeRow = (id: string) => {
-    if (!confirm('حذف این ردیف؟')) return;
+  const removeRow = async (id: string) => {
+    if (!await showConfirmAsync('حذف این ردیف؟', 'تأیید')) return;
     setDraftRows(rows => rows.filter(r => r._id !== id));
     if (editingRowId === id) { setCurrentRow(makeRow()); setEditingRowId(null); }
   };
 
-  const saveAll = () => {
+  const saveAll = async () => {
     if (draftRows.length === 0) { showAlert('حداقل یک ردیف اضافه کنید'); return; }
     const device = devices.find(d => d.id === multiDeviceId);
     if (!device) return;
@@ -385,7 +385,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     setDraftRows([]);
     setOpen(false);
     showAlert(savedCount + ' ورودی ثبت شد', '✅ موفق');
-    if (onGoTo && confirm('به کندلینگ برو؟')) {
+    if (onGoTo && await showConfirmAsync('به کندلینگ برو؟', 'تأیید')) {
       setTimeout(() => onGoTo('candlings'), 100);
     }
   };
@@ -416,15 +416,15 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     setOpen(true);
   };
 
-  const deleteEntryWithCascade = (id: string) => {
+  const deleteEntryWithCascade = async (id: string) => {
     const entry = eggEntries.find(e => e.id === id) as any;
     if (!entry) return;
     let delInv = false, delProd = false;
     if (entry.generatedInvoiceId) {
-      delInv = confirm('این ورودی یک فاکتور در معاملات ساخته.\nتایید — فاکتور هم حذف شود\nلغو — فقط ورودی حذف شود');
+      delInv = await showConfirmAsync('این ورودی یک فاکتور در معاملات ساخته.\nتایید — فاکتور هم حذف شود\nلغو — فقط ورودی حذف شود', 'تأیید');
     }
     if (entry.generatedProductionId) {
-      delProd = confirm('این ورودی یک رکورد تولید تخم ساخته.\nتایید — آن هم حذف شود\nلغو — فقط ورودی حذف شود');
+      delProd = await showConfirmAsync('این ورودی یک رکورد تولید تخم ساخته.\nتایید — آن هم حذف شود\nلغو — فقط ورودی حذف شود', 'تأیید');
     }
     if (delInv && entry.generatedInvoiceId) { try { deleteInvoice(entry.generatedInvoiceId); } catch {} }
     if (delProd && entry.generatedProductionId) { try { deleteProduction(entry.generatedProductionId); } catch {} }

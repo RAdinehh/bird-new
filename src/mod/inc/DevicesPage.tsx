@@ -9,7 +9,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, P
 import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert } from '../../cor/store/dialog';
+import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { parse as parseJ, addMonths, format as formatJ } from 'date-fns-jalali';
 import { Row } from './helpers';
 
@@ -198,10 +198,10 @@ export default function DevicesPage() {
     showAlert('تعمیر ثبت شد', '✅');
   };
 
-  const removeMaintenance = (deviceId: string, logId: string) => {
+  const removeMaintenance = async (deviceId: string, logId: string) => {
     const dev = devices.find(d => d.id === deviceId);
     if (!dev) return;
-    if (!confirm('حذف این رکورد تعمیر؟')) return;
+    if (!await showConfirmAsync('حذف این رکورد تعمیر؟', 'تأیید')) return;
     const logs = ((dev as any).maintenanceLogs || []).filter((l: any) => l.id !== logId);
     updateDevice(deviceId, { maintenanceLogs: logs } as any);
   };

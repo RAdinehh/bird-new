@@ -13,7 +13,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, P
 import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert } from '../../cor/store/dialog';
+import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { Row, chip } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 
@@ -141,11 +141,11 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     showAlert(toFa(saved) + ' نتیجه هچ ثبت شد', '✅ موفق');
   };
 
-  const doDelete = (id: string) => {
+  const doDelete = async (id: string) => {
     const h = hatches.find(x => x.id === id) as any;
     if (!h) return;
-    if (h.generatedFlockId && confirm('این هچ یک گله ساخته. گله هم حذف شود؟')) { try { removeFlock(h.generatedFlockId); } catch {} }
-    if (h.generatedInvoiceId && confirm('این هچ یک فاکتور ساخته. فاکتور هم حذف شود؟')) { try { deleteInvoice(h.generatedInvoiceId); } catch {} }
+    if (h.generatedFlockId && await showConfirmAsync('این هچ یک گله ساخته. گله هم حذف شود؟', 'تأیید')) { try { removeFlock(h.generatedFlockId); } catch {} }
+    if (h.generatedInvoiceId && await showConfirmAsync('این هچ یک فاکتور ساخته. فاکتور هم حذف شود؟', 'تأیید')) { try { deleteInvoice(h.generatedInvoiceId); } catch {} }
     deleteHatch(id); setDelId(null);
   };
 

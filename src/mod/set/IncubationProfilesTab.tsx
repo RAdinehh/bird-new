@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSet, type IncubationProfile } from './store';
 import { Btn, Field, Grid2, NumField, PageContainer } from '../../shr/components/ui';
 import SettingsGroup from './SettingsGroup';
-import { showAlert } from '../../cor/store/dialog';
+import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 
 export default function IncubationProfilesTab() {
   const s = useSet();
@@ -27,8 +27,8 @@ export default function IncubationProfilesTab() {
     setNewName('');
   };
 
-  const remove = (id: string) => {
-    if (!confirm('حذف این پرنده؟')) return;
+  const remove = async (id: string) => {
+    if (!await showConfirmAsync('حذف این پرنده؟', 'تأیید')) return;
     s.update({ incubationProfiles: profiles.filter(p => p.id !== id) } as any);
   };
 

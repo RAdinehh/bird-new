@@ -8,7 +8,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer
 import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert } from '../../cor/store/dialog';
+import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { todayJalali } from './helpers';
 
 const INFERTILE_REASONS: [string, string][] = [
@@ -343,12 +343,12 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                       </button>
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={async () => {
                           const subsequent = list.filter(x => x.stage > c.stage);
                           const msg = subsequent.length > 0
                             ? 'این کندلینگ و ' + toFa(subsequent.length) + ' کندلینگ بعدی حذف می‌شوند.\n\nادامه؟'
                             : 'این کندلینگ حذف شود؟';
-                          if (confirm(msg)) {
+                          if (await showConfirmAsync(msg, 'تأیید')) {
                             deleteCandling(c.id);
                             subsequent.forEach(s => deleteCandling(s.id));
                           }
