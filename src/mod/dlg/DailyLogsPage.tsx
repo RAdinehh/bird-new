@@ -31,6 +31,7 @@ import TimePicker from '../../shr/components/TimePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import { Section, SectionTitle, Row } from './helpers';
+import { format as formatJ } from 'date-fns-jalali';
 
 interface F {
   id?: string;
@@ -90,7 +91,7 @@ export default function DailyLogsPage() {
 
   const activeFlocks = flocks.filter(f => f.status === 'active');
   const today = new Date();
-  const todayStr = `${today.getFullYear()}/${String(today.getMonth()+1).padStart(2,'0')}/${String(today.getDate()).padStart(2,'0')}`;
+  const todayStr = formatJ(today, 'yyyy/MM/dd');
 
   const todaysLogs = useMemo(() => logs.filter(l => l.date === todayStr && (l.status || 'active') === 'active'), [logs, todayStr]);
   const historicalLogs = useMemo(() => logs.filter(l => l.date !== todayStr && (l.status || 'active') === 'active').sort((a, b) => b.date.localeCompare(a.date)), [logs, todayStr]);

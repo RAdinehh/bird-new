@@ -15,6 +15,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import { Row, chip } from './helpers';
+import { format as formatJ } from 'date-fns-jalali';
 
 const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
 
@@ -46,7 +47,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
-  const todayJ = () => { const d = new Date(); return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0'); };
+  const todayJ = () => { const d = new Date(); return formatJ(d, 'yyyy/MM/dd'); };
 
   const dataFor = (id: string) => entriesData[id] || emptyRow();
   const updateData = (id: string, patch: any) => setEntriesData(d => ({ ...d, [id]: { ...(d[id] || emptyRow()), ...patch } }));
@@ -318,7 +319,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                   <div style={{ padding: 10, background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, textAlign: 'center' }}>مرحله بعد:</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                      <Btn size="sm" onClick={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(new Date().getFullYear()), type: 'layer', hallId: '', zoneId: '' }); }}>🐔 گله</Btn>
+                      <Btn size="sm" onClick={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(formatJ(new Date(), 'yyyy')), type: 'layer', hallId: '', zoneId: '' }); }}>🐔 گله</Btn>
                       <Btn size="sm" onClick={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}>📥 فروش</Btn>
                     </div>
                   </div>

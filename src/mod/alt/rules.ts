@@ -6,6 +6,7 @@ import { useDlg } from '../dlg/store';
 import { useEgg, henDayRate } from '../egg/store';
 import { useInc, daysToHatch, isLockdown, isHatchWindow } from '../inc/store';
 import { toFa } from '../../shr/utils/fa';
+import { format as formatJ } from 'date-fns-jalali';
 
 interface RuleAlert {
   level: AlertLevel;
@@ -21,7 +22,7 @@ interface RuleAlert {
 const today = () => new Date().toISOString().slice(0, 10);
 const todayJalali = () => {
   const d = new Date();
-  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+  return formatJ(d, 'yyyy/MM/dd');
 };
 
 /** تشخیص همه‌ی هشدارهای خودکار */

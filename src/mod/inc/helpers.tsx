@@ -2,10 +2,11 @@
  * helpers.tsx — helperهای مشترک ماژول inc
  */
 import type { ReactNode, CSSProperties } from 'react';
+import { format as formatJ } from 'date-fns-jalali';
 
 export function todayJalali(): string {
   const d = new Date();
-  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+  return formatJ(d, 'yyyy/MM/dd');
 }
 
 export function Row({ l, v }: { l: string; v: string }) {

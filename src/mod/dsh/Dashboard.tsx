@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { parse as parseJ, differenceInDays as diffDaysJ } from 'date-fns-jalali';
+import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ } from 'date-fns-jalali';
 import { useNavigate } from 'react-router-dom';
 import { useTra, remaining } from '../tra/store';
 import { useCtc } from '../ctc/store';
@@ -140,7 +140,7 @@ export default function Dashboard() {
     for (let i = 0; i < 7; i++) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const key = d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+      const key = formatJ(d, 'yyyy/MM/dd');
       const prods = productions.filter(p => p.date === key);
       prods.forEach(p => last7.push(p));
     }
@@ -167,10 +167,10 @@ export default function Dashboard() {
     for (let i = trendDays - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const key = d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+      const key = formatJ(d, 'yyyy/MM/dd');
       const prods = productions.filter(p => p.date === key);
       const total = prods.reduce((a, p) => a + (p.totalCount || 0), 0);
-      days.push({ label: toFa(String(d.getDate())), value: total });
+      days.push({ label: formatJ(d, 'dd'), value: total });
     }
     return days;
   }, [productions, trendDays]);

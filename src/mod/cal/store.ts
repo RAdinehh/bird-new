@@ -6,7 +6,7 @@ import { useBrd } from '../brd/store';
 import { useFlk, getEffectiveStartDate } from '../flk/store';
 import { getSchedule } from './vaccineSchedules';
 import { toEn } from '../../shr/utils/fa';
-import { format, parse, differenceInDays } from 'date-fns-jalali';
+import { format, parse, differenceInDays, format as formatJ } from 'date-fns-jalali';
 
 export type EventType = 'hatch' | 'vaccine' | 'herbal' | 'payment' | 'daily' | 'finance';
 export type EventStatus = 'past' | 'today' | 'future' | 'overdue';
@@ -104,7 +104,7 @@ export function collectEvents(): CalEvent[] {
       if (days <= 2 && days >= 0) {
         const wd = new Date();
         wd.setDate(wd.getDate() + (days - 2));
-        const wdStr = wd.getFullYear() + '/' + String(wd.getMonth() + 1).padStart(2, '0') + '/' + String(wd.getDate()).padStart(2, '0');
+        const wdStr = formatJ(wd, 'yyyy/MM/dd');
         events.push({
           id: 'hatchwin-' + entry.id,
           date: wdStr,

@@ -78,7 +78,7 @@ function warrantyInfo(purchasedAt: string, months: number | null): { end: string
     if (isNaN(d.getTime())) return null;
     const end = formatJ(addMonths(d, months), 'yyyy/MM/dd');
     const t = new Date();
-    const today = t.getFullYear() + '/' + String(t.getMonth() + 1).padStart(2, '0') + '/' + String(t.getDate()).padStart(2, '0');
+    const today = formatJ(t, 'yyyy/MM/dd');
     return { end, expired: end < today };
   } catch { return null; }
 }
