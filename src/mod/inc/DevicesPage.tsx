@@ -110,6 +110,7 @@ export default function DevicesPage() {
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
+  const [expandedBird, setExpandedBird] = useState<string | null>(null);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -450,7 +451,7 @@ export default function DevicesPage() {
             })}</div>
         )}
         {form.capacityByBird.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 6, marginTop: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6 }}>
             {form.capacityByBird.map(c => {
               const prof: any = getProfileDefaults(c.birdName);
               const d: any = prof || {};
@@ -465,91 +466,112 @@ export default function DevicesPage() {
                 cursor: 'pointer', fontSize: 'var(--fs-xs)', fontFamily: 'inherit',
                 fontWeight: 600, padding: 0,
               } as any;
+              const isExpanded = expandedBird === c.birdName;
+              const fmt = (v: any) => (v != null && v !== '') ? toFa(String(v)) : '—';
+              const summary = fmt(c.setterTemp) + '°·' + fmt(c.setterHumidity) + '٪ → ' + fmt(c.hatcherTemp) + '°·' + fmt(c.hatcherHumidity) + '٪ · ' + fmt(c.totalDays) + '/' + fmt(c.lockdownDay);
               return (
                 <div key={c.birdName} style={{
-                  padding: '10px',
                   background: 'var(--card)',
                   border: '1px solid var(--accent)',
                   borderRadius: 'var(--r-md)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
+                  overflow: 'hidden',
                   boxShadow: '0 0 0 1px var(--accent-soft)',
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>{c.birdName}</span>
-                    <button type="button" onClick={() => removeCapacity(c.birdName)} aria-label="حذف" style={{
+                  <div
+                    onClick={() => setExpandedBird(isExpanded ? null : c.birdName)}
+                    role="button"
+                    aria-expanded={isExpanded}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '10px 12px',
+                      cursor: 'pointer',
+                      background: isExpanded ? 'var(--accent-soft)' : 'transparent',
+                      transition: 'background .15s',
+                      userSelect: 'none',
+                    }}
+                  >
+                    <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700, flexShrink: 0 }}>{c.birdName}</span>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flex: 1, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</span>
+                    <span style={{ fontSize: 10, color: 'var(--muted)', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s', flexShrink: 0 }}>▼</span>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); removeCapacity(c.birdName); }} aria-label="حذف" style={{
                       background: 'var(--danger-soft)',
                       border: '1px solid var(--danger)',
                       color: 'var(--danger)',
                       cursor: 'pointer',
                       borderRadius: 'var(--r-sm)',
-                      width: 26, height: 26,
+                      width: 24, height: 24,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 12, padding: 0, fontFamily: 'inherit', fontWeight: 700,
+                      fontSize: 11, padding: 0, fontFamily: 'inherit', fontWeight: 700,
+                      flexShrink: 0,
                     }}>✕</button>
                   </div>
 
-                  <Field label="ظرفیت" hint="حداکثر تعداد تخم">
-                    <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
-                  </Field>
+                  {isExpanded && (
+                    <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: 6, borderTop: '1px solid var(--border)' }}>
+                      <Field label="ظرفیت" hint="حداکثر تعداد تخم">
+                        <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
+                      </Field>
 
-                  <button type="button" onClick={() => fillProfile(c.birdName)} style={{
-                    padding: '6px 10px',
-                    background: 'var(--accent-soft)',
-                    border: '1px solid var(--accent-border)',
-                    color: 'var(--accent)',
-                    borderRadius: 'var(--r-sm)',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    fontSize: 'var(--fs-sm)',
-                    fontWeight: 600,
-                  }}>🔄 پر کردن از پروفایل</button>
+                      <button type="button" onClick={() => fillProfile(c.birdName)} style={{
+                        padding: '6px 10px',
+                        background: 'var(--accent-soft)',
+                        border: '1px solid var(--accent-border)',
+                        color: 'var(--accent)',
+                        borderRadius: 'var(--r-sm)',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        fontSize: 'var(--fs-sm)',
+                        fontWeight: 600,
+                      }}>🔄 پر کردن از پروفایل</button>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🌡 ستر</span>
-                    {setterOv && prof ? (
-                      <button type="button" onClick={() => resetSection(c.birdName, 'setter')} style={resetBtnStyle}>↩️ پیش‌فرض</button>
-                    ) : null}
-                  </div>
-                  <Grid2>
-                    <OvNumField label="دما" hint="°C" defValue={d.setterTemp}
-                      value={c.setterTemp} onChange={(e: any) => updateCapacityFull(c.birdName, { setterTemp: parseFloat(toEn(e.target.value)) || 0 })}
-                      unit="°C" min={20} max={45} placeholder="۳۷٫۷" />
-                    <OvNumField label="رطوبت" hint="٪" defValue={d.setterHumidity}
-                      value={c.setterHumidity} onChange={(e: any) => updateCapacityFull(c.birdName, { setterHumidity: parseFloat(toEn(e.target.value)) || 0 })}
-                      unit="٪" min={0} max={100} placeholder="۵۰" />
-                  </Grid2>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🌡 ستر</span>
+                        {setterOv && prof ? (
+                          <button type="button" onClick={() => resetSection(c.birdName, 'setter')} style={resetBtnStyle}>↩️ پیش‌فرض</button>
+                        ) : null}
+                      </div>
+                      <Grid2>
+                        <OvNumField label="دما" hint="°C" defValue={d.setterTemp}
+                          value={c.setterTemp} onChange={(e: any) => updateCapacityFull(c.birdName, { setterTemp: parseFloat(toEn(e.target.value)) || 0 })}
+                          unit="°C" min={20} max={45} placeholder="۳۷٫۷" />
+                        <OvNumField label="رطوبت" hint="٪" defValue={d.setterHumidity}
+                          value={c.setterHumidity} onChange={(e: any) => updateCapacityFull(c.birdName, { setterHumidity: parseFloat(toEn(e.target.value)) || 0 })}
+                          unit="٪" min={0} max={100} placeholder="۵۰" />
+                      </Grid2>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🐣 هچر</span>
-                    {hatcherOv && prof ? (
-                      <button type="button" onClick={() => resetSection(c.birdName, 'hatcher')} style={resetBtnStyle}>↩️ پیش‌فرض</button>
-                    ) : null}
-                  </div>
-                  <Grid2>
-                    <OvNumField label="دما" hint="°C" defValue={d.hatcherTemp}
-                      value={c.hatcherTemp} onChange={(e: any) => updateCapacityFull(c.birdName, { hatcherTemp: parseFloat(toEn(e.target.value)) || 0 })}
-                      unit="°C" min={20} max={45} placeholder="۳۷٫۲" />
-                    <OvNumField label="رطوبت" hint="٪" defValue={d.hatcherHumidity}
-                      value={c.hatcherHumidity} onChange={(e: any) => updateCapacityFull(c.birdName, { hatcherHumidity: parseFloat(toEn(e.target.value)) || 0 })}
-                      unit="٪" min={0} max={100} placeholder="۶۲" />
-                  </Grid2>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🐣 هچر</span>
+                        {hatcherOv && prof ? (
+                          <button type="button" onClick={() => resetSection(c.birdName, 'hatcher')} style={resetBtnStyle}>↩️ پیش‌فرض</button>
+                        ) : null}
+                      </div>
+                      <Grid2>
+                        <OvNumField label="دما" hint="°C" defValue={d.hatcherTemp}
+                          value={c.hatcherTemp} onChange={(e: any) => updateCapacityFull(c.birdName, { hatcherTemp: parseFloat(toEn(e.target.value)) || 0 })}
+                          unit="°C" min={20} max={45} placeholder="۳۷٫۲" />
+                        <OvNumField label="رطوبت" hint="٪" defValue={d.hatcherHumidity}
+                          value={c.hatcherHumidity} onChange={(e: any) => updateCapacityFull(c.birdName, { hatcherHumidity: parseFloat(toEn(e.target.value)) || 0 })}
+                          unit="٪" min={0} max={100} placeholder="۶۲" />
+                      </Grid2>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⏱ زمان</span>
-                    {timeOv && prof ? (
-                      <button type="button" onClick={() => resetSection(c.birdName, 'time')} style={resetBtnStyle}>↩️ پیش‌فرض</button>
-                    ) : null}
-                  </div>
-                  <Grid2>
-                    <OvNumField label="مدت کل" hint="از ورود تا هچ" defValue={d.totalDays}
-                      value={c.totalDays} onChange={(e: any) => updateCapacityFull(c.birdName, { totalDays: parseInt(toEn(e.target.value)) || 0 })}
-                      unit="روز" min={0} max={60} placeholder="۲۱" />
-                    <OvNumField label="روز قفل" hint="Lockdown" defValue={d.lockdownDay}
-                      value={c.lockdownDay} onChange={(e: any) => updateCapacityFull(c.birdName, { lockdownDay: parseInt(toEn(e.target.value)) || 0 })}
-                      unit="روز" min={0} max={60} placeholder="۱۸" />
-                  </Grid2>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⏱ زمان</span>
+                        {timeOv && prof ? (
+                          <button type="button" onClick={() => resetSection(c.birdName, 'time')} style={resetBtnStyle}>↩️ پیش‌فرض</button>
+                        ) : null}
+                      </div>
+                      <Grid2>
+                        <OvNumField label="مدت کل" hint="از ورود تا هچ" defValue={d.totalDays}
+                          value={c.totalDays} onChange={(e: any) => updateCapacityFull(c.birdName, { totalDays: parseInt(toEn(e.target.value)) || 0 })}
+                          unit="روز" min={0} max={60} placeholder="۲۱" />
+                        <OvNumField label="روز قفل" hint="Lockdown" defValue={d.lockdownDay}
+                          value={c.lockdownDay} onChange={(e: any) => updateCapacityFull(c.birdName, { lockdownDay: parseInt(toEn(e.target.value)) || 0 })}
+                          unit="روز" min={0} max={60} placeholder="۱۸" />
+                      </Grid2>
+                    </div>
+                  )}
                 </div>
               );
             })}
