@@ -373,18 +373,28 @@ export function Modal({
     if (!focusedRef.current) {
       focusedRef.current = true;
       setTimeout(() => {
-        // ترجیح: input/textarea، نه دکمه X
+        // ۱. ترجیح: input/textarea/select
         let target = modalRef.current?.querySelector(
-          'input:not([type="hidden"]):not([disabled]), textarea, select'
+          'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled])'
         ) as HTMLElement | null;
-        // fallback: دکمه غیر از X
+        
+        // ۲. اگه input نبود، آخرین دکمه (معمولاً confirm در footer)
+        // این روش X (که اول Modal هست) رو skip می‌کنه
         if (!target) {
           const btns = modalRef.current?.querySelectorAll('button:not([disabled])');
-          if (btns) {
-            for (const btn of Array.from(btns)) {
+          if (btns && btns.length > 0) {
+            // از آخر به اول — footer buttons معمولاً آخرین‌ها هستن
+            for (let i = btns.length - 1; i >= 0; i--) {
+              const btn = btns[i] as HTMLElement;
+              const text = (btn.textContent || '').trim();
               const aria = btn.getAttribute('aria-label') || '';
-              if (aria !== 'بستن' && aria !== 'Close') {
-                target = btn as HTMLElement;
+              // skip X (✕، ×، X، آیکون بستن)
+              const isClose = /^[✕×xX]$/.test(text) 
+                || aria.includes('بستن') 
+                || aria.includes('close')
+                || aria.includes('Close');
+              if (!isClose) {
+                target = btn;
                 break;
               }
             }
