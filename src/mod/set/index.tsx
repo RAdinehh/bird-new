@@ -1,3 +1,6 @@
+/**
+ * index.tsx — تنظیمات (گروه‌بندی منطقی)
+ */
 import { useState } from 'react';
 import ProfileTab from './ProfileTab';
 import AppearanceTab from './AppearanceTab';
@@ -8,42 +11,126 @@ import AboutTab from './AboutTab';
 import LogsTab from './LogsTab';
 import IncubationProfilesTab from './IncubationProfilesTab';
 
-const tabs = [
-  { id: 'profile', label: 'پروفایل' },
-  { id: 'appearance', label: 'ظاهر' },
-  { id: 'modules', label: 'ماژول‌ها' },
-  { id: 'notifications', label: 'اعلان‌ها' },
-  { id: 'backup', label: 'پشتیبان' },
-  { id: 'incubation', label: '🐣 انکوباسیون' },
-  { id: 'logs', label: 'لاگ خطاها' },
-  { id: 'about', label: 'درباره' }
-] as const;
+type TabId =
+  | 'profile' | 'appearance'
+  | 'modules' | 'incubation' | 'notifications'
+  | 'backup' | 'logs' | 'about';
 
-type TabId = typeof tabs[number]['id'];
+interface TabDef {
+  id: TabId;
+  label: string;
+  icon: string;
+}
+
+interface GroupDef {
+  label: string;
+  icon: string;
+  tabs: TabDef[];
+}
+
+const GROUPS: GroupDef[] = [
+  {
+    label: 'حساب',
+    icon: '👤',
+    tabs: [
+      { id: 'profile', label: 'پروفایل', icon: '👤' },
+      { id: 'appearance', label: 'ظاهر', icon: '🎨' },
+    ],
+  },
+  {
+    label: 'مرغداری',
+    icon: '🏭',
+    tabs: [
+      { id: 'modules', label: 'ماژول‌ها', icon: '🧩' },
+      { id: 'incubation', label: 'انکوباسیون', icon: '🐣' },
+      { id: 'notifications', label: 'اعلان‌ها', icon: '🔔' },
+    ],
+  },
+  {
+    label: 'سیستم',
+    icon: '⚙️',
+    tabs: [
+      { id: 'backup', label: 'پشتیبان', icon: '💾' },
+      { id: 'logs', label: 'لاگ', icon: '📋' },
+      { id: 'about', label: 'درباره', icon: 'ℹ️' },
+    ],
+  },
+];
+
+const ALL_TABS = GROUPS.flatMap(g => g.tabs);
 
 export default function Set() {
   const [tab, setTab] = useState<TabId>('profile');
+
   return (
     <div>
       <div style={{
-        display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
-        padding: '0 8px', background: 'var(--header-bg)',
-        position: 'sticky', top: 52, zIndex: 11, overflowX: 'auto', scrollbarWidth: 'none'
+        display: 'flex',
+        gap: 'var(--gap-xs)',
+        borderBottom: '1px solid var(--border)',
+        padding: '0 var(--sp-2)',
+        background: 'var(--header-bg)',
+        position: 'sticky',
+        top: 52,
+        zIndex: 11,
+        overflowX: 'auto',
+        scrollbarWidth: 'none',
       }}>
-        {tabs.map(t => (
-          <div key={t.id} onClick={() => setTab(t.id)} style={{
-            padding: '11px 12px', fontSize: 'var(--fs-base)', fontWeight: 600,
-            color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
-            cursor: 'pointer', position: 'relative', transition: 'color .15s',
-            whiteSpace: 'nowrap'
-          }}>
-            {t.label}
-            {tab === t.id && (
-              <div style={{ position: 'absolute', bottom: 0, right: 12, left: 12, height: 3, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />
+        {GROUPS.map((group, gi) => (
+          <div key={group.label} style={{ display: 'flex', alignItems: 'center' }}>
+            {gi > 0 && (
+              <div aria-hidden="true" style={{
+                width: 1,
+                height: 20,
+                background: 'var(--border)',
+                margin: '0 var(--gap-xs)',
+                flexShrink: 0,
+              }} />
             )}
+            {group.tabs.map(t => {
+              const active = tab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTab(t.id)}
+                  style={{
+                    padding: '10px var(--sp-2)',
+                    fontSize: 'var(--fs-sm)',
+                    fontWeight: 600,
+                    color: active ? 'var(--accent)' : 'var(--muted)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                    fontFamily: 'inherit',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  <span aria-hidden="true">{t.icon}</span>
+                  <span>{t.label}</span>
+                  {active && (
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      right: 6,
+                      left: 6,
+                      height: 3,
+                      background: 'var(--accent)',
+                      borderRadius: '3px 3px 0 0',
+                    }} />
+                  )}
+                </button>
+              );
+            })}
           </div>
         ))}
       </div>
+
       <div style={{ padding: 'var(--sp-3)' }}>
         {tab === 'profile' && <ProfileTab />}
         {tab === 'appearance' && <AppearanceTab />}
