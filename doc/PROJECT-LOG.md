@@ -142,3 +142,17 @@ doc/DESIGN.md · doc/SCHEMA.md · doc/WORKFLOW.md · این فایل
 - Auto-fill نام پرنده → چرخه + FCR
 - Auto-fill نژاد → FCR
 - selectOnFocus روی همه Inputها
+
+---
+
+## 🆕 فاز ۶ — تقویت stats (۱۴۰۵/۰۷/۰۹)
+
+### افزوده‌شده
+- ✅ rename `summary → stats` در ۲۱ ماژول (`0e760d8`)
+- ✅ DevicesPage — stats row به کارت‌های collapsed (`e47759a`)
+- ✅ WarningsPage — ۴ StatBox: منقضی، تمام‌شده، نزدیک انقضا، کم موجودی (`077a944`)
+- ✅ FilesPage — یکدست‌سازی با StatBox + StatBox «دسته‌ها» (`60cb0fd`)
+- ✅ ReceivablesPage — ۳ StatBox: تعداد، معوق، سرسید (`b352ca5`)
+
+### نتیجه
+۱۵ ماژول لیستی پوشش کامل دارند. ۴ صفحه گزارش (`rep/`) نیاز به stats ندارند.
