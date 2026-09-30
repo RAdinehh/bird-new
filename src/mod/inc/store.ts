@@ -107,6 +107,14 @@ export interface HatchResult {
   deadInShell: number | null;
   pipped: number | null;
   other: number | null;
+  gradeA: number | null;
+  gradeB: number | null;
+  maleCount: number | null;
+  femaleCount: number | null;
+  unknownCount: number | null;
+  avgWeight: number | null;
+  generatedFlockId: string;
+  generatedInvoiceId: string;
   notes: string;
   createdAt: string;
 }
