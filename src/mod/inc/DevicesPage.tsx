@@ -269,14 +269,6 @@ export default function DevicesPage() {
                   </>
                 )}
 
-                {(d.temp || d.humidity) && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🌡 شرایط</div>
-                    {d.temp && <Row l="دمای هدف" v={toFa(d.temp) + ' °C'} />}
-                    {d.humidity && <Row l="رطوبت هدف" v={toFa(d.humidity) + ' ٪'} />}
-                  </>
-                )}
-
                 {(d.purchasedAt || d.price || d.warranty) && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>💰 مالی</div>
@@ -404,47 +396,75 @@ export default function DevicesPage() {
           </div>
         )}
         {form.capacityByBird.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10, marginTop: 8 }}>
             {form.capacityByBird.map(c => (
-              <div key={c.birdName} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{c.birdName}</span>
-                  <button type="button" onClick={() => removeCapacity(c.birdName)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 'var(--fs-xs)', padding: 0 }}>✕</button>
-                </div>
-                <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
-                <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                  <NumField value={String(c.setterTemp ?? '')} onChange={e => updateCapacityFull(c.birdName, { setterTemp: parseFloat(toEn(e.target.value)) || 0 })} unit="°C" placeholder="دمای ستر" />
-                  <NumField value={String(c.setterHumidity ?? '')} onChange={e => updateCapacityFull(c.birdName, { setterHumidity: parseFloat(toEn(e.target.value)) || 0 })} unit="٪" placeholder="رطوبت ستر" />
-                  <NumField value={String(c.hatcherTemp ?? '')} onChange={e => updateCapacityFull(c.birdName, { hatcherTemp: parseFloat(toEn(e.target.value)) || 0 })} unit="°C" placeholder="دمای هچر" />
-                  <NumField value={String(c.hatcherHumidity ?? '')} onChange={e => updateCapacityFull(c.birdName, { hatcherHumidity: parseFloat(toEn(e.target.value)) || 0 })} unit="٪" placeholder="رطوبت هچر" />
-                  <NumField value={String(c.lockdownDay ?? '')} onChange={e => updateCapacityFull(c.birdName, { lockdownDay: parseInt(toEn(e.target.value)) || 0 })} unit="روز" placeholder="روز قفل" />
-                  <button type="button" onClick={() => fillProfile(c.birdName)} style={{
-                    gridColumn: '1 / -1',
-                    padding: '8px 12px',
-                    background: 'var(--accent-soft)',
-                    border: '1px solid var(--accent-border)',
-                    color: 'var(--accent)',
-                    borderRadius: 'var(--r-sm)',
+              <div key={c.birdName} style={{
+                padding: 'var(--sp-3)',
+                background: 'var(--card)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r-lg)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>{c.birdName}</span>
+                  <button type="button" onClick={() => removeCapacity(c.birdName)} aria-label="حذف" style={{
+                    background: 'var(--danger-soft)',
+                    border: '1px solid var(--danger)',
+                    color: 'var(--danger)',
                     cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    fontSize: 'var(--fs-sm)',
-                    fontWeight: 600,
-                  }}>🔄 پر کردن از پروفایل {c.birdName}</button>
+                    borderRadius: 'var(--r-sm)',
+                    width: 26, height: 26,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 12, padding: 0, fontFamily: 'inherit', fontWeight: 700,
+                  }}>✕</button>
                 </div>
+
+                <Field label="ظرفیت" hint="حداکثر تعداد تخم">
+                  <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
+                </Field>
+
+                <button type="button" onClick={() => fillProfile(c.birdName)} style={{
+                  padding: '8px 12px',
+                  background: 'var(--accent-soft)',
+                  border: '1px solid var(--accent-border)',
+                  color: 'var(--accent)',
+                  borderRadius: 'var(--r-sm)',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  fontSize: 'var(--fs-sm)',
+                  fontWeight: 600,
+                }}>🔄 پر کردن از پروفایل</button>
+
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 6, borderTop: '1px dashed var(--border)' }}>🌡 ستر</div>
+                <Grid2>
+                  <Field label="دما" hint="°C">
+                    <NumField value={String(c.setterTemp ?? '')} onChange={e => updateCapacityFull(c.birdName, { setterTemp: parseFloat(toEn(e.target.value)) || 0 })} unit="°C" min={20} max={45} placeholder="۳۷٫۷" />
+                  </Field>
+                  <Field label="رطوبت" hint="٪">
+                    <NumField value={String(c.setterHumidity ?? '')} onChange={e => updateCapacityFull(c.birdName, { setterHumidity: parseFloat(toEn(e.target.value)) || 0 })} unit="٪" min={0} max={100} placeholder="۵۰" />
+                  </Field>
+                </Grid2>
+
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 6, borderTop: '1px dashed var(--border)' }}>🐣 هچر</div>
+                <Grid2>
+                  <Field label="دما" hint="°C">
+                    <NumField value={String(c.hatcherTemp ?? '')} onChange={e => updateCapacityFull(c.birdName, { hatcherTemp: parseFloat(toEn(e.target.value)) || 0 })} unit="°C" min={20} max={45} placeholder="۳۷٫۲" />
+                  </Field>
+                  <Field label="رطوبت" hint="٪">
+                    <NumField value={String(c.hatcherHumidity ?? '')} onChange={e => updateCapacityFull(c.birdName, { hatcherHumidity: parseFloat(toEn(e.target.value)) || 0 })} unit="٪" min={0} max={100} placeholder="۶۲" />
+                  </Field>
+                </Grid2>
+
+                <Field label="روز قفل" hint="Lockdown">
+                  <NumField value={String(c.lockdownDay ?? '')} onChange={e => updateCapacityFull(c.birdName, { lockdownDay: parseInt(toEn(e.target.value)) || 0 })} unit="روز" min={0} max={60} placeholder="۱۸" />
+                </Field>
               </div>
             ))}
           </div>
         )}
 
-        <SectionTitle>🌡 شرایط عملیاتی</SectionTitle>
-        <Grid2>
-          <Field label="دمای هدف" hint="°C">
-            <NumField placeholder="۳۷٫۸" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={20} max={45} />
-          </Field>
-          <Field label="رطوبت هدف" hint="٪">
-            <NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={0} max={100} />
-          </Field>
-        </Grid2>
 
         <SectionTitle>⚙ مشخصات فنی</SectionTitle>
         <Grid2>
