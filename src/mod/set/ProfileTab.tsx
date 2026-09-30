@@ -4,9 +4,11 @@ import { Field, Grid2, Grid3, Input, NumField, PhoneField, DigitField, Select } 
 import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow } from './helpers';
+import PinSetupModal from '../../shr/components/PinSetupModal';
 
 export default function ProfileTab() {
   const { user, farm, bank, units, defaults, security, updateSection } = useSet();
+  const [showPinSetup, setShowPinSetup] = useState(false);
 
   const U = (k: string, label: string, opts: [string, string][]) => (
     <Field label={label}>
@@ -159,9 +161,15 @@ export default function ProfileTab() {
       <SettingsGroup icon="🔒" title="امنیت" subtitle={security.pinEnabled ? 'قفل با PIN فعال' : 'قفل غیرفعال'} tone="danger">
         <ToggleRow
           label="قفل با PIN"
-          sub="در ورود، رمز خواسته شود"
+          sub={security.pinEnabled ? "برای غیرفعال کردن، خاموش کن" : "برای فعال کردن، روشن کن"}
           value={security.pinEnabled}
-          onChange={() => updateSection('security', { pinEnabled: !security.pinEnabled })}
+          onChange={() => {
+            if (security.pinEnabled) {
+              updateSection('security', { pinEnabled: false, pin: '', recoveryHash: undefined });
+            } else {
+              setShowPinSetup(true);
+            }
+          }}
         />
         {security.pinEnabled ? (
           <>
@@ -185,6 +193,12 @@ export default function ProfileTab() {
           </>
         ) : null}
       </SettingsGroup>
+
+      <PinSetupModal
+        open={showPinSetup}
+        onClose={() => setShowPinSetup(false)}
+        onDone={() => { setShowPinSetup(false); }}
+      />
 
     </div>
   );
