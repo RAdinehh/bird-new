@@ -1,4 +1,6 @@
-// AnalyticsCards.tsx — sections 2+3+4 (سلامت، تولید، مالی)
+/**
+ * AnalyticsCards — بخش‌های 2+3+4: سلامت گله، عملکرد تولیدی، مالی این ماه
+ */
 import { SectionTitle, KpiCard, MiniStat, MiniEmpty } from './cards';
 import { LineChart } from '../../shr/components/Charts';
 import { toFa } from '../../shr/utils/fa';
@@ -112,6 +114,7 @@ export default function AnalyticsCards({
                     <div style={{ display: 'flex', gap: 3 }}>
                       {([7, 30, 90] as const).map(d => (
                         <button
+                  aria-label="تغییر بازه زمانی نمودار"
                           key={d}
                           onClick={() => setTrendDays(d)}
                           style={{

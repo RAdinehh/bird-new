@@ -1,4 +1,6 @@
-// cards.tsx — helperهای مشترک Dashboard
+/**
+ * cards.tsx — helperهای مشترک: SectionTitle، KpiCard، MiniStat، MiniEmpty
+ */
 import type { ReactNode } from 'react';
 import { toFa } from '../../shr/utils/fa';
 

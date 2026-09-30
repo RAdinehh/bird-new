@@ -1,4 +1,6 @@
-// ListCards.tsx — sections 5+6+7+8 (هشدار + گله + جوجه‌کشی + انبار)
+/**
+ * ListCards — بخش‌های 5+6+7+8: هشدارها، گله‌ها، جوجه‌کشی فعال، هشدار انبار
+ */
 import { SectionTitle, MiniEmpty } from './cards';
 import { Tag } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';

@@ -1,4 +1,6 @@
-// TodayCard.tsx — بخش ۱: امروز در یک نگاه
+/**
+ * TodayCard — بخش «امروز در یک نگاه»: Benchmark گله + 9 KpiCard
+ */
 import BenchmarkCard from './BenchmarkCard';
 import { KpiCard, SectionTitle, MiniEmpty } from './cards';
 import { toFa } from '../../shr/utils/fa';
