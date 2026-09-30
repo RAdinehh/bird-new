@@ -11,6 +11,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { Row, SectionTitle } from './helpers';
+import { format as formatJ } from 'date-fns-jalali';
 
 interface F {
   id?: string;
@@ -47,7 +48,10 @@ export default function StockPage() {
     [sales]
   );
 
-  const openNew = () => {
+  const openNew = () => {    const lastRec = sales.filter(s => s.customerId).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    const defaultX = lastRec?.customerId || customers[0]?.id || '';
+    const today = formatJ(new Date(), 'yyyy/MM/dd');
+
     if (customers.length === 0) { showAlert('اول یک مشتری در مخاطبین بسازید'); return; }
     setForm({ ...empty(), customerId: customers[0].id });
     setErr(''); setOpen(true);

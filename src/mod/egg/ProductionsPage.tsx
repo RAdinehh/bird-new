@@ -13,6 +13,7 @@ import ProgressTracker from '../../shr/components/ProgressTracker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import { Row, SectionTitle, chip } from './helpers';
+import { format as formatJ } from 'date-fns-jalali';
 
 interface F {
   id?: string;
@@ -54,7 +55,10 @@ export default function ProductionsPage() {
     return arr.sort((a, b) => b.date.localeCompare(a.date));
   }, [productions, filterFlock]);
 
-  const openNew = () => {
+  const openNew = () => {    const lastRec = productions.filter(p => p.flockId).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    const defaultX = lastRec?.flockId || flocks.filter(f => f.status === 'active')[0]?.id || flocks[0]?.id || '';
+    const today = formatJ(new Date(), 'yyyy/MM/dd');
+
     if (activeFlocks.length === 0) { showAlert('اول یک گله تخم‌گذار بسازید'); return; }
     setForm({ ...empty(), flockId: activeFlocks[0].id });
     setErr(''); setOpen(true);

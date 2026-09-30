@@ -11,6 +11,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import { format as formatJ } from 'date-fns-jalali';
 
 interface F {
   id?: string;
@@ -50,7 +51,10 @@ export default function DealsPage() {
     return arr.sort((a, b) => b.date.localeCompare(a.date));
   }, [deals, filterType]);
 
-  const openNew = () => {
+  const openNew = () => {    const lastRec = deals.filter(d => d.partyId).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    const defaultX = lastRec?.partyId || '';
+    const today = formatJ(new Date(), 'yyyy/MM/dd');
+
     if (contacts.length === 0) { showAlert('اول یک مخاطب بسازید'); return; }
     setForm({ ...empty(), partyId: contacts[0].id });
     setErr(''); setOpen(true);
