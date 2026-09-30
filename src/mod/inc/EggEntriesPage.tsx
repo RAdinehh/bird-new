@@ -389,6 +389,49 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     };
   }, [multiDeviceId, draftRows, eggEntries, birds, devices]);
 
+  // ═══ Live Usage — شامل ردیف در حال تایپ ═══
+  const liveUsage = useMemo(() => {
+    const device = devices.find(d => d.id === multiDeviceId);
+    if (!device) return null;
+    const refCap = Math.max(...(device.capacityByBird || []).map((c: any) => c.capacity || 0));
+    if (refCap === 0) return null;
+
+    let used = 0;
+    // ورودی‌های ثبت‌شده
+    eggEntries.forEach(e => {
+      if (e.status === 'failed') return;
+      const birdName = (birds.find(b => b.id === e.birdId)?.name) || '';
+      const cap = (device.capacityByBird || []).find((c: any) => c.birdName === birdName);
+      if (!cap?.capacity) return;
+      used += (e.count || 0) * (refCap / cap.capacity);
+    });
+    // ردیف‌های draft (به جز ردیفی که الان ویرایش می‌شه)
+    draftRows.forEach(r => {
+      if (editingRowId && r._id === editingRowId) return;
+      const b = birds.find(x => x.id === r.birdId);
+      if (!b) return;
+      const cap = (device.capacityByBird || []).find((c: any) => c.birdName === b.name);
+      if (!cap?.capacity) return;
+      used += (parseInt(toEn(r.count)) || 0) * (refCap / cap.capacity);
+    });
+    // ردیف در حال ویرایش/تایپ
+    const curCnt = parseInt(toEn(currentRow.count)) || 0;
+    const curBird = birds.find(b => b.id === currentRow.birdId);
+    if (curBird && curCnt > 0) {
+      const cap = (device.capacityByBird || []).find((c: any) => c.birdName === curBird.name);
+      if (cap?.capacity) {
+        used += curCnt * (refCap / cap.capacity);
+      }
+    }
+
+    return {
+      used: Math.round(used * 10) / 10,
+      total: refCap,
+      percent: Math.round((used / refCap) * 100),
+      remaining: Math.round((refCap - used) * 10) / 10,
+    };
+  }, [multiDeviceId, draftRows, eggEntries, birds, devices, currentRow.birdId, currentRow.count, editingRowId]);
+
   // ═══ فیلتر لیست ═══
   const list = useMemo(() => {
     return eggEntries.filter(e => {
@@ -756,6 +799,38 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         <Grid2>
           <Field label="تعداد تخم" required>
             <NumField value={currentRow.count} onChange={e => setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} autoClamp />
+            {(() => {
+              if (!currentRow.count.trim()) return null;
+              const cnt = parseInt(toEn(currentRow.count)) || 0;
+              if (cnt <= 0) {
+                return (
+                  <div style={{ padding: '6px 10px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 4 }}>
+                    ❌ تعداد باید بیشتر از صفر باشد
+                  </div>
+                );
+              }
+              if (!liveUsage) return null;
+              if (liveUsage.percent > 100) {
+                return (
+                  <div style={{ padding: '6px 10px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 4 }}>
+                    🔴 بیشتر از ظرفیت — {toFa(Math.abs(liveUsage.remaining))} واحد اضافی
+                    <br />💡 تعداد را کم کن یا ردیف حذف کن
+                  </div>
+                );
+              }
+              if (liveUsage.percent > 90) {
+                return (
+                  <div style={{ padding: '6px 10px', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, marginTop: 4 }}>
+                    🟡 نزدیک به ظرفیت — باقی: {toFa(liveUsage.remaining)} واحد ({toFa(liveUsage.percent)}٪)
+                  </div>
+                );
+              }
+              return (
+                <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, marginTop: 4 }}>
+                  ✅ قابل قبول — باقی: {toFa(liveUsage.remaining)} واحد ({toFa(liveUsage.percent)}٪)
+                </div>
+              );
+            })()}
           </Field>
           <Field label="طبقات (Tray)">
             <Input placeholder="۱-۲-۳" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
