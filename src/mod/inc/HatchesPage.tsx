@@ -393,20 +393,50 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                             }
                             return (
                               <>
-                                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی (اختیاری) — از {toFa(hatchedNum)} هچ‌شده</div>
-                                <Grid2>
-                                  <Field label="درجه A"><NumField value={d.gradeA} onChange={ev => updateData(e.id, { gradeA: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
-                                  <Field label="درجه B"><NumField value={d.gradeB} onChange={ev => updateData(e.id, { gradeB: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
-                                </Grid2>
-                                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت (اختیاری)</div>
-                                <Grid2>
-                                  <Field label="♂ نر"><NumField value={d.maleCount} onChange={ev => updateData(e.id, { maleCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
-                                  <Field label="♀ ماده"><NumField value={d.femaleCount} onChange={ev => updateData(e.id, { femaleCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
-                                </Grid2>
-                                <Grid2>
-                                  <Field label="? نامعلوم"><NumField value={d.unknownCount} onChange={ev => updateData(e.id, { unknownCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
-                                  <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
-                                </Grid2>
+                                {(() => {
+                                const gA = parseInt(toEn(d.gradeA)) || 0;
+                                const gB = parseInt(toEn(d.gradeB)) || 0;
+                                const gradesUsed = gA + gB;
+                                const gradesRem = hatchedNum - gradesUsed;
+                                const gradesOk = gradesRem >= 0;
+                                return (
+                                  <>
+                                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی (اختیاری) — از {toFa(hatchedNum)} هچ‌شده</div>
+                                    <Grid2>
+                                      <Field label="درجه A"><NumField value={d.gradeA} onChange={ev => updateData(e.id, { gradeA: ev.target.value })} max={hatchedNum - gB} min={0} unit="عدد" /></Field>
+                                      <Field label="درجه B"><NumField value={d.gradeB} onChange={ev => updateData(e.id, { gradeB: ev.target.value })} max={hatchedNum - gA} min={0} unit="عدد" /></Field>
+                                    </Grid2>
+                                    <div style={{ padding: '6px 10px', background: !gradesOk ? 'var(--danger-soft)' : gradesRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
+                                      A + B: {toFa(gradesUsed)} / {toFa(hatchedNum)}{!gradesOk ? ' 🔴 ' + toFa(Math.abs(gradesRem)) + ' اضافی' : gradesRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(gradesRem) + ' باقی'}
+                                    </div>
+                                  </>
+                                );
+                              })()}
+
+                              {(() => {
+                                const m = parseInt(toEn(d.maleCount)) || 0;
+                                const f_ = parseInt(toEn(d.femaleCount)) || 0;
+                                const u = parseInt(toEn(d.unknownCount)) || 0;
+                                const genderUsed = m + f_ + u;
+                                const genderRem = hatchedNum - genderUsed;
+                                const genderOk = genderRem >= 0;
+                                return (
+                                  <>
+                                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت (اختیاری)</div>
+                                    <Grid2>
+                                      <Field label="♂ نر"><NumField value={d.maleCount} onChange={ev => updateData(e.id, { maleCount: ev.target.value })} max={hatchedNum - f_ - u} min={0} unit="عدد" /></Field>
+                                      <Field label="♀ ماده"><NumField value={d.femaleCount} onChange={ev => updateData(e.id, { femaleCount: ev.target.value })} max={hatchedNum - m - u} min={0} unit="عدد" /></Field>
+                                    </Grid2>
+                                    <Grid2>
+                                      <Field label="? نامعلوم"><NumField value={d.unknownCount} onChange={ev => updateData(e.id, { unknownCount: ev.target.value })} max={hatchedNum - m - f_} min={0} unit="عدد" /></Field>
+                                      <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
+                                    </Grid2>
+                                    <div style={{ padding: '6px 10px', background: !genderOk ? 'var(--danger-soft)' : genderRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
+                                      ♂ + ♀ + ?: {toFa(genderUsed)} / {toFa(hatchedNum)}{!genderOk ? ' 🔴 ' + toFa(Math.abs(genderRem)) + ' اضافی' : genderRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(genderRem) + ' باقی'}
+                                    </div>
+                                  </>
+                                );
+                              })()}
                               </>
                             );
                           })()}
@@ -450,20 +480,50 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
               }
               return (
                 <>
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی — از {toFa(hatchedNum)} هچ‌شده</div>
-                  <Grid2>
-                    <Field label="درجه A"><NumField value={dataFor(formEntryId).gradeA} onChange={ev => updateData(formEntryId, { gradeA: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
-                    <Field label="درجه B"><NumField value={dataFor(formEntryId).gradeB} onChange={ev => updateData(formEntryId, { gradeB: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
-                  </Grid2>
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت و وزن</div>
-                  <Grid2>
-                    <Field label="♂ نر"><NumField value={dataFor(formEntryId).maleCount} onChange={ev => updateData(formEntryId, { maleCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
-                    <Field label="♀ ماده"><NumField value={dataFor(formEntryId).femaleCount} onChange={ev => updateData(formEntryId, { femaleCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
-                  </Grid2>
-                  <Grid2>
-                    <Field label="? نامعلوم"><NumField value={dataFor(formEntryId).unknownCount} onChange={ev => updateData(formEntryId, { unknownCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
-                    <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={dataFor(formEntryId).avgWeight} onChange={ev => updateData(formEntryId, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
-                  </Grid2>
+                  {(() => {
+                    const gA = parseInt(toEn(dataFor(formEntryId).gradeA)) || 0;
+                    const gB = parseInt(toEn(dataFor(formEntryId).gradeB)) || 0;
+                    const gradesUsed = gA + gB;
+                    const gradesRem = hatchedNum - gradesUsed;
+                    const gradesOk = gradesRem >= 0;
+                    return (
+                      <>
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی — از {toFa(hatchedNum)} هچ‌شده</div>
+                        <Grid2>
+                          <Field label="درجه A"><NumField value={dataFor(formEntryId).gradeA} onChange={ev => updateData(formEntryId, { gradeA: ev.target.value })} max={hatchedNum - gB} min={0} unit="عدد" /></Field>
+                          <Field label="درجه B"><NumField value={dataFor(formEntryId).gradeB} onChange={ev => updateData(formEntryId, { gradeB: ev.target.value })} max={hatchedNum - gA} min={0} unit="عدد" /></Field>
+                        </Grid2>
+                        <div style={{ padding: '6px 10px', background: !gradesOk ? 'var(--danger-soft)' : gradesRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
+                          A + B: {toFa(gradesUsed)} / {toFa(hatchedNum)}{!gradesOk ? ' 🔴 اضافی' : gradesRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(gradesRem) + ' باقی'}
+                        </div>
+                      </>
+                    );
+                  })()}
+
+                  {(() => {
+                    const m = parseInt(toEn(dataFor(formEntryId).maleCount)) || 0;
+                    const f_ = parseInt(toEn(dataFor(formEntryId).femaleCount)) || 0;
+                    const u = parseInt(toEn(dataFor(formEntryId).unknownCount)) || 0;
+                    const genderUsed = m + f_ + u;
+                    const genderRem = hatchedNum - genderUsed;
+                    const genderOk = genderRem >= 0;
+                    return (
+                      <>
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت و وزن</div>
+                        <Grid2>
+                          <Field label="♂ نر"><NumField value={dataFor(formEntryId).maleCount} onChange={ev => updateData(formEntryId, { maleCount: ev.target.value })} max={hatchedNum - f_ - u} min={0} unit="عدد" /></Field>
+                          <Field label="♀ ماده"><NumField value={dataFor(formEntryId).femaleCount} onChange={ev => updateData(formEntryId, { femaleCount: ev.target.value })} max={hatchedNum - m - u} min={0} unit="عدد" /></Field>
+                        </Grid2>
+                        <Grid2>
+                          <Field label="? نامعلوم"><NumField value={dataFor(formEntryId).unknownCount} onChange={ev => updateData(formEntryId, { unknownCount: ev.target.value })} max={hatchedNum - m - f_} min={0} unit="عدد" /></Field>
+                          <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={dataFor(formEntryId).avgWeight} onChange={ev => updateData(formEntryId, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
+                        </Grid2>
+                        <div style={{ padding: '6px 10px', background: !genderOk ? 'var(--danger-soft)' : genderRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
+                          ♂ + ♀ + ?: {toFa(genderUsed)} / {toFa(hatchedNum)}{!genderOk ? ' 🔴 اضافی' : genderRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(genderRem) + ' باقی'}
+                        </div>
+                      </>
+                    );
+                  })()}
                 </>
               );
             })()}
