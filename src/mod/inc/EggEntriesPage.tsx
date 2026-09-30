@@ -618,12 +618,12 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             else if (locked) accent = 'warn';
 
             let statusLabel = '';
-            let statusTone: any = 'blue';
+            let statusTone: any = 'muted';
             const totalDays = (_daysLookup(bird?.name) || 21);
             if (myHatch) { statusLabel = '✅ هچ‌شده'; statusTone = 'green'; }
             else if (hatchWindow) { statusLabel = '🐣 پنجره هچ'; statusTone = 'purple'; }
             else if (locked) { statusLabel = '🔒 Lock-down'; statusTone = 'amber'; }
-            else if (remain > 0) { statusLabel = toFa(remain) + ' روز مانده'; statusTone = 'blue'; }
+            else if (remain > 0) { statusLabel = toFa(remain) + ' روز مانده'; statusTone = 'accent'; }
             else if (remain === 0) { statusLabel = '🎯 امروز هچ'; statusTone = 'purple'; }
             else { statusLabel = '⚠️ گذشته از موعد هچ'; statusTone = 'amber'; }
 
