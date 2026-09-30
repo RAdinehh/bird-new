@@ -126,6 +126,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
   // ═══ Bulk mode state ═══
   const [multiDeviceId, setMultiDeviceId] = useState('');
+  const [hideHatchTip, setHideHatchTip] = useState(() => { try { return localStorage.getItem('pm-inc-hide-hatch-tip') === '1'; } catch { return false; } });
   const [draftRows, setDraftRows] = useState<DraftRow[]>([]);
   const [currentRow, setCurrentRow] = useState<DraftRow>(() => makeRow());
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
@@ -716,10 +717,13 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         footer={<BtnRow><Btn onClick={saveAll} disabled={draftRows.length === 0}>💾 ذخیره همه ({toFa(draftRows.length)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
         {/* ═══ بنر راهنما ═══ */}
-        <div style={{ padding: 'var(--pad-normal)', background: 'linear-gradient(135deg, var(--info-soft), var(--info-soft))', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 600, lineHeight: 1.8 }}>
-          🎯 <b>هچ همزمان:</b> پرنده‌های دوره‌بلندتر رو اول وارد کن<br />
-          <span style={{ opacity: 0.85 }}>ترتیب: غاز (۳۰) → بوقلمون (۲۸) → مرغ (۲۱)</span>
-        </div>
+        {!hideHatchTip && (
+          <div style={{ position: 'relative', padding: 'var(--pad-normal) 32px var(--pad-normal) var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 600, lineHeight: 1.8 }}>
+            <button type="button" aria-label="بستن راهنما" onClick={() => { setHideHatchTip(true); try { localStorage.setItem('pm-inc-hide-hatch-tip', '1'); } catch {} }} style={{ position: 'absolute', top: 4, left: 4, background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 14, padding: 4, lineHeight: 1, fontFamily: 'inherit' }}>✕</button>
+            🎯 <b>هچ همزمان:</b> پرنده‌های دوره‌بلندتر رو اول وارد کن<br />
+            <span style={{ opacity: 0.85 }}>ترتیب: غاز (۳۰) → بوقلمون (۲۸) → مرغ (۲۱)</span>
+          </div>
+        )}
 
         {/* ═══ دستگاه + ظرفیت ═══ */}
         <div style={{ padding: 'var(--pad-comfy)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -730,11 +734,11 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           {liveUsage && liveUsage.total > 0 && (
             <div style={{
               padding: 'var(--pad-normal)',
-              background: liveUsage.percent > 100 ? 'var(--danger-soft)' : liveUsage.percent > 90 ? 'var(--warn-soft)' : 'var(--info-soft)',
-              border: '1px solid ' + (liveUsage.percent > 100 ? 'var(--danger)' : liveUsage.percent > 90 ? 'var(--warn)' : 'var(--info)'),
+              background: liveUsage.percent > 100 ? 'var(--danger-soft)' : liveUsage.percent > 90 ? 'var(--warn-soft)' : 'var(--accent-soft)',
+              border: '1px solid ' + (liveUsage.percent > 100 ? 'var(--danger)' : liveUsage.percent > 90 ? 'var(--warn)' : 'var(--accent)'),
               borderRadius: 'var(--r-md)',
               fontSize: 'var(--fs-xs)',
-              color: liveUsage.percent > 100 ? 'var(--danger)' : liveUsage.percent > 90 ? 'var(--warn)' : 'var(--info)',
+              color: liveUsage.percent > 100 ? 'var(--danger)' : liveUsage.percent > 90 ? 'var(--warn)' : 'var(--accent)',
               fontWeight: 700,
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -786,7 +790,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                     <span>{party}</span>
                     <span>{toFa(r.entryDate)}{r.entryTime ? ' · ' + toFa(r.entryTime) : ''}</span>
                   </div>
-                  <div style={{ position: 'absolute', top: 6, left: 6, display: 'flex', gap: 2 }}>
+                  <div style={{ position: 'absolute', top: 6, right: 6, display: 'flex', gap: 2 }}>
                     <button type="button" onClick={() => editRow(r)} style={{ background: 'none', border: 'none', color: 'var(--text)', cursor: 'pointer', fontSize: 'var(--fs-xs)', padding: 3 }}>✏️</button>
                     <button
                         type="button"
@@ -819,13 +823,14 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         )}
 
         {/* ═══ فرم ردیف جدید ═══ */}
-        <div style={{ padding: 'var(--pad-comfy)', background: editingRowId ? 'var(--warn-soft)' : 'var(--info-soft)', border: '1px dashed ' + (editingRowId ? 'var(--warn)' : 'var(--info)'), borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 6 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: editingRowId ? 'var(--warn)' : 'var(--info)', fontWeight: 700 }}>
+        <div style={{ padding: 'var(--pad-comfy)', background: editingRowId ? 'var(--warn-soft)' : 'var(--accent-soft)', border: '1px dashed ' + (editingRowId ? 'var(--warn)' : 'var(--accent)'), borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: editingRowId ? 'var(--warn)' : 'var(--accent)', fontWeight: 700 }}>
             <span>{editingRowId ? '✏️' : '➕'}</span>
             <span>{editingRowId ? 'ویرایش ردیف انتخاب‌شده' : 'ردیف جدید'}</span>
           </div>
 
-          {/* منبع + تاریخ */}
+          {/* ═══ منبع + زمان ═══ */}
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🏠 منبع و زمان</div>
           <Grid2>
             <Field label="نوع منبع" required>
               <Select value={currentRow.dealType} onChange={e => setCurrentRow(f => ({ ...f, dealType: e.target.value as DealType, dealData: {}, flockId: '' }))}>
@@ -951,7 +956,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           {(currentRow.dealType === 'partnership' || currentRow.dealType === 'consignment') && (
             <div style={{ padding: 8, background: currentRow.dealStatus === 'withdrawn' ? 'var(--danger-soft)' : 'var(--input-bg)', border: '1px solid ' + (currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--border)'), borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                <input type="checkbox" checked={currentRow.dealStatus === 'withdrawn'} onChange={e => setCurrentRow(f => ({ ...f, dealStatus: e.target.checked ? 'withdrawn' : 'active' }))} style={{ width: 16, height: 36, accentColor: 'var(--muted)' }} />
+                <input type="checkbox" checked={currentRow.dealStatus === 'withdrawn'} onChange={e => setCurrentRow(f => ({ ...f, dealStatus: e.target.checked ? 'withdrawn' : 'active' }))} style={{ width: 18, height: 18, accentColor: 'var(--muted)' }} />
                 <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--text)' }}>کنار کشید</span>
               </label>
               {currentRow.dealStatus === 'withdrawn' && (
