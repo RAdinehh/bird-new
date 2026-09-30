@@ -1,8 +1,8 @@
 # 🚀 HANDOFF.md — سند تحویل به AI بعدی
 
 **تاریخ:** ۱۴۰۵/۰۷/۰۸
-**آخرین commit:** b352ca5
-**وضعیت:** inc کامل · فاز ۶ (تقویت stats لیست‌ها) ✅ کامل — ۱۵ ماژول پوشش داده شد
+**آپ commit:** 88c51ed
+**وضعیت:** ✅ ۲۲ ماژول تمیز · آماده تحویل
 
 ---
 
@@ -230,3 +230,32 @@ cat doc/PROJECT-LOG.md | head -40
 ---
 
 پایان سند · v1.0 · ۱۴۰۵/۰۷/۰۸
+
+
+---
+
+## 🚀 خلاصه جلسه — 2026/09/30
+
+### کارهای انجام‌شده
+- ✅ refactor کامل **dsh**: 1298 → 442 خط (14 commit)
+- ✅ **Design System v2**: 20+ توکن (spacing, shadow, touch, transition)
+- ✅ **State.tsx**: Empty/Loading/Error در shr/components
+- ✅ **helpers.tsx** مشترک در 13 ماژول (dlg, egg, fed, flk, hal, inc, rep, set, whs, doc, tra, cal, dsh)
+- ✅ ادغام **Purchases + Sales → InvoicePage** (-۱۱۰۰ خط)
+- ✅ uplift سراسری فونت/پدینگ در 48+ فایل
+- ✅ a11y: focus-visible + reduced-motion + aria
+- ✅ JSDoc در همه ماژول‌ها
+
+### نمره تخمینی
+**۷.۸/۱۰** (بهبود از ۵.۷)
+
+### باقی‌مونده (اختیاری)
+- شکستن `EggEntriesPage` (۱۰۶۳) به ۳ فایل
+- شکستن `DailyLogsPage` (۹۱۵)
+- حذف `any` در 29 مورد (نیاز به بررسی دقیق)
+
+### نقاط قوت
+- بدون critical/high issue
+- همه ماژول‌ها modular + helpers مشترک
+- RTL/i18n کامل
+- Design tokens یکدست

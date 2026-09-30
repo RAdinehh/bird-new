@@ -1,0 +1,3404 @@
+diff --git a/doc/HANDOFF.md b/doc/HANDOFF.md
+new file mode 100644
+index 0000000..5342344
+--- /dev/null
++++ b/doc/HANDOFF.md
+@@ -0,0 +1,231 @@
++# 🚀 HANDOFF.md — سند تحویل به AI بعدی
++
++**تاریخ:** ۱۴۰۵/۰۷/۰۸
++**آخرین commit:** e88f351
++**وضعیت:** inc کامل · فاز ۶ در جریان
++
++---
++
++## 📖 قبل از هر کار
++
++1. doc/DESIGN.md — سیستم طراحی
++2. doc/SCHEMA.md — ساختار داده v2.0
++3. doc/WORKFLOW.md — قوانین کار
++4. doc/PROJECT-LOG.md — تاریخچه
++5. doc/STANDARDS.md — قوانین کد
++6. doc/RELATIONSHIPS.md — نقشه روابط
++7. doc/FILTERS.md — استاندارد فیلترها
++8. این فایل
++
++---
++
++## 🎯 پروژه
++
++نرم‌افزار مدیریت مرغداری — PWA آفلاین، فارسی، RTL
++- کاربر: کارگر مرغداری
++- محیط: Termux + nano + موبایل
++- داده: localStorage + IndexedDB
++- ۱۵ ماژول + تقویم + اسناد
++
++GitHub: https://github.com/RAdinehh/bird-new
++مسیر: ~/Bird-new
++
++---
++
++## 🛠 تکنولوژی
++
++- React 18 + TypeScript strict
++- Vite 6
++- Tailwind v3.4.15
++- Zustand + persist
++- React Router v6
++- date-fns-jalali (همه‌ی محاسبات تاریخ باید از این استفاده کنن)
++- idb (IndexedDB)
++- Vazirmatn از CDN
++
++---
++
++## ✅ فازهای تموم‌شده
++
++### فاز ۰ — مستندسازی
++- ۹ سند Enterprise
++- پاکسازی .bak/.save
++- تقویت ui.tsx (۹ کامپوننت جدید)
++
++### فاز ۱ — آدیت
++- ۱۲۲ فیلد مدرن‌سازی
++- ۴ باگ بحرانی fix
++
++### فاز ۲ — UX
++- Header 🔔 هوشمند
++- Onboarding آپدیت
++- Reminders ۷/۳/۱/۰
++- HelpBanner ۴ ماژول
++- Redirect ۶ Placeholder
++
++### فاز ۳ — تقویم
++- ۵ قالب واکسن
++- واکسن خودکار از قالب گله
++- فیلتر گیاهی
++
++### فاز ۴ — تحلیل
++- پشتیبان خودکار
++- Pareto, Benchmark
++
++### فاز ۵ — inc (کامل ⭐)
++- Profile انکوباسیون (۷ پرنده)
++- DevicesPage (ظرفیت چندپرنده + تعمیرات + گارانتی)
++- EggEntriesPage (Multi-row + Draft Auto-Save + ctc/tra/egg)
++- CandlingsPage (Multi-select + روز دلخواه + تجمیع)
++- HatchesPage (Multi-select + تفکیک + ساخت گله + فروش + Validation)
++- Workflow Chain: device → entry → candling → hatch → flock/sale
++
++### بهبودهای اخیر
++- DatePicker — فشرده + Select مستقیم
++- TimePicker — عقربه‌ای SVG + drag
++- ExpandableCard — prop `stats` + InfoItem/StatBox/Dot
++- fix ageDays, daysUntilDue, daysAgo
++
++---
++
++## 🚧 کارهای فوری (ناتموم)
++
++### ۱. حذف summary تکراری از inc
++**مشکل:** وقتی stats اضافه شد، summary قدیمی موند → تکرار بصری
++**فایل‌ها:** ۴ ماژول inc
++**fix:** حذف بلوک summary={...}
++
++### ۲. باگ پنجره هچ
++**مشکل:** isHatchWindow(e) با expectedHatchDate خالی → true اشتباهی
++**fix:** isHatchWindow({ ...e, expectedHatchDate: expHatch })
++
++### ۳. گزارش ماژول‌های ExpandableCard
++**کار:** لیست همه‌ی فایل‌ها + وضعیت stats/summary
++
++---
++
++## 🎯 فاز ۶ — تقویت stats در همه ماژول‌ها
++
++### تکمیل‌شده:
++inc/Devices, inc/EggEntries, inc/Candlings, inc/Hatches
++
++### باقی‌مونده (به ترتیب):
++1. tra — معاملات (بزرگ‌ترین)
++2. flk — گله
++3. whs — انبار
++4. egg — تخم
++5. fed — جیره
++6. hal — سالن
++7. brd — پرنده
++8. ctc — مخاطبین
++9. dsh — داشبورد
++10. rep — گزارش
++11. cal — تقویم
++12. alt — هشدار
++13. doc — اسناد
++14. arc — آرشیو
++15. set — تنظیمات
++
++تخمین: ۳-۴ ساعت هر ماژول × ۱۴ = ۵۰ ساعت
++
++---
++
++## 🎨 الگوی stats (قفل‌شده)
++
++import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
++
++<ExpandableCard
++  accent="accent" index={toFa(i+1)} iconEmoji="🥚"
++  title="..." subtitle="..." badge={<Tag>...</Tag>}
++  stats={<>
++    <StatBox icon="🎯" label="ظرفیت" value="۶۵٪" tone="accent" />
++    <Dot />
++    <StatBox icon="📅" label="آخرین" value="۵ روز" />
++    <Dot />
++    <StatBox icon="🔄" label="ورودی" value="۲" />
++  </>}
++  isOpen={...} onToggle={...}
++>
++</ExpandableCard>
++
++**قواعد:**
++- حداکثر ۳ + ۳ عنصر
++- فقط عدد اول رنگی
++- جداکننده · (Dot)
++- maxWidth ۳۵٪ خودکار
++- بدون summary
++- ارتفاع اضافه نشه
++
++---
++
++## 📐 قواعد طراحی
++
++- کارت‌ها: ExpandableCard
++- انیمیشن: grid-template-rows 0fr→1fr با cubic-bezier(.16,1,.3,1)
++- RTL: تأیید راست، لغو چپ
++- ورودی عدد: dir=ltr + inputMode=numeric
++- فیلد کوتاه: Grid2/Grid3
++- SectionTitle با خط‌چین
++- Empty State با hint (نه ۰ یا NaN)
++- رنگ: --accent, --warn, --danger, --info, --purple
++
++---
++
++## 🔧 الگوی کار
++
++### اسکریپت پایتون (نه nano)
++cd ~/Bird-new && cat > ~/scripts/name.py << 'PYEOF'
++# کد
++PYEOF
++python3 ~/scripts/name.py
++
++### heredoc طولانی → تکه‌تکه
++اگه اسکریپت بیشتر از ۱۰۰ خط شد → تکه‌تکه بده
++
++### بعد از هر تغییر:
++npm run build 2>&1 | tail -5
++git add -A && git commit -m "..." && git push origin main
++
++---
++
++## ⚠️ مشکلات شناخته‌شده
++
++1. heredoc طولانی → همیشه تکه‌تکه
++2. cache مرورگر → hard refresh
++3. TypeScript strict → (x || 0) لازمه
++4. تاریخ‌ها → همیشه date-fns-jalali، نه new Date(y, m, d)
++5. jalaliToDate در src/mod/inc/store.ts — مرجع اصلی
++
++---
++
++## 🔑 نکات کلیدی برای AI بعدی
++
++1. کاربر فارسی‌زبان و غیرکدنویس — پیام‌ها ساده
++2. همیشه پیش‌نمایش قبل از کد
++3. اسکریپت پایتون با فایل، نه heredoc تو پیام
++4. build + commit بعد از هر تغییر
++5. گام‌های کوچیک
++6. وقتی کاربر گفت «پیشنهاد خودت» → تصمیم بگیر و انجام بده
++
++---
++
++## 📋 دستور شروع AI بعدی
++
++cd ~/Bird-new
++git log --oneline -5
++npm run build 2>&1 | tail -3
++cat doc/HANDOFF.md
++cat doc/PROJECT-LOG.md | head -40
++
++---
++
++## 📊 آمار پروژه
++
++- commit: ~۱۵۵
++- ماژول کامل: ۱ (inc)
++- ماژول نیمه‌کاره: ۱۴
++- بدهی فنی: ~۱۰ مورد
++
++---
++
++پایان سند · v1.0 · ۱۴۰۵/۰۷/۰۸
+diff --git a/src/mod/alt/AlertsPage.tsx b/src/mod/alt/AlertsPage.tsx
+index a490ea6..f23de30 100644
+--- a/src/mod/alt/AlertsPage.tsx
++++ b/src/mod/alt/AlertsPage.tsx
+@@ -148,7 +148,7 @@ export default function AlertsPage() {
+                   isOpen={isOpen}
+                   onToggle={() => setExpandedId(isOpen ? null : a.id)}
+                   badge={<Tag tone={a.level === 'critical' ? 'red' : a.level === 'important' ? 'amber' : 'blue'}>{LEVEL_LABEL[a.level]}</Tag>}
+-                  summary={
++                  stats={
+                     <>
+                       <span>{a.message}</span>
+                     </>
+diff --git a/src/mod/arc/ArchivePage.tsx b/src/mod/arc/ArchivePage.tsx
+index b603724..d738a08 100644
+--- a/src/mod/arc/ArchivePage.tsx
++++ b/src/mod/arc/ArchivePage.tsx
+@@ -73,7 +73,7 @@ export default function ArchivePage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : f.id)}
+                 badge={<Tag tone={f.status === 'sold' ? 'green' : 'gray'}>{statusLabel}</Tag>}
+-                summary={
++                stats={
+                   <>
+                     <span>سن نهایی: <b style={{ color: 'var(--text)' }}>{toFa(ageDays)} روز</b></span>
+                     {f.currentCount ? <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b></span> : null}
+diff --git a/src/mod/brd/BirdsPage.tsx b/src/mod/brd/BirdsPage.tsx
+index a61d9a3..c6fa11e 100644
+--- a/src/mod/brd/BirdsPage.tsx
++++ b/src/mod/brd/BirdsPage.tsx
+@@ -87,7 +87,7 @@ export default function BirdsPage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
+                 badge={<Tag tone="blue">{toFa(birdBreeds.length)} نژاد</Tag>}
+-                summary={
++                stats={
+                   <>
+                     {b.cycleDays ? <span>چرخه: <b style={{ color: 'var(--text)' }}>{toFa(b.cycleDays)} روز</b></span> : null}
+                     {b.fcrStandard ? <span>FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcrStandard)}</b></span> : null}
+diff --git a/src/mod/brd/BreedsPage.tsx b/src/mod/brd/BreedsPage.tsx
+index 12ea933..0b2c3d0 100644
+--- a/src/mod/brd/BreedsPage.tsx
++++ b/src/mod/brd/BreedsPage.tsx
+@@ -121,7 +121,7 @@ export default function BreedsPage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
+                 badge={b.fcr ? <Tag tone="purple">FCR {toFa(b.fcr)}</Tag> : undefined}
+-                summary={<>
++                stats={<>
+                   <span>پرنده: <b style={{ color: 'var(--text)' }}>{bird?.name || '—'}</b></span>
+                   {b.fcr && <span>FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcr)}</b></span>}
+                 </>}
+diff --git a/src/mod/ctc/ContactsPage.tsx b/src/mod/ctc/ContactsPage.tsx
+index f39b1dc..14ff0ea 100644
+--- a/src/mod/ctc/ContactsPage.tsx
++++ b/src/mod/ctc/ContactsPage.tsx
+@@ -169,7 +169,7 @@ export default function ContactsPage() {
+                   badge={<div style={{ display: 'flex', gap: 3 }}>
+                     {p.roles.map(r => <Tag key={r} tone={(r === 'customer' ? 'blue' : r === 'supplier' ? 'green' : 'purple') as any}>{ROLE_LABEL[r]}</Tag>)}
+                   </div>}
+-                  summary={<>
++                  stats={<>
+                     {p.roles.includes('customer') && p.trustScore ? <span>اعتبار: <b style={{ color: 'var(--text)' }}>{toFa(p.trustScore)}/۱۰</b></span> : null}
+                     {p.roles.includes('worker') && p.position ? <span>سمت: <b style={{ color: 'var(--text)' }}>{p.position}</b></span> : null}
+                     {p.roles.includes('supplier') && p.supplierTypes.length > 0 ? <span>کالاها: <b style={{ color: 'var(--text)' }}>{toFa(p.supplierTypes.length)}</b></span> : null}
+diff --git a/src/mod/dlg/DailyLogsPage.tsx b/src/mod/dlg/DailyLogsPage.tsx
+index fa4cafe..be66855 100644
+--- a/src/mod/dlg/DailyLogsPage.tsx
++++ b/src/mod/dlg/DailyLogsPage.tsx
+@@ -312,7 +312,7 @@ export default function DailyLogsPage() {
+         subtitle={`${toFa(l.date)}${l.entryTime ? ` · ${toFa(l.entryTime)}` : ''}${bird ? ` · ${bird.name}` : ''}`}
+         isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : l.id)}
+         badge={l.deathsCount > 0 ? <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag> : undefined}
+-        summary={<>
++        stats={<>
+           {l.temperature !== null && <span>🌡 {toFa(l.temperature)}°</span>}
+           {l.humidity !== null && <span>💧 {toFa(l.humidity)}٪</span>}
+           {l.feedAmount !== null && <span>🌾 {toFa(l.feedAmount)} kg</span>}
+diff --git a/src/mod/dsh/Dashboard.tsx b/src/mod/dsh/Dashboard.tsx
+index aba97e9..ca24249 100644
+--- a/src/mod/dsh/Dashboard.tsx
++++ b/src/mod/dsh/Dashboard.tsx
+@@ -1,4 +1,5 @@
+ import { useState, useEffect, useMemo } from 'react';
++import { parse as parseJ, differenceInDays as diffDaysJ } from 'date-fns-jalali';
+ import { useNavigate } from 'react-router-dom';
+ import { useTra, remaining } from '../tra/store';
+ import { useCtc } from '../ctc/store';
+@@ -118,10 +119,14 @@ export default function Dashboard() {
+   // ============ سرسیدهای نزدیک ============
+   const daysUntilDue = (dueDate: string): number | null => {
+     if (!dueDate) return null;
+-    const parts = dueDate.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString()).split('/');
+-    if (parts.length !== 3) return null;
+-    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+-    return Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
++    try {
++      const en = dueDate.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
++      const d = parseJ(en, 'yyyy/MM/dd', new Date());
++      if (isNaN(d.getTime())) return null;
++      return diffDaysJ(d, new Date());
++    } catch {
++      return null;
++    }
+   };
+ 
+   const upcomingDues = useMemo(() => {
+diff --git a/src/mod/egg/ProductionsPage.tsx b/src/mod/egg/ProductionsPage.tsx
+index c6aee62..d47b3e8 100644
+--- a/src/mod/egg/ProductionsPage.tsx
++++ b/src/mod/egg/ProductionsPage.tsx
+@@ -197,7 +197,7 @@ export default function ProductionsPage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : p.id)}
+                 badge={rate > 0 ? <Tag tone={tone}>{toFa(rate.toFixed(1))}٪</Tag> : undefined}
+-                summary={
++                stats={
+                   <>
+                     <span>کل: <b style={{ color: 'var(--text)' }}>{toFa(p.totalCount)}</b></span>
+                     {p.brokenCount > 0 ? <span style={{ color: 'var(--danger)' }}>شکسته: <b>{toFa(p.brokenCount)}</b></span> : null}
+diff --git a/src/mod/egg/StockPage.tsx b/src/mod/egg/StockPage.tsx
+index 7e1b8fd..e0b6cd5 100644
+--- a/src/mod/egg/StockPage.tsx
++++ b/src/mod/egg/StockPage.tsx
+@@ -162,7 +162,7 @@ export default function StockPage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : s.id)}
+                 badge={<Tag tone={s.paymentType === 'debt' ? 'amber' : 'green'}>{PAYMENT_LABEL[s.paymentType]}</Tag>}
+-                summary={
++                stats={
+                   <>
+                     <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(s.count)} {UNIT_LABEL[s.unit].split(' ')[0]}</b></span>
+                     <span>عدد: <b style={{ color: 'var(--text)' }}>{toFa(pieces.toLocaleString('fa-IR'))}</b></span>
+diff --git a/src/mod/fed/FormulasPage.tsx b/src/mod/fed/FormulasPage.tsx
+index b5b46c0..6975053 100644
+--- a/src/mod/fed/FormulasPage.tsx
++++ b/src/mod/fed/FormulasPage.tsx
+@@ -160,7 +160,7 @@ export default function FormulasPage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : f.id)}
+                 badge={<Tag tone={statusTone}>{statusLabel}</Tag>}
+-                summary={
++                stats={
+                   <>
+                     <span>پروتئین: <b style={{ color: 'var(--text)' }}>{toFa(n.protein)}٪</b></span>
+                     <span>انرژی: <b style={{ color: 'var(--text)' }}>{toFa(n.energy)}</b></span>
+diff --git a/src/mod/fed/IngredientsPage.tsx b/src/mod/fed/IngredientsPage.tsx
+index 5a49ea1..7e56862 100644
+--- a/src/mod/fed/IngredientsPage.tsx
++++ b/src/mod/fed/IngredientsPage.tsx
+@@ -231,7 +231,7 @@ export default function IngredientsPage() {
+                     ? <Tag tone="blue">پیش‌فرض</Tag>
+                     : (displayPrice > 0 ? <Tag tone="green">{toFa(displayPrice.toLocaleString('fa-IR'))} ت</Tag> : undefined)
+                 }
+-                summary={
++                stats={
+                   <>
+                     <span>پروتئین: <b>{toFa(it.protein)}٪</b></span>
+                     <span>انرژی: <b>{toFa(it.energy)}</b></span>
+diff --git a/src/mod/fed/RequirementsPage.tsx b/src/mod/fed/RequirementsPage.tsx
+index ae5259e..562c4c0 100644
+--- a/src/mod/fed/RequirementsPage.tsx
++++ b/src/mod/fed/RequirementsPage.tsx
+@@ -149,7 +149,7 @@ export default function RequirementsPage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : r.id)}
+                 badge={<Tag tone="blue">{toFa(r.protein)}٪ پروتئین</Tag>}
+-                summary={
++                stats={
+                   <>
+                     <span>پروتئین: <b style={{ color: 'var(--text)' }}>{toFa(r.protein)}٪</b></span>
+                     <span>انرژی: <b style={{ color: 'var(--text)' }}>{toFa(r.energy)}</b></span>
+diff --git a/src/mod/flk/FlocksPage.tsx b/src/mod/flk/FlocksPage.tsx
+index 56c010f..1fa10fd 100644
+--- a/src/mod/flk/FlocksPage.tsx
++++ b/src/mod/flk/FlocksPage.tsx
+@@ -334,7 +334,7 @@ export default function FlocksPage() {
+                   isOpen={isOpen}
+                   onToggle={() => setExpandedId(isOpen ? null : f.id)}
+                   badge={<Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>}
+-                  summary={<>
++                  stats={<>
+                     {ageDays > 0 && <span>🎂 سن: <b style={{ color: 'var(--text)' }}>{toFa(ageDays)} روز</b></span>}
+                     {f.currentCount && <span>🐔 زنده: <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b></span>}
+                     {f.initialCount && f.currentCount && f.initialCount !== f.currentCount && (
+diff --git a/src/mod/hal/EquipmentPage.tsx b/src/mod/hal/EquipmentPage.tsx
+index 740ac26..ea9c3f4 100644
+--- a/src/mod/hal/EquipmentPage.tsx
++++ b/src/mod/hal/EquipmentPage.tsx
+@@ -114,7 +114,7 @@ export default function EquipmentPage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : e.id)}
+                 badge={e.count ? <Tag tone="blue">{toFa(e.count)} عدد</Tag> : undefined}
+-                summary={<>
++                stats={<>
+                   {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)}</b></span>}
+                   {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(value.toLocaleString('fa-IR'))} ت</b></span>}
+                   {e.warranty && <span>گارانتی: <b style={{ color: 'var(--text)' }}>{toFa(e.warranty)} ماه</b></span>}
+diff --git a/src/mod/hal/HallsPage.tsx b/src/mod/hal/HallsPage.tsx
+index 1ada6bc..24d7592 100644
+--- a/src/mod/hal/HallsPage.tsx
++++ b/src/mod/hal/HallsPage.tsx
+@@ -95,7 +95,7 @@ export default function HallsPage() {
+                 subtitle={h.length ? `${toFa(h.length)}×${toFa(h.width || 0)}×${toFa(h.height || 0)} متر` : 'ابعاد وارد نشده'}
+                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
+                 badge={zoneCount > 0 ? <Tag tone="blue">{toFa(zoneCount)} بخش</Tag> : undefined}
+-                summary={<>
++                stats={<>
+                   {area > 0 && <span>مساحت: <b style={{ color: 'var(--text)' }}>{toFa(area.toFixed(1))} م²</b></span>}
+                   {h.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{toFa(h.capacity)}</b></span>}
+                   {equipCount > 0 && <span>تجهیز: <b style={{ color: 'var(--text)' }}>{toFa(equipCount)}</b></span>}
+diff --git a/src/mod/hal/ZonesPage.tsx b/src/mod/hal/ZonesPage.tsx
+index 8f51f3d..3e51039 100644
+--- a/src/mod/hal/ZonesPage.tsx
++++ b/src/mod/hal/ZonesPage.tsx
+@@ -108,7 +108,7 @@ export default function ZonesPage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : z.id)}
+                 badge={z.capacity ? <Tag tone="purple">{toFa(z.capacity)} پرنده</Tag> : undefined}
+-                summary={<>
++                stats={<>
+                   <span>سالن: <b style={{ color: 'var(--text)' }}>{hall?.name || '—'}</b></span>
+                   {z.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{toFa(z.capacity)}</b></span>}
+                 </>}
+diff --git a/src/mod/inc/CandlingsPage.tsx b/src/mod/inc/CandlingsPage.tsx
+index 1056105..2fa352d 100644
+--- a/src/mod/inc/CandlingsPage.tsx
++++ b/src/mod/inc/CandlingsPage.tsx
+@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
+ import { useInc, type Candling } from './store';
+ import { useBrd } from '../brd/store';
+ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
+-import ExpandableCard from '../../shr/components/ExpandableCard';
++import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
+ import DatePicker from '../../shr/components/DatePicker';
+ import { toFa, toEn } from '../../shr/utils/fa';
+ import { showAlert } from '../../cor/store/dialog';
+@@ -26,20 +26,44 @@ interface EntryData {
+ 
+ const emptyData = (): EntryData => ({ alive: '', infertile: '', dead: '', broken: '', infertileReason: '', deadReason: '', notes: '' });
+ 
++
++
++// مبنا: تعداد تخم موجود برای این مرحله (از مرحله قبل یا کل ورودی)
++function calcAvailableBase(entryId: string, currentStage: number, excludeCandlingId: string | null, allCandlings: any[], entryTotal: number): { base: number; source: string } {
++  // همه کندلینگ‌های این ورودی (به جز خودمون اگه ویرایش می‌کنیم)
++  const myCandlings = allCandlings
++    .filter(c => c.eggEntryId === entryId)
++    .filter(c => !excludeCandlingId || c.id !== excludeCandlingId)
++    .sort((a, b) => a.stage - b.stage);
++
++  // اگه مرحله اوله، یا هیچ کندلینگ قبلی نیست
++  const prevs = myCandlings.filter(c => c.stage < currentStage);
++  if (prevs.length === 0) {
++    return { base: entryTotal, source: 'کل ورودی' };
++  }
++  const prev = prevs[prevs.length - 1];
++  return { base: prev.alive || 0, source: 'مرحله ' + prev.stage };
++}
++
++function todayJalali(): string {
++  const d = new Date();
++  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
++}
++
+ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any) => void } = {}) {
+   const { devices, eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
+   const { birds } = useBrd();
+ 
+   const [open, setOpen] = useState(false);
+   const [modalDevice, setModalDevice] = useState('');
+-  const [modalStage, setModalStage] = useState('1');
++  const [modalDay, setModalDay] = useState('');
+   const [modalDate, setModalDate] = useState('');
+   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+   const [entriesData, setEntriesData] = useState<Record<string, EntryData>>({});
+   const [err, setErr] = useState('');
+   const [delId, setDelId] = useState<string | null>(null);
+-  const [expandedId, setExpandedId] = useState<string | null>(null);
+   const [q, setQ] = useState('');
++  const [expandedId, setExpandedId] = useState<string | null>(null);
+   const [editingId, setEditingId] = useState<string | null>(null);
+ 
+   useEffect(() => {
+@@ -50,19 +74,19 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+         setSelectedIds(new Set([initialEntry]));
+         setEntriesData({ [initialEntry]: emptyData() });
+         const stages = candlings.filter(c => c.eggEntryId === initialEntry).map(c => c.stage);
+-        const nextStage = stages.includes(1) ? (stages.includes(2) ? 3 : 2) : 1;
+-        setModalStage(String(nextStage));
++        const nextDay = stages.length > 0 ? Math.max(...stages) + 3 : 7;
++        setModalDay(String(nextDay));
++        setModalDate(todayJalali());
+         setOpen(true);
+       }
+     }
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [initialEntry]);
+ 
+-  const nextStageFor = (eggEntryId: string): number => {
++  const nextDayFor = (eggEntryId: string): number => {
+     const stages = candlings.filter(c => c.eggEntryId === eggEntryId).map(c => c.stage);
+-    if (stages.includes(1) && stages.includes(2)) return 3;
+-    if (stages.includes(1)) return 2;
+-    return 1;
++    if (stages.length === 0) return 7;
++    return Math.max(...stages) + 3;
+   };
+ 
+   const openNew = (preEntryId?: string) => {
+@@ -75,14 +99,13 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+     const data: Record<string, EntryData> = {};
+     if (preEntryId) data[preEntryId] = emptyData();
+     setEntriesData(data);
+-    setModalStage(preEntryId ? String(nextStageFor(preEntryId)) : '1');
+-    setModalDate('');
++    setModalDay(preEntryId ? String(nextDayFor(preEntryId)) : '7');
++    setModalDate(todayJalali());
+     setEditingId(null);
+     setErr('');
+     setOpen(true);
+   };
+ 
+-  // ═══ ورودی‌های قابل انتخاب ═══
+   const availableEntries = useMemo(() => {
+     return eggEntries
+       .filter(e => !modalDevice || e.deviceId === modalDevice)
+@@ -110,20 +133,20 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+ 
+   const save = () => {
+     if (!modalDate.trim()) { setErr('تاریخ اجباری است'); return; }
++    if (!modalDay.trim()) { setErr('روز انکوباسیون اجباری است'); return; }
++    const dayNum = parseInt(toEn(modalDay)) || 0;
++    if (dayNum <= 0 || dayNum > 30) { setErr('روز باید بین ۱ تا ۳۰ باشد'); return; }
+     if (selectedIds.size === 0) { setErr('حداقل یک ورودی انتخاب کنید'); return; }
+ 
+     let saved = 0;
+     let hasError = false;
+-    const ids = Array.from(selectedIds);
+ 
+-    // اگه تو حالت ویرایش هستیم
+     if (editingId) {
+       const d = entriesData[editingId] || emptyData();
+       const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
+       if (sum === 0) { setErr('حداقل یک مقدار وارد کنید'); return; }
+       updateCandling(editingId, {
+-        stage: parseInt(modalStage) as 1|2|3,
+-        date: modalDate,
++        stage: dayNum, date: modalDate,
+         alive: parseInt(toEn(d.alive)) || null,
+         infertile: parseInt(toEn(d.infertile)) || null,
+         dead: parseInt(toEn(d.dead)) || null,
+@@ -136,17 +159,16 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+       return;
+     }
+ 
+-    ids.forEach(id => {
++    Array.from(selectedIds).forEach(id => {
+       const entry = eggEntries.find(e => e.id === id);
+       if (!entry) return;
+       const d = entriesData[id] || emptyData();
+       const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
+       if (sum === 0) { hasError = true; return; }
+-      if (entry.count && sum > entry.count) { hasError = true; return; }
++      const baseInfo = calcAvailableBase(id, dayNum, null, candlings, entry.count || 0);
++      if (baseInfo.base && sum > baseInfo.base) { hasError = true; return; }
+       addCandling({
+-        eggEntryId: id,
+-        stage: parseInt(modalStage) as 1|2|3,
+-        date: modalDate,
++        eggEntryId: id, stage: dayNum, date: modalDate,
+         alive: parseInt(toEn(d.alive)) || null,
+         infertile: parseInt(toEn(d.infertile)) || null,
+         dead: parseInt(toEn(d.dead)) || null,
+@@ -158,12 +180,9 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+       saved++;
+     });
+ 
+-    if (hasError && saved === 0) { setErr('هیچ کندلینگی ذخیره نشد — مقادیر را چک کنید'); return; }
++    if (hasError && saved === 0) { setErr('هیچ کندلینگی ذخیره نشد'); return; }
+     setOpen(false);
+     showAlert(toFa(saved) + ' کندلینگ ثبت شد', '✅ موفق');
+-    if (onGoTo && parseInt(modalStage) === 3) {
+-      setTimeout(() => { if (confirm('به هچ برو؟')) onGoTo('hatches'); }, 300);
+-    }
+   };
+ 
+   const openEdit = (c: Candling) => {
+@@ -181,7 +200,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+         notes: c.notes,
+       }
+     });
+-    setModalStage(String(c.stage));
++    setModalDay(String(c.stage));
+     setModalDate(c.date);
+     setErr('');
+     setOpen(true);
+@@ -189,14 +208,28 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+ 
+   const target = delId ? candlings.find(c => c.id === delId) : null;
+ 
+-  // ═══ گروه‌بندی ═══
++  // ═══ گروه‌بندی + تجمیع + درصد ═══
+   const grouped = useMemo(() => {
+     const byEntry: Record<string, Candling[]> = {};
+     candlings.forEach(c => {
+       if (!byEntry[c.eggEntryId]) byEntry[c.eggEntryId] = [];
+       byEntry[c.eggEntryId].push(c);
+     });
+-    return Object.entries(byEntry).filter(([entryId]) => {
++    return Object.entries(byEntry).map(([entryId, list]) => {
++      const agg = list.reduce((acc, c) => ({
++        alive: acc.alive + (c.alive || 0),
++        infertile: acc.infertile + (c.infertile || 0),
++        dead: acc.dead + (c.dead || 0),
++        broken: acc.broken + (c.broken || 0),
++      }), { alive: 0, infertile: 0, dead: 0, broken: 0 });
++      const total = agg.alive + agg.infertile + agg.dead + agg.broken;
++      const entry = eggEntries.find(e => e.id === entryId);
++      const entryTotal = entry?.count || 0;
++      const fertilePercent = total > 0 ? (agg.alive / total * 100) : 0;
++      const lossPercent = entryTotal > 0 ? ((total - agg.alive) / entryTotal * 100) : 0;
++      const deadPercent = total > 0 ? ((agg.dead + agg.infertile) / total * 100) : 0;
++      return { entryId, list: list.sort((a, b) => a.stage - b.stage), agg, total, entryTotal, fertilePercent, lossPercent, deadPercent };
++    }).filter(({ entryId }) => {
+       if (!q.trim()) return true;
+       const t = q.trim().toLowerCase();
+       const entry = eggEntries.find(e => e.id === entryId);
+@@ -204,17 +237,58 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+       const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
+       const haystack = [bird?.name, dev?.name, entry?.entryDate].filter(Boolean).join(' ').toLowerCase();
+       return haystack.includes(t);
+-    }).sort(([a], [b]) => {
++    }).sort(({ entryId: a }, { entryId: b }) => {
+       const ea = eggEntries.find(e => e.id === a);
+       const eb = eggEntries.find(e => e.id === b);
+       return String(eb?.entryDate || '').localeCompare(String(ea?.entryDate || ''));
+     });
+   }, [candlings, eggEntries, birds, devices, q]);
+ 
++  // ═══ خلاصه کل ═══
++  const summary = useMemo(() => {
++    const totalEntries = eggEntries.filter(e => e.status !== 'failed').length;
++    const totalCandlings = candlings.length;
++    const totalAlive = candlings.reduce((a, c) => a + (c.alive || 0), 0);
++    const totalInfertile = candlings.reduce((a, c) => a + (c.infertile || 0), 0);
++    const totalDead = candlings.reduce((a, c) => a + (c.dead || 0), 0);
++    const totalBroken = candlings.reduce((a, c) => a + (c.broken || 0), 0);
++    const grandTotal = totalAlive + totalInfertile + totalDead + totalBroken;
++    const fertilePercent = grandTotal > 0 ? (totalAlive / grandTotal * 100) : 0;
++    const lossPercent = grandTotal > 0 ? ((totalInfertile + totalDead + totalBroken) / grandTotal * 100) : 0;
++    return { totalEntries, totalCandlings, totalAlive, totalInfertile, totalDead, totalBroken, fertilePercent, lossPercent };
++  }, [eggEntries, candlings]);
++
+   const dataFor = (id: string): EntryData => entriesData[id] || emptyData();
+ 
+   return (
+     <PageContainer>
++      {/* ═══ خلاصه کل ═══ */}
++      {summary.totalCandlings > 0 && (
++        <div style={{
++          padding: '12px 14px',
++          background: 'var(--card)',
++          border: '1px solid var(--border)',
++          borderRadius: 'var(--r-lg)',
++          display: 'grid',
++          gridTemplateColumns: '1fr 1fr',
++          gap: 8,
++        }}>
++          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
++            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>🧬 نطفه‌داری کل</span>
++            <span style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(summary.fertilePercent.toFixed(1))}٪</span>
++          </div>
++          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
++            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>📉 تلفات کل</span>
++            <span style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--danger)' }}>{toFa(summary.lossPercent.toFixed(1))}٪</span>
++          </div>
++          <div style={{ display: 'flex', justifyContent: 'space-between', gridColumn: '1 / -1', paddingTop: 6, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
++            <span>📥 {toFa(summary.totalEntries)} ورودی</span>
++            <span>🔍 {toFa(summary.totalCandlings)} کندلینگ</span>
++            <span>✅ {toFa(summary.totalAlive)} سالم</span>
++          </div>
++        </div>
++      )}
++
+       {candlings.length > 0 && (
+         <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (نام پرنده، دستگاه، تاریخ...)" />
+       )}
+@@ -222,80 +296,142 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+       {candlings.length === 0 ? (
+         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>}
+           title="کندلینگی ثبت نشده"
+-          desc="کندلینگ در روزهای ۷، ۱۲ و ۱۸ انجام می‌شود."
++          desc="کندلینگ در روزهای دلخواه انجام می‌شود."
+           action={<Btn variant="primary" onClick={() => openNew()}>+ ثبت کندلینگ</Btn>} />
+       ) : (
+         <>
+-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+-            {grouped.map(([entryId, list]) => {
+-              const entry = eggEntries.find(e => e.id === entryId);
+-              const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
+-              const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
+-              const entryTotal = entry?.count || 0;
+-              const latestCandling = list.slice().sort((a, b) => b.stage - a.stage)[0];
+-              const fertilePercent = entryTotal > 0 && latestCandling?.alive ? (latestCandling.alive / entryTotal) * 100 : 0;
+-
+-              return (
+-                <div key={entryId} style={{
+-                  background: 'var(--card)',
+-                  border: '1px solid var(--border)',
+-                  borderRadius: 'var(--r-lg)',
+-                  padding: '10px 12px',
+-                  display: 'flex',
+-                  flexDirection: 'column',
+-                  gap: 6,
+-                  position: 'relative',
+-                  overflow: 'hidden',
+-                }}>
+-                  <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: 'var(--accent)' }} />
++          {grouped.map(({ entryId, list, agg, total, entryTotal, fertilePercent, lossPercent, deadPercent }, i) => {
++            const entry = eggEntries.find(e => e.id === entryId);
++            const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
++            const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
++            const isOpen = expandedId === entryId;
++            const lossTone = lossPercent > 20 ? 'danger' : lossPercent > 10 ? 'warn' : 'green';
++
++            return (
++              <ExpandableCard key={entryId} accent="accent" index={toFa(i + 1)} iconEmoji="🔍"
++                title={bird?.name || '—'}
++                subtitle={(dev?.name || '—') + ' · ' + toFa(entryTotal) + ' تخم · ' + toFa(entry?.entryDate || '—')}
++                isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : entryId)}
++                badge={<Tag tone={lossTone}>تلفات {toFa(lossPercent.toFixed(0))}٪</Tag>}
++                stats={<>
++                  <StatBox icon="🧬" label="نطفه" value={toFa(Math.round(fertilePercent)) + '٪'} tone="accent" />
++                  <Dot />
++                  <StatBox icon="📊" label="کندلینگ" value={toFa(list.length)} />
++                </>}
++              >
++                {/* ═══ دکمه‌های روز ═══ */}
++                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📅 کندلینگ‌های این ورودی</div>
++                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
++                  {list.map((c, idx) => (
++                    <div key={c.id} style={{ position: 'relative' }}>
++                      <button
++                        type="button"
++                        onClick={() => openEdit(c)}
++                        title={toFa(c.date)}
++                        style={{
++                          padding: '6px 24px 6px 10px',
++                          background: 'var(--accent-soft)',
++                          border: '1px solid var(--accent-border)',
++                          borderRadius: 'var(--r-sm)',
++                          fontSize: 'var(--fs-xs)',
++                          fontWeight: 700,
++                          color: 'var(--accent)',
++                          cursor: 'pointer',
++                          fontFamily: 'inherit',
++                        }}
++                      >
++                        ✓ روز {toFa(c.stage)}
++                      </button>
++                      <button
++                        type="button"
++                        onClick={() => {
++                          const subsequent = list.filter(x => x.stage > c.stage);
++                          const msg = subsequent.length > 0
++                            ? 'این کندلینگ و ' + toFa(subsequent.length) + ' کندلینگ بعدی حذف می‌شوند.\n\nادامه؟'
++                            : 'این کندلینگ حذف شود؟';
++                          if (confirm(msg)) {
++                            deleteCandling(c.id);
++                            subsequent.forEach(s => deleteCandling(s.id));
++                          }
++                        }}
++                        title="بازگردانی و حذف بعدی‌ها"
++                        style={{
++                          position: 'absolute',
++                          top: 2,
++                          left: 2,
++                          background: 'transparent',
++                          border: 'none',
++                          color: 'var(--danger)',
++                          cursor: 'pointer',
++                          fontSize: 10,
++                          padding: 2,
++                          fontWeight: 700,
++                        }}
++                      >✕</button>
++                    </div>
++                  ))}
++                  <button
++                    type="button"
++                    onClick={() => openNew(entryId)}
++                    style={{
++                      padding: '6px 10px',
++                      background: 'var(--input-bg)',
++                      border: '1px dashed var(--border)',
++                      borderRadius: 'var(--r-sm)',
++                      fontSize: 'var(--fs-xs)',
++                      fontWeight: 700,
++                      color: 'var(--muted)',
++                      cursor: 'pointer',
++                      fontFamily: 'inherit',
++                    }}
++                  >
++                    + کندلینگ جدید
++                  </button>
++                </div>
+ 
+-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
+-                      🔍 {bird?.name || '—'}
+-                    </span>
+-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+-                      {dev?.name || '—'} · {toFa(entryTotal)} تخم
+-                    </span>
++                {/* ═══ تجمیع با درصد ═══ */}
++                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 تجمیع ({toFa(list.length)} کندلینگ)</div>
++                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
++                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
++                    <span style={{ color: 'var(--muted)' }}>🧬 نطفه‌داری</span>
++                    <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(fertilePercent.toFixed(1))}٪</span>
+                   </div>
+-
+-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
+-                    <span style={{ color: 'var(--muted)' }}>{toFa(entry?.entryDate || '—')}</span>
+-                    {fertilePercent > 0 && (
+-                      <Tag tone="green">{toFa(fertilePercent.toFixed(0))}٪ نطفه</Tag>
+-                    )}
++                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
++                    <span style={{ color: 'var(--muted)' }}>📉 تلفات کل</span>
++                    <span style={{ fontWeight: 700, color: lossPercent > 10 ? 'var(--danger)' : 'var(--text)' }}>{toFa(lossPercent.toFixed(1))}٪</span>
+                   </div>
+-
+-                  {/* مراحل */}
+-                  <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
+-                    {[1, 2, 3].map(st => {
+-                      const has = list.find(c => c.stage === st);
+-                      return (
+-                        <button
+-                          key={st}
+-                          type="button"
+-                          onClick={() => has ? openEdit(has) : openNew(entryId)}
+-                          style={{
+-                            flex: 1,
+-                            padding: '6px 4px',
+-                            background: has ? 'var(--accent-soft)' : 'var(--input-bg)',
+-                            border: '1px solid ' + (has ? 'var(--accent-border)' : 'var(--border)'),
+-                            borderRadius: 'var(--r-sm)',
+-                            fontSize: 'var(--fs-xs)',
+-                            fontWeight: 700,
+-                            color: has ? 'var(--accent)' : 'var(--muted)',
+-                            cursor: 'pointer',
+-                            fontFamily: 'inherit',
+-                          }}
+-                        >
+-                          {has ? '✓ ' : '+ '}مرحله {toFa(st)}
+-                        </button>
+-                      );
+-                    })}
++                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
++                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
++                      <span style={{ color: 'var(--muted)' }}>✅ سالم</span>
++                      <span style={{ fontWeight: 700 }}>{toFa(agg.alive)}</span>
++                    </div>
++                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
++                      <span style={{ color: 'var(--muted)' }}>⚪ بی‌نطفه</span>
++                      <span style={{ fontWeight: 700 }}>{toFa(agg.infertile)}</span>
++                    </div>
++                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
++                      <span style={{ color: 'var(--muted)' }}>💀 مرده</span>
++                      <span style={{ fontWeight: 700 }}>{toFa(agg.dead)}</span>
++                    </div>
++                    <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
++                      <span style={{ color: 'var(--muted)' }}>🥚 شکسته</span>
++                      <span style={{ fontWeight: 700 }}>{toFa(agg.broken)}</span>
++                    </div>
+                   </div>
+                 </div>
+-              );
+-            })}
+-          </div>
++
++                {/* ═══ نوار پیشرفت بصری ═══ */}
++                {total > 0 && (
++                  <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: 'var(--input-bg)' }}>
++                    <div style={{ width: (agg.alive / total * 100) + '%', background: 'var(--accent)' }} />
++                    <div style={{ width: (agg.infertile / total * 100) + '%', background: 'var(--warn)' }} />
++                    <div style={{ width: (agg.dead / total * 100) + '%', background: 'var(--danger)' }} />
++                    <div style={{ width: (agg.broken / total * 100) + '%', background: 'var(--muted)' }} />
++                  </div>
++                )}
++              </ExpandableCard>
++            );
++          })}
+           <Btn variant="primary" full onClick={() => openNew()}>+ ثبت کندلینگ</Btn>
+         </>
+       )}
+@@ -305,16 +441,12 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+ 
+         <SectionTitle>📅 زمان‌بندی</SectionTitle>
+         <Grid2>
++          <Field label="روز انکوباسیون" required hint="۷، ۱۰، ۱۵...">
++            <NumField value={modalDay} onChange={e => setModalDay(e.target.value)} unit="روز" min={1} max={30} autoClamp />
++          </Field>
+           <Field label="تاریخ" required>
+             <DatePicker value={modalDate} onChange={v => setModalDate(v)} placeholder="انتخاب" />
+           </Field>
+-          <Field label="مرحله" required>
+-            <Select value={modalStage} onChange={e => setModalStage(e.target.value)}>
+-              <option value="1">مرحله ۱ (روز ۷)</option>
+-              <option value="2">مرحله ۲ (روز ۱۲)</option>
+-              <option value="3">مرحله ۳ (روز ۱۸)</option>
+-            </Select>
+-          </Field>
+         </Grid2>
+ 
+         <SectionTitle>📦 انتخاب ورودی‌ها</SectionTitle>
+@@ -336,7 +468,16 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+               const isSelected = selectedIds.has(e.id);
+               const d = dataFor(e.id);
+               const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
+-              const remaining = (e.count || 0) - sum;
++              const dayNum = parseInt(toEn(modalDay)) || 0;
++              const baseInfo = calcAvailableBase(e.id, editingId ? (candlings.find(c => c.id === editingId)?.stage || dayNum) : dayNum, editingId, candlings, e.count || 0);
++              const remaining = baseInfo.base - sum;
++              const existingCandlings = candlings.filter(c => c.eggEntryId === e.id);
++              const alreadyAgg = existingCandlings.reduce((acc, c) => ({
++                alive: acc.alive + (c.alive || 0),
++                infertile: acc.infertile + (c.infertile || 0),
++                dead: acc.dead + (c.dead || 0),
++                broken: acc.broken + (c.broken || 0),
++              }), { alive: 0, infertile: 0, dead: 0, broken: 0 });
+ 
+               return (
+                 <div key={e.id} style={{
+@@ -348,21 +489,36 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+                   flexDirection: 'column',
+                   gap: 8,
+                 }}>
+-                  {/* Header ورودی */}
+                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+-                    <input
+-                      type="checkbox"
+-                      checked={isSelected}
+-                      onChange={() => toggleEntry(e.id)}
+-                      style={{ width: 18, height: 18, accentColor: 'var(--accent)' }}
+-                    />
++                    <input type="checkbox" checked={isSelected} onChange={() => toggleEntry(e.id)} style={{ width: 18, height: 18, accentColor: 'var(--accent)' }} />
+                     <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
+                       {bird?.name || '—'} · {toFa(e.count || 0)} تخم
+                     </span>
+                     <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(e.entryDate)}</span>
+                   </label>
+ 
+-                  {/* فیلدهای مقادیر (اگه انتخاب شده) */}
++                  {existingCandlings.length > 0 && (
++                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '4px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
++                      تجمیع قبلی: سالم {toFa(alreadyAgg.alive)} · بی‌نطفه {toFa(alreadyAgg.infertile)} · مرده {toFa(alreadyAgg.dead)}
++                    </div>
++                  )}
++
++                  {/* مبنا */}
++                  <div style={{
++                    fontSize: 'var(--fs-xs)',
++                    padding: '6px 10px',
++                    background: 'var(--info-soft)',
++                    border: '1px solid var(--info)',
++                    borderRadius: 'var(--r-sm)',
++                    color: 'var(--info)',
++                    fontWeight: 700,
++                    display: 'flex',
++                    justifyContent: 'space-between',
++                  }}>
++                    <span>🎯 مبنای این کندلینگ:</span>
++                    <span>{toFa(baseInfo.base)} تخم ({baseInfo.source})</span>
++                  </div>
++
+                   {isSelected && (
+                     <>
+                       <Grid2>
+@@ -374,7 +530,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+                         <Field label="شکسته"><NumField placeholder="۰" value={d.broken} onChange={ev => updateEntryData(e.id, { broken: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
+                       </Grid2>
+ 
+-                      {/* نوار جمع */}
+                       <div style={{
+                         padding: '6px 10px',
+                         background: remaining < 0 ? 'var(--danger-soft)' : remaining === 0 ? 'var(--accent-soft)' : 'var(--input-bg)',
+@@ -385,10 +540,10 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+                         fontWeight: 700,
+                         textAlign: 'center',
+                       }}>
+-                        جمع: {toFa(sum)} از {toFa(e.count || 0)}
++                        این کندلینگ: {toFa(sum)} از {toFa(baseInfo.base)}
+                         {remaining > 0 && ' · باقی: ' + toFa(remaining)}
+-                        {remaining < 0 && ' — بیشتر!'}
+-                        {remaining === 0 && ' ✅'}
++                        {remaining < 0 && ' — بیشتر از مبنای مرحله قبل!'}
++                        {remaining === 0 && ' ✅ کامل'}
+                       </div>
+ 
+                       <Grid2>
+@@ -416,7 +571,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
+ 
+       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف کندلینگ"
+         footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteCandling(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف مرحله {toFa(target?.stage || 0)}؟</div>
++        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف کندلینگ روز {toFa(target?.stage || 0)}؟</div>
+       </Modal>
+     </PageContainer>
+   );
+diff --git a/src/mod/inc/DevicesPage.tsx b/src/mod/inc/DevicesPage.tsx
+index 5fa74e1..8083a51 100644
+--- a/src/mod/inc/DevicesPage.tsx
++++ b/src/mod/inc/DevicesPage.tsx
+@@ -3,7 +3,7 @@ import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCap
+ import { useSet } from '../set/store';
+ import { useBrd } from '../brd/store';
+ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag } from '../../shr/components/ui';
+-import ExpandableCard from '../../shr/components/ExpandableCard';
++import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
+ import DatePicker from '../../shr/components/DatePicker';
+ import { toFa, toEn } from '../../shr/utils/fa';
+ import { showAlert } from '../../cor/store/dialog';
+@@ -221,16 +221,20 @@ export default function DevicesPage() {
+             const isOpen = expandedId === d.id;
+             const caps = d.capacityByBird || [];
+             const logs: any[] = (d as any).maintenanceLogs || [];
++            const totalCap = caps.reduce((a, c) => a + (c.capacity || 0), 0);
++            const usagePercent = totalCap > 0 ? Math.round((totalEggs / totalCap) * 100) : 0;
+             const w = warrantyInfo(d.purchasedAt, d.warranty);
+             return (
+               <ExpandableCard key={d.id} accent={accentFor(d.status)} index={toFa(i + 1)} iconEmoji="🥚"
+                 title={d.name} subtitle={MODE_FA[d.mode] + ' · ' + STATUS_FA[d.status]}
+                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : d.id)}
+                 badge={activeEntries > 0 ? <Tag tone="green">{toFa(activeEntries)} ورودی فعال</Tag> : undefined}
+-                summary={<>
+-                  {totalEggs > 0 && <span>تخم: <b>{toFa(totalEggs)}</b></span>}
+-                  {d.temp && <span>🌡 {toFa(d.temp)}°</span>}
+-                  {d.humidity && <span>💧 {toFa(d.humidity)}٪</span>}
++                stats={<>
++                  <StatBox icon="📊" label="استفاده" value={toFa(totalEggs) + '/' + toFa(totalCap)} tone={usagePercent > 90 ? 'warn' : 'accent'} />
++                  <Dot />
++                  <StatBox icon="🔄" label="ورودی" value={toFa(activeEntries)} />
++                  <Dot />
++                  <StatBox icon="🛠" label="تعمیر" value={toFa(logs.length)} />
+                 </>}
+               >
+                 {caps.length > 0 && (
+diff --git a/src/mod/inc/EggEntriesPage.tsx b/src/mod/inc/EggEntriesPage.tsx
+index 7d5e9ac..eb53feb 100644
+--- a/src/mod/inc/EggEntriesPage.tsx
++++ b/src/mod/inc/EggEntriesPage.tsx
+@@ -11,7 +11,7 @@ import { useCtc } from '../ctc/store';
+ import { useTra } from '../tra/store';
+ import { useEgg } from '../egg/store';
+ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
+-import ExpandableCard from '../../shr/components/ExpandableCard';
++import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
+ import DatePicker from '../../shr/components/DatePicker';
+ import { toFa, toEn } from '../../shr/utils/fa';
+ import { clampPercent, complement } from '../../shr/utils/smart';
+@@ -591,8 +591,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
+             const age = daysAgo(e.entryDate);
+             const expHatch = addDaysJalali(e.entryDate, incubationDays(bird?.name || 'مرغ'));
+             const remain = daysToHatch(expHatch);
+-            const locked = isLockdown(e);
+-            const hatchWindow = isHatchWindow(e);
++            const locked = isLockdown({ ...e, expectedHatchDate: expHatch });
++            const hatchWindow = isHatchWindow({ ...e, expectedHatchDate: expHatch });
+             const myHatch = hatches.find(h => h.eggEntryId === e.id);
+             const isOpen = expandedId === e.id;
+ 
+@@ -621,10 +621,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
+                 subtitle={dev?.name || '—'}
+                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : e.id)}
+                 badge={<Tag tone={statusTone}>{statusLabel}</Tag>}
+-                summary={<>
+-                  <span>ورود: <b style={{ color: 'var(--text)' }}>{toFa(e.entryDate)}{(e as any).entryTime ? ' · ' + toFa((e as any).entryTime) : ''}</b></span>
+-                  {expHatch && <span>هچ: <b style={{ color: 'var(--text)' }}>{toFa(expHatch)}</b></span>}
+-                  <span>{DEAL_LABEL[e.dealType]}</span>
++                stats={<>
++                  <StatBox icon="⏳" label="مانده" value={toFa(remain) + ' روز'} tone={remain <= 3 ? 'warn' : 'default'} />
++                  <Dot />
++                  <StatBox icon="📊" label="پیشرفت" value={toFa(Math.min(100, Math.round(age / Math.max(1, incubationDays(bird?.name || 'مرغ')) * 100))) + '٪'} tone="accent" />
+                 </>}
+               >
+                 {(() => {
+diff --git a/src/mod/inc/HatchesPage.tsx b/src/mod/inc/HatchesPage.tsx
+index 5c34cdf..55dd5e8 100644
+--- a/src/mod/inc/HatchesPage.tsx
++++ b/src/mod/inc/HatchesPage.tsx
+@@ -1,224 +1,743 @@
+-import { useState, useEffect } from 'react';
++import { useState, useEffect, useMemo } from 'react';
+ import { useInc, hatchRate, costPerChick, type HatchResult } from './store';
+ import { useBrd } from '../brd/store';
+ import { useFlk } from '../flk/store';
++import { useHal } from '../hal/store';
++import { useCtc } from '../ctc/store';
++import { useTra } from '../tra/store';
+ import { useNavigate } from 'react-router-dom';
+-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
+-import ExpandableCard from '../../shr/components/ExpandableCard';
++import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
++import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
+ import DatePicker from '../../shr/components/DatePicker';
+ import { toFa, toEn } from '../../shr/utils/fa';
+ import { showAlert } from '../../cor/store/dialog';
+ 
++const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
++
+ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any) => void } = {}) {
+-  const { eggEntries, hatches, candlings, addHatch, updateHatch, deleteHatch } = useInc();
++  const { devices, eggEntries, hatches, candlings, addHatch, updateHatch, deleteHatch } = useInc();
+   const { birds } = useBrd();
++  const { add: addFlock, remove: removeFlock } = useFlk();
++  const { halls, zones } = useHal();
++  const { contacts } = useCtc();
++  const { addInvoice, deleteInvoice } = useTra();
+   const nav = useNavigate();
+-  const { add: addFlock } = useFlk();
++
+   const [open, setOpen] = useState(false);
+-  const [form, setForm] = useState({ id:'', eggEntryId:'', date:'', hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', notes:'' });
++  const [editingId, setEditingId] = useState<string | null>(null);
++  const [formDate, setFormDate] = useState('');
++  const [formEntryId, setFormEntryId] = useState('');
++  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
++  const [entriesData, setEntriesData] = useState<Record<string, any>>({});
+   const [err, setErr] = useState('');
+   const [delId, setDelId] = useState<string | null>(null);
+   const [expandedId, setExpandedId] = useState<string | null>(null);
++  const [q, setQ] = useState('');
++  const [deviceFilter, setDeviceFilter] = useState('');
++
++  const [flockModal, setFlockModal] = useState<{ hatchId: string; count: number } | null>(null);
++  const [flockForm, setFlockForm] = useState({ name:'', type:'layer', hallId:'', zoneId:'' });
++  const [sellModal, setSellModal] = useState<{ hatchId: string; count: number } | null>(null);
++  const [sellForm, setSellForm] = useState({ buyerId:'', count:'', unitPrice:'', date:'' });
++
++  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
++  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
++  const todayJ = () => { const d = new Date(); return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0'); };
++
++  const dataFor = (id: string) => entriesData[id] || emptyRow();
++  const updateData = (id: string, patch: any) => setEntriesData(d => ({ ...d, [id]: { ...(d[id] || emptyRow()), ...patch } }));
+ 
+-  useEffect(() => {
+-    if (initialEntry) {
+-      const exists = eggEntries.find(e => e.id === initialEntry);
+-      if (exists) { setForm(f => ({ ...f, eggEntryId: initialEntry })); setOpen(true); }
++  const toggleEntry = (id: string) => {
++    const isSelected = selectedIds.has(id);
++    const newSet = new Set(selectedIds);
++    if (isSelected) {
++      newSet.delete(id);
++      const newData = { ...entriesData };
++      delete newData[id];
++      setEntriesData(newData);
++      setSelectedIds(newSet);
++    } else {
++      newSet.add(id);
++      const entry = eggEntries.find(e => e.id === id);
++      const calc = calcCurrentFertile(id, entry?.count || 0, candlings);
++      setEntriesData({ ...entriesData, [id]: { ...emptyRow(), hatched: calc.fertile > 0 ? String(calc.fertile) : '' } });
++      setSelectedIds(newSet);
+     }
+-    // eslint-disable-next-line react-hooks/exhaustive-deps
+-  }, [initialEntry]);
++  };
+ 
+-  const openNew = () => {
++  const openNew = (preId?: string) => {
+     if (eggEntries.length === 0) { showAlert('اول یک ورودی تخم بسازید'); return; }
+-    setForm({ id:'', eggEntryId: eggEntries[0].id, date:'', hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', notes:'' });
++    setEditingId(null);
++    setFormDate(todayJ());
++    setFormEntryId(preId || eggEntries[0].id);
++    const data: Record<string, any> = {};
++    if (preId) data[preId] = emptyRow();
++    setEntriesData(data);
++    setSelectedIds(preId ? new Set([preId]) : new Set());
+     setErr(''); setOpen(true);
+   };
++
+   const openEdit = (h: HatchResult) => {
+-    setForm({
+-      id: h.id, eggEntryId: h.eggEntryId, date: h.date,
+-      hatched: h.hatched ? toFa(h.hatched) : '',
+-      unhatched: h.unhatched ? toFa(h.unhatched) : '',
+-      deadInShell: h.deadInShell ? toFa(h.deadInShell) : '',
+-      pipped: h.pipped ? toFa(h.pipped) : '',
+-      other: h.other ? toFa(h.other) : '',
+-      notes: h.notes
+-    });
++    setEditingId(h.id);
++    setFormDate(h.date);
++    setFormEntryId(h.eggEntryId);
++    setSelectedIds(new Set([h.eggEntryId]));
++    setEntriesData({ [h.eggEntryId]: {
++      hatched: h.hatched ? toFa(h.hatched) : '', unhatched: h.unhatched ? toFa(h.unhatched) : '',
++      deadInShell: h.deadInShell ? toFa(h.deadInShell) : '', pipped: h.pipped ? toFa(h.pipped) : '',
++      other: h.other ? toFa(h.other) : '', gradeA: h.gradeA ? toFa(h.gradeA) : '', gradeB: h.gradeB ? toFa(h.gradeB) : '',
++      maleCount: h.maleCount ? toFa(h.maleCount) : '', femaleCount: h.femaleCount ? toFa(h.femaleCount) : '',
++      unknownCount: h.unknownCount ? toFa(h.unknownCount) : '', avgWeight: h.avgWeight ? toFa(h.avgWeight) : '', notes: h.notes
++    }});
+     setErr(''); setOpen(true);
+   };
+-  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
+-  const selectedEntry = eggEntries.find(e => e.id === form.eggEntryId);
+-  const totalEggs = selectedEntry?.count || 0;
+-  const lastCandling = candlings.filter(c => c.eggEntryId === form.eggEntryId).sort((a,b) => b.stage - a.stage)[0];
+-  const maxHatched = lastCandling?.alive || totalEggs;
++
+   const save = () => {
+-    if (!form.date.trim()) { setErr('تاریخ اجباری است'); return; }
+-    if (maxHatched && (parseInt(toEn(form.hatched))||0) > maxHatched) { setErr(`تعداد جوجه هچ‌شده از تعداد تخم سالم (${toFa(maxHatched)}) بیشتر است`); return; }
+-    const data = {
+-      eggEntryId: form.eggEntryId, date: form.date,
+-      hatched: int(form.hatched), unhatched: int(form.unhatched),
+-      deadInShell: int(form.deadInShell), pipped: int(form.pipped),
+-      other: int(form.other), notes: form.notes
+-    };
+-    if (form.id) updateHatch(form.id, data); else addHatch(data);
++    if (!formDate.trim()) { setErr('تاریخ اجباری است'); return; }
++    if (editingId) {
++      const d = dataFor(formEntryId);
++      const hatchedNum = int(d.hatched) || 0;
++      const hasHatched = hatchedNum > 0;
++      updateHatch(editingId, {
++        date: formDate,
++        hatched: int(d.hatched), unhatched: int(d.unhatched),
++        deadInShell: int(d.deadInShell), pipped: int(d.pipped), other: int(d.other),
++        gradeA: hasHatched ? int(d.gradeA) : null,
++        gradeB: hasHatched ? int(d.gradeB) : null,
++        maleCount: hasHatched ? int(d.maleCount) : null,
++        femaleCount: hasHatched ? int(d.femaleCount) : null,
++        unknownCount: hasHatched ? int(d.unknownCount) : null,
++        avgWeight: hasHatched ? num(d.avgWeight) : null,
++        notes: d.notes || ''
++      } as any);
++      setOpen(false); return;
++    }
++    if (selectedIds.size === 0) { setErr('حداقل یک ورودی انتخاب کنید'); return; }
++    let saved = 0;
++    Array.from(selectedIds).forEach(id => {
++      const d = dataFor(id);
++      const hatchedNum = int(d.hatched) || 0;
++      const hasHatched = hatchedNum > 0;
++      addHatch({
++        eggEntryId: id, date: formDate,
++        hatched: int(d.hatched), unhatched: int(d.unhatched),
++        deadInShell: int(d.deadInShell), pipped: int(d.pipped), other: int(d.other),
++        gradeA: hasHatched ? int(d.gradeA) : null,
++        gradeB: hasHatched ? int(d.gradeB) : null,
++        maleCount: hasHatched ? int(d.maleCount) : null,
++        femaleCount: hasHatched ? int(d.femaleCount) : null,
++        unknownCount: hasHatched ? int(d.unknownCount) : null,
++        avgWeight: hasHatched ? num(d.avgWeight) : null,
++        notes: d.notes || ''
++      } as any);
++      saved++;
++    });
+     setOpen(false);
++    showAlert(toFa(saved) + ' نتیجه هچ ثبت شد', '✅ موفق');
++  };
++
++  const doDelete = (id: string) => {
++    const h = hatches.find(x => x.id === id) as any;
++    if (!h) return;
++    if (h.generatedFlockId && confirm('این هچ یک گله ساخته. گله هم حذف شود؟')) { try { removeFlock(h.generatedFlockId); } catch {} }
++    if (h.generatedInvoiceId && confirm('این هچ یک فاکتور ساخته. فاکتور هم حذف شود؟')) { try { deleteInvoice(h.generatedInvoiceId); } catch {} }
++    deleteHatch(id); setDelId(null);
++  };
++
++  const createFlock = () => {
++    if (!flockModal) return;
++    if (!flockForm.name.trim()) { showAlert('نام گله اجباری است'); return; }
++    const h = hatches.find(x => x.id === flockModal.hatchId); if (!h) return;
++    const entry = eggEntries.find(e => e.id === h.eggEntryId);
++    const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
++    if (!bird) { showAlert('پرنده پیدا نشد'); return; }
++    addFlock({
++      name: flockForm.name.trim(), type: flockForm.type as any,
++      birdId: bird.id, breedId: entry?.breedId || '',
++      hallId: flockForm.hallId, zoneId: flockForm.zoneId,
++      initialCount: flockModal.count, currentCount: flockModal.count,
++      maleCount: h.maleCount || null, femaleCount: h.femaleCount || null,
++      layingStartDay: 140, vaccineScheduleId: '',
++      hatchDate: todayJ(), purchaseDate: '', startDate: todayJ(), endDate: '', source: 'hatch',
++      purchasePrice: null, deliveryCost: null, otherCosts: null,
++      status: 'active', notes: 'از هچ ' + toFa(h.date),
++    } as any);
++    setFlockModal(null);
++    showAlert('گله ساخته شد', '✅ موفق');
++    setTimeout(() => nav('/flk'), 500);
++  };
++
++  const doSell = () => {
++    if (!sellModal) return;
++    if (!sellForm.buyerId) { showAlert('خریدار اجباری است'); return; }
++    const count = parseInt(toEn(sellForm.count)) || 0;
++    const unitPrice = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;
++    if (count <= 0 || unitPrice <= 0) { showAlert('مقادیر باید بیشتر از صفر'); return; }
++    const h = hatches.find(x => x.id === sellModal.hatchId);
++    const invId = addInvoice({
++      type: 'sale', date: sellForm.date || h?.date || '',
++      partyId: sellForm.buyerId, category: 'chick',
++      items: [{ id: 'chick-' + Date.now(), name: 'جوجه یک‌روزه', quantity: count, unit: 'عدد', unitPrice, total: count * unitPrice }],
++      total: count * unitPrice, payments: [], dueDate: sellForm.date || h?.date || '',
++      relatedFlockId: '', relatedEntryId: h?.eggEntryId || '', notes: 'فروش جوجه'
++    } as any);
++    if (h && invId) updateHatch(h.id, { generatedInvoiceId: invId } as any);
++    setSellModal(null);
++    showAlert('فاکتور ثبت شد', '✅ موفق');
+   };
++
++  const filtered = useMemo(() => hatches.filter(h => {
++    const entry = eggEntries.find(e => e.id === h.eggEntryId);
++    if (deviceFilter && entry?.deviceId !== deviceFilter) return false;
++    if (q.trim()) {
++      const t = q.trim().toLowerCase();
++      const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
++      const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
++      if (![bird?.name, dev?.name, h.date, h.notes].filter(Boolean).join(' ').toLowerCase().includes(t)) return false;
++    }
++    return true;
++  }).sort((a, b) => String(b.date).localeCompare(String(a.date))), [hatches, eggEntries, deviceFilter, q, birds, devices]);
++
+   const target = delId ? hatches.find(h => h.id === delId) : null;
++  const availableEntries = eggEntries.filter(e => !deviceFilter || e.deviceId === deviceFilter).sort((a, b) => String(b.entryDate).localeCompare(String(a.entryDate)));
+ 
+   return (
+     <PageContainer>
+-      {hatches.length === 0 ? (
+-        <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><ellipse cx="12" cy="14" rx="7" ry="9"/></svg>}
+-          title="هچی ثبت نشده" desc="پس از پایان دوره‌ی جوجه‌کشی، نتیجه‌ی نهایی هچ را ثبت کنید."
+-          action={<Btn variant="primary" onClick={openNew}>+ ثبت هچ</Btn>} />
++      {hatches.length > 0 && (
++        <>
++          <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو..." />
++          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
++            <button onClick={() => setDeviceFilter('')} style={chip(!deviceFilter)}>همه</button>
++            {devices.map(d => <button key={d.id} onClick={() => setDeviceFilter(deviceFilter === d.id ? '' : d.id)} style={chip(deviceFilter === d.id)}>{d.name}</button>)}
++          </div>
++        </>
++      )}
++
++      {filtered.length === 0 ? (
++        <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><ellipse cx="12" cy="14" rx="7" ry="9"/></svg>}
++          title="هچی ثبت نشده" desc="نتیجه‌ی نهایی را ثبت کنید."
++          action={<Btn variant="primary" onClick={() => openNew()}>+ ثبت هچ</Btn>} />
+       ) : (
+         <>
+-          {hatches.map((h, i) => {
++          {filtered.map((h, i) => {
+             const entry = eggEntries.find(e => e.id === h.eggEntryId);
+             const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
++            const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
+             const isOpen = expandedId === h.id;
+             const total = entry?.count || 0;
+             const hr = hatchRate(h.hatched || 0, total);
+-            const myCandling = candlings.filter(c => c.eggEntryId === h.eggEntryId).sort((a,b) => b.stage - a.stage)[0];
+-            const aliveAfterCandling = myCandling?.alive || total;
+-            const realRate = aliveAfterCandling ? ((h.hatched || 0) / aliveAfterCandling * 100) : 0;
+-
++            const myCand = candlings.filter(c => c.eggEntryId === h.eggEntryId).sort((a,b) => b.stage - a.stage)[0];
++            const aliveAfter = myCand?.alive || total;
++            const realRate = aliveAfter ? ((h.hatched || 0) / aliveAfter * 100) : 0;
++            const tone = hr >= 70 ? 'green' : hr >= 50 ? 'amber' : 'red';
++            const sumH = (h.hatched||0) + (h.unhatched||0) + (h.deadInShell||0) + (h.pipped||0) + (h.other||0);
++            const isComplete = total > 0 && sumH >= total;
+             return (
+               <ExpandableCard key={h.id} accent="accent" index={toFa(i + 1)} iconEmoji="🐣"
+-                title={`${toFa(h.hatched || 0)} جوجه از ${toFa(total)} تخم`}
+-                subtitle={`${bird?.name || '—'} · ${toFa(h.date)}`}
++                title={toFa(h.hatched || 0) + ' جوجه · ' + (bird?.name || '—')}
++                subtitle={(dev?.name || '—') + ' · ' + toFa(h.date)}
+                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
+-                badge={<Tag tone={hr >= 70 ? 'green' : hr >= 50 ? 'amber' : 'red'}>{toFa(hr.toFixed(1))}٪</Tag>}
+-                summary={<>
+-                  <span>هچ‌شده: <b style={{ color: 'var(--accent)' }}>{toFa(h.hatched || 0)}</b></span>
+-                  <span>هچ‌نشده: <b style={{ color: 'var(--muted)' }}>{toFa(h.unhatched || 0)}</b></span>
+-                  <span>نرخ: <b style={{ color: 'var(--text)' }}>{toFa(hr.toFixed(1))}٪</b></span>
++                badge={<Tag tone={tone}>{toFa(hr.toFixed(1))}٪</Tag>}
++                stats={<>
++                  <StatBox icon="📊" label="نرخ" value={toFa(hr.toFixed(0)) + '٪'} tone={hr >= 70 ? 'accent' : 'warn'} />
++                  <Dot />
++                  <StatBox icon="🥚" label="تخم" value={toFa(total)} />
+                 </>}
+               >
+-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📊 نتیجه هچ</div>
++                {isComplete && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', textAlign: 'center' }}>✅ تکمیل — همه تخم‌ها شمارش شدن</div>}
++
++                {total > 0 && (h.hatched || 0) > 0 && (
++                  <>
++                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 توزیع</div>
++                    <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: 'var(--input-bg)' }}>
++                      {(h.hatched||0) > 0 && <div style={{ width: ((h.hatched||0)/total*100)+'%', background: 'var(--accent)' }} />}
++                      {(h.deadInShell||0) > 0 && <div style={{ width: ((h.deadInShell||0)/total*100)+'%', background: 'var(--danger)' }} />}
++                      {(h.pipped||0) > 0 && <div style={{ width: ((h.pipped||0)/total*100)+'%', background: 'var(--warn)' }} />}
++                      {(h.unhatched||0) > 0 && <div style={{ width: ((h.unhatched||0)/total*100)+'%', background: 'var(--muted)' }} />}
++                    </div>
++                  </>
++                )}
++
++                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 نتیجه هچ</div>
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+-                  <Row l="جوجه هچ‌شده" v={toFa(h.hatched || 0)} accent />
++                  <Row l="جوجه هچ‌شده" v={toFa(h.hatched || 0)} />
+                   <Row l="هچ‌نشده" v={toFa(h.unhatched || 0)} />
+                   {h.deadInShell ? <Row l="مرده در پوسته" v={toFa(h.deadInShell)} /> : null}
+                   {h.pipped ? <Row l="نوک‌زده" v={toFa(h.pipped)} /> : null}
+                   {h.other ? <Row l="سایر" v={toFa(h.other)} /> : null}
+                 </div>
+ 
+-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📈 نرخ‌ها</div>
+-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+-                  <Row l="نرخ هچ کل" v={`${toFa(hr.toFixed(1))}٪`} accent />
+-                  {aliveAfterCandling !== total && <Row l="نرخ از نطفه‌دار" v={`${toFa(realRate.toFixed(1))}٪`} accent />}
+-                </div>
++                {(h.gradeA || h.gradeB) && (
++                  <>
++                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی</div>
++                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
++                      {h.gradeA ? <Row l="درجه A" v={toFa(h.gradeA)} /> : null}
++                      {h.gradeB ? <Row l="درجه B" v={toFa(h.gradeB)} /> : null}
++                    </div>
++                  </>
++                )}
+ 
+-                {entry?.totalPrice && h.hatched && (
++                {(h.maleCount || h.femaleCount || h.unknownCount) && (
+                   <>
+-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>💰 هزینه</div>
++                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت</div>
+                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+-                      <Row l="هزینه کل تخم‌ها" v={`${toFa(entry.totalPrice.toLocaleString('fa-IR'))} ت`} />
+-                      <Row l="💰 هزینه هر جوجه" v={`${toFa(Math.round(costPerChick(entry.totalPrice, h.hatched)).toLocaleString('fa-IR'))} ت`} accent />
++                      {h.maleCount ? <Row l="♂ نر" v={toFa(h.maleCount)} /> : null}
++                      {h.femaleCount ? <Row l="♀ ماده" v={toFa(h.femaleCount)} /> : null}
++                      {h.unknownCount ? <Row l="? نامعلوم" v={toFa(h.unknownCount)} /> : null}
+                     </div>
+                   </>
+                 )}
+ 
++                {h.avgWeight ? <><div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ وزن</div><Row l="وزن متوسط" v={toFa(h.avgWeight) + ' گرم'} /></> : null}
++
++                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📈 نرخ‌ها</div>
++                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
++                  <Row l="نرخ هچ کل" v={toFa(hr.toFixed(1)) + '٪'} />
++                  {aliveAfter !== total && <Row l="نرخ از نطفه‌دار" v={toFa(realRate.toFixed(1)) + '٪'} />}
++                </div>
++
++                {entry?.totalPrice && h.hatched ? (
++                  <>
++                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>💰 هزینه</div>
++                    <Row l="💰 هزینه هر جوجه" v={toFa(Math.round(costPerChick(entry.totalPrice, h.hatched)).toLocaleString('fa-IR')) + ' ت'} />
++                  </>
++                ) : null}
++
+                 {h.notes && (
+                   <>
+-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
+-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+-                       padding: '8px 10px', background: 'var(--input-bg)',
+-                       borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
++                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📝 یادداشت</div>
++                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
+                   </>
+                 )}
+ 
++                {isComplete && (h.hatched || 0) > 0 && (
++                  <div style={{ padding: 10, background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
++                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, textAlign: 'center' }}>مرحله بعد:</div>
++                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
++                      <Btn size="sm" onClick={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(new Date().getFullYear()), type: 'layer', hallId: '', zoneId: '' }); }}>🐔 گله</Btn>
++                      <Btn size="sm" onClick={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}>📥 فروش</Btn>
++                    </div>
++                  </div>
++                )}
++
+                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+                   <Btn size="sm" onClick={() => openEdit(h)} style={{ flex: 1 }}>ویرایش</Btn>
+-                  {(h.hatched || 0) > 0 && (
+-                    <>
+-                      <Btn size="sm" variant="primary" onClick={() => {
+-                        const entry = eggEntries.find(e => e.id === h.eggEntryId);
+-                        const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
+-                        if (!bird) { showAlert('پرنده پیدا نشد'); return; }
+-                        const count = h.hatched || 0;
+-                        const name = prompt('نام گله جدید:', 'گله ' + (bird.name || '') + ' ' + toFa(new Date().getFullYear()));
+-                        if (!name) return;
+-                        const today = new Date();
+-                        const y = today.getFullYear();
+-                        const mm = String(today.getMonth() + 1).padStart(2, '0');
+-                        const dd = String(today.getDate()).padStart(2, '0');
+-                        const startDate = y + '/' + mm + '/' + dd;
+-                        addFlock({
+-                          name, type: 'layer',
+-                          birdId: bird.id, breedId: entry?.breedId || '',
+-                          hallId: '', zoneId: '',
+-                          initialCount: count, currentCount: count,
+-                          maleCount: null, femaleCount: null,
+-                          layingStartDay: 140,
+-                          vaccineScheduleId: '',
+-                          hatchDate: startDate, purchaseDate: '', startDate,
+-                          endDate: '', source: 'hatch',
+-                          purchasePrice: null, deliveryCost: null, otherCosts: null,
+-                          status: 'active', notes: 'از هچ ' + toFa(h.date),
+-                        });
+-                        showAlert('گله ساخته شد با ' + toFa(count) + ' پرنده', '✅ موفق');
+-                        setTimeout(() => nav('/flk'), 500);
+-                      }} style={{ flex: 1 }}>🐔 گله</Btn>
+-                      <Btn size="sm" onClick={() => {
+-                        const entry = eggEntries.find(e => e.id === h.eggEntryId);
+-                        const count = h.hatched || 0;
+-                        showAlert('برای ثبت فروش ' + toFa(count) + ' جوجه، از بخش معاملات استفاده کنید.', '📥 ثبت فروش');
+-                        setTimeout(() => nav('/tra'), 800);
+-                      }} style={{ flex: 1 }}>📥 فروش</Btn>
+-                    </>
+-                  )}
+                   <Btn size="sm" onClick={() => setDelId(h.id)} style={{ flex: 1 }}>حذف</Btn>
+                 </div>
+               </ExpandableCard>
+             );
+           })}
+-          <Btn variant="primary" full onClick={openNew}>+ ثبت هچ</Btn>
++          <Btn variant="primary" full onClick={() => openNew()}>+ ثبت هچ</Btn>
+         </>
+       )}
+ 
+-      <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش هچ' : 'ثبت نتیجه هچ'}
+-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+-        <Field label="ورودی تخم" required>
+-          <Select value={form.eggEntryId} onChange={e => setForm({...form, eggEntryId: e.target.value})}>
+-            {eggEntries.map(e => {
+-              const bird = birds.find(b => b.id === e.birdId);
+-              return <option key={e.id} value={e.id}>{bird?.name || '—'} · {toFa(e.entryDate)} · {toFa(e.count || 0)} تخم</option>;
+-            })}
+-          </Select>
++      {/* ═══ Modal ثبت/ویرایش ═══ */}
++      <Modal open={open} onClose={() => setOpen(false)} title={editingId ? '✏️ ویرایش هچ' : '🐣 ثبت هچ'}
++        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
++
++        <SectionTitle>📦 انتخاب ورودی‌ها</SectionTitle>
++
++        {editingId ? (
++          <Field label="ورودی تخم" required>
++            <Select value={formEntryId} onChange={e => setFormEntryId(e.target.value)}>
++              {eggEntries.map(e => {
++                const bird = birds.find(b => b.id === e.birdId);
++                const dev = devices.find(d => d.id === e.deviceId);
++                return <option key={e.id} value={e.id}>{bird?.name || '—'} · {toFa(e.entryDate)} · {toFa(e.count || 0)} تخم · {dev?.name || ''}</option>;
++              })}
++            </Select>
++          </Field>
++        ) : (
++          <>
++            <Field label="فیلتر دستگاه" hint={selectedIds.size > 0 ? toFa(selectedIds.size) + ' انتخاب‌شده' : undefined}>
++              <Select value={deviceFilter} onChange={e => setDeviceFilter(e.target.value)}>
++                <option value="">— همه دستگاه‌ها —</option>
++                {devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
++              </Select>
++            </Field>
++
++            {availableEntries.length === 0 ? (
++              <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>ورودی‌ای نیست</div>
++            ) : (
++              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
++                {availableEntries.map(e => {
++                  const bird = birds.find(b => b.id === e.birdId);
++                  const dev = devices.find(d => d.id === e.deviceId);
++                  const isSel = selectedIds.has(e.id);
++                  const d = dataFor(e.id);
++                  const calc = calcCurrentFertile(e.id, e.count || 0, candlings);
++                  const aliveAfter = calc.fertile;
++                  const myCand = candlings.filter(c => c.eggEntryId === e.id).sort((a,b) => b.stage - a.stage)[0];
++                  const sumE = (parseInt(toEn(d.hatched))||0) + (parseInt(toEn(d.unhatched))||0) + (parseInt(toEn(d.deadInShell))||0) + (parseInt(toEn(d.pipped))||0) + (parseInt(toEn(d.other))||0);
++                  const rem = (e.count || 0) - sumE;
++                  return (
++                    <div key={e.id} style={{ border: '1px solid ' + (isSel ? 'var(--accent-border)' : 'var(--border)'), background: isSel ? 'var(--accent-soft)' : 'var(--card)', borderRadius: 'var(--r-md)', padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
++                      <div onClick={() => toggleEntry(e.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', padding: 4, margin: -4, borderRadius: 'var(--r-sm)' }}>
++                        <input type="checkbox" checked={isSel} onChange={() => {}} onClick={(ev) => { ev.stopPropagation(); toggleEntry(e.id); }} style={{ width: 18, height: 18, accentColor: 'var(--accent)', cursor: 'pointer' }} />
++                        <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{bird?.name || '—'} · {toFa(e.count || 0)} تخم</span>
++                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{dev?.name || ''}</span>
++                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, transform: isSel ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform .2s' }}>▶</span>
++                      </div>
++
++                      {calc.byStage.length > 0 && (
++                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
++                          {calc.byStage.map((st, i) => (
++                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between' }}>
++                              <span>کندلینگ روز {toFa(st.stage)}:</span>
++                              <span>بی‌نطفه {toFa(st.infertile)} · مرده {toFa(st.dead)} · شکسته {toFa(st.broken)}</span>
++                            </div>
++                          ))}
++                          <div style={{ paddingTop: 4, marginTop: 4, borderTop: '1px dashed var(--border)', display: 'flex', justifyContent: 'space-between', color: 'var(--accent)', fontWeight: 700 }}>
++                            <span>📊 مجموع تلفات کندلینگ:</span>
++                            <span>{toFa(calc.totalLoss)}</span>
++                          </div>
++                          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--accent)', fontWeight: 700 }}>
++                            <span>🧬 نطفه‌دار فعلی:</span>
++                            <span>{toFa(calc.fertile)}</span>
++                          </div>
++                        </div>
++                      )}
++
++                      {isSel && (
++                        <>
++                          {(() => {
++                            const base = aliveAfter;
++                            const h = parseInt(toEn(d.hatched)) || 0;
++                            const uh = parseInt(toEn(d.unhatched)) || 0;
++                            const ds = parseInt(toEn(d.deadInShell)) || 0;
++                            const pp = parseInt(toEn(d.pipped)) || 0;
++                            const ot = parseInt(toEn(d.other)) || 0;
++                            const sum = h + uh + ds + pp + ot;
++                            const remaining = base - sum;
++                            const ok = remaining >= 0;
++                            return (
++                              <>
++                                <div style={{ padding: '6px 10px', background: myCand ? 'var(--accent-soft)' : 'var(--warn-soft)', border: '1px solid ' + (myCand ? 'var(--accent-border)' : 'var(--warn)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: myCand ? 'var(--accent)' : 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
++                                  {calc.byStage.length > 0 ? '🧬 سقف این هچ: ' + toFa(base) + ' (نطفه‌دار فعلی)' : '⚠️ بدون کندلینگ — سقف: ' + toFa(base) + ' تخم'}
++                                </div>
++                                <Grid2>
++                                  <Field label="جوجه هچ‌شده" required>
++                                    <NumField value={d.hatched} onChange={ev => updateData(e.id, { hatched: ev.target.value })} max={Math.max(0, base - uh - ds - pp - ot)} min={0} unit="عدد" />
++                                  </Field>
++                                  <Field label="هچ‌نشده">
++                                    <NumField value={d.unhatched} onChange={ev => updateData(e.id, { unhatched: ev.target.value })} max={Math.max(0, base - h - ds - pp - ot)} min={0} unit="عدد" />
++                                  </Field>
++                                </Grid2>
++                                <Grid2>
++                                  <Field label="مرده در پوسته">
++                                    <NumField value={d.deadInShell} onChange={ev => updateData(e.id, { deadInShell: ev.target.value })} max={Math.max(0, base - h - uh - pp - ot)} min={0} unit="عدد" />
++                                  </Field>
++                                  <Field label="نوک‌زده">
++                                    <NumField value={d.pipped} onChange={ev => updateData(e.id, { pipped: ev.target.value })} max={Math.max(0, base - h - uh - ds - ot)} min={0} unit="عدد" />
++                                  </Field>
++                                </Grid2>
++                                <Grid2>
++                                  <Field label="سایر">
++                                    <NumField value={d.other} onChange={ev => updateData(e.id, { other: ev.target.value })} max={Math.max(0, base - h - uh - ds - pp)} min={0} unit="عدد" />
++                                  </Field>
++                                  <Field label="وزن متوسط" hint="۲۰-۶۰ گرم">
++                                    <NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" />
++                                  </Field>
++                                </Grid2>
++                                <div style={{ padding: '8px 12px', background: !ok ? 'var(--danger-soft)' : remaining === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
++                                  <span>📊 مجموع: {toFa(sum)} / {toFa(base)}</span>
++                                  <span>
++                                    {ok && remaining > 0 && '⏳ ' + toFa(remaining) + ' باقی'}
++                                    {ok && remaining === 0 && '✅ کامل'}
++                                    {!ok && '🔴 ' + toFa(Math.abs(remaining)) + ' اضافی'}
++                                  </span>
++                                </div>
++                              </>
++                            );
++                          })()}
++                          {(() => {
++                            const hatchedNum = parseInt(toEn(d.hatched)) || 0;
++                            if (hatchedNum === 0) {
++                              return (
++                                <div style={{ padding: '10px 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
++                                  ⬆️ اول «جوجه هچ‌شده» را وارد کن — سپس می‌توانی کیفیت، جنسیت و وزن را تکمیل کنی
++                                </div>
++                              );
++                            }
++                            return (
++                              <>
++                                {(() => {
++                                const gA = parseInt(toEn(d.gradeA)) || 0;
++                                const gB = parseInt(toEn(d.gradeB)) || 0;
++                                const gradesUsed = gA + gB;
++                                const gradesRem = hatchedNum - gradesUsed;
++                                const gradesOk = gradesRem >= 0;
++                                return (
++                                  <>
++                                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی (اختیاری) — از {toFa(hatchedNum)} هچ‌شده</div>
++                                    <Grid2>
++                                      <Field label="درجه A"><NumField value={d.gradeA} onChange={ev => updateData(e.id, { gradeA: ev.target.value })} max={hatchedNum - gB} min={0} unit="عدد" /></Field>
++                                      <Field label="درجه B"><NumField value={d.gradeB} onChange={ev => updateData(e.id, { gradeB: ev.target.value })} max={hatchedNum - gA} min={0} unit="عدد" /></Field>
++                                    </Grid2>
++                                    <div style={{ padding: '6px 10px', background: !gradesOk ? 'var(--danger-soft)' : gradesRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
++                                      A + B: {toFa(gradesUsed)} / {toFa(hatchedNum)}{!gradesOk ? ' 🔴 ' + toFa(Math.abs(gradesRem)) + ' اضافی' : gradesRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(gradesRem) + ' باقی'}
++                                    </div>
++                                  </>
++                                );
++                              })()}
++
++                              {(() => {
++                                const m = parseInt(toEn(d.maleCount)) || 0;
++                                const f_ = parseInt(toEn(d.femaleCount)) || 0;
++                                const u = parseInt(toEn(d.unknownCount)) || 0;
++                                const genderUsed = m + f_ + u;
++                                const genderRem = hatchedNum - genderUsed;
++                                const genderOk = genderRem >= 0;
++                                return (
++                                  <>
++                                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت (اختیاری)</div>
++                                    <Grid2>
++                                      <Field label="♂ نر"><NumField value={d.maleCount} onChange={ev => updateData(e.id, { maleCount: ev.target.value })} max={hatchedNum - f_ - u} min={0} unit="عدد" /></Field>
++                                      <Field label="♀ ماده"><NumField value={d.femaleCount} onChange={ev => updateData(e.id, { femaleCount: ev.target.value })} max={hatchedNum - m - u} min={0} unit="عدد" /></Field>
++                                    </Grid2>
++                                    <Grid2>
++                                      <Field label="? نامعلوم"><NumField value={d.unknownCount} onChange={ev => updateData(e.id, { unknownCount: ev.target.value })} max={hatchedNum - m - f_} min={0} unit="عدد" /></Field>
++                                      <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
++                                    </Grid2>
++                                    <div style={{ padding: '6px 10px', background: !genderOk ? 'var(--danger-soft)' : genderRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
++                                      ♂ + ♀ + ?: {toFa(genderUsed)} / {toFa(hatchedNum)}{!genderOk ? ' 🔴 ' + toFa(Math.abs(genderRem)) + ' اضافی' : genderRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(genderRem) + ' باقی'}
++                                    </div>
++                                  </>
++                                );
++                              })()}
++                              </>
++                            );
++                          })()}
++                          <Field label="یادداشت"><Input value={d.notes || ''} onChange={ev => updateData(e.id, { notes: ev.target.value })} placeholder="..." /></Field>
++                          <div style={{ padding: '6px 10px', background: rem < 0 ? 'var(--danger-soft)' : rem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
++                            این هچ: {toFa(sumE)} از {toFa(e.count || 0)}{rem > 0 && ' · باقی: ' + toFa(rem)}{rem < 0 && ' — بیشتر!'}{rem === 0 && ' ✅'}
++                          </div>
++                        </>
++                      )}
++                    </div>
++                  );
++                })}
++              </div>
++            )}
++          </>
++        )}
++
++        {editingId && (
++          <>
++            <SectionTitle>📊 نتیجه</SectionTitle>
++            <Grid2>
++              <Field label="جوجه هچ‌شده" required><NumField value={dataFor(formEntryId).hatched} onChange={ev => updateData(formEntryId, { hatched: ev.target.value })} min={0} unit="عدد" /></Field>
++              <Field label="هچ‌نشده"><NumField value={dataFor(formEntryId).unhatched} onChange={ev => updateData(formEntryId, { unhatched: ev.target.value })} min={0} unit="عدد" /></Field>
++            </Grid2>
++            <Grid2>
++              <Field label="مرده در پوسته"><NumField value={dataFor(formEntryId).deadInShell} onChange={ev => updateData(formEntryId, { deadInShell: ev.target.value })} min={0} unit="عدد" /></Field>
++              <Field label="نوک‌زده"><NumField value={dataFor(formEntryId).pipped} onChange={ev => updateData(formEntryId, { pipped: ev.target.value })} min={0} unit="عدد" /></Field>
++            </Grid2>
++            <Grid2>
++              <Field label="سایر"><NumField value={dataFor(formEntryId).other} onChange={ev => updateData(formEntryId, { other: ev.target.value })} min={0} unit="عدد" /></Field>
++              <Field label="وزن متوسط"><NumField value={dataFor(formEntryId).avgWeight} onChange={ev => updateData(formEntryId, { avgWeight: ev.target.value })} min={0} unit="گرم" /></Field>
++            </Grid2>
++            {(() => {
++              const hatchedNum = parseInt(toEn(dataFor(formEntryId).hatched)) || 0;
++              if (hatchedNum === 0) {
++                return (
++                  <div style={{ padding: '10px 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
++                    ⬆️ اول «جوجه هچ‌شده» را وارد کن
++                  </div>
++                );
++              }
++              return (
++                <>
++                  {(() => {
++                    const gA = parseInt(toEn(dataFor(formEntryId).gradeA)) || 0;
++                    const gB = parseInt(toEn(dataFor(formEntryId).gradeB)) || 0;
++                    const gradesUsed = gA + gB;
++                    const gradesRem = hatchedNum - gradesUsed;
++                    const gradesOk = gradesRem >= 0;
++                    return (
++                      <>
++                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی — از {toFa(hatchedNum)} هچ‌شده</div>
++                        <Grid2>
++                          <Field label="درجه A"><NumField value={dataFor(formEntryId).gradeA} onChange={ev => updateData(formEntryId, { gradeA: ev.target.value })} max={hatchedNum - gB} min={0} unit="عدد" /></Field>
++                          <Field label="درجه B"><NumField value={dataFor(formEntryId).gradeB} onChange={ev => updateData(formEntryId, { gradeB: ev.target.value })} max={hatchedNum - gA} min={0} unit="عدد" /></Field>
++                        </Grid2>
++                        <div style={{ padding: '6px 10px', background: !gradesOk ? 'var(--danger-soft)' : gradesRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
++                          A + B: {toFa(gradesUsed)} / {toFa(hatchedNum)}{!gradesOk ? ' 🔴 اضافی' : gradesRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(gradesRem) + ' باقی'}
++                        </div>
++                      </>
++                    );
++                  })()}
++
++                  {(() => {
++                    const m = parseInt(toEn(dataFor(formEntryId).maleCount)) || 0;
++                    const f_ = parseInt(toEn(dataFor(formEntryId).femaleCount)) || 0;
++                    const u = parseInt(toEn(dataFor(formEntryId).unknownCount)) || 0;
++                    const genderUsed = m + f_ + u;
++                    const genderRem = hatchedNum - genderUsed;
++                    const genderOk = genderRem >= 0;
++                    return (
++                      <>
++                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت و وزن</div>
++                        <Grid2>
++                          <Field label="♂ نر"><NumField value={dataFor(formEntryId).maleCount} onChange={ev => updateData(formEntryId, { maleCount: ev.target.value })} max={hatchedNum - f_ - u} min={0} unit="عدد" /></Field>
++                          <Field label="♀ ماده"><NumField value={dataFor(formEntryId).femaleCount} onChange={ev => updateData(formEntryId, { femaleCount: ev.target.value })} max={hatchedNum - m - u} min={0} unit="عدد" /></Field>
++                        </Grid2>
++                        <Grid2>
++                          <Field label="? نامعلوم"><NumField value={dataFor(formEntryId).unknownCount} onChange={ev => updateData(formEntryId, { unknownCount: ev.target.value })} max={hatchedNum - m - f_} min={0} unit="عدد" /></Field>
++                          <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={dataFor(formEntryId).avgWeight} onChange={ev => updateData(formEntryId, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
++                        </Grid2>
++                        <div style={{ padding: '6px 10px', background: !genderOk ? 'var(--danger-soft)' : genderRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
++                          ♂ + ♀ + ?: {toFa(genderUsed)} / {toFa(hatchedNum)}{!genderOk ? ' 🔴 اضافی' : genderRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(genderRem) + ' باقی'}
++                        </div>
++                      </>
++                    );
++                  })()}
++                </>
++              );
++            })()}
++            <Field label="یادداشت"><Input value={dataFor(formEntryId).notes || ''} onChange={ev => updateData(formEntryId, { notes: ev.target.value })} placeholder="..." /></Field>
++          </>
++        )}
++
++        <SectionTitle>📅 تاریخ هچ</SectionTitle>
++        <Field label="تاریخ" required>
++          <DatePicker value={formDate} onChange={v => setFormDate(v)} placeholder="انتخاب تاریخ" />
+         </Field>
+-        <Field label="تاریخ هچ" required>
+-          <DatePicker value={form.date} onChange={v => setForm({...form, date: v})} placeholder="انتخاب تاریخ" />
++
++        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center' }}>✕ {err}</div>}
++      </Modal>
++
++      {/* ═══ Modal گله ═══ */}
++      <Modal open={!!flockModal} onClose={() => setFlockModal(null)} title="🐔 ساخت گله جدید"
++        footer={<BtnRow><Btn variant="primary" onClick={createFlock}>ساخت گله</Btn><Btn onClick={() => setFlockModal(null)}>لغو</Btn></BtnRow>}>
++        <Field label="نام گله" required>
++          <Input placeholder="مثلاً: گله بهار ۱۴۰۵" value={flockForm.name} onChange={e => setFlockForm({...flockForm, name: e.target.value})} />
+         </Field>
+         <Grid2>
+-          <Field label="جوجه هچ‌شده" required hint={maxHatched ? `حداکثر: ${toFa(maxHatched)}` : undefined}><NumField placeholder="۰" value={form.hatched} onChange={e => setForm({...form, hatched: e.target.value})} max={maxHatched || undefined} min={0} unit="عدد" /></Field>
+-          <Field label="هچ‌نشده"><NumField placeholder="۰" value={form.unhatched} onChange={e => setForm({...form, unhatched: e.target.value})} min={0} unit="عدد" /></Field>
++          <Field label="نوع" required>
++            <Select value={flockForm.type} onChange={e => setFlockForm({...flockForm, type: e.target.value})}>
++              <option value="layer">تخم‌گذار</option>
++              <option value="broiler">گوشتی</option>
++              <option value="breeder">مادر</option>
++            </Select>
++          </Field>
++          <Field label="تعداد">
++            <Input value={String(flockModal?.count || 0)} readOnly dir="ltr" unit="پرنده" />
++          </Field>
++        </Grid2>
++        <Grid2>
++          <Field label="سالن">
++            <Select value={flockForm.hallId} onChange={e => setFlockForm({...flockForm, hallId: e.target.value, zoneId: ''})}>
++              <option value="">—</option>
++              {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
++            </Select>
++          </Field>
++          <Field label="بخش">
++            <Select value={flockForm.zoneId} onChange={e => setFlockForm({...flockForm, zoneId: e.target.value})}>
++              <option value="">—</option>
++              {zones.filter(z => !flockForm.hallId || z.hallId === flockForm.hallId).map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
++            </Select>
++          </Field>
+         </Grid2>
++      </Modal>
++
++      {/* ═══ Modal فروش ═══ */}
++      <Modal open={!!sellModal} onClose={() => setSellModal(null)} title="📥 ثبت فروش جوجه"
++        footer={<BtnRow><Btn variant="primary" onClick={doSell}>ثبت فاکتور</Btn><Btn onClick={() => setSellModal(null)}>لغو</Btn></BtnRow>}>
++        <Field label="خریدار" required>
++          {contacts.length === 0 ? (
++            <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>مخاطبی نیست</div>
++          ) : (
++            <Select value={sellForm.buyerId} onChange={e => setSellForm({...sellForm, buyerId: e.target.value})}>
++              <option value="">— انتخاب خریدار —</option>
++              {contacts.filter((c: any) => (c.roles || []).includes('customer')).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
++            </Select>
++          )}
++        </Field>
+         <Grid2>
+-          <Field label="مرده در پوسته"><NumField placeholder="۰" value={form.deadInShell} onChange={e => setForm({...form, deadInShell: e.target.value})} min={0} unit="عدد" /></Field>
+-          <Field label="نوک‌زده"><NumField placeholder="۰" value={form.pipped} onChange={e => setForm({...form, pipped: e.target.value})} min={0} unit="عدد" /></Field>
+-          <Field label="سایر"><NumField placeholder="۰" value={form.other} onChange={e => setForm({...form, other: e.target.value})} min={0} unit="عدد" /></Field>
++          <Field label="تعداد" required><NumField value={sellForm.count} onChange={e => setSellForm({...sellForm, count: e.target.value})} max={sellModal?.count} min={0} unit="عدد" /></Field>
++          <Field label="قیمت هر جوجه" required><MoneyField value={sellForm.unitPrice} onChange={e => setSellForm({...sellForm, unitPrice: e.target.value})} /></Field>
+         </Grid2>
+-        <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
+-        {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {err}</div>}
++        <Field label="تاریخ"><DatePicker value={sellForm.date} onChange={v => setSellForm({...sellForm, date: v})} /></Field>
++        {(() => {
++          const cnt = parseInt(toEn(sellForm.count)) || 0;
++          const up = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;
++          const total = cnt * up;
++          if (total > 0) return <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع کل:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
++          return null;
++        })()}
+       </Modal>
+ 
++      {/* ═══ Modal حذف ═══ */}
+       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف هچ"
+-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteHatch(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف این نتیجه هچ؟</div>
++        footer={<BtnRow><Btn variant="danger" onClick={() => delId && doDelete(delId)}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
++        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
++          حذف <b>{toFa(target?.hatched || 0)} جوجه</b>؟
++        </div>
+       </Modal>
+     </PageContainer>
+   );
+ }
+ 
+-function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
++
++
++// نرخ هچ بر اساس نطفه‌داری — اگه نطفه‌داری پایین باشه، نرخ هچ هم کمتر
++
++
++// نطفه‌دار فعلی = کل تخم − مجموع همه تلفات کندلینگ‌ها
++function calcCurrentFertile(entryId: string, entryTotal: number, allCandlings: any[]): { fertile: number; totalLoss: number; byStage: any[] } {
++  const myCandlings = allCandlings.filter(c => c.eggEntryId === entryId).sort((a, b) => a.stage - b.stage);
++  let totalInfertile = 0;
++  let totalDead = 0;
++  let totalBroken = 0;
++  const byStage = myCandlings.map(c => {
++    totalInfertile += c.infertile || 0;
++    totalDead += c.dead || 0;
++    totalBroken += c.broken || 0;
++    return { stage: c.stage, alive: c.alive || 0, infertile: c.infertile || 0, dead: c.dead || 0, broken: c.broken || 0 };
++  });
++  const totalLoss = totalInfertile + totalDead + totalBroken;
++  return {
++    fertile: Math.max(0, entryTotal - totalLoss),
++    totalLoss,
++    byStage,
++  };
++}
++
++function smartHatchRate(fertilityRate: number): number {
++  if (fertilityRate >= 92) return 0.94;
++  if (fertilityRate >= 85) return 0.92;
++  if (fertilityRate >= 75) return 0.88;
++  if (fertilityRate >= 65) return 0.83;
++  return 0.78;
++}
++
++// محاسبه هچ‌شده تخمینی از کندلینگ
++function estimateHatched(aliveAfter: number, entryTotal: number, losses: { ds: number; pp: number; uh: number; ot: number }): number {
++  const fertility = entryTotal > 0 ? (aliveAfter / entryTotal * 100) : 0;
++  const rate = smartHatchRate(fertility);
++  const fromAlive = Math.round(aliveAfter * rate);
++  const lossesSum = losses.ds + losses.pp + losses.uh + losses.ot;
++  return Math.max(0, fromAlive - lossesSum);
++}
++
++function Row({ l, v }: { l: string; v: string }) {
+   return (
+-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
+-       padding: '6px 10px', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
+-       borderRadius: 'var(--r-sm)', color: accent ? 'var(--accent)' : undefined,
+-       fontWeight: accent ? 700 : undefined }}>
+-      <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
+-      <span style={{ fontWeight: 600, color: accent ? 'var(--accent)' : 'var(--text)' }}>{v}</span>
++    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
++      <span style={{ color: 'var(--muted)' }}>{l}:</span>
++      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
+     </div>
+   );
+ }
++
++function chip(active: boolean): React.CSSProperties {
++  return {
++    padding: '6px 11px', fontSize: 'var(--fs-sm)',
++    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
++    border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
++    borderRadius: 'var(--r-sm)',
++    color: active ? 'var(--accent)' : 'var(--muted)',
++    fontWeight: active ? 600 : 500, cursor: 'pointer',
++    fontFamily: 'inherit', whiteSpace: 'nowrap'
++  };
++}
+diff --git a/src/mod/inc/store.ts b/src/mod/inc/store.ts
+index 7beca39..68120b1 100644
+--- a/src/mod/inc/store.ts
++++ b/src/mod/inc/store.ts
+@@ -83,11 +83,14 @@ export interface EggEntry {
+ export interface Candling {
+   id: string;
+   eggEntryId: string;
+-  stage: 1 | 2 | 3;
++  stage: number;
+   date: string;
+   alive: number | null;
+   infertile: number | null;
+   dead: number | null;
++  deadEarly?: number | null;
++  deadMid?: number | null;
++  deadLate?: number | null;
+   broken: number | null;
+   infertileReason: string;
+   deadReason: string;
+@@ -104,6 +107,14 @@ export interface HatchResult {
+   deadInShell: number | null;
+   pipped: number | null;
+   other: number | null;
++  gradeA: number | null;
++  gradeB: number | null;
++  maleCount: number | null;
++  femaleCount: number | null;
++  unknownCount: number | null;
++  avgWeight: number | null;
++  generatedFlockId: string;
++  generatedInvoiceId: string;
+   notes: string;
+   createdAt: string;
+ }
+@@ -218,7 +229,8 @@ export function jalaliToDate(s: string): Date | null {
+ export function daysAgo(s: string): number {
+   const d = jalaliToDate(s);
+   if (!d) return 0;
+-  return Math.max(0, diffDaysJ(new Date(), d));
++  const days = diffDaysJ(new Date(), d);
++  return Math.max(1, days + 1);  // روز اول انکوباسیون = ۱
+ }
+ 
+ export function addDaysJalali(s: string, days: number): string {
+diff --git a/src/mod/set/LogsTab.tsx b/src/mod/set/LogsTab.tsx
+index 6e6704b..0fca415 100644
+--- a/src/mod/set/LogsTab.tsx
++++ b/src/mod/set/LogsTab.tsx
+@@ -98,7 +98,7 @@ export default function LogsTab() {
+                 subtitle={timeStr}
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : log.id)}
+-                summary={<>
++                stats={<>
+                   <span style={{ color: 'var(--warn)', fontWeight: 700 }}>{log.type}</span>
+                 </>}
+               >
+diff --git a/src/mod/tra/DealsPage.tsx b/src/mod/tra/DealsPage.tsx
+index d812cf3..e2ee741 100644
+--- a/src/mod/tra/DealsPage.tsx
++++ b/src/mod/tra/DealsPage.tsx
+@@ -149,7 +149,7 @@ export default function DealsPage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : d.id)}
+                 badge={<Tag tone={d.status === 'settled' ? 'green' : d.status === 'cancelled' ? 'gray' : 'amber'}>{STATUS_LABEL[d.status]}</Tag>}
+-                summary={
++                stats={
+                   <>
+                     {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(d.value.toLocaleString('fa-IR'))} ت</b></span>}
+                     {d.percent !== null && d.percent !== undefined && <span>درصد: <b style={{ color: 'var(--text)' }}>{toFa(d.percent)}٪</b></span>}
+diff --git a/src/mod/tra/PurchasesPage.tsx b/src/mod/tra/PurchasesPage.tsx
+index 2d24ddb..56c743a 100644
+--- a/src/mod/tra/PurchasesPage.tsx
++++ b/src/mod/tra/PurchasesPage.tsx
+@@ -253,7 +253,7 @@ export default function PurchasesPage() {
+                     </Tag>
+                   </div>
+                 }
+-                summary={
++                stats={
+                   <>
+                     <span>کل: <b>{toFa(inv.total.toLocaleString('fa-IR'))} ت</b></span>
+                     {rem2 > 0 && <span style={{ color: 'var(--warn)' }}>مانده: <b>{toFa(rem2.toLocaleString('fa-IR'))}</b></span>}
+diff --git a/src/mod/tra/SalesPage.tsx b/src/mod/tra/SalesPage.tsx
+index e1ce864..057fab5 100644
+--- a/src/mod/tra/SalesPage.tsx
++++ b/src/mod/tra/SalesPage.tsx
+@@ -245,7 +245,7 @@ export default function SalesPage() {
+                     </Tag>
+                   </div>
+                 }
+-                summary={
++                stats={
+                   <>
+                     <span>کل: <b>{toFa(inv.total.toLocaleString('fa-IR'))} ت</b></span>
+                     {rem2 > 0 && <span style={{ color: 'var(--warn)' }}>مانده: <b>{toFa(rem2.toLocaleString('fa-IR'))}</b></span>}
+diff --git a/src/mod/tra/store.ts b/src/mod/tra/store.ts
+index cd9ddc4..34eb930 100644
+--- a/src/mod/tra/store.ts
++++ b/src/mod/tra/store.ts
+@@ -1,4 +1,5 @@
+ import { create } from 'zustand';
++import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ } from 'date-fns-jalali';
+ import { persist } from 'zustand/middleware';
+ import { v4 as uuid } from 'uuid';
+ import { useWhs } from '../whs/store';
+@@ -489,18 +490,47 @@ export function invoiceStatus(inv: Invoice): InvoiceStatus {
+   return 'unpaid';
+ }
+ 
++
++
++// تبدیل تاریخ‌های میلادی ذخیره‌شده به شمسی
++function migrateInvDates(inv: any): any {
++  if (!inv) return inv;
++  const fix = (str: string) => {
++    if (!str) return str;
++    const en = String(str).replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
++    const m = en.match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
++    if (!m) return str;
++    const y = parseInt(m[1], 10);
++    if (y >= 1900 && y <= 2100) {
++      try {
++        const d = new Date(y, parseInt(m[2], 10) - 1, parseInt(m[3], 10));
++        return formatJ(d, 'yyyy/MM/dd');
++      } catch { return str; }
++    }
++    return str;
++  };
++  if (inv.date) inv.date = fix(inv.date);
++  if (inv.dueDate) inv.dueDate = fix(inv.dueDate);
++  if (inv.customDueDate) inv.customDueDate = fix(inv.customDueDate);
++  return inv;
++}
++
+ export function remaining(inv: Invoice): number {
+   const paid = paidSum(inv.payments || []);
+   return Math.max(0, (inv.total || 0) - paid);
+ }
+ 
+ export function ageDays(inv: Invoice): number {
+-  if (inv.date === '' || inv.date == null) return 0;
+-  const parts = inv.date.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString()).split('/');
+-  if (parts.length !== 3) return 0;
+-  const d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+-  const diff = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+-  return diff > 0 ? diff : 0;
++  if (!inv.date) return 0;
++  try {
++    const en = inv.date.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
++    const d = parseJ(en, 'yyyy/MM/dd', new Date());
++    if (isNaN(d.getTime())) return 0;
++    const diff = diffDaysJ(new Date(), d);
++    return diff > 0 ? diff : 0;
++  } catch {
++    return 0;
++  }
+ }
+ 
+ export function agingBucket(days: number): string {
+diff --git a/src/mod/whs/ItemsPage.tsx b/src/mod/whs/ItemsPage.tsx
+index f65c572..f90f575 100644
+--- a/src/mod/whs/ItemsPage.tsx
++++ b/src/mod/whs/ItemsPage.tsx
+@@ -200,7 +200,7 @@ export default function ItemsPage() {
+                   exp === 'soon' ? <Tag tone="amber">نزدیک انقضا</Tag> :
+                   <Tag tone="green">موجود</Tag>
+                 }
+-                summary={
++                stats={
+                   <>
+                     <span>موجودی: <b style={{ color: 'var(--text)' }}>{toFa(it.currentStock)} {UNIT_LABEL[it.unit]}</b></span>
+                     {it.minStock > 0 ? <span>حد: <b style={{ color: 'var(--text)' }}>{toFa(it.minStock)}</b></span> : null}
+diff --git a/src/mod/whs/MovesPage.tsx b/src/mod/whs/MovesPage.tsx
+index 7842d7e..8bdb6c0 100644
+--- a/src/mod/whs/MovesPage.tsx
++++ b/src/mod/whs/MovesPage.tsx
+@@ -166,7 +166,7 @@ export default function MovesPage() {
+                 isOpen={isOpen}
+                 onToggle={() => setExpandedId(isOpen ? null : m.id)}
+                 badge={<Tag tone={m.type === 'in' ? 'green' : 'amber'}>{m.type === 'in' ? 'ورود' : 'خروج'}</Tag>}
+-                summary={
++                stats={
+                   <>
+                     <span>مقدار: <b style={{ color: 'var(--text)' }}>{toFa(m.quantity)}</b></span>
+                     {m.unitPrice > 0 ? <span>قیمت: <b style={{ color: 'var(--text)' }}>{toFa(m.unitPrice.toLocaleString('fa-IR'))}</b></span> : null}
+diff --git a/src/shr/components/DatePicker.tsx b/src/shr/components/DatePicker.tsx
+index 768b9dc..0ec5d63 100644
+--- a/src/shr/components/DatePicker.tsx
++++ b/src/shr/components/DatePicker.tsx
+@@ -10,7 +10,6 @@ import { useSet } from '../../mod/set/store';
+ const MONTHS = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+ const WEEKDAYS = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+ 
+-// تبدیل ارقام فارسی به لاتین
+ const toLatin = (s: string) =>
+   s.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+ 
+@@ -23,8 +22,8 @@ interface Props {
+   error?: string;
+   warn?: string;
+   compact?: boolean;
+-  min?: string; // yyyy/MM/dd
+-  max?: string; // yyyy/MM/dd
++  min?: string;
++  max?: string;
+ }
+ 
+ export default function DatePicker({
+@@ -41,7 +40,6 @@ export default function DatePicker({
+ }: Props) {
+   const [open, setOpen] = useState(false);
+ 
+-  // lowPowerMode از تنظیمات + prefers-reduced-motion از سیستم
+   const lowPower = useSet((st: any) => st.lowPowerMode);
+   const [prefersReduced, setPrefersReduced] = useState(false);
+   useEffect(() => {
+@@ -51,9 +49,7 @@ export default function DatePicker({
+       const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+       mq.addEventListener('change', handler);
+       return () => mq.removeEventListener('change', handler);
+-    } catch {
+-      /* silent */
+-    }
++    } catch { /* silent */ }
+   }, []);
+   const noAnim = !!(lowPower || prefersReduced);
+ 
+@@ -65,14 +61,23 @@ export default function DatePicker({
+       try {
+         const p = parse(toLatin(value), 'yyyy/MM/dd', new Date());
+         if (!isNaN(p.getTime())) return p;
+-      } catch {
+-        /* silent */
+-      }
++      } catch { /* silent */ }
+     }
+     return today;
+   });
+ 
+-  // سال‌ها — داینامیک (±15 سال از الان)
++  // هر بار باز شدن: اگه value بود بریم همون، وگرنه امروز
++  useEffect(() => {
++    if (!open) return;
++    if (value) {
++      try {
++        const p = parse(toLatin(value), 'yyyy/MM/dd', new Date());
++        if (!isNaN(p.getTime())) { setCursor(p); return; }
++      } catch { /* silent */ }
++    }
++    setCursor(new Date());
++  }, [open]);
++
+   const currentYear = getYear(new Date());
+   const years = useMemo(
+     () => Array.from({ length: 31 }, (_, i) => currentYear - 15 + i),
+@@ -100,13 +105,7 @@ export default function DatePicker({
+     setOpen(false);
+   };
+ 
+-  // border بر اساس error/warn
+-  const borderColor = error
+-    ? 'var(--danger)'
+-    : warn
+-    ? 'var(--warn)'
+-    : 'var(--border)';
+-
++  const borderColor = error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)';
+   const height = compact ? 32 : 38;
+ 
+   return (
+@@ -138,42 +137,21 @@ export default function DatePicker({
+           minWidth: 0,
+           outline: 'none',
+         }}
+-        onFocus={(e) => {
+-          if (!disabled) {
+-            e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
+-          }
+-        }}
+-        onBlur={(e) => {
+-          e.currentTarget.style.boxShadow = 'none';
+-        }}
++        onFocus={(e) => { if (!disabled) e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)'; }}
++        onBlur={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+       >
+         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+           {value ? toFa(value) : placeholder}
+           {required && !value ? <span style={{ color: 'var(--danger)', marginRight: 4 }}>*</span> : null}
+         </span>
+-        <svg
+-          width={compact ? 13 : 15}
+-          height={compact ? 13 : 15}
+-          viewBox="0 0 24 24"
+-          fill="none"
+-          stroke="currentColor"
+-          strokeWidth="2"
+-          style={{ flexShrink: 0, color: 'var(--dim)' }}
+-          aria-hidden="true"
+-        >
++        <svg width={compact ? 13 : 15} height={compact ? 13 : 15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, color: 'var(--dim)' }} aria-hidden="true">
+           <rect x="3" y="4" width="18" height="18" rx="2" />
+           <path d="M16 2v4M8 2v4M3 10h18" />
+         </svg>
+       </button>
+ 
+       {(error || warn) && (
+-        <div
+-          style={{
+-            fontSize: 'var(--fs-xs)',
+-            color: error ? 'var(--danger)' : 'var(--warn)',
+-            marginTop: 4,
+-          }}
+-        >
++        <div style={{ fontSize: 'var(--fs-xs)', color: error ? 'var(--danger)' : 'var(--warn)', marginTop: 4 }}>
+           {error ? `✕ ${error}` : `⚠ ${warn}`}
+         </div>
+       )}
+@@ -182,167 +160,62 @@ export default function DatePicker({
+         open={open}
+         onClose={() => setOpen(false)}
+         title="انتخاب تاریخ"
++        size="sm"
+         footer={
+-          <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: 8 }}>
++          <div style={{ display: 'flex', gap: 6 }}>
+             <Btn
+-              variant="primary"
+-              disabled={!isInRange(todayStr)}
+-              onClick={() => {
+-                if (!isInRange(todayStr)) return;
+-                onChange(todayStr);
+-                setOpen(false);
+-              }}
+-            >
+-              امروز
+-            </Btn>
++              onClick={() => { if (isInRange(todayStr)) { onChange(todayStr); setOpen(false); } }}
++              style={{ flex: 1, height: 34 }}
++            >امروز</Btn>
+             <Btn
+-              onClick={() => {
+-                onChange('');
+-                setOpen(false);
+-              }}
+-            >
+-              پاک کردن
+-            </Btn>
+-            <Btn onClick={() => setOpen(false)}>لغو</Btn>
++              onClick={() => { onChange(''); setOpen(false); }}
++              style={{ flex: 1, height: 34 }}
++            >پاک</Btn>
+           </div>
+-        }
+-      >
+-        {/* نمایش تاریخ انتخاب‌شده — aria-live */}
+-        <div
+-          aria-live="polite"
+-          style={{
+-            padding: '8px 12px',
+-            background: 'var(--accent-soft)',
+-            border: '1px solid var(--accent-border)',
+-            borderRadius: 'var(--r-md)',
+-            fontSize: 'var(--fs-base)',
+-            color: 'var(--accent)',
+-            fontWeight: 700,
+-            textAlign: 'center',
+-          }}
+-        >
+-          {value ? toFa(value) : 'تاریخی انتخاب نشده'}
+-        </div>
+-
+-        {/* سال و ماه */}
+-        <div style={{ display: 'flex', gap: 8 }}>
+-          <select
+-            value={String(year)}
+-            onChange={(e) => setCursor(setYear(cursor, +e.target.value))}
+-            aria-label="انتخاب سال"
+-            style={{
+-              flex: 1,
+-              height: 36,
+-              background: 'var(--input-bg)',
+-              border: '1px solid var(--border)',
+-              borderRadius: 'var(--r-md)',
+-              padding: '0 10px',
+-              color: 'var(--text)',
+-              fontFamily: 'inherit',
+-              fontSize: 'var(--fs-base)',
+-              fontWeight: 600,
+-            }}
+-          >
+-            {years.map((y) => (
+-              <option key={y} value={y}>
+-                {toFa(y)}
+-              </option>
+-            ))}
+-          </select>
++        }>
++        {/* ═══ هدر فشرده: ‹ ماه سال › با Select مستقیم ═══ */}
++        <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0 0 4px' }}>
++          <button
++            type="button"
++            onClick={() => setCursor(subMonths(cursor, 1))}
++            aria-label="ماه قبل"
++            style={{ width: 32, height: 32, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
++          >›</button>
+           <select
+             value={String(month)}
+             onChange={(e) => setCursor(setMonth(cursor, +e.target.value))}
+-            aria-label="انتخاب ماه"
+-            style={{
+-              flex: 1,
+-              height: 36,
+-              background: 'var(--input-bg)',
+-              border: '1px solid var(--border)',
+-              borderRadius: 'var(--r-md)',
+-              padding: '0 10px',
+-              color: 'var(--text)',
+-              fontFamily: 'inherit',
+-              fontSize: 'var(--fs-base)',
+-              fontWeight: 600,
+-            }}
++            aria-label="ماه"
++            style={{ flex: 2, height: 32, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 4px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
+           >
+-            {MONTHS.map((m, i) => (
+-              <option key={i} value={i}>
+-                {m}
+-              </option>
+-            ))}
++            {MONTHS.map((m, i) => <option key={i} value={i}>{m}</option>)}
+           </select>
+-        </div>
+-
+-        {/* ناوبری ماه */}
+-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+-          <button
+-            type="button"
+-            onClick={() => setCursor(subMonths(cursor, 1))}
+-            aria-label="ماه قبل"
+-            style={{
+-              flex: 1,
+-              height: 34,
+-              background: 'var(--btn-bg)',
+-              border: '1px solid var(--border)',
+-              borderRadius: 'var(--r-md)',
+-              color: 'var(--muted)',
+-              fontFamily: 'inherit',
+-              fontSize: 'var(--fs-sm)',
+-              cursor: 'pointer',
+-              fontWeight: 600,
+-            }}
++          <select
++            value={String(year)}
++            onChange={(e) => setCursor(setYear(cursor, +e.target.value))}
++            aria-label="سال"
++            style={{ flex: 1.2, height: 32, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 4px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
+           >
+-            ‹ ماه قبل
+-          </button>
++            {years.map((y) => <option key={y} value={y}>{toFa(y)}</option>)}
++          </select>
+           <button
+             type="button"
+             onClick={() => setCursor(addMonths(cursor, 1))}
+             aria-label="ماه بعد"
+-            style={{
+-              flex: 1,
+-              height: 34,
+-              background: 'var(--btn-bg)',
+-              border: '1px solid var(--border)',
+-              borderRadius: 'var(--r-md)',
+-              color: 'var(--muted)',
+-              fontFamily: 'inherit',
+-              fontSize: 'var(--fs-sm)',
+-              cursor: 'pointer',
+-              fontWeight: 600,
+-            }}
+-          >
+-            ماه بعد ›
+-          </button>
++            style={{ width: 32, height: 32, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
++          >‹</button>
+         </div>
+ 
+-        {/* روزهای هفته */}
+-        <div
+-          role="row"
+-          style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}
+-        >
++        {/* ═══ روزهای هفته ═══ */}
++        <div role="row" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginTop: 4 }}>
+           {WEEKDAYS.map((w, i) => (
+-            <div
+-              key={i}
+-              role="columnheader"
+-              style={{
+-                textAlign: 'center',
+-                fontSize: 'var(--fs-xs)',
+-                color: i === 6 ? 'var(--danger)' : 'var(--dim)',
+-                padding: '4px 0',
+-                fontWeight: 700,
+-              }}
+-            >
++            <div key={i} role="columnheader" style={{ textAlign: 'center', fontSize: 10, color: i === 6 ? 'var(--danger)' : 'var(--dim)', padding: '2px 0', fontWeight: 700 }}>
+               {w}
+             </div>
+           ))}
+         </div>
+ 
+-        {/* روزها */}
+-        <div
+-          role="grid"
+-          style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}
+-        >
++        {/* ═══ روزها ═══ */}
++        <div role="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+           {Array.from({ length: firstCol }).map((_, i) => (
+             <div key={`e-${i}`} aria-hidden="true" />
+           ))}
+@@ -365,40 +238,22 @@ export default function DatePicker({
+                 aria-selected={isSelected}
+                 aria-current={isToday ? 'date' : undefined}
+                 style={{
+-                  aspectRatio: '1',
+-                  background: isSelected
+-                    ? 'var(--accent)'
+-                    : isToday
+-                    ? 'var(--accent-soft)'
+-                    : 'transparent',
+-                  border:
+-                    isToday && !isSelected
+-                      ? '1px solid var(--accent-border)'
+-                      : '1px solid transparent',
++                  height: 36,
++                  padding: 0,
++                  background: isSelected ? 'var(--accent)' : 'transparent',
++                  border: isToday && !isSelected ? '1.5px solid var(--accent)' : '1px solid transparent',
+                   borderRadius: 'var(--r-sm)',
+                   cursor: isDisabled ? 'not-allowed' : 'pointer',
+-                  color: isDisabled
+-                    ? 'var(--dim)'
+-                    : isSelected
+-                    ? 'var(--avatar-text)'
+-                    : isFriday
+-                    ? 'var(--danger)'
+-                    : 'var(--text)',
++                  color: isDisabled ? 'var(--dim)' : isSelected ? 'var(--avatar-text)' : isFriday ? 'var(--danger)' : 'var(--text)',
+                   fontFamily: 'inherit',
+                   fontSize: 'var(--fs-base)',
+-                  fontWeight: isSelected || isToday ? 700 : 400,
++                  fontWeight: isSelected || isToday ? 700 : 500,
+                   opacity: isDisabled ? 0.35 : 1,
+                   transition: noAnim ? 'none' : 'background var(--dur-fast)',
+                   outline: 'none',
+                 }}
+-                onFocus={(e) => {
+-                  if (!isDisabled && !isSelected) {
+-                    e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
+-                  }
+-                }}
+-                onBlur={(e) => {
+-                  e.currentTarget.style.boxShadow = 'none';
+-                }}
++                onFocus={(e) => { if (!isDisabled && !isSelected) e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)'; }}
++                onBlur={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+               >
+                 {toFa(day)}
+               </button>
+@@ -406,6 +261,7 @@ export default function DatePicker({
+           })}
+         </div>
+       </Modal>
++
+     </>
+   );
+ }
+diff --git a/src/shr/components/ExpandableCard.tsx b/src/shr/components/ExpandableCard.tsx
+index 629932f..86f7729 100644
+--- a/src/shr/components/ExpandableCard.tsx
++++ b/src/shr/components/ExpandableCard.tsx
+@@ -12,13 +12,13 @@ interface Props {
+   subtitle: string;
+   badge?: React.ReactNode;
+   summary?: React.ReactNode;
++  stats?: React.ReactNode;
+   compact?: boolean;
+   isOpen: boolean;
+   onToggle: () => void;
+   children: React.ReactNode;
+ }
+ 
+-// همه‌ی رنگ‌های ممکن
+ const COLORS: Record<AccentKey, { c: string; s: string }> = {
+   accent: { c: 'var(--accent)', s: 'var(--accent-soft)' },
+   green:  { c: 'var(--accent)', s: 'var(--accent-soft)' },
+@@ -28,14 +28,13 @@ const COLORS: Record<AccentKey, { c: string; s: string }> = {
+   gray:   { c: 'var(--dim)',    s: 'var(--input-bg)' },
+   purple: { c: 'var(--purple)', s: 'var(--purple-soft)' },
+   info:   { c: 'var(--info)',   s: 'var(--info-soft)' },
+-  blue:   { c: 'var(--info)',   s: 'var(--info-soft)' }
++  blue:   { c: 'var(--info)',   s: 'var(--info-soft)' },
+ };
+ 
+ export default function ExpandableCard({
+   accent = 'accent', index, iconEmoji = '📋', compact = false,
+-  title, subtitle, badge, summary, isOpen, onToggle, children
++  title, subtitle, badge, summary, stats, isOpen, onToggle, children,
+ }: Props) {
+-  // lowPowerMode از تنظیمات + prefers-reduced-motion از سیستم
+   const lowPower = useSet((st: any) => st.lowPowerMode);
+   const [prefersReduced, setPrefersReduced] = useState(false);
+   useEffect(() => {
+@@ -45,7 +44,7 @@ export default function ExpandableCard({
+       const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+       mq.addEventListener('change', handler);
+       return () => mq.removeEventListener('change', handler);
+-    } catch {}
++    } catch { /* silent */ }
+   }, []);
+   const noAnim = !!(lowPower || prefersReduced);
+ 
+@@ -57,11 +56,11 @@ export default function ExpandableCard({
+       position: 'relative',
+       background: 'var(--card)',
+       backdropFilter: noAnim ? 'none' : 'blur(8px)',
+-      border: `1px solid ${isOpen ? color : 'var(--border)'}`,
++      border: '1px solid ' + (isOpen ? color : 'var(--border)'),
+       borderRadius: 'var(--r-lg)',
+       overflow: 'hidden',
+       marginBottom: 8,
+-      transition: 'border-color var(--dur-base)'
++      transition: 'border-color var(--dur-base)',
+     }}>
+       <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: color, zIndex: 1 }} />
+ 
+@@ -69,7 +68,7 @@ export default function ExpandableCard({
+         role="button"
+         tabIndex={0}
+         aria-expanded={isOpen}
+-        aria-label={`${isOpen ? 'بستن' : 'باز کردن'} ${title}`}
++        aria-label={(isOpen ? 'بستن ' : 'باز کردن ') + title}
+         onClick={onToggle}
+         onKeyDown={(e) => {
+           if (e.key === 'Enter' || e.key === ' ') {
+@@ -77,27 +76,19 @@ export default function ExpandableCard({
+             onToggle();
+           }
+         }}
++        className="ec-trigger"
+         style={{
+           padding: compact ? '8px 14px 8px 12px' : '12px 18px 12px 16px',
+           cursor: 'pointer',
+           outline: 'none',
+         }}
+-        onFocus={(e) => {
+-          e.currentTarget.style.outline = '2px solid var(--accent)';
+-          e.currentTarget.style.outlineOffset = '2px';
+-          e.currentTarget.style.borderRadius = 'var(--r-md)';
+-        }}
+-        onBlur={(e) => {
+-          e.currentTarget.style.outline = 'none';
+-          e.currentTarget.style.outlineOffset = '0';
+-        }}
+       >
+         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+           <div style={{
+             width: compact ? 34 : 42, height: compact ? 34 : 42, borderRadius: 'var(--r-md)',
+             background: soft, color: color,
+             display: 'flex', alignItems: 'center', justifyContent: 'center',
+-            fontSize: 18, flexShrink: 0, position: 'relative'
++            fontSize: 18, flexShrink: 0, position: 'relative',
+           }}>
+             {iconEmoji}
+             {index !== undefined && index !== '' && (
+@@ -106,7 +97,7 @@ export default function ExpandableCard({
+                 background: color, color: 'var(--avatar-text)',
+                 fontSize: 'var(--fs-xs)', fontWeight: 800,
+                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+-                border: '2px solid var(--card-solid)'
++                border: '2px solid var(--card-solid)',
+               }}>{index}</span>
+             )}
+           </div>
+@@ -124,12 +115,17 @@ export default function ExpandableCard({
+           </svg>
+         </div>
+ 
+-        {summary && !compact && (
++        {(summary || stats) && !compact && (
+           <div style={{
+-            display: 'flex', gap: 14, marginTop: 10, paddingTop: 10,
++            display: 'flex', gap: 10, marginTop: 8, paddingTop: 8,
+             borderTop: '1px dashed var(--border)',
+-            fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexWrap: 'wrap'
+-          }}>{summary}</div>
++            fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexWrap: 'wrap',
++            alignItems: 'center',
++            lineHeight: 1.6,
++          }}>
++            {summary}
++            {stats}
++          </div>
+         )}
+       </div>
+ 
+@@ -137,7 +133,7 @@ export default function ExpandableCard({
+         display: 'grid',
+         gridTemplateRows: isOpen ? '1fr' : '0fr',
+         transition: noAnim ? 'none' : 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
+-        willChange: 'grid-template-rows'
++        willChange: 'grid-template-rows',
+       }}>
+         <div style={{ overflow: 'hidden' }}>
+           <div style={{ padding: '0 18px 14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+@@ -148,3 +144,49 @@ export default function ExpandableCard({
+     </div>
+   );
+ }
++
++// ─────────── کامپوننت‌های نمایش اطلاعات فشرده ───────────
++
++/** آیتم کوچیک برای ردیف summary — بدون ارتفاع اضافی */
++export function InfoItem({ icon, value, tone = 'default' }: { icon?: string; value: string; tone?: 'default' | 'accent' | 'warn' | 'danger' | 'info' | 'purple' }) {
++  const colorMap: Record<string, string> = {
++    default: 'var(--muted)',
++    accent: 'var(--accent)',
++    warn: 'var(--warn)',
++    danger: 'var(--danger)',
++    info: 'var(--info)',
++    purple: 'var(--purple)',
++  };
++  const fg = colorMap[tone] || colorMap.default;
++  return (
++    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', maxWidth: '35%', overflow: 'hidden' }}>
++      {icon && <span style={{ flexShrink: 0 }}>{icon}</span>}
++      <b style={{ color: fg, fontWeight: 700, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</b>
++    </span>
++  );
++}
++
++/** عنصر Label: Value — با رنگ شرطی */
++export function StatBox({ icon, value, label, tone = 'default' }: { icon?: string; value: string; label: string; tone?: 'default' | 'accent' | 'warn' | 'danger' | 'info' | 'purple' }) {
++  const colorMap: Record<string, string> = {
++    default: 'var(--text)',
++    accent: 'var(--accent)',
++    warn: 'var(--warn)',
++    danger: 'var(--danger)',
++    info: 'var(--info)',
++    purple: 'var(--purple)',
++  };
++  const fg = colorMap[tone] || colorMap.default;
++  return (
++    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', maxWidth: '40%', overflow: 'hidden' }}>
++      {icon && <span style={{ flexShrink: 0 }}>{icon}</span>}
++      <span style={{ color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}:</span>
++      <b style={{ color: fg, fontWeight: 700, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</b>
++    </span>
++  );
++}
++
++/** جداکننده‌ی نقطه‌ای بین آیتم‌ها */
++export function Dot() {
++  return <span aria-hidden="true" style={{ color: 'var(--dim)', margin: '0 2px' }}>·</span>;
++}
+diff --git a/src/shr/components/TimePicker.tsx b/src/shr/components/TimePicker.tsx
+index 07cb5e8..7fd4a6d 100644
+--- a/src/shr/components/TimePicker.tsx
++++ b/src/shr/components/TimePicker.tsx
+@@ -1,13 +1,12 @@
+-import { useState, useEffect } from 'react';
++import { useState, useEffect, useRef } from 'react';
+ import { Btn, Modal } from './ui';
+-import { toFa, toEn, formatNumWhileTyping } from '../utils/fa';
++import { toFa, toEn } from '../utils/fa';
+ import { useSet } from '../../mod/set/store';
+ 
+ interface Props {
+   value: string;
+   onChange: (v: string) => void;
+   placeholder?: string;
+-  // جدید
+   disabled?: boolean;
+   required?: boolean;
+   error?: string;
+@@ -15,19 +14,44 @@ interface Props {
+   compact?: boolean;
+ }
+ 
++const SIZE = 220;
++const CX = SIZE / 2;
++const CY = SIZE / 2;
++const R_INNER = 60;
++const R_OUTER = 94;
++const R_MID = (R_INNER + R_OUTER) / 2;
++const R_MIN = 78;
++
++function polar(angleDeg: number, radius: number) {
++  const rad = (angleDeg * Math.PI) / 180;
++  return { x: CX + radius * Math.sin(rad), y: CY - radius * Math.cos(rad) };
++}
++
++function parseTime(v: string) {
++  const parts = (v || '').replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).split(':');
++  const h = parseInt(parts[0]) || 0;
++  const m = parseInt(parts[1]) || 0;
++  return { h: Math.min(23, Math.max(0, h)), m: Math.min(59, Math.max(0, m)) };
++}
++
+ export default function TimePicker({
+-  value,
+-  onChange,
++  value, onChange,
+   placeholder = 'انتخاب ساعت',
+-  disabled = false,
+-  required = false,
+-  error,
+-  warn,
+-  compact = false,
++  disabled = false, required = false,
++  error, warn, compact = false,
+ }: Props) {
+   const [open, setOpen] = useState(false);
++  const [hour, setHour] = useState(0);
++  const [minute, setMinute] = useState(0);
++  const [step, setStep] = useState<'hour' | 'minute'>('hour');
++  const [dragging, setDragging] = useState(false);
++  const svgRef = useRef<SVGSVGElement | null>(null);
++  const hourRef = useRef(0);
++  const minuteRef = useRef(0);
++
++  useEffect(() => { hourRef.current = hour; }, [hour]);
++  useEffect(() => { minuteRef.current = minute; }, [minute]);
+ 
+-  // lowPowerMode + prefers-reduced-motion
+   const lowPower = useSet((st: any) => st.lowPowerMode);
+   const [prefersReduced, setPrefersReduced] = useState(false);
+   useEffect(() => {
+@@ -37,36 +61,21 @@ export default function TimePicker({
+       const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+       mq.addEventListener('change', handler);
+       return () => mq.removeEventListener('change', handler);
+-    } catch {
+-      /* silent */
+-    }
++    } catch { /* silent */ }
+   }, []);
+   const noAnim = !!(lowPower || prefersReduced);
+ 
+-  const parseTime = () => {
+-    const parts = (value || '')
+-      .replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
+-      .split(':');
+-    const h = parseInt(parts[0]) || 0;
+-    const m = parseInt(parts[1]) || 0;
+-    return { h: Math.min(23, Math.max(0, h)), m: Math.min(59, Math.max(0, m)) };
+-  };
+-
+-  const [hour, setHour] = useState(() => parseTime().h);
+-  const [minute, setMinute] = useState(() => parseTime().m);
+-
+   const openPicker = () => {
+     if (disabled) return;
+-    const p = parseTime();
++    const p = parseTime(value);
+     setHour(p.h);
+     setMinute(p.m);
++    setStep('hour');
+     setOpen(true);
+   };
+ 
+-  const confirm = () => {
+-    const h = String(hour).padStart(2, '0');
+-    const m = String(minute).padStart(2, '0');
+-    onChange(`${h}:${m}`);
++  const commitNow = (h: number, m: number) => {
++    onChange(String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0'));
+     setOpen(false);
+   };
+ 
+@@ -74,28 +83,76 @@ export default function TimePicker({
+     const now = new Date();
+     setHour(now.getHours());
+     setMinute(now.getMinutes());
++    setStep('hour');
+   };
+ 
+-  const changeMinute = (raw: string) => {
+-    const en = toEn(raw).replace(/\D/g, '');
+-    if (!en) {
+-      setMinute(0);
+-      return;
++  const pointerToTime = (clientX: number, clientY: number) => {
++    const svg = svgRef.current;
++    if (!svg) return null;
++    const rect = svg.getBoundingClientRect();
++    const scaleX = SIZE / rect.width;
++    const scaleY = SIZE / rect.height;
++    const px = (clientX - rect.left) * scaleX - CX;
++    const py = (clientY - rect.top) * scaleY - CY;
++    const dist = Math.sqrt(px * px + py * py);
++    let angle = Math.atan2(px, -py) * 180 / Math.PI;
++    if (angle < 0) angle += 360;
++    return { angle, dist };
++  };
++
++  const applyPointer = (clientX: number, clientY: number) => {
++    const r = pointerToTime(clientX, clientY);
++    if (!r) return;
++    if (step === 'hour') {
++      let h: number;
++      if (r.dist < R_MID) h = Math.round(r.angle / 30) % 12;
++      else h = 12 + Math.round(r.angle / 30) % 12;
++      setHour(h);
++    } else {
++      const m = Math.round(r.angle / 6) % 60;
++      setMinute(m);
+     }
+-    const n = parseInt(en);
+-    setMinute(Math.min(59, Math.max(0, n)));
+   };
+ 
+-  const quickMinutes = [0, 15, 30, 45];
++  const handleDown = (e: React.PointerEvent<SVGSVGElement>) => {
++    e.preventDefault();
++    try { (e.currentTarget as any).setPointerCapture(e.pointerId); } catch { /* silent */ }
++    setDragging(true);
++    applyPointer(e.clientX, e.clientY);
++  };
++
++  const handleMove = (e: React.PointerEvent<SVGSVGElement>) => {
++    if (!dragging) return;
++    e.preventDefault();
++    applyPointer(e.clientX, e.clientY);
++  };
+ 
++  const handleUp = (e: React.PointerEvent<SVGSVGElement>) => {
++    if (!dragging) return;
++    setDragging(false);
++    if (step === 'hour') {
++      // برو به دقیقه
++      setTimeout(() => setStep('minute'), 150);
++    } else {
++      // تمام — با مقادیر به‌روز commit کن
++      setTimeout(() => commitNow(hourRef.current, minuteRef.current), 150);
++    }
++  };
++
++  const borderColor = error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)';
+   const height = compact ? 32 : 38;
+   const fontSize = compact ? 'var(--fs-sm)' : 'var(--fs-base)';
+ 
+-  const borderColor = error
+-    ? 'var(--danger)'
+-    : warn
+-    ? 'var(--warn)'
+-    : 'var(--border)';
++  // موقعیت دسته بر اساس مرحله
++  const handPos = (() => {
++    if (step === 'hour') {
++      const angle = (hour % 12) * 30;
++      const radius = hour < 12 ? R_INNER : R_OUTER;
++      return polar(angle, radius);
++    }
++    const idx = Math.round(minute / 5) % 12;
++    return polar(idx * 30, R_MIN);
++  })();
+ 
+   return (
+     <>
+@@ -104,293 +161,135 @@ export default function TimePicker({
+         disabled={disabled}
+         onClick={openPicker}
+         aria-haspopup="dialog"
+-        aria-label={required ? `${placeholder} (اجباری)` : placeholder}
++        aria-label={required ? placeholder + ' (اجباری)' : placeholder}
+         aria-invalid={!!error}
+         style={{
+-          width: '100%',
+-          height,
++          width: '100%', height,
+           background: 'var(--input-bg)',
+-          border: `1px solid ${borderColor}`,
++          border: '1px solid ' + borderColor,
+           borderRadius: 'var(--r-md)',
+           padding: compact ? '0 10px' : '0 12px',
+           color: value ? 'var(--text)' : 'var(--dim)',
+-          fontFamily: 'inherit',
+-          fontSize,
++          fontFamily: 'inherit', fontSize,
+           cursor: disabled ? 'not-allowed' : 'pointer',
+           opacity: disabled ? 0.55 : 1,
+           textAlign: 'right',
+-          display: 'flex',
+-          alignItems: 'center',
+-          justifyContent: 'space-between',
+-          gap: 8,
+-          minWidth: 0,
+-          outline: 'none',
+-          transition: noAnim ? 'none' : 'border-color var(--dur-base)',
+-        }}
+-        onFocus={e => {
+-          if (!disabled) {
+-            e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
+-          }
+-        }}
+-        onBlur={e => {
+-          e.currentTarget.style.boxShadow = 'none';
++          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
++          minWidth: 0, outline: 'none',
+         }}
++        onFocus={(e) => { if (!disabled) e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)'; }}
++        onBlur={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+       >
+-        <span
+-          style={{
+-            overflow: 'hidden',
+-            textOverflow: 'ellipsis',
+-            whiteSpace: 'nowrap',
+-          }}
+-        >
++        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+           {value ? toFa(value) : placeholder}
+-          {required && !value ? (
+-            <span style={{ color: 'var(--danger)', marginRight: 4 }}> *</span>
+-          ) : null}
++          {required && !value ? <span style={{ color: 'var(--danger)', marginRight: 4 }}> *</span> : null}
+         </span>
+-        <svg
+-          width={compact ? 13 : 15}
+-          height={compact ? 13 : 15}
+-          viewBox="0 0 24 24"
+-          fill="none"
+-          stroke="currentColor"
+-          strokeWidth="2"
+-          strokeLinecap="round"
+-          style={{ flexShrink: 0, color: 'var(--dim)' }}
+-          aria-hidden="true"
+-        >
++        <svg width={compact ? 13 : 15} height={compact ? 13 : 15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, color: 'var(--dim)' }} aria-hidden="true">
+           <circle cx="12" cy="12" r="10" />
+           <path d="M12 6v6l4 2" />
+         </svg>
+       </button>
+ 
+       {(error || warn) && (
+-        <div
+-          style={{
+-            fontSize: 'var(--fs-xs)',
+-            color: error ? 'var(--danger)' : 'var(--warn)',
+-            marginTop: 4,
+-          }}
+-        >
+-          {error ? `✕ ${error}` : `⚠ ${warn}`}
++        <div style={{ fontSize: 'var(--fs-xs)', color: error ? 'var(--danger)' : 'var(--warn)', marginTop: 4 }}>
++          {error ? '✕ ' + error : '⚠ ' + warn}
+         </div>
+       )}
+ 
+       <Modal
+         open={open}
+         onClose={() => setOpen(false)}
+-        title="انتخاب ساعت"
++        title={step === 'hour' ? 'انتخاب ساعت' : 'انتخاب دقیقه'}
++        size="sm"
+         footer={
+-          <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: 8 }}>
+-            <Btn variant="primary" onClick={confirm}>تأیید</Btn>
+-            <Btn onClick={setNow}>الان</Btn>
+-            <Btn
+-              onClick={() => {
+-                onChange('');
+-                setOpen(false);
+-              }}
+-            >
+-              پاک کردن
+-            </Btn>
++          <div style={{ display: 'flex', gap: 8 }}>
++            {step === 'minute' && (
++              <Btn onClick={() => setStep('hour')} style={{ flex: 1, height: 34 }}>‹ ساعت</Btn>
++            )}
++            <Btn onClick={setNow} style={{ flex: 1, height: 34 }}>🕐 الان</Btn>
++            <Btn onClick={() => { onChange(''); setOpen(false); }} style={{ flex: 1, height: 34 }}>پاک</Btn>
+           </div>
+         }
+       >
+-        {/* نمایش بزرگ — aria-live */}
+-        <div
+-          aria-live="polite"
+-          aria-atomic="true"
+-          style={{
+-            padding: '14px',
+-            background: 'var(--accent-soft)',
+-            border: '1px solid var(--accent-border)',
+-            borderRadius: 'var(--r-md)',
+-            textAlign: 'center',
+-            fontSize: 36,
+-            fontWeight: 700,
+-            color: 'var(--accent)',
+-            fontVariantNumeric: 'tabular-nums',
+-            letterSpacing: 3,
+-            direction: 'ltr',
+-          }}
+-        >
+-          {toFa(String(hour).padStart(2, '0'))}:{toFa(String(minute).padStart(2, '0'))}
++        {/* ═══ نمایش دیجیتال ═══ */}
++        <div aria-live="polite" aria-atomic="true" style={{ textAlign: 'center', padding: '2px 0 6px' }}>
++          <div style={{ fontSize: 30, fontWeight: 700, color: 'var(--accent)', fontVariantNumeric: 'tabular-nums', letterSpacing: 3, direction: 'ltr' }}>
++            {toFa(String(hour).padStart(2, '0'))}:{toFa(String(minute).padStart(2, '0'))}
++          </div>
++          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
++            {step === 'hour' ? '🕐 ساعت را انتخاب کن' : '⏱ دقیقه را انتخاب کن'}
++          </div>
+         </div>
+ 
+-        {/* ساعت */}
+-        <div
+-          style={{
+-            fontSize: 'var(--fs-sm)',
+-            color: 'var(--muted)',
+-            fontWeight: 700,
+-            marginTop: 4,
+-            display: 'flex',
+-            justifyContent: 'space-between',
+-          }}
+-        >
+-          <span>ساعت</span>
+-          <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 400 }}>۰ تا ۲۳</span>
+-        </div>
+-        <div
+-          role="group"
+-          aria-label="انتخاب ساعت"
+-          style={{
+-            display: 'grid',
+-            gridTemplateColumns: 'repeat(6, 1fr)',
+-            gap: 4,
+-          }}
++        {/* ═══ ساعت عقربه‌ای ═══ */}
++        <svg
++          ref={svgRef}
++          viewBox={'0 0 ' + SIZE + ' ' + SIZE}
++          width="100%"
++          style={{ maxWidth: SIZE, display: 'block', margin: '0 auto', touchAction: 'none', cursor: 'pointer', userSelect: 'none' }}
++          onPointerDown={handleDown}
++          onPointerMove={handleMove}
++          onPointerUp={handleUp}
++          onPointerCancel={handleUp}
+         >
+-          {Array.from({ length: 24 }).map((_, h) => (
+-            <button
+-              key={h}
+-              type="button"
+-              onClick={() => setHour(h)}
+-              aria-pressed={hour === h}
+-              aria-label={`ساعت ${toFa(h)}`}
+-              style={{
+-                padding: '8px 2px',
+-                background: hour === h ? 'var(--accent)' : 'var(--input-bg)',
+-                border: `1px solid ${hour === h ? 'var(--accent)' : 'var(--border)'}`,
+-                borderRadius: 'var(--r-sm)',
+-                color: hour === h ? 'var(--avatar-text)' : 'var(--text)',
+-                fontFamily: 'inherit',
+-                fontSize: 'var(--fs-base)',
+-                fontWeight: hour === h ? 700 : 500,
+-                cursor: 'pointer',
+-                fontVariantNumeric: 'tabular-nums',
+-                outline: 'none',
+-                transition: noAnim ? 'none' : 'background var(--dur-fast)',
+-              }}
+-              onFocus={e => {
+-                e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
+-              }}
+-              onBlur={e => {
+-                e.currentTarget.style.boxShadow = 'none';
+-              }}
+-            >
+-              {toFa(String(h).padStart(2, '0'))}
+-            </button>
+-          ))}
+-        </div>
++          <circle cx={CX} cy={CY} r={R_OUTER + 22} fill="var(--input-bg)" opacity="0.4" />
+ 
+-        {/* دقیقه */}
+-        <div
+-          style={{
+-            fontSize: 'var(--fs-sm)',
+-            color: 'var(--muted)',
+-            fontWeight: 700,
+-            marginTop: 10,
+-            display: 'flex',
+-            justifyContent: 'space-between',
+-          }}
+-        >
+-          <span>دقیقه</span>
+-          <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 400 }}>تایپ یا از دکمه‌ها</span>
+-        </div>
++          {/* مرحله ساعت: دو حلقه */}
++          {step === 'hour' && (
++            <>
++              {Array.from({ length: 12 }).map((_, i) => {
++                const angle = i * 30;
++                const pI = polar(angle, R_INNER);
++                const pO = polar(angle, R_OUTER);
++                const hI = i;
++                const hO = i + 12;
++                const aI = hour === hI;
++                const aO = hour === hO;
++                return (
++                  <g key={i}>
++                    <circle cx={pI.x} cy={pI.y} r={13} fill={aI ? 'var(--accent)' : 'transparent'} />
++                    <text x={pI.x} y={pI.y} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={aI ? 700 : 500} fill={aI ? '#fff' : 'var(--text)'} style={{ pointerEvents: 'none' }}>{toFa(hI)}</text>
++                    <circle cx={pO.x} cy={pO.y} r={13} fill={aO ? 'var(--accent)' : 'transparent'} />
++                    <text x={pO.x} y={pO.y} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={aO ? 700 : 500} fill={aO ? '#fff' : 'var(--text)'} style={{ pointerEvents: 'none' }}>{toFa(hO)}</text>
++                  </g>
++                );
++              })}
++            </>
++          )}
+ 
+-        <div style={{ display: 'flex', gap: 6 }}>
+-          {/* فیلد ورودی دقیقه */}
+-          <div
+-            style={{
+-              flex: 1,
+-              height: 42,
+-              background: 'var(--input-bg)',
+-              border: '1px solid var(--accent-border)',
+-              borderRadius: 'var(--r-md)',
+-              padding: '0 12px',
+-              display: 'flex',
+-              alignItems: 'center',
+-              gap: 6,
+-              minWidth: 0,
+-            }}
+-          >
+-            <span
+-              aria-hidden="true"
+-              style={{
+-                fontSize: 'var(--fs-lg)',
+-                color: 'var(--accent)',
+-                fontWeight: 700,
+-              }}
+-            >
+-              :
+-            </span>
+-            <input
+-              type="text"
+-              inputMode="numeric"
+-              dir="ltr"
+-              value={formatNumWhileTyping(String(minute))}
+-              onChange={e => changeMinute(e.target.value)}
+-              onFocus={e => e.target.select()}
+-              placeholder="۰۰"
+-              aria-label="دقیقه (۰ تا ۵۹)"
+-              style={{
+-                flex: 1,
+-                minWidth: 0,
+-                background: 'none',
+-                border: 'none',
+-                outline: 'none',
+-                color: 'var(--accent)',
+-                fontFamily: 'inherit',
+-                fontSize: 20,
+-                fontWeight: 700,
+-                textAlign: 'center',
+-                fontVariantNumeric: 'tabular-nums',
+-              }}
+-            />
+-            <span
+-              aria-hidden="true"
+-              style={{ fontSize: 'var(--fs-xs)', color: 'var(--dim)' }}
+-            >
+-              دقیقه
+-            </span>
+-          </div>
++          {/* مرحله دقیقه: یک حلقه */}
++          {step === 'minute' && (
++            <>
++              {Array.from({ length: 12 }).map((_, i) => {
++                const angle = i * 30;
++                const m = i * 5;
++                const p = polar(angle, R_MIN);
++                const active = Math.floor(minute / 5) === i;
++                return (
++                  <g key={i}>
++                    <circle cx={p.x} cy={p.y} r={13} fill={active ? 'var(--accent)' : 'transparent'} />
++                    <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={active ? 700 : 500} fill={active ? '#fff' : 'var(--text)'} style={{ pointerEvents: 'none' }}>{toFa(String(m).padStart(2, '0'))}</text>
++                  </g>
++                );
++              })}
++            </>
++          )}
+ 
+-          {/* دکمه‌های سریع */}
+-          {quickMinutes.map(m => (
+-            <button
+-              key={m}
+-              type="button"
+-              onClick={() => setMinute(m)}
+-              aria-pressed={minute === m}
+-              aria-label={`${toFa(m)} دقیقه`}
+-              style={{
+-                width: 42,
+-                height: 42,
+-                background: minute === m ? 'var(--accent)' : 'var(--btn-bg)',
+-                border: `1px solid ${minute === m ? 'var(--accent)' : 'var(--border)'}`,
+-                borderRadius: 'var(--r-md)',
+-                color: minute === m ? 'var(--avatar-text)' : 'var(--muted)',
+-                fontFamily: 'inherit',
+-                fontSize: 'var(--fs-sm)',
+-                fontWeight: 700,
+-                cursor: 'pointer',
+-                fontVariantNumeric: 'tabular-nums',
+-                flexShrink: 0,
+-                outline: 'none',
+-                transition: noAnim ? 'none' : 'background var(--dur-fast)',
+-              }}
+-              onFocus={e => {
+-                e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
+-              }}
+-              onBlur={e => {
+-                e.currentTarget.style.boxShadow = 'none';
+-              }}
+-            >
+-              {toFa(String(m).padStart(2, '0'))}
+-            </button>
+-          ))}
+-        </div>
++          {/* عقربه */}
++          <line x1={CX} y1={CY} x2={handPos.x} y2={handPos.y} stroke="var(--accent)" strokeWidth={2.5} strokeLinecap="round" style={{ pointerEvents: 'none' }} />
++          <circle cx={CX} cy={CY} r={5} fill="var(--accent)" style={{ pointerEvents: 'none' }} />
++          <circle cx={handPos.x} cy={handPos.y} r={12} fill="var(--accent)" opacity={0.25} style={{ pointerEvents: 'none' }} />
++        </svg>
+ 
+-        {/* راهنما */}
+-        <div
+-          style={{
+-            fontSize: 'var(--fs-xs)',
+-            color: 'var(--dim)',
+-            textAlign: 'center',
+-            marginTop: 2,
+-          }}
++        {/* ═══ دکمه تأیید دستی ═══ */}
++        <Btn
++          variant="primary"
++          full
++          onClick={() => commitNow(hour, minute)}
++          style={{ marginTop: 6, height: 34 }}
+         >
+-          هر عددی بین ۰۰ تا ۵۹ وارد کنید — مثلاً ۱۶
+-        </div>
++          ✓ تأیید {toFa(String(hour).padStart(2, '0'))}:{toFa(String(minute).padStart(2, '0'))}
++        </Btn>
+       </Modal>
+     </>
+   );
+diff --git a/src/shr/components/ui.tsx b/src/shr/components/ui.tsx
+index 0a3d63e..c262c18 100644
+--- a/src/shr/components/ui.tsx
++++ b/src/shr/components/ui.tsx
+@@ -463,7 +463,7 @@ export function Modal({
+           borderTopRightRadius: 'var(--r-2xl)',
+           width: '100%',
+           maxWidth,
+-          maxHeight: '90vh',
++          maxHeight: '85vh',
+           display: 'flex',
+           flexDirection: 'column',
+           overflow: 'hidden',
+@@ -473,7 +473,7 @@ export function Modal({
+         {/* Header */}
+         <div
+           style={{
+-            padding: '14px 20px',
++            padding: '10px 14px',
+             borderBottom: '1px solid var(--border)',
+             display: 'flex',
+             alignItems: 'center',
+@@ -520,7 +520,7 @@ export function Modal({
+         {/* Body */}
+         <div
+           style={{
+-            padding: '20px',
++            padding: '14px',
+             overflowY: 'auto',
+             display: 'flex',
+             flexDirection: 'column',
+@@ -534,7 +534,7 @@ export function Modal({
+         {footer && (
+           <div
+             style={{
+-              padding: '12px 20px 24px',
++              padding: '10px 14px 18px',
+               borderTop: '1px solid var(--border)',
+               flexShrink: 0,
+             }}

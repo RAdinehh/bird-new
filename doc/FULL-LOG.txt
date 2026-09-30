@@ -1,0 +1,214 @@
+e47759a feat(inc): add stats row to DevicesPage collapsed cards
+0e760d8 refactor: rename summary -> stats in 21 modules (unified API)
+d575338 docs: add HANDOFF.md for AI next session
+cdde583 fix(inc): remove summary duplicates + fix hatchWindow with recomputed date
+4584c5c fix(inc): remove duplicated summary row (keep only stats)
+1db9ef1 feat(inc): compact stats row in collapsed cards (devices/eggs/candlings/hatches)
+55dff57 feat(ExpandableCard): add InfoItem + StatBox + Dot helpers for compact stats
+a33e986 fix(dsh): daysUntilDue uses date-fns-jalali (was Gregorian Date)
+77c79ef fix(tra): ageDays uses date-fns-jalali (was using Gregorian Date constructor)
+da77797 fix(inc): daysAgo starts from 1 (day 1 of incubation not 0)
+83a91c0 fix(ExpandableCard): add stats prop + fix focus outline (keyboard only)
+f2bc992 style: compact Modal + DatePicker + TimePicker (smaller padding/clock)
+412ace6 refactor(TimePicker): clock-face design with 24h two-ring + drag support
+f69fdcd refactor(DatePicker): compact modal + inline month/year selects
+9772408 fix(inc): Hatches — base = total eggs - sum of all candling losses
+d4a84be fix(inc): Hatches — auto-fill 100% fertile (no estimate), keep conservative as optional
+f7fc601 fix(inc): Hatches — max based on fertile count (from candling) not total eggs
+51000ba fix(inc): Hatches — fix toggleEntry nested state + full-row click
+598331a feat(inc): Hatches — smart auto-estimate based on fertility rate
+80dee52 feat(inc): Hatches — dynamic max on all fields based on total sum
+c44fd61 feat(inc): Hatches — grouped validation for grades + gender with live remaining
+4a1cc9a feat(inc): Hatches — quality/gender/weight only after hatched count
+7c0f810 feat(inc): Hatches — comprehensive validation (negative/grades/gender/weight/hatched)
+0a0000a feat(inc): Hatches — auto-fill from candling + chart + completion badge + post-hatch actions
+7bbdba2 refactor(inc): Hatches full rewrite — grades + gender + weight + real flock/sale modals + cascade
+9ec3687 revert(inc): remove dead stage split — back to single dead field
+f192035 feat(inc): Candlings — split dead into early/mid/late stages
+ae75509 feat(inc): Candlings — chained base from previous stage + revert button
+657bc38 refactor(inc): Candlings — ExpandableCard layout + summary bar + loss/fertility %
+a51f759 feat(inc): Candlings — manual day + auto today date + aggregate view
+f266ae0 refactor(inc): Candlings — multi-select entries + 2-col cards + accent color
+b15c89f feat(inc): Candlings — filter entries by device + bird in modal
+e91a542 refactor(inc): CandlingsPage full rewrite — grouped by entry + auto stage + neutral colors
+e1b5374 style(inc): remove colors from EggEntries — neutral borders only
+e3489f4 style(inc): change accent (green) to info (blue) in EggEntries
+e7babe6 style(inc): EggEntries Modal — clean sections + colored rows + 2-col layout
+0c0ad51 fix(inc): remove status filter + auto-migrate jalali dates
+8d42926 feat(inc): auto-set date+time on new entry + show time + fix edit preload
+6f3a36a fix(inc): migrate old jalali dates + recompute hatch from entryDate + remove redundant labels
+5ec312d feat(inc): filter ready flocks by age + sync-hatch conflict check
+9a9d548 fix(inc): use date-fns-jalali for all date calculations
+4d729b2 fix(inc): jalali date calc + flock age validation + sync-hatch guide
+584234a feat(inc): live capacity validation as user types count
+d13ae99 feat(inc): capacity validation with live warning + count>0 check
+21d4520 feat(inc): EggEntries — multi-row bulk form + draft auto-save per device
+0cca174 feat(inc): combined capacity across bird types (weighted by ref capacity)
+fcdd42c feat(inc): addEntry returns id + cascade delete with reference tracking
+3c3130f fix(inc): show price/shipping only for purchase/partnership
+8f3bb11 feat(inc): auto-link EggEntries — purchase→tra + own→egg + rent→tra + auto-fill bird/breed + remove candling/hatch from cards
+815a86d style(inc): EggEntries form — merge sections into 2-col grids (less empty space)
+2206dc7 refactor(inc): full rewrite EggEntriesPage — sections + ctc + search + filters
+912dfad feat(inc): show contact names from ctc in entry cards
+49ae58a feat(inc): EggEntries — supplier/partner/consignee/lessor from ctc
+8dc8b23 refactor(inc): EggEntries — device+source 2col at top
+5e1dc73 refactor(inc): remove invoiceNo field
+2000e57 refactor(inc): EggEntries form organized by sections + flock selector for own source
+9f7f5ed style(inc): maintenance modal 2-column
+be92f9f style(inc): maintenance modal 4-column layout
+85d904c style(inc): maintenance logs 4-column grid
+df7d8da fix(inc): replace Select with bird buttons (Select render issue)
+4736b91 refactor(inc): complete rewrite of DevicesPage from scratch
+2a6b46a fix(inc): capacity section — select on top + 2-column grid below
+d9edc5a style(inc): capacity as 2-column cards
+45c70ea fix(inc): capacity grid + single bird select
+77a6711 fix(inc): capacity single row + always show operational fields
+7d2a602 style(inc): maintenance logs 2-column grid
+a950854 fix(inc): capacity layout + remove custom bird btn + add maintenance modal
+563cd51 feat(inc): warranty expired badge in red
+54dc9d8 fix(inc): capacity layout beside name + remove empty text
+6b380ca fix(inc): warranty date in Jalali + bird name beside capacity field
+f0adad6 feat(inc): maintenance logs per device (date/type/cost/notes)
+34ab732 feat(inc): manual bird name input alongside list from brd
+7cd20d8 feat(inc): purchase deal type — seller/invoice/shipping fields
+91ec3ea feat(inc): post-hatch buttons (flock/sell)
+0935cc4 feat(inc): post-hatch — create flock or sell chicks
+e88f351 feat(inc): deal withdraw + auto-failed on infertility
+ab0fdda feat(inc): workflow chain — device → entry → candling → hatch
+4c7f877 feat(inc): URL params + cross-tab navigation
+e7403bf refactor(inc): Candlings + Hatches — Grid2 layout
+c8134e0 feat(inc): EggEntries — Grid2 + shippingCost + smart capacity + profile incubation
+f76f5f3 feat(inc): redesign DevicesPage — capacityByBird + auto-fill from profile + warranty auto-calc + status-based fields
+6f381a3 feat(set): incubation profiles tab — 7 birds with standard defaults
+3c6e8fd feat(ui): FilterBar + FilterChip + SavedViews
+6ba2612 feat(ui): EntityLink — cross-module navigation
+377162d feat(hooks): useUrlFilter for share-able filters
+c842151 docs: add FILTERS.md
+8190fd0 docs: add RELATIONSHIPS.md
+3dfec90 docs: update AUDIT-REPORT + README for v0.9.0
+3437e05 docs: bump v0.9.0 — phase 4 complete
+d8eb4bb feat(dsh): benchmark card — active vs archived flocks
+9747adb feat(rep): Pareto analysis of expenses
+afacf58 feat(dsh): auto-refresh KPI every 30s
+d679c85 feat(backup): auto-backup hook — every 24h, 5 versions
+822224a fix(cal): herbal events only from daily logs (no expiry)
+8959c77 feat(cal): herbal medicine filter + expiry events
+512ba3c feat(cal): vaccine schedule events from flock template
+464ed48 fix(flk): vaccineScheduleId in openEdit + save
+e640c25 feat(cal): vaccine schedule templates (Iran + International)
+4bedde3 docs: update AUDIT-REPORT + CHANGELOG for v0.8.0
+4592851 fix(router): add missing /ctc route
+3d76df7 fix(router): use /ctc directly (was /cus redirect)
+6d5df54 chore: cleanup build-docs.py.save + gitignore tsbuildinfo
+a7d047f chore: remove accidental "main" file
+592de43 feat(onboarding): 3-step modal with farm type
+8d6819c feat(help): HelpBanner for 4 key modules
+6603624 feat(Header): bell uses user dueDateReminders (7/3/1/0)
+56faa34 fix(settings): dueDateReminders number[] + update()
+52c29d9 refactor(app): update TITLES + onboarding text
+95966c4 feat(router): redirect 6 placeholders to target modules
+df8ba99 feat(Header): bell badge shows alerts + due-soon invoices (7d)
+cbc86b8 docs(audit): update with phase 1 progress
+7d8772e refactor: split 11 remaining long lines
+a30eb36 fix(ui): dynamic units for count/energy/minStock
+8b6d1ba fix(ui): add units to 17 numeric fields
+0699a26 refactor: split 102 long lines across 10 modules
+7715592 refactor(whs): split long lines
+b8dc717 refactor(dsh): extract helpers + split long lines
+78ffec3 fix(Modal): use onCloseRef to keep effect stable on parent re-render
+36cf49a fix(Modal): autofocus only on first open (prevent keyboard jump)
+3206b83 fix(tra): convert unitPrice/discount/shipping/payment to MoneyField
+6cf4811 fix(ui): convert 3 price fields to MoneyField (v2)
+d22228a fix(ui): convert 7 price fields to MoneyField
+e00c27f fix(ui): PhoneField+DigitField imports
+772f404 fix(ui): final 2 files NumField conversion
+fd1b8fd fix(ui): convert 5 more Inputs to NumField
+a31900a fix(ui): convert 97 numeric Inputs to NumField
+c7b9cb0 fix(audit): dimensions min=1 + fcr min=0.5
+f4fa082 fix(audit): temp fields min=-10
+f57fdee Revert "fix(audit): smart min values (temp=-10, dims=1, fcr=0.5)"
+be4f96c fix(audit): smart min values (temp=-10, dims=1, fcr=0.5)
+dda44ba fix(ui): NumField default min=0
+a3d60e8 fix(audit): add min to 22 files
+6714ab1 fix(audit): add min to numeric fields in src/mod/flk/FlocksPage.tsx
+a3d3d2d fix(dlg): 10-point audit — NumField/PercentField/Textarea + hints + empty summary + record title
+f41eb72 feat(ui): add NumField, MoneyField, PercentField, PhoneField, Textarea, Checkbox, RadioGroup
+6f8b856 chore: remove test.txt + cleanup.sh
+4caead6 chore: archive .bak/.save files + strengthen .gitignore
+782b793 docs: add COMPONENTS.md + README.md
+5f5c14d docs: add STANDARDS.md — coding contract v1.0
+eaeb4ea docs: add TECH-DEBT + BASELINE + SCHEMA v2.0
+76463c4 docs: add TECH-DEBT + BASELINE + update SCHEMA v2.0
+b687201 docs(audit): add AUDIT-REPORT.md — baseline v0.7.0
+39f69db feat(Input): Enter key navigation + cleanup redundant autoFocus
+b0b60fe refactor(Btn): forwardRef + displayName
+770dd34 refactor(DialogHost+HelpBanner): a11y + noAnim + focus trap
+4cc33be refactor(DialogHost+HelpBanner): a11y + noAnim + focus trap
+70e24d0 refactor(Charts): a11y + noAnim + dur-* + gradId یکتا
+2c547d6 refactor(ProgressTracker): a11y + noAnim + CSS var gradient + dur-*
+fe60a21 refactor(DependentSelect): a11y + props + هماهنگی height
+03fcd65 refactor(Chip+Empty): tone + a11y + focus
+b93a86d refactor(Tag): tones بیشتر + هماهنگی radius/font
+951714f refactor(Modal): a11y + focus trap + autofocus + size + noAnim
+d410e4a refactor(SmartSelect): بازنویسی کامل — هماهنگی + a11y + props + noAnim + compact
+61a1a51 refactor(DatePicker): بازنویسی کامل — a11y + props + باگ‌ها + noAnim + compact
+497663a feat(ExpandableCard): compact + lowPowerMode + prefers-reduced-motion
+1f166a8 a11y(ExpandableCard): role + tabIndex + aria + keyboard + focus
+fe3196e fix(ExpandableCard): باگ index خالی + transition dur-*
+2bc7080 refactor: Btn بازنویسی — icon + loading + disabled
+d5d3e7c refactor: BtnProps + icon/loading
+bb9b54b refactor: z-index توکن + Input dir
+4de360f feat(dlg): Store v6 — lightHours + تخم‌گذاری + migration
+4d0efd2 feat(dlg): ساعت ورود خودکار
+ab510c9 feat(dlg): دکمه‌های Archive/Restore در کارت‌ها
+ad6b69b feat(dlg): Archive + migration v5 + tab
+5a441eb refactor(dlg): createdAt/updatedAt + migration v4
+c7e181e feat(dsh): Toggle ۷/۳۰/۹۰ روزه برای نمودار تخم‌گذاری
+75e54b4 feat(dsh): کارت Benchmark نژاد (FCR فعلی vs استاندارد)
+3725d92 feat(dsh): KPIهای جهانی (دان/پرنده، آب/پرنده، ADG، CV) + MoM
+2f3e4cf feat(dsh): هشدارهای تجمیعی (انقضا، کمبود، هچ، بحرانی، تخم‌گذاری)
+6d4f0f3 style(dsh): فشرده‌سازی KpiCard/MiniStat + کاهش gap/padding
+63f8db0 refactor(dsh): حذف بخش مالی تکراری
+5f66c2e docs: آپدیت اسناد به v0.7.0 + CHANGELOG
+f51b916 feat(dsh): سرسید + چک + مالی ماه در داشبورد
+43f5c9f refactor(tra): بازنویسی تمیز SalesPage
+0c40c84 fix(tra): هندل undefined در InvoicePrint
+b7e1ee4 feat(tra): محاسبه total جدید بر اساس اقلام
+89005be feat(tra): فروشنده/خریدار قلم
+37eaba3 feat(tra): حمل قلم
+40c789a feat(tra): فیلدهای اختصاصی هر دسته در فرم فاکتور
+f42c803 feat(tra): فیلدهای اختیاری همه دسته‌ها + shipping + itemPartyId
+4cd6c56 style(tra): فشرده‌سازی صفحه مطالبات
+dc87730 feat(tra): ReceivablesPage — سرسید + چک + تعویق + فیلتر
+803d957 feat(tra): چک کامل — وضعیت (در جریان/نقد/برگشتی) + تاریخ نقد
+1d7135a feat(tra): تخفیف هر قلم (درصد یا مبلغ)
+b07c123 feat(tra): تخفیف هر قلم (درصد یا مبلغ)
+6597f6b fix(tra): همگام سرسید + Grid2 برای نوع پرداخت
+dfb07e8 feat(tra): پیش‌فروش با تاریخ تحویل و پیش‌پرداخت
+950fa1f feat(tra): Workflow فاکتور — ۴ مرحله با UI
+2e859a1 feat(tra): Workflow فاکتور + شماره خودکار
+48fc34c feat(tra): شرایط پرداخت (نقدی/قسطی/توافقی) + محاسبه خودکار سرسید
+61b90cd refactor(tra): حذف کامل مالیات — ساده‌سازی فرم خرید و فروش
+47e3b10 feat(tra): store v3 — فیلدهای فاز A-F (شرایط پرداخت، Workflow، پیش‌فروش، سرسید، تخفیف، چک)
+f261582 feat(whs): فیلد محور — auto-fill واحد/محل + حذف فیلدهای تکراری + selectOnFocus
+39cb533 feat(whs): فیلتر هوشمند partyId بر اساس reason در MovesPage
+d53f732 refactor: انتقال دکمه راهنماها به بخش «راهنما و آموزش»
+6a8b7d3 feat: دکمه نمایش مجدد راهنماها در تنظیمات → درباره
+aa12fce feat: چک تکراری قاطع در ۶ فایل (بخش، تجهیزات، ماده اولیه، نیاز، پرنده، نژاد)
+45a7967 fix: حذف کامنت‌های اشتباه + dedupe در Flocks و Halls و Zones
+87a2e4b feat: چک تکراری در ۵ ماژول (کالا، گله، سالن، دستگاه، جیره)
+1aa336d feat(brd): جلوگیری از نژاد تکراری + پاک کردن تکرارها
+5c0b8fe fix(brd): حذف subtitle تکراری در dropdown پرنده
+8525494 بهبود فرم پرنده (حذف نام انگلیسی + auto-fill + راهنما) و نژاد (حذف auto-fill)
+a5581cb feat: مرحله A — وابستگی‌های هوشمند (DependentSelect + اعتبارسنجی پرداخت)
+c1cd216 feat: SmartSelect در ۹ فایل — گروهی
+eb3edbf feat(tra): SmartSelect برای مخاطب در Sales/Purchases/Deals
+f80220c feat(ctc): هشدار نام/تلفن تکراری هنگام افزودن مخاطب
+0f59b34 feat(ctc): نوع مشتری چندتایی (عمده + خرده و ...)
+a7790ca refactor(ctc): خلاصه‌سازی فرم مخاطب — فقط نام، تلفن، کد ملی، آدرس، نقش، یادداشت
+80b96bd fix(whs): SmartSelect مخاطب با roles آرایه
+9537b32 feat(dlg): SmartSelect برای گله و منبع دان
+e9d02f0 feat: SmartSelect — کامپوننت عمومی انتخاب‌گر هوشمند
+77f6873 feat: dlg/store v3 — فیلدهای تغذیه/آب/وزن + jirah UI
+e8b3d2f checkpoint — قبل از تغییرات جیره و ثبت روزانه
+1c0224a نسخه اولیه — ۱۵ ماژول کامل

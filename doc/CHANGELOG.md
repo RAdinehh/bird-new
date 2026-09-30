@@ -1,5 +1,26 @@
 # CHANGELOG — تاریخچه نسخه‌ها
 
+## [0.10.0] — 2026/09/30
+
+### افزوده‌شده
+- 🎨 Design System v2 (spacing/shadows/touch/transitions tokens)
+- 🧩 State.tsx (Empty/Loading/Error)
+- 📦 helpers.tsx مشترک در ۱۳ ماژول
+- ♿ Global focus-visible + reduced-motion
+- 📚 JSDoc در همه ماژول‌ها
+
+### تغییر یافته
+- 🔄 ادغام Purchases + Sales → InvoicePage (-۱۱۰۰ خط)
+- 🔄 refactor dsh (1298 → 442)
+- 🔄 یکدست‌سازی فونت/پدینگ در 48+ فایل
+
+### رفع‌شده
+- 🐛 `new Date(y,m,d)` میلادی → `parseJ` (jalali fix)
+- 🐛 Empty states در همه لیست‌ها
+- 🐛 a11y در تمام UI
+
+---
+
 ## [0.9.1] — ۱۴۰۵/۰۷/۰۹
 
 ### افزوده‌شده
