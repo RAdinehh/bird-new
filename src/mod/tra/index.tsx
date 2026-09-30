@@ -1,3 +1,6 @@
+/**
+ * index.tsx — بخش tra
+ */
 import { useState } from 'react';
 import PurchasesPage from './PurchasesPage';
 import SalesPage from './SalesPage';

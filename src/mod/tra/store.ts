@@ -1,3 +1,6 @@
+/**
+ * store.ts — Zustand store معاملات
+ */
 import { create } from 'zustand';
 import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ } from 'date-fns-jalali';
 import { persist } from 'zustand/middleware';

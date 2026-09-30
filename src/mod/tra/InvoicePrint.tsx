@@ -1,3 +1,6 @@
+/**
+ * InvoicePrint.tsx — بخش tra
+ */
 import { useSet } from '../set/store';
 import { useCtc } from '../ctc/store';
 import { PAYMENT_LABEL, STATUS_LABEL, remaining, paidSum, invoiceStatus, type Invoice } from './store';

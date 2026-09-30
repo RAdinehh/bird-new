@@ -1,3 +1,6 @@
+/**
+ * ReceivablesPage — مطالبات/بدهی با aging
+ */
 import { useState, useMemo } from 'react';
 import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSum, WORKFLOW_LABEL, type Invoice, type Deferral } from './store';
 import { useCtc } from '../ctc/store';

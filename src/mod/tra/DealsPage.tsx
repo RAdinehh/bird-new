@@ -1,3 +1,6 @@
+/**
+ * DealsPage — معاملات خاص
+ */
 import { useState, useMemo } from 'react';
 import { useTra, DEAL_LABEL, type Deal, type DealType } from './store';
 import { useCtc } from '../ctc/store';

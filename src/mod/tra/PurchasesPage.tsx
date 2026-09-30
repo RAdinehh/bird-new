@@ -1,3 +1,6 @@
+/**
+ * PurchasesPage — خریدها با workflow
+ */
 import { useState, useMemo, useEffect } from 'react';
 import {
   useTra, CATEGORIES, itemsSum, paidSum, remaining, STATUS_LABEL,
