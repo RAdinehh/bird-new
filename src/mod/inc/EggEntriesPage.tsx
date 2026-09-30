@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 import {
   useInc, DEAL_LABEL, ENTRY_STATUS_LABEL, addDaysJalali,
   daysAgo, daysToHatch, isLockdown, isHatchWindow,
-  incubationDays, type EggEntry, type DealType
+  incubationDays, jalaliToDate, type EggEntry, type DealType
 } from './store';
 import { useBrd } from '../brd/store';
 import { useFlk } from '../flk/store';
@@ -161,6 +161,17 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     if (currentRow.dealType === 'purchase' && !currentRow.dealData.sellerId) { showAlert('فروشنده اجباری است'); return; }
     if (currentRow.dealType === 'partnership' && !currentRow.dealData.partnerId) { showAlert('شریک اجباری است'); return; }
     if (currentRow.dealType === 'own' && !currentRow.flockId) { showAlert('گله اجباری است'); return; }
+
+    // ═══ چک آماده بودن گله برای تخم‌گذاری ═══
+    if (currentRow.dealType === 'own' && currentRow.flockId) {
+      const flk = flocks.find((f: any) => f.id === currentRow.flockId);
+      const brd = birds.find(b => b.id === currentRow.birdId);
+      const ready = flockReadyForEggs(flk, brd);
+      if (!ready.ready) {
+        showAlert('این گله هنوز به سن تخم‌گذاری نرسیده.\n\nسن فعلی: ' + toFa(ready.ageDays) + ' روز\nحداقل: ' + toFa(ready.minAge) + ' روز\n\n' + toFa(ready.daysLeft) + ' روز مانده', '⛔ گله آماده نیست');
+        return;
+      }
+    }
 
     // ═══ چک ظرفیت ═══
     const device = devices.find(d => d.id === multiDeviceId);
@@ -633,6 +644,13 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       <Modal open={open} onClose={() => setOpen(false)} title={editingRowId ? 'ویرایش ردیف' : 'ورود تخم به دستگاه'}
         footer={<BtnRow><Btn variant="primary" onClick={saveAll}>💾 ذخیره همه ({toFa(draftRows.length)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
+        <div style={{ padding: '10px 12px', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, lineHeight: 1.8 }}>
+          🎯 <b>هچ همزمان:</b><br />
+          برای هچ همزمان، پرنده‌های دوره‌بلندتر رو اول وارد کن.<br />
+          مثال: غاز (۳۰ روزه) → بوقلمون (۲۸ روزه) → مرغ (۲۱ روزه)<br />
+          <span style={{ opacity: 0.8 }}>نرم‌افزار تاریخ ورود هر کدوم رو خودکار محاسبه می‌کنه.</span>
+        </div>
+
         <SectionTitle>📦 دستگاه</SectionTitle>
         <Field label="انتخاب دستگاه" required>
           <SmartSelect value={multiDeviceId} onChange={v => { setMultiDeviceId(v); }} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
@@ -890,6 +908,33 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 function todayJalali(): string {
   const d = new Date();
   return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+}
+
+
+
+// چک آماده بودن گله برای تخم‌گذاری
+function flockReadyForEggs(flock: any, bird: any): { ready: boolean; ageDays: number; minAge: number; daysLeft: number } {
+  const startDate = flock?.hatchDate || flock?.purchaseDate || flock?.startDate || '';
+  if (!startDate) return { ready: true, ageDays: 0, minAge: 0, daysLeft: 0 };
+  try {
+    const start = jalaliToDate(startDate);
+    if (!start) return { ready: true, ageDays: 0, minAge: 0, daysLeft: 0 };
+    const today = new Date();
+    const ageDays = Math.max(0, Math.floor((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+    const minAge = flock?.layingStartDay || 140;
+    return {
+      ready: ageDays >= minAge,
+      ageDays,
+      minAge,
+      daysLeft: Math.max(0, minAge - ageDays),
+    };
+  } catch { return { ready: true, ageDays: 0, minAge: 0, daysLeft: 0 }; }
+}
+
+// محاسبه تاریخ ورود برای هچ همزمان
+function calcEntryDateForSyncHatch(targetHatchDate: string, totalDays: number): string {
+  if (!targetHatchDate || !totalDays) return '';
+  return addDaysJalali(targetHatchDate, -totalDays);
 }
 
 function Row({ l, v }: { l: string; v: string }) {

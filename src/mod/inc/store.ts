@@ -209,12 +209,40 @@ export const ENTRY_STATUS_LABEL: Record<EntryStatus, string> = {
 /* ============ محاسبات ============ */
 export function jalaliToDate(s: string): Date | null {
   if (!s) return null;
-  const en = toEn(s);
-  const p = en.split('/').map(x => parseInt(x));
-  if (p.length !== 3 || p.some(isNaN)) return null;
   try {
-    const d = parse(`${p[0]}/${String(p[1]).padStart(2,'0')}/${String(p[2]).padStart(2,'0')}`, 'yyyy/MM/dd', new Date());
-    return isNaN(d.getTime()) ? null : d;
+    const en = toEn(s).replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/\//g, '/');
+    const parts = en.split('/').map(p => parseInt(p, 10));
+    if (parts.length !== 3 || parts.some(isNaN)) return null;
+    const [jy, jm, jd] = parts;
+    // الگوریتم تبدیل شمسی به میلادی (بدون کتابخانه)
+    const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    let gy = (jy > 979 ? 1600 : 621);
+    let jy2 = (jy > 979 ? jy - 979 : jy);
+    let days = 365 * jy2 + Math.floor(jy2 / 33) * 8 + Math.floor(((jy2 % 33) + 3) / 4);
+    for (let i = 0; i < jm - 1; i++) days += (i < 6 ? 31 : 30);
+    days += jd - 1;
+    let gy2 = gy + 400 * Math.floor(days / 146097);
+    days %= 146097;
+    if (days > 36524) {
+      gy2 += 100 * Math.floor(--days / 36524);
+      days %= 36524;
+      if (days >= 365) days++;
+    }
+    gy2 += 4 * Math.floor(days / 1461);
+    days %= 1461;
+    if (days > 365) {
+      gy2 += Math.floor((days - 1) / 365);
+      days = (days - 1) % 365;
+    }
+    let gd = days + 1;
+    let gm = 0;
+    for (let i = 0; i < 12; i++) {
+      const mdays = i === 1 ? ((gy2 % 4 === 0 && gy2 % 100 !== 0) || gy2 % 400 === 0 ? 29 : 28) : (g_d_m[i + 1] - g_d_m[i]);
+      if (gd <= mdays) break;
+      gd -= mdays;
+      gm++;
+    }
+    return new Date(gy2, gm, gd);
   } catch { return null; }
 }
 
@@ -227,11 +255,39 @@ export function daysAgo(s: string): number {
 export function addDaysJalali(s: string, days: number): string {
   const d = jalaliToDate(s);
   if (!d) return '';
-  const r = addDays(d, days);
-  // format yyyy/MM/dd به شمسی
-  const y = r.getFullYear(), m = r.getMonth() + 1, day = r.getDate();
+  d.setDate(d.getDate() + days);
+  // تبدیل میلادی به شمسی
+  const gy = d.getFullYear();
+  const gm = d.getMonth() + 1;
+  const gd = d.getDate();
+  const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+  let jy = (gy > 1600 ? gy - 1600 : gy - 621);
+  let gy2 = (gy > 1600 ? gy - 1600 : gy - 621);
+  gy2 = gy - 1600;
+  jy = 979;
+  let days2 = (gy - 1600) * 365 + Math.floor((gy - 1600 + 3) / 4) - Math.floor((gy - 1600 + 99) / 100) + Math.floor((gy - 1600 + 399) / 400);
+  for (let i = 0; i < gm - 1; i++) days2 += g_d_m[i + 1] - g_d_m[i];
+  if (gm > 2 && ((gy % 4 === 0 && gy % 100 !== 0) || gy % 400 === 0)) days2++;
+  days2 += gd - 1;
+  let j_days = days2 - 79;
+  let j_np = Math.floor(j_days / 12053);
+  j_days %= 12053;
+  let jy2 = 979 + 33 * j_np + 4 * Math.floor(j_days / 1461);
+  j_days %= 1461;
+  if (j_days >= 366) {
+    jy2 += Math.floor((j_days - 1) / 365);
+    j_days = (j_days - 1) % 365;
+  }
+  let jm = 0;
+  for (let i = 0; i < 11; i++) {
+    const mdays = i < 6 ? 31 : 30;
+    if (j_days < mdays) break;
+    j_days -= mdays;
+    jm++;
+  }
+  const jd = j_days + 1;
   const pad = (n: number) => String(n).padStart(2, '0');
-  return `${y}/${pad(m)}/${pad(day)}`;
+  return jy2 + '/' + pad(jm + 1) + '/' + pad(jd);
 }
 
 /** روزهای باقی‌مانده تا هچ */
