@@ -451,7 +451,7 @@ export default function DevicesPage() {
             })}</div>
         )}
         {form.capacityByBird.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 6 }}>
             {form.capacityByBird.map(c => {
               const prof: any = getProfileDefaults(c.birdName);
               const d: any = prof || {};
@@ -468,48 +468,61 @@ export default function DevicesPage() {
               } as any;
               const isExpanded = expandedBird === c.birdName;
               const fmt = (v: any) => (v != null && v !== '') ? toFa(String(v)) : '—';
-              const summary = fmt(c.setterTemp) + '°·' + fmt(c.setterHumidity) + '٪ → ' + fmt(c.hatcherTemp) + '°·' + fmt(c.hatcherHumidity) + '٪ · ' + fmt(c.totalDays) + '/' + fmt(c.lockdownDay);
               return (
                 <div key={c.birdName} style={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--accent)',
                   borderRadius: 'var(--r-md)',
                   overflow: 'hidden',
-                  boxShadow: '0 0 0 1px var(--accent-soft)',
+                  background: isExpanded ? 'var(--accent-soft)' : 'var(--input-bg)',
+                  transition: 'background .15s',
                 }}>
                   <div
                     onClick={() => setExpandedBird(isExpanded ? null : c.birdName)}
                     role="button"
                     aria-expanded={isExpanded}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
                       padding: '10px 12px',
                       cursor: 'pointer',
-                      background: isExpanded ? 'var(--accent-soft)' : 'transparent',
-                      transition: 'background .15s',
                       userSelect: 'none',
                     }}
                   >
-                    <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700, flexShrink: 0 }}>{c.birdName}</span>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flex: 1, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</span>
-                    <span style={{ fontSize: 10, color: 'var(--muted)', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s', flexShrink: 0 }}>▼</span>
-                    <button type="button" onClick={(e) => { e.stopPropagation(); removeCapacity(c.birdName); }} aria-label="حذف" style={{
-                      background: 'var(--danger-soft)',
-                      border: '1px solid var(--danger)',
-                      color: 'var(--danger)',
-                      cursor: 'pointer',
-                      borderRadius: 'var(--r-sm)',
-                      width: 24, height: 24,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 11, padding: 0, fontFamily: 'inherit', fontWeight: 700,
-                      flexShrink: 0,
-                    }}>✕</button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700, flex: 1 }}>{c.birdName}</span>
+                      <span style={{ fontSize: 12, color: 'var(--muted)', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s', flexShrink: 0 }}>▼</span>
+                      <button type="button" onClick={(e) => { e.stopPropagation(); removeCapacity(c.birdName); }} aria-label="حذف" style={{
+                        background: 'var(--danger-soft)',
+                        border: '1px solid var(--danger)',
+                        color: 'var(--danger)',
+                        cursor: 'pointer',
+                        borderRadius: 'var(--r-sm)',
+                        width: 26, height: 26,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 12, padding: 0, fontFamily: 'inherit', fontWeight: 700,
+                        flexShrink: 0,
+                      }}>✕</button>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 6, fontSize: 'var(--fs-sm)' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🌡 ستر</span>
+                        <span style={{ fontWeight: 700 }}>{fmt(c.setterTemp)}°</span>
+                        <span style={{ color: 'var(--dim)', fontWeight: 600 }}>{fmt(c.setterHumidity)}٪</span>
+                      </span>
+                      <span style={{ color: 'var(--dim)', fontSize: 14 }}>→</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🐣 هچر</span>
+                        <span style={{ fontWeight: 700 }}>{fmt(c.hatcherTemp)}°</span>
+                        <span style={{ color: 'var(--dim)', fontWeight: 600 }}>{fmt(c.hatcherHumidity)}٪</span>
+                      </span>
+                      <span style={{ color: 'var(--dim)', fontSize: 14 }}>·</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⏱</span>
+                        <span style={{ fontWeight: 600 }}>{fmt(c.totalDays)}/{fmt(c.lockdownDay)}</span>
+                      </span>
+                    </div>
                   </div>
 
                   {isExpanded && (
-                    <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: 6, borderTop: '1px solid var(--border)' }}>
+                    <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: 6, background: 'var(--card)' }}>
                       <Field label="ظرفیت" hint="حداکثر تعداد تخم">
                         <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
                       </Field>
