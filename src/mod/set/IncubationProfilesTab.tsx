@@ -69,7 +69,7 @@ export default function IncubationProfilesTab() {
                 <NumField placeholder="مثلاً: ۳۰" value={String(p.totalDays)} onChange={e => update(p.id, { totalDays: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
               </Field>
               <Field label="Lock-down" hint="روز توقف چرخش">
-                <NumField value={String(p.lockdownDay)} onChange={e => update(p.id, { lockdownDay: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
+                <NumField placeholder="مثلاً: ۱۸" value={String(p.lockdownDay)} onChange={e => update(p.id, { lockdownDay: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
               </Field>
             </Grid2>
           </div>

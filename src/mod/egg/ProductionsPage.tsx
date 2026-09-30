@@ -320,14 +320,14 @@ export default function ProductionsPage() {
 
         <Grid2>
           <Field label="تخم شکسته">
-            <NumField value={form.brokenCount} onChange={e => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
+            <NumField placeholder="مثلاً: ۵" value={form.brokenCount} onChange={e => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
           </Field>
           <Field label="تخم نرم">
-            <NumField value={form.softCount} onChange={e => setForm({ ...form, softCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
+            <NumField placeholder="مثلاً: ۲" value={form.softCount} onChange={e => setForm({ ...form, softCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
           </Field>
         </Grid2>
         <Field label="تخم کثیف">
-          <NumField value={form.dirtyCount} onChange={e => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
+          <NumField placeholder="مثلاً: ۳" value={form.dirtyCount} onChange={e => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
         </Field>
 
         {/* کادر خلاصه‌ی محاسبات */}

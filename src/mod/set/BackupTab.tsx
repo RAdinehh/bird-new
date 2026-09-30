@@ -239,7 +239,7 @@ export default function BackupTab() {
         />
         {s.encryption.enabled ? (
           <Field label="رمز عبور" hint="این رمز را گم نکنید">
-            <Input
+            <Input placeholder="رمز عبور"
               type="password"
               value={s.encryption.password}
               onChange={e => s.updateSection('encryption', { password: e.target.value })}

@@ -421,18 +421,18 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                                 </div>
                                 <Grid2>
                                   <Field label="جوجه هچ‌شده" required>
-                                    <NumField value={d.hatched} onChange={ev => updateData(e.id, { hatched: ev.target.value })} max={Math.max(0, base - uh - ds - pp - ot)} min={0} unit="عدد" />
+                                    <NumField placeholder="مثلاً: ۴۵۰" value={d.hatched} onChange={ev => updateData(e.id, { hatched: ev.target.value })} max={Math.max(0, base - uh - ds - pp - ot)} min={0} unit="عدد" />
                                   </Field>
                                   <Field label="هچ‌نشده">
-                                    <NumField value={d.unhatched} onChange={ev => updateData(e.id, { unhatched: ev.target.value })} max={Math.max(0, base - h - ds - pp - ot)} min={0} unit="عدد" />
+                                    <NumField placeholder="مثلاً: ۲۰" value={d.unhatched} onChange={ev => updateData(e.id, { unhatched: ev.target.value })} max={Math.max(0, base - h - ds - pp - ot)} min={0} unit="عدد" />
                                   </Field>
                                 </Grid2>
                                 <Grid2>
                                   <Field label="مرده در پوسته">
-                                    <NumField value={d.deadInShell} onChange={ev => updateData(e.id, { deadInShell: ev.target.value })} max={Math.max(0, base - h - uh - pp - ot)} min={0} unit="عدد" />
+                                    <NumField placeholder="مثلاً: ۱۰" value={d.deadInShell} onChange={ev => updateData(e.id, { deadInShell: ev.target.value })} max={Math.max(0, base - h - uh - pp - ot)} min={0} unit="عدد" />
                                   </Field>
                                   <Field label="نوک‌زده">
-                                    <NumField value={d.pipped} onChange={ev => updateData(e.id, { pipped: ev.target.value })} max={Math.max(0, base - h - uh - ds - ot)} min={0} unit="عدد" />
+                                    <NumField placeholder="مثلاً: ۵" value={d.pipped} onChange={ev => updateData(e.id, { pipped: ev.target.value })} max={Math.max(0, base - h - uh - ds - ot)} min={0} unit="عدد" />
                                   </Field>
                                 </Grid2>
                                 <Grid2>

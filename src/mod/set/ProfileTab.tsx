@@ -65,7 +65,7 @@ export default function ProfileTab() {
         </Grid2>
         <Grid3>
           <Field label="استان">
-            <Input value={farm.province} onChange={e => updateSection('farm', { province: e.target.value })} />
+            <Input placeholder="مثلاً: تهران" value={farm.province} onChange={e => updateSection('farm', { province: e.target.value })} />
           </Field>
           <Field label="شهر">
             <Input value={farm.city} onChange={e => updateSection('farm', { city: e.target.value })} />
@@ -137,7 +137,7 @@ export default function ProfileTab() {
             <Input value={defaults.birdType} onChange={e => updateSection('defaults', { birdType: e.target.value })} placeholder="مرغ" />
           </Field>
           <Field label="اندازه‌ی گله">
-            <NumField value={defaults.flockSize} onChange={e => updateSection('defaults', { flockSize: e.target.value })} min={0} unit="پرنده" />
+            <NumField placeholder="مثلاً: ۵۰۰" value={defaults.flockSize} onChange={e => updateSection('defaults', { flockSize: e.target.value })} min={0} unit="پرنده" />
           </Field>
         </Grid2>
         <Field label="طول دوره‌ی جوجه‌کشی">

@@ -324,7 +324,7 @@ export default function ItemsPage() {
         <Grid3>
           {!form.id && (
             <Field label="موجودی اولیه" hint="اگه الان موجودی داری، اینجا وارد کن — بعد از این، فقط از معاملات به‌روز میشه">
-              <NumField value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={UNIT_LABEL[form.unit]} min={0} />
+              <NumField placeholder="مثلاً: ۱۰۰" value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={UNIT_LABEL[form.unit]} min={0} />
             </Field>
           )}
           <Field label="حداقل موجودی" hint="برای هشدار">

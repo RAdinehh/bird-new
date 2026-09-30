@@ -374,7 +374,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
                   0 })} />
               </Field>
               <Field label="حمل">
-                <MoneyField value={String(it.shipping ||
+                <MoneyField placeholder="مثلاً: ۵۰٬۰۰۰" value={String(it.shipping ||
                   '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) ||
                   0 })} />
               </Field>
@@ -461,7 +461,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
           </Field>
           {form.paymentTerms !== 'custom' && (
             <Field label="سرسید (خودکار)">
-              <Input readOnly value={form.dueDate} dir="ltr" />
+              <Input placeholder="خودکار محاسبه می‌شود" readOnly value={form.dueDate} dir="ltr" />
             </Field>
           )}
           {form.paymentTerms === 'custom' && (
@@ -477,7 +477,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
               <NumField placeholder="مثلاً: ۱۰۰" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
             </Field>
             <Field label="فاصله" required>
-              <NumField value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
+              <NumField placeholder="مثلاً: ۷" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
             </Field>
           </Grid2>
         )}
