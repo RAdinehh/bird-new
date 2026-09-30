@@ -222,7 +222,7 @@ export default function FlocksPage() {
           }}>
             {t.label}
             <span style={{ fontSize: 12, background: tab === t.id ? 'var(--accent-soft)' : 'var(--input-bg)', color: tab === t.id ? 'var(--accent)' : 'var(--muted)', padding: '1px 5px', borderRadius: 8, fontWeight: 700 }}>{toFa(tabCount(t.id))}</span>
-            {tab === t.id && <div style={{ position: 'absolute', bottom: 0, right: 12, left: 12, height: 36.5, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />}
+            {tab === t.id && <div style={{ position: 'absolute', bottom: 0, right: 12, left: 12, height: 3, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />}
           </div>
         ))}
       </div>
