@@ -510,7 +510,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
               const bird = birds.find(b => b.id === e.birdId);
               const isSelected = selectedIds.has(e.id);
               const d = dataFor(e.id);
-              const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
+              const sum = (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
               const dayNum = parseInt(toEn(modalDay)) || 0;
               const baseInfo = calcAvailableBase(e.id, editingId ? (candlings.find(c => c.id === editingId)?.stage || dayNum) : dayNum, editingId, candlings, e.count || 0);
               const remaining = baseInfo.base - sum;
@@ -603,7 +603,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                         fontWeight: 700,
                         textAlign: 'center',
                       }}>
-                        این کندلینگ: {toFa(sum)} از {toFa(baseInfo.base)}
+                        مجموع تلفات: {toFa(sum)} از {toFa(baseInfo.base)}
                         {remaining > 0 && ' · باقی — ' + toFa(remaining)}
                         {remaining < 0 && ' — بیشتر از مبنای مرحله قبل!'}
                         {remaining === 0 && ' ✅ کامل'}
