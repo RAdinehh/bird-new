@@ -3,7 +3,7 @@ import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCap
 import { useSet } from '../set/store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag } from '../../shr/components/ui';
-import ExpandableCard from '../../shr/components/ExpandableCard';
+import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
@@ -221,12 +221,21 @@ export default function DevicesPage() {
             const isOpen = expandedId === d.id;
             const caps = d.capacityByBird || [];
             const logs: any[] = (d as any).maintenanceLogs || [];
+            const totalCap = caps.reduce((a, c) => a + (c.capacity || 0), 0);
+            const usagePercent = totalCap > 0 ? Math.round((totalEggs / totalCap) * 100) : 0;
             const w = warrantyInfo(d.purchasedAt, d.warranty);
             return (
               <ExpandableCard key={d.id} accent={accentFor(d.status)} index={toFa(i + 1)} iconEmoji="🥚"
                 title={d.name} subtitle={MODE_FA[d.mode] + ' · ' + STATUS_FA[d.status]}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : d.id)}
                 badge={activeEntries > 0 ? <Tag tone="green">{toFa(activeEntries)} ورودی فعال</Tag> : undefined}
+                stats={<>
+                  <StatBox icon="📊" label="استفاده" value={toFa(totalEggs) + '/' + toFa(totalCap)} tone={usagePercent > 90 ? 'warn' : 'accent'} />
+                  <Dot />
+                  <StatBox icon="🔄" label="ورودی" value={toFa(activeEntries)} />
+                  <Dot />
+                  <StatBox icon="🛠" label="تعمیر" value={toFa(logs.length)} />
+                </>}
               >
                 {caps.length > 0 && (
                   <>
