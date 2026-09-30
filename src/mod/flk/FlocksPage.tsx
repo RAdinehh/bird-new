@@ -84,7 +84,15 @@ export default function FlocksPage() {
   const openNew = () => {
     if (birds.length === 0) { showAlert('اول پرنده بسازید'); return; }
     if (halls.length === 0) { showAlert('اول سالن بسازید'); return; }
-    setForm({ ...empty(), birdId: birds[0].id, hallId: halls[0].id });
+    const lastF = flocks
+      .slice()
+      .sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''))[0];
+    setForm({
+      ...empty(),
+      birdId: lastF?.birdId || birds[0].id,
+      hallId: lastF?.hallId || halls[0].id,
+      ...(lastF?.breedId ? { breedId: lastF.breedId } : {}),
+    });
     setErr(''); setOpen(true);
   };
 

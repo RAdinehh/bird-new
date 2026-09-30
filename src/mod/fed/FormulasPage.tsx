@@ -41,7 +41,14 @@ export default function FormulasPage() {
 
   const openNew = () => {
     if (ingredients.length === 0) { showAlert('اول مواد اولیه بسازید'); return; }
-    setForm({ ...empty(), date: formatJalali(new Date(), 'yyyy/MM/dd') });
+    const lastF = formulas
+      .filter(x => x.requirementId)
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    setForm({
+      ...empty(),
+      date: formatJalali(new Date(), 'yyyy/MM/dd'),
+      ...(lastF?.requirementId ? { requirementId: lastF.requirementId } : {}),
+    });
     setErr(''); setOpen(true);
   };
 
