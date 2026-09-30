@@ -149,45 +149,89 @@ export default function NotificationsTab() {
           وقتی این آستانه‌ها رد شوند، هشدار خودکار ایجاد می‌شود.
         </div>
 
-        <LocalNumField
-          label="افت تخم‌گذاری بیش از"
-          hint="درصد افت نسبت به میانگین"
-          value={th.eggDropPercent}
-          onChange={n => s.updateSection('thresholds', { eggDropPercent: n })}
-          unit="٪"
-          min={0}
-          max={100}
-        />
+        <Grid2>
+          <LocalNumField
+            label="افت تخم بیش از"
+            hint="٪ نسبت به میانگین"
+            value={th.eggDropPercent}
+            onChange={n => s.updateSection('thresholds', { eggDropPercent: n })}
+            unit="٪"
+            min={0}
+            max={100}
+          />
+          <LocalNumField
+            label="تلفات بیش از"
+            hint="در هزار پرنده"
+            value={th.mortalityPerThousand}
+            onChange={n => s.updateSection('thresholds', { mortalityPerThousand: n })}
+            unit="در هزار"
+            min={0}
+            max={1000}
+          />
+        </Grid2>
 
-        <LocalNumField
-          label="تلفات بیش از"
-          hint="در هزار پرنده"
-          value={th.mortalityPerThousand}
-          onChange={n => s.updateSection('thresholds', { mortalityPerThousand: n })}
-          unit="در هزار"
-          min={0}
-          max={1000}
-        />
+        <Grid2>
+          <LocalNumField
+            label="انحراف دما"
+            hint="°C"
+            value={th.tempDeviation}
+            onChange={n => s.updateSection('thresholds', { tempDeviation: n })}
+            unit="°C"
+            min={0}
+            max={30}
+          />
+          <LocalNumField
+            label="انحراف رطوبت"
+            hint="٪"
+            value={th.humidityDeviation}
+            onChange={n => s.updateSection('thresholds', { humidityDeviation: n })}
+            unit="٪"
+            min={0}
+            max={100}
+          />
+        </Grid2>
 
-        <LocalNumField
-          label="انحراف دما بیش از"
-          hint="درجه سلسیوس"
-          value={th.tempDeviation}
-          onChange={n => s.updateSection('thresholds', { tempDeviation: n })}
-          unit="°C"
-          min={0}
-          max={30}
-        />
+        <Grid2>
+          <LocalNumField
+            label="حداقل آب/دان"
+            hint="هشدار اگر کمتر"
+            value={th.waterFeedMin ?? 1.6}
+            onChange={n => s.updateSection('thresholds', { waterFeedMin: n })}
+            unit=""
+            min={0}
+            max={10}
+          />
+          <LocalNumField
+            label="حداکثر آب/دان"
+            hint="هشدار اگر بیشتر"
+            value={th.waterFeedMax ?? 2.2}
+            onChange={n => s.updateSection('thresholds', { waterFeedMax: n })}
+            unit=""
+            min={0}
+            max={10}
+          />
+        </Grid2>
 
-        <LocalNumField
-          label="انحراف رطوبت بیش از"
-          hint="درصد"
-          value={th.humidityDeviation}
-          onChange={n => s.updateSection('thresholds', { humidityDeviation: n })}
-          unit="٪"
-          min={0}
-          max={100}
-        />
+        <Grid2>
+          <LocalNumField
+            label="دمای بحرانی بالا"
+            hint="هشدار فوری"
+            value={th.criticalTempHigh ?? 32}
+            onChange={n => s.updateSection('thresholds', { criticalTempHigh: n })}
+            unit="°C"
+            min={0}
+            max={60}
+          />
+          <LocalNumField
+            label="دمای بحرانی پایین"
+            hint="هشدار فوری"
+            value={th.criticalTempLow ?? 18}
+            onChange={n => s.updateSection('thresholds', { criticalTempLow: n })}
+            unit="°C"
+            min={-10}
+            max={40}
+          />
+        </Grid2>
 
         <Btn
           size="sm"
