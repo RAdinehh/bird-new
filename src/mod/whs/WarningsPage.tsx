@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useWhs, CATEGORY_ICON, UNIT_LABEL, stockWarning, expiryWarning, daysToExpiry, type Item } from './store';
 import { Empty, PageContainer, Tag } from '../../shr/components/ui';
+import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 
 export default function WarningsPage() {
@@ -33,10 +34,18 @@ export default function WarningsPage() {
         background: 'var(--warn-soft)',
         border: '1px solid var(--warn)',
         borderRadius: 'var(--r-lg)',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center'
       }}>
-        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--warn)', fontWeight: 700 }}>
+        <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 700, marginBottom: 10 }}>
           ⚠ {toFa(totalWarnings)} هشدار
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
+          <StatBox icon="⛔" label="منقضی" value={toFa(expired.length)} tone={expired.length > 0 ? 'danger' : 'default'} />
+          <Dot />
+          <StatBox icon="🔴" label="تمام‌شده" value={toFa(criticalStock.length)} tone={criticalStock.length > 0 ? 'danger' : 'default'} />
+          <Dot />
+          <StatBox icon="⏰" label="نزدیک انقضا" value={toFa(expiringSoon.length)} tone={expiringSoon.length > 0 ? 'warn' : 'default'} />
+          <Dot />
+          <StatBox icon="⚠" label="کم" value={toFa(lowStock.length)} tone={lowStock.length > 0 ? 'warn' : 'default'} />
         </div>
       </div>
 
