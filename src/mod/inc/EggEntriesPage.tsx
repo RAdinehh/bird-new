@@ -544,7 +544,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             {party} · {toFa(row.entryDate)}
           </span>
         </div>
-        <button type="button" onClick={() => editRow(row)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--info)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: '2px 6px' }}>✏️</button>
+        <button type="button" onClick={() => editRow(row)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--text)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, padding: '2px 6px' }}>✏️</button>
         <button type="button" onClick={() => removeRow(row._id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, padding: 2 }}>✕</button>
       </div>
     );
@@ -669,7 +669,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                       {e.unitPrice && <Row l="قیمت هر تخم" v={toFa(e.unitPrice.toLocaleString('fa-IR')) + ' ت'} />}
                       {(e as any).shippingCost && <Row l="هزینه حمل" v={toFa((e as any).shippingCost.toLocaleString('fa-IR')) + ' ت'} />}
                       {e.totalPrice && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--info-soft)', color: 'var(--info)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '8px 10px', background: 'var(--input-bg)', color: 'var(--text)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                           <span>جمع تخم:</span><span>{toFa(e.totalPrice.toLocaleString('fa-IR'))} ت</span>
                         </div>
                       )}
@@ -696,10 +696,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={editingRowId ? '✏️ ویرایش ردیف' : '📥 ورود تخم به دستگاه'}
-        footer={<BtnRow><Btn variant="primary" onClick={saveAll} disabled={draftRows.length === 0}>💾 ذخیره همه ({toFa(draftRows.length)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn onClick={saveAll} disabled={draftRows.length === 0}>💾 ذخیره همه ({toFa(draftRows.length)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
         {/* ═══ بنر راهنما ═══ */}
-        <div style={{ padding: '10px 12px', background: 'linear-gradient(135deg, var(--info-soft), var(--info-soft))', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, lineHeight: 1.8 }}>
+        <div style={{ padding: '10px 12px', background: 'linear-gradient(135deg, var(--info-soft), var(--info-soft))', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 600, lineHeight: 1.8 }}>
           🎯 <b>هچ همزمان:</b> پرنده‌های دوره‌بلندتر رو اول وارد کن<br />
           <span style={{ opacity: 0.85 }}>ترتیب: غاز (۳۰) → بوقلمون (۲۸) → مرغ (۲۱)</span>
         </div>
@@ -770,7 +770,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                     <span>{toFa(r.entryDate)}{r.entryTime ? ' · ' + toFa(r.entryTime) : ''}</span>
                   </div>
                   <div style={{ position: 'absolute', top: 6, left: 6, display: 'flex', gap: 2 }}>
-                    <button type="button" onClick={() => editRow(r)} style={{ background: 'none', border: 'none', color: 'var(--info)', cursor: 'pointer', fontSize: 12, padding: 3 }}>✏️</button>
+                    <button type="button" onClick={() => editRow(r)} style={{ background: 'none', border: 'none', color: 'var(--text)', cursor: 'pointer', fontSize: 12, padding: 3 }}>✏️</button>
                     <button type="button" onClick={() => removeRow(r._id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 12, padding: 3 }}>✕</button>
                   </div>
                 </div>
@@ -912,7 +912,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           {(currentRow.dealType === 'partnership' || currentRow.dealType === 'consignment') && (
             <div style={{ padding: 8, background: currentRow.dealStatus === 'withdrawn' ? 'var(--danger-soft)' : 'var(--input-bg)', border: '1px solid ' + (currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--border)'), borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                <input type="checkbox" checked={currentRow.dealStatus === 'withdrawn'} onChange={e => setCurrentRow(f => ({ ...f, dealStatus: e.target.checked ? 'withdrawn' : 'active' }))} style={{ width: 16, height: 16, accentColor: 'var(--danger)' }} />
+                <input type="checkbox" checked={currentRow.dealStatus === 'withdrawn'} onChange={e => setCurrentRow(f => ({ ...f, dealStatus: e.target.checked ? 'withdrawn' : 'active' }))} style={{ width: 16, height: 16, accentColor: 'var(--muted)' }} />
                 <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--text)' }}>کنار کشید</span>
               </label>
               {currentRow.dealStatus === 'withdrawn' && (
@@ -960,7 +960,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               if (liveUsage.percent > 90) {
                 return <div style={{ padding: '6px 10px', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>🟡 نزدیک به ظرفیت — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
               }
-              return <div style={{ padding: '6px 10px', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 700 }}>✅ قابل قبول — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
+              return <div style={{ padding: '6px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 700 }}>✅ قابل قبول — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
             })()}
           </div>
 
@@ -982,7 +982,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 const sh = parseFloat(toEn(currentRow.shippingCost).replace('٫', '.')) || 0;
                 const total = (cnt * up) + sh;
                 if (total > 0) {
-                  return <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--info-soft)', color: 'var(--info)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع ردیف:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
+                  return <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--input-bg)', color: 'var(--text)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع ردیف:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
                 }
                 return null;
               })()}
@@ -996,7 +996,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
           {/* دکمه‌ها */}
           <div style={{ display: 'flex', gap: 6 }}>
-            <Btn variant="primary" full onClick={addRowToList}>
+            <Btn full onClick={addRowToList}>
               {editingRowId ? '💾 به‌روزرسانی ردیف' : '➕ افزودن به لیست'}
             </Btn>
             {editingRowId && <Btn onClick={() => { setEditingRowId(null); setCurrentRow({ ...makeRow(), birdId: birds[0]?.id || '', entryDate: todayJalali(), entryTime: nowTime() }); }}>لغو</Btn>}
@@ -1064,8 +1064,8 @@ function Row({ l, v }: { l: string; v: string }) {
 
 function DepBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'var(--info-soft)', border: '1px dashed var(--info)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 700, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+    <div style={{ background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 700, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
         {title}
       </div>
       {children}
