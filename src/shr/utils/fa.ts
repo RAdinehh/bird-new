@@ -80,3 +80,42 @@ export function parseFaNum(s: any): number {
   const cleaned = String(s).replace(/[۰-۹]/g, d => String(FA.indexOf(d))).replace(/[^\d.-]/g, '');
   return parseFloat(cleaned) || 0;
 }
+
+/** فرمت عدد اعشاری هنگام تایپ — با یک جداکننده */
+export function formatDecimalWhileTyping(s: string): string {
+  let cleaned = String(s || '')
+    .replace(/[۰-۹]/g, d => String(FA.indexOf(d)))
+    .replace(/[٬,]/g, '')
+    .replace(/٫/g, '.');  // نرمال‌سازی به نقطه
+  
+  // جدا کردن عدد صحیح و اعشار
+  const parts = cleaned.split('.');
+  let intPart = parts[0].replace(/\D/g, '');
+  let decPart = parts[1] ? parts[1].replace(/\D/g, '').slice(0, 2) : '';
+  
+  // حذف صفرهای ابتدایی
+  intPart = intPart.replace(/^0+/, '') || '0';
+  
+  // جداکننده هزارگان
+  const withSep = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '٬');
+  
+  // نتیجه با اعشار
+  let result = withSep;
+  if (cleaned.includes('.') && (decPart || parts[1] === '')) {
+    result += '.' + decPart;
+  }
+  
+  // تبدیل به فارسی
+  return result.replace(/[0-9]/g, d => FA[+d]);
+}
+
+/** تبدیل به عدد اعشاری */
+export function parseDecimal(s: any): number {
+  if (s === null || s === undefined || s === '') return 0;
+  const cleaned = String(s)
+    .replace(/[۰-۹]/g, d => String(FA.indexOf(d)))
+    .replace(/[٬,]/g, '')
+    .replace(/٫/g, '.')
+    .replace(/[^\d.-]/g, '');
+  return parseFloat(cleaned) || 0;
+}
