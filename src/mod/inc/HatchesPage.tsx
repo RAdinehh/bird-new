@@ -12,277 +12,190 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 
-const FLOCK_TYPE_LABEL: Record<string, string> = { layer: 'تخم‌گذار', broiler: 'گوشتی', breeder: 'مادر' };
+const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
 
 export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any) => void } = {}) {
   const { devices, eggEntries, hatches, candlings, addHatch, updateHatch, deleteHatch } = useInc();
   const { birds } = useBrd();
-  const { add: addFlock, flocks, remove: removeFlock } = useFlk();
+  const { add: addFlock, remove: removeFlock } = useFlk();
   const { halls, zones } = useHal();
   const { contacts } = useCtc();
   const { addInvoice, deleteInvoice } = useTra();
   const nav = useNavigate();
 
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
-    id:'', eggEntryId:'', date:'',
-    hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'',
-    gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'',
-    notes:''
-  });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formDate, setFormDate] = useState('');
+  const [formEntryId, setFormEntryId] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [entriesData, setEntriesData] = useState<Record<string, any>>({});
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [deviceFilter, setDeviceFilter] = useState('');
-  const [postHatchAction, setPostHatchAction] = useState<{ hatchId: string; action: 'flock' | 'sale' } | null>(null);
 
-  // گله‌سازی
   const [flockModal, setFlockModal] = useState<{ hatchId: string; count: number } | null>(null);
   const [flockForm, setFlockForm] = useState({ name:'', type:'layer', hallId:'', zoneId:'' });
-
-  // فروش
   const [sellModal, setSellModal] = useState<{ hatchId: string; count: number } | null>(null);
   const [sellForm, setSellForm] = useState({ buyerId:'', count:'', unitPrice:'', date:'' });
 
-  useEffect(() => {
-    if (initialEntry) {
-      const exists = eggEntries.find(e => e.id === initialEntry);
-      if (exists) {
-        setForm(f => ({ ...f, eggEntryId: initialEntry }));
-        setOpen(true);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialEntry]);
+  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
+  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
+  const todayJ = () => { const d = new Date(); return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0'); };
 
-  const openNew = (preEntryId?: string) => {
+  const dataFor = (id: string) => entriesData[id] || emptyRow();
+  const updateData = (id: string, patch: any) => setEntriesData(d => ({ ...d, [id]: { ...(d[id] || emptyRow()), ...patch } }));
+
+  const toggleEntry = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) { next.delete(id); setEntriesData(d => { const nd = { ...d }; delete nd[id]; return nd; }); }
+      else { next.add(id); setEntriesData(d => ({ ...d, [id]: emptyRow() })); }
+      return next;
+    });
+  };
+
+  const openNew = (preId?: string) => {
     if (eggEntries.length === 0) { showAlert('اول یک ورودی تخم بسازید'); return; }
-    const targetId = preEntryId || eggEntries[0].id;
-    setForm({ id:'', eggEntryId: targetId, date:'', hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
+    setEditingId(null);
+    setFormDate(todayJ());
+    setFormEntryId(preId || eggEntries[0].id);
+    const data: Record<string, any> = {};
+    if (preId) data[preId] = emptyRow();
+    setEntriesData(data);
+    setSelectedIds(preId ? new Set([preId]) : new Set());
     setErr(''); setOpen(true);
   };
 
   const openEdit = (h: HatchResult) => {
-    setForm({
-      id: h.id, eggEntryId: h.eggEntryId, date: h.date,
-      hatched: h.hatched ? toFa(h.hatched) : '',
-      unhatched: h.unhatched ? toFa(h.unhatched) : '',
-      deadInShell: h.deadInShell ? toFa(h.deadInShell) : '',
-      pipped: h.pipped ? toFa(h.pipped) : '',
-      other: h.other ? toFa(h.other) : '',
-      gradeA: h.gradeA ? toFa(h.gradeA) : '',
-      gradeB: h.gradeB ? toFa(h.gradeB) : '',
-      maleCount: h.maleCount ? toFa(h.maleCount) : '',
-      femaleCount: h.femaleCount ? toFa(h.femaleCount) : '',
-      unknownCount: h.unknownCount ? toFa(h.unknownCount) : '',
-      avgWeight: h.avgWeight ? toFa(h.avgWeight) : '',
-      notes: h.notes
-    });
+    setEditingId(h.id);
+    setFormDate(h.date);
+    setFormEntryId(h.eggEntryId);
+    setSelectedIds(new Set([h.eggEntryId]));
+    setEntriesData({ [h.eggEntryId]: {
+      hatched: h.hatched ? toFa(h.hatched) : '', unhatched: h.unhatched ? toFa(h.unhatched) : '',
+      deadInShell: h.deadInShell ? toFa(h.deadInShell) : '', pipped: h.pipped ? toFa(h.pipped) : '',
+      other: h.other ? toFa(h.other) : '', gradeA: h.gradeA ? toFa(h.gradeA) : '', gradeB: h.gradeB ? toFa(h.gradeB) : '',
+      maleCount: h.maleCount ? toFa(h.maleCount) : '', femaleCount: h.femaleCount ? toFa(h.femaleCount) : '',
+      unknownCount: h.unknownCount ? toFa(h.unknownCount) : '', avgWeight: h.avgWeight ? toFa(h.avgWeight) : '', notes: h.notes
+    }});
     setErr(''); setOpen(true);
   };
 
-  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
-  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
-
-  const selectedEntry = eggEntries.find(e => e.id === form.eggEntryId);
-  const totalEggs = selectedEntry?.count || 0;
-  const lastCandling = candlings.filter(c => c.eggEntryId === form.eggEntryId).sort((a,b) => b.stage - a.stage)[0];
-  const maxHatched = lastCandling?.alive || totalEggs;
-
-  const sum = (parseInt(toEn(form.hatched))||0) + (parseInt(toEn(form.unhatched))||0) + (parseInt(toEn(form.deadInShell))||0) + (parseInt(toEn(form.pipped))||0) + (parseInt(toEn(form.other))||0);
-
   const save = () => {
-    if (!form.date.trim()) { setErr('تاریخ اجباری است'); return; }
-    const hatched = int(form.hatched);
-    if (maxHatched && hatched && hatched > maxHatched) { setErr('تعداد جوجه هچ‌شده از تخم سالم (' + toFa(maxHatched) + ') بیشتر است'); return; }
-    const data = {
-      eggEntryId: form.eggEntryId, date: form.date,
-      hatched, unhatched: int(form.unhatched),
-      deadInShell: int(form.deadInShell), pipped: int(form.pipped),
-      other: int(form.other),
-      gradeA: int(form.gradeA), gradeB: int(form.gradeB),
-      maleCount: int(form.maleCount), femaleCount: int(form.femaleCount), unknownCount: int(form.unknownCount),
-      avgWeight: num(form.avgWeight),
-      notes: form.notes
-    };
-    if (form.id) updateHatch(form.id, data);
-    else addHatch(data as any);
+    if (!formDate.trim()) { setErr('تاریخ اجباری است'); return; }
+    if (editingId) {
+      const d = dataFor(formEntryId);
+      updateHatch(editingId, {
+        date: formDate,
+        hatched: int(d.hatched), unhatched: int(d.unhatched),
+        deadInShell: int(d.deadInShell), pipped: int(d.pipped), other: int(d.other),
+        gradeA: int(d.gradeA), gradeB: int(d.gradeB),
+        maleCount: int(d.maleCount), femaleCount: int(d.femaleCount), unknownCount: int(d.unknownCount),
+        avgWeight: num(d.avgWeight), notes: d.notes || ''
+      } as any);
+      setOpen(false); return;
+    }
+    if (selectedIds.size === 0) { setErr('حداقل یک ورودی انتخاب کنید'); return; }
+    let saved = 0;
+    Array.from(selectedIds).forEach(id => {
+      const d = dataFor(id);
+      addHatch({
+        eggEntryId: id, date: formDate,
+        hatched: int(d.hatched), unhatched: int(d.unhatched),
+        deadInShell: int(d.deadInShell), pipped: int(d.pipped), other: int(d.other),
+        gradeA: int(d.gradeA), gradeB: int(d.gradeB),
+        maleCount: int(d.maleCount), femaleCount: int(d.femaleCount), unknownCount: int(d.unknownCount),
+        avgWeight: num(d.avgWeight), notes: d.notes || ''
+      } as any);
+      saved++;
+    });
     setOpen(false);
+    showAlert(toFa(saved) + ' نتیجه هچ ثبت شد', '✅ موفق');
   };
 
   const doDelete = (id: string) => {
     const h = hatches.find(x => x.id === id) as any;
     if (!h) return;
-    let delFlock = false, delInv = false;
-    if (h.generatedFlockId) {
-      delFlock = confirm('این هچ یک گله ساخته. تایید: گله هم حذف شود؟\nلغو: فقط هچ حذف شود');
-    }
-    if (h.generatedInvoiceId) {
-      delInv = confirm('این هچ یک فاکتور فروش ساخته. تایید: فاکتور هم حذف شود؟\nلغو: فقط هچ حذف شود');
-    }
-    if (delFlock && h.generatedFlockId) { try { removeFlock(h.generatedFlockId); } catch {} }
-    if (delInv && h.generatedInvoiceId) { try { deleteInvoice(h.generatedInvoiceId); } catch {} }
-    deleteHatch(id);
-    setDelId(null);
+    if (h.generatedFlockId && confirm('این هچ یک گله ساخته. گله هم حذف شود؟')) { try { removeFlock(h.generatedFlockId); } catch {} }
+    if (h.generatedInvoiceId && confirm('این هچ یک فاکتور ساخته. فاکتور هم حذف شود؟')) { try { deleteInvoice(h.generatedInvoiceId); } catch {} }
+    deleteHatch(id); setDelId(null);
   };
 
   const createFlock = () => {
     if (!flockModal) return;
     if (!flockForm.name.trim()) { showAlert('نام گله اجباری است'); return; }
-    const h = hatches.find(x => x.id === flockModal.hatchId);
-    if (!h) return;
+    const h = hatches.find(x => x.id === flockModal.hatchId); if (!h) return;
     const entry = eggEntries.find(e => e.id === h.eggEntryId);
     const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
     if (!bird) { showAlert('پرنده پیدا نشد'); return; }
-    const today = new Date();
-    const startDate = today.getFullYear() + '/' + String(today.getMonth()+1).padStart(2,'0') + '/' + String(today.getDate()).padStart(2,'0');
     addFlock({
-      name: flockForm.name.trim(),
-      type: flockForm.type as any,
-      birdId: bird.id,
-      breedId: entry?.breedId || '',
+      name: flockForm.name.trim(), type: flockForm.type as any,
+      birdId: bird.id, breedId: entry?.breedId || '',
       hallId: flockForm.hallId, zoneId: flockForm.zoneId,
       initialCount: flockModal.count, currentCount: flockModal.count,
       maleCount: h.maleCount || null, femaleCount: h.femaleCount || null,
       layingStartDay: 140, vaccineScheduleId: '',
-      hatchDate: startDate, purchaseDate: '', startDate,
-      endDate: '', source: 'hatch',
+      hatchDate: todayJ(), purchaseDate: '', startDate: todayJ(), endDate: '', source: 'hatch',
       purchasePrice: null, deliveryCost: null, otherCosts: null,
       status: 'active', notes: 'از هچ ' + toFa(h.date),
     } as any);
-    // ذخیره id گله در هچ — نیاز به id برگشتی داریم که addFlock نداره
-    // بذار فقط موفقیت نشون بده
     setFlockModal(null);
-    setFlockForm({ name:'', type:'layer', hallId:'', zoneId:'' });
-    showAlert('گله «' + flockForm.name + '» با ' + toFa(flockModal.count) + ' پرنده ساخته شد', '✅ موفق');
+    showAlert('گله ساخته شد', '✅ موفق');
     setTimeout(() => nav('/flk'), 500);
   };
 
   const doSell = () => {
     if (!sellModal) return;
     if (!sellForm.buyerId) { showAlert('خریدار اجباری است'); return; }
-    if (!sellForm.count.trim() || !sellForm.unitPrice.trim()) { showAlert('تعداد و قیمت اجباری'); return; }
     const count = parseInt(toEn(sellForm.count)) || 0;
     const unitPrice = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;
     if (count <= 0 || unitPrice <= 0) { showAlert('مقادیر باید بیشتر از صفر'); return; }
-    const total = count * unitPrice;
     const h = hatches.find(x => x.id === sellModal.hatchId);
     const invId = addInvoice({
       type: 'sale', date: sellForm.date || h?.date || '',
       partyId: sellForm.buyerId, category: 'chick',
-      items: [{
-        id: 'chick-' + Date.now(),
-        name: 'جوجه یک‌روزه',
-        quantity: count, unit: 'عدد',
-        unitPrice, total
-      }],
-      total, payments: [], dueDate: sellForm.date || h?.date || '',
-      relatedFlockId: '', relatedEntryId: h?.eggEntryId || '',
-      notes: 'فروش جوجه — هچ ' + (h?.date || ''),
+      items: [{ id: 'chick-' + Date.now(), name: 'جوجه یک‌روزه', quantity: count, unit: 'عدد', unitPrice, total: count * unitPrice }],
+      total: count * unitPrice, payments: [], dueDate: sellForm.date || h?.date || '',
+      relatedFlockId: '', relatedEntryId: h?.eggEntryId || '', notes: 'فروش جوجه'
     } as any);
     if (h && invId) updateHatch(h.id, { generatedInvoiceId: invId } as any);
     setSellModal(null);
-    setSellForm({ buyerId:'', count:'', unitPrice:'', date:'' });
-    showAlert('فاکتور فروش ثبت شد', '✅ موفق');
+    showAlert('فاکتور ثبت شد', '✅ موفق');
   };
 
-  // ═══ تخمین از کندلینگ ═══
-  const suggestionsFromCandling = useMemo(() => {
-    if (!selectedEntry) return null;
-    const myCandlings = candlings.filter(c => c.eggEntryId === form.eggEntryId).sort((a, b) => b.stage - a.stage);
-    const last = myCandlings[0];
-    if (!last) return null;
-    const total = selectedEntry.count || 0;
-    const alive = last.alive || 0;
-    const infertile = last.infertile || 0;
-    const dead = last.dead || 0;
-    const broken = last.broken || 0;
-    const expectedHatched = Math.round(alive * 0.92);
-    const expectedDeadInShell = Math.round(alive * 0.05);
-    const expectedUnhatched = Math.max(0, alive - expectedHatched - expectedDeadInShell);
-    return {
-      total, alive, infertile, dead, broken,
-      expectedHatched, expectedDeadInShell, expectedUnhatched,
-      fertilityRate: total > 0 ? (alive / total * 100) : 0,
-      candlingStage: last.stage,
-    };
-  }, [candlings, form.eggEntryId, selectedEntry]);
-
-  const applySuggestions = () => {
-    if (!suggestionsFromCandling) return;
-    setForm(f => ({
-      ...f,
-      hatched: String(suggestionsFromCandling.expectedHatched),
-      deadInShell: String(suggestionsFromCandling.expectedDeadInShell),
-      unhatched: String(suggestionsFromCandling.expectedUnhatched),
-    }));
-    showAlert('مقادیر تخمینی پر شد — می‌تونی دستی تغییر بدی', '📊 تخمین');
-  };
+  const filtered = useMemo(() => hatches.filter(h => {
+    const entry = eggEntries.find(e => e.id === h.eggEntryId);
+    if (deviceFilter && entry?.deviceId !== deviceFilter) return false;
+    if (q.trim()) {
+      const t = q.trim().toLowerCase();
+      const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
+      const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
+      if (![bird?.name, dev?.name, h.date, h.notes].filter(Boolean).join(' ').toLowerCase().includes(t)) return false;
+    }
+    return true;
+  }).sort((a, b) => String(b.date).localeCompare(String(a.date))), [hatches, eggEntries, deviceFilter, q, birds, devices]);
 
   const target = delId ? hatches.find(h => h.id === delId) : null;
-
-  // ═══ گروه‌بندی + خلاصه ═══
-  const filtered = useMemo(() => {
-    return hatches.filter(h => {
-      const entry = eggEntries.find(e => e.id === h.eggEntryId);
-      if (deviceFilter && entry?.deviceId !== deviceFilter) return false;
-      if (q.trim()) {
-        const t = q.trim().toLowerCase();
-        const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
-        const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
-        const haystack = [bird?.name, dev?.name, h.date, h.notes].filter(Boolean).join(' ').toLowerCase();
-        if (!haystack.includes(t)) return false;
-      }
-      return true;
-    }).sort((a, b) => String(b.date).localeCompare(String(a.date)));
-  }, [hatches, eggEntries, deviceFilter, q, birds, devices]);
-
-  const summary = useMemo(() => {
-    const totalHatched = hatches.reduce((a, h) => a + (h.hatched || 0), 0);
-    const totalEggs = hatches.reduce((a, h) => {
-      const entry = eggEntries.find(e => e.id === h.eggEntryId);
-      return a + (entry?.count || 0);
-    }, 0);
-    const rate = totalEggs > 0 ? (totalHatched / totalEggs * 100) : 0;
-    return { totalHatched, totalEggs, rate };
-  }, [hatches, eggEntries]);
+  const availableEntries = eggEntries.filter(e => !deviceFilter || e.deviceId === deviceFilter).sort((a, b) => String(b.entryDate).localeCompare(String(a.entryDate)));
 
   return (
     <PageContainer>
       {hatches.length > 0 && (
         <>
-          <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>🐣 جوجه هچ‌شده</span>
-              <span style={{ fontSize: 'var(--fs-xl)', fontWeight: 700 }}>{toFa(summary.totalHatched)}</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>📊 نرخ هچ کل</span>
-              <span style={{ fontSize: 'var(--fs-xl)', fontWeight: 700 }}>{toFa(summary.rate.toFixed(1))}٪</span>
-            </div>
-            <div style={{ gridColumn: '1 / -1', paddingTop: 6, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', justifyContent: 'space-between' }}>
-              <span>📥 {toFa(hatches.length)} هچ</span>
-              <span>🥚 {toFa(summary.totalEggs)} تخم</span>
-            </div>
-          </div>
-
-          <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (پرنده، دستگاه، یادداشت...)" />
-
+          <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو..." />
           <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
             <button onClick={() => setDeviceFilter('')} style={chip(!deviceFilter)}>همه</button>
-            {devices.map(d => (
-              <button key={d.id} onClick={() => setDeviceFilter(deviceFilter === d.id ? '' : d.id)} style={chip(deviceFilter === d.id)}>{d.name}</button>
-            ))}
+            {devices.map(d => <button key={d.id} onClick={() => setDeviceFilter(deviceFilter === d.id ? '' : d.id)} style={chip(deviceFilter === d.id)}>{d.name}</button>)}
           </div>
         </>
       )}
 
       {filtered.length === 0 ? (
-        <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><ellipse cx="12" cy="14" rx="7" ry="9"/></svg>}
-          title={hatches.length === 0 ? 'هچی ثبت نشده' : 'موردی مطابق فیلتر نیست'}
-          desc="پس از پایان دوره‌ی جوجه‌کشی، نتیجه‌ی نهایی را ثبت کنید."
-          action={<Btn onClick={() => openNew()}>+ ثبت هچ</Btn>} />
+        <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><ellipse cx="12" cy="14" rx="7" ry="9"/></svg>}
+          title="هچی ثبت نشده" desc="نتیجه‌ی نهایی را ثبت کنید."
+          action={<Btn variant="primary" onClick={() => openNew()}>+ ثبت هچ</Btn>} />
       ) : (
         <>
           {filtered.map((h, i) => {
@@ -292,9 +205,9 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
             const isOpen = expandedId === h.id;
             const total = entry?.count || 0;
             const hr = hatchRate(h.hatched || 0, total);
-            const myCandling = candlings.filter(c => c.eggEntryId === h.eggEntryId).sort((a,b) => b.stage - a.stage)[0];
-            const aliveAfterCandling = myCandling?.alive || total;
-            const realRate = aliveAfterCandling ? ((h.hatched || 0) / aliveAfterCandling * 100) : 0;
+            const myCand = candlings.filter(c => c.eggEntryId === h.eggEntryId).sort((a,b) => b.stage - a.stage)[0];
+            const aliveAfter = myCand?.alive || total;
+            const realRate = aliveAfter ? ((h.hatched || 0) / aliveAfter * 100) : 0;
             const tone = hr >= 70 ? 'green' : hr >= 50 ? 'amber' : 'red';
             const sumH = (h.hatched||0) + (h.unhatched||0) + (h.deadInShell||0) + (h.pipped||0) + (h.other||0);
             const isComplete = total > 0 && sumH >= total;
@@ -304,35 +217,20 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                 subtitle={(dev?.name || '—') + ' · ' + toFa(h.date)}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
                 badge={<Tag tone={tone}>{toFa(hr.toFixed(1))}٪</Tag>}
-                summary={<>
-                  <span>🐣 {toFa(h.hatched || 0)}</span>
-                  <span>🥚 {toFa(total)}</span>
-                  <span>📊 {toFa(hr.toFixed(0))}٪</span>
-                </>}
+                summary={<><span>🐣 {toFa(h.hatched || 0)}</span><span>🥚 {toFa(total)}</span><span>📊 {toFa(hr.toFixed(0))}٪</span></>}
               >
-                {isComplete && (
-                  <div style={{ padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', textAlign: 'center', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
-                    ✅ هچ تکمیل شد — همه تخم‌ها شمارش شدن
-                  </div>
-                )}
+                {isComplete && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', textAlign: 'center' }}>✅ تکمیل — همه تخم‌ها شمارش شدن</div>}
 
                 {total > 0 && (h.hatched || 0) > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 نمودار توزیع</div>
-                    <div style={{ display: 'flex', height: 12, borderRadius: 6, overflow: 'hidden', background: 'var(--input-bg)' }}>
-                      {(h.hatched || 0) > 0 && <div style={{ width: ((h.hatched||0)/total*100)+'%', background: 'var(--accent)' }} title={'هچ ' + toFa(h.hatched || 0)} />}
-                      {(h.deadInShell || 0) > 0 && <div style={{ width: ((h.deadInShell||0)/total*100)+'%', background: 'var(--danger)' }} title={'مرده ' + toFa(h.deadInShell || 0)} />}
-                      {(h.pipped || 0) > 0 && <div style={{ width: ((h.pipped||0)/total*100)+'%', background: 'var(--warn)' }} title={'نوک‌زده ' + toFa(h.pipped || 0)} />}
-                      {(h.unhatched || 0) > 0 && <div style={{ width: ((h.unhatched||0)/total*100)+'%', background: 'var(--muted)' }} title={'هچ‌نشده ' + toFa(h.unhatched || 0)} />}
-                      {(h.other || 0) > 0 && <div style={{ width: ((h.other||0)/total*100)+'%', background: 'var(--dim)' }} title={'سایر ' + toFa(h.other || 0)} />}
+                  <>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 توزیع</div>
+                    <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: 'var(--input-bg)' }}>
+                      {(h.hatched||0) > 0 && <div style={{ width: ((h.hatched||0)/total*100)+'%', background: 'var(--accent)' }} />}
+                      {(h.deadInShell||0) > 0 && <div style={{ width: ((h.deadInShell||0)/total*100)+'%', background: 'var(--danger)' }} />}
+                      {(h.pipped||0) > 0 && <div style={{ width: ((h.pipped||0)/total*100)+'%', background: 'var(--warn)' }} />}
+                      {(h.unhatched||0) > 0 && <div style={{ width: ((h.unhatched||0)/total*100)+'%', background: 'var(--muted)' }} />}
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: 'var(--fs-xs)' }}>
-                      {(h.hatched||0) > 0 && <span style={{ color: 'var(--accent)' }}>🟢 هچ {toFa(h.hatched||0)} ({toFa(((h.hatched||0)/total*100).toFixed(0))}٪)</span>}
-                      {(h.deadInShell||0) > 0 && <span style={{ color: 'var(--danger)' }}>🔴 مرده {toFa(h.deadInShell||0)}</span>}
-                      {(h.pipped||0) > 0 && <span style={{ color: 'var(--warn)' }}>🟡 نوک {toFa(h.pipped||0)}</span>}
-                      {(h.unhatched||0) > 0 && <span style={{ color: 'var(--muted)' }}>⚪ هچ‌نشده {toFa(h.unhatched||0)}</span>}
-                    </div>
-                  </div>
+                  </>
                 )}
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 نتیجه هچ</div>
@@ -347,44 +245,36 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                 {(h.gradeA || h.gradeB) && (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-                      {h.gradeA ? <div style={{ padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--muted)' }}>درجه A</span><span style={{ fontWeight: 700 }}>{toFa(h.gradeA)}</span></div> : null}
-                      {h.gradeB ? <div style={{ padding: '6px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--muted)' }}>درجه B</span><span style={{ fontWeight: 700 }}>{toFa(h.gradeB)}</span></div> : null}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      {h.gradeA ? <Row l="درجه A" v={toFa(h.gradeA)} /> : null}
+                      {h.gradeB ? <Row l="درجه B" v={toFa(h.gradeB)} /> : null}
                     </div>
                   </>
                 )}
 
                 {(h.maleCount || h.femaleCount || h.unknownCount) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ تفکیک جنسیت</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
-                      {h.maleCount ? <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--muted)' }}>♂ نر</span><span style={{ fontWeight: 700 }}>{toFa(h.maleCount)}</span></div> : null}
-                      {h.femaleCount ? <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--muted)' }}>♀ ماده</span><span style={{ fontWeight: 700 }}>{toFa(h.femaleCount)}</span></div> : null}
-                      {h.unknownCount ? <div style={{ padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--muted)' }}>? نامعلوم</span><span style={{ fontWeight: 700 }}>{toFa(h.unknownCount)}</span></div> : null}
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      {h.maleCount ? <Row l="♂ نر" v={toFa(h.maleCount)} /> : null}
+                      {h.femaleCount ? <Row l="♀ ماده" v={toFa(h.femaleCount)} /> : null}
+                      {h.unknownCount ? <Row l="? نامعلوم" v={toFa(h.unknownCount)} /> : null}
                     </div>
                   </>
                 )}
 
-                {h.avgWeight ? (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ وزن</div>
-                    <Row l="وزن متوسط جوجه" v={toFa(h.avgWeight) + ' گرم'} />
-                  </>
-                ) : null}
+                {h.avgWeight ? <><div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ وزن</div><Row l="وزن متوسط" v={toFa(h.avgWeight) + ' گرم'} /></> : null}
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📈 نرخ‌ها</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="نرخ هچ کل" v={toFa(hr.toFixed(1)) + '٪'} />
-                  {aliveAfterCandling !== total && <Row l="نرخ از نطفه‌دار" v={toFa(realRate.toFixed(1)) + '٪'} />}
+                  {aliveAfter !== total && <Row l="نرخ از نطفه‌دار" v={toFa(realRate.toFixed(1)) + '٪'} />}
                 </div>
 
                 {entry?.totalPrice && h.hatched ? (
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>💰 هزینه</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <Row l="هزینه کل تخم‌ها" v={toFa(entry.totalPrice.toLocaleString('fa-IR')) + ' ت'} />
-                      <Row l="💰 هزینه هر جوجه" v={toFa(Math.round(costPerChick(entry.totalPrice, h.hatched)).toLocaleString('fa-IR')) + ' ت'} />
-                    </div>
+                    <Row l="💰 هزینه هر جوجه" v={toFa(Math.round(costPerChick(entry.totalPrice, h.hatched)).toLocaleString('fa-IR')) + ' ت'} />
                   </>
                 ) : null}
 
@@ -396,23 +286,17 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                 )}
 
                 {isComplete && (h.hatched || 0) > 0 && (
-                  <div style={{ padding: '12px 14px', background: 'var(--input-bg)', border: '1px dashed var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>🎯 مرحله بعد:</div>
+                  <div style={{ padding: 10, background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, textAlign: 'center' }}>مرحله بعد:</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                      <Btn onClick={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(new Date().getFullYear()), type: 'layer', hallId: '', zoneId: '' }); }}>🐔 ساخت گله</Btn>
-                      <Btn onClick={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}>📥 فروش جوجه</Btn>
+                      <Btn size="sm" onClick={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(new Date().getFullYear()), type: 'layer', hallId: '', zoneId: '' }); }}>🐔 گله</Btn>
+                      <Btn size="sm" onClick={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}>📥 فروش</Btn>
                     </div>
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(h)} style={{ flex: 1 }}>ویرایش</Btn>
-                  {(h.hatched || 0) > 0 && (
-                    <>
-                      <Btn size="sm" onClick={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(new Date().getFullYear()), type: 'layer', hallId: '', zoneId: '' }); }} style={{ flex: 1 }}>🐔 گله</Btn>
-                      <Btn size="sm" onClick={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }} style={{ flex: 1 }}>📥 فروش</Btn>
-                    </>
-                  )}
                   <Btn size="sm" onClick={() => setDelId(h.id)} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
@@ -422,68 +306,130 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
         </>
       )}
 
-      {/* ═══ Modal ثبت/ویرایش هچ ═══ */}
-      <Modal open={open} onClose={() => setOpen(false)} title={form.id ? '✏️ ویرایش هچ' : '🐣 ثبت هچ'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+      {/* ═══ Modal ثبت/ویرایش ═══ */}
+      <Modal open={open} onClose={() => setOpen(false)} title={editingId ? '✏️ ویرایش هچ' : '🐣 ثبت هچ'}
+        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
-        <SectionTitle>📦 ورودی تخم</SectionTitle>
-        <Field label="انتخاب ورودی" required>
-          <Select value={form.eggEntryId} onChange={e => setForm({...form, eggEntryId: e.target.value})}>
-            {eggEntries.map(e => {
-              const bird = birds.find(b => b.id === e.birdId);
-              const dev = devices.find(d => d.id === e.deviceId);
-              return <option key={e.id} value={e.id}>{bird?.name || '—'} · {toFa(e.entryDate)} · {toFa(e.count || 0)} تخم · {dev?.name || ''}</option>;
-            })}
-          </Select>
-        </Field>
-        {selectedEntry && (
-          <div style={{ padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <Row l="تعداد کل" v={toFa(totalEggs) + ' تخم'} />
-            <Row l="از نطفه‌دار" v={toFa(maxHatched) + ' تخم'} />
-          </div>
+        <SectionTitle>📦 انتخاب ورودی‌ها</SectionTitle>
+
+        {editingId ? (
+          <Field label="ورودی تخم" required>
+            <Select value={formEntryId} onChange={e => setFormEntryId(e.target.value)}>
+              {eggEntries.map(e => {
+                const bird = birds.find(b => b.id === e.birdId);
+                const dev = devices.find(d => d.id === e.deviceId);
+                return <option key={e.id} value={e.id}>{bird?.name || '—'} · {toFa(e.entryDate)} · {toFa(e.count || 0)} تخم · {dev?.name || ''}</option>;
+              })}
+            </Select>
+          </Field>
+        ) : (
+          <>
+            <Field label="فیلتر دستگاه" hint={selectedIds.size > 0 ? toFa(selectedIds.size) + ' انتخاب‌شده' : undefined}>
+              <Select value={deviceFilter} onChange={e => setDeviceFilter(e.target.value)}>
+                <option value="">— همه دستگاه‌ها —</option>
+                {devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+              </Select>
+            </Field>
+
+            {availableEntries.length === 0 ? (
+              <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>ورودی‌ای نیست</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {availableEntries.map(e => {
+                  const bird = birds.find(b => b.id === e.birdId);
+                  const dev = devices.find(d => d.id === e.deviceId);
+                  const isSel = selectedIds.has(e.id);
+                  const d = dataFor(e.id);
+                  const myCand = candlings.filter(c => c.eggEntryId === e.id).sort((a,b) => b.stage - a.stage)[0];
+                  const aliveAfter = myCand?.alive || e.count || 0;
+                  const sumE = (parseInt(toEn(d.hatched))||0) + (parseInt(toEn(d.unhatched))||0) + (parseInt(toEn(d.deadInShell))||0) + (parseInt(toEn(d.pipped))||0) + (parseInt(toEn(d.other))||0);
+                  const rem = (e.count || 0) - sumE;
+                  return (
+                    <div key={e.id} style={{ border: '1px solid ' + (isSel ? 'var(--accent-border)' : 'var(--border)'), background: isSel ? 'var(--accent-soft)' : 'var(--card)', borderRadius: 'var(--r-md)', padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                        <input type="checkbox" checked={isSel} onChange={() => toggleEntry(e.id)} style={{ width: 18, height: 18, accentColor: 'var(--accent)' }} />
+                        <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{bird?.name || '—'} · {toFa(e.count || 0)} تخم</span>
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{dev?.name || ''}</span>
+                      </label>
+
+                      {myCand && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '4px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>پس از کندلینگ روز {toFa(myCand.stage)}: نطفه‌دار {toFa(aliveAfter)}</div>}
+
+                      {isSel && (
+                        <>
+                          <Grid2>
+                            <Field label="جوجه هچ‌شده" required hint={'حداکثر: ' + toFa(aliveAfter)}>
+                              <NumField value={d.hatched} onChange={ev => updateData(e.id, { hatched: ev.target.value })} max={aliveAfter} min={0} unit="عدد" />
+                            </Field>
+                            <Field label="هچ‌نشده"><NumField value={d.unhatched} onChange={ev => updateData(e.id, { unhatched: ev.target.value })} min={0} unit="عدد" /></Field>
+                          </Grid2>
+                          <Grid2>
+                            <Field label="مرده در پوسته"><NumField value={d.deadInShell} onChange={ev => updateData(e.id, { deadInShell: ev.target.value })} min={0} unit="عدد" /></Field>
+                            <Field label="نوک‌زده"><NumField value={d.pipped} onChange={ev => updateData(e.id, { pipped: ev.target.value })} min={0} unit="عدد" /></Field>
+                          </Grid2>
+                          <Grid2>
+                            <Field label="سایر"><NumField value={d.other} onChange={ev => updateData(e.id, { other: ev.target.value })} min={0} unit="عدد" /></Field>
+                            <Field label="وزن متوسط"><NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} unit="گرم" /></Field>
+                          </Grid2>
+                          <Grid2>
+                            <Field label="درجه A"><NumField value={d.gradeA} onChange={ev => updateData(e.id, { gradeA: ev.target.value })} min={0} unit="عدد" /></Field>
+                            <Field label="درجه B"><NumField value={d.gradeB} onChange={ev => updateData(e.id, { gradeB: ev.target.value })} min={0} unit="عدد" /></Field>
+                          </Grid2>
+                          <Grid2>
+                            <Field label="♂ نر"><NumField value={d.maleCount} onChange={ev => updateData(e.id, { maleCount: ev.target.value })} min={0} unit="عدد" /></Field>
+                            <Field label="♀ ماده"><NumField value={d.femaleCount} onChange={ev => updateData(e.id, { femaleCount: ev.target.value })} min={0} unit="عدد" /></Field>
+                          </Grid2>
+                          <Field label="? نامعلوم"><NumField value={d.unknownCount} onChange={ev => updateData(e.id, { unknownCount: ev.target.value })} min={0} unit="عدد" /></Field>
+                          <Field label="یادداشت"><Input value={d.notes || ''} onChange={ev => updateData(e.id, { notes: ev.target.value })} placeholder="..." /></Field>
+                          <div style={{ padding: '6px 10px', background: rem < 0 ? 'var(--danger-soft)' : rem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
+                            این هچ: {toFa(sumE)} از {toFa(e.count || 0)}{rem > 0 && ' · باقی: ' + toFa(rem)}{rem < 0 && ' — بیشتر!'}{rem === 0 && ' ✅'}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
         )}
 
-        <SectionTitle>📅 تاریخ</SectionTitle>
-        <Field label="تاریخ هچ" required>
-          <DatePicker value={form.date} onChange={v => setForm({...form, date: v})} placeholder="انتخاب تاریخ" />
+        {editingId && (
+          <>
+            <SectionTitle>📊 نتیجه</SectionTitle>
+            <Grid2>
+              <Field label="جوجه هچ‌شده" required><NumField value={dataFor(formEntryId).hatched} onChange={ev => updateData(formEntryId, { hatched: ev.target.value })} min={0} unit="عدد" /></Field>
+              <Field label="هچ‌نشده"><NumField value={dataFor(formEntryId).unhatched} onChange={ev => updateData(formEntryId, { unhatched: ev.target.value })} min={0} unit="عدد" /></Field>
+            </Grid2>
+            <Grid2>
+              <Field label="مرده در پوسته"><NumField value={dataFor(formEntryId).deadInShell} onChange={ev => updateData(formEntryId, { deadInShell: ev.target.value })} min={0} unit="عدد" /></Field>
+              <Field label="نوک‌زده"><NumField value={dataFor(formEntryId).pipped} onChange={ev => updateData(formEntryId, { pipped: ev.target.value })} min={0} unit="عدد" /></Field>
+            </Grid2>
+            <Grid2>
+              <Field label="سایر"><NumField value={dataFor(formEntryId).other} onChange={ev => updateData(formEntryId, { other: ev.target.value })} min={0} unit="عدد" /></Field>
+              <Field label="وزن متوسط"><NumField value={dataFor(formEntryId).avgWeight} onChange={ev => updateData(formEntryId, { avgWeight: ev.target.value })} min={0} unit="گرم" /></Field>
+            </Grid2>
+            <Grid2>
+              <Field label="درجه A"><NumField value={dataFor(formEntryId).gradeA} onChange={ev => updateData(formEntryId, { gradeA: ev.target.value })} min={0} unit="عدد" /></Field>
+              <Field label="درجه B"><NumField value={dataFor(formEntryId).gradeB} onChange={ev => updateData(formEntryId, { gradeB: ev.target.value })} min={0} unit="عدد" /></Field>
+            </Grid2>
+            <Grid2>
+              <Field label="♂ نر"><NumField value={dataFor(formEntryId).maleCount} onChange={ev => updateData(formEntryId, { maleCount: ev.target.value })} min={0} unit="عدد" /></Field>
+              <Field label="♀ ماده"><NumField value={dataFor(formEntryId).femaleCount} onChange={ev => updateData(formEntryId, { femaleCount: ev.target.value })} min={0} unit="عدد" /></Field>
+            </Grid2>
+            <Field label="? نامعلوم"><NumField value={dataFor(formEntryId).unknownCount} onChange={ev => updateData(formEntryId, { unknownCount: ev.target.value })} min={0} unit="عدد" /></Field>
+            <Field label="یادداشت"><Input value={dataFor(formEntryId).notes || ''} onChange={ev => updateData(formEntryId, { notes: ev.target.value })} placeholder="..." /></Field>
+          </>
+        )}
+
+        <SectionTitle>📅 تاریخ هچ</SectionTitle>
+        <Field label="تاریخ" required>
+          <DatePicker value={formDate} onChange={v => setFormDate(v)} placeholder="انتخاب تاریخ" />
         </Field>
-
-        <SectionTitle>📊 نتیجه هچ</SectionTitle>
-        <Grid2>
-          <Field label="جوجه هچ‌شده" required hint={maxHatched ? `حداکثر: ${toFa(maxHatched)}` : undefined}>
-            <NumField placeholder="۰" value={form.hatched} onChange={e => setForm({...form, hatched: e.target.value})} max={maxHatched || undefined} min={0} unit="عدد" />
-          </Field>
-          <Field label="هچ‌نشده"><NumField placeholder="۰" value={form.unhatched} onChange={e => setForm({...form, unhatched: e.target.value})} min={0} unit="عدد" /></Field>
-        </Grid2>
-        <Grid2>
-          <Field label="مرده در پوسته"><NumField placeholder="۰" value={form.deadInShell} onChange={e => setForm({...form, deadInShell: e.target.value})} min={0} unit="عدد" /></Field>
-          <Field label="نوک‌زده"><NumField placeholder="۰" value={form.pipped} onChange={e => setForm({...form, pipped: e.target.value})} min={0} unit="عدد" /></Field>
-        </Grid2>
-        <Field label="سایر"><NumField placeholder="۰" value={form.other} onChange={e => setForm({...form, other: e.target.value})} min={0} unit="عدد" /></Field>
-
-        <SectionTitle>🏅 تفکیک کیفی (اختیاری)</SectionTitle>
-        <Grid2>
-          <Field label="درجه A"><NumField placeholder="۰" value={form.gradeA} onChange={e => setForm({...form, gradeA: e.target.value})} min={0} unit="عدد" /></Field>
-          <Field label="درجه B"><NumField placeholder="۰" value={form.gradeB} onChange={e => setForm({...form, gradeB: e.target.value})} min={0} unit="عدد" /></Field>
-        </Grid2>
-
-        <SectionTitle>⚖️ جنسیت و وزن (اختیاری)</SectionTitle>
-        <Grid2>
-          <Field label="♂ نر"><NumField placeholder="۰" value={form.maleCount} onChange={e => setForm({...form, maleCount: e.target.value})} min={0} unit="عدد" /></Field>
-          <Field label="♀ ماده"><NumField placeholder="۰" value={form.femaleCount} onChange={e => setForm({...form, femaleCount: e.target.value})} min={0} unit="عدد" /></Field>
-        </Grid2>
-        <Grid2>
-          <Field label="? نامعلوم"><NumField placeholder="۰" value={form.unknownCount} onChange={e => setForm({...form, unknownCount: e.target.value})} min={0} unit="عدد" /></Field>
-          <Field label="وزن متوسط"><NumField placeholder="۴۲" value={form.avgWeight} onChange={e => setForm({...form, avgWeight: e.target.value})} min={0} unit="گرم" /></Field>
-        </Grid2>
-
-        <SectionTitle>📝 یادداشت</SectionTitle>
-        <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
 
         {err && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center' }}>✕ {err}</div>}
       </Modal>
 
-      {/* ═══ Modal ساخت گله ═══ */}
+      {/* ═══ Modal گله ═══ */}
       <Modal open={!!flockModal} onClose={() => setFlockModal(null)} title="🐔 ساخت گله جدید"
         footer={<BtnRow><Btn variant="primary" onClick={createFlock}>ساخت گله</Btn><Btn onClick={() => setFlockModal(null)}>لغو</Btn></BtnRow>}>
         <Field label="نام گله" required>
@@ -531,23 +477,15 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
           )}
         </Field>
         <Grid2>
-          <Field label="تعداد" required>
-            <NumField placeholder="۰" value={sellForm.count} onChange={e => setSellForm({...sellForm, count: e.target.value})} max={sellModal?.count} min={0} unit="عدد" />
-          </Field>
-          <Field label="قیمت هر جوجه" required>
-            <MoneyField value={sellForm.unitPrice} onChange={e => setSellForm({...sellForm, unitPrice: e.target.value})} />
-          </Field>
+          <Field label="تعداد" required><NumField value={sellForm.count} onChange={e => setSellForm({...sellForm, count: e.target.value})} max={sellModal?.count} min={0} unit="عدد" /></Field>
+          <Field label="قیمت هر جوجه" required><MoneyField value={sellForm.unitPrice} onChange={e => setSellForm({...sellForm, unitPrice: e.target.value})} /></Field>
         </Grid2>
-        <Field label="تاریخ">
-          <DatePicker value={sellForm.date} onChange={v => setSellForm({...sellForm, date: v})} />
-        </Field>
+        <Field label="تاریخ"><DatePicker value={sellForm.date} onChange={v => setSellForm({...sellForm, date: v})} /></Field>
         {(() => {
           const cnt = parseInt(toEn(sellForm.count)) || 0;
           const up = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;
           const total = cnt * up;
-          if (total > 0) {
-            return <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع کل:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
-          }
+          if (total > 0) return <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع کل:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
           return null;
         })()}
       </Modal>
