@@ -13,7 +13,7 @@ export default function NotificationsTab() {
   const qh = s.quietHours;
   const th = s.thresholds;
 
-  const activeChannels = [ch.inApp, ch.sound, ch.vibration, ch.sms, ch.email, ch.telegram].filter(Boolean).length;
+  const activeChannels = [ch.inApp, ch.sound, ch.vibration].filter(Boolean).length;
   const activeAlerts = [al.critical, al.important, al.info].filter(Boolean).length;
 
   return (
@@ -22,7 +22,7 @@ export default function NotificationsTab() {
       <SettingsGroup
         icon="📡"
         title="نحوه‌ی اعلان"
-        subtitle={`${toFa(activeChannels)} کانال فعال از ۶`}
+        subtitle={`${toFa(activeChannels)} کانال فعال از ۳`}
         tone="accent"
        defaultOpen>
         <SubSection label="نحوه‌ی ارسال اعلان" icon="📡" />

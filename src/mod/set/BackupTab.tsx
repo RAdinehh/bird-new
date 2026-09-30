@@ -229,24 +229,6 @@ export default function BackupTab() {
 
       {/* امنیت */}
       <SettingsGroup icon="🔐" title="امنیت و نگهداری" tone="warn">
-        <SubSection label="رمزنگاری و محافظت" icon="🔐" />
-        <RowToggle
-          label="رمزنگاری پشتیبان"
-          sub="الگوریتم AES-256 (در نسخه‌ی بعدی)"
-          value={s.encryption.enabled}
-          onChange={() => s.updateSection('encryption', { enabled: !s.encryption.enabled })}
-        />
-        {s.encryption.enabled ? (
-          <Field label="رمز عبور" hint="این رمز را گم نکنید">
-            <Input placeholder="رمز عبور"
-              type="password"
-              value={s.encryption.password}
-              onChange={e => s.updateSection('encryption', { password: e.target.value })}
-              dir="ltr"
-            />
-          </Field>
-        ) : null}
-      
         <SubSection label="پاک کردن داده‌ها" icon="⚠" />
         <SubSection label="عملیات غیرقابل بازگشت" icon="⚠️" />
         <Btn full variant="danger" onClick={() => setShowReset(true)}>
