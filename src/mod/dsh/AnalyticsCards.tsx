@@ -1,5 +1,5 @@
 // AnalyticsCards.tsx — sections 2+3+4 (سلامت، تولید، مالی)
-import { SectionTitle, KpiCard, MiniStat } from './cards';
+import { SectionTitle, KpiCard, MiniStat, MiniEmpty } from './cards';
 import { LineChart } from '../../shr/components/Charts';
 import { toFa } from '../../shr/utils/fa';
 
@@ -50,6 +50,17 @@ export default function AnalyticsCards({
   momComparison,
   nav,
 }: Props) {
+  const isEmpty = survivalRate === 100 && henDay7 === 0 && brokenRate7 === 0 && eggTrend.length === 0;
+  if (isEmpty) {
+    return (
+      <MiniEmpty
+        icon="📊"
+        title="داده کافی برای تحلیل نیست"
+        hint="با ثبت تولید روزانه و داده‌های گله، تحلیل‌ها فعال می‌شوند"
+      />
+    );
+  }
+
   return (
     <>
                 <SectionTitle>❤️ سلامت گله</SectionTitle>

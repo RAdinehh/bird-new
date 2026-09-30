@@ -1,6 +1,6 @@
 // TodayCard.tsx — بخش ۱: امروز در یک نگاه
 import BenchmarkCard from './BenchmarkCard';
-import { KpiCard, SectionTitle } from './cards';
+import { KpiCard, SectionTitle, MiniEmpty } from './cards';
 import { toFa } from '../../shr/utils/fa';
 
 interface Props {
@@ -37,6 +37,19 @@ export default function TodayCard({
   humidToday,
 }: Props) {
   const deathTone: 'accent' | 'warn' | 'danger' = deathsToday === 0 ? 'accent' : deathsToday <= 3 ? 'warn' : 'danger';
+  if (activeFlocks.length === 0) {
+    return (
+      <>
+        <SectionTitle>📅 امروز در یک نگاه</SectionTitle>
+        <MiniEmpty
+          icon="🐔"
+          title="هنوز گله‌ای ثبت نشده"
+          hint="برای شروع، از بخش گله‌ها اولین گله خود را اضافه کنید"
+        />
+      </>
+    );
+  }
+
   return (
     <>
                 {benchmarkData && activeFlocks.length > 0 && (

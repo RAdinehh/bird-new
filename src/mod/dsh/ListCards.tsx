@@ -1,5 +1,5 @@
 // ListCards.tsx — sections 5+6+7+8 (هشدار + گله + جوجه‌کشی + انبار)
-import { SectionTitle } from './cards';
+import { SectionTitle, MiniEmpty } from './cards';
 import { Tag } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import { getAgeDays, getLifecycle } from '../flk/store';
@@ -30,6 +30,18 @@ export default function ListCards({
   stockAlerts,
   nav,
 }: Props) {
+  const isEmpty = active.length === 0 && activeFlocks.length === 0
+                  && activeEntries.length === 0 && stockAlerts === 0;
+  if (isEmpty) {
+    return (
+      <MiniEmpty
+        icon="✅"
+        title="همه‌چیز مرتبه"
+        hint="هیچ هشدار، گله فعال، یا جوجه‌کشی در جریان نیست"
+      />
+    );
+  }
+
   return (
     <>
             {/* ============ ۵. هشدارها ============ */}
