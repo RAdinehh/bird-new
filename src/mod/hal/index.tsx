@@ -1,3 +1,6 @@
+/**
+ * index.tsx — بخش hal
+ */
 import { useState } from 'react';
 import HallsPage from './HallsPage';
 import ZonesPage from './ZonesPage';

@@ -1,3 +1,6 @@
+/**
+ * EquipmentPage — تجهیزات
+ */
 import { useState } from 'react';
 import { useHal, type Equipment, EQUIP_LABELS } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';;
@@ -5,6 +8,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
+import { chip } from './helpers';
 
 export default function EquipmentPage() {
   const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
@@ -247,16 +251,4 @@ export default function EquipmentPage() {
       </Modal>
     </PageContainer>
   );
-}
-
-function chip(active: boolean): React.CSSProperties {
-  return {
-    padding: '6px 11px', fontSize: 'var(--fs-sm)',
-    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
-    border: `1px solid ${active ? 'var(--accent-border)' : 'var(--border)'}`,
-    borderRadius: 'var(--r-sm)',
-    color: active ? 'var(--accent)' : 'var(--muted)',
-    fontWeight: active ? 600 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap'
-  };
 }

@@ -1,3 +1,6 @@
+/**
+ * ZonesPage — بخش‌های سالن
+ */
 import { useState, useMemo } from 'react';
 import { useHal, type Zone } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
@@ -5,6 +8,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
+import { chip } from './helpers';
 
 export default function ZonesPage() {
   const { halls: _hallsRaw, zones: _zonesRaw, addZone, updateZone, deleteZone } = useHal();
@@ -183,16 +187,4 @@ export default function ZonesPage() {
       </Modal>
     </PageContainer>
   );
-}
-
-function chip(active: boolean): React.CSSProperties {
-  return {
-    padding: '6px 11px', fontSize: 'var(--fs-sm)',
-    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
-    border: `1px solid ${active ? 'var(--accent-border)' : 'var(--border)'}`,
-    borderRadius: 'var(--r-sm)',
-    color: active ? 'var(--accent)' : 'var(--muted)',
-    fontWeight: active ? 600 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap'
-  };
 }

@@ -1,9 +1,13 @@
+/**
+ * HallsPage — سالن‌ها
+ */
 import { useState, useMemo } from 'react';
 import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync , showAlert} from '../../cor/store/dialog';
+import { Row, Pill } from './helpers';
 
 interface F { id?: string; name: string; code: string; length: string; width: string; height: string; capacity: string; targetTemp: string; targetHumidity: string; ventilation: string; light: string; ventilationSystem: string; feederType: string; drinkerType: string; litterType: string; address: string; builtAt: string; lastSanitizedAt: string; notes: string; }
 const empty: F = { name:'', code:'', length:'', width:'', height:'', capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'', ventilationSystem:'tunnel', feederType:'chain', drinkerType:'nipple', litterType:'wood_shavings', address:'', builtAt:'', lastSanitizedAt:'', notes:'' };
@@ -214,24 +218,5 @@ export default function HallsPage() {
         </div>
       </Modal>
     </PageContainer>
-  );
-}
-
-function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: 'var(--pad-tight)', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
-       borderRadius: 'var(--r-sm)', color: accent ? 'var(--accent)' : undefined,
-       fontWeight: accent ? 700 : undefined }}>
-      <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600 }}>{v}</span>
-    </div>
-  );
-}
-function Pill({ label, value }: { label: string; value: string }) {
-  return (
-    <span style={{ padding: '4px 10px', background: 'var(--input-bg)', borderRadius: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-      {label}: <b style={{ color: 'var(--text)' }}>{value}</b>
-    </span>
   );
 }
