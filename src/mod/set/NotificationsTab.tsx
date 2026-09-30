@@ -3,7 +3,7 @@ import { useSet } from './store';
 import { Btn, Field, Grid2, Input } from '../../shr/components/ui';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
-import { ToggleRow, LocalNumField } from './helpers';
+import { ToggleRow, LocalNumField, SubSection } from './helpers';
 
 /** فیلد عددی با تبدیل خودکار فارسی/انگلیسی */
 export default function NotificationsTab() {
@@ -25,6 +25,7 @@ export default function NotificationsTab() {
         subtitle={`${toFa(activeChannels)} کانال فعال از ۶`}
         tone="accent"
       >
+        <SubSection label="نحوه‌ی ارسال اعلان" icon="📡" />
         <ToggleRow
           label="درون‌برنامه (Toast)"
           sub="همیشه فعال"
@@ -70,6 +71,7 @@ export default function NotificationsTab() {
         subtitle={`${toFa(activeAlerts)} از ۳ نوع فعال`}
         tone="warn"
       >
+        <SubSection label="چه سطحی هشدار بده" icon="🎯" />
         <ToggleRow
           label="🔴 بحرانی"
           sub="دما، تلفات بالا، آتش"
@@ -138,6 +140,7 @@ export default function NotificationsTab() {
         subtitle={`افت ${toFa(th.eggDropPercent)}٪ · تلفات ${toFa(th.mortalityPerThousand)} در هزار`}
         tone="danger"
       >
+        <SubSection label="مقادیر بحرانی" icon="⚙️" />
         <div style={{
           fontSize: 'var(--fs-xs)',
           color: 'var(--muted)',

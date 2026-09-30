@@ -5,7 +5,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { Btn, BtnRow, Field, Grid2, Input, Modal, Select } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
-import { RowToggle, Line } from './helpers';
+import { RowToggle, Line, SubSection } from './helpers';
 
 export default function BackupTab() {
   const s = useSet();
@@ -171,6 +171,7 @@ export default function BackupTab() {
 
       {/* پشتیبان دستی */}
       <SettingsGroup icon="📤" title="خروجی گرفتن" tone="info">
+        <SubSection label="دانلود پشتیبان" icon="📤" />
         <Btn variant="primary" full onClick={handleExport}>
           📥 دریافت پشتیبان کامل (JSON)
         </Btn>
@@ -202,6 +203,7 @@ export default function BackupTab() {
 
       {/* پشتیبان خودکار */}
       <SettingsGroup icon="💾" title="پشتیبان خودکار" subtitle={s.autoBackup.enabled ? "فعال" : "غیرفعال"} tone="accent">
+        <SubSection label="تنظیمات خودکار" icon="💾" />
         <RowToggle
           label="فعال"
           sub="در localStorage — بدون ارسال به سرور"
@@ -231,6 +233,7 @@ export default function BackupTab() {
 
       {/* امنیت */}
       <SettingsGroup icon="🔐" title="امنیت" tone="warn">
+        <SubSection label="رمزنگاری و محافظت" icon="🔐" />
         <RowToggle
           label="رمزنگاری پشتیبان"
           sub="الگوریتم AES-256 (در نسخه‌ی بعدی)"
@@ -251,6 +254,7 @@ export default function BackupTab() {
 
       {/* منطقه خطر */}
       <SettingsGroup icon="⚠" title="منطقه خطر" tone="danger">
+        <SubSection label="عملیات غیرقابل بازگشت" icon="⚠️" />
         <Btn full variant="danger" onClick={() => setShowReset(true)}>
           🗑 پاک کردن همه‌ی داده‌ها
         </Btn>

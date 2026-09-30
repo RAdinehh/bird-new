@@ -155,3 +155,22 @@ export function LocalNumField({ label, hint, value, onChange, unit, min, max }: 
     </Field>
   );
 }
+
+/** SubSection — زیرگروه داخل SettingsGroup */
+export function SubSection({ label, icon }: { label: string; icon?: string }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 6,
+      padding: '8px 4px 4px',
+      marginTop: 'var(--gap-sm)',
+      borderTop: '1px dashed var(--border)',
+      fontSize: 'var(--fs-xs)',
+      fontWeight: 700,
+      color: 'var(--muted)',
+      letterSpacing: '.3px',
+    }}>
+      {icon && <span aria-hidden="true">{icon}</span>}
+      <span>{label}</span>
+    </div>
+  );
+}
