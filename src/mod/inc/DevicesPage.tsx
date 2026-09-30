@@ -435,16 +435,17 @@ export default function DevicesPage() {
                   style={{
                     padding: '6px 12px',
                     background: isSelected ? 'var(--accent-soft)' : 'var(--btn-bg)',
-                    border: '1px solid ' + (isSelected ? 'var(--accent)' : 'var(--border)'),
+                    border: isSelected ? '1.5px solid var(--accent)' : '1px solid var(--border)',
                     borderRadius: 'var(--r-md)',
                     color: isSelected ? 'var(--accent)' : 'var(--text)',
                     cursor: 'pointer',
                     fontFamily: 'inherit',
                     fontSize: 'var(--fs-sm)',
-                    fontWeight: 600,
+                    fontWeight: isSelected ? 700 : 600,
+                    boxShadow: isSelected ? '0 0 0 2px var(--accent-soft)' : 'none',
                     transition: 'all .15s',
                   }}
-                >{isSelected ? '✓' : '+'} {b.name}</button>
+                >+ {b.name}</button>
               );
             })}</div>
         )}
