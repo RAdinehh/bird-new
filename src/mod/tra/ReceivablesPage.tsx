@@ -9,6 +9,7 @@ import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa } from '../../shr/utils/fa';
 import { showSuccess } from '../../cor/store/dialog';
+import { Line, tab, filterChip } from './helpers';
 
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 type QuickFilter = 'all' | 'overdue' | 'soon';
@@ -466,38 +467,4 @@ export default function ReceivablesPage() {
       </Modal>
     </PageContainer>
   );
-}
-
-function Line({ l, v }: { l: string; v: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
-      <span style={{ color: 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
-    </div>
-  );
-}
-
-function tab(active: boolean): React.CSSProperties {
-  return {
-    flex: 1,
-    padding: '7px 12px', fontSize: 'var(--fs-sm)',
-    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
-    border: `1px solid ${active ? 'var(--accent-border)' : 'var(--border)'}`,
-    borderRadius: 'var(--r-sm)',
-    color: active ? 'var(--accent)' : 'var(--muted)',
-    fontWeight: active ? 700 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap',
-  };
-}
-
-function filterChip(active: boolean, color = 'accent'): React.CSSProperties {
-  return {
-    padding: '4px 10px', fontSize: 'var(--fs-xs)',
-    background: active ? `var(--${color}-soft, var(--accent-soft))` : 'var(--btn-bg)',
-    border: `1px solid ${active ? `var(--${color})` : 'var(--border)'}`,
-    borderRadius: 'var(--r-sm)',
-    color: active ? `var(--${color})` : 'var(--muted)',
-    fontWeight: active ? 700 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap',
-  };
 }
