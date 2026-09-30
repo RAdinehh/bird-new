@@ -328,7 +328,7 @@ export default function ItemsPage() {
             </Field>
           )}
           <Field label="حداقل موجودی" hint="برای هشدار">
-            <NumField unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
+            <NumField placeholder="مثلاً: ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
           </Field>
           
         </Grid3>
@@ -361,7 +361,7 @@ export default function ItemsPage() {
             </Grid2>
             <Grid2>
               <Field label="دوره منع مصرف" hint="روز">
-                <NumField value={form.withdrawalDays} onChange={e => setForm({ ...form, withdrawalDays: e.target.value })} unit="روز" min={0} />
+                <NumField placeholder="مثلاً: ۳" value={form.withdrawalDays} onChange={e => setForm({ ...form, withdrawalDays: e.target.value })} unit="روز" min={0} />
               </Field>
               <Field label="نگهداری">
                 <Select value={form.storage} onChange={e => setForm({ ...form, storage: e.target.value })}>

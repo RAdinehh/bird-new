@@ -253,14 +253,14 @@ export default function MovesPage() {
 
         <Grid2>
           <Field label="تعداد" required>
-            <NumField
+            <NumField placeholder="مثلاً: ۱۰۰"
               value={form.quantity}
               onChange={e => setForm({ ...form, quantity: e.target.value })}
               unit={selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}
               max={form.type === 'out' ? currentStock : undefined} min={0} />
           </Field>
           <Field label="قیمت واحد">
-            <MoneyField value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
+            <MoneyField placeholder="مثلاً: ۵۰٬۰۰۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
           </Field>
         </Grid2>
 

@@ -440,7 +440,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                                     <NumField value={d.other} onChange={ev => updateData(e.id, { other: ev.target.value })} max={Math.max(0, base - h - uh - ds - pp)} min={0} unit="عدد" />
                                   </Field>
                                   <Field label="وزن متوسط" hint="۲۰-۶۰ گرم">
-                                    <NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" />
+                                    <NumField placeholder="مثلاً: ۱.۵" value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" />
                                   </Field>
                                 </Grid2>
                                 <div style={{ padding: 'var(--pad-normal)', background: !ok ? 'var(--danger-soft)' : remaining === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>

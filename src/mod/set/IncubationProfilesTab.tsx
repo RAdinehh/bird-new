@@ -48,25 +48,25 @@ export default function IncubationProfilesTab() {
 
             <Grid2>
               <Field label="دما ستر" hint="°C">
-                <NumField value={String(p.setterTemp)} onChange={e => update(p.id, { setterTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
+                <NumField placeholder="مثلاً: ۲۵" value={String(p.setterTemp)} onChange={e => update(p.id, { setterTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
               </Field>
               <Field label="رطوبت ستر" hint="٪">
-                <NumField value={String(p.setterHumidity)} onChange={e => update(p.id, { setterHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
+                <NumField placeholder="مثلاً: ۶۰" value={String(p.setterHumidity)} onChange={e => update(p.id, { setterHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
               </Field>
             </Grid2>
 
             <Grid2>
               <Field label="دما هچر" hint="°C">
-                <NumField value={String(p.hatcherTemp)} onChange={e => update(p.id, { hatcherTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
+                <NumField placeholder="مثلاً: ۲۵" value={String(p.hatcherTemp)} onChange={e => update(p.id, { hatcherTemp: parseFloat(e.target.value) || 0 })} unit="°C" min={30} max={45} />
               </Field>
               <Field label="رطوبت هچر" hint="٪">
-                <NumField value={String(p.hatcherHumidity)} onChange={e => update(p.id, { hatcherHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
+                <NumField placeholder="مثلاً: ۶۰" value={String(p.hatcherHumidity)} onChange={e => update(p.id, { hatcherHumidity: parseFloat(e.target.value) || 0 })} unit="٪" min={0} max={100} />
               </Field>
             </Grid2>
 
             <Grid2>
               <Field label="مدت کل" hint="روز">
-                <NumField value={String(p.totalDays)} onChange={e => update(p.id, { totalDays: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
+                <NumField placeholder="مثلاً: ۳۰" value={String(p.totalDays)} onChange={e => update(p.id, { totalDays: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />
               </Field>
               <Field label="Lock-down" hint="روز توقف چرخش">
                 <NumField value={String(p.lockdownDay)} onChange={e => update(p.id, { lockdownDay: parseInt(e.target.value) || 0 })} unit="روز" min={10} max={40} />

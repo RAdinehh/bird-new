@@ -256,7 +256,7 @@ export default function StockPage() {
             </Select>
           </Field>
           <Field label="تعداد" required>
-            <NumField value={form.count} onChange={e => setForm({ ...form, count: e.target.value })} max={100000} min={0} />
+            <NumField placeholder="مثلاً: ۱۰۰" value={form.count} onChange={e => setForm({ ...form, count: e.target.value })} max={100000} min={0} />
           </Field>
         </Grid2>
 
@@ -276,7 +276,7 @@ export default function StockPage() {
         ) : null}
 
         <Field label="قیمت واحد" required hint={`قیمت هر ${UNIT_LABEL[form.unit].split(' ')[0]}`}>
-          <MoneyField value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
+          <MoneyField placeholder="مثلاً: ۵۰٬۰۰۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
         </Field>
 
         {total > 0 ? (

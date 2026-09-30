@@ -71,7 +71,7 @@ export default function ProfileTab() {
             <Input value={farm.city} onChange={e => updateSection('farm', { city: e.target.value })} />
           </Field>
           <Field label="کد پستی">
-            <DigitField maxLength={10} value={farm.postalCode} onChange={e => updateSection('farm', { postalCode: e.target.value })} />
+            <DigitField placeholder="۱۲۳۴۵۶۷۸۹۰" maxLength={10} value={farm.postalCode} onChange={e => updateSection('farm', { postalCode: e.target.value })} />
           </Field>
         </Grid3>
         <Field label="آدرس">
@@ -141,7 +141,7 @@ export default function ProfileTab() {
           </Field>
         </Grid2>
         <Field label="طول دوره‌ی جوجه‌کشی">
-          <NumField value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} unit="روز" min={1} />
+          <NumField placeholder="مثلاً: ۳" value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} unit="روز" min={1} />
         </Field>
         <Grid2>
           <Field label="دمای Setter"><NumField value={defaults.setterTemp} onChange={e => updateSection('defaults', { setterTemp: e.target.value })} unit="°C" min={-10} /></Field>
@@ -152,7 +152,7 @@ export default function ProfileTab() {
           <Field label="رطوبت Hatcher"><NumField value={defaults.hatcherHumidity} onChange={e => updateSection('defaults', { hatcherHumidity: e.target.value })} unit="٪" min={0} /></Field>
         </Grid2>
         <Field label="روز شروع Lock-down">
-          <NumField value={defaults.lockdownDay} onChange={e => updateSection('defaults', { lockdownDay: e.target.value })} unit="روز" min={0} />
+          <NumField placeholder="مثلاً: ۷" value={defaults.lockdownDay} onChange={e => updateSection('defaults', { lockdownDay: e.target.value })} unit="روز" min={0} />
         </Field>
       </SettingsGroup>
 

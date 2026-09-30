@@ -974,7 +974,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 8 }}>💰 مالی</div>
               <Grid2>
                 <Field label="قیمت هر تخم">
-                  <MoneyField value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
+                  <MoneyField placeholder="مثلاً: ۲٬۵۰۰٬۰۰۰" value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
                 </Field>
                 <Field label="هزینه حمل">
                   <MoneyField value={currentRow.shippingCost} onChange={e => setCurrentRow(f => ({ ...f, shippingCost: e.target.value }))} />

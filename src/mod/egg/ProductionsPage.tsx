@@ -380,7 +380,7 @@ export default function ProductionsPage() {
 
         <SectionTitle>⚖ وزن</SectionTitle>
         <Field label="وزن میانگین تخم" hint="اختیاری">
-          <NumField value={form.avgWeight} onChange={e => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
+          <NumField placeholder="مثلاً: ۱.۵" value={form.avgWeight} onChange={e => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
         </Field>
 
         <Field label="یادداشت">
