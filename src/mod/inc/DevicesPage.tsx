@@ -1,3 +1,6 @@
+/**
+ * DevicesPage — دستگاه‌های انکوباسیون (ظرفیت، تعمیرات، گارانتی)
+ */
 import { useState, useMemo } from 'react';
 import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity } from './store';
 import { useSet } from '../set/store';

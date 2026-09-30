@@ -1,3 +1,6 @@
+/**
+ * store.ts — Zustand store ماژول inc (Device, EggEntry, Candling, Hatch)
+ */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';

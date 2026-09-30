@@ -1,3 +1,6 @@
+/**
+ * CandlingsPage — کندلینگ با Multi-select و تجمیع
+ */
 import { useState, useEffect, useMemo } from 'react';
 import { useInc, type Candling } from './store';
 import { useBrd } from '../brd/store';

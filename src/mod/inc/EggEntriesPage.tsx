@@ -1,3 +1,6 @@
+/**
+ * EggEntriesPage — ورودی تخم به دستگاه‌های انکوباسیون (Multi-row + Draft Auto-Save)
+ */
 import ProgressTracker from '../../shr/components/ProgressTracker';
 import { useState, useMemo, useEffect } from 'react';
 import {

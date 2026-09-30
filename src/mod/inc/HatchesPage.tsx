@@ -1,3 +1,6 @@
+/**
+ * HatchesPage — هچ، تفکیک، ساخت گله، فروش، validation
+ */
 import { useState, useEffect, useMemo } from 'react';
 import { useInc, hatchRate, costPerChick, type HatchResult } from './store';
 import { useBrd } from '../brd/store';

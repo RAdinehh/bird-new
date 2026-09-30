@@ -1,3 +1,6 @@
+/**
+ * index.tsx — بخش inc
+ */
 import { useSearchParams } from 'react-router-dom';
 import DevicesPage from './DevicesPage';
 import EggEntriesPage from './EggEntriesPage';
