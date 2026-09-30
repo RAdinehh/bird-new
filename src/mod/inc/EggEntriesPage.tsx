@@ -695,138 +695,191 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         </>
       )}
 
-      <Modal open={open} onClose={() => setOpen(false)} title={editingRowId ? 'ویرایش ردیف' : 'ورود تخم به دستگاه'}
-        footer={<BtnRow><Btn variant="primary" onClick={saveAll}>💾 ذخیره همه ({toFa(draftRows.length)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+      <Modal open={open} onClose={() => setOpen(false)} title={editingRowId ? '✏️ ویرایش ردیف' : '📥 ورود تخم به دستگاه'}
+        footer={<BtnRow><Btn variant="primary" onClick={saveAll} disabled={draftRows.length === 0}>💾 ذخیره همه ({toFa(draftRows.length)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
-        <div style={{ padding: '10px 12px', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, lineHeight: 1.8 }}>
-          🎯 <b>هچ همزمان:</b><br />
-          برای هچ همزمان، پرنده‌های دوره‌بلندتر رو اول وارد کن.<br />
-          مثال: غاز (۳۰ روزه) → بوقلمون (۲۸ روزه) → مرغ (۲۱ روزه)<br />
-          <span style={{ opacity: 0.8 }}>نرم‌افزار تاریخ ورود هر کدوم رو خودکار محاسبه می‌کنه.</span>
+        {/* ═══ بنر راهنما ═══ */}
+        <div style={{ padding: '10px 12px', background: 'linear-gradient(135deg, var(--info-soft), var(--accent-soft))', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, lineHeight: 1.8 }}>
+          🎯 <b>هچ همزمان:</b> پرنده‌های دوره‌بلندتر رو اول وارد کن<br />
+          <span style={{ opacity: 0.85 }}>ترتیب: غاز (۳۰) → بوقلمون (۲۸) → مرغ (۲۱)</span>
         </div>
 
-        <SectionTitle>📦 دستگاه</SectionTitle>
-        <Field label="انتخاب دستگاه" required>
-          <SmartSelect value={multiDeviceId} onChange={v => { setMultiDeviceId(v); }} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
-        </Field>
-        {draftUsage.total > 0 && (
-          <div style={{
-            padding: '8px 12px',
-            background: draftUsage.percent > 100 ? 'var(--danger-soft)' : 'var(--input-bg)',
-            border: '1px solid ' + (draftUsage.percent > 100 ? 'var(--danger)' : 'var(--border)'),
-            borderRadius: 'var(--r-md)',
-            fontSize: 'var(--fs-sm)',
-            fontWeight: 700,
-            color: draftUsage.percent > 100 ? 'var(--danger)' : 'var(--text)',
-          }}>
-            📊 استفاده: {toFa(draftUsage.used)} / {toFa(draftUsage.total)} واحد ({toFa(draftUsage.percent)}٪)
-            {draftUsage.percent > 100 && (
-              <>
-                <br />⚠️ بیشتر از ظرفیت دستگاه! {toFa(Math.round((draftUsage.used - draftUsage.total) * 10) / 10)} واحد اضافی
-                <br />💡 یک ردیف یا تعدادش رو کم کن
-              </>
-            )}
+        {/* ═══ دستگاه + ظرفیت ═══ */}
+        <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>
+            <span>📦</span><span>انتخاب دستگاه</span>
+          </div>
+          <SmartSelect value={multiDeviceId} onChange={v => setMultiDeviceId(v)} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
+          {liveUsage && liveUsage.total > 0 && (
+            <div style={{
+              padding: '8px 10px',
+              background: liveUsage.percent > 100 ? 'var(--danger-soft)' : liveUsage.percent > 90 ? 'var(--warn-soft)' : 'var(--accent-soft)',
+              border: '1px solid ' + (liveUsage.percent > 100 ? 'var(--danger)' : liveUsage.percent > 90 ? 'var(--warn)' : 'var(--accent-border)'),
+              borderRadius: 'var(--r-md)',
+              fontSize: 'var(--fs-xs)',
+              color: liveUsage.percent > 100 ? 'var(--danger)' : liveUsage.percent > 90 ? 'var(--warn)' : 'var(--accent)',
+              fontWeight: 700,
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>📊 استفاده کل</span>
+                <span>{toFa(liveUsage.used)} / {toFa(liveUsage.total)} ({toFa(liveUsage.percent)}٪)</span>
+              </div>
+              {liveUsage.percent > 100 && <div style={{ marginTop: 4 }}>⚠️ {toFa(Math.abs(liveUsage.remaining))} واحد اضافی</div>}
+            </div>
+          )}
+        </div>
+
+        {/* ═══ ردیف‌های اضافه‌شده ═══ */}
+        {draftRows.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>
+              <span>📋</span><span>ردیف‌های ثبت‌شده ({toFa(draftRows.length)})</span>
+            </div>
+            {draftRows.map((r, i) => {
+              const bird = birds.find(b => b.id === r.birdId);
+              const sellerName = (r.dealData.sellerId && (contacts.find((c: any) => c.id === r.dealData.sellerId) as any)?.name) || '';
+              const partnerName = (r.dealData.partnerId && (contacts.find((c: any) => c.id === r.dealData.partnerId) as any)?.name) || '';
+              const flockName = r.flockId ? flocks.find((f: any) => f.id === r.flockId)?.name : '';
+              const consigneeName = (r.dealData.consigneeId && (contacts.find((c: any) => c.id === r.dealData.consigneeId) as any)?.name) || '';
+              const lessorName = (r.dealData.lessorId && (contacts.find((c: any) => c.id === r.dealData.lessorId) as any)?.name) || '';
+              const party = sellerName || partnerName || flockName || consigneeName || lessorName || '—';
+              const accentColor = r.dealType === 'own' ? 'accent' : r.dealType === 'purchase' ? 'info' : r.dealType === 'partnership' ? 'purple' : r.dealType === 'rent' ? 'warn' : 'dim';
+              return (
+                <div key={r._id} style={{
+                  position: 'relative',
+                  padding: '10px 34px 10px 12px',
+                  background: 'var(--card)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-md)',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                }}>
+                  <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: 'var(--' + accentColor + ')' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+                      {toFa(i + 1)}. {DEAL_LABEL[r.dealType]} · {bird?.name || '—'}
+                    </span>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--' + accentColor + ')', direction: 'ltr' }}>
+                      {toFa(r.count || 0)} تخم
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                    <span>{party}</span>
+                    <span>{toFa(r.entryDate)}{r.entryTime ? ' · ' + toFa(r.entryTime) : ''}</span>
+                  </div>
+                  <div style={{ position: 'absolute', top: 6, left: 6, display: 'flex', gap: 2 }}>
+                    <button type="button" onClick={() => editRow(r)} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 12, padding: 3 }}>✏️</button>
+                    <button type="button" onClick={() => removeRow(r._id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 12, padding: 3 }}>✕</button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
-        {draftRows.length > 0 && (
-          <>
-            <SectionTitle>📋 ردیف‌های تخم</SectionTitle>
-            {draftRows.map((r, i) => renderRowSummary(r, i))}
-          </>
-        )}
+        {/* ═══ فرم ردیف جدید ═══ */}
+        <div style={{ padding: '12px 14px', background: editingRowId ? 'var(--warn-soft)' : 'var(--accent-soft)', border: '1px dashed ' + (editingRowId ? 'var(--warn)' : 'var(--accent-border)'), borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 10, marginTop: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: editingRowId ? 'var(--warn)' : 'var(--accent)', fontWeight: 700 }}>
+            <span>{editingRowId ? '✏️' : '➕'}</span>
+            <span>{editingRowId ? 'ویرایش ردیف انتخاب‌شده' : 'ردیف جدید'}</span>
+          </div>
 
-        <SectionTitle>{editingRowId ? '✏️ ویرایش ردیف' : '➕ ردیف جدید'}</SectionTitle>
-
-        <Grid2>
-          <Field label="نوع منبع" required>
-            <Select value={currentRow.dealType} onChange={e => setCurrentRow(f => ({ ...f, dealType: e.target.value as DealType, dealData: {}, flockId: '' }))}>
-              <option value="own">🏠 گله خودم</option>
-              <option value="partnership">🤝 شراکتی</option>
-              <option value="purchase">📥 خریداری</option>
-              <option value="rent">🏢 اجاره‌ای</option>
-              <option value="consignment">📦 امانی</option>
-            </Select>
-          </Field>
-          <Field label="تاریخ ورود" required>
-            <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ" />
-          </Field>
-          <Field label="ساعت ورود">
-            <Input value={currentRow.entryTime} onChange={e => setCurrentRow(f => ({ ...f, entryTime: e.target.value }))} placeholder="۱۴:۳۵" dir="ltr" />
-          </Field>
-        </Grid2>
-
-        {currentRow.dealType === 'own' && (
-          <Field label="انتخاب گله" required>
-            {(() => {
-              const activeFlocks = flocks.filter((fl: any) => fl.status === 'active');
-              const readyFlocks = activeFlocks.filter((fl: any) => {
-                const brd = birds.find(b => b.id === fl.birdId);
-                const r = flockReadyForEggs(fl, brd);
-                return r.ready;
-              });
-              const notReady = activeFlocks.length - readyFlocks.length;
-              if (activeFlocks.length === 0) {
-                return <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>گله فعالی نیست</div>;
-              }
-              if (readyFlocks.length === 0) {
-                return (
-                  <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--warn)', padding: 10, background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', lineHeight: 1.8 }}>
-                    ⛔ هیچ گله‌ای به سن تخم‌گذاری نرسیده
-                    <br />{toFa(notReady)} گله فعال ولی نابالغ
-                  </div>
-                );
-              }
-              return (
-                <>
-                  <Select value={currentRow.flockId} onChange={e => {
-                    const fid = e.target.value;
-                    const fl = flocks.find((x: any) => x.id === fid);
-                    setCurrentRow(f => ({ ...f, flockId: fid, birdId: fl?.birdId || f.birdId, breedId: fl?.breedId || f.breedId }));
-                  }}>
-                    <option value="">— انتخاب گله —</option>
-                    {readyFlocks.map((fl: any) => {
-                      const brd = birds.find(b => b.id === fl.birdId);
-                      const r = flockReadyForEggs(fl, brd);
-                      return <option key={fl.id} value={fl.id}>{fl.name} ({toFa(r.ageDays)} روز)</option>;
-                    })}
-                  </Select>
-                  {notReady > 0 && (
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', paddingTop: 4, fontWeight: 600 }}>
-                      ⚠️ {toFa(notReady)} گله نابالغ پنهان شده
-                    </div>
-                  )}
-                </>
-              );
-            })()}
-          </Field>
-        )}
-
-        {currentRow.dealType === 'purchase' && (
-          <DepBox title="📥 خرید">
-            <Field label="فروشنده" required>
-              {suppliers.length === 0 ? (
-                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-                  فروشنده‌ای در مخاطبین نیست
-                </div>
-              ) : (
-                <Select value={currentRow.dealData.sellerId || ''} onChange={e => setD('sellerId', e.target.value)}>
-                  <option value="">— انتخاب —</option>
-                  {suppliers.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </Select>
-              )}
-            </Field>
-          </DepBox>
-        )}
-
-        {currentRow.dealType === 'partnership' && (
-          <DepBox title="🤝 شراکت">
-            <Field label="شریک" required>
-              <Select value={currentRow.dealData.partnerId || ''} onChange={e => setD('partnerId', e.target.value)}>
-                <option value="">— انتخاب —</option>
-                {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+          {/* منبع + تاریخ */}
+          <Grid2>
+            <Field label="نوع منبع" required>
+              <Select value={currentRow.dealType} onChange={e => setCurrentRow(f => ({ ...f, dealType: e.target.value as DealType, dealData: {}, flockId: '' }))}>
+                <option value="own">🏠 گله خودم</option>
+                <option value="partnership">🤝 شراکتی</option>
+                <option value="purchase">📥 خریداری</option>
+                <option value="rent">🏢 اجاره‌ای</option>
+                <option value="consignment">📦 امانی</option>
               </Select>
             </Field>
+            <Field label="تاریخ ورود" required>
+              <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ" />
+            </Field>
+          </Grid2>
+
+          {/* ساعت + انتخاب طرف (شرطی) */}
+          <Grid2>
+            <Field label="ساعت ورود">
+              <Input value={currentRow.entryTime} onChange={e => setCurrentRow(f => ({ ...f, entryTime: e.target.value }))} placeholder="۱۴:۳۵" dir="ltr" />
+            </Field>
+
+            {currentRow.dealType === 'own' && (
+              <Field label="انتخاب گله" required>
+                {(() => {
+                  const activeFlocks = flocks.filter((fl: any) => fl.status === 'active');
+                  const readyFlocks = activeFlocks.filter((fl: any) => {
+                    const brd = birds.find(b => b.id === fl.birdId);
+                    const r = flockReadyForEggs(fl, brd);
+                    return r.ready;
+                  });
+                  if (activeFlocks.length === 0) return <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>گله فعالی نیست</div>;
+                  if (readyFlocks.length === 0) return <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', padding: 10, background: 'var(--warn-soft)', borderRadius: 'var(--r-md)', textAlign: 'center' }}>⛔ هیچ گله آماده‌ای نیست</div>;
+                  return (
+                    <Select value={currentRow.flockId} onChange={e => {
+                      const fid = e.target.value;
+                      const fl = flocks.find((x: any) => x.id === fid);
+                      setCurrentRow(f => ({ ...f, flockId: fid, birdId: fl?.birdId || f.birdId, breedId: fl?.breedId || f.breedId }));
+                    }}>
+                      <option value="">— انتخاب گله —</option>
+                      {readyFlocks.map((fl: any) => {
+                        const brd = birds.find(b => b.id === fl.birdId);
+                        const r = flockReadyForEggs(fl, brd);
+                        return <option key={fl.id} value={fl.id}>{fl.name} ({toFa(r.ageDays)} روز)</option>;
+                      })}
+                    </Select>
+                  );
+                })()}
+              </Field>
+            )}
+
+            {currentRow.dealType === 'purchase' && (
+              <Field label="فروشنده" required>
+                {suppliers.length === 0 ? (
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>فروشنده‌ای نیست</div>
+                ) : (
+                  <Select value={currentRow.dealData.sellerId || ''} onChange={e => setD('sellerId', e.target.value)}>
+                    <option value="">— انتخاب —</option>
+                    {suppliers.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </Select>
+                )}
+              </Field>
+            )}
+
+            {currentRow.dealType === 'partnership' && (
+              <Field label="شریک" required>
+                <Select value={currentRow.dealData.partnerId || ''} onChange={e => setD('partnerId', e.target.value)}>
+                  <option value="">— انتخاب —</option>
+                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </Select>
+              </Field>
+            )}
+
+            {currentRow.dealType === 'rent' && (
+              <Field label="اجاره‌دهنده" required>
+                <Select value={currentRow.dealData.lessorId || ''} onChange={e => setD('lessorId', e.target.value)}>
+                  <option value="">— انتخاب —</option>
+                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </Select>
+              </Field>
+            )}
+
+            {currentRow.dealType === 'consignment' && (
+              <Field label="امانت‌دار" required>
+                <Select value={currentRow.dealData.consigneeId || ''} onChange={e => setD('consigneeId', e.target.value)}>
+                  <option value="">— انتخاب —</option>
+                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </Select>
+              </Field>
+            )}
+          </Grid2>
+
+          {/* درصد شریک/امانت‌دار + اجاره */}
+          {currentRow.dealType === 'partnership' && (
             <Grid2>
               <Field label="درصد شریک" hint="٪">
                 <NumField value={currentRow.dealData.partnerPercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('partnerPercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
@@ -835,32 +888,9 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 <Input readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.partnerPercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
               </Field>
             </Grid2>
-          </DepBox>
-        )}
+          )}
 
-        {currentRow.dealType === 'rent' && (
-          <DepBox title="🏢 اجاره">
-            <Field label="اجاره‌دهنده" required>
-              <Select value={currentRow.dealData.lessorId || ''} onChange={e => setD('lessorId', e.target.value)}>
-                <option value="">— انتخاب —</option>
-                {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-              </Select>
-            </Field>
-            <Grid2>
-              <Field label="مبلغ اجاره"><MoneyField value={currentRow.dealData.rentAmount || ''} onChange={e => setD('rentAmount', e.target.value)} /></Field>
-              <Field label="سرسید"><Input value={currentRow.dealData.rentDueDate || ''} onChange={e => setD('rentDueDate', e.target.value)} /></Field>
-            </Grid2>
-          </DepBox>
-        )}
-
-        {currentRow.dealType === 'consignment' && (
-          <DepBox title="📦 امانت">
-            <Field label="امانت‌دار" required>
-              <Select value={currentRow.dealData.consigneeId || ''} onChange={e => setD('consigneeId', e.target.value)}>
-                <option value="">— انتخاب —</option>
-                {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-              </Select>
-            </Field>
+          {currentRow.dealType === 'consignment' && (
             <Grid2>
               <Field label="درصد امانت‌دار" hint="٪">
                 <NumField value={currentRow.dealData.consigneePercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('consigneePercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
@@ -869,114 +899,109 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 <Input readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.consigneePercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
               </Field>
             </Grid2>
-          </DepBox>
-        )}
+          )}
 
-        {(currentRow.dealType === 'partnership' || currentRow.dealType === 'consignment') && (
-          <div style={{ padding: 10, background: currentRow.dealStatus === 'withdrawn' ? 'var(--danger-soft)' : 'var(--input-bg)', border: '1px solid ' + (currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--border)'), borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-              <input type="checkbox" checked={currentRow.dealStatus === 'withdrawn'} onChange={e => setCurrentRow(f => ({ ...f, dealStatus: e.target.checked ? 'withdrawn' : 'active' }))} style={{ width: 18, height: 18, accentColor: 'var(--danger)' }} />
-              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--text)' }}>کنار کشید</span>
-            </label>
-            {currentRow.dealStatus === 'withdrawn' && (
-              <Grid2>
-                <Field label="تاریخ"><DatePicker value={currentRow.dealWithdrawnAt} onChange={v => setCurrentRow(f => ({ ...f, dealWithdrawnAt: v }))} /></Field>
-                <Field label="دلیل"><Input value={currentRow.dealWithdrawnReason} onChange={e => setCurrentRow(f => ({ ...f, dealWithdrawnReason: e.target.value }))} /></Field>
-              </Grid2>
-            )}
-          </div>
-        )}
+          {currentRow.dealType === 'rent' && (
+            <Grid2>
+              <Field label="مبلغ اجاره"><MoneyField value={currentRow.dealData.rentAmount || ''} onChange={e => setD('rentAmount', e.target.value)} /></Field>
+              <Field label="سرسید"><Input value={currentRow.dealData.rentDueDate || ''} onChange={e => setD('rentDueDate', e.target.value)} /></Field>
+            </Grid2>
+          )}
 
-        <Grid2>
-          <Field label="پرنده" required>
-            <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="—" modalTitle="انتخاب پرنده" autoThreshold={6} />
-          </Field>
-          <Field label="نژاد">
-            <Select value={currentRow.breedId} onChange={e => setCurrentRow(f => ({ ...f, breedId: e.target.value }))}>
-              <option value="">—</option>
-              {breedsForBird.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </Select>
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label="تعداد تخم" required>
-            <NumField value={currentRow.count} onChange={e => setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} autoClamp />
+          {/* کنارکشیدن شراکت */}
+          {(currentRow.dealType === 'partnership' || currentRow.dealType === 'consignment') && (
+            <div style={{ padding: 8, background: currentRow.dealStatus === 'withdrawn' ? 'var(--danger-soft)' : 'var(--input-bg)', border: '1px solid ' + (currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--border)'), borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <input type="checkbox" checked={currentRow.dealStatus === 'withdrawn'} onChange={e => setCurrentRow(f => ({ ...f, dealStatus: e.target.checked ? 'withdrawn' : 'active' }))} style={{ width: 16, height: 16, accentColor: 'var(--danger)' }} />
+                <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--text)' }}>کنار کشید</span>
+              </label>
+              {currentRow.dealStatus === 'withdrawn' && (
+                <Grid2>
+                  <Field label="تاریخ"><DatePicker value={currentRow.dealWithdrawnAt} onChange={v => setCurrentRow(f => ({ ...f, dealWithdrawnAt: v }))} /></Field>
+                  <Field label="دلیل"><Input value={currentRow.dealWithdrawnReason} onChange={e => setCurrentRow(f => ({ ...f, dealWithdrawnReason: e.target.value }))} /></Field>
+                </Grid2>
+              )}
+            </div>
+          )}
+
+          {/* مشخصات تخم */}
+          <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 4 }}>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 8 }}>🥚 مشخصات تخم</div>
+            <Grid2>
+              <Field label="پرنده" required>
+                <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="—" modalTitle="انتخاب پرنده" autoThreshold={6} />
+              </Field>
+              <Field label="نژاد">
+                <Select value={currentRow.breedId} onChange={e => setCurrentRow(f => ({ ...f, breedId: e.target.value }))}>
+                  <option value="">—</option>
+                  {breedsForBird.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </Select>
+              </Field>
+            </Grid2>
+            <Grid2>
+              <Field label="تعداد تخم" required>
+                <NumField value={currentRow.count} onChange={e => setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} autoClamp />
+              </Field>
+              <Field label="طبقات (Tray)">
+                <Input placeholder="۱-۲-۳" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
+              </Field>
+            </Grid2>
+            {/* Live validation */}
             {(() => {
               if (!currentRow.count.trim()) return null;
               const cnt = parseInt(toEn(currentRow.count)) || 0;
               if (cnt <= 0) {
-                return (
-                  <div style={{ padding: '6px 10px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 4 }}>
-                    ❌ تعداد باید بیشتر از صفر باشد
-                  </div>
-                );
+                return <div style={{ padding: '6px 10px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700 }}>❌ تعداد باید بیشتر از صفر باشد</div>;
               }
               if (!liveUsage) return null;
               if (liveUsage.percent > 100) {
-                return (
-                  <div style={{ padding: '6px 10px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 4 }}>
-                    🔴 بیشتر از ظرفیت — {toFa(Math.abs(liveUsage.remaining))} واحد اضافی
-                    <br />💡 تعداد را کم کن یا ردیف حذف کن
-                  </div>
-                );
+                return <div style={{ padding: '6px 10px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700 }}>🔴 بیشتر از ظرفیت — {toFa(Math.abs(liveUsage.remaining))} واحد اضافی</div>;
               }
               if (liveUsage.percent > 90) {
-                return (
-                  <div style={{ padding: '6px 10px', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, marginTop: 4 }}>
-                    🟡 نزدیک به ظرفیت — باقی: {toFa(liveUsage.remaining)} واحد ({toFa(liveUsage.percent)}٪)
-                  </div>
-                );
+                return <div style={{ padding: '6px 10px', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>🟡 نزدیک به ظرفیت — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
               }
-              return (
-                <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, marginTop: 4 }}>
-                  ✅ قابل قبول — باقی: {toFa(liveUsage.remaining)} واحد ({toFa(liveUsage.percent)}٪)
-                </div>
-              );
+              return <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>✅ قابل قبول — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
             })()}
+          </div>
+
+          {/* مالی */}
+          {(currentRow.dealType === 'purchase' || currentRow.dealType === 'partnership') && (
+            <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 4 }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 8 }}>💰 مالی</div>
+              <Grid2>
+                <Field label="قیمت هر تخم">
+                  <MoneyField value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
+                </Field>
+                <Field label="هزینه حمل">
+                  <MoneyField value={currentRow.shippingCost} onChange={e => setCurrentRow(f => ({ ...f, shippingCost: e.target.value }))} />
+                </Field>
+              </Grid2>
+              {(() => {
+                const cnt = parseInt(toEn(currentRow.count)) || 0;
+                const up = parseFloat(toEn(currentRow.unitPrice).replace('٫', '.')) || 0;
+                const sh = parseFloat(toEn(currentRow.shippingCost).replace('٫', '.')) || 0;
+                const total = (cnt * up) + sh;
+                if (total > 0) {
+                  return <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع ردیف:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
+                }
+                return null;
+              })()}
+            </div>
+          )}
+
+          {/* یادداشت */}
+          <Field label="یادداشت">
+            <Input placeholder="..." value={currentRow.notes} onChange={e => setCurrentRow(f => ({ ...f, notes: e.target.value }))} />
           </Field>
-          <Field label="طبقات (Tray)">
-            <Input placeholder="۱-۲-۳" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
-          </Field>
-        </Grid2>
 
-        {(currentRow.dealType === 'purchase' || currentRow.dealType === 'partnership') && (
-          <>
-            <Grid2>
-              <Field label="قیمت هر تخم">
-                <MoneyField value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
-              </Field>
-              <Field label="هزینه حمل">
-                <MoneyField value={currentRow.shippingCost} onChange={e => setCurrentRow(f => ({ ...f, shippingCost: e.target.value }))} />
-              </Field>
-            </Grid2>
-            {(() => {
-              const cnt = parseInt(toEn(currentRow.count)) || 0;
-              const up = parseFloat(toEn(currentRow.unitPrice).replace('٫', '.')) || 0;
-              const sh = parseFloat(toEn(currentRow.shippingCost).replace('٫', '.')) || 0;
-              const total = (cnt * up) + sh;
-              if (total > 0) {
-                return (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: '6px 10px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                    <span>💰 جمع ردیف:</span>
-                    <span>{toFa(total.toLocaleString('fa-IR'))} ت</span>
-                  </div>
-                );
-              }
-              return null;
-            })()}
-          </>
-        )}
-
-        <Field label="یادداشت">
-          <Input placeholder="..." value={currentRow.notes} onChange={e => setCurrentRow(f => ({ ...f, notes: e.target.value }))} />
-        </Field>
-
-        <Btn variant="primary" full onClick={addRowToList}>
-          {editingRowId ? '💾 به‌روزرسانی ردیف' : '+ افزودن به لیست'}
-        </Btn>
-        {editingRowId && (
-          <Btn full onClick={() => { setEditingRowId(null); setCurrentRow(makeRow()); }}>لغو ویرایش</Btn>
-        )}
+          {/* دکمه‌ها */}
+          <div style={{ display: 'flex', gap: 6 }}>
+            <Btn variant="primary" full onClick={addRowToList}>
+              {editingRowId ? '💾 به‌روزرسانی ردیف' : '➕ افزودن به لیست'}
+            </Btn>
+            {editingRowId && <Btn onClick={() => { setEditingRowId(null); setCurrentRow({ ...makeRow(), birdId: birds[0]?.id || '', entryDate: todayJalali(), entryTime: nowTime() }); }}>لغو</Btn>}
+          </div>
+        </div>
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف ورودی تخم"
