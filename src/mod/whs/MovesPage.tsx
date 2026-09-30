@@ -166,7 +166,7 @@ export default function MovesPage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : m.id)}
                 badge={<Tag tone={m.type === 'in' ? 'green' : 'amber'}>{m.type === 'in' ? 'ورود' : 'خروج'}</Tag>}
-                summary={
+                stats={
                   <>
                     <span>مقدار: <b style={{ color: 'var(--text)' }}>{toFa(m.quantity)}</b></span>
                     {m.unitPrice > 0 ? <span>قیمت: <b style={{ color: 'var(--text)' }}>{toFa(m.unitPrice.toLocaleString('fa-IR'))}</b></span> : null}

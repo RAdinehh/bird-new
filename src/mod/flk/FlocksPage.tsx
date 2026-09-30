@@ -334,7 +334,7 @@ export default function FlocksPage() {
                   isOpen={isOpen}
                   onToggle={() => setExpandedId(isOpen ? null : f.id)}
                   badge={<Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>}
-                  summary={<>
+                  stats={<>
                     {ageDays > 0 && <span>🎂 سن: <b style={{ color: 'var(--text)' }}>{toFa(ageDays)} روز</b></span>}
                     {f.currentCount && <span>🐔 زنده: <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b></span>}
                     {f.initialCount && f.currentCount && f.initialCount !== f.currentCount && (

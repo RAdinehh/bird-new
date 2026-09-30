@@ -231,7 +231,7 @@ export default function IngredientsPage() {
                     ? <Tag tone="blue">پیش‌فرض</Tag>
                     : (displayPrice > 0 ? <Tag tone="green">{toFa(displayPrice.toLocaleString('fa-IR'))} ت</Tag> : undefined)
                 }
-                summary={
+                stats={
                   <>
                     <span>پروتئین: <b>{toFa(it.protein)}٪</b></span>
                     <span>انرژی: <b>{toFa(it.energy)}</b></span>

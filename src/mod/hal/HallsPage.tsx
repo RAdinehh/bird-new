@@ -95,7 +95,7 @@ export default function HallsPage() {
                 subtitle={h.length ? `${toFa(h.length)}×${toFa(h.width || 0)}×${toFa(h.height || 0)} متر` : 'ابعاد وارد نشده'}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
                 badge={zoneCount > 0 ? <Tag tone="blue">{toFa(zoneCount)} بخش</Tag> : undefined}
-                summary={<>
+                stats={<>
                   {area > 0 && <span>مساحت: <b style={{ color: 'var(--text)' }}>{toFa(area.toFixed(1))} م²</b></span>}
                   {h.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{toFa(h.capacity)}</b></span>}
                   {equipCount > 0 && <span>تجهیز: <b style={{ color: 'var(--text)' }}>{toFa(equipCount)}</b></span>}

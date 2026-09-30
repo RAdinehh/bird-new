@@ -121,7 +121,7 @@ export default function BreedsPage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
                 badge={b.fcr ? <Tag tone="purple">FCR {toFa(b.fcr)}</Tag> : undefined}
-                summary={<>
+                stats={<>
                   <span>پرنده: <b style={{ color: 'var(--text)' }}>{bird?.name || '—'}</b></span>
                   {b.fcr && <span>FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcr)}</b></span>}
                 </>}

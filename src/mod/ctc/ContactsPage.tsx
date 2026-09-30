@@ -169,7 +169,7 @@ export default function ContactsPage() {
                   badge={<div style={{ display: 'flex', gap: 3 }}>
                     {p.roles.map(r => <Tag key={r} tone={(r === 'customer' ? 'blue' : r === 'supplier' ? 'green' : 'purple') as any}>{ROLE_LABEL[r]}</Tag>)}
                   </div>}
-                  summary={<>
+                  stats={<>
                     {p.roles.includes('customer') && p.trustScore ? <span>اعتبار: <b style={{ color: 'var(--text)' }}>{toFa(p.trustScore)}/۱۰</b></span> : null}
                     {p.roles.includes('worker') && p.position ? <span>سمت: <b style={{ color: 'var(--text)' }}>{p.position}</b></span> : null}
                     {p.roles.includes('supplier') && p.supplierTypes.length > 0 ? <span>کالاها: <b style={{ color: 'var(--text)' }}>{toFa(p.supplierTypes.length)}</b></span> : null}

@@ -114,7 +114,7 @@ export default function EquipmentPage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : e.id)}
                 badge={e.count ? <Tag tone="blue">{toFa(e.count)} عدد</Tag> : undefined}
-                summary={<>
+                stats={<>
                   {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)}</b></span>}
                   {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(value.toLocaleString('fa-IR'))} ت</b></span>}
                   {e.warranty && <span>گارانتی: <b style={{ color: 'var(--text)' }}>{toFa(e.warranty)} ماه</b></span>}

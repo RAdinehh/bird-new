@@ -312,7 +312,7 @@ export default function DailyLogsPage() {
         subtitle={`${toFa(l.date)}${l.entryTime ? ` · ${toFa(l.entryTime)}` : ''}${bird ? ` · ${bird.name}` : ''}`}
         isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : l.id)}
         badge={l.deathsCount > 0 ? <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag> : undefined}
-        summary={<>
+        stats={<>
           {l.temperature !== null && <span>🌡 {toFa(l.temperature)}°</span>}
           {l.humidity !== null && <span>💧 {toFa(l.humidity)}٪</span>}
           {l.feedAmount !== null && <span>🌾 {toFa(l.feedAmount)} kg</span>}

@@ -200,7 +200,7 @@ export default function ItemsPage() {
                   exp === 'soon' ? <Tag tone="amber">نزدیک انقضا</Tag> :
                   <Tag tone="green">موجود</Tag>
                 }
-                summary={
+                stats={
                   <>
                     <span>موجودی: <b style={{ color: 'var(--text)' }}>{toFa(it.currentStock)} {UNIT_LABEL[it.unit]}</b></span>
                     {it.minStock > 0 ? <span>حد: <b style={{ color: 'var(--text)' }}>{toFa(it.minStock)}</b></span> : null}

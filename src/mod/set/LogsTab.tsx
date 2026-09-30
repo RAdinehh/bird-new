@@ -98,7 +98,7 @@ export default function LogsTab() {
                 subtitle={timeStr}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : log.id)}
-                summary={<>
+                stats={<>
                   <span style={{ color: 'var(--warn)', fontWeight: 700 }}>{log.type}</span>
                 </>}
               >

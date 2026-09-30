@@ -148,7 +148,7 @@ export default function AlertsPage() {
                   isOpen={isOpen}
                   onToggle={() => setExpandedId(isOpen ? null : a.id)}
                   badge={<Tag tone={a.level === 'critical' ? 'red' : a.level === 'important' ? 'amber' : 'blue'}>{LEVEL_LABEL[a.level]}</Tag>}
-                  summary={
+                  stats={
                     <>
                       <span>{a.message}</span>
                     </>

@@ -160,7 +160,7 @@ export default function FormulasPage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : f.id)}
                 badge={<Tag tone={statusTone}>{statusLabel}</Tag>}
-                summary={
+                stats={
                   <>
                     <span>پروتئین: <b style={{ color: 'var(--text)' }}>{toFa(n.protein)}٪</b></span>
                     <span>انرژی: <b style={{ color: 'var(--text)' }}>{toFa(n.energy)}</b></span>

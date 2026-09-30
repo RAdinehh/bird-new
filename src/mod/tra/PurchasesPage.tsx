@@ -253,7 +253,7 @@ export default function PurchasesPage() {
                     </Tag>
                   </div>
                 }
-                summary={
+                stats={
                   <>
                     <span>کل: <b>{toFa(inv.total.toLocaleString('fa-IR'))} ت</b></span>
                     {rem2 > 0 && <span style={{ color: 'var(--warn)' }}>مانده: <b>{toFa(rem2.toLocaleString('fa-IR'))}</b></span>}

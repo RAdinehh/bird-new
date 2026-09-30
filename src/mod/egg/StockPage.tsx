@@ -162,7 +162,7 @@ export default function StockPage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : s.id)}
                 badge={<Tag tone={s.paymentType === 'debt' ? 'amber' : 'green'}>{PAYMENT_LABEL[s.paymentType]}</Tag>}
-                summary={
+                stats={
                   <>
                     <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(s.count)} {UNIT_LABEL[s.unit].split(' ')[0]}</b></span>
                     <span>عدد: <b style={{ color: 'var(--text)' }}>{toFa(pieces.toLocaleString('fa-IR'))}</b></span>

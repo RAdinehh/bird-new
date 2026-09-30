@@ -73,7 +73,7 @@ export default function ArchivePage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : f.id)}
                 badge={<Tag tone={f.status === 'sold' ? 'green' : 'gray'}>{statusLabel}</Tag>}
-                summary={
+                stats={
                   <>
                     <span>سن نهایی: <b style={{ color: 'var(--text)' }}>{toFa(ageDays)} روز</b></span>
                     {f.currentCount ? <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b></span> : null}

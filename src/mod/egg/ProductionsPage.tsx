@@ -197,7 +197,7 @@ export default function ProductionsPage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : p.id)}
                 badge={rate > 0 ? <Tag tone={tone}>{toFa(rate.toFixed(1))}٪</Tag> : undefined}
-                summary={
+                stats={
                   <>
                     <span>کل: <b style={{ color: 'var(--text)' }}>{toFa(p.totalCount)}</b></span>
                     {p.brokenCount > 0 ? <span style={{ color: 'var(--danger)' }}>شکسته: <b>{toFa(p.brokenCount)}</b></span> : null}

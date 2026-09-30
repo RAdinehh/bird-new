@@ -108,7 +108,7 @@ export default function ZonesPage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : z.id)}
                 badge={z.capacity ? <Tag tone="purple">{toFa(z.capacity)} پرنده</Tag> : undefined}
-                summary={<>
+                stats={<>
                   <span>سالن: <b style={{ color: 'var(--text)' }}>{hall?.name || '—'}</b></span>
                   {z.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{toFa(z.capacity)}</b></span>}
                 </>}

@@ -87,7 +87,7 @@ export default function BirdsPage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
                 badge={<Tag tone="blue">{toFa(birdBreeds.length)} نژاد</Tag>}
-                summary={
+                stats={
                   <>
                     {b.cycleDays ? <span>چرخه: <b style={{ color: 'var(--text)' }}>{toFa(b.cycleDays)} روز</b></span> : null}
                     {b.fcrStandard ? <span>FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcrStandard)}</b></span> : null}

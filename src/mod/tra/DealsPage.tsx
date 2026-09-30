@@ -149,7 +149,7 @@ export default function DealsPage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : d.id)}
                 badge={<Tag tone={d.status === 'settled' ? 'green' : d.status === 'cancelled' ? 'gray' : 'amber'}>{STATUS_LABEL[d.status]}</Tag>}
-                summary={
+                stats={
                   <>
                     {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(d.value.toLocaleString('fa-IR'))} ت</b></span>}
                     {d.percent !== null && d.percent !== undefined && <span>درصد: <b style={{ color: 'var(--text)' }}>{toFa(d.percent)}٪</b></span>}

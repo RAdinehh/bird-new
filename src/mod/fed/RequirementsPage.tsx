@@ -149,7 +149,7 @@ export default function RequirementsPage() {
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : r.id)}
                 badge={<Tag tone="blue">{toFa(r.protein)}٪ پروتئین</Tag>}
-                summary={
+                stats={
                   <>
                     <span>پروتئین: <b style={{ color: 'var(--text)' }}>{toFa(r.protein)}٪</b></span>
                     <span>انرژی: <b style={{ color: 'var(--text)' }}>{toFa(r.energy)}</b></span>
