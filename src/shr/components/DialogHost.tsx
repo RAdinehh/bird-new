@@ -52,6 +52,34 @@ function isQuietHour(): boolean {
   }
 }
 
+/** پخش بوق کوتاه با Web Audio */
+function playBeep(type?: string) {
+  try {
+    const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    const isCritical = type === 'danger' || type === 'error';
+    osc.frequency.value = isCritical ? 880 : 660;
+    gain.gain.value = 0.08;
+    osc.start();
+    osc.stop(ctx.currentTime + (isCritical ? 0.25 : 0.15));
+    setTimeout(() => { try { ctx.close(); } catch {} }, 400);
+  } catch {}
+}
+
+/** لرزش (فقط موبایل) */
+function vibrate(type?: string) {
+  try {
+    if (!('vibrate' in navigator)) return;
+    const isCritical = type === 'danger' || type === 'error';
+    (navigator as any).vibrate(isCritical ? [200, 80, 200] : 100);
+  } catch {}
+}
+
 export default function DialogHost() {
   const { open, config, close } = useDialog();
   const noAnim = useNoAnim();
@@ -140,6 +168,16 @@ export default function DialogHost() {
       }
     }
   }, []);
+
+  // صدای بوق + لرزش هنگام باز شدن دیالوگ
+  useEffect(() => {
+    if (!open || !config) return;
+    try {
+      const s = useSet.getState();
+      if (s.channels?.sound !== false) playBeep(config.type);
+      if (s.channels?.vibration !== false) vibrate(config.type);
+    } catch {}
+  }, [open, config?.type]);
 
   if (!open || !config) return null;
 
