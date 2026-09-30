@@ -140,7 +140,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
           </Select>
         </Field>
         <Field label="یادداشت">
-          <Input value={notes} onChange={e => setNotes(e.target.value)} />
+          <Input placeholder="یادداشت..." value={notes} onChange={e => setNotes(e.target.value)} />
         </Field>
       </Modal>
 

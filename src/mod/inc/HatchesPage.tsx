@@ -626,7 +626,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
             </Select>
           </Field>
           <Field label="تعداد">
-            <Input value={String(flockModal?.count || 0)} readOnly dir="ltr" unit="پرنده" />
+            <Input placeholder="مثلاً: ۱۰۰" value={String(flockModal?.count || 0)} readOnly dir="ltr" unit="پرنده" />
           </Field>
         </Grid2>
         <Grid2>

@@ -507,8 +507,8 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
             {p.method === 'check' && (
               <>
                 <Grid3>
-                  <Field label="شماره چک"><Input value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
-                  <Field label="بانک"><Input value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
+                  <Field label="شماره چک"><Input placeholder="مثلاً: ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
+                  <Field label="بانک"><Input placeholder="مثلاً: ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
                   <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })} /></Field>
                 </Grid3>
                 <Field label="وضعیت چک">
@@ -553,7 +553,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
           <>
             <Field label="تاریخ"><DatePicker value={transferDate} onChange={v => setTransferDate(v)} /></Field>
             {(transferModal.to === 'received' || transferModal.to === 'paid') && (
-              <Field label="یادداشت"><Input value={transferNote} onChange={e => setTransferNote(e.target.value)} /></Field>
+              <Field label="یادداشت"><Input placeholder="یادداشت..." value={transferNote} onChange={e => setTransferNote(e.target.value)} /></Field>
             )}
           </>
         )}

@@ -889,7 +889,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 <NumField value={currentRow.dealData.partnerPercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('partnerPercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
               </Field>
               <Field label="درصد من" hint="خودکار">
-                <Input readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.partnerPercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
+                <Input placeholder="مثلاً: ۱۰" readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.partnerPercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
               </Field>
             </Grid2>
           )}
@@ -900,7 +900,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 <NumField value={currentRow.dealData.consigneePercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('consigneePercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
               </Field>
               <Field label="درصد من" hint="خودکار">
-                <Input readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.consigneePercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
+                <Input placeholder="مثلاً: ۱۰" readOnly dir="ltr" value={toFa(complement(parseInt(toEn(currentRow.dealData.consigneePercent || '0')) || 0) ?? 100) + '٪'} unit="٪" />
               </Field>
             </Grid2>
           )}

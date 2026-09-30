@@ -33,7 +33,7 @@ export default function ProfileTab() {
             <PhoneField value={user.phone} onChange={e => updateSection('user', { phone: e.target.value })} placeholder="۰۹..." />
           </Field>
           <Field label="ایمیل">
-            <Input value={user.email} onChange={e => updateSection('user', { email: e.target.value })} dir="ltr" />
+            <Input placeholder="example@domain.com" value={user.email} onChange={e => updateSection('user', { email: e.target.value })} dir="ltr" />
           </Field>
         </Grid2>
         <Field label="نقش">
@@ -60,7 +60,7 @@ export default function ProfileTab() {
             </Select>
           </Field>
           <Field label="شماره پروانه">
-            <Input value={farm.licenseNo} onChange={e => updateSection('farm', { licenseNo: e.target.value })} dir="ltr" />
+            <Input placeholder="مثلاً: ۰۰۱" value={farm.licenseNo} onChange={e => updateSection('farm', { licenseNo: e.target.value })} dir="ltr" />
           </Field>
         </Grid2>
         <Grid3>
@@ -101,7 +101,7 @@ export default function ProfileTab() {
           <Input value={bank.sheba} onChange={e => updateSection('bank', { sheba: e.target.value })} dir="ltr" placeholder="IR..." />
         </Field>
         <Field label="صاحب حساب">
-          <Input value={bank.accountHolder} onChange={e => updateSection('bank', { accountHolder: e.target.value })} />
+          <Input placeholder="مثلاً: علی رضایی" value={bank.accountHolder} onChange={e => updateSection('bank', { accountHolder: e.target.value })} />
         </Field>
       </SettingsGroup>
 
