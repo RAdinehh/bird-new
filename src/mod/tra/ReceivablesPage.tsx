@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSum, WORKFLOW_LABEL, type Invoice, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Input, Modal, PageContainer } from '../../shr/components/ui';
+import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa } from '../../shr/utils/fa';
 import { showSuccess } from '../../cor/store/dialog';
@@ -149,21 +150,34 @@ export default function ReceivablesPage() {
           background: kind === 'sale' ? 'var(--accent-soft)' : 'var(--warn-soft)',
           border: `1px solid ${kind === 'sale' ? 'var(--accent-border)' : 'var(--warn)'}`,
           borderRadius: 'var(--r-md)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          <span style={{
-            fontSize: 'var(--fs-sm)', fontWeight: 700,
-            color: kind === 'sale' ? 'var(--accent)' : 'var(--warn)'
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           }}>
-            {kind === 'sale' ? 'مجموع طلب' : 'مجموع بدهی'}
-          </span>
-          <span style={{
-            fontSize: 'var(--fs-lg)', fontWeight: 700,
-            color: kind === 'sale' ? 'var(--accent)' : 'var(--warn)',
-            fontVariantNumeric: 'tabular-nums'
+            <span style={{
+              fontSize: 'var(--fs-sm)', fontWeight: 700,
+              color: kind === 'sale' ? 'var(--accent)' : 'var(--warn)'
+            }}>
+              {kind === 'sale' ? 'مجموع طلب' : 'مجموع بدهی'}
+            </span>
+            <span style={{
+              fontSize: 'var(--fs-lg)', fontWeight: 700,
+              color: kind === 'sale' ? 'var(--accent)' : 'var(--warn)',
+              fontVariantNumeric: 'tabular-nums'
+            }}>
+              {toFa(totalOpen.toLocaleString('fa-IR'))} ت
+            </span>
+          </div>
+          <div style={{
+            display: 'flex', justifyContent: 'center', alignItems: 'center',
+            flexWrap: 'wrap', gap: 4, marginTop: 10
           }}>
-            {toFa(totalOpen.toLocaleString('fa-IR'))} ت
-          </span>
+            <StatBox icon="📋" label="تعداد" value={toFa(openInvoices.length)} />
+            <Dot />
+            <StatBox icon="⏰" label="معوق" value={toFa(overdueCount)} tone={overdueCount > 0 ? 'danger' : 'default'} />
+            <Dot />
+            <StatBox icon="⏳" label="سرسید" value={toFa(soonCount)} tone={soonCount > 0 ? 'warn' : 'default'} />
+          </div>
         </div>
       ) : null}
 
