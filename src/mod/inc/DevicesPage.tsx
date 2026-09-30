@@ -115,6 +115,7 @@ export default function DevicesPage() {
   const [undoData, setUndoData] = useState<{ birdName: string; data: any } | null>(null);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoDevice, setUndoDevice] = useState<{ device: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [maintDeviceId, setMaintDeviceId] = useState<string | null>(null);
   const [maintForm, setMaintForm] = useState({ date: '', type: '', cost: '', description: '' });
@@ -256,6 +257,17 @@ export default function DevicesPage() {
     setOpen(false);
   };
 
+  const undoDeleteDevice = () => {
+    if (!undoDevice) return;
+    try {
+      addDevice(undoDevice.device);
+      showToast('دستگاه بازگردانی شد', 'success', 2000);
+    } catch {
+      showToast('بازگردانی ناموفق بود', 'error', 2000);
+    }
+    setUndoDevice(null);
+  };
+
   const addMaintenance = (deviceId: string) => {
     const dev = devices.find(d => d.id === deviceId);
     if (!dev) return;
@@ -288,6 +300,23 @@ export default function DevicesPage() {
 
   return (
     <PageContainer>
+      {undoDevice && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '10px 14px', marginBottom: 8,
+          background: 'var(--warn-soft, var(--input-bg))',
+          border: '1px solid var(--warn)',
+          borderRadius: 'var(--r-md)',
+          fontSize: 'var(--fs-sm)',
+        }}>
+          <span>دستگاه «{undoDevice.device.name}» حذف شد</span>
+          <button type="button" onClick={undoDeleteDevice} style={{
+            background: 'none', border: 'none',
+            color: 'var(--warn)', fontWeight: 700, cursor: 'pointer',
+            fontFamily: 'inherit', fontSize: 'var(--fs-sm)', padding: '4px 10px',
+          }}>بازگردانی</button>
+        </div>
+      )}
       {devices.length === 0 ? (
         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>}
           title="هنوز دستگاهی نساخته‌اید" desc="اولین دستگاه جوجه‌کشی خود را اضافه کنید."
@@ -409,8 +438,17 @@ export default function DevicesPage() {
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
         <SectionTitle>📋 مشخصات اصلی</SectionTitle>
-        <Field label="نام دستگاه" required>
-          <Input placeholder="مثلاً — دستگاه ۱" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+        <Field label="نام دستگاه" required hint={
+          form.name && devices.some(x => x.id !== form.id && x.name.trim() === form.name.trim())
+            ? '⚠️ این نام قبلاً استفاده شده'
+            : undefined
+        }>
+          <Input
+            placeholder="مثلاً — دستگاه ۱"
+            value={form.name}
+            onChange={e => setForm({...form, name: e.target.value})}
+            error={form.name && devices.some(x => x.id !== form.id && x.name.trim() === form.name.trim()) ? ' ' : undefined}
+          />
         </Field>
         <Grid2>
           <Field label="حالت" required>
@@ -520,7 +558,7 @@ export default function DevicesPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700, flex: 1 }}>{c.birdName}</span>
                       <span style={{ fontSize: 12, color: 'var(--muted)', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s', flexShrink: 0 }}>▼</span>
-                      <button type="button" onClick={(e) => { e.stopPropagation(); removeCapacity(c.birdName); }} aria-label="حذف" style={{
+                      <button type="button" onClick={(e) => { e.stopPropagation(); removeCapacity(c.birdName); }} aria-label={`حذف ${c.birdName}`} style={{
                         background: 'var(--danger-soft)',
                         border: '1px solid var(--danger)',
                         color: 'var(--danger)',
@@ -698,7 +736,16 @@ export default function DevicesPage() {
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف دستگاه"
-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteDevice(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="danger" onClick={() => {
+          if (!delId) return;
+          const dev = devices.find(d => d.id === delId);
+          if (dev) {
+            setUndoDevice({ device: dev });
+            setTimeout(() => setUndoDevice(cur => cur && cur.device.id === dev.id ? null : cur), 6000);
+          }
+          deleteDevice(delId);
+          setDelId(null);
+        }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
           حذف <b>{target?.name}</b>؟
         </div>

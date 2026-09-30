@@ -785,7 +785,7 @@ export function ErrorBox({ children }: { children: React.ReactNode }) {
 export function DeleteBtn({ onClick, title = 'حذف', size = 'md' }: {
   onClick: () => void; title?: string; size?: 'sm' | 'md';
 }) {
-  const dim = size === 'sm' ? 28 : 36;
+  const dim = size === 'sm' ? 44 : 44;
   return (
     <button
       type="button"
