@@ -5,6 +5,7 @@ import { lastMonths, monthLabel, salesInMonth, purchasesInMonth, eggsInMonth, fe
 import { DualBarChart, BarChart } from '../../shr/components/Charts';
 import { PageContainer, Select } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
+import { Section } from './helpers';
 
 type Mode = 'month' | 'quarter' | 'year';
 
@@ -152,20 +153,6 @@ export default function ComparePage() {
         </Section>
       ) : null}
     </PageContainer>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{
-      background: 'var(--card)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-lg)',
-      padding: '14px 16px'
-    }}>
-      <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 4 }}>{title}</div>
-      {children}
-    </div>
   );
 }
 

@@ -6,6 +6,7 @@ import { useDlg } from '../dlg/store';
 import { BarChart, LineChart } from '../../shr/components/Charts';
 import { PageContainer, Tag } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
+import { StatCard, Section } from './helpers';
 
 export default function FlockReportPage() {
   const { flocks } = useFlk();
@@ -144,12 +145,12 @@ export default function FlockReportPage() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-            <Stat label="🥚 تخم کل" value={toFa(d.totalEggs.toLocaleString('fa-IR'))} color="accent" />
-            <Stat label="💀 مرگ‌ومیر" value={toFa(d.mortality.toFixed(1)) + '٪'} color="danger" />
-            <Stat label="📊 Hen-Day" value={toFa(d.avgHenDay.toFixed(1)) + '٪'} color="info" />
-            <Stat label="🌾 دان مصرفی" value={toFa(d.totalFeed.toLocaleString('fa-IR')) + ' kg'} color="warn" />
-            {d.avgBroken > 0 ? <Stat label="💔 شکسته" value={toFa(d.avgBroken.toFixed(1)) + '٪'} color="warn" /> : null}
-            <Stat label="📋 رکوردها" value={toFa(d.productionsCount + d.logsCount)} color="accent" />
+            <StatCard label="🥚 تخم کل" value={toFa(d.totalEggs.toLocaleString('fa-IR'))} color="accent" />
+            <StatCard label="💀 مرگ‌ومیر" value={toFa(d.mortality.toFixed(1)) + '٪'} color="danger" />
+            <StatCard label="📊 Hen-Day" value={toFa(d.avgHenDay.toFixed(1)) + '٪'} color="info" />
+            <StatCard label="🌾 دان مصرفی" value={toFa(d.totalFeed.toLocaleString('fa-IR')) + ' kg'} color="warn" />
+            {d.avgBroken > 0 ? <StatCard label="💔 شکسته" value={toFa(d.avgBroken.toFixed(1)) + '٪'} color="warn" /> : null}
+            <StatCard label="📋 رکوردها" value={toFa(d.productionsCount + d.logsCount)} color="accent" />
           </div>
         </div>
       ))}
@@ -170,35 +171,5 @@ export default function FlockReportPage() {
         </>
       ) : null}
     </PageContainer>
-  );
-}
-
-function Stat({ label, value, color }: { label: string; value: string; color: 'accent' | 'warn' | 'danger' | 'info' }) {
-  return (
-    <div style={{
-      padding: 'var(--pad-normal)',
-      background: 'var(--' + color + '-soft)',
-      borderRadius: 'var(--r-sm)',
-      border: '1px solid var(--' + color + ')'
-    }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--' + color + ')', fontWeight: 700 }}>{label}</div>
-      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--' + color + ')', marginTop: 2 }}>
-        {value}
-      </div>
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{
-      background: 'var(--card)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-lg)',
-      padding: '14px 16px'
-    }}>
-      <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 4 }}>{title}</div>
-      {children}
-    </div>
   );
 }

@@ -6,6 +6,7 @@ import { PageContainer } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import { pareto } from '../../shr/utils/pareto';
 import ExportButtons from './ExportButtons';
+import { StatCard, Section } from './helpers';
 
 
 function ParetoCard({ invoices }: { invoices: any[] }) {
@@ -177,36 +178,5 @@ export default function FinancialPage() {
       </div>
       <ExportButtons />
     </PageContainer>
-  );
-}
-
-function StatCard({ label, value, color }: { label: string; value: number; color: 'accent' | 'warn' | 'danger' }) {
-  return (
-    <div style={{
-      padding: '12px 10px', textAlign: 'center',
-      background: 'var(--' + color + '-soft)',
-      border: '1px solid var(--' + color + ')',
-      borderRadius: 'var(--r-md)'
-    }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--' + color + ')', fontWeight: 700 }}>{label}</div>
-      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--' + color + ')', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-        {toFa(value.toLocaleString('fa-IR'))}
-      </div>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>تومان</div>
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{
-      background: 'var(--card)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-lg)',
-      padding: '14px 16px'
-    }}>
-      <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 4 }}>{title}</div>
-      {children}
-    </div>
   );
 }
