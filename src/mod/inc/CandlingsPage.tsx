@@ -148,20 +148,28 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     let hasError = false;
 
     if (editingId) {
+      const entry = eggEntries.find(e => e.id === editingId);
+      const baseInfo = calcAvailableBase(editingId, dayNum, editingId, candlings, entry?.count || 0);
       const d = entriesData[editingId] || emptyData();
-      const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
-      if (sum === 0) { setErr('حداقل یک مقدار وارد کنید'); return; }
+      const _inf = parseInt(toEn(d.infertile)) || 0;
+      const _dead = parseInt(toEn(d.dead)) || 0;
+      const _brk = parseInt(toEn(d.broken)) || 0;
+      const _alive = Math.max(0, (baseInfo.base || 0) - _inf - _dead - _brk);
+      if (_inf + _dead + _brk === 0 && _alive === 0) { setErr('حداقل یک مقدار وارد کنید'); return; }
+      if (_inf + _dead + _brk > baseInfo.base) { setErr('مجموع بیشتر از مبنا'); return; }
       updateCandling(editingId, {
         stage: dayNum, date: modalDate,
-        alive: parseInt(toEn(d.alive)) || null,
-        infertile: parseInt(toEn(d.infertile)) || null,
-        dead: parseInt(toEn(d.dead)) || null,
-        broken: parseInt(toEn(d.broken)) || null,
+        alive: _alive,
+        infertile: _inf,
+        dead: _dead,
+        broken: _brk,
         infertileReason: d.infertileReason,
         deadReason: d.deadReason,
         notes: d.notes,
       });
       setOpen(false);
+      setEditingId(null);
+      setEntriesData({});
       return;
     }
 
@@ -169,10 +177,14 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       const entry = eggEntries.find(e => e.id === id);
       if (!entry) return;
       const d = entriesData[id] || emptyData();
-      const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
-      if (sum === 0) { hasError = true; return; }
+      const _inf = parseInt(toEn(d.infertile)) || 0;
+      const _dead = parseInt(toEn(d.dead)) || 0;
+      const _brk = parseInt(toEn(d.broken)) || 0;
       const baseInfo = calcAvailableBase(id, dayNum, null, candlings, entry.count || 0);
-      if (baseInfo.base && sum > baseInfo.base) { hasError = true; return; }
+      const _alive = Math.max(0, (baseInfo.base || 0) - _inf - _dead - _brk);
+      const sum = _alive + _inf + _dead + _brk;
+      if (sum === 0) { hasError = true; return; }
+      if (baseInfo.base && (_inf + _dead + _brk) > baseInfo.base) { hasError = true; return; }
       addCandling({
         eggEntryId: id, stage: dayNum, date: modalDate,
         alive: parseInt(toEn(d.alive)) || null,
@@ -553,8 +565,28 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                   {isSelected && (
                     <>
                       <Grid2>
-                        <Field label="سالم"><NumField placeholder="۰" value={d.alive} onChange={ev => updateEntryData(e.id, { alive: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
                         <Field label="بی‌نطفه"><NumField placeholder="۰" value={d.infertile} onChange={ev => updateEntryData(e.id, { infertile: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
+                        <Field label="سالم" hint="خودکار">
+                          {(() => {
+                            const _inf = parseInt(toEn(d.infertile)) || 0;
+                            const _dead = parseInt(toEn(d.dead)) || 0;
+                            const _brk = parseInt(toEn(d.broken)) || 0;
+                            const _base = baseInfo.base || 0;
+                            const _alive = Math.max(0, _base - _inf - _dead - _brk);
+                            const _over = (_inf + _dead + _brk) > _base;
+                            return (
+                              <div style={{
+                                height: 38, display: "flex", alignItems: "center", justifyContent: "flex-end",
+                                padding: "0 12px",
+                                background: _over ? "var(--danger-soft)" : "var(--accent-soft)",
+                                border: "1px solid " + (_over ? "var(--danger)" : "var(--accent-border)"),
+                                borderRadius: "var(--r-md)",
+                                fontSize: "var(--fs-base)", fontWeight: 700,
+                                color: _over ? "var(--danger)" : "var(--accent)",
+                              }}>{toFa(_alive)} عدد</div>
+                            );
+                          })()}
+                        </Field>
                       </Grid2>
                       <Grid2>
                         <Field label="مرده"><NumField placeholder="۰" value={d.dead} onChange={ev => updateEntryData(e.id, { dead: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
