@@ -830,98 +830,98 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           </div>
 
           {/* ═══ منبع + زمان ═══ */}
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🏠 منبع و زمان</div>
-          <Grid2>
-            <Field label="نوع منبع" required>
-              <Select value={currentRow.dealType} onChange={e => setCurrentRow(f => ({ ...f, dealType: e.target.value as DealType, dealData: {}, flockId: '' }))}>
-                <option value="own">🏠 گله خودم</option>
-                <option value="partnership">🤝 شراکتی</option>
-                <option value="purchase">📥 خریداری</option>
-                <option value="rent">🏢 اجاره‌ای</option>
-                <option value="consignment">📦 امانی</option>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🏠 منبع و طرف مقابل</div>
+
+          <Field label="نوع منبع" required>
+            <Select value={currentRow.dealType} onChange={e => setCurrentRow(f => ({ ...f, dealType: e.target.value as DealType, dealData: {}, flockId: '' }))}>
+              <option value="own">🏠 گله خودم</option>
+              <option value="partnership">🤝 شراکتی</option>
+              <option value="purchase">📥 خریداری</option>
+              <option value="rent">🏢 اجاره‌ای</option>
+              <option value="consignment">📦 امانی</option>
+            </Select>
+          </Field>
+
+          {currentRow.dealType === 'own' && (
+            <Field label="انتخاب گله" required>
+              {(() => {
+                const activeFlocks = flocks.filter((fl: any) => fl.status === 'active');
+                const readyFlocks = activeFlocks.filter((fl: any) => {
+                  const brd = birds.find(b => b.id === fl.birdId);
+                  const r = flockReadyForEggs(fl, brd);
+                  return r.ready;
+                });
+                if (activeFlocks.length === 0) return <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>گله فعالی نیست</div>;
+                if (readyFlocks.length === 0) return <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', padding: 10, background: 'var(--warn-soft)', borderRadius: 'var(--r-md)', textAlign: 'center' }}>⛔ هیچ گله آماده‌ای نیست</div>;
+                return (
+                  <Select value={currentRow.flockId} onChange={e => {
+                    const fid = e.target.value;
+                    const fl = flocks.find((x: any) => x.id === fid);
+                    setCurrentRow(f => ({ ...f, flockId: fid, birdId: fl?.birdId || f.birdId, breedId: fl?.breedId || f.breedId }));
+                  }}>
+                    <option value="">— انتخاب گله —</option>
+                    {readyFlocks.map((fl: any) => {
+                      const brd = birds.find(b => b.id === fl.birdId);
+                      const r = flockReadyForEggs(fl, brd);
+                      return <option key={fl.id} value={fl.id}>{fl.name} ({toFa(r.ageDays)} روز)</option>;
+                    })}
+                  </Select>
+                );
+              })()}
+            </Field>
+          )}
+
+          {currentRow.dealType === 'purchase' && (
+            <Field label="فروشنده" required>
+              {suppliers.length === 0 ? (
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>فروشنده‌ای نیست</div>
+              ) : (
+                <Select value={currentRow.dealData.sellerId || ''} onChange={e => setD('sellerId', e.target.value)}>
+                  <option value="">— انتخاب —</option>
+                  {suppliers.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </Select>
+              )}
+            </Field>
+          )}
+
+          {currentRow.dealType === 'partnership' && (
+            <Field label="شریک" required>
+              <Select value={currentRow.dealData.partnerId || ''} onChange={e => setD('partnerId', e.target.value)}>
+                <option value="">— انتخاب —</option>
+                {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </Select>
             </Field>
+          )}
+
+          {currentRow.dealType === 'rent' && (
+            <Field label="اجاره‌دهنده" required>
+              <Select value={currentRow.dealData.lessorId || ''} onChange={e => setD('lessorId', e.target.value)}>
+                <option value="">— انتخاب —</option>
+                {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </Select>
+            </Field>
+          )}
+
+          {currentRow.dealType === 'consignment' && (
+            <Field label="امانت‌دار" required>
+              <Select value={currentRow.dealData.consigneeId || ''} onChange={e => setD('consigneeId', e.target.value)}>
+                <option value="">— انتخاب —</option>
+                {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </Select>
+            </Field>
+          )}
+
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4, borderTop: '1px dashed var(--border)' }}>📅 زمان</div>
+          <Grid2>
             <Field label="تاریخ ورود" required>
               <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ" />
             </Field>
-          </Grid2>
-
-          {/* ساعت + انتخاب طرف (شرطی) */}
-          <Grid2>
             <Field label="ساعت ورود">
               <Input value={currentRow.entryTime} onChange={e => setCurrentRow(f => ({ ...f, entryTime: e.target.value }))} placeholder="۱۴:۳۵" dir="ltr" />
             </Field>
-
-            {currentRow.dealType === 'own' && (
-              <Field label="انتخاب گله" required>
-                {(() => {
-                  const activeFlocks = flocks.filter((fl: any) => fl.status === 'active');
-                  const readyFlocks = activeFlocks.filter((fl: any) => {
-                    const brd = birds.find(b => b.id === fl.birdId);
-                    const r = flockReadyForEggs(fl, brd);
-                    return r.ready;
-                  });
-                  if (activeFlocks.length === 0) return <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>گله فعالی نیست</div>;
-                  if (readyFlocks.length === 0) return <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', padding: 10, background: 'var(--warn-soft)', borderRadius: 'var(--r-md)', textAlign: 'center' }}>⛔ هیچ گله آماده‌ای نیست</div>;
-                  return (
-                    <Select value={currentRow.flockId} onChange={e => {
-                      const fid = e.target.value;
-                      const fl = flocks.find((x: any) => x.id === fid);
-                      setCurrentRow(f => ({ ...f, flockId: fid, birdId: fl?.birdId || f.birdId, breedId: fl?.breedId || f.breedId }));
-                    }}>
-                      <option value="">— انتخاب گله —</option>
-                      {readyFlocks.map((fl: any) => {
-                        const brd = birds.find(b => b.id === fl.birdId);
-                        const r = flockReadyForEggs(fl, brd);
-                        return <option key={fl.id} value={fl.id}>{fl.name} ({toFa(r.ageDays)} روز)</option>;
-                      })}
-                    </Select>
-                  );
-                })()}
-              </Field>
-            )}
-
-            {currentRow.dealType === 'purchase' && (
-              <Field label="فروشنده" required>
-                {suppliers.length === 0 ? (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>فروشنده‌ای نیست</div>
-                ) : (
-                  <Select value={currentRow.dealData.sellerId || ''} onChange={e => setD('sellerId', e.target.value)}>
-                    <option value="">— انتخاب —</option>
-                    {suppliers.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                  </Select>
-                )}
-              </Field>
-            )}
-
-            {currentRow.dealType === 'partnership' && (
-              <Field label="شریک" required>
-                <Select value={currentRow.dealData.partnerId || ''} onChange={e => setD('partnerId', e.target.value)}>
-                  <option value="">— انتخاب —</option>
-                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </Select>
-              </Field>
-            )}
-
-            {currentRow.dealType === 'rent' && (
-              <Field label="اجاره‌دهنده" required>
-                <Select value={currentRow.dealData.lessorId || ''} onChange={e => setD('lessorId', e.target.value)}>
-                  <option value="">— انتخاب —</option>
-                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </Select>
-              </Field>
-            )}
-
-            {currentRow.dealType === 'consignment' && (
-              <Field label="امانت‌دار" required>
-                <Select value={currentRow.dealData.consigneeId || ''} onChange={e => setD('consigneeId', e.target.value)}>
-                  <option value="">— انتخاب —</option>
-                  {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </Select>
-              </Field>
-            )}
           </Grid2>
 
+          
           {/* درصد شریک/امانت‌دار + اجاره */}
           {currentRow.dealType === 'partnership' && (
             <Grid2>
