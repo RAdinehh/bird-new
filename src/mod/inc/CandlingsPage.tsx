@@ -182,7 +182,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       const _brk = parseInt(toEn(d.broken)) || 0;
       const baseInfo = calcAvailableBase(id, dayNum, null, candlings, entry.count || 0);
       const _alive = Math.max(0, (baseInfo.base || 0) - _inf - _dead - _brk);
-      const sum = _alive + _inf + _dead + _brk;
+      const sum = _inf + _dead + _brk;
       if (sum === 0) { hasError = true; return; }
       if (baseInfo.base && (_inf + _dead + _brk) > baseInfo.base) { hasError = true; return; }
       addCandling({
@@ -512,7 +512,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
               const d = dataFor(e.id);
               const sum = (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
               const dayNum = parseInt(toEn(modalDay)) || 0;
-              const baseInfo = calcAvailableBase(e.id, editingId ? (candlings.find(c => c.id === editingId)?.stage || dayNum) : dayNum, editingId, candlings, e.count || 0);
+              const baseInfo = calcAvailableBase(e.id, dayNum, null, candlings, e.count || 0);
               const remaining = baseInfo.base - sum;
               const existingCandlings = candlings.filter(c => c.eggEntryId === e.id);
               const alreadyAgg = existingCandlings.reduce((acc, c) => ({
