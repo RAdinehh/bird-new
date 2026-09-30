@@ -1,3 +1,6 @@
+/**
+ * index.tsx — بخش egg
+ */
 import { useState } from 'react';
 import ProductionsPage from './ProductionsPage';
 import StockPage from './StockPage';

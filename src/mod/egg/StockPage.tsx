@@ -1,3 +1,6 @@
+/**
+ * StockPage — انبار تخم
+ */
 import { useState, useMemo } from 'react';
 import { useEgg, calcStock, toPieces, saleTotal, EGG_TYPE_LABEL, UNIT_LABEL, PAYMENT_LABEL, type EggSale, type EggType } from './store';
 import { useCtc } from '../ctc/store';
@@ -7,6 +10,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
+import { Row, SectionTitle } from './helpers';
 
 interface F {
   id?: string;
@@ -310,22 +314,5 @@ export default function StockPage() {
         </div>
       </Modal>
     </PageContainer>
-  );
-}
-
-function Row({ l, v }: { l: string; v: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-      <span style={{ color: 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
-    </div>
-  );
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)',
-       fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
   );
 }
