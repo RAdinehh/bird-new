@@ -360,3 +360,13 @@ textarea:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ==== Grid Systems — Adaptive ==== */
+:root {
+  --grid-kpi-large: 1fr 1fr;
+  --grid-kpi-medium: 1fr 1fr 1fr;
+  --grid-tile: 1fr 1fr 1fr;
+  --grid-item-tiny: 1fr 1fr 1fr 1fr;
+  --grid-form: 1fr 1fr;
+  --grid-calendar: repeat(7, 1fr);
+}
