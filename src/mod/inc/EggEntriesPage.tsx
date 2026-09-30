@@ -173,6 +173,32 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       }
     }
 
+    // ═══ چک هچ همزمان (اختیاری) ═══
+    // اگه چند ردیف با پرنده‌های متفاوت تو یه دستگاه هستن،
+    // تاریخ ورود باید طوری باشه که روز هچ یکسان بشه
+    if (draftRows.length > 0 && currentRow.entryDate) {
+      const curBird = birds.find(b => b.id === currentRow.birdId);
+      const curHatchDate = addDaysJalali(currentRow.entryDate, incubationDays(curBird?.name || 'مرغ'));
+      // چک کن آیا ردیف دیگه‌ای با هچ متفاوت هست
+      const conflicts: string[] = [];
+      draftRows.forEach(r => {
+        if (editingRowId && r._id === editingRowId) return;
+        const rBird = birds.find(b => b.id === r.birdId);
+        const rHatchDate = addDaysJalali(r.entryDate, incubationDays(rBird?.name || 'مرغ'));
+        if (rHatchDate && curHatchDate && rHatchDate !== curHatchDate) {
+          conflicts.push('ردیف ' + rBird?.name + ' → هچ ' + rHatchDate);
+        }
+      });
+      if (conflicts.length > 0) {
+        const msg = '⚠️ هچ همزمان نیست\n\n' +
+          'هچ این ردیف: ' + curHatchDate + '\n' +
+          'هچ ردیف‌های دیگر:\n' + conflicts.join('\n') + '\n\n' +
+          '💡 برای هچ همزمان، پرنده دوره‌بلندتر رو زودتر وارد کن.\n\n' +
+          'ادامه بدهم؟';
+        if (!confirm(msg)) return;
+      }
+    }
+
     // ═══ چک ظرفیت ═══
     const device = devices.find(d => d.id === multiDeviceId);
     if (device) {
@@ -701,20 +727,47 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
         {currentRow.dealType === 'own' && (
           <Field label="انتخاب گله" required>
-            {flocks.filter((fl: any) => fl.status === 'active').length === 0 ? (
-              <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-                گله فعالی نیست
-              </div>
-            ) : (
-              <Select value={currentRow.flockId} onChange={e => {
-                const fid = e.target.value;
-                const fl = flocks.find((x: any) => x.id === fid);
-                setCurrentRow(f => ({ ...f, flockId: fid, birdId: fl?.birdId || f.birdId, breedId: fl?.breedId || f.breedId }));
-              }}>
-                <option value="">— انتخاب گله —</option>
-                {flocks.filter((fl: any) => fl.status === 'active').map((fl: any) => <option key={fl.id} value={fl.id}>{fl.name}</option>)}
-              </Select>
-            )}
+            {(() => {
+              const activeFlocks = flocks.filter((fl: any) => fl.status === 'active');
+              const readyFlocks = activeFlocks.filter((fl: any) => {
+                const brd = birds.find(b => b.id === fl.birdId);
+                const r = flockReadyForEggs(fl, brd);
+                return r.ready;
+              });
+              const notReady = activeFlocks.length - readyFlocks.length;
+              if (activeFlocks.length === 0) {
+                return <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>گله فعالی نیست</div>;
+              }
+              if (readyFlocks.length === 0) {
+                return (
+                  <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--warn)', padding: 10, background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', lineHeight: 1.8 }}>
+                    ⛔ هیچ گله‌ای به سن تخم‌گذاری نرسیده
+                    <br />{toFa(notReady)} گله فعال ولی نابالغ
+                  </div>
+                );
+              }
+              return (
+                <>
+                  <Select value={currentRow.flockId} onChange={e => {
+                    const fid = e.target.value;
+                    const fl = flocks.find((x: any) => x.id === fid);
+                    setCurrentRow(f => ({ ...f, flockId: fid, birdId: fl?.birdId || f.birdId, breedId: fl?.breedId || f.breedId }));
+                  }}>
+                    <option value="">— انتخاب گله —</option>
+                    {readyFlocks.map((fl: any) => {
+                      const brd = birds.find(b => b.id === fl.birdId);
+                      const r = flockReadyForEggs(fl, brd);
+                      return <option key={fl.id} value={fl.id}>{fl.name} ({toFa(r.ageDays)} روز)</option>;
+                    })}
+                  </Select>
+                  {notReady > 0 && (
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', paddingTop: 4, fontWeight: 600 }}>
+                      ⚠️ {toFa(notReady)} گله نابالغ پنهان شده
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </Field>
         )}
 
