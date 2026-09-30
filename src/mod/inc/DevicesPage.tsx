@@ -9,6 +9,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, P
 import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { showToast } from '../../cor/store/toast';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { parse as parseJ, addMonths, format as formatJ } from 'date-fns-jalali';
 import { Row, normalizeBird } from './helpers';
@@ -111,6 +112,7 @@ export default function DevicesPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [expandedBird, setExpandedBird] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ birdName: string; data: any } | null>(null);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -147,17 +149,29 @@ export default function DevicesPage() {
   const addCapacity = (birdName: string) => {
     if (!birdName.trim()) return;
     if (form.capacityByBird.some(c => normalizeBird(c.birdName) === normalizeBird(birdName))) return;
-    const profile = profiles.find(p => normalizeBird(p.birdName) === normalizeBird(birdName));
-    setForm(f => ({
-      ...f,
-      capacityByBird: [...f.capacityByBird, { birdName, capacity: null }],
-      temp: f.temp || (profile ? String(profile.setterTemp) : ''),
-      humidity: f.humidity || (profile ? String(profile.setterHumidity) : ''),
-    }));
+    const defaults = fillCapacityFromProfile(birdName);
+    const newCap: any = { birdName, capacity: null, ...(defaults || {}) };
+    setForm(f => ({ ...f, capacityByBird: [...f.capacityByBird, newCap] }));
+    if (defaults) {
+      showToast(`«${birdName}» با مقادیر پیش‌فرض پروفایل افزوده شد`, 'success', 2200);
+    } else {
+      showToast(`«${birdName}» افزوده شد`, 'info', 1800);
+    }
   };
 
   const removeCapacity = (birdName: string) => {
+    const removed = form.capacityByBird.find(c => normalizeBird(c.birdName) === normalizeBird(birdName));
+    if (!removed) return;
     setForm(f => ({ ...f, capacityByBird: f.capacityByBird.filter(c => normalizeBird(c.birdName) !== normalizeBird(birdName)) }));
+    setUndoData({ birdName, data: removed });
+    setTimeout(() => setUndoData(cur => cur && cur.birdName === birdName ? null : cur), 5000);
+  };
+
+  const undoRemoveCapacity = () => {
+    if (!undoData) return;
+    const { data } = undoData;
+    setForm(f => ({ ...f, capacityByBird: [...f.capacityByBird, data] }));
+    setUndoData(null);
   };
 
   const updateCapacity = (birdName: string, capacity: number | null) => {
@@ -449,6 +463,24 @@ export default function DevicesPage() {
                 >+ {b.name}</button>
               );
             })}</div>
+        )}
+        {undoData && (
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '8px 12px',
+            background: 'var(--input-bg)',
+            border: '1px solid var(--warn)',
+            borderRadius: 'var(--r-md)',
+            marginTop: 6,
+            fontSize: 'var(--fs-sm)',
+          }}>
+            <span>«{undoData.birdName}» حذف شد</span>
+            <button type="button" onClick={undoRemoveCapacity} style={{
+              background: 'none', border: 'none',
+              color: 'var(--warn)', fontWeight: 700, cursor: 'pointer',
+              fontFamily: 'inherit', fontSize: 'var(--fs-sm)', padding: '2px 8px',
+            }}>بازگردانی</button>
+          </div>
         )}
         {form.capacityByBird.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 6 }}>
