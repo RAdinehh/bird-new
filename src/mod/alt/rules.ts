@@ -7,6 +7,7 @@ import { useEgg, henDayRate } from '../egg/store';
 import { useInc, daysToHatch, isLockdown, isHatchWindow } from '../inc/store';
 import { toFa } from '../../shr/utils/fa';
 import { format as formatJ } from 'date-fns-jalali';
+import { useSet } from '../set/store';
 
 interface RuleAlert {
   level: AlertLevel;
@@ -26,6 +27,36 @@ const todayJalali = () => {
 };
 
 /** تشخیص همه‌ی هشدارهای خودکار */
+
+
+/** خواندن thresholds از store (با fallback) */
+function getThresholds() {
+  try {
+    const s = useSet.getState();
+    return s.thresholds || {
+      eggDropPercent: 10,
+      mortalityPerThousand: 5,
+      tempDeviation: 2,
+      humidityDeviation: 10,
+      waterFeedMin: 1.6,
+      waterFeedMax: 2.2,
+      criticalTempHigh: 32,
+      criticalTempLow: 18,
+    };
+  } catch {
+    return {
+      eggDropPercent: 10,
+      mortalityPerThousand: 5,
+      tempDeviation: 2,
+      humidityDeviation: 10,
+      waterFeedMin: 1.6,
+      waterFeedMax: 2.2,
+      criticalTempHigh: 32,
+      criticalTempLow: 18,
+    };
+  }
+}
+
 export function detectAllAlerts(): RuleAlert[] {
   const alerts: RuleAlert[] = [];
 

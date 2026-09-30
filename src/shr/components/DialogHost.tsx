@@ -29,6 +29,29 @@ function useNoAnim() {
   return !!(lowPower || prefersReduced);
 }
 
+
+
+/** چک ساعت سکوت */
+function isQuietHour(): boolean {
+  try {
+    const s = useSet.getState();
+    if (!s.quietHours?.enabled) return false;
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const current = `${hh}:${mm}`;
+    const from = s.quietHours.from || '22:00';
+    const to = s.quietHours.to || '07:00';
+    // اگه from > to (مثل 22 تا 7)
+    if (from > to) {
+      return current >= from || current <= to;
+    }
+    return current >= from && current <= to;
+  } catch {
+    return false;
+  }
+}
+
 export default function DialogHost() {
   const { open, config, close } = useDialog();
   const noAnim = useNoAnim();
@@ -119,6 +142,15 @@ export default function DialogHost() {
   }, []);
 
   if (!open || !config) return null;
+
+  // چک کانال in-app
+  try {
+    const s = useSet.getState();
+    if (s.channels && s.channels.inApp === false) return null;
+    if (isQuietHour() && (config.type === 'info' || config.type === 'success')) {
+      return null; // ساعات سکوت فقط info/success رو بلاک می‌کنه
+    }
+  } catch {}
 
   const type: DialogType = config.type || 'info';
   const cfg = TYPE_CONFIG[type] || TYPE_CONFIG.info;
