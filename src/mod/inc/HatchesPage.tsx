@@ -61,8 +61,8 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
       const entry = eggEntries.find(e => e.id === id);
       const myCand = candlings.filter(c => c.eggEntryId === id).sort((a,b) => b.stage - a.stage)[0];
       const aliveAfter = myCand?.alive || entry?.count || 0;
-      const estimated = estimateHatched(aliveAfter, entry?.count || 0, { ds: 0, pp: 0, uh: 0, ot: 0 });
-      setEntriesData({ ...entriesData, [id]: { ...emptyRow(), hatched: estimated > 0 ? String(estimated) : '' } });
+      // auto-fill با ۱۰۰٪ نطفه‌دار (کاربر خودش تلفات می‌زنه)
+      setEntriesData({ ...entriesData, [id]: { ...emptyRow(), hatched: aliveAfter > 0 ? String(aliveAfter) : '' } });
       setSelectedIds(newSet);
     }
   };
@@ -392,8 +392,8 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                             const ok = remaining >= 0;
                             return (
                               <>
-                                <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
-                                  🧬 سقف این هچ: {toFa(base)} (نطفه‌دار از کندلینگ)
+                                <div style={{ padding: '6px 10px', background: myCand ? 'var(--accent-soft)' : 'var(--warn-soft)', border: '1px solid ' + (myCand ? 'var(--accent-border)' : 'var(--warn)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: myCand ? 'var(--accent)' : 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
+                                  {myCand ? '🧬 سقف این هچ: ' + toFa(base) + ' (نطفه‌دار از کندلینگ روز ' + toFa(myCand.stage) + ')' : '⚠️ بدون کندلینگ — سقف: ' + toFa(base) + ' تخم'}
                                 </div>
                                 <Grid2>
                                   <Field label="جوجه هچ‌شده" required>
