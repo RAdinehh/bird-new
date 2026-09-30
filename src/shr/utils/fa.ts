@@ -89,7 +89,11 @@ export function numberToWords(n: number | null | undefined): string {
 /** تجزیه‌ی عدد از رشته‌ی فارسی با جداکننده */
 export function parseFaNum(s: any): number {
   if (s === null || s === undefined || s === '') return 0;
-  const cleaned = String(s).replace(/[۰-۹]/g, d => String(FA.indexOf(d))).replace(/[^\d.-]/g, '');
+  const cleaned = String(s)
+    .replace(/[۰-۹]/g, d => String(FA.indexOf(d)))
+    .replace(/[٬,]/g, '')
+    .replace(/[٫،]/g, '.')
+    .replace(/[^\d.-]/g, '');
   return parseFloat(cleaned) || 0;
 }
 
