@@ -87,13 +87,19 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     if (!formDate.trim()) { setErr('تاریخ اجباری است'); return; }
     if (editingId) {
       const d = dataFor(formEntryId);
+      const hatchedNum = int(d.hatched) || 0;
+      const hasHatched = hatchedNum > 0;
       updateHatch(editingId, {
         date: formDate,
         hatched: int(d.hatched), unhatched: int(d.unhatched),
         deadInShell: int(d.deadInShell), pipped: int(d.pipped), other: int(d.other),
-        gradeA: int(d.gradeA), gradeB: int(d.gradeB),
-        maleCount: int(d.maleCount), femaleCount: int(d.femaleCount), unknownCount: int(d.unknownCount),
-        avgWeight: num(d.avgWeight), notes: d.notes || ''
+        gradeA: hasHatched ? int(d.gradeA) : null,
+        gradeB: hasHatched ? int(d.gradeB) : null,
+        maleCount: hasHatched ? int(d.maleCount) : null,
+        femaleCount: hasHatched ? int(d.femaleCount) : null,
+        unknownCount: hasHatched ? int(d.unknownCount) : null,
+        avgWeight: hasHatched ? num(d.avgWeight) : null,
+        notes: d.notes || ''
       } as any);
       setOpen(false); return;
     }
@@ -101,13 +107,19 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     let saved = 0;
     Array.from(selectedIds).forEach(id => {
       const d = dataFor(id);
+      const hatchedNum = int(d.hatched) || 0;
+      const hasHatched = hatchedNum > 0;
       addHatch({
         eggEntryId: id, date: formDate,
         hatched: int(d.hatched), unhatched: int(d.unhatched),
         deadInShell: int(d.deadInShell), pipped: int(d.pipped), other: int(d.other),
-        gradeA: int(d.gradeA), gradeB: int(d.gradeB),
-        maleCount: int(d.maleCount), femaleCount: int(d.femaleCount), unknownCount: int(d.unknownCount),
-        avgWeight: num(d.avgWeight), notes: d.notes || ''
+        gradeA: hasHatched ? int(d.gradeA) : null,
+        gradeB: hasHatched ? int(d.gradeB) : null,
+        maleCount: hasHatched ? int(d.maleCount) : null,
+        femaleCount: hasHatched ? int(d.femaleCount) : null,
+        unknownCount: hasHatched ? int(d.unknownCount) : null,
+        avgWeight: hasHatched ? num(d.avgWeight) : null,
+        notes: d.notes || ''
       } as any);
       saved++;
     });
@@ -370,15 +382,34 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                             <Field label="سایر"><NumField value={d.other} onChange={ev => updateData(e.id, { other: ev.target.value })} min={0} unit="عدد" /></Field>
                             <Field label="وزن متوسط"><NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} unit="گرم" /></Field>
                           </Grid2>
-                          <Grid2>
-                            <Field label="درجه A"><NumField value={d.gradeA} onChange={ev => updateData(e.id, { gradeA: ev.target.value })} min={0} unit="عدد" /></Field>
-                            <Field label="درجه B"><NumField value={d.gradeB} onChange={ev => updateData(e.id, { gradeB: ev.target.value })} min={0} unit="عدد" /></Field>
-                          </Grid2>
-                          <Grid2>
-                            <Field label="♂ نر"><NumField value={d.maleCount} onChange={ev => updateData(e.id, { maleCount: ev.target.value })} min={0} unit="عدد" /></Field>
-                            <Field label="♀ ماده"><NumField value={d.femaleCount} onChange={ev => updateData(e.id, { femaleCount: ev.target.value })} min={0} unit="عدد" /></Field>
-                          </Grid2>
-                          <Field label="? نامعلوم"><NumField value={d.unknownCount} onChange={ev => updateData(e.id, { unknownCount: ev.target.value })} min={0} unit="عدد" /></Field>
+                          {(() => {
+                            const hatchedNum = parseInt(toEn(d.hatched)) || 0;
+                            if (hatchedNum === 0) {
+                              return (
+                                <div style={{ padding: '10px 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
+                                  ⬆️ اول «جوجه هچ‌شده» را وارد کن — سپس می‌توانی کیفیت، جنسیت و وزن را تکمیل کنی
+                                </div>
+                              );
+                            }
+                            return (
+                              <>
+                                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی (اختیاری) — از {toFa(hatchedNum)} هچ‌شده</div>
+                                <Grid2>
+                                  <Field label="درجه A"><NumField value={d.gradeA} onChange={ev => updateData(e.id, { gradeA: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
+                                  <Field label="درجه B"><NumField value={d.gradeB} onChange={ev => updateData(e.id, { gradeB: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
+                                </Grid2>
+                                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت (اختیاری)</div>
+                                <Grid2>
+                                  <Field label="♂ نر"><NumField value={d.maleCount} onChange={ev => updateData(e.id, { maleCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
+                                  <Field label="♀ ماده"><NumField value={d.femaleCount} onChange={ev => updateData(e.id, { femaleCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
+                                </Grid2>
+                                <Grid2>
+                                  <Field label="? نامعلوم"><NumField value={d.unknownCount} onChange={ev => updateData(e.id, { unknownCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
+                                  <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
+                                </Grid2>
+                              </>
+                            );
+                          })()}
                           <Field label="یادداشت"><Input value={d.notes || ''} onChange={ev => updateData(e.id, { notes: ev.target.value })} placeholder="..." /></Field>
                           <div style={{ padding: '6px 10px', background: rem < 0 ? 'var(--danger-soft)' : rem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
                             این هچ: {toFa(sumE)} از {toFa(e.count || 0)}{rem > 0 && ' · باقی: ' + toFa(rem)}{rem < 0 && ' — بیشتر!'}{rem === 0 && ' ✅'}
@@ -408,15 +439,34 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
               <Field label="سایر"><NumField value={dataFor(formEntryId).other} onChange={ev => updateData(formEntryId, { other: ev.target.value })} min={0} unit="عدد" /></Field>
               <Field label="وزن متوسط"><NumField value={dataFor(formEntryId).avgWeight} onChange={ev => updateData(formEntryId, { avgWeight: ev.target.value })} min={0} unit="گرم" /></Field>
             </Grid2>
-            <Grid2>
-              <Field label="درجه A"><NumField value={dataFor(formEntryId).gradeA} onChange={ev => updateData(formEntryId, { gradeA: ev.target.value })} min={0} unit="عدد" /></Field>
-              <Field label="درجه B"><NumField value={dataFor(formEntryId).gradeB} onChange={ev => updateData(formEntryId, { gradeB: ev.target.value })} min={0} unit="عدد" /></Field>
-            </Grid2>
-            <Grid2>
-              <Field label="♂ نر"><NumField value={dataFor(formEntryId).maleCount} onChange={ev => updateData(formEntryId, { maleCount: ev.target.value })} min={0} unit="عدد" /></Field>
-              <Field label="♀ ماده"><NumField value={dataFor(formEntryId).femaleCount} onChange={ev => updateData(formEntryId, { femaleCount: ev.target.value })} min={0} unit="عدد" /></Field>
-            </Grid2>
-            <Field label="? نامعلوم"><NumField value={dataFor(formEntryId).unknownCount} onChange={ev => updateData(formEntryId, { unknownCount: ev.target.value })} min={0} unit="عدد" /></Field>
+            {(() => {
+              const hatchedNum = parseInt(toEn(dataFor(formEntryId).hatched)) || 0;
+              if (hatchedNum === 0) {
+                return (
+                  <div style={{ padding: '10px 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
+                    ⬆️ اول «جوجه هچ‌شده» را وارد کن
+                  </div>
+                );
+              }
+              return (
+                <>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی — از {toFa(hatchedNum)} هچ‌شده</div>
+                  <Grid2>
+                    <Field label="درجه A"><NumField value={dataFor(formEntryId).gradeA} onChange={ev => updateData(formEntryId, { gradeA: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
+                    <Field label="درجه B"><NumField value={dataFor(formEntryId).gradeB} onChange={ev => updateData(formEntryId, { gradeB: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
+                  </Grid2>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت و وزن</div>
+                  <Grid2>
+                    <Field label="♂ نر"><NumField value={dataFor(formEntryId).maleCount} onChange={ev => updateData(formEntryId, { maleCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
+                    <Field label="♀ ماده"><NumField value={dataFor(formEntryId).femaleCount} onChange={ev => updateData(formEntryId, { femaleCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
+                  </Grid2>
+                  <Grid2>
+                    <Field label="? نامعلوم"><NumField value={dataFor(formEntryId).unknownCount} onChange={ev => updateData(formEntryId, { unknownCount: ev.target.value })} max={hatchedNum} min={0} unit="عدد" /></Field>
+                    <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={dataFor(formEntryId).avgWeight} onChange={ev => updateData(formEntryId, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
+                  </Grid2>
+                </>
+              );
+            })()}
             <Field label="یادداشت"><Input value={dataFor(formEntryId).notes || ''} onChange={ev => updateData(formEntryId, { notes: ev.target.value })} placeholder="..." /></Field>
           </>
         )}
