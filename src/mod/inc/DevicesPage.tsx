@@ -422,25 +422,31 @@ export default function DevicesPage() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {birds.map(b => (
-              <button
-                key={b.id}
-                type="button"
-                onClick={() => addCapacity(b.name)}
-                style={{
-                  padding: '6px 12px',
-                  background: 'var(--btn-bg)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-md)',
-                  color: 'var(--text)',
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                  fontSize: 'var(--fs-sm)',
-                  fontWeight: 600,
-                }}
-              >+ {b.name}</button>
-            ))}
-          </div>
+            {birds.map(b => {
+              const isSelected = form.capacityByBird.some(
+                cc => normalizeBird(cc.birdName) === normalizeBird(b.name)
+              );
+              return (
+                <button
+                  key={b.id}
+                  type="button"
+                  onClick={() => isSelected ? removeCapacity(b.name) : addCapacity(b.name)}
+                  aria-pressed={isSelected}
+                  style={{
+                    padding: '6px 12px',
+                    background: isSelected ? 'var(--accent-soft)' : 'var(--btn-bg)',
+                    border: '1px solid ' + (isSelected ? 'var(--accent)' : 'var(--border)'),
+                    borderRadius: 'var(--r-md)',
+                    color: isSelected ? 'var(--accent)' : 'var(--text)',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    fontSize: 'var(--fs-sm)',
+                    fontWeight: 600,
+                    transition: 'all .15s',
+                  }}
+                >{isSelected ? '✓' : '+'} {b.name}</button>
+              );
+            })}</div>
         )}
         {form.capacityByBird.length > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 6, marginTop: 6 }}>
