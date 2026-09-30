@@ -41,11 +41,13 @@ export default function MenuDrawer() {
 
   const sections: Section[] = [
     {
-      title: 'اصلی',
+      title: 'خانه',
       icon: '🏠',
       tone: 'accent',
       items: [
-        { to: '/', label: 'داشبورد', icon: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10' }
+        { to: '/', label: 'داشبورد', icon: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10' },
+        { to: '/dlg', label: 'ثبت روزانه', icon: 'M12 6v6l4 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z' },
+        { to: '/cal', label: 'تقویم', icon: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z' },
       ]
     },
     {
@@ -58,7 +60,6 @@ export default function MenuDrawer() {
         { to: '/flk', label: 'گله‌ها', icon: 'M20 7h-9M14 17H5 M20 17a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M10 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0z' },
         { to: '/inc', label: 'جوجه‌کشی', icon: 'M12 2v20M5 8h14M5 16h14' },
         { to: '/egg', label: 'تخم‌ها', icon: 'M12 5a7 7 0 0 0-7 7 7 7 0 0 0 14 0 7 7 0 0 0-7-7z' },
-        { to: '/dlg', label: 'ثبت روزانه', icon: 'M12 6v6l4 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z' }
       ]
     },
     {
@@ -67,16 +68,16 @@ export default function MenuDrawer() {
       tone: 'info',
       items: [
         { to: '/whs', label: 'انبار', icon: 'M21 8v13H3V8M1 3h22v5H1z', badge: stockCount > 0 ? 'stock' : null },
-        { to: '/fed', label: 'جیره‌نویسی', icon: 'M12 2v20M5 8h14M5 16h14' }
+        { to: '/fed', label: 'جیره‌نویسی', icon: 'M12 2v20M5 8h14M5 16h14' },
       ]
     },
     {
       title: 'کسب‌وکار',
-      icon: '💰',
+      icon: '💼',
       tone: 'warn',
       items: [
         { to: '/tra', label: 'معاملات', icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' },
-        { to: '/ctc', label: 'مخاطبین', icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' }
+        { to: '/ctc', label: 'مخاطبین', icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' },
       ]
     },
     {
@@ -85,18 +86,17 @@ export default function MenuDrawer() {
       tone: 'purple',
       items: [
         { to: '/rep', label: 'گزارش‌ها', icon: 'M3 3v18h18 M19 9l-5 5-4-4-3 3' },
-        { to: '/cal', label: 'تقویم', icon: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z' },
-        { to: '/doc', label: 'اسناد و فایل‌ها', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6' },
         { to: '/alt', label: 'هشدارها', icon: 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9', badge: alertCount > 0 ? 'alerts' : null },
-        { to: '/arc', label: 'آرشیو', icon: 'M21 8v13H3V8M1 3h22v5H1z' }
+        { to: '/doc', label: 'اسناد و فایل‌ها', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6' },
+        { to: '/arc', label: 'آرشیو', icon: 'M21 8v13H3V8M1 3h22v5H1z' },
       ]
     },
     {
       title: 'سیستم',
-      icon: '⚙',
+      icon: '⚙️',
       tone: 'danger',
       items: [
-        { to: '/set', label: 'تنظیمات', icon: 'M3 3h18v18H3z M3 9h18' }
+        { to: '/set', label: 'تنظیمات', icon: 'M3 3h18v18H3z M3 9h18' },
       ]
     }
   ];
