@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useInc, type Candling } from './store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
-import ExpandableCard from '../../shr/components/ExpandableCard';
+import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
@@ -317,6 +317,11 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                   <span>🧬 <b style={{ color: 'var(--accent)' }}>{toFa(fertilePercent.toFixed(0))}٪</b></span>
                   <span>📉 <b style={{ color: lossPercent > 10 ? 'var(--danger)' : 'var(--text)' }}>{toFa(lossPercent.toFixed(0))}٪</b></span>
                   <span>🔍 {toFa(list.length)} کندلینگ</span>
+                </>}
+                stats={<>
+                  <StatBox icon="🧬" label="نطفه" value={toFa(Math.round(fertilePercent)) + '٪'} tone="accent" />
+                  <Dot />
+                  <StatBox icon="📊" label="کندلینگ" value={toFa(list.length)} />
                 </>}
               >
                 {/* ═══ دکمه‌های روز ═══ */}

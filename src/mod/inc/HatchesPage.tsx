@@ -7,7 +7,7 @@ import { useCtc } from '../ctc/store';
 import { useTra } from '../tra/store';
 import { useNavigate } from 'react-router-dom';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
-import ExpandableCard from '../../shr/components/ExpandableCard';
+import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
@@ -239,6 +239,11 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
                 badge={<Tag tone={tone}>{toFa(hr.toFixed(1))}٪</Tag>}
                 summary={<><span>🐣 {toFa(h.hatched || 0)}</span><span>🥚 {toFa(total)}</span><span>📊 {toFa(hr.toFixed(0))}٪</span></>}
+                stats={<>
+                  <StatBox icon="📊" label="نرخ" value={toFa(hr.toFixed(0)) + '٪'} tone={hr >= 70 ? 'accent' : 'warn'} />
+                  <Dot />
+                  <StatBox icon="🥚" label="تخم" value={toFa(total)} />
+                </>}
               >
                 {isComplete && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', textAlign: 'center' }}>✅ تکمیل — همه تخم‌ها شمارش شدن</div>}
 

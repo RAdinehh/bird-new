@@ -11,7 +11,7 @@ import { useCtc } from '../ctc/store';
 import { useTra } from '../tra/store';
 import { useEgg } from '../egg/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
-import ExpandableCard from '../../shr/components/ExpandableCard';
+import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { clampPercent, complement } from '../../shr/utils/smart';
@@ -625,6 +625,11 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   <span>ورود: <b style={{ color: 'var(--text)' }}>{toFa(e.entryDate)}{(e as any).entryTime ? ' · ' + toFa((e as any).entryTime) : ''}</b></span>
                   {expHatch && <span>هچ: <b style={{ color: 'var(--text)' }}>{toFa(expHatch)}</b></span>}
                   <span>{DEAL_LABEL[e.dealType]}</span>
+                </>}
+                stats={<>
+                  <StatBox icon="⏳" label="مانده" value={toFa(remain) + ' روز'} tone={remain <= 3 ? 'warn' : 'default'} />
+                  <Dot />
+                  <StatBox icon="📊" label="پیشرفت" value={toFa(Math.min(100, Math.round(age / Math.max(1, incubationDays(bird?.name || 'مرغ')) * 100))) + '٪'} tone="accent" />
                 </>}
               >
                 {(() => {
