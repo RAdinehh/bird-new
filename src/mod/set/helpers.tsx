@@ -101,7 +101,7 @@ export function RowToggle({ label, sub, value, onChange }: { label: string; sub?
       }}>
         <span style={{
           position: 'absolute', top: 2, right: value ? 18 : 2,
-          width: 18, height: 36, borderRadius: '50%', background: '#fff',
+          width: 18, height: 18, borderRadius: '50%', background: '#fff',
           transition: 'right .2s'
         }} />
       </button>

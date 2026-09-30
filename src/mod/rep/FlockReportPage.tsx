@@ -126,7 +126,7 @@ export default function FlockReportPage() {
             }}>
               🐔
               <span style={{
-                position: 'absolute', top: -4, left: -4, width: 18, height: 36,
+                position: 'absolute', top: -4, left: -4, width: 18, height: 18,
                 borderRadius: '50%', background: 'var(--accent)',
                 color: 'var(--avatar-text)', fontSize: 'var(--fs-xs)', fontWeight: 800,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',

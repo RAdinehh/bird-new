@@ -338,7 +338,7 @@ function DepBox({ title, children }: { title: string; children: React.ReactNode 
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700,
          display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8,
          borderBottom: '1px solid var(--border)' }}>
-        <span style={{ width: 6, height: 36, borderRadius: '50%', background: 'var(--accent)' }} />
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)' }} />
         {title}
       </div>
       {children}

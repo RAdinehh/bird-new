@@ -323,7 +323,7 @@ export default function ReceivablesPage() {
                   }}
                 >
                   <div style={{
-                    width: 8, height: 36, borderRadius: '50%',
+                    width: 8, height: 8, borderRadius: '50%',
                     background: `var(--${color})`, flexShrink: 0
                   }} />
                   <div style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600 }}>

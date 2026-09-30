@@ -175,8 +175,7 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
                         <span
                           key={idx}
                           style={{
-                            width: 5,
-                            height: 36,
+                            width: 5, height: 5,
                             borderRadius: '50%',
                             background: isToday ? 'var(--avatar-text)' : color
                           }}
