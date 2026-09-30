@@ -40,7 +40,7 @@ export default function IncubationProfilesTab() {
         </div>
 
         {profiles.map(p => (
-          <div key={p.id} style={{ padding: 12, background: 'var(--input-bg)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 8 }}>
+          <div key={p.id} style={{ padding: 12, background: 'var(--input-bg)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 'var(--gap-md)', marginBottom: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 700, fontSize: 'var(--fs-md)' }}>{p.birdName}</span>
               <button onClick={() => remove(p.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>

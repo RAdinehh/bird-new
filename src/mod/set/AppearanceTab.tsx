@@ -24,7 +24,7 @@ export default function AppearanceTab() {
               background: s.theme === v ? 'var(--accent-soft)' : 'var(--btn-bg)',
               border: '2px solid ' + (s.theme === v ? 'var(--accent-border)' : 'var(--border)'),
               borderRadius: 'var(--r-md)', cursor: 'pointer', fontFamily: 'inherit',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--gap-sm)',
               color: s.theme === v ? 'var(--accent)' : 'var(--muted)',
               fontWeight: 600, fontSize: 'var(--fs-base)'
             }}>
@@ -86,7 +86,7 @@ export default function AppearanceTab() {
             return (
               <div key={i} style={{
                 flex: 1, display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: 2, padding: '4px 0',
+                alignItems: 'center', gap: 'var(--gap-xs)', padding: '4px 0',
                 fontSize: 'var(--fs-xs)',
                 color: i === 0 ? 'var(--accent)' : 'var(--dim)',
                 fontWeight: i === 0 ? 600 : 400

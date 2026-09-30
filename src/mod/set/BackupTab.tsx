@@ -278,7 +278,7 @@ export default function BackupTab() {
               background: 'var(--info-soft)',
               border: '1px solid var(--info)',
               borderRadius: 'var(--r-md)',
-              display: 'flex', flexDirection: 'column', gap: 6,
+              display: 'flex', flexDirection: 'column', gap: 'var(--gap-sm)',
               fontSize: 'var(--fs-sm)'
             }}>
               <Line l="نسخه‌ی فایل" v={toFa(preview.version)} />
