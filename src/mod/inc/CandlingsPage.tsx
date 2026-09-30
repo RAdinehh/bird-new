@@ -26,6 +26,25 @@ interface EntryData {
 
 const emptyData = (): EntryData => ({ alive: '', infertile: '', dead: '', broken: '', infertileReason: '', deadReason: '', notes: '' });
 
+
+
+// مبنا: تعداد تخم موجود برای این مرحله (از مرحله قبل یا کل ورودی)
+function calcAvailableBase(entryId: string, currentStage: number, excludeCandlingId: string | null, allCandlings: any[], entryTotal: number): { base: number; source: string } {
+  // همه کندلینگ‌های این ورودی (به جز خودمون اگه ویرایش می‌کنیم)
+  const myCandlings = allCandlings
+    .filter(c => c.eggEntryId === entryId)
+    .filter(c => !excludeCandlingId || c.id !== excludeCandlingId)
+    .sort((a, b) => a.stage - b.stage);
+
+  // اگه مرحله اوله، یا هیچ کندلینگ قبلی نیست
+  const prevs = myCandlings.filter(c => c.stage < currentStage);
+  if (prevs.length === 0) {
+    return { base: entryTotal, source: 'کل ورودی' };
+  }
+  const prev = prevs[prevs.length - 1];
+  return { base: prev.alive || 0, source: 'مرحله ' + prev.stage };
+}
+
 function todayJalali(): string {
   const d = new Date();
   return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
@@ -146,7 +165,8 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       const d = entriesData[id] || emptyData();
       const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
       if (sum === 0) { hasError = true; return; }
-      if (entry.count && sum > entry.count) { hasError = true; return; }
+      const baseInfo = calcAvailableBase(id, dayNum, null, candlings, entry.count || 0);
+      if (baseInfo.base && sum > baseInfo.base) { hasError = true; return; }
       addCandling({
         eggEntryId: id, stage: dayNum, date: modalDate,
         alive: parseInt(toEn(d.alive)) || null,
@@ -302,26 +322,53 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                 {/* ═══ دکمه‌های روز ═══ */}
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📅 کندلینگ‌های این ورودی</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                  {list.map(c => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => openEdit(c)}
-                      title={toFa(c.date)}
-                      style={{
-                        padding: '6px 10px',
-                        background: 'var(--accent-soft)',
-                        border: '1px solid var(--accent-border)',
-                        borderRadius: 'var(--r-sm)',
-                        fontSize: 'var(--fs-xs)',
-                        fontWeight: 700,
-                        color: 'var(--accent)',
-                        cursor: 'pointer',
-                        fontFamily: 'inherit',
-                      }}
-                    >
-                      ✓ روز {toFa(c.stage)}
-                    </button>
+                  {list.map((c, idx) => (
+                    <div key={c.id} style={{ position: 'relative' }}>
+                      <button
+                        type="button"
+                        onClick={() => openEdit(c)}
+                        title={toFa(c.date)}
+                        style={{
+                          padding: '6px 24px 6px 10px',
+                          background: 'var(--accent-soft)',
+                          border: '1px solid var(--accent-border)',
+                          borderRadius: 'var(--r-sm)',
+                          fontSize: 'var(--fs-xs)',
+                          fontWeight: 700,
+                          color: 'var(--accent)',
+                          cursor: 'pointer',
+                          fontFamily: 'inherit',
+                        }}
+                      >
+                        ✓ روز {toFa(c.stage)}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const subsequent = list.filter(x => x.stage > c.stage);
+                          const msg = subsequent.length > 0
+                            ? 'این کندلینگ و ' + toFa(subsequent.length) + ' کندلینگ بعدی حذف می‌شوند.\n\nادامه؟'
+                            : 'این کندلینگ حذف شود؟';
+                          if (confirm(msg)) {
+                            deleteCandling(c.id);
+                            subsequent.forEach(s => deleteCandling(s.id));
+                          }
+                        }}
+                        title="بازگردانی و حذف بعدی‌ها"
+                        style={{
+                          position: 'absolute',
+                          top: 2,
+                          left: 2,
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--danger)',
+                          cursor: 'pointer',
+                          fontSize: 10,
+                          padding: 2,
+                          fontWeight: 700,
+                        }}
+                      >✕</button>
+                    </div>
                   ))}
                   <button
                     type="button"
@@ -421,7 +468,9 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
               const isSelected = selectedIds.has(e.id);
               const d = dataFor(e.id);
               const sum = (parseInt(toEn(d.alive))||0) + (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
-              const remaining = (e.count || 0) - sum;
+              const dayNum = parseInt(toEn(modalDay)) || 0;
+              const baseInfo = calcAvailableBase(e.id, editingId ? (candlings.find(c => c.id === editingId)?.stage || dayNum) : dayNum, editingId, candlings, e.count || 0);
+              const remaining = baseInfo.base - sum;
               const existingCandlings = candlings.filter(c => c.eggEntryId === e.id);
               const alreadyAgg = existingCandlings.reduce((acc, c) => ({
                 alive: acc.alive + (c.alive || 0),
@@ -454,6 +503,22 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                     </div>
                   )}
 
+                  {/* مبنا */}
+                  <div style={{
+                    fontSize: 'var(--fs-xs)',
+                    padding: '6px 10px',
+                    background: 'var(--info-soft)',
+                    border: '1px solid var(--info)',
+                    borderRadius: 'var(--r-sm)',
+                    color: 'var(--info)',
+                    fontWeight: 700,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}>
+                    <span>🎯 مبنای این کندلینگ:</span>
+                    <span>{toFa(baseInfo.base)} تخم ({baseInfo.source})</span>
+                  </div>
+
                   {isSelected && (
                     <>
                       <Grid2>
@@ -475,10 +540,10 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                         fontWeight: 700,
                         textAlign: 'center',
                       }}>
-                        این کندلینگ: {toFa(sum)} از {toFa(e.count || 0)}
+                        این کندلینگ: {toFa(sum)} از {toFa(baseInfo.base)}
                         {remaining > 0 && ' · باقی: ' + toFa(remaining)}
-                        {remaining < 0 && ' — بیشتر!'}
-                        {remaining === 0 && ' ✅'}
+                        {remaining < 0 && ' — بیشتر از مبنای مرحله قبل!'}
+                        {remaining === 0 && ' ✅ کامل'}
                       </div>
 
                       <Grid2>
