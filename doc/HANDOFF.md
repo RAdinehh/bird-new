@@ -1,8 +1,8 @@
 # 🚀 HANDOFF.md — سند تحویل به AI بعدی
 
 **تاریخ:** ۱۴۰۵/۰۷/۰۸
-**آخرین commit:** e88f351
-**وضعیت:** inc کامل · فاز ۶ در جریان
+**آخرین commit:** b352ca5
+**وضعیت:** inc کامل · فاز ۶ (تقویت stats لیست‌ها) ✅ کامل — ۱۵ ماژول پوشش داده شد
 
 ---
 
@@ -90,16 +90,16 @@ GitHub: https://github.com/RAdinehh/bird-new
 
 ## 🚧 کارهای فوری (ناتموم)
 
-### ۱. حذف summary تکراری از inc
+### ۱. حذف summary تکراری از inc ✅ انجام شد (`0e760d8`)
 **مشکل:** وقتی stats اضافه شد، summary قدیمی موند → تکرار بصری
 **فایل‌ها:** ۴ ماژول inc
 **fix:** حذف بلوک summary={...}
 
-### ۲. باگ پنجره هچ
+### ۲. باگ پنجره هچ ✅ انجام شد (`cdde583`)
 **مشکل:** isHatchWindow(e) با expectedHatchDate خالی → true اشتباهی
 **fix:** isHatchWindow({ ...e, expectedHatchDate: expHatch })
 
-### ۳. گزارش ماژول‌های ExpandableCard
+### ۳. گزارش ماژول‌های ExpandableCard ✅ انجام شد (این جلسه)
 **کار:** لیست همه‌ی فایل‌ها + وضعیت stats/summary
 
 ---
@@ -108,6 +108,7 @@ GitHub: https://github.com/RAdinehh/bird-new
 
 ### تکمیل‌شده:
 inc/Devices, inc/EggEntries, inc/Candlings, inc/Hatches
+**افزوده‌شده این جلسه:** whs/WarningsPage (`077a944`) · doc/FilesPage (`60cb0fd`) · tra/ReceivablesPage (`b352ca5`)
 
 ### باقی‌مونده (به ترتیب):
 1. tra — معاملات (بزرگ‌ترین)
