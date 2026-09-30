@@ -4,6 +4,7 @@ import { Btn, BtnRow, Empty, Modal } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import { SubSection } from './helpers';
 
 export default function LogsTab() {
   const [logs, setLogs] = useState<LogEntry[]>([]);

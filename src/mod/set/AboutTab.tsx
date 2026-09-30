@@ -292,15 +292,13 @@ export default function AboutTab() {
         </div>
       </Modal>
 
-      <Section title="📞 پشتیبانی و بازخورد">
+      <Section title="📞 پشتیبانی و اطلاعات">
         <Btn full onClick={() => showAlert('ارسال بازخورد — در گام بعدی')}>✉ ارسال بازخورد</Btn>
         <Btn full onClick={() => showAlert('بررسی بروزرسانی — در گام بعدی')}>🔍 بررسی بروزرسانی</Btn>
-      </Section>
-
-      <Section title="📜 قوانین">
         <Btn full onClick={() => showAlert('شرایط استفاده — در گام بعدی')}>شرایط استفاده</Btn>
-        <Btn full onClick={() => showAlert('حریم خصوصی — در گام بعدی')}>سیاست حریم خصوصی</Btn>
-      </Section>
+        <Btn full onClick={() => showAlert('حریم خصوصی — در گام بعدی')}>سیاست حریم خصوصی</Btn></Section>
+
+      
 
       <Section title="⚠ منطقه خطر">
         <Btn full variant="danger" onClick={async () => { if (await showConfirmAsync('تأیید', 'بازنشانی تنظیمات به حالت اولیه؟', { danger: true, confirmText: 'بله' })) { reset(); location.reload(); } }}>بازنشانی تنظیمات</Btn>

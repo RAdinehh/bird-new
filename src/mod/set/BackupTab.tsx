@@ -170,7 +170,7 @@ export default function BackupTab() {
       </SettingsGroup>
 
       {/* پشتیبان دستی */}
-      <SettingsGroup icon="📤" title="خروجی گرفتن" tone="info">
+      <SettingsGroup icon="📤" title="پشتیبان‌گیری" tone="info">
         <SubSection label="دانلود پشتیبان" icon="📤" />
         <Btn variant="primary" full onClick={handleExport}>
           📥 دریافت پشتیبان کامل (JSON)
@@ -232,7 +232,7 @@ export default function BackupTab() {
       </SettingsGroup>
 
       {/* امنیت */}
-      <SettingsGroup icon="🔐" title="امنیت" tone="warn">
+      <SettingsGroup icon="🔐" title="امنیت و نگهداری" tone="warn">
         <SubSection label="رمزنگاری و محافظت" icon="🔐" />
         <RowToggle
           label="رمزنگاری پشتیبان"
