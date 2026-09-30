@@ -370,3 +370,32 @@ textarea:focus-visible {
   --grid-form: 1fr 1fr;
   --grid-calendar: repeat(7, 1fr);
 }
+
+/* ═══ Density Modes ═══ */
+/* dense — فشرده: padding و gap کم‌تر */
+.pm-dense {
+  --sp-unit: max(3px, 0.8vw);
+  --pad-tight: 4px 6px;
+  --pad-normal: 6px 10px;
+  --pad-comfy: 9px;
+  --pad-loose: 12px;
+  --gap-xs: 3px;
+  --gap-sm: 6px;
+  --gap-md: 9px;
+  --gap-lg: 12px;
+  --touch-min: max(40px, 8vw);
+}
+
+/* comfy — راحت (پیش‌فرض) */
+.pm-comfy {
+  --sp-unit: max(4px, 1vw);
+  --pad-tight: 6px 8px;
+  --pad-normal: 8px 12px;
+  --pad-comfy: 12px;
+  --pad-loose: 16px;
+  --gap-xs: 4px;
+  --gap-sm: 8px;
+  --gap-md: 12px;
+  --gap-lg: 16px;
+  --touch-min: max(44px, 9vw);
+}

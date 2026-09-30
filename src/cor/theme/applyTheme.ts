@@ -42,7 +42,8 @@ export function applyTheme(
   fontSize: string,
   animations: boolean,
   lowPowerMode: boolean,
-  highContrast: boolean
+  highContrast: boolean,
+  density: string = 'comfortable'
 ) {
   const root = document.documentElement;
 
@@ -94,5 +95,13 @@ export function applyTheme(
     root.classList.add('pm-high-contrast');
   } else {
     root.classList.remove('pm-high-contrast');
+  }
+
+  // ===== تراکم نمایش =====
+  root.classList.remove('pm-dense', 'pm-comfy');
+  if (density === 'compact') {
+    root.classList.add('pm-dense');
+  } else {
+    root.classList.add('pm-comfy');
   }
 }

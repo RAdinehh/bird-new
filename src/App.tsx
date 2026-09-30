@@ -71,7 +71,8 @@ export default function App() {
       settings.fontSize,
       settings.animations,
       settings.lowPowerMode,
-      settings.highContrast
+      settings.highContrast,
+      settings.density
     );
   }, [
     theme,
