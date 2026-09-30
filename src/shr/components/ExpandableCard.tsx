@@ -145,7 +145,28 @@ export default function ExpandableCard({
   );
 }
 
-// جعبه‌ی آماری inline برای استفاده در summary/stats (بدون افزایش ارتفاع)
+// ─────────── کامپوننت‌های نمایش اطلاعات فشرده ───────────
+
+/** آیتم کوچیک برای ردیف summary — بدون ارتفاع اضافی */
+export function InfoItem({ icon, value, tone = 'default' }: { icon?: string; value: string; tone?: 'default' | 'accent' | 'warn' | 'danger' | 'info' | 'purple' }) {
+  const colorMap: Record<string, string> = {
+    default: 'var(--muted)',
+    accent: 'var(--accent)',
+    warn: 'var(--warn)',
+    danger: 'var(--danger)',
+    info: 'var(--info)',
+    purple: 'var(--purple)',
+  };
+  const fg = colorMap[tone] || colorMap.default;
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', maxWidth: '35%', overflow: 'hidden' }}>
+      {icon && <span style={{ flexShrink: 0 }}>{icon}</span>}
+      <b style={{ color: fg, fontWeight: 700, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</b>
+    </span>
+  );
+}
+
+/** عنصر Label: Value — با رنگ شرطی */
 export function StatBox({ icon, value, label, tone = 'default' }: { icon?: string; value: string; label: string; tone?: 'default' | 'accent' | 'warn' | 'danger' | 'info' | 'purple' }) {
   const colorMap: Record<string, string> = {
     default: 'var(--text)',
@@ -157,10 +178,15 @@ export function StatBox({ icon, value, label, tone = 'default' }: { icon?: strin
   };
   const fg = colorMap[tone] || colorMap.default;
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap' }}>
-      {icon && <span>{icon}</span>}
-      <span>{label}:</span>
-      <b style={{ color: fg, fontWeight: 700, direction: 'ltr' }}>{value}</b>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', maxWidth: '40%', overflow: 'hidden' }}>
+      {icon && <span style={{ flexShrink: 0 }}>{icon}</span>}
+      <span style={{ color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}:</span>
+      <b style={{ color: fg, fontWeight: 700, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</b>
     </span>
   );
+}
+
+/** جداکننده‌ی نقطه‌ای بین آیتم‌ها */
+export function Dot() {
+  return <span aria-hidden="true" style={{ color: 'var(--dim)', margin: '0 2px' }}>·</span>;
 }
