@@ -15,6 +15,9 @@ interface Props {
   feedPerBirdGrams: number;
   waterPerBirdMl: number;
   nav: (path: string) => void;
+  brokenToday: number;
+  waterToday: number;
+  humidToday: number;
 }
 
 export default function TodayCard({
@@ -29,6 +32,9 @@ export default function TodayCard({
   feedPerBirdGrams,
   waterPerBirdMl,
   nav,
+  brokenToday,
+  waterToday,
+  humidToday,
 }: Props) {
   const deathTone: 'accent' | 'warn' | 'danger' = deathsToday === 0 ? 'accent' : deathsToday <= 3 ? 'warn' : 'danger';
   return (
@@ -223,7 +229,32 @@ export default function TodayCard({
                     noFormat
                     onClick={() => nav('/dlg')}
                   />
-                </div>
+                            <KpiCard
+              icon="🥚"
+              label="تخم شکسته"
+              value={brokenToday}
+              unit="عدد"
+              color={brokenToday > 0 ? 'warn' : 'info'}
+              onClick={() => nav('/egg')}
+            />
+            <KpiCard
+              icon="💧"
+              label="آب مصرفی"
+              value={waterToday}
+              unit="لیتر"
+              color="info"
+              onClick={() => nav('/dlg')}
+            />
+            <KpiCard
+              icon="💦"
+              label="رطوبت سالن"
+              value={humidToday}
+              unit={humidToday > 0 ? '٪' : 'ثبت نشده'}
+              color={humidToday > 70 ? 'warn' : 'info'}
+              noFormat
+              onClick={() => nav('/dlg')}
+            />
+          </div>
     </>
   );
 }

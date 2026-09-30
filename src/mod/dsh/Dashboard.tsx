@@ -119,12 +119,6 @@ export default function Dashboard() {
     return list.sort((a, b) => (a.pay.dueDate || '').localeCompare(b.pay.dueDate || '')).slice(0, 5);
   }, [invoices]);
 
-  const monthStats = useMemo(() => {
-    const monthInvoices = invoices.filter(i => i.date && i.date.startsWith(thisMonth));
-    const purchases = monthInvoices.filter(i => i.type === 'purchase').reduce((a, i) => a + (i.total || 0), 0);
-    const sales = monthInvoices.filter(i => i.type === 'sale').reduce((a, i) => a + (i.total || 0), 0);
-    return { purchases, sales, profit: sales - purchases };
-  }, [invoices, thisMonth]);
 
   // ============ ۲. سلامت گله ============
   const aliveCount = useMemo(() =>
@@ -170,7 +164,6 @@ export default function Dashboard() {
   // روند ۷ روزه تخم
   const eggTrend = useMemo(() => {
     const days: { label: string; value: number }[] = [];
-    const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
     for (let i = trendDays - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
@@ -435,7 +428,7 @@ export default function Dashboard() {
       {/* ============ ۱. امروز در یک نگاه ============ */}
       {hasData ? (
         <>
-          <TodayCard benchmarkData={benchmarkData} activeFlocks={activeFlocks} selectedFlockId={selectedFlockId} setSelectedFlockId={setSelectedFlockId} eggsToday={eggsToday} deathsToday={deathsToday} feedToday={feedToday} tempToday={tempToday} feedPerBirdGrams={feedPerBirdGrams} waterPerBirdMl={waterPerBirdMl} nav={nav} />
+          <TodayCard benchmarkData={benchmarkData} activeFlocks={activeFlocks} selectedFlockId={selectedFlockId} setSelectedFlockId={setSelectedFlockId} eggsToday={eggsToday} deathsToday={deathsToday} feedToday={feedToday} tempToday={tempToday} feedPerBirdGrams={feedPerBirdGrams} waterPerBirdMl={waterPerBirdMl} nav={nav} brokenToday={brokenToday} waterToday={waterToday} humidToday={humidToday} />
 
       <AnalyticsCards survivalRate={survivalRate} survivalTone={survivalTone} henDay7={henDay7} henDayTone={henDayTone} brokenRate7={brokenRate7} brokenTone={brokenTone} cumulativeMortality={cumulativeMortality} eggTrend={eggTrend} trendDays={trendDays} setTrendDays={setTrendDays} fcr={fcr} waterFeedRatio={waterFeedRatio} weightMetrics={weightMetrics} costPerEgg={costPerEgg} salesThisMonth={salesThisMonth} purchasesThisMonth={purchasesThisMonth} profit={profit} receivables={receivables} inventoryValue={inventoryValue} momComparison={momComparison} nav={nav} />
         </>
