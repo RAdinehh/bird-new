@@ -19,7 +19,7 @@ import { format as formatJ } from 'date-fns-jalali';
 
 const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
 
-export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any) => void } = {}) {
+export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void } = {}) {
   const { devices, eggEntries, hatches, candlings, addHatch, updateHatch, deleteHatch } = useInc();
   const { birds } = useBrd();
   const { add: addFlock, remove: removeFlock } = useFlk();

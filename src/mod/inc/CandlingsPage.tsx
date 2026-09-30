@@ -49,7 +49,7 @@ function calcAvailableBase(entryId: string, currentStage: number, excludeCandlin
   return { base: prev.alive || 0, source: 'مرحله ' + prev.stage };
 }
 
-export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any) => void } = {}) {
+export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void } = {}) {
   const { devices, eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
   const { birds } = useBrd();
 

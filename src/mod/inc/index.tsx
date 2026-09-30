@@ -1,6 +1,7 @@
 /**
  * index.tsx — بخش inc
  */
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import DevicesPage from './DevicesPage';
 import EggEntriesPage from './EggEntriesPage';
@@ -20,6 +21,19 @@ export default function Inc() {
   const tabParam = params.get('tab') as TabId;
   const validTabs: TabId[] = ['devices', 'eggs', 'candlings', 'hatches'];
   const tab: TabId = validTabs.includes(tabParam) ? tabParam : 'devices';
+  const [pendingEntry, setPendingEntry] = useState('');
+  const goTo = (t: any, payload?: { entry?: string }) => {
+    if (payload?.entry) {
+      setPendingEntry(payload.entry);
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('entry', payload.entry);
+        window.history.replaceState({}, '', url.toString());
+      } catch {}
+    }
+    setTab(t as TabId);
+  };
+
   const setTab = (t: TabId) => {
     setParams(prev => {
       const next = new URLSearchParams(prev);
@@ -50,9 +64,9 @@ export default function Inc() {
         ))}
       </div>
       {tab === 'devices' && <DevicesPage />}
-      {tab === 'eggs' && <EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={setTab} />}
-      {tab === 'candlings' && <CandlingsPage initialEntry={params.get('entry') || ''} onGoTo={setTab} />}
-      {tab === 'hatches' && <HatchesPage initialEntry={params.get('entry') || ''} onGoTo={setTab} />}
+      {tab === 'eggs' && <EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} />}
+      {tab === 'candlings' && <CandlingsPage initialEntry={pendingEntry || params.get('entry') || ''} onGoTo={goTo} />}
+      {tab === 'hatches' && <HatchesPage initialEntry={params.get('entry') || ''} onGoTo={goTo} />}
     </div>
   );
 }

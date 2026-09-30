@@ -96,7 +96,7 @@ function calcDeviceUsage(
   };
 }
 
-export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initialDevice?: string; onGoTo?: (t: any) => void } = {}) {
+export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initialDevice?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void } = {}) {
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
   const { birds, breeds } = useBrd();
   const { flocks } = useFlk();
