@@ -28,39 +28,51 @@ export function KpiCard({ icon, label, value, unit, color, onClick, noFormat }: 
       style={{
         background: 'var(--card)',
         border: '1px solid var(--border)',
-        borderRadius: 'var(--r-lg)',
-        padding: 'var(--pad-card)',
+        borderRadius: 'var(--r-md)',
+        padding: '8px 10px',
         cursor: onClick ? 'pointer' : 'default',
-        minHeight: 92,
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between'
+        alignItems: 'center',
+        gap: 8,
+        minHeight: 44
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-        <span style={{ fontSize: 'var(--fs-md)' }}>{icon}</span>
-        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
-          {label}
-        </span>
-      </div>
-      <div style={{
-        fontSize: 'clamp(14px, 4vw, var(--fs-xl))',
+      <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>{icon}</span>
+      <span style={{
+        fontSize: 'var(--fs-xs)',
+        color: 'var(--muted)',
+        fontWeight: 600,
+        flex: 1,
+        minWidth: 0,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+      }}>
+        {label}
+      </span>
+      <span style={{
+        fontSize: 'clamp(13px, 3.5vw, var(--fs-md))',
         fontWeight: 700,
         color: 'var(--' + color + ')',
         fontVariantNumeric: 'tabular-nums',
-        lineHeight: 1.15,
-        wordBreak: 'break-word',
-        overflowWrap: 'anywhere'
+        whiteSpace: 'nowrap',
+        flexShrink: 0
       }}>
         {noFormat ? toFa(String(value)) : toFa(value.toLocaleString('fa-IR'))}
-      </div>
+      </span>
       {unit ? (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{unit}</div>
+        <span style={{
+          fontSize: 'var(--fs-xs)',
+          color: 'var(--muted)',
+          whiteSpace: 'nowrap',
+          flexShrink: 0
+        }}>
+          {unit}
+        </span>
       ) : null}
     </div>
   );
 }
-
 export function MiniStat({ label, value, suffix, color, noFormat }: {
   label: string;
   value: number;
