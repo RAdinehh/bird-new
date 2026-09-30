@@ -1,13 +1,20 @@
 const FA = '۰۱۲۳۴۵۶۷۸۹';
 
-export const toFa = (s: any): string => String(s ?? '').replace(/[0-9]/g, d => FA[+d]);
+export const toFa = (s: any): string => 
+  String(s ?? '')
+    .replace(/[0-9]/g, d => FA[+d])
+    .replace(/,/g, '٬');
 
 export const toEn = (s: any): string =>
   String(s ?? '')
     .replace(/[۰-۹]/g, d => String(FA.indexOf(d)))
     .replace(/[٬,]/g, '');
 
-export const numFa = (n: any): string => Number(n || 0).toLocaleString('fa-IR');
+export const numFa = (n: any): string => {
+  const num = Number(n || 0);
+  if (!isFinite(num)) return '۰';
+  return toFa(num.toLocaleString('fa-IR'));
+};
 
 /** فرمت عدد هنگام تایپ: جداکننده هزار هر ۳ رقم + ارقام فارسی */
 export function formatNumWhileTyping(s: string): string {
