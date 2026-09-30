@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { useDialog, type DialogType } from '../../cor/store/dialog';
 import { Btn } from './ui';
 import { useSet } from '../../mod/set/store';
+import { playBeep, vibrate } from '../../shr/utils/audio';
 
 const TYPE_CONFIG: Record<DialogType, { icon: string; color: string }> = {
   alert: { icon: '⚠', color: 'warn' },
@@ -50,34 +51,6 @@ function isQuietHour(): boolean {
   } catch {
     return false;
   }
-}
-
-/** پخش بوق کوتاه با Web Audio */
-function playBeep(type?: string) {
-  try {
-    const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    const isCritical = type === 'danger' || type === 'error';
-    osc.frequency.value = isCritical ? 880 : 660;
-    gain.gain.value = 0.08;
-    osc.start();
-    osc.stop(ctx.currentTime + (isCritical ? 0.25 : 0.15));
-    setTimeout(() => { try { ctx.close(); } catch {} }, 400);
-  } catch {}
-}
-
-/** لرزش (فقط موبایل) */
-function vibrate(type?: string) {
-  try {
-    if (!('vibrate' in navigator)) return;
-    const isCritical = type === 'danger' || type === 'error';
-    (navigator as any).vibrate(isCritical ? [200, 80, 200] : 100);
-  } catch {}
 }
 
 export default function DialogHost() {

@@ -4,6 +4,8 @@ import { Btn, Field, Grid2, Input } from '../../shr/components/ui';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow, LocalNumField, SubSection } from './helpers';
+import { playBeep, vibrate, unlockAudio, hasVibration } from '../../shr/utils/audio';
+import { showToast } from '../../cor/store/toast';
 
 export default function NotificationsTab() {
   const s = useSet();
@@ -44,6 +46,35 @@ export default function NotificationsTab() {
           value={ch.vibration}
           onChange={() => s.updateSection('channels', { vibration: !ch.vibration })}
         />
+
+        <SubSection label="تست کانال‌ها" icon="🧪" />
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <Btn
+            size="sm"
+            onClick={() => {
+              unlockAudio().then(() => {
+                playBeep('info');
+                showToast('🔊 تست صدا ارسال شد', 'info', 1500);
+              });
+            }}
+          >
+            🔊 تست صدا
+          </Btn>
+          <Btn
+            size="sm"
+            onClick={() => {
+              const ok = vibrate('info');
+              showToast(ok ? '📳 لرزش ارسال شد' : '⚠️ مرورگر ویبره ندارد', ok ? 'info' : 'warn', 1800);
+            }}
+          >
+            📳 تست ویبره
+          </Btn>
+        </div>
+        {!hasVibration() && (
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingTop: 4 }}>
+            ⓘ مرورگر فعلی از ویبره پشتیبانی نمی‌کند
+          </div>
+        )}
 
         <SubSection label="سطوح هشدار" icon="🔔" />
         <ToggleRow
