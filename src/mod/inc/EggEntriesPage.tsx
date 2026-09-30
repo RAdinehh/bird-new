@@ -6,7 +6,7 @@ import { useState, useMemo, useEffect } from 'react';
 import {
   useInc, DEAL_LABEL, ENTRY_STATUS_LABEL, addDaysJalali,
   daysAgo, daysToHatch, isLockdown, isHatchWindow,
-  incubationDays, jalaliToDate, type EggEntry, type DealType
+  incubationDays, daysFromProfiles, jalaliToDate, type EggEntry, type DealType
 } from './store';
 import { useBrd } from '../brd/store';
 import { useFlk } from '../flk/store';
@@ -21,7 +21,7 @@ import { clampPercent, complement } from '../../shr/utils/smart';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { todayJalali, Row, chip } from './helpers';
-import { useIncubationProfile } from './hooks';
+import { useSet } from '../set/store';
 
 const DRAFT_KEY = (devId: string) => 'pm-inc-egg-draft-' + devId;
 
@@ -107,6 +107,18 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const [open, setOpen] = useState(false);
   const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const _profiles = useSet((s: any) => s.incubationProfiles) || [];
+  const daysByName = useMemo(() => {
+    const map = new Map<string, number>();
+    birds.forEach((b: any) => map.set(b.name, daysFromProfiles(b.name, _profiles)));
+    return map;
+  }, [birds, _profiles]);
+  const _daysLookup = (name: string | undefined): number => {
+    if (!name) return 21;
+    return daysByName.get(name) || daysFromProfiles(name, _profiles);
+  };
+
   const [filterDev, setFilterDev] = useState('');
   const [filterSource, setFilterSource] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -549,8 +561,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             {party} · {toFa(row.entryDate)}
           </span>
         </div>
-        <button type="button" onClick={() => editRow(row)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--text)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', padding: '2px 6px' }}>✏️</button>
-        <button type="button" onClick={() => removeRow(row._id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)', padding: 2 }}>✕</button>
+        <button type="button" onClick={() => editRow(row)} aria-label="ویرایش ردیف" style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--text)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', padding: '6px 10px', minWidth: 36, minHeight: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>✏️</button>
+        <button type="button" onClick={() => removeRow(row._id)} aria-label="حذف ردیف" style={{ background: 'none', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', padding: '6px 10px', minWidth: 36, minHeight: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
       </div>
     );
   };
@@ -559,7 +571,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     <PageContainer>
       {devices.length > 0 && eggEntries.length > 0 && (
         <>
-          <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (گله، فروشنده، شریک، یادداشت...)" />
+          <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (گله، فروشنده، شریک، یادداشت...)" aria-label="جستجو در ورودی‌های تخم" />
           <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
             <button onClick={() => { setFilterDev(''); setFilterSource(''); setFilterStatus(''); }} style={chip(!filterDev && !filterSource && !filterStatus)}>همه</button>
             {devices.map(d => (
@@ -594,7 +606,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             const bird = birds.find(b => b.id === e.birdId);
             const breed = breeds.find(b => b.id === e.breedId);
             const age = daysAgo(e.entryDate);
-            const expHatch = addDaysJalali(e.entryDate, incubationDays(bird?.name || 'مرغ'));
+            const expHatch = addDaysJalali(e.entryDate, (_daysLookup(bird?.name) || 21));
             const remain = daysToHatch(expHatch);
             const locked = isLockdown({ ...e, expectedHatchDate: expHatch });
             const hatchWindow = isHatchWindow({ ...e, expectedHatchDate: expHatch });
@@ -607,7 +619,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
             let statusLabel = '';
             let statusTone: any = 'blue';
-            const totalDays = incubationDays(bird?.name || 'مرغ');
+            const totalDays = (_daysLookup(bird?.name) || 21);
             if (myHatch) { statusLabel = '✅ هچ‌شده'; statusTone = 'green'; }
             else if (hatchWindow) { statusLabel = '🐣 پنجره هچ'; statusTone = 'purple'; }
             else if (locked) { statusLabel = '🔒 Lock-down'; statusTone = 'amber'; }
@@ -629,12 +641,12 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 stats={<>
                   <StatBox icon="⏳" label="مانده" value={toFa(remain) + ' روز'} tone={remain <= 3 ? 'warn' : 'default'} />
                   <Dot />
-                  <StatBox icon="📊" label="پیشرفت" value={toFa(Math.min(100, Math.round(age / Math.max(1, incubationDays(bird?.name || 'مرغ')) * 100))) + '٪'} tone="accent" />
+                  <StatBox icon="📊" label="پیشرفت" value={toFa(Math.min(100, Math.round(age / Math.max(1, (_daysLookup(bird?.name) || 21)) * 100))) + '٪'} tone="accent" />
                 </>}
               >
                 {(() => {
                   const b = birds.find(x => x.id === e.birdId);
-                  const total = incubationDays(b?.name || 'مرغ');
+                  const total = (_daysLookup(b?.name) || 21);
                   const lbl = hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : ('روز ' + toFa(age) + ' از ' + toFa(total));
                   return <ProgressTracker current={age} target={total} label={lbl} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
                 })()}

@@ -268,19 +268,35 @@ export function isHatchWindow(entry: EggEntry): boolean {
 }
 
 /** طول دوره بر اساس پرنده (پیش‌فرض ۲۱ روز برای مرغ) */
-export function incubationDays(birdName: string): number {
+let _incCache: { key: string; map: Record<string, number> } = { key: '__init__', map: {} };
+
+function _normBird(s: string): string {
+  return (s || '').replace(/[\u{1F300}-\u{1F9FF}]/gu, '').replace(/\s+/g, '').toLowerCase();
+}
+
+function _getProfileDaysMap(): Record<string, number> {
   try {
-    const stored = localStorage.getItem('pm-settings');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      const profiles = parsed?.state?.incubationProfiles || parsed?.incubationProfiles || [];
-      // استفاده از تطبیق مشترک (بدون ایموجی/فاصله)
-      const norm = (s: string) => (s || '').replace(/[\u{1F300}-\u{1F9FF}]/gu, '').replace(/\s+/g, '').toLowerCase();
-      const target = norm(birdName);
-      const found = profiles.find((p: any) => norm(p.birdName) === target);
-      if (found?.totalDays) return found.totalDays;
-    }
-  } catch {}
+    const stored = localStorage.getItem('pm-settings') || '';
+    if (stored === _incCache.key) return _incCache.map;
+    const parsed = JSON.parse(stored || '{}');
+    const profiles = parsed?.state?.incubationProfiles || parsed?.incubationProfiles || [];
+    const map: Record<string, number> = {};
+    profiles.forEach((p: any) => {
+      if (p?.totalDays) map[_normBird(p.birdName)] = p.totalDays;
+    });
+    _incCache = { key: stored, map };
+    return map;
+  } catch { return {}; }
+}
+
+export function incubationDays(birdName: string): number {
+  const target = _normBird(birdName);
+  const cached = _getProfileDaysMap();
+  if (cached[target]) return cached[target];
+  return _fallbackDays(birdName);
+}
+
+function _fallbackDays(birdName: string): number {
   const n = (birdName || '').toLowerCase();
   if (n.includes('بوقلمون')) return 28;
   if (n.includes('اردک')) return 28;
@@ -289,6 +305,14 @@ export function incubationDays(birdName: string): number {
   if (n.includes('قرقاول')) return 24;
   if (n.includes('کبوتر')) return 17;
   return 21;
+}
+
+/** نسخه pure — از آرایه profiles داده‌شده استفاده می‌کنه (برای useMemo) */
+export function daysFromProfiles(birdName: string, profiles: any[]): number {
+  const target = _normBird(birdName);
+  const found = (profiles || []).find((p: any) => _normBird(p.birdName) === target);
+  if (found?.totalDays) return found.totalDays;
+  return _fallbackDays(birdName);
 }
 
 /** محاسبه‌ی نرخ هچ */
