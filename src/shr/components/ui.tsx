@@ -618,16 +618,25 @@ export function Chip({
 // فاز ۰.۹ — کامپوننت‌های تقویتی
 // ═══════════════════════════════════════════
 
-export function NumField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode'>) {
-  return <Input mode="number" dir="ltr" inputMode="numeric" min={0} autoClamp {...props} />;
+export function NumField({ value, ...props }: Omit<InputProps, 'mode' | 'dir' | 'inputMode'>) {
+  const displayValue = value !== undefined && value !== null && String(value) !== ''
+    ? formatNumWhileTyping(String(value))
+    : '';
+  return <Input mode="number" dir="ltr" inputMode="numeric" min={0} autoClamp value={displayValue} {...props} />;
 }
 
-export function MoneyField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'showWords'>) {
-  return <Input mode="number" dir="ltr" inputMode="numeric" unit="تومان" min={0} showWords autoClamp {...props} />;
+export function MoneyField({ value, ...props }: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'showWords'>) {
+  const displayValue = value !== undefined && value !== null && String(value) !== ''
+    ? formatNumWhileTyping(String(value))
+    : '';
+  return <Input mode="number" dir="ltr" inputMode="numeric" unit="تومان" min={0} showWords autoClamp value={displayValue} {...props} />;
 }
 
-export function PercentField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'max'>) {
-  return <Input mode="number" dir="ltr" inputMode="numeric" unit="٪" min={0} max={100} autoClamp {...props} />;
+export function PercentField({ value, ...props }: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'max'>) {
+  const displayValue = value !== undefined && value !== null && String(value) !== ''
+    ? formatNumWhileTyping(String(value))
+    : '';
+  return <Input mode="number" dir="ltr" inputMode="numeric" unit="٪" min={0} max={100} autoClamp value={displayValue} {...props} />;
 }
 
 export function PhoneField({ maxLength = 11, ...props }: Omit<InputProps, 'unit' | 'inputMode'> & { maxLength?: number }) {
