@@ -29,6 +29,8 @@ export function chip(active: boolean): React.CSSProperties {
     color: active ? 'var(--accent)' : 'var(--muted)',
     fontWeight: active ? 600 : 500, cursor: 'pointer',
     fontFamily: 'inherit', whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   };
 }
 
@@ -51,6 +53,8 @@ export function tab(active: boolean): React.CSSProperties {
     color: active ? 'var(--accent)' : 'var(--muted)',
     fontWeight: active ? 700 : 500, cursor: 'pointer',
     fontFamily: 'inherit', whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   };
 }
 
@@ -63,5 +67,7 @@ export function filterChip(active: boolean, color = 'accent'): React.CSSProperti
     color: active ? `var(--${color})` : 'var(--muted)',
     fontWeight: active ? 700 : 500, cursor: 'pointer',
     fontFamily: 'inherit', whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   };
 }

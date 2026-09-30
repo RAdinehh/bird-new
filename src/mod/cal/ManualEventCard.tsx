@@ -68,7 +68,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
           type="button"
           onClick={handleToggleDone}
           style={{
-            width: 24, height: 24,
+            width: 24, height: 36,
             borderRadius: 6,
             background: event.done ? 'var(--accent)' : 'transparent',
             border: '2px solid ' + (event.done ? 'var(--accent)' : 'var(--dim)'),

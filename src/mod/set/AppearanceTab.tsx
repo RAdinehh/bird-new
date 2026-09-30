@@ -92,7 +92,7 @@ export default function AppearanceTab() {
                 fontWeight: i === 0 ? 600 : 400
               }}>
                 <span style={{ fontSize: 'var(--fs-md)' }}>{m ? m.icon : '❓'}</span>
-                <span style={{ fontSize: 9, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                <span style={{ fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
                   {m ? m.name : '—'}
                 </span>
               </div>

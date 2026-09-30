@@ -52,7 +52,7 @@ export function GridCard({ file, onPreview, onDelete }: { file: DocFile; onPrevi
           overflow: 'hidden',
           textOverflow: 'ellipsis'
         }}>{file.name}</div>
-        <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>
+        <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>
           {formatSize(file.size)}
         </div>
         <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
@@ -121,7 +121,7 @@ export function ListCard({ file, onPreview, onDelete }: { file: DocFile; onPrevi
 }
 
 export const iconBtn: CSSProperties = {
-  width: 30, height: 30,
+  width: 30, height: 36,
   borderRadius: 8,
   background: 'var(--btn-bg)',
   border: '1px solid var(--border)',

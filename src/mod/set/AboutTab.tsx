@@ -264,7 +264,7 @@ export default function AboutTab() {
                     padding: '6px 0'
                   }}>
                     <span style={{
-                      width: 6, height: 6,
+                      width: 6, height: 36,
                       borderRadius: '50%',
                       background: 'var(--accent)',
                       flexShrink: 0,

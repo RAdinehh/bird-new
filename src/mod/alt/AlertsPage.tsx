@@ -68,7 +68,7 @@ export default function AlertsPage() {
           فعال
           {counts.total > 0 ? (
             <span style={{
-              fontSize: 10,
+              fontSize: 12,
               background: counts.critical > 0 ? 'var(--danger)' : 'var(--warn)',
               color: '#fff',
               padding: '1px 6px',

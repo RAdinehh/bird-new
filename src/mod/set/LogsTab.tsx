@@ -121,7 +121,7 @@ export default function LogsTab() {
                   <>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>🌳 Stack کامپوننت</div>
                     <div style={{
-                      fontSize: 10,
+                      fontSize: 12,
                       fontFamily: 'monospace',
                       padding: 'var(--pad-normal)',
                       background: 'var(--input-bg)',

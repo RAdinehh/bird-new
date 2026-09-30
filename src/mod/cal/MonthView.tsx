@@ -176,7 +176,7 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
                           key={idx}
                           style={{
                             width: 5,
-                            height: 5,
+                            height: 36,
                             borderRadius: '50%',
                             background: isToday ? 'var(--avatar-text)' : color
                           }}
@@ -203,7 +203,7 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
       }}>
         {Object.entries(TYPE_COLORS).map(([type, c]) => (
           <div key={type} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: c.dot }} />
+            <span style={{ width: 8, height: 36, borderRadius: '50%', background: c.dot }} />
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
               {type === 'hatch' ? 'جوجه‌کشی' :
                type === 'vaccine' ? 'واکسن' :

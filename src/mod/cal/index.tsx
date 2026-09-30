@@ -112,7 +112,7 @@ export default function Cal() {
               <span>{f.label}</span>
               {count > 0 ? (
                 <span style={{
-                  fontSize: 10,
+                  fontSize: 12,
                   background: active ? 'var(--accent)' : 'var(--input-bg)',
                   color: active ? 'var(--avatar-text)' : 'var(--dim)',
                   padding: '1px 5px',

@@ -363,7 +363,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                           border: '1px solid var(--danger)',
                           color: 'var(--danger)',
                           cursor: 'pointer',
-                          fontSize: 9,
+                          fontSize: 12,
                           lineHeight: 1,
                           padding: '2px 4px',
                           borderRadius: 'var(--r-sm)',
@@ -372,7 +372,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                           alignItems: 'center',
                           justifyContent: 'center',
                           minWidth: 16,
-                          height: 16,
+                          height: 36,
                         }}
                       >✕</button>
                     </div>
@@ -429,7 +429,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
                 {/* ═══ نوار پیشرفت بصری ═══ */}
                 {total > 0 && (
-                  <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: 'var(--input-bg)' }}>
+                  <div style={{ display: 'flex', height: 36, borderRadius: 4, overflow: 'hidden', background: 'var(--input-bg)' }}>
                     <div style={{ width: (agg.alive / total * 100) + '%', background: 'var(--accent)' }} />
                     <div style={{ width: (agg.infertile / total * 100) + '%', background: 'var(--warn)' }} />
                     <div style={{ width: (agg.dead / total * 100) + '%', background: 'var(--danger)' }} />
@@ -497,7 +497,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                   gap: 8,
                 }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={isSelected} onChange={() => toggleEntry(e.id)} style={{ width: 18, height: 18, accentColor: 'var(--accent)' }} />
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleEntry(e.id)} style={{ width: 18, height: 36, accentColor: 'var(--accent)' }} />
                     <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
                       {bird?.name || '—'} · {toFa(e.count || 0)} تخم
                     </span>

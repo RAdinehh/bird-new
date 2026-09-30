@@ -44,7 +44,7 @@ export default function Rep() {
             {tab === t.id ? (
               <div style={{
                 position: 'absolute', bottom: 0,
-                right: 12, left: 12, height: 2.5,
+                right: 12, left: 12, height: 36.5,
                 background: 'var(--accent)',
                 borderRadius: '3px 3px 0 0'
               }} />

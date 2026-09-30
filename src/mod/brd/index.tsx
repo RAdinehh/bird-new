@@ -31,7 +31,7 @@ export default function Brd() {
             {tab === t && (
               <div style={{
                 position: 'absolute', bottom: 0, right: 14, left: 14,
-                height: 2.5, background: 'var(--accent)',
+                height: 36.5, background: 'var(--accent)',
                 borderRadius: '3px 3px 0 0'
               }} />
             )}

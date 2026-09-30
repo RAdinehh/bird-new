@@ -208,11 +208,13 @@ export default function FlocksPage() {
             padding: '11px 12px', fontSize: 'var(--fs-base)', fontWeight: 600,
             color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
             cursor: 'pointer', position: 'relative', whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
             display: 'flex', alignItems: 'center', gap: 5
           }}>
             {t.label}
-            <span style={{ fontSize: 10, background: tab === t.id ? 'var(--accent-soft)' : 'var(--input-bg)', color: tab === t.id ? 'var(--accent)' : 'var(--muted)', padding: '1px 5px', borderRadius: 8, fontWeight: 700 }}>{toFa(tabCount(t.id))}</span>
-            {tab === t.id && <div style={{ position: 'absolute', bottom: 0, right: 12, left: 12, height: 2.5, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />}
+            <span style={{ fontSize: 12, background: tab === t.id ? 'var(--accent-soft)' : 'var(--input-bg)', color: tab === t.id ? 'var(--accent)' : 'var(--muted)', padding: '1px 5px', borderRadius: 8, fontWeight: 700 }}>{toFa(tabCount(t.id))}</span>
+            {tab === t.id && <div style={{ position: 'absolute', bottom: 0, right: 12, left: 12, height: 36.5, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />}
           </div>
         ))}
       </div>
@@ -362,7 +364,7 @@ export default function FlocksPage() {
 
                   {/* نوار پیشرفت */}
                   {!isArchived && (
-                    <div style={{ height: 6, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ height: 36, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}>
                       <div style={{
                         height: '100%', width: `${Math.min(100, lc.progress)}%`,
                         background: lc.color === 'green' ? 'linear-gradient(90deg, var(--accent), #16a34a)' : lc.color === 'amber' ? 'linear-gradient(90deg, var(--warn), #dc2626)' : 'linear-gradient(90deg, var(--info), #0284c7)',

@@ -139,7 +139,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
 
       ${bankInfo ? '<div style="margin-top: 10px; font-size: 11px; color: #475569;">' + bankInfo + (settings.bank.cardNo ? ' — کارت: ' + toFa(settings.bank.cardNo) : '') + (settings.bank.sheba ? ' — شبا: ' + settings.bank.sheba : '') + '</div>' : ''}
 
-      ${invoice.notes ? '<div style="margin-top: 10px; padding: 8px 10px; background: #f8fafc; border-radius: 6px; font-size: 11px; line-height: 1.8;"><b>یادداشت:</b> ' + invoice.notes + '</div>' : ''}
+      ${invoice.notes ? '<div style="margin-top: 10px; padding: 8px 10px; background: #f8fafc; border-radius: 6px; font-size: 11px; line-height: 36.8;"><b>یادداشت:</b> ' + invoice.notes + '</div>' : ''}
 
       <div class="signature">
         <div class="sig-box">مهر و امضای ${isSale ? 'فروشنده' : 'خریدار'}</div>
@@ -211,15 +211,15 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
           }}>
             <div style={{ textAlign: 'center', marginBottom: 10 }}>
               <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>{settings.farm.name || 'مرغداری'}</div>
-              <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>{title} — {invoice.number}</div>
+              <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{title} — {invoice.number}</div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, marginBottom: 10, paddingBottom: 8, borderBottom: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 10, paddingBottom: 8, borderBottom: '1px solid #e2e8f0' }}>
               <span>{party?.name || '—'}</span>
               <span>{toFa(invoice.date)}</span>
             </div>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
                 <tr style={{ background: '#f1f5f9' }}>
                   <th style={{ padding: 4, border: '1px solid #cbd5e1', textAlign: 'right' }}>شرح</th>
@@ -243,7 +243,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
               <span>{toFa(invoice.total.toLocaleString('fa-IR'))} ت</span>
             </div>
 
-            <div style={{ fontSize: 9, color: '#94a3b8', textAlign: 'center', marginTop: 10 }}>
+            <div style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 10 }}>
               پیش‌نمایش — برای مشاهده کامل، چاپ کنید
             </div>
           </div>

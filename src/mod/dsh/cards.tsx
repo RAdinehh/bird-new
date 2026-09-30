@@ -56,6 +56,8 @@ export function KpiCard({ icon, label, value, unit, color, onClick, noFormat }: 
         color: 'var(--' + color + ')',
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
         flexShrink: 0
       }}>
         {noFormat ? toFa(String(value)) : toFa(value.toLocaleString('fa-IR'))}
@@ -65,6 +67,8 @@ export function KpiCard({ icon, label, value, unit, color, onClick, noFormat }: 
           fontSize: 'var(--fs-xs)',
           color: 'var(--muted)',
           whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
           flexShrink: 0
         }}>
           {unit}

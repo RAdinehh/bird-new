@@ -40,7 +40,7 @@ function ParetoCard({ invoices }: { invoices: any[] }) {
               {toFa(d.percent)}٪
             </span>
           </div>
-          <div style={{ height: 4, background: 'var(--input-bg)', borderRadius: 2, overflow: 'hidden' }}>
+          <div style={{ height: 36, background: 'var(--input-bg)', borderRadius: 2, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: d.percent + '%', background: d.cumulative <= 80 ? 'var(--danger)' : 'var(--muted)' }} />
           </div>
         </div>

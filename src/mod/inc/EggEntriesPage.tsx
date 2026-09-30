@@ -791,7 +791,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                           padding: '2px 6px',
                           fontWeight: 700,
                           minWidth: 20,
-                          height: 20,
+                          height: 36,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -938,7 +938,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           {(currentRow.dealType === 'partnership' || currentRow.dealType === 'consignment') && (
             <div style={{ padding: 8, background: currentRow.dealStatus === 'withdrawn' ? 'var(--danger-soft)' : 'var(--input-bg)', border: '1px solid ' + (currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--border)'), borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                <input type="checkbox" checked={currentRow.dealStatus === 'withdrawn'} onChange={e => setCurrentRow(f => ({ ...f, dealStatus: e.target.checked ? 'withdrawn' : 'active' }))} style={{ width: 16, height: 16, accentColor: 'var(--muted)' }} />
+                <input type="checkbox" checked={currentRow.dealStatus === 'withdrawn'} onChange={e => setCurrentRow(f => ({ ...f, dealStatus: e.target.checked ? 'withdrawn' : 'active' }))} style={{ width: 16, height: 36, accentColor: 'var(--muted)' }} />
                 <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: currentRow.dealStatus === 'withdrawn' ? 'var(--danger)' : 'var(--text)' }}>کنار کشید</span>
               </label>
               {currentRow.dealStatus === 'withdrawn' && (

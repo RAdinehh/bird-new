@@ -42,13 +42,13 @@ export function ToggleRow({ label, sub, value, onChange }: any) {
         {sub ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{sub}</div> : null}
       </div>
       <button type="button" onClick={onChange} style={{
-        width: 44, height: 24, borderRadius: 12,
+        width: 44, height: 36, borderRadius: 12,
         background: value ? 'var(--accent)' : 'var(--dim)',
         position: 'relative', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0
       }}>
         <span style={{
           position: 'absolute', top: 2, right: value ? 22 : 2,
-          width: 20, height: 20, borderRadius: '50%', background: '#fff',
+          width: 20, height: 36, borderRadius: '50%', background: '#fff',
           transition: 'right .2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)'
         }} />
       </button>
@@ -83,13 +83,13 @@ export function RowToggle({ label, sub, value, onChange }: { label: string; sub?
         {sub ? <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{sub}</div> : null}
       </div>
       <button onClick={onChange} style={{
-        width: 38, height: 22, borderRadius: 11,
+        width: 38, height: 36, borderRadius: 11,
         background: value ? 'var(--accent)' : 'var(--dim)',
         position: 'relative', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0
       }}>
         <span style={{
           position: 'absolute', top: 2, right: value ? 18 : 2,
-          width: 18, height: 18, borderRadius: '50%', background: '#fff',
+          width: 18, height: 36, borderRadius: '50%', background: '#fff',
           transition: 'right .2s'
         }} />
       </button>

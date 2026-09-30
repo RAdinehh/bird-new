@@ -97,7 +97,7 @@ export default function ModulesTab() {
                     disabled={isSet}
                     onClick={() => !isSet && toggleModule(id)}
                     style={{
-                      width: 44, height: 24, borderRadius: 12,
+                      width: 44, height: 36, borderRadius: 12,
                       background: isEnabled ? 'var(--accent)' : 'var(--dim)',
                       position: 'relative', border: 'none',
                       cursor: isSet ? 'not-allowed' : 'pointer',
@@ -107,7 +107,7 @@ export default function ModulesTab() {
                   >
                     <span style={{
                       position: 'absolute', top: 2, right: isEnabled ? 22 : 2,
-                      width: 20, height: 20, borderRadius: '50%',
+                      width: 20, height: 36, borderRadius: '50%',
                       background: '#fff', transition: 'right .2s',
                       boxShadow: '0 1px 3px rgba(0,0,0,.2)'
                     }} />

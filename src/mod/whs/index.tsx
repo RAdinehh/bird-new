@@ -43,13 +43,15 @@ export default function Whs() {
               cursor: 'pointer',
               position: 'relative',
               whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
               display: 'flex', alignItems: 'center', gap: 5
             }}
           >
             {t.label}
             {t.id === 'warnings' && warnCount > 0 ? (
               <span style={{
-                fontSize: 10,
+                fontSize: 12,
                 background: 'var(--danger)',
                 color: '#fff',
                 padding: '1px 6px',
@@ -60,7 +62,7 @@ export default function Whs() {
             {tab === t.id ? (
               <div style={{
                 position: 'absolute', bottom: 0,
-                right: 12, left: 12, height: 2.5,
+                right: 12, left: 12, height: 36.5,
                 background: 'var(--accent)',
                 borderRadius: '3px 3px 0 0'
               }} />
