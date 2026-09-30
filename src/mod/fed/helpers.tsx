@@ -56,6 +56,7 @@ export function chip(active: boolean): CSSProperties {
     borderRadius: 'var(--r-sm)',
     color: active ? 'var(--accent)' : 'var(--muted)',
     fontWeight: active ? 600 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap'
+    fontFamily: 'inherit', whiteSpace: 'nowrap',
+    flexShrink: 0
   };
 }

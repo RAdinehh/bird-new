@@ -26,6 +26,7 @@ export function chip(active: boolean): React.CSSProperties {
     borderRadius: 'var(--r-sm)',
     color: active ? 'var(--info)' : 'var(--muted)',
     fontWeight: active ? 600 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap'
+    fontFamily: 'inherit', whiteSpace: 'nowrap',
+    flexShrink: 0
   };
 }

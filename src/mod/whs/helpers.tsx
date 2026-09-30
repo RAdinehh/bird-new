@@ -56,7 +56,6 @@ export function WarningGroup({ title, icon, color, items, renderLine }: {
       background: 'var(--card)',
       border: '1px solid var(--border)',
       borderRadius: 'var(--r-lg)',
-      overflow: 'hidden'
     }}>
       <div style={{
         padding: '12px 16px',
@@ -81,13 +80,13 @@ export function WarningGroup({ title, icon, color, items, renderLine }: {
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
               fontSize: 'var(--fs-sm)', fontWeight: 600,
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+              whiteSpace: 'nowrap',
             }}>
               {it.name}
             </div>
             <div style={{
               fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2,
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+              whiteSpace: 'nowrap',
             }}>
               {renderLine(it)}
             </div>

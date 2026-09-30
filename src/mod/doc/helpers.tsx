@@ -163,6 +163,7 @@ export function chip(active: boolean): CSSProperties {
     fontWeight: active ? 600 : 500,
     cursor: 'pointer',
     fontFamily: 'inherit',
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    flexShrink: 0
   };
 }
