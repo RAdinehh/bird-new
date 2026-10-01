@@ -415,7 +415,7 @@ export default function DailyLogsPage() {
         {l.medications.length > 0 && (
           <Section title="💊 دارو">
             {l.medications.map(m => (
-              <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--info-soft)', borderRadius: 'var(--r-sm)', color: 'var(--info)' }}>
+              <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: 'var(--text)' }}>
                 <b>{m.name}</b>{m.dose ? ` — ${m.dose}` : ''}{m.withdrawalDays ? ` · منع مصرف ${toFa(m.withdrawalDays)} روز` : ''}
               </div>
             ))}
@@ -542,7 +542,7 @@ export default function DailyLogsPage() {
           </Field>
 
           {flockAliveCount > 0 && (
-            <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600, textAlign: 'center' }}>
+            <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, textAlign: 'center' }}>
               تعداد زنده گله: {toFa(flockAliveCount)} پرنده
               {form.feedMethod && ` · دانخوری — ${FEED_SYSTEM_LABEL[form.feedMethod as 'manual' | 'auto'] || '—'}`}
               {form.waterMethod && ` · آبخوری — ${WATER_SYSTEM_LABEL[form.waterMethod as 'manual' | 'nipple' | 'trough' | 'tank'] || '—'}`}
@@ -693,7 +693,7 @@ export default function DailyLogsPage() {
             const after = it.currentStock - used;
             const warn = after < it.minStock;
             return (
-              <div style={{ padding: 'var(--pad-normal)', background: warn ? 'var(--warn-soft)' : 'var(--info-soft)', border: `1px solid ${warn ? 'var(--warn)' : 'var(--info)'}`, borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: warn ? 'var(--warn)' : 'var(--info)', fontWeight: 600 }}>
+              <div style={{ padding: 'var(--pad-normal)', background: warn ? 'var(--warn-soft)' : 'var(--accent-soft)', border: `1px solid ${warn ? 'var(--warn)' : 'var(--accent-border)'}`, borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: warn ? 'var(--warn)' : 'var(--accent)', fontWeight: 600 }}>
                 موجودی فعلی: {toFa(it.currentStock)} {UNIT_LABEL[it.unit]}
                 {used > 0 && ` · بعد از مصرف — ${toFa(after)} ${UNIT_LABEL[it.unit]}`}
                 {warn && ' ⚠️ زیر حد هشدار'}
@@ -714,7 +714,7 @@ export default function DailyLogsPage() {
 
           {form.waterMethod === 'manual' && (
             <>
-              <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600 }}>
+              <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
                 💡 حالت دستی: تعداد بار × حجم هر بار
               </div>
               <Grid2>
@@ -862,9 +862,9 @@ export default function DailyLogsPage() {
             + افزودن دارو
           </Btn>
           {form.medications.map((m, i) => (
-            <div key={m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 700 }}>دارو {toFa(i + 1)}</span>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>دارو {toFa(i + 1)}</span>
                 <button onClick={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
               </div>
               <Grid2>
