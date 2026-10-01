@@ -13,6 +13,7 @@ import { showToast } from '../../cor/store/toast';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { parse as parseJ, addMonths, format as formatJ } from 'date-fns-jalali';
 import { Row, normalizeBird } from './helpers';
+import { useIncubationProfile } from './hooks';
 
 function OvNumField({ label, hint, value, defValue, onChange, unit, min, max, placeholder }: any) {
   const overridden = defValue != null && value != null && value !== '' && Number(value) !== Number(defValue);
@@ -106,6 +107,7 @@ function warrantyInfo(purchasedAt: string, months: number | null): { end: string
 export default function DevicesPage() {
   const { devices, eggEntries, addDevice, updateDevice, deleteDevice } = useInc();
   const settings = useSet();
+  const _profilesSet = useSet((s: any) => s.incubationProfiles) || [];
   const { birds } = useBrd();
   const profiles: any[] = (settings as any).incubationProfiles || [];
 
