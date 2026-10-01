@@ -59,8 +59,8 @@ export default function Egg() {
         ))}
       </div>
 
-      <div ref={containerRef} style={{ overflow: 'hidden', width: '100%' }}>
-        <div ref={trackRef} style={{ display: 'flex', direction: 'ltr', willChange: 'transform' }}>
+      <div ref={containerRef} style={{ overflow: 'hidden', width: '100%', minHeight: 'calc(100vh - 120px)', touchAction: 'pan-y' }}>
+        <div ref={trackRef} style={{ display: 'flex', direction: 'ltr', willChange: 'transform', touchAction: 'pan-y' }}>
           <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl' }}>
             <ProductionsPage />
           </div>
