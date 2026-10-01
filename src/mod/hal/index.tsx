@@ -1,6 +1,7 @@
 /**
  * index.tsx — بخش hal
  */
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useState } from 'react';
 import HallsPage from './HallsPage';
 import ZonesPage from './ZonesPage';
@@ -16,8 +17,11 @@ type TabId = typeof tabs[number]['id'];
 
 export default function Hal() {
   const [tab, setTab] = useState<TabId>('halls');
+  const TAB_IDS = ['halls', 'zones', 'equip'];
+  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+
   return (
-    <div>
+    <div ref={swipeRef}>
       <div style={{
         display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 12px', background: 'var(--header-bg)',

@@ -1,6 +1,7 @@
 /**
  * index.tsx — بخش egg
  */
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useState } from 'react';
 import ProductionsPage from './ProductionsPage';
 import StockPage from './StockPage';
@@ -15,8 +16,11 @@ type TabId = typeof tabs[number]['id'];
 export default function Egg() {
   const [tab, setTab] = useState<TabId>('productions');
 
+  const TAB_IDS = ['productions', 'stock'];
+  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+
   return (
-    <div>
+    <div ref={swipeRef}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',

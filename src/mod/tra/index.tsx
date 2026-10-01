@@ -1,6 +1,7 @@
 /**
  * index.tsx — بخش tra
  */
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useState } from 'react';
 import PurchasesPage from './PurchasesPage';
 import SalesPage from './SalesPage';
@@ -19,8 +20,11 @@ type TabId = typeof tabs[number]['id'];
 export default function Tra() {
   const [tab, setTab] = useState<TabId>('purchases');
 
+  const TAB_IDS = ['purchases', 'sales', 'deals', 'receivables'];
+  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+
   return (
-    <div>
+    <div ref={swipeRef}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',

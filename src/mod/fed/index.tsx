@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import IngredientsPage from './IngredientsPage';
 import RequirementsPage from './RequirementsPage';
 import FormulasPage from './FormulasPage';
@@ -14,8 +15,11 @@ type TabId = typeof tabs[number]['id'];
 export default function Fed() {
   const [tab, setTab] = useState<TabId>('ingredients');
 
+  const TAB_IDS = ['ingredients', 'requirements', 'formulas'];
+  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+
   return (
-    <div>
+    <div ref={swipeRef}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',

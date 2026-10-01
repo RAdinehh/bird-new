@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import ItemsPage from './ItemsPage';
 import MovesPage from './MovesPage';
 import WarningsPage from './WarningsPage';
@@ -21,8 +22,11 @@ export default function Whs() {
     stockWarning(i) !== 'ok' || expiryWarning(i) !== 'ok'
   ).length;
 
+  const TAB_IDS = ['items', 'moves', 'warnings'];
+  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+
   return (
-    <div>
+    <div ref={swipeRef}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',
