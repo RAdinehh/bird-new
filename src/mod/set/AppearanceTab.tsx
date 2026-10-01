@@ -17,7 +17,7 @@ export default function AppearanceTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
-      <SettingsGroup icon="🎨" title="تم و رنگ" subtitle={s.theme === 'light' ? 'روشن · سبز' : 'تیره · سبز'} tone="accent" defaultOpen>
+      <SettingsGroup icon="🎨" title="تم و رنگ" subtitle={s.theme === 'light' ? 'روشن · سبز' : 'تیره · سبز'} tone="accent">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {themes.map(([v, ic, l]) => (
             <button key={v} type="button" onClick={() => s.update({ theme: v as any })} style={{

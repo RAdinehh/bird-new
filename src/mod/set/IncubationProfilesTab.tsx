@@ -59,7 +59,7 @@ export default function IncubationProfilesTab() {
 
   return (
     <PageContainer>
-      <SettingsGroup icon="🐣" title="برنامه‌های انکوباسیون" subtitle={`${toFa(profiles.length)} پرنده`} defaultOpen tone="accent">
+      <SettingsGroup icon="🐣" title="برنامه‌های انکوباسیون" subtitle={`${toFa(profiles.length)} پرنده`} tone="accent">
         <div style={{
           fontSize: 'var(--fs-xs)', color: 'var(--muted)',
           lineHeight: 1.8, marginBottom: 'var(--gap-sm)',

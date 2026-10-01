@@ -17,7 +17,7 @@ export default function SettingsGroup({
   children,
   tone = 'accent'
 }: Props) {
-    const STORAGE_KEY = 'pm-set-group-' + title;
+    const STORAGE_KEY = 'pm-set-group-v2-' + title;
   const [open, setOpen] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);

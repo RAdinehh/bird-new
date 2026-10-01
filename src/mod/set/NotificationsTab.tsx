@@ -21,8 +21,7 @@ export default function NotificationsTab() {
         icon="📡"
         title="نحوه‌ی اعلان"
         subtitle={`${toFa(activeAlerts)} سطح هشدار فعال`}
-        tone="accent"
-        defaultOpen>
+        tone="accent">
 
 
         <SubSection label="سطوح هشدار" icon="🔔" />

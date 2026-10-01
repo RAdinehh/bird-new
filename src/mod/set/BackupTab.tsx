@@ -128,7 +128,7 @@ export default function BackupTab() {
       ) : null}
 
       {/* آمار حجم */}
-      <SettingsGroup icon="📊" title="آمار فعلی" subtitle={formatSize(stats.totalSize)} tone="accent" defaultOpen>
+      <SettingsGroup icon="📊" title="آمار فعلی" subtitle={formatSize(stats.totalSize)} tone="accent">
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           padding: 'var(--pad-normal)',
@@ -171,7 +171,7 @@ export default function BackupTab() {
       </SettingsGroup>
 
       {/* پشتیبان دستی */}
-      <SettingsGroup icon="📤" title="پشتیبان‌گیری" tone="info" defaultOpen>
+      <SettingsGroup icon="📤" title="پشتیبان‌گیری" tone="info">
         <SubSection label="دانلود پشتیبان" icon="📤" />
         <Btn variant="primary" full onClick={handleExport}>
           📥 دریافت پشتیبان کامل (JSON)
