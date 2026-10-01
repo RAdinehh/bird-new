@@ -50,14 +50,13 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
     <div id={'fg-' + id} style={{
       position: 'relative',
       background: 'var(--card)',
-      backdropFilter: 'blur(8px)',
       border: '1px solid ' + (open ? 'var(--accent)' : 'var(--border)'),
       borderRadius: 'var(--r-lg)',
       overflow: 'hidden',
       marginBottom: 8,
       flexShrink: 0,
       scrollMarginTop: 120,
-      transition: 'border-color var(--dur-base)',
+      transition: 'border-color 120ms ease',
     }}>
       <div style={{
         position: 'absolute',
@@ -229,10 +228,10 @@ export function FormTabs({ tabs, active, onChange }: FormTabsProps) {
       zIndex: 100,
       background: '#ffffff',
       borderBottom: '1px solid var(--border)',
-      padding: '8px 0 8px 0',
+      padding: '8px 14px 8px 14px',
+      margin: '0 -14px 12px -14px',
       display: 'flex',
       gap: 8,
-      marginBottom: 12,
       boxShadow: '0 2px 6px rgba(15,23,42,.06)',
     }}>
       {tabs.map(t => (
@@ -257,7 +256,7 @@ export function FormTabs({ tabs, active, onChange }: FormTabsProps) {
             cursor: 'pointer',
             whiteSpace: 'nowrap',
             minWidth: 0,
-            transition: 'all var(--dur-fast)',
+            transition: 'background 120ms ease, border-color 120ms ease, color 120ms ease',
           }}
         >
           {t.icon && <span>{t.icon}</span>}
