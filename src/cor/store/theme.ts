@@ -1,21 +1,23 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+/**
+ * theme.ts — Wrapper روی useSet (single source of truth)
+ * قبلاً یه store مستقل بود که با تنظیمات sync نمی‌شد.
+ * الان فقط از useSet می‌خونه/می‌نویسه.
+ */
+import { useSet } from '../../mod/set/store';
 
 type Theme = 'light' | 'dark';
 
-interface ThemeState {
-  theme: Theme;
-  toggle: () => void;
-  set: (t: Theme) => void;
-}
+export function useTheme() {
+  const theme = useSet((s: any) => s.theme) as Theme;
+  const update = useSet((s: any) => s.update);
 
-export const useTheme = create<ThemeState>()(
-  persist(
-    (set, get) => ({
-      theme: 'light',
-      toggle: () => set({ theme: get().theme === 'light' ? 'dark' : 'light' }),
-      set: (theme) => set({ theme })
-    }),
-    { name: 'pm-theme' }
-  )
-);
+  const toggle = () => {
+    update({ theme: theme === 'light' ? 'dark' : 'light' });
+  };
+
+  const set = (t: Theme) => {
+    update({ theme: t });
+  };
+
+  return { theme: theme || 'light', toggle, set };
+}
