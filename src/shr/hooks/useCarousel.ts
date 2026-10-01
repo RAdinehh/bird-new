@@ -43,10 +43,21 @@ export function useCarousel(
   const apply = useCallback((tx: number, animate: boolean) => {
     const tr = trackRef.current;
     if (!tr) return;
-    tr.style.transition = animate
-      ? 'transform 200ms cubic-bezier(.25,.8,.3,1)'
-      : 'none';
-    tr.style.transform = `translate3d(${tx}px, 0, 0)`;
+
+    if (!animate) {
+      tr.style.transition = 'none';
+      tr.style.transform = `translate3d(${tx}px, 0, 0)`;
+      void tr.offsetWidth; // force reflow
+      txRef.current = tx;
+      return;
+    }
+
+    // برای انیمیشن: اول transition رو set کن، reflow، بعد transform
+    tr.style.transition = 'transform 260ms cubic-bezier(.25,.8,.3,1)';
+    void tr.offsetWidth; // force reflow — کلید انیمیشن
+    requestAnimationFrame(() => {
+      tr.style.transform = `translate3d(${tx}px, 0, 0)`;
+    });
     txRef.current = tx;
   }, []);
 
