@@ -1,6 +1,7 @@
 /**
  * index.tsx — بخش inc
  */
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import DevicesPage from './DevicesPage';
@@ -43,8 +44,11 @@ export default function Inc() {
       return next;
     });
   };
+  const TAB_IDS = ['devices', 'eggs', 'candlings', 'hatches'];
+  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+
   return (
-    <div>
+    <div ref={swipeRef}>
       <div style={{
         display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 8px', background: 'var(--header-bg)',

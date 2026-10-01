@@ -1,6 +1,7 @@
 /**
  * index.tsx — تنظیمات (گروه‌بندی منطقی)
  */
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useState } from 'react';
 import ProfileTab from './ProfileTab';
 import AppearanceTab from './AppearanceTab';
@@ -78,8 +79,11 @@ export default function Set() {
     try { localStorage.setItem(LAST_TAB_KEY, id); } catch {}
   };
 
+  const ALL_TAB_IDS = ALL_TABS.map(t => t.id as string);
+  const swipeRef = useSwipeTabs(ALL_TAB_IDS, tab, (id) => changeTab(id as TabId));
+
   return (
-    <div>
+    <div ref={swipeRef}>
       <div style={{
         display: 'flex',
         gap: 'var(--gap-xs)',
