@@ -5,7 +5,9 @@ import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumF
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert } from '../../cor/store/dialog';
+import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import UndoBar from '../../cor/ui/UndoBar';
+import { showToast } from '../../cor/store/toast';
 import SmartSelect from '../../shr/components/SmartSelect';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
@@ -35,6 +37,7 @@ export default function MovesPage() {
   });
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [filterType, setFilterType] = useState<MovementType | ''>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -43,6 +46,18 @@ export default function MovesPage() {
     if (filterType) arr = arr.filter(m => m.type === filterType);
     return arr.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 100);
   }, [movements, filterType]);
+
+  const undoDelete = () => {
+    const item = undoData;
+    if (!item) return;
+    try {
+      addMovement(item.item);
+      showToast('بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
 
   const openNew = () => {
     if (items.length === 0) { showAlert('اول یک قلم در انبار بسازید'); return; }
@@ -119,6 +134,13 @@ export default function MovesPage() {
 
   return (
     <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="حذف شد"
+          onUndo={undoDelete}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
         <HelpBanner
           id="moves-intro"
           icon="⚠️"
@@ -325,7 +347,7 @@ export default function MovesPage() {
         open={delId !== null}
         onClose={() => setDelId(null)}
         title="حذف گردش"
-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteMovement(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel); setDelId(null); showToast('حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف این گردش؟</div>
       </Modal>
