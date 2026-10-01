@@ -35,16 +35,21 @@ export default function Tra() {
     return () => clearTimeout(t);
   }, [tab]);
 
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onScroll = () => {
     if (syncingRef.current) return;
-    const el = scrollRef.current;
-    if (!el) return;
-    const w = el.clientWidth;
-    if (w <= 0) return;
-    const idx = Math.round(el.scrollLeft / w);
-    const ids = ['purchases', 'sales', 'deals', 'receivables'] as string[];
-    const newTab = ids[idx];
-    if (newTab && newTab !== tab) setTab(newTab as TabId);
+    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+    scrollTimerRef.current = setTimeout(() => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const w = el.clientWidth;
+      if (w <= 0) return;
+      // در RTL با direction:ltr روی container، scrollLeft از 0 شروع می‌شه
+      const idx = Math.round(el.scrollLeft / w);
+      const ids = ['purchases', 'sales', 'deals', 'receivables'] as string[];
+      const newTab = ids[idx];
+      if (newTab && newTab !== tab) setTab(newTab as TabId);
+    }, 70);
   };
 
   return (
@@ -89,6 +94,7 @@ export default function Tra() {
           onScroll={onScroll}
           style={{
             display: 'flex',
+            direction: 'ltr',
             overflowX: 'auto',
             scrollSnapType: 'x mandatory',
             width: '100%',
@@ -96,10 +102,10 @@ export default function Tra() {
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div key="purchases" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><PurchasesPage /></div>
-          <div key="sales" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><SalesPage /></div>
-          <div key="deals" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><DealsPage /></div>
-          <div key="receivables" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><ReceivablesPage /></div>
+          <div key="purchases" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><PurchasesPage /></div>
+          <div key="sales" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><SalesPage /></div>
+          <div key="deals" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><DealsPage /></div>
+          <div key="receivables" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><ReceivablesPage /></div>
         </div>
     </div>
   );

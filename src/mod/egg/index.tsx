@@ -31,16 +31,21 @@ export default function Egg() {
     return () => clearTimeout(t);
   }, [tab]);
 
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onScroll = () => {
     if (syncingRef.current) return;
-    const el = scrollRef.current;
-    if (!el) return;
-    const w = el.clientWidth;
-    if (w <= 0) return;
-    const idx = Math.round(el.scrollLeft / w);
-    const ids = ['productions', 'stock'] as string[];
-    const newTab = ids[idx];
-    if (newTab && newTab !== tab) setTab(newTab as TabId);
+    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+    scrollTimerRef.current = setTimeout(() => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const w = el.clientWidth;
+      if (w <= 0) return;
+      // در RTL با direction:ltr روی container، scrollLeft از 0 شروع می‌شه
+      const idx = Math.round(el.scrollLeft / w);
+      const ids = ['productions', 'stock'] as string[];
+      const newTab = ids[idx];
+      if (newTab && newTab !== tab) setTab(newTab as TabId);
+    }, 70);
   };
 
   return (
@@ -85,6 +90,7 @@ export default function Egg() {
           onScroll={onScroll}
           style={{
             display: 'flex',
+            direction: 'ltr',
             overflowX: 'auto',
             scrollSnapType: 'x mandatory',
             width: '100%',
@@ -92,8 +98,8 @@ export default function Egg() {
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div key="productions" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><ProductionsPage /></div>
-          <div key="stock" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><StockPage /></div>
+          <div key="productions" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><ProductionsPage /></div>
+          <div key="stock" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><StockPage /></div>
         </div>
     </div>
   );

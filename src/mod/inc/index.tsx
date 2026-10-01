@@ -60,16 +60,21 @@ export default function Inc() {
     return () => clearTimeout(t);
   }, [tab]);
 
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onScroll = () => {
     if (syncingRef.current) return;
-    const el = scrollRef.current;
-    if (!el) return;
-    const w = el.clientWidth;
-    if (w <= 0) return;
-    const idx = Math.round(el.scrollLeft / w);
-    const ids = ['devices', 'eggs', 'candlings', 'hatches'] as string[];
-    const newTab = ids[idx];
-    if (newTab && newTab !== tab) setTab(newTab as TabId);
+    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+    scrollTimerRef.current = setTimeout(() => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const w = el.clientWidth;
+      if (w <= 0) return;
+      // در RTL با direction:ltr روی container، scrollLeft از 0 شروع می‌شه
+      const idx = Math.round(el.scrollLeft / w);
+      const ids = ['devices', 'eggs', 'candlings', 'hatches'] as string[];
+      const newTab = ids[idx];
+      if (newTab && newTab !== tab) setTab(newTab as TabId);
+    }, 70);
   };
 
   return (
@@ -97,6 +102,7 @@ export default function Inc() {
           onScroll={onScroll}
           style={{
             display: 'flex',
+            direction: 'ltr',
             overflowX: 'auto',
             scrollSnapType: 'x mandatory',
             width: '100%',
@@ -104,10 +110,10 @@ export default function Inc() {
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div key="devices" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><DevicesPage /></div>
-          <div key="eggs" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} /></div>
-          <div key="candlings" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><CandlingsPage initialEntry={pendingEntry || params.get('entry') || ''} onGoTo={goTo} /></div>
-          <div key="hatches" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><HatchesPage initialEntry={params.get('entry') || ''} onGoTo={goTo} /></div>
+          <div key="devices" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><DevicesPage /></div>
+          <div key="eggs" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} /></div>
+          <div key="candlings" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><CandlingsPage initialEntry={pendingEntry || params.get('entry') || ''} onGoTo={goTo} /></div>
+          <div key="hatches" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><HatchesPage initialEntry={params.get('entry') || ''} onGoTo={goTo} /></div>
         </div>
     </div>
   );
