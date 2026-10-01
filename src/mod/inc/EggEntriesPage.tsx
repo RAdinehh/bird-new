@@ -19,6 +19,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { clampPercent, complement } from '../../shr/utils/smart';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { todayJalali, Row, chip } from './helpers';
 import { useSet } from '../set/store';
@@ -128,6 +129,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const [multiDeviceId, setMultiDeviceId] = useState('');
   const [hideHatchTip, setHideHatchTip] = useState(() => { try { return localStorage.getItem('pm-inc-hide-hatch-tip') === '1'; } catch { return false; } });
   const [draftRows, setDraftRows] = useState<DraftRow[]>([]);
+  const [undoRow, setUndoRow] = useState<{ row: DraftRow; idx: number } | null>(null);
   const [currentRow, setCurrentRow] = useState<DraftRow>(() => makeRow());
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
 
@@ -302,9 +304,24 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   };
 
   const removeRow = async (id: string) => {
-    if (!await showConfirmAsync('تأیید', 'حذف این ردیف؟', { danger: true })) return;
+    const idx = draftRows.findIndex(r => r._id === id);
+    if (idx < 0) return;
+    const row = draftRows[idx];
     setDraftRows(rows => rows.filter(r => r._id !== id));
-    if (editingRowId === id) { setCurrentRow(makeRow()); setEditingRowId(null); }
+    setUndoRow({ row, idx });
+    setTimeout(() => setUndoRow(cur => cur && cur.row._id === id ? null : cur), 6000);
+    showToast('ردیف حذف شد', 'info', 1800);
+  };
+
+  const undoRemoveRow = () => {
+    if (!undoRow) return;
+    setDraftRows(rows => {
+      const next = [...rows];
+      next.splice(undoRow.idx, 0, undoRow.row);
+      return next;
+    });
+    setUndoRow(null);
+    showToast('ردیف بازگردانی شد', 'success', 1800);
   };
 
   const saveAll = async () => {
@@ -398,7 +415,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     try { localStorage.removeItem(DRAFT_KEY(multiDeviceId)); } catch {}
     setDraftRows([]);
     setOpen(false);
-    showAlert(savedCount + ' ورودی ثبت شد', '✅ موفق');
+    showToast(savedCount + ' ورودی ثبت شد', 'success', 2500);
     if (onGoTo && await showConfirmAsync('تأیید', 'به کندلینگ برو؟')) {
       setTimeout(() => onGoTo('candlings'), 100);
     }
@@ -570,6 +587,21 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
   return (
     <PageContainer>
+      {undoRow && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '10px 14px', marginBottom: 8,
+          background: 'var(--warn-soft)', border: '1px solid var(--warn)',
+          borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)',
+        }}>
+          <span>ردیف حذف شد</span>
+          <button type="button" onClick={undoRemoveRow} aria-label="بازگردانی ردیف" style={{
+            background: 'none', border: 'none', color: 'var(--warn)',
+            fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+            fontSize: 'var(--fs-sm)', padding: '4px 10px',
+          }}>بازگردانی</button>
+        </div>
+      )}
       {devices.length > 0 && eggEntries.length > 0 && (
         <>
           <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (گله، فروشنده، شریک، یادداشت...)" aria-label="جستجو در ورودی‌های تخم" />
