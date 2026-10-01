@@ -30,7 +30,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
 import UndoBar from '../../cor/ui/UndoBar';
-import { Section, SectionTitle, Row } from './helpers';
+import { Section, SectionTitle, Row, FormGroup, FormSub, FormSubFirst, FormTabs, useFormGroups } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 
@@ -90,6 +90,8 @@ export default function DailyLogsPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ log: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const { groups, toggle, openOnly } = useFormGroups({ house: true, feed: false, health: false });
+  const [activeGroup, setActiveGroup] = useState<string>('house');
 
   const activeFlocks = flocks.filter(f => f.status === 'active');
   const today = new Date();
@@ -542,378 +544,398 @@ export default function DailyLogsPage() {
 
         <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش ثبت روزانه' : 'ثبت روزانه جدید'}
           footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-<Grid2>
-            <Field label="گله" required>
-              <SmartSelect
-                value={form.flockId}
-                onChange={onFlockChange}
-                options={activeFlocks.map(f => ({
-                  value: f.id,
-                  label: f.name,
-                  subtitle: f.currentCount ? `${toFa(f.currentCount)} پرنده` : undefined,
-                }))}
-                placeholder="— انتخاب گله —"
-                modalTitle="انتخاب گله"
-              />
-            </Field>
-            <Field label="ساعت ورود">
-              <TimePicker value={form.entryTime} onChange={v => setForm({ ...form, entryTime: v })} placeholder="انتخاب ساعت" />
-            </Field>
-          </Grid2>
 
-          <Field label="تاریخ" required>
-            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
-          </Field>
+          <FormTabs
+            tabs={[
+              { id: 'house', label: 'محیط و پرنده', icon: '🏠' },
+              { id: 'feed', label: 'تغذیه و تولید', icon: '🌾' },
+              { id: 'health', label: 'سلامت و سایر', icon: '🩺' },
+            ]}
+            active={activeGroup}
+            onChange={(id) => { setActiveGroup(id); openOnly(id); }}
+          />
 
-          {flockAliveCount > 0 && (
-            <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, textAlign: 'center' }}>
-              تعداد زنده گله: {toFa(flockAliveCount)} پرنده
-              {form.feedMethod && ` · دانخوری — ${FEED_SYSTEM_LABEL[form.feedMethod as 'manual' | 'auto'] || '—'}`}
-              {form.waterMethod && ` · آبخوری — ${WATER_SYSTEM_LABEL[form.waterMethod as 'manual' | 'nipple' | 'trough' | 'tank'] || '—'}`}
-            </div>
-          )}
+          <FormGroup id="house" icon="🏠" title="محیط و پرنده" sub="پایه، شرایط محیطی، مشاهده" open={!!groups.house} onToggle={() => toggle('house')}>
 
-          <SectionTitle>🌡 شرایط محیطی</SectionTitle>
-
-          <Grid2>
-            <Field label="حداقل دما" hint="۱۵-۳۰ درجه">
-              <NumField placeholder="۲۰" value={form.temperatureMin} onChange={e => setForm({ ...form, temperatureMin: e.target.value })} unit="°C" min={-10} max={50} />
-            </Field>
-            <Field label="حداکثر دما" hint="۱۵-۳۰ درجه">
-              <NumField placeholder="۲۵" value={form.temperatureMax} onChange={e => setForm({ ...form, temperatureMax: e.target.value })} unit="°C" min={-10} max={50} />
-            </Field>
-          </Grid2>
-
-          <Grid2>
-            <Field label="حداقل رطوبت" hint="۴۰-۷۰٪">
-              <PercentField placeholder="۵۰" value={form.humidityMin} onChange={e => setForm({ ...form, humidityMin: e.target.value })} />
-            </Field>
-            <Field label="حداکثر رطوبت" hint="۴۰-۷۰٪">
-              <PercentField placeholder="۷۰" value={form.humidityMax} onChange={e => setForm({ ...form, humidityMax: e.target.value })} />
-            </Field>
-          </Grid2>
-
-          <Grid2>
-            <Field label="تهویه">
-              <Select value={form.ventilation} onChange={e => setForm({ ...form, ventilation: e.target.value })}>
-                <option value="ok">مناسب</option>
-                <option value="low">ضعیف</option>
-                <option value="high">شدید</option>
-              </Select>
-            </Field>
-            <Field label="بستر">
-              <Select value={form.litter} onChange={e => setForm({ ...form, litter: e.target.value })}>
-                <option value="dry">خشک</option>
-                <option value="wet">مرطوب</option>
-                <option value="clumped">کلوخه</option>
-              </Select>
-            </Field>
-          </Grid2>
-
-          <SectionTitle>🐔 مشاهده پرنده</SectionTitle>
-
-          <Grid3>
-            <Field label="رفتار">
-              <Select value={form.behavior} onChange={e => setForm({ ...form, behavior: e.target.value })}>
-                <option value="active">فعال</option>
-                <option value="lethargic">بی‌حال</option>
-                <option value="excited">پرهیجان</option>
-              </Select>
-            </Field>
-            <Field label="توزیع">
-              <Select value={form.distribution} onChange={e => setForm({ ...form, distribution: e.target.value })}>
-                <option value="uniform">یکنواخت</option>
-                <option value="cornered">گوشه‌گیر</option>
-              </Select>
-            </Field>
-            <Field label="صدا">
-              <Select value={form.sound} onChange={e => setForm({ ...form, sound: e.target.value })}>
-                <option value="normal">طبیعی</option>
-                <option value="cough">سرفه</option>
-                <option value="sneeze">عطسه</option>
-              </Select>
-            </Field>
-          </Grid3>
-
-          <Field label="ظاهر عمومی">
-            <Textarea rows={2} placeholder="رنگ پر، چشم، تاج، منقار..." value={form.appearance} onChange={e => setForm({ ...form, appearance: e.target.value })} />
-          </Field>
-
-          <SectionTitle>🌾 تغذیه</SectionTitle>
-
-          <Field label="منبع دان مصرفی" hint="از جیره‌ها یا دان تکی انبار">
-            <SmartSelect
-              value={form.feedSourceType && form.feedSourceId
-                ? (form.feedSourceType === 'formula' ? 'f:' : 'i:') + form.feedSourceId
-                : ''}
-              onChange={val => {
-                if (val.startsWith('f:')) {
-                  const id = val.slice(2);
-                  const f = formulas.find(x => x.id === id);
-                  setForm(prev => ({ ...prev, feedSourceType: 'formula', feedSourceId: id, feedType: f?.name || '' }));
-                } else if (val.startsWith('i:')) {
-                  const id = val.slice(2);
-                  const it = feedItems.find(x => x.id === id);
-                  setForm(prev => ({ ...prev, feedSourceType: 'item', feedSourceId: id, feedType: it?.name || '' }));
-                } else {
-                  setForm(prev => ({ ...prev, feedSourceType: '', feedSourceId: '', feedType: '' }));
-                }
-              }}
-              options={[
-                ...formulas.map(f => ({
-                  value: 'f:' + f.id,
-                  label: f.name,
-                  subtitle: `${f.lines.length} ماده`,
-                  group: 'formula',
-                })),
-                ...feedItems.map(it => ({
-                  value: 'i:' + it.id,
-                  label: it.name,
-                  subtitle: `موجودی ${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`,
-                  group: 'item',
-                })),
-              ]}
-              groupLabels={{ formula: '📋 جیره‌ها', item: '🌾 دان تکی' }}
-              groupIcons={{ formula: '📋', item: '🌾' }}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب منبع دان"
-              autoThreshold={6}
-            />
-          </Field>
-
-          {form.feedSourceType === 'formula' && form.feedSourceId && (() => {
-            const f = formulas.find(x => x.id === form.feedSourceId);
-            if (!f) return null;
-            const used = num(form.feedAmount) || 0;
-            return (
-              <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 4 }}>مواد اولیه این جیره:</div>
-                {f.lines.length === 0 && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠️ این جیره خطی ندارد</div>}
-                {f.lines.map(line => {
-                  const ing = ingredients.find(i => i.id === line.ingredientId);
-                  if (!ing) return null;
-                  const stockItem = whsItems.find(x => x.id === ing.stockItemId);
-                  const need = used > 0 ? (line.percent / 100) * used : 0;
-                  const after = stockItem ? stockItem.currentStock - need : 0;
-                  const warn = stockItem && after < 0;
-                  return (
-                    <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', gap: 8 }}>
-                      <span style={{ flex: 1 }}>• {ing.name} <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>({toFa(line.percent)}٪)</span></span>
-                      <span style={{ direction: 'ltr', color: warn ? 'var(--danger)' : undefined, fontWeight: warn ? 700 : 600 }}>
-                        {need > 0 ? `${toFa(need.toFixed(1))} kg` : '—'}
-                        {stockItem && <span style={{ color: warn ? 'var(--danger)' : 'var(--muted)', fontSize: 'var(--fs-xs)', marginRight: 4 }}> [{toFa(stockItem.currentStock)}]</span>}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })()}
-
-          {form.feedSourceType === 'item' && form.feedSourceId && (() => {
-            const it = feedItems.find(x => x.id === form.feedSourceId);
-            if (!it) return null;
-            const used = num(form.feedAmount) || 0;
-            const after = it.currentStock - used;
-            const warn = after < it.minStock;
-            return (
-              <div style={{ padding: 'var(--pad-normal)', background: warn ? 'var(--warn-soft)' : 'var(--accent-soft)', border: `1px solid ${warn ? 'var(--warn)' : 'var(--accent-border)'}`, borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: warn ? 'var(--warn)' : 'var(--accent)', fontWeight: 600 }}>
-                موجودی فعلی: {toFa(it.currentStock)} {UNIT_LABEL[it.unit]}
-                {used > 0 && ` · بعد از مصرف — ${toFa(after)} ${UNIT_LABEL[it.unit]}`}
-                {warn && ' ⚠️ زیر حد هشدار'}
-              </div>
-            );
-          })()}
-
-          <Grid2>
-            <Field label="مقدار دان مصرفی">
-              <NumField placeholder="۵۰" value={form.feedAmount} onChange={e => setForm({ ...form, feedAmount: e.target.value })} unit="kg" min={0} />
-            </Field>
-            <Field label="دان باقیمانده">
-              <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
-            </Field>
-          </Grid2>
-
-          <SectionTitle>💧 آب</SectionTitle>
-
-          {form.waterMethod === 'manual' && (
-            <>
-              <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
-                💡 حالت دستی: تعداد بار × حجم هر بار
-              </div>
+            <FormSubFirst icon="📋" title="اطلاعات پایه">
               <Grid2>
-                <Field label="تعداد بار">
-                  <NumField placeholder="۵" value={form.waterFillCount} onChange={e => setForm({ ...form, waterFillCount: e.target.value })} unit="بار" min={0} />
+                <Field label="گله" required>
+                  <SmartSelect
+                    value={form.flockId}
+                    onChange={onFlockChange}
+                    options={activeFlocks.map(f => ({
+                      value: f.id,
+                      label: f.name,
+                      subtitle: f.currentCount ? `${toFa(f.currentCount)} پرنده` : undefined,
+                    }))}
+                    placeholder="— انتخاب گله —"
+                    modalTitle="انتخاب گله"
+                  />
                 </Field>
-                <Field label="حجم هر بار">
-                  <NumField placeholder="۲۰" value={form.waterFillVolume} onChange={e => setForm({ ...form, waterFillVolume: e.target.value })} unit="L" min={0} />
+                <Field label="ساعت ورود">
+                  <TimePicker value={form.entryTime} onChange={v => setForm({ ...form, entryTime: v })} placeholder="انتخاب ساعت" />
                 </Field>
               </Grid2>
-              {(form.waterFillCount && form.waterFillVolume) && (
-                <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
-                  مجموع آب مصرفی: {toFa((int(form.waterFillCount) || 0) * (num(form.waterFillVolume) || 0))} لیتر
+
+              <Field label="تاریخ" required>
+                <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
+              </Field>
+
+              {flockAliveCount > 0 && (
+                <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, textAlign: 'center' }}>
+                  تعداد زنده گله: {toFa(flockAliveCount)} پرنده
+                  {form.feedMethod && ` · دانخوری — ${FEED_SYSTEM_LABEL[form.feedMethod as 'manual' | 'auto'] || '—'}`}
+                  {form.waterMethod && ` · آبخوری — ${WATER_SYSTEM_LABEL[form.waterMethod as 'manual' | 'nipple' | 'trough' | 'tank'] || '—'}`}
                 </div>
               )}
-            </>
-          )}
+            </FormSubFirst>
 
-          {form.waterMethod !== 'manual' && form.waterMethod !== '' && (
-            <>
-              <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600 }}>
-                ⚠️ سیستم {WATER_SYSTEM_LABEL[form.waterMethod as 'nipple' | 'trough' | 'tank']} — فعلاً فقط دستی پیاده شده
-              </div>
-              <Field label="مقدار آب مصرفی (تخمینی)">
-                <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
-              </Field>
-            </>
-          )}
-
-          {isLayerFlock && (
-          <>
-            <SectionTitle>🥚 تخم‌گذاری</SectionTitle>
-            <Grid3>
-              <Field label="تعداد تخم">
-                <NumField placeholder="۰" value={form.eggsCount} onChange={e => setForm({...form, eggsCount: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
-              </Field>
-              <Field label="شکسته">
-                <NumField placeholder="۰" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} unit="عدد" min={0} />
-              </Field>
-              <Field label="کثیف">
-                <NumField placeholder="۰" value={form.dirtyEggs} onChange={e => setForm({...form, dirtyEggs: e.target.value})} unit="عدد" min={0} />
-              </Field>
-            </Grid3>
-          </>
-        )}
-
-        <SectionTitle>⚖️ وزن‌کشی (اختیاری)</SectionTitle>
-
-          {form.weightSamples.length > 0 && (
-            <Grid2>
-              <Field label="جنسیت">
-                <Select value={form.weightGender} onChange={e => setForm({ ...form, weightGender: e.target.value as any })}>
-                  <option value="">— نامشخص —</option>
-                  <option value="male">نر</option>
-                  <option value="female">ماده</option>
-                  <option value="mixed">مخلوط</option>
-                </Select>
-              </Field>
-              <Field label="خلاصه">
-                <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
-                  {form.weightSamples.length >= 2 ? <>میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) ||
-                    0 }))))} kg · CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) ||
-                    0 }))))}٪</> : <>💡 حداقل ۲ نمونه اضافه کن تا میانگین محاسبه شود</>}
-                </div>
-              </Field>
-            </Grid2>
-          )}
-
-          {form.weightSamples.map((w, i) => (
-            <div key={w.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              <div style={{ flex: 1 }}>
-                <NumField
-                  placeholder="وزن (kg)"
-                  value={w.weight}
-                  onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
-                  unit="kg" min={0} />
-              </div>
-              <button type="button" onClick={() => setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) }))}
-                style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', width: 38, height: 38, flexShrink: 0 }}>✕</button>
-            </div>
-          ))}
-
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, weightSamples: [...f.weightSamples, { id: crypto.randomUUID(), weight: '' }] }))}>
-            + افزودن نمونه وزن
-          </Btn>
-
-          <SectionTitle>💀 تلفات</SectionTitle>
-
-          {form.deaths.length > 0 && (
-            <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--danger)', fontWeight: 700, textAlign: 'center' }}>
-              مجموع: {toFa(form.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده
-              {flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''}
-            </div>
-          )}
-
-          {form.deaths.map((d, i) => (
-            <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700 }}>{d.count === 0 && !d.cause ? "رکورد جدید" : "رکورد " + toFa(i + 1)}</span>
-                <button type="button" onClick={() => setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) }))}
-                  style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
-              </div>
+            <FormSub icon="🌡" title="شرایط محیطی">
               <Grid2>
-                <Field label="تعداد">
-                  <NumField placeholder="۰" value={String(d.count || '')}
-                    onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
-                    min={0} max={flockAliveCount || undefined} unit="پرنده" />
+                <Field label="حداقل دما" hint="۱۵-۳۰ درجه">
+                  <NumField placeholder="۲۰" value={form.temperatureMin} onChange={e => setForm({ ...form, temperatureMin: e.target.value })} unit="°C" min={-10} max={50} />
                 </Field>
-                <Field label="علت">
-                  <Select value={d.cause || ''} onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, cause: e.target.value } : x) }))}>
-                    {DEATH_CAUSES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                <Field label="حداکثر دما" hint="۱۵-۳۰ درجه">
+                  <NumField placeholder="۲۵" value={form.temperatureMax} onChange={e => setForm({ ...form, temperatureMax: e.target.value })} unit="°C" min={-10} max={50} />
+                </Field>
+              </Grid2>
+              <Grid2>
+                <Field label="حداقل رطوبت" hint="۴۰-۷۰٪">
+                  <PercentField placeholder="۵۰" value={form.humidityMin} onChange={e => setForm({ ...form, humidityMin: e.target.value })} />
+                </Field>
+                <Field label="حداکثر رطوبت" hint="۴۰-۷۰٪">
+                  <PercentField placeholder="۷۰" value={form.humidityMax} onChange={e => setForm({ ...form, humidityMax: e.target.value })} />
+                </Field>
+              </Grid2>
+              <Grid2>
+                <Field label="تهویه">
+                  <Select value={form.ventilation} onChange={e => setForm({ ...form, ventilation: e.target.value })}>
+                    <option value="ok">مناسب</option>
+                    <option value="low">ضعیف</option>
+                    <option value="high">شدید</option>
+                  </Select>
+                </Field>
+                <Field label="بستر">
+                  <Select value={form.litter} onChange={e => setForm({ ...form, litter: e.target.value })}>
+                    <option value="dry">خشک</option>
+                    <option value="wet">مرطوب</option>
+                    <option value="clumped">کلوخه</option>
                   </Select>
                 </Field>
               </Grid2>
-              <Field label="توضیحات">
-                <Textarea rows={2} placeholder="جزئیات..." value={d.notes || ''}
-                  onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />
+            </FormSub>
+
+            <FormSub icon="🐔" title="مشاهده پرنده">
+              <Grid3>
+                <Field label="رفتار">
+                  <Select value={form.behavior} onChange={e => setForm({ ...form, behavior: e.target.value })}>
+                    <option value="active">فعال</option>
+                    <option value="lethargic">بی‌حال</option>
+                    <option value="excited">پرهیجان</option>
+                  </Select>
+                </Field>
+                <Field label="توزیع">
+                  <Select value={form.distribution} onChange={e => setForm({ ...form, distribution: e.target.value })}>
+                    <option value="uniform">یکنواخت</option>
+                    <option value="cornered">گوشه‌گیر</option>
+                  </Select>
+                </Field>
+                <Field label="صدا">
+                  <Select value={form.sound} onChange={e => setForm({ ...form, sound: e.target.value })}>
+                    <option value="normal">طبیعی</option>
+                    <option value="cough">سرفه</option>
+                    <option value="sneeze">عطسه</option>
+                  </Select>
+                </Field>
+              </Grid3>
+              <Field label="ظاهر عمومی">
+                <Textarea rows={2} placeholder="رنگ پر، چشم، تاج، منقار..." value={form.appearance} onChange={e => setForm({ ...form, appearance: e.target.value })} />
               </Field>
-            </div>
-          ))}
+            </FormSub>
 
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deaths: [...f.deaths, { id: crypto.randomUUID(), count: 0, cause: '', notes: '' }] }))}>
-            + افزودن رکورد تلفات
-          </Btn>
+          </FormGroup>
 
-          <SectionTitle>💉 واکسن و دارو</SectionTitle>
+          <FormGroup id="feed" icon="🌾" title="تغذیه و تولید" sub="دان، آب، تخم، وزن" open={!!groups.feed} onToggle={() => toggle('feed')}>
 
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: crypto.randomUUID(), name: '', dose: '', method: '', reaction: '' }] }))}>
-            + افزودن واکسن
-          </Btn>
-          {form.vaccines.map((v, i) => (
-            <div key={v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>واکسن {toFa(i + 1)}</span>
-                <button onClick={() => setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) }))} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
-              </div>
+            <FormSubFirst icon="🌾" title="تغذیه">
+              <Field label="منبع دان مصرفی" hint="از جیره‌ها یا دان تکی انبار">
+                <SmartSelect
+                  value={form.feedSourceType && form.feedSourceId
+                    ? (form.feedSourceType === 'formula' ? 'f:' : 'i:') + form.feedSourceId
+                    : ''}
+                  onChange={val => {
+                    if (val.startsWith('f:')) {
+                      const id = val.slice(2);
+                      const f = formulas.find(x => x.id === id);
+                      setForm(prev => ({ ...prev, feedSourceType: 'formula', feedSourceId: id, feedType: f?.name || '' }));
+                    } else if (val.startsWith('i:')) {
+                      const id = val.slice(2);
+                      const it = feedItems.find(x => x.id === id);
+                      setForm(prev => ({ ...prev, feedSourceType: 'item', feedSourceId: id, feedType: it?.name || '' }));
+                    } else {
+                      setForm(prev => ({ ...prev, feedSourceType: '', feedSourceId: '', feedType: '' }));
+                    }
+                  }}
+                  options={[
+                    ...formulas.map(f => ({
+                      value: 'f:' + f.id,
+                      label: f.name,
+                      subtitle: `${f.lines.length} ماده`,
+                      group: 'formula',
+                    })),
+                    ...feedItems.map(it => ({
+                      value: 'i:' + it.id,
+                      label: it.name,
+                      subtitle: `موجودی ${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`,
+                      group: 'item',
+                    })),
+                  ]}
+                  groupLabels={{ formula: '📋 جیره‌ها', item: '🌾 دان تکی' }}
+                  groupIcons={{ formula: '📋', item: '🌾' }}
+                  placeholder="— انتخاب کنید —"
+                  modalTitle="انتخاب منبع دان"
+                  autoThreshold={6}
+                />
+              </Field>
+
+              {form.feedSourceType === 'formula' && form.feedSourceId && (() => {
+                const f = formulas.find(x => x.id === form.feedSourceId);
+                if (!f) return null;
+                const used = num(form.feedAmount) || 0;
+                return (
+                  <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 4 }}>مواد اولیه این جیره:</div>
+                    {f.lines.length === 0 && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠️ این جیره خطی ندارد</div>}
+                    {f.lines.map(line => {
+                      const ing = ingredients.find(i => i.id === line.ingredientId);
+                      if (!ing) return null;
+                      const stockItem = whsItems.find(x => x.id === ing.stockItemId);
+                      const need = used > 0 ? (line.percent / 100) * used : 0;
+                      const after = stockItem ? stockItem.currentStock - need : 0;
+                      const warn = stockItem && after < 0;
+                      return (
+                        <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', gap: 8 }}>
+                          <span style={{ flex: 1 }}>• {ing.name} <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>({toFa(line.percent)}٪)</span></span>
+                          <span style={{ direction: 'ltr', color: warn ? 'var(--danger)' : undefined, fontWeight: warn ? 700 : 600 }}>
+                            {need > 0 ? `${toFa(need.toFixed(1))} kg` : '—'}
+                            {stockItem && <span style={{ color: warn ? 'var(--danger)' : 'var(--muted)', fontSize: 'var(--fs-xs)', marginRight: 4 }}> [{toFa(stockItem.currentStock)}]</span>}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+
+              {form.feedSourceType === 'item' && form.feedSourceId && (() => {
+                const it = feedItems.find(x => x.id === form.feedSourceId);
+                if (!it) return null;
+                const used = num(form.feedAmount) || 0;
+                const after = it.currentStock - used;
+                const warn = after < it.minStock;
+                return (
+                  <div style={{ padding: 'var(--pad-normal)', background: warn ? 'var(--warn-soft)' : 'var(--accent-soft)', border: `1px solid ${warn ? 'var(--warn)' : 'var(--accent-border)'}`, borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: warn ? 'var(--warn)' : 'var(--accent)', fontWeight: 600 }}>
+                    موجودی فعلی: {toFa(it.currentStock)} {UNIT_LABEL[it.unit]}
+                    {used > 0 && ` · بعد از مصرف — ${toFa(after)} ${UNIT_LABEL[it.unit]}`}
+                    {warn && ' ⚠️ زیر حد هشدار'}
+                  </div>
+                );
+              })()}
+
               <Grid2>
-                <Input placeholder="نام" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
-                <Input placeholder="دوز" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
+                <Field label="مقدار دان مصرفی">
+                  <NumField placeholder="۵۰" value={form.feedAmount} onChange={e => setForm({ ...form, feedAmount: e.target.value })} unit="kg" min={0} />
+                </Field>
+                <Field label="دان باقیمانده">
+                  <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
+                </Field>
               </Grid2>
-            </div>
-          ))}
+            </FormSubFirst>
 
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, medications: [...f.medications, { id: crypto.randomUUID(), name: '', dose: '', method: '', withdrawalDays: null }] }))}>
-            + افزودن دارو
-          </Btn>
-          {form.medications.map((m, i) => (
-            <div key={m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>دارو {toFa(i + 1)}</span>
-                <button onClick={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
-              </div>
-              <Grid2>
-                <Input placeholder="نام" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
-                <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
-              </Grid2>
-            </div>
-          ))}
+            <FormSub icon="💧" title="آب">
+              {form.waterMethod === 'manual' && (
+                <>
+                  <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+                    💡 حالت دستی: تعداد بار × حجم هر بار
+                  </div>
+                  <Grid2>
+                    <Field label="تعداد بار">
+                      <NumField placeholder="۵" value={form.waterFillCount} onChange={e => setForm({ ...form, waterFillCount: e.target.value })} unit="بار" min={0} />
+                    </Field>
+                    <Field label="حجم هر بار">
+                      <NumField placeholder="۲۰" value={form.waterFillVolume} onChange={e => setForm({ ...form, waterFillVolume: e.target.value })} unit="L" min={0} />
+                    </Field>
+                  </Grid2>
+                  {(form.waterFillCount && form.waterFillVolume) && (
+                    <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
+                      مجموع آب مصرفی: {toFa((int(form.waterFillCount) || 0) * (num(form.waterFillVolume) || 0))} لیتر
+                    </div>
+                  )}
+                </>
+              )}
 
-          <SectionTitle>🔧 فعالیت‌ها</SectionTitle>
+              {form.waterMethod !== 'manual' && form.waterMethod !== '' && (
+                <>
+                  <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600 }}>
+                    ⚠️ سیستم {WATER_SYSTEM_LABEL[form.waterMethod as 'nipple' | 'trough' | 'tank']} — فعلاً فقط دستی پیاده شده
+                  </div>
+                  <Field label="مقدار آب مصرفی (تخمینی)">
+                    <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
+                  </Field>
+                </>
+              )}
+            </FormSub>
 
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, activities: [...f.activities, { id: crypto.randomUUID(), type: '', notes: '' }] }))}>
-            + افزودن فعالیت
-          </Btn>
-          {form.activities.map((a, i) => (
-            <div key={a.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              <Input placeholder="نوع فعالیت..." value={a.type} onChange={e => setForm(f => ({ ...f, activities: f.activities.map(x => x.id === a.id ? { ...x, type: e.target.value } : x) }))} />
-              <button onClick={() => setForm(f => ({ ...f, activities: f.activities.filter(x => x.id !== a.id) }))} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', width: 38, height: 38, flexShrink: 0 }}>✕</button>
-            </div>
-          ))}
+            {isLayerFlock && (
+              <FormSub icon="🥚" title="تخم‌گذاری">
+                <Grid3>
+                  <Field label="تعداد تخم">
+                    <NumField placeholder="۰" value={form.eggsCount} onChange={e => setForm({...form, eggsCount: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
+                  </Field>
+                  <Field label="شکسته">
+                    <NumField placeholder="۰" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} unit="عدد" min={0} />
+                  </Field>
+                  <Field label="کثیف">
+                    <NumField placeholder="۰" value={form.dirtyEggs} onChange={e => setForm({...form, dirtyEggs: e.target.value})} unit="عدد" min={0} />
+                  </Field>
+                </Grid3>
+              </FormSub>
+            )}
 
-          <SectionTitle>📝 یادداشت</SectionTitle>
-          <Field label="یادداشت">
-            <Textarea rows={3} placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-          </Field>
+            <FormSub icon="⚖️" title="وزن‌کشی (اختیاری)">
+              {form.weightSamples.length > 0 && (
+                <Grid2>
+                  <Field label="جنسیت">
+                    <Select value={form.weightGender} onChange={e => setForm({ ...form, weightGender: e.target.value as any })}>
+                      <option value="">— نامشخص —</option>
+                      <option value="male">نر</option>
+                      <option value="female">ماده</option>
+                      <option value="mixed">مخلوط</option>
+                    </Select>
+                  </Field>
+                  <Field label="خلاصه">
+                    <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
+                      {form.weightSamples.length >= 2 ? <>میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))} kg · CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))}٪</> : <>💡 حداقل ۲ نمونه اضافه کن تا میانگین محاسبه شود</>}
+                    </div>
+                  </Field>
+                </Grid2>
+              )}
+
+              {form.weightSamples.map((w, i) => (
+                <div key={w.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <div style={{ flex: 1 }}>
+                    <NumField
+                      placeholder="وزن (kg)"
+                      value={w.weight}
+                      onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
+                      unit="kg" min={0} />
+                  </div>
+                  <button type="button" onClick={() => setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) }))}
+                    style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', width: 38, height: 38, flexShrink: 0 }}>✕</button>
+                </div>
+              ))}
+
+              <Btn size="sm" full onClick={() => setForm(f => ({ ...f, weightSamples: [...f.weightSamples, { id: crypto.randomUUID(), weight: '' }] }))}>
+                + افزودن نمونه وزن
+              </Btn>
+            </FormSub>
+
+          </FormGroup>
+
+          <FormGroup id="health" icon="🩺" title="سلامت و سایر" sub="تلفات، واکسن، فعالیت، یادداشت" open={!!groups.health} onToggle={() => toggle('health')}>
+
+            <FormSubFirst icon="💀" title="تلفات">
+              {form.deaths.length > 0 && (
+                <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--danger)', fontWeight: 700, textAlign: 'center' }}>
+                  مجموع: {toFa(form.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده
+                  {flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''}
+                </div>
+              )}
+
+              {form.deaths.map((d, i) => (
+                <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700 }}>{d.count === 0 && !d.cause ? "رکورد جدید" : "رکورد " + toFa(i + 1)}</span>
+                    <button type="button" onClick={() => setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) }))}
+                      style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
+                  </div>
+                  <Grid2>
+                    <Field label="تعداد">
+                      <NumField placeholder="۰" value={String(d.count || '')}
+                        onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
+                        min={0} max={flockAliveCount || undefined} unit="پرنده" />
+                    </Field>
+                    <Field label="علت">
+                      <Select value={d.cause || ''} onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, cause: e.target.value } : x) }))}>
+                        {DEATH_CAUSES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                      </Select>
+                    </Field>
+                  </Grid2>
+                  <Field label="توضیحات">
+                    <Textarea rows={2} placeholder="جزئیات..." value={d.notes || ''}
+                      onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />
+                  </Field>
+                </div>
+              ))}
+
+              <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deaths: [...f.deaths, { id: crypto.randomUUID(), count: 0, cause: '', notes: '' }] }))}>
+                + افزودن رکورد تلفات
+              </Btn>
+            </FormSubFirst>
+
+            <FormSub icon="💉" title="واکسن و دارو">
+              <Btn size="sm" full onClick={() => setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: crypto.randomUUID(), name: '', dose: '', method: '', reaction: '' }] }))}>
+                + افزودن واکسن
+              </Btn>
+              {form.vaccines.map((v, i) => (
+                <div key={v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>واکسن {toFa(i + 1)}</span>
+                    <button onClick={() => setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) }))} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                  </div>
+                  <Grid2>
+                    <Input placeholder="نام" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
+                    <Input placeholder="دوز" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
+                  </Grid2>
+                </div>
+              ))}
+
+              <Btn size="sm" full onClick={() => setForm(f => ({ ...f, medications: [...f.medications, { id: crypto.randomUUID(), name: '', dose: '', method: '', withdrawalDays: null }] }))}>
+                + افزودن دارو
+              </Btn>
+              {form.medications.map((m, i) => (
+                <div key={m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>دارو {toFa(i + 1)}</span>
+                    <button onClick={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                  </div>
+                  <Grid2>
+                    <Input placeholder="نام" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
+                    <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
+                  </Grid2>
+                </div>
+              ))}
+            </FormSub>
+
+            <FormSub icon="🔧" title="فعالیت‌ها">
+              <Btn size="sm" full onClick={() => setForm(f => ({ ...f, activities: [...f.activities, { id: crypto.randomUUID(), type: '', notes: '' }] }))}>
+                + افزودن فعالیت
+              </Btn>
+              {form.activities.map((a, i) => (
+                <div key={a.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <Input placeholder="نوع فعالیت..." value={a.type} onChange={e => setForm(f => ({ ...f, activities: f.activities.map(x => x.id === a.id ? { ...x, type: e.target.value } : x) }))} />
+                  <button onClick={() => setForm(f => ({ ...f, activities: f.activities.filter(x => x.id !== a.id) }))} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', width: 38, height: 38, flexShrink: 0 }}>✕</button>
+                </div>
+              ))}
+            </FormSub>
+
+            <FormSub icon="📝" title="یادداشت">
+              <Field label="یادداشت">
+                <Textarea rows={3} placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+              </Field>
+            </FormSub>
+
+          </FormGroup>
 
           <ErrorBox>{err}</ErrorBox>
         </Modal>
