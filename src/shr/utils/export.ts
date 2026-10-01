@@ -1,4 +1,5 @@
 import { toFa } from './fa';
+import { useSet } from '../../mod/set/store';
 
 /** تبدیل به CSV با BOM برای Excel */
 export function toCSV(headers: string[], rows: (string | number | null | undefined)[][]): string {
@@ -82,6 +83,7 @@ export function printHTML(html: string): void {
 
 /** قالب چاپ استاندارد A4 */
 export function printTemplate(title: string, bodyHtml: string, extraCss = ''): string {
+  const paper = useSet.getState().printPaper || 'A4';
   return `<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -119,7 +121,7 @@ export function printTemplate(title: string, bodyHtml: string, extraCss = ''): s
   .badge-red { background: #fee2e2; color: #dc2626; }
   @media print {
     body { padding: 10mm; }
-    @page { size: A4; margin: 10mm; }
+    @page { size: ${paper}; margin: 10mm; }
   }
   ${extraCss}
 </style>
