@@ -652,6 +652,8 @@ export function Modal({
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--sp-3)',
+            flex: 1,
+            minHeight: 0,
           }}
         >
           {children}

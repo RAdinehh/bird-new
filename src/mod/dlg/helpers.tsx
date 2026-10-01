@@ -55,6 +55,7 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
       borderRadius: 'var(--r-lg)',
       overflow: 'hidden',
       marginBottom: 8,
+      flexShrink: 0,
       transition: 'border-color var(--dur-base)',
     }}>
       <div style={{
