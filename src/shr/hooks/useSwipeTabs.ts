@@ -17,9 +17,6 @@ export function useSwipeTabs(
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // جلوگیری از pan افقی مرورگر + bounce
-    el.style.touchAction = 'pan-y';
-    el.style.overscrollBehavior = 'contain';
     let startX = 0, startY = 0, startT = 0;
     let activeTouch = false;
     let locked: 'none' | 'h' | 'v' = 'none';
@@ -28,7 +25,7 @@ export function useSwipeTabs(
       let cur: HTMLElement | null = node;
       while (cur && cur !== el) {
         const ox = window.getComputedStyle(cur).overflowX;
-        if ((ox === 'auto' || ox === 'scroll') && cur.scrollWidth > cur.clientWidth + 4) return true;
+        if (ox === 'scroll' && cur.scrollWidth > cur.clientWidth + 4) return true;
         cur = cur.parentElement;
       }
       return false;
