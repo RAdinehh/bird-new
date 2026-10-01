@@ -11,6 +11,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
 import { todayJalali } from './helpers';
+import { useIncubationProfile } from './hooks';
 
 const INFERTILE_REASONS: [string, string][] = [
   ['', '—'], ['season', 'فصل'], ['rooster_age', 'سن خروس'], ['nutrition', 'تغذیه'], ['genetics', 'ژنتیک'], ['storage', 'نگهداری تخم']

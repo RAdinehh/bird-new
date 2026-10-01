@@ -586,7 +586,12 @@ export default function DevicesPage() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700, flex: 1 }}>{c.birdName}</span>
+                      <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700, flex: 1 }}>
+                      {c.birdName}
+                      {getProfileDefaults(c.birdName) ? (
+                        <span title="از پروفایل انکوباسیون" style={{ fontSize: 10, color: 'var(--accent)', marginRight: 4 }}>🪄</span>
+                      ) : null}
+                    </span>
                       <span style={{ fontSize: 12, color: 'var(--muted)', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s', flexShrink: 0 }}>▼</span>
                       <button type="button" onClick={(e) => { e.stopPropagation(); removeCapacity(c.birdName); }} aria-label={`حذف ${c.birdName}`} style={{
                         background: 'var(--danger-soft)',
