@@ -250,8 +250,8 @@ export default function FlocksPage() {
 
           return (
             <div style={{
-              background: 'var(--info-soft)',
-              border: '1px solid var(--info)',
+              background: 'var(--accent-soft)',
+              border: '1px solid var(--accent-border)',
               borderRadius: 'var(--r-lg)',
               padding: 'var(--pad-comfy)'
             }}>
@@ -260,7 +260,7 @@ export default function FlocksPage() {
                 marginBottom: 10
               }}>
                 <span style={{ fontSize: 'var(--fs-md)' }}>⏳</span>
-                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--info)' }}>
+                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
                   نزدیک به شروع تخم‌گذاری ({toFa(upcoming.length)})
                 </span>
               </div>
@@ -281,7 +281,7 @@ export default function FlocksPage() {
                         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{f.name}</span>
                         <span style={{
                           fontSize: 'var(--fs-xs)',
-                          color: remain <= 14 ? 'var(--warn)' : 'var(--info)',
+                          color: remain <= 14 ? 'var(--warn)' : 'var(--muted)',
                           fontWeight: 700
                         }}>
                           {toFa(remain)} روز مانده
@@ -358,11 +358,11 @@ export default function FlocksPage() {
                   {!isArchived && !ready && (f.type === 'layer' || f.type === 'breeder') && (
                     <div style={{
                       padding: 'var(--pad-normal)',
-                      background: untilLay <= 30 ? 'var(--warn-soft)' : 'var(--info-soft)',
+                      background: untilLay <= 30 ? 'var(--warn-soft)' : 'var(--accent-soft)',
                       border: `1px dashed ${untilLay <= 30 ? 'var(--warn)' : 'var(--info)'}`,
                       borderRadius: 'var(--r-md)',
                       fontSize: 'var(--fs-xs)',
-                      color: untilLay <= 30 ? 'var(--warn)' : 'var(--info)',
+                      color: untilLay <= 30 ? 'var(--warn)' : 'var(--accent)',
                       fontWeight: 700,
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between'
                     }}>
@@ -376,7 +376,7 @@ export default function FlocksPage() {
                     <div style={{ height: 36, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}>
                       <div style={{
                         height: '100%', width: `${Math.min(100, lc.progress)}%`,
-                        background: lc.color === 'green' ? 'linear-gradient(90deg, var(--accent), #16a34a)' : lc.color === 'amber' ? 'linear-gradient(90deg, var(--warn), #dc2626)' : 'linear-gradient(90deg, var(--info), #0284c7)',
+                        background: lc.color === 'green' ? 'linear-gradient(90deg, var(--accent), #16a34a)' : lc.color === 'amber' ? 'linear-gradient(90deg, var(--warn), #dc2626)' : 'linear-gradient(90deg, var(--accent), #16a34a)',
                         borderRadius: 4
                       }} />
                     </div>
