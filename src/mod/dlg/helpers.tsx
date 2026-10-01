@@ -33,7 +33,7 @@ export function Row({ l, v, warn }: { l: string; v: string; warn?: boolean }) {
 // Form Components — گروه‌بندی جدید
 // ═══════════════════════════════════════════════════════════════
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 interface FormGroupProps {
   id: string;
@@ -46,19 +46,6 @@ interface FormGroupProps {
 }
 
 export function FormGroup({ id, icon, title, sub, open, onToggle, children }: FormGroupProps) {
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const [h, setH] = useState(0);
-
-  useEffect(() => {
-    const el = bodyRef.current;
-    if (!el) return;
-    const update = () => setH(el.scrollHeight);
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
   return (
     <div style={{
       position: 'relative',
@@ -143,20 +130,21 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
           <path d="m6 9 6 6 6-6" />
         </svg>
       </div>
-      <div style={{
-        height: open ? h : 0,
-        overflow: 'hidden',
-        transition: 'height var(--dur-slow) cubic-bezier(.16,1,.3,1)',
-      }}>
-        <div
-          ref={bodyRef}
-          style={{
-            padding: '0 18px 14px 16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-          }}
-        >
+      <div
+        aria-hidden={!open}
+        style={{
+          maxHeight: open ? 6000 : 0,
+          overflow: 'hidden',
+          opacity: open ? 1 : 0,
+          transition: 'max-height 350ms cubic-bezier(.16,1,.3,1), opacity 250ms ease',
+        }}
+      >
+        <div style={{
+          padding: '0 18px 14px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+        }}>
           {children}
         </div>
       </div>
