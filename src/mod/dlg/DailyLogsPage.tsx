@@ -28,6 +28,8 @@ import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
+import UndoBar from '../../cor/ui/UndoBar';
 import { Section, SectionTitle, Row } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 
@@ -85,6 +87,7 @@ export default function DailyLogsPage() {
   const [form, setForm] = useState<F>(newLog());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ log: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const activeFlocks = flocks.filter(f => f.status === 'active');
