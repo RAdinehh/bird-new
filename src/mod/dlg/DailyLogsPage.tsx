@@ -901,10 +901,15 @@ export default function DailyLogsPage() {
           footer={<BtnRow><Btn variant="danger" onClick={() => {
             if (delId) {
               const log = logs.find(l => l.id === delId);
+              if (log) {
+                setUndoData({ log });
+                setTimeout(() => setUndoData(cur => cur && cur.log.id === log.id ? null : cur), 6000);
+              }
               if (log?.feedMovementIds) log.feedMovementIds.forEach(id => deleteMovement(id));
               const prod = findByLogId(delId);
               if (prod) deleteProduction(prod.id);
               remove(delId);
+              showToast('ثبت حذف شد', 'info', 1800);
             }
             setDelId(null);
           }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
