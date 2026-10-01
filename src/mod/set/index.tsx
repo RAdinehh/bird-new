@@ -1,7 +1,8 @@
 /**
  * index.tsx — تنظیمات (گروه‌بندی منطقی)
  */
-import {useState, useRef, useEffect} from 'react';
+import { useState } from 'react';
+import { useCarousel } from '../../shr/hooks/useCarousel';
 import ProfileTab from './ProfileTab';
 import AppearanceTab from './AppearanceTab';
 import ModulesTab from './ModulesTab';
@@ -58,74 +59,42 @@ const GROUPS: GroupDef[] = [
 ];
 
 const ALL_TABS = GROUPS.flatMap(g => g.tabs);
+const TAB_IDS = ALL_TABS.map(t => t.id as string);
 
 const LAST_TAB_KEY = 'pm-set-last-tab';
 
 function getLastTab(): TabId {
   try {
     const saved = localStorage.getItem(LAST_TAB_KEY);
-    if (saved) return saved as TabId;
-  } catch {}
+    if (saved && TAB_IDS.includes(saved)) return saved as TabId;
+  } catch { /* silent */ }
   return 'profile';
 }
+
+const TAB_COMPONENTS: Record<TabId, React.ComponentType> = {
+  profile: ProfileTab,
+  appearance: AppearanceTab,
+  modules: ModulesTab,
+  incubation: IncubationProfilesTab,
+  notifications: NotificationsTab,
+  backup: BackupTab,
+  logs: LogsTab,
+  about: AboutTab,
+};
 
 export default function Set() {
   const [tab, setTab] = useState<TabId>(getLastTab);
 
-  // Persist tab change
   const changeTab = (id: TabId) => {
     setTab(id);
-    try { localStorage.setItem(LAST_TAB_KEY, id); } catch {}
+    try { localStorage.setItem(LAST_TAB_KEY, id); } catch { /* silent */ }
   };
 
-  const ALL_TAB_IDS = ALL_TABS.map(t => t.id as string);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const syncingRef = useRef(false);
-  const clickToRef = useRef(false);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const ids = ['profile', 'appearance', 'modules', 'notifications', 'backup', 'incubation', 'logs', 'about'] as string[];
-    const idx = ids.indexOf(tab);
-    if (idx < 0) return;
-    const child = el.children[idx] as HTMLElement | undefined;
-    if (!child) return;
-    const cr = child.getBoundingClientRect();
-    const er = el.getBoundingClientRect();
-    const delta = cr.left - er.left;
-    if (Math.abs(delta) < 4) return;
-    syncingRef.current = true;
-    el.scrollBy({
-      left: delta,
-      behavior: clickToRef.current ? 'auto' : 'smooth',
-    });
-    clickToRef.current = false;
-    const t = setTimeout(() => { syncingRef.current = false; }, 400);
-    return () => clearTimeout(t);
-  }, [tab]);
-
-  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onScroll = () => {
-    if (syncingRef.current) return;
-    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-    scrollTimerRef.current = setTimeout(() => {
-      const el = scrollRef.current;
-      if (!el) return;
-      const er = el.getBoundingClientRect();
-      let bestIdx = 0;
-      let bestDist = Infinity;
-      for (let i = 0; i < el.children.length; i++) {
-        const c = el.children[i] as HTMLElement;
-        const cr = c.getBoundingClientRect();
-        const d = Math.abs(cr.left - er.left);
-        if (d < bestDist) { bestDist = d; bestIdx = i; }
-      }
-      const ids = ['profile', 'appearance', 'modules', 'notifications', 'backup', 'incubation', 'logs', 'about'] as string[];
-      const newTab = ids[bestIdx];
-      if (newTab && newTab !== tab) setTab(newTab as TabId);
-    }, 90);
-  };
+  const { containerRef, trackRef, setInstant } = useCarousel(
+    TAB_IDS,
+    tab,
+    (id) => changeTab(id as TabId)
+  );
 
   return (
     <div>
@@ -158,7 +127,7 @@ export default function Set() {
                 <button
                   key={t.id}
                   type="button"
-                  onClick={() => { clickToRef.current = true; changeTab(t.id); }}
+                  onClick={() => { setInstant(); changeTab(t.id); }}
                   style={{
                     padding: '10px var(--sp-2)',
                     fontSize: 'var(--fs-sm)',
@@ -198,28 +167,48 @@ export default function Set() {
 
       <div style={{ padding: 'var(--sp-3)' }}>
         <div
-          ref={scrollRef}
-          onScroll={onScroll}
+          ref={containerRef}
           style={{
-            display: 'flex',
-            direction: 'rtl',
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            touchAction: 'pan-x',
-            scrollSnapType: 'x mandatory',
+            overflow: 'hidden',
+            overflowX: 'hidden',
             width: '100%',
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch',
+            minHeight: 'calc(100vh - 160px)',
+            touchAction: 'pan-y',
+            isolation: 'isolate',
           }}
         >
-          <div key="profile" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><ProfileTab /></div>
-          <div key="appearance" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><AppearanceTab /></div>
-          <div key="modules" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><ModulesTab /></div>
-          <div key="notifications" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><NotificationsTab /></div>
-          <div key="backup" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><BackupTab /></div>
-          <div key="incubation" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><IncubationProfilesTab /></div>
-          <div key="logs" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><LogsTab /></div>
-          <div key="about" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><AboutTab /></div>
+          <div
+            ref={trackRef}
+            style={{
+              display: 'flex',
+              direction: 'ltr',
+              willChange: 'transform',
+              touchAction: 'pan-y',
+              width: '100%',
+              minWidth: 0,
+            }}
+          >
+            {ALL_TABS.map(t => {
+              const Comp = TAB_COMPONENTS[t.id];
+              return (
+                <div
+                  key={t.id}
+                  style={{
+                    flex: '0 0 100%',
+                    width: '100%',
+                    minWidth: 0,
+                    maxWidth: '100%',
+                    direction: 'rtl',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box',
+                    isolation: 'isolate',
+                  }}
+                >
+                  <Comp />
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
