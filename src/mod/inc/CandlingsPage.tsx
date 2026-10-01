@@ -9,6 +9,7 @@ import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/Exp
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 import { todayJalali } from './helpers';
 
 const INFERTILE_REASONS: [string, string][] = [
@@ -169,6 +170,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       });
       setOpen(false);
       setEditingId(null);
+      showToast('کندلینگ ذخیره شد', 'success', 2000);
       setEntriesData({});
       return;
     }
@@ -374,6 +376,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                     <div key={c.id} style={{ position: 'relative' }}>
                       <button
                         type="button"
+                        aria-label={'ویرایش کندلینگ روز ' + c.stage}
                         onClick={() => openEdit(c)}
                         title={toFa(c.date)}
                         style={{
