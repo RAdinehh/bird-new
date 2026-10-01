@@ -56,7 +56,7 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
       overflow: 'hidden',
       marginBottom: 8,
       flexShrink: 0,
-      scrollMarginTop: 80,
+      scrollMarginTop: 100,
       transition: 'border-color var(--dur-base)',
     }}>
       <div style={{
@@ -227,7 +227,7 @@ export function FormTabs({ tabs, active, onChange }: FormTabsProps) {
       position: 'sticky',
       top: 0,
       zIndex: 20,
-      background: 'var(--card-solid, var(--card))',
+      background: 'var(--bg, #fff)',
       border: '1px solid var(--border)',
       borderRadius: 'var(--r-lg)',
       padding: 8,
