@@ -7,9 +7,10 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
-import { showConfirmAsync } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
 import { Row, SectionTitle, NutrientRow } from './helpers';
+import UndoBar from '../../cor/ui/UndoBar';
+import { showToast } from '../../cor/store/toast';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
 interface F {
   id?: string;
@@ -33,6 +34,7 @@ export default function FormulasPage() {
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const list = useMemo(
@@ -140,8 +142,27 @@ export default function FormulasPage() {
 
   const target = delId ? formulas.find(f => f.id === delId) : null;
 
+  const undoDelete = () => {
+    const item = undoData;
+    if (!item) return;
+    try {
+      addFormula(item.item);
+      showToast('فرمول بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
+
   return (
     <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="حذف شد"
+          onUndo={undoDelete}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
       {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
@@ -392,7 +413,7 @@ export default function FormulasPage() {
         open={delId !== null}
         onClose={() => setDelId(null)}
         title="حذف جیره"
-        footer={<BtnRow><Btn onClick={() => setDelId(null)}>لغو</Btn><Btn variant="danger" onClick={() => { if (delId) deleteFormula(delId); setDelId(null); }}>حذف کن</Btn></BtnRow>}
+        footer={<BtnRow><Btn onClick={() => setDelId(null)}>لغو</Btn><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این فرمول حذف شود؟', { danger: true }); if (!ok) return; const item = formulas.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteFormula(idToDel); setDelId(null); showToast('فرمول حذف شد', 'info', 1800); }}>حذف کن</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.name}</b>؟</div>
       </Modal>
