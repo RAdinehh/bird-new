@@ -122,6 +122,19 @@ export default function DevicesPage() {
   const [maintDeviceId, setMaintDeviceId] = useState<string | null>(null);
   const [maintForm, setMaintForm] = useState({ date: '', type: '', cost: '', description: '' });
 
+  // ═══ Performance: pre-compute device stats ═══
+  const deviceStats = useMemo(() => {
+    const map: Record<string, { totalEggs: number; activeCount: number }> = {};
+    eggEntries.forEach(e => {
+      if (!map[e.deviceId]) map[e.deviceId] = { totalEggs: 0, activeCount: 0 };
+      map[e.deviceId].totalEggs += (e.count || 0);
+      if (e.status === 'incubating' || e.status === 'candled' || e.status === 'locked') {
+        map[e.deviceId].activeCount += 1;
+      }
+    });
+    return map;
+  }, [eggEntries]);
+
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
@@ -341,9 +354,9 @@ export default function DevicesPage() {
       ) : (
         <>
           {devices.map((d, i) => {
-            const entries = eggEntries.filter(e => e.deviceId === d.id);
-            const totalEggs = entries.reduce((a, e) => a + (e.count || 0), 0);
-            const activeEntries = entries.filter(e => e.status === 'incubating' || e.status === 'candled' || e.status === 'locked').length;
+            const stats = deviceStats[d.id] || { totalEggs: 0, activeCount: 0 };
+            const totalEggs = stats.totalEggs;
+            const activeEntries = stats.activeCount;
             const isOpen = expandedId === d.id;
             const caps = d.capacityByBird || [];
             const logs: any[] = (d as any).maintenanceLogs || [];
