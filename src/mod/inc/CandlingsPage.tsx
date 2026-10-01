@@ -313,21 +313,21 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       {/* ═══ خلاصه کل ═══ */}
       {summary.totalCandlings > 0 && (
         <div style={{
-          padding: 'var(--pad-comfy)',
+          padding: '10px 12px',
           background: 'var(--card)',
           border: '1px solid var(--border)',
-          borderRadius: 'var(--r-lg)',
+          borderRadius: 'var(--r-md)',
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: 8,
+          gap: 6,
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>🧬 نطفه‌داری کل</span>
-            <span style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(summary.fertilePercent.toFixed(1))}٪</span>
+            <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(summary.fertilePercent.toFixed(1))}٪</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>📉 تلفات کل</span>
-            <span style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--danger)' }}>{toFa(summary.lossPercent.toFixed(1))}٪</span>
+            <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: summary.lossPercent > 50 ? 'var(--danger)' : summary.lossPercent > 20 ? 'var(--warn)' : 'var(--muted)' }}>{toFa(summary.lossPercent.toFixed(1))}٪</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', gridColumn: '1 / -1', paddingTop: 6, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
             <span>📥 {toFa(summary.totalEntries)} ورودی</span>
@@ -546,7 +546,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                   gap: 8,
                 }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={isSelected} onChange={() => toggleEntry(e.id)} aria-label="انتخاب این ورودی" style={{ width: 20, height: 20, accentColor: 'var(--accent)', cursor: 'pointer' }} />
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleEntry(e.id)} aria-label="انتخاب این ورودی" style={{ width: 20, height: 20, accentColor: 'var(--accent)', cursor: 'pointer', flexShrink: 0 }} />
                     <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
                       {bird?.name || '—'} · {toFa(e.count || 0)} تخم
                     </span>

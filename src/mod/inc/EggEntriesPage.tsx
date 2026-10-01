@@ -1089,14 +1089,3 @@ function calcEntryDateForSyncHatch(targetHatchDate: string, totalDays: number): 
   if (!targetHatchDate || !totalDays) return '';
   return addDaysJalali(targetHatchDate, -totalDays);
 }
-
-function DepBox({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 700, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
-        {title}
-      </div>
-      {children}
-    </div>
-  );
-}

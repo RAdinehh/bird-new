@@ -317,6 +317,11 @@ export default function DevicesPage() {
           }}>بازگردانی</button>
         </div>
       )}
+      {devices.length > 0 && (
+        <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', fontWeight: 700, padding: '0 4px' }}>
+          🏭 {toFa(devices.length)} دستگاه
+        </div>
+      )}
       {devices.length === 0 ? (
         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>}
           title="هنوز دستگاهی نساخته‌اید" desc="اولین دستگاه جوجه‌کشی خود را اضافه کنید."
