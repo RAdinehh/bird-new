@@ -21,10 +21,10 @@ export default function Tra() {
   const [tab, setTab] = useState<TabId>('purchases');
 
   const TAB_IDS = ['purchases', 'sales', 'deals', 'receivables'];
-  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
 
   return (
-    <div ref={swipeRef}>
+    <div>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',

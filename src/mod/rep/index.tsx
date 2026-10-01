@@ -18,10 +18,10 @@ export default function Rep() {
   const [tab, setTab] = useState<TabId>('financial');
 
   const TAB_IDS = ['financial', 'production', 'flock', 'compare'];
-  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
 
   return (
-    <div ref={swipeRef}>
+    <div>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',

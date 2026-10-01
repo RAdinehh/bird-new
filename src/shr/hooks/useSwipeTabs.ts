@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
+import { startTransition } from 'react';
 
 /**
- * useSwipeTabs — swipe چپ/راست بین تب‌ها روی موبایل
- * نسخه v2: بدون re-bind، بدون re-render
+ * useSwipeTabs — swipe چپ/راست بین تب‌ها
+ * v3: attach to document (universal) + startTransition (non-blocking)
  */
 export function useSwipeTabs(
   ids: string[],
@@ -10,22 +11,17 @@ export function useSwipeTabs(
   onChange: (id: string) => void,
   opts?: { threshold?: number; velocity?: number; edgeGuard?: number }
 ) {
-  const ref = useRef<HTMLDivElement>(null);
   const idsRef = useRef(ids);
   const activeRef = useRef(active);
   const onChangeRef = useRef(onChange);
   const optsRef = useRef(opts);
 
-  // update refs بدون re-bind
   idsRef.current = ids;
   activeRef.current = active;
   onChangeRef.current = onChange;
   optsRef.current = opts;
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
     let startX = 0;
     let startY = 0;
     let startT = 0;
@@ -34,6 +30,12 @@ export function useSwipeTabs(
 
     const onStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
+      // ignore if touch started inside an open modal/sheet
+      const tgt = e.target as HTMLElement | null;
+      if (tgt && tgt.closest('[role="dialog"], [data-sheet]')) {
+        activeTouch = false;
+        return;
+      }
       const t = e.touches[0];
       startX = t.clientX;
       startY = t.clientY;
@@ -58,9 +60,9 @@ export function useSwipeTabs(
       if (locked !== 'h') { locked = 'none'; return; }
 
       const o = optsRef.current || {};
-      const threshold = o.threshold ?? 45;
-      const velocity = o.velocity ?? 0.35;
-      const edgeGuard = o.edgeGuard ?? 24;
+      const threshold = o.threshold ?? 60;
+      const velocity = o.velocity ?? 0.4;
+      const edgeGuard = o.edgeGuard ?? 30;
 
       const t = e.changedTouches[0];
       const dx = t.clientX - startX;
@@ -78,29 +80,33 @@ export function useSwipeTabs(
       const idx = idsArr.indexOf(activeRef.current);
       if (idx < 0) { locked = 'none'; return; }
 
-      // RTL: swipe راست (dx>0) = قبلی، swipe چپ (dx<0) = بعدی
+      // RTL: swipe راست = قبلی (idx+1)? با RTL flex row: index 0 راست است.
+      // swipe راست (dx>0) کاربر به سمت index بعدی میره
+      // => در RTL: برو به previous در آرایه؟ بستگی به چیدمان داره
+      // تصمیم: swipe راست → index کم‌تر (به سمت راست آرایه)، swipe چپ → index بیشتر
       let nextIdx = idx;
-      if (dx > 0) nextIdx = idx + 1;
-      else nextIdx = idx - 1;
+      if (dx > 0) nextIdx = idx - 1;  // ← تغییر از نسخه قبل
+      else nextIdx = idx + 1;
 
       if (nextIdx < 0 || nextIdx >= idsArr.length) { locked = 'none'; return; }
-      onChangeRef.current(idsArr[nextIdx]);
+
+      startTransition(() => {
+        onChangeRef.current(idsArr[nextIdx]);
+      });
       locked = 'none';
     };
 
     const onCancel = () => { activeTouch = false; locked = 'none'; };
 
-    el.addEventListener('touchstart', onStart, { passive: true });
-    el.addEventListener('touchmove', onMove, { passive: true });
-    el.addEventListener('touchend', onEnd, { passive: true });
-    el.addEventListener('touchcancel', onCancel, { passive: true });
+    document.addEventListener('touchstart', onStart, { passive: true });
+    document.addEventListener('touchmove', onMove, { passive: true });
+    document.addEventListener('touchend', onEnd, { passive: true });
+    document.addEventListener('touchcancel', onCancel, { passive: true });
     return () => {
-      el.removeEventListener('touchstart', onStart);
-      el.removeEventListener('touchmove', onMove);
-      el.removeEventListener('touchend', onEnd);
-      el.removeEventListener('touchcancel', onCancel);
+      document.removeEventListener('touchstart', onStart);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onEnd);
+      document.removeEventListener('touchcancel', onCancel);
     };
-  }, []);  // ← بدون dependency → یک بار bind
-
-  return ref;
+  }, []);
 }

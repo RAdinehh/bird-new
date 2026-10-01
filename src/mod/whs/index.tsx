@@ -23,10 +23,10 @@ export default function Whs() {
   ).length;
 
   const TAB_IDS = ['items', 'moves', 'warnings'];
-  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
 
   return (
-    <div ref={swipeRef}>
+    <div>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',
