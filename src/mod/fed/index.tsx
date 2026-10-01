@@ -1,4 +1,8 @@
-import {useState, useRef, useEffect} from 'react';
+/**
+ * index.tsx — بخش fed
+ */
+import { useState } from 'react';
+import { useCarousel } from '../../shr/hooks/useCarousel';
 import IngredientsPage from './IngredientsPage';
 import RequirementsPage from './RequirementsPage';
 import FormulasPage from './FormulasPage';
@@ -11,55 +15,15 @@ const tabs = [
 
 type TabId = typeof tabs[number]['id'];
 
+const TAB_IDS = ['ingredients', 'requirements', 'formulas'];
+
 export default function Fed() {
   const [tab, setTab] = useState<TabId>('ingredients');
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const syncingRef = useRef(false);
-  const clickToRef = useRef(false);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const ids = ['ingredients', 'requirements', 'formulas'] as string[];
-    const idx = ids.indexOf(tab);
-    if (idx < 0) return;
-    const child = el.children[idx] as HTMLElement | undefined;
-    if (!child) return;
-    const cr = child.getBoundingClientRect();
-    const er = el.getBoundingClientRect();
-    const delta = cr.left - er.left;
-    if (Math.abs(delta) < 4) return;
-    syncingRef.current = true;
-    el.scrollBy({
-      left: delta,
-      behavior: clickToRef.current ? 'auto' : 'smooth',
-    });
-    clickToRef.current = false;
-    const t = setTimeout(() => { syncingRef.current = false; }, 400);
-    return () => clearTimeout(t);
-  }, [tab]);
-
-  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onScroll = () => {
-    if (syncingRef.current) return;
-    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-    scrollTimerRef.current = setTimeout(() => {
-      const el = scrollRef.current;
-      if (!el) return;
-      const er = el.getBoundingClientRect();
-      let bestIdx = 0;
-      let bestDist = Infinity;
-      for (let i = 0; i < el.children.length; i++) {
-        const c = el.children[i] as HTMLElement;
-        const cr = c.getBoundingClientRect();
-        const d = Math.abs(cr.left - er.left);
-        if (d < bestDist) { bestDist = d; bestIdx = i; }
-      }
-      const ids = ['ingredients', 'requirements', 'formulas'] as string[];
-      const newTab = ids[bestIdx];
-      if (newTab && newTab !== tab) setTab(newTab as TabId);
-    }, 90);
-  };
+  const { containerRef, trackRef, setInstant } = useCarousel(
+    TAB_IDS,
+    tab,
+    (id) => setTab(id as TabId)
+  );
 
   return (
     <div>
@@ -69,12 +33,12 @@ export default function Fed() {
         padding: '0 8px',
         background: 'var(--header-bg)',
         position: 'sticky', top: 52, zIndex: 11,
-        overflowX: 'auto', scrollbarWidth: 'none'
+        overflowX: 'auto', scrollbarWidth: 'none',
       }}>
         {tabs.map(t => (
           <div
             key={t.id}
-            onClick={() => { clickToRef.current = true; setTab(t.id); }}
+            onClick={() => { setInstant(); setTab(t.id); }}
             style={{
               padding: '11px 12px',
               fontSize: 'var(--fs-base)',
@@ -82,7 +46,7 @@ export default function Fed() {
               color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
               cursor: 'pointer',
               position: 'relative',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
             }}
           >
             {t.label}
@@ -91,7 +55,7 @@ export default function Fed() {
                 position: 'absolute', bottom: 0,
                 right: 12, left: 12, height: 3,
                 background: 'var(--accent)',
-                borderRadius: '3px 3px 0 0'
+                borderRadius: '3px 3px 0 0',
               }} />
             ) : null}
           </div>
@@ -99,24 +63,34 @@ export default function Fed() {
       </div>
 
       <div
-          ref={scrollRef}
-          onScroll={onScroll}
+        ref={containerRef}
+        style={{
+          overflow: 'hidden',
+          width: '100%',
+          minHeight: 'calc(100vh - 120px)',
+          touchAction: 'pan-y',
+        }}
+      >
+        <div
+          ref={trackRef}
           style={{
             display: 'flex',
-            direction: 'rtl',
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            touchAction: 'pan-x',
-            scrollSnapType: 'x mandatory',
-            width: '100%',
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch',
+            direction: 'ltr',
+            willChange: 'transform',
+            touchAction: 'pan-y',
           }}
         >
-          <div key="ingredients" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><IngredientsPage /></div>
-          <div key="requirements" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><RequirementsPage /></div>
-          <div key="formulas" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><FormulasPage /></div>
+          <div key="ingredients" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+            <IngredientsPage />
+          </div>
+          <div key="requirements" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+            <RequirementsPage />
+          </div>
+          <div key="formulas" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+            <FormulasPage />
+          </div>
         </div>
+      </div>
     </div>
   );
 }
