@@ -89,12 +89,19 @@ export default function Set() {
     const ids = ['profile', 'appearance', 'modules', 'notifications', 'backup', 'incubation', 'logs', 'about'] as string[];
     const idx = ids.indexOf(tab);
     if (idx < 0) return;
-    const target = idx * el.clientWidth;
-    if (Math.abs(el.scrollLeft - target) < 4) return;
+    const child = el.children[idx] as HTMLElement | undefined;
+    if (!child) return;
+    const cr = child.getBoundingClientRect();
+    const er = el.getBoundingClientRect();
+    if (Math.abs(cr.left - er.left) < 4) return;
     syncingRef.current = true;
-    el.scrollTo({ left: target, behavior: clickToRef.current ? 'auto' : 'smooth' });
+    child.scrollIntoView({
+      behavior: clickToRef.current ? 'auto' : 'smooth',
+      block: 'nearest',
+      inline: 'start',
+    });
     clickToRef.current = false;
-    const t = setTimeout(() => { syncingRef.current = false; }, 500);
+    const t = setTimeout(() => { syncingRef.current = false; }, 400);
     return () => clearTimeout(t);
   }, [tab]);
 
@@ -108,7 +115,7 @@ export default function Set() {
       const w = el.clientWidth;
       if (w <= 0) return;
       // در RTL با direction:ltr روی container، scrollLeft از 0 شروع می‌شه
-      const idx = Math.round(el.scrollLeft / w);
+      const idx = Math.round(Math.abs(el.scrollLeft) / w);
       const ids = ['profile', 'appearance', 'modules', 'notifications', 'backup', 'incubation', 'logs', 'about'] as string[];
       const newTab = ids[idx];
       if (newTab && newTab !== tab) setTab(newTab as TabId);
@@ -190,22 +197,24 @@ export default function Set() {
           onScroll={onScroll}
           style={{
             display: 'flex',
-            direction: 'ltr',
+            direction: 'rtl',
             overflowX: 'auto',
+            overflowY: 'hidden',
+            touchAction: 'pan-x',
             scrollSnapType: 'x mandatory',
             width: '100%',
             scrollbarWidth: 'none',
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div key="profile" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><ProfileTab /></div>
-          <div key="appearance" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><AppearanceTab /></div>
-          <div key="modules" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><ModulesTab /></div>
-          <div key="notifications" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><NotificationsTab /></div>
-          <div key="backup" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><BackupTab /></div>
-          <div key="incubation" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><IncubationProfilesTab /></div>
-          <div key="logs" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><LogsTab /></div>
-          <div key="about" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><AboutTab /></div>
+          <div key="profile" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><ProfileTab /></div>
+          <div key="appearance" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><AppearanceTab /></div>
+          <div key="modules" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><ModulesTab /></div>
+          <div key="notifications" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><NotificationsTab /></div>
+          <div key="backup" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><BackupTab /></div>
+          <div key="incubation" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><IncubationProfilesTab /></div>
+          <div key="logs" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><LogsTab /></div>
+          <div key="about" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><AboutTab /></div>
         </div>
       </div>
     </div>

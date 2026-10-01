@@ -23,12 +23,19 @@ export default function Fed() {
     const ids = ['ingredients', 'requirements', 'formulas'] as string[];
     const idx = ids.indexOf(tab);
     if (idx < 0) return;
-    const target = idx * el.clientWidth;
-    if (Math.abs(el.scrollLeft - target) < 4) return;
+    const child = el.children[idx] as HTMLElement | undefined;
+    if (!child) return;
+    const cr = child.getBoundingClientRect();
+    const er = el.getBoundingClientRect();
+    if (Math.abs(cr.left - er.left) < 4) return;
     syncingRef.current = true;
-    el.scrollTo({ left: target, behavior: clickToRef.current ? 'auto' : 'smooth' });
+    child.scrollIntoView({
+      behavior: clickToRef.current ? 'auto' : 'smooth',
+      block: 'nearest',
+      inline: 'start',
+    });
     clickToRef.current = false;
-    const t = setTimeout(() => { syncingRef.current = false; }, 500);
+    const t = setTimeout(() => { syncingRef.current = false; }, 400);
     return () => clearTimeout(t);
   }, [tab]);
 
@@ -42,7 +49,7 @@ export default function Fed() {
       const w = el.clientWidth;
       if (w <= 0) return;
       // در RTL با direction:ltr روی container، scrollLeft از 0 شروع می‌شه
-      const idx = Math.round(el.scrollLeft / w);
+      const idx = Math.round(Math.abs(el.scrollLeft) / w);
       const ids = ['ingredients', 'requirements', 'formulas'] as string[];
       const newTab = ids[idx];
       if (newTab && newTab !== tab) setTab(newTab as TabId);
@@ -91,17 +98,19 @@ export default function Fed() {
           onScroll={onScroll}
           style={{
             display: 'flex',
-            direction: 'ltr',
+            direction: 'rtl',
             overflowX: 'auto',
+            overflowY: 'hidden',
+            touchAction: 'pan-x',
             scrollSnapType: 'x mandatory',
             width: '100%',
             scrollbarWidth: 'none',
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div key="ingredients" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><IngredientsPage /></div>
-          <div key="requirements" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><RequirementsPage /></div>
-          <div key="formulas" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px', direction: 'rtl', touchAction: 'pan-y' }}><FormulasPage /></div>
+          <div key="ingredients" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><IngredientsPage /></div>
+          <div key="requirements" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><RequirementsPage /></div>
+          <div key="formulas" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><FormulasPage /></div>
         </div>
     </div>
   );
