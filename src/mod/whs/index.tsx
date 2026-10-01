@@ -1,4 +1,8 @@
-import {useState, useRef, useEffect} from 'react';
+/**
+ * index.tsx — بخش whs
+ */
+import { useState } from 'react';
+import { useCarousel } from '../../shr/hooks/useCarousel';
 import ItemsPage from './ItemsPage';
 import MovesPage from './MovesPage';
 import WarningsPage from './WarningsPage';
@@ -8,65 +12,25 @@ import { toFa } from '../../shr/utils/fa';
 const tabs = [
   { id: 'items', label: 'اقلام' },
   { id: 'moves', label: 'ورود/خروج' },
-  { id: 'warnings', label: 'هشدارها' }
+  { id: 'warnings', label: 'هشدارها' },
 ] as const;
 
 type TabId = typeof tabs[number]['id'];
 
+const TAB_IDS = ['items', 'moves', 'warnings'];
+
 export default function Whs() {
   const [tab, setTab] = useState<TabId>('items');
   const { items } = useWhs();
-
   const warnCount = items.filter(i =>
     stockWarning(i) !== 'ok' || expiryWarning(i) !== 'ok'
   ).length;
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const syncingRef = useRef(false);
-  const clickToRef = useRef(false);
 
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const ids = ['items', 'moves', 'warnings'] as string[];
-    const idx = ids.indexOf(tab);
-    if (idx < 0) return;
-    const child = el.children[idx] as HTMLElement | undefined;
-    if (!child) return;
-    const cr = child.getBoundingClientRect();
-    const er = el.getBoundingClientRect();
-    const delta = cr.left - er.left;
-    if (Math.abs(delta) < 4) return;
-    syncingRef.current = true;
-    el.scrollBy({
-      left: delta,
-      behavior: clickToRef.current ? 'auto' : 'smooth',
-    });
-    clickToRef.current = false;
-    const t = setTimeout(() => { syncingRef.current = false; }, 400);
-    return () => clearTimeout(t);
-  }, [tab]);
-
-  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onScroll = () => {
-    if (syncingRef.current) return;
-    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-    scrollTimerRef.current = setTimeout(() => {
-      const el = scrollRef.current;
-      if (!el) return;
-      const er = el.getBoundingClientRect();
-      let bestIdx = 0;
-      let bestDist = Infinity;
-      for (let i = 0; i < el.children.length; i++) {
-        const c = el.children[i] as HTMLElement;
-        const cr = c.getBoundingClientRect();
-        const d = Math.abs(cr.left - er.left);
-        if (d < bestDist) { bestDist = d; bestIdx = i; }
-      }
-      const ids = ['items', 'moves', 'warnings'] as string[];
-      const newTab = ids[bestIdx];
-      if (newTab && newTab !== tab) setTab(newTab as TabId);
-    }, 90);
-  };
+  const { containerRef, trackRef, setInstant } = useCarousel(
+    TAB_IDS,
+    tab,
+    (id) => setTab(id as TabId)
+  );
 
   return (
     <div>
@@ -76,12 +40,12 @@ export default function Whs() {
         padding: '0 8px',
         background: 'var(--header-bg)',
         position: 'sticky', top: 52, zIndex: 11,
-        overflowX: 'auto', scrollbarWidth: 'none'
+        overflowX: 'auto', scrollbarWidth: 'none',
       }}>
         {tabs.map(t => (
           <div
             key={t.id}
-            onClick={() => { clickToRef.current = true; setTab(t.id); }}
+            onClick={() => { setInstant(); setTab(t.id); }}
             style={{
               padding: '11px 12px',
               fontSize: 'var(--fs-base)',
@@ -90,12 +54,10 @@ export default function Whs() {
               cursor: 'pointer',
               position: 'relative',
               whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: 'flex', alignItems: 'center', gap: 5
+              display: 'flex', alignItems: 'center', gap: 5,
             }}
           >
-            {t.label}
+            <span>{t.label}</span>
             {t.id === 'warnings' && warnCount > 0 ? (
               <span style={{
                 fontSize: 12,
@@ -103,7 +65,7 @@ export default function Whs() {
                 color: '#fff',
                 padding: '1px 6px',
                 borderRadius: 8,
-                fontWeight: 700
+                fontWeight: 700,
               }}>{toFa(warnCount)}</span>
             ) : null}
             {tab === t.id ? (
@@ -111,7 +73,7 @@ export default function Whs() {
                 position: 'absolute', bottom: 0,
                 right: 12, left: 12, height: 3,
                 background: 'var(--accent)',
-                borderRadius: '3px 3px 0 0'
+                borderRadius: '3px 3px 0 0',
               }} />
             ) : null}
           </div>
@@ -119,24 +81,34 @@ export default function Whs() {
       </div>
 
       <div
-          ref={scrollRef}
-          onScroll={onScroll}
+        ref={containerRef}
+        style={{
+          overflow: 'hidden',
+          width: '100%',
+          minHeight: 'calc(100vh - 120px)',
+          touchAction: 'pan-y',
+        }}
+      >
+        <div
+          ref={trackRef}
           style={{
             display: 'flex',
-            direction: 'rtl',
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            touchAction: 'pan-x',
-            scrollSnapType: 'x mandatory',
-            width: '100%',
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch',
+            direction: 'ltr',
+            willChange: 'transform',
+            touchAction: 'pan-y',
           }}
         >
-          <div key="items" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><ItemsPage /></div>
-          <div key="moves" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><MovesPage /></div>
-          <div key="warnings" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><WarningsPage /></div>
+          <div key="items" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+            <ItemsPage />
+          </div>
+          <div key="moves" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+            <MovesPage />
+          </div>
+          <div key="warnings" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+            <WarningsPage />
+          </div>
         </div>
+      </div>
     </div>
   );
 }
