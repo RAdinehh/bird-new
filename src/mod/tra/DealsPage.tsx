@@ -10,7 +10,9 @@ import { Btn, BtnRow, Empty, Field,
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert } from '../../cor/store/dialog';
+import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import UndoBar from '../../cor/ui/UndoBar';
+import { showToast } from '../../cor/store/toast';
 import { format as formatJ } from 'date-fns-jalali';
 
 interface F {
@@ -42,6 +44,7 @@ export default function DealsPage() {
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [filterType, setFilterType] = useState<DealType | ''>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -50,6 +53,18 @@ export default function DealsPage() {
     if (filterType) arr = arr.filter(d => d.type === filterType);
     return arr.sort((a, b) => b.date.localeCompare(a.date));
   }, [deals, filterType]);
+
+  const undoDelete = () => {
+    const item = undoData;
+    if (!item) return;
+    try {
+      addDeal(item.item);
+      showToast('معامله بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
 
   const openNew = () => {    const lastRec = deals.filter(d => d.partyId).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
     const defaultX = lastRec?.partyId || '';
@@ -115,6 +130,13 @@ export default function DealsPage() {
 
   return (
     <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="حذف شد"
+          onUndo={undoDelete}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
         <button onClick={() => setFilterType('')} style={chip(filterType === '')}>
           همه ({toFa(deals.length)})
@@ -273,7 +295,7 @@ export default function DealsPage() {
         open={delId !== null}
         onClose={() => setDelId(null)}
         title="حذف معامله"
-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteDeal(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این معامله حذف شود؟', { danger: true }); if (!ok) return; const item = deals.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteDeal(idToDel); setDelId(null); showToast('معامله حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.description}</b>؟</div>
       </Modal>

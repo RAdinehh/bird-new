@@ -18,7 +18,9 @@ import ItemDetailsForm from '../../shr/components/ItemDetailsForm';
 import HelpBanner from '../../shr/components/HelpBanner';
 import InvoicePrint from './InvoicePrint';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert } from '../../cor/store/dialog';
+import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import UndoBar from '../../cor/ui/UndoBar';
+import { showToast } from '../../cor/store/toast';
 import { Row, SectionTitle, chip } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 
@@ -61,6 +63,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
   const [form, setForm] = useState<F>(empty(isPurchase));
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [filterCat, setFilterCat] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [printId, setPrintId] = useState<string | null>(null);
@@ -107,6 +110,18 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
 
   // ==== Handlers ====
+  const undoDelete = () => {
+    const item = undoData;
+    if (!item) return;
+    try {
+      addInvoice(item.item);
+      showToast('فاکتور بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
+
   const openNew = () => {
     if (parties.length === 0) { showAlert(isPurchase ? 'اول یک فروشنده بسازید' : 'اول یک مشتری بسازید'); return; }
     const today = formatJ(new Date(), 'yyyy/MM/dd');
@@ -237,6 +252,13 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
 
   return (
     <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="حذف شد"
+          onUndo={undoDelete}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
       <HelpBanner
         id="purchases-intro"
         icon="📥"
@@ -591,7 +613,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
       {/* Modal حذف */}
       <Modal
         open={delId !== null} onClose={() => setDelId(null)} title="حذف خرید"
-        footer={<BtnRow><Btn onClick={() => setDelId(null)}>لغو</Btn><Btn variant="danger" onClick={() => { if (delId) deleteInvoice(delId); setDelId(null); }}>حذف کن</Btn></BtnRow>}
+        footer={<BtnRow><Btn onClick={() => setDelId(null)}>لغو</Btn><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این فاکتور حذف شود؟', { danger: true }); if (!ok) return; const item = invoices.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteInvoice(idToDel); setDelId(null); showToast('فاکتور حذف شد', 'info', 1800); }}>حذف کن</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.number}</b>؟</div>
       </Modal>
