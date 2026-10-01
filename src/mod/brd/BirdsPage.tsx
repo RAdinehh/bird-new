@@ -8,6 +8,9 @@ import {
 } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import UndoBar from '../../cor/ui/UndoBar';
+import { showToast } from '../../cor/store/toast';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
 interface F { id?: string; name: string; cycleDays: string; fcrStandard: string; }
 const empty: F = { name: '', cycleDays: '', fcrStandard: '' };
@@ -18,6 +21,7 @@ export default function BirdsPage() {
   const [form, setForm] = useState<F>(empty);
   const [error, setError] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // فیلتر تکرارها تو render
@@ -62,8 +66,27 @@ export default function BirdsPage() {
   };
   const target = delId ? birds.find(b => b.id === delId) : null;
 
+  const undoDelete = () => {
+    const item = undoData;
+    if (!item) return;
+    try {
+      addBird(item.item);
+      showToast('پرنده بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
+
   return (
     <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="حذف شد"
+          onUndo={undoDelete}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
       {birds.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>}
@@ -187,7 +210,7 @@ export default function BirdsPage() {
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف پرنده"
-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteBird(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این پرنده حذف شود؟', { danger: true }); if (!ok) return; const item = birds.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteBird(idToDel); setDelId(null); showToast('پرنده حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
           آیا از حذف <b>{target?.name}</b> مطمئن هستید؟
           <br /><span style={{ color: 'var(--muted)', fontSize: 'var(--fs-base)' }}>تمام نژادهای مربوط به این پرنده هم حذف می‌شوند.</span>
