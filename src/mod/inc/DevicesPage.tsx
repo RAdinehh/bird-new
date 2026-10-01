@@ -480,10 +480,8 @@ export default function DevicesPage() {
           onChange={(id) => {
             setActiveGroup(id);
             openOnly(id);
-            setTimeout(() => {
-              const el = document.getElementById('fg-' + id);
-              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 180);
+            const el = document.getElementById('fg-' + id);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
         />
 
