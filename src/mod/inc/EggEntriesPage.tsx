@@ -14,6 +14,7 @@ import { useCtc } from '../ctc/store';
 import { useTra } from '../tra/store';
 import { useEgg } from '../egg/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
+import { FormGroup, FormSub, FormSubFirst, FormTabs, useFormGroups } from '../dlg/helpers';
 import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -145,6 +146,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const [undoRow, setUndoRow] = useState<{ row: DraftRow; idx: number } | null>(null);
   const [currentRow, setCurrentRow] = useState<DraftRow>(() => makeRow());
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
+  const [activeGroup, setActiveGroup] = useState('source');
+  const { groups, toggle, openOnly } = useFormGroups({ source: true, egg: false, finance: false });
 
   // ═══ Draft Auto-Load when device changes ═══
   useEffect(() => {
@@ -874,8 +877,26 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             <span>{editingRowId ? 'ویرایش ردیف انتخاب‌شده' : 'ردیف جدید'}</span>
           </div>
 
+          <FormTabs
+            tabs={[
+              { id: 'source',  icon: '🏠', label: 'منبع' },
+              { id: 'egg',     icon: '🥚', label: 'تخم' },
+              { id: 'finance', icon: '💰', label: 'مالی' },
+            ]}
+            active={activeGroup}
+            onChange={(id) => {
+              setActiveGroup(id);
+              openOnly(id);
+              setTimeout(() => {
+                const el = document.getElementById('fg-' + id);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }, 180);
+            }}
+          />
+
           {/* ═══ منبع + زمان ═══ */}
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🏠 منبع و طرف مقابل</div>
+            <FormGroup id="source" icon="🏠" title="منبع و زمان" sub="طرف، تاریخ، درصد" open={!!groups.source} onToggle={() => toggle('source')}>
+          <FormSubFirst icon="🏠" title="منبع و طرف مقابل">
 
           <Field label="نوع منبع" required>
             <Select value={currentRow.dealType} onChange={e => setCurrentRow(f => ({ ...f, dealType: e.target.value as DealType, dealData: {}, flockId: '' }))}>
@@ -956,7 +977,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             </Field>
           )}
 
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4, borderTop: '1px dashed var(--border)' }}>📅 زمان</div>
+          </FormSubFirst>
+          <FormSub icon="📅" title="زمان">
           <Grid2>
             <Field label="تاریخ ورود" required>
               <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ"  autoToday />
@@ -967,6 +989,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           </Grid2>
 
           
+          </FormSub>
+          <FormSub icon="📊" title="شراکت و درصد">
           {/* درصد شریک/امانت‌دار + اجاره */}
           {currentRow.dealType === 'partnership' && (
             <Grid2>
@@ -1013,9 +1037,12 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             </div>
           )}
 
-          {/* مشخصات تخم */}
-          <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 4 }}>
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 8 }}>🥚 مشخصات تخم</div>
+                    </FormSub>
+          </FormGroup>
+
+          <FormGroup id="egg" icon="🥚" title="مشخصات تخم" sub="پرنده، نژاد، تعداد" open={!!groups.egg} onToggle={() => toggle('egg')}>
+          <FormSubFirst icon="🥚" title="پرنده و تعداد">
+          <div>
             <Grid2>
               <Field label="پرنده" required>
                 <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="—" modalTitle="انتخاب پرنده" autoThreshold={6} />
@@ -1052,11 +1079,15 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               return <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 700 }}>✅ قابل قبول — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
             })()}
           </div>
+          </FormSubFirst>
+          </FormGroup>
+
+          <FormGroup id="finance" icon="💰" title="مالی و یادداشت" sub="قیمت، حمل، یادداشت" open={!!groups.finance} onToggle={() => toggle('finance')}>
+          <FormSubFirst icon="💰" title="مالی">
 
           {/* مالی */}
           {(currentRow.dealType === 'purchase' || currentRow.dealType === 'partnership') && (
-            <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 4 }}>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 8 }}>💰 مالی</div>
+            <div>
               <Grid2>
                 <Field label="قیمت هر تخم">
                   <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
@@ -1078,10 +1109,14 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             </div>
           )}
 
-          {/* یادداشت */}
+          </FormSubFirst>
+          <FormSub icon="📝" title="یادداشت">
           <Field label="یادداشت">
             <Input placeholder="..." value={currentRow.notes} onChange={e => setCurrentRow(f => ({ ...f, notes: e.target.value }))} />
           </Field>
+
+          </FormSub>
+          </FormGroup>
 
           {/* دکمه‌ها */}
           <div style={{ display: 'flex', gap: 6 }}>
