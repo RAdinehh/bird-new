@@ -14,6 +14,7 @@ import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/Exp
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 import { Row, chip } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { useIncubationProfile } from './hooks';
@@ -37,6 +38,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   const [entriesData, setEntriesData] = useState<Record<string, any>>({});
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ hatch: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [deviceFilter, setDeviceFilter] = useState('');
@@ -96,6 +98,15 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
       unknownCount: h.unknownCount ? toFa(h.unknownCount) : '', avgWeight: h.avgWeight ? toFa(h.avgWeight) : '', notes: h.notes
     }});
     setErr(''); setOpen(true);
+  };
+
+  const undoDeleteHatch = () => {
+    if (!undoData) return;
+    try {
+      addHatch(undoData.hatch);
+      showToast('هچ بازگردانی شد', 'success', 2000);
+    } catch {}
+    setUndoData(null);
   };
 
   const save = () => {
@@ -209,6 +220,21 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
   return (
     <PageContainer>
+      {undoData && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '10px 14px', marginBottom: 8,
+          background: 'var(--warn-soft)', border: '1px solid var(--warn)',
+          borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)',
+        }}>
+          <span>هچ حذف شد</span>
+          <button type="button" onClick={undoDeleteHatch} aria-label="بازگردانی هچ" style={{
+            background: 'none', border: 'none', color: 'var(--warn)',
+            fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+            fontSize: 'var(--fs-sm)', padding: '4px 10px',
+          }}>بازگردانی</button>
+        </div>
+      )}
       {hatches.length > 0 && (
         <>
           <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو..." />
