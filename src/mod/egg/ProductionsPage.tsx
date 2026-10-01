@@ -12,6 +12,9 @@ import DatePicker from '../../shr/components/DatePicker';
 import ProgressTracker from '../../shr/components/ProgressTracker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import UndoBar from '../../cor/ui/UndoBar';
+import { showToast } from '../../cor/store/toast';
+import { showConfirmAsync } from '../../cor/store/dialog';
 import { Row, SectionTitle, chip } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 
@@ -46,6 +49,7 @@ export default function ProductionsPage() {
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [filterFlock, setFilterFlock] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -54,6 +58,18 @@ export default function ProductionsPage() {
     if (filterFlock) arr = arr.filter(p => p.flockId === filterFlock);
     return arr.sort((a, b) => b.date.localeCompare(a.date));
   }, [productions, filterFlock]);
+
+  const undoDelete = () => {
+    const item = undoData;
+    if (!item) return;
+    try {
+      addProduction(item.item);
+      showToast('بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
 
   const openNew = () => {    const lastRec = productions.filter(p => p.flockId).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
     const defaultX = lastRec?.flockId || flocks.filter(f => f.status === 'active')[0]?.id || flocks[0]?.id || '';
@@ -155,6 +171,13 @@ export default function ProductionsPage() {
 
   return (
     <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="حذف شد"
+          onUndo={undoDelete}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
         <HelpBanner
           id="egg-prod-intro"
           icon="🥚"
@@ -398,7 +421,7 @@ export default function ProductionsPage() {
         open={delId !== null}
         onClose={() => setDelId(null)}
         title="حذف تخم‌گذاری"
-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteProduction(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = productions.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteProduction(idToDel); setDelId(null); showToast('حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف ثبت <b>{toFa(target?.date)}</b>؟</div>
       </Modal>

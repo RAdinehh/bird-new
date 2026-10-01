@@ -9,6 +9,9 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import UndoBar from '../../cor/ui/UndoBar';
+import { showToast } from '../../cor/store/toast';
+import { showConfirmAsync } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { Row, SectionTitle } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
@@ -39,6 +42,7 @@ export default function StockPage() {
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const stock = useMemo(() => calcStock(productions, sales), [productions, sales]);
@@ -47,6 +51,18 @@ export default function StockPage() {
     () => [...sales].sort((a, b) => b.date.localeCompare(a.date)),
     [sales]
   );
+
+  const undoDelete = () => {
+    const item = undoData;
+    if (!item) return;
+    try {
+      addSale(item.item);
+      showToast('بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
 
   const openNew = () => {    const lastRec = sales.filter(s => s.customerId).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
     const defaultX = lastRec?.customerId || customers[0]?.id || '';
@@ -101,6 +117,13 @@ export default function StockPage() {
 
   return (
     <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="حذف شد"
+          onUndo={undoDelete}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
       <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>
         📦 موجودی انبار
       </div>
@@ -311,7 +334,7 @@ export default function StockPage() {
         open={delId !== null}
         onClose={() => setDelId(null)}
         title="حذف فروش"
-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) deleteSale(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = sales.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteSale(idToDel); setDelId(null); showToast('حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>
           حذف فروش به <b>{contacts.find(c => c.id === target?.customerId)?.name}</b>؟
