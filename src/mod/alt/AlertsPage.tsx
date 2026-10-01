@@ -8,6 +8,7 @@ import { toFa } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { logAction } from '../../cor/logger/auditLog';
 
 type TabId = 'active' | 'history';
 type FilterLevel = AlertLevel | '';
@@ -235,7 +236,8 @@ export default function AlertsPage() {
           open={delId !== null}
           onClose={() => setDelId(null)}
           title="حذف هشدار"
-          footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این هشدار حذف شود؟', { danger: true }); if (!ok) return; const item = alerts.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } remove(idToDel); setDelId(null); showToast('هشدار حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
+          footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این هشدار حذف شود؟', { danger: true }); if (!ok) return; const item = alerts.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } remove(idToDel);
+              logAction('delete', 'alt', 'حذف از هشدارها'); setDelId(null); showToast('هشدار حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
         >
           <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>
             حذف این هشدار از تاریخچه؟

@@ -9,6 +9,7 @@ import { showAlert } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { logAction } from '../../cor/logger/auditLog';
 
 export default function BreedsPage() {
   const { birds, breeds: _breedsRaw, dedupeBreeds, addBreed, updateBreed, deleteBreed } = useBrd();
@@ -207,7 +208,8 @@ export default function BreedsPage() {
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف نژاد"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این نژاد حذف شود؟', { danger: true }); if (!ok) return; const item = breeds.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteBreed(idToDel); setDelId(null); showToast('نژاد حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این نژاد حذف شود؟', { danger: true }); if (!ok) return; const item = breeds.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteBreed(idToDel);
+              logAction('delete', 'brd', 'حذف از پرنده و نژاد'); setDelId(null); showToast('نژاد حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
           آیا از حذف <b>{target?.name}</b> مطمئن هستید؟
         </div>

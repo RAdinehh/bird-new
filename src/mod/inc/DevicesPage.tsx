@@ -14,6 +14,7 @@ import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { parse as parseJ, addMonths, format as formatJ } from 'date-fns-jalali';
 import { Row, normalizeBird } from './helpers';
 import { useIncubationProfile } from './hooks';
+import { logAction } from '../../cor/logger/auditLog';
 
 function OvNumField({ label, hint, value, defValue, onChange, unit, min, max, placeholder }: any) {
   const overridden = defValue != null && value != null && value !== '' && Number(value) !== Number(defValue);

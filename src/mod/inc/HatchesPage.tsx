@@ -18,6 +18,7 @@ import { showToast } from '../../cor/store/toast';
 import { Row, chip } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { useIncubationProfile } from './hooks';
+import { logAction } from '../../cor/logger/auditLog';
 
 const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
 

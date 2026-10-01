@@ -16,6 +16,7 @@ import { showToast } from '../../cor/store/toast';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
 import { Row, SectionTitle, chip } from './helpers';
+import { logAction } from '../../cor/logger/auditLog';
 
 interface F {
   id?: string;
@@ -407,7 +408,8 @@ export default function ItemsPage() {
         open={delId !== null}
         onClose={() => setDelId(null)}
         title="حذف قلم"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = items.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteItem(idToDel); setDelId(null); showToast('حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = items.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteItem(idToDel);
+              logAction('delete', 'whs', 'حذف از انبار'); setDelId(null); showToast('حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>
           حذف <b>{target?.name}</b>؟

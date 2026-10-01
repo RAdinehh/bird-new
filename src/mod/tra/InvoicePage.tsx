@@ -23,6 +23,7 @@ import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { Row, SectionTitle, chip } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
+import { logAction } from '../../cor/logger/auditLog';
 
 interface F {
   id?: string;
@@ -613,7 +614,8 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
       {/* Modal حذف */}
       <Modal
         open={delId !== null} onClose={() => setDelId(null)} title="حذف خرید"
-        footer={<BtnRow><Btn onClick={() => setDelId(null)}>لغو</Btn><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این فاکتور حذف شود؟', { danger: true }); if (!ok) return; const item = invoices.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteInvoice(idToDel); setDelId(null); showToast('فاکتور حذف شد', 'info', 1800); }}>حذف کن</Btn></BtnRow>}
+        footer={<BtnRow><Btn onClick={() => setDelId(null)}>لغو</Btn><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این فاکتور حذف شود؟', { danger: true }); if (!ok) return; const item = invoices.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteInvoice(idToDel);
+              logAction('delete', 'tra', 'حذف از معاملات'); setDelId(null); showToast('فاکتور حذف شد', 'info', 1800); }}>حذف کن</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.number}</b>؟</div>
       </Modal>

@@ -12,6 +12,7 @@ import { chip } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { logAction } from '../../cor/logger/auditLog';
 
 export default function ZonesPage() {
   const { halls: _hallsRaw, zones: _zonesRaw, addZone, updateZone, deleteZone } = useHal();
@@ -205,7 +206,8 @@ export default function ZonesPage() {
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف بخش"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این منطقه حذف شود؟', { danger: true }); if (!ok) return; const item = zones.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteZone(idToDel); setDelId(null); showToast('منطقه حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این منطقه حذف شود؟', { danger: true }); if (!ok) return; const item = zones.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteZone(idToDel);
+              logAction('delete', 'hal', 'حذف از سالن‌ها'); setDelId(null); showToast('منطقه حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.name}</b>؟</div>
       </Modal>
     </PageContainer>

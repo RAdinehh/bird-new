@@ -32,6 +32,7 @@ import { showToast } from '../../cor/store/toast';
 import UndoBar from '../../cor/ui/UndoBar';
 import { Section, SectionTitle, Row } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
+import { logAction } from '../../cor/logger/auditLog';
 
 interface F {
   id?: string;
@@ -932,6 +933,7 @@ export default function DailyLogsPage() {
             const prod = findByLogId(idToDel);
             if (prod) deleteProduction(prod.id);
             remove(idToDel);
+              logAction('delete', 'dlg', 'حذف از ثبت روزانه');
             showToast('ثبت حذف شد', 'info', 1800);
             setDelId(null);
           }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>

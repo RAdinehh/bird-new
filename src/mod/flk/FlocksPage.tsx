@@ -21,6 +21,7 @@ import DependentSelect from '../../shr/components/DependentSelect';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
 import { Row, DepBox } from './helpers';
+import { logAction } from '../../cor/logger/auditLog';
 
 interface F {
   id?: string;
@@ -688,7 +689,8 @@ export default function FlocksPage() {
         </Modal>
 
         <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف گله"
-          footer={<BtnRow><Btn variant="danger" onClick={() => { const idToDel = delId; if (!idToDel) return; const item = flocks.find(f => f.id === idToDel); if (item) { setUndoData({ flock: item }); setTimeout(() => setUndoData((cur: any) => cur && cur.flock.id === item.id ? null : cur), 6000); } remove(idToDel); setDelId(null); showToast('گله حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+          footer={<BtnRow><Btn variant="danger" onClick={() => { const idToDel = delId; if (!idToDel) return; const item = flocks.find(f => f.id === idToDel); if (item) { setUndoData({ flock: item }); setTimeout(() => setUndoData((cur: any) => cur && cur.flock.id === item.id ? null : cur), 6000); } remove(idToDel);
+              logAction('delete', 'flk', 'حذف از گله‌ها'); setDelId(null); showToast('گله حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
           <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>
             حذف کامل <b>{target?.name}</b>؟
             <br />

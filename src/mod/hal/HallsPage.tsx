@@ -11,6 +11,7 @@ import { Row, Pill } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { logAction } from '../../cor/logger/auditLog';
 
 interface F { id?: string; name: string; code: string; length: string; width: string; height: string; capacity: string; targetTemp: string; targetHumidity: string; ventilation: string; light: string; ventilationSystem: string; feederType: string; drinkerType: string; litterType: string; address: string; builtAt: string; lastSanitizedAt: string; notes: string; }
 const empty: F = { name:'', code:'', length:'', width:'', height:'', capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'', ventilationSystem:'tunnel', feederType:'chain', drinkerType:'nipple', litterType:'wood_shavings', address:'', builtAt:'', lastSanitizedAt:'', notes:'' };
@@ -234,7 +235,8 @@ export default function HallsPage() {
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف سالن"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این سالن حذف شود؟', { danger: true }); if (!ok) return; const item = halls.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteHall(idToDel); setDelId(null); showToast('سالن حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این سالن حذف شود؟', { danger: true }); if (!ok) return; const item = halls.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteHall(idToDel);
+              logAction('delete', 'hal', 'حذف از سالن‌ها'); setDelId(null); showToast('سالن حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
           حذف <b>{target?.name}</b>؟
           <br /><span style={{ color: 'var(--muted)', fontSize: 'var(--fs-base)' }}>تمام بخش‌ها و تجهیزات این سالن هم حذف می‌شوند.</span>

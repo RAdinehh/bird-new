@@ -9,6 +9,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { logAction } from '../../cor/logger/auditLog';
 
 interface F {
   id?: string; name: string; phone: string; phone2: string; email: string;
@@ -333,7 +334,8 @@ export default function ContactsPage() {
         </Modal>
 
         <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف مخاطب"
-          footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مخاطب حذف شود؟', { danger: true }); if (!ok) return; const item = contacts.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } remove(idToDel); setDelId(null); showToast('مخاطب حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+          footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مخاطب حذف شود؟', { danger: true }); if (!ok) return; const item = contacts.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } remove(idToDel);
+              logAction('delete', 'ctc', 'حذف از مخاطبین'); setDelId(null); showToast('مخاطب حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
           <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.name}</b>؟</div>
         </Modal>
       </PageContainer>

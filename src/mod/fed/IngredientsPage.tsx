@@ -12,6 +12,7 @@ import { Row, SectionTitle, chip } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { logAction } from '../../cor/logger/auditLog';
 
 interface F {
   id?: string;
@@ -414,7 +415,8 @@ export default function IngredientsPage() {
         open={delId !== null}
         onClose={() => setDelId(null)}
         title="حذف ماده"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این ماده حذف شود؟', { danger: true }); if (!ok) return; const item = ingredients.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteIngredient(idToDel); setDelId(null); showToast('ماده حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این ماده حذف شود؟', { danger: true }); if (!ok) return; const item = ingredients.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteIngredient(idToDel);
+              logAction('delete', 'fed', 'حذف از جیره‌نویسی'); setDelId(null); showToast('ماده حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>
           حذف <b>{target?.name}</b>؟
