@@ -383,39 +383,54 @@ export function Modal({
   const dragStartY = useRef(0);
   const dragLastY = useRef(0);
   const dragStartT = useRef(0);
+  const rafRef = useRef(0);
 
   React.useEffect(() => {
-    if (open) { setSnap('partial'); setDragY(0); setDragging(false); }
+    if (open) { setSnap('partial'); setDragY(0); setDragging(false); if (modalRef.current) modalRef.current.style.transform = ''; }
   }, [open]);
 
   const onDragStart = (e: React.TouchEvent) => {
     dragActive.current = true;
-    setDragging(true);
     dragStartY.current = e.touches[0].clientY;
     dragLastY.current = 0;
     dragStartT.current = Date.now();
+    if (modalRef.current) modalRef.current.style.transition = 'none';
   };
   const onDragMove = (e: React.TouchEvent) => {
     if (!dragActive.current) return;
-    let dy = e.touches[0].clientY - dragStartY.current;
-    const floor = snap === 'full' ? 0 : -240;
-    dy = Math.max(floor, Math.min(560, dy));
+    const touchY = e.touches[0].clientY;
+    const min = snap === 'full' ? 0 : -240;
+    const dy = Math.max(min, Math.min(560, touchY - dragStartY.current));
     dragLastY.current = dy;
-    setDragY(dy);
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      if (modalRef.current) {
+        modalRef.current.style.transform = `translateY(${dragLastY.current}px)`;
+      }
+    });
   };
   const onDragEnd = () => {
     if (!dragActive.current) return;
     dragActive.current = false;
+    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = 0; }
     const dy = dragLastY.current;
     const dt = Math.max(1, Date.now() - dragStartT.current);
     const v = dy / dt;
     const fast = Math.abs(v) > 0.5;
+    const el = modalRef.current;
+    if (!el) return;
+
     if (snap === 'partial') {
       if (dy < -60 || (fast && v < -0.4)) {
-        setDragging(false); setDragY(0); setSnap('full'); return;
+        setSnap('full');
+        el.style.transition = 'transform 300ms cubic-bezier(.2,.9,.3,1)';
+        el.style.transform = '';
+        return;
       }
       if (dy > 110 || (fast && v > 0.5)) {
-        setDragY(window.innerHeight);
+        el.style.transition = 'transform 240ms ease-out';
+        el.style.transform = `translateY(${window.innerHeight}px)`;
         setTimeout(() => {
           if (!preventCloseRef.current) onCloseRef.current();
         }, 240);
@@ -423,10 +438,14 @@ export function Modal({
       }
     } else {
       if (dy > 60 || (fast && v > 0.4)) {
-        setDragging(false); setDragY(0); setSnap('partial'); return;
+        setSnap('partial');
+        el.style.transition = 'transform 300ms cubic-bezier(.2,.9,.3,1)';
+        el.style.transform = '';
+        return;
       }
     }
-    setDragging(false); setDragY(0);
+    el.style.transition = 'transform 300ms cubic-bezier(.2,.9,.3,1)';
+    el.style.transform = '';
   };
 
   // Esc + body scroll lock + focus return
@@ -571,10 +590,7 @@ export function Modal({
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          transform: dragY !== 0 ? `translateY(${dragY}px)` : undefined,
-          transition: dragging
-            ? 'none'
-            : 'max-height 320ms cubic-bezier(.2,.9,.3,1), height 320ms cubic-bezier(.2,.9,.3,1), border-radius 220ms ease, transform 300ms cubic-bezier(.2,.9,.3,1)',
+          transition: 'max-height 320ms cubic-bezier(.2,.9,.3,1), height 320ms cubic-bezier(.2,.9,.3,1), border-radius 220ms ease, transform 300ms cubic-bezier(.2,.9,.3,1)',
         }}
       >
         {/* Drag handle (فقط موبایل) */}
@@ -584,17 +600,19 @@ export function Modal({
           onTouchEnd={onDragEnd}
           onTouchCancel={onDragEnd}
           style={{
-            padding: '10px 0 6px',
+            padding: '14px 0 10px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             cursor: 'grab',
             touchAction: 'none',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
             flexShrink: 0,
           }}
         >
           <div style={{
-            width: 40, height: 4, borderRadius: 2,
+            width: 48, height: 5, borderRadius: 3,
             background: 'var(--border)',
           }} />
         </div>
