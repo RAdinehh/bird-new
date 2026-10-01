@@ -15,6 +15,7 @@ export default function Fed() {
   const [tab, setTab] = useState<TabId>('ingredients');
   const scrollRef = useRef<HTMLDivElement>(null);
   const syncingRef = useRef(false);
+  const clickToRef = useRef(false);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -25,7 +26,8 @@ export default function Fed() {
     const target = idx * el.clientWidth;
     if (Math.abs(el.scrollLeft - target) < 4) return;
     syncingRef.current = true;
-    el.scrollTo({ left: target, behavior: 'smooth' });
+    el.scrollTo({ left: target, behavior: clickToRef.current ? 'auto' : 'smooth' });
+    clickToRef.current = false;
     const t = setTimeout(() => { syncingRef.current = false; }, 500);
     return () => clearTimeout(t);
   }, [tab]);
@@ -60,7 +62,7 @@ export default function Fed() {
         {tabs.map(t => (
           <div
             key={t.id}
-            onClick={() => setTab(t.id)}
+            onClick={() => { clickToRef.current = true; setTab(t.id); }}
             style={{
               padding: '11px 12px',
               fontSize: 'var(--fs-base)',
