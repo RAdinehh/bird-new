@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import {
   useFlk, type Flock, type FlockType, type FlockStatus,
   SOURCE_LABEL, getAgeDays, getLifecycle, formatAge,
@@ -63,6 +64,7 @@ export default function FlocksPage() {
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
   const [archId, setArchId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'archived'], tab, (id) => setTab(id as TabId));
 
   // فیلتر تکرارها تو render
   const birds = useMemo(() => {
@@ -221,7 +223,7 @@ export default function FlocksPage() {
   ];
 
   return (
-    <div>
+    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 12px', background: 'var(--header-bg)',

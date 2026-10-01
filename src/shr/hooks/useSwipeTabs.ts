@@ -10,48 +10,45 @@ export function useSwipeTabs(
   const idsRef = useRef(ids);
   const activeRef = useRef(active);
   const onChangeRef = useRef(onChange);
+  const optsRef = useRef(opts);
   idsRef.current = ids;
   activeRef.current = active;
   onChangeRef.current = onChange;
+  optsRef.current = opts;
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
     let startX = 0, startY = 0, startT = 0;
     let activeTouch = false;
     let locked: 'none' | 'h' | 'v' = 'none';
 
-    const hasHScroll = (node: HTMLElement | null): boolean => {
-      let cur: HTMLElement | null = node;
-      while (cur && cur !== el) {
-        const ox = window.getComputedStyle(cur).overflowX;
-        if (ox === 'scroll' && cur.scrollWidth > cur.clientWidth + 4) return true;
-        cur = cur.parentElement;
-      }
-      return false;
-    };
-
     const onStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const tgt = e.target as HTMLElement;
-      if (tgt.closest('[role="dialog"]')) return;
-      if (hasHScroll(tgt)) return;
+      // فقط dialog رو skip کن
+      if (tgt.closest('[role="dialog"]')) { activeTouch = false; return; }
       const t = e.touches[0];
-      startX = t.clientX; startY = t.clientY;
+      startX = t.clientX;
+      startY = t.clientY;
       startT = Date.now();
-      activeTouch = true; locked = 'none';
+      activeTouch = true;
+      locked = 'none';
     };
 
     const onMove = (e: TouchEvent) => {
-      if (!activeTouch || locked !== 'none') return;
+      if (!activeTouch) return;
       const t = e.touches[0];
       const dx = t.clientX - startX;
       const dy = t.clientY - startY;
-      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-        locked = Math.abs(dx) > Math.abs(dy) * 1.5 ? 'h' : 'v';
+      if (locked === 'none') {
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+          locked = Math.abs(dx) > Math.abs(dy) * 1.4 ? 'h' : 'v';
+        }
       }
       if (locked === 'h' && e.cancelable) {
-        e.preventDefault();
+        try { e.preventDefault(); } catch {}
       }
     };
 
@@ -61,16 +58,19 @@ export function useSwipeTabs(
       const wasH = locked === 'h';
       locked = 'none';
       if (!wasH) return;
-      const o = opts || {};
-      const threshold = o.threshold ?? 55;
-      const velocity = o.velocity ?? 0.4;
-      const edgeGuard = o.edgeGuard ?? 30;
+
+      const o = optsRef.current || {};
+      const threshold = o.threshold ?? 45;
+      const velocity = o.velocity ?? 0.3;
+      const edgeGuard = o.edgeGuard ?? 20;
+
       const t = e.changedTouches[0];
       const dx = t.clientX - startX;
       const dt = Math.max(1, Date.now() - startT);
       const v = Math.abs(dx) / dt;
       if (!(Math.abs(dx) > threshold || v > velocity)) return;
       if (startX < edgeGuard || startX > window.innerWidth - edgeGuard) return;
+
       const idsArr = idsRef.current;
       const idx = idsArr.indexOf(activeRef.current);
       if (idx < 0) return;
