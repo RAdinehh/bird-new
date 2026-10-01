@@ -256,8 +256,8 @@ export default function BackupTab() {
           <>
             <div style={{
               padding: 'var(--pad-comfy)',
-              background: 'var(--info-soft)',
-              border: '1px solid var(--info)',
+              background: 'var(--accent-soft)',
+              border: '1px solid var(--accent-border)',
               borderRadius: 'var(--r-md)',
               display: 'flex', flexDirection: 'column', gap: 'var(--gap-sm)',
               fontSize: 'var(--fs-sm)'

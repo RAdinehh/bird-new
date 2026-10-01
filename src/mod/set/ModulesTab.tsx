@@ -48,14 +48,14 @@ export default function ModulesTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-sm)' }}>
       <div style={{
-        background: 'var(--info-soft)', border: '1px solid var(--info)',
+        background: 'var(--accent-soft)', border: '1px solid var(--accent-border)',
         borderRadius: 'var(--r-md)', padding: '10px var(--sp-3)',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
-        <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--info)', fontWeight: 700 }}>
+        <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
           ماژول‌های فعال
         </span>
-        <span style={{ fontSize: 'var(--fs-md)', color: 'var(--info)', fontWeight: 700 }}>
+        <span style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700 }}>
           {toFa(enabledCount)} / {toFa(totalCount)}
         </span>
       </div>
