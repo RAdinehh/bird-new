@@ -266,10 +266,23 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
   const summary = useMemo(() => {
     const totalEntries = eggEntries.filter(e => e.status !== 'failed').length;
     const totalCandlings = candlings.length;
-    const totalAlive = candlings.reduce((a, c) => a + (c.alive || 0), 0);
-    const totalInfertile = candlings.reduce((a, c) => a + (c.infertile || 0), 0);
-    const totalDead = candlings.reduce((a, c) => a + (c.dead || 0), 0);
-    const totalBroken = candlings.reduce((a, c) => a + (c.broken || 0), 0);
+
+    // برای هر کندلینگ، از baseinfo مربوطه alive رو محاسبه کن
+    const allData = candlings.map(c => {
+      const entry = eggEntries.find(e => e.id === c.eggEntryId);
+      const entryTotal = entry?.count || 0;
+      const baseInfo = calcAvailableBase(c.eggEntryId, c.stage, c.id, candlings, entryTotal);
+      const inf = c.infertile || 0;
+      const dead = c.dead || 0;
+      const brk = c.broken || 0;
+      const alive = Math.max(0, (baseInfo.base || 0) - inf - dead - brk);
+      return { alive, inf, dead, brk };
+    });
+
+    const totalAlive = allData.reduce((a, x) => a + x.alive, 0);
+    const totalInfertile = allData.reduce((a, x) => a + x.inf, 0);
+    const totalDead = allData.reduce((a, x) => a + x.dead, 0);
+    const totalBroken = allData.reduce((a, x) => a + x.brk, 0);
     const grandTotal = totalAlive + totalInfertile + totalDead + totalBroken;
     const fertilePercent = grandTotal > 0 ? (totalAlive / grandTotal * 100) : 0;
     const lossPercent = grandTotal > 0 ? ((totalInfertile + totalDead + totalBroken) / grandTotal * 100) : 0;
