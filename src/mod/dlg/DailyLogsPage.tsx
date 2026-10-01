@@ -27,7 +27,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert } from '../../cor/store/dialog';
+import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
 import UndoBar from '../../cor/ui/UndoBar';
 import { Section, SectionTitle, Row } from './helpers';
@@ -918,19 +918,21 @@ export default function DailyLogsPage() {
         </Modal>
 
         <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف ثبت روزانه"
-          footer={<BtnRow><Btn variant="danger" onClick={() => {
-            if (delId) {
-              const log = logs.find(l => l.id === delId);
-              if (log) {
-                setUndoData({ log });
-                setTimeout(() => setUndoData(cur => cur && cur.log.id === log.id ? null : cur), 6000);
-              }
-              if (log?.feedMovementIds) log.feedMovementIds.forEach(id => deleteMovement(id));
-              const prod = findByLogId(delId);
-              if (prod) deleteProduction(prod.id);
-              remove(delId);
-              showToast('ثبت حذف شد', 'info', 1800);
+          footer={<BtnRow><Btn variant="danger" onClick={async () => {
+            const idToDel = delId;
+            if (!idToDel) return;
+            const ok = await showConfirmAsync('تأیید حذف', 'این ثبت روزانه و داده‌های مرتبط حذف شوند؟', { danger: true });
+            if (!ok) return;
+            const log = logs.find(l => l.id === idToDel);
+            if (log) {
+              setUndoData({ log });
+              setTimeout(() => setUndoData(cur => cur && cur.log.id === log.id ? null : cur), 6000);
             }
+            if (log?.feedMovementIds) log.feedMovementIds.forEach(id => deleteMovement(id));
+            const prod = findByLogId(idToDel);
+            if (prod) deleteProduction(prod.id);
+            remove(idToDel);
+            showToast('ثبت حذف شد', 'info', 1800);
             setDelId(null);
           }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
           <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف این ثبت؟</div>
