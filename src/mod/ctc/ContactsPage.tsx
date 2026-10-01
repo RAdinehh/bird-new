@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useCtc, type Person, type Role, ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES, SALARY_TYPES, avatarLetter } from './store';
 import { Btn, BtnRow, DigitField, Empty,
   Field, Grid2, Grid3, Input,
@@ -35,6 +36,7 @@ export default function ContactsPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const swipeRef = useSwipeTabs(['all', 'customer', 'supplier', 'worker'], tab, (id) => setTab(id as TabId));
 
   const openNew = () => { setForm(empty); setErr(''); setOpen(true); };
   const openEdit = (p: Person) => {
@@ -132,7 +134,7 @@ export default function ContactsPage() {
   };
 
   return (
-    <div>
+    <div ref={swipeRef}>
       <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
          padding: '0 12px', background: 'var(--header-bg)', position: 'sticky',
          top: 52, zIndex: 11, overflowX: 'auto', scrollbarWidth: 'none' }}>

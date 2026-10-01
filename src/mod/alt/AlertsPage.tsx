@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useAlt, LEVEL_LABEL, LEVEL_ICON, CATEGORY_LABEL, activeAlerts, countByLevel, type Alert, type AlertLevel } from './store';
 import { runRules } from './rules';
 import { Btn, BtnRow, Empty, Modal, PageContainer, Tag } from '../../shr/components/ui';
@@ -17,6 +18,7 @@ export default function AlertsPage() {
   const { alerts, dismiss, snooze, restore, remove, clearAll } = useAlt();
 
   const [tab, setTab] = useState<TabId>('active');
+  const swipeRef = useSwipeTabs(['active', 'history'], tab, (id) => setTab(id as TabId));
   const [filterLevel, setFilterLevel] = useState<FilterLevel>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [snoozeId, setSnoozeId] = useState<string | null>(null);
@@ -73,7 +75,7 @@ export default function AlertsPage() {
   };
 
   return (
-    <div>
+    <div ref={swipeRef}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',

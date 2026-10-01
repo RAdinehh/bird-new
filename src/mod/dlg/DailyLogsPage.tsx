@@ -1,6 +1,7 @@
 /**
  * DailyLogsPage — ثبت روزانه (دمای سالن، آب، دان، تلفات)
  */
+import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useState, useMemo } from 'react';
 import {
   useDlg, type DailyLog, type Death, type Vaccine,
@@ -84,6 +85,7 @@ export default function DailyLogsPage() {
   const feedItems = whsItems.filter(x => x.category === 'feed');
 
   const [tab, setTab] = useState<TabId>('today');
+  const swipeRef = useSwipeTabs(['today', 'history', 'archive'], tab, (id) => setTab(id as TabId));
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(newLog());
   const [err, setErr] = useState('');
@@ -480,7 +482,7 @@ export default function DailyLogsPage() {
   const currentList = tab === 'today' ? todaysLogs : tab === 'history' ? historicalLogs : archivedLogs;
 
   return (
-    <div>
+    <div ref={swipeRef}>
       <div style={{
         display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 12px', background: 'var(--header-bg)',
