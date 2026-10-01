@@ -762,6 +762,7 @@ export default function DevicesPage() {
           }
           deleteDevice(delId);
           setDelId(null);
+          showToast('دستگاه حذف شد', 'info', 1800);
         }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
           حذف <b>{target?.name}</b>؟
