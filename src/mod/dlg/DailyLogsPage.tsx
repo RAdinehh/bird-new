@@ -552,7 +552,14 @@ export default function DailyLogsPage() {
               { id: 'health', label: 'سلامت و سایر', icon: '🩺' },
             ]}
             active={activeGroup}
-            onChange={(id) => { setActiveGroup(id); openOnly(id); }}
+            onChange={(id) => {
+            setActiveGroup(id);
+            openOnly(id);
+            setTimeout(() => {
+              const el = document.getElementById('fg-' + id);
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 400);
+          }}
           />
 
           <FormGroup id="house" icon="🏠" title="محیط و پرنده" sub="پایه، شرایط محیطی، مشاهده" open={!!groups.house} onToggle={() => toggle('house')}>

@@ -47,7 +47,7 @@ interface FormGroupProps {
 
 export function FormGroup({ id, icon, title, sub, open, onToggle, children }: FormGroupProps) {
   return (
-    <div style={{
+    <div id={'fg-' + id} style={{
       position: 'relative',
       background: 'var(--card)',
       backdropFilter: 'blur(8px)',
@@ -56,6 +56,7 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
       overflow: 'hidden',
       marginBottom: 8,
       flexShrink: 0,
+      scrollMarginTop: 80,
       transition: 'border-color var(--dur-base)',
     }}>
       <div style={{
@@ -226,8 +227,7 @@ export function FormTabs({ tabs, active, onChange }: FormTabsProps) {
       position: 'sticky',
       top: 0,
       zIndex: 20,
-      background: 'var(--header-bg)',
-      backdropFilter: 'blur(10px)',
+      background: 'var(--card-solid, var(--card))',
       border: '1px solid var(--border)',
       borderRadius: 'var(--r-lg)',
       padding: 8,

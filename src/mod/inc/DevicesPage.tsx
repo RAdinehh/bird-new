@@ -477,7 +477,14 @@ export default function DevicesPage() {
             { id: 'finance',  icon: '💰', label: 'مالی' },
           ]}
           active={activeGroup}
-          onChange={(id) => { setActiveGroup(id); openOnly(id); }}
+          onChange={(id) => {
+            setActiveGroup(id);
+            openOnly(id);
+            setTimeout(() => {
+              const el = document.getElementById('fg-' + id);
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 400);
+          }}
         />
 
         <FormGroup id="specs" icon="📋" title="مشخصات" sub="اصلی، فنی" open={!!groups.specs} onToggle={() => toggle('specs')}>
