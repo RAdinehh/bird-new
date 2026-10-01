@@ -224,15 +224,14 @@ export function FormTabs({ tabs, active, onChange }: FormTabsProps) {
   return (
     <div style={{
       position: 'sticky',
-      top: 0,
+      top: -14,
       zIndex: 100,
       background: '#ffffff',
       borderBottom: '1px solid var(--border)',
-      padding: '8px 14px 8px 14px',
-      margin: '0 -14px 12px -14px',
+      padding: '22px 14px 8px 14px',
+      margin: '-14px -14px 12px -14px',
       display: 'flex',
       gap: 8,
-      boxShadow: '0 2px 6px rgba(15,23,42,.06)',
     }}>
       {tabs.map(t => (
         <button

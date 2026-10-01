@@ -651,6 +651,8 @@ export function Modal({
           style={{
             padding: '14px',
             overflowY: 'auto',
+            overscrollBehavior: 'contain',
+            WebkitOverflowScrolling: 'touch',
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--sp-3)',

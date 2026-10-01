@@ -483,7 +483,7 @@ export default function DevicesPage() {
             setTimeout(() => {
               const el = document.getElementById('fg-' + id);
               if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 280);
+            }, 180);
           }}
         />
 
