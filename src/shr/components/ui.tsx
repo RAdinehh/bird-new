@@ -967,7 +967,7 @@ export function Sheet({
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%',
-          maxWidth: 420,
+          maxWidth: 100,
           background: 'var(--card-solid, #fff)',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,

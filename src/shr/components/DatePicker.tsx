@@ -195,19 +195,19 @@ export default function DatePicker({
             </div>
           </div>
         }>
-        {/* ═══ هدر فشرده: ‹ ماه سال › با Select مستقیم ═══ */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0 0 4px' }}>
+        {/* ═══ هدر: فلش چپ | ماه | سال | فلش راست ═══ */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8 }}>
           <button
             type="button"
             onClick={() => setCursor(subMonths(cursor, 1))}
             aria-label="ماه قبل"
-            style={{ width: 32, height: 32, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+            style={{ width: 34, height: 34, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
           >›</button>
           <select
             value={String(month)}
             onChange={(e) => setCursor(setMonth(cursor, +e.target.value))}
             aria-label="ماه"
-            style={{ flex: 2, height: 32, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 4px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
+            style={{ flex: 1.5, height: 34, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 6px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
           >
             {MONTHS.map((m, i) => <option key={i} value={i}>{m}</option>)}
           </select>
@@ -215,7 +215,7 @@ export default function DatePicker({
             value={String(year)}
             onChange={(e) => setCursor(setYear(cursor, +e.target.value))}
             aria-label="سال"
-            style={{ flex: 1.2, height: 32, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 4px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
+            style={{ flex: 1, height: 34, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 6px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
           >
             {years.map((y) => <option key={y} value={y}>{toFa(y)}</option>)}
           </select>
@@ -223,7 +223,7 @@ export default function DatePicker({
             type="button"
             onClick={() => setCursor(addMonths(cursor, 1))}
             aria-label="ماه بعد"
-            style={{ width: 32, height: 32, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+            style={{ width: 34, height: 34, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
           >‹</button>
         </div>
 
@@ -260,7 +260,7 @@ export default function DatePicker({
                 aria-selected={isSelected}
                 aria-current={isToday ? 'date' : undefined}
                 style={{
-                  height: 36,
+                  height: 42,
                   padding: 0,
                   background: isSelected ? 'var(--accent)' : 'transparent',
                   border: isToday && !isSelected ? '1.5px solid var(--accent)' : '1px solid transparent',
