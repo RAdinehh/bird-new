@@ -73,7 +73,8 @@ export function useSwipeTabs(
       const idsArr = idsRef.current;
       const idx = idsArr.indexOf(activeRef.current);
       if (idx < 0) return;
-      const nextIdx = dx < 0 ? idx + 1 : idx - 1;
+      // RTL: swipe راست (dx>0) = tab بعدی
+      const nextIdx = dx > 0 ? idx + 1 : idx - 1;
       if (nextIdx < 0 || nextIdx >= idsArr.length) return;
       onChangeRef.current(idsArr[nextIdx]);
     };
