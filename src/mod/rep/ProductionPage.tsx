@@ -137,7 +137,7 @@ export default function ProductionPage() {
       {/* FCR */}
       {fcrData.some(d => d.value > 0) ? (
         <Section title="⚖ FCR (ضریب تبدیل)">
-          <LineChart data={fcrData} color="var(--info)" />
+          <LineChart data={fcrData} color="var(--accent)" />
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center', marginTop: 4 }}>
             محاسبه: دان مصرفی / وزن تخم‌های تولیدی
           </div>

@@ -96,14 +96,14 @@ export default function ComparePage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
             <div style={{
               padding: 'var(--pad-comfy)',
-              background: 'var(--info-soft)',
-              border: '1px solid var(--info)',
+              background: 'var(--accent-soft)',
+              border: '1px solid var(--accent-border)',
               borderRadius: 'var(--r-md)'
             }}>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 700 }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>
                 میانگین فروش ماهانه
               </div>
-              <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--info)', marginTop: 4 }}>
+              <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--accent)', marginTop: 4 }}>
                 {toFa(Math.round(avgSales).toLocaleString('fa-IR'))} ت
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function ComparePage() {
         <Section title="🥚 تولید تخم در طول زمان">
           <BarChart
             data={currentData.map(d => ({ label: d.label, value: d.eggs }))}
-            color="var(--info)"
+            color="var(--accent)"
           />
         </Section>
       ) : null}

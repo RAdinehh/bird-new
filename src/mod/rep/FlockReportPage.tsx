@@ -114,7 +114,7 @@ export default function FlockReportPage() {
             position: 'absolute', top: 0, right: 0, bottom: 0, width: 4,
             background: d.lifecycle.color === 'green' ? 'var(--accent)' :
               d.lifecycle.color === 'amber' ? 'var(--warn)' :
-              d.lifecycle.color === 'blue' ? 'var(--info)' : 'var(--dim)'
+              d.lifecycle.color === 'blue' ? 'var(--accent)' : 'var(--dim)'
           }} />
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
@@ -166,7 +166,7 @@ export default function FlockReportPage() {
           </Section>
 
           <Section title="📊 مقایسه Hen-Day">
-            <BarChart data={henDayChart} color="var(--info)" />
+            <BarChart data={henDayChart} color="var(--accent)" />
           </Section>
         </>
       ) : null}

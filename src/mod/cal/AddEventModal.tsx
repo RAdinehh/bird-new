@@ -100,11 +100,11 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
 
       <div style={{
         padding: 'var(--pad-normal)',
-        background: 'var(--info-soft)',
-        border: '1px solid var(--info)',
+        background: 'var(--accent-soft)',
+        border: '1px solid var(--accent-border)',
         borderRadius: 'var(--r-md)',
         fontSize: 'var(--fs-xs)',
-        color: 'var(--info)',
+        color: 'var(--accent)',
         textAlign: 'center',
         lineHeight: 1.7
       }}>
