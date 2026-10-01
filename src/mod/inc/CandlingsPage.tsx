@@ -67,9 +67,37 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
   const [editingId, setEditingId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ candling: any } | null>(null);
 
+  // ═══ Performance: lookup maps ═══
+  const _entriesById = useMemo(() => {
+    const m: Record<string, any> = {};
+    (eggEntries || []).forEach(e => { m[e.id] = e; });
+    return m;
+  }, [eggEntries]);
+
+  const _birdsById = useMemo(() => {
+    const m: Record<string, any> = {};
+    (birds || []).forEach(b => { m[b.id] = b; });
+    return m;
+  }, [birds]);
+
+  const _devicesById = useMemo(() => {
+    const m: Record<string, any> = {};
+    (devices || []).forEach(d => { m[d.id] = d; });
+    return m;
+  }, [devices]);
+
+  const _candlingsByEntry = useMemo(() => {
+    const m: Record<string, any[]> = {};
+    (candlings || []).forEach(cc => {
+      if (!m[cc.eggEntryId]) m[cc.eggEntryId] = [];
+      m[cc.eggEntryId].push(cc);
+    });
+    return m;
+  }, [candlings]);
+
   useEffect(() => {
     if (initialEntry) {
-      const entry = eggEntries.find(e => e.id === initialEntry);
+      const entry = _entriesById[initialEntry];
       if (entry) {
         setModalDevice(entry.deviceId);
         setSelectedIds(new Set([initialEntry]));
@@ -99,7 +127,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
   const openNew = (preEntryId?: string) => {
     if (eggEntries.length === 0) { showAlert('اول یک ورودی تخم ثبت کنید'); return; }
     const initialDev = preEntryId
-      ? eggEntries.find(e => e.id === preEntryId)?.deviceId || devices[0]?.id || ''
+      ? _entriesById[preEntryId]?.deviceId || devices[0]?.id || ''
       : devices[0]?.id || '';
     setModalDevice(initialDev);
     setSelectedIds(preEntryId ? new Set([preEntryId]) : new Set());
@@ -149,7 +177,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     let hasError = false;
 
     if (editingId) {
-      const entry = eggEntries.find(e => e.id === editingId);
+      const entry = _entriesById[editingId];
       const baseInfo = calcAvailableBase(editingId, dayNum, editingId, candlings, entry?.count || 0);
       const d = entriesData[editingId] || emptyData();
       const _inf = parseInt(toEn(d.infertile)) || 0;
@@ -176,7 +204,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     }
 
     Array.from(selectedIds).forEach(id => {
-      const entry = eggEntries.find(e => e.id === id);
+      const entry = _entriesById[id];
       if (!entry) return;
       const d = entriesData[id] || emptyData();
       const _inf = parseInt(toEn(d.infertile)) || 0;
@@ -243,7 +271,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
         broken: acc.broken + (c.broken || 0),
       }), { alive: 0, infertile: 0, dead: 0, broken: 0 });
       const total = agg.alive + agg.infertile + agg.dead + agg.broken;
-      const entry = eggEntries.find(e => e.id === entryId);
+      const entry = _entriesById[entryId];
       const entryTotal = entry?.count || 0;
       const fertilePercent = total > 0 ? (agg.alive / total * 100) : 0;
       const lossPercent = entryTotal > 0 ? ((total - agg.alive) / entryTotal * 100) : 0;
@@ -252,14 +280,14 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     }).filter(({ entryId }) => {
       if (!q.trim()) return true;
       const t = q.trim().toLowerCase();
-      const entry = eggEntries.find(e => e.id === entryId);
-      const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
-      const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
+      const entry = _entriesById[entryId];
+      const bird = entry ? _birdsById[entry.birdId] : null;
+      const dev = entry ? _devicesById[entry.deviceId] : null;
       const haystack = [bird?.name, dev?.name, entry?.entryDate].filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(t);
     }).sort(({ entryId: a }, { entryId: b }) => {
-      const ea = eggEntries.find(e => e.id === a);
-      const eb = eggEntries.find(e => e.id === b);
+      const ea = _entriesById[a];
+      const eb = _entriesById[b];
       return String(eb?.entryDate || '').localeCompare(String(ea?.entryDate || ''));
     });
   }, [candlings, eggEntries, birds, devices, q]);
@@ -271,7 +299,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
 
     // برای هر کندلینگ، از baseinfo مربوطه alive رو محاسبه کن
     const allData = candlings.map(c => {
-      const entry = eggEntries.find(e => e.id === c.eggEntryId);
+      const entry = _entriesById[c.eggEntryId];
       const entryTotal = entry?.count || 0;
       const baseInfo = calcAvailableBase(c.eggEntryId, c.stage, c.id, candlings, entryTotal);
       const inf = c.infertile || 0;
@@ -351,9 +379,9 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       ) : (
         <>
           {grouped.map(({ entryId, list, agg, total, entryTotal, fertilePercent, lossPercent, deadPercent }, i) => {
-            const entry = eggEntries.find(e => e.id === entryId);
-            const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
-            const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
+            const entry = _entriesById[entryId];
+            const bird = entry ? _birdsById[entry.birdId] : null;
+            const dev = entry ? _devicesById[entry.deviceId] : null;
             const isOpen = expandedId === entryId;
             const lossTone = lossPercent > 20 ? 'danger' : lossPercent > 10 ? 'warn' : 'green';
 
@@ -523,7 +551,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {availableEntries.map(e => {
-              const bird = birds.find(b => b.id === e.birdId);
+              const bird = _birdsById[e.birdId];
               const isSelected = selectedIds.has(e.id);
               const d = dataFor(e.id);
               const sum = (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
