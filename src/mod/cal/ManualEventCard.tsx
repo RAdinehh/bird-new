@@ -128,7 +128,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
         </Field>
         <Grid2>
           <Field label="تاریخ" required>
-            <DatePicker value={date} onChange={setDate} />
+            <DatePicker value={date} onChange={setDate}  autoToday />
           </Field>
           <Field label="ساعت">
             <TimePicker value={time} onChange={setTime} placeholder="انتخاب" />

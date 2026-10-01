@@ -204,7 +204,7 @@ export default function AlertsPage() {
           <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', textAlign: 'center' }}>
             این هشدار تا تاریخ انتخاب‌شده پنهان می‌شود
           </div>
-          <DatePicker value={snoozeDate} onChange={setSnoozeDate} placeholder="انتخاب تاریخ" />
+          <DatePicker value={snoozeDate} onChange={setSnoozeDate} placeholder="انتخاب تاریخ"  autoToday />
         </Modal>
 
         {/* مودال حذف */}
