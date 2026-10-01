@@ -32,12 +32,12 @@ export default function Tra() {
     if (!child) return;
     const cr = child.getBoundingClientRect();
     const er = el.getBoundingClientRect();
-    if (Math.abs(cr.left - er.left) < 4) return;
+    const delta = cr.left - er.left;
+    if (Math.abs(delta) < 4) return;
     syncingRef.current = true;
-    child.scrollIntoView({
+    el.scrollBy({
+      left: delta,
       behavior: clickToRef.current ? 'auto' : 'smooth',
-      block: 'nearest',
-      inline: 'start',
     });
     clickToRef.current = false;
     const t = setTimeout(() => { syncingRef.current = false; }, 400);
@@ -51,18 +51,23 @@ export default function Tra() {
     scrollTimerRef.current = setTimeout(() => {
       const el = scrollRef.current;
       if (!el) return;
-      const w = el.clientWidth;
-      if (w <= 0) return;
-      // در RTL با direction:ltr روی container، scrollLeft از 0 شروع می‌شه
-      const idx = Math.round(Math.abs(el.scrollLeft) / w);
+      const er = el.getBoundingClientRect();
+      let bestIdx = 0;
+      let bestDist = Infinity;
+      for (let i = 0; i < el.children.length; i++) {
+        const c = el.children[i] as HTMLElement;
+        const cr = c.getBoundingClientRect();
+        const d = Math.abs(cr.left - er.left);
+        if (d < bestDist) { bestDist = d; bestIdx = i; }
+      }
       const ids = ['purchases', 'sales', 'deals', 'receivables'] as string[];
-      const newTab = ids[idx];
+      const newTab = ids[bestIdx];
       if (newTab && newTab !== tab) setTab(newTab as TabId);
-    }, 70);
+    }, 90);
   };
 
   return (
-    <div style={{ touchAction: 'pan-y' }}>
+    <div>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',
