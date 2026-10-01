@@ -6,8 +6,9 @@ import { Btn, BtnRow, DigitField, Empty,
   Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showConfirmAsync } from '../../cor/store/dialog';
+import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
 interface F {
   id?: string; name: string; phone: string; phone2: string; email: string;
@@ -31,6 +32,7 @@ export default function ContactsPage() {
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const openNew = () => { setForm(empty); setErr(''); setOpen(true); };
@@ -116,6 +118,18 @@ export default function ContactsPage() {
     { id: 'supplier', label: 'فروشندگان' }, { id: 'worker', label: 'کارگران' }
   ];
 
+  const undoDelete = () => {
+    const item = undoData;
+    if (!item) return;
+    try {
+      add(item.item);
+      showToast('مخاطب بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
@@ -142,6 +156,13 @@ export default function ContactsPage() {
       </div>
 
       <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="مخاطب حذف شد"
+          onUndo={undoDelete}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
         <div style={{ height: 38, background: 'var(--input-bg)', border: '1px solid var(--border)',
            borderRadius: 'var(--r-md)', padding: '0 12px', display: 'flex',
            alignItems: 'center', gap: 8 }}>
@@ -312,7 +333,7 @@ export default function ContactsPage() {
         </Modal>
 
         <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف مخاطب"
-          footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) remove(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+          footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مخاطب حذف شود؟', { danger: true }); if (!ok) return; const item = contacts.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } remove(idToDel); setDelId(null); showToast('مخاطب حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
           <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.name}</b>؟</div>
         </Modal>
       </PageContainer>
