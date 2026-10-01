@@ -56,7 +56,7 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
       overflow: 'hidden',
       marginBottom: 8,
       flexShrink: 0,
-      scrollMarginTop: 100,
+      scrollMarginTop: 120,
       transition: 'border-color var(--dur-base)',
     }}>
       <div style={{
@@ -226,15 +226,14 @@ export function FormTabs({ tabs, active, onChange }: FormTabsProps) {
     <div style={{
       position: 'sticky',
       top: 0,
-      zIndex: 20,
-      background: 'var(--bg, #fff)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-lg)',
-      padding: 8,
+      zIndex: 100,
+      background: '#ffffff',
+      borderBottom: '1px solid var(--border)',
+      padding: '8px 0 8px 0',
       display: 'flex',
       gap: 8,
       marginBottom: 12,
-      boxShadow: '0 1px 3px rgba(15,23,42,.08)',
+      boxShadow: '0 2px 6px rgba(15,23,42,.06)',
     }}>
       {tabs.map(t => (
         <button
@@ -269,7 +268,6 @@ export function FormTabs({ tabs, active, onChange }: FormTabsProps) {
   );
 }
 
-/** Hook برای state گروه‌های باز/بسته */
 export function useFormGroups(initial: Record<string, boolean>) {
   const [groups, setGroups] = useState<Record<string, boolean>>(initial);
   const toggle = (id: string) => setGroups(g => ({ ...g, [id]: !g[id] }));
