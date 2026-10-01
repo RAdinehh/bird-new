@@ -576,7 +576,7 @@ export default function DevicesPage() {
                     fontSize: 'var(--fs-sm)',
                     fontWeight: isSelected ? 700 : 600,
                     boxShadow: isSelected ? '0 0 0 2px var(--accent-soft)' : 'none',
-                    transition: 'all .15s',
+                    transition: 'background 120ms ease, border-color 120ms ease, color 120ms ease',
                   }}
                 >+ {b.name}</button>
               );

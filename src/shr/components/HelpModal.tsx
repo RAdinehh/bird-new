@@ -88,7 +88,7 @@ export default function HelpModal() {
             height: 6,
             borderRadius: 3,
             background: i === step ? 'var(--' + current.accent + ')' : 'var(--border)',
-            transition: 'all .3s'
+            transition: 'background 120ms ease, border-color 120ms ease, color 120ms ease'
           }} />
         ))}
       </div>

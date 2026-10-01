@@ -65,8 +65,7 @@ export default function Header({ title }: { title: string }) {
   return (
     <header style={{
       position: 'sticky', top: 0,
-      background: 'var(--header-bg)',
-      backdropFilter: 'blur(14px)',
+      background: 'var(--card-solid, #fff)',
       WebkitBackdropFilter: 'blur(14px)',
       borderBottom: '1px solid var(--border)',
       padding: '9px 12px',

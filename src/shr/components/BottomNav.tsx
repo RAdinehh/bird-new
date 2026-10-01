@@ -69,8 +69,7 @@ export default function BottomNav() {
       <nav style={{
         position: 'fixed',
         bottom: 0, left: 0, right: 0,
-        background: 'var(--header-bg)',
-        backdropFilter: 'blur(24px) saturate(1.5)',
+        background: 'var(--card-solid, #fff)',
         WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
         borderTop: '1px solid var(--border)',
         display: 'flex',
@@ -165,7 +164,7 @@ export default function BottomNav() {
                     fontWeight: isActive ? 800 : 500,
                     color: isActive ? 'var(--accent)' : 'var(--muted)',
                     letterSpacing: isActive ? '-.2px' : '0',
-                    transition: 'all .25s',
+                    transition: 'background 120ms ease, border-color 120ms ease, color 120ms ease',
                     lineHeight: 1,
                     animation: isActive ? 'pmLabelFade 0.3s ease-out' : 'none'
                   }}>

@@ -105,7 +105,6 @@ export default function SettingsGroup({
         display: 'grid',
         gridTemplateRows: open ? '1fr' : '0fr',
         transition: 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
-        willChange: 'grid-template-rows'
       }}>
         <div style={{ overflow: 'hidden' }}>
           <div style={{

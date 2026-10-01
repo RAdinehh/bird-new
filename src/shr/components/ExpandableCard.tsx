@@ -133,7 +133,6 @@ export default function ExpandableCard({
         display: 'grid',
         gridTemplateRows: isOpen ? '1fr' : '0fr',
         transition: noAnim ? 'none' : 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
-        willChange: 'grid-template-rows',
       }}>
         <div style={{ overflow: 'hidden' }}>
           <div style={{ padding: '0 18px 14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
