@@ -111,9 +111,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const _profiles = useSet((s: any) => s.incubationProfiles) || [];
-  const daysByName = useMemo(() => {
-
-  // ═══ Performance: pre-compute lookup maps ═══
+  // ═══ Performance: pre-compute lookup maps (top-level hooks) ═══
   const _birdsById = useMemo(() => {
     const m: Record<string, any> = {};
     (birds || []).forEach((b: any) => { m[b.id] = b; });
@@ -125,6 +123,8 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     (contacts || []).forEach((cc: any) => { m[cc.id] = cc; });
     return m;
   }, [contacts]);
+
+  const daysByName = useMemo(() => {
     const map = new Map<string, number>();
     birds.forEach((b: any) => map.set(b.name, daysFromProfiles(b.name, _profiles)));
     return map;
