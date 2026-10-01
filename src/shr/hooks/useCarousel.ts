@@ -6,6 +6,21 @@ import { useEffect, useRef, useCallback } from 'react';
  * - refs برای active/ids/onChange (بدون re-bind)
  * - translate3d (GPU accelerated)
  */
+
+/** بررسی می‌کنه که آیا عنصر یا والدینش اسکرول افقی داره */
+function hasHorizontalScroller(el: HTMLElement | null, container: HTMLElement): boolean {
+  let cur: HTMLElement | null = el;
+  while (cur && cur !== container) {
+    const style = window.getComputedStyle(cur);
+    const ox = style.overflowX;
+    if ((ox === 'auto' || ox === 'scroll') && cur.scrollWidth > cur.clientWidth + 4) {
+      return true;
+    }
+    cur = cur.parentElement;
+  }
+  return false;
+}
+
 export function useCarousel(
   ids: string[],
   active: string,
@@ -85,6 +100,8 @@ export function useCarousel(
       if (e.touches.length !== 1) return;
       const tgt = e.target as HTMLElement;
       if (tgt.closest('[role="dialog"]')) return;
+      // اگه لمس داخل یه اسکرول افقی بود، carousel رو فعال نکن
+      if (hasHorizontalScroller(tgt, el)) return;
       const t = e.touches[0];
       dragging = true;
       startX = t.clientX;
