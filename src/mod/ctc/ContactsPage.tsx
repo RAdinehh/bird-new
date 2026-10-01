@@ -7,6 +7,7 @@ import { Btn, BtnRow, DigitField, Empty,
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 
 interface F {
   id?: string; name: string; phone: string; phone2: string; email: string;

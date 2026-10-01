@@ -3,6 +3,7 @@ import { useSet, type IncubationProfile } from './store';
 import { Btn, Field, Grid2, NumField, Input, PageContainer } from '../../shr/components/ui';
 import SettingsGroup from './SettingsGroup';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 import { toFa, parseFaNum } from '../../shr/utils/fa';
 
 function SmallDeleteBtn({ onClick }: { onClick: () => void }) {

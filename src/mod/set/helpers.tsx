@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { clearLogs, exportLogs, getLogs, logCount, type LogEntry } from '../../cor/logger/logger';
 import { showAlert, showConfirmAsync, showSuccess } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 import { Btn, BtnRow, DigitField, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, PhoneField, Select, Tag } from '../../shr/components/ui';
 import { downloadBackup, exportAll, formatSize, getStats, importAll, readFile, type BackupFile, validateBackup } from '../../shr/utils/backup';
 import { toEn, toFa } from '../../shr/utils/fa';

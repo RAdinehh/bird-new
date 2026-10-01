@@ -2,6 +2,7 @@ import { useSet } from './store';
 import { useState } from 'react';
 import { Btn, Modal, Tag } from '../../shr/components/ui';
 import { showConfirmAsync, showAlert, showSuccess } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 import { toFa } from '../../shr/utils/fa';
 import { Section, InfoRow, SubSection } from './helpers';
 

@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from 'react';
 import { exportAll, validateBackup, importAll, getStats, downloadBackup, readFile, formatSize, type BackupFile } from '../../shr/utils/backup';
 import { useSet } from './store';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 import { Btn, BtnRow, Field, Grid2, Input, Modal, Select } from '../../shr/components/ui';
 import { toFa, parseFaNum } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';

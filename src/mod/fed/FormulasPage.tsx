@@ -8,6 +8,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 import { Row, SectionTitle, NutrientRow } from './helpers';
 
 interface F {
