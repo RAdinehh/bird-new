@@ -55,7 +55,6 @@ export default function ExpandableCard({
     <div style={{
       position: 'relative',
       background: 'var(--card)',
-      backdropFilter: noAnim ? 'none' : 'blur(8px)',
       border: '1px solid ' + (isOpen ? color : 'var(--border)'),
       borderRadius: 'var(--r-lg)',
       overflow: 'hidden',

@@ -227,7 +227,7 @@ export function Card({ accent = 'accent', onClick, children, style }: CardProps)
   const colors = { accent: 'var(--accent)', warn: 'var(--warn)', dim: 'var(--dim)', purple: 'var(--purple)' };
   return (
     <div onClick={onClick} style={{
-      position: 'relative', background: 'var(--card)', backdropFilter: 'blur(8px)',
+      position: 'relative', background: 'var(--card)',
       border: '1px solid var(--border)', borderRadius: 'var(--r-lg)',
       padding: 'var(--sp-3) var(--sp-4)', overflow: 'hidden',
       cursor: onClick ? 'pointer' : 'default', minWidth: 0, ...style
@@ -571,7 +571,6 @@ export function Modal({
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          animation: noAnim ? 'none' : 'pmSlideUp var(--dur-enter) var(--ease-out)',
           transform: dragY !== 0 ? `translateY(${dragY}px)` : undefined,
           transition: dragging
             ? 'none'
@@ -653,9 +652,6 @@ export function Modal({
             overflowY: 'auto',
             overscrollBehavior: 'contain',
             WebkitOverflowScrolling: 'touch',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--sp-3)',
             flex: 1,
             minHeight: 0,
           }}
