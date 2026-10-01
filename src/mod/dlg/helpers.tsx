@@ -33,7 +33,7 @@ export function Row({ l, v, warn }: { l: string; v: string; warn?: boolean }) {
 // Form Components — گروه‌بندی جدید
 // ═══════════════════════════════════════════════════════════════
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface FormGroupProps {
   id: string;
@@ -46,6 +46,19 @@ interface FormGroupProps {
 }
 
 export function FormGroup({ id, icon, title, sub, open, onToggle, children }: FormGroupProps) {
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [h, setH] = useState(0);
+
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const update = () => setH(el.scrollHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   return (
     <div style={{
       position: 'relative',
@@ -57,7 +70,6 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
       marginBottom: 8,
       transition: 'border-color var(--dur-base)',
     }}>
-      {/* نوار رنگی سمت راست */}
       <div style={{
         position: 'absolute',
         top: 0, right: 0, bottom: 0,
@@ -66,8 +78,6 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
         zIndex: 1,
         transition: 'background var(--dur-base)',
       }} />
-
-      {/* Header */}
       <div
         role="button"
         tabIndex={0}
@@ -90,7 +100,6 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
           outline: 'none',
         }}
       >
-        {/* آیکون */}
         <div style={{
           width: 42, height: 42,
           borderRadius: 'var(--r-md)',
@@ -100,8 +109,6 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
           fontSize: 18,
           flexShrink: 0,
         }}>{icon}</div>
-
-        {/* متن */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
             fontSize: 'var(--fs-md)',
@@ -123,8 +130,6 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
             }}>{sub}</div>
           ) : null}
         </div>
-
-        {/* Chevron */}
         <svg
           width="16" height="16" viewBox="0 0 24 24" fill="none"
           stroke={open ? 'var(--accent)' : 'var(--dim)'}
@@ -138,22 +143,21 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
           <path d="m6 9 6 6 6-6" />
         </svg>
       </div>
-
-      {/* Body */}
       <div style={{
-        display: 'grid',
-        gridTemplateRows: open ? '1fr' : '0fr',
-        transition: 'grid-template-rows var(--dur-slow) cubic-bezier(.16,1,.3,1)',
+        height: open ? h : 0,
+        overflow: 'hidden',
+        transition: 'height var(--dur-slow) cubic-bezier(.16,1,.3,1)',
       }}>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{
+        <div
+          ref={bodyRef}
+          style={{
             padding: '0 18px 14px 16px',
             display: 'flex',
             flexDirection: 'column',
             gap: 12,
-          }}>
-            {children}
-          </div>
+          }}
+        >
+          {children}
         </div>
       </div>
     </div>
