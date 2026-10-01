@@ -56,6 +56,7 @@ export function FormGroup({ id, icon, title, sub, open, onToggle, children }: Fo
       marginBottom: 8,
       flexShrink: 0,
       scrollMarginTop: 120,
+      contain: 'layout paint',
       transition: 'border-color 120ms ease',
     }}>
       <div style={{
@@ -224,14 +225,15 @@ export function FormTabs({ tabs, active, onChange }: FormTabsProps) {
   return (
     <div style={{
       position: 'sticky',
-      top: -14,
+      top: 0,
       zIndex: 100,
       background: '#ffffff',
       borderBottom: '1px solid var(--border)',
-      padding: '22px 14px 8px 14px',
-      margin: '-14px -14px 12px -14px',
+      padding: '14px 0 8px 0',
+      margin: '0 0 12px 0',
       display: 'flex',
       gap: 8,
+      contain: 'layout style paint',
     }}>
       {tabs.map(t => (
         <button
