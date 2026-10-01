@@ -111,6 +111,19 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
   const _profiles = useSet((s: any) => s.incubationProfiles) || [];
   const daysByName = useMemo(() => {
+
+  // ═══ Performance: pre-compute lookup maps ═══
+  const _birdsById = useMemo(() => {
+    const m: Record<string, any> = {};
+    (birds || []).forEach((b: any) => { m[b.id] = b; });
+    return m;
+  }, [birds]);
+
+  const _contactsById = useMemo(() => {
+    const m: Record<string, any> = {};
+    (contacts || []).forEach((cc: any) => { m[cc.id] = cc; });
+    return m;
+  }, [contacts]);
     const map = new Map<string, number>();
     birds.forEach((b: any) => map.set(b.name, daysFromProfiles(b.name, _profiles)));
     return map;
@@ -542,19 +555,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const list = useMemo(() => {
     return eggEntries.filter(e => {
       if (filterDev && e.deviceId !== filterDev) return false;
-
-  // ═══ Performance: pre-compute lookup maps ═══
-  const _birdsById = useMemo(() => {
-    const m: Record<string, any> = {};
-    birds.forEach((b: any) => { m[b.id] = b; });
-    return m;
-  }, [birds]);
-
-  const _contactsById = useMemo(() => {
-    const m: Record<string, any> = {};
-    contacts.forEach((c: any) => { m[c.id] = c; });
-    return m;
-  }, [contacts]);
       if (filterSource && e.dealType !== filterSource) return false;
       if (filterStatus && e.status !== filterStatus) return false;
       if (q.trim()) {
