@@ -1,8 +1,9 @@
 /**
  * index.tsx — بخش inc
  */
-import {useState, useRef, useEffect} from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useCarousel } from '../../shr/hooks/useCarousel';
 import DevicesPage from './DevicesPage';
 import EggEntriesPage from './EggEntriesPage';
 import CandlingsPage from './CandlingsPage';
@@ -12,16 +13,30 @@ const tabs = [
   { id: 'devices', label: 'دستگاه‌ها' },
   { id: 'eggs', label: 'ورودی تخم' },
   { id: 'candlings', label: 'کندلینگ' },
-  { id: 'hatches', label: 'هچ' }
+  { id: 'hatches', label: 'هچ' },
 ] as const;
 type TabId = typeof tabs[number]['id'];
+
+const TAB_IDS = ['devices', 'eggs', 'candlings', 'hatches'];
 
 export default function Inc() {
   const [params, setParams] = useSearchParams();
   const tabParam = params.get('tab') as TabId;
   const validTabs: TabId[] = ['devices', 'eggs', 'candlings', 'hatches'];
   const tab: TabId = validTabs.includes(tabParam) ? tabParam : 'devices';
+
   const [pendingEntry, setPendingEntry] = useState('');
+
+  const setTab = (t: TabId) => {
+    setParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.set('tab', t);
+      next.delete('entry');
+      next.delete('device');
+      return next;
+    });
+  };
+
   const goTo = (t: any, payload?: { entry?: string }) => {
     if (payload?.entry) {
       setPendingEntry(payload.entry);
@@ -34,103 +49,81 @@ export default function Inc() {
     setTab(t as TabId);
   };
 
-  const setTab = (t: TabId) => {
-    setParams(prev => {
-      const next = new URLSearchParams(prev);
-      next.set('tab', t);
-      next.delete('entry');
-      next.delete('device');
-      return next;
-    });
-  };
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const syncingRef = useRef(false);
-  const clickToRef = useRef(false);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const ids = ['devices', 'eggs', 'candlings', 'hatches'] as string[];
-    const idx = ids.indexOf(tab);
-    if (idx < 0) return;
-    const child = el.children[idx] as HTMLElement | undefined;
-    if (!child) return;
-    const cr = child.getBoundingClientRect();
-    const er = el.getBoundingClientRect();
-    const delta = cr.left - er.left;
-    if (Math.abs(delta) < 4) return;
-    syncingRef.current = true;
-    el.scrollBy({
-      left: delta,
-      behavior: clickToRef.current ? 'auto' : 'smooth',
-    });
-    clickToRef.current = false;
-    const t = setTimeout(() => { syncingRef.current = false; }, 400);
-    return () => clearTimeout(t);
-  }, [tab]);
-
-  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onScroll = () => {
-    if (syncingRef.current) return;
-    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-    scrollTimerRef.current = setTimeout(() => {
-      const el = scrollRef.current;
-      if (!el) return;
-      const er = el.getBoundingClientRect();
-      let bestIdx = 0;
-      let bestDist = Infinity;
-      for (let i = 0; i < el.children.length; i++) {
-        const c = el.children[i] as HTMLElement;
-        const cr = c.getBoundingClientRect();
-        const d = Math.abs(cr.left - er.left);
-        if (d < bestDist) { bestDist = d; bestIdx = i; }
-      }
-      const ids = ['devices', 'eggs', 'candlings', 'hatches'] as string[];
-      const newTab = ids[bestIdx];
-      if (newTab && newTab !== tab) setTab(newTab as TabId);
-    }, 90);
-  };
+  const { containerRef, trackRef, setInstant } = useCarousel(
+    TAB_IDS,
+    tab,
+    (id) => setTab(id as TabId)
+  );
 
   return (
     <div>
       <div style={{
-        display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
-        padding: '0 8px', background: 'var(--header-bg)',
-        position: 'sticky', top: 52, zIndex: 11, overflowX: 'auto', scrollbarWidth: 'none'
+        display: 'flex', gap: 0,
+        borderBottom: '1px solid var(--border)',
+        padding: '0 8px',
+        background: 'var(--header-bg)',
+        position: 'sticky', top: 52, zIndex: 11,
+        overflowX: 'auto', scrollbarWidth: 'none',
       }}>
         {tabs.map(t => (
-          <div key={t.id} onClick={() => { clickToRef.current = true; setTab(t.id); }} style={{
-            padding: '11px 12px', fontSize: 'var(--fs-base)', fontWeight: 600,
-            color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
-            cursor: 'pointer', position: 'relative', whiteSpace: 'nowrap'
-          }}>
+          <div
+            key={t.id}
+            onClick={() => { setInstant(); setTab(t.id); }}
+            style={{
+              padding: '11px 12px',
+              fontSize: 'var(--fs-base)',
+              fontWeight: 600,
+              color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
+              cursor: 'pointer',
+              position: 'relative',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {t.label}
-            {tab === t.id && <div style={{ position: 'absolute', bottom: 0,
-               right: 12, left: 12, height: 3, background: 'var(--accent)',
-               borderRadius: '3px 3px 0 0' }} />}
+            {tab === t.id && (
+              <div style={{
+                position: 'absolute', bottom: 0,
+                right: 12, left: 12, height: 3,
+                background: 'var(--accent)',
+                borderRadius: '3px 3px 0 0',
+              }} />
+            )}
           </div>
         ))}
       </div>
+
       <div
-          ref={scrollRef}
-          onScroll={onScroll}
+        ref={containerRef}
+        style={{
+          overflow: 'hidden',
+          width: '100%',
+          minHeight: 'calc(100vh - 120px)',
+          touchAction: 'pan-y',
+        }}
+      >
+        <div
+          ref={trackRef}
           style={{
             display: 'flex',
-            direction: 'rtl',
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            touchAction: 'pan-x',
-            scrollSnapType: 'x mandatory',
-            width: '100%',
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch',
+            direction: 'ltr',
+            willChange: 'transform',
+            touchAction: 'pan-y',
           }}
         >
-          <div key="devices" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><DevicesPage /></div>
-          <div key="eggs" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} /></div>
-          <div key="candlings" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><CandlingsPage initialEntry={pendingEntry || params.get('entry') || ''} onGoTo={goTo} /></div>
-          <div key="hatches" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><HatchesPage initialEntry={params.get('entry') || ''} onGoTo={goTo} /></div>
+          <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+            <DevicesPage />
+          </div>
+          <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+            <EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} />
+          </div>
+          <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+            <CandlingsPage initialEntry={pendingEntry || params.get('entry') || ''} onGoTo={goTo} />
+          </div>
+          <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+            <HatchesPage initialEntry={params.get('entry') || ''} onGoTo={goTo} />
+          </div>
         </div>
+      </div>
     </div>
   );
 }
