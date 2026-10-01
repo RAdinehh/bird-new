@@ -6,6 +6,7 @@ import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCap
 import { useSet } from '../set/store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag, ErrorBox } from '../../shr/components/ui';
+import { FormGroup, FormSub, FormSubFirst, FormTabs, useFormGroups } from '../dlg/helpers';
 import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -122,6 +123,8 @@ export default function DevicesPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [maintDeviceId, setMaintDeviceId] = useState<string | null>(null);
   const [maintForm, setMaintForm] = useState({ date: '', type: '', cost: '', description: '' });
+  const [activeGroup, setActiveGroup] = useState('specs');
+  const { groups, toggle, openOnly } = useFormGroups({ specs: true, capacity: false, finance: false });
 
   // ═══ Performance: pre-compute device stats ═══
   const deviceStats = useMemo(() => {
@@ -467,9 +470,19 @@ export default function DevicesPage() {
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش دستگاه' : 'افزودن دستگاه'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        <FormTabs
+          tabs={[
+            { id: 'specs',    icon: '📋', label: 'مشخصات' },
+            { id: 'capacity', icon: '📊', label: 'ظرفیت' },
+            { id: 'finance',  icon: '💰', label: 'مالی' },
+          ]}
+          active={activeGroup}
+          onChange={(id) => { setActiveGroup(id); openOnly(id); }}
+        />
 
-        <SectionTitle>📋 مشخصات اصلی</SectionTitle>
-        <Field label="نام دستگاه" required hint={
+        <FormGroup id="specs" icon="📋" title="مشخصات" sub="اصلی، فنی" open={!!groups.specs} onToggle={() => toggle('specs')}>
+          <FormSubFirst icon="📋" title="مشخصات اصلی">
+            <Field label="نام دستگاه" required hint={
           form.name && devices.some(x => x.id !== form.id && x.name.trim() === form.name.trim())
             ? '⚠️ این نام قبلاً استفاده شده'
             : undefined
@@ -498,9 +511,38 @@ export default function DevicesPage() {
             </Select>
           </Field>
         </Grid2>
+          </FormSubFirst>
+          <FormSub icon="⚙" title="مشخصات فنی">
+            <Grid2>
+          <Field label="تعداد راگ" hint="قفسه">
+            <NumField placeholder="۰" value={form.racks} onChange={e => setForm({...form, racks: e.target.value})} unit="عدد" min={0} />
+          </Field>
+          <Field label="تعداد سبد" hint="Tray">
+            <NumField placeholder="۰" value={form.trays} onChange={e => setForm({...form, trays: e.target.value})} unit="عدد" min={0} />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="تعداد فن">
+            <NumField placeholder="۰" value={form.fans} onChange={e => setForm({...form, fans: e.target.value})} unit="عدد" min={0} />
+          </Field>
+          <Field label="توان موتور">
+            <NumField placeholder="۰" value={form.motorPower} onChange={e => setForm({...form, motorPower: e.target.value})} unit="W" min={0} />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="سنسور دما">
+            <NumField placeholder="۰" value={form.tempSensors} onChange={e => setForm({...form, tempSensors: e.target.value})} unit="عدد" min={0} />
+          </Field>
+          <Field label="سنسور رطوبت">
+            <NumField placeholder="۰" value={form.humiditySensors} onChange={e => setForm({...form, humiditySensors: e.target.value})} unit="عدد" min={0} />
+          </Field>
+        </Grid2>
+          </FormSub>
+        </FormGroup>
 
-        <SectionTitle>📊 ظرفیت بر اساس پرنده</SectionTitle>
-        {birds.length === 0 ? (
+        <FormGroup id="capacity" icon="📊" title="ظرفیت" sub="بر اساس پرنده" open={!!groups.capacity} onToggle={() => toggle('capacity')}>
+          <FormSubFirst icon="📊" title="ظرفیت بر اساس پرنده">
+            {birds.length === 0 ? (
           <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
             هنوز پرنده‌ای در ماژول «پرنده و نژاد» ثبت نشده
           </div>
@@ -696,36 +738,12 @@ export default function DevicesPage() {
             })}
           </div>
         )}
+          </FormSubFirst>
+        </FormGroup>
 
-
-        <SectionTitle>⚙ مشخصات فنی</SectionTitle>
-        <Grid2>
-          <Field label="تعداد راگ" hint="قفسه">
-            <NumField placeholder="۰" value={form.racks} onChange={e => setForm({...form, racks: e.target.value})} unit="عدد" min={0} />
-          </Field>
-          <Field label="تعداد سبد" hint="Tray">
-            <NumField placeholder="۰" value={form.trays} onChange={e => setForm({...form, trays: e.target.value})} unit="عدد" min={0} />
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label="تعداد فن">
-            <NumField placeholder="۰" value={form.fans} onChange={e => setForm({...form, fans: e.target.value})} unit="عدد" min={0} />
-          </Field>
-          <Field label="توان موتور">
-            <NumField placeholder="۰" value={form.motorPower} onChange={e => setForm({...form, motorPower: e.target.value})} unit="W" min={0} />
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label="سنسور دما">
-            <NumField placeholder="۰" value={form.tempSensors} onChange={e => setForm({...form, tempSensors: e.target.value})} unit="عدد" min={0} />
-          </Field>
-          <Field label="سنسور رطوبت">
-            <NumField placeholder="۰" value={form.humiditySensors} onChange={e => setForm({...form, humiditySensors: e.target.value})} unit="عدد" min={0} />
-          </Field>
-        </Grid2>
-
-        <SectionTitle>💰 مالی</SectionTitle>
-        <Grid2>
+        <FormGroup id="finance" icon="💰" title="مالی و یادداشت" open={!!groups.finance} onToggle={() => toggle('finance')}>
+          <FormSubFirst icon="💰" title="مالی">
+            <Grid2>
           <Field label="قیمت خرید">
             <MoneyField placeholder="۰" value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
           </Field>
@@ -746,9 +764,11 @@ export default function DevicesPage() {
             {warrantyForm.expired ? '⏰ گارانتی تمام شده — ' : '✅ گارانتی تا — '}{toFa(warrantyForm.end)}
           </div>
         )}
-
-        <SectionTitle>📝 یادداشت</SectionTitle>
-        <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+          </FormSubFirst>
+          <FormSub icon="📝" title="یادداشت">
+            <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+          </FormSub>
+        </FormGroup>
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>
