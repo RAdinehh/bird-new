@@ -70,6 +70,7 @@ export default function Rep() {
           overflow: 'hidden',
           width: '100%',
           minHeight: 'calc(100vh - 120px)',
+          isolation: 'isolate',
           touchAction: 'pan-y',
         }}
       >
@@ -79,19 +80,20 @@ export default function Rep() {
             display: 'flex',
             direction: 'ltr',
             willChange: 'transform',
+            backfaceVisibility: 'hidden',
             touchAction: 'pan-y',
           }}
         >
-          <div key="financial" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div key="financial" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <FinancialPage />
           </div>
-          <div key="production" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div key="production" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <ProductionPage />
           </div>
-          <div key="flock" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div key="flock" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <FlockReportPage />
           </div>
-          <div key="compare" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div key="compare" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <ComparePage />
           </div>
         </div>

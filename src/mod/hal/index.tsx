@@ -68,6 +68,7 @@ export default function Hal() {
           overflow: 'hidden',
           width: '100%',
           minHeight: 'calc(100vh - 120px)',
+          isolation: 'isolate',
           touchAction: 'pan-y',
         }}
       >
@@ -77,16 +78,17 @@ export default function Hal() {
             display: 'flex',
             direction: 'ltr',
             willChange: 'transform',
+            backfaceVisibility: 'hidden',
             touchAction: 'pan-y',
           }}
         >
-          <div key="halls" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div key="halls" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <HallsPage />
           </div>
-          <div key="zones" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div key="zones" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <ZonesPage />
           </div>
-          <div key="equip" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div key="equip" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <EquipmentPage />
           </div>
         </div>

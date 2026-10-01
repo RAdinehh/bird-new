@@ -86,6 +86,7 @@ export default function Whs() {
           overflow: 'hidden',
           width: '100%',
           minHeight: 'calc(100vh - 120px)',
+          isolation: 'isolate',
           touchAction: 'pan-y',
         }}
       >
@@ -95,16 +96,17 @@ export default function Whs() {
             display: 'flex',
             direction: 'ltr',
             willChange: 'transform',
+            backfaceVisibility: 'hidden',
             touchAction: 'pan-y',
           }}
         >
-          <div key="items" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div key="items" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <ItemsPage />
           </div>
-          <div key="moves" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div key="moves" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <MovesPage />
           </div>
-          <div key="warnings" style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div key="warnings" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <WarningsPage />
           </div>
         </div>

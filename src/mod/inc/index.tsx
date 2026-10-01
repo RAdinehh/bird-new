@@ -98,6 +98,7 @@ export default function Inc() {
           overflow: 'hidden',
           width: '100%',
           minHeight: 'calc(100vh - 120px)',
+          isolation: 'isolate',
           touchAction: 'pan-y',
         }}
       >
@@ -107,19 +108,20 @@ export default function Inc() {
             display: 'flex',
             direction: 'ltr',
             willChange: 'transform',
+            backfaceVisibility: 'hidden',
             touchAction: 'pan-y',
           }}
         >
-          <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <DevicesPage />
           </div>
-          <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} />
           </div>
-          <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <CandlingsPage initialEntry={pendingEntry || params.get('entry') || ''} onGoTo={goTo} />
           </div>
-          <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <HatchesPage initialEntry={params.get('entry') || ''} onGoTo={goTo} />
           </div>
         </div>

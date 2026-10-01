@@ -59,12 +59,14 @@ export default function Egg() {
         ))}
       </div>
 
-      <div ref={containerRef} style={{ overflow: 'hidden', width: '100%', minHeight: 'calc(100vh - 120px)', touchAction: 'pan-y' }}>
-        <div ref={trackRef} style={{ display: 'flex', direction: 'ltr', willChange: 'transform', touchAction: 'pan-y' }}>
-          <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+      <div ref={containerRef} style={{ overflow: 'hidden', width: '100%', minHeight: 'calc(100vh - 120px)',
+          isolation: 'isolate', touchAction: 'pan-y' }}>
+        <div ref={trackRef} style={{ display: 'flex', direction: 'ltr', willChange: 'transform',
+            backfaceVisibility: 'hidden', touchAction: 'pan-y' }}>
+          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <ProductionsPage />
           </div>
-          <div style={{ minWidth: '100%', flexShrink: 0, direction: 'rtl', contain: 'layout paint' }}>
+          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
             <StockPage />
           </div>
         </div>
