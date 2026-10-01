@@ -12,6 +12,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, P
 import HelpBanner from '../../shr/components/HelpBanner';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { MiniProgress } from '../../shr/components/ProgressTracker';
+import UndoBar from '../../cor/ui/UndoBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
@@ -58,6 +59,7 @@ export default function FlocksPage() {
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
   const [archId, setArchId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -81,6 +83,18 @@ export default function FlocksPage() {
       return true;
     });
   }, [_hallsRaw]);
+
+  const undoDeleteFlock = () => {
+    if (undoData == null) return;
+    const flockToRestore = undoData.flock;
+    try {
+      add(flockToRestore);
+      showToast('گله بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
 
   const openNew = () => {
     if (birds.length === 0) { showAlert('اول پرنده بسازید'); return; }
@@ -229,6 +243,13 @@ export default function FlocksPage() {
       </div>
 
       <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="گله حذف شد"
+          onUndo={undoDeleteFlock}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
         <HelpBanner
           id="flk-intro"
           icon="🐔"
@@ -667,7 +688,7 @@ export default function FlocksPage() {
         </Modal>
 
         <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف گله"
-          footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) remove(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
+          footer={<BtnRow><Btn variant="danger" onClick={() => { const idToDel = delId; if (!idToDel) return; const item = flocks.find(f => f.id === idToDel); if (item) { setUndoData({ flock: item }); setTimeout(() => setUndoData((cur: any) => cur && cur.flock.id === item.id ? null : cur), 6000); } remove(idToDel); setDelId(null); showToast('گله حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
           <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>
             حذف کامل <b>{target?.name}</b>؟
             <br />
