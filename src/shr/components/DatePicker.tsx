@@ -183,59 +183,53 @@ export default function DatePicker({
             >پاک</Btn>
           </div>
         }>
-        {/* ═══ هدر فشرده: ‹ ماه سال › با Select مستقیم ═══ */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0 0 4px' }}>
+        {/* ═══ هدر: ماه بزرگ + سال کوچیک ═══ */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 4px 12px' }}>
           <button
             type="button"
             onClick={() => setCursor(subMonths(cursor, 1))}
             aria-label="ماه قبل"
-            style={{ width: 32, height: 32, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+            style={{ width: 40, height: 40, background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 22, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}
           >›</button>
-          <select
-            value={String(month)}
-            onChange={(e) => setCursor(setMonth(cursor, +e.target.value))}
-            aria-label="ماه"
-            style={{ flex: 2, height: 32, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 4px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
-          >
-            {MONTHS.map((m, i) => <option key={i} value={i}>{m}</option>)}
-          </select>
-          <select
-            value={String(year)}
-            onChange={(e) => setCursor(setYear(cursor, +e.target.value))}
-            aria-label="سال"
-            style={{ flex: 1.2, height: 32, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 4px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
-          >
-            {years.map((y) => <option key={y} value={y}>{toFa(y)}</option>)}
-          </select>
+
+          <div style={{ textAlign: 'center', flex: 1 }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text)', letterSpacing: '.5px' }}>
+              {MONTHS[month]}
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)', marginTop: 1 }}>
+              {toFa(year)}
+            </div>
+          </div>
+
           <button
             type="button"
             onClick={() => setCursor(addMonths(cursor, 1))}
             aria-label="ماه بعد"
-            style={{ width: 32, height: 32, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+            style={{ width: 40, height: 40, background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 22, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}
           >‹</button>
         </div>
 
         {/* ═══ روزهای هفته ═══ */}
-        <div role="row" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginTop: 4 }}>
+        <div role="row" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 0, marginBottom: 4 }}>
           {WEEKDAYS.map((w, i) => (
-            <div key={i} role="columnheader" style={{ textAlign: 'center', fontSize: 10, color: i === 6 ? 'var(--danger)' : 'var(--dim)', padding: '2px 0', fontWeight: 700 }}>
+            <div key={i} role="columnheader" style={{ textAlign: 'center', fontSize: 12, color: i === 6 ? 'var(--danger)' : 'var(--dim)', padding: '4px 0', fontWeight: 700 }}>
               {w}
             </div>
           ))}
         </div>
 
-        {/* ═══ روزها ═══ */}
-        <div role="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+        {/* ═══ روزها — دایره‌ای ═══ */}
+        <div role="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px 0' }}>
           {Array.from({ length: firstCol }).map((_, i) => (
             <div key={`e-${i}`} aria-hidden="true" />
           ))}
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const day = i + 1;
-            const d = setDate(cursor, day);
-            const dayStr = format(d, 'yyyy/MM/dd');
+            const dd = setDate(cursor, day);
+            const dayStr = format(dd, 'yyyy/MM/dd');
             const isSelected = dayStr === value;
             const isToday = dayStr === todayStr;
-            const isFriday = d.getDay() === 5;
+            const isFriday = dd.getDay() === 5;
             const isDisabled = !isInRange(dayStr);
 
             return (
@@ -248,29 +242,45 @@ export default function DatePicker({
                 aria-selected={isSelected}
                 aria-current={isToday ? 'date' : undefined}
                 style={{
-                  height: 36,
+                  position: 'relative',
+                  height: 42,
+                  width: 42,
+                  margin: '0 auto',
                   padding: 0,
                   background: isSelected ? 'var(--accent)' : 'transparent',
-                  border: isToday && !isSelected ? '1.5px solid var(--accent)' : '1px solid transparent',
-                  borderRadius: 'var(--r-sm)',
+                  border: 'none',
+                  borderRadius: '50%',
                   cursor: isDisabled ? 'not-allowed' : 'pointer',
-                  color: isDisabled ? 'var(--dim)' : isSelected ? 'var(--avatar-text)' : isFriday ? 'var(--danger)' : 'var(--text)',
+                  color: isDisabled
+                    ? 'var(--dim)'
+                    : isSelected
+                      ? 'var(--avatar-text, #fff)'
+                      : isFriday
+                        ? 'var(--danger)'
+                        : 'var(--text)',
                   fontFamily: 'inherit',
-                  fontSize: 'var(--fs-base)',
+                  fontSize: 15,
                   fontWeight: isSelected || isToday ? 700 : 500,
-                  opacity: isDisabled ? 0.35 : 1,
-                  transition: noAnim ? 'none' : 'background var(--dur-fast)',
+                  opacity: isDisabled ? 0.3 : 1,
+                  transition: 'background 140ms ease, color 140ms ease',
                   outline: 'none',
                 }}
-                onFocus={(e) => { if (!isDisabled && !isSelected) e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)'; }}
-                onBlur={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
               >
                 {toFa(day)}
+                {isToday && !isSelected && (
+                  <span style={{
+                    position: 'absolute',
+                    bottom: 4, left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 4, height: 4, borderRadius: '50%',
+                    background: 'var(--accent)',
+                  }} />
+                )}
               </button>
             );
           })}
         </div>
-      </Sheet>
+            </Sheet>
 
     </>
   );
