@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 /**
- * useCarousel — swipe افقی بدون scroll، فقط transform
- * 100% مستقل از RTL / مرورگر
+ * useCarousel v2 — transform-based swipe
+ * - listener ها فقط یک بار bind میشن (باگ «گاهی میره گاهی نمیره» حل)
+ * - refs برای active/ids/onChange (بدون re-bind)
+ * - translate3d (GPU accelerated)
  */
 export function useCarousel(
   ids: string[],
@@ -11,108 +13,127 @@ export function useCarousel(
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+
+  const idsRef = useRef(ids);
+  const activeRef = useRef(active);
+  const onChangeRef = useRef(onChange);
+  idsRef.current = ids;
+  activeRef.current = active;
+  onChangeRef.current = onChange;
+
+  const wRef = useRef(0);
+  const txRef = useRef(0);
   const clickToRef = useRef(false);
 
-  const st = useRef({
-    w: 0,
-    tx: 0,
-    dragging: false,
-    startX: 0,
-    startTx: 0,
-    t0: 0,
-  });
-
-  const apply = (tx: number, animate: boolean) => {
+  const apply = useCallback((tx: number, animate: boolean) => {
     const tr = trackRef.current;
     if (!tr) return;
-    tr.style.transition = animate ? 'transform 260ms cubic-bezier(.22,.61,.36,1)' : 'none';
-    tr.style.transform = `translate3d(${tx}px,0,0)`;
-  };
+    tr.style.transition = animate
+      ? 'transform 260ms cubic-bezier(.22,.61,.36,1)'
+      : 'none';
+    tr.style.transform = `translate3d(${tx}px, 0, 0)`;
+    txRef.current = tx;
+  }, []);
 
-  // measure + apply on mount / resize
+  // measure container + resize
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const measure = () => {
       const w = el.clientWidth;
-      st.current.w = w;
-      const i = ids.indexOf(active);
-      if (i >= 0) {
-        st.current.tx = -i * w;
-        apply(st.current.tx, false);
+      if (w <= 0) return;
+      const changed = wRef.current !== w;
+      wRef.current = w;
+      if (changed) {
+        const i = idsRef.current.indexOf(activeRef.current);
+        if (i >= 0) apply(-i * w, false);
       }
     };
     measure();
+    const t1 = setTimeout(measure, 60);
+    const t2 = setTimeout(measure, 300);
     const ro = new ResizeObserver(measure);
     ro.observe(el);
-    return () => ro.disconnect();
-  }, []);  // eslint-disable-line
+    return () => { clearTimeout(t1); clearTimeout(t2); ro.disconnect(); };
+  }, [apply]);
 
-  // active change (tab click or swipe end)
+  // sync on active change
   useEffect(() => {
-    const i = ids.indexOf(active);
+    const i = idsRef.current.indexOf(active);
     if (i < 0) return;
-    const w = st.current.w || containerRef.current?.clientWidth || 0;
-    if (!w) return;
+    const w = wRef.current;
+    if (w <= 0) return;
     const target = -i * w;
-    if (Math.abs(st.current.tx - target) < 1 && !clickToRef.current) return;
-    st.current.tx = target;
-    apply(target, !clickToRef.current);
+    const isClick = clickToRef.current;
     clickToRef.current = false;
-  }, [active, ids.join(',')]);  // eslint-disable-line
+    if (Math.abs(txRef.current - target) < 1 && !isClick) return;
+    apply(target, !isClick);
+  }, [active, apply]);
 
-  // touch handlers
+  // listeners — یک بار bind، بدون deps به active/ids
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const s = st.current;
+
+    let dragging = false;
+    let startX = 0;
+    let startTx = 0;
+    let startT = 0;
+    let lastTx = 0;
 
     const onStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const tgt = e.target as HTMLElement;
       if (tgt.closest('[role="dialog"]')) return;
       const t = e.touches[0];
-      s.startX = t.clientX;
-      s.startTx = s.tx;
-      s.t0 = Date.now();
-      s.dragging = true;
+      dragging = true;
+      startX = t.clientX;
+      startTx = txRef.current;
+      lastTx = startTx;
+      startT = Date.now();
       if (trackRef.current) trackRef.current.style.transition = 'none';
     };
 
     const onMove = (e: TouchEvent) => {
-      if (!s.dragging) return;
+      if (!dragging) return;
       const t = e.touches[0];
-      const dx = t.clientX - s.startX;
-      let tx = s.startTx + dx;
-      const min = -(ids.length - 1) * s.w;
+      const dx = t.clientX - startX;
+      const w = wRef.current || el.clientWidth;
+      if (w <= 0) return;
+      const min = -(idsRef.current.length - 1) * w;
+      let tx = startTx + dx;
       if (tx > 0) tx *= 0.35;
       else if (tx < min) tx = min + (tx - min) * 0.35;
-      s.tx = tx;
+      lastTx = tx;
       if (trackRef.current) {
-        trackRef.current.style.transform = `translate3d(${tx}px,0,0)`;
+        trackRef.current.style.transform = `translate3d(${tx}px, 0, 0)`;
       }
     };
 
     const onEnd = (e: TouchEvent) => {
-      if (!s.dragging) return;
-      s.dragging = false;
+      if (!dragging) return;
+      dragging = false;
+      const w = wRef.current || el.clientWidth;
+      if (w <= 0) return;
+      const len = idsRef.current.length;
       const t = e.changedTouches[0];
-      const dx = t.clientX - s.startX;
-      const dt = Math.max(1, Date.now() - s.t0);
+      const dx = t.clientX - startX;
+      const dt = Math.max(1, Date.now() - startT);
       const v = dx / dt;
-      const startIdx = Math.round(-s.startTx / s.w);
-      let idx = Math.round(-s.tx / s.w);
-      if (Math.abs(v) > 0.35) {
-        idx = v < 0 ? startIdx + 1 : startIdx - 1;
+      const startIdx = Math.round(-startTx / w);
+      let idx = startIdx;
+      if (v < -0.35) idx = startIdx + 1;
+      else if (v > 0.35) idx = startIdx - 1;
+      else idx = Math.round(-lastTx / w);
+      idx = Math.max(0, Math.min(len - 1, idx));
+      apply(-idx * w, true);
+      const newId = idsRef.current[idx];
+      if (newId !== activeRef.current) {
+        onChangeRef.current(newId);
       }
-      idx = Math.max(0, Math.min(ids.length - 1, idx));
-      const target = -idx * s.w;
-      s.tx = target;
-      apply(target, true);
-      if (ids[idx] !== active) onChange(ids[idx]);
     };
 
-    const onCancel = () => { s.dragging = false; };
+    const onCancel = () => { dragging = false; };
 
     el.addEventListener('touchstart', onStart, { passive: true });
     el.addEventListener('touchmove', onMove, { passive: true });
@@ -124,9 +145,9 @@ export function useCarousel(
       el.removeEventListener('touchend', onEnd);
       el.removeEventListener('touchcancel', onCancel);
     };
-  }, [ids.join(','), active]);  // eslint-disable-line
+  }, [apply]);
 
-  const setInstant = () => { clickToRef.current = true; };
+  const setInstant = useCallback(() => { clickToRef.current = true; }, []);
 
   return { containerRef, trackRef, setInstant };
 }
