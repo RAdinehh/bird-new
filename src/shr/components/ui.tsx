@@ -564,8 +564,8 @@ export function Modal({
           borderTopRightRadius: isFull ? 0 : 'var(--r-2xl)',
           width: '100%',
           maxWidth,
-          maxHeight: isFull ? '100vh' : '85vh',
-          height: isFull ? '100vh' : undefined,
+          maxHeight: isFull ? '100dvh' : '85vh',
+          height: isFull ? '100dvh' : undefined,
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -600,7 +600,7 @@ export function Modal({
         {/* Header */}
         <div
           style={{
-            padding: '10px 14px',
+            padding: 'calc(10px + env(safe-area-inset-top)) 14px 10px',
             borderBottom: '1px solid var(--border)',
             display: 'flex',
             alignItems: 'center',
