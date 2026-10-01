@@ -328,7 +328,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(h)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(h.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={() => setDelId(h.id)} aria-label="حذف هچ" style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );

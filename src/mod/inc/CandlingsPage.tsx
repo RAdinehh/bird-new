@@ -402,7 +402,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                             subsequent.forEach(s => deleteCandling(s.id));
                           }
                         }}
-                        title="بازگردانی و حذف بعدی‌ها"
+                        title="بازگردانی و حذف بعدی‌ها" aria-label="حذف کندلینگ"
                         style={{
                           position: 'absolute',
                           top: '50%',
@@ -488,7 +488,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={() => openNew()}>+ ثبت کندلینگ</Btn>
+          <Btn variant="primary" full onClick={() => openNew()} aria-label="ثبت کندلینگ جدید">+ ثبت کندلینگ</Btn>
         </>
       )}
 

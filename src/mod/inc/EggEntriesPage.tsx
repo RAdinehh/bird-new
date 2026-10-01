@@ -704,7 +704,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(e)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(e.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={() => setDelId(e.id)} aria-label="حذف ورودی" style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );

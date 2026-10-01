@@ -430,7 +430,7 @@ export default function DevicesPage() {
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(d.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={() => setDelId(d.id)} aria-label="حذف دستگاه" style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
