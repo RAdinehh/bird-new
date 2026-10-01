@@ -2,11 +2,7 @@ import { useEffect, useRef } from 'react';
 
 /**
  * useSwipeTabs — swipe چپ/راست بین تب‌ها روی موبایل
- *
- * @param ids        آرایه id تب‌ها به ترتیب نمایش
- * @param active     تب فعال فعلی
- * @param onChange   callback وقتی swipe کامل شد
- * @param opts       تنظیمات (اختیاری)
+ * نسخه v2: بدون re-bind، بدون re-render
  */
 export function useSwipeTabs(
   ids: string[],
@@ -15,9 +11,16 @@ export function useSwipeTabs(
   opts?: { threshold?: number; velocity?: number; edgeGuard?: number }
 ) {
   const ref = useRef<HTMLDivElement>(null);
-  const threshold = opts?.threshold ?? 70;
-  const velocity = opts?.velocity ?? 0.5;
-  const edgeGuard = opts?.edgeGuard ?? 40;
+  const idsRef = useRef(ids);
+  const activeRef = useRef(active);
+  const onChangeRef = useRef(onChange);
+  const optsRef = useRef(opts);
+
+  // update refs بدون re-bind
+  idsRef.current = ids;
+  activeRef.current = active;
+  onChangeRef.current = onChange;
+  optsRef.current = opts;
 
   useEffect(() => {
     const el = ref.current;
@@ -40,14 +43,12 @@ export function useSwipeTabs(
     };
 
     const onMove = (e: TouchEvent) => {
-      if (!activeTouch) return;
+      if (!activeTouch || locked !== 'none') return;
       const t = e.touches[0];
       const dx = t.clientX - startX;
       const dy = t.clientY - startY;
-      if (locked === 'none') {
-        if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
-          locked = Math.abs(dx) > Math.abs(dy) * 1.3 ? 'h' : 'v';
-        }
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+        locked = Math.abs(dx) > Math.abs(dy) * 1.6 ? 'h' : 'v';
       }
     };
 
@@ -56,6 +57,11 @@ export function useSwipeTabs(
       activeTouch = false;
       if (locked !== 'h') { locked = 'none'; return; }
 
+      const o = optsRef.current || {};
+      const threshold = o.threshold ?? 45;
+      const velocity = o.velocity ?? 0.35;
+      const edgeGuard = o.edgeGuard ?? 24;
+
       const t = e.changedTouches[0];
       const dx = t.clientX - startX;
       const dt = Math.max(1, Date.now() - startT);
@@ -63,23 +69,22 @@ export function useSwipeTabs(
       const passed = Math.abs(dx) > threshold || v > velocity;
       if (!passed) { locked = 'none'; return; }
 
-      // edge guard: نگیر اگه انگشت از لبه شروع کرده (نزدیک به back gesture)
       if (startX < edgeGuard || startX > window.innerWidth - edgeGuard) {
         locked = 'none';
         return;
       }
 
-      const idx = ids.indexOf(active);
+      const idsArr = idsRef.current;
+      const idx = idsArr.indexOf(activeRef.current);
       if (idx < 0) { locked = 'none'; return; }
 
       // RTL: swipe راست (dx>0) = قبلی، swipe چپ (dx<0) = بعدی
-      // چون فارسی RTL است
       let nextIdx = idx;
-      if (dx > 0) nextIdx = idx + 1;  // فینگر به راست → برو به تب بعد (سمت چپ بصری)
+      if (dx > 0) nextIdx = idx + 1;
       else nextIdx = idx - 1;
 
-      if (nextIdx < 0 || nextIdx >= ids.length) { locked = 'none'; return; }
-      onChange(ids[nextIdx]);
+      if (nextIdx < 0 || nextIdx >= idsArr.length) { locked = 'none'; return; }
+      onChangeRef.current(idsArr[nextIdx]);
       locked = 'none';
     };
 
@@ -95,7 +100,7 @@ export function useSwipeTabs(
       el.removeEventListener('touchend', onEnd);
       el.removeEventListener('touchcancel', onCancel);
     };
-  }, [ids, active, onChange, threshold, velocity, edgeGuard]);
+  }, []);  // ← بدون dependency → یک بار bind
 
   return ref;
 }
