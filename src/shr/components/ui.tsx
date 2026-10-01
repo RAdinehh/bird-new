@@ -5,6 +5,7 @@ declare global {
 }
 
 import React, {useRef, useCallback, useEffect, forwardRef} from 'react';
+import { createPortal } from 'react-dom';
 import { formatNumWhileTyping, numberToWords, parseFaNum } from '../utils/fa';
 
 type BtnVariant = 'primary' | 'ghost' | 'danger' | 'outline';
@@ -923,5 +924,75 @@ export function DeleteBtn({ onClick, title = 'حذف', size = 'md' }: {
     >
       ✕
     </button>
+  );
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Sheet — پاپ‌آپ کوچک از پایین صفحه
+   با createPortal روی body رندر میشه، پس داخل گروه‌ها گیر نمی‌کنه
+   ═══════════════════════════════════════════════════════════════ */
+export function Sheet({
+  open, onClose, title, footer, children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title?: string;
+  footer?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return createPortal(
+    <div
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        background: 'rgba(15,23,42,.45)',
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: 420,
+          background: 'var(--card-solid, #fff)',
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          padding: '10px 14px 18px',
+          boxShadow: '0 -8px 30px rgba(0,0,0,.25)',
+          maxHeight: '80vh',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 4px' }}>
+          <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--dim)', opacity: 0.5 }} />
+        </div>
+        {title ? (
+          <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, textAlign: 'right', paddingBottom: 2 }}>
+            {title}
+          </div>
+        ) : null}
+        <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
+          {children}
+        </div>
+        {footer ? <div style={{ paddingTop: 4 }}>{footer}</div> : null}
+      </div>
+    </div>,
+    document.body
   );
 }
