@@ -44,7 +44,7 @@ export function useCarousel(
     const tr = trackRef.current;
     if (!tr) return;
     tr.style.transition = animate
-      ? 'transform 260ms cubic-bezier(.22,.61,.36,1)'
+      ? 'transform 200ms cubic-bezier(.25,.8,.3,1)'
       : 'none';
     tr.style.transform = `translate3d(${tx}px, 0, 0)`;
     txRef.current = tx;
