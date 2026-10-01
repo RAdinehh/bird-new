@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getLogs, clearLogs, exportLogs, logCount, type LogEntry } from '../../cor/logger/logger';
+import { getAuditLogs, clearAuditLogs, exportAuditLogs, type AuditEntry } from '../../cor/logger/auditLog';
 import { Btn, BtnRow, Empty, Modal } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
