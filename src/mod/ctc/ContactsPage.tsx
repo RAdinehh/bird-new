@@ -134,7 +134,7 @@ export default function ContactsPage() {
   };
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y', overscrollBehavior: 'contain' }}>
+    <div ref={swipeRef} style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', minHeight: 'calc(100vh - 120px)' }}>
       <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
          padding: '0 12px', background: 'var(--header-bg)', position: 'sticky',
          top: 52, zIndex: 11, overflowX: 'auto', scrollbarWidth: 'none' }}>

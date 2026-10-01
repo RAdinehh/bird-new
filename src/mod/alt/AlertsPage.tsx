@@ -75,7 +75,7 @@ export default function AlertsPage() {
   };
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y', overscrollBehavior: 'contain' }}>
+    <div ref={swipeRef} style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', minHeight: 'calc(100vh - 120px)' }}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',

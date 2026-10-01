@@ -20,23 +20,6 @@ export function useSwipeTabs(
     const root = ref.current;
     if (!root) return;
 
-    // ─── on-screen debug panel ───
-    const dbg = document.createElement('div');
-    dbg.id = 'swipe-debug';
-    dbg.style.cssText = [
-      'position:fixed','top:0','left:0','right:0',
-      'background:rgba(0,0,0,.85)','color:#0f0',
-      'font-size:11px','padding:4px 6px','z-index:99999',
-      'font-family:monospace','direction:ltr','text-align:left',
-      'pointer-events:none','white-space:pre-wrap','max-height:40vh','overflow:hidden',
-    ].join(';');
-    dbg.textContent = '[swipe] mounted. ready.';
-    document.body.appendChild(dbg);
-
-    const log = (s: string) => {
-      dbg.textContent = s;
-    };
-
     let startX = 0, startY = 0, startT = 0;
     let activeTouch = false;
     let locked: 'none' | 'h' | 'v' = 'none';
@@ -44,10 +27,9 @@ export function useSwipeTabs(
     const onStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const tgt = e.target as HTMLElement;
-      if (tgt.closest('[role="dialog"]')) { log('start: DIALOG (skip)'); return; }
-      const inside = root.contains(tgt);
-      log(`start: <${tgt.tagName.toLowerCase()}> inside=${inside}`);
-      if (!inside) return;
+      if (tgt.closest('[role="dialog"]')) { activeTouch = false; return; }
+      // اگه داخل swipe root نبود، ignore
+      if (!root.contains(tgt)) { activeTouch = false; return; }
       const t = e.touches[0];
       startX = t.clientX;
       startY = t.clientY;
@@ -67,7 +49,6 @@ export function useSwipeTabs(
         }
       }
       if (locked === 'h' && e.cancelable) e.preventDefault();
-      log(`move: dx=${dx.toFixed(0)} dy=${dy.toFixed(0)} lock=${locked}`);
     };
 
     const onEnd = (e: TouchEvent) => {
@@ -75,24 +56,29 @@ export function useSwipeTabs(
       activeTouch = false;
       const wasH = locked === 'h';
       locked = 'none';
-      if (!wasH) { log('end: was not H'); return; }
+      if (!wasH) return;
+
       const o = optsRef.current || {};
-      const threshold = o.threshold ?? 35;
-      const velocity = o.velocity ?? 0.2;
+      const threshold = o.threshold ?? 45;
+      const velocity = o.velocity ?? 0.3;
+      const edgeGuard = o.edgeGuard ?? 20;
+
       const t = e.changedTouches[0];
       const dx = t.clientX - startX;
       const dt = Math.max(1, Date.now() - startT);
       const v = Math.abs(dx) / dt;
-      if (!(Math.abs(dx) > threshold || v > velocity)) { log(`end: too small dx=${dx.toFixed(0)} v=${v.toFixed(2)}`); return; }
+      if (!(Math.abs(dx) > threshold || v > velocity)) return;
+      if (startX < edgeGuard || startX > window.innerWidth - edgeGuard) return;
+
       const idsArr = idsRef.current;
       const idx = idsArr.indexOf(activeRef.current);
+      if (idx < 0) return;
       const nextIdx = dx < 0 ? idx + 1 : idx - 1;
-      if (nextIdx < 0 || nextIdx >= idsArr.length) { log(`end: OOB idx=${idx} next=${nextIdx}`); return; }
-      log(`end: CHANGING ${idsArr[idx]} → ${idsArr[nextIdx]}`);
+      if (nextIdx < 0 || nextIdx >= idsArr.length) return;
       onChangeRef.current(idsArr[nextIdx]);
     };
 
-    const onCancel = () => { activeTouch = false; locked = 'none'; log('cancel'); };
+    const onCancel = () => { activeTouch = false; locked = 'none'; };
 
     document.addEventListener('touchstart', onStart, { passive: true, capture: true });
     document.addEventListener('touchmove', onMove, { passive: false, capture: true });
@@ -103,7 +89,6 @@ export function useSwipeTabs(
       document.removeEventListener('touchmove', onMove, { capture: true } as any);
       document.removeEventListener('touchend', onEnd, { capture: true } as any);
       document.removeEventListener('touchcancel', onCancel, { capture: true } as any);
-      dbg.remove();
     };
   }, []);
 
