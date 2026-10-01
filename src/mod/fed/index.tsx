@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
+import {useState, useRef, useEffect} from 'react';
 import IngredientsPage from './IngredientsPage';
 import RequirementsPage from './RequirementsPage';
 import FormulasPage from './FormulasPage';
@@ -14,12 +13,37 @@ type TabId = typeof tabs[number]['id'];
 
 export default function Fed() {
   const [tab, setTab] = useState<TabId>('ingredients');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const syncingRef = useRef(false);
 
-  const TAB_IDS = ['ingredients', 'requirements', 'formulas'];
-  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ids = ['ingredients', 'requirements', 'formulas'] as string[];
+    const idx = ids.indexOf(tab);
+    if (idx < 0) return;
+    const target = idx * el.clientWidth;
+    if (Math.abs(el.scrollLeft - target) < 4) return;
+    syncingRef.current = true;
+    el.scrollTo({ left: target, behavior: 'smooth' });
+    const t = setTimeout(() => { syncingRef.current = false; }, 500);
+    return () => clearTimeout(t);
+  }, [tab]);
+
+  const onScroll = () => {
+    if (syncingRef.current) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    if (w <= 0) return;
+    const idx = Math.round(el.scrollLeft / w);
+    const ids = ['ingredients', 'requirements', 'formulas'] as string[];
+    const newTab = ids[idx];
+    if (newTab && newTab !== tab) setTab(newTab as TabId);
+  };
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
+    <div style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',
@@ -55,9 +79,22 @@ export default function Fed() {
         ))}
       </div>
 
-      {tab === 'ingredients' ? <IngredientsPage /> : null}
-      {tab === 'requirements' ? <RequirementsPage /> : null}
-      {tab === 'formulas' ? <FormulasPage /> : null}
+      <div
+          ref={scrollRef}
+          onScroll={onScroll}
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            scrollSnapType: 'x mandatory',
+            width: '100%',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <div key="ingredients" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><IngredientsPage /></div>
+          <div key="requirements" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><RequirementsPage /></div>
+          <div key="formulas" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><FormulasPage /></div>
+        </div>
     </div>
   );
 }

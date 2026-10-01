@@ -1,8 +1,7 @@
 /**
  * index.tsx — بخش egg
  */
-import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
-import { useState } from 'react';
+import {useState, useRef, useEffect} from 'react';
 import ProductionsPage from './ProductionsPage';
 import StockPage from './StockPage';
 
@@ -15,12 +14,37 @@ type TabId = typeof tabs[number]['id'];
 
 export default function Egg() {
   const [tab, setTab] = useState<TabId>('productions');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const syncingRef = useRef(false);
 
-  const TAB_IDS = ['productions', 'stock'];
-  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ids = ['productions', 'stock'] as string[];
+    const idx = ids.indexOf(tab);
+    if (idx < 0) return;
+    const target = idx * el.clientWidth;
+    if (Math.abs(el.scrollLeft - target) < 4) return;
+    syncingRef.current = true;
+    el.scrollTo({ left: target, behavior: 'smooth' });
+    const t = setTimeout(() => { syncingRef.current = false; }, 500);
+    return () => clearTimeout(t);
+  }, [tab]);
+
+  const onScroll = () => {
+    if (syncingRef.current) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    if (w <= 0) return;
+    const idx = Math.round(el.scrollLeft / w);
+    const ids = ['productions', 'stock'] as string[];
+    const newTab = ids[idx];
+    if (newTab && newTab !== tab) setTab(newTab as TabId);
+  };
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
+    <div style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',
@@ -56,8 +80,21 @@ export default function Egg() {
         ))}
       </div>
 
-      {tab === 'productions' ? <ProductionsPage /> : null}
-      {tab === 'stock' ? <StockPage /> : null}
+      <div
+          ref={scrollRef}
+          onScroll={onScroll}
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            scrollSnapType: 'x mandatory',
+            width: '100%',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <div key="productions" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><ProductionsPage /></div>
+          <div key="stock" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><StockPage /></div>
+        </div>
     </div>
   );
 }

@@ -1,8 +1,7 @@
 /**
  * index.tsx — بخش tra
  */
-import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
-import { useState } from 'react';
+import {useState, useRef, useEffect} from 'react';
 import PurchasesPage from './PurchasesPage';
 import SalesPage from './SalesPage';
 import DealsPage from './DealsPage';
@@ -19,12 +18,37 @@ type TabId = typeof tabs[number]['id'];
 
 export default function Tra() {
   const [tab, setTab] = useState<TabId>('purchases');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const syncingRef = useRef(false);
 
-  const TAB_IDS = ['purchases', 'sales', 'deals', 'receivables'];
-  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ids = ['purchases', 'sales', 'deals', 'receivables'] as string[];
+    const idx = ids.indexOf(tab);
+    if (idx < 0) return;
+    const target = idx * el.clientWidth;
+    if (Math.abs(el.scrollLeft - target) < 4) return;
+    syncingRef.current = true;
+    el.scrollTo({ left: target, behavior: 'smooth' });
+    const t = setTimeout(() => { syncingRef.current = false; }, 500);
+    return () => clearTimeout(t);
+  }, [tab]);
+
+  const onScroll = () => {
+    if (syncingRef.current) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    if (w <= 0) return;
+    const idx = Math.round(el.scrollLeft / w);
+    const ids = ['purchases', 'sales', 'deals', 'receivables'] as string[];
+    const newTab = ids[idx];
+    if (newTab && newTab !== tab) setTab(newTab as TabId);
+  };
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
+    <div style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',
@@ -60,10 +84,23 @@ export default function Tra() {
         ))}
       </div>
 
-      {tab === 'purchases' ? <PurchasesPage /> : null}
-      {tab === 'sales' ? <SalesPage /> : null}
-      {tab === 'deals' ? <DealsPage /> : null}
-      {tab === 'receivables' ? <ReceivablesPage /> : null}
+      <div
+          ref={scrollRef}
+          onScroll={onScroll}
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            scrollSnapType: 'x mandatory',
+            width: '100%',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <div key="purchases" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><PurchasesPage /></div>
+          <div key="sales" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><SalesPage /></div>
+          <div key="deals" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><DealsPage /></div>
+          <div key="receivables" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><ReceivablesPage /></div>
+        </div>
     </div>
   );
 }
