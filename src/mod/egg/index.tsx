@@ -63,10 +63,10 @@ export default function Egg() {
           isolation: 'isolate', touchAction: 'pan-y' }}>
         <div ref={trackRef} style={{ display: 'flex', direction: 'ltr', willChange: 'transform',
             backfaceVisibility: 'hidden', touchAction: 'pan-y' }}>
-          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <ProductionsPage />
           </div>
-          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <StockPage />
           </div>
         </div>

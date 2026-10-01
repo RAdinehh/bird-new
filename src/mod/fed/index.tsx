@@ -66,6 +66,7 @@ export default function Fed() {
         ref={containerRef}
         style={{
           overflow: 'hidden',
+          overflowX: 'hidden',
           width: '100%',
           minHeight: 'calc(100vh - 120px)',
           isolation: 'isolate',
@@ -78,17 +79,18 @@ export default function Fed() {
             display: 'flex',
             direction: 'ltr',
             willChange: 'transform',
-            backfaceVisibility: 'hidden',
             touchAction: 'pan-y',
+            width: '100%',
+            minWidth: 0,
           }}
         >
-          <div key="ingredients" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="ingredients" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <IngredientsPage />
           </div>
-          <div key="requirements" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="requirements" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <RequirementsPage />
           </div>
-          <div key="formulas" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="formulas" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <FormulasPage />
           </div>
         </div>

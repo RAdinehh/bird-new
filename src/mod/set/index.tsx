@@ -212,14 +212,14 @@ export default function Set() {
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div key="profile" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><ProfileTab /></div>
-          <div key="appearance" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><AppearanceTab /></div>
-          <div key="modules" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><ModulesTab /></div>
-          <div key="notifications" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><NotificationsTab /></div>
-          <div key="backup" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><BackupTab /></div>
-          <div key="incubation" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><IncubationProfilesTab /></div>
-          <div key="logs" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><LogsTab /></div>
-          <div key="about" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start' }}><AboutTab /></div>
+          <div key="profile" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><ProfileTab /></div>
+          <div key="appearance" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><AppearanceTab /></div>
+          <div key="modules" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><ModulesTab /></div>
+          <div key="notifications" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><NotificationsTab /></div>
+          <div key="backup" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><BackupTab /></div>
+          <div key="incubation" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><IncubationProfilesTab /></div>
+          <div key="logs" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><LogsTab /></div>
+          <div key="about" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}><AboutTab /></div>
         </div>
       </div>
     </div>

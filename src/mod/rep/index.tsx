@@ -68,6 +68,7 @@ export default function Rep() {
         ref={containerRef}
         style={{
           overflow: 'hidden',
+          overflowX: 'hidden',
           width: '100%',
           minHeight: 'calc(100vh - 120px)',
           isolation: 'isolate',
@@ -80,20 +81,21 @@ export default function Rep() {
             display: 'flex',
             direction: 'ltr',
             willChange: 'transform',
-            backfaceVisibility: 'hidden',
             touchAction: 'pan-y',
+            width: '100%',
+            minWidth: 0,
           }}
         >
-          <div key="financial" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="financial" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <FinancialPage />
           </div>
-          <div key="production" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="production" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <ProductionPage />
           </div>
-          <div key="flock" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="flock" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <FlockReportPage />
           </div>
-          <div key="compare" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="compare" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <ComparePage />
           </div>
         </div>

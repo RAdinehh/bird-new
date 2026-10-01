@@ -96,6 +96,7 @@ export default function Inc() {
         ref={containerRef}
         style={{
           overflow: 'hidden',
+          overflowX: 'hidden',
           width: '100%',
           minHeight: 'calc(100vh - 120px)',
           isolation: 'isolate',
@@ -108,20 +109,21 @@ export default function Inc() {
             display: 'flex',
             direction: 'ltr',
             willChange: 'transform',
-            backfaceVisibility: 'hidden',
             touchAction: 'pan-y',
+            width: '100%',
+            minWidth: 0,
           }}
         >
-          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <DevicesPage />
           </div>
-          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} />
           </div>
-          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <CandlingsPage initialEntry={pendingEntry || params.get('entry') || ''} onGoTo={goTo} />
           </div>
-          <div style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <HatchesPage initialEntry={params.get('entry') || ''} onGoTo={goTo} />
           </div>
         </div>

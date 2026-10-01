@@ -84,6 +84,7 @@ export default function Whs() {
         ref={containerRef}
         style={{
           overflow: 'hidden',
+          overflowX: 'hidden',
           width: '100%',
           minHeight: 'calc(100vh - 120px)',
           isolation: 'isolate',
@@ -96,17 +97,18 @@ export default function Whs() {
             display: 'flex',
             direction: 'ltr',
             willChange: 'transform',
-            backfaceVisibility: 'hidden',
             touchAction: 'pan-y',
+            width: '100%',
+            minWidth: 0,
           }}
         >
-          <div key="items" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="items" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <ItemsPage />
           </div>
-          <div key="moves" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="moves" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <MovesPage />
           </div>
-          <div key="warnings" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="warnings" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <WarningsPage />
           </div>
         </div>

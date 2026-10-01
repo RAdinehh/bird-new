@@ -66,6 +66,7 @@ export default function Hal() {
         ref={containerRef}
         style={{
           overflow: 'hidden',
+          overflowX: 'hidden',
           width: '100%',
           minHeight: 'calc(100vh - 120px)',
           isolation: 'isolate',
@@ -78,17 +79,18 @@ export default function Hal() {
             display: 'flex',
             direction: 'ltr',
             willChange: 'transform',
-            backfaceVisibility: 'hidden',
             touchAction: 'pan-y',
+            width: '100%',
+            minWidth: 0,
           }}
         >
-          <div key="halls" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="halls" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <HallsPage />
           </div>
-          <div key="zones" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="zones" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <ZonesPage />
           </div>
-          <div key="equip" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, direction: 'rtl', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
+          <div key="equip" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <EquipmentPage />
           </div>
         </div>
