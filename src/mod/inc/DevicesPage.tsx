@@ -410,7 +410,7 @@ export default function DevicesPage() {
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 4 }}>
                     {logs.slice().reverse().slice(0, 6).map((m: any) => (
-                      <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 3, fontSize: 'var(--fs-sm)', padding: '8px 24px 8px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', position: 'relative' }}>
+                      <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' as any, fontSize: 'var(--fs-sm)', padding: '8px 24px 8px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', position: 'relative' }}>
                         <button
                           type="button"
                           onClick={() => removeMaintenance(d.id, m.id)}
@@ -453,7 +453,7 @@ export default function DevicesPage() {
                   </>
                 )}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+                <div style={{ display: 'flex', gap: 'var(--sp-2)' as any, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={() => setDelId(d.id)} aria-label="حذف دستگاه" style={{ flex: 1 }}>حذف</Btn>
                 </div>
@@ -551,7 +551,7 @@ export default function DevicesPage() {
           </div>
         )}
         {form.capacityByBird.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' as any, marginTop: 6 }}>
             {form.capacityByBird.map(c => {
               const prof: any = getProfileDefaults(c.birdName);
               const d: any = prof || {};
@@ -606,7 +606,7 @@ export default function DevicesPage() {
                       }}>✕</button>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 6, fontSize: 'var(--fs-sm)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' as any, flexWrap: 'wrap', marginTop: 6, fontSize: 'var(--fs-sm)' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🌡 ستر</span>
                         <span style={{ fontWeight: 700 }}>{fmt(c.setterTemp)}°</span>
@@ -627,7 +627,7 @@ export default function DevicesPage() {
                   </div>
 
                   {isExpanded && (
-                    <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: 6, background: 'var(--card)' }}>
+                    <div style={{ padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' as any, background: 'var(--card)' }}>
                       <Field label="ظرفیت" hint="حداکثر تعداد تخم">
                         <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
                       </Field>
