@@ -375,6 +375,60 @@ export function Modal({
   preventCloseRef.current = preventClose;
   const titleId = useRef<string>('modal-title-' + Math.random().toString(36).slice(2, 9));
 
+  // ─── Snap / drag (mobile bottom-sheet) ───
+  const [snap, setSnap] = React.useState<'partial' | 'full'>('partial');
+  const [dragY, setDragY] = React.useState(0);
+  const [dragging, setDragging] = React.useState(false);
+  const dragActive = useRef(false);
+  const dragStartY = useRef(0);
+  const dragLastY = useRef(0);
+  const dragStartT = useRef(0);
+
+  React.useEffect(() => {
+    if (open) { setSnap('partial'); setDragY(0); setDragging(false); }
+  }, [open]);
+
+  const onDragStart = (e: React.TouchEvent) => {
+    dragActive.current = true;
+    setDragging(true);
+    dragStartY.current = e.touches[0].clientY;
+    dragLastY.current = 0;
+    dragStartT.current = Date.now();
+  };
+  const onDragMove = (e: React.TouchEvent) => {
+    if (!dragActive.current) return;
+    let dy = e.touches[0].clientY - dragStartY.current;
+    const floor = snap === 'full' ? 0 : -240;
+    dy = Math.max(floor, Math.min(560, dy));
+    dragLastY.current = dy;
+    setDragY(dy);
+  };
+  const onDragEnd = () => {
+    if (!dragActive.current) return;
+    dragActive.current = false;
+    const dy = dragLastY.current;
+    const dt = Math.max(1, Date.now() - dragStartT.current);
+    const v = dy / dt;
+    const fast = Math.abs(v) > 0.5;
+    if (snap === 'partial') {
+      if (dy < -60 || (fast && v < -0.4)) {
+        setDragging(false); setDragY(0); setSnap('full'); return;
+      }
+      if (dy > 110 || (fast && v > 0.5)) {
+        setDragY(window.innerHeight);
+        setTimeout(() => {
+          if (!preventCloseRef.current) onCloseRef.current();
+        }, 240);
+        return;
+      }
+    } else {
+      if (dy > 60 || (fast && v > 0.4)) {
+        setDragging(false); setDragY(0); setSnap('partial'); return;
+      }
+    }
+    setDragging(false); setDragY(0);
+  };
+
   // Esc + body scroll lock + focus return
   useEffect(() => {
     if (!open) return;
@@ -481,6 +535,7 @@ export function Modal({
   if (!open) return null;
 
   const maxWidth = MODAL_SIZES[size] || MODAL_SIZES.md;
+  const isFull = snap === 'full';
 
   return (
     <div
@@ -505,17 +560,43 @@ export function Modal({
         onKeyDown={handleKeyDown}
         style={{
           background: 'var(--card-solid)',
-          borderTopLeftRadius: 'var(--r-2xl)',
-          borderTopRightRadius: 'var(--r-2xl)',
+          borderTopLeftRadius: isFull ? 0 : 'var(--r-2xl)',
+          borderTopRightRadius: isFull ? 0 : 'var(--r-2xl)',
           width: '100%',
           maxWidth,
-          maxHeight: '85vh',
+          maxHeight: isFull ? '100vh' : '85vh',
+          height: isFull ? '100vh' : undefined,
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
           animation: noAnim ? 'none' : 'pmSlideUp var(--dur-enter) var(--ease-out)',
+          transform: dragY !== 0 ? `translateY(${dragY}px)` : undefined,
+          transition: dragging
+            ? 'none'
+            : 'max-height 320ms cubic-bezier(.2,.9,.3,1), height 320ms cubic-bezier(.2,.9,.3,1), border-radius 220ms ease, transform 300ms cubic-bezier(.2,.9,.3,1)',
         }}
       >
+        {/* Drag handle (فقط موبایل) */}
+        <div
+          onTouchStart={onDragStart}
+          onTouchMove={onDragMove}
+          onTouchEnd={onDragEnd}
+          onTouchCancel={onDragEnd}
+          style={{
+            padding: '10px 0 6px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            cursor: 'grab',
+            touchAction: 'none',
+            flexShrink: 0,
+          }}
+        >
+          <div style={{
+            width: 40, height: 4, borderRadius: 2,
+            background: 'var(--border)',
+          }} />
+        </div>
         {/* Header */}
         <div
           style={{
