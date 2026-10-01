@@ -43,6 +43,7 @@ export default function DatePicker({
   autoToday = false,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(value || '');
 
   const lowPower = useSet((st: any) => st.lowPowerMode);
   const [prefersReduced, setPrefersReduced] = useState(false);
@@ -89,6 +90,11 @@ export default function DatePicker({
     setCursor(new Date());
   }, [open]);
 
+  // هنگام باز شدن، pending = value
+  useEffect(() => {
+    if (open) setPending(value || '');
+  }, [open, value]);
+
   const currentYear = getYear(new Date());
   const years = useMemo(
     () => Array.from({ length: 31 }, (_, i) => currentYear - 15 + i),
@@ -109,11 +115,10 @@ export default function DatePicker({
   };
 
   const handleSelect = (day: number) => {
-    const d = setDate(cursor, day);
-    const dStr = format(d, 'yyyy/MM/dd');
+    const dd = setDate(cursor, day);
+    const dStr = format(dd, 'yyyy/MM/dd');
     if (!isInRange(dStr)) return;
-    onChange(dStr);
-    setOpen(false);
+    setPending(dStr);
   };
 
   const borderColor = error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)';
@@ -172,15 +177,24 @@ export default function DatePicker({
         onClose={() => setOpen(false)}
         title="انتخاب تاریخ"
         footer={
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <Btn
-              onClick={() => { if (isInRange(todayStr)) { onChange(todayStr); setOpen(false); } }}
-              style={{ flex: 1, height: 34 }}
-            >امروز</Btn>
-            <Btn
-              onClick={() => { onChange(''); setOpen(false); }}
-              style={{ flex: 1, height: 34 }}
-            >پاک</Btn>
+              variant="primary"
+              full
+              disabled={!pending}
+              onClick={() => { if (isInRange(pending)) { onChange(pending); setOpen(false); } }}
+              style={{ height: 38 }}
+            >✓ تأیید</Btn>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <Btn
+                onClick={() => { setPending(todayStr); setCursor(new Date()); }}
+                style={{ flex: 1, height: 34 }}
+              >امروز</Btn>
+              <Btn
+                onClick={() => { setPending(''); }}
+                style={{ flex: 1, height: 34 }}
+              >پاک</Btn>
+            </div>
           </div>
         }>
         {/* ═══ هدر: ماه بزرگ + سال کوچیک ═══ */}
@@ -227,7 +241,7 @@ export default function DatePicker({
             const day = i + 1;
             const dd = setDate(cursor, day);
             const dayStr = format(dd, 'yyyy/MM/dd');
-            const isSelected = dayStr === value;
+            const isSelected = dayStr === pending;
             const isToday = dayStr === todayStr;
             const isFriday = dd.getDay() === 5;
             const isDisabled = !isInRange(dayStr);
