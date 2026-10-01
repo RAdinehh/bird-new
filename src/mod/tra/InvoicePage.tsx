@@ -363,7 +363,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
         <SectionTitle>📋 اطلاعات پایه</SectionTitle>
         <Grid2>
           <Field label="تاریخ" required>
-            <DatePicker value={form.date} onChange={v => setForm({...form, date: v})} />
+            <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
           </Field>
           <Field label="دسته">
             <Select value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
@@ -463,7 +463,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
         {form.isPreorder && (
           <>
             <Field label="تاریخ تحویل" required>
-              <DatePicker value={form.deliveryDate} onChange={v => setForm({...form, deliveryDate: v})} />
+              <DatePicker value={form.deliveryDate} onChange={v => setForm({...form, deliveryDate: v})}  autoToday />
             </Field>
             <Grid2>
               <Field label="نوع پیش‌پرداخت">
@@ -495,7 +495,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
           )}
           {form.paymentTerms === 'custom' && (
             <Field label="تاریخ سرسید" required>
-              <DatePicker value={form.customDueDate} onChange={v => setForm({...form, customDueDate: v, dueDate: v})} />
+              <DatePicker value={form.customDueDate} onChange={v => setForm({...form, customDueDate: v, dueDate: v})}  autoToday />
             </Field>
           )}
         </Grid2>
@@ -531,14 +531,14 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
               </Field>
             </Grid2>
             <Field label="تاریخ">
-              <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} />
+              <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })}  autoToday />
             </Field>
             {p.method === 'check' && (
               <>
                 <Grid3>
                   <Field label="شماره چک"><Input placeholder="مثلاً — ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
                   <Field label="بانک"><Input placeholder="مثلاً — ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
-                  <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })} /></Field>
+                  <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
                 </Grid3>
                 <Field label="وضعیت چک">
                   <Select value={p.status || 'pending'} onChange={e => updatePayment(p.id, { status: e.target.value as CheckStatus })}>
@@ -548,7 +548,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
                   </Select>
                 </Field>
                 {p.status === 'cleared' && (
-                  <Field label="تاریخ نقد"><DatePicker value={p.clearedDate || ''} onChange={v => updatePayment(p.id, { clearedDate: v })} /></Field>
+                  <Field label="تاریخ نقد"><DatePicker value={p.clearedDate || ''} onChange={v => updatePayment(p.id, { clearedDate: v })}  autoToday /></Field>
                 )}
               </>
             )}
@@ -580,7 +580,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
       >
         {transferModal && (
           <>
-            <Field label="تاریخ"><DatePicker value={transferDate} onChange={v => setTransferDate(v)} /></Field>
+            <Field label="تاریخ"><DatePicker value={transferDate} onChange={v => setTransferDate(v)}  autoToday /></Field>
             {(transferModal.to === 'received' || transferModal.to === 'paid') && (
               <Field label="یادداشت"><Input placeholder="یادداشت..." value={transferNote} onChange={e => setTransferNote(e.target.value)} /></Field>
             )}

@@ -356,7 +356,7 @@ export default function ItemsPage() {
                 <Input placeholder="..." dir="ltr" value={form.batchNo} onChange={e => setForm({ ...form, batchNo: e.target.value })} />
               </Field>
               <Field label="تاریخ انقضا">
-                <DatePicker value={form.expireDate} onChange={v => setForm({ ...form, expireDate: v })} />
+                <DatePicker value={form.expireDate} onChange={v => setForm({ ...form, expireDate: v })}  autoToday />
               </Field>
             </Grid2>
             <Grid2>

@@ -270,7 +270,7 @@ export default function ProductionsPage() {
             </Select>
           </Field>
           <Field label="تاریخ" required>
-            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })} />
+            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
           </Field>
         </Grid2>
 

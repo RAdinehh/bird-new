@@ -271,7 +271,7 @@ export default function FormulasPage() {
             />
           </Field>
           <Field label="تاریخ">
-            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })} />
+            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
           </Field>
         </Grid2>
 

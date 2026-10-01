@@ -699,7 +699,7 @@ export default function DevicesPage() {
             <MoneyField placeholder="۰" value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
           </Field>
           <Field label="تاریخ خرید">
-            <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} />
+            <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})}  autoToday />
           </Field>
         </Grid2>
         <Grid2>
@@ -726,7 +726,7 @@ export default function DevicesPage() {
         footer={<BtnRow><Btn variant="primary" onClick={() => { if (maintDeviceId) addMaintenance(maintDeviceId); }}>ذخیره</Btn><Btn onClick={() => setMaintDeviceId(null)}>لغو</Btn></BtnRow>}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           <Field label="تاریخ" required>
-            <DatePicker value={maintForm.date} onChange={v => setMaintForm({ ...maintForm, date: v })} />
+            <DatePicker value={maintForm.date} onChange={v => setMaintForm({ ...maintForm, date: v })}  autoToday />
           </Field>
           <Field label="نوع تعمیر" required>
             <Input placeholder="تعویض فن..." value={maintForm.type} onChange={e => setMaintForm({ ...maintForm, type: e.target.value })} />

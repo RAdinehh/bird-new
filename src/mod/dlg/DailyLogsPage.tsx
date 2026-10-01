@@ -538,7 +538,7 @@ export default function DailyLogsPage() {
           </Grid2>
 
           <Field label="تاریخ" required>
-            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })} />
+            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
           </Field>
 
           {flockAliveCount > 0 && (

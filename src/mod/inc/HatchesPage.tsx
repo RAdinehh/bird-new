@@ -607,7 +607,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
         <SectionTitle>📅 تاریخ هچ</SectionTitle>
         <Field label="تاریخ" required>
-          <DatePicker value={formDate} onChange={v => setFormDate(v)} placeholder="انتخاب تاریخ" />
+          <DatePicker value={formDate} onChange={v => setFormDate(v)} placeholder="انتخاب تاریخ"  autoToday />
         </Field>
 
         <ErrorBox>{err}</ErrorBox>
@@ -664,7 +664,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
           <Field label="تعداد" required><NumField value={sellForm.count} onChange={e => setSellForm({...sellForm, count: e.target.value})} max={sellModal?.count} min={0} unit="عدد" /></Field>
           <Field label="قیمت هر جوجه" required><MoneyField value={sellForm.unitPrice} onChange={e => setSellForm({...sellForm, unitPrice: e.target.value})} /></Field>
         </Grid2>
-        <Field label="تاریخ"><DatePicker value={sellForm.date} onChange={v => setSellForm({...sellForm, date: v})} /></Field>
+        <Field label="تاریخ"><DatePicker value={sellForm.date} onChange={v => setSellForm({...sellForm, date: v})}  autoToday /></Field>
         {(() => {
           const cnt = parseInt(toEn(sellForm.count)) || 0;
           const up = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;

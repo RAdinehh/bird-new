@@ -457,7 +457,7 @@ export default function ReceivablesPage() {
         {deferModal ? (
           <>
             <Field label="سرسید جدید" required>
-              <DatePicker value={deferDate} onChange={v => setDeferDate(v)} />
+              <DatePicker value={deferDate} onChange={v => setDeferDate(v)}  autoToday />
             </Field>
             <Field label="دلیل تعویق">
               <Input placeholder="..." value={deferReason} onChange={e => setDeferReason(e.target.value)} />

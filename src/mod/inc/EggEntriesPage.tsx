@@ -914,7 +914,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4, borderTop: '1px dashed var(--border)' }}>📅 زمان</div>
           <Grid2>
             <Field label="تاریخ ورود" required>
-              <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ" />
+              <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ"  autoToday />
             </Field>
             <Field label="ساعت ورود">
               <Input value={currentRow.entryTime} onChange={e => setCurrentRow(f => ({ ...f, entryTime: e.target.value }))} placeholder="۱۴:۳۵" dir="ltr" />
@@ -961,7 +961,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               </label>
               {currentRow.dealStatus === 'withdrawn' && (
                 <Grid2>
-                  <Field label="تاریخ"><DatePicker value={currentRow.dealWithdrawnAt} onChange={v => setCurrentRow(f => ({ ...f, dealWithdrawnAt: v }))} /></Field>
+                  <Field label="تاریخ"><DatePicker value={currentRow.dealWithdrawnAt} onChange={v => setCurrentRow(f => ({ ...f, dealWithdrawnAt: v }))}  autoToday /></Field>
                   <Field label="دلیل"><Input value={currentRow.dealWithdrawnReason} onChange={e => setCurrentRow(f => ({ ...f, dealWithdrawnReason: e.target.value }))} /></Field>
                 </Grid2>
               )}

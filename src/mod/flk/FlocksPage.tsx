@@ -591,15 +591,15 @@ export default function FlocksPage() {
           <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>تاریخ‌ها</div>
 
           <Field label="تاریخ هچ" hint="اگر از جوجه‌کشی خودت آمده — سن از این محاسبه می‌شود">
-            <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ" />
+            <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ"  autoToday />
           </Field>
 
           <Field label="تاریخ خرید" hint="اگر از بیرون خریده‌ای">
-            <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید" />
+            <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید"  autoToday />
           </Field>
 
           <Field label="تاریخ شروع نگهداری" hint="اگر هیچ‌کدام از موارد بالا نبود">
-            <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="انتخاب تاریخ شروع" />
+            <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="انتخاب تاریخ شروع"  autoToday />
           </Field>
 
           <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>هزینه‌ها</div>

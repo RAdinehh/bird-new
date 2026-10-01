@@ -501,7 +501,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
             <NumField value={modalDay} onChange={e => setModalDay(e.target.value)} unit="روز" min={1} max={30} autoClamp />
           </Field>
           <Field label="تاریخ" required>
-            <DatePicker value={modalDate} onChange={v => setModalDate(v)} placeholder="انتخاب" />
+            <DatePicker value={modalDate} onChange={v => setModalDate(v)} placeholder="انتخاب"  autoToday />
           </Field>
         </Grid2>
 

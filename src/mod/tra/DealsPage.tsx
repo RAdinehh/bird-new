@@ -214,7 +214,7 @@ export default function DealsPage() {
             </Select>
           </Field>
           <Field label="تاریخ" required>
-            <DatePicker value={form.date} onChange={v => setForm({...form, date: v})} />
+            <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
           </Field>
         </Grid2>
 
@@ -251,7 +251,7 @@ export default function DealsPage() {
         </Grid2>
 
         <Field label="سرسید">
-          <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})} />
+          <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})}  autoToday />
         </Field>
 
         <Field label="وضعیت">
