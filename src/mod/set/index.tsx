@@ -80,10 +80,10 @@ export default function Set() {
   };
 
   const ALL_TAB_IDS = ALL_TABS.map(t => t.id as string);
-  useSwipeTabs(ALL_TAB_IDS, tab, (id) => changeTab(id as TabId));
+  const swipeRef = useSwipeTabs(ALL_TAB_IDS, tab, (id) => changeTab(id as TabId));
 
   return (
-    <div>
+    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex',
         gap: 'var(--gap-xs)',

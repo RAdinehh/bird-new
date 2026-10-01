@@ -45,10 +45,10 @@ export default function Inc() {
     });
   };
   const TAB_IDS = ['devices', 'eggs', 'candlings', 'hatches'];
-  useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
 
   return (
-    <div>
+    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 8px', background: 'var(--header-bg)',

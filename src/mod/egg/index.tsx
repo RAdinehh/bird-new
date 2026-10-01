@@ -17,10 +17,10 @@ export default function Egg() {
   const [tab, setTab] = useState<TabId>('productions');
 
   const TAB_IDS = ['productions', 'stock'];
-  useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
 
   return (
-    <div>
+    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',

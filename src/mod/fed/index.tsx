@@ -16,10 +16,10 @@ export default function Fed() {
   const [tab, setTab] = useState<TabId>('ingredients');
 
   const TAB_IDS = ['ingredients', 'requirements', 'formulas'];
-  useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
 
   return (
-    <div>
+    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',

@@ -18,10 +18,10 @@ type TabId = typeof tabs[number]['id'];
 export default function Hal() {
   const [tab, setTab] = useState<TabId>('halls');
   const TAB_IDS = ['halls', 'zones', 'equip'];
-  useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
 
   return (
-    <div>
+    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 12px', background: 'var(--header-bg)',
