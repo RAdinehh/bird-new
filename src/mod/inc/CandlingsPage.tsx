@@ -68,6 +68,16 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
   const [editingId, setEditingId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ candling: any } | null>(null);
 
+  // profile پرنده انتخاب‌شده اول
+  const _firstSelectedBirdName = (() => {
+    const firstId = Array.from(selectedIds)[0];
+    if (!firstId) return undefined;
+    const entry = eggEntries.find(x => x.id === firstId);
+    if (!entry) return undefined;
+    return birds.find(b => b.id === entry.birdId)?.name;
+  })();
+  const _profile = useIncubationProfile(_firstSelectedBirdName);
+
   // ═══ Performance: lookup maps ═══
   const _entriesById = useMemo(() => {
     const m: Record<string, any> = {};
@@ -528,6 +538,22 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
         <SectionTitle>📅 زمان‌بندی</SectionTitle>
+        {_firstSelectedBirdName && _profile.totalDays ? (
+          <div style={{
+            fontSize: 'var(--fs-xs)',
+            padding: '6px 10px',
+            background: 'var(--accent-soft)',
+            border: '1px solid var(--accent-border)',
+            borderRadius: 'var(--r-sm)',
+            color: 'var(--accent)',
+            fontWeight: 700,
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}>
+            <span>🐣 {_firstSelectedBirdName}</span>
+            <span>مدت {toFa(_profile.totalDays)} روز · قفل {toFa(_profile.lockdownDay)}</span>
+          </div>
+        ) : null}
         <Grid2>
           <Field label="روز انکوباسیون" required hint="۷، ۱۰، ۱۵...">
             <NumField value={modalDay} onChange={e => setModalDay(e.target.value)} unit="روز" min={1} max={30} autoClamp />
