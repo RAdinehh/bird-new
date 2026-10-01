@@ -48,6 +48,44 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   const [sellModal, setSellModal] = useState<{ hatchId: string; count: number } | null>(null);
   const [sellForm, setSellForm] = useState({ buyerId:'', count:'', unitPrice:'', date:'' });
 
+  // ═══ Performance: lookup maps ═══
+  const _entriesById = useMemo(() => {
+    const m: Record<string, any> = {};
+    (eggEntries || []).forEach(e => { m[e.id] = e; });
+    return m;
+  }, [eggEntries]);
+
+  const _birdsById = useMemo(() => {
+    const m: Record<string, any> = {};
+    (birds || []).forEach(b => { m[b.id] = b; });
+    return m;
+  }, [birds]);
+
+  const _devicesById = useMemo(() => {
+    const m: Record<string, any> = {};
+    (devices || []).forEach(d => { m[d.id] = d; });
+    return m;
+  }, [devices]);
+
+  // ═══ Performance: index candlings by entry, sorted desc ═══
+  const _candlingsByEntry = useMemo(() => {
+    const m: Record<string, any[]> = {};
+    (candlings || []).forEach(cc => {
+      if (!m[cc.eggEntryId]) m[cc.eggEntryId] = [];
+      m[cc.eggEntryId].push(cc);
+    });
+    Object.values(m).forEach(arr => arr.sort((a, b) => b.stage - a.stage));
+    return m;
+  }, [candlings]);
+
+  const _latestCandByEntry = useMemo(() => {
+    const m: Record<string, any> = {};
+    Object.entries(_candlingsByEntry).forEach(([k, arr]) => {
+      if (arr.length > 0) m[k] = arr[0];
+    });
+    return m;
+  }, [_candlingsByEntry]);
+
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
   const todayJ = () => { const d = new Date(); return formatJ(d, 'yyyy/MM/dd'); };
@@ -66,7 +104,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
       setSelectedIds(newSet);
     } else {
       newSet.add(id);
-      const entry = eggEntries.find(e => e.id === id);
+      const entry = _entriesById[id];
       const calc = calcCurrentFertile(id, entry?.count || 0, candlings);
       setEntriesData({ ...entriesData, [id]: { ...emptyRow(), hatched: calc.fertile > 0 ? String(calc.fertile) : '' } });
       setSelectedIds(newSet);
@@ -165,8 +203,8 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     if (!flockModal) return;
     if (!flockForm.name.trim()) { showAlert('نام گله اجباری است'); return; }
     const h = hatches.find(x => x.id === flockModal.hatchId); if (!h) return;
-    const entry = eggEntries.find(e => e.id === h.eggEntryId);
-    const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
+    const entry = _entriesById[h.eggEntryId];
+    const bird = entry ? _birdsById[entry.birdId] : null;
     if (!bird) { showAlert('پرنده پیدا نشد'); return; }
     addFlock({
       name: flockForm.name.trim(), type: flockForm.type as any,
@@ -204,12 +242,12 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   };
 
   const filtered = useMemo(() => hatches.filter(h => {
-    const entry = eggEntries.find(e => e.id === h.eggEntryId);
+    const entry = _entriesById[h.eggEntryId];
     if (deviceFilter && entry?.deviceId !== deviceFilter) return false;
     if (q.trim()) {
       const t = q.trim().toLowerCase();
-      const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
-      const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
+      const bird = entry ? _birdsById[entry.birdId] : null;
+      const dev = entry ? _devicesById[entry.deviceId] : null;
       if (![bird?.name, dev?.name, h.date, h.notes].filter(Boolean).join(' ').toLowerCase().includes(t)) return false;
     }
     return true;
@@ -252,13 +290,13 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
       ) : (
         <>
           {filtered.map((h, i) => {
-            const entry = eggEntries.find(e => e.id === h.eggEntryId);
-            const bird = entry ? birds.find(b => b.id === entry.birdId) : null;
-            const dev = entry ? devices.find(d => d.id === entry.deviceId) : null;
+            const entry = _entriesById[h.eggEntryId];
+            const bird = entry ? _birdsById[entry.birdId] : null;
+            const dev = entry ? _devicesById[entry.deviceId] : null;
             const isOpen = expandedId === h.id;
             const total = entry?.count || 0;
             const hr = hatchRate(h.hatched || 0, total);
-            const myCand = candlings.filter(c => c.eggEntryId === h.eggEntryId).sort((a,b) => b.stage - a.stage)[0];
+            const myCand = _latestCandByEntry[h.eggEntryId];
             const aliveAfter = myCand?.alive || total;
             const realRate = aliveAfter ? ((h.hatched || 0) / aliveAfter * 100) : 0;
             const tone = hr >= 70 ? 'green' : hr >= 50 ? 'amber' : 'red';
@@ -373,8 +411,8 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
           <Field label="ورودی تخم" required>
             <Select value={formEntryId} onChange={e => setFormEntryId(e.target.value)}>
               {eggEntries.map(e => {
-                const bird = birds.find(b => b.id === e.birdId);
-                const dev = devices.find(d => d.id === e.deviceId);
+                const bird = _birdsById[e.birdId];
+                const dev = _devicesById[e.deviceId];
                 return <option key={e.id} value={e.id}>{bird?.name || '—'} · {toFa(e.entryDate)} · {toFa(e.count || 0)} تخم · {dev?.name || ''}</option>;
               })}
             </Select>
@@ -393,13 +431,13 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {availableEntries.map(e => {
-                  const bird = birds.find(b => b.id === e.birdId);
-                  const dev = devices.find(d => d.id === e.deviceId);
+                  const bird = _birdsById[e.birdId];
+                  const dev = _devicesById[e.deviceId];
                   const isSel = selectedIds.has(e.id);
                   const d = dataFor(e.id);
                   const calc = calcCurrentFertile(e.id, e.count || 0, candlings);
                   const aliveAfter = calc.fertile;
-                  const myCand = candlings.filter(c => c.eggEntryId === e.id).sort((a,b) => b.stage - a.stage)[0];
+                  const myCand = _latestCandByEntry[e.id];
                   const sumE = (parseInt(toEn(d.hatched))||0) + (parseInt(toEn(d.unhatched))||0) + (parseInt(toEn(d.deadInShell))||0) + (parseInt(toEn(d.pipped))||0) + (parseInt(toEn(d.other))||0);
                   const rem = (e.count || 0) - sumE;
                   return (
