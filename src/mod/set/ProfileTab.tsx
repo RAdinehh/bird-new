@@ -5,6 +5,7 @@ import { toFa, parseFaNum } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow } from './helpers';
 import PinSetupModal from '../../shr/components/PinSetupModal';
+import { showToast } from '../../cor/store/toast';
 
 export default function ProfileTab() {
   const { user, farm, bank, units, defaults, security, updateSection } = useSet();

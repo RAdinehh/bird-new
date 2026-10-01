@@ -3,6 +3,7 @@ import { Btn, Field, Grid2, Select } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow, ColorBtn } from './helpers';
+import { showToast } from '../../cor/store/toast';
 
 export default function AppearanceTab() {
   const s = useSet();

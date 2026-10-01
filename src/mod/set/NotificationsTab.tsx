@@ -4,6 +4,7 @@ import { Btn, Field, Grid2, Input } from '../../shr/components/ui';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow, LocalNumField, SubSection } from './helpers';
+import { showToast } from '../../cor/store/toast';
 
 export default function NotificationsTab() {
   const s = useSet();

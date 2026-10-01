@@ -1,6 +1,7 @@
 import { useSet, MODULE_LABELS } from './store';
 import { Tag } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
+import { showToast } from '../../cor/store/toast';
 
 function Toggle({ enabled, disabled, onToggle }: { enabled: boolean; disabled?: boolean; onToggle: () => void }) {
   return (
