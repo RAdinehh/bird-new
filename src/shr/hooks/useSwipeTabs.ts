@@ -17,18 +17,22 @@ export function useSwipeTabs(
   optsRef.current = opts;
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const root = ref.current;
+    if (!root) return;
 
     let startX = 0, startY = 0, startT = 0;
     let activeTouch = false;
     let locked: 'none' | 'h' | 'v' = 'none';
+    let startedInRoot = false;
 
+    // document-level capture — قبل از هر چیز دیگه‌ای events رو می‌گیره
     const onStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const tgt = e.target as HTMLElement;
-      // فقط dialog رو skip کن
-      if (tgt.closest('[role="dialog"]')) { activeTouch = false; return; }
+      if (tgt.closest('[role="dialog"]')) { startedInRoot = false; return; }
+      // آیا لمس داخل ref ما شروع شد؟
+      startedInRoot = root.contains(tgt);
+      if (!startedInRoot) return;
       const t = e.touches[0];
       startX = t.clientX;
       startY = t.clientY;
@@ -48,7 +52,7 @@ export function useSwipeTabs(
         }
       }
       if (locked === 'h' && e.cancelable) {
-        try { e.preventDefault(); } catch {}
+        e.preventDefault();
       }
     };
 
@@ -81,15 +85,15 @@ export function useSwipeTabs(
 
     const onCancel = () => { activeTouch = false; locked = 'none'; };
 
-    el.addEventListener('touchstart', onStart, { passive: true });
-    el.addEventListener('touchmove', onMove, { passive: false });
-    el.addEventListener('touchend', onEnd, { passive: true });
-    el.addEventListener('touchcancel', onCancel, { passive: true });
+    document.addEventListener('touchstart', onStart, { passive: true, capture: true });
+    document.addEventListener('touchmove', onMove, { passive: false, capture: true });
+    document.addEventListener('touchend', onEnd, { passive: true, capture: true });
+    document.addEventListener('touchcancel', onCancel, { passive: true, capture: true });
     return () => {
-      el.removeEventListener('touchstart', onStart);
-      el.removeEventListener('touchmove', onMove);
-      el.removeEventListener('touchend', onEnd);
-      el.removeEventListener('touchcancel', onCancel);
+      document.removeEventListener('touchstart', onStart, { capture: true } as any);
+      document.removeEventListener('touchmove', onMove, { capture: true } as any);
+      document.removeEventListener('touchend', onEnd, { capture: true } as any);
+      document.removeEventListener('touchcancel', onCancel, { capture: true } as any);
     };
   }, []);
 
