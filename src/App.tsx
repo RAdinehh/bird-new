@@ -36,19 +36,6 @@ function Layout() {
     <div style={{
       maxWidth: 480, margin: '0 auto', minHeight: '100dvh', paddingBottom: 80
     }}>
-      <div style={{
-        padding: '8px 12px',
-        background: 'linear-gradient(90deg, #ff0000, #ff6600)',
-        color: 'white',
-        fontWeight: 700,
-        fontSize: 'var(--fs-sm)',
-        textAlign: 'center',
-        position: 'sticky',
-        top: 0,
-        zIndex: 9999,
-      }}>
-        🔴 v0.9.2 — آخرین تغییرات اعمال شد ✅
-      </div>
       <Header title={title} />
       <MenuDrawer />
       <HelpModal />
