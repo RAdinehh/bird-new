@@ -275,9 +275,9 @@ export default function ProductionsPage() {
         </Grid2>
 
         {flockCount > 0 ? (
-          <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)',
-             border: '1px solid var(--info)', borderRadius: 'var(--r-md)',
-             fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600,
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
+             border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
+             fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600,
              textAlign: 'center' }}>
             تعداد گله: {toFa(flockCount)} پرنده
           </div>
@@ -364,7 +364,7 @@ export default function ProductionsPage() {
             {int(form.dirtyCount) > 0 ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
                 <span style={{ color: 'var(--muted)' }}>🧹 کثیف:</span>
-                <span style={{ fontWeight: 700, color: 'var(--info)' }}>{toFa(int(form.dirtyCount))}</span>
+                <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(int(form.dirtyCount))}</span>
               </div>
             ) : null}
             <div style={{ display: 'flex', justifyContent: 'space-between',
