@@ -577,7 +577,7 @@ export default function DevicesPage() {
                 }}>
                   <div
                     onClick={() => setExpandedBird(isExpanded ? null : c.birdName)}
-                    role="button"
+                    role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); () => setExpandedBird(isExpanded ? null : c.birdName); } }}
                     aria-expanded={isExpanded}
                     style={{
                       padding: '10px 12px',
