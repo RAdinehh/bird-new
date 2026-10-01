@@ -117,6 +117,18 @@ export default function DailyLogsPage() {
     return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
   };
 
+  const undoDeleteLog = () => {
+    if (undoData == null) return;
+    const logToRestore = undoData.log;
+    try {
+      add(logToRestore);
+      showToast('ثبت بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
+
   const openNew = () => {
     if (activeFlocks.length === 0) { showAlert('اول یک گله بسازید'); return; }
     const flock = activeFlocks[0];
@@ -498,6 +510,13 @@ export default function DailyLogsPage() {
       </div>
 
       <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="ثبت حذف شد"
+          onUndo={undoDeleteLog}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
         <HelpBanner
           id="dlg-intro"
           icon="📋"
