@@ -1,8 +1,7 @@
 /**
  * index.tsx — بخش hal
  */
-import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
-import { useState } from 'react';
+import {useState, useRef, useEffect} from 'react';
 import HallsPage from './HallsPage';
 import ZonesPage from './ZonesPage';
 import EquipmentPage from './EquipmentPage';
@@ -17,11 +16,37 @@ type TabId = typeof tabs[number]['id'];
 
 export default function Hal() {
   const [tab, setTab] = useState<TabId>('halls');
-  const TAB_IDS = ['halls', 'zones', 'equip'];
-  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const syncingRef = useRef(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ids = ['halls', 'zones', 'equip'] as string[];
+    const idx = ids.indexOf(tab);
+    if (idx < 0) return;
+    const target = idx * el.clientWidth;
+    if (Math.abs(el.scrollLeft - target) < 4) return;
+    syncingRef.current = true;
+    el.scrollTo({ left: target, behavior: 'smooth' });
+    const t = setTimeout(() => { syncingRef.current = false; }, 500);
+    return () => clearTimeout(t);
+  }, [tab]);
+
+  const onScroll = () => {
+    if (syncingRef.current) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    if (w <= 0) return;
+    const idx = Math.round(el.scrollLeft / w);
+    const ids = ['halls', 'zones', 'equip'] as string[];
+    const newTab = ids[idx];
+    if (newTab && newTab !== tab) setTab(newTab as TabId);
+  };
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
+    <div style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 12px', background: 'var(--header-bg)',
@@ -41,9 +66,22 @@ export default function Hal() {
           </div>
         ))}
       </div>
-      {tab === 'halls' && <HallsPage />}
-      {tab === 'zones' && <ZonesPage />}
-      {tab === 'equip' && <EquipmentPage />}
+      <div
+          ref={scrollRef}
+          onScroll={onScroll}
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            scrollSnapType: 'x mandatory',
+            width: '100%',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <div key="halls" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><HallsPage /></div>
+          <div key="zones" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><ZonesPage /></div>
+          <div key="equip" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><EquipmentPage /></div>
+        </div>
     </div>
   );
 }

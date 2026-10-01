@@ -1,8 +1,7 @@
 /**
  * index.tsx — بخش inc
  */
-import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
-import { useState } from 'react';
+import {useState, useRef, useEffect} from 'react';
 import { useSearchParams } from 'react-router-dom';
 import DevicesPage from './DevicesPage';
 import EggEntriesPage from './EggEntriesPage';
@@ -44,11 +43,37 @@ export default function Inc() {
       return next;
     });
   };
-  const TAB_IDS = ['devices', 'eggs', 'candlings', 'hatches'];
-  const swipeRef = useSwipeTabs(TAB_IDS, tab, (id) => setTab(id as TabId));
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const syncingRef = useRef(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ids = ['devices', 'eggs', 'candlings', 'hatches'] as string[];
+    const idx = ids.indexOf(tab);
+    if (idx < 0) return;
+    const target = idx * el.clientWidth;
+    if (Math.abs(el.scrollLeft - target) < 4) return;
+    syncingRef.current = true;
+    el.scrollTo({ left: target, behavior: 'smooth' });
+    const t = setTimeout(() => { syncingRef.current = false; }, 500);
+    return () => clearTimeout(t);
+  }, [tab]);
+
+  const onScroll = () => {
+    if (syncingRef.current) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    if (w <= 0) return;
+    const idx = Math.round(el.scrollLeft / w);
+    const ids = ['devices', 'eggs', 'candlings', 'hatches'] as string[];
+    const newTab = ids[idx];
+    if (newTab && newTab !== tab) setTab(newTab as TabId);
+  };
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
+    <div style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 8px', background: 'var(--header-bg)',
@@ -67,10 +92,23 @@ export default function Inc() {
           </div>
         ))}
       </div>
-      {tab === 'devices' && <DevicesPage />}
-      {tab === 'eggs' && <EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} />}
-      {tab === 'candlings' && <CandlingsPage initialEntry={pendingEntry || params.get('entry') || ''} onGoTo={goTo} />}
-      {tab === 'hatches' && <HatchesPage initialEntry={params.get('entry') || ''} onGoTo={goTo} />}
+      <div
+          ref={scrollRef}
+          onScroll={onScroll}
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            scrollSnapType: 'x mandatory',
+            width: '100%',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <div key="devices" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><DevicesPage /></div>
+          <div key="eggs" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} /></div>
+          <div key="candlings" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><CandlingsPage initialEntry={pendingEntry || params.get('entry') || ''} onGoTo={goTo} /></div>
+          <div key="hatches" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><HatchesPage initialEntry={params.get('entry') || ''} onGoTo={goTo} /></div>
+        </div>
     </div>
   );
 }

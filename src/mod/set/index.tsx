@@ -1,8 +1,7 @@
 /**
  * index.tsx — تنظیمات (گروه‌بندی منطقی)
  */
-import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
-import { useState } from 'react';
+import {useState, useRef, useEffect} from 'react';
 import ProfileTab from './ProfileTab';
 import AppearanceTab from './AppearanceTab';
 import ModulesTab from './ModulesTab';
@@ -80,10 +79,37 @@ export default function Set() {
   };
 
   const ALL_TAB_IDS = ALL_TABS.map(t => t.id as string);
-  const swipeRef = useSwipeTabs(ALL_TAB_IDS, tab, (id) => changeTab(id as TabId));
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const syncingRef = useRef(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ids = ['profile', 'appearance', 'modules', 'notifications', 'backup', 'incubation', 'logs', 'about'] as string[];
+    const idx = ids.indexOf(tab);
+    if (idx < 0) return;
+    const target = idx * el.clientWidth;
+    if (Math.abs(el.scrollLeft - target) < 4) return;
+    syncingRef.current = true;
+    el.scrollTo({ left: target, behavior: 'smooth' });
+    const t = setTimeout(() => { syncingRef.current = false; }, 500);
+    return () => clearTimeout(t);
+  }, [tab]);
+
+  const onScroll = () => {
+    if (syncingRef.current) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    if (w <= 0) return;
+    const idx = Math.round(el.scrollLeft / w);
+    const ids = ['profile', 'appearance', 'modules', 'notifications', 'backup', 'incubation', 'logs', 'about'] as string[];
+    const newTab = ids[idx];
+    if (newTab && newTab !== tab) setTab(newTab as TabId);
+  };
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
+    <div style={{ touchAction: 'pan-y' }}>
       <div style={{
         display: 'flex',
         gap: 'var(--gap-xs)',
@@ -152,14 +178,27 @@ export default function Set() {
       </div>
 
       <div style={{ padding: 'var(--sp-3)' }}>
-        {tab === 'profile' && <ProfileTab />}
-        {tab === 'appearance' && <AppearanceTab />}
-        {tab === 'modules' && <ModulesTab />}
-        {tab === 'notifications' && <NotificationsTab />}
-        {tab === 'backup' && <BackupTab />}
-        {tab === 'incubation' && <IncubationProfilesTab />}
-        {tab === 'logs' && <LogsTab />}
-        {tab === 'about' && <AboutTab />}
+        <div
+          ref={scrollRef}
+          onScroll={onScroll}
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            scrollSnapType: 'x mandatory',
+            width: '100%',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <div key="profile" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><ProfileTab /></div>
+          <div key="appearance" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><AppearanceTab /></div>
+          <div key="modules" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><ModulesTab /></div>
+          <div key="notifications" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><NotificationsTab /></div>
+          <div key="backup" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><BackupTab /></div>
+          <div key="incubation" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><IncubationProfilesTab /></div>
+          <div key="logs" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><LogsTab /></div>
+          <div key="about" style={{ minWidth: '100%', flexShrink: 0, scrollSnapAlign: 'start', contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}><AboutTab /></div>
+        </div>
       </div>
     </div>
   );
