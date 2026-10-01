@@ -312,6 +312,7 @@ export default function DailyLogsPage() {
       }
     } catch (e) { /* silent */ }
 
+    showToast(form.id ? 'ثبت روزانه به‌روز شد' : 'ثبت روزانه ذخیره شد', 'success', 2200);
     setOpen(false);
   };
 
