@@ -229,7 +229,7 @@ export default function ListCards({
 
             {/* ============ ۸. هشدار انبار ============ */}
             {stockAlerts > 0 ? (
-              <div
+              <div role="button" tabIndex={0}
                 onClick={() => nav('/whs')}
                 style={{
                   padding: 'var(--pad-card)',

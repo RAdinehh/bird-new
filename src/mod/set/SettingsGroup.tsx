@@ -44,7 +44,7 @@ export default function SettingsGroup({
       overflow: 'hidden',
       transition: 'border-color .2s'
     }}>
-      <div
+      <div role="button" tabIndex={0}
         onClick={toggle}
         style={{
           padding: '13px 16px',

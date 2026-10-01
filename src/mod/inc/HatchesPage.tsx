@@ -442,7 +442,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                   const rem = (e.count || 0) - sumE;
                   return (
                     <div key={e.id} style={{ border: '1px solid ' + (isSel ? 'var(--accent-border)' : 'var(--border)'), background: isSel ? 'var(--accent-soft)' : 'var(--card)', borderRadius: 'var(--r-md)', padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <div onClick={() => toggleEntry(e.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', padding: 4, margin: -4, borderRadius: 'var(--r-sm)' }}>
+                      <div role="button" tabIndex={0} onClick={() => toggleEntry(e.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', padding: 4, margin: -4, borderRadius: 'var(--r-sm)' }}>
                         <input type="checkbox" checked={isSel} onChange={() => {}} onClick={(ev) => { ev.stopPropagation(); toggleEntry(e.id); }} aria-label="انتخاب ورودی" style={{ width: 20, height: 20, accentColor: 'var(--accent)', cursor: 'pointer', flexShrink: 0 }} />
                         <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{bird?.name || '—'} · {toFa(e.count || 0)} تخم</span>
                         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{dev?.name || ''}</span>

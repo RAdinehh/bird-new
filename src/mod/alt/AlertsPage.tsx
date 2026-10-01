@@ -64,7 +64,7 @@ export default function AlertsPage() {
         background: 'var(--header-bg)',
         position: 'sticky', top: 52, zIndex: 11
       }}>
-        <div onClick={() => setTab('active')} style={tabStyle(tab === 'active')}>
+        <div role="button" tabIndex={0} onClick={() => setTab('active')} style={tabStyle(tab === 'active')}>
           فعال
           {counts.total > 0 ? (
             <span style={{
@@ -77,7 +77,7 @@ export default function AlertsPage() {
             }}>{toFa(counts.total)}</span>
           ) : null}
         </div>
-        <div onClick={() => setTab('history')} style={tabStyle(tab === 'history')}>
+        <div role="button" tabIndex={0} onClick={() => setTab('history')} style={tabStyle(tab === 'history')}>
           تاریخچه ({toFa(alerts.filter(a => a.status === 'dismissed').length)})
         </div>
       </div>

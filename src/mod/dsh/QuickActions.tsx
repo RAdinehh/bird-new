@@ -4,7 +4,7 @@ import { SectionTitle } from '../../shr/components/ui';
 
 function QuickAction({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
   return (
-    <div
+    <div role="button" tabIndex={0}
       onClick={onClick}
       style={{
         background: 'var(--card)',

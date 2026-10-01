@@ -220,7 +220,7 @@ export default function AnalyticsCards({
                 </div>
 
                 {receivables > 0 ? (
-                  <div
+                  <div role="button" tabIndex={0}
                     onClick={() => nav('/tra')}
                     style={{
                       padding: 'var(--pad-inner)',

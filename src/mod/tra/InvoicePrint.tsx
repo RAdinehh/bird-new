@@ -159,7 +159,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
   };
 
   return (
-    <div
+    <div role="button" tabIndex={0}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       style={{
         position: 'fixed', inset: 0,
@@ -184,7 +184,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
           <div style={{ flex: 1, fontSize: 'var(--fs-lg)', fontWeight: 700 }}>
             پیش‌نمایش {title}
           </div>
-          <button
+          <button aria-label="حذف"
             onClick={onClose}
             style={{
               width: 32, height: 32, borderRadius: 'var(--r-md)',

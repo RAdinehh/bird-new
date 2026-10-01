@@ -181,7 +181,7 @@ export default function AboutTab() {
                 borderRadius: 'var(--r-md)',
                 overflow: 'hidden'
               }}>
-                <div
+                <div role="button" tabIndex={0}
                   onClick={() => setExpandedFaq(isOpen ? null : i)}
                   style={{
                     padding: 'var(--pad-comfy)',

@@ -193,7 +193,7 @@ export default function ReceivablesPage() {
           borderRadius: 'var(--r-md)',
           overflow: 'hidden',
         }}>
-          <div
+          <div role="button" tabIndex={0}
             onClick={() => setShowUpcoming(!showUpcoming)}
             style={{
               padding: 'var(--pad-normal)',
@@ -314,7 +314,7 @@ export default function ReceivablesPage() {
                 borderRadius: 'var(--r-md)',
                 overflow: 'hidden',
               }}>
-                <div
+                <div role="button" tabIndex={0}
                   onClick={() => toggleBucket(key as BucketKey)}
                   style={{
                     padding: 'var(--pad-normal)',

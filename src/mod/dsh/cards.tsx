@@ -23,7 +23,7 @@ export function KpiCard({ icon, label, value, unit, color, onClick, noFormat }: 
   noFormat?: boolean;
 }) {
   return (
-    <div
+    <div role="button" tabIndex={0}
       onClick={onClick}
       style={{
         background: 'var(--card)',
