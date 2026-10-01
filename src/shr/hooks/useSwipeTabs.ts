@@ -17,6 +17,9 @@ export function useSwipeTabs(
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // جلوگیری از pan افقی مرورگر + bounce
+    el.style.touchAction = 'pan-y';
+    el.style.overscrollBehavior = 'contain';
     let startX = 0, startY = 0, startT = 0;
     let activeTouch = false;
     let locked: 'none' | 'h' | 'v' = 'none';
@@ -50,6 +53,9 @@ export function useSwipeTabs(
       if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
         locked = Math.abs(dx) > Math.abs(dy) * 1.5 ? 'h' : 'v';
       }
+      if (locked === 'h' && e.cancelable) {
+        e.preventDefault();
+      }
     };
 
     const onEnd = (e: TouchEvent) => {
@@ -79,7 +85,7 @@ export function useSwipeTabs(
     const onCancel = () => { activeTouch = false; locked = 'none'; };
 
     el.addEventListener('touchstart', onStart, { passive: true });
-    el.addEventListener('touchmove', onMove, { passive: true });
+    el.addEventListener('touchmove', onMove, { passive: false });
     el.addEventListener('touchend', onEnd, { passive: true });
     el.addEventListener('touchcancel', onCancel, { passive: true });
     return () => {
