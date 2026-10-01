@@ -24,6 +24,7 @@ interface Props {
   compact?: boolean;
   min?: string;
   max?: string;
+  autoToday?: boolean;
 }
 
 export default function DatePicker({
@@ -37,6 +38,7 @@ export default function DatePicker({
   compact = false,
   min,
   max,
+  autoToday = false,
 }: Props) {
   const [open, setOpen] = useState(false);
 
@@ -65,6 +67,13 @@ export default function DatePicker({
     }
     return today;
   });
+
+  // autoToday: اگه value خالیه، خودکار امروز رو ست کن
+  useEffect(() => {
+    if (autoToday && !value && !disabled) {
+      onChange(todayStr);
+    }
+  }, [autoToday, disabled]);
 
   // هر بار باز شدن: اگه value بود بریم همون، وگرنه امروز
   useEffect(() => {

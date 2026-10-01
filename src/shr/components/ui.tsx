@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    __modalDepth?: number;
+  }
+}
+
 import React, {useRef, useCallback, useEffect, forwardRef} from 'react';
 import { formatNumWhileTyping, numberToWords, parseFaNum } from '../utils/fa';
 
@@ -372,6 +378,7 @@ export function Modal({
   // Esc + body scroll lock + focus return
   useEffect(() => {
     if (!open) return;
+    window.__modalDepth = (window.__modalDepth || 0) + 1;
 
     previousFocus.current = document.activeElement as HTMLElement;
 
@@ -419,6 +426,7 @@ export function Modal({
     }
 
     return () => {
+      window.__modalDepth = Math.max(0, (window.__modalDepth || 0) - 1);
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = '';
       // برگشت focus
@@ -483,7 +491,7 @@ export function Modal({
         position: 'fixed',
         inset: 0,
         background: 'var(--overlay)',
-        zIndex: 100,
+        zIndex: 100 + (window.__modalDepth || 0),
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'center',
