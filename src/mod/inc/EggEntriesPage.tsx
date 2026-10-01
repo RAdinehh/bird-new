@@ -542,6 +542,19 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const list = useMemo(() => {
     return eggEntries.filter(e => {
       if (filterDev && e.deviceId !== filterDev) return false;
+
+  // ═══ Performance: pre-compute lookup maps ═══
+  const _birdsById = useMemo(() => {
+    const m: Record<string, any> = {};
+    birds.forEach((b: any) => { m[b.id] = b; });
+    return m;
+  }, [birds]);
+
+  const _contactsById = useMemo(() => {
+    const m: Record<string, any> = {};
+    contacts.forEach((c: any) => { m[c.id] = c; });
+    return m;
+  }, [contacts]);
       if (filterSource && e.dealType !== filterSource) return false;
       if (filterStatus && e.status !== filterStatus) return false;
       if (q.trim()) {
