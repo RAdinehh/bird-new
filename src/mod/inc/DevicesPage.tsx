@@ -227,9 +227,10 @@ export default function DevicesPage() {
 
 
   const save = () => {
+    setErr('');
     if (!form.id) {
       const dup = devices.find((x: any) => x.name.trim() === form.name.trim());
-      if (dup) { showAlert('دستگاهی با نام «' + dup.name + '» قبلاً ثبت شده', '❌ نام تکراری'); return; }
+      if (dup) { setErr('دستگاهی با نام «' + dup.name + '» قبلاً ثبت شده'); return; }
     }
     if (!form.name.trim()) { setErr('نام دستگاه اجباری است'); return; }
     const data = {
@@ -255,7 +256,16 @@ export default function DevicesPage() {
       equipmentId: '',
       notes: form.notes.trim(),
     };
-    if (form.id) updateDevice(form.id, data); else addDevice(data);
+    if (form.id) {
+      updateDevice(form.id, data);
+      showToast('تغییرات ذخیره شد', 'success', 2000);
+    } else {
+      addDevice(data);
+      showToast('دستگاه «' + data.name + '» افزوده شد', 'success', 2200);
+    }
+    setForm(empty);
+    setErr('');
+    setExpandedBird(null);
     setOpen(false);
   };
 
