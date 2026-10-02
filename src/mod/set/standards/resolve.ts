@@ -1,9 +1,22 @@
-import type {
-  BirdType, EnvRange, FeedRange, BirdStandard,
-  EffectiveEnv, EffectiveFeed, ResolveSource,
-} from './types';
-import { DEFAULT_STANDARDS, FALLBACK_ENV, FALLBACK_FEED } from './data';
+/**
+ * resolve.ts — توابع Priority Chain (نسخه ۲)
+ *
+ * Priority:
+ *   1. Override (کاربر در فرم)
+ *   2. Settings (پنل تنظیمات)
+ *   3. Default (DEFAULT_STANDARDS)
+ *   4. Fallback
+ */
 
+import type {
+  BirdType, EnvRange, FeedRange, GrowthRange, BirdStandard,
+  EffectiveEnv, EffectiveFeed, EffectiveGrowth, ResolveSource,
+  BiologyStandard, SpaceStandard, EquipmentRatios, ProductionStandard,
+  MortalityRange,
+} from './types';
+import { DEFAULT_STANDARDS, FALLBACK_ENV, FALLBACK_FEED, FALLBACK_GROWTH } from './data';
+
+// ═══ نگاشت نام فارسی → key ═══
 const NAME_TO_KEY: Record<string, BirdType> = {
   'مرندی': 'marandi',
   'گلپایگانی': 'golpaygani',
@@ -25,24 +38,14 @@ export function resolveBirdType(birdName: string | null | undefined): BirdType |
   return null;
 }
 
-function findEnvRange(env: EnvRange[], ageDays: number): EnvRange | null {
-  if (!env || env.length === 0) return null;
-  // اگر سن 0 یا منفی بود، مثل روز ۱ حساب کن (جوجه تازه هچ‌شده)
+// ═══ Helpers ═══
+function findInRange<T extends { dayFrom: number; dayTo: number }>(arr: T[], ageDays: number): T | null {
+  if (!arr || arr.length === 0) return null;
   const safeAge = Math.max(1, ageDays || 0);
-  for (const range of env) {
+  for (const range of arr) {
     if (safeAge >= range.dayFrom && safeAge <= range.dayTo) return range;
   }
-  return env[env.length - 1] || null;
-}
-
-function findFeedRange(feed: FeedRange[], ageDays: number): FeedRange | null {
-  if (!feed || feed.length === 0) return null;
-  // اگر سن 0 یا منفی بود، مثل روز ۱ حساب کن
-  const safeAge = Math.max(1, ageDays || 0);
-  for (const range of feed) {
-    if (safeAge >= range.dayFrom && safeAge <= range.dayTo) return range;
-  }
-  return feed[feed.length - 1] || null;
+  return arr[arr.length - 1] || null;
 }
 
 export interface ResolveOptions {
@@ -61,16 +64,26 @@ function getStandard(
   return { std: null, source: 'default' };
 }
 
+function resolveKey(birdNameOrKey: string | null | undefined): BirdType | null {
+  if (!birdNameOrKey) return null;
+  const direct = NAME_TO_KEY[birdNameOrKey];
+  if (direct) return direct;
+  if (birdNameOrKey in DEFAULT_STANDARDS) return birdNameOrKey as BirdType;
+  // تلاش با includes
+  return resolveBirdType(birdNameOrKey);
+}
+
+// ═══ Env ═══
 export function getEffectiveEnv(
   birdNameOrKey: string | null | undefined,
   ageDays: number | null,
   overrideTemp?: number | null,
   opts?: ResolveOptions,
 ): EffectiveEnv {
-  const key = NAME_TO_KEY[birdNameOrKey || ''] || (birdNameOrKey as BirdType);
+  const key = resolveKey(birdNameOrKey);
   const { std, source: stdSource } = getStandard(key, opts);
 
-  const baseRange = std ? findEnvRange(std.env, ageDays || 0) : null;
+  const baseRange = std ? findInRange(std.env, ageDays || 0) : null;
 
   let source: ResolveSource = stdSource;
   let temp = baseRange?.temp || FALLBACK_ENV.temp;
@@ -87,6 +100,7 @@ export function getEffectiveEnv(
   return { temp, humidity, light, source };
 }
 
+// ═══ Feed ═══
 export function getEffectiveFeed(
   birdNameOrKey: string | null | undefined,
   ageDays: number | null,
@@ -94,10 +108,10 @@ export function getEffectiveFeed(
   overrideWaterMl?: number | null,
   opts?: ResolveOptions,
 ): EffectiveFeed {
-  const key = NAME_TO_KEY[birdNameOrKey || ''] || (birdNameOrKey as BirdType);
+  const key = resolveKey(birdNameOrKey);
   const { std, source: stdSource } = getStandard(key, opts);
 
-  const baseRange = std ? findFeedRange(std.feed, ageDays || 0) : null;
+  const baseRange = std ? findInRange(std.feed, ageDays || 0) : null;
 
   let source: ResolveSource = stdSource;
   let feedG = baseRange?.feedG ?? FALLBACK_FEED.feedG;
@@ -114,14 +128,96 @@ export function getEffectiveFeed(
     source = 'fallback';
   }
 
-  return { feedG, waterMl, source };
+  return {
+    feedG,
+    waterMl,
+    proteinPct: baseRange?.proteinPct,
+    energyKcal: baseRange?.energyKcal,
+    source,
+  };
 }
 
+// ═══ 🆕 Growth ═══
+export function getEffectiveGrowth(
+  birdNameOrKey: string | null | undefined,
+  ageDays: number | null,
+  opts?: ResolveOptions,
+): EffectiveGrowth {
+  const key = resolveKey(birdNameOrKey);
+  const { std, source: stdSource } = getStandard(key, opts);
+
+  const baseRange = std ? findInRange(std.growth?.weightByAge || [], ageDays || 0) : null;
+
+  if (!baseRange) {
+    return { ...FALLBACK_GROWTH, source: 'fallback' };
+  }
+
+  return {
+    weightG: baseRange.weightG,
+    adgG: baseRange.adgG,
+    fcr: baseRange.fcr,
+    source: stdSource,
+  };
+}
+
+// ═══ 🆕 Biology ═══
+export function getBiology(
+  birdNameOrKey: string | null | undefined,
+  opts?: ResolveOptions,
+): BiologyStandard | null {
+  const key = resolveKey(birdNameOrKey);
+  const { std } = getStandard(key, opts);
+  return std?.biology || null;
+}
+
+// ═══ 🆕 Space ═══
+export function getSpace(
+  birdNameOrKey: string | null | undefined,
+  opts?: ResolveOptions,
+): SpaceStandard | null {
+  const key = resolveKey(birdNameOrKey);
+  const { std } = getStandard(key, opts);
+  return std?.space || null;
+}
+
+// ═══ 🆕 Equipment ═══
+export function getEquipment(
+  birdNameOrKey: string | null | undefined,
+  opts?: ResolveOptions,
+): EquipmentRatios | null {
+  const key = resolveKey(birdNameOrKey);
+  const { std } = getStandard(key, opts);
+  return std?.equipment || null;
+}
+
+// ═══ 🆕 Production ═══
+export function getProduction(
+  birdNameOrKey: string | null | undefined,
+  opts?: ResolveOptions,
+): ProductionStandard | null {
+  const key = resolveKey(birdNameOrKey);
+  const { std } = getStandard(key, opts);
+  return std?.production || null;
+}
+
+// ═══ 🆕 Mortality ═══
+export function getMortalityRange(
+  birdNameOrKey: string | null | undefined,
+  ageDays: number | null,
+  opts?: ResolveOptions,
+): MortalityRange | null {
+  const key = resolveKey(birdNameOrKey);
+  const { std } = getStandard(key, opts);
+  if (!std) return null;
+  return findInRange(std.mortality, ageDays || 0);
+}
+
+// ═══ Standard کامل ═══
 export function getStandardFor(
   birdNameOrKey: string | null | undefined,
   opts?: ResolveOptions,
 ): BirdStandard | null {
-  const key = NAME_TO_KEY[birdNameOrKey || ''] || (birdNameOrKey as BirdType);
+  const key = resolveKey(birdNameOrKey);
   const { std } = getStandard(key, opts);
   return std;
 }
