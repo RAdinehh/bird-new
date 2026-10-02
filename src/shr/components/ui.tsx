@@ -557,7 +557,8 @@ export function Modal({
   const maxWidth = MODAL_SIZES[size] || MODAL_SIZES.md;
   const isFull = snap === 'full';
 
-  return (
+  return createPortal(
+
     <div
       onClick={(e) => {
         if (e.target === e.currentTarget && !preventClose) onClose();
@@ -691,8 +692,9 @@ export function Modal({
           </div>
         )}
       </div>
-    </div>
-  );
+    </div>,
+    document.body
+  )
 }
 
 export function PageContainer({ children }: { children: React.ReactNode }) {
