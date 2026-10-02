@@ -56,7 +56,7 @@ function Layout() {
 
   return (
     <div style={{
-      maxWidth: 480, margin: '0 auto', minHeight: '100dvh', paddingBottom: 80
+      maxWidth: 480, margin: '0 auto', minHeight: '100dvh', paddingBottom: 80, boxSizing: 'border-box'
     }}>
       <Header title={title} />
       <MenuDrawer />
