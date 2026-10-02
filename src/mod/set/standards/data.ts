@@ -11,7 +11,7 @@
  * ⚠️ همه اعداد در پنل تنظیمات قابل ویرایش هستند.
  */
 
-import type { BirdStandard, EnvRange, FeedRange, GrowthRange } from './types';
+import type { BirdStandard, EnvRange, FeedRange, GrowthRange, IncubationStandard } from './types';
 
 // ═══════════════════════════════════════════════
 // رنج‌های Brooding مشترک
@@ -22,6 +22,19 @@ const COMMON_BROODING: EnvRange[] = [
   { dayFrom: 8,  dayTo: 14,  temp: { min: 28, max: 31, target: 29 }, humidity: { min: 55, max: 65 }, light: { hours: 20, lux: 20 } },
   { dayFrom: 15, dayTo: 21,  temp: { min: 26, max: 29, target: 27 }, humidity: { min: 55, max: 65 }, light: { hours: 18, lux: 20 } },
 ];
+
+
+// ═══════════════════════════════════════════════
+// انکوباسیون استاندارد مرغ‌ها (۲۱ روزه)
+// ═══════════════════════════════════════════════
+const CHICKEN_INCUBATION: IncubationStandard = {
+  totalDays: 21,
+  lockdownDay: 18,
+  setterTemp: 37.7,
+  setterHumidity: 55,
+  hatcherTemp: 37.2,
+  hatcherHumidity: 65,
+};
 
 // ═══════════════════════════════════════════════
 // ۱. مرندی (بومی)
@@ -109,6 +122,7 @@ const MARANDI: BirdStandard = {
     { dayFrom: 22, dayTo: 56,   maxPct: 4 },
     { dayFrom: 57, dayTo: 9999, maxPct: 6 },
   ],
+  incubation: CHICKEN_INCUBATION,
   mortalityTotalPct: 12,
 
   notes: 'نژاد بومی شمال‌غرب ایران — مقاوم، تخم‌گذاری متوسط',
@@ -198,6 +212,7 @@ const GOLPAYGANI: BirdStandard = {
     { dayFrom: 22, dayTo: 56,   maxPct: 4 },
     { dayFrom: 57, dayTo: 9999, maxPct: 6 },
   ],
+  incubation: CHICKEN_INCUBATION,
   mortalityTotalPct: 12,
 
   notes: 'نژاد بومی اصفهان — تولید تخم بالاتر از بقیه بومی‌ها',
@@ -287,6 +302,7 @@ const GILINI: BirdStandard = {
     { dayFrom: 22, dayTo: 56,   maxPct: 4 },
     { dayFrom: 57, dayTo: 9999, maxPct: 6 },
   ],
+  incubation: CHICKEN_INCUBATION,
   mortalityTotalPct: 12,
 
   notes: 'نژاد بومی ترکیبی — مقاوم و سازگار با اقلیم‌های مختلف',
@@ -370,6 +386,7 @@ const BROILER: BirdStandard = {
     { dayFrom: 8,  dayTo: 21,   maxPct: 2 },
     { dayFrom: 22, dayTo: 42,   maxPct: 3 },
   ],
+  incubation: CHICKEN_INCUBATION,
   mortalityTotalPct: 5,
 
   notes: 'مرغ گوشتی صنعتی — Ross 308 Management Guide',
@@ -462,6 +479,7 @@ const LAYER: BirdStandard = {
     { dayFrom: 22, dayTo: 140,  maxPct: 2.5 },
     { dayFrom: 141, dayTo: 9999, maxPct: 4 },
   ],
+  incubation: CHICKEN_INCUBATION,
   mortalityTotalPct: 8,
 
   notes: 'مرغ تخمگذار صنعتی — Hy-Line Brown. مناسب برای تولید تخم نطفه‌دار',

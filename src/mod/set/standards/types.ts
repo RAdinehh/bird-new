@@ -104,6 +104,16 @@ export interface EquipmentRatios {
   fanM3PerKg: number;
 }
 
+// ═══ 🆕 انکوباسیون ═══
+export interface IncubationStandard {
+  totalDays: number;         // کل روز انکوباسیون (۲۱ مرغ)
+  lockdownDay: number;       // روز شروع lockdown (۱۸ مرغ)
+  setterTemp: number;        // دمای ستر (°C)
+  setterHumidity: number;    // رطوبت ستر (٪)
+  hatcherTemp: number;       // دمای هچر (°C)
+  hatcherHumidity: number;   // رطوبت هچر (٪)
+}
+
 // ═══ استاندارد کامل پرنده ═══
 export interface BirdStandard {
   key: BirdType;
@@ -117,6 +127,7 @@ export interface BirdStandard {
   growth: GrowthStandard;
   space: SpaceStandard;
   equipment: EquipmentRatios;
+  incubation: IncubationStandard;
   production?: ProductionStandard;
   mortality: MortalityRange[];
   mortalityTotalPct: number;

@@ -12,7 +12,7 @@ import type {
   BirdType, EnvRange, FeedRange, GrowthRange, BirdStandard,
   EffectiveEnv, EffectiveFeed, EffectiveGrowth, ResolveSource,
   BiologyStandard, SpaceStandard, EquipmentRatios, ProductionStandard,
-  MortalityRange,
+  MortalityRange, IncubationStandard,
 } from './types';
 import { DEFAULT_STANDARDS, FALLBACK_ENV, FALLBACK_FEED, FALLBACK_GROWTH } from './data';
 
@@ -210,6 +210,16 @@ export function getMortalityRange(
   const { std } = getStandard(key, opts);
   if (!std) return null;
   return findInRange(std.mortality, ageDays || 0);
+}
+
+// ═══ 🆕 Incubation ═══
+export function getIncubation(
+  birdNameOrKey: string | null | undefined,
+  opts?: ResolveOptions,
+): IncubationStandard | null {
+  const key = resolveKey(birdNameOrKey);
+  const { std } = getStandard(key, opts);
+  return std?.incubation || null;
 }
 
 // ═══ Standard کامل ═══
