@@ -316,12 +316,8 @@ export function detectAllAlerts(): RuleAlert[] {
     const days = daysToHatch(entry.expectedHatchDate);
 
     // Lock-down امروز
-    const age = (() => {
-      const parts = entry.entryDate.split('/').map(x => parseInt(x.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString())));
-      if (parts.length !== 3 || parts.some(isNaN)) return 0;
-      const d = new Date(parts[0], parts[1] - 1, parts[2]);
-      return Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
-    })();
+    const entryDate = jalaliDate(entry.entryDate);
+    const age = entryDate ? diffCalDays(startOfDay(new Date()), entryDate) : 0;
 
     if (age === 18) {
       alerts.push({
