@@ -13,6 +13,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { useBrd } from '../brd/store';
 import { useFlk } from '../flk/store';
 import { toFa } from '../../shr/utils/fa';
+import { useTempUnit, toUserTemp, toCelsius, tempLabel } from '../../shr/utils/temp';
 import {
   DEFAULT_STANDARDS,
   getStandardsGroupedByBird,
@@ -54,13 +55,32 @@ function RangeCard({ title, children }: { title: string; children: React.ReactNo
 // CompactField — لیبل بالا، ورودی پایین (برای گرید ۲ ستونه)
 // ═══════════════════════════════════════════════
 function CompactField({
-  label, value, onChange, unit,
+  label, value, onChange, unit, isTemp = false,
 }: {
   label: string;
   value: number | null;
   onChange: (v: number | null) => void;
   unit: string;
+  isTemp?: boolean;
 }) {
+  const tempUnit = useTempUnit();
+  const displayValue = isTemp ? toUserTemp(value, tempUnit) : value;
+  const displayUnit = isTemp ? tempLabel(tempUnit) : unit;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let v = e.target.value;
+    v = v.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    v = v.replace(/[٫،]/g, '.');
+    v = v.replace(/[^\d.-]/g, '');
+    if (v === '' || v === '-' || v === '.') {
+      onChange(null);
+      return;
+    }
+    const n = Number(v);
+    if (isNaN(n)) return;
+    onChange(isTemp ? toCelsius(n, tempUnit) : n);
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
       <span style={{
@@ -76,20 +96,8 @@ function CompactField({
         <input
           type="text"
           inputMode="decimal"
-          value={value === null || value === undefined ? '' : String(value)}
-          onChange={(e) => {
-            let v = e.target.value;
-            // تبدیل ارقام فارسی به لاتین
-            v = v.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
-            // فقط اعداد و نقطه منفی مجاز
-            v = v.replace(/[^\d.-]/g, '');
-            if (v === '' || v === '-' || v === '.') {
-              onChange(null);
-              return;
-            }
-            const n = Number(v);
-            if (!isNaN(n)) onChange(n);
-          }}
+          value={displayValue === null || displayValue === undefined ? '' : String(displayValue)}
+          onChange={handleChange}
           onFocus={(e) => e.target.select()}
           style={{
             flex: 1,
@@ -115,15 +123,12 @@ function CompactField({
           flexShrink: 0,
           minWidth: 24,
           textAlign: 'left',
-        }}>{unit}</span>
+        }}>{displayUnit}</span>
       </div>
     </div>
   );
 }
 
-// ═══════════════════════════════════════════════
-// FieldsGrid — گرید ۲ ستونه برای فیلدها
-// ═══════════════════════════════════════════════
 function FieldsGrid({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
@@ -156,18 +161,21 @@ function EnvEditor({ env, onChange }: { env: EnvRange[]; onChange: (n: EnvRange[
               value={r.temp.target}
               onChange={v => update(i, { temp: { ...r.temp, target: v ?? 0 } })}
               unit="°C"
+              isTemp={true}
             />
             <CompactField
               label="دما حداقل"
               value={r.temp.min}
               onChange={v => update(i, { temp: { ...r.temp, min: v ?? 0 } })}
               unit="°C"
+              isTemp={true}
             />
             <CompactField
               label="دما حداکثر"
               value={r.temp.max}
               onChange={v => update(i, { temp: { ...r.temp, max: v ?? 0 } })}
               unit="°C"
+              isTemp={true}
             />
             <CompactField
               label="💧 رطوبت حداقل"

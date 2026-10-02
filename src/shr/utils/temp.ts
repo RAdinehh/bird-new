@@ -48,3 +48,13 @@ export function formatTemp(
   if (v == null) return '—';
   return toFaFn(round1(v)) + tempLabel(unit);
 }
+
+// ═══════════════════════════════════════════════
+// useTempUnit — hook خواندن واحد دما از Settings
+// ═══════════════════════════════════════════════
+import { useSet } from '../../mod/set/store';
+
+export function useTempUnit(): TempUnit {
+  const t = useSet((s: any) => s?.units?.temperature);
+  return t === 'f' ? 'f' : 'c';
+}
