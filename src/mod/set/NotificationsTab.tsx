@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
 import { useSet } from './store';
 import { Btn, Field, Grid2, Input } from '../../shr/components/ui';
-import { toFa, toEn } from '../../shr/utils/fa';
+import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow, LocalNumField, SubSection } from './helpers';
-import { showToast } from '../../cor/store/toast';
 
 export default function NotificationsTab() {
   const s = useSet();
@@ -14,16 +12,25 @@ export default function NotificationsTab() {
 
   const activeAlerts = [al.critical, al.important, al.info].filter(Boolean).length;
 
+  // یادآور سرسید — کوتاه‌تر و تمیزتر
+  const updateReminder = (days: number) => {
+    const cur = s.dueDateReminders || [7, 3, 1];
+    const next = cur.includes(days)
+      ? cur.filter(x => x !== days)
+      : [...cur, days].sort((a, b) => b - a);
+    s.update({ dueDateReminders: next });
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
+      {/* ═══ ۱. نحوه‌ی اعلان ═══ */}
       <SettingsGroup
         icon="📡"
         title="نحوه‌ی اعلان"
         subtitle={`${toFa(activeAlerts)} سطح هشدار فعال`}
-        tone="accent">
-
-
+        tone="accent"
+      >
         <SubSection label="سطوح هشدار" icon="🔔" />
         <ToggleRow
           label="🔴 بحرانی"
@@ -81,20 +88,65 @@ export default function NotificationsTab() {
         ) : null}
       </SettingsGroup>
 
+      {/* ═══ ۲. یادآور سرسید ═══ */}
       <SettingsGroup
-        icon="📊"
-        title="آستانه‌های هشدار"
-        subtitle={`افت ${toFa(th.eggDropPercent)}٪ · تلفات ${toFa(th.mortalityPerThousand)} در هزار`}
-        tone="danger"
+        icon="⏰"
+        title="یادآور سرسید"
+        subtitle={`${toFa((s.dueDateReminders || []).length)} یادآور فعال`}
+        tone="warn"
       >
-        <SubSection label="مقادیر بحرانی" icon="⚙️" />
         <div style={{
           fontSize: 'var(--fs-xs)',
           color: 'var(--muted)',
           lineHeight: 1.7,
           padding: 'var(--pad-normal)',
           background: 'var(--input-bg)',
-          borderRadius: 'var(--r-sm)'
+          borderRadius: 'var(--r-sm)',
+        }}>
+          قبل از رسیدن سرسید فاکتورهای پرداخت‌نشده، هشدار نمایش داده می‌شود.
+        </div>
+        <Grid2>
+          <ToggleRow
+            label="۷ روز قبل"
+            sub="یادآوری زودهنگام"
+            value={(s.dueDateReminders || []).includes(7)}
+            onChange={() => updateReminder(7)}
+          />
+          <ToggleRow
+            label="۳ روز قبل"
+            sub="یادآوری میانی"
+            value={(s.dueDateReminders || []).includes(3)}
+            onChange={() => updateReminder(3)}
+          />
+          <ToggleRow
+            label="۱ روز قبل"
+            sub="یادآوری نزدیک"
+            value={(s.dueDateReminders || []).includes(1)}
+            onChange={() => updateReminder(1)}
+          />
+          <ToggleRow
+            label="روز سرسید"
+            sub="در روز پرداخت"
+            value={(s.dueDateReminders || []).includes(0)}
+            onChange={() => updateReminder(0)}
+          />
+        </Grid2>
+      </SettingsGroup>
+
+      {/* ═══ ۳. آستانه‌های هشدار ═══ */}
+      <SettingsGroup
+        icon="📊"
+        title="آستانه‌های هشدار"
+        subtitle={`افت ${toFa(th.eggDropPercent)}٪ · تلفات ${toFa(th.mortalityPerThousand)} در هزار`}
+        tone="danger"
+      >
+        <div style={{
+          fontSize: 'var(--fs-xs)',
+          color: 'var(--muted)',
+          lineHeight: 1.7,
+          padding: 'var(--pad-normal)',
+          background: 'var(--input-bg)',
+          borderRadius: 'var(--r-sm)',
         }}>
           وقتی این آستانه‌ها رد شوند، هشدار خودکار ایجاد می‌شود.
         </div>
@@ -194,58 +246,11 @@ export default function NotificationsTab() {
             waterFeedMin: 1.6,
             waterFeedMax: 2.2,
             criticalTempHigh: 32,
-            criticalTempLow: 18
+            criticalTempLow: 18,
           })}
         >
           🔄 بازنشانی به پیش‌فرض
         </Btn>
-
-        <SubSection label="یادآور سرسید" icon="⏰" />
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 4px 8px', lineHeight: 1.7 }}>
-          قبل از رسیدن سرسید فاکتورهای پرداخت‌نشده، هشدار نمایش داده می‌شود.
-        </div>
-        <Grid2>
-          <ToggleRow
-            label="۷ روز قبل"
-            sub="یادآوری زودهنگام"
-            value={(s.dueDateReminders || []).includes(7)}
-            onChange={() => {
-              const cur = s.dueDateReminders || [7, 3, 1];
-              const next = cur.includes(7) ? cur.filter((x) => x !== 7) : [...cur, 7].sort((a, b) => b - a);
-              s.update({ dueDateReminders: next });
-            }}
-          />
-          <ToggleRow
-            label="۳ روز قبل"
-            sub="یادآوری میانی"
-            value={(s.dueDateReminders || []).includes(3)}
-            onChange={() => {
-              const cur = s.dueDateReminders || [7, 3, 1];
-              const next = cur.includes(3) ? cur.filter((x) => x !== 3) : [...cur, 3].sort((a, b) => b - a);
-              s.update({ dueDateReminders: next });
-            }}
-          />
-          <ToggleRow
-            label="۱ روز قبل"
-            sub="یادآوری نزدیک"
-            value={(s.dueDateReminders || []).includes(1)}
-            onChange={() => {
-              const cur = s.dueDateReminders || [7, 3, 1];
-              const next = cur.includes(1) ? cur.filter((x) => x !== 1) : [...cur, 1].sort((a, b) => b - a);
-              s.update({ dueDateReminders: next });
-            }}
-          />
-          <ToggleRow
-            label="روز سرسید"
-            sub="در روز پرداخت"
-            value={(s.dueDateReminders || []).includes(0)}
-            onChange={() => {
-              const cur = s.dueDateReminders || [7, 3, 1];
-              const next = cur.includes(0) ? cur.filter((x) => x !== 0) : [...cur, 0].sort((a, b) => b - a);
-              s.update({ dueDateReminders: next });
-            }}
-          />
-        </Grid2>
       </SettingsGroup>
 
     </div>

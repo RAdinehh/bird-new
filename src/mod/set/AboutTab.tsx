@@ -3,9 +3,8 @@ import { safeStorage } from '../../shr/utils/storage';
 import { useState } from 'react';
 import { Btn, Modal, Tag } from '../../shr/components/ui';
 import { showConfirmAsync, showAlert, showSuccess } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
 import { toFa } from '../../shr/utils/fa';
-import { Section, InfoRow, SubSection } from './helpers';
+import { Section, SubSection } from './helpers';
 
 const FAQS: { q: string; a: string }[] = [
   { q: 'چطور اولین پرنده را اضافه کنم؟', a: 'از منو → پرنده‌ها و نژادها → پرنده‌ها → دکمه‌ی «+ افزودن پرنده». نام و چرخه زندگی را وارد کنید. بعد از پرنده، یک نژاد برایش بسازید.' },
@@ -27,87 +26,127 @@ const FAQS: { q: string; a: string }[] = [
   { q: 'چطور یک فاکتور چاپ کنم؟', a: 'معاملات → خرید یا فروش → روی فاکتور بزنید → «🖨 چاپ». می‌توانید فایل PDF ذخیره یا چاپ کنید.' },
   { q: 'چطور داده‌ها را در Excel ببینم؟', a: 'گزارش‌ها → مالی → پایین صفحه «📤 خروجی گرفتن». فایل CSV دانلود می‌شود که در Excel باز می‌شود.' },
   { q: 'چطور هشدار را به تعویق بیندازم؟', a: 'هشدارها → روی هشدار بزنید → «⏰ تعویق» → تاریخ انتخاب کنید. تا آن تاریخ پنهان می‌ماند.' },
-  { q: 'میان‌برهای کیبورد چیست؟', a: 'Ctrl+H برای راهنما، ? برای لیست میان‌برها، Ctrl+1 تا Ctrl+9 برای پرش بین ماژول‌ها. در کامپیوتر کار می‌کنند.' }
+  { q: 'میان‌برهای کیبورد چیست؟', a: 'Ctrl+H برای راهنما، ? برای لیست میان‌برها، Ctrl+1 تا Ctrl+9 برای پرش بین ماژول‌ها. در کامپیوتر کار می‌کنند.' },
 ];
 
 const GUIDE_SECTIONS: { title: string; icon: string; items: string[] }[] = [
-  {
-    title: 'شروع کار',
-    icon: '🚀',
-    items: [
-      'قبل از هر کاری، به تنظیمات بروید و نام مرغداری، آدرس و شماره تماس را وارد کنید',
-      'پرنده و نژاد بسازید — مثلاً مرغ (لگهورن، بلاک استار)',
-      'سالن بسازید و ابعاد آن را وارد کنید — مساحت و حجم خودکار محاسبه می‌شود',
-      'مشتریان، فروشندگان و کارگران را در بخش «مخاطبین» ثبت کنید',
-      'گله‌ی خود را با انتخاب پرنده، نژاد، سالن و تعداد بسازید'
-    ]
-  },
-  {
-    title: 'کارهای روزانه',
-    icon: '📋',
-    items: [
-      'هر روز دما و رطوبت سالن را در «ثبت روزانه» وارد کنید',
-      'مقدار دان و آب مصرفی را بنویسید',
-      'تلفات را با علت دقیق ثبت کنید (بیماری، گرمازدگی، شکارچی و...)',
-      'واکسن و دارو مصرفی را با دوز و شماره بچ بنویسید',
-      'برای هر دارو، دوره‌ی منع مصرف را ثبت کنید'
-    ]
-  },
-  {
-    title: 'تخم و جوجه‌کشی',
-    icon: '🥚',
-    items: [
-      'تخم‌گذاری روزانه را در «تخم‌ها» ثبت کنید — می‌توانید درصد بزنید یا تعداد',
-      'سیستم خودکار نرخ تخم‌گذاری (Hen-Day) را محاسبه می‌کند',
-      'برای جوجه‌کشی، دستگاه بسازید و ظرفیت آن را وارد کنید',
-      'ورودی تخم را با نوع معامله (شخصی، شراکتی، اجاره‌ای، امانی) ثبت کنید',
-      'در روز ۷، ۱۲ و ۱۸ کندلینگ انجام دهید و نتایج را بنویسید'
-    ]
-  },
-  {
-    title: 'مالی و معاملات',
-    icon: '💰',
-    items: [
-      'هر خرید از فروشنده را در «معاملات → خرید» ثبت کنید',
-      'هر فروش به مشتری را در «معاملات → فروش» ثبت کنید',
-      'پرداخت‌ها را جزئی ثبت کنید (نقدی، کارت، چک)',
-      'برای معاملات امانی، شراکتی یا تهاتر از «معاملات خاص» استفاده کنید',
-      'در «مطالبات» ببینید چه کسی چقدر بدهکار است (Aging Buckets)'
-    ]
-  },
-  {
-    title: 'گزارش و تحلیل',
-    icon: '📊',
-    items: [
-      'در «گزارش‌ها» ۴ تب دارید — مالی، تولید، گله، مقایسه',
-      'نمودارها روند فروش، خرید، تخم و سود را نشان می‌دهند',
-      'برای خروجی Excel، دکمه‌ی «📤 خروجی گرفتن» پایین صفحه',
-      'برای PDF، «📄 گزارش کلی PDF» یا از دکمه‌ی چاپ فاکتور',
-      'در هر بخش، روی کارت‌ها بزنید تا اطلاعات کامل باز شود'
-    ]
-  },
-  {
-    title: 'پشتیبان‌گیری',
-    icon: '💾',
-    items: [
-      'هر هفته یک فایل پشتیبان کامل بگیرید',
-      'تنظیمات → پشتیبان → «دریافت پشتیبان کامل»',
-      'فایل را در ایمیل یا تلگرام برای خودتان بفرستید',
-      'برای بازیابی، همان فایل را انتخاب کنید',
-      'قبل از هر تغییر مهم، پشتیبان بگیرید'
-    ]
-  }
+  { title: 'شروع کار', icon: '🚀', items: [
+    'قبل از هر کاری، به تنظیمات بروید و نام مرغداری، آدرس و شماره تماس را وارد کنید',
+    'پرنده و نژاد بسازید — مثلاً مرغ (لگهورن، بلاک استار)',
+    'سالن بسازید و ابعاد آن را وارد کنید — مساحت و حجم خودکار محاسبه می‌شود',
+    'مشتریان، فروشندگان و کارگران را در بخش «مخاطبین» ثبت کنید',
+    'گله‌ی خود را با انتخاب پرنده، نژاد، سالن و تعداد بسازید',
+  ]},
+  { title: 'کارهای روزانه', icon: '📋', items: [
+    'هر روز دما و رطوبت سالن را در «ثبت روزانه» وارد کنید',
+    'مقدار دان و آب مصرفی را بنویسید',
+    'تلفات را با علت دقیق ثبت کنید (بیماری، گرمازدگی، شکارچی و...)',
+    'واکسن و دارو مصرفی را با دوز و شماره بچ بنویسید',
+    'برای هر دارو، دوره‌ی منع مصرف را ثبت کنید',
+  ]},
+  { title: 'تخم و جوجه‌کشی', icon: '🥚', items: [
+    'تخم‌گذاری روزانه را در «تخم‌ها» ثبت کنید — می‌توانید درصد بزنید یا تعداد',
+    'سیستم خودکار نرخ تخم‌گذاری (Hen-Day) را محاسبه می‌کند',
+    'برای جوجه‌کشی، دستگاه بسازید و ظرفیت آن را وارد کنید',
+    'ورودی تخم را با نوع معامله (شخصی، شراکتی، اجاره‌ای، امانی) ثبت کنید',
+    'در روز ۷، ۱۲ و ۱۸ کندلینگ انجام دهید و نتایج را بنویسید',
+  ]},
+  { title: 'مالی و معاملات', icon: '💰', items: [
+    'هر خرید از فروشنده را در «معاملات → خرید» ثبت کنید',
+    'هر فروش به مشتری را در «معاملات → فروش» ثبت کنید',
+    'پرداخت‌ها را جزئی ثبت کنید (نقدی، کارت، چک)',
+    'برای معاملات امانی، شراکتی یا تهاتر از «معاملات خاص» استفاده کنید',
+    'در «مطالبات» ببینید چه کسی چقدر بدهکار است (Aging Buckets)',
+  ]},
+  { title: 'گزارش و تحلیل', icon: '📊', items: [
+    'در «گزارش‌ها» ۴ تب دارید — مالی، تولید، گله، مقایسه',
+    'نمودارها روند فروش، خرید، تخم و سود را نشان می‌دهند',
+    'برای خروجی Excel، دکمه‌ی «📤 خروجی گرفتن» پایین صفحه',
+    'برای PDF، «📄 گزارش کلی PDF» یا از دکمه‌ی چاپ فاکتور',
+    'در هر بخش، روی کارت‌ها بزنید تا اطلاعات کامل باز شود',
+  ]},
+  { title: 'پشتیبان‌گیری', icon: '💾', items: [
+    'هر هفته یک فایل پشتیبان کامل بگیرید',
+    'تنظیمات → پشتیبان → «دریافت پشتیبان کامل»',
+    'فایل را در ایمیل یا تلگرام برای خودتان بفرستید',
+    'برای بازیابی، همان فایل را انتخاب کنید',
+    'قبل از هر تغییر مهم، پشتیبان بگیرید',
+  ]},
 ];
 
-export default function AboutTab() {
+// ═══ کارت آماری ═══
+function StatCard({ icon, value, label, tone }: { icon: string; value: number; label: string; tone: 'accent' | 'info' | 'purple' | 'warn' }) {
+  return (
+    <div style={{
+      background: 'var(--' + tone + '-soft)',
+      border: '1px solid var(--' + tone + '-border)',
+      borderRadius: 'var(--r-md)',
+      padding: '10px 12px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 10,
+      minWidth: 0,
+    }}>
+      <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }} aria-hidden="true">{icon}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontSize: 'var(--fs-lg)',
+          fontWeight: 700,
+          color: 'var(--' + tone + ')',
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1.1,
+        }}>{toFa(value)}</div>
+        <div style={{
+          fontSize: 'var(--fs-xs)',
+          color: 'var(--muted)',
+          marginTop: 2,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>{label}</div>
+      </div>
+    </div>
+  );
+}
 
+// ═══ ردیف لینک ═══
+function LinkRow({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '11px 12px',
+        background: 'var(--input-bg)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r-md)',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        textAlign: 'right',
+        color: 'var(--text)',
+        fontSize: 'var(--fs-base)',
+        fontWeight: 600,
+      }}
+    >
+      <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }} aria-hidden="true">{icon}</span>
+      <span style={{ flex: 1 }}>{label}</span>
+      <span style={{ color: 'var(--muted)', fontSize: 14 }}>‹</span>
+    </button>
+  );
+}
+
+export default function AboutTab() {
   const resetHelpBanners = () => {
     try {
       const keys = Object.keys(localStorage).filter(k => k.startsWith('help-banner-'));
       keys.forEach(k => localStorage.removeItem(k));
       showSuccess('همه راهنماها دوباره فعال شدند. اکنون در صفحات مربوطه نمایش داده می‌شوند.');
-    } catch (e) {
-      // silent
+    } catch {
+      /* silent */
     }
   };
 
@@ -117,20 +156,22 @@ export default function AboutTab() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   const counts = {
-    birds: (safeStorage.getJSON('pm-brd', {}) as any)?.state?.birds?.length || 0,
-    breeds: (safeStorage.getJSON('pm-brd', {}) as any)?.state?.breeds?.length || 0,
-    suppliers: (safeStorage.getJSON('pm-pur', {}) as any)?.state?.suppliers?.length || 0,
-    purchases: (safeStorage.getJSON('pm-pur', {}) as any)?.state?.purchases?.length || 0
+    birds: (safeStorage.getJSON('pm-brd', {}) as { state?: { birds?: unknown[] } })?.state?.birds?.length || 0,
+    breeds: (safeStorage.getJSON('pm-brd', {}) as { state?: { breeds?: unknown[] } })?.state?.breeds?.length || 0,
+    suppliers: (safeStorage.getJSON('pm-pur', {}) as { state?: { suppliers?: unknown[] } })?.state?.suppliers?.length || 0,
+    purchases: (safeStorage.getJSON('pm-pur', {}) as { state?: { purchases?: unknown[] } })?.state?.purchases?.length || 0,
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}>
+
+      {/* ═══ ۱. درباره برنامه ═══ */}
       <Section title="🐔 درباره‌ی برنامه">
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: 12,
-          padding: 'var(--pad-normal) 0',
+          padding: '4px 0',
         }}>
           <div style={{
             width: 56, height: 56, borderRadius: 'var(--r-lg)',
@@ -151,22 +192,36 @@ export default function AboutTab() {
         </div>
       </Section>
 
+      {/* ═══ ۲. آمار شما (بصری) ═══ */}
       <Section title="📊 آمار شما">
-        <InfoRow label="پرنده‌ها" value={toFa(counts.birds)} />
-        <InfoRow label="نژادها" value={toFa(counts.breeds)} />
-        <InfoRow label="فروشندگان" value={toFa(counts.suppliers)} />
-        <InfoRow label="خریدها" value={toFa(counts.purchases)} />
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 8,
+        }}>
+          <StatCard icon="🐔" value={counts.birds} label="پرنده" tone="accent" />
+          <StatCard icon="🏷️" value={counts.breeds} label="نژاد" tone="info" />
+          <StatCard icon="👥" value={counts.suppliers} label="فروشنده" tone="purple" />
+          <StatCard icon="🛒" value={counts.purchases} label="خرید" tone="warn" />
+        </div>
       </Section>
 
+      {/* ═══ ۳. راهنما و آموزش ═══ */}
       <Section title="🎓 راهنما و آموزش">
-        <SubSection label="ابزارهای کمکی" icon="📚" />
-        <Btn full onClick={() => setOpenFaq(true)}>❓ سؤالات متداول ({toFa(FAQS.length)})</Btn>
-        <Btn full onClick={() => setOpenGuide(true)}>📖 راهنمای کاربری</Btn>
-        <Btn full onClick={resetHelpBanners}>📖 نمایش مجدد راهنماهای صفحه‌ها</Btn>
-        <Btn full onClick={() => { safeStorage.remove('pm-onboarding-done'); showAlert('آموزش اولیه بازنشانی شد — صفحه را رفرش کنید'); }}>🔄 بازنشانی آموزش اولیه</Btn>
+        <LinkRow icon="❓" label={`سؤالات متداول (${toFa(FAQS.length)})`} onClick={() => setOpenFaq(true)} />
+        <LinkRow icon="📖" label="راهنمای کاربری" onClick={() => setOpenGuide(true)} />
+        <LinkRow icon="💡" label="نمایش مجدد راهنماهای صفحه‌ها" onClick={resetHelpBanners} />
+        <LinkRow
+          icon="🔄"
+          label="بازنشانی آموزش اولیه"
+          onClick={() => {
+            safeStorage.remove('pm-onboarding-done');
+            showAlert('آموزش اولیه بازنشانی شد — صفحه را رفرش کنید');
+          }}
+        />
       </Section>
 
-      {/* مودال سوالات متداول */}
+      {/* ═══ مودال سوالات متداول ═══ */}
       <Modal
         open={openFaq}
         onClose={() => { setOpenFaq(false); setExpandedFaq(null); }}
@@ -181,27 +236,29 @@ export default function AboutTab() {
                 background: 'var(--input-bg)',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--r-md)',
-                overflow: 'hidden'
+                overflow: 'hidden',
               }}>
-                <div role="button" tabIndex={0}
+                <div
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setExpandedFaq(isOpen ? null : i)}
                   style={{
                     padding: 'var(--pad-comfy)',
                     display: 'flex', alignItems: 'center', gap: 8,
-                    cursor: 'pointer'
+                    cursor: 'pointer',
                   }}
                 >
                   <span style={{
                     fontSize: 'var(--fs-sm)',
                     color: 'var(--accent)',
                     fontWeight: 700,
-                    flexShrink: 0
+                    flexShrink: 0,
                   }}>{toFa(i + 1)}.</span>
                   <span style={{
                     flex: 1,
                     fontSize: 'var(--fs-sm)',
                     fontWeight: 600,
-                    color: 'var(--text)'
+                    color: 'var(--text)',
                   }}>{f.q}</span>
                   <svg
                     width="14" height="14" viewBox="0 0 24 24"
@@ -212,27 +269,24 @@ export default function AboutTab() {
                     style={{
                       transform: isOpen ? 'rotate(180deg)' : 'rotate(0)',
                       transition: 'transform .25s',
-                      flexShrink: 0
+                      flexShrink: 0,
                     }}
                   >
                     <path d="m6 9 6 6 6-6" />
                   </svg>
                 </div>
-
                 <div style={{
                   display: 'grid',
                   gridTemplateRows: isOpen ? '1fr' : '0fr',
-                  transition: 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)'
+                  transition: 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
                 }}>
                   <div style={{ overflow: 'hidden' }}>
                     <div style={{
-                      padding: '0 14px 14px 40px',
+                      padding: '10px 14px 14px 40px',
                       fontSize: 'var(--fs-sm)',
                       color: 'var(--muted)',
                       lineHeight: 1.9,
                       borderTop: '1px dashed var(--border)',
-                      paddingTop: 10,
-                      marginTop: 2
                     }}>
                       {f.a}
                     </div>
@@ -244,7 +298,7 @@ export default function AboutTab() {
         </div>
       </Modal>
 
-      {/* مودال راهنما */}
+      {/* ═══ مودال راهنما ═══ */}
       <Modal
         open={openGuide}
         onClose={() => setOpenGuide(false)}
@@ -258,13 +312,13 @@ export default function AboutTab() {
                 display: 'flex', alignItems: 'center', gap: 8,
                 padding: '4px 0 8px',
                 borderBottom: '1px dashed var(--border)',
-                marginBottom: 8
+                marginBottom: 8,
               }}>
                 <span style={{ fontSize: 'var(--fs-lg)' }}>{sec.icon}</span>
                 <span style={{
                   fontSize: 'var(--fs-md)',
                   fontWeight: 700,
-                  color: 'var(--accent)'
+                  color: 'var(--accent)',
                 }}>{sec.title}</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -274,14 +328,14 @@ export default function AboutTab() {
                     fontSize: 'var(--fs-sm)',
                     color: 'var(--text)',
                     lineHeight: 1.8,
-                    padding: '6px 0'
+                    padding: '4px 0',
                   }}>
                     <span style={{
                       width: 6, height: 6,
                       borderRadius: '50%',
                       background: 'var(--accent)',
                       flexShrink: 0,
-                      marginTop: 8
+                      marginTop: 8,
                     }} />
                     <span style={{ flex: 1 }}>{it}</span>
                   </div>
@@ -289,7 +343,6 @@ export default function AboutTab() {
               </div>
             </div>
           ))}
-
           <div style={{
             padding: 'var(--pad-comfy)',
             background: 'var(--accent-soft)',
@@ -298,34 +351,50 @@ export default function AboutTab() {
             fontSize: 'var(--fs-sm)',
             color: 'var(--accent)',
             lineHeight: 1.8,
-            textAlign: 'center'
+            textAlign: 'center',
           }}>
-            💡 نکته: از دکمه‌ی «؟» در هدر یا `Ctrl + H` هر زمان که خواستید، راهنما را ببینید.
+            💡 نکته: از دکمه‌ی «؟» در هدر یا Ctrl + H هر زمان که خواستید، راهنما را ببینید.
           </div>
         </div>
       </Modal>
 
+      {/* ═══ ۴. ارتباط و اطلاعات ═══ */}
       <Section title="📞 ارتباط و اطلاعات">
-        <SubSection label="ارتباط با ما" icon="📞" />
-        <Btn full onClick={() => showAlert('ارسال بازخورد — در گام بعدی')}>✉ ارسال بازخورد</Btn>
-        <Btn full onClick={() => showAlert('بررسی بروزرسانی — در گام بعدی')}>🔍 بررسی بروزرسانی</Btn>
-        <Btn full onClick={() => showAlert('شرایط استفاده — در گام بعدی')}>شرایط استفاده</Btn>
-        <Btn full onClick={() => showAlert('حریم خصوصی — در گام بعدی')}>سیاست حریم خصوصی</Btn>
+        <LinkRow icon="✉️" label="ارسال بازخورد" onClick={() => showAlert('ارسال بازخورد — در گام بعدی')} />
+        <LinkRow icon="🔍" label="بررسی بروزرسانی" onClick={() => showAlert('بررسی بروزرسانی — در گام بعدی')} />
+        <LinkRow icon="📜" label="شرایط استفاده" onClick={() => showAlert('شرایط استفاده — در گام بعدی')} />
+        <LinkRow icon="🔒" label="سیاست حریم خصوصی" onClick={() => showAlert('حریم خصوصی — در گام بعدی')} />
+      </Section>
 
-        <SubSection label="قوانین" icon="📜" />
-        <Btn full onClick={() => showAlert('شرایط استفاده — در گام بعدی')}>شرایط استفاده</Btn>
-        <Btn full onClick={() => showAlert('حریم خصوصی — در گام بعدی')}>سیاست حریم خصوصی</Btn>
+      {/* ═══ ۵. عملیات حساس ═══ */}
+      <Section title="⚠️ عملیات حساس">
+        <SubSection label="بازنشانی" icon="🚨" />
+        <Btn
+          full
+          variant="danger"
+          onClick={async () => {
+            if (await showConfirmAsync('تأیید', 'بازنشانی تنظیمات به حالت اولیه؟', { danger: true, confirmText: 'بله' })) {
+              reset();
+              location.reload();
+            }
+          }}
+        >
+          🗑 بازنشانی تنظیمات به پیش‌فرض
+        </Btn>
+      </Section>
 
-        <SubSection label="عملیات حساس" icon="⚠️" />
-        <Btn full variant="danger" onClick={async () => { if (await showConfirmAsync('تأیید', 'بازنشانی تنظیمات به حالت اولیه؟', { danger: true, confirmText: 'بله' })) { reset(); location.reload(); } }}>بازنشانی تنظیمات</Btn></Section>
-
-      <div style={{ textAlign: 'center', fontSize: 'var(--fs-xs)', color: 'var(--dim)', padding: '10px 0' }}>
+      {/* فوتر */}
+      <div style={{
+        textAlign: 'center',
+        fontSize: 'var(--fs-xs)',
+        color: 'var(--dim)',
+        padding: '10px 0',
+      }}>
         ساخته‌شده برای مرغداری ایران 🇮🇷
         <br />
         با ❤ برای کسب‌وکار شما
       </div>
-    
-        
-</div>
+
+    </div>
   );
 }
