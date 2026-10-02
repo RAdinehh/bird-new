@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   DEFAULT_STANDARDS, FALLBACK_ENV, FALLBACK_FEED,
   resolveBirdType, getEffectiveEnv, getEffectiveFeed, getStandardFor,
+  getEffectiveGrowth, getBiology, getSpace, getEquipment,
+  getProduction, getMortalityRange,
 } from '../mod/set/standards';
 
 // ═══════════════════════════════════════════════
@@ -223,12 +225,38 @@ describe('DEFAULT_STANDARDS integrity', () => {
     expect(Object.keys(DEFAULT_STANDARDS)).toHaveLength(5);
   });
 
-  it('هر پرنده env و feed داره', () => {
+  it('هر پرنده ساختار کامل داره', () => {
     Object.values(DEFAULT_STANDARDS).forEach(std => {
       expect(std.env.length).toBeGreaterThan(0);
       expect(std.feed.length).toBeGreaterThan(0);
       expect(std.mortality.length).toBeGreaterThan(0);
-      expect(std.densityMax).toBeGreaterThan(0);
+      expect(std.space.densityMax).toBeGreaterThan(0);
+      expect(std.biology).toBeTruthy();
+      expect(std.growth).toBeTruthy();
+      expect(std.growth.weightByAge.length).toBeGreaterThan(0);
+      expect(std.equipment).toBeTruthy();
+    });
+  });
+
+  it('تلفات کل مجاز داره', () => {
+    Object.values(DEFAULT_STANDARDS).forEach(std => {
+      expect(std.mortalityTotalPct).toBeGreaterThan(0);
+    });
+  });
+
+  it('equipment feeder و drinker داره', () => {
+    Object.values(DEFAULT_STANDARDS).forEach(std => {
+      expect(std.equipment.feeder).toBeTruthy();
+      expect(std.equipment.drinker).toBeTruthy();
+      expect(std.equipment.lampWattPerM2).toBeGreaterThan(0);
+      expect(std.equipment.fanM3PerKg).toBeGreaterThan(0);
+    });
+  });
+
+  it('biology برای همه پرنده‌ها پر شده', () => {
+    Object.values(DEFAULT_STANDARDS).forEach(std => {
+      expect(std.biology.incubationDays).toBeGreaterThan(0);
+      expect(std.biology.sexualMaturityDay).toBeGreaterThan(0);
     });
   });
 
@@ -308,5 +336,137 @@ describe('FALLBACK', () => {
   });
   it('FALLBACK_FEED', () => {
     expect(FALLBACK_FEED.feedG).toBe(80);
+  });
+});
+
+// ═══════════════════════════════════════════════
+// 🆕 getEffectiveGrowth
+// ═══════════════════════════════════════════════
+describe('getEffectiveGrowth', () => {
+  it('مرندی روز 3 → وزن ~90g', () => {
+    const g = getEffectiveGrowth('مرندی', 3);
+    expect(g.weightG).toBe(90);
+    expect(g.source).toBe('default');
+  });
+
+  it('گوشتی روز 40 → وزن ~2650g', () => {
+    const g = getEffectiveGrowth('گوشتی', 40);
+    expect(g.weightG).toBe(2650);
+  });
+
+  it('گوشتی ADG روز 25 → 95', () => {
+    const g = getEffectiveGrowth('گوشتی', 25);
+    expect(g.adgG).toBe(95);
+  });
+
+  it('گوشتی FCR روز 30 → 1.5', () => {
+    const g = getEffectiveGrowth('گوشتی', 30);
+    expect(g.fcr).toBe(1.5);
+  });
+
+  it('پرنده ناشناخته → fallback', () => {
+    const g = getEffectiveGrowth('xyz', 5);
+    expect(g.source).toBe('fallback');
+  });
+
+  it('سن null → اولین رنج', () => {
+    const g = getEffectiveGrowth('گوشتی', null);
+    expect(g.weightG).toBe(185);
+  });
+});
+
+// ═══════════════════════════════════════════════
+// 🆕 getBiology
+// ═══════════════════════════════════════════════
+describe('getBiology', () => {
+  it('مرندی → layingStartDay 150', () => {
+    const b = getBiology('مرندی');
+    expect(b).toBeTruthy();
+    expect(b!.layingStartDay).toBe(150);
+    expect(b!.incubationDays).toBe(21);
+  });
+
+  it('گوشتی → بدون layingStartDay', () => {
+    const b = getBiology('گوشتی');
+    expect(b!.layingStartDay).toBeNull();
+    expect(b!.endOfCycleDay).toBe(42);
+  });
+
+  it('ناشناخته → null', () => {
+    expect(getBiology('xyz')).toBeNull();
+  });
+});
+
+// ═══════════════════════════════════════════════
+// 🆕 getSpace
+// ═══════════════════════════════════════════════
+describe('getSpace', () => {
+  it('مرندی → density 10', () => {
+    const sp = getSpace('مرندی');
+    expect(sp!.densityMax).toBe(10);
+    expect(sp!.feederSpaceCm).toBe(12);
+  });
+
+  it('گوشتی → density 20', () => {
+    const sp = getSpace('گوشتی');
+    expect(sp!.densityMax).toBe(20);
+  });
+
+  it('ناشناخته → null', () => {
+    expect(getSpace('xyz')).toBeNull();
+  });
+});
+
+// ═══════════════════════════════════════════════
+// 🆕 getEquipment
+// ═══════════════════════════════════════════════
+describe('getEquipment', () => {
+  it('مرندی → nipplePerBird 10', () => {
+    const eq = getEquipment('مرندی');
+    expect(eq!.drinker.nippleBirdsPerUnit).toBe(10);
+  });
+
+  it('گوشتی → panPerUnit 30', () => {
+    const eq = getEquipment('گوشتی');
+    expect(eq!.feeder.panBirdsPerUnit).toBe(30);
+  });
+
+  it('ناشناخته → null', () => {
+    expect(getEquipment('xyz')).toBeNull();
+  });
+});
+
+// ═══════════════════════════════════════════════
+// 🆕 getProduction
+// ═══════════════════════════════════════════════
+describe('getProduction', () => {
+  it('مرندی production دارد', () => {
+    const p = getProduction('مرندی');
+    expect(p!.eggsPerYear).toBe(170);
+    expect(p!.fertilityPct).toBe(82);
+  });
+
+  it('گوشتی production ندارد', () => {
+    expect(getProduction('گوشتی')).toBeNull();
+  });
+});
+
+// ═══════════════════════════════════════════════
+// 🆕 getMortalityRange
+// ═══════════════════════════════════════════════
+describe('getMortalityRange', () => {
+  it('مرندی روز 5 → 1.5%', () => {
+    const m = getMortalityRange('مرندی', 5);
+    expect(m!.maxPct).toBe(1.5);
+  });
+
+  it('مرندی روز 100 → 6%', () => {
+    const m = getMortalityRange('مرندی', 100);
+    expect(m!.maxPct).toBe(6);
+  });
+
+  it('گوشتی روز 30 → 3%', () => {
+    const m = getMortalityRange('گوشتی', 30);
+    expect(m!.maxPct).toBe(3);
   });
 });
