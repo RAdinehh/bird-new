@@ -6,7 +6,7 @@ import { useDlg } from '../dlg/store';
 import { useEgg, henDayRate } from '../egg/store';
 import { useInc, daysToHatch, isLockdown, isHatchWindow } from '../inc/store';
 import { toFa } from '../../shr/utils/fa';
-import { format as formatJ } from 'date-fns-jalali';
+import { format as formatJ, startOfDay, differenceInCalendarDays as diffCalDays, parse as parseJ} from 'date-fns-jalali';
 import { useSet } from '../set/store';
 
 interface RuleAlert {
@@ -21,6 +21,17 @@ interface RuleAlert {
 }
 
 const today = () => new Date().toISOString().slice(0, 10);
+
+/** تاریخ شمسی → Date (نرمال‌شده به 00:00 شمسی) */
+function jalaliDate(s: string): Date | null {
+  if (!s) return null;
+  try {
+    const en = s.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const d = parseJ(en, 'yyyy/MM/dd', new Date());
+    if (isNaN(d.getTime())) return null;
+    return startOfDay(d);
+  } catch { return null; }
+}
 const todayJalali = () => {
   const d = new Date();
   return formatJ(d, 'yyyy/MM/dd');
@@ -208,10 +219,9 @@ export function detectAllAlerts(): RuleAlert[] {
   const todayStr = todayJalali();
   const recentLogs = logs.filter(l => {
     // ۳ روز اخیر
-    const parts = l.date.split('/').map(x => parseInt(x.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString())));
-    if (parts.length !== 3 || parts.some(isNaN)) return false;
-    const d = new Date(parts[0], parts[1] - 1, parts[2]);
-    const diff = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+    const d = jalaliDate(l.date);
+    if (!d) return false;
+    const diff = diffCalDays(startOfDay(new Date()), d);
     return diff >= 0 && diff <= 3;
   });
 
@@ -273,10 +283,9 @@ export function detectAllAlerts(): RuleAlert[] {
   // ============ ۵. تخم‌گذاری ============
   const productions = useEgg.getState().productions;
   const recentProd = productions.filter(p => {
-    const parts = p.date.split('/').map(x => parseInt(x.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString())));
-    if (parts.length !== 3 || parts.some(isNaN)) return false;
-    const d = new Date(parts[0], parts[1] - 1, parts[2]);
-    const diff = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+    const d = jalaliDate(p.date);
+    if (!d) return false;
+    const diff = diffCalDays(startOfDay(new Date()), d);
     return diff >= 0 && diff <= 7;
   });
 
