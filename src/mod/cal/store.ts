@@ -6,7 +6,7 @@ import { useBrd } from '../brd/store';
 import { useFlk, getEffectiveStartDate } from '../flk/store';
 import { getSchedule } from './vaccineSchedules';
 import { toEn } from '../../shr/utils/fa';
-import { format, parse, differenceInDays, format as formatJ } from 'date-fns-jalali';
+import { format, parse, differenceInDays, format as formatJ, startOfDay, addDays} from 'date-fns-jalali';
 
 export type EventType = 'hatch' | 'vaccine' | 'herbal' | 'payment' | 'daily' | 'finance';
 export type EventStatus = 'past' | 'today' | 'future' | 'overdue';
@@ -48,7 +48,7 @@ export function jalaliToKey(s: string): string {
 export function daysFromToday(s: string): number {
   const d = jalaliToDate(s);
   if (d === null) return 999;
-  return differenceInDays(d, new Date());
+  return differenceInDays(startOfDay(d), startOfDay(new Date()));
 }
 
 /** تعیین وضعیت */
@@ -65,8 +65,7 @@ export function statusOf(date: string): EventStatus {
 function addDaysJalali(dateStr: string, days: number): string {
   const d = jalaliToDate(dateStr);
   if (!d) return '';
-  d.setDate(d.getDate() + days);
-  return format(d, 'yyyy/MM/dd');
+  return format(addDays(d, days), 'yyyy/MM/dd');
 }
 
 /** جمع‌آوری همه‌ی رویدادها از همه‌ی storeها */
