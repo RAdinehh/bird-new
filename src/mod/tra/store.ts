@@ -2,7 +2,7 @@
  * store.ts — Zustand store معاملات
  */
 import { create } from 'zustand';
-import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ } from 'date-fns-jalali';
+import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ, addDays} from 'date-fns-jalali';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { useWhs } from '../whs/store';
@@ -379,15 +379,15 @@ export function calcDueDate(
     // آخرین قسط = تاریخ فاکتور + (تعداد اقساط × فاصله)
     // ولی سرسید اولین قسط = تاریخ + فاصله
     const gap = gapDays || 30;
-    const parts = invoiceDate.split('/').map(Number);
-    if (parts.length !== 3) return invoiceDate;
-    // محاسبه سرسید اول (تاریخ + فاصله)
-    const d = new Date(parts[0], parts[1] - 1, parts[2]);
-    d.setDate(d.getDate() + gap);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}/${m}/${day}`;
+    try {
+      const en = invoiceDate.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+      const base = parseJ(en, 'yyyy/MM/dd', new Date());
+      if (isNaN(base.getTime())) return invoiceDate;
+      const due = addDays(base, gap);
+      return formatJ(due, 'yyyy/MM/dd');
+    } catch {
+      return invoiceDate;
+    }
   }
   return customDueDate || invoiceDate;
 }
