@@ -22,7 +22,6 @@ export default function ProfileTab() {
   const userSummary = user.name || 'نام وارد نشده';
   const farmSummary = farm.name || 'نام مرغداری وارد نشده';
   const bankSummary = bank.bankName ? `بانک ${bank.bankName}` : 'اطلاعات بانکی خالی';
-  const unitSummary = units.currency === 'toman' ? 'تومان · متر · کیلوگرم' : 'ریال · متر · کیلوگرم';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
@@ -108,28 +107,6 @@ export default function ProfileTab() {
         </Field>
       </SettingsGroup>
 
-      <SettingsGroup icon="📏" title="استانداردها و واحدها" subtitle={unitSummary} tone="warn">
-        <Grid2>
-          {U('currency', 'واحد پول', [['toman', 'تومان'], ['rial', 'ریال']])}
-          {U('length', 'واحد طول', [['m', 'متر'], ['cm', 'سانتی‌متر']])}
-        </Grid2>
-        <Grid2>
-          {U('weight', 'واحد وزن', [['g', 'گرم'], ['kg', 'کیلوگرم'], ['t', 'تن']])}
-          {U('volume', 'واحد حجم', [['ml', 'میلی‌لیتر'], ['L', 'لیتر']])}
-        </Grid2>
-        <Grid2>
-          {U('temperature', 'واحد دما', [['c', 'سلسیوس'], ['f', 'فارنهایت']])}
-          {U('area', 'واحد مساحت', [['m2', 'متر مربع'], ['ha', 'هکتار']])}
-        </Grid2>
-        <Grid2>
-          {U('dateFormat', 'فرمت تاریخ', [['jalali', 'شمسی'], ['gregorian', 'میلادی']])}
-          {U('numberFormat', 'فرمت عدد', [['fa', 'فارسی (۱۲۳)'], ['en', 'لاتین (123)']])}
-        </Grid2>
-        <Grid2>
-          {U('thousandSep', 'جداکننده هزار', [['،', '،'], [',', ','], ['.', '.']])}
-          {U('decimals', 'دقت اعشار', [['0', '۰ رقم'], ['1', '۱ رقم'], ['2', '۲ رقم'], ['3', '۳ رقم']])}
-        </Grid2>
-      </SettingsGroup>
 
       <SettingsGroup icon="🔒" title="امنیت" subtitle={security.pinEnabled ? 'قفل با PIN فعال' : 'قفل غیرفعال'} tone="danger">
         <ToggleRow

@@ -1,11 +1,11 @@
 /**
- * UnitsTab.tsx — تب «واحدها و قالب‌بندی»
+ * UnitsTab.tsx — واحدها و قالب‌بندی (طرح مینیمال)
  *
- * همه واحدهای نمایشی از اینجا تنظیم میشن.
- * پیش‌نمایش زنده زیر هر بخش.
+ * دو کارت اصلی:
+ *   ۱. واحدهای فیزیکی + ارز (با پیش‌نمایش هر خط)
+ *   ۲. نمایش اعداد + تاریخ
  */
 import { useSet } from '../store';
-import { Field, Select, NumField } from '../../../shr/components/ui';
 import SettingsGroup from '../SettingsGroup';
 import { useFormat } from '../../../shr/units/useFormat';
 import {
@@ -18,6 +18,97 @@ import {
 const SEP_OPTIONS: ThousandSep[] = ['fa', 'en', 'space', 'dot', 'none'];
 const DEC_OPTIONS = [0, 1, 2, 3, 4];
 
+// ═══ نمونه‌ها برای پیش‌نمایش ═══
+const SAMPLE = {
+  money: 5000000,
+  temp: 32,
+  weight: 2500,
+  volume: 5000,
+  length: 12,
+  area: 100,
+  time: 3600,
+  number: 12500000,
+};
+
+// ═══ یک ردیف واحد ═══
+function UnitRow({
+  icon, label, value, onChange, options, preview,
+}: {
+  icon: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: readonly { v: string; l: string }[];
+  preview: string;
+}) {
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr auto auto',
+      gap: 10,
+      alignItems: 'center',
+      padding: '10px 0',
+      borderBottom: '1px solid var(--border)',
+    }}>
+      {/* راست: label */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        minWidth: 0,
+      }}>
+        <span style={{ fontSize: 18, flexShrink: 0 }} aria-hidden="true">{icon}</span>
+        <span style={{
+          fontSize: 'var(--fs-base)',
+          fontWeight: 600,
+          color: 'var(--text)',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>{label}</span>
+      </div>
+
+      {/* وسط: preview */}
+      <div style={{
+        fontSize: 'var(--fs-sm)',
+        fontWeight: 700,
+        color: 'var(--accent)',
+        fontVariantNumeric: 'tabular-nums',
+        direction: 'rtl',
+        textAlign: 'left',
+        whiteSpace: 'nowrap',
+        minWidth: 80,
+      }}>
+        {preview}
+      </div>
+
+      {/* چپ: dropdown */}
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        style={{
+          height: 34,
+          padding: '0 8px',
+          background: 'var(--input-bg)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-sm)',
+          color: 'var(--text)',
+          fontFamily: 'inherit',
+          fontSize: 'var(--fs-sm)',
+          fontWeight: 600,
+          cursor: 'pointer',
+          minWidth: 90,
+          textAlign: 'right',
+        }}
+      >
+        {options.map(o => (
+          <option key={o.v} value={o.v}>{o.l}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 export default function UnitsTab() {
   const units = useSet(s => s.units);
   const update = (patch: Partial<typeof units>) => {
@@ -25,213 +116,189 @@ export default function UnitsTab() {
   };
   const fmt = useFormat();
 
-  // نمونه‌ها برای پیش‌نمایش
-  const sampleMoney = 5000000; // ۵ میلیون تومان
-  const sampleTemp = 32;        // ۳۲ درجه سلسیوس
-  const sampleWeight = 2500;    // ۲۵۰۰ گرم
-  const sampleVolume = 5000;    // ۵۰۰۰ میلی‌لیتر
-  const sampleLength = 12;      // ۱۲ سانتی‌متر
-  const sampleArea = 100;       // ۱۰۰ مترمربع
-  const sampleTime = 3600;      // ۱ ساعت
-  const sampleNumber = 12500000;
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
-      {/* ═══ 💰 ارز ═══ */}
-      <SettingsGroup icon="💰" title="ارز" subtitle="واحد پول و نرخ دلار" tone="accent">
-        <Field label="واحد پول">
-          <Select
-            value={units.currency}
-            onChange={e => update({ currency: e.target.value as CurrencyUnit })}
-          >
-            {(['toman', 'rial', 'usd'] as const).map(k => (
-              <option key={k} value={k}>{UNIT_LABELS.currency[k]}</option>
-            ))}
-          </Select>
-        </Field>
+      {/* ═══ کارت ۱: واحدهای اندازه‌گیری ═══ */}
+      <SettingsGroup icon="📐" title="واحدهای اندازه‌گیری" subtitle="با پیش‌نمایش زنده" tone="accent">
+
+        <UnitRow
+          icon="💰" label="ارز"
+          value={units.currency}
+          onChange={v => update({ currency: v as CurrencyUnit })}
+          options={[
+            { v: 'toman', l: 'تومان' },
+            { v: 'rial', l: 'ریال' },
+            { v: 'usd', l: 'دلار' },
+          ]}
+          preview={fmt.money(SAMPLE.money)}
+        />
 
         {units.currency === 'usd' && (
-          <Field label="نرخ دلار (تومان)" hint="هر روز از سایت‌های معتبر به‌روز کن">
-            <NumField
-              value={String(units.usdRate)}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr auto',
+            gap: 10,
+            alignItems: 'center',
+            padding: '10px 0',
+            borderBottom: '1px solid var(--border)',
+            background: 'var(--accent-soft)',
+            marginTop: -1,
+            paddingRight: 10,
+            paddingLeft: 10,
+            borderRadius: 'var(--r-sm)',
+          }}>
+            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'var(--accent)' }}>
+              نرخ دلار (تومان)
+            </span>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={fmt.int(units.usdRate)}
               onChange={e => {
-                const n = Number(e.target.value);
+                const cleaned = String(e.target.value)
+                  .replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
+                  .replace(/[^\d]/g, '');
+                const n = Number(cleaned);
                 if (!isNaN(n) && n > 0) update({ usdRate: n });
               }}
-              unit="تومان"
-              min={1}
+              style={{
+                width: 100,
+                height: 34,
+                padding: '0 8px',
+                background: 'var(--card)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: 'var(--r-sm)',
+                color: 'var(--accent)',
+                fontFamily: 'inherit',
+                fontSize: 'var(--fs-sm)',
+                fontWeight: 700,
+                textAlign: 'center',
+                direction: 'rtl',
+                fontVariantNumeric: 'tabular-nums',
+              }}
             />
-          </Field>
+          </div>
         )}
 
-        <PreviewBox>
-          {fmt.money(sampleMoney)}
-        </PreviewBox>
+        <UnitRow
+          icon="🌡" label="دما"
+          value={units.temperature}
+          onChange={v => update({ temperature: v as TempUnit })}
+          options={[
+            { v: 'c', l: 'سلسیوس' },
+            { v: 'f', l: 'فارنهایت' },
+          ]}
+          preview={fmt.temp(SAMPLE.temp)}
+        />
+
+        <UnitRow
+          icon="⚖️" label="وزن"
+          value={units.weight}
+          onChange={v => update({ weight: v as WeightUnit })}
+          options={[
+            { v: 'mg', l: 'میلی‌گرم' },
+            { v: 'g', l: 'گرم' },
+            { v: 'kg', l: 'کیلوگرم' },
+            { v: 'ton', l: 'تن' },
+          ]}
+          preview={fmt.weight(SAMPLE.weight)}
+        />
+
+        <UnitRow
+          icon="💧" label="حجم"
+          value={units.volume}
+          onChange={v => update({ volume: v as VolumeUnit })}
+          options={[
+            { v: 'cc', l: 'سی‌سی' },
+            { v: 'ml', l: 'میلی‌لیتر' },
+            { v: 'L', l: 'لیتر' },
+          ]}
+          preview={fmt.volume(SAMPLE.volume)}
+        />
+
+        <UnitRow
+          icon="📏" label="طول"
+          value={units.length}
+          onChange={v => update({ length: v as LengthUnit })}
+          options={[
+            { v: 'mm', l: 'میلی‌متر' },
+            { v: 'cm', l: 'سانتی‌متر' },
+            { v: 'm', l: 'متر' },
+            { v: 'km', l: 'کیلومتر' },
+          ]}
+          preview={fmt.length(SAMPLE.length)}
+        />
+
+        <UnitRow
+          icon="📐" label="مساحت"
+          value={units.area}
+          onChange={v => update({ area: v as AreaUnit })}
+          options={[
+            { v: 'm2', l: 'مترمربع' },
+            { v: 'ha', l: 'هکتار' },
+          ]}
+          preview={fmt.area(SAMPLE.area)}
+        />
+
+        <UnitRow
+          icon="⏱" label="زمان"
+          value={units.time}
+          onChange={v => update({ time: v as TimeUnit })}
+          options={[
+            { v: 's', l: 'ثانیه' },
+            { v: 'min', l: 'دقیقه' },
+            { v: 'h', l: 'ساعت' },
+            { v: 'day', l: 'روز' },
+          ]}
+          preview={fmt.time(SAMPLE.time)}
+        />
+
       </SettingsGroup>
 
-      {/* ═══ 🌡 دما ═══ */}
-      <SettingsGroup icon="🌡" title="دما" subtitle="سلسیوس / فارنهایت" tone="warn">
-        <Field label="واحد">
-          <Select
-            value={units.temperature}
-            onChange={e => update({ temperature: e.target.value as TempUnit })}
-          >
-            {(['c', 'f'] as const).map(k => (
-              <option key={k} value={k}>{UNIT_LABELS.temperature[k]}</option>
-            ))}
-          </Select>
-        </Field>
-        <PreviewBox>{fmt.temp(sampleTemp)}</PreviewBox>
+      {/* ═══ کارت ۲: نمایش اعداد و تاریخ ═══ */}
+      <SettingsGroup icon="🔢" title="نمایش اعداد و تاریخ" subtitle="فرمت سراسری کل نرم‌افزار" tone="purple">
+
+        <UnitRow
+          icon="🔤" label="فرمت اعداد"
+          value={units.numberFormat}
+          onChange={v => update({ numberFormat: v as NumberFormat })}
+          options={[
+            { v: 'fa', l: 'فارسی' },
+            { v: 'en', l: 'انگلیسی' },
+          ]}
+          preview={fmt.int(SAMPLE.number)}
+        />
+
+        <UnitRow
+          icon="🔢" label="تعداد اعشار"
+          value={String(units.decimals)}
+          onChange={v => update({ decimals: Number(v) })}
+          options={DEC_OPTIONS.map(n => ({ v: String(n), l: `${n} رقم` }))}
+          preview={fmt.num(1234.5678)}
+        />
+
+        <UnitRow
+          icon="⌨️" label="جداکننده هزار"
+          value={units.thousandSep}
+          onChange={v => update({ thousandSep: v as ThousandSep })}
+          options={SEP_OPTIONS.map(k => ({ v: k, l: UNIT_LABELS.thousandSep[k] }))}
+          preview={fmt.int(SAMPLE.number)}
+        />
+
+        <UnitRow
+          icon="📅" label="تقویم"
+          value={units.dateFormat}
+          onChange={v => update({ dateFormat: v as DateFormat })}
+          options={[
+            { v: 'jalali', l: 'شمسی' },
+            { v: 'gregorian', l: 'میلادی' },
+          ]}
+          preview={units.dateFormat === 'jalali' ? '۱۴۰۴/۰۷/۱۲' : '2025/10/04'}
+        />
+
       </SettingsGroup>
 
-      {/* ═══ ⚖️ وزن ═══ */}
-      <SettingsGroup icon="⚖️" title="وزن" subtitle="واحد وزن" tone="info">
-        <Field label="واحد">
-          <Select
-            value={units.weight}
-            onChange={e => update({ weight: e.target.value as WeightUnit })}
-          >
-            {(['mg', 'g', 'kg', 'ton'] as const).map(k => (
-              <option key={k} value={k}>{UNIT_LABELS.weight[k]}</option>
-            ))}
-          </Select>
-        </Field>
-        <PreviewBox>{fmt.weight(sampleWeight)}</PreviewBox>
-      </SettingsGroup>
-
-      {/* ═══ 💧 حجم ═══ */}
-      <SettingsGroup icon="💧" title="حجم" subtitle="واحد حجم (دارو، آب)" tone="info">
-        <Field label="واحد">
-          <Select
-            value={units.volume}
-            onChange={e => update({ volume: e.target.value as VolumeUnit })}
-          >
-            {(['cc', 'ml', 'L'] as const).map(k => (
-              <option key={k} value={k}>{UNIT_LABELS.volume[k]}</option>
-            ))}
-          </Select>
-        </Field>
-        <PreviewBox>{fmt.volume(sampleVolume)}</PreviewBox>
-      </SettingsGroup>
-
-      {/* ═══ 📏 طول ═══ */}
-      <SettingsGroup icon="📏" title="طول" subtitle="فاصله، ابعاد" tone="info">
-        <Field label="واحد">
-          <Select
-            value={units.length}
-            onChange={e => update({ length: e.target.value as LengthUnit })}
-          >
-            {(['mm', 'cm', 'm', 'km'] as const).map(k => (
-              <option key={k} value={k}>{UNIT_LABELS.length[k]}</option>
-            ))}
-          </Select>
-        </Field>
-        <PreviewBox>{fmt.length(sampleLength)}</PreviewBox>
-      </SettingsGroup>
-
-      {/* ═══ 📐 مساحت ═══ */}
-      <SettingsGroup icon="📐" title="مساحت" subtitle="مترمربع، هکتار" tone="info">
-        <Field label="واحد">
-          <Select
-            value={units.area}
-            onChange={e => update({ area: e.target.value as AreaUnit })}
-          >
-            {(['m2', 'ha'] as const).map(k => (
-              <option key={k} value={k}>{UNIT_LABELS.area[k]}</option>
-            ))}
-          </Select>
-        </Field>
-        <PreviewBox>{fmt.area(sampleArea)}</PreviewBox>
-      </SettingsGroup>
-
-      {/* ═══ ⏱ زمان ═══ */}
-      <SettingsGroup icon="⏱" title="زمان" subtitle="دقیقه، ساعت، روز" tone="info">
-        <Field label="واحد">
-          <Select
-            value={units.time}
-            onChange={e => update({ time: e.target.value as TimeUnit })}
-          >
-            {(['min', 'h', 'day'] as const).map(k => (
-              <option key={k} value={k}>{UNIT_LABELS.time[k]}</option>
-            ))}
-          </Select>
-        </Field>
-        <PreviewBox>{fmt.time(sampleTime)}</PreviewBox>
-      </SettingsGroup>
-
-      {/* ═══ 🔢 نمایش اعداد ═══ */}
-      <SettingsGroup icon="🔢" title="نمایش اعداد" subtitle="فرمت، اعشار، جداکننده" tone="purple">
-        <Field label="فرمت اعداد">
-          <Select
-            value={units.numberFormat}
-            onChange={e => update({ numberFormat: e.target.value as NumberFormat })}
-          >
-            {(['fa', 'en'] as const).map(k => (
-              <option key={k} value={k}>{UNIT_LABELS.numberFormat[k]}</option>
-            ))}
-          </Select>
-        </Field>
-
-        <Field label="تعداد اعشار">
-          <Select
-            value={String(units.decimals)}
-            onChange={e => update({ decimals: Number(e.target.value) })}
-          >
-            {DEC_OPTIONS.map(n => (
-              <option key={n} value={n}>{n} رقم</option>
-            ))}
-          </Select>
-        </Field>
-
-        <Field label="جداکننده هزار">
-          <Select
-            value={units.thousandSep}
-            onChange={e => update({ thousandSep: e.target.value as ThousandSep })}
-          >
-            {SEP_OPTIONS.map(k => (
-              <option key={k} value={k}>{UNIT_LABELS.thousandSep[k]}</option>
-            ))}
-          </Select>
-        </Field>
-
-        <PreviewBox>{fmt.int(sampleNumber)}</PreviewBox>
-      </SettingsGroup>
-
-      {/* ═══ 📅 تاریخ ═══ */}
-      <SettingsGroup icon="📅" title="تاریخ" subtitle="تقویم" tone="info">
-        <Field label="تقویم">
-          <Select
-            value={units.dateFormat}
-            onChange={e => update({ dateFormat: e.target.value as DateFormat })}
-          >
-            {(['jalali', 'gregorian'] as const).map(k => (
-              <option key={k} value={k}>{UNIT_LABELS.dateFormat[k]}</option>
-            ))}
-          </Select>
-        </Field>
-      </SettingsGroup>
-
-    </div>
-  );
-}
-
-// ═══ پیش‌نمایش ═══
-function PreviewBox({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{
-      padding: '10px 14px',
-      background: 'var(--accent-soft)',
-      border: '1px solid var(--accent-border)',
-      borderRadius: 'var(--r-md)',
-      textAlign: 'center',
-      fontSize: 'var(--fs-md)',
-      fontWeight: 700,
-      color: 'var(--accent)',
-      fontVariantNumeric: 'tabular-nums',
-      direction: 'rtl',
-    }}>
-      {children}
     </div>
   );
 }
