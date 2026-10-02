@@ -1,6 +1,7 @@
 /**
  * index.tsx — تنظیمات (گروه‌بندی منطقی)
  */
+import EnvStandardsTab from './EnvStandardsTab';
 import { useState } from 'react';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import ProfileTab from './ProfileTab';
@@ -14,7 +15,8 @@ import LogsTab from './LogsTab';
 type TabId =
   | 'profile' | 'appearance'
   | 'modules' | 'notifications'
-  | 'backup' | 'logs' | 'about';
+  | 'backup' | 'logs' | 'about'
+  | 'standards';
 
 interface TabDef {
   id: TabId;
@@ -42,6 +44,7 @@ const GROUPS: GroupDef[] = [
     icon: '🏭',
     tabs: [
       { id: 'modules', label: 'ماژول‌ها', icon: '🧩' },
+      { id: 'standards', label: 'استانداردها', icon: '📏' },
             { id: 'notifications', label: 'اعلان‌ها', icon: '🔔' },
     ],
   },
@@ -73,6 +76,7 @@ const TAB_COMPONENTS: Record<TabId, React.ComponentType> = {
   profile: ProfileTab,
   appearance: AppearanceTab,
   modules: ModulesTab,
+  standards: EnvStandardsTab,
   notifications: NotificationsTab,
   backup: BackupTab,
   logs: LogsTab,
