@@ -10,7 +10,7 @@ export function monthKey(date: string): string {
   if (date === '' || date == null) return '';
   const parts = date.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).split('/');
   if (parts.length !== 3) return '';
-  return parts[0] + '/' + parts[1];
+  return parts[0] + '/' + String(parts[1]).padStart(2, '0');
 }
 
 
