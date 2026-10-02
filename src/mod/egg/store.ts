@@ -111,12 +111,13 @@ export function healthyCount(p: EggProduction): number {
 /** نرخ تخم‌گذاری Hen-Day — درصد */
 export function henDayRate(p: EggProduction, flockCount: number): number {
   if (flockCount <= 0) return 0;
-  return (healthyCount(p) / flockCount) * 100;
+  return Math.round((healthyCount(p) / flockCount) * 10000) / 100;
 }
 
 /** درصد شکسته */
 export function brokenRate(p: EggProduction): number {
-  const total = (p.totalCount || 0) + (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0);
+  // totalCount شامل همه‌ی تخم‌ها (سالم + شکسته + نرم + کثیف) است
+  const total = p.totalCount || 0;
   if (total === 0) return 0;
   return ((p.brokenCount || 0) / total) * 100;
 }
