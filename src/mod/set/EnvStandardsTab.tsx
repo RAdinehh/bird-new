@@ -530,8 +530,34 @@ export default function EnvStandardsTab() {
     showToast('همه به پیش‌فرض برگشتند', 'success', 2000);
   };
 
+  // DEBUG
+  const debugInfo = {
+    flocksCount: (flocks || []).length,
+    activeFlocks: (flocks || []).filter((f: any) => f.status === 'active').length,
+    brdBirdsCount: (brdBirds || []).length,
+    activeBirdNames: Array.from(activeBirdNames),
+    birdNames: (brdBirds || []).map((b: any) => b.name),
+    stdNames: allKeys.map(k => (custom[k] || DEFAULT_STANDARDS[k])?.nameFa),
+  };
+
   return (
     <PageContainer>
+      <div style={{
+        padding: 8,
+        background: 'var(--danger-soft)',
+        border: '1px solid var(--danger)',
+        borderRadius: 'var(--r-sm)',
+        fontSize: 10,
+        color: 'var(--danger)',
+        fontFamily: 'monospace',
+        direction: 'ltr',
+        textAlign: 'left',
+        whiteSpace: 'pre-wrap',
+        lineHeight: 1.5,
+      }}>
+        {JSON.stringify(debugInfo, null, 2)}
+      </div>
+
       <div style={{
         padding: 'var(--pad-normal)',
         background: 'var(--accent-soft)',
