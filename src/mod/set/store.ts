@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { BirdStandard } from './standards';
 import { persist } from 'zustand/middleware';
+import { DEFAULT_UNITS, type Units } from '../../shr/units';
 
 
 
@@ -17,12 +18,8 @@ export interface Settings {
   };
   // بانکی
   bank: { cardNo: string; sheba: string; bankName: string; accountHolder: string; };
-  // استانداردها
-  units: {
-    currency: string; length: string; weight: string; volume: string;
-    temperature: string; area: string; dateFormat: string;
-    numberFormat: string; thousandSep: string; decimals: string;
-  };
+  // واحدها و قالب‌بندی
+  units: Units;
   // امنیت
   security: { pinEnabled: boolean; pin: string; recoveryHash?: string; autoLockMin: number; };
 
@@ -63,7 +60,7 @@ const defaultSettings: Settings = {
   user: { name: '', phone: '', email: '', role: 'owner', avatar: '' },
   farm: { name: '', type: 'layer', province: '', city: '', address: '', postalCode: '', phone: '', licenseNo: '', establishedAt: '', logo: '' },
   bank: { cardNo: '', sheba: '', bankName: '', accountHolder: '' },
-  units: { currency: 'toman', length: 'm', weight: 'kg', volume: 'L', temperature: 'c', area: 'm2', dateFormat: 'jalali', numberFormat: 'fa', thousandSep: '،', decimals: '2' },
+  units: DEFAULT_UNITS,
 
   bottomNav: ['dsh', 'dlg', 'inc', 'rep', 'set'],
 
@@ -129,6 +126,7 @@ export const useSet = create<State>()(
           bottomNav: Array.isArray(p.bottomNav) && p.bottomNav.length === 5
             ? p.bottomNav
             : current.bottomNav,
+          units: { ...DEFAULT_UNITS, ...(p.units || {}) },
           channels: { ...current.channels, ...(p.channels || {}) },
           alerts: { ...current.alerts, ...(p.alerts || {}) },
           quietHours: { ...current.quietHours, ...(p.quietHours || {}) },
