@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { parse as parseJ, differenceInCalendarDays as diffCalDays, startOfDay } from 'date-fns-jalali';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 
@@ -166,11 +167,14 @@ export function stockWarning(item: Item): 'ok' | 'low' | 'critical' {
 /** روزهای مانده تا انقضا */
 export function daysToExpiry(expireDate: string): number | null {
   if (expireDate === '' || expireDate == null) return null;
-  const parts = expireDate.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString()).split('/');
-  if (parts.length !== 3) return null;
-  const d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
-  const diff = Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-  return diff;
+  try {
+    const en = String(expireDate).replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const d = parseJ(en, 'yyyy/MM/dd', new Date());
+    if (isNaN(d.getTime())) return null;
+    return diffCalDays(startOfDay(d), startOfDay(new Date()));
+  } catch {
+    return null;
+  }
 }
 
 /** هشدار انقضا */
