@@ -97,6 +97,41 @@ export function useCarousel(
     apply(target, !isClick);
   }, [active, apply]);
 
+  // ═══ تنظیم ارتفاع container به اندازه تب فعال (نه بلندترین تب) ═══
+  // چرا: تو flex row، همه‌ی پنل‌ها به بلندترین کشیده می‌شن → فضای سفید می‌سازه
+  useEffect(() => {
+    const c = containerRef.current;
+    const t = trackRef.current;
+    if (!c || !t) return;
+
+    // مهم: پنل‌ها نباید به بلندترین کشیده بشن
+    t.style.alignItems = 'flex-start';
+
+    const i = idsRef.current.indexOf(active);
+    if (i < 0) return;
+    const panel = t.children[i] as HTMLElement | undefined;
+    if (!panel) return;
+
+    const apply = () => {
+      const h = panel.getBoundingClientRect().height;
+      if (h > 0) c.style.height = h + 'px';
+    };
+
+    apply();
+    requestAnimationFrame(apply);
+    const t1 = window.setTimeout(apply, 60);
+    const t2 = window.setTimeout(apply, 300);
+
+    const ro = new ResizeObserver(apply);
+    ro.observe(panel);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      ro.disconnect();
+    };
+  }, [active]);
+
   // listeners — یک بار bind روی document.body
   // اینطوری مستقل از ارتفاع containerRef، swipe روی کل ویوپورت کار میکنه
   useEffect(() => {

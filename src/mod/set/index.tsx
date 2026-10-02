@@ -1,8 +1,9 @@
 /**
- * index.tsx — تنظیمات (گروه‌بندی منطقی)
+ * index.tsx — تنظیمات (۵ تب اصلی)
  */
 import EnvStandardsTab from './EnvStandardsTab';
-import { useState } from 'react';
+import type React from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import ProfileTab from './ProfileTab';
 import AppearanceTab from './AppearanceTab';
@@ -12,13 +13,14 @@ import NotificationsTab from './NotificationsTab';
 import BackupTab from './BackupTab';
 import AboutTab from './AboutTab';
 import LogsTab from './LogsTab';
+import SettingsGroup from './SettingsGroup';
 
 type TabId =
-  | 'profile' | 'appearance'
-  | 'modules' | 'notifications'
-  | 'backup' | 'logs' | 'about'
-  | 'standards'
-  | 'units';
+  | 'account'
+  | 'appearance'
+  | 'config'
+  | 'notifications'
+  | 'system';
 
 interface TabDef {
   id: TabId;
@@ -34,30 +36,14 @@ interface GroupDef {
 
 const GROUPS: GroupDef[] = [
   {
-    label: 'حساب',
-    icon: '👤',
-    tabs: [
-      { id: 'profile', label: 'پروفایل', icon: '👤' },
-      { id: 'appearance', label: 'ظاهر', icon: '🎨' },
-    ],
-  },
-  {
-    label: 'مرغداری',
-    icon: '🏭',
-    tabs: [
-      { id: 'modules', label: 'ماژول‌ها', icon: '🧩' },
-      { id: 'standards', label: 'استانداردها', icon: '📏' },
-      { id: 'units', label: 'واحدها', icon: '📐' },
-            { id: 'notifications', label: 'اعلان‌ها', icon: '🔔' },
-    ],
-  },
-  {
-    label: 'سیستم',
+    label: 'تنظیمات',
     icon: '⚙️',
     tabs: [
-      { id: 'backup', label: 'پشتیبان', icon: '💾' },
-      { id: 'logs', label: 'لاگ', icon: '📋' },
-      { id: 'about', label: 'درباره', icon: 'ℹ️' },
+      { id: 'account',       label: 'حساب کاربری',   icon: '👤' },
+      { id: 'appearance',    label: 'ظاهر و نمایش',  icon: '🎨' },
+      { id: 'config',        label: 'پیکربندی',      icon: '⚙️' },
+      { id: 'notifications', label: 'اعلان‌ها',       icon: '🔔' },
+      { id: 'system',        label: 'سیستم',          icon: '💾' },
     ],
   },
 ];
@@ -65,35 +51,61 @@ const GROUPS: GroupDef[] = [
 const ALL_TABS = GROUPS.flatMap(g => g.tabs);
 const TAB_IDS = ALL_TABS.map(t => t.id as string);
 
-const LAST_TAB_KEY = 'pm-set-last-tab';
+const LAST_TAB_KEY = 'pm-set-last-tab-v2';
 
 function getLastTab(): TabId {
   try {
     const saved = localStorage.getItem(LAST_TAB_KEY);
     if (saved && TAB_IDS.includes(saved)) return saved as TabId;
   } catch { /* silent */ }
-  return 'profile';
+  return 'account';
 }
 
-const TAB_COMPONENTS: Record<TabId, React.ComponentType> = {
-  profile: ProfileTab,
-  appearance: AppearanceTab,
-  modules: ModulesTab,
-  standards: EnvStandardsTab,
-  units: UnitsTab,
-  notifications: NotificationsTab,
-  backup: BackupTab,
-  logs: LogsTab,
-  about: AboutTab,
+/** هر تب می‌تونه چند کامپوننت رو کنار هم نشون بده */
+type TabComponent = React.ComponentType | {
+  comp: React.ComponentType;
+  icon: string;
+  title: string;
+  subtitle?: string;
+  tone?: 'accent' | 'warn' | 'info' | 'purple' | 'danger';
+};
+
+const TAB_COMPONENTS: Record<TabId, TabComponent[]> = {
+  account:       [ProfileTab],
+  appearance:    [AppearanceTab],
+  config: [
+    { comp: EnvStandardsTab, icon: '📏', title: 'استانداردهای نژادها', subtitle: 'دما، رطوبت، دان، وزن، تلفات', tone: 'accent' },
+    { comp: UnitsTab,        icon: '📐', title: 'واحدها و اندازه‌گیری', subtitle: 'ارز، دما، وزن، حجم، طول، مساحت', tone: 'info' },
+    { comp: ModulesTab,      icon: '🧩', title: 'ماژول‌ها',              subtitle: 'فعال / غیرفعال کردن بخش‌های نرم‌افزار', tone: 'purple' },
+  ],
+  notifications: [NotificationsTab],
+  system: [
+    { comp: BackupTab, icon: '💾', title: 'پشتیبان‌گیری',      subtitle: 'آمار، پشتیبان، بازیابی، امنیت', tone: 'accent' },
+    { comp: LogsTab,   icon: '📋', title: 'لاگ عملیات',         subtitle: 'تاریخچه فعالیت‌ها و خطاها',      tone: 'info' },
+    { comp: AboutTab,  icon: 'ℹ️', title: 'درباره',            subtitle: 'اطلاعات برنامه، راهنما، تماس',   tone: 'purple' },
+  ],
 };
 
 export default function Set() {
   const [tab, setTab] = useState<TabId>(getLastTab);
+  const tabsBarRef = useRef<HTMLDivElement>(null);
 
   const changeTab = (id: TabId) => {
     setTab(id);
     try { localStorage.setItem(LAST_TAB_KEY, id); } catch { /* silent */ }
   };
+
+  // وقتی تب فعال عوض میشه، نوار بالا رو اسکرول کن که تب فعال دیده شه
+  useEffect(() => {
+    const bar = tabsBarRef.current;
+    if (!bar) return;
+    const btn = bar.querySelector(`[data-tab-id="${tab}"]`) as HTMLElement | null;
+    if (!btn) return;
+    const barRect = bar.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const offset = (btnRect.left + btnRect.width / 2) - (barRect.left + barRect.width / 2);
+    bar.scrollBy({ left: offset, behavior: 'smooth' });
+  }, [tab]);
 
   const { containerRef, trackRef, setInstant } = useCarousel(
     TAB_IDS,
@@ -103,18 +115,21 @@ export default function Set() {
 
   return (
     <div>
-      <div style={{
-        display: 'flex',
-        gap: 'var(--gap-xs)',
-        borderBottom: '1px solid var(--border)',
-        padding: '0 var(--sp-2)',
-        background: 'var(--header-bg)',
-        position: 'sticky',
-        top: 52,
-        zIndex: 11,
-        overflowX: 'auto',
-        scrollbarWidth: 'none',
-      }}>
+      <div
+        ref={tabsBarRef}
+        style={{
+          display: 'flex',
+          gap: 'var(--gap-xs)',
+          borderBottom: '1px solid var(--border)',
+          padding: '0 var(--sp-2)',
+          background: 'var(--header-bg)',
+          position: 'sticky',
+          top: 52,
+          zIndex: 11,
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+        }}
+      >
         {GROUPS.map((group, gi) => (
           <div key={group.label} style={{ display: 'flex', alignItems: 'center' }}>
             {gi > 0 && (
@@ -132,6 +147,7 @@ export default function Set() {
                 <button
                   key={t.id}
                   type="button"
+                  data-tab-id={t.id}
                   onClick={() => { setInstant(); changeTab(t.id); }}
                   style={{
                     padding: '10px var(--sp-2)',
@@ -170,14 +186,14 @@ export default function Set() {
         ))}
       </div>
 
-      <div style={{ padding: 'var(--sp-3)' }}>
+      <div style={{ padding: '8px 6px' }}>
         <div
           ref={containerRef}
           style={{
             overflow: 'hidden',
             overflowX: 'hidden',
             width: '100%',
-                        touchAction: 'pan-y',
+            touchAction: 'pan-y',
             isolation: 'isolate',
           }}
         >
@@ -193,7 +209,7 @@ export default function Set() {
             }}
           >
             {ALL_TABS.map(t => {
-              const Comp = TAB_COMPONENTS[t.id];
+              const comps = TAB_COMPONENTS[t.id];
               return (
                 <div
                   key={t.id}
@@ -208,7 +224,38 @@ export default function Set() {
                     isolation: 'isolate',
                   }}
                 >
-                  <Comp />
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--sp-3)',
+                  }}>
+                    {comps.map((c, i) => {
+                      // چک کن آبجکته یا کامپوننت ساده
+                      const isWrapped = typeof c === 'object' && c !== null && 'comp' in c;
+                      if (!isWrapped) {
+                        const Comp = c as React.ComponentType;
+                        return <Comp key={i} />;
+                      }
+                      const { comp: Comp, icon, title, subtitle, tone } = c as {
+                        comp: React.ComponentType;
+                        icon: string;
+                        title: string;
+                        subtitle?: string;
+                        tone?: 'accent' | 'warn' | 'info' | 'purple' | 'danger';
+                      };
+                      return (
+                        <SettingsGroup
+                          key={i}
+                          icon={icon}
+                          title={title}
+                          subtitle={subtitle}
+                          tone={tone || 'accent'}
+                        >
+                          <Comp />
+                        </SettingsGroup>
+                      );
+                    })}
+                  </div>
                 </div>
               );
             })}

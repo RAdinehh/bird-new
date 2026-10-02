@@ -17,7 +17,7 @@ export default function SettingsGroup({
   children,
   tone = 'accent'
 }: Props) {
-    const STORAGE_KEY = 'pm-set-group-v2-' + title;
+    const STORAGE_KEY = 'pm-set-group-v3-' + title;
   const [open, setOpen] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -47,7 +47,7 @@ export default function SettingsGroup({
       <div role="button" tabIndex={0}
         onClick={toggle}
         style={{
-          padding: '13px 16px',
+          padding: '11px 10px',
           display: 'flex',
           alignItems: 'center',
           gap: 12,
@@ -108,7 +108,7 @@ export default function SettingsGroup({
       }}>
         <div style={{ overflow: 'hidden' }}>
           <div style={{
-            padding: '12px 16px 16px',
+            padding: '10px 10px 12px',
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--sp-3)',
