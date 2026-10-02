@@ -6,6 +6,7 @@ import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITT
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { useTempUnit, toUserTemp, tempLabel } from '../../shr/utils/temp';
 import { showAlert } from '../../cor/store/dialog';
 import { Row, Pill } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -16,6 +17,55 @@ import { logAction } from '../../cor/logger/auditLog';
 interface F { id?: string; name: string; code: string; length: string; width: string; height: string; capacity: string; targetTemp: string; targetHumidity: string; ventilation: string; light: string; ventilationSystem: string; feederType: string; drinkerType: string; litterType: string; address: string; builtAt: string; lastSanitizedAt: string; notes: string; }
 const empty: F = { name:'', code:'', length:'', width:'', height:'', capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'', ventilationSystem:'tunnel', feederType:'chain', drinkerType:'nipple', litterType:'wood_shavings', address:'', builtAt:'', lastSanitizedAt:'', notes:'' };
 
+function TempFormField({ value, onChange, label, placeholder }: any) {
+  const tempUnit = useTempUnit();
+  const celsius = (() => {
+    if (!value) return null;
+    const en = String(value).replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٫،]/g, '.');
+    const n = parseFloat(en);
+    return isNaN(n) ? null : n;
+  })();
+  const displayed = celsius == null ? null : (
+    tempUnit === 'c' ? celsius : Math.round((celsius * 9 / 5 + 32) * 10) / 10
+  );
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let v = e.target.value;
+    v = v.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    v = v.replace(/[٫،]/g, '.');
+    v = v.replace(/[^\d.-]/g, '');
+    if (v === '' || v === '-' || v === '.') { onChange(''); return; }
+    const n = parseFloat(v);
+    if (isNaN(n)) return;
+    const c = tempUnit === 'c' ? n : (n - 32) * 5 / 9;
+    onChange(String(Math.round(c * 10) / 10));
+  };
+  return (
+    <Field label={label}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <input
+          type="text"
+          inputMode="decimal"
+          value={displayed == null ? '' : String(displayed)}
+          onChange={handleChange}
+          placeholder={placeholder}
+          onFocus={(e) => e.target.select()}
+          style={{
+            flex: 1, height: 38, padding: '0 12px',
+            background: 'var(--input-bg)', border: '1px solid var(--border)',
+            borderRadius: 'var(--r-md)', color: 'var(--text)',
+            fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 600,
+            textAlign: 'right', outline: 'none',
+            fontVariantNumeric: 'tabular-nums', direction: 'ltr', minWidth: 0,
+          }}
+        />
+        <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', flexShrink: 0, minWidth: 30, textAlign: 'left' }}>
+          {tempUnit === 'c' ? '°C' : '°F'}
+        </span>
+      </div>
+    </Field>
+  );
+}
+
 export default function HallsPage() {
   const { halls: _hallsRaw, zones, equipment, addHall, updateHall, deleteHall } = useHal();
   const [open, setOpen] = useState(false);
@@ -24,6 +74,7 @@ export default function HallsPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const tempUnit = useTempUnit();
 
   const halls = useMemo(() => {
     const seen = new Set<string>();
@@ -138,7 +189,7 @@ export default function HallsPage() {
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 شرایط محیطی</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <Row l="دمای هدف" v={h.targetTemp ? `${toFa(h.targetTemp)} °C` : '—'} />
+                  <Row l="دمای هدف" v={h.targetTemp != null ? `${toFa(toUserTemp(h.targetTemp, tempUnit) ?? h.targetTemp)} ${tempLabel(tempUnit)}` : '—'} />
                   <Row l="رطوبت هدف" v={h.targetHumidity ? `${toFa(h.targetHumidity)} ٪` : '—'} />
                   <Row l="تهویه" v={h.ventilation ? `${toFa(h.ventilation)} m³/min` : '—'} />
                   <Row l="روشنایی" v={h.light ? `${toFa(h.light)} lux` : '—'} />
@@ -208,7 +259,7 @@ export default function HallsPage() {
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
            color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>شرایط</div>
         <Grid2>
-          <Field label="دمای هدف"><NumField placeholder="۲۲" value={form.targetTemp} onChange={e => setForm({...form, targetTemp: e.target.value})} unit="°C" min={-10} /></Field>
+          <TempFormField label="دمای هدف" placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => setForm({...form, targetTemp: v})} />
           <Field label="رطوبت هدف"><NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => setForm({...form, targetHumidity: e.target.value})} unit="٪" min={-10} /></Field>
         </Grid2>
         <Grid2>
