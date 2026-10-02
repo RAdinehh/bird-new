@@ -1,10 +1,12 @@
 import { useEffect, useRef, useCallback } from 'react';
 
 /**
- * useCarousel v2 — transform-based swipe
- * - listener ها فقط یک بار bind میشن (باگ «گاهی میره گاهی نمیره» حل)
+ * useCarousel v3 — transform-based swipe با تشخیص جهت
+ *
+ * - listener ها یک بار bind میشن
  * - refs برای active/ids/onChange (بدون re-bind)
  * - translate3d (GPU accelerated)
+ * - direction lock: عمودی = اسکرول عادی، افقی = swipe
  */
 
 /** بررسی می‌کنه که آیا عنصر یا والدینش اسکرول افقی داره */
@@ -47,14 +49,13 @@ export function useCarousel(
     if (!animate) {
       tr.style.transition = 'none';
       tr.style.transform = `translate3d(${tx}px, 0, 0)`;
-      void tr.offsetWidth; // force reflow
+      void tr.offsetWidth;
       txRef.current = tx;
       return;
     }
 
-    // برای انیمیشن: اول transition رو set کن، reflow، بعد transform
     tr.style.transition = 'transform 260ms cubic-bezier(.25,.8,.3,1)';
-    void tr.offsetWidth; // force reflow — کلید انیمیشن
+    void tr.offsetWidth;
     requestAnimationFrame(() => {
       tr.style.transform = `translate3d(${tx}px, 0, 0)`;
     });
@@ -96,29 +97,32 @@ export function useCarousel(
     apply(target, !isClick);
   }, [active, apply]);
 
-  // listeners — یک بار bind، بدون deps به active/ids
+  // listeners — یک بار bind
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     let dragging = false;
     let startX = 0;
+    let startY = 0;
     let startTx = 0;
     let startT = 0;
     let lastTx = 0;
+    let direction: 'none' | 'h' | 'v' = 'none';
 
     const onStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const tgt = e.target as HTMLElement;
       if (tgt.closest('[role="dialog"]')) return;
-      // اگه لمس داخل یه اسکرول افقی بود، carousel رو فعال نکن
       if (hasHorizontalScroller(tgt, el)) return;
       const t = e.touches[0];
       dragging = true;
       startX = t.clientX;
+      startY = t.clientY;
       startTx = txRef.current;
       lastTx = startTx;
       startT = Date.now();
+      direction = 'none';
       if (trackRef.current) trackRef.current.style.transition = 'none';
     };
 
@@ -126,6 +130,30 @@ export function useCarousel(
       if (!dragging) return;
       const t = e.touches[0];
       const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+
+      // تشخیص جهت فقط یک بار
+      if (direction === 'none') {
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+          // اگه حرکت عمودی غالب بود، carousel رو کنسل کن
+          if (Math.abs(dy) > Math.abs(dx) * 1.3) {
+            direction = 'v';
+            dragging = false;
+            // برگردون موقعیت قبلی
+            if (trackRef.current) {
+              trackRef.current.style.transform = `translate3d(${startTx}px, 0, 0)`;
+              trackRef.current.style.transition = '';
+            }
+            return;
+          }
+          direction = 'h';
+        } else {
+          return;
+        }
+      }
+
+      if (direction !== 'h') return;
+
       const w = wRef.current || el.clientWidth;
       if (w <= 0) return;
       const min = -(idsRef.current.length - 1) * w;
@@ -136,11 +164,18 @@ export function useCarousel(
       if (trackRef.current) {
         trackRef.current.style.transform = `translate3d(${tx}px, 0, 0)`;
       }
+      // جلوگیری از اسکرول افقی صفحه در حین swipe
+      if (e.cancelable) {
+        try { e.preventDefault(); } catch { /* silent */ }
+      }
     };
 
     const onEnd = (e: TouchEvent) => {
       if (!dragging) return;
+      const wasH = direction === 'h';
       dragging = false;
+      direction = 'none';
+      if (!wasH) return;
       const w = wRef.current || el.clientWidth;
       if (w <= 0) return;
       const len = idsRef.current.length;
@@ -161,10 +196,10 @@ export function useCarousel(
       }
     };
 
-    const onCancel = () => { dragging = false; };
+    const onCancel = () => { dragging = false; direction = 'none'; };
 
     el.addEventListener('touchstart', onStart, { passive: true });
-    el.addEventListener('touchmove', onMove, { passive: true });
+    el.addEventListener('touchmove', onMove, { passive: false });
     el.addEventListener('touchend', onEnd, { passive: true });
     el.addEventListener('touchcancel', onCancel, { passive: true });
     return () => {
