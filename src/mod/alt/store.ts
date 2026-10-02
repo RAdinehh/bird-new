@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { format } from 'date-fns-jalali';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 
@@ -33,6 +34,11 @@ interface State {
 }
 
 const now = () => new Date().toISOString();
+
+/** تاریخ امروز شمسی — برای مقایسه با snoozeUntil */
+function todayJalali(): string {
+  return format(new Date(), 'yyyy/MM/dd');
+}
 
 export const useAlt = create<State>()(
   persist(
@@ -113,7 +119,7 @@ export const CATEGORY_LABEL: Record<AlertCategory, string> = {
 
 /** فیلتر هشدارهای فعال */
 export function activeAlerts(alerts: Alert[]): Alert[] {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayJalali();
   return alerts.filter(a => {
     if (a.status === 'active') return true;
     if (a.status === 'snoozed' && a.snoozeUntil && a.snoozeUntil <= today) return true;
