@@ -1,23 +1,14 @@
 import { useState } from 'react';
 import { useSet } from './store';
-import { Field, Grid2, Grid3, Input, NumField, PhoneField, DigitField, Select } from '../../shr/components/ui';
-import { toFa, parseFaNum } from '../../shr/utils/fa';
+import { Field, Grid2, Input, NumField, PhoneField, DigitField, Select } from '../../shr/components/ui';
+import { parseFaNum } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow } from './helpers';
 import PinSetupModal from '../../shr/components/PinSetupModal';
-import { showToast } from '../../cor/store/toast';
 
 export default function ProfileTab() {
-  const { user, farm, bank, units, security, updateSection } = useSet();
+  const { user, farm, bank, security, updateSection } = useSet();
   const [showPinSetup, setShowPinSetup] = useState(false);
-
-  const U = (k: string, label: string, opts: [string, string][]) => (
-    <Field label={label}>
-      <Select value={(units as any)[k]} onChange={e => updateSection('units', { [k]: e.target.value } as any)}>
-        {opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-      </Select>
-    </Field>
-  );
 
   const userSummary = user.name || 'نام وارد نشده';
   const farmSummary = farm.name || 'نام مرغداری وارد نشده';
@@ -26,34 +17,61 @@ export default function ProfileTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
-      <SettingsGroup icon="👤" title="پروفایل کاربر" subtitle={userSummary} defaultOpen={!user.name} tone="accent">
-        <Field label="نام و نام خانوادگی">
-          <Input value={user.name} onChange={e => updateSection('user', { name: e.target.value })} placeholder="نام شما" />
-        </Field>
+      {/* ═══ پروفایل کاربر ═══ */}
+      <SettingsGroup icon="👤" title="پروفایل کاربر" subtitle={userSummary} tone="accent">
         <Grid2>
-          <Field label="شماره تماس">
-            <PhoneField value={user.phone} onChange={e => updateSection('user', { phone: e.target.value })} placeholder="۰۹..." />
+          <Field label="نام و نام خانوادگی">
+            <Input
+              value={user.name}
+              onChange={e => updateSection('user', { name: e.target.value })}
+              placeholder="نام شما"
+            />
           </Field>
-          <Field label="ایمیل">
-            <Input placeholder="example@domain.com" value={user.email} onChange={e => updateSection('user', { email: e.target.value })} dir="ltr" />
+          <Field label="نقش">
+            <Select
+              value={user.role}
+              onChange={e => updateSection('user', { role: e.target.value })}
+            >
+              <option value="owner">مالک</option>
+              <option value="manager">مدیر</option>
+              <option value="worker">کارگر</option>
+            </Select>
           </Field>
         </Grid2>
-        <Field label="نقش">
-          <Select value={user.role} onChange={e => updateSection('user', { role: e.target.value })}>
-            <option value="owner">مالک</option>
-            <option value="manager">مدیر</option>
-            <option value="worker">کارگر</option>
-          </Select>
-        </Field>
+        <Grid2>
+          <Field label="شماره تماس">
+            <PhoneField
+              value={user.phone}
+              onChange={e => updateSection('user', { phone: e.target.value })}
+              placeholder="۰۹..."
+            />
+          </Field>
+          <Field label="ایمیل">
+            <Input
+              placeholder="example@domain.com"
+              value={user.email}
+              onChange={e => updateSection('user', { email: e.target.value })}
+              dir="ltr"
+            />
+          </Field>
+        </Grid2>
       </SettingsGroup>
 
-      <SettingsGroup icon="🏠" title="اطلاعات مرغداری" subtitle={farmSummary} defaultOpen={!farm.name} tone="info">
+      {/* ═══ اطلاعات مرغداری ═══ */}
+      <SettingsGroup icon="🏠" title="اطلاعات مرغداری" subtitle={farmSummary} tone="info">
         <Field label="نام مرغداری">
-          <Input value={farm.name} onChange={e => updateSection('farm', { name: e.target.value })} placeholder="مثلاً — مرغداری سبز دشت" />
+          <Input
+            value={farm.name}
+            onChange={e => updateSection('farm', { name: e.target.value })}
+            placeholder="مثلاً — مرغداری سبز دشت"
+          />
         </Field>
         <Grid2>
           <Field label="نوع مرغداری">
-            <Select value={farm.type} onChange={e => updateSection('farm', { type: e.target.value })}>
+            <Select
+              value={farm.type}
+              onChange={e => updateSection('farm', { type: e.target.value })}
+            >
               <option value="layer">تخم‌گذار</option>
               <option value="broiler">گوشتی</option>
               <option value="breeder">مادر</option>
@@ -62,56 +80,117 @@ export default function ProfileTab() {
             </Select>
           </Field>
           <Field label="شماره پروانه">
-            <Input placeholder="مثلاً — ۰۰۱" value={farm.licenseNo} onChange={e => updateSection('farm', { licenseNo: e.target.value })} dir="ltr" />
+            <Input
+              placeholder="مثلاً — ۰۰۱"
+              value={farm.licenseNo}
+              onChange={e => updateSection('farm', { licenseNo: e.target.value })}
+              dir="ltr"
+            />
           </Field>
         </Grid2>
-        <Grid3>
+        <Grid2>
           <Field label="استان">
-            <Input placeholder="مثلاً — تهران" value={farm.province} onChange={e => updateSection('farm', { province: e.target.value })} />
+            <Input
+              placeholder="مثلاً — تهران"
+              value={farm.province}
+              onChange={e => updateSection('farm', { province: e.target.value })}
+            />
           </Field>
           <Field label="شهر">
-            <Input value={farm.city} onChange={e => updateSection('farm', { city: e.target.value })} />
-          </Field>
-          <Field label="کد پستی">
-            <DigitField placeholder="۱۲۳۴۵۶۷۸۹۰" maxLength={10} value={farm.postalCode} onChange={e => updateSection('farm', { postalCode: e.target.value })} />
-          </Field>
-        </Grid3>
-        <Field label="آدرس">
-          <Input value={farm.address} onChange={e => updateSection('farm', { address: e.target.value })} placeholder="آدرس کامل" />
-        </Field>
-        <Grid2>
-          <Field label="تلفن ثابت">
-            <PhoneField value={farm.phone} onChange={e => updateSection('farm', { phone: e.target.value })} />
-          </Field>
-          <Field label="تاریخ تأسیس">
-            <Input value={farm.establishedAt} onChange={e => updateSection('farm', { establishedAt: e.target.value })} placeholder="۱۴۰۰/۰۱/۰۱" />
+            <Input
+              value={farm.city}
+              onChange={e => updateSection('farm', { city: e.target.value })}
+            />
           </Field>
         </Grid2>
+        <Grid2>
+          <Field label="کد پستی">
+            <DigitField
+              placeholder="۱۲۳۴۵۶۷۸۹۰"
+              maxLength={10}
+              value={farm.postalCode}
+              onChange={e => updateSection('farm', { postalCode: e.target.value })}
+            />
+          </Field>
+          <Field label="تلفن ثابت">
+            <PhoneField
+              value={farm.phone}
+              onChange={e => updateSection('farm', { phone: e.target.value })}
+            />
+          </Field>
+        </Grid2>
+        <Field label="تاریخ تأسیس">
+          <Input
+            value={farm.establishedAt}
+            onChange={e => updateSection('farm', { establishedAt: e.target.value })}
+            placeholder="۱۴۰۰/۰۱/۰۱"
+          />
+        </Field>
+        <Field label="آدرس">
+          <Input
+            value={farm.address}
+            onChange={e => updateSection('farm', { address: e.target.value })}
+            placeholder="آدرس کامل"
+          />
+        </Field>
       </SettingsGroup>
 
+      {/* ═══ اطلاعات بانکی ═══ */}
       <SettingsGroup icon="🏦" title="اطلاعات بانکی" subtitle={bankSummary} tone="purple">
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+        <div style={{
+          fontSize: 'var(--fs-xs)',
+          color: 'var(--muted)',
+          lineHeight: 1.7,
+          padding: 'var(--pad-normal)',
+          background: 'var(--input-bg)',
+          borderRadius: 'var(--r-sm)',
+        }}>
           این اطلاعات در فاکتورهای چاپی نمایش داده می‌شود
         </div>
-        <Field label="نام بانک">
-          <Input value={bank.bankName} onChange={e => updateSection('bank', { bankName: e.target.value })} placeholder="مثلاً — ملت" />
-        </Field>
+        <Grid2>
+          <Field label="نام بانک">
+            <Input
+              value={bank.bankName}
+              onChange={e => updateSection('bank', { bankName: e.target.value })}
+              placeholder="مثلاً — ملت"
+            />
+          </Field>
+          <Field label="صاحب حساب">
+            <Input
+              placeholder="مثلاً — علی رضایی"
+              value={bank.accountHolder}
+              onChange={e => updateSection('bank', { accountHolder: e.target.value })}
+            />
+          </Field>
+        </Grid2>
         <Field label="شماره کارت">
-          <DigitField maxLength={16} value={bank.cardNo} onChange={e => updateSection('bank', { cardNo: e.target.value })} placeholder="۶۰۳۷..." />
+          <DigitField
+            maxLength={16}
+            value={bank.cardNo}
+            onChange={e => updateSection('bank', { cardNo: e.target.value })}
+            placeholder="۶۰۳۷..."
+          />
         </Field>
         <Field label="شماره شبا">
-          <Input value={bank.sheba} onChange={e => updateSection('bank', { sheba: e.target.value })} dir="ltr" placeholder="IR..." />
-        </Field>
-        <Field label="صاحب حساب">
-          <Input placeholder="مثلاً — علی رضایی" value={bank.accountHolder} onChange={e => updateSection('bank', { accountHolder: e.target.value })} />
+          <Input
+            value={bank.sheba}
+            onChange={e => updateSection('bank', { sheba: e.target.value })}
+            dir="ltr"
+            placeholder="IR..."
+          />
         </Field>
       </SettingsGroup>
 
-
-      <SettingsGroup icon="🔒" title="امنیت" subtitle={security.pinEnabled ? 'قفل با PIN فعال' : 'قفل غیرفعال'} tone="danger">
+      {/* ═══ امنیت ═══ */}
+      <SettingsGroup
+        icon="🔒"
+        title="امنیت"
+        subtitle={security.pinEnabled ? 'قفل با PIN فعال' : 'قفل غیرفعال'}
+        tone="danger"
+      >
         <ToggleRow
           label="قفل با PIN"
-          sub={security.pinEnabled ? "برای غیرفعال کردن، خاموش کن" : "برای فعال کردن، روشن کن"}
+          sub={security.pinEnabled ? 'برای غیرفعال کردن، خاموش کن' : 'برای فعال کردن، روشن کن'}
           value={security.pinEnabled}
           onChange={() => {
             if (security.pinEnabled) {
@@ -122,16 +201,21 @@ export default function ProfileTab() {
           }}
         />
         {security.pinEnabled ? (
-          <>
+          <Grid2>
             <Field label="PIN چهاررقمی">
               <NumField
                 value={security.pin}
                 onChange={e => updateSection('security', { pin: e.target.value.replace(/[^0-9۰-۹]/g, '').slice(0, 4) })}
                 placeholder="••••"
-                type="password" min={0} />
+                type="password"
+                min={0}
+              />
             </Field>
             <Field label="قفل خودکار پس از">
-              <Select value={String(security.autoLockMin)} onChange={e => updateSection('security', { autoLockMin: Math.round(parseFaNum(e.target.value)) })}>
+              <Select
+                value={String(security.autoLockMin)}
+                onChange={e => updateSection('security', { autoLockMin: Math.round(parseFaNum(e.target.value)) })}
+              >
                 <option value="1">۱ دقیقه</option>
                 <option value="5">۵ دقیقه</option>
                 <option value="15">۱۵ دقیقه</option>
@@ -140,7 +224,7 @@ export default function ProfileTab() {
                 <option value="0">غیرفعال</option>
               </Select>
             </Field>
-          </>
+          </Grid2>
         ) : null}
       </SettingsGroup>
 
