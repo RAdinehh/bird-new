@@ -27,7 +27,8 @@ export function resolveBirdType(birdName: string | null | undefined): BirdType |
 
 function findEnvRange(env: EnvRange[], ageDays: number): EnvRange | null {
   if (!env || env.length === 0) return null;
-  const safeAge = Math.max(0, ageDays || 0);
+  // اگر سن 0 یا منفی بود، مثل روز ۱ حساب کن (جوجه تازه هچ‌شده)
+  const safeAge = Math.max(1, ageDays || 0);
   for (const range of env) {
     if (safeAge >= range.dayFrom && safeAge <= range.dayTo) return range;
   }
@@ -36,7 +37,8 @@ function findEnvRange(env: EnvRange[], ageDays: number): EnvRange | null {
 
 function findFeedRange(feed: FeedRange[], ageDays: number): FeedRange | null {
   if (!feed || feed.length === 0) return null;
-  const safeAge = Math.max(0, ageDays || 0);
+  // اگر سن 0 یا منفی بود، مثل روز ۱ حساب کن
+  const safeAge = Math.max(1, ageDays || 0);
   for (const range of feed) {
     if (safeAge >= range.dayFrom && safeAge <= range.dayTo) return range;
   }
