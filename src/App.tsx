@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { safeStorage } from './shr/utils/storage';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import { useSet } from './mod/set/store';
 import { applyTheme } from './cor/theme/applyTheme';
@@ -57,7 +58,7 @@ export default function App() {
   const { locked, unlock } = useAutoLock();
 
   useEffect(() => {
-    if (!localStorage.getItem('pm-onboarding-v2-done')) setShowOnb(true);
+    if (!safeStorage.get('pm-onboarding-v2-done')) setShowOnb(true);
   }, []);
 
   // اعمال تم

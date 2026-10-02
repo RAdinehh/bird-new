@@ -1,3 +1,4 @@
+import { safeStorage } from './storage';
 // لیست کلیدهای localStorage پروژه
 export const PM_KEYS = [
   'pm-settings',
@@ -50,7 +51,7 @@ export function exportAll(): string {
   const data: Record<string, any> = {};
 
   for (const k of PM_KEYS) {
-    const raw = localStorage.getItem(k);
+    const raw = safeStorage.get(k);
     if (raw) {
       try {
         data[k] = JSON.parse(raw);
@@ -100,15 +101,15 @@ export function importAll(backup: BackupFile, mode: 'replace' | 'merge'): { succ
       if (!incoming) continue;
 
       if (mode === 'replace') {
-        localStorage.setItem(k, JSON.stringify(incoming));
+        safeStorage.setJSON(k, incoming);
       } else {
-        const existingRaw = localStorage.getItem(k);
+        const existingRaw = safeStorage.get(k);
         if (!existingRaw) {
-          localStorage.setItem(k, JSON.stringify(incoming));
+          safeStorage.setJSON(k, incoming);
         } else {
-          const existing = JSON.parse(existingRaw);
+          const existing = safeStorage.getJSON(k, {});
           const merged = mergeZustand(existing, incoming);
-          localStorage.setItem(k, JSON.stringify(merged));
+          safeStorage.setJSON(k, merged);
         }
       }
     }
@@ -148,7 +149,7 @@ export function getStats(): BackupStats {
   let totalKeys = 0;
 
   for (const k of PM_KEYS) {
-    const raw = localStorage.getItem(k);
+    const raw = safeStorage.get(k);
     const size = raw ? raw.length : 0;
     totalSize += size;
     if (raw) totalKeys++;

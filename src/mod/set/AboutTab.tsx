@@ -1,4 +1,5 @@
 import { useSet } from './store';
+import { safeStorage } from '../../shr/utils/storage';
 import { useState } from 'react';
 import { Btn, Modal, Tag } from '../../shr/components/ui';
 import { showConfirmAsync, showAlert, showSuccess } from '../../cor/store/dialog';
@@ -116,10 +117,10 @@ export default function AboutTab() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   const counts = {
-    birds: JSON.parse(localStorage.getItem('pm-brd') || '{}')?.state?.birds?.length || 0,
-    breeds: JSON.parse(localStorage.getItem('pm-brd') || '{}')?.state?.breeds?.length || 0,
-    suppliers: JSON.parse(localStorage.getItem('pm-pur') || '{}')?.state?.suppliers?.length || 0,
-    purchases: JSON.parse(localStorage.getItem('pm-pur') || '{}')?.state?.purchases?.length || 0
+    birds: (safeStorage.getJSON('pm-brd', {}) as any)?.state?.birds?.length || 0,
+    breeds: (safeStorage.getJSON('pm-brd', {}) as any)?.state?.breeds?.length || 0,
+    suppliers: (safeStorage.getJSON('pm-pur', {}) as any)?.state?.suppliers?.length || 0,
+    purchases: (safeStorage.getJSON('pm-pur', {}) as any)?.state?.purchases?.length || 0
   };
 
   return (
@@ -162,7 +163,7 @@ export default function AboutTab() {
         <Btn full onClick={() => setOpenFaq(true)}>❓ سؤالات متداول ({toFa(FAQS.length)})</Btn>
         <Btn full onClick={() => setOpenGuide(true)}>📖 راهنمای کاربری</Btn>
         <Btn full onClick={resetHelpBanners}>📖 نمایش مجدد راهنماهای صفحه‌ها</Btn>
-        <Btn full onClick={() => { localStorage.removeItem('pm-onboarding-done'); showAlert('آموزش اولیه بازنشانی شد — صفحه را رفرش کنید'); }}>🔄 بازنشانی آموزش اولیه</Btn>
+        <Btn full onClick={() => { safeStorage.remove('pm-onboarding-done'); showAlert('آموزش اولیه بازنشانی شد — صفحه را رفرش کنید'); }}>🔄 بازنشانی آموزش اولیه</Btn>
       </Section>
 
       {/* مودال سوالات متداول */}

@@ -1,3 +1,4 @@
+import { safeStorage } from '../../shr/utils/storage';
 const KEY = 'pm-error-log';
 const MAX = 100;
 
@@ -42,7 +43,7 @@ export function logError(entry: Omit<LogEntry, 'id' | 'time' | 'url' | 'userAgen
 
 /** پاک کردن لاگ‌ها */
 export function clearLogs(): void {
-  localStorage.removeItem(KEY);
+  safeStorage.remove(KEY);
 }
 
 /** خروجی JSON */

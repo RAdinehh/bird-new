@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef } from 'react';
+import { safeStorage } from '../../shr/utils/storage';
 import { exportAll, validateBackup, importAll, getStats, downloadBackup, readFile, formatSize, type BackupFile } from '../../shr/utils/backup';
 import { useSet } from './store';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -93,7 +94,7 @@ export default function BackupTab() {
     if (!(await showConfirmAsync('تأیید', '⚠ پاک کردن همه‌ی داده‌ها — قابل بازگشت نیست. مطمئن هستید؟', { danger: true, confirmText: 'بله، ادامه' }))) return;
     if (!(await showConfirmAsync('تأیید', 'این آخرین تأیید است. تمام گله‌ها، معاملات، و تنظیمات پاک می‌شوند.', { danger: true, confirmText: 'بله، ادامه' }))) return;
     for (const k of Object.keys(localStorage)) {
-      if (k.startsWith('pm-')) localStorage.removeItem(k);
+      if (k.startsWith('pm-')) safeStorage.remove(k);
     }
     location.reload();
   };

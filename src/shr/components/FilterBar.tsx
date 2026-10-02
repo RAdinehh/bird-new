@@ -1,3 +1,4 @@
+import { safeStorage } from '../utils/storage';
 import { useState } from 'react';
 
 interface FilterChip {
@@ -108,7 +109,7 @@ export function SavedViews({ module, currentParams, onLoad }: SVProps) {
   const save = () => {
     if (!name.trim() || !currentParams) return;
     const next = [...views.filter(v => v.name !== name), { name: name.trim(), params: currentParams }];
-    localStorage.setItem(KEY, JSON.stringify(next));
+    safeStorage.setJSON(KEY, next);
     setViews(next);
     setName('');
     setNaming(false);
@@ -116,7 +117,7 @@ export function SavedViews({ module, currentParams, onLoad }: SVProps) {
 
   const remove = (n: string) => {
     const next = views.filter(v => v.name !== n);
-    localStorage.setItem(KEY, JSON.stringify(next));
+    safeStorage.setJSON(KEY, next);
     setViews(next);
   };
 
