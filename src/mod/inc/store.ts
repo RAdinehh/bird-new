@@ -1,6 +1,8 @@
 /**
  * store.ts — Zustand store ماژول inc (Device, EggEntry, Candling, Hatch)
  */
+import { useSet } from '../set/store';
+import { getIncubation } from '../set/standards';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
@@ -268,31 +270,13 @@ export function isHatchWindow(entry: EggEntry): boolean {
 }
 
 /** طول دوره بر اساس پرنده (پیش‌فرض ۲۱ روز برای مرغ) */
-let _incCache: { key: string; map: Record<string, number> } = { key: '__init__', map: {} };
-
-function _normBird(s: string): string {
-  return (s || '').replace(/[\u{1F300}-\u{1F9FF}]/gu, '').replace(/\s+/g, '').toLowerCase();
-}
-
-function _getProfileDaysMap(): Record<string, number> {
-  try {
-    const stored = localStorage.getItem('pm-settings') || '';
-    if (stored === _incCache.key) return _incCache.map;
-    const parsed = JSON.parse(stored || '{}');
-    const profiles = parsed?.state?.incubationProfiles || parsed?.incubationProfiles || [];
-    const map: Record<string, number> = {};
-    profiles.forEach((p: any) => {
-      if (p?.totalDays) map[_normBird(p.birdName)] = p.totalDays;
-    });
-    _incCache = { key: stored, map };
-    return map;
-  } catch { return {}; }
-}
 
 export function incubationDays(birdName: string): number {
-  const target = _normBird(birdName);
-  const cached = _getProfileDaysMap();
-  if (cached[target]) return cached[target];
+  try {
+    const custom = (useSet.getState() as any).customStandards || {};
+    const inc = getIncubation(birdName, { customStandards: custom });
+    if (inc) return inc.totalDays;
+  } catch { /* silent */ }
   return _fallbackDays(birdName);
 }
 
@@ -308,11 +292,8 @@ function _fallbackDays(birdName: string): number {
 }
 
 /** نسخه pure — از آرایه profiles داده‌شده استفاده می‌کنه (برای useMemo) */
-export function daysFromProfiles(birdName: string, profiles: any[]): number {
-  const target = _normBird(birdName);
-  const found = (profiles || []).find((p: any) => _normBird(p.birdName) === target);
-  if (found?.totalDays) return found.totalDays;
-  return _fallbackDays(birdName);
+export function daysFromProfiles(birdName: string, _profiles?: any[]): number {
+  return incubationDays(birdName);
 }
 
 /** محاسبه‌ی نرخ هچ */
@@ -331,28 +312,16 @@ export function costPerChick(totalCost: number, hatched: number): number {
 /** پر کردن اتوماتیک از پروفایل انکوباسیون بر اساس نام پرنده */
 export function fillCapacityFromProfile(birdName: string): Partial<DeviceCapacity> | null {
   try {
-    const raw = localStorage.getItem('pm-settings');
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    const profiles = parsed?.state?.incubationProfiles || parsed?.incubationProfiles || [];
-    const norm = (s: string) => String(s || '')
-      .replace(/[\u200c\u200f]/g, '')
-      .replace(/[🐔🦃🦆🦢🐦🕊️]/g, '')
-      .trim()
-      .toLowerCase();
-    const target = norm(birdName);
-    const found = profiles.find((p: any) => {
-      const pn = norm(p.birdName);
-      return pn === target || pn.includes(target) || target.includes(pn);
-    });
-    if (!found) return null;
+    const custom = (useSet.getState() as any).customStandards || {};
+    const inc = getIncubation(birdName, { customStandards: custom });
+    if (!inc) return null;
     return {
-      setterTemp: found.setterTemp,
-      setterHumidity: found.setterHumidity,
-      hatcherTemp: found.hatcherTemp,
-      hatcherHumidity: found.hatcherHumidity,
-      totalDays: found.totalDays,
-      lockdownDay: found.lockdownDay,
+      setterTemp: inc.setterTemp,
+      setterHumidity: inc.setterHumidity,
+      hatcherTemp: inc.hatcherTemp,
+      hatcherHumidity: inc.hatcherHumidity,
+      totalDays: inc.totalDays,
+      lockdownDay: inc.lockdownDay,
     };
   } catch { return null; }
 }

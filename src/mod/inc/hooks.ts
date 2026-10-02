@@ -1,8 +1,11 @@
 /**
  * hooks.ts — هوک‌های reactive برای انکوباسیون
+ * از standards (تنظیمات) می‌خونه
  */
+
 import { useSet } from '../set/store';
-import { findProfile, getIncubationDefault, normalizeBird } from './helpers';
+import { getIncubation } from '../set/standards';
+import { getIncubationDefault, normalizeBird } from './helpers';
 
 export interface ResolvedProfile {
   birdName: string;
@@ -16,25 +19,26 @@ export interface ResolvedProfile {
 }
 
 /**
- * هوک reactive — پروفایل انکوباسیون رو از تنظیمات می‌خونه
+ * هوک reactive — پروفایل انکوباسیون رو از standards می‌خونه
  * وقتی کاربر تو تنظیمات تغییر بده، همه جا فوراً آپدیت می‌شه
  */
 export function useIncubationProfile(birdName: string | undefined): ResolvedProfile {
   const settings = useSet();
-  const profiles: any[] = (settings as any).incubationProfiles || [];
+  const custom = (settings as any).customStandards || {};
   const fallback = getIncubationDefault(birdName || 'مرغ');
-  const found = findProfile(profiles, birdName || '');
 
-  if (found) {
+  const inc = getIncubation(birdName || '', { customStandards: custom });
+
+  if (inc) {
     return {
-      birdName: found.birdName,
-      setterTemp: found.setterTemp ?? fallback.setterTemp,
-      setterHumidity: found.setterHumidity ?? fallback.setterHumidity,
-      hatcherTemp: found.hatcherTemp ?? fallback.hatcherTemp,
-      hatcherHumidity: found.hatcherHumidity ?? fallback.hatcherHumidity,
-      totalDays: found.totalDays ?? fallback.totalDays,
-      lockdownDay: found.lockdownDay ?? fallback.lockdownDay,
-      isCustom: true,
+      birdName: birdName || 'مرغ',
+      setterTemp: inc.setterTemp,
+      setterHumidity: inc.setterHumidity,
+      hatcherTemp: inc.hatcherTemp,
+      hatcherHumidity: inc.hatcherHumidity,
+      totalDays: inc.totalDays,
+      lockdownDay: inc.lockdownDay,
+      isCustom: false,  // استاندارد پیش‌فرض (نه سفارشی)
     };
   }
 

@@ -262,9 +262,12 @@ describe('incubationDays — مقادیر پیش‌فرض پرندگان', () =>
 // daysFromProfiles — pure function
 // ═══════════════════════════════════════════════
 describe('daysFromProfiles', () => {
-  it('پیدا در profiles', () => {
-    const profiles = [{ birdName: 'مرغ', totalDays: 25 }];
-    expect(daysFromProfiles('مرغ', profiles)).toBe(25);
+  it('مرغ → 21 (از standards)', () => {
+    expect(daysFromProfiles('مرغ', [])).toBe(21);
+  });
+
+  it('مرندی → 21 (از standards)', () => {
+    expect(daysFromProfiles('مرندی', [])).toBe(21);
   });
 
   it('نبود → fallback', () => {
@@ -275,9 +278,8 @@ describe('daysFromProfiles', () => {
     expect(daysFromProfiles('بوقلمون', null as any)).toBe(28);
   });
 
-  it('مقایسه case-insensitive', () => {
-    const profiles = [{ birdName: 'مرغ', totalDays: 25 }];
-    expect(daysFromProfiles('مرغ', profiles)).toBe(25);
+  it('گوشتی → 21', () => {
+    expect(daysFromProfiles('گوشتی', [])).toBe(21);
   });
 
   it('profile بدون totalDays → fallback', () => {

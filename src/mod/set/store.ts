@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { BirdStandard } from './standards';
 import { persist } from 'zustand/middleware';
 
 
@@ -63,6 +64,9 @@ export interface Settings {
   thresholds: { eggDropPercent: number; mortalityPerThousand: number; tempDeviation: number; humidityDeviation: number; waterFeedMin: number; waterFeedMax: number; criticalTempHigh: number; criticalTempLow: number; },
   dueDateReminders: number[];
 
+  /** استانداردهای سفارشی (ویرایش‌شده توسط کاربر) */
+  customStandards?: Record<string, BirdStandard>;
+
   // پشتیبان
   autoBackup: { enabled: boolean; intervalHours: number; maxVersions: number; };
   encryption: { enabled: boolean; password: string; };
@@ -96,6 +100,7 @@ const defaultSettings: Settings = {
   quietHours: { enabled: false, from: '22:00', to: '07:00', weekends: true },
   thresholds: { eggDropPercent: 10, mortalityPerThousand: 5, tempDeviation: 2, humidityDeviation: 10, waterFeedMin: 1.6, waterFeedMax: 2.2, criticalTempHigh: 32, criticalTempLow: 18 },
   dueDateReminders: [7, 3, 1],
+  customStandards: {},
 
   autoBackup: { enabled: true, intervalHours: 24, maxVersions: 5 },
   encryption: { enabled: false, password: '' },
@@ -115,6 +120,8 @@ interface State extends Settings {
   update: (patch: Partial<Settings>) => void;
   updateSection: <K extends keyof Settings>(key: K, patch: Partial<Settings[K]>) => void;
   reset: () => void;
+  updateStandard: (key: string, std: BirdStandard) => void;
+  resetStandard: (key: string) => void;
   toggleModule: (id: string) => void;
 }
 
@@ -125,6 +132,15 @@ export const useSet = create<State>()(
       update: (patch) => set((state: any) => ({ ...state, ...patch })),
       updateSection: (key, patch) => set((state: any) => ({ ...state, [key]: { ...state[key], ...patch } })),
       reset: () => set(defaultSettings as any),
+      updateStandard: (key: string, std: BirdStandard) => set((state: any) => ({
+        ...state,
+        customStandards: { ...(state.customStandards || {}), [key]: std }
+      })),
+      resetStandard: (key: string) => set((state: any) => {
+        const next = { ...(state.customStandards || {}) };
+        delete next[key];
+        return { ...state, customStandards: next };
+      }),
       toggleModule: (id) => set({
         modules: { ...get().modules, [id]: !get().modules[id] }
       })

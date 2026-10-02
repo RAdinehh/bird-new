@@ -10,11 +10,10 @@ import NotificationsTab from './NotificationsTab';
 import BackupTab from './BackupTab';
 import AboutTab from './AboutTab';
 import LogsTab from './LogsTab';
-import IncubationProfilesTab from './IncubationProfilesTab';
 
 type TabId =
   | 'profile' | 'appearance'
-  | 'modules' | 'incubation' | 'notifications'
+  | 'modules' | 'notifications'
   | 'backup' | 'logs' | 'about';
 
 interface TabDef {
@@ -43,8 +42,7 @@ const GROUPS: GroupDef[] = [
     icon: '🏭',
     tabs: [
       { id: 'modules', label: 'ماژول‌ها', icon: '🧩' },
-      { id: 'incubation', label: 'انکوباسیون', icon: '🐣' },
-      { id: 'notifications', label: 'اعلان‌ها', icon: '🔔' },
+            { id: 'notifications', label: 'اعلان‌ها', icon: '🔔' },
     ],
   },
   {
@@ -75,7 +73,6 @@ const TAB_COMPONENTS: Record<TabId, React.ComponentType> = {
   profile: ProfileTab,
   appearance: AppearanceTab,
   modules: ModulesTab,
-  incubation: IncubationProfilesTab,
   notifications: NotificationsTab,
   backup: BackupTab,
   logs: LogsTab,

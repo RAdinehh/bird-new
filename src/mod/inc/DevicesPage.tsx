@@ -108,9 +108,7 @@ function warrantyInfo(purchasedAt: string, months: number | null): { end: string
 export default function DevicesPage() {
   const { devices, eggEntries, addDevice, updateDevice, deleteDevice } = useInc();
   const settings = useSet();
-  const _profilesSet = useSet((s: any) => s.incubationProfiles) || [];
   const { birds } = useBrd();
-  const profiles: any[] = (settings as any).incubationProfiles || [];
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
@@ -214,17 +212,7 @@ export default function DevicesPage() {
   };
 
   const getProfileDefaults = (birdName: string) => {
-    const norm = (s: string) => String(s || '')
-      .replace(/[\u200c\u200f]/g, '')
-      .replace(/[🐔🦃🦆🦢🐦🕊️]/g, '')
-      .trim()
-      .toLowerCase();
-    const target = norm(birdName);
-    if (!target) return null;
-    return profiles.find((p: any) => {
-      const pn = norm(p.birdName);
-      return pn === target || pn.includes(target) || target.includes(pn);
-    }) || null;
+    return fillCapacityFromProfile(birdName);
   };
 
   const resetSection = (birdName: string, section: 'setter' | 'hatcher' | 'time') => {
