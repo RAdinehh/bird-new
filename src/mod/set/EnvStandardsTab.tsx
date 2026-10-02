@@ -51,9 +51,9 @@ function RangeCard({ title, children }: { title: string; children: React.ReactNo
 }
 
 // ═══════════════════════════════════════════════
-// FieldRow — یک ردیف: لیبل + ورودی + واحد
+// CompactField — لیبل بالا، ورودی پایین (برای گرید ۲ ستونه)
 // ═══════════════════════════════════════════════
-function FieldRow({
+function CompactField({
   label, value, onChange, unit,
 }: {
   label: string;
@@ -62,43 +62,62 @@ function FieldRow({
   unit: string;
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
       <span style={{
-        fontSize: 'var(--fs-sm)',
+        fontSize: 11,
         color: 'var(--muted)',
-        flex: 1,
-        minWidth: 0,
+        fontWeight: 600,
+        textAlign: 'right',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
       }}>{label}</span>
-      <input
-        type="number"
-        value={value ?? ''}
-        onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
-        style={{
-          width: 80,
-          height: 34,
-          padding: '0 8px',
-          background: 'var(--card)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--r-sm)',
-          color: 'var(--text)',
-          fontFamily: 'inherit',
-          fontSize: 'var(--fs-sm)',
-          fontWeight: 600,
-          textAlign: 'center',
-          outline: 'none',
-          fontVariantNumeric: 'tabular-nums',
-          direction: 'ltr',
-        }}
-      />
-      <span style={{
-        fontSize: 11,
-        color: 'var(--muted)',
-        minWidth: 32,
-        textAlign: 'left',
-      }}>{unit}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <input
+          type="number"
+          value={value ?? ''}
+          onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
+          style={{
+            flex: 1,
+            height: 32,
+            padding: '0 6px',
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-sm)',
+            color: 'var(--text)',
+            fontFamily: 'inherit',
+            fontSize: 13,
+            fontWeight: 600,
+            textAlign: 'center',
+            outline: 'none',
+            fontVariantNumeric: 'tabular-nums',
+            direction: 'ltr',
+            minWidth: 0,
+          }}
+        />
+        <span style={{
+          fontSize: 10,
+          color: 'var(--muted)',
+          flexShrink: 0,
+          minWidth: 24,
+          textAlign: 'left',
+        }}>{unit}</span>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════
+// FieldsGrid — گرید ۲ ستونه برای فیلدها
+// ═══════════════════════════════════════════════
+function FieldsGrid({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: '10px 8px',
+    }}>
+      {children}
     </div>
   );
 }
@@ -117,36 +136,38 @@ function EnvEditor({ env, onChange }: { env: EnvRange[]; onChange: (n: EnvRange[
           key={i}
           title={`روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`}
         >
-          <FieldRow
-            label="🌡 دما هدف"
-            value={r.temp.target}
-            onChange={v => update(i, { temp: { ...r.temp, target: v ?? 0 } })}
-            unit="°C"
-          />
-          <FieldRow
-            label="دما حداقل"
-            value={r.temp.min}
-            onChange={v => update(i, { temp: { ...r.temp, min: v ?? 0 } })}
-            unit="°C"
-          />
-          <FieldRow
-            label="دما حداکثر"
-            value={r.temp.max}
-            onChange={v => update(i, { temp: { ...r.temp, max: v ?? 0 } })}
-            unit="°C"
-          />
-          <FieldRow
-            label="💧 رطوبت حداقل"
-            value={r.humidity.min}
-            onChange={v => update(i, { humidity: { ...r.humidity, min: v ?? 0 } })}
-            unit="٪"
-          />
-          <FieldRow
-            label="رطوبت حداکثر"
-            value={r.humidity.max}
-            onChange={v => update(i, { humidity: { ...r.humidity, max: v ?? 0 } })}
-            unit="٪"
-          />
+          <FieldsGrid>
+            <CompactField
+              label="🌡 دما هدف"
+              value={r.temp.target}
+              onChange={v => update(i, { temp: { ...r.temp, target: v ?? 0 } })}
+              unit="°C"
+            />
+            <CompactField
+              label="دما حداقل"
+              value={r.temp.min}
+              onChange={v => update(i, { temp: { ...r.temp, min: v ?? 0 } })}
+              unit="°C"
+            />
+            <CompactField
+              label="دما حداکثر"
+              value={r.temp.max}
+              onChange={v => update(i, { temp: { ...r.temp, max: v ?? 0 } })}
+              unit="°C"
+            />
+            <CompactField
+              label="💧 رطوبت حداقل"
+              value={r.humidity.min}
+              onChange={v => update(i, { humidity: { ...r.humidity, min: v ?? 0 } })}
+              unit="٪"
+            />
+            <CompactField
+              label="رطوبت حداکثر"
+              value={r.humidity.max}
+              onChange={v => update(i, { humidity: { ...r.humidity, max: v ?? 0 } })}
+              unit="٪"
+            />
+          </FieldsGrid>
         </RangeCard>
       ))}
     </div>
@@ -167,30 +188,32 @@ function FeedEditor({ feed, onChange }: { feed: FeedRange[]; onChange: (n: FeedR
           key={i}
           title={`روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`}
         >
-          <FieldRow
-            label="🌾 دان"
-            value={r.feedG}
-            onChange={v => update(i, { feedG: v ?? 0 })}
-            unit="گرم"
-          />
-          <FieldRow
-            label="💧 آب"
-            value={r.waterMl}
-            onChange={v => update(i, { waterMl: v ?? 0 })}
-            unit="ml"
-          />
-          <FieldRow
-            label="🥩 پروتئین"
-            value={r.proteinPct ?? null}
-            onChange={v => update(i, { proteinPct: v ?? undefined })}
-            unit="٪"
-          />
-          <FieldRow
-            label="⚡ انرژی"
-            value={r.energyKcal ?? null}
-            onChange={v => update(i, { energyKcal: v ?? undefined })}
-            unit="kcal"
-          />
+          <FieldsGrid>
+            <CompactField
+              label="🌾 دان"
+              value={r.feedG}
+              onChange={v => update(i, { feedG: v ?? 0 })}
+              unit="گرم"
+            />
+            <CompactField
+              label="💧 آب"
+              value={r.waterMl}
+              onChange={v => update(i, { waterMl: v ?? 0 })}
+              unit="ml"
+            />
+            <CompactField
+              label="🥩 پروتئین"
+              value={r.proteinPct ?? null}
+              onChange={v => update(i, { proteinPct: v ?? undefined })}
+              unit="٪"
+            />
+            <CompactField
+              label="⚡ انرژی"
+              value={r.energyKcal ?? null}
+              onChange={v => update(i, { energyKcal: v ?? undefined })}
+              unit="kcal"
+            />
+          </FieldsGrid>
         </RangeCard>
       ))}
     </div>
@@ -211,24 +234,26 @@ function GrowthEditor({ growth, onChange }: { growth: GrowthRange[]; onChange: (
           key={i}
           title={`روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`}
         >
-          <FieldRow
-            label="⚖️ وزن"
-            value={r.weightG}
-            onChange={v => update(i, { weightG: v ?? 0 })}
-            unit="گرم"
-          />
-          <FieldRow
-            label="📈 افزایش روزانه (ADG)"
-            value={r.adgG}
-            onChange={v => update(i, { adgG: v ?? 0 })}
-            unit="گرم"
-          />
-          <FieldRow
-            label="🎯 FCR"
-            value={r.fcr}
-            onChange={v => update(i, { fcr: v ?? 0 })}
-            unit="—"
-          />
+          <FieldsGrid>
+            <CompactField
+              label="⚖️ وزن"
+              value={r.weightG}
+              onChange={v => update(i, { weightG: v ?? 0 })}
+              unit="گرم"
+            />
+            <CompactField
+              label="📈 ADG"
+              value={r.adgG}
+              onChange={v => update(i, { adgG: v ?? 0 })}
+              unit="گرم"
+            />
+            <CompactField
+              label="🎯 FCR"
+              value={r.fcr}
+              onChange={v => update(i, { fcr: v ?? 0 })}
+              unit="—"
+            />
+          </FieldsGrid>
         </RangeCard>
       ))}
     </div>
@@ -249,7 +274,7 @@ function MortalityEditor({ mortality, onChange }: { mortality: MortalityRange[];
           key={i}
           title={`روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`}
         >
-          <FieldRow
+          <CompactField
             label="💀 حداکثر تلفات"
             value={r.maxPct}
             onChange={v => update(i, { maxPct: v ?? 0 })}
