@@ -28,6 +28,27 @@ const TITLES: Record<string, string> = {
 const FIRST_VISIT_KEY = 'pm-onboarding-done';
 
 function Layout() {
+  // Prefetch common modules in background (speed up navigation)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      import('./mod/dsh/Dashboard');
+      import('./mod/dlg');
+      import('./mod/inc');
+      import('./mod/brd');
+      import('./mod/flk');
+      import('./mod/whs');
+      import('./mod/tra');
+      import('./mod/set');
+      import('./mod/hal');
+      import('./mod/fed');
+      import('./mod/ctc');
+      import('./mod/rep');
+      import('./mod/alt');
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   const loc = useLocation();
   const title = TITLES[loc.pathname] ?? 'مدیریت مرغداری';
   useKeyboard();
