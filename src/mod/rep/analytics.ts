@@ -87,7 +87,8 @@ export function eggsInMonth(productions: any[], month: string): { healthy: numbe
   productions.forEach(p => {
     if (monthKey(p.date) === month) {
       healthy += healthyCount(p);
-      total += (p.totalCount || 0) + (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0);
+      // totalCount شامل همه‌ی تخم‌ها (سالم + شکسته + نرم + کثیف) است
+      total += p.totalCount || 0;
       days++;
     }
   });
