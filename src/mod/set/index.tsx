@@ -7,6 +7,7 @@ import { useCarousel } from '../../shr/hooks/useCarousel';
 import ProfileTab from './ProfileTab';
 import AppearanceTab from './AppearanceTab';
 import ModulesTab from './ModulesTab';
+import UnitsTab from './units/UnitsTab';
 import NotificationsTab from './NotificationsTab';
 import BackupTab from './BackupTab';
 import AboutTab from './AboutTab';
@@ -16,7 +17,8 @@ type TabId =
   | 'profile' | 'appearance'
   | 'modules' | 'notifications'
   | 'backup' | 'logs' | 'about'
-  | 'standards';
+  | 'standards'
+  | 'units';
 
 interface TabDef {
   id: TabId;
@@ -45,6 +47,7 @@ const GROUPS: GroupDef[] = [
     tabs: [
       { id: 'modules', label: 'ماژول‌ها', icon: '🧩' },
       { id: 'standards', label: 'استانداردها', icon: '📏' },
+      { id: 'units', label: 'واحدها', icon: '📐' },
             { id: 'notifications', label: 'اعلان‌ها', icon: '🔔' },
     ],
   },
@@ -77,6 +80,7 @@ const TAB_COMPONENTS: Record<TabId, React.ComponentType> = {
   appearance: AppearanceTab,
   modules: ModulesTab,
   standards: EnvStandardsTab,
+  units: UnitsTab,
   notifications: NotificationsTab,
   backup: BackupTab,
   logs: LogsTab,
