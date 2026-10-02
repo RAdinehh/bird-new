@@ -3,16 +3,7 @@ import type { BirdStandard } from './standards';
 import { persist } from 'zustand/middleware';
 
 
-export interface IncubationProfile {
-  id: string;
-  birdName: string;
-  setterTemp: number;
-  setterHumidity: number;
-  hatcherTemp: number;
-  hatcherHumidity: number;
-  totalDays: number;
-  lockdownDay: number;
-}
+
 
 export interface Settings {
   schemaVersion: number;
@@ -31,12 +22,6 @@ export interface Settings {
     currency: string; length: string; weight: string; volume: string;
     temperature: string; area: string; dateFormat: string;
     numberFormat: string; thousandSep: string; decimals: string;
-  };
-  // پیش‌فرض کشاورزی
-  defaults: {
-    birdType: string; flockSize: string; hatchDays: string;
-    setterTemp: string; hatcherTemp: string;
-    setterHumidity: string; hatcherHumidity: string; lockdownDay: string;
   };
   // امنیت
   security: { pinEnabled: boolean; pin: string; recoveryHash?: string; autoLockMin: number; };
@@ -71,7 +56,6 @@ export interface Settings {
   autoBackup: { enabled: boolean; intervalHours: number; maxVersions: number; };
   encryption: { enabled: boolean; password: string; };
   auditLog: { enabled: boolean; maxEntries: number; };
-  incubationProfiles?: IncubationProfile[];
 }
 
 const defaultSettings: Settings = {
@@ -80,18 +64,6 @@ const defaultSettings: Settings = {
   farm: { name: '', type: 'layer', province: '', city: '', address: '', postalCode: '', phone: '', licenseNo: '', establishedAt: '', logo: '' },
   bank: { cardNo: '', sheba: '', bankName: '', accountHolder: '' },
   units: { currency: 'toman', length: 'm', weight: 'kg', volume: 'L', temperature: 'c', area: 'm2', dateFormat: 'jalali', numberFormat: 'fa', thousandSep: '،', decimals: '2' },
-  defaults: { birdType: '', flockSize: '', hatchDays: '21', setterTemp: '37.8', hatcherTemp: '37.5', setterHumidity: '55', hatcherHumidity: '68', lockdownDay: '18' },
-  security: { pinEnabled: false, pin: '', autoLockMin: 5 },
-
-  theme: 'light', accentColor: 'green', fontSize: 'medium',
-  density: 'comfortable', animations: true, highContrast: false,
-  lowPowerMode: false, printPaper: 'A4',
-
-  modules: {
-    dsh: true, brd: true, hal: true, ctc: true, flk: true,
-    inc: true, egg: true, dlg: true, whs: true, fed: true,
-    tra: true, rep: true, alt: true, arc: true, set: true
-  },
 
   bottomNav: ['dsh', 'dlg', 'inc', 'rep', 'set'],
 
@@ -100,20 +72,21 @@ const defaultSettings: Settings = {
   quietHours: { enabled: false, from: '22:00', to: '07:00', weekends: true },
   thresholds: { eggDropPercent: 10, mortalityPerThousand: 5, tempDeviation: 2, humidityDeviation: 10, waterFeedMin: 1.6, waterFeedMax: 2.2, criticalTempHigh: 32, criticalTempLow: 18 },
   dueDateReminders: [7, 3, 1],
+  security: { pinEnabled: false, pin: '', autoLockMin: 0 },
+  theme: 'light',
+  accentColor: 'green',
+  fontSize: 'medium',
+  density: 'comfortable',
+  animations: true,
+  highContrast: false,
+  lowPowerMode: false,
+  printPaper: 'A4',
+  modules: {},
   customStandards: {},
 
   autoBackup: { enabled: true, intervalHours: 24, maxVersions: 5 },
   encryption: { enabled: false, password: '' },
   auditLog: { enabled: true, maxEntries: 100 },
-  incubationProfiles: [
-    { id: 'chicken',  birdName: '🐔 مرغ',      setterTemp: 37.7, setterHumidity: 50, hatcherTemp: 37.2, hatcherHumidity: 62, totalDays: 21, lockdownDay: 18 },
-    { id: 'turkey',   birdName: '🦃 بوقلمون',  setterTemp: 37.6, setterHumidity: 53, hatcherTemp: 37.1, hatcherHumidity: 68, totalDays: 28, lockdownDay: 25 },
-    { id: 'duck',     birdName: '🦆 اردک',     setterTemp: 37.6, setterHumidity: 57, hatcherTemp: 37.2, hatcherHumidity: 72, totalDays: 28, lockdownDay: 25 },
-    { id: 'goose',    birdName: '🦢 غاز',      setterTemp: 37.6, setterHumidity: 57, hatcherTemp: 37.1, hatcherHumidity: 72, totalDays: 30, lockdownDay: 27 },
-    { id: 'quail',    birdName: '🐦 بلدرچین',  setterTemp: 37.6, setterHumidity: 53, hatcherTemp: 37.2, hatcherHumidity: 68, totalDays: 18, lockdownDay: 15 },
-    { id: 'pheasant', birdName: '🐦 قرقاول',   setterTemp: 37.6, setterHumidity: 53, hatcherTemp: 37.2, hatcherHumidity: 68, totalDays: 24, lockdownDay: 21 },
-    { id: 'pigeon',   birdName: '🕊 کبوتر',    setterTemp: 37.6, setterHumidity: 53, hatcherTemp: 37.2, hatcherHumidity: 68, totalDays: 17, lockdownDay: 14 },
-  ],
 };
 
 interface State extends Settings {

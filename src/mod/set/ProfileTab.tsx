@@ -8,7 +8,7 @@ import PinSetupModal from '../../shr/components/PinSetupModal';
 import { showToast } from '../../cor/store/toast';
 
 export default function ProfileTab() {
-  const { user, farm, bank, units, defaults, security, updateSection } = useSet();
+  const { user, farm, bank, units, security, updateSection } = useSet();
   const [showPinSetup, setShowPinSetup] = useState(false);
 
   const U = (k: string, label: string, opts: [string, string][]) => (
@@ -129,34 +129,6 @@ export default function ProfileTab() {
           {U('thousandSep', 'جداکننده هزار', [['،', '،'], [',', ','], ['.', '.']])}
           {U('decimals', 'دقت اعشار', [['0', '۰ رقم'], ['1', '۱ رقم'], ['2', '۲ رقم'], ['3', '۳ رقم']])}
         </Grid2>
-      </SettingsGroup>
-
-      <SettingsGroup icon="🐔" title="پیش‌فرض‌های کشاورزی" subtitle={`Setter ${toFa(defaults.setterTemp)}° · Hatcher ${toFa(defaults.hatcherTemp)}°`} tone="accent">
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-          این مقادیر در فرم‌های جدید پیش‌فرض می‌شوند
-        </div>
-        <Grid2>
-          <Field label="نوع پرنده پیش‌فرض">
-            <Input value={defaults.birdType} onChange={e => updateSection('defaults', { birdType: e.target.value })} placeholder="مرغ" />
-          </Field>
-          <Field label="اندازه‌ی گله">
-            <NumField placeholder="مثلاً — ۵۰۰" value={defaults.flockSize} onChange={e => updateSection('defaults', { flockSize: e.target.value })} min={0} unit="پرنده" />
-          </Field>
-        </Grid2>
-        <Field label="طول دوره‌ی جوجه‌کشی">
-          <NumField placeholder="مثلاً — ۳" value={defaults.hatchDays} onChange={e => updateSection('defaults', { hatchDays: e.target.value })} unit="روز" min={1} />
-        </Field>
-        <Grid2>
-          <Field label="دمای Setter"><NumField value={defaults.setterTemp} onChange={e => updateSection('defaults', { setterTemp: e.target.value })} unit="°C" min={-10} /></Field>
-          <Field label="دمای Hatcher"><NumField value={defaults.hatcherTemp} onChange={e => updateSection('defaults', { hatcherTemp: e.target.value })} unit="°C" min={-10} /></Field>
-        </Grid2>
-        <Grid2>
-          <Field label="رطوبت Setter"><NumField value={defaults.setterHumidity} onChange={e => updateSection('defaults', { setterHumidity: e.target.value })} unit="٪" min={-10} /></Field>
-          <Field label="رطوبت Hatcher"><NumField value={defaults.hatcherHumidity} onChange={e => updateSection('defaults', { hatcherHumidity: e.target.value })} unit="٪" min={0} /></Field>
-        </Grid2>
-        <Field label="روز شروع Lock-down">
-          <NumField placeholder="مثلاً — ۷" value={defaults.lockdownDay} onChange={e => updateSection('defaults', { lockdownDay: e.target.value })} unit="روز" min={0} />
-        </Field>
       </SettingsGroup>
 
       <SettingsGroup icon="🔒" title="امنیت" subtitle={security.pinEnabled ? 'قفل با PIN فعال' : 'قفل غیرفعال'} tone="danger">

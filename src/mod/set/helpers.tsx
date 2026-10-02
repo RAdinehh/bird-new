@@ -9,7 +9,7 @@ import { showToast } from '../../cor/store/toast';
 import { Btn, BtnRow, DigitField, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, PhoneField, Select, Tag } from '../../shr/components/ui';
 import { downloadBackup, exportAll, formatSize, getStats, importAll, readFile, type BackupFile, validateBackup } from '../../shr/utils/backup';
 import { toEn, toFa } from '../../shr/utils/fa';
-import { MODULE_LABELS, type IncubationProfile, useSet } from './store';
+import { MODULE_LABELS, useSet } from './store';
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
