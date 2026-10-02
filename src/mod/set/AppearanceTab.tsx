@@ -45,16 +45,18 @@ export default function AppearanceTab() {
       </SettingsGroup>
 
       <SettingsGroup icon="🔤" title="فونت و چیدمان" subtitle={`اندازه ${fontSizes.find(f => f[0] === s.fontSize)?.[1] || 'متوسط'}`} tone="info">
-        <Field label="اندازه فونت">
-          <Select value={s.fontSize} onChange={e => s.update({ fontSize: e.target.value as any })}>
-            {fontSizes.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-          </Select>
-        </Field>
-        <Field label="حالت نمایش">
-          <Select value={s.density} onChange={e => s.update({ density: e.target.value as any })}>
-            {densities.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-          </Select>
-        </Field>
+        <Grid2>
+          <Field label="اندازه فونت">
+            <Select value={s.fontSize} onChange={e => s.update({ fontSize: e.target.value as any })}>
+              {fontSizes.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+            </Select>
+          </Field>
+          <Field label="حالت نمایش">
+            <Select value={s.density} onChange={e => s.update({ density: e.target.value as any })}>
+              {densities.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+            </Select>
+          </Field>
+        </Grid2>
         <ToggleRow
           label="انیمیشن‌ها"
           sub="باز/بسته شدن کارت‌ها و مودال‌ها"
@@ -101,36 +103,38 @@ export default function AppearanceTab() {
           })}
         </div>
 
-        {[0, 1, 2, 3, 4].map(slot => {
-          const currentId = s.bottomNav[slot] || '';
-          const usedIds = s.bottomNav.filter((x, i) => i !== slot && x);
-          return (
-            <Field key={slot} label={`جای ${toFa(slot + 1)}${slot === 0 ? ' (قفل)' : ''}`}>
-              <Select
-                value={currentId}
-                disabled={slot === 0}
-                onChange={e => {
-                  const newNav = [...s.bottomNav];
-                  newNav[slot] = e.target.value;
-                  s.update({ bottomNav: newNav });
-                }}
-              >
-                {slot === 0 ? (
-                  <option value="dsh">🏠 داشبورد</option>
-                ) : (
-                  <>
-                    <option value="">— خالی —</option>
-                    {Object.entries(MODULE_LABELS).map(([id, m]) => {
-                      if (id === 'dsh') return null;
-                      if (usedIds.includes(id)) return null;
-                      return <option key={id} value={id}>{m.icon} {m.name}</option>;
-                    })}
-                  </>
-                )}
-              </Select>
-            </Field>
-          );
-        })}
+        <Grid2>
+          {[0, 1, 2, 3, 4].map(slot => {
+            const currentId = s.bottomNav[slot] || '';
+            const usedIds = s.bottomNav.filter((x, i) => i !== slot && x);
+            return (
+              <Field key={slot} label={`جای ${toFa(slot + 1)}${slot === 0 ? ' (قفل)' : ''}`}>
+                <Select
+                  value={currentId}
+                  disabled={slot === 0}
+                  onChange={e => {
+                    const newNav = [...s.bottomNav];
+                    newNav[slot] = e.target.value;
+                    s.update({ bottomNav: newNav });
+                  }}
+                >
+                  {slot === 0 ? (
+                    <option value="dsh">🏠 داشبورد</option>
+                  ) : (
+                    <>
+                      <option value="">— خالی —</option>
+                      {Object.entries(MODULE_LABELS).map(([id, m]) => {
+                        if (id === 'dsh') return null;
+                        if (usedIds.includes(id)) return null;
+                        return <option key={id} value={id}>{m.icon} {m.name}</option>;
+                      })}
+                    </>
+                  )}
+                </Select>
+              </Field>
+            );
+          })}
+        </Grid2>
 
         <Btn size="sm" full onClick={() => s.update({ bottomNav: ['dsh', 'dlg', 'inc', 'rep', 'set'] })}>
           🔄 بازنشانی به پیش‌فرض
