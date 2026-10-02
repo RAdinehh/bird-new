@@ -25,6 +25,7 @@ import {
   type FeedRange,
   type GrowthRange,
   type MortalityRange,
+  resolveBirdType,
 } from './standards';
 
 // ═══ NumCell ═══
@@ -486,31 +487,30 @@ export default function EnvStandardsTab() {
     ...Object.keys(custom),
   ]));
 
-  // پرنده‌های فعال
-  const activeBirdNames = new Set<string>();
+  // پرنده‌های فعال — بر اساس birdType (نه اسم خام)
+  const activeBirdKeys = new Set<string>();
   (flocks || [])
     .filter((f: any) => f.status === 'active')
     .forEach((f: any) => {
       const brd = (brdBirds || []).find((b: any) => b.id === f.birdId);
-      if (brd?.name) activeBirdNames.add(brd.name.trim());
+      if (!brd?.name) return;
+      // resolveBirdType اسم رو به key تبدیل می‌کنه (مرغ → marandi)
+      const key = resolveBirdType(brd.name);
+      if (key) activeBirdKeys.add(key);
     });
 
   const flockCountFor = (key: string): number => {
-    const stdName = (custom[key] || DEFAULT_STANDARDS[key])?.nameFa;
-    if (!stdName) return 0;
     return (flocks || []).filter((f: any) => {
       if (f.status !== 'active') return false;
       const brd = (brdBirds || []).find((b: any) => b.id === f.birdId);
-      return brd?.name?.trim() === stdName.trim();
+      if (!brd?.name) return false;
+      const resolvedKey = resolveBirdType(brd.name);
+      return resolvedKey === key;
     }).length;
   };
 
   const visibleKeys = onlyActive
-    ? allKeys.filter((k) => {
-        const std = custom[k] || DEFAULT_STANDARDS[k];
-        if (!std) return false;
-        return activeBirdNames.has(std.nameFa.trim());
-      })
+    ? allKeys.filter((k) => activeBirdKeys.has(k))
     : allKeys;
 
   const handleAddBird = (key: string, nameFa: string, nameEn: string, template: BirdStandard) => {
@@ -530,33 +530,8 @@ export default function EnvStandardsTab() {
     showToast('همه به پیش‌فرض برگشتند', 'success', 2000);
   };
 
-  // DEBUG
-  const debugInfo = {
-    flocksCount: (flocks || []).length,
-    activeFlocks: (flocks || []).filter((f: any) => f.status === 'active').length,
-    brdBirdsCount: (brdBirds || []).length,
-    activeBirdNames: Array.from(activeBirdNames),
-    birdNames: (brdBirds || []).map((b: any) => b.name),
-    stdNames: allKeys.map(k => (custom[k] || DEFAULT_STANDARDS[k])?.nameFa),
-  };
-
   return (
     <PageContainer>
-      <div style={{
-        padding: 8,
-        background: 'var(--danger-soft)',
-        border: '1px solid var(--danger)',
-        borderRadius: 'var(--r-sm)',
-        fontSize: 10,
-        color: 'var(--danger)',
-        fontFamily: 'monospace',
-        direction: 'ltr',
-        textAlign: 'left',
-        whiteSpace: 'pre-wrap',
-        lineHeight: 1.5,
-      }}>
-        {JSON.stringify(debugInfo, null, 2)}
-      </div>
 
       <div style={{
         padding: 'var(--pad-normal)',

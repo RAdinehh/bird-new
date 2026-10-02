@@ -9,7 +9,7 @@
  */
 
 import type {
-  BirdType, EnvRange, FeedRange, GrowthRange, BirdStandard,
+  EnvRange, FeedRange, GrowthRange, BirdStandard,
   EffectiveEnv, EffectiveFeed, EffectiveGrowth, ResolveSource,
   BiologyStandard, SpaceStandard, EquipmentRatios, ProductionStandard,
   MortalityRange, IncubationStandard,
@@ -17,18 +17,19 @@ import type {
 import { DEFAULT_STANDARDS, FALLBACK_ENV, FALLBACK_FEED, FALLBACK_GROWTH } from './data';
 
 // ═══ نگاشت نام فارسی → key ═══
-const NAME_TO_KEY: Record<string, BirdType> = {
+const NAME_TO_KEY: Record<string, string> = {
+  // نژادهای بومی
   'مرندی': 'marandi',
   'گلپایگانی': 'golpaygani',
   'گلین': 'gilini',
-  'مرغ': 'marandi',
-  'مرغ گوشتی': 'broiler',
+  // نژادهای صنعتی
   'گوشتی': 'broiler',
-  'مرغ تخمگذار': 'layer',
+  'مرغ گوشتی': 'broiler',
   'تخمگذار': 'layer',
+  'مرغ تخمگذار': 'layer',
 };
 
-export function resolveBirdType(birdName: string | null | undefined): BirdType | null {
+export function resolveBirdType(birdName: string | null | undefined): string | null {
   if (!birdName) return null;
   const clean = birdName.trim();
   if (NAME_TO_KEY[clean]) return NAME_TO_KEY[clean];
@@ -53,7 +54,7 @@ export interface ResolveOptions {
 }
 
 function getStandard(
-  birdType: BirdType | null,
+  birdType: string | null,
   opts?: ResolveOptions,
 ): { std: BirdStandard | null; source: 'settings' | 'default' } {
   if (!birdType) return { std: null, source: 'default' };
@@ -64,11 +65,11 @@ function getStandard(
   return { std: null, source: 'default' };
 }
 
-function resolveKey(birdNameOrKey: string | null | undefined): BirdType | null {
+function resolveKey(birdNameOrKey: string | null | undefined): string | null {
   if (!birdNameOrKey) return null;
   const direct = NAME_TO_KEY[birdNameOrKey];
   if (direct) return direct;
-  if (birdNameOrKey in DEFAULT_STANDARDS) return birdNameOrKey as BirdType;
+  if (birdNameOrKey in DEFAULT_STANDARDS) return birdNameOrKey as string;
   // تلاش با includes
   return resolveBirdType(birdNameOrKey);
 }
@@ -230,4 +231,18 @@ export function getStandardFor(
   const key = resolveKey(birdNameOrKey);
   const { std } = getStandard(key, opts);
   return std;
+}
+
+// ═══ گروه‌بندی استانداردها بر اساس پرنده مادر ═══
+export function getStandardsGroupedByBird(
+  customStandards?: Record<string, BirdStandard>,
+): Record<string, BirdStandard[]> {
+  const all: Record<string, BirdStandard> = { ...DEFAULT_STANDARDS, ...(customStandards || {}) };
+  const groups: Record<string, BirdStandard[]> = {};
+  Object.values(all).forEach((std: any) => {
+    const bird = std.birdName || 'سایر';
+    if (!groups[bird]) groups[bird] = [];
+    groups[bird].push(std);
+  });
+  return groups;
 }

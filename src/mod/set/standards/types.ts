@@ -116,8 +116,9 @@ export interface IncubationStandard {
 
 // ═══ استاندارد کامل پرنده ═══
 export interface BirdStandard {
-  key: BirdType;
-  nameFa: string;
+  key: string;              // کلید نژاد (marandi, golpaygani, ...)
+  birdName: string;         // پرنده مادر (مرغ، بوقلمون، ...)
+  nameFa: string;           // نام نژاد
   nameEn: string;
   category: BirdCategory;
 

@@ -41,6 +41,7 @@ const CHICKEN_INCUBATION: IncubationStandard = {
 // ═══════════════════════════════════════════════
 const MARANDI: BirdStandard = {
   key: 'marandi',
+  birdName: 'مرغ',
   nameFa: 'مرندی',
   nameEn: 'Marandi',
   category: 'native',
@@ -133,6 +134,7 @@ const MARANDI: BirdStandard = {
 // ═══════════════════════════════════════════════
 const GOLPAYGANI: BirdStandard = {
   key: 'golpaygani',
+  birdName: 'مرغ',
   nameFa: 'گلپایگانی',
   nameEn: 'Golpaygani',
   category: 'native',
@@ -223,6 +225,7 @@ const GOLPAYGANI: BirdStandard = {
 // ═══════════════════════════════════════════════
 const GILINI: BirdStandard = {
   key: 'gilini',
+  birdName: 'مرغ',
   nameFa: 'گلین',
   nameEn: 'Gilini',
   category: 'native',
@@ -313,6 +316,7 @@ const GILINI: BirdStandard = {
 // ═══════════════════════════════════════════════
 const BROILER: BirdStandard = {
   key: 'broiler',
+  birdName: 'مرغ',
   nameFa: 'مرغ گوشتی',
   nameEn: 'Broiler (Ross 308)',
   category: 'industrial',
@@ -397,6 +401,7 @@ const BROILER: BirdStandard = {
 // ═══════════════════════════════════════════════
 const LAYER: BirdStandard = {
   key: 'layer',
+  birdName: 'مرغ',
   nameFa: 'مرغ تخمگذار',
   nameEn: 'Layer (Hy-Line Brown)',
   category: 'industrial',
