@@ -1,10 +1,5 @@
 /**
- * EnvStandardsTab.tsx — استانداردهای پرنده‌ها
- *
- * معماری:
- *   - لیست پرنده‌ها (صفحه اصلی) + toggle فقط فعال
- *   - کلیک روی هر پرنده → Sheet جزئیات با ۹ آکاردئون
- *   - دکمه افزودن پرنده جدید
+ * EnvStandardsTab.tsx — استانداردهای نژادها گروه‌بندی‌شده بر اساس پرنده مادر
  */
 
 import { useState } from 'react';
@@ -20,12 +15,12 @@ import { useFlk } from '../flk/store';
 import { toFa } from '../../shr/utils/fa';
 import {
   DEFAULT_STANDARDS,
+  getStandardsGroupedByBird,
   type BirdStandard,
   type EnvRange,
   type FeedRange,
   type GrowthRange,
   type MortalityRange,
-  resolveBirdType,
 } from './standards';
 
 // ═══ NumCell ═══
@@ -186,7 +181,7 @@ function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose: () => 
   const isCustom = !!custom[birdKey];
   const std: BirdStandard = custom[birdKey] || DEFAULT_STANDARDS[birdKey] || {
     ...DEFAULT_STANDARDS.marandi,
-    key: birdKey as any,
+    key: birdKey,
   };
 
   const updateBird = (patch: Partial<BirdStandard>) => {
@@ -196,7 +191,7 @@ function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose: () => 
   const resetBird = async () => {
     const ok = await showConfirmAsync(
       'بازگشت به پیش‌فرض',
-      'همه ویرایش‌های این پرنده حذف شود؟',
+      'همه ویرایش‌های این نژاد حذف شود؟',
       { danger: true }
     );
     if (!ok) return;
@@ -209,13 +204,16 @@ function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose: () => 
       <PageContainer>
         <SettingsGroup icon="📝" title="نام‌ها" tone="info">
           <Grid2>
-            <Field label="نام فارسی">
+            <Field label="نام نژاد (فارسی)">
               <Input value={std.nameFa} onChange={e => updateBird({ nameFa: e.target.value })} />
             </Field>
-            <Field label="نام انگلیسی">
+            <Field label="نام نژاد (انگلیسی)">
               <Input value={std.nameEn} onChange={e => updateBird({ nameEn: e.target.value })} />
             </Field>
           </Grid2>
+          <Field label="پرنده مادر" hint="مثلاً — مرغ، بوقلمون، اردک">
+            <Input value={std.birdName} onChange={e => updateBird({ birdName: e.target.value })} />
+          </Field>
         </SettingsGroup>
 
         <SettingsGroup icon="🧬" title="بیولوژی" tone="accent">
@@ -283,9 +281,9 @@ function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose: () => 
           </Field>
         </SettingsGroup>
 
-        {isCustom && (
+        {isCustom ? (
           <Btn onClick={resetBird} full>🔄 بازگشت به پیش‌فرض</Btn>
-        )}
+        ) : null}
       </PageContainer>
     </Sheet>
   );
@@ -298,71 +296,44 @@ function AddBirdModal({
   open: boolean;
   onClose: () => void;
   existingCustom: Record<string, BirdStandard>;
-  onAdd: (key: string, nameFa: string, nameEn: string, template: BirdStandard) => void;
+  onAdd: (key: string, nameFa: string, nameEn: string, birdName: string, template: BirdStandard) => void;
 }) {
-  const { birds } = useBrd();
-  const [mode, setMode] = useState<'from-brd' | 'custom'>('from-brd');
-  const [selectedBrdBird, setSelectedBrdBird] = useState<string>('');
   const [customNameFa, setCustomNameFa] = useState('');
   const [customNameEn, setCustomNameEn] = useState('');
+  const [customBirdName, setCustomBirdName] = useState('مرغ');
   const [templateKey, setTemplateKey] = useState<string>('marandi');
   const [err, setErr] = useState('');
 
   const allStandardKeys = Object.keys(DEFAULT_STANDARDS);
   const existingKeys = Object.keys(existingCustom);
 
-  const brdBirdsWithoutStd = (birds || []).filter((b: any) => {
-    const key = b.name.trim().toLowerCase().replace(/\s+/g, '-');
-    return !allStandardKeys.includes(b.name.trim()) && !existingKeys.includes(key);
-  });
-
   const reset = () => {
-    setSelectedBrdBird('');
     setCustomNameFa('');
     setCustomNameEn('');
+    setCustomBirdName('مرغ');
     setTemplateKey('marandi');
     setErr('');
   };
 
   const handleAdd = () => {
-    if (mode === 'from-brd') {
-      if (!selectedBrdBird) { setErr('پرنده‌ای انتخاب کنید'); return; }
-      const bird = birds.find((b: any) => b.id === selectedBrdBird);
-      if (!bird) { setErr('پرنده پیدا نشد'); return; }
-      const key = bird.name.trim().toLowerCase().replace(/\s+/g, '-');
-      const template = existingCustom[templateKey] || DEFAULT_STANDARDS[templateKey];
-      onAdd(key, bird.name, bird.nameEn || bird.name, template);
-      reset();
-      onClose();
-    } else {
-      if (!customNameFa.trim()) { setErr('نام فارسی اجباری است'); return; }
-      const key = customNameFa.trim().toLowerCase().replace(/\s+/g, '-');
-      if (allStandardKeys.includes(key) || existingKeys.includes(key)) {
-        setErr('این نام قبلاً هست');
-        return;
-      }
-      const template = existingCustom[templateKey] || DEFAULT_STANDARDS[templateKey];
-      onAdd(key, customNameFa.trim(), customNameEn.trim() || customNameFa.trim(), template);
-      reset();
-      onClose();
+    if (!customNameFa.trim()) { setErr('نام نژاد اجباری است'); return; }
+    if (!customBirdName.trim()) { setErr('نام پرنده مادر اجباری است'); return; }
+    const key = customNameFa.trim().toLowerCase().replace(/\s+/g, '-');
+    if (allStandardKeys.includes(key) || existingKeys.includes(key)) {
+      setErr('این نام قبلاً هست');
+      return;
     }
+    const template = existingCustom[templateKey] || DEFAULT_STANDARDS[templateKey];
+    onAdd(key, customNameFa.trim(), customNameEn.trim() || customNameFa.trim(), customBirdName.trim(), template);
+    reset();
+    onClose();
   };
-
-  const optStyle = (active: boolean) => ({
-    padding: '10px 12px', minHeight: 64,
-    background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
-    border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-    borderRadius: 'var(--r-md)',
-    color: active ? 'var(--accent)' : 'var(--text)',
-    fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-    fontSize: 'var(--fs-sm)', textAlign: 'right' as const,
-  });
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title="افزودن پرنده به استانداردها"
+      title="افزودن نژاد جدید"
       footer={
         <div style={{ display: 'flex', gap: 6, flexDirection: 'column' }}>
           <Btn onClick={handleAdd} variant="primary" full>افزودن</Btn>
@@ -370,76 +341,31 @@ function AddBirdModal({
         </div>
       }
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-        <button type="button" onClick={() => setMode('from-brd')} style={optStyle(mode === 'from-brd')}>
-          📋 از پرنده‌های من
-          <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 3, fontWeight: 400 }}>
-            انتخاب از ماژول پرنده
-          </div>
-        </button>
-        <button type="button" onClick={() => setMode('custom')} style={optStyle(mode === 'custom')}>
-          ✏️ پرنده جدید
-          <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 3, fontWeight: 400 }}>
-            نام دلخواه
-          </div>
-        </button>
-      </div>
+      <Field label="پرنده مادر" required hint="مثلاً — مرغ، بوقلمون، اردک">
+        <Input
+          value={customBirdName}
+          onChange={e => setCustomBirdName(e.target.value)}
+          placeholder="مرغ"
+        />
+      </Field>
 
-      {mode === 'from-brd' && brdBirdsWithoutStd.length === 0 && (
-        <div style={{
-          padding: 'var(--pad-normal)',
-          background: 'var(--warn-soft)',
-          border: '1px solid var(--warn)',
-          borderRadius: 'var(--r-md)',
-          fontSize: 'var(--fs-sm)', color: 'var(--warn)',
-          textAlign: 'center', lineHeight: 1.9,
-        }}>
-          ⚠️ هیچ پرنده‌ای در ماژول «پرنده» بدون استاندارد نیست.
-          <br />
-          ابتدا در آن ماژول پرنده اضافه کنید.
-        </div>
-      )}
+      <Field label="نام نژاد (فارسی)" required>
+        <Input
+          value={customNameFa}
+          onChange={e => setCustomNameFa(e.target.value)}
+          placeholder="مثلاً — لاری"
+        />
+      </Field>
 
-      {mode === 'from-brd' && brdBirdsWithoutStd.length > 0 && (
-        <Field label="انتخاب پرنده" required>
-          <select
-            value={selectedBrdBird}
-            onChange={e => setSelectedBrdBird(e.target.value)}
-            style={{
-              width: '100%', height: 38,
-              background: 'var(--input-bg)', border: '1px solid var(--border)',
-              borderRadius: 'var(--r-md)', padding: '0 10px',
-              color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)',
-            }}
-          >
-            <option value="">— انتخاب —</option>
-            {brdBirdsWithoutStd.map((b: any) => (
-              <option key={b.id} value={b.id}>{b.name}</option>
-            ))}
-          </select>
-        </Field>
-      )}
+      <Field label="نام نژاد (انگلیسی)">
+        <Input
+          value={customNameEn}
+          onChange={e => setCustomNameEn(e.target.value)}
+          placeholder="Lari"
+        />
+      </Field>
 
-      {mode === 'custom' && (
-        <>
-          <Field label="نام فارسی" required>
-            <Input
-              value={customNameFa}
-              onChange={e => setCustomNameFa(e.target.value)}
-              placeholder="مثلاً — لاری"
-            />
-          </Field>
-          <Field label="نام انگلیسی">
-            <Input
-              value={customNameEn}
-              onChange={e => setCustomNameEn(e.target.value)}
-              placeholder="Lari"
-            />
-          </Field>
-        </>
-      )}
-
-      <Field label="کپی مقادیر از" hint="یک پرنده مشابه انتخاب کنید">
+      <Field label="کپی مقادیر از" hint="یک نژاد مشابه انتخاب کنید">
         <select
           value={templateKey}
           onChange={e => setTemplateKey(e.target.value)}
@@ -463,7 +389,7 @@ function AddBirdModal({
         borderRadius: 'var(--r-sm)',
         fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.8,
       }}>
-        💡 تمام مقادیر از پرنده انتخاب‌شده کپی می‌شود.
+        💡 تمام مقادیر از نژاد انتخاب‌شده کپی می‌شود.
       </div>
 
       <ErrorBox>{err}</ErrorBox>
@@ -482,39 +408,33 @@ export default function EnvStandardsTab() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [onlyActive, setOnlyActive] = useState(true);
 
-  const allKeys = Array.from(new Set([
-    ...Object.keys(DEFAULT_STANDARDS),
-    ...Object.keys(custom),
-  ]));
+  // گروه‌بندی standards بر اساس پرنده مادر
+  const grouped = getStandardsGroupedByBird(custom);
 
-  // پرنده‌های فعال — بر اساس birdType (نه اسم خام)
-  const activeBirdKeys = new Set<string>();
+  // پرنده‌های فعال (بر اساس flock)
+  const activeBirdNames = new Set<string>();
   (flocks || [])
     .filter((f: any) => f.status === 'active')
     .forEach((f: any) => {
       const brd = (brdBirds || []).find((b: any) => b.id === f.birdId);
-      if (!brd?.name) return;
-      // resolveBirdType اسم رو به key تبدیل می‌کنه (مرغ → marandi)
-      const key = resolveBirdType(brd.name);
-      if (key) activeBirdKeys.add(key);
+      if (brd?.name) activeBirdNames.add(brd.name.trim());
     });
 
-  const flockCountFor = (key: string): number => {
-    return (flocks || []).filter((f: any) => {
-      if (f.status !== 'active') return false;
-      const brd = (brdBirds || []).find((b: any) => b.id === f.birdId);
-      if (!brd?.name) return false;
-      const resolvedKey = resolveBirdType(brd.name);
-      return resolvedKey === key;
-    }).length;
-  };
+  // فیلتر
+  const visibleGroups = onlyActive
+    ? Object.entries(grouped).filter(([birdName]) => activeBirdNames.has(birdName))
+    : Object.entries(grouped);
 
-  const visibleKeys = onlyActive
-    ? allKeys.filter((k) => activeBirdKeys.has(k))
-    : allKeys;
-
-  const handleAddBird = (key: string, nameFa: string, nameEn: string, template: BirdStandard) => {
-    const newStd: BirdStandard = { ...template, key: key as any, nameFa, nameEn };
+  const handleAddBreed = (
+    key: string, nameFa: string, nameEn: string, birdName: string, template: BirdStandard,
+  ) => {
+    const newStd: BirdStandard = {
+      ...template,
+      key,
+      nameFa,
+      nameEn,
+      birdName,
+    };
     (s as any).updateStandard(key, newStd);
     showToast(nameFa + ' اضافه شد', 'success', 2000);
   };
@@ -532,7 +452,6 @@ export default function EnvStandardsTab() {
 
   return (
     <PageContainer>
-
       <div style={{
         padding: 'var(--pad-normal)',
         background: 'var(--accent-soft)',
@@ -542,7 +461,8 @@ export default function EnvStandardsTab() {
         color: 'var(--text)',
         lineHeight: 1.9,
       }}>
-        <b>💡 استانداردها</b> — روی هر پرنده بزن تا مقادیرش رو ویرایش کنی.
+        <b>💡 استانداردها</b> — نژادها بر اساس پرنده مادر گروه‌بندی شده‌اند.
+        روی هر نژاد بزن تا مقادیرش رو ویرایش کنی.
       </div>
 
       {/* Toggle */}
@@ -576,87 +496,96 @@ export default function EnvStandardsTab() {
         </span>
       </button>
 
-      <SettingsGroup
-        icon="🐔"
-        title="پرنده‌ها"
-        subtitle={onlyActive ? visibleKeys.length + ' فعال' : allKeys.length + ' پرنده'}
-        tone="accent"
-      >
-        {visibleKeys.length === 0 ? (
-          <div style={{
-            padding: 'var(--pad-comfy)', textAlign: 'center',
-            fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 2,
-          }}>
-            <div style={{ fontSize: 36, marginBottom: 8 }}>🐔</div>
-            <div style={{ fontWeight: 700, color: 'var(--text)' }}>هنوز گله فعالی ندارید</div>
-            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4 }}>
-              ابتدا در ماژول «گله» یک گله بسازید
+      {/* لیست گروه‌ها */}
+      {visibleGroups.length === 0 ? (
+        <div style={{
+          padding: 'var(--pad-comfy)', textAlign: 'center',
+          fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 2,
+          background: 'var(--input-bg)',
+          borderRadius: 'var(--r-md)',
+        }}>
+          <div style={{ fontSize: 36, marginBottom: 8 }}>🐔</div>
+          <div style={{ fontWeight: 700, color: 'var(--text)' }}>هنوز گله فعالی ندارید</div>
+          <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4 }}>
+            ابتدا در ماژول «گله» یک گله بسازید
+          </div>
+          <button
+            type="button"
+            onClick={() => setOnlyActive(false)}
+            style={{
+              marginTop: 10, padding: '6px 12px',
+              background: 'var(--card)', border: '1px solid var(--border)',
+              borderRadius: 'var(--r-md)',
+              color: 'var(--text)', cursor: 'pointer',
+              fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
+            }}
+          >
+            👁 نمایش همه پرنده‌ها
+          </button>
+        </div>
+      ) : (
+        visibleGroups.map(([birdName, breeds]) => (
+          <SettingsGroup
+            key={birdName}
+            icon="🐔"
+            title={birdName}
+            subtitle={toFa(breeds.length) + ' نژاد'}
+            tone="accent"
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {breeds.map((std) => {
+                const isCustom = !!custom[std.key];
+                const isNative = std.category === 'native';
+                const flockCount = (flocks || []).filter((f: any) => {
+                  if (f.status !== 'active') return false;
+                  const brd = (brdBirds || []).find((b: any) => b.id === f.birdId);
+                  return brd?.name?.trim() === birdName;
+                }).length;
+
+                return (
+                  <button
+                    key={std.key}
+                    type="button"
+                    onClick={() => setSelectedBird(std.key)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '10px 12px',
+                      background: 'var(--input-bg)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--r-md)',
+                      cursor: 'pointer', fontFamily: 'inherit',
+                      textAlign: 'right', minHeight: 52,
+                    }}
+                  >
+                    <span style={{ fontSize: 20, flexShrink: 0 }}>
+                      {isNative ? '🇮🇷' : '🔬'}
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: 'var(--fs-base)', fontWeight: 700,
+                        color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6,
+                      }}>
+                        {std.nameFa}
+                        {isCustom ? <span style={{ fontSize: 10, color: 'var(--accent)' }}>✓</span> : null}
+                      </div>
+                      <div style={{
+                        fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2,
+                      }}>
+                        {isNative ? 'بومی' : 'صنعتی'}
+                        {flockCount > 0 ? ' · ' + toFa(flockCount) + ' گله' : ''}
+                      </div>
+                    </div>
+                    <span style={{ color: 'var(--muted)', fontSize: 14 }}>‹</span>
+                  </button>
+                );
+              })}
             </div>
-            <button
-              type="button"
-              onClick={() => setOnlyActive(false)}
-              style={{
-                marginTop: 10, padding: '6px 12px',
-                background: 'var(--input-bg)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--r-md)',
-                color: 'var(--text)', cursor: 'pointer',
-                fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
-              }}
-            >
-              👁 نمایش همه پرنده‌ها
-            </button>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {visibleKeys.map((key) => {
-              const std = custom[key] || DEFAULT_STANDARDS[key];
-              const isCustom = !!custom[key];
-              const isNative = std.category === 'native';
-              const cnt = flockCountFor(key);
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setSelectedBird(key)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '10px 12px',
-                    background: 'var(--input-bg)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--r-md)',
-                    cursor: 'pointer', fontFamily: 'inherit',
-                    textAlign: 'right', minHeight: 52,
-                  }}
-                >
-                  <span style={{ fontSize: 20, flexShrink: 0 }}>
-                    {isNative ? '🇮🇷' : '🔬'}
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{
-                      fontSize: 'var(--fs-base)', fontWeight: 700,
-                      color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6,
-                    }}>
-                      {std.nameFa}
-                      {isCustom ? <span style={{ fontSize: 10, color: 'var(--accent)' }}>✓</span> : null}
-                    </div>
-                    <div style={{
-                      fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2,
-                    }}>
-                      {isNative ? 'بومی' : 'صنعتی'}
-                      {cnt > 0 ? ' · ' + toFa(cnt) + ' گله فعال' : ''}
-                    </div>
-                  </div>
-                  <span style={{ color: 'var(--muted)', fontSize: 14 }}>‹</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </SettingsGroup>
+          </SettingsGroup>
+        ))
+      )}
 
       <Btn onClick={() => setShowAddModal(true)} full>
-        ➕ افزودن پرنده به استانداردها
+        ➕ افزودن نژاد جدید
       </Btn>
 
       {Object.keys(custom).length > 0 ? (
@@ -671,7 +600,7 @@ export default function EnvStandardsTab() {
         open={showAddModal}
         onClose={() => setShowAddModal(false)}
         existingCustom={custom}
-        onAdd={handleAddBird}
+        onAdd={handleAddBreed}
       />
     </PageContainer>
   );
