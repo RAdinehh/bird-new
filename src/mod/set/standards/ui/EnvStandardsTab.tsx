@@ -1,19 +1,21 @@
 import { useState } from 'react';
-import { Btn, PageContainer, Tag } from '../../../../shr/components/ui';
+import { Btn, PageContainer } from '../../../../shr/components/ui';
 import SettingsGroup from '../../SettingsGroup';
 import { showToast } from '../../../../cor/store/toast';
 import { showConfirmAsync } from '../../../../cor/store/dialog';
 import { useBrd } from '../../../brd/store';
 import { useFlk } from '../../../flk/store';
 import { toFa } from '../../../../shr/utils/fa';
-import { DEFAULT_STANDARDS, getStandardsGroupedByBird, type BirdStandard } from '../index';
+import { getStandardsGroupedByBird, type BirdStandard } from '../index';
 import { useSet } from '../../store';
 import { StandardDetail } from './StandardDetail';
 import { AddBirdModal } from './AddBirdModal';
 
 export default function EnvStandardsTab() {
-  const s = useSet();
-  const custom = (s as any).customStandards || {};
+  const custom = useSet(state => state.customStandards) || {};
+  const updateStandard = useSet(state => state.updateStandard);
+  const resetStandard = useSet(state => state.resetStandard);
+
   const { flocks } = useFlk();
   const { birds: brdBirds } = useBrd();
 
@@ -23,6 +25,7 @@ export default function EnvStandardsTab() {
 
   const grouped = getStandardsGroupedByBird(custom);
 
+  // پرنده‌های مادری که در گله‌های فعال هستن
   const activeBirdNames = new Set<string>();
   (flocks || [])
     .filter((f: any) => f.status === 'active')
@@ -31,22 +34,32 @@ export default function EnvStandardsTab() {
       if (brd?.name) activeBirdNames.add(brd.name.trim());
     });
 
+  // نژادهایی که دستی توسط کاربر اضافه شدن (custom) — همیشه نشون بده
+  const customBirdNames = new Set<string>();
+  Object.values(custom).forEach((std: any) => {
+    if (std.birdName) customBirdNames.add(std.birdName);
+  });
+
   const visibleGroups = onlyActive
-    ? Object.entries(grouped).filter(([birdName]) => activeBirdNames.has(birdName))
+    ? Object.entries(grouped).filter(([birdName]) =>
+        activeBirdNames.has(birdName) || customBirdNames.has(birdName)
+      )
     : Object.entries(grouped);
 
   const handleAddBreed = (
     key: string, nameFa: string, nameEn: string, birdName: string, template: BirdStandard,
   ) => {
     const newStd: BirdStandard = { ...template, key, nameFa, nameEn, birdName };
-    (s as any).updateStandard(key, newStd);
+    updateStandard(key, newStd);
     showToast(nameFa + ' اضافه شد', 'success', 2000);
+    // خودکار همه رو نشون بده که کاربر ببینه اضافه شد
+    setOnlyActive(false);
   };
 
   const resetAll = async () => {
     const ok = await showConfirmAsync('بازگشت همه', 'همه ویرایش‌های استانداردها حذف شود؟', { danger: true });
     if (!ok) return;
-    Object.keys(custom).forEach(k => (s as any).resetStandard(k));
+    Object.keys(custom).forEach(k => resetStandard(k));
     showToast('همه به پیش‌فرض برگشتند', 'success', 2000);
   };
 

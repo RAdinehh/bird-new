@@ -16,9 +16,18 @@ export function CompactField({
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
+    // اعداد فارسی → انگلیسی
     v = v.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
-    v = v.replace(/[٫،]/g, '.');
+    // همه جداکننده‌ها → نقطه انگلیسی
+    v = v.replace(/[٫،,]/g, '.');
+    // فقط عدد، نقطه، منفی
     v = v.replace(/[^\d.-]/g, '');
+    // فقط یه نقطه و فقط یه منفی در ابتدا
+    const parts = v.split('.');
+    if (parts.length > 2) {
+      v = parts[0] + '.' + parts.slice(1).join('');
+    }
+    // اگر خالی یا فقط علامت
     if (v === '' || v === '-' || v === '.') {
       onChange(null);
       return;
@@ -45,7 +54,6 @@ export function CompactField({
           inputMode="decimal"
           value={displayValue === null || displayValue === undefined ? '' : String(displayValue)}
           onChange={handleChange}
-          onFocus={(e) => e.target.select()}
           style={{
             flex: 1,
             height: 32,
