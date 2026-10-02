@@ -1,19 +1,23 @@
 /**
- * EnvStandardsTab.tsx — ویرایش استانداردهای محیطی، تغذیه‌ای، رشد و تولیدی
+ * EnvStandardsTab.tsx — استانداردهای پرنده‌ها
  *
- * کاربر می‌تواند هر مقدار را ویرایش کند.
- * تغییرات در customStandards ذخیره می‌شود.
+ * معماری:
+ *   - لیست پرنده‌ها (صفحه اصلی) + toggle فقط فعال
+ *   - کلیک روی هر پرنده → Sheet جزئیات با ۹ آکاردئون
+ *   - دکمه افزودن پرنده جدید
  */
 
 import { useState } from 'react';
 import { useSet } from './store';
-import { Btn, Field, Grid2, NumField, Input, PageContainer, ErrorBox } from '../../shr/components/ui';
+import {
+  Btn, Field, Grid2, NumField, Input, PageContainer, Sheet, Modal, ErrorBox,
+} from '../../shr/components/ui';
 import SettingsGroup from './SettingsGroup';
 import { showToast } from '../../cor/store/toast';
-import { showConfirmAsync, showAlert } from '../../cor/store/dialog';
+import { showConfirmAsync } from '../../cor/store/dialog';
 import { useBrd } from '../brd/store';
-import { Modal } from '../../shr/components/ui';
-import { toFa, parseFaNum } from '../../shr/utils/fa';
+import { useFlk } from '../flk/store';
+import { toFa } from '../../shr/utils/fa';
 import {
   DEFAULT_STANDARDS,
   type BirdStandard,
@@ -23,205 +27,511 @@ import {
   type MortalityRange,
 } from './standards';
 
-// ═══ Row برای ویرایش عدد ═══
+// ═══ NumCell ═══
 function NumCell({
-  value, onChange, unit, width = 80, min = 0,
-}: { value: number | null; onChange: (v: number | null) => void; unit?: string; width?: number; min?: number }) {
+  value, onChange, unit,
+}: { value: number | null; onChange: (v: number | null) => void; unit?: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: width }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 0 }}>
       <input
         type="number"
         value={value ?? ''}
-        min={min}
-        onChange={(e) => {
-          const v = e.target.value === '' ? null : Number(e.target.value);
-          onChange(v);
-        }}
+        onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
         style={{
-          flex: 1, height: 30, padding: '0 6px',
+          width: '100%', height: 28, padding: '0 4px',
           background: 'var(--input-bg)', border: '1px solid var(--border)',
           borderRadius: 'var(--r-sm)', color: 'var(--text)',
-          fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+          fontFamily: 'inherit', fontSize: 12,
           outline: 'none', textAlign: 'center', minWidth: 0,
-          fontVariantNumeric: 'tabular-nums',
-          direction: 'ltr',
+          fontVariantNumeric: 'tabular-nums', direction: 'ltr',
         }}
       />
-      {unit && <span style={{ fontSize: 10, color: 'var(--muted)', flexShrink: 0 }}>{unit}</span>}
+      {unit ? <span style={{ fontSize: 9, color: 'var(--muted)', flexShrink: 0 }}>{unit}</span> : null}
     </div>
   );
 }
 
-function TabHeader({ children }: { children: string }) {
+function ColHeader({ children }: { children: string }) {
   return (
     <div style={{
-      fontSize: 'var(--fs-xs)', color: 'var(--muted)',
-      fontWeight: 700, padding: '6px 4px', textAlign: 'center',
+      fontSize: 10, color: 'var(--muted)', fontWeight: 700,
+      padding: '4px 2px', textAlign: 'center',
     }}>{children}</div>
   );
 }
 
-// ═══ ویرایش env ═══
-function EnvEditor({ env, onChange }: { env: EnvRange[]; onChange: (next: EnvRange[]) => void }) {
+// ═══ EnvEditor ═══
+function EnvEditor({ env, onChange }: { env: EnvRange[]; onChange: (n: EnvRange[]) => void }) {
   const update = (i: number, patch: Partial<EnvRange>) => {
-    const next = env.map((r, idx) => idx === i ? { ...r, ...patch } : r);
-    onChange(next);
+    onChange(env.map((r, idx) => idx === i ? { ...r, ...patch } : r));
   };
-
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <div style={{ minWidth: 560, display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', gap: 4 }}>
-        <TabHeader>روز</TabHeader>
-        <TabHeader>دما هدف</TabHeader>
-        <TabHeader>دما min</TabHeader>
-        <TabHeader>دما max</TabHeader>
-        <TabHeader>رطوبت min</TabHeader>
-        <TabHeader>رطوبت max</TabHeader>
-
-        {env.map((r, i) => (
-          <div key={i} style={{ display: 'contents' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600,
-              fontVariantNumeric: 'tabular-nums', direction: 'ltr',
-            }}>{r.dayFrom}-{r.dayTo === 9999 ? '∞' : r.dayTo}</div>
-            <NumCell value={r.temp.target} onChange={v => update(i, { temp: { ...r.temp, target: v ?? 0 } })} unit="°C" />
-            <NumCell value={r.temp.min} onChange={v => update(i, { temp: { ...r.temp, min: v ?? 0 } })} unit="°C" />
-            <NumCell value={r.temp.max} onChange={v => update(i, { temp: { ...r.temp, max: v ?? 0 } })} unit="°C" />
-            <NumCell value={r.humidity.min} onChange={v => update(i, { humidity: { ...r.humidity, min: v ?? 0 } })} unit="٪" />
-            <NumCell value={r.humidity.max} onChange={v => update(i, { humidity: { ...r.humidity, max: v ?? 0 } })} unit="٪" />
-          </div>
-        ))}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '46px 1fr 1fr 1fr 1fr 1fr', gap: 3 }}>
+        <ColHeader>روز</ColHeader>
+        <ColHeader>هدف</ColHeader>
+        <ColHeader>min</ColHeader>
+        <ColHeader>max</ColHeader>
+        <ColHeader>رطوبت</ColHeader>
+        <ColHeader>رطوبت</ColHeader>
       </div>
+      {env.map((r, i) => (
+        <div key={i} style={{ display: 'grid', gridTemplateColumns: '46px 1fr 1fr 1fr 1fr 1fr', gap: 3 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 10, color: 'var(--muted)', fontWeight: 600,
+            fontVariantNumeric: 'tabular-nums', direction: 'ltr',
+          }}>{r.dayFrom}-{r.dayTo === 9999 ? '∞' : r.dayTo}</div>
+          <NumCell value={r.temp.target} onChange={v => update(i, { temp: { ...r.temp, target: v ?? 0 } })} unit="°C" />
+          <NumCell value={r.temp.min} onChange={v => update(i, { temp: { ...r.temp, min: v ?? 0 } })} unit="°C" />
+          <NumCell value={r.temp.max} onChange={v => update(i, { temp: { ...r.temp, max: v ?? 0 } })} unit="°C" />
+          <NumCell value={r.humidity.min} onChange={v => update(i, { humidity: { ...r.humidity, min: v ?? 0 } })} unit="٪" />
+          <NumCell value={r.humidity.max} onChange={v => update(i, { humidity: { ...r.humidity, max: v ?? 0 } })} unit="٪" />
+        </div>
+      ))}
     </div>
   );
 }
 
-// ═══ ویرایش feed ═══
-function FeedEditor({ feed, onChange }: { feed: FeedRange[]; onChange: (next: FeedRange[]) => void }) {
+// ═══ FeedEditor ═══
+function FeedEditor({ feed, onChange }: { feed: FeedRange[]; onChange: (n: FeedRange[]) => void }) {
   const update = (i: number, patch: Partial<FeedRange>) => {
-    const next = feed.map((r, idx) => idx === i ? { ...r, ...patch } : r);
-    onChange(next);
+    onChange(feed.map((r, idx) => idx === i ? { ...r, ...patch } : r));
   };
-
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <div style={{ minWidth: 480, display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr', gap: 4 }}>
-        <TabHeader>روز</TabHeader>
-        <TabHeader>دان (g)</TabHeader>
-        <TabHeader>آب (ml)</TabHeader>
-        <TabHeader>پروتئین ٪</TabHeader>
-        <TabHeader>انرژی kcal</TabHeader>
-
-        {feed.map((r, i) => (
-          <div key={i} style={{ display: 'contents' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600,
-              fontVariantNumeric: 'tabular-nums', direction: 'ltr',
-            }}>{r.dayFrom}-{r.dayTo === 9999 ? '∞' : r.dayTo}</div>
-            <NumCell value={r.feedG} onChange={v => update(i, { feedG: v ?? 0 })} unit="g" />
-            <NumCell value={r.waterMl} onChange={v => update(i, { waterMl: v ?? 0 })} unit="ml" />
-            <NumCell value={r.proteinPct ?? null} onChange={v => update(i, { proteinPct: v ?? undefined })} unit="٪" />
-            <NumCell value={r.energyKcal ?? null} onChange={v => update(i, { energyKcal: v ?? undefined })} unit="k" />
-          </div>
-        ))}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '46px 1fr 1fr 1fr 1fr', gap: 3 }}>
+        <ColHeader>روز</ColHeader>
+        <ColHeader>دان</ColHeader>
+        <ColHeader>آب</ColHeader>
+        <ColHeader>پروتئین</ColHeader>
+        <ColHeader>انرژی</ColHeader>
       </div>
+      {feed.map((r, i) => (
+        <div key={i} style={{ display: 'grid', gridTemplateColumns: '46px 1fr 1fr 1fr 1fr', gap: 3 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 10, color: 'var(--muted)', fontWeight: 600,
+            fontVariantNumeric: 'tabular-nums', direction: 'ltr',
+          }}>{r.dayFrom}-{r.dayTo === 9999 ? '∞' : r.dayTo}</div>
+          <NumCell value={r.feedG} onChange={v => update(i, { feedG: v ?? 0 })} unit="g" />
+          <NumCell value={r.waterMl} onChange={v => update(i, { waterMl: v ?? 0 })} unit="ml" />
+          <NumCell value={r.proteinPct ?? null} onChange={v => update(i, { proteinPct: v ?? undefined })} unit="٪" />
+          <NumCell value={r.energyKcal ?? null} onChange={v => update(i, { energyKcal: v ?? undefined })} unit="k" />
+        </div>
+      ))}
     </div>
   );
 }
 
-// ═══ ویرایش growth ═══
-function GrowthEditor({ growth, onChange }: { growth: GrowthRange[]; onChange: (next: GrowthRange[]) => void }) {
+// ═══ GrowthEditor ═══
+function GrowthEditor({ growth, onChange }: { growth: GrowthRange[]; onChange: (n: GrowthRange[]) => void }) {
   const update = (i: number, patch: Partial<GrowthRange>) => {
-    const next = growth.map((r, idx) => idx === i ? { ...r, ...patch } : r);
-    onChange(next);
+    onChange(growth.map((r, idx) => idx === i ? { ...r, ...patch } : r));
   };
-
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <div style={{ minWidth: 480, display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr', gap: 4 }}>
-        <TabHeader>روز</TabHeader>
-        <TabHeader>وزن (g)</TabHeader>
-        <TabHeader>ADG (g)</TabHeader>
-        <TabHeader>FCR</TabHeader>
-
-        {growth.map((r, i) => (
-          <div key={i} style={{ display: 'contents' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600,
-              fontVariantNumeric: 'tabular-nums', direction: 'ltr',
-            }}>{r.dayFrom}-{r.dayTo === 9999 ? '∞' : r.dayTo}</div>
-            <NumCell value={r.weightG} onChange={v => update(i, { weightG: v ?? 0 })} unit="g" />
-            <NumCell value={r.adgG} onChange={v => update(i, { adgG: v ?? 0 })} unit="g" />
-            <NumCell value={r.fcr} onChange={v => update(i, { fcr: v ?? 0 })} />
-          </div>
-        ))}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '46px 1fr 1fr 1fr', gap: 3 }}>
+        <ColHeader>روز</ColHeader>
+        <ColHeader>وزن (g)</ColHeader>
+        <ColHeader>ADG</ColHeader>
+        <ColHeader>FCR</ColHeader>
       </div>
+      {growth.map((r, i) => (
+        <div key={i} style={{ display: 'grid', gridTemplateColumns: '46px 1fr 1fr 1fr', gap: 3 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 10, color: 'var(--muted)', fontWeight: 600,
+            fontVariantNumeric: 'tabular-nums', direction: 'ltr',
+          }}>{r.dayFrom}-{r.dayTo === 9999 ? '∞' : r.dayTo}</div>
+          <NumCell value={r.weightG} onChange={v => update(i, { weightG: v ?? 0 })} unit="g" />
+          <NumCell value={r.adgG} onChange={v => update(i, { adgG: v ?? 0 })} unit="g" />
+          <NumCell value={r.fcr} onChange={v => update(i, { fcr: v ?? 0 })} />
+        </div>
+      ))}
     </div>
   );
 }
 
-// ═══ ویرایش mortality ═══
-function MortalityEditor({ mortality, onChange }: { mortality: MortalityRange[]; onChange: (next: MortalityRange[]) => void }) {
+// ═══ MortalityEditor ═══
+function MortalityEditor({ mortality, onChange }: { mortality: MortalityRange[]; onChange: (n: MortalityRange[]) => void }) {
   const update = (i: number, patch: Partial<MortalityRange>) => {
-    const next = mortality.map((r, idx) => idx === i ? { ...r, ...patch } : r);
-    onChange(next);
+    onChange(mortality.map((r, idx) => idx === i ? { ...r, ...patch } : r));
   };
-
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <div style={{ minWidth: 360, display: 'grid', gridTemplateColumns: '100px 1fr', gap: 4 }}>
-        <TabHeader>روز</TabHeader>
-        <TabHeader>حداکثر ٪</TabHeader>
-
-        {mortality.map((r, i) => (
-          <div key={i} style={{ display: 'contents' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600,
-              fontVariantNumeric: 'tabular-nums', direction: 'ltr',
-            }}>{r.dayFrom}-{r.dayTo === 9999 ? '∞' : r.dayTo}</div>
-            <NumCell value={r.maxPct} onChange={v => update(i, { maxPct: v ?? 0 })} unit="٪" />
-          </div>
-        ))}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 3 }}>
+        <ColHeader>روز</ColHeader>
+        <ColHeader>حداکثر ٪</ColHeader>
       </div>
+      {mortality.map((r, i) => (
+        <div key={i} style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 3 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 10, color: 'var(--muted)', fontWeight: 600,
+            fontVariantNumeric: 'tabular-nums', direction: 'ltr',
+          }}>{r.dayFrom}-{r.dayTo === 9999 ? '∞' : r.dayTo}</div>
+          <NumCell value={r.maxPct} onChange={v => update(i, { maxPct: v ?? 0 })} unit="٪" />
+        </div>
+      ))}
     </div>
   );
 }
 
-// ═══ کامپوننت اصلی ═══
-export default function EnvStandardsTab() {
+// ═══ StandardDetail ═══
+function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose: () => void }) {
   const s = useSet();
   const custom = (s as any).customStandards || {};
-
-  // برای هر پرنده: از custom یا default
-  const getEffective = (key: string): BirdStandard => {
-    return custom[key] || DEFAULT_STANDARDS[key];
+  const isCustom = !!custom[birdKey];
+  const std: BirdStandard = custom[birdKey] || DEFAULT_STANDARDS[birdKey] || {
+    ...DEFAULT_STANDARDS.marandi,
+    key: birdKey as any,
   };
 
-  const updateBird = (key: string, patch: Partial<BirdStandard>) => {
-    const base = getEffective(key);
-    (s as any).updateStandard(key, { ...base, ...patch });
+  const updateBird = (patch: Partial<BirdStandard>) => {
+    (s as any).updateStandard(birdKey, { ...std, ...patch });
   };
 
-  const resetBird = async (key: string) => {
+  const resetBird = async () => {
     const ok = await showConfirmAsync(
-      `بازگشت به پیش‌فرض`,
-      `همه ویرایش‌های «${DEFAULT_STANDARDS[key].nameFa}» حذف شود؟`,
+      'بازگشت به پیش‌فرض',
+      'همه ویرایش‌های این پرنده حذف شود؟',
       { danger: true }
     );
     if (!ok) return;
-    (s as any).resetStandard(key);
+    (s as any).resetStandard(birdKey);
     showToast('بازگشت به پیش‌فرض انجام شد', 'success', 2000);
   };
 
-  const birdKeys = Object.keys(DEFAULT_STANDARDS);
+  return (
+    <Sheet open={true} onClose={onClose} title={std.nameFa + ' — استاندارد'}>
+      <PageContainer>
+        <SettingsGroup icon="📝" title="نام‌ها" tone="info">
+          <Grid2>
+            <Field label="نام فارسی">
+              <Input value={std.nameFa} onChange={e => updateBird({ nameFa: e.target.value })} />
+            </Field>
+            <Field label="نام انگلیسی">
+              <Input value={std.nameEn} onChange={e => updateBird({ nameEn: e.target.value })} />
+            </Field>
+          </Grid2>
+        </SettingsGroup>
+
+        <SettingsGroup icon="🧬" title="بیولوژی" tone="accent">
+          <Grid2>
+            <Field label="سن شروع تخم‌گذاری">
+              <NumField
+                value={std.biology.layingStartDay?.toString() ?? ''}
+                onChange={e => updateBird({ biology: { ...std.biology, layingStartDay: e.target.value ? Number(e.target.value) : null } })}
+                unit="روز" min={0}
+              />
+            </Field>
+            <Field label="سن کشتار">
+              <NumField
+                value={std.biology.cullDay?.toString() ?? ''}
+                onChange={e => updateBird({ biology: { ...std.biology, cullDay: e.target.value ? Number(e.target.value) : null } })}
+                unit="روز" min={0}
+              />
+            </Field>
+          </Grid2>
+          <Grid2>
+            <Field label="دوره انکوباسیون">
+              <NumField
+                value={std.incubation.totalDays.toString()}
+                onChange={e => updateBird({ incubation: { ...std.incubation, totalDays: Number(e.target.value) || 21 } })}
+                unit="روز" min={1}
+              />
+            </Field>
+            <Field label="روز Lockdown">
+              <NumField
+                value={std.incubation.lockdownDay.toString()}
+                onChange={e => updateBird({ incubation: { ...std.incubation, lockdownDay: Number(e.target.value) || 18 } })}
+                unit="روز" min={1}
+              />
+            </Field>
+          </Grid2>
+        </SettingsGroup>
+
+        <SettingsGroup icon="🌡" title="دما و رطوبت" subtitle="بر اساس سن" tone="warn">
+          <EnvEditor env={std.env} onChange={env => updateBird({ env })} />
+        </SettingsGroup>
+
+        <SettingsGroup icon="🌾" title="تغذیه" subtitle="دان، آب، پروتئین" tone="accent">
+          <FeedEditor feed={std.feed} onChange={feed => updateBird({ feed })} />
+        </SettingsGroup>
+
+        <SettingsGroup icon="⚖️" title="رشد" subtitle="وزن، ADG، FCR" tone="purple">
+          <GrowthEditor growth={std.growth.weightByAge} onChange={wba => updateBird({ growth: { ...std.growth, weightByAge: wba } })} />
+        </SettingsGroup>
+
+        <SettingsGroup icon="📐" title="فضا و تراکم" tone="info">
+          <Grid2>
+            <Field label="تراکم (پرنده/m²)">
+              <NumField value={std.space.densityMax.toString()} onChange={e => updateBird({ space: { ...std.space, densityMax: Number(e.target.value) || 0 } })} unit="پرنده" min={1} />
+            </Field>
+            <Field label="فضای دانخوری">
+              <NumField value={std.space.feederSpaceCm.toString()} onChange={e => updateBird({ space: { ...std.space, feederSpaceCm: Number(e.target.value) || 0 } })} unit="cm" min={1} />
+            </Field>
+          </Grid2>
+        </SettingsGroup>
+
+        <SettingsGroup icon="💀" title="تلفات مجاز" tone="danger">
+          <MortalityEditor mortality={std.mortality} onChange={mortality => updateBird({ mortality })} />
+          <Field label="تلفات کل چرخه (٪)">
+            <NumField value={std.mortalityTotalPct.toString()} onChange={e => updateBird({ mortalityTotalPct: Number(e.target.value) || 0 })} unit="٪" min={0} />
+          </Field>
+        </SettingsGroup>
+
+        {isCustom && (
+          <Btn onClick={resetBird} full>🔄 بازگشت به پیش‌فرض</Btn>
+        )}
+      </PageContainer>
+    </Sheet>
+  );
+}
+
+// ═══ AddBirdModal ═══
+function AddBirdModal({
+  open, onClose, existingCustom, onAdd,
+}: {
+  open: boolean;
+  onClose: () => void;
+  existingCustom: Record<string, BirdStandard>;
+  onAdd: (key: string, nameFa: string, nameEn: string, template: BirdStandard) => void;
+}) {
+  const { birds } = useBrd();
+  const [mode, setMode] = useState<'from-brd' | 'custom'>('from-brd');
+  const [selectedBrdBird, setSelectedBrdBird] = useState<string>('');
+  const [customNameFa, setCustomNameFa] = useState('');
+  const [customNameEn, setCustomNameEn] = useState('');
+  const [templateKey, setTemplateKey] = useState<string>('marandi');
+  const [err, setErr] = useState('');
+
+  const allStandardKeys = Object.keys(DEFAULT_STANDARDS);
+  const existingKeys = Object.keys(existingCustom);
+
+  const brdBirdsWithoutStd = (birds || []).filter((b: any) => {
+    const key = b.name.trim().toLowerCase().replace(/\s+/g, '-');
+    return !allStandardKeys.includes(b.name.trim()) && !existingKeys.includes(key);
+  });
+
+  const reset = () => {
+    setSelectedBrdBird('');
+    setCustomNameFa('');
+    setCustomNameEn('');
+    setTemplateKey('marandi');
+    setErr('');
+  };
+
+  const handleAdd = () => {
+    if (mode === 'from-brd') {
+      if (!selectedBrdBird) { setErr('پرنده‌ای انتخاب کنید'); return; }
+      const bird = birds.find((b: any) => b.id === selectedBrdBird);
+      if (!bird) { setErr('پرنده پیدا نشد'); return; }
+      const key = bird.name.trim().toLowerCase().replace(/\s+/g, '-');
+      const template = existingCustom[templateKey] || DEFAULT_STANDARDS[templateKey];
+      onAdd(key, bird.name, bird.nameEn || bird.name, template);
+      reset();
+      onClose();
+    } else {
+      if (!customNameFa.trim()) { setErr('نام فارسی اجباری است'); return; }
+      const key = customNameFa.trim().toLowerCase().replace(/\s+/g, '-');
+      if (allStandardKeys.includes(key) || existingKeys.includes(key)) {
+        setErr('این نام قبلاً هست');
+        return;
+      }
+      const template = existingCustom[templateKey] || DEFAULT_STANDARDS[templateKey];
+      onAdd(key, customNameFa.trim(), customNameEn.trim() || customNameFa.trim(), template);
+      reset();
+      onClose();
+    }
+  };
+
+  const optStyle = (active: boolean) => ({
+    padding: '10px 12px', minHeight: 64,
+    background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
+    border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+    borderRadius: 'var(--r-md)',
+    color: active ? 'var(--accent)' : 'var(--text)',
+    fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+    fontSize: 'var(--fs-sm)', textAlign: 'right' as const,
+  });
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="افزودن پرنده به استانداردها"
+      footer={
+        <div style={{ display: 'flex', gap: 6, flexDirection: 'column' }}>
+          <Btn onClick={handleAdd} variant="primary" full>افزودن</Btn>
+          <Btn onClick={onClose} full>لغو</Btn>
+        </div>
+      }
+    >
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+        <button type="button" onClick={() => setMode('from-brd')} style={optStyle(mode === 'from-brd')}>
+          📋 از پرنده‌های من
+          <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 3, fontWeight: 400 }}>
+            انتخاب از ماژول پرنده
+          </div>
+        </button>
+        <button type="button" onClick={() => setMode('custom')} style={optStyle(mode === 'custom')}>
+          ✏️ پرنده جدید
+          <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 3, fontWeight: 400 }}>
+            نام دلخواه
+          </div>
+        </button>
+      </div>
+
+      {mode === 'from-brd' && brdBirdsWithoutStd.length === 0 && (
+        <div style={{
+          padding: 'var(--pad-normal)',
+          background: 'var(--warn-soft)',
+          border: '1px solid var(--warn)',
+          borderRadius: 'var(--r-md)',
+          fontSize: 'var(--fs-sm)', color: 'var(--warn)',
+          textAlign: 'center', lineHeight: 1.9,
+        }}>
+          ⚠️ هیچ پرنده‌ای در ماژول «پرنده» بدون استاندارد نیست.
+          <br />
+          ابتدا در آن ماژول پرنده اضافه کنید.
+        </div>
+      )}
+
+      {mode === 'from-brd' && brdBirdsWithoutStd.length > 0 && (
+        <Field label="انتخاب پرنده" required>
+          <select
+            value={selectedBrdBird}
+            onChange={e => setSelectedBrdBird(e.target.value)}
+            style={{
+              width: '100%', height: 38,
+              background: 'var(--input-bg)', border: '1px solid var(--border)',
+              borderRadius: 'var(--r-md)', padding: '0 10px',
+              color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)',
+            }}
+          >
+            <option value="">— انتخاب —</option>
+            {brdBirdsWithoutStd.map((b: any) => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
+        </Field>
+      )}
+
+      {mode === 'custom' && (
+        <>
+          <Field label="نام فارسی" required>
+            <Input
+              value={customNameFa}
+              onChange={e => setCustomNameFa(e.target.value)}
+              placeholder="مثلاً — لاری"
+            />
+          </Field>
+          <Field label="نام انگلیسی">
+            <Input
+              value={customNameEn}
+              onChange={e => setCustomNameEn(e.target.value)}
+              placeholder="Lari"
+            />
+          </Field>
+        </>
+      )}
+
+      <Field label="کپی مقادیر از" hint="یک پرنده مشابه انتخاب کنید">
+        <select
+          value={templateKey}
+          onChange={e => setTemplateKey(e.target.value)}
+          style={{
+            width: '100%', height: 38,
+            background: 'var(--input-bg)', border: '1px solid var(--border)',
+            borderRadius: 'var(--r-md)', padding: '0 10px',
+            color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)',
+          }}
+        >
+          {[...allStandardKeys, ...existingKeys].map(k => {
+            const std = existingCustom[k] || DEFAULT_STANDARDS[k];
+            return <option key={k} value={k}>{std.nameFa}</option>;
+          })}
+        </select>
+      </Field>
+
+      <div style={{
+        padding: 'var(--pad-normal)',
+        background: 'var(--input-bg)',
+        borderRadius: 'var(--r-sm)',
+        fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.8,
+      }}>
+        💡 تمام مقادیر از پرنده انتخاب‌شده کپی می‌شود.
+      </div>
+
+      <ErrorBox>{err}</ErrorBox>
+    </Modal>
+  );
+}
+
+// ═══ EnvStandardsTab ═══
+export default function EnvStandardsTab() {
+  const s = useSet();
+  const custom = (s as any).customStandards || {};
+  const { flocks } = useFlk();
+  const { birds: brdBirds } = useBrd();
+
+  const [selectedBird, setSelectedBird] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [onlyActive, setOnlyActive] = useState(true);
+
+  const allKeys = Array.from(new Set([
+    ...Object.keys(DEFAULT_STANDARDS),
+    ...Object.keys(custom),
+  ]));
+
+  // پرنده‌های فعال
+  const activeBirdNames = new Set<string>();
+  (flocks || [])
+    .filter((f: any) => f.status === 'active')
+    .forEach((f: any) => {
+      const brd = (brdBirds || []).find((b: any) => b.id === f.birdId);
+      if (brd?.name) activeBirdNames.add(brd.name.trim());
+    });
+
+  const flockCountFor = (key: string): number => {
+    const stdName = (custom[key] || DEFAULT_STANDARDS[key])?.nameFa;
+    if (!stdName) return 0;
+    return (flocks || []).filter((f: any) => {
+      if (f.status !== 'active') return false;
+      const brd = (brdBirds || []).find((b: any) => b.id === f.birdId);
+      return brd?.name?.trim() === stdName.trim();
+    }).length;
+  };
+
+  const visibleKeys = onlyActive
+    ? allKeys.filter((k) => {
+        const std = custom[k] || DEFAULT_STANDARDS[k];
+        if (!std) return false;
+        return activeBirdNames.has(std.nameFa.trim());
+      })
+    : allKeys;
+
+  const handleAddBird = (key: string, nameFa: string, nameEn: string, template: BirdStandard) => {
+    const newStd: BirdStandard = { ...template, key: key as any, nameFa, nameEn };
+    (s as any).updateStandard(key, newStd);
+    showToast(nameFa + ' اضافه شد', 'success', 2000);
+  };
+
+  const resetAll = async () => {
+    const ok = await showConfirmAsync(
+      'بازگشت همه',
+      'همه ویرایش‌های استانداردها حذف شود؟',
+      { danger: true }
+    );
+    if (!ok) return;
+    Object.keys(custom).forEach(k => (s as any).resetStandard(k));
+    showToast('همه به پیش‌فرض برگشتند', 'success', 2000);
+  };
 
   return (
     <PageContainer>
-      {/* بنر راهنما */}
       <div style={{
         padding: 'var(--pad-normal)',
         background: 'var(--accent-soft)',
@@ -231,117 +541,137 @@ export default function EnvStandardsTab() {
         color: 'var(--text)',
         lineHeight: 1.9,
       }}>
-        <b>💡 استانداردها</b> — اینجا همه‌ی مقادیر پیش‌فرض پرنده‌ها رو می‌بینی.
-        می‌تونی هر عدد رو ویرایش کنی. تغییرات روی همه‌ی ماژول‌ها اعمال می‌شه.
-        جاهایی که کاربر مقدار دستی وارد کنه، اون مقدار اولویت داره.
+        <b>💡 استانداردها</b> — روی هر پرنده بزن تا مقادیرش رو ویرایش کنی.
       </div>
 
-      {birdKeys.map((key) => {
-        const std = getEffective(key);
-        const isCustom = !!custom[key];
+      {/* Toggle */}
+      <button
+        type="button"
+        onClick={() => setOnlyActive(!onlyActive)}
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '10px 14px',
+          background: onlyActive ? 'var(--accent-soft)' : 'var(--input-bg)',
+          border: '1px solid ' + (onlyActive ? 'var(--accent-border)' : 'var(--border)'),
+          borderRadius: 'var(--r-md)',
+          cursor: 'pointer', fontFamily: 'inherit',
+          fontSize: 'var(--fs-sm)', fontWeight: 600,
+          color: onlyActive ? 'var(--accent)' : 'var(--muted)',
+        }}
+      >
+        <span>{onlyActive ? '✓ فقط پرنده‌های فعال' : '👁 همه پرنده‌ها'}</span>
+        <span style={{
+          width: 36, height: 20, borderRadius: 10,
+          background: onlyActive ? 'var(--accent)' : 'var(--border)',
+          position: 'relative',
+          transition: 'background 200ms',
+        }}>
+          <span style={{
+            position: 'absolute', top: 2,
+            [onlyActive ? 'right' : 'left']: 2,
+            width: 16, height: 16, borderRadius: '50%',
+            background: '#fff', transition: 'all 200ms',
+          }} />
+        </span>
+      </button>
 
-        return (
-          <SettingsGroup
-            key={key}
-            icon={std.category === 'native' ? '🇮🇷' : '🔬'}
-            title={std.nameFa + (isCustom ? ' ✓ ویرایش‌شده' : '')}
-            subtitle={std.nameEn}
-            tone={std.category === 'native' ? 'accent' : 'info'}
-          >
-            {/* اطلاعات پایه */}
-            <Grid2>
-              <Field label="نام فارسی">
-                <Input
-                  value={std.nameFa}
-                  onChange={e => updateBird(key, { nameFa: e.target.value })}
-                />
-              </Field>
-              <Field label="نام انگلیسی">
-                <Input
-                  value={std.nameEn}
-                  onChange={e => updateBird(key, { nameEn: e.target.value })}
-                />
-              </Field>
-            </Grid2>
+      <SettingsGroup
+        icon="🐔"
+        title="پرنده‌ها"
+        subtitle={onlyActive ? visibleKeys.length + ' فعال' : allKeys.length + ' پرنده'}
+        tone="accent"
+      >
+        {visibleKeys.length === 0 ? (
+          <div style={{
+            padding: 'var(--pad-comfy)', textAlign: 'center',
+            fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 2,
+          }}>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>🐔</div>
+            <div style={{ fontWeight: 700, color: 'var(--text)' }}>هنوز گله فعالی ندارید</div>
+            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4 }}>
+              ابتدا در ماژول «گله» یک گله بسازید
+            </div>
+            <button
+              type="button"
+              onClick={() => setOnlyActive(false)}
+              style={{
+                marginTop: 10, padding: '6px 12px',
+                background: 'var(--input-bg)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r-md)',
+                color: 'var(--text)', cursor: 'pointer',
+                fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
+              }}
+            >
+              👁 نمایش همه پرنده‌ها
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {visibleKeys.map((key) => {
+              const std = custom[key] || DEFAULT_STANDARDS[key];
+              const isCustom = !!custom[key];
+              const isNative = std.category === 'native';
+              const cnt = flockCountFor(key);
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setSelectedBird(key)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '10px 12px',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--r-md)',
+                    cursor: 'pointer', fontFamily: 'inherit',
+                    textAlign: 'right', minHeight: 52,
+                  }}
+                >
+                  <span style={{ fontSize: 20, flexShrink: 0 }}>
+                    {isNative ? '🇮🇷' : '🔬'}
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontSize: 'var(--fs-base)', fontWeight: 700,
+                      color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6,
+                    }}>
+                      {std.nameFa}
+                      {isCustom ? <span style={{ fontSize: 10, color: 'var(--accent)' }}>✓</span> : null}
+                    </div>
+                    <div style={{
+                      fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2,
+                    }}>
+                      {isNative ? 'بومی' : 'صنعتی'}
+                      {cnt > 0 ? ' · ' + toFa(cnt) + ' گله فعال' : ''}
+                    </div>
+                  </div>
+                  <span style={{ color: 'var(--muted)', fontSize: 14 }}>‹</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </SettingsGroup>
 
-            {/* بیولوژی */}
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🧬 بیولوژی</div>
-            <Grid2>
-              <Field label="سن شروع تخم‌گذاری (روز)">
-                <NumField
-                  value={std.biology.layingStartDay?.toString() ?? ''}
-                  onChange={e => updateBird(key, { biology: { ...std.biology, layingStartDay: e.target.value ? Number(e.target.value) : null } })}
-                  unit="روز" min={0}
-                />
-              </Field>
-              <Field label="سن کشتار (روز)">
-                <NumField
-                  value={std.biology.cullDay?.toString() ?? ''}
-                  onChange={e => updateBird(key, { biology: { ...std.biology, cullDay: e.target.value ? Number(e.target.value) : null } })}
-                  unit="روز" min={0}
-                />
-              </Field>
-            </Grid2>
-            <Grid2>
-              <Field label="دوره انکوباسیون (روز)">
-                <NumField
-                  value={std.incubation.totalDays.toString()}
-                  onChange={e => updateBird(key, { incubation: { ...std.incubation, totalDays: Number(e.target.value) || 21 } })}
-                  unit="روز" min={1}
-                />
-              </Field>
-              <Field label="روز Lockdown">
-                <NumField
-                  value={std.incubation.lockdownDay.toString()}
-                  onChange={e => updateBird(key, { incubation: { ...std.incubation, lockdownDay: Number(e.target.value) || 18 } })}
-                  unit="روز" min={1}
-                />
-              </Field>
-            </Grid2>
+      <Btn onClick={() => setShowAddModal(true)} full>
+        ➕ افزودن پرنده به استانداردها
+      </Btn>
 
-            {/* محیط */}
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🌡 دما و رطوبت (بر اساس سن)</div>
-            <EnvEditor env={std.env} onChange={env => updateBird(key, { env })} />
+      {Object.keys(custom).length > 0 ? (
+        <Btn onClick={resetAll} full>🔄 بازگشت همه به پیش‌فرض</Btn>
+      ) : null}
 
-            {/* تغذیه */}
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🌾 تغذیه (بر اساس سن)</div>
-            <FeedEditor feed={std.feed} onChange={feed => updateBird(key, { feed })} />
+      {selectedBird ? (
+        <StandardDetail birdKey={selectedBird} onClose={() => setSelectedBird(null)} />
+      ) : null}
 
-            {/* رشد */}
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>⚖️ رشد (وزن، ADG، FCR)</div>
-            <GrowthEditor growth={std.growth.weightByAge} onChange={wba => updateBird(key, { growth: { ...std.growth, weightByAge: wba } })} />
-
-            {/* فضا و تجهیزات */}
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>📐 فضا و تراکم</div>
-            <Grid2>
-              <Field label="تراکم (پرنده/m²)">
-                <NumField value={std.space.densityMax.toString()} onChange={e => updateBird(key, { space: { ...std.space, densityMax: Number(e.target.value) || 0 } })} unit="پرنده" min={1} />
-              </Field>
-              <Field label="فضای دانخوری (cm/پرنده)">
-                <NumField value={std.space.feederSpaceCm.toString()} onChange={e => updateBird(key, { space: { ...std.space, feederSpaceCm: Number(e.target.value) || 0 } })} unit="cm" min={1} />
-              </Field>
-            </Grid2>
-
-            {/* تلفات */}
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>💀 تلفات مجاز (٪)</div>
-            <MortalityEditor mortality={std.mortality} onChange={mortality => updateBird(key, { mortality })} />
-            <Field label="تلفات کل چرخه (٪)">
-              <NumField value={std.mortalityTotalPct.toString()} onChange={e => updateBird(key, { mortalityTotalPct: Number(e.target.value) || 0 })} unit="٪" min={0} />
-            </Field>
-
-            {/* Reset */}
-            {isCustom && (
-              <Btn
-                onClick={() => resetBird(key)}
-                full
-                style={{ marginTop: 8 }}
-              >
-                🔄 بازگشت به پیش‌فرض {DEFAULT_STANDARDS[key].nameFa}
-              </Btn>
-            )}
-          </SettingsGroup>
-        );
-      })}
+      <AddBirdModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        existingCustom={custom}
+        onAdd={handleAddBird}
+      />
     </PageContainer>
   );
 }
