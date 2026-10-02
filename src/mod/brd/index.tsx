@@ -61,8 +61,7 @@ export default function Brd() {
           overflow: 'hidden',
           overflowX: 'hidden',
           width: '100%',
-          minHeight: 'calc(100vh - 120px)',
-          touchAction: 'pan-y',
+                    touchAction: 'pan-y',
           isolation: 'isolate',
         }}
       >

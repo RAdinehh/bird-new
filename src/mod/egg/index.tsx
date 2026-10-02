@@ -59,8 +59,7 @@ export default function Egg() {
         ))}
       </div>
 
-      <div ref={containerRef} style={{ overflow: 'hidden', width: '100%', minHeight: 'calc(100vh - 120px)',
-          isolation: 'isolate', touchAction: 'pan-y' }}>
+      <div ref={containerRef} style={{ overflow: 'hidden', width: '100%',           isolation: 'isolate', touchAction: 'pan-y' }}>
         <div ref={trackRef} style={{ display: 'flex', direction: 'ltr', willChange: 'transform',
             backfaceVisibility: 'hidden', touchAction: 'pan-y' }}>
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>

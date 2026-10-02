@@ -173,8 +173,7 @@ export default function Set() {
             overflow: 'hidden',
             overflowX: 'hidden',
             width: '100%',
-            minHeight: 'calc(100vh - 160px)',
-            touchAction: 'pan-y',
+                        touchAction: 'pan-y',
             isolation: 'isolate',
           }}
         >

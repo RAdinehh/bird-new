@@ -98,8 +98,7 @@ export default function Inc() {
           overflow: 'hidden',
           overflowX: 'hidden',
           width: '100%',
-          minHeight: 'calc(100vh - 120px)',
-          isolation: 'isolate',
+                    isolation: 'isolate',
           touchAction: 'pan-y',
         }}
       >
