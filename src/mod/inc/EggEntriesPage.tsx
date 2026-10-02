@@ -271,7 +271,9 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       if (refCap > 0 && bird) {
         // محاسبه استفاده با این ردیف جدید (نه ردیف فعلی)
         let used = 0;
-        const allEntries = eggEntries.map(x => ({ ...x, __birdName: (birds.find(b => b.id === x.birdId)?.name) || '' }));
+        const __birdsById: Record<string, string> = {};
+    for (const b of birds) __birdsById[b.id] = b.name;
+    const allEntries = eggEntries.map(x => ({ ...x, __birdName: __birdsById[x.birdId] || '' }));
         allEntries.forEach(e => {
           if (e.status === 'failed') return;
           const cap = (device.capacityByBird || []).find((c: any) => c.birdName === e.__birdName);
@@ -475,7 +477,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     setDelId(null);
   };
 
-  const breedsForBird = breeds.filter(b => b.birdId === currentRow.birdId);
+  const breedsForBird = useMemo(
+    () => breeds.filter(b => b.birdId === currentRow.birdId),
+    [breeds, currentRow.birdId]
+  );
 
   // ═══ محاسبه استفاده دستگاه در فرم ═══
   const draftUsage = useMemo(() => {

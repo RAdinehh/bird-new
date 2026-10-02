@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback} from 'react';
 import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ } from 'date-fns-jalali';
 import { useNavigate } from 'react-router-dom';
 import { useTra, remaining } from '../tra/store';
@@ -86,7 +86,7 @@ export default function Dashboard() {
   const humidToday = todayLogs.length > 0 ? (todayLogs[0].humidity || 0) : 0;
 
   // ============ سرسیدهای نزدیک ============
-  const daysUntilDue = (dueDate: string): number | null => {
+  const daysUntilDue = useCallback((dueDate: string): number | null => {
     if (!dueDate) return null;
     try {
       const en = dueDate.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
@@ -96,7 +96,7 @@ export default function Dashboard() {
     } catch {
       return null;
     }
-  };
+  }, []);
 
   const upcomingDues = useMemo(() => {
     return invoices
@@ -105,7 +105,7 @@ export default function Dashboard() {
       .filter(x => x.days !== null && x.days <= 7)
       .sort((a, b) => (a.days ?? 0) - (b.days ?? 0))
       .slice(0, 5);
-  }, [invoices]);
+  }, [invoices, daysUntilDue]);
 
   const pendingChecks = useMemo(() => {
     const list: { inv: any; pay: any }[] = [];
