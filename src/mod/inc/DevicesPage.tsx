@@ -1,6 +1,7 @@
 /**
  * DevicesPage — دستگاه‌های انکوباسیون (ظرفیت، تعمیرات، گارانتی)
  */
+import { useTempUnit, toUserTemp, toCelsius, round1 } from '../../shr/utils/temp';
 import { useState, useMemo } from 'react';
 import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity, fillCapacityFromProfile } from './store';
 import { useSet } from '../set/store';
@@ -16,14 +17,82 @@ import { Row, normalizeBird } from './helpers';
 import { useIncubationProfile } from './hooks';
 import { logAction } from '../../cor/logger/auditLog';
 
-function OvNumField({ label, hint, value, defValue, onChange, unit, min, max, placeholder }: any) {
-  const overridden = defValue != null && value != null && value !== '' && Number(value) !== Number(defValue);
+function OvNumField({ label, hint, value, defValue, onChange, unit, min, max, placeholder, isTemp }: any) {
+  const tempUnit = useTempUnit();
+
+  // اگه دما هست: مقدار ذخیره‌شده سلسیوس است، نمایش تبدیل می‌شود
+  const displayValue = isTemp
+    ? (value == null || value === '' ? '' : String(toUserTemp(Number(value), tempUnit)))
+    : String(value ?? '');
+
+  const displayDef = isTemp && defValue != null
+    ? toUserTemp(Number(defValue), tempUnit)
+    : defValue;
+
+  const displayUnit = isTemp
+    ? (tempUnit === 'c' ? '°C' : '°F')
+    : unit;
+
+  const overridden = defValue != null && value != null && value !== ''
+    && Math.abs(Number(value) - Number(defValue)) > 0.05;
+
+  // برای نمایش hint به‌روز
+  const dynamicHint = isTemp ? displayUnit : hint;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isTemp) {
+      onChange(e);
+      return;
+    }
+    // تبدیل به سلسیوس برای ذخیره
+    let v = e.target.value;
+    v = v.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    v = v.replace(/[٫،]/g, '.');
+    v = v.replace(/[^\d.-]/g, '');
+    if (v === '' || v === '-' || v === '.') {
+      onChange({ target: { value: '' } });
+      return;
+    }
+    const n = Number(v);
+    if (isNaN(n)) return;
+    const celsius = toCelsius(n, tempUnit);
+    if (celsius != null) {
+      onChange({ target: { value: String(round1(celsius)) } });
+    }
+  };
+
   return (
-    <Field label={label} hint={hint}>
+    <Field label={label} hint={dynamicHint}>
       <div style={{ position: 'relative' }}>
-        <NumField value={String(value ?? '')} onChange={onChange} unit={unit} min={min} max={max} placeholder={placeholder} />
+        {isTemp ? (
+          <input
+            type="text"
+            inputMode="decimal"
+            value={displayValue}
+            onChange={handleChange}
+            onFocus={(e) => e.target.select()}
+            style={{
+              width: '100%',
+              height: 38,
+              padding: '0 12px',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-md)',
+              color: 'var(--text)',
+              fontFamily: 'inherit',
+              fontSize: 'var(--fs-base)',
+              fontWeight: 600,
+              textAlign: 'right',
+              outline: 'none',
+              fontVariantNumeric: 'tabular-nums',
+              direction: 'ltr',
+            }}
+          />
+        ) : (
+          <NumField value={String(value ?? '')} onChange={onChange} unit={unit} min={min} max={max} placeholder={placeholder} />
+        )}
         {overridden && (
-          <span title={`دستی — پیش‌فرض: ${toFa(String(defValue))}`} style={{
+          <span title={`دستی — پیش‌فرض: ${toFa(String(displayDef))}${isTemp ? displayUnit : ''}`} style={{
             position: 'absolute', top: -2, left: -2,
             width: 8, height: 8, borderRadius: '50%',
             background: 'var(--warn)',
@@ -640,7 +709,7 @@ export default function DevicesPage() {
                         ) : null}
                       </div>
                       <Grid2>
-                        <OvNumField label="دما" hint="°C" defValue={d.setterTemp}
+                        <OvNumField label="دما" hint="°C" isTemp={true} defValue={d.setterTemp}
                           value={c.setterTemp} onChange={(e: any) => updateCapacityFull(c.birdName, { setterTemp: parseFloat(toEn(e.target.value)) || 0 })}
                           unit="°C" min={20} max={45} placeholder="۳۷٫۷" />
                         <OvNumField label="رطوبت" hint="٪" defValue={d.setterHumidity}
@@ -655,7 +724,7 @@ export default function DevicesPage() {
                         ) : null}
                       </div>
                       <Grid2>
-                        <OvNumField label="دما" hint="°C" defValue={d.hatcherTemp}
+                        <OvNumField label="دما" hint="°C" isTemp={true} defValue={d.hatcherTemp}
                           value={c.hatcherTemp} onChange={(e: any) => updateCapacityFull(c.birdName, { hatcherTemp: parseFloat(toEn(e.target.value)) || 0 })}
                           unit="°C" min={20} max={45} placeholder="۳۷٫۲" />
                         <OvNumField label="رطوبت" hint="٪" defValue={d.hatcherHumidity}
