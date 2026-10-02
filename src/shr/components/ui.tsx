@@ -947,7 +947,12 @@ export function Sheet({
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
   }, [open, onClose]);
 
   if (!open) return null;
@@ -963,6 +968,7 @@ export function Sheet({
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'center',
+        touchAction: 'none',
       }}
     >
       <div
@@ -989,7 +995,16 @@ export function Sheet({
             {title}
           </div>
         ) : null}
-        <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
+        <div style={{
+          overflowY: 'auto',
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
+          minHeight: 0,
+        }}>
           {children}
         </div>
         {footer ? <div style={{ paddingTop: 4 }}>{footer}</div> : null}

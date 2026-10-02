@@ -74,9 +74,23 @@ function CompactField({
       }}>{label}</span>
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <input
-          type="number"
-          value={value ?? ''}
-          onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
+          type="text"
+          inputMode="decimal"
+          value={value === null || value === undefined ? '' : String(value)}
+          onChange={(e) => {
+            let v = e.target.value;
+            // تبدیل ارقام فارسی به لاتین
+            v = v.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+            // فقط اعداد و نقطه منفی مجاز
+            v = v.replace(/[^\d.-]/g, '');
+            if (v === '' || v === '-' || v === '.') {
+              onChange(null);
+              return;
+            }
+            const n = Number(v);
+            if (!isNaN(n)) onChange(n);
+          }}
+          onFocus={(e) => e.target.select()}
           style={{
             flex: 1,
             height: 32,
