@@ -97,9 +97,10 @@ export function useCarousel(
     apply(target, !isClick);
   }, [active, apply]);
 
-  // listeners — یک بار bind
+  // listeners — یک بار bind روی document.body
+  // اینطوری مستقل از ارتفاع containerRef، swipe روی کل ویوپورت کار میکنه
   useEffect(() => {
-    const el = containerRef.current;
+    const el = document.body;
     if (!el) return;
 
     let dragging = false;
@@ -154,7 +155,7 @@ export function useCarousel(
 
       if (direction !== 'h') return;
 
-      const w = wRef.current || el.clientWidth;
+      const w = wRef.current || containerRef.current?.clientWidth || 0;
       if (w <= 0) return;
       const min = -(idsRef.current.length - 1) * w;
       let tx = startTx + dx;
@@ -176,7 +177,7 @@ export function useCarousel(
       dragging = false;
       direction = 'none';
       if (!wasH) return;
-      const w = wRef.current || el.clientWidth;
+      const w = wRef.current || containerRef.current?.clientWidth || 0;
       if (w <= 0) return;
       const len = idsRef.current.length;
       const t = e.changedTouches[0];
