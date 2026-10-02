@@ -4,7 +4,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
-import { parse as parseJ, addDays as addDaysJ, format as formatJ, differenceInDays as diffDaysJ } from 'date-fns-jalali';
+import { parse as parseJ, addDays as addDaysJ, format as formatJ, differenceInDays as diffDaysJ, startOfDay } from 'date-fns-jalali';
 import { toEn } from '../../shr/utils/fa';
 
 /* ============ انواع ============ */
@@ -238,7 +238,7 @@ export function jalaliToDate(s: string): Date | null {
 export function daysAgo(s: string): number {
   const d = jalaliToDate(s);
   if (!d) return 0;
-  const days = diffDaysJ(new Date(), d);
+  const days = diffDaysJ(startOfDay(new Date()), startOfDay(d));
   return Math.max(1, days + 1);  // روز اول انکوباسیون = ۱
 }
 
@@ -252,7 +252,7 @@ export function addDaysJalali(s: string, days: number): string {
 export function daysToHatch(hatchDate: string): number {
   const d = jalaliToDate(hatchDate);
   if (!d) return 0;
-  return diffDaysJ(d, new Date());
+  return diffDaysJ(startOfDay(d), startOfDay(new Date()));
 }
 
 /** Lock-down شده؟ (روز ۱۸ به بعد) */
