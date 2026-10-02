@@ -1015,22 +1015,28 @@ export function Sheet({
 }
 
 // ═══════════════════════════════════════════════
-// TempInput — ورودی دما با تبدیل خودکار
-// مقدار همیشه به سلسیوس می‌ماند؛ نمایش به واحد کاربر
+
+// ═══════════════════════════════════════════════
+// TempInput — ورودی دما با تبدیل خودکار °C ↔ °F
 // ═══════════════════════════════════════════════
 export function TempInput({
-  value, onChange, disabled, height = 32, fontSize = 13,
+  value,
+  onChange,
+  unit,
+  disabled,
+  height = 32,
+  fontSize = 13,
 }: {
-  value: number | null;                    // سلسیوس (internal)
+  value: number | null;
   onChange: (celsius: number | null) => void;
+  unit: 'c' | 'f';
   disabled?: boolean;
   height?: number;
   fontSize?: number;
 }) {
-  const unit = useTempUnitInternal();
-  const displayed = toUserTempInternal(value, unit);
-  const unit = useTempUnit();
-  const displayed = toUserTemp(value, unit);
+  const displayed = value == null ? '' : (
+    unit === 'c' ? value : Math.round((value * 9 / 5 + 32) * 10) / 10
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
@@ -1040,8 +1046,8 @@ export function TempInput({
     if (v === '' || v === '-' || v === '.') { onChange(null); return; }
     const n = Number(v);
     if (isNaN(n)) return;
-    const c = toCelsius(n, unit);
-    if (c != null) onChange(round1(c));
+    const celsius = unit === 'c' ? n : (n - 32) * 5 / 9;
+    onChange(Math.round(celsius * 10) / 10);
   };
 
   return (
@@ -1050,7 +1056,7 @@ export function TempInput({
         type="text"
         inputMode="decimal"
         disabled={disabled}
-        value={displayed == null ? '' : String(displayed)}
+        value={String(displayed)}
         onChange={handleChange}
         onFocus={(e) => e.target.select()}
         style={{
@@ -1077,7 +1083,7 @@ export function TempInput({
         flexShrink: 0,
         minWidth: 26,
         textAlign: 'left',
-      }}>{tempLabel(unit)}</span>
+      }}>{unit === 'c' ? '°C' : '°F'}</span>
     </div>
   );
 }
@@ -1086,15 +1092,19 @@ export function TempInput({
 // TempDisplay — نمایش فقط‌خواندنی دما
 // ═══════════════════════════════════════════════
 export function TempDisplay({
-  value, prefix = '', suffix = '', weight = 600,
+  value,
+  unit,
+  toFaFn,
+  prefix = '',
+  suffix = '',
 }: {
-  value: number | null;                    // سلسیوس
+  value: number | null;
+  unit: 'c' | 'f';
+  toFaFn: (v: any) => string;
   prefix?: string;
   suffix?: string;
-  weight?: number;
 }) {
-  const { useTempUnit, formatTemp } = require('../../shr/utils/temp');
-  const { toFa } = require('../utils/fa');
-  const unit = useTempUnit();
-  return <>{prefix}{formatTemp(value, unit, toFa)}{suffix}</>;
+  if (value == null) return <>{prefix}—{suffix}</>;
+  const v = unit === 'c' ? value : Math.round((value * 9 / 5 + 32) * 10) / 10;
+  return <>{prefix}{toFaFn(v)}{unit === 'c' ? '°C' : '°F'}{suffix}</>;
 }
