@@ -1013,3 +1013,88 @@ export function Sheet({
     document.body
   );
 }
+
+// ═══════════════════════════════════════════════
+// TempInput — ورودی دما با تبدیل خودکار
+// مقدار همیشه به سلسیوس می‌ماند؛ نمایش به واحد کاربر
+// ═══════════════════════════════════════════════
+export function TempInput({
+  value, onChange, disabled, height = 32, fontSize = 13,
+}: {
+  value: number | null;                    // سلسیوس (internal)
+  onChange: (celsius: number | null) => void;
+  disabled?: boolean;
+  height?: number;
+  fontSize?: number;
+}) {
+  const unit = useTempUnitInternal();
+  const displayed = toUserTempInternal(value, unit);
+  const unit = useTempUnit();
+  const displayed = toUserTemp(value, unit);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let v = e.target.value;
+    v = v.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    v = v.replace(/[٫،]/g, '.');
+    v = v.replace(/[^\d.-]/g, '');
+    if (v === '' || v === '-' || v === '.') { onChange(null); return; }
+    const n = Number(v);
+    if (isNaN(n)) return;
+    const c = toCelsius(n, unit);
+    if (c != null) onChange(round1(c));
+  };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
+      <input
+        type="text"
+        inputMode="decimal"
+        disabled={disabled}
+        value={displayed == null ? '' : String(displayed)}
+        onChange={handleChange}
+        onFocus={(e) => e.target.select()}
+        style={{
+          flex: 1,
+          height,
+          padding: '0 6px',
+          background: 'var(--input-bg)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-sm)',
+          color: 'var(--text)',
+          fontFamily: 'inherit',
+          fontSize,
+          fontWeight: 600,
+          textAlign: 'center',
+          outline: 'none',
+          fontVariantNumeric: 'tabular-nums',
+          direction: 'ltr',
+          minWidth: 0,
+        }}
+      />
+      <span style={{
+        fontSize: fontSize - 2,
+        color: 'var(--muted)',
+        flexShrink: 0,
+        minWidth: 26,
+        textAlign: 'left',
+      }}>{tempLabel(unit)}</span>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════
+// TempDisplay — نمایش فقط‌خواندنی دما
+// ═══════════════════════════════════════════════
+export function TempDisplay({
+  value, prefix = '', suffix = '', weight = 600,
+}: {
+  value: number | null;                    // سلسیوس
+  prefix?: string;
+  suffix?: string;
+  weight?: number;
+}) {
+  const { useTempUnit, formatTemp } = require('../../shr/utils/temp');
+  const { toFa } = require('../utils/fa');
+  const unit = useTempUnit();
+  return <>{prefix}{formatTemp(value, unit, toFa)}{suffix}</>;
+}
