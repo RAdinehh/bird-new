@@ -185,19 +185,19 @@ export default function DealsPage() {
                   </>
                 }
               >
-                <SectionTitle>📋 اطلاعات معامله</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات معامله</SectionTitle>
                 <Row l="نوع" v={DEAL_LABEL[d.type]} />
                 <Row l="طرف معامله" v={party?.name || '—'} />
                 <Row l="تاریخ" v={toFa(d.date)} />
                 {d.dueDate ? <Row l="سرسید" v={toFa(d.dueDate)} /> : null}
                 <Row l="وضعیت" v={STATUS_LABEL[d.status]} />
 
-                <SectionTitle>📝 توضیحات</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> توضیحات</SectionTitle>
                 <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.description}</div>
 
                 {(d.value > 0 || (d.percent !== null && d.percent !== undefined)) ? (
                   <>
-                    <SectionTitle>💰 مالی</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
                     {d.value > 0 ? <Row l="ارزش کل" v={`${toFa(d.value.toLocaleString('fa-IR'))} ت`} /> : null}
                     {d.percent !== null && d.percent !== undefined ? <Row l="درصد" v={`${toFa(d.percent)}٪`} /> : null}
                   </>
@@ -205,7 +205,7 @@ export default function DealsPage() {
 
                 {d.notes ? (
                   <>
-                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
                   </>
                 ) : null}

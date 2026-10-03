@@ -232,7 +232,7 @@ export default function ItemsPage() {
                   </>
                 }
               >
-                <SectionTitle>📦 مشخصات قلم</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> مشخصات قلم</SectionTitle>
                 <Row l="دسته" v={CATEGORY_LABEL[it.category]} />
                 <Row l="واحد" v={UNIT_LABEL[it.unit]} />
                 <Row l="موجودی فعلی" v={`${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`} />
@@ -273,7 +273,7 @@ export default function ItemsPage() {
 
                 {myMovements.length > 0 ? (
                   <>
-                    <SectionTitle>📋 آخرین گردش‌ها ({toFa(myMovements.length)})</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> آخرین گردش‌ها ({toFa(myMovements.length)})</SectionTitle>
                     {myMovements.slice(-3).reverse().map(m => (
                       <div key={m.id} style={{ fontSize: 'var(--fs-sm)',
                          padding: 'var(--pad-tight)', background: 'var(--input-bg)',
@@ -288,7 +288,7 @@ export default function ItemsPage() {
 
                 {it.notes ? (
                   <>
-                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
                        padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{it.notes}</div>

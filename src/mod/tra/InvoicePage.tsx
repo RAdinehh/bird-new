@@ -318,14 +318,14 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
                   </>
                 }
               >
-                <SectionTitle>📋 اطلاعات</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات</SectionTitle>
                 <Row l="فروشنده" v={party?.name || '—'} />
                 <Row l="تاریخ" v={toFa(inv.date)} />
                 {inv.number ? <Row l="شماره" v={inv.number} /> : null}
                 {inv.dueDate ? <Row l="سرسید" v={toFa(inv.dueDate)} /> : null}
                 {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تاریخ تحویل" v={toFa(inv.deliveryDate)} /> : null}
 
-                <SectionTitle>📦 اقلام</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
                 {inv.items.map(it => (
                   <div key={it.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                     <span>{it.description || '—'} × {toFa(it.quantity)}</span>
@@ -383,7 +383,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
         title={form.id ? 'ویرایش خرید' : 'ثبت خرید جدید'}
         footer={<BtnRow><Btn onClick={() => setOpen(false)}>لغو</Btn><Btn variant="primary" onClick={save}>ذخیره</Btn></BtnRow>}
       >
-        <SectionTitle>📋 اطلاعات پایه</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
         <Grid2>
           <Field label="تاریخ" required>
             <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
@@ -403,7 +403,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
           />
         </Field>
 
-        <SectionTitle>📦 اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت</SectionTitle>
         {form.items.map((it, idx) => (
           <div key={it.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -475,11 +475,11 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
         ))}
         <Btn size="sm" full onClick={addItem}>+ افزودن قلم</Btn>
 
-        <SectionTitle>📦 نوع سفارش</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> نوع سفارش</SectionTitle>
         <Field label="نوع سفارش">
           <Select value={form.isPreorder ? 'preorder' : 'stock'} onChange={e => setForm({ ...form, isPreorder: e.target.value === 'preorder' })}>
-            <option value="stock">📦 از موجودی (فوری)</option>
-            <option value="preorder">📅 پیش‌خرید (تاریخ تحویل)</option>
+            <option value="stock"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> از موجودی (فوری)</option>
+            <option value="preorder"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> پیش‌خرید (تاریخ تحویل)</option>
           </Select>
         </Field>
 
@@ -502,12 +502,12 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
           </>
         )}
 
-        <SectionTitle>📅 شرایط پرداخت</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> شرایط پرداخت</SectionTitle>
         <Grid2>
           <Field label="نوع پرداخت" required>
             <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
               <option value="cash">💵 نقدی</option>
-              <option value="installment">📅 قسطی</option>
+              <option value="installment"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> قسطی</option>
               <option value="custom">✏️ توافقی</option>
             </Select>
           </Field>
@@ -586,7 +586,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
           </div>
         )}
 
-        <SectionTitle>📝 یادداشت</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
         <Field label="یادداشت">
           <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
         </Field>

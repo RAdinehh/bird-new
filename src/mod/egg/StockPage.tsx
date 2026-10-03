@@ -201,17 +201,17 @@ export default function StockPage() {
                   </>
                 }
               >
-                <SectionTitle>📋 اطلاعات فروش</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات فروش</SectionTitle>
                 <Row l="مشتری" v={cus?.name || '—'} />
                 <Row l="تاریخ" v={toFa(s.date)} />
                 <Row l="نوع تخم" v={EGG_TYPE_LABEL[s.type]} />
                 <Row l="روش پرداخت" v={PAYMENT_LABEL[s.paymentType]} />
 
-                <SectionTitle>🥚 تعداد</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تعداد</SectionTitle>
                 <Row l="تعداد" v={`${toFa(s.count)} ${UNIT_LABEL[s.unit]}`} />
                 <Row l="معادل عدد" v={`${toFa(pieces.toLocaleString('fa-IR'))} عدد`} />
 
-                <SectionTitle>💰 مالی</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
                 <Row l="قیمت واحد" v={`${toFa(s.unitPrice.toLocaleString('fa-IR'))} ت`} />
                 <div style={{ display: 'flex', justifyContent: 'space-between',
                    fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
@@ -223,7 +223,7 @@ export default function StockPage() {
 
                 {s.notes ? (
                   <>
-                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
                        padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{s.notes}</div>
@@ -268,7 +268,7 @@ export default function StockPage() {
 
         <Field label="نوع تخم" required hint={`موجودی این نوع — ${toFa(selectedStock)} عدد`}>
           <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as EggType })}>
-            <option value="eating">🥚 خوراکی ({toFa(stock.eating)})</option>
+            <option value="eating"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> خوراکی ({toFa(stock.eating)})</option>
             <option value="fertile">🌱 نطفه‌دار ({toFa(stock.fertile)})</option>
             <option value="broken">💔 شکسته ({toFa(stock.broken)})</option>
           </Select>

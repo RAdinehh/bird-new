@@ -119,7 +119,7 @@ export default function AppearanceTab() {
                   }}
                 >
                   {slot === 0 ? (
-                    <option value="dsh">🏠 داشبورد</option>
+                    <option value="dsh"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🏠</span> داشبورد</option>
                   ) : (
                     <>
                       <option value="">— خالی —</option>

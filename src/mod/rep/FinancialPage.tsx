@@ -28,7 +28,7 @@ function ParetoCard({ invoices }: { invoices: any[] }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 'var(--pad-comfy)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)' }}>
-      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>📊 تحلیل Pareto — اقلام پرهزینه</div>
+      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> تحلیل Pareto — اقلام پرهزینه</div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
         {toFa(top80.length)} قلم اول = حدود ۸۰٪ کل خرید
       </div>
@@ -120,7 +120,7 @@ export default function FinancialPage() {
           {receivables > 0 ? (
             <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)',
                border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)' }}>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>📥 طلب از مشتریان</div>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> طلب از مشتریان</div>
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
                 {toFa(receivables.toLocaleString('fa-IR'))}
               </div>
@@ -129,7 +129,7 @@ export default function FinancialPage() {
           ) : null}
           {payables > 0 ? (
             <div style={{ padding: 'var(--pad-comfy)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)' }}>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>📤 بدهی به فروشندگان</div>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📤</span> بدهی به فروشندگان</div>
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--warn)', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
                 {toFa(payables.toLocaleString('fa-IR'))}
               </div>

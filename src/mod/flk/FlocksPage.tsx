@@ -422,7 +422,7 @@ export default function FlocksPage() {
                   badge={<Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>}
                   stats={<>
                     {ageDays > 0 && <span>🎂 سن: <b style={{ color: 'var(--text)' }}>{fmt.int(ageDays)} روز</b></span>}
-                    {f.currentCount && <span>🐔 زنده: <b style={{ color: 'var(--text)' }}>{fmt.int(f.currentCount)}</b></span>}
+                    {f.currentCount && <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> زنده: <b style={{ color: 'var(--text)' }}>{fmt.int(f.currentCount)}</b></span>}
                     {f.initialCount && f.currentCount && f.initialCount !== f.currentCount && (
                       <span style={{ color: 'var(--danger)' }}>💀 تلفات: <b>{fmt.int(f.initialCount - f.currentCount)}</b></span>
                     )}
@@ -459,7 +459,7 @@ export default function FlocksPage() {
                   {/* تاریخ‌ها */}
                   {(f.hatchDate || f.purchaseDate || f.startDate) && (
                     <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📅 تاریخ‌ها</div>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تاریخ‌ها</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         {f.hatchDate && <Row l="هچ" v={toFa(f.hatchDate)} />}
                         {f.purchaseDate && <Row l="خرید" v={toFa(f.purchaseDate)} />}
@@ -469,7 +469,7 @@ export default function FlocksPage() {
                   )}
 
                   {/* مشخصات */}
-                  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات</div>
+                  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مشخصات</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {ageDays > 0 && <Row l="سن (روز)" v={`${fmt.int(ageDays)} روز`} />}
                     {f.initialCount && <Row l="تعداد اولیه" v={toFa(f.initialCount)} />}
@@ -487,7 +487,7 @@ export default function FlocksPage() {
                   {/* هزینه‌ها */}
                   {costs.total > 0 && (
                     <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 هزینه‌ها</div>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هزینه‌ها</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         {costs.birdCost > 0 && <Row l="قیمت پرنده‌ها" v={`${toFa(costs.birdCost.toLocaleString('fa-IR'))} ت`} />}
                         {costs.delivery > 0 && <Row l="هزینه حمل" v={`${toFa(costs.delivery.toLocaleString('fa-IR'))} ت`} />}
@@ -498,7 +498,7 @@ export default function FlocksPage() {
                         </div>
                         {costs.perBird > 0 && (
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                            <span>💰 هر پرنده:</span>
+                            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هر پرنده:</span>
                             <span>{toFa(Math.round(costs.perBird).toLocaleString('fa-IR'))} ت</span>
                           </div>
                         )}
@@ -509,7 +509,7 @@ export default function FlocksPage() {
                   {/* یادداشت */}
                   {f.notes && (
                     <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
                       <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
                     </>
                   )}
@@ -719,7 +719,7 @@ export default function FlocksPage() {
               </div>
               {liveCosts.per > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--accent)', fontWeight: 700 }}>💰 هر پرنده:</span>
+                  <span style={{ color: 'var(--accent)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هر پرنده:</span>
                   <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{toFa(Math.round(liveCosts.per).toLocaleString('fa-IR'))} ت</span>
                 </div>
               )}

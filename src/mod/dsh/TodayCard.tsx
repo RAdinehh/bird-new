@@ -42,7 +42,7 @@ export default function TodayCard({
   if (activeFlocks.length === 0) {
     return (
       <>
-        <SectionTitle>📅 امروز در یک نگاه</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> امروز در یک نگاه</SectionTitle>
         <MiniEmpty
           icon="🐔"
           title="هنوز گله‌ای ثبت نشده"
@@ -190,7 +190,7 @@ export default function TodayCard({
                   </div>
                 )}
 
-                <SectionTitle>📅 امروز در یک نگاه</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> امروز در یک نگاه</SectionTitle>
                 <BenchmarkCard />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
                   <KpiCard

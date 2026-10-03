@@ -182,7 +182,7 @@ export default function RequirementsPage() {
                   </>
                 }
               >
-                <SectionTitle>🐔 مشخصات</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> مشخصات</SectionTitle>
                 <Row l="نوع پرنده" v={r.birdType} />
                 <Row l="مرحله" v={stageLabel} />
 
@@ -202,7 +202,7 @@ export default function RequirementsPage() {
 
                 {r.notes ? (
                   <>
-                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
                        padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{r.notes}</div>

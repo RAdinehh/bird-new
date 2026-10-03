@@ -237,7 +237,7 @@ export default function ProductionsPage() {
                   </>
                 }
               >
-                <SectionTitle>📊 آمار تخم‌گذاری</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> آمار تخم‌گذاری</SectionTitle>
                 <Row l="تخم سالم" v={toFa(healthy2)} accent />
                 <Row l="تخم شکسته" v={toFa(p.brokenCount)} />
                 {p.softCount > 0 ? <Row l="تخم نرم" v={toFa(p.softCount)} /> : null}
@@ -263,7 +263,7 @@ export default function ProductionsPage() {
 
                 {p.notes ? (
                   <>
-                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
                        padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{p.notes}</div>
@@ -307,7 +307,7 @@ export default function ProductionsPage() {
           </div>
         ) : null}
 
-        <SectionTitle>🥚 تخم‌گذاری</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم‌گذاری</SectionTitle>
 
         <Grid2>
           <Field
@@ -370,7 +370,7 @@ export default function ProductionsPage() {
             gap: 6
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-              <span style={{ color: 'var(--muted)' }}>🥚 تخم سالم:</span>
+              <span style={{ color: 'var(--muted)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم سالم:</span>
               <span style={{ fontWeight: 700, color: 'var(--text)' }}>{toFa(healthy)}</span>
             </div>
             {int(form.brokenCount) > 0 ? (
@@ -381,7 +381,7 @@ export default function ProductionsPage() {
             ) : null}
             {int(form.softCount) > 0 ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-                <span style={{ color: 'var(--muted)' }}>🥚 نرم:</span>
+                <span style={{ color: 'var(--muted)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> نرم:</span>
                 <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(int(form.softCount))}</span>
               </div>
             ) : null}

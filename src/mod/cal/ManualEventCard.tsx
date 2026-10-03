@@ -98,7 +98,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
           </div>
 
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 4, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <span>📅 {toFa(event.date)}</span>
+            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> {toFa(event.date)}</span>
             {event.time ? <span>⏰ {toFa(event.time)}</span> : null}
             <span style={{ color: colors.text }}>🏷 {typeLabel}</span>
           </div>

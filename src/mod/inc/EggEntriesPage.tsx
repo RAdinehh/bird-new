@@ -701,7 +701,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   return <ProgressTracker current={age} target={total} label={lbl} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
                 })()}
 
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📋 مشخصات</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> مشخصات</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="دستگاه" v={dev?.name || '—'} />
                   <Row l="پرنده" v={(bird?.name || '—') + (breed ? ' · ' + breed.name : '')} />
@@ -731,7 +731,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
                 {(e.unitPrice || e.totalPrice || (e as any).shippingCost) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {e.unitPrice && <Row l="قیمت هر تخم" v={toFa(e.unitPrice.toLocaleString('fa-IR')) + ' ت'} />}
                       {(e as any).shippingCost && <Row l="هزینه حمل" v={toFa((e as any).shippingCost.toLocaleString('fa-IR')) + ' ت'} />}
@@ -746,7 +746,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
                 {e.notes && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
                   </>
                 )}
@@ -791,10 +791,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               fontWeight: 700,
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>📊 استفاده کل</span>
+                <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> استفاده کل</span>
                 <span>{toFa(liveUsage.used)} / {toFa(liveUsage.total)} ({toFa(liveUsage.percent)}٪)</span>
               </div>
-              {liveUsage.percent > 100 && <div style={{ marginTop: 4 }}>⚠️ {toFa(Math.abs(liveUsage.remaining))} واحد اضافی</div>}
+              {liveUsage.percent > 100 && <div style={{ marginTop: 4 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚠️</span> {toFa(Math.abs(liveUsage.remaining))} واحد اضافی</div>}
             </div>
           )}
         </div>
@@ -879,15 +879,15 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           </div>
 
           {/* ═══ منبع + زمان ═══ */}
-            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 4 }}>🏠 منبع و طرف مقابل</div>
+            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 4 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🏠</span> منبع و طرف مقابل</div>
 
           <Field label="نوع منبع" required>
             <Select value={currentRow.dealType} onChange={e => setCurrentRow(f => ({ ...f, dealType: e.target.value as DealType, dealData: {}, flockId: '' }))}>
-              <option value="own">🏠 گله خودم</option>
+              <option value="own"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🏠</span> گله خودم</option>
               <option value="partnership">🤝 شراکتی</option>
-              <option value="purchase">📥 خریداری</option>
+              <option value="purchase"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> خریداری</option>
               <option value="rent">🏢 اجاره‌ای</option>
-              <option value="consignment">📦 امانی</option>
+              <option value="consignment"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> امانی</option>
             </Select>
           </Field>
 
@@ -960,7 +960,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             </Field>
           )}
 
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 6, borderTop: '1px dashed var(--border)' }}>📅 زمان</div>
+          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 6, borderTop: '1px dashed var(--border)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> زمان</div>
           <Grid2>
             <Field label="تاریخ ورود" required>
               <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ"  autoToday />
@@ -1019,7 +1019,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
           {/* مشخصات تخم */}
           <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 4 }}>
-            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 8 }}>🥚 مشخصات تخم</div>
+            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 8 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> مشخصات تخم</div>
             <Grid2>
               <Field label="پرنده" required>
                 <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="—" modalTitle="انتخاب پرنده" autoThreshold={6} />
@@ -1060,7 +1060,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           {/* مالی */}
           {(currentRow.dealType === 'purchase' || currentRow.dealType === 'partnership') && (
             <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 4 }}>
-              <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 8 }}>💰 مالی</div>
+              <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 8 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</div>
               <Grid2>
                 <Field label="قیمت هر تخم">
                   <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
@@ -1075,7 +1075,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                 const sh = parseFloat(toEn(currentRow.shippingCost).replace('٫', '.')) || 0;
                 const total = (cnt * up) + sh;
                 if (total > 0) {
-                  return <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', color: 'var(--text)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع ردیف:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
+                  return <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', color: 'var(--text)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> جمع ردیف:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
                 }
                 return null;
               })()}

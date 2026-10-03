@@ -436,7 +436,7 @@ export default function DevicesPage() {
               >
                 {caps.length > 0 && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 ظرفیت</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> ظرفیت</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                       {caps.map(c => (
                         <div key={c.birdName} style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
@@ -450,7 +450,7 @@ export default function DevicesPage() {
 
                 {(d.purchasedAt || d.price || d.warranty) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</div>
                     {d.price && <Row l="قیمت" v={toFa(d.price.toLocaleString('fa-IR')) + ' ت'} />}
                     {d.purchasedAt && <Row l="تاریخ خرید" v={toFa(d.purchasedAt)} />}
                     {d.warranty && <Row l="گارانتی" v={toFa(d.warranty) + ' ماه'} />}
@@ -506,7 +506,7 @@ export default function DevicesPage() {
 
                 {d.notes && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
                   </>
                 )}
@@ -525,7 +525,7 @@ export default function DevicesPage() {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش دستگاه' : 'افزودن دستگاه'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
-        <SectionTitle>📋 مشخصات اصلی</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> مشخصات اصلی</SectionTitle>
         <Field label="نام دستگاه" required hint={
           form.name && devices.some(x => x.id !== form.id && x.name.trim() === form.name.trim())
             ? '⚠️ این نام قبلاً استفاده شده'
@@ -550,13 +550,13 @@ export default function DevicesPage() {
             <Select value={form.status} onChange={e => setForm({...form, status: e.target.value as DeviceStatus})}>
               <option value="active">✅ فعال</option>
               <option value="idle">⏸ غیرفعال</option>
-              <option value="maintenance">🔧 تعمیر</option>
+              <option value="maintenance"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🔧</span> تعمیر</option>
               <option value="broken">❌ خراب</option>
             </Select>
           </Field>
         </Grid2>
 
-        <SectionTitle>📊 ظرفیت بر اساس پرنده</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> ظرفیت بر اساس پرنده</SectionTitle>
         {birds.length === 0 ? (
           <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
             هنوز پرنده‌ای در ماژول «پرنده و نژاد» ثبت نشده
@@ -666,7 +666,7 @@ export default function DevicesPage() {
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' as any, flexWrap: 'wrap', marginTop: 6, fontSize: 'var(--fs-sm)' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 ستر</span>
+                        <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> ستر</span>
                         <span style={{ fontWeight: 700 }}>{fmt(c.setterTemp)}°</span>
                         <span style={{ color: 'var(--dim)', fontWeight: 600 }}>{fmt(c.setterHumidity)}٪</span>
                       </span>
@@ -703,7 +703,7 @@ export default function DevicesPage() {
                       }}>🔄 پر کردن از پروفایل</button>
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-                        <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 ستر</span>
+                        <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> ستر</span>
                         {setterOv && prof ? (
                           <button type="button" onClick={() => resetSection(c.birdName, 'setter')} style={resetBtnStyle}>↩️ پیش‌فرض</button>
                         ) : null}
@@ -781,7 +781,7 @@ export default function DevicesPage() {
           </Field>
         </Grid2>
 
-        <SectionTitle>💰 مالی</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
         <Grid2>
           <Field label="قیمت خرید">
             <MoneyField placeholder="۰" value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
@@ -804,7 +804,7 @@ export default function DevicesPage() {
           </div>
         )}
 
-        <SectionTitle>📝 یادداشت</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
         <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
 
         <ErrorBox>{err}</ErrorBox>

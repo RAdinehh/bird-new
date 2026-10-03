@@ -221,7 +221,7 @@ export default function FormulasPage() {
                   <span>{toFa(total.toFixed(2))}٪</span>
                 </div>
 
-                <SectionTitle>📊 مواد مغذی</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مواد مغذی</SectionTitle>
                 <Grid2>
                   <Row l="پروتئین" v={`${toFa(n.protein)} ٪`} />
                   <Row l="انرژی" v={`${toFa(n.energy)} kcal`} />
@@ -237,7 +237,7 @@ export default function FormulasPage() {
 
                 {n.price > 0 ? (
                   <>
-                    <SectionTitle>💰 مالی</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
                     <div style={{ display: 'flex', justifyContent: 'space-between',
                        fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
                        color: 'var(--accent)', borderRadius: 'var(--r-sm)',
@@ -250,7 +250,7 @@ export default function FormulasPage() {
 
                 {f.notes ? (
                   <>
-                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
                        padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
@@ -373,7 +373,7 @@ export default function FormulasPage() {
 
         <Btn size="sm" full onClick={addLine}>+ افزودن ماده</Btn>
 
-        <SectionTitle>📊 مواد مغذی محاسبه‌شده</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مواد مغذی محاسبه‌شده</SectionTitle>
         <Grid2>
           <NutrientRow l="پروتئین" value={nutrients.protein} target={selectedReq ? selectedReq.protein : undefined} unit="٪" />
           <NutrientRow l="انرژی" value={nutrients.energy} target={selectedReq ? selectedReq.energy : undefined} unit="kcal" />
@@ -391,7 +391,7 @@ export default function FormulasPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between',
              fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
              color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-            <span>💰 هزینه هر کیلوگرم:</span>
+            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هزینه هر کیلوگرم:</span>
             <span>{toFa(nutrients.price.toLocaleString('fa-IR'))} ت</span>
           </div>
         ) : null}

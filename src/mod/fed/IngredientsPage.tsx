@@ -291,7 +291,7 @@ export default function IngredientsPage() {
                   </>
                 )}
 
-                <SectionTitle>💰 مالی و انبار</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی و انبار</SectionTitle>
                 {livePrice > 0 && <Row l="قیمت انبار" v={`${toFa(livePrice.toLocaleString('fa-IR'))} ت/kg`} />}
                 {!livePrice && it.price > 0 && <Row l="قیمت دستی" v={`${toFa(it.price.toLocaleString('fa-IR'))} ت/kg`} />}
                 {stockItem ? (
@@ -306,7 +306,7 @@ export default function IngredientsPage() {
 
                 {it.notes && (
                   <>
-                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
                        padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
@@ -388,7 +388,7 @@ export default function IngredientsPage() {
           <Field label="حداکثر" hint="۰ = بدون محدودیت"><NumField value={form.maxPercent} onChange={e => setForm({ ...form, maxPercent: e.target.value })} unit="٪" max={100} min={0} /></Field>
         </Grid2>
 
-        <SectionTitle>📦 اتصال به انبار</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اتصال به انبار</SectionTitle>
         <Field label="کالای مرتبط" hint="اگر وصل شود، موجودی خودکار کم و قیمت از انبار خونده می‌شود">
 <SmartSelect
               value={form.stockItemId}

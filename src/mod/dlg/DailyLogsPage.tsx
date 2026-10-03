@@ -335,10 +335,10 @@ export default function DailyLogsPage() {
         isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : l.id)}
         badge={l.deathsCount > 0 ? <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag> : undefined}
         stats={<>
-          {l.temperature !== null && <span>🌡 {toFa(l.temperature)}°</span>}
-          {l.humidity !== null && <span>💧 {toFa(l.humidity)}٪</span>}
-          {l.feedAmount !== null && <span>🌾 {toFa(l.feedAmount)} kg</span>}
-          {l.waterAmount !== null && <span>💧 {toFa(l.waterAmount)} L</span>}
+          {l.temperature !== null && <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> {toFa(l.temperature)}°</span>}
+          {l.humidity !== null && <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💧</span> {toFa(l.humidity)}٪</span>}
+          {l.feedAmount !== null && <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌾</span> {toFa(l.feedAmount)} kg</span>}
+          {l.waterAmount !== null && <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💧</span> {toFa(l.waterAmount)} L</span>}
         </>}
       >
         {(tWarn !== 'ok' || hWarn !== 'ok') && (
@@ -461,7 +461,7 @@ export default function DailyLogsPage() {
           {(l.status || 'active') === 'active' ? (
             <>
               <Btn size="sm" onClick={() => openEdit(l)} style={{ flex: 1 }}>ویرایش</Btn>
-              <Btn size="sm" onClick={() => archive(l.id)} style={{ flex: 1 }}>📦 آرشیو</Btn>
+              <Btn size="sm" onClick={() => archive(l.id)} style={{ flex: 1 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> آرشیو</Btn>
             </>
           ) : (
             <>
@@ -575,7 +575,7 @@ export default function DailyLogsPage() {
             </div>
           )}
 
-          <SectionTitle>🌡 شرایط محیطی</SectionTitle>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> شرایط محیطی</SectionTitle>
 
           <Grid2>
             <Field label="حداقل دما" hint="۱۵-۳۰ درجه">
@@ -612,7 +612,7 @@ export default function DailyLogsPage() {
             </Field>
           </Grid2>
 
-          <SectionTitle>🐔 مشاهده پرنده</SectionTitle>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> مشاهده پرنده</SectionTitle>
 
           <Grid3>
             <Field label="رفتار">
@@ -641,7 +641,7 @@ export default function DailyLogsPage() {
             <Textarea rows={2} placeholder="رنگ پر، چشم، تاج، منقار..." value={form.appearance} onChange={e => setForm({ ...form, appearance: e.target.value })} />
           </Field>
 
-          <SectionTitle>🌾 تغذیه</SectionTitle>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌾</span> تغذیه</SectionTitle>
 
           <Field label="منبع دان مصرفی" hint="از جیره‌ها یا دان تکی انبار">
             <SmartSelect
@@ -690,7 +690,7 @@ export default function DailyLogsPage() {
             return (
               <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 4 }}>مواد اولیه این جیره:</div>
-                {f.lines.length === 0 && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠️ این جیره خطی ندارد</div>}
+                {f.lines.length === 0 && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚠️</span> این جیره خطی ندارد</div>}
                 {f.lines.map(line => {
                   const ing = ingredients.find(i => i.id === line.ingredientId);
                   if (!ing) return null;
@@ -736,7 +736,7 @@ export default function DailyLogsPage() {
             </Field>
           </Grid2>
 
-          <SectionTitle>💧 آب</SectionTitle>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💧</span> آب</SectionTitle>
 
           {form.waterMethod === 'manual' && (
             <>
@@ -772,7 +772,7 @@ export default function DailyLogsPage() {
 
           {isLayerFlock && (
           <>
-            <SectionTitle>🥚 تخم‌گذاری</SectionTitle>
+            <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم‌گذاری</SectionTitle>
             <Grid3>
               <Field label="تعداد تخم">
                 <NumField placeholder="۰" value={form.eggsCount} onChange={e => setForm({...form, eggsCount: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
@@ -787,7 +787,7 @@ export default function DailyLogsPage() {
           </>
         )}
 
-        <SectionTitle>⚖️ وزن‌کشی (اختیاری)</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚖️</span> وزن‌کشی (اختیاری)</SectionTitle>
 
           {form.weightSamples.length > 0 && (
             <Grid2>
@@ -900,7 +900,7 @@ export default function DailyLogsPage() {
             </div>
           ))}
 
-          <SectionTitle>🔧 فعالیت‌ها</SectionTitle>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🔧</span> فعالیت‌ها</SectionTitle>
 
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, activities: [...f.activities, { id: crypto.randomUUID(), type: '', notes: '' }] }))}>
             + افزودن فعالیت
@@ -912,7 +912,7 @@ export default function DailyLogsPage() {
             </div>
           ))}
 
-          <SectionTitle>📝 یادداشت</SectionTitle>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
           <Field label="یادداشت">
             <Textarea rows={3} placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>

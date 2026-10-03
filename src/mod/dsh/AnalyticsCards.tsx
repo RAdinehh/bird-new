@@ -94,7 +94,7 @@ export default function AnalyticsCards({
                 </div>
 
                 {/* ============ ۳. عملکرد تولیدی ============ */}
-                <SectionTitle>📊 عملکرد تولیدی</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> عملکرد تولیدی</SectionTitle>
                 <div style={{
                   background: 'var(--card)',
                   border: '1px solid var(--border)',
@@ -183,7 +183,7 @@ export default function AnalyticsCards({
                 )}
 
                 {/* ============ ۴. مالی ============ */}
-                <SectionTitle>💰 مالی این ماه</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی این ماه</SectionTitle>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
                   <KpiCard
                     icon="📥"

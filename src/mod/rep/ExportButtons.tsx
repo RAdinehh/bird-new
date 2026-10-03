@@ -144,20 +144,20 @@ export default function ExportButtons() {
         </div>
       </div>
 
-      <h2>📊 خلاصه‌ی مالی</h2>
+      <h2><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> خلاصه‌ی مالی</h2>
       <table>
         <tr><td>فروش کل</td><td style="text-align: left;">${toFa(totalSales.toLocaleString('fa-IR'))} ت</td></tr>
         <tr><td>خرید کل</td><td style="text-align: left;">${toFa(totalPurchases.toLocaleString('fa-IR'))} ت</td></tr>
         <tr class="total-row"><td>سود کل</td><td style="text-align: left;">${toFa((totalSales - totalPurchases).toLocaleString('fa-IR'))} ت</td></tr>
       </table>
 
-      <h2>🐔 وضعیت گله</h2>
+      <h2><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> وضعیت گله</h2>
       <table>
         <tr><td>تعداد گله فعال</td><td style="text-align: left;">${toFa(totalFlocks)}</td></tr>
         <tr><td>جمع پرنده</td><td style="text-align: left;">${toFa(totalBirds.toLocaleString('fa-IR'))}</td></tr>
       </table>
 
-      <h2>🥚 تولید</h2>
+      <h2><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تولید</h2>
       <table>
         <tr><td>جمع تخم‌گذاری</td><td style="text-align: left;">${toFa(totalEggs.toLocaleString('fa-IR'))} عدد</td></tr>
       </table>
@@ -182,12 +182,12 @@ export default function ExportButtons() {
           📊 خروجی Excel (CSV)
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-          <Btn size="sm" onClick={exportSales}>📥 فروش</Btn>
-          <Btn size="sm" onClick={exportPurchases}>📤 خرید</Btn>
-          <Btn size="sm" onClick={exportEggs}>🥚 تخم‌گذاری</Btn>
-          <Btn size="sm" onClick={exportFlocks}>🐔 گله‌ها</Btn>
-          <Btn size="sm" onClick={exportContacts}>👥 مخاطبین</Btn>
-          <Btn size="sm" onClick={exportDailyLogs}>📋 ثبت روزانه</Btn>
+          <Btn size="sm" onClick={exportSales}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> فروش</Btn>
+          <Btn size="sm" onClick={exportPurchases}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📤</span> خرید</Btn>
+          <Btn size="sm" onClick={exportEggs}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم‌گذاری</Btn>
+          <Btn size="sm" onClick={exportFlocks}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> گله‌ها</Btn>
+          <Btn size="sm" onClick={exportContacts}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>👥</span> مخاطبین</Btn>
+          <Btn size="sm" onClick={exportDailyLogs}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> ثبت روزانه</Btn>
         </div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
           فایل‌های CSV در Excel و Google Sheets باز می‌شوند

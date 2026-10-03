@@ -180,7 +180,7 @@ export default function AlertsPage() {
                     </>
                   }
                 >
-                  <SectionTitle>📋 جزئیات</SectionTitle>
+                  <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> جزئیات</SectionTitle>
                   <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
                      padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>

@@ -198,7 +198,7 @@ export default function MovesPage() {
                   </>
                 }
               >
-                <SectionTitle>📋 اطلاعات گردش</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات گردش</SectionTitle>
                 <Row l="کالا" v={item ? `${CATEGORY_ICON[item.category]} ${item.name}` : '—'} />
                 <Row l="نوع" v={m.type === 'in' ? 'ورود' : 'خروج'} />
                 <Row l="دلیل" v={MOVEMENT_REASON[m.reason]} />
@@ -208,7 +208,7 @@ export default function MovesPage() {
 
                 {m.unitPrice > 0 ? (
                   <>
-                    <SectionTitle>💰 مالی</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
                     <Row l="قیمت واحد" v={`${toFa(m.unitPrice.toLocaleString('fa-IR'))} ت`} />
                     <div style={{ display: 'flex', justifyContent: 'space-between',
                        fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
@@ -222,7 +222,7 @@ export default function MovesPage() {
 
                 {m.notes ? (
                   <>
-                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
                        padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>{m.notes}</div>
@@ -247,8 +247,8 @@ export default function MovesPage() {
       >
         <Field label="نوع گردش" required>
           <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as MovementType })}>
-            <option value="in">📥 ورود به انبار</option>
-            <option value="out">📤 خروج از انبار</option>
+            <option value="in"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> ورود به انبار</option>
+            <option value="out"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📤</span> خروج از انبار</option>
           </Select>
         </Field>
 

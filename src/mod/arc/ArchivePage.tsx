@@ -81,7 +81,7 @@ export default function ArchivePage() {
                   </>
                 }
               >
-                <SectionTitle>📋 اطلاعات گله</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات گله</SectionTitle>
                 <Row l="پرنده" v={bird?.name || '—'} />
                 <Row l="نژاد" v={breed?.name || '—'} />
                 <Row l="سالن" v={hall?.name || '—'} />
@@ -91,7 +91,7 @@ export default function ArchivePage() {
                 {f.currentCount ? <Row l="تعداد نهایی" v={toFa(f.currentCount)} /> : null}
                 <Row l="سن نهایی" v={toFa(ageDays) + ' روز (' + formatAge(ageDays) + ')'} />
 
-                <SectionTitle>📅 تاریخ‌ها</SectionTitle>
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تاریخ‌ها</SectionTitle>
                 {f.hatchDate ? <Row l="هچ" v={toFa(f.hatchDate)} /> : null}
                 {f.purchaseDate ? <Row l="خرید" v={toFa(f.purchaseDate)} /> : null}
                 {f.startDate ? <Row l="شروع" v={toFa(f.startDate)} /> : null}
@@ -99,7 +99,7 @@ export default function ArchivePage() {
 
                 {costs.total > 0 ? (
                   <>
-                    <SectionTitle>💰 هزینه‌ها</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هزینه‌ها</SectionTitle>
                     <Row l="جمع کل" v={toFa(costs.total.toLocaleString('fa-IR')) + ' ت'} />
                     {costs.perBird > 0 ? <Row l="هر پرنده" v={toFa(Math.round(costs.perBird).toLocaleString('fa-IR')) + ' ت'} /> : null}
                   </>
@@ -107,7 +107,7 @@ export default function ArchivePage() {
 
                 {f.notes ? (
                   <>
-                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
                   </>
                 ) : null}

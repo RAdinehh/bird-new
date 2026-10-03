@@ -233,7 +233,7 @@ export default function ContactsPage() {
 
                   {p.roles.includes('supplier') && p.supplierTypes.length > 0 && (
                     <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📦 کالاهای فروشنده</div>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> کالاهای فروشنده</div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                         {p.supplierTypes.map(t => (
                           <span key={t} style={{ padding: '4px 10px', background: 'var(--accent-soft)',
@@ -260,7 +260,7 @@ export default function ContactsPage() {
 
                   {p.notes && (
                     <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
                       <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
                          padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                          borderRadius: 'var(--r-sm)' }}>{p.notes}</div>

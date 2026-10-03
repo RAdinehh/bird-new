@@ -153,8 +153,8 @@ export default function LogsTab() {
       {/* ═══ دکمه‌ها ═══ */}
       {currentLen > 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-          <Btn size="sm" onClick={handleExport}>📥 خروجی JSON</Btn>
-          <Btn size="sm" onClick={handleCopy}>📋 کپی همه</Btn>
+          <Btn size="sm" onClick={handleExport}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> خروجی JSON</Btn>
+          <Btn size="sm" onClick={handleCopy}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> کپی همه</Btn>
         </div>
       ) : null}
 
@@ -194,7 +194,7 @@ export default function LogsTab() {
                       {entry.module}
                     </div>
 
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>📋 نوع فعالیت</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> نوع فعالیت</div>
                     <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                       {label}
                     </div>
@@ -261,7 +261,7 @@ export default function LogsTab() {
                       {timeStr}
                     </div>
 
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>📋 نوع</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> نوع</div>
                     <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                       {log.type}
                     </div>

@@ -364,7 +364,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
           gap: 6,
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>🧬 نطفه‌داری کل</span>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> نطفه‌داری کل</span>
             <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(summary.fertilePercent.toFixed(1))}٪</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -372,7 +372,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
             <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: summary.lossPercent > 50 ? 'var(--danger)' : summary.lossPercent > 20 ? 'var(--warn)' : 'var(--muted)' }}>{toFa(summary.lossPercent.toFixed(1))}٪</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', gridColumn: '1 / -1', paddingTop: 8, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-            <span>📥 {toFa(summary.totalEntries)} ورودی</span>
+            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> {toFa(summary.totalEntries)} ورودی</span>
             <span>🔍 {toFa(summary.totalCandlings)} کندلینگ</span>
             <span>✅ {toFa(summary.totalAlive)} سالم</span>
           </div>
@@ -410,7 +410,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                 </>}
               >
                 {/* ═══ دکمه‌های روز ═══ */}
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📅 کندلینگ‌های این ورودی</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> کندلینگ‌های این ورودی</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                   {list.map((c, idx) => (
                     <div key={c.id} style={{ position: 'relative' }}>
@@ -489,10 +489,10 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                 </div>
 
                 {/* ═══ تجمیع با درصد ═══ */}
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 تجمیع ({toFa(list.length)} کندلینگ)</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> تجمیع ({toFa(list.length)} کندلینگ)</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>🧬 نطفه‌داری</span>
+                    <span style={{ color: 'var(--muted)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> نطفه‌داری</span>
                     <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(fertilePercent.toFixed(1))}٪</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
@@ -513,7 +513,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                       <span style={{ fontWeight: 700 }}>{toFa(agg.dead)}</span>
                     </div>
                     <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--muted)' }}>🥚 شکسته</span>
+                      <span style={{ color: 'var(--muted)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> شکسته</span>
                       <span style={{ fontWeight: 700 }}>{toFa(agg.broken)}</span>
                     </div>
                   </div>
@@ -538,7 +538,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       <Modal open={open} onClose={() => setOpen(false)} title={editingId ? '✏️ ویرایش کندلینگ' : '🔍 ثبت کندلینگ'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
-        <SectionTitle>📅 زمان‌بندی</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> زمان‌بندی</SectionTitle>
         {_firstSelectedBirdName && _profile.totalDays ? (
           <div style={{
             fontSize: 'var(--fs-xs)',
@@ -564,7 +564,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
           </Field>
         </Grid2>
 
-        <SectionTitle>📦 انتخاب ورودی‌ها</SectionTitle>
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> انتخاب ورودی‌ها</SectionTitle>
         <Field label="فیلتر دستگاه">
           <Select value={modalDevice} onChange={e => { setModalDevice(e.target.value); setSelectedIds(new Set()); setEntriesData({}); }}>
             <option value="">— همه دستگاه‌ها —</option>
