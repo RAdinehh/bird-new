@@ -284,16 +284,7 @@ export default function HallsPage() {
         </Grid3>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
            color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>شرایط</div>
-          <Field label="نژاد پرنده" hint="محاسبه خودکار ظرفیت">
-            <Select value={form.breedId} onChange={e => setForm({...form, breedId: e.target.value})}>
-              <option value="">— انتخاب —</option>
-              {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </Select>
-          </Field>
-          
-          
-          
-        <Grid2>
+          <Grid2>
           <TempFormField label="دمای هدف" placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => setForm({...form, targetTemp: v})} />
           <Field label="رطوبت هدف"><NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => setForm({...form, targetHumidity: e.target.value})} unit="٪" min={-10} /></Field>
         </Grid2>
