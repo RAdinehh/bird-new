@@ -4,6 +4,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
+import { useWhs } from '../whs/store';
 
 export type EggType = 'eating' | 'fertile' | 'broken';
 
@@ -18,6 +19,8 @@ export interface EggProduction {
   avgWeight: number | null;
   notes: string;
   sourceLogId?: string;   // لینک به dlg (اختیاری)
+  stockItemId?: string;   // لینک به whs (اختیاری)
+  stockMovementId?: string;
   createdAt: string;
 }
 
@@ -67,15 +70,55 @@ export const useEgg = create<State>()(
       packCarton: 0,
 
       addProduction: (p) => {
-        const newProd = { ...p, id: uuid(), createdAt: now() };
+        let stockMovementId = '';
+        if (p.stockItemId && p.totalCount > 0) {
+          try {
+            const whs = useWhs.getState();
+            const mid = whs.addMovement({
+              itemId: p.stockItemId, type: 'in',
+              quantity: p.totalCount, unitPrice: 0,
+              reason: 'adjustment', date: p.date, partyId: '',
+              notes: 'تولید تخم — ' + (p.date || ''),
+            });
+            if (mid) stockMovementId = mid;
+          } catch {}
+        }
+        const newProd = { ...p, stockMovementId, id: uuid(), createdAt: now() };
         set({ productions: [...get().productions, newProd] });
         return newProd.id;
       },
       findByLogId: (logId) => get().productions.find(x => x.sourceLogId === logId),
-      updateProduction: (id, patch) => set({
-        productions: get().productions.map(x => x.id === id ? { ...x, ...patch } : x)
-      }),
-      deleteProduction: (id) => set({ productions: get().productions.filter(x => x.id !== id) }),
+      updateProduction: (id, patch) => {
+        const prev = get().productions.find(x => x.id === id);
+        if (!prev) return;
+        const merged = { ...prev, ...patch };
+        if (prev.stockMovementId) {
+          try { useWhs.getState().deleteMovement(prev.stockMovementId); } catch {}
+        }
+        let stockMovementId = '';
+        if (merged.stockItemId && merged.totalCount > 0) {
+          try {
+            const whs = useWhs.getState();
+            const mid = whs.addMovement({
+              itemId: merged.stockItemId, type: 'in',
+              quantity: merged.totalCount, unitPrice: 0,
+              reason: 'adjustment', date: merged.date, partyId: '',
+              notes: 'تولید تخم — ' + (merged.date || ''),
+            });
+            if (mid) stockMovementId = mid;
+          } catch {}
+        }
+        set({
+          productions: get().productions.map(x => x.id === id ? { ...merged, stockMovementId } : x)
+        });
+      },
+      deleteProduction: (id) => {
+        const prev = get().productions.find(x => x.id === id);
+        if (prev?.stockMovementId) {
+          try { useWhs.getState().deleteMovement(prev.stockMovementId); } catch {}
+        }
+        set({ productions: get().productions.filter(x => x.id !== id) });
+      },
 
       addSale: (s) => set({ sales: [...get().sales, { ...s, id: uuid(), createdAt: now() }] }),
       deleteSale: (id) => set({ sales: get().sales.filter(x => x.id !== id) })
