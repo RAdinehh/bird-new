@@ -381,7 +381,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
       <Modal
         open={open} onClose={() => setOpen(false)}
         title={form.id ? 'ویرایش خرید' : 'ثبت خرید جدید'}
-        footer={<BtnRow><Btn onClick={() => setOpen(false)}>لغو</Btn><Btn variant="primary" onClick={save}>ذخیره</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
         <Grid2>
@@ -599,7 +599,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
         open={!!transferModal}
         onClose={() => { setTransferModal(null); setTransferNote(''); setTransferDate(''); }}
         title={transferModal ? `تغییر به ${WORKFLOW_LABEL[transferModal.to]}` : ''}
-        footer={<BtnRow><Btn onClick={() => setTransferModal(null)}>لغو</Btn><Btn variant="primary" onClick={doTransfer}>تأیید</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="primary" onClick={doTransfer}>تأیید</Btn><Btn onClick={() => setTransferModal(null)}>لغو</Btn></BtnRow>}
       >
         {transferModal && (
           <>
@@ -614,8 +614,8 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
       {/* Modal حذف */}
       <Modal
         open={delId !== null} onClose={() => setDelId(null)} title="حذف خرید"
-        footer={<BtnRow><Btn onClick={() => setDelId(null)}>لغو</Btn><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این فاکتور حذف شود؟', { danger: true }); if (!ok) return; const item = invoices.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteInvoice(idToDel);
-              logAction('delete', 'tra', 'حذف از معاملات'); setDelId(null); showToast('فاکتور حذف شد', 'info', 1800); }}>حذف کن</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این فاکتور حذف شود؟', { danger: true }); if (!ok) return; const item = invoices.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteInvoice(idToDel);
+              logAction('delete', 'tra', 'حذف از معاملات'); setDelId(null); showToast('فاکتور حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.number}</b>؟</div>
       </Modal>

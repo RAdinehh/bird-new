@@ -449,8 +449,8 @@ export default function ReceivablesPage() {
         title="⏰ تعویق سرسید"
         footer={
           <BtnRow>
-            <Btn onClick={() => setDeferModal(null)}>لغو</Btn>
             <Btn variant="primary" onClick={doDefer}>تأیید</Btn>
+            <Btn onClick={() => setDeferModal(null)}>لغو</Btn>
           </BtnRow>
         }
       >

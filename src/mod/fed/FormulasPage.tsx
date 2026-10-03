@@ -272,7 +272,7 @@ export default function FormulasPage() {
         open={open}
         onClose={() => setOpen(false)}
         title={form.id ? 'ویرایش جیره' : 'ساخت جیره جدید'}
-        footer={<BtnRow><Btn onClick={() => setOpen(false)}>لغو</Btn><Btn variant="primary" onClick={save}>ذخیره</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Field label="نام جیره" required>
           <Input placeholder="مثلاً — جیره لیر زمستان" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
@@ -414,8 +414,8 @@ export default function FormulasPage() {
         open={delId !== null}
         onClose={() => setDelId(null)}
         title="حذف جیره"
-        footer={<BtnRow><Btn onClick={() => setDelId(null)}>لغو</Btn><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این فرمول حذف شود؟', { danger: true }); if (!ok) return; const item = formulas.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteFormula(idToDel);
-              logAction('delete', 'fed', 'حذف از جیره‌نویسی'); setDelId(null); showToast('فرمول حذف شد', 'info', 1800); }}>حذف کن</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این فرمول حذف شود؟', { danger: true }); if (!ok) return; const item = formulas.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteFormula(idToDel);
+              logAction('delete', 'fed', 'حذف از جیره‌نویسی'); setDelId(null); showToast('فرمول حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.name}</b>؟</div>
       </Modal>
