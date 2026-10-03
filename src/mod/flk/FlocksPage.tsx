@@ -492,17 +492,17 @@ export default function FlocksPage() {
                     <>
                       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هزینه‌ها</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        {costs.birdCost > 0 && <Row l="قیمت پرنده‌ها" v={`${toFa(costs.birdCost.toLocaleString('fa-IR'))} ت`} />}
-                        {costs.delivery > 0 && <Row l="هزینه حمل" v={`${toFa(costs.delivery.toLocaleString('fa-IR'))} ت`} />}
-                        {costs.other > 0 && <Row l="سایر" v={`${toFa(costs.other.toLocaleString('fa-IR'))} ت`} />}
+                        {costs.birdCost > 0 && <Row l="قیمت پرنده‌ها" v={fmt.money(costs.birdCost)} />}
+                        {costs.delivery > 0 && <Row l="هزینه حمل" v={fmt.money(costs.delivery)} />}
+                        {costs.other > 0 && <Row l="سایر" v={fmt.money(costs.other)} />}
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                           <span>جمع کل:</span>
-                          <span>{toFa(costs.total.toLocaleString('fa-IR'))} ت</span>
+                          <span>{fmt.money(costs.total)}</span>
                         </div>
                         {costs.perBird > 0 && (
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                             <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هر پرنده:</span>
-                            <span>{toFa(Math.round(costs.perBird).toLocaleString('fa-IR'))} ت</span>
+                            <span>{fmt.money(Math.round(costs.perBird))}</span>
                           </div>
                         )}
                       </div>
