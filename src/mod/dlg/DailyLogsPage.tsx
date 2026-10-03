@@ -750,19 +750,19 @@ const collectWhsShortages = () => {
           <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> شرایط محیطی</SectionTitle>
 
           <Grid2>
-            <Field label="حداقل دما" hint="۱۵-۳۰ درجه">
+            <Field label="حداقل دما" hint="۱۵-۳۰ درجه" error={vErrors.temperatureMin}>
               <NumField placeholder="۲۰" value={form.temperatureMin} onChange={e => setForm({ ...form, temperatureMin: e.target.value })} unit="°C" min={-10} max={50} />
             </Field>
-            <Field label="حداکثر دما" hint="۱۵-۳۰ درجه">
+            <Field label="حداکثر دما" hint="۱۵-۳۰ درجه" error={vErrors.temperatureMax}>
               <NumField placeholder="۲۵" value={form.temperatureMax} onChange={e => setForm({ ...form, temperatureMax: e.target.value })} unit="°C" min={-10} max={50} />
             </Field>
           </Grid2>
 
           <Grid2>
-            <Field label="حداقل رطوبت" hint="۴۰-۷۰٪">
+            <Field label="حداقل رطوبت" hint="۴۰-۷۰٪" error={vErrors.humidityMin}>
               <PercentField placeholder="۵۰" value={form.humidityMin} onChange={e => setForm({ ...form, humidityMin: e.target.value })} />
             </Field>
-            <Field label="حداکثر رطوبت" hint="۴۰-۷۰٪">
+            <Field label="حداکثر رطوبت" hint="۴۰-۷۰٪" error={vErrors.humidityMax}>
               <PercentField placeholder="۷۰" value={form.humidityMax} onChange={e => setForm({ ...form, humidityMax: e.target.value })} />
             </Field>
           </Grid2>
@@ -961,18 +961,18 @@ const collectWhsShortages = () => {
           <>
             <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم‌گذاری</SectionTitle>
             <Grid2>
-                  <Field label="🥚 تخم خوراکی">
+                  <Field label="🥚 تخم خوراکی" error={vErrors.eatingEggs}>
                     <NumField placeholder="۰" value={form.eatingEggs} onChange={e => setForm({...form, eatingEggs: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
                   </Field>
-                  <Field label="🌱 تخم نطفه‌دار">
+                  <Field label="🌱 تخم نطفه‌دار" error={vErrors.fertileEggs}>
                     <NumField placeholder="۰" value={form.fertileEggs} onChange={e => setForm({...form, fertileEggs: e.target.value})} unit="عدد" min={0} />
                   </Field>
                 </Grid2>
                 <Grid2>
-                  <Field label="💔 شکسته">
+                  <Field label="💔 شکسته" error={vErrors.brokenEggs}>
                     <NumField placeholder="۰" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} unit="عدد" min={0} />
                   </Field>
-                  <Field label="📦 سایر (نرم/کثیف)">
+                  <Field label="📦 سایر (نرم/کثیف)" error={vErrors.otherEggs}>
                     <NumField placeholder="۰" value={form.otherEggs} onChange={e => setForm({...form, otherEggs: e.target.value})} unit="عدد" min={0} />
                   </Field>
                 </Grid2>
