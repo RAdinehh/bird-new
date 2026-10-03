@@ -718,24 +718,20 @@ export default function FlocksPage() {
             </Field>
           )}
 
-          {(form.source === 'purchase' || form.source === 'previous') && (
+          {form.source === 'purchase' && (
             <Grid2>
               <Field label="تاریخ خرید / تحویل" hint="روزی که گله به دستت رسید">
                 <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید" autoToday />
               </Field>
-              {form.source === 'purchase' && (
-                <Field label="تاریخ هچ" hint="اگر فروشنده گفته (اختیاری)">
-                  <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="اختیاری" />
-                </Field>
-              )}
+              <Field label="تاریخ هچ" hint="اگر فروشنده گفته (اختیاری)">
+                <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="اختیاری" />
+              </Field>
             </Grid2>
           )}
 
-          {form.source === 'previous' && (
-            <Field label="تاریخ شروع نگهداری" hint="اگه تاریخی ثبت نکردی، خالی بذار">
-              <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" />
-            </Field>
-          )}
+          <Field label="تاریخ شروع نگهداری" hint="اگه تاریخ دقیق خرید یا هچ رو نمی‌دونی، این رو پر کن">
+            <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" />
+          </Field>
 
           <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>هزینه‌ها</div>
 
