@@ -433,21 +433,7 @@ export default function FlocksPage() {
                   </>}
                 >
                   {/* شمارش معکوس */}
-                  {!isArchived && !ready && (f.type === 'layer' || f.type === 'breeder') && (
-                    <div style={{
-                      padding: 'var(--pad-normal)',
-                      background: untilLay <= 30 ? 'var(--warn-soft)' : 'var(--accent-soft)',
-                      border: `1px dashed ${untilLay <= 30 ? 'var(--warn)' : 'var(--info)'}`,
-                      borderRadius: 'var(--r-md)',
-                      fontSize: 'var(--fs-xs)',
-                      color: untilLay <= 30 ? 'var(--warn)' : 'var(--accent)',
-                      fontWeight: 700,
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between'
-                    }}>
-                      <span>⏳ {fmt.int(untilLay)} روز تا شروع تخم‌گذاری</span>
-                      <span>روز {fmt.int(breedStd.byBreedId(f.breedId)?.biology?.layingStartDay ?? LAYING_START_DAY)}</span>
-                    </div>
-                  )}
+                  
 
                   {/* نوار پیشرفت */}
                   {!isArchived && (
