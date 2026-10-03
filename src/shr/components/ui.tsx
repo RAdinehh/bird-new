@@ -229,10 +229,26 @@ export function Field({ label, required, hint, children }: FieldProps) {
 }
 
 export function Grid2({ children }: { children: React.ReactNode }) {
-  return <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 'var(--sp-2)' }}>{children}</div>;
+  const count = React.Children.toArray(children).filter(Boolean).length;
+  const cols = count >= 2 ? 2 : 1;
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+      gap: 'var(--sp-2)',
+    }}>{children}</div>
+  );
 }
 export function Grid3({ children }: { children: React.ReactNode }) {
-  return <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)', gap: 'var(--sp-2)' }}>{children}</div>;
+  const count = React.Children.toArray(children).filter(Boolean).length;
+  const cols = count >= 3 ? 3 : count >= 2 ? 2 : 1;
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+      gap: 'var(--sp-2)',
+    }}>{children}</div>
+  );
 }
 
 interface CardProps {
