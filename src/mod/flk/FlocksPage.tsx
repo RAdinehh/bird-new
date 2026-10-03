@@ -727,11 +727,16 @@ export default function FlocksPage() {
             label="برنامه واکسن"
             hint={
               form.vaccineScheduleId
+                ? undefined
+                : 'برای افزودن خودکار واکسن‌ها به تقویم'
+            }
+            autoFrom={
+              form.vaccineScheduleId
                 ? (() => {
                     const sch = getSchedule(form.vaccineScheduleId);
-                    return sch ? `${sch.items.length} مرحله · ${sch.description}` : undefined;
+                    return sch ? `تقویم · ${sch.items.length} مرحله` : 'تقویم';
                   })()
-                : 'برای افزودن خودکار واکسن‌ها به تقویم'
+                : undefined
             }
           >
             <Select
