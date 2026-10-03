@@ -5,7 +5,6 @@ import { v4 as uuid } from 'uuid';
 export interface Bird {
   id: string;
   name: string;
-  nameEn: string;
   cycleDays: number | null;
   fcrStandard: number | null;
   createdAt: string;

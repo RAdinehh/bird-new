@@ -13,7 +13,7 @@ vi.mock('../cor/logger/auditLog', () => ({ logAction: vi.fn() }));
 // helper: با id معتبر
 const makeBird = (o: any = {}) => ({
   id: 'b-' + Math.random().toString(36).slice(2, 9),
-  name: 'مرغ', nameEn: 'Chicken', cycleDays: 21, fcrStandard: 1.6,
+  name: 'مرغ', cycleDays: 21, fcrStandard: 1.6,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   ...o,
 });
@@ -144,7 +144,7 @@ describe('BirdsPage — افزودن', () => {
 
 describe('BirdsPage — Expand / ویرایش / حذف', () => {
   it('expand → مشخصات', async () => {
-    useBrd.setState({ birds: [makeBird({ name: 'مرغ', nameEn: 'Chicken' })] as any });
+    useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
     render(<BirdsPage />);
     expandCard('مرغ');
 

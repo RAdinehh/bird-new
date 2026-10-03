@@ -58,7 +58,7 @@ export default function BirdsPage() {
 
     if (!form.name.trim()) { setError('نام پرنده اجباری است'); return; }
     const payload = {
-      name: form.name.trim(), nameEn: '',
+      name: form.name.trim(),
       cycleDays: form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null,
       fcrStandard: form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null
     };
@@ -107,7 +107,7 @@ export default function BirdsPage() {
                 index={toFa(i + 1)}
                 iconEmoji="🐔"
                 title={b.name}
-                subtitle={b.nameEn || ''}
+                subtitle=""
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
                 badge={<Tag tone="blue">{toFa(birdBreeds.length)} نژاد</Tag>}
@@ -124,7 +124,7 @@ export default function BirdsPage() {
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>نام انگلیسی:</span>
-                    <span style={{ fontWeight: 600 }}>{b.nameEn || '—'}</span>
+                    <span style={{ fontWeight: 600 }}>—</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
