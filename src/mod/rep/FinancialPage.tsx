@@ -173,7 +173,7 @@ export default function FinancialPage() {
       ) : null}
 
       {/* خروجی‌ها */}
-      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', padding: '4px 4px 8px' }}>
+      <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', padding: '4px 4px 8px' }}>
         📤 خروجی گرفتن
       </div>
       <ExportButtons />

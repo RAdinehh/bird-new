@@ -56,7 +56,7 @@ export default function BenchmarkCard() {
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
         فعال ({toFa(active.length)}) vs آرشیو ({toFa(archived.length)})
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10px', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10px', fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
         <span style={{ flex: 1 }}>متریک</span>
         <span style={{ width: 70, textAlign: 'center' }}>فعال</span>
         <span style={{ width: 70, textAlign: 'center' }}>آرشیو</span>

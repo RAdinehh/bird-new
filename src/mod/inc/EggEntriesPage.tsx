@@ -701,7 +701,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   return <ProgressTracker current={age} target={total} label={lbl} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
                 })()}
 
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📋 مشخصات</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📋 مشخصات</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="دستگاه" v={dev?.name || '—'} />
                   <Row l="پرنده" v={(bird?.name || '—') + (breed ? ' · ' + breed.name : '')} />
@@ -712,7 +712,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
                   <Row l="وضعیت" v={ENTRY_STATUS_LABEL[e.status]} />
                 </div>
 
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🤝 منبع</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🤝 منبع</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="نوع" v={DEAL_LABEL[e.dealType]} />
                   {e.dealType === 'own' && (e as any).flockId && <Row l="گله" v={(flocks.find((f: any) => f.id === (e as any).flockId)?.name) || '—'} />}
@@ -731,7 +731,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
                 {(e.unitPrice || e.totalPrice || (e as any).shippingCost) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>💰 مالی</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {e.unitPrice && <Row l="قیمت هر تخم" v={toFa(e.unitPrice.toLocaleString('fa-IR')) + ' ت'} />}
                       {(e as any).shippingCost && <Row l="هزینه حمل" v={toFa((e as any).shippingCost.toLocaleString('fa-IR')) + ' ت'} />}
@@ -746,7 +746,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
                 {e.notes && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📝 یادداشت</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
                   </>
                 )}
@@ -776,7 +776,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
         {/* ═══ دستگاه + ظرفیت ═══ */}
         <div style={{ padding: 'var(--pad-comfy)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
             <span>📦</span><span>انتخاب دستگاه</span>
           </div>
           <SmartSelect value={multiDeviceId} onChange={v => setMultiDeviceId(v)} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
@@ -802,7 +802,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
         {/* ═══ ردیف‌های اضافه‌شده ═══ */}
         {draftRows.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 4 }}>
               <span>📋</span><span>ردیف‌های ثبت‌شده ({toFa(draftRows.length)})</span>
             </div>
             {draftRows.map((r, i) => {
@@ -879,7 +879,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           </div>
 
           {/* ═══ منبع + زمان ═══ */}
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🏠 منبع و طرف مقابل</div>
+            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 4 }}>🏠 منبع و طرف مقابل</div>
 
           <Field label="نوع منبع" required>
             <Select value={currentRow.dealType} onChange={e => setCurrentRow(f => ({ ...f, dealType: e.target.value as DealType, dealData: {}, flockId: '' }))}>
@@ -1019,7 +1019,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
           {/* مشخصات تخم */}
           <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 4 }}>
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 8 }}>🥚 مشخصات تخم</div>
+            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 8 }}>🥚 مشخصات تخم</div>
             <Grid2>
               <Field label="پرنده" required>
                 <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="—" modalTitle="انتخاب پرنده" autoThreshold={6} />
@@ -1060,7 +1060,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           {/* مالی */}
           {(currentRow.dealType === 'purchase' || currentRow.dealType === 'partnership') && (
             <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 4 }}>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 8 }}>💰 مالی</div>
+              <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 8 }}>💰 مالی</div>
               <Grid2>
                 <Field label="قیمت هر تخم">
                   <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />

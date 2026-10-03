@@ -200,7 +200,7 @@ export default function ContactsPage() {
                     {p.roles.includes('supplier') && p.supplierTypes.length > 0 ? <span>کالاها: <b style={{ color: 'var(--text)' }}>{toFa(p.supplierTypes.length)}</b></span> : null}
                   </>}
                 >
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📞 اطلاعات تماس</div>
+                  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📞 اطلاعات تماس</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <Row l="تلفن اصلی" v={p.phone || '—'} />
                     {p.phone2 && <Row l="تلفن دوم" v={p.phone2} />}
@@ -210,7 +210,7 @@ export default function ContactsPage() {
 
                   {(p.city || p.address) && (
                     <>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📍 آدرس</div>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📍 آدرس</div>
                       <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
                          background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
                          lineHeight: 1.7 }}>
@@ -222,7 +222,7 @@ export default function ContactsPage() {
 
                   {p.roles.includes('customer') && (
                     <>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🛒 اطلاعات مشتری</div>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🛒 اطلاعات مشتری</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         <Row l="نوع" v={CUSTOMER_TYPES.find(x => x[0] === p.customerType)?.[1] || '—'} />
                         {p.trustScore && <Row l="اعتبار" v={`${toFa(p.trustScore)} از ۱۰`} />}
@@ -233,7 +233,7 @@ export default function ContactsPage() {
 
                   {p.roles.includes('supplier') && p.supplierTypes.length > 0 && (
                     <>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📦 کالاهای فروشنده</div>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📦 کالاهای فروشنده</div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                         {p.supplierTypes.map(t => (
                           <span key={t} style={{ padding: '4px 10px', background: 'var(--accent-soft)',
@@ -248,7 +248,7 @@ export default function ContactsPage() {
 
                   {p.roles.includes('worker') && (
                     <>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>👷 اطلاعات کارگر</div>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>👷 اطلاعات کارگر</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         {p.position && <Row l="سمت" v={p.position} />}
                         {p.startDate && <Row l="تاریخ شروع" v={toFa(p.startDate)} />}
@@ -260,7 +260,7 @@ export default function ContactsPage() {
 
                   {p.notes && (
                     <>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
                       <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
                          padding: 'var(--pad-normal)', background: 'var(--input-bg)',
                          borderRadius: 'var(--r-sm)' }}>{p.notes}</div>

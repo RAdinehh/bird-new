@@ -410,7 +410,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                 </>}
               >
                 {/* ═══ دکمه‌های روز ═══ */}
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📅 کندلینگ‌های این ورودی</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📅 کندلینگ‌های این ورودی</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                   {list.map((c, idx) => (
                     <div key={c.id} style={{ position: 'relative' }}>
@@ -489,7 +489,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
                 </div>
 
                 {/* ═══ تجمیع با درصد ═══ */}
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 تجمیع ({toFa(list.length)} کندلینگ)</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 تجمیع ({toFa(list.length)} کندلینگ)</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>🧬 نطفه‌داری</span>

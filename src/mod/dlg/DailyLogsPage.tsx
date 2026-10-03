@@ -689,7 +689,7 @@ export default function DailyLogsPage() {
             const used = num(form.feedAmount) || 0;
             return (
               <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 4 }}>مواد اولیه این جیره:</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 4 }}>مواد اولیه این جیره:</div>
                 {f.lines.length === 0 && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠️ این جیره خطی ندارد</div>}
                 {f.lines.map(line => {
                   const ing = ingredients.find(i => i.id === line.ingredientId);

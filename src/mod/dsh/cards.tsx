@@ -7,7 +7,7 @@ import { toFa } from '../../shr/utils/fa';
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
     <div style={{
-      fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)',
+      fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)',
       padding: '8px 4px 8px', letterSpacing: '.5px'
     }}>{children}</div>
   );

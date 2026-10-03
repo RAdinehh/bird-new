@@ -331,7 +331,7 @@ export default function FormulasPage() {
                border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
                display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>ماده {toFa(idx + 1)}</span>
+                <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>ماده {toFa(idx + 1)}</span>
                 <button type="button" onClick={() => removeLine(line.id)} style={{ background: 'none',
                    border: 'none', color: 'var(--danger)', cursor: 'pointer',
                    fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>

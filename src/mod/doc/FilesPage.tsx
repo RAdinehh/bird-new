@@ -83,7 +83,7 @@ export default function FilesPage() {
           justifyContent: 'space-between',
           marginBottom: 10
         }}>
-          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>
+          <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
             📁 اسناد
           </div>
           <button

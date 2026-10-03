@@ -118,7 +118,7 @@ export default function BirdsPage() {
                   </>
                 }
               >
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات کامل</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات کامل</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
@@ -142,7 +142,7 @@ export default function BirdsPage() {
 
                 {birdBreeds.length > 0 && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🧬 نژادهای این پرنده</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🧬 نژادهای این پرنده</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {birdBreeds.map(bd => (
                         <span key={bd.id} style={{ padding: '4px 10px',

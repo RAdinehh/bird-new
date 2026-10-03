@@ -178,7 +178,7 @@ export default function ExportButtons() {
         padding: 'var(--sp-4)',
         display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)'
       }}>
-        <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>
+        <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
           📊 خروجی Excel (CSV)
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
@@ -201,7 +201,7 @@ export default function ExportButtons() {
         padding: 'var(--sp-4)',
         display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)'
       }}>
-        <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>
+        <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
           📄 خروجی PDF
         </div>
         <Btn variant="primary" full onClick={exportSummaryPDF}>

@@ -125,7 +125,7 @@ export default function StockPage() {
           onDismiss={() => setUndoData(null)}
         />
       )}
-      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>
+      <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
         📦 موجودی انبار
       </div>
 
@@ -165,7 +165,7 @@ export default function StockPage() {
         </div>
       </div>
 
-      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', marginTop: 8 }}>
+      <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', marginTop: 8 }}>
         💰 فروش‌ها
       </div>
 

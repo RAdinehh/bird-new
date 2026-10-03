@@ -7,7 +7,7 @@ import { toFa } from '../../shr/utils/fa';
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>{title}</div>
+      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>{title}</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>{children}</div>
     </>
   );

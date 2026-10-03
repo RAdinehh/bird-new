@@ -319,7 +319,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
                 {total > 0 && (h.hatched || 0) > 0 && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 توزیع</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 توزیع</div>
                     <div style={{ display: 'flex', height: 36, borderRadius: 4, overflow: 'hidden', background: 'var(--input-bg)' }}>
                       {(h.hatched||0) > 0 && <div style={{ width: ((h.hatched||0)/total*100)+'%', background: 'var(--accent)' }} />}
                       {(h.deadInShell||0) > 0 && <div style={{ width: ((h.deadInShell||0)/total*100)+'%', background: 'var(--danger)' }} />}
@@ -329,7 +329,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                   </>
                 )}
 
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📊 نتیجه هچ</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 نتیجه هچ</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="جوجه هچ‌شده" v={toFa(h.hatched || 0)} />
                   <Row l="هچ‌نشده" v={toFa(h.unhatched || 0)} />
@@ -340,7 +340,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
                 {(h.gradeA || h.gradeB) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🏅 تفکیک کیفی</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {h.gradeA ? <Row l="درجه A" v={toFa(h.gradeA)} /> : null}
                       {h.gradeB ? <Row l="درجه B" v={toFa(h.gradeB)} /> : null}
@@ -350,7 +350,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
                 {(h.maleCount || h.femaleCount || h.unknownCount) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>⚖️ جنسیت</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {h.maleCount ? <Row l="♂ نر" v={toFa(h.maleCount)} /> : null}
                       {h.femaleCount ? <Row l="♀ ماده" v={toFa(h.femaleCount)} /> : null}
@@ -359,9 +359,9 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                   </>
                 )}
 
-                {h.avgWeight ? <><div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ وزن</div><Row l="وزن متوسط" v={toFa(h.avgWeight) + ' گرم'} /></> : null}
+                {h.avgWeight ? <><div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>⚖️ وزن</div><Row l="وزن متوسط" v={toFa(h.avgWeight) + ' گرم'} /></> : null}
 
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📈 نرخ‌ها</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📈 نرخ‌ها</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="نرخ هچ کل" v={toFa(hr.toFixed(1)) + '٪'} />
                   {aliveAfter !== total && <Row l="نرخ از نطفه‌دار" v={toFa(realRate.toFixed(1)) + '٪'} />}
@@ -369,21 +369,21 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
                 {entry?.totalPrice && h.hatched ? (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>💰 هزینه</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 هزینه</div>
                     <Row l="💰 هزینه هر جوجه" v={toFa(Math.round(costPerChick(entry.totalPrice, h.hatched)).toLocaleString('fa-IR')) + ' ت'} />
                   </>
                 ) : null}
 
                 {h.notes && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>📝 یادداشت</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
                   </>
                 )}
 
                 {isComplete && (h.hatched || 0) > 0 && (
                   <div style={{ padding: 10, background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, textAlign: 'center' }}>مرحله بعد:</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', textAlign: 'center' }}>مرحله بعد:</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                       <Btn size="sm" onClick={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(formatJ(new Date(), 'yyyy')), type: 'layer', hallId: '', zoneId: '' }); }}>🐔 گله</Btn>
                       <Btn size="sm" onClick={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}>📥 فروش</Btn>
@@ -540,7 +540,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                                 const gradesOk = gradesRem >= 0;
                                 return (
                                   <>
-                                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی (اختیاری) — از {toFa(hatchedNum)} هچ‌شده</div>
+                                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🏅 تفکیک کیفی (اختیاری) — از {toFa(hatchedNum)} هچ‌شده</div>
                                     <Grid2>
                                       <Field label="درجه A"><NumField value={d.gradeA} onChange={ev => updateData(e.id, { gradeA: ev.target.value })} max={hatchedNum - gB} min={0} unit="عدد" /></Field>
                                       <Field label="درجه B"><NumField value={d.gradeB} onChange={ev => updateData(e.id, { gradeB: ev.target.value })} max={hatchedNum - gA} min={0} unit="عدد" /></Field>
@@ -561,7 +561,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                                 const genderOk = genderRem >= 0;
                                 return (
                                   <>
-                                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت (اختیاری)</div>
+                                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>⚖️ جنسیت (اختیاری)</div>
                                     <Grid2>
                                       <Field label="♂ نر"><NumField value={d.maleCount} onChange={ev => updateData(e.id, { maleCount: ev.target.value })} max={hatchedNum - f_ - u} min={0} unit="عدد" /></Field>
                                       <Field label="♀ ماده"><NumField value={d.femaleCount} onChange={ev => updateData(e.id, { femaleCount: ev.target.value })} max={hatchedNum - m - u} min={0} unit="عدد" /></Field>
@@ -627,7 +627,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                     const gradesOk = gradesRem >= 0;
                     return (
                       <>
-                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🏅 تفکیک کیفی — از {toFa(hatchedNum)} هچ‌شده</div>
+                        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🏅 تفکیک کیفی — از {toFa(hatchedNum)} هچ‌شده</div>
                         <Grid2>
                           <Field label="درجه A"><NumField value={dataFor(formEntryId).gradeA} onChange={ev => updateData(formEntryId, { gradeA: ev.target.value })} max={hatchedNum - gB} min={0} unit="عدد" /></Field>
                           <Field label="درجه B"><NumField value={dataFor(formEntryId).gradeB} onChange={ev => updateData(formEntryId, { gradeB: ev.target.value })} max={hatchedNum - gA} min={0} unit="عدد" /></Field>
@@ -648,7 +648,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                     const genderOk = genderRem >= 0;
                     return (
                       <>
-                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>⚖️ جنسیت و وزن</div>
+                        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>⚖️ جنسیت و وزن</div>
                         <Grid2>
                           <Field label="♂ نر"><NumField value={dataFor(formEntryId).maleCount} onChange={ev => updateData(formEntryId, { maleCount: ev.target.value })} max={hatchedNum - f_ - u} min={0} unit="عدد" /></Field>
                           <Field label="♀ ماده"><NumField value={dataFor(formEntryId).femaleCount} onChange={ev => updateData(formEntryId, { femaleCount: ev.target.value })} max={hatchedNum - m - u} min={0} unit="عدد" /></Field>
