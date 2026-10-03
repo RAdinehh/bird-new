@@ -310,9 +310,10 @@ export default function HallsPage() {
                 {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </Select>
             </Field>
-            <Field label="ظرفیت">
-              <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} />
-              {form.breedId && (() => {
+            <Field
+              label="ظرفیت"
+              hint={(() => {
+                if (!form.breedId) return undefined;
                 const std = breedStd.byBreedId(form.breedId);
                 const density = std?.space?.densityMax;
                 const L = parseFloat(toEn(form.length)) || 0;
@@ -320,30 +321,12 @@ export default function HallsPage() {
                 const area = L * W;
                 if (area > 0 && density) {
                   const cap = Math.floor(area * density);
-                  return (
-                    <div
-                      style={{
-                        marginTop: 4,
-                        width: '100%',
-                        padding: '6px 8px',
-                        background: 'var(--input-bg)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--r-sm)',
-                        color: 'var(--muted)',
-                        fontFamily: 'inherit',
-                        fontSize: 11,
-                        fontWeight: 600,
-                        textAlign: 'center',
-                        direction: 'ltr',
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {toFa(area)} × {toFa(density)} = {toFa(cap)}
-                    </div>
-                  );
+                  return `${toFa(area)} × ${toFa(density)} = ${toFa(cap)}`;
                 }
-                return null;
+                return undefined;
               })()}
+            >
+              <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} />
             </Field>
           </Grid2>
           {form.breedId && (
