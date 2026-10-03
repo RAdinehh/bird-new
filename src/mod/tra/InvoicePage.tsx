@@ -467,7 +467,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
               </>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-base)', color: 'var(--accent)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
               <span>جمع قلم:</span>
               <span>{toFa(it.total.toLocaleString('fa-IR'))} ت</span>
             </div>

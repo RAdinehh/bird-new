@@ -371,7 +371,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>📉 تلفات کل</span>
             <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: summary.lossPercent > 50 ? 'var(--danger)' : summary.lossPercent > 20 ? 'var(--warn)' : 'var(--muted)' }}>{toFa(summary.lossPercent.toFixed(1))}٪</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gridColumn: '1 / -1', paddingTop: 6, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gridColumn: '1 / -1', paddingTop: 8, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
             <span>📥 {toFa(summary.totalEntries)} ورودی</span>
             <span>🔍 {toFa(summary.totalCandlings)} کندلینگ</span>
             <span>✅ {toFa(summary.totalAlive)} سالم</span>
