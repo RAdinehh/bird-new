@@ -156,5 +156,5 @@ export function useFlockEvents(flockId: string | null): FlockEventView[] {
 
     // ═══ مرتب‌سازی بر اساس تاریخ (قدیمی → جدید) ═══
     return events.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-  }, [flockId, flocks, logs, hatches, invoices, productions, persons]);
+  }, [flockId, flocks, logs, hatches, invoices, productions, contacts]);
 }
