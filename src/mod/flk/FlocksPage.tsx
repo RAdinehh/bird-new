@@ -6,7 +6,6 @@ import {
   sexRatio, daysUntilLaying, isLayingReady, calcCosts,
   DEFAULT_LAYING_START, getLayingStartDay
 } from './store';
-import { useFlockEvents, type FlockEventView } from './useFlockEvents';
 import { useBrd } from '../brd/store';
 import { format, addDays, subMonths } from 'date-fns-jalali';
 import { schedulesByType, getSchedule } from '../cal/vaccineSchedules';
@@ -153,63 +152,6 @@ function checkHallCapacity(
     over: over > 0 ? over : 0,
     mode: 'count',
   };
-}
-
-function FlockEventsSection({ flockId }: { flockId: string }) {
-  const events = useFlockEvents(flockId);
-  const fmt = useFormat();
-  if (events.length === 0) return null;
-
-  const typeMeta: Record<string, { icon: string; color: string; label: string; sign: '+' | '-' | '' }> = {
-    initial: { icon: '📌', color: 'var(--info)', label: 'ثبت اولیه', sign: '+' },
-    add: { icon: '➕', color: 'var(--accent)', label: 'افزودن', sign: '+' },
-    sell: { icon: '💵', color: 'var(--purple)', label: 'فروش', sign: '-' },
-    death: { icon: '💀', color: 'var(--danger)', label: 'تلفات', sign: '-' },
-    transfer: { icon: '🔄', color: 'var(--warn)', label: 'انتقال', sign: '' },
-    egg: { icon: '🥚', color: 'var(--muted)', label: 'تخم', sign: '' },
-  };
-
-  return (
-    <>
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-        <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> رویدادها ({fmt.int(events.length)})
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {events.map(ev => {
-          const meta = typeMeta[ev.type] || { icon: '📌', color: 'var(--muted)', label: ev.type, sign: '' };
-          return (
-            <div key={ev.id} style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              gap: 6, fontSize: 'var(--fs-sm)',
-              padding: 'var(--pad-tight)',
-              background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flex: 1 }}>
-                <span aria-hidden="true">{meta.icon}</span>
-                <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{toFa(ev.date)}</span>
-                <span style={{ color: meta.color, fontWeight: 700 }}>
-                  {meta.sign}{fmt.int(ev.count)}
-                </span>
-                {ev.partyName ? (
-                  <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    · {ev.partyName}
-                  </span>
-                ) : null}
-                {ev.reason && ev.type === 'death' ? (
-                  <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>· {ev.reason}</span>
-                ) : null}
-              </div>
-              {ev.totalPrice ? (
-                <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0 }}>
-                  {fmt.money(ev.totalPrice)}
-                </span>
-              ) : null}
-            </div>
-          );
-        })}
-      </div>
-    </>
-  );
 }
 
 export default function FlocksPage() {
@@ -665,8 +607,6 @@ export default function FlocksPage() {
                     </>
                   )}
 
-                  {/* رویدادها */}
-                  <FlockEventsSection flockId={f.id} />
 
                   {/* یادداشت */}
                   {f.notes && (
