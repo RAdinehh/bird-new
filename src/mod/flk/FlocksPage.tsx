@@ -61,7 +61,7 @@ function todayJ(): string {
 }
 
 /** محدوده‌ی مجاز تاریخ شمسی */
-function jalaliBounds(monthsBack: number, daysForward = 30): { min: string; max: string } {
+function jalaliBounds(monthsBack: number, daysForward = 60): { min: string; max: string } {
   try {
     const now = new Date();
     return {
@@ -69,6 +69,18 @@ function jalaliBounds(monthsBack: number, daysForward = 30): { min: string; max:
       max: format(addDays(now, daysForward), 'yyyy/MM/dd'),
     };
   } catch { return { min: '', max: '' }; }
+}
+
+/** پیام هشدار اگه تاریخ خارج از محدوده باشه */
+function checkDateBounds(date: string, bounds: { min: string; max: string }): string | undefined {
+  if (!date) return undefined;
+  if (bounds.max && date > bounds.max) {
+    return 'بیش از ۲ ماه در آینده — گله هنوز وجود ندارد';
+  }
+  if (bounds.min && date < bounds.min) {
+    return 'بیش از ۱۸ ماه در گذشته — سن غیرمنطقی';
+  }
+  return undefined;
 }
 
 function checkHallCapacity(
@@ -903,14 +915,14 @@ export default function FlocksPage() {
 
           {form.source === 'hatch' && (
             <Field label="تاریخ هچ" hint="تاریخ خروج جوجه از دستگاه">
-              <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} />
+              <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} />
             </Field>
           )}
 
           {form.source === 'purchase' && (
             <Grid2>
               <Field label="تاریخ خرید / تحویل" hint="روزی که گله به دستت رسید">
-                <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} />
+                <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} />
               </Field>
               <Field label="تاریخ هچ" hint="اگر فروشنده گفته (اختیاری)">
                 <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="اختیاری" />
@@ -919,7 +931,7 @@ export default function FlocksPage() {
           )}
 
           <Field label="تاریخ شروع نگهداری" hint="اگه تاریخ دقیق خرید یا هچ رو نمی‌دونی، این رو پر کن">
-            <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} />
+            <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
           </Field>
 
           <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>هزینه‌ها</div>
