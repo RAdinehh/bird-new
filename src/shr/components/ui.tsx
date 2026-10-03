@@ -169,13 +169,13 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
       </div>
       {wordsText && (
         <div style={{
-          fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600,
-          padding: '5px 10px', background: 'var(--accent-soft)',
-          borderRadius: 'var(--r-sm)',
-          display: 'flex', alignItems: 'center', gap: 6,
-          border: '1px solid var(--accent-border)'
+          fontSize: 10,
+          color: 'var(--muted)',
+          lineHeight: 1.3,
+          marginTop: -2,
+          paddingRight: 2,
         }}>
-          <span>💬</span><span>{wordsText}</span>
+          {wordsText}
         </div>
       )}
       {error && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {error}</div>}
