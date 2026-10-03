@@ -3,7 +3,7 @@ import { parse as parseJ, differenceInCalendarDays as diffCalDays, startOfDay } 
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 
-export type ItemCategory = 'feed' | 'medicine' | 'vaccine' | 'herbal' | 'equipment' | 'consumable';
+export type ItemCategory = 'feed' | 'medicine' | 'vaccine' | 'herbal' | 'equipment' | 'consumable' | 'egg';
 export type ItemUnit = 'kg' | 'g' | 'L' | 'ml' | 'pcs' | 'vial' | 'pack';
 export type MovementType = 'in' | 'out' | 'adjust';
 export type MovementReason = 'purchase' | 'consumption' | 'sale' | 'loss' | 'adjustment' | 'return';
@@ -107,6 +107,7 @@ export const useWhs = create<State>()(
 );
 
 export const CATEGORY_LABEL: Record<ItemCategory, string> = {
+  egg: '🥚 تخم مرغ',
   feed: 'دان و خوراک',
   medicine: 'دارو',
   vaccine: 'واکسن',
@@ -116,6 +117,7 @@ export const CATEGORY_LABEL: Record<ItemCategory, string> = {
 };
 
 export const CATEGORY_ICON: Record<ItemCategory, string> = {
+  egg: '🥚',
   feed: '🌾',
   medicine: '💊',
   vaccine: '💉',
@@ -133,6 +135,7 @@ export const CATEGORY_DEFAULTS: Record<ItemCategory, {
   needsExpiry: boolean;
   needsWithdrawal: boolean;
 }> = {
+  egg:        { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false },
   feed:       { unit: 'kg',   storage: 'room',   needsExpiry: false, needsWithdrawal: false },
   medicine:   { unit: 'ml',   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true  },
   vaccine:    { unit: 'vial', storage: 'fridge', needsExpiry: true,  needsWithdrawal: true  },
