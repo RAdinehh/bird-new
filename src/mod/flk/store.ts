@@ -5,7 +5,7 @@ import { parse, differenceInDays } from 'date-fns-jalali';
 import { toEn } from '../../shr/utils/fa';
 
 export type FlockType = 'layer' | 'broiler' | 'breeder';
-export type FlockStatus = 'active' | 'archived' | 'sold';
+export type FlockStatus = 'active' | 'archived' | 'sold' | 'merged';
 
 export type FlockEventType = 'add' | 'sell' | 'death' | 'transfer';
 export type FlockEventSex = 'male' | 'female' | 'mixed';
@@ -26,6 +26,19 @@ export interface FlockEvent {
   hatchId?: string;
   notes: string;
   createdAt: string;
+}
+
+export interface FlockMergeSource {
+  flockId: string;
+  flockName: string;
+  count: number;
+  ageDays: number;
+}
+
+export interface FlockMergeInfo {
+  sources: FlockMergeSource[];
+  avgAgeDays: number;
+  mergedAt: string;
 }
 
 export interface Flock {
@@ -54,6 +67,8 @@ export interface Flock {
   notes: string;
   /** رویدادهای دستی گله */
   events?: FlockEvent[];
+  mergedInto?: string;
+  mergedInfo?: FlockMergeInfo;
   createdAt: string;
   updatedAt: string;
 }
@@ -62,6 +77,7 @@ interface State {
   flocks: Flock[];
   addEvent: (flockId: string, ev: Omit<FlockEvent, 'id'|'flockId'|'createdAt'>) => void;
   removeEvent: (flockId: string, eventId: string) => void;
+  mergeFlocks: (targetId: string, sourceId: string, opts: { targetAgeDays: number; sourceAgeDays: number; hatchDate?: string }) => void;
   add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => void;
   update: (id: string, patch: Partial<Flock>) => void;
   remove: (id: string) => void;
@@ -94,6 +110,46 @@ export const useFlk = create<State>()(
             ? { ...f, events: (f.events || []).filter(e => e.id !== eventId), updatedAt: now() }
             : f
         )
+      }),
+      mergeFlocks: (targetId, sourceId, opts) => set({
+        flocks: get().flocks.map(f => {
+          if (f.id === sourceId) {
+            return {
+              ...f,
+              status: 'merged' as FlockStatus,
+              mergedInto: targetId,
+              currentCount: 0,
+              updatedAt: now(),
+            };
+          }
+          if (f.id !== targetId) return f;
+          const target = f;
+          const source = get().flocks.find(x => x.id === sourceId);
+          if (!source) return f;
+          const targetSources = target.mergedInfo?.sources || [{
+            flockId: target.id,
+            flockName: target.name,
+            count: target.currentCount || 0,
+            ageDays: opts.targetAgeDays,
+          }];
+          const newSources = [...targetSources, {
+            flockId: source.id,
+            flockName: source.name,
+            count: source.currentCount || 0,
+            ageDays: opts.sourceAgeDays,
+          }];
+          const totalCount = newSources.reduce((s, x) => s + x.count, 0);
+          const weightedAge = newSources.reduce((s, x) => s + x.count * x.ageDays, 0);
+          const avgAgeDays = totalCount > 0 ? Math.round((weightedAge / totalCount) * 10) / 10 : 0;
+          return {
+            ...target,
+            initialCount: (target.initialCount || 0) + (source.initialCount || 0),
+            currentCount: (target.currentCount || 0) + (source.currentCount || 0),
+            hatchDate: opts.hatchDate || target.hatchDate,
+            mergedInfo: { sources: newSources, avgAgeDays, mergedAt: now() },
+            updatedAt: now(),
+          };
+        }),
       })
     }),
     { name: 'pm-flk' }
@@ -101,7 +157,7 @@ export const useFlk = create<State>()(
 );
 
 export const TYPE_LABEL: Record<FlockType, string> = { layer: 'تخم‌گذار', broiler: 'گوشتی', breeder: 'مادر' };
-export const STATUS_LABEL: Record<FlockStatus, string> = { active: 'فعال', archived: 'آرشیو', sold: 'فروخته‌شده' };
+export const STATUS_LABEL: Record<FlockStatus, string> = { active: 'فعال', archived: 'آرشیو', sold: 'فروخته‌شده', merged: 'ادغام‌شده' };
 export const SOURCE_LABEL: Record<string, string> = { purchase: 'خریداری', hatch: 'جوجه‌کشی خودم' };
 
 export function jalaliToDate(s: string): Date | null {
