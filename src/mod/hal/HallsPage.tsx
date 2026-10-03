@@ -272,7 +272,12 @@ export default function HallsPage() {
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="نام سالن" required><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
         <Grid2>
-          <Field label="کد سالن"><Input placeholder="H-01" dir="ltr" value={form.code} onChange={e => setForm({...form, code: e.target.value})} /></Field>
+          <Field label="نژاد پرنده" hint="محاسبه خودکار">
+            <Select value={form.breedId} onChange={e => setForm({...form, breedId: e.target.value})}>
+              <option value="">— انتخاب —</option>
+              {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </Select>
+          </Field>
           <Field label="ظرفیت"><NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} /></Field>
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
