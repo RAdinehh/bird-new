@@ -117,7 +117,7 @@ export default function ListCards({
                 }}>
                   {activeFlocks.slice(0, 3).map((f, i) => {
                     const age = getAgeDays(f);
-                    const lc = getLifecycle(f.type, age);
+                    const lc = getLifecycle(f.type, age, (f as any).endOfCycleDay ?? null);
                     const bird = birds.find(b => b.id === f.birdId);
                     const flockCount = f.currentCount || f.initialCount || 0;
                     const flockProds = productions.filter(p => p.flockId === f.id && dateDiffDays(p.date) <= 7);
