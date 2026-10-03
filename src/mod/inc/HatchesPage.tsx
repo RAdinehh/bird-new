@@ -207,17 +207,21 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     const entry = _entriesById[h.eggEntryId];
     const bird = entry ? _birdsById[entry.birdId] : null;
     if (!bird) { showAlert('پرنده پیدا نشد'); return; }
-    addFlock({
+    const newFlockId = addFlock({
       name: flockForm.name.trim(), type: flockForm.type as any,
       birdId: bird.id, breedId: entry?.breedId || '',
       hallId: flockForm.hallId, zoneId: flockForm.zoneId,
       initialCount: flockModal.count, currentCount: flockModal.count,
       maleCount: h.maleCount || null, femaleCount: h.femaleCount || null,
-      layingStartDay: 140, vaccineScheduleId: '',
-      hatchDate: todayJ(), purchaseDate: '', startDate: todayJ(), source: 'hatch',
+      layingStartDay: 0, vaccineScheduleId: '',
+      hatchDate: h.date, purchaseDate: '', startDate: h.date, source: 'hatch',
       purchasePrice: null, deliveryCost: null, otherCosts: null,
       status: 'active', notes: 'از هچ ' + toFa(h.date),
+      sourceHatchId: h.id,
     } as any);
+    if (h && newFlockId) {
+      try { updateHatch(h.id, { generatedFlockId: newFlockId } as any); } catch {}
+    }
     setFlockModal(null);
     showAlert('گله ساخته شد', '✅ موفق');
     setTimeout(() => nav('/flk'), 500);
