@@ -59,16 +59,61 @@ function checkHallCapacity(
   newCount: number,
   flocks: any[],
   halls: any[],
+  breedStd: any,
   excludeFlockId?: string,
-): { ok: boolean; capacity: number; current: number; total: number; over: number } | null {
+  newBreedId?: string,
+): { ok: boolean; capacity: number; current: number; total: number; over: number; mode: 'count' | 'area'; note?: string } | null {
   if (!hallId || !newCount) return null;
   const hall = halls.find(h => h.id === hallId);
-  if (!hall || !hall.capacity) return null;
+  if (!hall) return null;
 
+  // اگه ابعاد سالن داره، از مساحت استفاده کن
+  const area = (hall.length || 0) * (hall.width || 0);
+  const hasArea = area > 0;
+
+  if (hasArea) {
+    // چک بر اساس مساحت مصرفی
+    let usedArea = 0;
+    let hasUnknownDensity = false;
+    const activeFlocks = (flocks || []).filter(f => f.hallId === hallId && f.status === 'active' && f.id !== excludeFlockId);
+
+    for (const f of activeFlocks) {
+      const std = breedStd.byBreedId(f.breedId);
+      const density = std?.space?.densityMax;
+      const count = f.currentCount || f.initialCount || 0;
+      if (density && density > 0) {
+        usedArea += count / density;
+      } else {
+        hasUnknownDensity = true;
+      }
+    }
+
+    // گله جدید
+    const newStd = newBreedId ? breedStd.byBreedId(newBreedId) : null;
+    const newDensity = newStd?.space?.densityMax;
+    if (newDensity && newDensity > 0) {
+      usedArea += newCount / newDensity;
+    } else {
+      hasUnknownDensity = true;
+    }
+
+    const over = usedArea - area;
+    return {
+      ok: over <= 0 && !hasUnknownDensity,
+      capacity: Math.round(area),
+      current: Math.round(usedArea - (newDensity && newDensity > 0 ? newCount / newDensity : 0)),
+      total: Math.round(usedArea),
+      over: over > 0 ? Math.round(over) : 0,
+      mode: 'area',
+      note: hasUnknownDensity ? 'بعضی نژادها تراکم تعریف نشده — دقیق نیست' : undefined,
+    };
+  }
+
+  // fallback: چک بر اساس تعداد
+  if (!hall.capacity) return null;
   const current = (flocks || [])
     .filter(f => f.hallId === hallId && f.status === 'active' && f.id !== excludeFlockId)
     .reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);
-
   const total = current + newCount;
   const over = total - hall.capacity;
   return {
@@ -77,6 +122,7 @@ function checkHallCapacity(
     current,
     total,
     over: over > 0 ? over : 0,
+    mode: 'count',
   };
 }
 
@@ -222,14 +268,14 @@ export default function FlocksPage() {
     };
     // 🔒 چک ظرفیت سالن
     const newCount = data.currentCount || data.initialCount || 0;
-    const cap = checkHallCapacity(form.hallId, newCount, flocks, halls, form.id || undefined);
+    const cap = checkHallCapacity(form.hallId, newCount, flocks, halls, breedStd, form.id || undefined, form.breedId);
     if (cap && !cap.ok) {
       const ok = await showConfirmAsync(
         '⚠️ ظرفیت سالن پر می‌شود',
-        `ظرفیت سالن: ${cap.capacity} پرنده\n` +
-        `فعلی: ${cap.current} پرنده\n` +
-        `بعد از این گله: ${cap.total} پرنده\n` +
-        `اضافه‌بار: ${cap.over} پرنده\n\n` +
+        (cap.mode === 'area'
+          ? `فضای سالن: ${cap.capacity} m²\nفعلی: ${cap.current} m²\nبعد از این گله: ${cap.total} m²\nاضافه‌بار: ${cap.over} m²\n`
+          : `ظرفیت سالن: ${cap.capacity} پرنده\nفعلی: ${cap.current} پرنده\nبعد از این گله: ${cap.total} پرنده\nاضافه‌بار: ${cap.over} پرنده\n`) +
+        (cap.note ? `\n⚠️ ${cap.note}\n` : '') + '\n' +
         `آیا می‌خواهید ادامه دهید؟`,
         { danger: true, confirmText: 'بله، ادامه' }
       );
