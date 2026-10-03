@@ -310,10 +310,10 @@ export default function HallsPage() {
                 {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </Select>
             </Field>
-            <Field
-              label="ظرفیت"
-              hint={(() => {
-                if (!form.breedId) return undefined;
+            <Field label="ظرفیت">
+              <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} />
+              {(() => {
+                if (!form.breedId) return null;
                 const std = breedStd.byBreedId(form.breedId);
                 const density = std?.space?.densityMax;
                 const L = parseFloat(toEn(form.length)) || 0;
@@ -321,12 +321,24 @@ export default function HallsPage() {
                 const area = L * W;
                 if (area > 0 && density) {
                   const cap = Math.floor(area * density);
-                  return `${toFa(area)} × ${toFa(density)} = ${toFa(cap)}`;
+                  return (
+                    <div
+                      dir="ltr"
+                      style={{
+                        marginTop: 4,
+                        fontSize: 11,
+                        color: 'var(--muted)',
+                        textAlign: 'center',
+                        fontVariantNumeric: 'tabular-nums',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {toFa(area)} × {toFa(density)} = {toFa(cap)}
+                    </div>
+                  );
                 }
-                return undefined;
+                return null;
               })()}
-            >
-              <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} />
             </Field>
           </Grid2>
           {form.breedId && (
