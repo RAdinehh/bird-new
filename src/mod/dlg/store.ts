@@ -93,6 +93,12 @@ export interface DailyLog {
   eggsCount: number | null;
   brokenEggs: number | null;
   dirtyEggs: number | null;
+  // 🆕 تخم - تفکیک جدید
+  eatingEggs?: number | null;
+  fertileEggs?: number | null;
+  otherEggs?: number | null;
+  brokenTarget?: 'consumption' | 'eating';
+  otherTarget?: 'consumption' | 'eating';
 
   // تلفات
   deathsCount: number;
@@ -136,6 +142,11 @@ export const useDlg = create<State>()(
           eggsCount: (l as any).eggsCount ?? null,
           brokenEggs: (l as any).brokenEggs ?? null,
           dirtyEggs: (l as any).dirtyEggs ?? null,
+          eatingEggs: (l as any).eatingEggs ?? null,
+          fertileEggs: (l as any).fertileEggs ?? null,
+          otherEggs: (l as any).otherEggs ?? null,
+          brokenTarget: (l as any).brokenTarget || 'consumption',
+          otherTarget: (l as any).otherTarget || 'consumption',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         } as DailyLog;
@@ -161,7 +172,7 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
-      version: 6,
+      version: 7,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
@@ -193,6 +204,16 @@ export const useDlg = create<State>()(
           persisted.logs = persisted.logs.map((l: any) => ({
             ...l,
             status: l.status || 'active',
+          }));
+        }
+        if (version < 7 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => ({
+            ...l,
+            eatingEggs: l.eatingEggs ?? l.eggsCount ?? null,
+            fertileEggs: l.fertileEggs ?? null,
+            otherEggs: l.otherEggs ?? l.dirtyEggs ?? null,
+            brokenTarget: l.brokenTarget || 'consumption',
+            otherTarget: l.otherTarget || 'consumption',
           }));
         }
         if (version < 6 && persisted?.logs) {
