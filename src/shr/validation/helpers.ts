@@ -1,140 +1,149 @@
 /**
  * validation/helpers.ts — اسکیماهای پایه و ابزارها
- *
- * ⚠️ نکات مهم:
- * - همه‌ی اعداد با coerce تبدیل میشن (چون فرم‌ها رشته ذخیره می‌کنن)
- * - پیام‌ها به فارسی ساده برای کاربر نهایی
- * - پیام‌ها روی path مشخص می‌شن تا UI بتونه زیر فیلد درست نشون بده
  */
 import { z } from 'zod';
 import type { ValidationResult, ValidationIssue } from './types';
 
 // ═══════════════════════════════════════════════
+// پاک‌سازی ورودی
+// ═══════════════════════════════════════════════
+
+export function sanitizeNumber(val: unknown): unknown {
+  if (typeof val === 'number') return Number.isFinite(val) ? val : undefined;
+  if (typeof val === 'string') {
+    const clean = val
+      .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 1776))
+      .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632))
+      .replace(/[،,]/g, '')
+      .replace(/[\s\u200C]/g, '')
+      .trim();
+    if (clean === '') return undefined;
+    const num = Number(clean);
+    return Number.isFinite(num) ? num : undefined;
+  }
+  return val;
+}
+
+export const poultryInt = z.preprocess(
+  sanitizeNumber,
+  z.number({ invalid_type_error: 'لطفاً عدد صحیح معتبر وارد کنید' })
+    .int('مقدار باید عدد صحیح باشد'),
+);
+
+export const poultryFloat = z.preprocess(
+  sanitizeNumber,
+  z.number({ invalid_type_error: 'لطفاً عدد معتبر وارد کنید' }),
+);
+
+// ═══════════════════════════════════════════════
 // اعداد
 // ═══════════════════════════════════════════════
 
-/** عدد صحیح ≥ 0 */
 export const intNonNeg = (label: string, max = 1_000_000) =>
-  z.coerce.number({ invalid_type_error: `${label} باید عدد باشد` })
-    .int(`${label} باید عدد صحیح باشد`)
-    .min(0, `${label} نمی‌تواند منفی باشد`)
-    .max(max, `${label} بیش از حد بزرگ است`);
+  poultryInt.pipe(z.number().min(0, `${label} نمی‌تواند منفی باشد`).max(max, `${label} بیش از حد بزرگ است`));
 
-/** عدد صحیح > 0 */
 export const intPos = (label: string, max = 1_000_000) =>
-  z.coerce.number({ invalid_type_error: `${label} باید عدد باشد` })
-    .int(`${label} باید عدد صحیح باشد`)
-    .min(1, `${label} باید بیشتر از صفر باشد`)
-    .max(max, `${label} بیش از حد بزرگ است`);
+  poultryInt.pipe(z.number().min(1, `${label} باید بیشتر از صفر باشد`).max(max, `${label} بیش از حد بزرگ است`));
 
-/** عدد صحیح در بازه */
 export const intRange = (label: string, min: number, max: number) =>
-  z.coerce.number({ invalid_type_error: `${label} باید عدد باشد` })
-    .int(`${label} باید عدد صحیح باشد`)
+  poultryInt.pipe(z.number()
     .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
-    .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`);
+    .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`));
 
-/** عدد اعشاری ≥ 0 */
 export const floatNonNeg = (label: string, max = 1_000_000) =>
-  z.coerce.number({ invalid_type_error: `${label} باید عدد باشد` })
-    .min(0, `${label} نمی‌تواند منفی باشد`)
-    .max(max, `${label} بیش از حد بزرگ است`);
+  poultryFloat.pipe(z.number().min(0, `${label} نمی‌تواند منفی باشد`).max(max, `${label} بیش از حد بزرگ است`));
 
-/** عدد اعشاری > 0 */
 export const floatPos = (label: string, max = 1_000_000) =>
-  z.coerce.number({ invalid_type_error: `${label} باید عدد باشد` })
-    .min(0.0001, `${label} باید بیشتر از صفر باشد`)
-    .max(max, `${label} بیش از حد بزرگ است`);
+  poultryFloat.pipe(z.number().min(0.0001, `${label} باید بیشتر از صفر باشد`).max(max, `${label} بیش از حد بزرگ است`));
 
-/** عدد اعشاری در بازه */
 export const floatRange = (label: string, min: number, max: number) =>
-  z.coerce.number({ invalid_type_error: `${label} باید عدد باشد` })
+  poultryFloat.pipe(z.number()
     .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
-    .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`);
+    .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`));
 
-/** اختیاری — اگه خالی باشه null می‌شه */
 export const intOpt = (label: string, max = 1_000_000) =>
-  z.union([z.literal(''), z.coerce.number().int().min(0, `${label} منفی نباشه`).max(max)])
-    .optional()
-    .transform(v => (v === '' || v === undefined || v === null) ? null : Number(v));
+  z.union([
+    z.literal(''),
+    z.undefined(),
+    z.null(),
+    poultryInt.pipe(z.number().min(0, `${label} منفی نباشد`).max(max, `${label} بیش از حد بزرگ`)),
+  ]).transform(v => (v === '' || v === undefined || v === null) ? null : Number(v));
 
 // ═══════════════════════════════════════════════
-// تاریخ (شمسی)
+// تاریخ شمسی
 // ═══════════════════════════════════════════════
 
-const JALALI_RE = /^\d{4}\/\d{2}\/\d{2}$/;
+const JALALI_RE = /^14\d{2}[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12]\d|3[01])$/;
 
-/** تاریخ شمسی */
-export const jalaliDate = (label = 'تاریخ') =>
-  z.string()
-    .min(1, `${label} اجباری است`)
+export const persianDate = (label = 'تاریخ') =>
+  z.string({ required_error: `${label} اجباری است` })
     .regex(JALALI_RE, `${label} باید به شکل ۱۴۰۵/۰۷/۱۱ باشد`);
 
-/** تاریخ شمسی اختیاری */
-export const jalaliDateOpt = (label = 'تاریخ') =>
-  z.union([z.literal(''), z.string().regex(JALALI_RE, `${label} نامعتبر است`)])
-    .optional()
-    .default('');
+export const persianDateOpt = (label = 'تاریخ') =>
+  z.union([
+    z.literal(''),
+    z.undefined(),
+    z.string().regex(JALALI_RE, `${label} نامعتبر است`),
+  ]).transform(v => v ?? '');
 
-/** تاریخ شمسی با محدوده */
-export const jalaliDateMinMax = (label: string, min: string, max: string) =>
-  z.string()
-    .min(1, `${label} اجباری است`)
-    .regex(JALALI_RE, `${label} نامعتبر است`)
-    .refine(v => v >= min, { message: `${label} نمی‌تواند قبل از ${min} باشد` })
-    .refine(v => v <= max, { message: `${label} نمی‌تواند بعد از ${max} باشد` });
+function todayJalali(): string {
+  const d = new Date();
+  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+}
 
-/** تاریخ شمسی که در آینده نباشه */
-export const jalaliDateNotFuture = (label = 'تاریخ', today?: string) =>
-  z.string()
-    .min(1, `${label} اجباری است`)
+export const persianDateNotFuture = (label = 'تاریخ') =>
+  z.string({ required_error: `${label} اجباری است` })
     .regex(JALALI_RE, `${label} نامعتبر است`)
-    .refine(v => !today || v <= today, { message: `${label} نمی‌تواند در آینده باشد` });
+    .refine(v => v <= todayJalali(), `${label} نمی‌تواند در آینده باشد`);
+
+export const persianDatePast = (label = 'تاریخ') =>
+  z.string({ required_error: `${label} اجباری است` })
+    .regex(JALALI_RE, `${label} نامعتبر است`)
+    .refine(v => v <= todayJalali(), `${label} باید امروز یا قبل‌تر باشد`);
+
+export const persianDateMinMax = (label: string, min: string, max: string) =>
+  z.string({ required_error: `${label} اجباری است` })
+    .regex(JALALI_RE, `${label} نامعتبر است`)
+    .refine(v => v >= min, `${label} نمی‌تواند قبل از ${min} باشد`)
+    .refine(v => v <= max, `${label} نمی‌تواند بعد از ${max} باشد`);
 
 // ═══════════════════════════════════════════════
-// رشته‌ها
+// رشته‌ها و انتخاب‌ها
 // ═══════════════════════════════════════════════
 
-/** رشته اجباری */
 export const requiredStr = (label: string, min = 1, max = 500) =>
-  z.string()
-    .min(min, `${label} اجباری است`)
+  z.string({ required_error: `${label} اجباری است` })
+    .trim()
+    .min(min, `${label} باید حداقل ${min} کاراکتر باشد`)
     .max(max, `${label} بیش از حد طولانی است`);
 
-/** رشته اختیاری */
 export const optionalStr = (max = 2000) =>
   z.string().max(max, 'متن بیش از حد طولانی است').optional().default('');
 
-/** آیتم اجباری (id از لیست) */
 export const requiredId = (label: string) =>
-  z.string().min(1, `${label} اجباری است`);
+  z.string({ required_error: `${label} اجباری است` })
+    .min(1, `${label} اجباری است`);
 
-/** آیتم اختیاری (id از لیست) */
 export const optionalId = () => z.string().optional().default('');
 
-/** انتخاب از لیست محدود (enum) */
-export const oneOf = <T extends string>(label: string, values: readonly T[]) =>
-  z.enum(values as any, {
-    invalid_type_error: `${label} نامعتبر است`,
-    required_error: `${label} اجباری است`,
-  }) as unknown as z.ZodType<T>;
+export const oneOf = <T extends readonly [string, ...string[]]>(label: string, values: T) =>
+  z.enum(values, { errorMap: () => ({ message: `${label} نامعتبر است` }) }) as unknown as z.ZodType<T[number]>;
 
-/** چک‌باکس / بولین */
 export const bool = () => z.boolean().optional().default(false);
 
+export const phoneIR = (label = 'شماره تماس') =>
+  z.string()
+    .regex(/^09\d{9}$/, `${label} باید با ۰۹ شروع شده و ۱۱ رقم باشد`)
+    .optional()
+    .or(z.literal(''));
+
 // ═══════════════════════════════════════════════
-// ابزارهای سراسری
+// ابزارها
 // ═══════════════════════════════════════════════
 
-/** اعتبارسنجی امن — بدون throw، نتیجه ساختاریافته */
-export function validate<T>(
-  schema: z.ZodSchema<T>,
-  data: any,
-): ValidationResult {
+export function validate<T>(schema: z.ZodSchema<T>, data: any): ValidationResult {
   const result = schema.safeParse(data);
-  if (result.success) {
-    return { ok: true, errors: {} };
-  }
+  if (result.success) return { ok: true, errors: {} };
   const errors: Record<string, string> = {};
   for (const issue of result.error.issues) {
     const key = issue.path.join('.') || '_';
@@ -143,7 +152,6 @@ export function validate<T>(
   return { ok: false, errors };
 }
 
-/** استخراج لیست خطاها با جزئیات */
 export function issues<T>(schema: z.ZodSchema<T>, data: any): ValidationIssue[] {
   const result = schema.safeParse(data);
   if (result.success) return [];
@@ -154,30 +162,8 @@ export function issues<T>(schema: z.ZodSchema<T>, data: any): ValidationIssue[] 
   }));
 }
 
-/** بررسی حداقل یک عدد مثبت در چند فیلد */
-export function atLeastOne(schema: z.ZodEffects<any>, fields: string[], label = 'حداقل یک مقدار') {
-  return schema.superRefine((data: any, ctx: any) => {
-    const has = fields.some(f => Number(data[f]) > 0);
-    if (!has) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: label,
-        path: [fields[0]],
-      });
-    }
-  });
-}
-
-/** جمع دو یا چند فیلد نباید از حد مشخص بیشتر باشد */
-export function sumLessThan(schema: z.ZodEffects<any>, fields: string[], max: number, label = 'مجموع') {
-  return schema.superRefine((data: any, ctx: any) => {
-    const sum = fields.reduce((a, f) => a + (Number(data[f]) || 0), 0);
-    if (sum > max) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `${label} (${sum.toLocaleString('fa-IR')}) نمی‌تواند از ${max.toLocaleString('fa-IR')} بیشتر باشد`,
-        path: [fields[0]],
-      });
-    }
-  });
+/** میانگین وزنی */
+export function avgWeight(totalKg: number, count: number): number {
+  if (count <= 0) return 0;
+  return (totalKg * 1000) / count; // گرم
 }
