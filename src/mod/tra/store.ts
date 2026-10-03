@@ -238,6 +238,19 @@ function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] {
         if (!f) continue;
         flk.update(it.flockId, { currentCount: (f.currentCount ?? 0) + qty });
       } else {
+        // EXISTING_FLOCK_CHECK — اگه قبلاً از این فاکتور گله ساختیم، همون رو استفاده کن
+        const existing = flk.flocks.find(f =>
+          f.sourceInvoiceId === inv.id &&
+          f.sourceCategory === inv.category &&
+          f.birdId === it.birdId &&
+          f.breedId === (it.breedId || '')
+        );
+        if (existing) {
+          flk.update(existing.id, { currentCount: (existing.currentCount ?? 0) + qty });
+          const idx0 = inv.items.indexOf(it);
+          if (idx0 >= 0 && outItems[idx0]) outItems[idx0].flockId = existing.id;
+          continue;
+        }
         // گله جدید بساز
         const breed = brd.breeds.find(b => b.id === it.breedId);
         const bird = brd.birds.find(b => b.id === it.birdId);
@@ -289,7 +302,7 @@ export const useTra = create<State>()(
       deals: [],
       addInvoice: (i) => {
         const id = uuid();
-        const num = 'INV-' + Date.now().toString(36).toUpperCase();
+        const num = generateInvoiceNumber(i.type, i.date, get().invoices);
         const newInv = { ...i, id, number: i.number || num, createdAt: now(), updatedAt: now() } as any;
         let items: InvoiceItem[] = newInv.items || [];
         try { items = applyInvoiceFlocks(newInv); } catch(e) {}
