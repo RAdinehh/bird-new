@@ -45,7 +45,20 @@ export const Btn = forwardRef<HTMLButtonElement, BtnProps>(({  variant = 'ghost'
 Btn.displayName = 'Btn';
 
 export function BtnRow({ children }: { children: React.ReactNode }) {
-  return <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>{children}</div>;
+  const items = React.Children.toArray(children).filter(Boolean);
+  return (
+    <div style={{ display: 'flex', gap: 'var(--sp-2)', width: '100%' }}>
+      {items.map((child, i) => (
+        <div key={i} style={{ flex: 1, minWidth: 0, display: 'flex' }}>
+          {React.isValidElement(child)
+            ? React.cloneElement(child as React.ReactElement<{ style?: React.CSSProperties }>, {
+                style: { flex: 1, ...((child as React.ReactElement<{ style?: React.CSSProperties }>).props.style || {}) },
+              })
+            : child}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
