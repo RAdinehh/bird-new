@@ -341,13 +341,12 @@ export default function HallsPage() {
                         color: 'var(--accent)',
                         cursor: 'pointer',
                         fontFamily: 'inherit',
-                        fontSize: 10.5,
+                        fontSize: 11,
                         fontWeight: 600,
                         textAlign: 'center',
-                        lineHeight: 1.4,
                       }}
                     >
-                      ✨ {toFa(L)}×{toFa(W)} = {toFa(area)} m² × {toFa(density)} = <b>{toFa(cap)}</b>
+                      ✨ پیشنهاد: {toFa(cap)} پرنده
                     </button>
                   );
                 }
