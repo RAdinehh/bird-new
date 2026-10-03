@@ -988,7 +988,7 @@ export default function DailyLogsPage() {
               </Grid2>
               {vaccineItems.length > 0 && (
                 <Grid2>
-                  <Field label="از انبار (اختیاری)">
+                  <Field label="از انبار" autoFrom="انبار (مصرف کسر می‌شه)" hint="اگه انتخاب کنی، به‌طور خودکار از موجودی انبار کم می‌شه">
                     <SmartSelect
                       value={v.itemId || ''}
                       onChange={id => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
@@ -1028,7 +1028,7 @@ export default function DailyLogsPage() {
               </Grid2>
               {medicineItems.length > 0 && (
                 <Grid2>
-                  <Field label="از انبار (اختیاری)">
+                  <Field label="از انبار" autoFrom="انبار (مصرف کسر می‌شه)" hint="اگه انتخاب کنی، به‌طور خودکار از موجودی انبار کم می‌شه">
                     <SmartSelect
                       value={m.itemId || ''}
                       onChange={id => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
