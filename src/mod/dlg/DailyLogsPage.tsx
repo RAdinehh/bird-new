@@ -1036,7 +1036,7 @@ const collectWhsShortages = () => {
                   style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
               </div>
               <Grid2>
-                <Field label="تعداد">
+                <Field label="تعداد" error={vErrors.deathsCount || vErrors.deaths}>
                   <NumField placeholder="۰" value={String(d.count || '')}
                     onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
                     min={0} max={flockAliveCount || undefined} unit="پرنده" />
