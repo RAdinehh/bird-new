@@ -229,6 +229,9 @@ export default function FlocksPage() {
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
   const [archId, setArchId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [eventModal, setEventModal] = useState<{ flockId: string; type: 'add' | 'sell' | 'death' } | null>(null);
+  const [eventForm, setEventForm] = useState({ date: '', count: '', sex: 'mixed' as 'male'|'female'|'mixed', reason: '', unitPrice: '', notes: '' });
+  const [eventErr, setEventErr] = useState('');
   const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'archived'], tab, (id) => setTab(id as TabId));
 
   // فیلتر تکرارها تو render
@@ -375,6 +378,45 @@ export default function FlocksPage() {
 
   const formStd = breedStd.byBreedId(form.breedId);
   const formLaying = formStd?.biology?.layingStartDay ?? DEFAULT_LAYING_START;
+
+  const addEvent = useFlk(s => s.addEvent);
+
+  const openEvent = (flockId: string, type: 'add' | 'sell' | 'death') => {
+    setEventForm({ date: todayJ(), count: '', sex: 'mixed', reason: '', unitPrice: '', notes: '' });
+    setEventErr('');
+    setEventModal({ flockId, type });
+  };
+
+  const saveEvent = () => {
+    if (!eventModal) return;
+    if (!eventForm.date.trim()) { setEventErr('تاریخ اجباری است'); return; }
+    const cnt = int(eventForm.count);
+    if (!cnt || cnt <= 0) { setEventErr('تعداد باید بزرگ‌تر از صفر باشد'); return; }
+    if (eventModal.type === 'death' && !eventForm.reason.trim()) { setEventErr('علت تلفات اجباری است'); return; }
+
+    // چک: تعداد فروش/تلفات نباید بیشتر از تعداد فعلی باشه
+    const flk = flocks.find(x => x.id === eventModal.flockId);
+    const alive = flk?.currentCount ?? flk?.initialCount ?? 0;
+    if ((eventModal.type === 'sell' || eventModal.type === 'death') && cnt > alive) {
+      setEventErr(`تعداد (${toFa(cnt)}) بیشتر از تعداد زنده گله (${toFa(alive)}) است`);
+      return;
+    }
+
+    addEvent(eventModal.flockId, {
+      date: eventForm.date.trim(),
+      type: eventModal.type,
+      count: cnt,
+      sex: eventForm.sex,
+      reason: eventModal.type === 'death' ? eventForm.reason.trim() : undefined,
+      unitPrice: eventForm.unitPrice ? num(eventForm.unitPrice) || undefined : undefined,
+      totalPrice: eventForm.unitPrice ? (num(eventForm.unitPrice) || 0) * cnt : undefined,
+      notes: eventForm.notes.trim(),
+    });
+
+    showToast('رویداد ثبت شد', 'success', 1800);
+    setEventModal(null);
+    setEventErr('');
+  };
 
   const list = useMemo(() => {
     let arr = flocks;
@@ -674,6 +716,45 @@ export default function FlocksPage() {
                     </>
                   )}
 
+                  {/* دکمه‌های رویداد (فقط برای فعال) */}
+                  {!isArchived && (
+                    <div style={{ display: 'flex', gap: 4, paddingTop: 4 }}>
+                      <button
+                        type="button"
+                        onClick={() => openEvent(f.id, 'add')}
+                        style={{
+                          flex: 1, padding: '8px 6px',
+                          background: 'var(--accent-soft)', border: '1px solid var(--accent-border)',
+                          borderRadius: 'var(--r-md)', color: 'var(--accent)',
+                          fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >➕ افزودن</button>
+                      <button
+                        type="button"
+                        onClick={() => openEvent(f.id, 'sell')}
+                        style={{
+                          flex: 1, padding: '8px 6px',
+                          background: 'var(--purple-soft)', border: '1px solid var(--purple)',
+                          borderRadius: 'var(--r-md)', color: 'var(--purple)',
+                          fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >💵 فروش</button>
+                      <button
+                        type="button"
+                        onClick={() => openEvent(f.id, 'death')}
+                        style={{
+                          flex: 1, padding: '8px 6px',
+                          background: 'var(--danger-soft)', border: '1px solid var(--danger)',
+                          borderRadius: 'var(--r-md)', color: 'var(--danger)',
+                          fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >💀 تلفات</button>
+                    </div>
+                  )}
+
                   {/* دکمه‌ها */}
                   <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                     {isArchived ? (
@@ -694,6 +775,81 @@ export default function FlocksPage() {
             {tab !== 'archived' && <Btn variant="primary" full onClick={openNew}>+ افزودن گله</Btn>}
           </>
         )}
+
+        {/* Modal ثبت رویداد */}
+        <Modal
+          open={!!eventModal}
+          onClose={() => setEventModal(null)}
+          title={
+            eventModal?.type === 'add' ? '➕ افزودن به گله'
+            : eventModal?.type === 'sell' ? '💵 فروش از گله'
+            : eventModal?.type === 'death' ? '💀 ثبت تلفات'
+            : 'رویداد'
+          }
+          footer={<BtnRow>
+            <Btn variant="primary" onClick={saveEvent}>ثبت</Btn>
+            <Btn onClick={() => setEventModal(null)}>لغو</Btn>
+          </BtnRow>}
+        >
+          <Field label="تاریخ" required>
+            <DatePicker
+              value={eventForm.date}
+              onChange={v => setEventForm(f => ({ ...f, date: v }))}
+              placeholder="انتخاب تاریخ"
+              autoToday
+              min={jalaliBounds(18).min}
+              max={jalaliBounds(18).max}
+            />
+          </Field>
+          <Grid2>
+            <Field label="تعداد" required>
+              <NumField
+                placeholder="۰"
+                value={eventForm.count}
+                onChange={e => setEventForm(f => ({ ...f, count: e.target.value }))}
+                unit="پرنده" min={1}
+              />
+            </Field>
+            <Field label="جنسیت">
+              <Select value={eventForm.sex} onChange={e => setEventForm(f => ({ ...f, sex: e.target.value as any }))}>
+                <option value="mixed">مخلوط</option>
+                <option value="male">نر (خروس)</option>
+                <option value="female">ماده (مرغ)</option>
+              </Select>
+            </Field>
+          </Grid2>
+          {eventModal?.type === 'death' && (
+            <Field label="علت تلفات" required>
+              <Select value={eventForm.reason} onChange={e => setEventForm(f => ({ ...f, reason: e.target.value }))}>
+                <option value="">— انتخاب علت —</option>
+                <option value="بیماری">بیماری</option>
+                <option value="گرمازدگی">گرمازدگی</option>
+                <option value="سرمازدگی">سرمازدگی</option>
+                <option value="شکارچی">شکارچی</option>
+                <option value="تلفات جوجه">تلفات جوجه</option>
+                <option value="کهتری">کهتری</option>
+                <option value="نامشخص">نامشخص</option>
+              </Select>
+            </Field>
+          )}
+          {eventModal?.type === 'sell' && (
+            <Field label="قیمت هر پرنده (اختیاری)">
+              <MoneyField
+                placeholder="۰"
+                value={eventForm.unitPrice}
+                onChange={e => setEventForm(f => ({ ...f, unitPrice: e.target.value }))}
+              />
+            </Field>
+          )}
+          <Field label="یادداشت (اختیاری)">
+            <Input
+              placeholder="..."
+              value={eventForm.notes}
+              onChange={e => setEventForm(f => ({ ...f, notes: e.target.value }))}
+            />
+          </Field>
+          <ErrorBox>{eventErr}</ErrorBox>
+        </Modal>
 
         <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش گله' : 'افزودن گله'}
           footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
