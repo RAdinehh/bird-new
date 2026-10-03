@@ -3,6 +3,8 @@
  */
 import { useState, useMemo } from 'react';
 import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS } from './store';
+import { useBrd } from '../brd/store';
+import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -15,8 +17,8 @@ import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
-interface F { id?: string; name: string; code: string; length: string; width: string; height: string; capacity: string; targetTemp: string; targetHumidity: string; ventilation: string; light: string; ventilationSystem: string; feederType: string; drinkerType: string; litterType: string; address: string; builtAt: string; lastSanitizedAt: string; notes: string; }
-const empty: F = { name:'', code:'', length:'', width:'', height:'', capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'', ventilationSystem:'tunnel', feederType:'chain', drinkerType:'nipple', litterType:'wood_shavings', address:'', builtAt:'', lastSanitizedAt:'', notes:'' };
+interface F { id?: string; name: string; code: string; length: string; width: string; height: string; capacity: string; targetTemp: string; targetHumidity: string; ventilation: string; light: string; ventilationSystem: string; feederType: string; drinkerType: string; litterType: string; address: string; builtAt: string; lastSanitizedAt: string; notes: string; breedId: string; }
+const empty: F = { name:'', code:'', length:'', width:'', height:'', capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'', ventilationSystem:'tunnel', feederType:'chain', drinkerType:'nipple', litterType:'wood_shavings', address:'', builtAt:'', lastSanitizedAt:'', notes:'', breedId:'' };
 
 function TempFormField({ value, onChange, label, placeholder }: any) {
   const tempUnit = useTempUnit();
@@ -68,8 +70,18 @@ function TempFormField({ value, onChange, label, placeholder }: any) {
   );
 }
 
+
+/** محاسبه ظرفیت پیشنهادی بر اساس مساحت و نژاد */
+function calcSuggestedCapacity(length: number | null, width: number | null, densityMax: number | null): number | null {
+  if (!length || !width || !densityMax) return null;
+  const area = length * width;
+  return Math.floor(area * densityMax);
+}
+
 export default function HallsPage() {
   const { halls: _hallsRaw, zones, equipment, addHall, updateHall, deleteHall } = useHal();
+  const breedStd = useBreedStandard();
+  const { breeds } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
@@ -77,6 +89,12 @@ export default function HallsPage() {
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const tempUnit = useTempUnit();
+  const __breedStd = form.breedId ? breedStd.byBreedId(form.breedId) : null;
+  const __suggestedCap = calcSuggestedCapacity(
+    parseFloat(toEn(form.length)) || null,
+    parseFloat(toEn(form.width)) || null,
+    __breedStd?.space?.densityMax ?? null,
+  );
   const fmt = useFormat();
 
   const halls = useMemo(() => {
@@ -103,8 +121,9 @@ export default function HallsPage() {
         'chain', drinkerType: h.drinkerType ||
         'nipple', litterType: h.litterType ||
         'wood_shavings',
-      address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, notes: h.notes
-    });
+      address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, notes: h.notes,
+        breedId: (h as any).breedId || ''
+      });
     setErr(''); setOpen(true);
   };
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
@@ -130,7 +149,8 @@ export default function HallsPage() {
       targetTemp: num(form.targetTemp), targetHumidity: num(form.targetHumidity),
       ventilation: num(form.ventilation), light: num(form.light),
       ventilationSystem: form.ventilationSystem, feederType: form.feederType, drinkerType: form.drinkerType, litterType: form.litterType,
-      address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), notes: form.notes.trim()
+      address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), notes: form.notes.trim(),
+      breedId: form.breedId || undefined,
     };
     if (form.id) updateHall(form.id, data); else addHall(data);
     setOpen(false);

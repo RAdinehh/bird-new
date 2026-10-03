@@ -25,6 +25,10 @@ export interface Hall {
   builtAt: string;
   lastSanitizedAt: string;
   notes: string;
+  /** شناسه پرنده (birdId) — برای محاسبه ظرفیت و استانداردها */
+  birdId?: string;
+  /** شناسه نژاد (breedId) — دقیق‌تر از پرنده */
+  breedId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -49,6 +53,10 @@ export interface Equipment {
   purchasedAt: string;
   warranty: number | null;
   notes: string;
+  /** ظرفیت هر واحد — m³/h برای هواکش/کولر، وات برای لامپ/هیتر */
+  capacity?: number | null;
+  /** بازدهی — lumen/Watt برای لامپ */
+  efficiency?: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -98,6 +106,24 @@ export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   camera: { name: 'دوربین', icon: '📷' },
   sensor: { name: 'سنسور', icon: '📡' },
   other: { name: 'سایر', icon: '🔧' }
+};
+
+/** واحد ظرفیت هر نوع تجهیز */
+export const EQUIP_CAPACITY_UNIT: Record<string, string> = {
+  fan: 'm³/h',
+  cooler: 'm³/h',
+  heater: 'kW',
+  lamp: 'W',
+  camera: '—',
+  sensor: '—',
+  drinker: '—',
+  feeder: '—',
+  other: '—',
+};
+
+/** واحد بازدهی */
+export const EQUIP_EFFICIENCY_UNIT: Record<string, string> = {
+  lamp: 'lm/W',
 };
 
 export const VENT_SYS_LABELS: Record<string, string> = {

@@ -2,22 +2,116 @@
  * EquipmentPage — تجهیزات
  */
 import { useState } from 'react';
-import { useHal, type Equipment, EQUIP_LABELS } from './store';
+import { useHal, type Equipment, EQUIP_LABELS, EQUIP_CAPACITY_UNIT, EQUIP_EFFICIENCY_UNIT } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
 import { chip } from './helpers';
+import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
+import { useFlk } from '../flk/store';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
+
+function getCapacityHint(type: string, cap: number | null, hallVol: number | null): string {
+  if (!cap || !hallVol || hallVol <= 0) return '';
+  if (type === 'fan' || type === 'cooler') {
+    const changesPerHour = cap / hallVol;
+    const minPerChange = Math.round(60 / changesPerHour);
+    if (minPerChange <= 1) return 'هر دقیقه ۱ بار تعویض هوا — مناسب گرمای شدید';
+    if (minPerChange <= 3) return 'هر ' + minPerChange + ' دقیقه ۱ بار تعویض هوا — مناسب تابستان';
+    if (minPerChange <= 10) return 'هر ' + minPerChange + ' دقیقه ۱ بار تعویض هوا — مناسب بهار/پاییز';
+    return 'هر ' + minPerChange + ' دقیقه ۱ بار تعویض هوا — مناسب زمستان';
+  }
+  if (type === 'lamp') {
+    const luxPerWatt = 85;
+    const lux = (cap * luxPerWatt) / (hallVol / 3);
+    if (lux >= 20) return '~' + Math.round(lux) + ' لوکس — مناسب تخم‌گذار';
+    if (lux >= 10) return '~' + Math.round(lux) + ' لوکس — مناسب پرورش';
+    return '~' + Math.round(lux) + ' لوکس — نور کم';
+  }
+  return '';
+}
+
+
+/** محاسبه نیاز تجهیزات بر اساس گله فعال سالن و استاندارد نژاد */
+function calcEquipNeed(
+  type: string,
+  hallId: string,
+  flocks: any[],
+  breedStd: any,
+  hallArea: number,
+): { need: number; unit: string; desc: string } | null {
+  // گله فعال این سالن
+  const flock = flocks.find((f: any) => f.hallId === hallId && f.status === 'active');
+  if (!flock) return null;
+
+  const std = breedStd.byBreedId(flock.breedId);
+  if (!std || !std.equipment) return null;
+
+  const count = flock.currentCount || 0;
+  if (count <= 0) return null;
+
+  if (type === 'feeder') {
+    const eq = std.equipment.feeder;
+    if (eq.panBirdsPerUnit) {
+      const need = Math.ceil(count / eq.panBirdsPerUnit);
+      return { need, unit: 'عدد', desc: count + ' پرنده ÷ ' + eq.panBirdsPerUnit + ' پرنده/واحد' };
+    }
+    if (eq.chainCmPerBird) {
+      const meters = Math.ceil((count * eq.chainCmPerBird) / 100);
+      return { need: meters, unit: 'متر', desc: count + ' پرنده × ' + eq.chainCmPerBird + ' سانتی‌متر' };
+    }
+  }
+
+  if (type === 'drinker') {
+    const eq = std.equipment.drinker;
+    if (eq.nippleBirdsPerUnit) {
+      const need = Math.ceil(count / eq.nippleBirdsPerUnit);
+      return { need, unit: 'عدد', desc: count + ' پرنده ÷ ' + eq.nippleBirdsPerUnit + ' پرنده/نوپل' };
+    }
+    if (eq.cupBirdsPerUnit) {
+      const need = Math.ceil(count / eq.cupBirdsPerUnit);
+      return { need, unit: 'عدد', desc: count + ' پرنده ÷ ' + eq.cupBirdsPerUnit + ' پرنده/کاپ' };
+    }
+  }
+
+  if (type === 'lamp' && hallArea > 0) {
+    const w = std.equipment.lampWattPerM2 || 3;
+    const totalW = Math.ceil(hallArea * w);
+    return { need: totalW, unit: 'W', desc: hallArea + ' m² × ' + w + ' W/m²' };
+  }
+
+  if (type === 'fan') {
+    const kg = std.equipment.fanM3PerKg || 4.5;
+    // وزن هدف از growth یا فرض ۲ کیلوگرم
+    const targetW = std.growth?.weightByAge?.[std.growth.weightByAge.length - 1]?.weightG || 2000;
+    const totalKg = (count * targetW) / 1000;
+    const need = Math.ceil(totalKg * kg);
+    return { need, unit: 'm³/h', desc: 'وزن کل ' + Math.round(totalKg) + ' kg × ' + kg };
+  }
+
+  return null;
+}
+
 export default function EquipmentPage() {
   const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
+  const breedStd = useBreedStandard();
+  const { flocks } = useFlk();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ id:'', hallId:'', type:'lamp', name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'' });
+  const [form, setForm] = useState({ id:'', hallId:'', type:'lamp', name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'' });
+  const __selectedHall = halls.find(h => h.id === form.hallId);
+  const hallVolume = __selectedHall
+    ? (__selectedHall.length || 0) * (__selectedHall.width || 0) * (__selectedHall.height || 0)
+    : null;
+  const hallArea = __selectedHall
+    ? (__selectedHall.length || 0) * (__selectedHall.width || 0)
+    : 0;
+  const equipNeed = calcEquipNeed(form.type, form.hallId, flocks || [], breedStd, hallArea);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
@@ -56,11 +150,13 @@ export default function EquipmentPage() {
   }
 
   const openNew = () => { setForm({ id:'', hallId: halls[0].id, type:'lamp',
-     name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'' }); setErr(''); setOpen(true); };
+     name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'' }); setErr(''); setOpen(true); };
   const openEdit = (e: Equipment) => {
     setForm({ id: e.id, hallId: e.hallId, type: e.type, name: e.name, count: e.count ? toFa(e.count) : '',
        unitPrice: e.unitPrice ? toFa(e.unitPrice) : '', purchasedAt: e.purchasedAt,
-       warranty: e.warranty ? toFa(e.warranty) : '', notes: e.notes });
+       warranty: e.warranty ? toFa(e.warranty) : '', notes: e.notes,
+       capacity: (e as any).capacity ? toFa((e as any).capacity) : '',
+       efficiency: (e as any).efficiency ? toFa((e as any).efficiency) : '' });
     setErr(''); setOpen(true);
   };
 
@@ -86,7 +182,9 @@ export default function EquipmentPage() {
       unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || null : null,
       purchasedAt: form.purchasedAt.trim(),
       warranty: form.warranty ? parseInt(toEn(form.warranty)) || null : null,
-      notes: form.notes.trim()
+      notes: form.notes.trim(),
+      capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
+      efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
     };
     if (form.id) updateEquip(form.id, data); else addEquip(data);
     setOpen(false);
@@ -260,10 +358,81 @@ export default function EquipmentPage() {
           <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
         </Field>
         <Grid3>
-          <Field label="تعداد"><NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" min={0} /></Field>
+          <Field label="تعداد">
+            <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" min={0} />
+            {equipNeed ? (
+              <div style={{
+                fontSize: 11,
+                marginTop: 4,
+                lineHeight: 1.6,
+                padding: '6px 8px',
+                borderRadius: 'var(--r-sm)',
+                background: (parseInt(toEn(form.count)) || 0) >= equipNeed.need ? 'var(--accent-soft)' : 'var(--danger-soft)',
+                color: (parseInt(toEn(form.count)) || 0) >= equipNeed.need ? 'var(--accent)' : 'var(--danger)',
+              }}>
+                {(() => {
+                  const have = parseInt(toEn(form.count)) || 0;
+                  if (have >= equipNeed.need) {
+                    return '✓ کافیه — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' (' + equipNeed.desc + ')';
+                  }
+                  const pct = equipNeed.need > 0 ? Math.round((have / equipNeed.need) * 100) : 0;
+                  return '⚠ کم داره — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' · فعلی ' + pct + '٪';
+                })()}
+              </div>
+            ) : null}
+          </Field>
           <Field label="قیمت واحد"><MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} /></Field>
           <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
         </Grid3>
+
+        {(EQUIP_CAPACITY_UNIT[form.type] && EQUIP_CAPACITY_UNIT[form.type] !== '—') || (EQUIP_EFFICIENCY_UNIT[form.type]) ? (
+          <Grid2>
+            {EQUIP_CAPACITY_UNIT[form.type] && EQUIP_CAPACITY_UNIT[form.type] !== '—' ? (
+              <Field
+                label={`ظرفیت هر واحد (${EQUIP_CAPACITY_UNIT[form.type]})`}
+                hint={
+                  form.type === 'fan' ? 'حجم هوایی که هر فن جابه‌جا می‌کند'
+                  : form.type === 'cooler' ? 'ظرفیت سرمایشی'
+                  : form.type === 'heater' ? 'توان گرمایشی'
+                  : form.type === 'lamp' ? 'توان مصرفی هر لامپ'
+                  : undefined
+                }
+              >
+                <NumField
+                  placeholder="۰"
+                  value={form.capacity}
+                  onChange={e => setForm({...form, capacity: e.target.value})}
+                  unit={EQUIP_CAPACITY_UNIT[form.type]}
+                  min={0}
+                />
+                {form.capacity && hallVolume ? (
+                  <div style={{
+                    fontSize: 11,
+                    color: 'var(--accent)',
+                    marginTop: 4,
+                    lineHeight: 1.6,
+                    padding: '6px 8px',
+                    background: 'var(--accent-soft)',
+                    borderRadius: 'var(--r-sm)',
+                  }}>
+                    {getCapacityHint(form.type, parseFloat(toEn(form.capacity).replace('٫','.')) || null, hallVolume)}
+                  </div>
+                ) : null}
+              </Field>
+            ) : null}
+            {EQUIP_EFFICIENCY_UNIT[form.type] ? (
+              <Field label={`بازدهی (${EQUIP_EFFICIENCY_UNIT[form.type]})`} hint="مثلاً LED حدود ۸۵">
+                <NumField
+                  placeholder="۸۵"
+                  value={form.efficiency}
+                  onChange={e => setForm({...form, efficiency: e.target.value})}
+                  unit={EQUIP_EFFICIENCY_UNIT[form.type]}
+                  min={0}
+                />
+              </Field>
+            ) : null}
+          </Grid2>
+        ) : null}
         <Field label="تاریخ خرید"><Input placeholder="۱۴۰۵/۰۷/۰۴" value={form.purchasedAt} onChange={e => setForm({...form, purchasedAt: e.target.value})} /></Field>
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
         <ErrorBox>{err}</ErrorBox>

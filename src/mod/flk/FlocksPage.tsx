@@ -52,6 +52,34 @@ const empty = (): F => ({
 
 type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'archived';
 
+
+/** چک ظرفیت سالن — مجموع گله‌های فعال + گله جدید */
+function checkHallCapacity(
+  hallId: string,
+  newCount: number,
+  flocks: any[],
+  halls: any[],
+  excludeFlockId?: string,
+): { ok: boolean; capacity: number; current: number; total: number; over: number } | null {
+  if (!hallId || !newCount) return null;
+  const hall = halls.find(h => h.id === hallId);
+  if (!hall || !hall.capacity) return null;
+
+  const current = (flocks || [])
+    .filter(f => f.hallId === hallId && f.status === 'active' && f.id !== excludeFlockId)
+    .reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);
+
+  const total = current + newCount;
+  const over = total - hall.capacity;
+  return {
+    ok: over <= 0,
+    capacity: hall.capacity,
+    current,
+    total,
+    over: over > 0 ? over : 0,
+  };
+}
+
 export default function FlocksPage() {
   const fmt = useFormat();
   const breedStd = useBreedStandard();
@@ -141,7 +169,7 @@ export default function FlocksPage() {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
-  const save = () => {
+  const save = async () => {
     // 🔒 جلوگیری قاطع از نام تکراری گله
     if (!form.id) {
       const _trimmed = form.name.trim();
@@ -177,6 +205,22 @@ export default function FlocksPage() {
       vaccineScheduleId: form.vaccineScheduleId,
       status: form.status, notes: form.notes.trim()
     };
+    // 🔒 چک ظرفیت سالن
+    const newCount = data.currentCount || data.initialCount || 0;
+    const cap = checkHallCapacity(form.hallId, newCount, flocks, halls, form.id || undefined);
+    if (cap && !cap.ok) {
+      const ok = await showConfirmAsync(
+        '⚠️ ظرفیت سالن پر می‌شود',
+        `ظرفیت سالن: ${cap.capacity} پرنده\n` +
+        `فعلی: ${cap.current} پرنده\n` +
+        `بعد از این گله: ${cap.total} پرنده\n` +
+        `اضافه‌بار: ${cap.over} پرنده\n\n` +
+        `آیا می‌خواهید ادامه دهید؟`,
+        { danger: true, confirmText: 'بله، ادامه' }
+      );
+      if (!ok) return;
+    }
+
     if (form.id) update(form.id, data); else add(data);
     setOpen(false);
   };
