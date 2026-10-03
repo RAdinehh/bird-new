@@ -213,7 +213,14 @@ export function Select({ children, style, ...rest }: React.SelectHTMLAttributes<
   );
 }
 
-interface FieldProps { label: React.ReactNode; required?: boolean; hint?: string; children: React.ReactNode; }
+interface FieldProps {
+  label: React.ReactNode;
+  required?: boolean;
+  hint?: string;
+  /** 🆕 اگه فیلد خودکار از ماژول دیگه پر شده — نام ماژول */
+  autoFrom?: string;
+  children: React.ReactNode;
+}
 export function Field({ label, required, hint, autoFrom, children }: FieldProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
