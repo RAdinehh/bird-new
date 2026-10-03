@@ -462,7 +462,7 @@ export function PieChart({ data, size = 140, ariaLabel }: PieProps) {
               />
               <span style={{ color: 'var(--text)' }}>{d.label}</span>
               <span style={{ color: 'var(--muted)' }}>
-                ({toFaNum(Math.round((d.value / total) * 100))}٪)
+                ({toFaNum(Math.round((d.value / total) * 1000) / 10)}٪)
               </span>
             </div>
           ))}
