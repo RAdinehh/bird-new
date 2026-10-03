@@ -89,6 +89,7 @@ export default function DailyLogsPage() {
   const [tab, setTab] = useState<TabId>('today');
   const swipeRef = useSwipeTabs(['today', 'history', 'archive'], tab, (id) => setTab(id as TabId));
   const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<F>(newLog());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
@@ -252,11 +253,14 @@ export default function DailyLogsPage() {
 
 
   const save = () => {
-    if (!form.flockId) { setErr('گله اجباری است'); return; }
-    if (!form.date.trim()) { setErr('تاریخ اجباری است'); return; }
+    if (saving) return;
+    setSaving(true);
+    if (!form.flockId) { setErr('گله اجباری است'); setSaving(false); return; }
+    if (!form.date.trim()) { setErr('تاریخ اجباری است'); setSaving(false); return; }
     const dCount = form.deaths.reduce((a, x) => a + (x.count || 0), 0);
     if (flockAliveCount && dCount > flockAliveCount) {
       setErr(`مجموع تلفات (${toFa(dCount)}) از تعداد زنده گله (${toFa(flockAliveCount)}) بیشتر است`);
+      setSaving(false);
       return;
     }
 
@@ -383,6 +387,7 @@ export default function DailyLogsPage() {
 
     showToast(form.id ? 'ثبت روزانه به‌روز شد' : 'ثبت روزانه ذخیره شد', 'success', 2200);
     setOpen(false);
+    setSaving(false);
   };
 
   const renderLogCard = (l: DailyLog, i: number) => {
