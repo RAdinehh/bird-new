@@ -203,12 +203,27 @@ export function Select({ children, style, ...rest }: React.SelectHTMLAttributes<
 interface FieldProps { label: string; required?: boolean; hint?: string; children: React.ReactNode; }
 export function Field({ label, required, hint, children }: FieldProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: 0 }}>
-      <label style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
+      <label style={{
+        fontSize: 'var(--fs-sm)',
+        color: 'var(--muted)',
+        fontWeight: 600,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        paddingRight: 2,
+      }}>
         {label}{required && <span style={{ color: 'var(--danger)' }}>*</span>}
       </label>
       {children}
-      {hint && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--dim)' }}>{hint}</div>}
+      {hint && (
+        <div style={{
+          fontSize: 'var(--fs-xs)',
+          color: 'var(--dim)',
+          lineHeight: 1.5,
+          paddingRight: 2,
+        }}>{hint}</div>
+      )}
     </div>
   );
 }

@@ -373,7 +373,6 @@ export default function EquipmentPage() {
               options={halls.map(c => ({
                 value: c.id,
                 label: c.name,
-                subtitle: (h => h.name)(c),
               }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب سالن"
