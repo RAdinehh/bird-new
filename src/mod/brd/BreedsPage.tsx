@@ -234,7 +234,7 @@ export default function BreedsPage() {
               }} />
           </Field>
           <Field label="FCR">
-            <NumField placeholder="۲٫۰" value={form.fcr} onChange={e => setForm({ ...form, fcr: e.target.value })} min={0} unit="FCR" />
+            <NumField placeholder="۲٫۰" value={form.fcr} onChange={e => setForm({ ...form, fcr: e.target.value })} min={0.5} max={5} unit="FCR" autoClamp />
           </Field>
         </Grid2>
         <ErrorBox>{err}</ErrorBox>
