@@ -214,7 +214,7 @@ export function Select({ children, style, ...rest }: React.SelectHTMLAttributes<
 }
 
 interface FieldProps { label: React.ReactNode; required?: boolean; hint?: string; children: React.ReactNode; }
-export function Field({ label, required, hint, children }: FieldProps) {
+export function Field({ label, required, hint, autoFrom, children }: FieldProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
       <label style={{
@@ -227,6 +227,13 @@ export function Field({ label, required, hint, children }: FieldProps) {
         paddingRight: 2,
       }}>
         {label}{required && <span style={{ color: 'var(--danger)' }}>*</span>}
+        {autoFrom ? (
+          <span style={{
+            width: 6, height: 6, borderRadius: '50%',
+            background: 'var(--accent)', display: 'inline-block',
+            flexShrink: 0,
+          }} aria-label={'از ' + autoFrom} />
+        ) : null}
       </label>
       {children}
       {hint && (
@@ -236,6 +243,16 @@ export function Field({ label, required, hint, children }: FieldProps) {
           lineHeight: 1.5,
           paddingRight: 2,
         }}>{hint}</div>
+      )}
+      {autoFrom && (
+        <div style={{
+          fontSize: 11,
+          color: 'var(--accent)',
+          fontWeight: 600,
+          opacity: 0.85,
+          paddingRight: 2,
+          lineHeight: 1.4,
+        }}>{'✨ از ' + autoFrom}</div>
       )}
     </div>
   );
