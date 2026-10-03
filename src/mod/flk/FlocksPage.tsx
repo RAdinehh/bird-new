@@ -606,10 +606,10 @@ export default function FlocksPage() {
                       <Row l="چرخه زندگی" v={`${fmt.int(f.endOfCycleDay)} روز`} />
                     )}
                     {(() => {
-                      const std = breedStd.byBreedId(f.breedId);
-                      const layStart = std?.biology?.layingStartDay;
-                      if (!layStart || (f.type !== 'layer' && f.type !== 'breeder')) return null;
-                      return <Row l="سن تخم‌گذاری" v={`${fmt.int(layStart)} روز`} />;
+                      if (f.type !== 'layer' && f.type !== 'breeder') return null;
+                      const layStart = f.layingStartDay || DEFAULT_LAYING_START;
+                      const fromStd = !f.layingStartDay;
+                      return <Row l="سن تخم‌گذاری" v={`${fmt.int(layStart)} روز${fromStd ? ' (پیش‌فرض)' : ''}`} />;
                     })()}
                     {f.vaccineScheduleId && (() => {
                       const sch = getSchedule(f.vaccineScheduleId);
