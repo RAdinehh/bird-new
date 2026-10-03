@@ -943,6 +943,25 @@ export function Sheet({
   footer?: React.ReactNode;
   children: React.ReactNode;
 }) {
+  // انیمیشن ورود: اول mount با translateY(100%)، بعد به translateY(0)
+  const [mounted, setMounted] = React.useState(false);
+  const [animating, setAnimating] = React.useState(false);
+
+  React.useEffect(() => {
+    if (open) {
+      setMounted(true);
+      // یک فریم صبر کن، بعد انیمیشن شروع
+      const t = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimating(true));
+      });
+      return () => cancelAnimationFrame(t);
+    } else {
+      setAnimating(false);
+      const t = setTimeout(() => setMounted(false), 220);
+      return () => clearTimeout(t);
+    }
+  }, [open]);
+
   React.useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -955,7 +974,7 @@ export function Sheet({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   return createPortal(
     <div
@@ -972,6 +991,8 @@ export function Sheet({
         alignItems: 'flex-end',
         justifyContent: 'center',
         touchAction: 'none',
+        opacity: animating ? 1 : 0,
+        transition: 'opacity 200ms ease',
       }}
     >
       <div
@@ -988,6 +1009,9 @@ export function Sheet({
           display: 'flex',
           flexDirection: 'column',
           gap: 8,
+          transform: animating ? 'translateY(0)' : 'translateY(100%)',
+          transition: 'transform 250ms cubic-bezier(.16,1,.3,1)',
+          willChange: 'transform',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 4px' }}>

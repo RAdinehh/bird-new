@@ -76,6 +76,7 @@ export function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose:
           title="شناسه نژاد"
           subtitle={(nameChanged || spaceChanged) ? '🔸 تغییر یافته' : `${std.nameFa} · ${std.birdName}`}
           exclusiveGroup="std-sections"
+          persist={false}
           tone="info"
         >
           <G2>
@@ -183,6 +184,7 @@ export function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose:
           title="بیولوژی"
           subtitle={bioChanged ? '🔸 تغییر یافته' : 'تخم‌گذاری، کشتار، انکوباسیون'}
           exclusiveGroup="std-sections"
+          persist={false}
           tone="accent"
         >
           <G2>
@@ -285,6 +287,7 @@ export function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose:
           title="دما و رطوبت"
           subtitle={envChanged ? '🔸 تغییر یافته' : `${std.env.length} مرحله سنی`}
           exclusiveGroup="std-sections"
+          persist={false}
           tone="danger"
         >
           <EnvEditor env={std.env} onChange={env => updateBird({ env })} />
@@ -296,6 +299,7 @@ export function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose:
           title="تغذیه و رشد"
           subtitle={feedChanged ? '🔸 تغییر یافته' : `${std.feed.length} مرحله دان · ${std.growth.weightByAge.length} نقطه رشد`}
           exclusiveGroup="std-sections"
+          persist={false}
           tone="purple"
         >
           <FeedEditor feed={std.feed} onChange={feed => updateBird({ feed })} />
@@ -312,6 +316,7 @@ export function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose:
           title="تلفات مجاز"
           subtitle={mortChanged ? '🔸 تغییر یافته' : `${std.mortality.length} مرحله · کل ${std.mortalityTotalPct}٪`}
           exclusiveGroup="std-sections"
+          persist={false}
           tone="danger"
         >
           <MortalityEditor

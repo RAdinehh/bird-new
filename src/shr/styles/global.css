@@ -1,9 +1,27 @@
-/* ═══ Reset base — جلوگیری از اسکرول اضافی ═══ */
-html, body {
+/* ═══ Reset — قفل body برای جلوگیری از جابه‌جایی نوار مرورگر ═══ */
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
+
+#root {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ═══ Reset base — جلوگیری از اسکرول اضافی ═══ */
+
 
 @tailwind base;
 @tailwind components;

@@ -10,6 +10,9 @@ export function RangeCard({ title, children }: { title: string; children: ReactN
       display: 'flex',
       flexDirection: 'column',
       gap: 8,
+      minWidth: 0,
+      overflow: 'hidden',
+      boxSizing: 'border-box',
     }}>
       <div style={{
         fontSize: 'var(--fs-sm)',

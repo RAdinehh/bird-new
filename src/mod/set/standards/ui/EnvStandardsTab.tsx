@@ -11,6 +11,81 @@ import { useSet } from '../../store';
 import { StandardDetail } from './StandardDetail';
 import { AddBirdModal } from './AddBirdModal';
 
+// ═══ کارت نژاد — ۲ ستونه جمع‌وجور ═══
+function BreedCard({
+  name, isNative, isCustom, flockCount, onClick,
+}: {
+  name: string;
+  isNative: boolean;
+  isCustom: boolean;
+  flockCount: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: '8px 10px',
+        background: 'var(--input-bg)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r-md)',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        textAlign: 'right',
+        minWidth: 0,
+        minHeight: 46,
+      }}
+    >
+      <span style={{
+        width: 24, height: 24,
+        borderRadius: 6,
+        background: isNative ? '#34C759' : '#5856D6',
+        color: '#fff',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 12, flexShrink: 0,
+      }} aria-hidden="true">{isNative ? '🇮🇷' : '🔬'}</span>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontSize: 'var(--fs-sm)',
+          fontWeight: 700,
+          color: 'var(--text)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>
+          {name}
+          {isCustom ? (
+            <span style={{
+              width: 5, height: 5, borderRadius: '50%',
+              background: 'var(--accent)', display: 'inline-block',
+              flexShrink: 0,
+            }} />
+          ) : null}
+        </div>
+        <div style={{
+          fontSize: 10,
+          color: 'var(--muted)',
+          marginTop: 1,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>
+          {isNative ? 'بومی' : 'صنعتی'}
+          {flockCount > 0 ? ` · ${toFa(flockCount)} گله` : ''}
+        </div>
+      </div>
+    </button>
+  );
+}
+
 export default function EnvStandardsTab() {
   const custom = useSet(state => state.customStandards) || {};
   const updateStandard = useSet(state => state.updateStandard);
@@ -60,10 +135,12 @@ export default function EnvStandardsTab() {
     showToast('همه به پیش‌فرض برگشتند', 'success', 2000);
   };
 
+  const totalBreeds = Object.values(grouped).reduce((sum, arr) => sum + arr.length, 0);
+
   return (
     <PageContainer>
 
-      {/* دکمه فیلتر */}
+      {/* ═══ فیلتر فعال ═══ */}
       <button
         type="button"
         onClick={() => setOnlyActive(!onlyActive)}
@@ -139,13 +216,13 @@ export default function EnvStandardsTab() {
             key={birdName}
             icon="🐔"
             title={birdName}
-            subtitle={toFa(breeds.length) + ' نژاد'}
+            subtitle={`${toFa(breeds.length)} نژاد`}
             tone="accent"
           >
             <div style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
-              gap: 8,
+              gap: 6,
             }}>
               {breeds.map((std) => {
                 const isCustom = !!custom[std.key];
@@ -157,67 +234,30 @@ export default function EnvStandardsTab() {
                 }).length;
 
                 return (
-                  <button
+                  <BreedCard
                     key={std.key}
-                    type="button"
+                    name={std.nameFa}
+                    isNative={isNative}
+                    isCustom={isCustom}
+                    flockCount={flockCount}
                     onClick={() => setSelectedBird(std.key)}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      gap: 4,
-                      padding: '10px 12px',
-                      background: 'var(--input-bg)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--r-md)',
-                      cursor: 'pointer',
-                      fontFamily: 'inherit',
-                      textAlign: 'right',
-                      minWidth: 0,
-                    }}
-                  >
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      width: '100%',
-                      minWidth: 0,
-                    }}>
-                      <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
-                        {isNative ? '🇮🇷' : '🔬'}
-                      </span>
-                      <span style={{
-                        fontSize: 'var(--fs-base)',
-                        fontWeight: 700,
-                        color: 'var(--text)',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        flex: 1,
-                        minWidth: 0,
-                      }}>{std.nameFa}</span>
-                      {isCustom && (
-                        <span style={{ fontSize: 10, color: 'var(--accent)', flexShrink: 0 }}>✓</span>
-                      )}
-                    </div>
-                    <div style={{
-                      fontSize: 'var(--fs-xs)',
-                      color: 'var(--muted)',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      width: '100%',
-                    }}>
-                      {isNative ? 'بومی' : 'صنعتی'}
-                      {flockCount > 0 ? ' · ' + toFa(flockCount) + ' گله' : ''}
-                    </div>
-                  </button>
+                  />
                 );
               })}
             </div>
           </SettingsGroup>
         ))
       )}
+
+      {/* نمایش کل */}
+      <div style={{
+        fontSize: 'var(--fs-xs)',
+        color: 'var(--muted)',
+        textAlign: 'center',
+        padding: '4px 0',
+      }}>
+        {toFa(totalBreeds)} نژاد در {toFa(Object.keys(grouped).length)} پرنده
+      </div>
 
       <Btn onClick={() => setShowAddModal(true)} full>➕ افزودن نژاد جدید</Btn>
 

@@ -55,7 +55,12 @@ export function CompactField({
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
       }}>{label}</span>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, direction: 'ltr' }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'center',
+        gap: 4,
+      }}>
         <input
           ref={inputRef}
           type="text"
@@ -63,7 +68,7 @@ export function CompactField({
           value={displayValue === null || displayValue === undefined ? '' : String(displayValue)}
           onChange={handleChange}
           style={{
-            flex: 1,
+            width: 70,
             height: 22,
             padding: 0,
             background: 'transparent',
@@ -72,11 +77,10 @@ export function CompactField({
             fontFamily: 'inherit',
             fontSize: 'var(--fs-base)',
             fontWeight: 700,
-            textAlign: 'right',
+            textAlign: 'center',
             outline: 'none',
             fontVariantNumeric: 'tabular-nums',
             direction: 'rtl',
-            minWidth: 0,
           }}
         />
         <span style={{
@@ -84,6 +88,8 @@ export function CompactField({
           color: 'var(--muted)',
           flexShrink: 0,
           fontWeight: 500,
+          minWidth: 24,
+          textAlign: 'left',
         }}>{displayUnit}</span>
       </div>
     </div>

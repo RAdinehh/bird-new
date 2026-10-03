@@ -7,6 +7,8 @@ interface Props {
   defaultOpen?: boolean;
   /** اگه ست بشه، فقط یکی از گروه‌های هم‌نام می‌تونه باز باشه */
   exclusiveGroup?: string;
+  /** اگه false، از localStorage نمی‌خونه و ذخیره نمی‌کنه */
+  persist?: boolean;
   children: ReactNode;
   tone?: 'accent' | 'warn' | 'info' | 'purple' | 'danger';
 }
@@ -17,11 +19,13 @@ export default function SettingsGroup({
   subtitle,
   defaultOpen = false,
   exclusiveGroup,
+  persist = true,
   children,
   tone = 'accent'
 }: Props) {
     const STORAGE_KEY = 'pm-set-group-v3-' + title;
   const [open, setOpen] = useState(() => {
+    if (!persist) return defaultOpen;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved !== null) return saved === '1';
@@ -45,7 +49,7 @@ export default function SettingsGroup({
   const toggle = () => {
     const next = !open;
     setOpen(next);
-    try { localStorage.setItem(STORAGE_KEY, next ? '1' : '0'); } catch {}
+    if (persist) try { localStorage.setItem(STORAGE_KEY, next ? '1' : '0'); } catch {}
     if (next && exclusiveGroup) {
       window.dispatchEvent(new CustomEvent('pm-exclusive-close', {
         detail: { group: exclusiveGroup, title }
