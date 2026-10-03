@@ -195,7 +195,7 @@ export default function FlocksPage() {
       initialCount: int(form.initialCount),
       currentCount: int(form.currentCount) || int(form.initialCount),
       maleCount: int(form.maleCount), femaleCount: int(form.femaleCount),
-      layingStartDay: form.layingStartDay.trim() === '' ? LAYING_START_DAY : (int(form.layingStartDay) || LAYING_START_DAY),
+      layingStartDay: form.layingStartDay.trim() === '' ? (breedStd.byBreedId(form.breedId)?.biology?.layingStartDay ?? LAYING_START_DAY) : (int(form.layingStartDay) || LAYING_START_DAY),
       hatchDate: form.hatchDate.trim(), purchaseDate: form.purchaseDate.trim(),
       startDate: form.startDate.trim(), endDate: '',
       source: form.source,
@@ -224,6 +224,9 @@ export default function FlocksPage() {
     if (form.id) update(form.id, data); else add(data);
     setOpen(false);
   };
+
+  const formStd = breedStd.byBreedId(form.breedId);
+  const formLaying = formStd?.biology?.layingStartDay ?? LAYING_START_DAY;
 
   const list = useMemo(() => {
     let arr = flocks;
@@ -441,7 +444,7 @@ export default function FlocksPage() {
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between'
                     }}>
                       <span>⏳ {fmt.int(untilLay)} روز تا شروع تخم‌گذاری</span>
-                      <span>روز {fmt.int(LAYING_START_DAY)}</span>
+                      <span>روز {fmt.int(std?.biology?.layingStartDay ?? LAYING_START_DAY)}</span>
                     </div>
                   )}
 
@@ -638,12 +641,12 @@ export default function FlocksPage() {
             <DepBox title="🥚 سن شروع تخم‌گذاری">
               <Field
                 label="سن تخم‌گذاری"
-                hint={'پیش‌فرض ' + toFa(LAYING_START_DAY) + ' روز — اگر نژاد شما فرق دارد، عدد خودتان را وارد کنید'}
+                hint={(formStd?.biology?.layingStartDay ? '✨ استاندارد نژاد: ' + toFa(formStd.biology.layingStartDay) : 'پیش‌فرض ' + toFa(LAYING_START_DAY)) + ' روز — اگر نژاد شما فرق دارد، عدد خودتان را وارد کنید'}
               >
                 <NumField
                   value={form.layingStartDay}
                   onChange={e => setForm({ ...form, layingStartDay: e.target.value })}
-                  placeholder={fmt.int(LAYING_START_DAY)}
+                  placeholder={fmt.int(formLaying)}
                   unit="روز"
                   max={400}
                   min={80}
