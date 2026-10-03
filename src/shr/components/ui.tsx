@@ -355,6 +355,7 @@ interface ModalProps {
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg';
   preventClose?: boolean;
+  contentGap?: number;
 }
 
 const MODAL_SIZES: Record<'sm' | 'md' | 'lg', number> = {
@@ -365,7 +366,7 @@ const MODAL_SIZES: Record<'sm' | 'md' | 'lg', number> = {
 
 export function Modal({
   open, onClose, title, children, footer,
-  size = 'md', preventClose = false,
+  size = 'md', preventClose = false, contentGap,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
@@ -674,6 +675,11 @@ export function Modal({
             WebkitOverflowScrolling: 'touch',
             flex: 1,
             minHeight: 0,
+            ...(contentGap ? {
+              display: 'flex',
+              flexDirection: 'column',
+              gap: contentGap,
+            } : {}),
           }}
         >
           {children}
