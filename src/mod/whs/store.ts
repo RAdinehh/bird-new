@@ -37,6 +37,14 @@ export interface Movement {
   partyId: string;
   notes: string;
   createdAt: string;
+  /** 🆕 رهگیری: کدوم گله */
+  flockId?: string;
+  /** 🆕 رهگیری: از کدوم ماژول اومده */
+  sourceModule?: 'egg' | 'dlg' | 'tra' | 'inc' | 'fed' | 'manual';
+  /** 🆕 رهگیری: ID رکورد مبدأ */
+  sourceId?: string;
+  /** 🆕 شماره دسته (Batch) — برای تخم و دارو */
+  batchNo?: string;
 }
 
 interface State {
@@ -47,6 +55,21 @@ interface State {
   deleteItem: (id: string) => void;
   addMovement: (m: Omit<Movement, 'id' | 'createdAt'>) => string;
   deleteMovement: (id: string) => void;
+}
+
+
+/** تولید شماره دسته — B-YYYY-MM-DD-NNN */
+export function generateBatchNo(date: string, existingMovements: Movement[], itemId: string): string {
+  if (!date) return '';
+  const clean = date.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+  const parts = clean.split('/');
+  if (parts.length !== 3) return '';
+  const prefix = `B-${parts[0]}-${String(parts[1]).padStart(2, '0')}-${String(parts[2]).padStart(2, '0')}`;
+  const todayMovements = existingMovements.filter(m =>
+    m.itemId === itemId && (m.batchNo || '').startsWith(prefix)
+  );
+  const next = todayMovements.length + 1;
+  return `${prefix}-${String(next).padStart(3, '0')}`;
 }
 
 const now = () => new Date().toISOString();
