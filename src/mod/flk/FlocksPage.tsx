@@ -444,7 +444,7 @@ export default function FlocksPage() {
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between'
                     }}>
                       <span>⏳ {fmt.int(untilLay)} روز تا شروع تخم‌گذاری</span>
-                      <span>روز {fmt.int(std?.biology?.layingStartDay ?? LAYING_START_DAY)}</span>
+                      <span>روز {fmt.int(breedStd.byBreedId(f.breedId)?.biology?.layingStartDay ?? LAYING_START_DAY)}</span>
                     </div>
                   )}
 
