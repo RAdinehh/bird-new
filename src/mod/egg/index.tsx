@@ -4,11 +4,11 @@
 import { useState } from 'react';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import ProductionsPage from './ProductionsPage';
-import StockPage from './StockPage';
+import StatsPage from './StatsPage';
 
 const tabs = [
   { id: 'productions', label: 'تخم‌گذاری' },
-  { id: 'stock', label: 'انبار و فروش' },
+  { id: 'stock', label: 'آمار کل' },
 ] as const;
 
 type TabId = typeof tabs[number]['id'];
@@ -66,7 +66,7 @@ export default function Egg() {
             <ProductionsPage />
           </div>
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <StockPage />
+            <StatsPage />
           </div>
         </div>
       </div>

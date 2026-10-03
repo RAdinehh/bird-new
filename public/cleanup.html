@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><body style="font:14px monospace;padding:14px;direction:ltr"><pre id="o">...</pre>
+<script>
+try {
+  let out = '';
+  const raw = localStorage.getItem('pm-flk');
+  if (!raw) { out = 'no pm-flk'; }
+  else {
+    const s = JSON.parse(raw);
+    const flocks = (s.state?.flocks) || s.flocks || [];
+    for (const f of flocks) {
+      const before = (f.events||[]).length;
+      f.events = [];
+      out += f.name + ': events ' + before + ' → 0\n';
+    }
+    if (s.state) s.state.flocks = flocks; else s.flocks = flocks;
+    localStorage.setItem('pm-flk', JSON.stringify(s));
+    out += '\nDONE. reload app.';
+  }
+  document.getElementById('o').textContent = out;
+} catch(e) { document.getElementById('o').textContent = 'ERR: ' + e.message; }
+</script></body></html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="font:18px monospace;padding:16px;direction:ltr;line-height:1.6;background:#fff">
+<h2 style="font-size:16px">Storage Check</h2>
+<div id="o">loading...</div>
+<button onclick="location.reload()" style="font-size:18px;padding:10px 20px;margin-top:16px">Reload</button>
+<script>
+(async () => {
+  let out = '';
+  out += 'LOCALSTORAGE (' + localStorage.length + ')\n';
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    const v = localStorage.getItem(k) || '';
+    out += '  ' + k + ' [' + v.length + ']\n';
+  }
+  out += '\nINDEXEDDB\n';
+  try {
+    const dbs = await indexedDB.databases();
+    if (dbs.length === 0) out += '  (none)\n';
+    for (const d of dbs) out += '  ' + d.name + '\n';
+  } catch(e) { out += '  err: ' + e.message + '\n'; }
+  out += '\nCACHES\n';
+  try {
+    const names = await caches.keys();
+    if (names.length === 0) out += '  (none)\n';
+    for (const n of names) out += '  ' + n + '\n';
+  } catch(e) { out += '  err: ' + e.message + '\n'; }
+  document.getElementById('o').innerText = out;
+})();
+</script></body></html>

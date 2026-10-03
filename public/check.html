@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><body style="font:14px monospace;padding:14px;direction:ltr"><pre id="o">loading...</pre>
+<script>
+try {
+  const keys = Object.keys(localStorage);
+  let out = 'localStorage keys:\n  ' + keys.join('\n  ') + '\n\n';
+  const tryParse = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+  const flkRaw = tryParse('pm-flk');
+  const dlgRaw = tryParse('pm-dlg');
+  out += 'pm-flk raw: ' + (flkRaw ? 'exists' : 'null') + '\n';
+  out += 'pm-dlg raw: ' + (dlgRaw ? 'exists' : 'null') + '\n\n';
+  const getFlocks = (raw) => raw ? (raw.state?.flocks || raw.flocks || []) : [];
+  const getLogs = (raw) => raw ? (raw.state?.logs || raw.logs || []) : [];
+  const flocks = getFlocks(flkRaw);
+  const logs = getLogs(dlgRaw);
+  out += 'FLOCKS (' + flocks.length + '):\n';
+  for (const f of flocks) {
+    out += '\n--- ' + f.name + ' ---\n';
+    out += 'initial=' + f.initialCount + ' current=' + f.currentCount + '\n';
+    out += 'events (' + ((f.events||[]).length) + '):\n';
+    for (const e of (f.events||[])) {
+      out += '  ' + e.date + ' | ' + e.type + ' | n=' + e.count + ' | r=' + (e.reason||'—') + ' | note=' + (e.notes||'—') + '\n';
+    }
+  }
+  out += '\n\nLOGS (' + logs.length + '):\n';
+  for (const l of logs) {
+    out += l.date + ' | flock=' + (l.flockId||'').slice(0,6) + ' | dC=' + l.deathsCount + ' | deaths=' + JSON.stringify(l.deaths||[]) + '\n';
+  }
+  document.getElementById('o').textContent = out;
+} catch(e) { document.getElementById('o').textContent = 'ERR: ' + e.message + '\n' + e.stack; }
+</script></body></html>
