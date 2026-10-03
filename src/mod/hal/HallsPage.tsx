@@ -334,7 +334,7 @@ export default function HallsPage() {
                       style={{
                         marginTop: 4,
                         width: '100%',
-                        padding: '5px 8px',
+                        padding: '6px 8px',
                         background: 'var(--accent-soft)',
                         border: '1px solid var(--accent-border)',
                         borderRadius: 'var(--r-sm)',
@@ -344,9 +344,13 @@ export default function HallsPage() {
                         fontSize: 11,
                         fontWeight: 600,
                         textAlign: 'center',
+                        lineHeight: 1.6,
                       }}
                     >
-                      ✨ پیشنهاد: {toFa(cap)} پرنده
+                      <div>✨ پیشنهاد: {toFa(cap)} پرنده</div>
+                      <div style={{ fontSize: 10, opacity: 0.75, fontWeight: 500 }}>
+                        به ازای هر m²، {toFa(density)} پرنده · مساحت {toFa(area)} m²
+                      </div>
                     </button>
                   );
                 }
