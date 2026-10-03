@@ -7,6 +7,27 @@ import { toEn } from '../../shr/utils/fa';
 export type FlockType = 'layer' | 'broiler' | 'breeder';
 export type FlockStatus = 'active' | 'archived' | 'sold';
 
+export type FlockEventType = 'add' | 'sell' | 'death' | 'transfer';
+export type FlockEventSex = 'male' | 'female' | 'mixed';
+
+export interface FlockEvent {
+  id: string;
+  flockId: string;
+  date: string;
+  type: FlockEventType;
+  count: number;
+  sex: FlockEventSex;
+  origin?: 'purchase' | 'hatch' | 'transfer';
+  buyerId?: string;
+  reason?: string;
+  unitPrice?: number;
+  totalPrice?: number;
+  invoiceId?: string;
+  hatchId?: string;
+  notes: string;
+  createdAt: string;
+}
+
 export interface Flock {
   id: string;
   name: string;
@@ -31,12 +52,16 @@ export interface Flock {
   otherCosts: number | null;       // سایر هزینه‌ها
   status: FlockStatus;
   notes: string;
+  /** رویدادهای دستی گله */
+  events?: FlockEvent[];
   createdAt: string;
   updatedAt: string;
 }
 
 interface State {
   flocks: Flock[];
+  addEvent: (flockId: string, ev: Omit<FlockEvent, 'id'|'flockId'|'createdAt'>) => void;
+  removeEvent: (flockId: string, eventId: string) => void;
   add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => void;
   update: (id: string, patch: Partial<Flock>) => void;
   remove: (id: string) => void;
