@@ -677,19 +677,30 @@ export default function FlocksPage() {
 
           <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>تاریخ‌ها</div>
 
-          <Grid2>
-            <Field label="تاریخ هچ" hint="اگر از جوجه‌کشی خودت آمده">
-            <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ"  autoToday />
-          </Field>
+          {form.source === 'hatch' && (
+            <Field label="تاریخ هچ" hint="تاریخ خروج جوجه از دستگاه">
+              <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ" autoToday />
+            </Field>
+          )}
 
-          <Field label="تاریخ خرید" hint="اگر از بیرون خریده‌ای">
-            <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید"  autoToday />
-          </Field>
+          {(form.source === 'purchase' || form.source === 'previous') && (
+            <Grid2>
+              <Field label="تاریخ خرید / تحویل" hint="روزی که گله به دستت رسید">
+                <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید" autoToday />
+              </Field>
+              {form.source === 'purchase' && (
+                <Field label="تاریخ هچ" hint="اگر فروشنده گفته (اختیاری)">
+                  <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="اختیاری" />
+                </Field>
+              )}
+            </Grid2>
+          )}
 
-          </Grid2>
-          <Field label="تاریخ شروع نگهداری" hint="اگر هیچ‌کدام از موارد بالا نبود">
-            <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="انتخاب تاریخ شروع"  autoToday />
-          </Field>
+          {form.source === 'previous' && (
+            <Field label="تاریخ شروع نگهداری" hint="اگه تاریخی ثبت نکردی، خالی بذار">
+              <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" />
+            </Field>
+          )}
 
           <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>هزینه‌ها</div>
 
