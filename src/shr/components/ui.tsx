@@ -934,8 +934,8 @@ export function ErrorBox({ children }: { children: React.ReactNode }) {
       alignItems: 'center',
       gap: 8,
     }}>
+      <span style={{ flex: 1, textAlign: 'right', lineHeight: 1.6 }}>{children}</span>
       <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
-      <span style={{ flex: 1 }}>{children}</span>
     </div>
   );
 }
