@@ -2,6 +2,7 @@
  * مقادیر پیش‌فرض پرندگان و نژادها
  * منبع: استانداردهای جهانی صنعت طیور
  */
+import { DEFAULT_STANDARDS } from '../set/standards/data';
 
 export interface BirdPreset {
   name: string;
@@ -28,6 +29,22 @@ export const SUGGESTED_BREEDS: Record<string, string[]> = {
 
 export function findBirdPreset(name: string): BirdPreset | undefined {
   const trimmed = name.trim();
+  if (!trimmed) return undefined;
+
+  // ۱. اول از استانداردهای نژاد بخون (match دقیق)
+  for (const std of Object.values(DEFAULT_STANDARDS)) {
+    if (std.nameFa === trimmed) {
+      const lastGrowth = std.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
+      return {
+        name: std.nameFa,
+        cycleDays: std.biology.cullDay ?? null,
+        fcrStandard: lastGrowth?.fcr ?? null,
+        notes: std.nameEn || '',
+      };
+    }
+  }
+
+  // ۲. اگه پیدا نشد، از presets قدیمی
   if (BIRD_PRESETS[trimmed]) return BIRD_PRESETS[trimmed];
   for (const key of Object.keys(BIRD_PRESETS)) {
     if (trimmed.includes(key) || key.includes(trimmed)) return BIRD_PRESETS[key];
