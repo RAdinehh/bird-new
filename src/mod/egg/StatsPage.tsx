@@ -394,12 +394,13 @@ export default function StatsPage() {
               )}
               {chartType === 'pie' && (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
+                  {/* pieConsistencyApplied — درصد ۱ اعشاری یکسان با نوارها */}
                   <PieChart
                     data={[
-                      { label: 'خوراکی', value: stats.eating, color: 'var(--accent)' },
-                      { label: 'نطفه‌دار', value: stats.fertile, color: 'var(--purple)' },
-                      { label: 'شکسته', value: stats.broken, color: 'var(--warn)' },
-                      { label: 'سایر', value: stats.other, color: 'var(--muted)' },
+                      { label: `خوراکی (${toFa(stats.eatingPct)}٪)`, value: stats.eating, color: 'var(--accent)' },
+                      { label: `نطفه‌دار (${toFa(stats.fertilePct)}٪)`, value: stats.fertile, color: 'var(--purple)' },
+                      { label: `شکسته (${toFa(stats.brokenPct)}٪)`, value: stats.broken, color: 'var(--warn)' },
+                      { label: `سایر (${toFa(stats.otherPct)}٪)`, value: stats.other, color: 'var(--muted)' },
                     ].filter(x => x.value > 0)}
                     size={160}
                   />
