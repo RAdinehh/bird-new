@@ -37,6 +37,7 @@ export default function BreedsPage() {
   const { birds, breeds: _breedsRaw, dedupeBreeds, addBreed, updateBreed, deleteBreed } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', birdId:'', name:'', fcr:'', standardKey:'' });
+  const [fcrFromStd, setFcrFromStd] = useState(false);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
@@ -97,11 +98,13 @@ export default function BreedsPage() {
 
   const openNew = () => {
     setForm({ id:'', birdId: birds[0].id, name:'', fcr:'', standardKey:'' });
+    setFcrFromStd(false);
     setErr(''); setOpen(true);
   };
 
   const openEdit = (b: Breed) => {
     setForm({ id: b.id, birdId: b.birdId, name: b.name, fcr: b.fcr ? toFa(b.fcr) : '', standardKey: (b as any).standardKey || '' });
+    setFcrFromStd(!!(b as any).standardKey);
     setErr(''); setOpen(true);
   };
 
@@ -124,7 +127,8 @@ export default function BreedsPage() {
     const payload = {
       birdId: form.birdId,
       name: form.name.trim(),
-      fcr: form.fcr ? parseFloat(toEn(form.fcr).replace('٫','.')) || null : null
+      fcr: form.fcr ? parseFloat(toEn(form.fcr).replace('٫','.')) || null : null,
+      standardKey: form.standardKey || undefined,
     };
     if (form.id) updateBreed(form.id, payload); else addBreed(payload);
     setOpen(false);
@@ -227,14 +231,38 @@ export default function BreedsPage() {
                   ...f,
                   name: newName,
                   standardKey: matchedKey || f.standardKey,
-                  fcr: matchedKey && DEFAULT_STANDARDS[matchedKey]?.growth?.weightByAge?.[0]?.fcr
-                    ? toFa(DEFAULT_STANDARDS[matchedKey].growth.weightByAge[0].fcr)
+                  fcr: matchedKey && DEFAULT_STANDARDS[matchedKey]?.growth?.weightByAge?.length
+                    ? toFa(DEFAULT_STANDARDS[matchedKey].growth.weightByAge[
+                        DEFAULT_STANDARDS[matchedKey].growth.weightByAge.length - 1
+                      ].fcr)
                     : f.fcr,
                 }));
+                setFcrFromStd(!!matchedKey);
               }} />
           </Field>
-          <Field label="FCR">
-            <NumField placeholder="۲٫۰" value={form.fcr} onChange={e => setForm({ ...form, fcr: e.target.value })} min={0.5} max={5} unit="FCR" autoClamp />
+          <Field
+            label={
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                FCR
+                {fcrFromStd ? (
+                  <span style={{
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: 'var(--accent)', display: 'inline-block',
+                  }} />
+                ) : null}
+              </span>
+            }
+            hint={fcrFromStd ? '✨ از استاندارد' : undefined}
+          >
+            <NumField
+              placeholder="۲٫۰"
+              value={form.fcr}
+              onChange={e => {
+                setForm({ ...form, fcr: e.target.value });
+                setFcrFromStd(false);
+              }}
+              min={0.5} max={5} unit="FCR" autoClamp
+            />
           </Field>
         </Grid2>
         <ErrorBox>{err}</ErrorBox>
