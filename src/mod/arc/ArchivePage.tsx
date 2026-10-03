@@ -19,7 +19,7 @@ export default function ArchivePage() {
 
   const archivedFlocks = useMemo(
     () => flocks.filter(f => f.status === 'archived' || f.status === 'sold')
-      .sort((a, b) => (b.endDate || '').localeCompare(a.endDate || '')),
+      .sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || '')),
     [flocks]
   );
 
@@ -77,7 +77,7 @@ export default function ArchivePage() {
                   <>
                     <span>سن نهایی: <b style={{ color: 'var(--text)' }}>{toFa(ageDays)} روز</b></span>
                     {f.currentCount ? <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b></span> : null}
-                    {f.endDate ? <span>آرشیو: <b style={{ color: 'var(--text)' }}>{toFa(f.endDate)}</b></span> : null}
+                    {f.updatedAt ? <span>آرشیو: <b style={{ color: 'var(--text)' }}>{toFa(f.updatedAt.slice(0, 10))}</b></span> : null}
                   </>
                 }
               >
