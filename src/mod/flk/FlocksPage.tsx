@@ -727,33 +727,20 @@ export default function FlocksPage() {
           )}
 
           {(form.type === 'layer' || form.type === 'breeder') ? (
-            <DepBox title="🥚 سن شروع تخم‌گذاری">
-              <Field
-                label="سن تخم‌گذاری"
-                hint={formStd?.biology?.layingStartDay ? 'عدد خودتان را وارد کنید اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START) + ' روز'}
-                autoFrom={formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
-              >
-                <NumField
-                  value={form.layingStartDay}
-                  onChange={e => setForm({ ...form, layingStartDay: e.target.value })}
-                  placeholder={fmt.int(formLaying)}
-                  unit="روز"
-                  max={400}
-                  min={80}
-                />
-              </Field>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
-                <b>راهنما:</b>
-                <br />
-                • مرغ تخم‌گذار صنعتی: ۱۴۰ روز (پیش‌فرض)
-                <br />
-                • مرغ بومی: ۱۵۰-۱۸۰ روز
-                <br />
-                • بوقلمون: ۱۸۰-۲۱۰ روز
-                <br />
-                • گله مادر (بریدر): ۱۶۰-۱۸۰ روز
-              </div>
-            </DepBox>
+            <Field
+              label="سن شروع تخم‌گذاری (روز)"
+              hint={formStd?.biology?.layingStartDay ? 'عدد را تغییر بده اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)}
+              autoFrom={formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
+            >
+              <NumField
+                value={form.layingStartDay}
+                onChange={e => setForm({ ...form, layingStartDay: e.target.value })}
+                placeholder={fmt.int(formLaying)}
+                unit="روز"
+                max={400}
+                min={80}
+              />
+            </Field>
           ) : null}
 
           <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>تاریخ‌ها</div>
