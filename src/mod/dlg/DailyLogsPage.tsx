@@ -12,6 +12,7 @@ import {
   totalWater
 } from './store';
 import { useFlk , isLayingReady, getAgeDays } from '../flk/store';
+import { useFormat } from '../../shr/units';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useBrd } from '../brd/store';
 import { useFed } from '../fed/store';
@@ -75,6 +76,7 @@ type TabId = 'today' | 'history' | 'archive';
 
 export default function DailyLogsPage() {
   const { logs, add, update, remove, archive, restore } = useDlg();
+  const fmt = useFormat();
   const { flocks } = useFlk();
   const { birds, breeds } = useBrd();
   const { items: whsItems, addMovement, deleteMovement } = useWhs();
@@ -770,6 +772,21 @@ export default function DailyLogsPage() {
                 <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
               </Field>
             </>
+          )}
+
+          {isLayerType && !isFlockMature && selectedFlock && (
+            <div style={{
+              padding: 'var(--pad-normal)',
+              background: 'var(--warn-soft)',
+              border: '1px dashed var(--warn)',
+              borderRadius: 'var(--r-md)',
+              fontSize: 'var(--fs-sm)',
+              color: 'var(--warn)',
+              lineHeight: 1.7,
+              marginBottom: 8,
+            }}>
+              💡 این گله هنوز به سن تخم‌گذاری نرسیده ({fmt.int(getAgeDays(selectedFlock))} از {fmt.int(selectedFlock.layingStartDay)} روز). فرم تخم‌گذاری بعد از بلوغ فعال می‌شود.
+            </div>
           )}
 
           {isLayerFlock && (
