@@ -16,6 +16,7 @@ import { MiniProgress } from '../../shr/components/ProgressTracker';
 import UndoBar from '../../cor/ui/UndoBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { useFormat } from '../../shr/units';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import DependentSelect from '../../shr/components/DependentSelect';
@@ -51,6 +52,7 @@ const empty = (): F => ({
 type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'archived';
 
 export default function FlocksPage() {
+  const fmt = useFormat();
   const { flocks, add, update, remove, archive, restore } = useFlk();
   const { birds: _birdsRaw, breeds } = useBrd();
   const { halls: _hallsRaw, zones } = useHal();
@@ -285,7 +287,7 @@ export default function FlocksPage() {
               }}>
                 <span style={{ fontSize: 'var(--fs-md)' }}>⏳</span>
                 <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
-                  نزدیک به شروع تخم‌گذاری ({toFa(upcoming.length)})
+                  نزدیک به شروع تخم‌گذاری ({fmt.int(upcoming.length)})
                 </span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -308,7 +310,7 @@ export default function FlocksPage() {
                           color: remain <= 14 ? 'var(--warn)' : 'var(--muted)',
                           fontWeight: 700
                         }}>
-                          {toFa(remain)} روز مانده
+                          {fmt.int(remain)} روز مانده
                         </span>
                       </div>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 6 }}>
@@ -371,10 +373,10 @@ export default function FlocksPage() {
                   onToggle={() => setExpandedId(isOpen ? null : f.id)}
                   badge={<Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>}
                   stats={<>
-                    {ageDays > 0 && <span>🎂 سن: <b style={{ color: 'var(--text)' }}>{toFa(ageDays)} روز</b></span>}
-                    {f.currentCount && <span>🐔 زنده: <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b></span>}
+                    {ageDays > 0 && <span>🎂 سن: <b style={{ color: 'var(--text)' }}>{fmt.int(ageDays)} روز</b></span>}
+                    {f.currentCount && <span>🐔 زنده: <b style={{ color: 'var(--text)' }}>{fmt.int(f.currentCount)}</b></span>}
                     {f.initialCount && f.currentCount && f.initialCount !== f.currentCount && (
-                      <span style={{ color: 'var(--danger)' }}>💀 تلفات: <b>{toFa(f.initialCount - f.currentCount)}</b></span>
+                      <span style={{ color: 'var(--danger)' }}>💀 تلفات: <b>{fmt.int(f.initialCount - f.currentCount)}</b></span>
                     )}
                   </>}
                 >
@@ -390,8 +392,8 @@ export default function FlocksPage() {
                       fontWeight: 700,
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between'
                     }}>
-                      <span>⏳ {toFa(untilLay)} روز تا شروع تخم‌گذاری</span>
-                      <span>روز {toFa(LAYING_START_DAY)}</span>
+                      <span>⏳ {fmt.int(untilLay)} روز تا شروع تخم‌گذاری</span>
+                      <span>روز {fmt.int(LAYING_START_DAY)}</span>
                     </div>
                   )}
 
@@ -421,11 +423,11 @@ export default function FlocksPage() {
                   {/* مشخصات */}
                   <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {ageDays > 0 && <Row l="سن (روز)" v={`${toFa(ageDays)} روز`} />}
+                    {ageDays > 0 && <Row l="سن (روز)" v={`${fmt.int(ageDays)} روز`} />}
                     {f.initialCount && <Row l="تعداد اولیه" v={toFa(f.initialCount)} />}
-                    {f.currentCount && <Row l="تعداد فعلی" v={toFa(f.currentCount)} />}
+                    {f.currentCount && <Row l="تعداد فعلی" v={fmt.int(f.currentCount)} />}
                     {f.initialCount && f.currentCount && f.initialCount !== f.currentCount && (
-                      <Row l="تلفات" v={`${toFa(f.initialCount - f.currentCount)} (${toFa(((f.initialCount - f.currentCount) / f.initialCount * 100).toFixed(1))}٪)`} />
+                      <Row l="تلفات" v={`${fmt.int(f.initialCount - f.currentCount)} (${toFa(((f.initialCount - f.currentCount) / f.initialCount * 100).toFixed(1))}٪)`} />
                     )}
                     {f.type === 'breeder' && f.maleCount && f.femaleCount && (
                       <Row l="نسبت خروس/مرغ" v={sexRatio(f.maleCount, f.femaleCount)} />
@@ -593,7 +595,7 @@ export default function FlocksPage() {
                 <NumField
                   value={form.layingStartDay}
                   onChange={e => setForm({ ...form, layingStartDay: e.target.value })}
-                  placeholder={toFa(LAYING_START_DAY)}
+                  placeholder={fmt.int(LAYING_START_DAY)}
                   unit="روز"
                   max={400}
                   min={80}
