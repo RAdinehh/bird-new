@@ -59,12 +59,14 @@ export function useFlockEvents(flockId: string | null): FlockEventView[] {
 
     // ═══ ۱. رکورد اولیه گله ═══
     const startDate = flock.hatchDate || flock.purchaseDate || flock.startDate;
-    if (startDate && (flock.initialCount || 0) > 0) {
+    const initialCount = flock.initialCount || flock.currentCount || flock.maleCount || 0;
+    const initialCountResolved = flock.initialCount ?? flock.currentCount ?? null;
+    if (initialCountResolved != null && initialCountResolved > 0) {
       events.push({
         id: 'initial-' + flock.id,
-        date: startDate,
+        date: startDate || (flock.createdAt || '').slice(0, 10),
         type: 'initial',
-        count: flock.initialCount || 0,
+        count: initialCount,
         sex: 'mixed',
         origin: flock.source || 'initial',
         notes: 'ثبت اولیه گله',
