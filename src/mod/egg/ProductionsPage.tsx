@@ -98,6 +98,24 @@ export default function ProductionsPage() {
   const selectedFlock = activeFlocks.find(f => f.id === form.flockId) || flocks.find(f => f.id === form.flockId);
   const flockCount = selectedFlock ? (selectedFlock.currentCount || selectedFlock.initialCount || 0) : 0;
 
+  /* liveErrorApplied */
+  // اعتبارسنجی زنده
+  const liveErrors = (() => {
+    const errs: { field: string; msg: string }[] = [];
+    const e = int(form.eatingCount);
+    const f = int(form.fertileCount);
+    const b = int(form.brokenCount);
+    const s = int(form.softCount);
+    const d = int(form.dirtyCount);
+    if (e < 0 || f < 0 || b < 0 || s < 0 || d < 0) errs.push({ field: 'all', msg: 'مقادیر منفی مجاز نیست' });
+    if (flockCount > 0 && (e + f) > flockCount) errs.push({ field: 'healthy', msg: `مجموع سالم (${toFa(e + f)}) از تعداد گله (${toFa(flockCount)}) بیشتره` });
+    if (e > 0 && e > flockCount) errs.push({ field: 'eating', msg: 'تخم خوراکی از تعداد گله بیشتره' });
+    if (f > 0 && f > flockCount) errs.push({ field: 'fertile', msg: 'تخم نطفه‌دار از تعداد گله بیشتره' });
+    return errs;
+  })();
+  const healthySum = int(form.eatingCount) + int(form.fertileCount);
+  const totalSum = healthySum + int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount);
+
   const totalEggs = int(form.eatingCount) + int(form.fertileCount) + int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount);
   const healthy = int(form.eatingCount) + int(form.fertileCount);
   const liveRate = flockCount > 0 && healthy > 0 ? ((healthy / flockCount) * 100).toFixed(1) : '0';
@@ -272,10 +290,10 @@ export default function ProductionsPage() {
 
         <Grid2>
           <Field label="🥚 تخم خوراکی">
-            <NumField placeholder="مثلاً — ۴۰" value={form.eatingCount} onChange={e => setForm({ ...form, eatingCount: e.target.value })} unit="عدد" min={0} />
+            <NumField placeholder="مثلاً — ۴۰" value={form.eatingCount} onChange={e => setForm({ ...form, eatingCount: e.target.value })} unit="عدد" min={0} integer />
           </Field>
           <Field label="🌱 تخم نطفه‌دار">
-            <NumField placeholder="مثلاً — ۱۰" value={form.fertileCount} onChange={e => setForm({ ...form, fertileCount: e.target.value })} unit="عدد" min={0} />
+            <NumField placeholder="مثلاً — ۱۰" value={form.fertileCount} onChange={e => setForm({ ...form, fertileCount: e.target.value })} unit="عدد" min={0} integer />
           </Field>
         </Grid2>
 
@@ -285,18 +303,30 @@ export default function ProductionsPage() {
           </div>
         )}
 
+        {/* خطاهای زنده */}
+        {liveErrors.length > 0 && (
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {liveErrors.map((er, i) => (
+              <div key={i} style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span>⚠️</span>
+                <span>{er.msg}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         <SectionTitle>💔 تخم‌های مصرفی</SectionTitle>
 
         <Grid2>
           <Field label="تخم شکسته">
-            <NumField placeholder="مثلاً — ۵" value={form.brokenCount} onChange={e => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" min={0} />
+            <NumField placeholder="مثلاً — ۵" value={form.brokenCount} onChange={e => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" min={0} integer />
           </Field>
           <Field label="تخم نرم">
-            <NumField placeholder="مثلاً — ۲" value={form.softCount} onChange={e => setForm({ ...form, softCount: e.target.value })} unit="عدد" min={0} />
+            <NumField placeholder="مثلاً — ۲" value={form.softCount} onChange={e => setForm({ ...form, softCount: e.target.value })} unit="عدد" min={0} integer />
           </Field>
         </Grid2>
         <Field label="تخم کثیف">
-          <NumField placeholder="مثلاً — ۳" value={form.dirtyCount} onChange={e => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" min={0} />
+          <NumField placeholder="مثلاً — ۳" value={form.dirtyCount} onChange={e => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" min={0} integer />
         </Field>
 
         {totalEggs > 0 ? (

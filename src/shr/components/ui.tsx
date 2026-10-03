@@ -68,6 +68,7 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   min?: number;
   max?: number;
   autoClamp?: boolean; // اگر true باشد، در همان تایپ محدود می‌کند
+  integer?: boolean; // فقط عدد صحیح (بدون اعشار)
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -83,7 +84,14 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
-    if (effectiveMode === 'number') v = formatNumWhileTyping(v);
+    if (effectiveMode === 'number') {
+      // اگر integer بود، نقطه/اعشار رو حذف کن
+      if ((rest as any).integer) {
+        const dot = ['٫', '.', ',']; 
+        for (const d of dot) v = v.split(d).join('');
+      }
+      v = formatNumWhileTyping(v);
+    }
     setLocalValue(v);
     if (autoClamp && (min !== undefined || max !== undefined) && v) {
       const n = parseFaNum(v);
@@ -856,7 +864,8 @@ export function DigitField({ maxLength, ...props }: Omit<InputProps, 'unit' | 'i
 }
 
 export function NumField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode'>) {
-  return <Input mode="number" dir="ltr" inputMode="decimal" min={0} {...props} />;
+  const inputMode = (props as any).integer ? 'numeric' : 'decimal';
+  return <Input mode="number" dir="ltr" inputMode={inputMode} min={0} {...props} />;
 }
 
 export function PercentField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'max'>) {
