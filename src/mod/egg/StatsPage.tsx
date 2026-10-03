@@ -55,9 +55,10 @@ export default function StatsPage() {
     }
     const healthy = eating + fertile;
     const total = healthy + broken + other;
+    // pctFixApplied — همه از total برای یکنواختی
     const brokenPct = total > 0 ? Math.round((broken / total) * 1000) / 10 : 0;
-    const fertilePct = healthy > 0 ? Math.round((fertile / healthy) * 1000) / 10 : 0;
-    const eatingPct = healthy > 0 ? Math.round((eating / healthy) * 1000) / 10 : 0;
+    const fertilePct = total > 0 ? Math.round((fertile / total) * 1000) / 10 : 0;
+    const eatingPct = total > 0 ? Math.round((eating / total) * 1000) / 10 : 0;
     const otherPct = total > 0 ? Math.round((other / total) * 1000) / 10 : 0;
     const dayCount = new Set(filtered.map(p => p.date)).size;
     const avgHealthy = dayCount > 0 ? Math.round(healthy / dayCount) : 0;
