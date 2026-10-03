@@ -11,7 +11,7 @@ import {
   mortalityRate, avgWeight, sumWeight, cvWeight,
   totalWater
 } from './store';
-import { useFlk } from '../flk/store';
+import { useFlk , isLayingReady, getAgeDays } from '../flk/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useBrd } from '../brd/store';
 import { useFed } from '../fed/store';
@@ -177,7 +177,9 @@ export default function DailyLogsPage() {
   };
 
   const selectedFlock = activeFlocks.find(f => f.id === form.flockId);
-  const isLayerFlock = selectedFlock?.type === 'layer' || selectedFlock?.type === 'breeder';
+  const isLayerType = selectedFlock?.type === 'layer' || selectedFlock?.type === 'breeder';
+  const isFlockMature = selectedFlock ? isLayingReady(selectedFlock) : false;
+  const isLayerFlock = isLayerType && isFlockMature;  // فقط اگه بالغ باشه فرم تخمگذاری فعال میشه
   const flockAliveCount = selectedFlock?.currentCount || selectedFlock?.initialCount || 0;
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
