@@ -706,11 +706,9 @@ export function Modal({
             WebkitOverflowScrolling: 'touch',
             flex: 1,
             minHeight: 0,
-            ...(contentGap ? {
-              display: 'flex',
-              flexDirection: 'column',
-              gap: contentGap,
-            } : {}),
+            display: 'flex',
+            flexDirection: 'column',
+            gap: contentGap ?? 12,
           }}
         >
           {children}
