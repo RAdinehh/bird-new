@@ -12,16 +12,18 @@ export interface EggProduction {
   id: string;
   flockId: string;
   date: string;
+  eatingCount: number;
+  fertileCount: number;
   totalCount: number;
   brokenCount: number;
   softCount: number;
   dirtyCount: number;
   avgWeight: number | null;
   notes: string;
-  sourceLogId?: string;   // لینک به dlg (اختیاری)
-  eggCategory?: 'eating' | 'fertile';  // نوع تخم سالم
-  healthyMovementId?: string;    // movement تخم سالم
-  consumptionMovementId?: string; // movement تخم مصرفی (شکسته/نرم/کثیف)
+  sourceLogId?: string;
+  eatingMovementId?: string;
+  fertileMovementId?: string;
+  consumptionMovementId?: string;
   createdAt: string;
 }
 
@@ -88,6 +90,59 @@ function ensureEggItem(kind: 'eating' | 'fertile' | 'consumption'): string {
   return newId || '';
 }
 
+function eggCascade(id: string, p: EggProduction) {
+  const consumptionCount = (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0);
+  let eatingMovementId = '', fertileMovementId = '', consumptionMovementId = '';
+  const whs = useWhs.getState();
+  if (p.eatingCount > 0) {
+    const itemId = ensureEggItem('eating');
+    if (itemId) {
+      const batchNo = generateBatchNo(p.date, whs.movements, itemId);
+      const mid = whs.addMovement({
+        itemId, type: 'in', quantity: p.eatingCount, unitPrice: 0,
+        reason: 'adjustment', date: p.date, partyId: '',
+        notes: 'تولید تخم — خوراکی',
+        flockId: p.flockId, sourceModule: 'egg', sourceId: id, batchNo,
+      });
+      if (mid) eatingMovementId = mid;
+    }
+  }
+  if (p.fertileCount > 0) {
+    const itemId = ensureEggItem('fertile');
+    if (itemId) {
+      const batchNo = generateBatchNo(p.date, whs.movements, itemId);
+      const mid = whs.addMovement({
+        itemId, type: 'in', quantity: p.fertileCount, unitPrice: 0,
+        reason: 'adjustment', date: p.date, partyId: '',
+        notes: 'تولید تخم — نطفه‌دار',
+        flockId: p.flockId, sourceModule: 'egg', sourceId: id, batchNo,
+      });
+      if (mid) fertileMovementId = mid;
+    }
+  }
+  if (consumptionCount > 0) {
+    const itemId = ensureEggItem('consumption');
+    if (itemId) {
+      const batchNo = generateBatchNo(p.date, whs.movements, itemId);
+      const mid = whs.addMovement({
+        itemId, type: 'in', quantity: consumptionCount, unitPrice: 0,
+        reason: 'adjustment', date: p.date, partyId: '',
+        notes: 'تخم مصرفی',
+        flockId: p.flockId, sourceModule: 'egg', sourceId: id, batchNo,
+      });
+      if (mid) consumptionMovementId = mid;
+    }
+  }
+  return { eatingMovementId, fertileMovementId, consumptionMovementId };
+}
+
+function eggCascadeDelete(prev: EggProduction) {
+  const whs = useWhs.getState();
+  if (prev.eatingMovementId) { try { whs.deleteMovement(prev.eatingMovementId); } catch {} }
+  if (prev.fertileMovementId) { try { whs.deleteMovement(prev.fertileMovementId); } catch {} }
+  if (prev.consumptionMovementId) { try { whs.deleteMovement(prev.consumptionMovementId); } catch {} }
+}
+
 const now = () => new Date().toISOString();
 
 export const useEgg = create<State>()(
@@ -101,41 +156,8 @@ export const useEgg = create<State>()(
 
       addProduction: (p) => {
         const id = uuid();
-        const consumptionCount = (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0);
-        let healthyMovementId = '';
-        let consumptionMovementId = '';
-        const whs = useWhs.getState();
-
-        if (p.totalCount > 0) {
-          const kind = p.eggCategory || 'eating';
-          const itemId = ensureEggItem(kind);
-          if (itemId) {
-            const batchNo = generateBatchNo(p.date, useWhs.getState().movements, itemId);
-            const mid = useWhs.getState().addMovement({
-              itemId, type: 'in', quantity: p.totalCount, unitPrice: 0,
-              reason: 'adjustment', date: p.date, partyId: '',
-              notes: `تولید تخم — ${kind === 'eating' ? 'خوراکی' : 'نطفه‌دار'}`,
-              flockId: p.flockId, sourceModule: 'egg', sourceId: id, batchNo,
-            });
-            if (mid) healthyMovementId = mid;
-          }
-        }
-
-        if (consumptionCount > 0) {
-          const itemId = ensureEggItem('consumption');
-          if (itemId) {
-            const batchNo = generateBatchNo(p.date, useWhs.getState().movements, itemId);
-            const mid = useWhs.getState().addMovement({
-              itemId, type: 'in', quantity: consumptionCount, unitPrice: 0,
-              reason: 'adjustment', date: p.date, partyId: '',
-              notes: 'تخم مصرفی (شکسته/نرم/کثیف)',
-              flockId: p.flockId, sourceModule: 'egg', sourceId: id, batchNo,
-            });
-            if (mid) consumptionMovementId = mid;
-          }
-        }
-
-        const newProd = { ...p, healthyMovementId, consumptionMovementId, id, createdAt: now() };
+        const { eatingMovementId, fertileMovementId, consumptionMovementId } = eggCascade(id, p as EggProduction);
+        const newProd = { ...p, eatingMovementId, fertileMovementId, consumptionMovementId, id, createdAt: now() };
         set({ productions: [...get().productions, newProd] });
         return newProd.id;
       },
@@ -143,59 +165,18 @@ export const useEgg = create<State>()(
       updateProduction: (id, patch) => {
         const prev = get().productions.find(x => x.id === id);
         if (!prev) return;
-
-        // حذف movement های قبلی
-        const whs = useWhs.getState();
-        if (prev.healthyMovementId) { try { whs.deleteMovement(prev.healthyMovementId); } catch {} }
-        if (prev.consumptionMovementId) { try { whs.deleteMovement(prev.consumptionMovementId); } catch {} }
-
+        eggCascadeDelete(prev);
         const merged = { ...prev, ...patch };
-        const consumptionCount = (merged.brokenCount || 0) + (merged.softCount || 0) + (merged.dirtyCount || 0);
-        let healthyMovementId = '';
-        let consumptionMovementId = '';
-
-        if (merged.totalCount > 0) {
-          const kind = merged.eggCategory || 'eating';
-          const itemId = ensureEggItem(kind);
-          if (itemId) {
-            const batchNo = generateBatchNo(merged.date, useWhs.getState().movements, itemId);
-            const mid = useWhs.getState().addMovement({
-              itemId, type: 'in', quantity: merged.totalCount, unitPrice: 0,
-              reason: 'adjustment', date: merged.date, partyId: '',
-              notes: `تولید تخم — ${kind === 'eating' ? 'خوراکی' : 'نطفه‌دار'}`,
-              flockId: merged.flockId, sourceModule: 'egg', sourceId: id, batchNo,
-            });
-            if (mid) healthyMovementId = mid;
-          }
-        }
-
-        if (consumptionCount > 0) {
-          const itemId = ensureEggItem('consumption');
-          if (itemId) {
-            const batchNo = generateBatchNo(merged.date, useWhs.getState().movements, itemId);
-            const mid = useWhs.getState().addMovement({
-              itemId, type: 'in', quantity: consumptionCount, unitPrice: 0,
-              reason: 'adjustment', date: merged.date, partyId: '',
-              notes: 'تخم مصرفی (شکسته/نرم/کثیف)',
-              flockId: merged.flockId, sourceModule: 'egg', sourceId: id, batchNo,
-            });
-            if (mid) consumptionMovementId = mid;
-          }
-        }
-
+        const { eatingMovementId, fertileMovementId, consumptionMovementId } = eggCascade(id, merged as EggProduction);
         set({
           productions: get().productions.map(x => x.id === id
-            ? { ...merged, healthyMovementId, consumptionMovementId }
+            ? { ...merged, eatingMovementId, fertileMovementId, consumptionMovementId }
             : x)
         });
       },
       deleteProduction: (id) => {
         const prev = get().productions.find(x => x.id === id);
-        if (prev) {
-          const whs = useWhs.getState();
-          if (prev.healthyMovementId) { try { whs.deleteMovement(prev.healthyMovementId); } catch {} }
-          if (prev.consumptionMovementId) { try { whs.deleteMovement(prev.consumptionMovementId); } catch {} }
-        }
+        if (prev) eggCascadeDelete(prev);
         set({ productions: get().productions.filter(x => x.id !== id) });
       },
 

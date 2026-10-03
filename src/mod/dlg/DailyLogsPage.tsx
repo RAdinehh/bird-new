@@ -410,24 +410,25 @@ const collectWhsShortages = () => {
     // === sync با egg ===
     try {
       const eggs = int(form.eggsCount) || 0;
+      const broken = int(form.brokenEggs) || 0;
+      const dirty = int(form.dirtyEggs) || 0;
       const existingProd = findByLogId(logId);
-      if (isLayerFlock && eggs > 0) {
+      if (isLayerFlock && (eggs > 0 || broken > 0 || dirty > 0)) {
         const prodData = {
           flockId: form.flockId,
           date: form.date,
-          totalCount: eggs,
-          brokenCount: int(form.brokenEggs) || 0,
+          eatingCount: eggs,
+          fertileCount: 0,
+          totalCount: eggs + broken,
+          brokenCount: broken,
           softCount: 0,
-          dirtyCount: int(form.dirtyEggs) || 0,
+          dirtyCount: dirty,
           avgWeight: null,
           notes: '',
           sourceLogId: logId,
         };
-        if (existingProd) {
-          updateProduction(existingProd.id, prodData);
-        } else {
-          addProduction(prodData);
-        }
+        if (existingProd) { updateProduction(existingProd.id, prodData); }
+        else { addProduction(prodData); }
       } else if (existingProd) {
         deleteProduction(existingProd.id);
       }

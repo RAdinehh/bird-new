@@ -23,21 +23,21 @@ interface F {
   id?: string;
   flockId: string;
   date: string;
-  percent: string;
-  totalCount: string;
+  eatingCount: string;
+  fertileCount: string;
   brokenCount: string;
   softCount: string;
   dirtyCount: string;
   avgWeight: string;
   notes: string;
-  eggCategory: 'eating' | 'fertile' | '';
 }
 
 const empty = (): F => ({
   flockId: '', date: '',
-  percent: '',
-  totalCount: '', brokenCount: '', softCount: '', dirtyCount: '',
-  avgWeight: '', notes: '', eggCategory: '' });
+  eatingCount: '', fertileCount: '',
+  brokenCount: '', softCount: '', dirtyCount: '',
+  avgWeight: '', notes: '',
+});
 
 export default function ProductionsPage() {
   const { productions, addProduction, updateProduction, deleteProduction } = useEgg();
@@ -72,25 +72,22 @@ export default function ProductionsPage() {
     setUndoData(null);
   };
 
-  const openNew = () => {    const lastRec = productions.filter(p => p.flockId).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
-    const defaultX = lastRec?.flockId || flocks.filter(f => f.status === 'active')[0]?.id || flocks[0]?.id || '';
-    const today = formatJ(new Date(), 'yyyy/MM/dd');
-
+  const openNew = () => {
     if (activeFlocks.length === 0) { showAlert('اول یک گله تخم‌گذار بسازید'); return; }
-    setForm({ ...empty(), flockId: activeFlocks[0].id, eggCategory: activeFlocks[0].type === 'breeder' ? 'fertile' : 'eating' });
+    setForm({ ...empty(), flockId: activeFlocks[0].id });
     setErr(''); setOpen(true);
   };
 
   const openEdit = (p: EggProduction) => {
     setForm({
-      id: p.id, flockId: p.flockId, date: p.date, eggCategory: (p as any).eggCategory || 'eating',
-      percent: '',
-      totalCount: p.totalCount ? toFa(p.totalCount) : '',
+      id: p.id, flockId: p.flockId, date: p.date,
+      eatingCount: p.eatingCount ? toFa(p.eatingCount) : '',
+      fertileCount: p.fertileCount ? toFa(p.fertileCount) : '',
       brokenCount: p.brokenCount ? toFa(p.brokenCount) : '',
       softCount: p.softCount ? toFa(p.softCount) : '',
       dirtyCount: p.dirtyCount ? toFa(p.dirtyCount) : '',
-      avgWeight: p.avgWeight ? toFa(p.avgWeight) : '',
-      notes: p.notes || ''
+      avgWeight: p.avgWeight !== null && p.avgWeight !== undefined ? toFa(p.avgWeight) : '',
+      notes: p.notes || '',
     });
     setErr(''); setOpen(true);
   };
@@ -101,71 +98,40 @@ export default function ProductionsPage() {
   const selectedFlock = activeFlocks.find(f => f.id === form.flockId) || flocks.find(f => f.id === form.flockId);
   const flockCount = selectedFlock ? (selectedFlock.currentCount || selectedFlock.initialCount || 0) : 0;
 
-  // تغییر درصد → تعداد خودکار
-  const onPercentChange = (v: string) => {
-    if (v === '') {
-      setForm(f => ({ ...f, percent: '', totalCount: '' }));
-      return;
-    }
-    const p = Math.max(0, Math.min(100, parseFloat(toEn(v).replace('٫','.')) || 0));
-    const cnt = flockCount > 0 ? Math.round((p / 100) * flockCount) : 0;
-    setForm(f => ({ ...f, percent: v, totalCount: cnt > 0 ? toFa(cnt) : '' }));
-  };
-
-  // تغییر تعداد → درصد خودکار
-  const onCountChange = (v: string) => {
-    if (v === '') {
-      setForm(f => ({ ...f, totalCount: '', percent: '' }));
-      return;
-    }
-    const cnt = parseInt(toEn(v)) || 0;
-    const pct = flockCount > 0 && cnt > 0 ? Math.round((cnt / flockCount) * 1000) / 10 : 0;
-    setForm(f => ({ ...f, totalCount: v, percent: cnt > 0 ? toFa(pct) : '' }));
-  };
-
-  // محاسبه‌ی زنده‌ی مجموع
-  const totalEggs = int(form.totalCount) + int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount);
-  const healthy = int(form.totalCount);
+  const totalEggs = int(form.eatingCount) + int(form.fertileCount) + int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount);
+  const healthy = int(form.eatingCount) + int(form.fertileCount);
   const liveRate = flockCount > 0 && healthy > 0 ? ((healthy / flockCount) * 100).toFixed(1) : '0';
+  const fertilePercent = healthy > 0 ? Math.round((int(form.fertileCount) / healthy) * 100) : 0;
+  const eatingPercent = healthy > 0 ? Math.round((int(form.eatingCount) / healthy) * 100) : 0;
 
   const save = () => {
     if (form.flockId === '') { setErr('گله اجباری است'); return; }
     if (form.date.trim() === '') { setErr('تاریخ اجباری است'); return; }
-
-    let total = int(form.totalCount);
-    // اگر تخم سالم خالی ولی درصد پر بود
-    if (total === 0 && form.percent !== '' && flockCount > 0) {
-      const p = parseFloat(toEn(form.percent).replace('٫','.')) || 0;
-      total = Math.round((p / 100) * flockCount);
-    }
-
+    const eating = int(form.eatingCount);
+    const fertile = int(form.fertileCount);
     const broken = int(form.brokenCount);
     const soft = int(form.softCount);
     const dirty = int(form.dirtyCount);
-
-    if (total + broken + soft + dirty === 0) { setErr('حداقل یک عدد وارد کنید'); return; }
-    if (flockCount > 0 && total > flockCount) {
-      setErr('تخم سالم (' + toFa(total) + ') نمی‌تواند از تعداد گله (' + toFa(flockCount) + ') بیشتر باشد — هر مرغ حداکثر ۱ تخم در روز');
+    const total = eating + fertile + broken + soft + dirty;
+    if (total === 0) { setErr('حداقل یک عدد وارد کنید'); return; }
+    if (flockCount > 0 && (eating + fertile) > flockCount) {
+      setErr('تخم سالم (' + toFa(eating + fertile) + ') نمی‌تواند از تعداد گله (' + toFa(flockCount) + ') بیشتر باشد');
       return;
     }
-
     const data = {
       flockId: form.flockId,
       date: form.date.trim(),
+      eatingCount: eating,
+      fertileCount: fertile,
       totalCount: total,
       brokenCount: broken,
       softCount: soft,
       dirtyCount: dirty,
       avgWeight: form.avgWeight ? num(form.avgWeight) : null,
       notes: form.notes.trim(),
-      eggCategory: form.eggCategory || 'eating',
     };
-
-    if (form.id === undefined) {
-      addProduction(data);
-    } else {
-      updateProduction(form.id, data);
-    }
+    if (form.id === undefined) { addProduction(data); }
+    else { updateProduction(form.id, data); }
     setOpen(false);
   };
 
@@ -180,13 +146,13 @@ export default function ProductionsPage() {
           onDismiss={() => setUndoData(null)}
         />
       )}
-        <HelpBanner
-          id="egg-prod-intro"
-          icon="🥚"
-          title="ثبت تخم‌گذاری روزانه"
-          description="هر روز تعداد تخم‌های تولیدی گله را ثبت کنید. نرخ تخم‌گذاری و روند تولید خودکار محاسبه می‌شود."
-          tone="info"
-        />
+      <HelpBanner
+        id="egg-prod-intro"
+        icon="🥚"
+        title="ثبت تخم‌گذاری روزانه"
+        description="هر روز تعداد تخم‌ها را بین خوراکی، نطفه‌دار و مصرفی تقسیم کنید."
+        tone="info"
+      />
       {activeFlocks.length > 0 && productions.length > 0 ? (
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
           <button onClick={() => setFilterFlock('')} style={chip(filterFlock === '')}>همه</button>
@@ -238,18 +204,17 @@ export default function ProductionsPage() {
                   </>
                 }
               >
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> آمار تخم‌گذاری</SectionTitle>
-                <Row l="تخم سالم" v={toFa(healthy2)} accent />
+                <SectionTitle>📊 آمار تخم‌گذاری</SectionTitle>
+                {p.eatingCount > 0 && <Row l="🥚 تخم خوراکی" v={toFa(p.eatingCount)} />}
+                {p.fertileCount > 0 && <Row l="🌱 تخم نطفه‌دار" v={toFa(p.fertileCount)} />}
+                <Row l="تخم سالم" v={toFa(healthy2)} />
                 <Row l="تخم شکسته" v={toFa(p.brokenCount)} />
                 {p.softCount > 0 ? <Row l="تخم نرم" v={toFa(p.softCount)} /> : null}
                 {p.dirtyCount > 0 ? <Row l="تخم کثیف" v={toFa(p.dirtyCount)} /> : null}
                 <Row l="جمع کل" v={toFa((p.totalCount || 0) + (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0))} />
 
                 {rate > 0 ? (
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
-                     color: 'var(--accent)', borderRadius: 'var(--r-sm)',
-                     fontWeight: 700 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                     <span>نرخ تخم‌گذاری (Hen-Day):</span>
                     <span>{toFa(rate.toFixed(1))}٪</span>
                   </div>
@@ -264,10 +229,8 @@ export default function ProductionsPage() {
 
                 {p.notes ? (
                   <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{p.notes}</div>
+                    <SectionTitle>📝 یادداشت</SectionTitle>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{p.notes}</div>
                   </>
                 ) : null}
 
@@ -290,7 +253,7 @@ export default function ProductionsPage() {
       >
         <Grid2>
           <Field label="گله" required>
-            <Select value={form.flockId} onChange={e => setForm({ ...form, flockId: e.target.value, percent: '', totalCount: '' })}>
+            <Select value={form.flockId} onChange={e => setForm({ ...form, flockId: e.target.value })}>
               {activeFlocks.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
             </Select>
           </Field>
@@ -300,78 +263,46 @@ export default function ProductionsPage() {
         </Grid2>
 
         {flockCount > 0 ? (
-          <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-             border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
-             fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600,
-             textAlign: 'center' }}>
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, textAlign: 'center' }}>
             تعداد گله: {toFa(flockCount)} پرنده
           </div>
         ) : null}
 
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم‌گذاری</SectionTitle>
+        <SectionTitle>🥚 تخم‌های سالم</SectionTitle>
 
         <Grid2>
-          <Field
-            label="درصد تخم‌گذاری"
-            hint={flockCount > 0 && form.percent !== '' ? toFa(form.percent) + '٪ از ' + toFa(flockCount) : 'اختیاری'}
-          >
-            <NumField
-              value={form.percent}
-              onChange={e => onPercentChange(e.target.value)}
-              unit="٪"
-              max={100}
-              min={0}
-            />
+          <Field label="🥚 تخم خوراکی">
+            <NumField placeholder="مثلاً — ۴۰" value={form.eatingCount} onChange={e => setForm({ ...form, eatingCount: e.target.value })} unit="عدد" min={0} />
           </Field>
-          <Field
-            label="تخم سالم"
-            required
-            hint={flockCount > 0 ? 'حداکثر ' + toFa(flockCount) : undefined}
-          >
-            <NumField
-              value={form.totalCount}
-              onChange={e => onCountChange(e.target.value)}
-              unit="عدد"
-              max={flockCount || undefined}
-              min={0}
-            />
+          <Field label="🌱 تخم نطفه‌دار">
+            <NumField placeholder="مثلاً — ۱۰" value={form.fertileCount} onChange={e => setForm({ ...form, fertileCount: e.target.value })} unit="عدد" min={0} />
           </Field>
         </Grid2>
 
-        {flockCount > 0 && healthy > flockCount ? (
-          <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)',
-             border: '1px solid var(--danger)', borderRadius: 'var(--r-md)',
-             fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700,
-             textAlign: 'center' }}>
-            ❌ تخم سالم نمی‌تواند از تعداد گله ({toFa(flockCount)}) بیشتر باشد
+        {(int(form.eatingCount) > 0 || int(form.fertileCount) > 0) && (
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, lineHeight: 1.7, textAlign: 'center' }}>
+            📊 ترکیب سالم: <b>{toFa(eatingPercent)}٪ خوراکی</b> · <b>{toFa(fertilePercent)}٪ نطفه‌دار</b>
           </div>
-        ) : null}
+        )}
+
+        <SectionTitle>💔 تخم‌های مصرفی</SectionTitle>
 
         <Grid2>
           <Field label="تخم شکسته">
-            <NumField placeholder="مثلاً — ۵" value={form.brokenCount} onChange={e => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
+            <NumField placeholder="مثلاً — ۵" value={form.brokenCount} onChange={e => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" min={0} />
           </Field>
           <Field label="تخم نرم">
-            <NumField placeholder="مثلاً — ۲" value={form.softCount} onChange={e => setForm({ ...form, softCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
+            <NumField placeholder="مثلاً — ۲" value={form.softCount} onChange={e => setForm({ ...form, softCount: e.target.value })} unit="عدد" min={0} />
           </Field>
         </Grid2>
         <Field label="تخم کثیف">
-          <NumField placeholder="مثلاً — ۳" value={form.dirtyCount} onChange={e => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" max={flockCount || undefined} min={0} />
+          <NumField placeholder="مثلاً — ۳" value={form.dirtyCount} onChange={e => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" min={0} />
         </Field>
 
-        {/* کادر خلاصه‌ی محاسبات */}
         {totalEggs > 0 ? (
-          <div style={{
-            padding: 'var(--pad-normal)',
-            background: 'var(--accent-soft)',
-            border: '1px solid var(--accent-border)',
-            borderRadius: 'var(--r-md)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 6
-          }}>
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-              <span style={{ color: 'var(--muted)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم سالم:</span>
+              <span style={{ color: 'var(--muted)' }}>🥚 تخم سالم:</span>
               <span style={{ fontWeight: 700, color: 'var(--text)' }}>{toFa(healthy)}</span>
             </div>
             {int(form.brokenCount) > 0 ? (
@@ -382,7 +313,7 @@ export default function ProductionsPage() {
             ) : null}
             {int(form.softCount) > 0 ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-                <span style={{ color: 'var(--muted)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> نرم:</span>
+                <span style={{ color: 'var(--muted)' }}>⚪ نرم:</span>
                 <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(int(form.softCount))}</span>
               </div>
             ) : null}
@@ -392,9 +323,7 @@ export default function ProductionsPage() {
                 <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(int(form.dirtyCount))}</span>
               </div>
             ) : null}
-            <div style={{ display: 'flex', justifyContent: 'space-between',
-               borderTop: '1px solid var(--accent-border)', paddingTop: 6,
-               marginTop: 2 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 6, marginTop: 2 }}>
               <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>جمع کل:</span>
               <span style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700 }}>{toFa(totalEggs)} عدد</span>
             </div>
@@ -407,53 +336,20 @@ export default function ProductionsPage() {
           </div>
         ) : null}
 
+        {(int(form.eatingCount) > 0 || int(form.fertileCount) > 0 || (int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount)) > 0) && (
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, lineHeight: 1.7 }}>
+            {int(form.eatingCount) > 0 && <div>✓ {toFa(int(form.eatingCount))} تخم مرغ خوراکی → انبار</div>}
+            {int(form.fertileCount) > 0 && <div>✓ {toFa(int(form.fertileCount))} تخم نطفه‌دار → انبار</div>}
+            {(int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount)) > 0 && (
+              <div>✓ {toFa(int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount))} تخم مصرفی → انبار مصرفی</div>
+            )}
+          </div>
+        )}
+
         <SectionTitle>⚖ وزن</SectionTitle>
         <Field label="وزن میانگین تخم" hint="اختیاری">
           <NumField placeholder="مثلاً — ۱.۵" value={form.avgWeight} onChange={e => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
         </Field>
-
-        {selectedFlock && (
-          <Field label="نوع تخم سالم" autoFrom={selectedFlock.type === 'breeder' ? 'نوع گله (مادر)' : undefined} hint="تخم‌های سالم به کدوم انبار برن؟">
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button
-                type="button"
-                onClick={() => setForm(f => ({ ...f, eggCategory: 'eating' }))}
-                style={{
-                  flex: 1, padding: '10px 8px',
-                  background: (form.eggCategory || 'eating') === 'eating' ? 'var(--accent-soft)' : 'var(--btn-bg)',
-                  border: '1px solid ' + ((form.eggCategory || 'eating') === 'eating' ? 'var(--accent-border)' : 'var(--border)'),
-                  borderRadius: 'var(--r-md)',
-                  color: (form.eggCategory || 'eating') === 'eating' ? 'var(--accent)' : 'var(--muted)',
-                  fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >🥚 تخم مرغ خوراکی</button>
-              <button
-                type="button"
-                onClick={() => setForm(f => ({ ...f, eggCategory: 'fertile' }))}
-                style={{
-                  flex: 1, padding: '10px 8px',
-                  background: form.eggCategory === 'fertile' ? 'var(--purple-soft)' : 'var(--btn-bg)',
-                  border: '1px solid ' + (form.eggCategory === 'fertile' ? 'var(--purple)' : 'var(--border)'),
-                  borderRadius: 'var(--r-md)',
-                  color: form.eggCategory === 'fertile' ? 'var(--purple)' : 'var(--muted)',
-                  fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >🌱 تخم نطفه‌دار</button>
-            </div>
-          </Field>
-        )}
-        {(int(form.totalCount) > 0 || (int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount)) > 0) && (
-          <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, lineHeight: 1.7 }}>
-            ✓ {toFa(int(form.totalCount))} تخم {(form.eggCategory || 'eating') === 'fertile' ? 'نطفه‌دار' : 'مرغ'} → انبار
-            {(int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount)) > 0 && (
-              <>
-                <br />✓ {toFa(int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount))} تخم مصرفی (شکسته/نرم/کثیف) → انبار مصرفی
-              </>
-            )}
-          </div>
-        )}
 
         <Field label="یادداشت">
           <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
@@ -466,8 +362,17 @@ export default function ProductionsPage() {
         open={delId !== null}
         onClose={() => setDelId(null)}
         title="حذف تخم‌گذاری"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = productions.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteProduction(idToDel);
-              logAction('delete', 'egg', 'حذف از تخم‌ها'); setDelId(null); showToast('حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="danger" onClick={async () => {
+          const idToDel = delId; if (!idToDel) return;
+          const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true });
+          if (!ok) return;
+          const item = productions.find((x: any) => x.id === idToDel);
+          if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); }
+          deleteProduction(idToDel);
+          logAction('delete', 'egg', 'حذف از تخم‌ها');
+          setDelId(null);
+          showToast('حذف شد', 'info', 1800);
+        }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف ثبت <b>{toFa(target?.date)}</b>؟</div>
       </Modal>
