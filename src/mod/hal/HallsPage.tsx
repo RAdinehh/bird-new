@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS, EQUIP_LABELS } from './store';
 import { useBrd } from '../brd/store';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
+import { useFlk } from '../flk/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -99,6 +100,7 @@ function calcSuggestedCapacity(length: number | null, width: number | null, dens
 export default function HallsPage() {
   const { halls: _hallsRaw, zones, equipment, addHall, updateHall, deleteHall } = useHal();
   const breedStd = useBreedStandard();
+  const { flocks } = useFlk();
   const { breeds } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
@@ -211,17 +213,20 @@ export default function HallsPage() {
             const hallEquips = equipment.filter(e => e.hallId === h.id);
             const totalAirflow = hallEquips.filter(e => e.type === 'fan' || e.type === 'cooler').reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
             const totalLightW = hallEquips.filter(e => e.type === 'lamp').reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
+            const hallFlocks = (flocks || []).filter((f: any) => f.hallId === h.id && f.status === 'active');
+            const totalBirds = hallFlocks.reduce((sum: number, f: any) => sum + (f.currentCount || f.initialCount || 0), 0);
             const isOpen = expandedId === h.id;
             return (
               <ExpandableCard key={h.id} accent="accent" index={fmt.int(i + 1)} iconEmoji="🏭"
                 title={h.name + (h.code ? ` · ${h.code}` : '')}
                 subtitle={h.length ? `${toFa(h.length)}×${toFa(h.width || 0)}×${toFa(h.height || 0)} متر` : 'ابعاد وارد نشده'}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
-                badge={zoneCount > 0 ? <Tag tone="blue">{fmt.int(zoneCount)} بخش</Tag> : undefined}
+                badge={<>{zoneCount > 0 ? <Tag tone="blue">{fmt.int(zoneCount)} بخش</Tag> : null}{hallFlocks.length > 0 ? <Tag tone="green">{fmt.int(hallFlocks.length)} گله</Tag> : null}</>}
                 stats={<>
                   {area > 0 && <span>مساحت: <b style={{ color: 'var(--text)' }}>{toFa(area.toFixed(1))} م²</b></span>}
                   {h.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{fmt.int(h.capacity)}</b></span>}
                   {equipCount > 0 && <span>تجهیز: <b style={{ color: 'var(--text)' }}>{fmt.int(equipCount)}</b></span>}
+                    {totalBirds > 0 && <span>پرنده: <b style={{ color: 'var(--text)' }}>{fmt.int(totalBirds)}</b></span>}
                 </>}
               >
                 <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📐</span> ابعاد و ظرفیت</div>
@@ -230,6 +235,24 @@ export default function HallsPage() {
                   <Row l="حجم" v={`${toFa(volume.toFixed(1))} م³`} />
                   <Row l="ظرفیت" v={h.capacity ? `${fmt.int(h.capacity)} پرنده` : '—'} />
                 </div>
+
+                {hallFlocks.length > 0 && (
+                  <>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
+                      <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> گله‌های فعال ({fmt.int(hallFlocks.length)})
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      {hallFlocks.map((fl: any) => (
+                        <Row
+                          key={fl.id}
+                          l={fl.name}
+                          v={`${fmt.int(fl.currentCount || fl.initialCount || 0)} پرنده`}
+                        />
+                      ))}
+                      <Row l="جمع کل" v={`${fmt.int(totalBirds)} پرنده`} accent />
+                    </div>
+                  </>
+                )}
 
                 <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> شرایط محیطی</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
