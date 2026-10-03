@@ -4,8 +4,6 @@
 import { useState, useMemo } from 'react';
 import { useEgg, healthyCount, henDayRate, brokenRate, type EggProduction } from './store';
 import { useFlk, getAgeDays } from '../flk/store';
-import { useWhs, UNIT_LABEL } from '../whs/store';
-import SmartSelect from '../../shr/components/SmartSelect';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
@@ -32,21 +30,19 @@ interface F {
   dirtyCount: string;
   avgWeight: string;
   notes: string;
-  stockItemId: string;
+  eggCategory: 'eating' | 'fertile' | '';
 }
 
 const empty = (): F => ({
   flockId: '', date: '',
   percent: '',
   totalCount: '', brokenCount: '', softCount: '', dirtyCount: '',
-  avgWeight: '', notes: '', stockItemId: '' });
+  avgWeight: '', notes: '', eggCategory: '' });
 
 export default function ProductionsPage() {
   const { productions, addProduction, updateProduction, deleteProduction } = useEgg();
   const { flocks } = useFlk();
   const { birds } = useBrd();
-  const { items: whsItems } = useWhs();
-  const eggItems = whsItems.filter(x => x.category === 'egg');
 
   const activeFlocks = flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder'));
 
@@ -81,13 +77,13 @@ export default function ProductionsPage() {
     const today = formatJ(new Date(), 'yyyy/MM/dd');
 
     if (activeFlocks.length === 0) { showAlert('اول یک گله تخم‌گذار بسازید'); return; }
-    setForm({ ...empty(), flockId: activeFlocks[0].id });
+    setForm({ ...empty(), flockId: activeFlocks[0].id, eggCategory: activeFlocks[0].type === 'breeder' ? 'fertile' : 'eating' });
     setErr(''); setOpen(true);
   };
 
   const openEdit = (p: EggProduction) => {
     setForm({
-      id: p.id, flockId: p.flockId, date: p.date, stockItemId: (p as any).stockItemId || '',
+      id: p.id, flockId: p.flockId, date: p.date, eggCategory: (p as any).eggCategory || 'eating',
       percent: '',
       totalCount: p.totalCount ? toFa(p.totalCount) : '',
       brokenCount: p.brokenCount ? toFa(p.brokenCount) : '',
@@ -162,7 +158,7 @@ export default function ProductionsPage() {
       dirtyCount: dirty,
       avgWeight: form.avgWeight ? num(form.avgWeight) : null,
       notes: form.notes.trim(),
-      stockItemId: form.stockItemId || undefined,
+      eggCategory: form.eggCategory || 'eating',
     };
 
     if (form.id === undefined) {
@@ -416,21 +412,46 @@ export default function ProductionsPage() {
           <NumField placeholder="مثلاً — ۱.۵" value={form.avgWeight} onChange={e => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
         </Field>
 
-        {eggItems.length > 0 && (
-          <Field label="ثبت به انبار تخم" autoFrom="انبار (موجودی اضافه می‌شه)" hint="اگه انتخاب کنی، تخم سالم به موجودی انبار اضافه می‌شه">
-            <SmartSelect
-              value={form.stockItemId}
-              onChange={v => setForm(f => ({ ...f, stockItemId: v }))}
-              options={eggItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${toFa(w.currentStock)} ${UNIT_LABEL[w.unit]}` }))}
-              placeholder="— متصل نکن —"
-              modalTitle="انتخاب آیتم تخم از انبار"
-              autoThreshold={6}
-            />
+        {selectedFlock && (
+          <Field label="نوع تخم سالم" autoFrom={selectedFlock.type === 'breeder' ? 'نوع گله (مادر)' : undefined} hint="تخم‌های سالم به کدوم انبار برن؟">
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button
+                type="button"
+                onClick={() => setForm(f => ({ ...f, eggCategory: 'eating' }))}
+                style={{
+                  flex: 1, padding: '10px 8px',
+                  background: (form.eggCategory || 'eating') === 'eating' ? 'var(--accent-soft)' : 'var(--btn-bg)',
+                  border: '1px solid ' + ((form.eggCategory || 'eating') === 'eating' ? 'var(--accent-border)' : 'var(--border)'),
+                  borderRadius: 'var(--r-md)',
+                  color: (form.eggCategory || 'eating') === 'eating' ? 'var(--accent)' : 'var(--muted)',
+                  fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >🥚 تخم مرغ خوراکی</button>
+              <button
+                type="button"
+                onClick={() => setForm(f => ({ ...f, eggCategory: 'fertile' }))}
+                style={{
+                  flex: 1, padding: '10px 8px',
+                  background: form.eggCategory === 'fertile' ? 'var(--purple-soft)' : 'var(--btn-bg)',
+                  border: '1px solid ' + (form.eggCategory === 'fertile' ? 'var(--purple)' : 'var(--border)'),
+                  borderRadius: 'var(--r-md)',
+                  color: form.eggCategory === 'fertile' ? 'var(--purple)' : 'var(--muted)',
+                  fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >🌱 تخم نطفه‌دار</button>
+            </div>
           </Field>
         )}
-        {form.stockItemId && int(form.totalCount) > 0 && (
-          <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
-            ✓ {toFa(int(form.totalCount))} تخم سالم به انبار اضافه می‌شه
+        {(int(form.totalCount) > 0 || (int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount)) > 0) && (
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, lineHeight: 1.7 }}>
+            ✓ {toFa(int(form.totalCount))} تخم {(form.eggCategory || 'eating') === 'fertile' ? 'نطفه‌دار' : 'مرغ'} → انبار
+            {(int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount)) > 0 && (
+              <>
+                <br />✓ {toFa(int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount))} تخم مصرفی (شکسته/نرم/کثیف) → انبار مصرفی
+              </>
+            )}
           </div>
         )}
 
