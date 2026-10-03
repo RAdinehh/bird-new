@@ -359,7 +359,7 @@ export default function EquipmentPage() {
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
-        footer={<div style={{ display: "flex", gap: 6 }}><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn><Btn variant="primary" onClick={save} style={{ flex: 1 }}>ذخیره</Btn>{!form.id ? <Btn variant="primary" onClick={saveAndNext} style={{ flex: 1 }}>+ بعدی</Btn> : null}</div>}>
+        footer={<div style={{ display: "flex", gap: 6 }}><Btn variant="primary" onClick={save} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
         <Grid2>
           <Field label="نوع" required>
             <Select value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
