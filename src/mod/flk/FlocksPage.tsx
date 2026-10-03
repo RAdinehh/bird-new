@@ -403,7 +403,7 @@ export default function FlocksPage() {
               const hall = halls.find(h => h.id === f.hallId);
               const zone = zones.find(z => z.id === f.zoneId);
               const ageDays = getAgeDays(f);
-              const lc = getLifecycle(f.type, ageDays);
+              const lc = getLifecycle(f.type, ageDays, breedStd.byBreedId(f.breedId)?.biology?.endOfCycleDay ?? null);
               const isArchived = f.status === 'archived' || f.status === 'sold';
               const ready = isLayingReady(f);
               const untilLay = daysUntilLaying(f);

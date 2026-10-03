@@ -93,19 +93,23 @@ export interface Lifecycle {
   progress: number;
 }
 
-export function getLifecycle(type: FlockType, ageDays: number): Lifecycle {
+export function getLifecycle(type: FlockType, ageDays: number, endOfCycleDay?: number | null): Lifecycle {
+  const cycle = endOfCycleDay && endOfCycleDay > 0 ? endOfCycleDay : (type === 'broiler' ? 42 : 500);
+  const p = (ageDays / cycle) * 100;
+
   if (type === 'broiler') {
-    if (ageDays <= 7) return { stage: 'chick', label: 'جوجه یک‌روزه', color: 'blue', progress: (ageDays / 42) * 100 };
-    if (ageDays <= 21) return { stage: 'growing', label: 'رشد سریع', color: 'blue', progress: (ageDays / 42) * 100 };
-    if (ageDays <= 42) return { stage: 'finisher', label: 'فینیشر', color: 'amber', progress: (ageDays / 42) * 100 };
+    if (ageDays <= 7) return { stage: 'chick', label: 'جوجه یک‌روزه', color: 'blue', progress: p };
+    if (ageDays <= 21) return { stage: 'growing', label: 'رشد سریع', color: 'blue', progress: p };
+    if (ageDays <= cycle) return { stage: 'finisher', label: 'فینیشر', color: 'amber', progress: p };
     return { stage: 'end', label: 'پایان دوره', color: 'gray', progress: 100 };
   }
-  if (ageDays <= 7) return { stage: 'chick1', label: 'جوجه یک‌روزه', color: 'blue', progress: (ageDays / 500) * 100 };
-  if (ageDays <= 28) return { stage: 'chick2', label: 'جوجه نوزاد', color: 'blue', progress: (ageDays / 500) * 100 };
-  if (ageDays <= 70) return { stage: 'growing', label: 'در حال رشد', color: 'blue', progress: (ageDays / 500) * 100 };
-  if (ageDays <= 120) return { stage: 'grower', label: 'گروور', color: 'amber', progress: (ageDays / 500) * 100 };
-  if (ageDays <= 140) return { stage: 'prelayer', label: 'پیش‌تخم‌گذار', color: 'amber', progress: (ageDays / 500) * 100 };
-  if (ageDays <= 500) return { stage: 'layer', label: 'تخم‌گذار', color: 'green', progress: (ageDays / 500) * 100 };
+
+  if (ageDays <= 7) return { stage: 'chick1', label: 'جوجه یک‌روزه', color: 'blue', progress: p };
+  if (ageDays <= 28) return { stage: 'chick2', label: 'جوجه نوزاد', color: 'blue', progress: p };
+  if (ageDays <= 70) return { stage: 'growing', label: 'در حال رشد', color: 'blue', progress: p };
+  if (ageDays <= 120) return { stage: 'grower', label: 'گروور', color: 'amber', progress: p };
+  if (ageDays <= 140) return { stage: 'prelayer', label: 'پیش‌تخم‌گذار', color: 'amber', progress: p };
+  if (ageDays <= cycle) return { stage: 'layer', label: 'تخم‌گذار', color: 'green', progress: p };
   return { stage: 'end', label: 'پایان دوره', color: 'gray', progress: 100 };
 }
 
