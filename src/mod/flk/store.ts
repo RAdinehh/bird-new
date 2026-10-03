@@ -69,6 +69,8 @@ export interface Flock {
   events?: FlockEvent[];
   mergedInto?: string;
   mergedInfo?: FlockMergeInfo;
+  sourceInvoiceId?: string;
+  sourceCategory?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -78,7 +80,7 @@ interface State {
   addEvent: (flockId: string, ev: Omit<FlockEvent, 'id'|'flockId'|'createdAt'>) => void;
   removeEvent: (flockId: string, eventId: string) => void;
   mergeFlocks: (targetId: string, sourceId: string, opts: { targetAgeDays: number; sourceAgeDays: number; hatchDate?: string }) => void;
-  add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => void;
+  add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => string;
   update: (id: string, patch: Partial<Flock>) => void;
   remove: (id: string) => void;
   archive: (id: string) => void;
@@ -91,7 +93,11 @@ export const useFlk = create<State>()(
   persist(
     (set, get) => ({
       flocks: [],
-      add: (f) => set({ flocks: [...get().flocks, {...f, id: uuid(), createdAt: now(), updatedAt: now()}] }),
+      add: (f) => {
+        const id = uuid();
+        set({ flocks: [...get().flocks, {...f, id, createdAt: now(), updatedAt: now()}] });
+        return id;
+      },
       update: (id, patch) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       remove: (id) => set({ flocks: get().flocks.filter(x => x.id !== id) }),
       archive: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', updatedAt: now()} : x) }),

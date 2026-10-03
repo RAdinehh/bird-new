@@ -6,6 +6,8 @@ import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ, addD
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { useWhs } from '../whs/store';
+import { useFlk } from '../flk/store';
+import { useBrd } from '../brd/store';
 import type { ItemCategoryFields } from '../../shr/utils/itemDetails';
 
 export type InvoiceType = 'purchase' | 'sale';
@@ -196,6 +198,83 @@ function applyInvoiceMovements(inv: Invoice, prevItems?: InvoiceItem[]): Invoice
   });
 }
 
+const BIRD_CATS = ['chick', 'adult', 'fertile_egg'];
+
+/** اعمال اثر فاکتور روی گله‌ها — خرید جوجه/پرنده → افزودن، فروش → کاهش */
+function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): void {
+  const flk = useFlk.getState();
+  const brd = useBrd.getState();
+
+  // ۱. برگردوندن اثر قبلی (در حالت ویرایش/حذف)
+  if (prev) {
+    for (const it of prev.items || []) {
+      if (!it.birdId || !it.flockId) continue;
+      if (!BIRD_CATS.includes(prev.category)) continue;
+      const qty = it.quantity || 0;
+      if (qty <= 0) continue;
+      const f = flk.flocks.find(x => x.id === it.flockId);
+      if (!f) continue;
+      const cur = f.currentCount ?? 0;
+      if (prev.type === 'purchase') {
+        flk.update(it.flockId, { currentCount: Math.max(0, cur - qty) });
+      } else if (prev.type === 'sale') {
+        flk.update(it.flockId, { currentCount: cur + qty });
+      }
+    }
+  }
+
+  // ۲. اعمال اثر جدید
+  if (!BIRD_CATS.includes(inv.category)) return;
+  for (const it of inv.items || []) {
+    if (!it.birdId) continue;
+    const qty = it.quantity || 0;
+    if (qty <= 0) continue;
+
+    if (inv.type === 'purchase') {
+      if (it.flockId) {
+        const f = flk.flocks.find(x => x.id === it.flockId);
+        if (!f) continue;
+        flk.update(it.flockId, { currentCount: (f.currentCount ?? 0) + qty });
+      } else {
+        // گله جدید بساز
+        const breed = brd.breeds.find(b => b.id === it.breedId);
+        const bird = brd.birds.find(b => b.id === it.birdId);
+        const name = `گله ${breed?.name || bird?.name || '?'} — ${inv.date}`;
+        flk.add({
+          name,
+          type: 'layer',
+          birdId: it.birdId,
+          breedId: it.breedId || '',
+          hallId: '',
+          zoneId: '',
+          initialCount: qty,
+          currentCount: qty,
+          maleCount: it.maleCount ?? null,
+          femaleCount: it.femaleCount ?? null,
+          layingStartDay: 0,
+          endOfCycleDay: null,
+          vaccineScheduleId: '',
+          hatchDate: '',
+          purchaseDate: inv.date,
+          startDate: inv.date,
+          source: 'purchase',
+          purchasePrice: it.unitPrice || 0,
+          deliveryCost: it.shipping || 0,
+          otherCosts: 0,
+          status: 'active',
+          notes: `از فاکتور ${inv.number || ''}`,
+          sourceInvoiceId: inv.id,
+          sourceCategory: inv.category,
+        });
+      }
+    } else if (inv.type === 'sale' && it.flockId) {
+      const f = flk.flocks.find(x => x.id === it.flockId);
+      if (!f) continue;
+      flk.update(it.flockId, { currentCount: Math.max(0, (f.currentCount ?? 0) - qty) });
+    }
+  }
+}
+
 const now = () => new Date().toISOString();
 
 export const useTra = create<State>()(
@@ -206,7 +285,9 @@ export const useTra = create<State>()(
       addInvoice: (i) => {
         const id = uuid();
         const num = 'INV-' + Date.now().toString(36).toUpperCase();
-        set({ invoices: [...get().invoices, { ...i, id, number: i.number || num, createdAt: now(), updatedAt: now() } as any] });
+        const newInv = { ...i, id, number: i.number || num, createdAt: now(), updatedAt: now() } as any;
+        set({ invoices: [...get().invoices, newInv] });
+        try { applyInvoiceFlocks(newInv); } catch(e) {}
         return id;
       },
       updateInvoice: (id, patch) => {
@@ -214,11 +295,26 @@ export const useTra = create<State>()(
         if (!prev) return;
         const merged = { ...prev, ...patch, updatedAt: now() } as Invoice;
         const items = applyInvoiceMovements(merged, prev.items);
-        set({ invoices: get().invoices.map(x => x.id === id ? { ...merged, items } : x) });
+        const final = { ...merged, items };
+        set({ invoices: get().invoices.map(x => x.id === id ? final : x) });
+        try { applyInvoiceFlocks(final, prev); } catch(e) {}
       },
       deleteInvoice: (id) => {
         const inv = get().invoices.find(x => x.id === id);
         if (inv) {
+          // revert flock effect
+          const flk = useFlk.getState();
+          for (const it of inv.items || []) {
+            if (!it.birdId || !it.flockId) continue;
+            if (!BIRD_CATS.includes(inv.category)) continue;
+            const qty = it.quantity || 0;
+            if (qty <= 0) continue;
+            const f = flk.flocks.find(x => x.id === it.flockId);
+            if (!f) continue;
+            const cur = f.currentCount ?? 0;
+            if (inv.type === 'purchase') flk.update(it.flockId, { currentCount: Math.max(0, cur - qty) });
+            else if (inv.type === 'sale') flk.update(it.flockId, { currentCount: cur + qty });
+          }
           const whs = useWhs.getState();
           inv.items.forEach(it => {
             if (it.movementId) {
