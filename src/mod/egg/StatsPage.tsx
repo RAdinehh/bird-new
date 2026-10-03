@@ -276,40 +276,60 @@ export default function StatsPage() {
             </div>
           )}
 
-          {/* خلاصه compact — ۴ کارت */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-            <div style={{ padding: '10px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>کل تخم</div>
-                <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)', marginTop: 2 }}>{toFa(stats.total.toLocaleString('fa-IR'))}</div>
-              </div>
-              <span style={{ fontSize: '1.6em', opacity: 0.5 }}>🥚</span>
-            </div>
-            <div style={{ padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>میانگین روزانه</div>
-                <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text)', marginTop: 2 }}>
-                  {canAvg ? toFa(stats.avgHealthy.toLocaleString('fa-IR')) : '—'}
-                </div>
-                <div style={{ fontSize: '10px', color: 'var(--muted)' }}>
-                  {canAvg ? `سالم از ${toFa(coverage.days)} روز` : 'داده کافی نیست'}
-                </div>
-              </div>
-              <span style={{ fontSize: '1.6em', opacity: 0.5 }}>📅</span>
-            </div>
+          {/* خلاصه — ۴ ستون */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 5 }}>
+            {/* summary4colApplied — رنگ‌بندی بهتر */}
+            <SummaryCard
+              icon="🥚"
+              label="کل تخم"
+              value={toFa(stats.total.toLocaleString('fa-IR'))}
+              sub={`از ${toFa(coverage.days)} روز`}
+              bg="linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04))"
+              border="var(--accent-border)"
+              color="var(--accent)"
+            />
+            <SummaryCard
+              icon="📅"
+              label="میانگین"
+              value={canAvg ? toFa(stats.avgHealthy.toLocaleString('fa-IR')) : '—'}
+              sub={canAvg ? 'سالم/روز' : 'داده کم'}
+              bg="linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04))"
+              border="rgba(59,130,246,0.4)"
+              color="#3b82f6"
+            />
+            <SummaryCard
+              icon="⚖️"
+              label="توده تخم"
+              value={`${toFa(eggMassKg.toLocaleString('fa-IR'))}`}
+              sub="کیلوگرم"
+              bg="linear-gradient(135deg, rgba(168,85,247,0.12), rgba(168,85,247,0.04))"
+              border="var(--purple)"
+              color="var(--purple)"
+            />
+            {forecast ? (
+              <SummaryCard
+                icon="🔮"
+                label="پیش‌بینی"
+                value={toFa(forecast.next7.toLocaleString('fa-IR'))}
+                sub="هفته بعد"
+                bg="linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04))"
+                border="var(--warn)"
+                color="var(--warn)"
+              />
+            ) : (
+              <SummaryCard
+                icon="🔮"
+                label="پیش‌بینی"
+                value="—"
+                sub="داده کم"
+                bg="var(--input-bg)"
+                border="var(--border)"
+                color="var(--muted)"
+              />
+            )}
           </div>
 
-          {/* توده تخم */}
-          <div style={{ padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>توده تخم (تقریبی)</div>
-              <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text)', marginTop: 2 }}>{toFa(eggMassKg.toLocaleString('fa-IR'))} kg</div>
-              <div style={{ fontSize: '10px', color: 'var(--muted)' }}>میانگین ۶۰ گرم/تخم</div>
-            </div>
-            <span style={{ fontSize: '1.6em', opacity: 0.5 }}>⚖️</span>
-          </div>
-
-          {/* مقایسه با دوره قبل */}
+                    {/* مقایسه با دوره قبل */}
           {prevRangeStats && prevRangeStats.healthy > 0 && (
             <div style={{ padding: '10px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
               <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>📊 مقایسه با دوره قبل</span>
@@ -559,6 +579,18 @@ function CompareRow({ label, cur, prev, inverse }: { label: string; cur: number;
       <span style={{ color, fontWeight: 700, marginLeft: 8, minWidth: 50, textAlign: 'left' }}>
         {rounded > 0 ? '+' : ''}{toFa(rounded)}٪
       </span>
+    </div>
+  );
+}
+
+
+function SummaryCard({ icon, label, value, sub, bg, border, color }: { icon: string; label: string; value: string; sub: string; bg: string; border: string; color: string }) {
+  return (
+    <div style={{ padding: '8px 4px', background: bg, border: `1px solid ${border}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, textAlign: 'center', minWidth: 0 }}>
+      <span style={{ fontSize: '1.2em' }}>{icon}</span>
+      <div style={{ fontSize: '10px', color, fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap' }}>{label}</div>
+      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{value}</div>
+      <div style={{ fontSize: '9px', color: 'var(--muted)', lineHeight: 1.2, whiteSpace: 'nowrap' }}>{sub}</div>
     </div>
   );
 }
