@@ -291,32 +291,43 @@ export default function HallsPage() {
                 <option value="">— انتخاب —</option>
                 {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </Select>
+              {form.breedId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const std = breedStd.byBreedId(form.breedId);
+                    if (!std) return;
+                    const area = (parseFloat(toEn(form.length)) || 0) * (parseFloat(toEn(form.width)) || 0);
+                    const cap = area > 0 && std.space?.densityMax ? Math.floor(area * std.space.densityMax) : null;
+                    const env = std.env?.[0];
+                    const patch: any = {};
+                    if (cap) patch.capacity = String(cap);
+                    if (env?.temp?.target != null) patch.targetTemp = String(env.temp.target);
+                    if (env?.humidity?.min != null) patch.targetHumidity = String(env.humidity.min);
+                    setForm(f => ({ ...f, ...patch }));
+                    showToast('از استاندارد پر شد', 'success', 1500);
+                  }}
+                  style={{
+                    marginTop: 4,
+                    padding: '4px 8px',
+                    background: 'var(--accent-soft)',
+                    border: '1px solid var(--accent-border)',
+                    borderRadius: 'var(--r-sm)',
+                    color: 'var(--accent)',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    fontSize: 11,
+                    fontWeight: 600,
+                  }}
+                >
+                  ✨ پر کردن خودکار
+                </button>
+              )}
             </Field>
             <Field label="ظرفیت">
               <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} />
             </Field>
           </Grid2>
-          {form.breedId && (
-            <Btn
-              size="sm"
-              full
-              onClick={() => {
-                const std = breedStd.byBreedId(form.breedId);
-                if (!std) return;
-                const area = (parseFloat(toEn(form.length)) || 0) * (parseFloat(toEn(form.width)) || 0);
-                const cap = area > 0 && std.space?.densityMax ? Math.floor(area * std.space.densityMax) : null;
-                const env = std.env?.[0];
-                const patch: any = {};
-                if (cap) patch.capacity = String(cap);
-                if (env?.temp?.target != null) patch.targetTemp = String(env.temp.target);
-                if (env?.humidity?.min != null) patch.targetHumidity = String(env.humidity.min);
-                setForm(f => ({ ...f, ...patch }));
-                showToast('مقادیر از استاندارد پر شد', 'success', 1500);
-              }}
-            >
-              ✨ پر کردن خودکار از استاندارد
-            </Btn>
-          )}
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
            color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
         <Grid3>
