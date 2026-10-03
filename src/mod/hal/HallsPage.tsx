@@ -321,25 +321,15 @@ export default function HallsPage() {
                 if (area > 0 && density) {
                   const cap = Math.floor(area * density);
                   return (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const env = std?.env?.[0];
-                        const patch: any = { capacity: String(cap) };
-                        if (env?.temp?.target != null) patch.targetTemp = String(env.temp.target);
-                        if (env?.humidity?.min != null) patch.targetHumidity = String(env.humidity.min);
-                        setForm(f => ({ ...f, ...patch }));
-                        showToast('از استاندارد پر شد', 'success', 1500);
-                      }}
+                    <div
                       style={{
                         marginTop: 4,
                         width: '100%',
                         padding: '6px 8px',
-                        background: 'var(--accent-soft)',
-                        border: '1px solid var(--accent-border)',
+                        background: 'var(--input-bg)',
+                        border: '1px solid var(--border)',
                         borderRadius: 'var(--r-sm)',
-                        color: 'var(--accent)',
-                        cursor: 'pointer',
+                        color: 'var(--muted)',
                         fontFamily: 'inherit',
                         fontSize: 11,
                         fontWeight: 600,
@@ -349,13 +339,48 @@ export default function HallsPage() {
                       }}
                     >
                       {toFa(area)} × {toFa(density)} = {toFa(cap)}
-                    </button>
+                    </div>
                   );
                 }
                 return null;
               })()}
             </Field>
           </Grid2>
+          {form.breedId && (
+            <button
+              type="button"
+              onClick={() => {
+                const std = breedStd.byBreedId(form.breedId);
+                if (!std) return;
+                const area = (parseFloat(toEn(form.length)) || 0) * (parseFloat(toEn(form.width)) || 0);
+                const density = std.space?.densityMax;
+                const cap = area > 0 && density ? Math.floor(area * density) : null;
+                const env = std.env?.[0];
+                const patch: any = {};
+                if (cap) patch.capacity = String(cap);
+                if (env?.temp?.target != null) patch.targetTemp = String(env.temp.target);
+                if (env?.humidity?.min != null) patch.targetHumidity = String(env.humidity.min);
+                setForm(f => ({ ...f, ...patch }));
+                showToast('مقادیر از استاندارد پر شد', 'success', 1500);
+              }}
+              style={{
+                marginTop: 6,
+                width: '100%',
+                padding: '8px',
+                background: 'var(--accent-soft)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: 'var(--r-md)',
+                color: 'var(--accent)',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                fontSize: 12,
+                fontWeight: 700,
+                textAlign: 'center',
+              }}
+            >
+              ✨ پر کردن خودکار از استاندارد
+            </button>
+          )}
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
            color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
         <Grid3>
