@@ -79,7 +79,22 @@ export const useFlk = create<State>()(
       update: (id, patch) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       remove: (id) => set({ flocks: get().flocks.filter(x => x.id !== id) }),
       archive: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', updatedAt: now()} : x) }),
-      restore: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', updatedAt: now()} : x) })
+      restore: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', updatedAt: now()} : x) }),
+
+      addEvent: (flockId, ev) => set({
+        flocks: get().flocks.map(f => {
+          if (f.id !== flockId) return f;
+          const newEvent: FlockEvent = { ...ev, id: uuid(), flockId, createdAt: now() };
+          return { ...f, events: [...(f.events || []), newEvent], updatedAt: now() };
+        })
+      }),
+      removeEvent: (flockId, eventId) => set({
+        flocks: get().flocks.map(f =>
+          f.id === flockId
+            ? { ...f, events: (f.events || []).filter(e => e.id !== eventId), updatedAt: now() }
+            : f
+        )
+      })
     }),
     { name: 'pm-flk' }
   )
