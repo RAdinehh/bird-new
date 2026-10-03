@@ -95,7 +95,6 @@ export default function ArchivePage() {
                 {f.hatchDate ? <Row l="هچ" v={toFa(f.hatchDate)} /> : null}
                 {f.purchaseDate ? <Row l="خرید" v={toFa(f.purchaseDate)} /> : null}
                 {f.startDate ? <Row l="شروع" v={toFa(f.startDate)} /> : null}
-                {f.endDate ? <Row l="پایان" v={toFa(f.endDate)} /> : null}
 
                 {costs.total > 0 ? (
                   <>
