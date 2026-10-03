@@ -20,6 +20,8 @@ export default function BirdsPage() {
   const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird, dedupeBirds } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
+  const [cycleFromPreset, setCycleFromPreset] = useState(false);
+  const [fcrFromPreset, setFcrFromPreset] = useState(false);
   const [error, setError] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
@@ -36,9 +38,10 @@ export default function BirdsPage() {
     });
   }, [_birdsRaw]);
 
-  const openNew = () => { setForm(empty); setError(''); setOpen(true); };
+  const openNew = () => { setForm(empty); setError(''); setOpen(true); setCycleFromPreset(false); setFcrFromPreset(false); };
   const openEdit = (b: Bird) => {
     setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '' });
+    setCycleFromPreset(false); setFcrFromPreset(false);
     setError(''); setOpen(true);
   };
   const save = async () => {
