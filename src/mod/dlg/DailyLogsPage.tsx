@@ -85,6 +85,8 @@ export default function DailyLogsPage() {
   const { addProduction, updateProduction, deleteProduction, findByLogId } = useEgg();
 
   const feedItems = whsItems.filter(x => x.category === 'feed');
+  const vaccineItems = whsItems.filter(x => x.category === 'vaccine');
+  const medicineItems = whsItems.filter(x => x.category === 'medicine' || x.category === 'herbal');
 
   const [tab, setTab] = useState<TabId>('today');
   const swipeRef = useSwipeTabs(['today', 'history', 'archive'], tab, (id) => setTab(id as TabId));
@@ -316,6 +318,23 @@ export default function DailyLogsPage() {
       ? Math.round(((hMin + hMax) / 2) * 10) / 10
       : num(form.humidity);
 
+    // ===== whs cascade: حذف movement های قبلی =====
+    if (form.id) {
+      const oldLog = logs.find(l => l.id === form.id);
+      oldLog?.vaccines?.forEach(v => { if (v.movementId) { try { deleteMovement(v.movementId); } catch {} } });
+      oldLog?.medications?.forEach(m => { if (m.movementId) { try { deleteMovement(m.movementId); } catch {} } });
+    }
+    const processedVaccines = form.vaccines.map(v => {
+      if (!v.itemId || !v.quantity || v.quantity <= 0) return { ...v, movementId: '' };
+      const mid = addMovement({ itemId: v.itemId, type: 'out', quantity: v.quantity, unitPrice: 0, reason: 'consumption', date: form.date, partyId: '', notes: `ثبت روزانه — واکسن ${v.name || ''}` });
+      return { ...v, movementId: mid || '' };
+    });
+    const processedMedications = form.medications.map(m => {
+      if (!m.itemId || !m.quantity || m.quantity <= 0) return { ...m, movementId: '' };
+      const mid = addMovement({ itemId: m.itemId, type: 'out', quantity: m.quantity, unitPrice: 0, reason: 'consumption', date: form.date, partyId: '', notes: `ثبت روزانه — دارو ${m.name || ''}` });
+      return { ...m, movementId: mid || '' };
+    });
+
     const data: Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'> = {
       flockId: form.flockId, date: form.date, entryTime: form.entryTime,
       temperature: calcTemp,
@@ -346,7 +365,7 @@ export default function DailyLogsPage() {
         .filter(w => w.weight > 0),
       weightGender: form.weightGender,
       deathsCount: dCount, deaths: form.deaths,
-      vaccines: form.vaccines, medications: form.medications,
+      vaccines: processedVaccines, medications: processedMedications,
       activities: form.activities, notes: form.notes.trim()
     };
     let logId: string;
@@ -954,7 +973,7 @@ export default function DailyLogsPage() {
 
           <SectionTitle>💉 واکسن و دارو</SectionTitle>
 
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: crypto.randomUUID(), name: '', dose: '', method: '', reaction: '' }] }))}>
+          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: crypto.randomUUID(), name: '', dose: '', method: '', reaction: '', itemId: '', quantity: null, movementId: '' }] }))}>
             + افزودن واکسن
           </Btn>
           {form.vaccines.map((v, i) => (
@@ -967,10 +986,34 @@ export default function DailyLogsPage() {
                 <Input placeholder="نام" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
                 <Input placeholder="دوز" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
               </Grid2>
+              {vaccineItems.length > 0 && (
+                <Grid2>
+                  <Field label="از انبار (اختیاری)">
+                    <SmartSelect
+                      value={v.itemId || ''}
+                      onChange={id => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
+                      options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${toFa(w.currentStock)} ${UNIT_LABEL[w.unit]}` }))}
+                      placeholder="— متصل نکن —"
+                      modalTitle="انتخاب از انبار"
+                      autoThreshold={6}
+                    />
+                  </Field>
+                  {v.itemId && (
+                    <Field label="مقدار مصرفی">
+                      <NumField
+                        value={v.quantity !== null && v.quantity !== undefined ? String(v.quantity) : ''}
+                        onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 } : x) }))}
+                        unit={UNIT_LABEL[vaccineItems.find(w => w.id === v.itemId)?.unit || 'pcs'] || ''}
+                        min={0}
+                      />
+                    </Field>
+                  )}
+                </Grid2>
+              )}
             </div>
           ))}
 
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, medications: [...f.medications, { id: crypto.randomUUID(), name: '', dose: '', method: '', withdrawalDays: null }] }))}>
+          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, medications: [...f.medications, { id: crypto.randomUUID(), name: '', dose: '', method: '', withdrawalDays: null, itemId: '', quantity: null, movementId: '' }] }))}>
             + افزودن دارو
           </Btn>
           {form.medications.map((m, i) => (
@@ -983,6 +1026,30 @@ export default function DailyLogsPage() {
                 <Input placeholder="نام" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
                 <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
               </Grid2>
+              {medicineItems.length > 0 && (
+                <Grid2>
+                  <Field label="از انبار (اختیاری)">
+                    <SmartSelect
+                      value={m.itemId || ''}
+                      onChange={id => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
+                      options={medicineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${toFa(w.currentStock)} ${UNIT_LABEL[w.unit]}` }))}
+                      placeholder="— متصل نکن —"
+                      modalTitle="انتخاب از انبار"
+                      autoThreshold={6}
+                    />
+                  </Field>
+                  {m.itemId && (
+                    <Field label="مقدار مصرفی">
+                      <NumField
+                        value={m.quantity !== null && m.quantity !== undefined ? String(m.quantity) : ''}
+                        onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 } : x) }))}
+                        unit={UNIT_LABEL[medicineItems.find(w => w.id === m.itemId)?.unit || 'pcs'] || ''}
+                        min={0}
+                      />
+                    </Field>
+                  )}
+                </Grid2>
+              )}
             </div>
           ))}
 

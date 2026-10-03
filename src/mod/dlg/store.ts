@@ -25,6 +25,9 @@ export interface Vaccine {
   dose: string;
   method: string;
   reaction: string;
+  itemId?: string;
+  quantity?: number | null;
+  movementId?: string;
 }
 
 export interface Medication {
@@ -33,6 +36,9 @@ export interface Medication {
   dose: string;
   method: string;
   withdrawalDays: number | null;
+  itemId?: string;
+  quantity?: number | null;
+  movementId?: string;
 }
 
 export interface Activity {
