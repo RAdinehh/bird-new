@@ -137,6 +137,7 @@ export default function FlocksPage() {
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
+  const [layingFromStd, setLayingFromStd] = useState(false);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
@@ -644,7 +645,16 @@ export default function FlocksPage() {
             <Field label="نژاد">
               <DependentSelect
                 value={form.breedId}
-                onChange={v => setForm(f => ({ ...f, breedId: v }))}
+                onChange={v => {
+                  const std = breedStd.byBreedId(v);
+                  const layStart = std?.biology?.layingStartDay;
+                  setForm(f => ({
+                    ...f,
+                    breedId: v,
+                    layingStartDay: layStart ? String(layStart) : f.layingStartDay,
+                  }));
+                  setLayingFromStd(!!layStart);
+                }}
                 parentValue={form.birdId}
                 parentLabel="پرنده"
                 options={breedsForBird.map(b => ({ value: b.id, label: b.name }))}
@@ -729,12 +739,15 @@ export default function FlocksPage() {
           {(form.type === 'layer' || form.type === 'breeder') ? (
             <Field
               label="سن شروع تخم‌گذاری (روز)"
-              hint={formStd?.biology?.layingStartDay ? 'عدد را تغییر بده اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)}
-              autoFrom={formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
+              hint={layingFromStd ? 'عدد را تغییر بده اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)}
+              autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
             >
               <NumField
                 value={form.layingStartDay}
-                onChange={e => setForm({ ...form, layingStartDay: e.target.value })}
+                onChange={e => {
+                  setForm({ ...form, layingStartDay: e.target.value });
+                  setLayingFromStd(false);
+                }}
                 placeholder={fmt.int(formLaying)}
                 unit="روز"
                 max={400}
