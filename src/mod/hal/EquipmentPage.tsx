@@ -17,10 +17,11 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
 
-function getCapacityHint(type: string, cap: number | null, hallVol: number | null): string {
+function getCapacityHint(type: string, cap: number | null, hallVol: number | null, count: number = 1, eff: number | null = null): string {
   if (!cap || !hallVol || hallVol <= 0) return '';
   if (type === 'fan' || type === 'cooler') {
-    const changesPerHour = cap / hallVol;
+    const totalCap = cap * count;
+    const changesPerHour = totalCap / hallVol;
     const minPerChange = Math.round(60 / changesPerHour);
     if (minPerChange <= 1) return 'هر دقیقه ۱ بار تعویض هوا — مناسب گرمای شدید';
     if (minPerChange <= 3) return 'هر ' + minPerChange + ' دقیقه ۱ بار تعویض هوا — مناسب تابستان';
@@ -28,8 +29,10 @@ function getCapacityHint(type: string, cap: number | null, hallVol: number | nul
     return 'هر ' + minPerChange + ' دقیقه ۱ بار تعویض هوا — مناسب زمستان';
   }
   if (type === 'lamp') {
-    const luxPerWatt = 85;
-    const lux = (cap * luxPerWatt) / (hallVol / 3);
+    const luxPerWatt = eff || 85;
+    const totalLumens = cap * count * luxPerWatt;
+    const area = hallVol / 3;
+    const lux = totalLumens / area;
     if (lux >= 20) return '~' + Math.round(lux) + ' لوکس — مناسب تخم‌گذار';
     if (lux >= 10) return '~' + Math.round(lux) + ' لوکس — مناسب پرورش';
     return '~' + Math.round(lux) + ' لوکس — نور کم';
@@ -439,7 +442,7 @@ export default function EquipmentPage() {
                     background: 'var(--accent-soft)',
                     borderRadius: 'var(--r-sm)',
                   }}>
-                    {getCapacityHint(form.type, parseFloat(toEn(form.capacity).replace('٫','.')) || null, hallVolume)}
+                    {getCapacityHint(form.type, parseFloat(toEn(form.capacity).replace('٫','.')) || null, hallVolume, parseInt(toEn(form.count)) || 1, parseFloat(toEn(form.efficiency).replace('٫','.')) || null)}
                   </div>
                 ) : null}
               </Field>
