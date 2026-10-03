@@ -25,7 +25,6 @@ export interface Flock {
   hatchDate: string;      // تاریخ هچ (اگر از جوجه‌کشی خودت)
   purchaseDate: string;   // تاریخ خرید
   startDate: string;      // تاریخ شروع نگهداری
-  endDate: string;
   source: string;
   purchasePrice: number | null;    // قیمت هر پرنده
   deliveryCost: number | null;     // هزینه حمل
@@ -54,8 +53,8 @@ export const useFlk = create<State>()(
       add: (f) => set({ flocks: [...get().flocks, {...f, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       update: (id, patch) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       remove: (id) => set({ flocks: get().flocks.filter(x => x.id !== id) }),
-      archive: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', endDate: new Date().toISOString().slice(0,10), updatedAt: now()} : x) }),
-      restore: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', endDate: '', updatedAt: now()} : x) })
+      archive: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', updatedAt: now()} : x) }),
+      restore: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', updatedAt: now()} : x) })
     }),
     { name: 'pm-flk' }
   )

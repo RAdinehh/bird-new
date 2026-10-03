@@ -214,7 +214,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
       initialCount: flockModal.count, currentCount: flockModal.count,
       maleCount: h.maleCount || null, femaleCount: h.femaleCount || null,
       layingStartDay: 140, vaccineScheduleId: '',
-      hatchDate: todayJ(), purchaseDate: '', startDate: todayJ(), endDate: '', source: 'hatch',
+      hatchDate: todayJ(), purchaseDate: '', startDate: todayJ(), source: 'hatch',
       purchasePrice: null, deliveryCost: null, otherCosts: null,
       status: 'active', notes: 'از هچ ' + toFa(h.date),
     } as any);
