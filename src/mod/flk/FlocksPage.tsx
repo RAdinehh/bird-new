@@ -7,6 +7,7 @@ import {
   DEFAULT_LAYING_START, getLayingStartDay
 } from './store';
 import { useBrd } from '../brd/store';
+import { format } from 'date-fns-jalali';
 import { schedulesByType, getSchedule } from '../cal/vaccineSchedules';
 import { useHal } from '../hal/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
@@ -54,6 +55,10 @@ type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'archived';
 
 
 /** چک ظرفیت سالن — مجموع گله‌های فعال + گله جدید */
+function todayJ(): string {
+  try { return format(new Date(), 'yyyy/MM/dd'); } catch { return ''; }
+}
+
 function checkHallCapacity(
   hallId: string,
   newCount: number,
@@ -622,7 +627,32 @@ export default function FlocksPage() {
               </Select>
             </Field>
             <Field label="منبع">
-              <Select value={form.source} onChange={e => setForm({ ...form, source: e.target.value })}>
+              <Select value={form.source} onChange={e => {
+                  const newSource = e.target.value;
+                  const today = todayJ();
+                  setForm(f => {
+                    if (newSource === 'hatch') {
+                      return {
+                        ...f,
+                        source: newSource,
+                        hatchDate: f.hatchDate || today,
+                        purchaseDate: '',
+                        purchasePrice: '',
+                        deliveryCost: '',
+                      };
+                    }
+                    if (newSource === 'purchase') {
+                      return {
+                        ...f,
+                        source: newSource,
+                        purchaseDate: f.purchaseDate || today,
+                        purchasePrice: f.purchasePrice,
+                        deliveryCost: f.deliveryCost,
+                      };
+                    }
+                    return { ...f, source: newSource };
+                  });
+                }}>
                 {Object.entries(SOURCE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </Select>
             </Field>
