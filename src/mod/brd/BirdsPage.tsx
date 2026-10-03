@@ -184,6 +184,8 @@ export default function BirdsPage() {
               cycleDays: preset?.cycleDays ? toFa(preset.cycleDays) : f.cycleDays,
               fcrStandard: preset?.fcrStandard ? toFa(preset.fcrStandard) : f.fcrStandard,
             }));
+            setCycleFromPreset(!!preset?.cycleDays);
+            setFcrFromPreset(!!preset?.fcrStandard);
           }}
           error={error || undefined}
         />
