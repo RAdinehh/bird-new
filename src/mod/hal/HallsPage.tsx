@@ -344,13 +344,11 @@ export default function HallsPage() {
                         fontSize: 11,
                         fontWeight: 600,
                         textAlign: 'center',
-                        lineHeight: 1.6,
+                        direction: 'ltr',
+                        fontVariantNumeric: 'tabular-nums',
                       }}
                     >
-                      <div>✨ پیشنهاد: {toFa(cap)} پرنده</div>
-                      <div style={{ fontSize: 10, opacity: 0.75, fontWeight: 500 }}>
-                        به ازای هر m²، {toFa(density)} پرنده · مساحت {toFa(area)} m²
-                      </div>
+                      {toFa(area)} × {toFa(density)} = {toFa(cap)}
                     </button>
                   );
                 }
