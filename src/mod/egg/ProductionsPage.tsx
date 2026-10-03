@@ -4,6 +4,8 @@
 import { useState, useMemo } from 'react';
 import { useEgg, healthyCount, henDayRate, brokenRate, type EggProduction } from './store';
 import { useFlk, getAgeDays } from '../flk/store';
+import { useWhs, UNIT_LABEL } from '../whs/store';
+import SmartSelect from '../../shr/components/SmartSelect';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
@@ -30,19 +32,21 @@ interface F {
   dirtyCount: string;
   avgWeight: string;
   notes: string;
+  stockItemId: string;
 }
 
 const empty = (): F => ({
   flockId: '', date: '',
   percent: '',
   totalCount: '', brokenCount: '', softCount: '', dirtyCount: '',
-  avgWeight: '', notes: ''
-});
+  avgWeight: '', notes: '', stockItemId: '' });
 
 export default function ProductionsPage() {
   const { productions, addProduction, updateProduction, deleteProduction } = useEgg();
   const { flocks } = useFlk();
   const { birds } = useBrd();
+  const { items: whsItems } = useWhs();
+  const eggItems = whsItems.filter(x => x.category === 'egg');
 
   const activeFlocks = flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder'));
 
@@ -83,7 +87,7 @@ export default function ProductionsPage() {
 
   const openEdit = (p: EggProduction) => {
     setForm({
-      id: p.id, flockId: p.flockId, date: p.date,
+      id: p.id, flockId: p.flockId, date: p.date, stockItemId: (p as any).stockItemId || '',
       percent: '',
       totalCount: p.totalCount ? toFa(p.totalCount) : '',
       brokenCount: p.brokenCount ? toFa(p.brokenCount) : '',
@@ -157,7 +161,8 @@ export default function ProductionsPage() {
       softCount: soft,
       dirtyCount: dirty,
       avgWeight: form.avgWeight ? num(form.avgWeight) : null,
-      notes: form.notes.trim()
+      notes: form.notes.trim(),
+      stockItemId: form.stockItemId || undefined,
     };
 
     if (form.id === undefined) {
@@ -410,6 +415,24 @@ export default function ProductionsPage() {
         <Field label="وزن میانگین تخم" hint="اختیاری">
           <NumField placeholder="مثلاً — ۱.۵" value={form.avgWeight} onChange={e => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
         </Field>
+
+        {eggItems.length > 0 && (
+          <Field label="ثبت به انبار تخم" autoFrom="انبار (موجودی اضافه می‌شه)" hint="اگه انتخاب کنی، تخم سالم به موجودی انبار اضافه می‌شه">
+            <SmartSelect
+              value={form.stockItemId}
+              onChange={v => setForm(f => ({ ...f, stockItemId: v }))}
+              options={eggItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${toFa(w.currentStock)} ${UNIT_LABEL[w.unit]}` }))}
+              placeholder="— متصل نکن —"
+              modalTitle="انتخاب آیتم تخم از انبار"
+              autoThreshold={6}
+            />
+          </Field>
+        )}
+        {form.stockItemId && int(form.totalCount) > 0 && (
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
+            ✓ {toFa(int(form.totalCount))} تخم سالم به انبار اضافه می‌شه
+          </div>
+        )}
 
         <Field label="یادداشت">
           <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
