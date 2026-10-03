@@ -22,51 +22,69 @@ const empty: F = { name:'', code:'', length:'', width:'', height:'', capacity:''
 
 function TempFormField({ value, onChange, label, placeholder }: any) {
   const tempUnit = useTempUnit();
-  const fmt = useFormat();
+  const [local, setLocal] = useState<string>('');
+  const [editing, setEditing] = useState(false);
+
   const celsius = (() => {
-    if (!value) return null;
+    if (value === '' || value == null) return null;
     const en = String(value).replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٫،]/g, '.');
     const n = parseFloat(en);
     return isNaN(n) ? null : n;
   })();
-  const displayed = celsius == null ? null : (
-    tempUnit === 'c' ? celsius : Math.round((celsius * 9 / 5 + 32) * 10) / 10
+
+  const displayVal = celsius == null ? '' : (
+    tempUnit === 'c' ? String(celsius) : String(Math.round((celsius * 9 / 5 + 32) * 10) / 10)
   );
+
+  const shown = editing ? local : displayVal;
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
     v = v.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
     v = v.replace(/[٫،]/g, '.');
     v = v.replace(/[^\d.-]/g, '');
+    setLocal(v);
     if (v === '' || v === '-' || v === '.') { onChange(''); return; }
     const n = parseFloat(v);
     if (isNaN(n)) return;
     const c = tempUnit === 'c' ? n : (n - 32) * 5 / 9;
     onChange(String(Math.round(c * 10) / 10));
   };
+
   return (
-    <Field label={label}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+      <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, textAlign: 'right' }}>{label}</span>
+      <div style={{
+        width: '100%', minWidth: 0, height: 38,
+        background: 'var(--input-bg)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r-md)',
+        padding: '0 12px',
+        display: 'flex', alignItems: 'center', gap: 8,
+        overflow: 'hidden',
+      }}>
         <input
           type="text"
           inputMode="decimal"
-          value={displayed == null ? '' : String(displayed)}
+          value={shown}
           onChange={handleChange}
+          onFocus={() => { setEditing(true); setLocal(displayVal); }}
+          onBlur={() => setEditing(false)}
           placeholder={placeholder}
-          onFocus={(e) => e.target.select()}
+          dir="ltr"
           style={{
-            flex: 1, height: 38, padding: '0 12px',
-            background: 'var(--input-bg)', border: '1px solid var(--border)',
-            borderRadius: 'var(--r-md)', color: 'var(--text)',
-            fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 600,
-            textAlign: 'right', outline: 'none',
-            fontVariantNumeric: 'tabular-nums', direction: 'ltr', minWidth: 0,
+            flex: '1 1 0%', width: '100%', minWidth: 0,
+            background: 'none', border: 'none', outline: 'none',
+            color: 'var(--text)', fontFamily: 'inherit',
+            fontSize: 'var(--fs-base)', fontWeight: 600,
+            textAlign: 'right',
           }}
         />
-        <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', flexShrink: 0, minWidth: 30, textAlign: 'left' }}>
+        <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--dim)', flexShrink: 0 }}>
           {tempUnit === 'c' ? '°C' : '°F'}
         </span>
       </div>
-    </Field>
+    </div>
   );
 }
 
