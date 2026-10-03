@@ -482,10 +482,30 @@ export default function FlocksPage() {
                       <Row l="تلفات" v={`${fmt.int(f.initialCount - f.currentCount)} (${toFa(((f.initialCount - f.currentCount) / f.initialCount * 100).toFixed(1))}٪)`} />
                     )}
                     {f.type === 'breeder' && f.maleCount && f.femaleCount && (
-                      <Row l="نسبت خروس/مرغ" v={sexRatio(f.maleCount, f.femaleCount)} />
+                      <>
+                        <Row l="تعداد خروس" v={fmt.int(f.maleCount)} />
+                        <Row l="تعداد مرغ" v={fmt.int(f.femaleCount)} />
+                        <Row l="نسبت خروس/مرغ" v={sexRatio(f.maleCount, f.femaleCount)} />
+                      </>
                     )}
-                    <Row l="منبع" v={SOURCE_LABEL[f.source] || '—'} />
+                    {breed && <Row l="نژاد" v={breed.name} />}
+                    {hall && <Row l="سالن" v={hall.name} />}
                     {zone && <Row l="بخش" v={zone.name} />}
+                    <Row l="منبع" v={SOURCE_LABEL[f.source] || '—'} />
+                    {f.endOfCycleDay && (
+                      <Row l="چرخه زندگی" v={`${fmt.int(f.endOfCycleDay)} روز`} />
+                    )}
+                    {(() => {
+                      const std = breedStd.byBreedId(f.breedId);
+                      const layStart = std?.biology?.layingStartDay;
+                      if (!layStart || (f.type !== 'layer' && f.type !== 'breeder')) return null;
+                      return <Row l="سن تخم‌گذاری" v={`${fmt.int(layStart)} روز`} />;
+                    })()}
+                    {f.vaccineScheduleId && (() => {
+                      const sch = getSchedule(f.vaccineScheduleId);
+                      if (!sch) return null;
+                      return <Row l="برنامه واکسن" v={`${sch.label} · ${toFa(sch.items.length)} مرحله`} />;
+                    })()}
                   </div>
 
                   {/* هزینه‌ها */}
