@@ -196,6 +196,7 @@ export default function FlocksPage() {
       currentCount: int(form.currentCount) || int(form.initialCount),
       maleCount: int(form.maleCount), femaleCount: int(form.femaleCount),
       layingStartDay: form.layingStartDay.trim() === '' ? (breedStd.byBreedId(form.breedId)?.biology?.layingStartDay ?? LAYING_START_DAY) : (int(form.layingStartDay) || LAYING_START_DAY),
+      endOfCycleDay: breedStd.byBreedId(form.breedId)?.biology?.endOfCycleDay ?? null,
       hatchDate: form.hatchDate.trim(), purchaseDate: form.purchaseDate.trim(),
       startDate: form.startDate.trim(), endDate: '',
       source: form.source,
@@ -403,7 +404,7 @@ export default function FlocksPage() {
               const hall = halls.find(h => h.id === f.hallId);
               const zone = zones.find(z => z.id === f.zoneId);
               const ageDays = getAgeDays(f);
-              const lc = getLifecycle(f.type, ageDays, breedStd.byBreedId(f.breedId)?.biology?.endOfCycleDay ?? null);
+              const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null);
               const isArchived = f.status === 'archived' || f.status === 'sold';
               const ready = isLayingReady(f);
               const untilLay = daysUntilLaying(f);
