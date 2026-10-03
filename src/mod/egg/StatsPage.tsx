@@ -356,18 +356,28 @@ function SummaryCard({ icon, label, value, sub, tone }: { icon: string; label: s
     purple: { color: 'var(--purple)', border: 'var(--purple)', bg: 'var(--purple-soft)' },
     warn: { color: 'var(--warn)', border: 'var(--warn)', bg: 'var(--warn-soft)' },
   }[tone];
+  /* cardCenterApplied */
   return (
-    <div style={{ padding: '12px 14px', background: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-      <span style={{ fontSize: '1.6em', flexShrink: 0 }}>{icon}</span>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 'var(--fs-xs)', color: colors.color, fontWeight: 700 }}>{label}</div>
-        <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{value}</div>
-        <div style={{ fontSize: '10px', color: 'var(--muted)' }}>{sub}</div>
-      </div>
+    <div style={{
+      padding: '16px 10px',
+      background: colors.bg,
+      border: `1px solid ${colors.border}`,
+      borderRadius: 'var(--r-md)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 4,
+      textAlign: 'center',
+      minHeight: 118,
+    }}>
+      <span style={{ fontSize: '1.8em', lineHeight: 1, marginBottom: 2 }}>{icon}</span>
+      <div style={{ fontSize: 'var(--fs-xs)', color: colors.color, fontWeight: 700 }}>{label}</div>
+      <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums', lineHeight: 1.15 }}>{value}</div>
+      <div style={{ fontSize: '10px', color: 'var(--muted)', lineHeight: 1.3 }}>{sub}</div>
     </div>
   );
 }
-
 function QualityBar({ icon, label, pct, count, total, color }: { icon: string; label: string; pct: number; count: number; total: number; color: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
