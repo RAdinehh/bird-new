@@ -650,7 +650,8 @@ export default function FlocksPage() {
             <DepBox title="🥚 سن شروع تخم‌گذاری">
               <Field
                 label="سن تخم‌گذاری"
-                hint={(formStd?.biology?.layingStartDay ? '✨ استاندارد نژاد: ' + toFa(formStd.biology.layingStartDay) : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)) + ' روز — اگر نژاد شما فرق دارد، عدد خودتان را وارد کنید'}
+                hint={formStd?.biology?.layingStartDay ? 'عدد خودتان را وارد کنید اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START) + ' روز'}
+                autoFrom={formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
               >
                 <NumField
                   value={form.layingStartDay}
