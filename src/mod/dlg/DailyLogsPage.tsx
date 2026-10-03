@@ -35,6 +35,8 @@ import UndoBar from '../../cor/ui/UndoBar';
 import { Section, SectionTitle, Row } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
+import { useValidation } from '../../shr/validation/useValidation';
+import { createDlgSchema } from '../../shr/validation/rules/dlg';
 
 interface F {
   id?: string;
@@ -193,6 +195,47 @@ export default function DailyLogsPage() {
   const flockAliveCount = selectedFlock?.currentCount || selectedFlock?.initialCount || 0;
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
+
+  // ═══ اعتبارسنجی زنده ═══
+  const validationContext = {
+    flockCount: selectedFlock?.initialCount || 0,
+    flockCurrentCount: selectedFlock?.currentCount || flockAliveCount,
+    flockType: selectedFlock?.type,
+  };
+  const { errors: vErrors } = useValidation(
+    createDlgSchema(validationContext),
+    {
+      flockId: form.flockId || '',
+      date: form.date || '',
+      entryTime: form.entryTime || '',
+      temperature: num(form.temperature),
+      temperatureMin: num(form.temperatureMin),
+      temperatureMax: num(form.temperatureMax),
+      humidity: num(form.humidity),
+      humidityMin: num(form.humidityMin),
+      humidityMax: num(form.humidityMax),
+      lightHours: int(form.lightHours),
+      feedAmount: num(form.feedAmount),
+      feedRemaining: num(form.feedRemaining),
+      feedSourceId: form.feedSourceId || '',
+      waterAmount: num(form.waterAmount),
+      waterFillCount: int(form.waterFillCount),
+      waterFillVolume: num(form.waterFillVolume),
+      eatingEggs: int(form.eatingEggs) ?? 0,
+      fertileEggs: int(form.fertileEggs) ?? 0,
+      brokenEggs: int(form.brokenEggs) ?? 0,
+      otherEggs: int(form.otherEggs) ?? 0,
+      brokenTarget: (form as any).brokenTarget || 'consumption',
+      otherTarget: (form as any).otherTarget || 'consumption',
+      deathsCount: form.deaths.reduce((a, x) => a + (x.count || 0), 0),
+      deaths: form.deaths,
+      vaccines: form.vaccines,
+      medications: form.medications,
+      weightSamples: form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 })),
+      activities: form.activities,
+      notes: form.notes || '',
+    },
+  );
 
   const onFlockChange = (flockId: string) => {
     const sys = detectSystems(flockId);

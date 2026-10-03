@@ -227,9 +227,13 @@ interface FieldProps {
   hint?: string;
   /** 🆕 اگه فیلد خودکار از ماژول دیگه پر شده — نام ماژول */
   autoFrom?: string;
+  /** 🆕 پیام خطای اعتبارسنجی — قرمز */
+  error?: string;
+  /** 🆕 پیام هشدار — زرد */
+  warning?: string;
   children: React.ReactNode;
 }
-export function Field({ label, required, hint, autoFrom, children }: FieldProps) {
+export function Field({ label, required, hint, autoFrom, error, warning, children }: FieldProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
       <label style={{
@@ -268,6 +272,36 @@ export function Field({ label, required, hint, autoFrom, children }: FieldProps)
           paddingRight: 2,
           lineHeight: 1.4,
         }}>{'✨ از ' + autoFrom}</div>
+      )}
+      {error && (
+        <div style={{
+          fontSize: 11,
+          color: 'var(--danger)',
+          fontWeight: 600,
+          paddingRight: 2,
+          lineHeight: 1.5,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+        }}>
+          <span aria-hidden="true">⚠️</span>
+          <span>{error}</span>
+        </div>
+      )}
+      {!error && warning && (
+        <div style={{
+          fontSize: 11,
+          color: 'var(--warn)',
+          fontWeight: 600,
+          paddingRight: 2,
+          lineHeight: 1.5,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+        }}>
+          <span aria-hidden="true">💡</span>
+          <span>{warning}</span>
+        </div>
       )}
     </div>
   );
