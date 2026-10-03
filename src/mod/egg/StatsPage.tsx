@@ -6,6 +6,7 @@ import { useEgg } from './store';
 import { useFlk } from '../flk/store';
 import { PageContainer, Select, Empty } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
+import { BarChart, LineChart, DualBarChart, PieChart } from '../../shr/components/Charts';
 
 type Range = '7' | '30' | '90' | 'all';
 
@@ -30,6 +31,7 @@ export default function StatsPage() {
   const { flocks } = useFlk();
   const [filterFlock, setFilterFlock] = useState('');
   const [range, setRange] = useState<Range>('30');
+  const [chartType, setChartType] = useState<'bar' | 'line' | 'dual' | 'pie'>('bar');
 
   const activeFlocks = flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder'));
 
@@ -117,6 +119,40 @@ export default function StatsPage() {
     return null;
   }, [trend]);
 
+  const weekly = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const p of filtered) {
+      const d = toEnDate(p.date || '');
+      const parts = d.split('/');
+      if (parts.length !== 3) continue;
+      const dt = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      const day = dt.getDay();
+      const diff = (day + 1) % 7; // شنبه=0
+      const start = new Date(dt);
+      start.setDate(dt.getDate() - diff);
+      const key = `${start.getFullYear()}/${String(start.getMonth() + 1).padStart(2, '0')}/${String(start.getDate()).padStart(2, '0')}`;
+      const h = (p.eatingCount || 0) + (p.fertileCount || 0);
+      map.set(key, (map.get(key) || 0) + h);
+    }
+    return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0])).slice(-8).map(([week, total]) => ({ week, total }));
+  }, [filtered]);
+
+  const monthly = useMemo(() => {
+    const map = new Map<string, { total: number; fertile: number; broken: number }>();
+    for (const p of filtered) {
+      const d = toEnDate(p.date || '');
+      const parts = d.split('/');
+      if (parts.length !== 3) continue;
+      const key = `${parts[0]}/${parts[1]}`;
+      if (!map.has(key)) map.set(key, { total: 0, fertile: 0, broken: 0 });
+      const r = map.get(key)!;
+      r.total += (p.eatingCount || 0) + (p.fertileCount || 0);
+      r.fertile += p.fertileCount || 0;
+      r.broken += p.brokenCount || 0;
+    }
+    return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0])).slice(-6).map(([month, v]) => ({ month, ...v }));
+  }, [filtered]);
+
   const rangeLabel = range === '7' ? '۷ روز' : range === '30' ? '۳۰ روز' : range === '90' ? '۹۰ روز' : 'کل';
 
   return (
@@ -183,31 +219,99 @@ export default function StatsPage() {
             )}
           </div>
 
-          {/* روند روزانه */}
+          {/* روند روزانه — چند حالت */}
           {trend.days.length >= 2 && (
-            <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
                 <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>📈 روند روزانه</span>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(trend.days.length)} روز</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 90 }}>
-                {trend.days.map(d => (
-                  <div key={d.date} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 0, minWidth: 0 }}>
-                    {d.broken > 0 && (
-                      <div style={{ width: '100%', height: `${Math.max(2, (d.broken / trend.max) * 70)}px`, background: 'var(--warn)', borderRadius: '2px 2px 0 0' }} title={`${d.date}: ${d.healthy} سالم + ${d.broken} شکسته`} />
-                    )}
-                    <div style={{ width: '100%', height: `${Math.max(2, (d.healthy / trend.max) * 70)}px`, background: 'var(--accent)', borderRadius: '2px 2px 0 0' }} title={`${d.date}: ${d.healthy} سالم`} />
-                  </div>
-                ))}
+
+              {/* انتخاب نوع نمودار */}
+              <div style={{ display: 'flex', gap: 4 }}>
+                <ChartTab active={chartType === 'bar'} onClick={() => setChartType('bar')} icon="📊" label="میله‌ای" />
+                <ChartTab active={chartType === 'line'} onClick={() => setChartType('line')} icon="📈" label="خطی" />
+                <ChartTab active={chartType === 'dual'} onClick={() => setChartType('dual')} icon="📉" label="دو-ستونی" />
+                <ChartTab active={chartType === 'pie'} onClick={() => setChartType('pie')} icon="🥧" label="دایره‌ای" />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--muted)' }}>
-                <span>{toFa(shortDate(trend.days[0]?.date || ''))}</span>
-                <span style={{ display: 'flex', gap: 8 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><span style={{ width: 8, height: 8, background: 'var(--accent)', borderRadius: 1 }} /> سالم</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><span style={{ width: 8, height: 8, background: 'var(--warn)', borderRadius: 1 }} /> شکسته</span>
-                </span>
-                <span>{toFa(shortDate(trend.days[trend.days.length - 1]?.date || ''))}</span>
+
+              {chartType === 'bar' && (
+                <BarChart
+                  data={trend.days.map(d => ({ label: shortDate(d.date), value: d.healthy }))}
+                  color="var(--accent)"
+                  height={140}
+                />
+              )}
+              {chartType === 'line' && (
+                <LineChart
+                  data={trend.days.map(d => ({ label: shortDate(d.date), value: d.healthy }))}
+                  color="var(--accent)"
+                  height={140}
+                />
+              )}
+              {chartType === 'dual' && (
+                <DualBarChart
+                  data={trend.days.map(d => ({ label: shortDate(d.date), a: d.healthy, b: d.broken }))}
+                  colorA="var(--accent)"
+                  colorB="var(--warn)"
+                  labelA="سالم"
+                  labelB="شکسته"
+                  height={140}
+                />
+              )}
+              {chartType === 'pie' && (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
+                  <PieChart
+                    data={[
+                      { label: 'خوراکی', value: stats.eating, color: 'var(--accent)' },
+                      { label: 'نطفه‌دار', value: stats.fertile, color: 'var(--purple)' },
+                      { label: 'شکسته', value: stats.broken, color: 'var(--warn)' },
+                      { label: 'سایر', value: stats.other, color: 'var(--muted)' },
+                    ].filter(x => x.value > 0)}
+                    size={160}
+                  />
+                </div>
+              )}
+
+              {/* خلاصه روند */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>بیشترین</div>
+                  <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(trend.max.toLocaleString('fa-IR'))}</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>کمترین</div>
+                  <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--text)' }}>{toFa(Math.min(...trend.days.map(d => d.healthy)).toLocaleString('fa-IR'))}</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>میانگین</div>
+                  <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--text)' }}>{toFa(Math.round(trend.days.reduce((a, d) => a + d.healthy, 0) / trend.days.length).toLocaleString('fa-IR'))}</div>
+                </div>
               </div>
+            </div>
+          )}
+
+          {/* نمودار هفتگی */}
+          {weekly.length >= 2 && (
+            <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>📆 روند هفتگی</span>
+              <BarChart
+                data={weekly.map(w => ({ label: shortDate(w.week), value: w.total }))}
+                color="var(--purple)"
+                height={120}
+              />
+            </div>
+          )}
+
+          {/* نمودار ماهانه */}
+          {monthly.length >= 2 && (
+            <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>📅 روند ماهانه</span>
+              <BarChart
+                data={monthly.map(m => ({ label: m.month.split('/')[1], value: m.total }))}
+                color="var(--accent)"
+                height={100}
+              />
             </div>
           )}
 
@@ -261,5 +365,34 @@ function QualityBar({ icon, label, pct, count, total, color }: { icon: string; l
         <div style={{ height: '100%', width: `${Math.min(100, pct)}%`, background: color, borderRadius: 3, transition: 'width 250ms ease' }} />
       </div>
     </div>
+  );
+}
+
+
+function ChartTab({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: string; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        flex: 1,
+        padding: '6px 4px',
+        background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
+        border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+        borderRadius: 'var(--r-md)',
+        color: active ? 'var(--accent)' : 'var(--muted)',
+        fontFamily: 'inherit',
+        fontSize: 'var(--fs-xs)',
+        fontWeight: 700,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 3,
+      }}
+    >
+      <span>{icon}</span>
+      <span>{label}</span>
+    </button>
   );
 }
