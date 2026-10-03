@@ -186,10 +186,10 @@ export default function FlocksPage() {
     if (!form.name.trim()) { setErr('نام گله اجباری است'); return; }
 
     // ═══ قواعد منطقی ═══
-    const _init = int(form.initialCount);
+    const _init = int(form.initialCount) || 0;
     const _curr = int(form.currentCount) || _init;
-    const _male = int(form.maleCount);
-    const _female = int(form.femaleCount);
+    const _male = int(form.maleCount) || 0;
+    const _female = int(form.femaleCount) || 0;
 
     if (_curr > _init) {
       setErr(`تعداد فعلی (${toFa(_curr)}) نمی‌تواند بیشتر از تعداد اولیه (${toFa(_init)}) باشد`);
