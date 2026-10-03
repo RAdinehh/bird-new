@@ -50,7 +50,7 @@ interface F {
   waterMethod: 'manual' | 'nipple' | 'trough' | 'tank' | '';
   waterAmount: string; waterFillCount: string; waterFillVolume: string;
   weightSamples: { id: string; weight: string }[];
-  eggsCount: string; brokenEggs: string; dirtyEggs: string;
+  eatingEggs: string; fertileEggs: string; brokenEggs: string; otherEggs: string;
   weightGender: '' | 'male' | 'female' | 'mixed';
   deaths: Death[];
   vaccines: Vaccine[]; medications: Medication[]; activities: Activity[];
@@ -67,7 +67,7 @@ const newLog = (flockId = ''): F => ({
   feedSourceType: '', feedSourceId: '', feedMovementIds: [], feedMethod: '',
   waterMethod: '', waterAmount: '', waterFillCount: '', waterFillVolume: '',
   weightSamples: [], weightGender: '',
-  eggsCount: '', brokenEggs: '', dirtyEggs: '',
+  eatingEggs: '', fertileEggs: '', brokenEggs: '', otherEggs: '',
   deaths: [], vaccines: [], medications: [], activities: [],
   notes: ''
 });
@@ -174,9 +174,10 @@ export default function DailyLogsPage() {
       waterFillCount: l.waterFillCount !== null ? toFa(l.waterFillCount) : '',
       waterFillVolume: l.waterFillVolume !== null ? toFa(l.waterFillVolume) : '',
       weightSamples: (l.weightSamples || []).map(w => ({ id: w.id, weight: toFa(w.weight) })),
-      eggsCount: l.eggsCount ? toFa(l.eggsCount) : '',
+      eatingEggs: (l as any).eatingEggs ? toFa((l as any).eatingEggs) : (l.eggsCount ? toFa(l.eggsCount) : ''),
+      fertileEggs: (l as any).fertileEggs ? toFa((l as any).fertileEggs) : '',
       brokenEggs: l.brokenEggs ? toFa(l.brokenEggs) : '',
-      dirtyEggs: l.dirtyEggs ? toFa(l.dirtyEggs) : '',
+      otherEggs: (l as any).otherEggs ? toFa((l as any).otherEggs) : (l.dirtyEggs ? toFa(l.dirtyEggs) : ''),
       weightGender: l.weightGender || '',
       deaths: l.deaths || [], vaccines: l.vaccines || [],
       medications: l.medications || [], activities: l.activities || [],
@@ -388,9 +389,14 @@ const collectWhsShortages = () => {
       waterAmount: calcWater,
       waterFillCount: int(form.waterFillCount),
       waterFillVolume: num(form.waterFillVolume),
-      eggsCount: int(form.eggsCount),
+      eatingEggs: int(form.eatingEggs),
+      fertileEggs: int(form.fertileEggs),
       brokenEggs: int(form.brokenEggs),
-      dirtyEggs: int(form.dirtyEggs),
+      otherEggs: int(form.otherEggs),
+      brokenTarget: (form as any).brokenTarget || 'consumption',
+      otherTarget: (form as any).otherTarget || 'consumption',
+      eggsCount: int(form.eatingEggs),
+      dirtyEggs: int(form.otherEggs),
       weightSamples: form.weightSamples
         .map(w => ({ id: w.id, weight: parseFloat(toEn(w.weight).replace('٫','.')) || 0 }))
         .filter(w => w.weight > 0),
@@ -409,20 +415,21 @@ const collectWhsShortages = () => {
 
     // === sync با egg ===
     try {
-      const eggs = int(form.eggsCount) || 0;
+      const eating = int(form.eatingEggs) || 0;
+      const fertile = int(form.fertileEggs) || 0;
       const broken = int(form.brokenEggs) || 0;
-      const dirty = int(form.dirtyEggs) || 0;
+      const other = int(form.otherEggs) || 0;
       const existingProd = findByLogId(logId);
-      if (isLayerFlock && (eggs > 0 || broken > 0 || dirty > 0)) {
+      if (isLayerFlock && (eating + fertile + broken + other > 0)) {
         const prodData = {
           flockId: form.flockId,
           date: form.date,
-          eatingCount: eggs,
-          fertileCount: 0,
-          totalCount: eggs + broken,
+          eatingCount: eating,
+          fertileCount: fertile,
+          totalCount: eating + fertile + broken + other,
           brokenCount: broken,
           softCount: 0,
-          dirtyCount: dirty,
+          dirtyCount: other,
           avgWeight: null,
           notes: '',
           sourceLogId: logId,
@@ -910,17 +917,22 @@ const collectWhsShortages = () => {
           {isLayerFlock && (
           <>
             <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم‌گذاری</SectionTitle>
-            <Grid3>
-              <Field label="تعداد تخم">
-                <NumField placeholder="۰" value={form.eggsCount} onChange={e => setForm({...form, eggsCount: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
-              </Field>
-              <Field label="شکسته">
-                <NumField placeholder="۰" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} unit="عدد" min={0} />
-              </Field>
-              <Field label="کثیف">
-                <NumField placeholder="۰" value={form.dirtyEggs} onChange={e => setForm({...form, dirtyEggs: e.target.value})} unit="عدد" min={0} />
-              </Field>
-            </Grid3>
+            <Grid2>
+                  <Field label="🥚 تخم خوراکی">
+                    <NumField placeholder="۰" value={form.eatingEggs} onChange={e => setForm({...form, eatingEggs: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
+                  </Field>
+                  <Field label="🌱 تخم نطفه‌دار">
+                    <NumField placeholder="۰" value={form.fertileEggs} onChange={e => setForm({...form, fertileEggs: e.target.value})} unit="عدد" min={0} />
+                  </Field>
+                </Grid2>
+                <Grid2>
+                  <Field label="💔 شکسته">
+                    <NumField placeholder="۰" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} unit="عدد" min={0} />
+                  </Field>
+                  <Field label="📦 سایر (نرم/کثیف)">
+                    <NumField placeholder="۰" value={form.otherEggs} onChange={e => setForm({...form, otherEggs: e.target.value})} unit="عدد" min={0} />
+                  </Field>
+                </Grid2>
           </>
         )}
 
