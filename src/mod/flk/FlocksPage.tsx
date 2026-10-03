@@ -4,7 +4,7 @@ import {
   useFlk, type Flock, type FlockType, type FlockStatus,
   SOURCE_LABEL, getAgeDays, getLifecycle, formatAge,
   sexRatio, daysUntilLaying, isLayingReady, calcCosts,
-  LAYING_START_DAY, getLayingStartDay
+  DEFAULT_LAYING_START, getLayingStartDay
 } from './store';
 import { useBrd } from '../brd/store';
 import { schedulesByType, getSchedule } from '../cal/vaccineSchedules';
@@ -195,7 +195,7 @@ export default function FlocksPage() {
       initialCount: int(form.initialCount),
       currentCount: int(form.currentCount) || int(form.initialCount),
       maleCount: int(form.maleCount), femaleCount: int(form.femaleCount),
-      layingStartDay: form.layingStartDay.trim() === '' ? (breedStd.byBreedId(form.breedId)?.biology?.layingStartDay ?? LAYING_START_DAY) : (int(form.layingStartDay) || LAYING_START_DAY),
+      layingStartDay: form.layingStartDay.trim() === '' ? (breedStd.byBreedId(form.breedId)?.biology?.layingStartDay ?? DEFAULT_LAYING_START) : (int(form.layingStartDay) || DEFAULT_LAYING_START),
       endOfCycleDay: breedStd.byBreedId(form.breedId)?.biology?.endOfCycleDay ?? null,
       hatchDate: form.hatchDate.trim(), purchaseDate: form.purchaseDate.trim(),
       startDate: form.startDate.trim(), endDate: '',
@@ -227,7 +227,7 @@ export default function FlocksPage() {
   };
 
   const formStd = breedStd.byBreedId(form.breedId);
-  const formLaying = formStd?.biology?.layingStartDay ?? LAYING_START_DAY;
+  const formLaying = formStd?.biology?.layingStartDay ?? DEFAULT_LAYING_START;
 
   const list = useMemo(() => {
     let arr = flocks;
@@ -318,7 +318,7 @@ export default function FlocksPage() {
             if (f.status !== 'active') return false;
             if (f.type !== 'layer' && f.type !== 'breeder') return false;
             const std = breedStd.byBreedId(f.breedId);
-            const startDay = getLayingStartDay(f, std?.biology?.layingStartDay ?? LAYING_START_DAY);
+            const startDay = getLayingStartDay(f, std?.biology?.layingStartDay ?? DEFAULT_LAYING_START);
             const age = getAgeDays(f);
             return age < startDay && age >= startDay - 60;
           }).sort((a, b) => getAgeDays(b) - getAgeDays(a));
@@ -345,7 +345,7 @@ export default function FlocksPage() {
                 {upcoming.map(f => {
                   const age = getAgeDays(f);
                   const std = breedStd.byBreedId(f.breedId);
-            const startDay = getLayingStartDay(f, std?.biology?.layingStartDay ?? LAYING_START_DAY);
+            const startDay = getLayingStartDay(f, std?.biology?.layingStartDay ?? DEFAULT_LAYING_START);
                   const remain = startDay - age;
                   const bird = birds.find(b => b.id === f.birdId);
                   return (
@@ -650,7 +650,7 @@ export default function FlocksPage() {
             <DepBox title="🥚 سن شروع تخم‌گذاری">
               <Field
                 label="سن تخم‌گذاری"
-                hint={(formStd?.biology?.layingStartDay ? '✨ استاندارد نژاد: ' + toFa(formStd.biology.layingStartDay) : 'پیش‌فرض ' + toFa(LAYING_START_DAY)) + ' روز — اگر نژاد شما فرق دارد، عدد خودتان را وارد کنید'}
+                hint={(formStd?.biology?.layingStartDay ? '✨ استاندارد نژاد: ' + toFa(formStd.biology.layingStartDay) : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)) + ' روز — اگر نژاد شما فرق دارد، عدد خودتان را وارد کنید'}
               >
                 <NumField
                   value={form.layingStartDay}

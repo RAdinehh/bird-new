@@ -127,11 +127,11 @@ export function sexRatio(male: number | null, female: number | null): string {
   return `۱ به ${r.toFixed(1)}`;
 }
 
-/** آیا گله آماده تخم‌گذاری است؟ (۱۴۰ روز برای تخم‌گذار) */
-export const LAYING_START_DAY = 140;
+/** سن پیش‌فرض تخم‌گذاری (اگه استاندارد نژاد موجود نبود) — استاندارد ایران */
+export const DEFAULT_LAYING_START = 150;
 
 /** سن شروع تخم‌گذاری این گله — اگر کاربر پر کرده، آن، وگرنه پیش‌فرض */
-export function getLayingStartDay(f: Flock, fallback = LAYING_START_DAY): number {
+export function getLayingStartDay(f: Flock, fallback = DEFAULT_LAYING_START): number {
   if (f.layingStartDay && f.layingStartDay > 0) return f.layingStartDay;
   return fallback;
 }
