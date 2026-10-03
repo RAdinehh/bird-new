@@ -276,52 +276,52 @@ export default function StatsPage() {
             </div>
           )}
 
-          {/* خلاصه — ۴ ستون */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 5 }}>
-            {/* summary4colApplied — رنگ‌بندی بهتر */}
+          {/* خلاصه — ۲×۲ */}
+          {/* summary2x2Applied */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <SummaryCard
               icon="🥚"
               label="کل تخم"
               value={toFa(stats.total.toLocaleString('fa-IR'))}
-              sub={`از ${toFa(coverage.days)} روز`}
-              bg="linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04))"
+              sub={`در ${toFa(coverage.days)} روز`}
+              bg="linear-gradient(135deg, rgba(34,197,94,0.14), rgba(34,197,94,0.05))"
               border="var(--accent-border)"
               color="var(--accent)"
             />
             <SummaryCard
               icon="📅"
-              label="میانگین"
+              label="میانگین روزانه"
               value={canAvg ? toFa(stats.avgHealthy.toLocaleString('fa-IR')) : '—'}
-              sub={canAvg ? 'سالم/روز' : 'داده کم'}
-              bg="linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04))"
+              sub={canAvg ? 'تخم سالم' : 'داده کافی نیست'}
+              bg="linear-gradient(135deg, rgba(59,130,246,0.14), rgba(59,130,246,0.05))"
               border="rgba(59,130,246,0.4)"
               color="#3b82f6"
             />
             <SummaryCard
               icon="⚖️"
               label="توده تخم"
-              value={`${toFa(eggMassKg.toLocaleString('fa-IR'))}`}
-              sub="کیلوگرم"
-              bg="linear-gradient(135deg, rgba(168,85,247,0.12), rgba(168,85,247,0.04))"
+              value={`${toFa(eggMassKg.toLocaleString('fa-IR'))} kg`}
+              sub="میانگین ۶۰ گرم/تخم"
+              bg="linear-gradient(135deg, rgba(168,85,247,0.14), rgba(168,85,247,0.05))"
               border="var(--purple)"
               color="var(--purple)"
             />
             {forecast ? (
               <SummaryCard
                 icon="🔮"
-                label="پیش‌بینی"
+                label="پیش‌بینی هفته بعد"
                 value={toFa(forecast.next7.toLocaleString('fa-IR'))}
-                sub="هفته بعد"
-                bg="linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04))"
+                sub={`بر اساس ${toFa(forecast.days)} روز اخیر`}
+                bg="linear-gradient(135deg, rgba(245,158,11,0.14), rgba(245,158,11,0.05))"
                 border="var(--warn)"
                 color="var(--warn)"
               />
             ) : (
               <SummaryCard
                 icon="🔮"
-                label="پیش‌بینی"
+                label="پیش‌بینی هفته بعد"
                 value="—"
-                sub="داده کم"
+                sub="داده کافی نیست"
                 bg="var(--input-bg)"
                 border="var(--border)"
                 color="var(--muted)"
@@ -586,11 +586,13 @@ function CompareRow({ label, cur, prev, inverse }: { label: string; cur: number;
 
 function SummaryCard({ icon, label, value, sub, bg, border, color }: { icon: string; label: string; value: string; sub: string; bg: string; border: string; color: string }) {
   return (
-    <div style={{ padding: '8px 4px', background: bg, border: `1px solid ${border}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, textAlign: 'center', minWidth: 0 }}>
-      <span style={{ fontSize: '1.2em' }}>{icon}</span>
-      <div style={{ fontSize: '10px', color, fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap' }}>{label}</div>
-      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{value}</div>
-      <div style={{ fontSize: '9px', color: 'var(--muted)', lineHeight: 1.2, whiteSpace: 'nowrap' }}>{sub}</div>
+    <div style={{ padding: '14px 12px', background: bg, border: `1px solid ${border}`, borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+      <span style={{ fontSize: '1.7em', flexShrink: 0 }}>{icon}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: 1 }}>
+        <div style={{ fontSize: 'var(--fs-xs)', color, fontWeight: 700 }}>{label}</div>
+        <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>{value}</div>
+        <div style={{ fontSize: '10px', color: 'var(--muted)', lineHeight: 1.2 }}>{sub}</div>
+      </div>
     </div>
   );
 }
