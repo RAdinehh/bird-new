@@ -960,7 +960,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             </Field>
           )}
 
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4, borderTop: '1px dashed var(--border)' }}>📅 زمان</div>
+          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 6, borderTop: '1px dashed var(--border)' }}>📅 زمان</div>
           <Grid2>
             <Field label="تاریخ ورود" required>
               <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ"  autoToday />

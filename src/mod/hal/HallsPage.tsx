@@ -376,21 +376,18 @@ export default function HallsPage() {
               ✨ پر کردن خودکار از استاندارد
             </button>
           )}
-        <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
-           color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
         <Grid3>
           <Field label="طول"><NumField placeholder="۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} /></Field>
           <Field label="عرض"><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} /></Field>
           <Field label="ارتفاع"><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} /></Field>
         </Grid3>
-        <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
-           color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>شرایط</div>
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>شرایط</div>
           <Grid2>
           <TempFormField label="دمای هدف" placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => setForm({...form, targetTemp: v})} />
           <Field label="رطوبت هدف"><NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => setForm({...form, targetHumidity: e.target.value})} unit="٪" min={-10} /></Field>
         </Grid2>
-        <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
-           color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>زمان‌ها</div>
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>زمان‌ها</div>
         <Grid2>
           <Field label="تاریخ ساخت"><Input placeholder="۱۴۰۰/۰۱/۰۱" value={form.builtAt} onChange={e => setForm({...form, builtAt: e.target.value})} /></Field>
           <Field label="آخرین ضدعفونی"><Input placeholder="۱۴۰۵/۰۷/۰۱" value={form.lastSanitizedAt} onChange={e => setForm({...form, lastSanitizedAt: e.target.value})} /></Field>

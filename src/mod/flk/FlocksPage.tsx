@@ -663,7 +663,7 @@ export default function FlocksPage() {
             </DepBox>
           ) : null}
 
-          <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>تاریخ‌ها</div>
+          <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>تاریخ‌ها</div>
 
           <Field label="تاریخ هچ" hint="اگر از جوجه‌کشی خودت آمده — سن از این محاسبه می‌شود">
             <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ"  autoToday />
@@ -677,7 +677,7 @@ export default function FlocksPage() {
             <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="انتخاب تاریخ شروع"  autoToday />
           </Field>
 
-          <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>هزینه‌ها</div>
+          <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>هزینه‌ها</div>
 
           <Grid2>
             <Field label="قیمت هر پرنده">

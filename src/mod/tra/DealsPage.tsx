@@ -317,9 +317,7 @@ function Row({ l, v }: { l: string; v: string }) {
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
-      paddingTop: 10, marginTop: 4,
-      borderTop: '1px dashed var(--border)',
-      fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)'
+      paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px'
     }}>{children}</div>
   );
 }
