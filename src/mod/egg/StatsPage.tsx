@@ -155,6 +155,64 @@ export default function StatsPage() {
     return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0])).slice(-6).map(([month, v]) => ({ month, ...v }));
   }, [filtered]);
 
+  // دوره قبل (برای مقایسه)
+  const prevRangeStats = useMemo(() => {
+    if (range === 'all') return null;
+    const rangeDays = parseInt(range);
+    const startCur = cutOff(rangeDays);
+    const startPrev = cutOff(rangeDays * 2);
+    const prev = productions.filter(p => {
+      const d = toEnDate(p.date || '');
+      return d >= startPrev && d < startCur;
+    });
+    let healthy = 0, total = 0, broken = 0;
+    for (const p of prev) {
+      const h = (p.eatingCount || 0) + (p.fertileCount || 0);
+      healthy += h;
+      total += h + (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0);
+      broken += p.brokenCount || 0;
+    }
+    return { healthy, total, broken, count: prev.length };
+  }, [productions, range]);
+
+  // توده تخم (kg) — میانگین ۶۰ گرم
+  const eggMassKg = useMemo(() => {
+    const totalHealthy = stats.eating + stats.fertile;
+    return Math.round((totalHealthy * 60) / 100) / 10;
+  }, [stats]);
+
+  // بهترین/بدترین روز هفته
+  const byWeekday = useMemo(() => {
+    const names = ['شنبه', 'یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'];
+    const map = new Map<number, { total: number; days: number }>();
+    for (const p of filtered) {
+      const d = toEnDate(p.date || '');
+      const parts = d.split('/');
+      if (parts.length !== 3) continue;
+      const dt = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      const day = (dt.getDay() + 1) % 7;
+      if (!map.has(day)) map.set(day, { total: 0, days: 0 });
+      const r = map.get(day)!;
+      r.total += (p.eatingCount || 0) + (p.fertileCount || 0);
+      r.days += 1;
+    }
+    const arr: { name: string; avg: number; total: number }[] = [];
+    for (const [day, v] of map.entries()) {
+      if (v.days === 0) continue;
+      arr.push({ name: names[day], avg: Math.round(v.total / v.days), total: v.total });
+    }
+    arr.sort((a, b) => b.avg - a.avg);
+    return arr;
+  }, [filtered]);
+
+  // پیش‌بینی هفته بعد (میانگین ۷ روز اخیر × ۷)
+  const forecast = useMemo(() => {
+    const last7 = trend.days.slice(-7);
+    if (last7.length < 3) return null;
+    const avg = last7.reduce((a, d) => a + d.healthy, 0) / last7.length;
+    return { avg: Math.round(avg), next7: Math.round(avg * 7), days: last7.length };
+  }, [trend]);
+
   const rangeLabel = range === '7' ? '۷ روز' : range === '30' ? '۳۰ روز' : range === '90' ? '۹۰ روز' : 'کل';
 
   // اعتبارسنجی دوره
@@ -241,6 +299,38 @@ export default function StatsPage() {
             </div>
           </div>
 
+          {/* توده تخم */}
+          <div style={{ padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>توده تخم (تقریبی)</div>
+              <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text)', marginTop: 2 }}>{toFa(eggMassKg.toLocaleString('fa-IR'))} kg</div>
+              <div style={{ fontSize: '10px', color: 'var(--muted)' }}>میانگین ۶۰ گرم/تخم</div>
+            </div>
+            <span style={{ fontSize: '1.6em', opacity: 0.5 }}>⚖️</span>
+          </div>
+
+          {/* مقایسه با دوره قبل */}
+          {prevRangeStats && prevRangeStats.healthy > 0 && (
+            <div style={{ padding: '10px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>📊 مقایسه با دوره قبل</span>
+              <CompareRow label="تخم سالم" cur={stats.healthy} prev={prevRangeStats.healthy} />
+              <CompareRow label="کل تخم" cur={stats.total} prev={prevRangeStats.total} />
+              <CompareRow label="شکسته" cur={stats.broken} prev={prevRangeStats.broken} inverse />
+            </div>
+          )}
+
+          {/* پیش‌بینی */}
+          {forecast && (
+            <div style={{ padding: '10px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>🔮 پیش‌بینی هفته بعد</div>
+                <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)', marginTop: 2 }}>{toFa(forecast.next7.toLocaleString('fa-IR'))} تخم</div>
+                <div style={{ fontSize: '10px', color: 'var(--muted)' }}>بر اساس میانگین {toFa(forecast.days)} روز اخیر ({toFa(forecast.avg)}/روز)</div>
+              </div>
+              <span style={{ fontSize: '1.6em', opacity: 0.5 }}>🔮</span>
+            </div>
+          )}
+
           {/* کیفیت تخم — نوارهای compact */}
           <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -248,8 +338,8 @@ export default function StatsPage() {
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rangeLabel}</span>
             </div>
 
-            <QualityBar icon="🌱" label="نطفه‌دار" pct={stats.fertilePct} count={stats.fertile} total={stats.healthy} color="var(--purple)" />
-            <QualityBar icon="🥚" label="خوراکی" pct={stats.eatingPct} count={stats.eating} total={stats.healthy} color="var(--accent)" />
+            <QualityBar icon="🌱" label="نطفه‌دار" pct={stats.fertilePct} count={stats.fertile} total={stats.total} color="var(--purple)" />
+            <QualityBar icon="🥚" label="خوراکی" pct={stats.eatingPct} count={stats.eating} total={stats.total} color="var(--accent)" />
             <QualityBar icon="💔" label="شکسته" pct={stats.brokenPct} count={stats.broken} total={stats.total} color="var(--warn)" />
             {stats.other > 0 && (
               <QualityBar icon="📦" label="سایر" pct={stats.otherPct} count={stats.other} total={stats.total} color="var(--muted)" />
@@ -377,6 +467,20 @@ export default function StatsPage() {
             </div>
           )}
 
+          {/* بهترین روزهای هفته */}
+          {byWeekday.length >= 3 && (
+            <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>📆 الگوی روزهای هفته</span>
+              {byWeekday.map((d, i) => (
+                <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', background: i === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
+                  <span style={{ flex: 1, fontWeight: i === 0 ? 700 : 500, color: i === 0 ? 'var(--accent)' : 'var(--text)' }}>{d.name}</span>
+                  <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{toFa(d.total)}</span>
+                  <span style={{ color: i === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700 }}>{toFa(d.avg)}/روز</span>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* بهترین روزها */}
           {dayRank.length > 0 && (
             <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -437,5 +541,23 @@ function ChartTab({ active, onClick, icon, label }: { active: boolean; onClick: 
       <span>{icon}</span>
       <span>{label}</span>
     </button>
+  );
+}
+
+
+function CompareRow({ label, cur, prev, inverse }: { label: string; cur: number; prev: number; inverse?: boolean }) {
+  const diff = prev > 0 ? ((cur - prev) / prev) * 100 : 0;
+  const rounded = Math.round(diff * 10) / 10;
+  const good = inverse ? rounded < 0 : rounded > 0;
+  const color = Math.abs(rounded) < 1 ? 'var(--muted)' : (good ? 'var(--accent)' : 'var(--danger)');
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)', padding: '4px 0' }}>
+      <span style={{ color: 'var(--muted)', flex: 1 }}>{label}</span>
+      <span style={{ color: 'var(--text)', fontWeight: 700, marginLeft: 8 }}>{toFa(cur.toLocaleString('fa-IR'))}</span>
+      <span style={{ color: 'var(--muted)', marginLeft: 8, minWidth: 50, textAlign: 'left' }}>قبلاً {toFa(prev.toLocaleString('fa-IR'))}</span>
+      <span style={{ color, fontWeight: 700, marginLeft: 8, minWidth: 50, textAlign: 'left' }}>
+        {rounded > 0 ? '+' : ''}{toFa(rounded)}٪
+      </span>
+    </div>
   );
 }
