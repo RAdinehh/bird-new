@@ -201,7 +201,9 @@ function applyInvoiceMovements(inv: Invoice, prevItems?: InvoiceItem[]): Invoice
 const BIRD_CATS = ['chick', 'adult', 'fertile_egg'];
 
 /** اعمال اثر فاکتور روی گله‌ها — خرید جوجه/پرنده → افزودن، فروش → کاهش */
-function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): void {
+/* ITEMS_RETURNED */
+function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] {
+  const outItems: InvoiceItem[] = (inv.items || []).map(it => ({ ...it }));
   const flk = useFlk.getState();
   const brd = useBrd.getState();
 
@@ -224,7 +226,7 @@ function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): void {
   }
 
   // ۲. اعمال اثر جدید
-  if (!BIRD_CATS.includes(inv.category)) return;
+  if (!BIRD_CATS.includes(inv.category)) return outItems;
   for (const it of inv.items || []) {
     if (!it.birdId) continue;
     const qty = it.quantity || 0;
@@ -240,7 +242,7 @@ function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): void {
         const breed = brd.breeds.find(b => b.id === it.breedId);
         const bird = brd.birds.find(b => b.id === it.birdId);
         const name = `گله ${breed?.name || bird?.name || '?'} — ${inv.date}`;
-        flk.add({
+        const newFlockId = flk.add({
           name,
           type: 'layer',
           birdId: it.birdId,
@@ -266,6 +268,8 @@ function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): void {
           sourceInvoiceId: inv.id,
           sourceCategory: inv.category,
         });
+        const idx = inv.items.indexOf(it);
+        if (idx >= 0 && outItems[idx]) outItems[idx].flockId = newFlockId;
       }
     } else if (inv.type === 'sale' && it.flockId) {
       const f = flk.flocks.find(x => x.id === it.flockId);
@@ -273,6 +277,7 @@ function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): void {
       flk.update(it.flockId, { currentCount: Math.max(0, (f.currentCount ?? 0) - qty) });
     }
   }
+  return outItems;
 }
 
 const now = () => new Date().toISOString();
@@ -286,18 +291,22 @@ export const useTra = create<State>()(
         const id = uuid();
         const num = 'INV-' + Date.now().toString(36).toUpperCase();
         const newInv = { ...i, id, number: i.number || num, createdAt: now(), updatedAt: now() } as any;
-        set({ invoices: [...get().invoices, newInv] });
-        try { applyInvoiceFlocks(newInv); } catch(e) {}
+        let items: InvoiceItem[] = newInv.items || [];
+        try { items = applyInvoiceFlocks(newInv); } catch(e) {}
+        const final = { ...newInv, items };
+        set({ invoices: [...get().invoices, final] });
         return id;
       },
       updateInvoice: (id, patch) => {
         const prev = get().invoices.find(x => x.id === id);
         if (!prev) return;
         const merged = { ...prev, ...patch, updatedAt: now() } as Invoice;
-        const items = applyInvoiceMovements(merged, prev.items);
-        const final = { ...merged, items };
+        const itemsMoved = applyInvoiceMovements(merged, prev.items);
+        const mergedWithItems = { ...merged, items: itemsMoved };
+        let itemsFinal: InvoiceItem[] = itemsMoved;
+        try { itemsFinal = applyInvoiceFlocks(mergedWithItems, prev); } catch(e) {}
+        const final = { ...mergedWithItems, items: itemsFinal };
         set({ invoices: get().invoices.map(x => x.id === id ? final : x) });
-        try { applyInvoiceFlocks(final, prev); } catch(e) {}
       },
       deleteInvoice: (id) => {
         const inv = get().invoices.find(x => x.id === id);
