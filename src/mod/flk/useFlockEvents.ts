@@ -156,6 +156,24 @@ export function useFlockEvents(flockId: string | null): FlockEventView[] {
       });
     }
 
+    // ═══ ۶. رویدادهای دستی از خود گله (f.events) ═══
+    for (const e of (flock.events || [])) {
+      events.push({
+        id: 'flk-' + e.id,
+        date: e.date,
+        type: e.type,
+        count: e.count,
+        sex: e.sex,
+        origin: e.origin,
+        reason: e.reason,
+        unitPrice: e.unitPrice,
+        totalPrice: e.totalPrice,
+        notes: e.notes || '',
+        source: 'flk',
+        sourceId: e.id,
+      });
+    }
+
     // ═══ مرتب‌سازی بر اساس تاریخ (قدیمی → جدید) ═══
     return events.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
   }, [flockId, flocks, logs, hatches, invoices, productions, contacts]);
