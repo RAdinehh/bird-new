@@ -190,11 +190,22 @@ export default function BirdsPage() {
           error={error || undefined}
         />
         </Field>
-        <Field label="چرخه زندگی (روز)" hint="از شروع تا پایان دوره">
-          <NumField
-            placeholder="۰"
-            value={form.cycleDays}
-            onChange={e => setForm({ ...form, cycleDays: e.target.value })} min={1} max={2000} unit="روز" autoClamp />
+        <Field
+            label={
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                چرخه زندگی (روز)
+                {cycleFromPreset ? (
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
+                ) : null}
+              </span>
+            }
+            hint={cycleFromPreset ? '✨ از استاندارد' : 'از شروع تا پایان دوره'}
+          >
+            <NumField
+              placeholder="۰"
+              value={form.cycleDays}
+              onChange={e => { setForm({ ...form, cycleDays: e.target.value }); setCycleFromPreset(false); }}
+              min={1} max={2000} unit="روز" autoClamp />
         </Field>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7,
            padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
@@ -202,11 +213,22 @@ export default function BirdsPage() {
           💡 <b>چرخه زندگی</b> یعنی چند روز طول می‌کشد تا این پرنده دوره‌اش کامل شود. مثال: جوجه گوشتی ۴۲ روز، مرغ تخم‌گذار ۵۰۰ روز.
         </div>
 
-        <Field label="FCR استاندارد" hint="ضریب تبدیل غذایی مرجع">
-          <NumField
-            placeholder="۲٫۰"
-            value={form.fcrStandard}
-            onChange={e => setForm({ ...form, fcrStandard: e.target.value })} min={0.5} max={5} unit="FCR" autoClamp />
+        <Field
+            label={
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                FCR استاندارد
+                {fcrFromPreset ? (
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
+                ) : null}
+              </span>
+            }
+            hint={fcrFromPreset ? '✨ از استاندارد' : 'ضریب تبدیل غذایی مرجع'}
+          >
+            <NumField
+              placeholder="۲٫۰"
+              value={form.fcrStandard}
+              onChange={e => { setForm({ ...form, fcrStandard: e.target.value }); setFcrFromPreset(false); }}
+              min={0.5} max={5} unit="FCR" autoClamp />
         </Field>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7,
            padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
