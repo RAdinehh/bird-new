@@ -285,8 +285,7 @@ export default function HallsPage() {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="نام سالن" required><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
-        <Grid2>
-          <Field label="نژاد پرنده" hint="محاسبه خودکار">
+        <Field label="نژاد پرنده" hint="برای محاسبه خودکار">
             <Select value={form.breedId} onChange={e => setForm({...form, breedId: e.target.value})}>
               <option value="">— انتخاب —</option>
               {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
@@ -313,8 +312,9 @@ export default function HallsPage() {
               ✨ پر کردن خودکار از استاندارد
             </Btn>
           )}
-          <Field label="ظرفیت"><NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} /></Field>
-        </Grid2>
+          <Field label="ظرفیت">
+            <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} />
+          </Field>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
            color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
         <Grid3>
