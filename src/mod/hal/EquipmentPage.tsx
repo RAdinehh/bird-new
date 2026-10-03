@@ -190,6 +190,30 @@ export default function EquipmentPage() {
     setOpen(false);
   };
 
+  const saveAndNext = () => {
+    // بدون چک تکراری
+    if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
+    const data = {
+      hallId: form.hallId, type: form.type, name: form.name.trim(),
+      count: form.count ? parseInt(toEn(form.count)) || null : null,
+      unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || null : null,
+      purchasedAt: form.purchasedAt.trim(),
+      warranty: form.warranty ? parseInt(toEn(form.warranty)) || null : null,
+      notes: form.notes.trim(),
+      capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
+      efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
+    };
+    addEquip(data);
+    showToast('ذخیره شد — تجهیز بعدی', 'success', 1500);
+    // پاک کردن فقط نام و مشخصات، نگه‌داشتن سالن و نوع
+    setForm(f => ({
+      ...f,
+      id: '', name: '', count: '', unitPrice: '', purchasedAt: '',
+      warranty: '', notes: '', capacity: '', efficiency: '',
+    }));
+    setErr('');
+  };
+
   const list = filter ? equipment.filter(e => e.hallId === filter) : equipment;
   const target = delId ? equipment.find(e => e.id === delId) : null;
   const totalValue = list.reduce((acc, e) => acc + ((e.count || 0) * (e.unitPrice || 0)), 0);
@@ -332,7 +356,7 @@ export default function EquipmentPage() {
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        footer={<div style={{ display: "flex", gap: 6 }}><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn><Btn variant="primary" onClick={save} style={{ flex: 1 }}>ذخیره</Btn>{!form.id ? <Btn variant="primary" onClick={saveAndNext} style={{ flex: 1 }}>+ بعدی</Btn> : null}</div>}>
         <Grid2>
           <Field label="نوع" required>
             <Select value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
