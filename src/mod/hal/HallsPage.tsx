@@ -2,7 +2,7 @@
  * HallsPage — سالن‌ها
  */
 import { useState, useMemo } from 'react';
-import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS } from './store';
+import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS, EQUIP_LABELS } from './store';
 import { useBrd } from '../brd/store';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
@@ -219,6 +219,20 @@ export default function HallsPage() {
                   <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
                   <Row l="تهویه خودکار" v={totalAirflow > 0 ? `${fmt.num(totalAirflow)} m³/h` : '— تجهیز ثبت نشده'} />
                   <Row l="روشنایی نصب‌شده" v={totalLightW > 0 ? `${fmt.num(totalLightW)} W` : '— تجهیز ثبت نشده'} />
+                  {hallEquips.length > 0 && (
+                    <Row
+                      l="تجهیزات نصب‌شده"
+                      v={(() => {
+                        const counts: Record<string, number> = {};
+                        hallEquips.forEach(e => {
+                          counts[e.type] = (counts[e.type] || 0) + (e.count || 0);
+                        });
+                        return Object.entries(counts)
+                          .map(([t, c]) => `${EQUIP_LABELS[t]?.icon || '🔧'} ${fmt.int(c)}`)
+                          .join(' · ');
+                      })()}
+                    />
+                  )}
                 </div>
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🔧 تجهیزات ثابت</div>
