@@ -254,9 +254,40 @@ export default function DailyLogsPage() {
   };
 
 
-  const save = () => {
+const collectWhsShortages = () => {
+    type S = { name: string; need: number; have: number; unit: string };
+    const list: S[] = [];
+    const check = (itemId: string | undefined, qty: number | null | undefined) => {
+      if (!itemId || !qty || qty <= 0) return;
+      const it = whsItems.find(x => x.id === itemId);
+      if (!it) return;
+      if (it.currentStock < qty) {
+        list.push({ name: it.name, need: qty, have: it.currentStock, unit: UNIT_LABEL[it.unit] || '' });
+      }
+    };
+    form.vaccines.forEach(v => check(v.itemId, v.quantity));
+    form.medications.forEach(m => check(m.itemId, m.quantity));
+    if (form.feedSourceType === 'item' && form.feedSourceId) {
+      check(form.feedSourceId, num(form.feedAmount));
+    }
+    return list;
+  };
+
+  const save = async () => {
     if (saving) return;
     setSaving(true);
+
+    // چک موجودی انبار
+    const shortages = collectWhsShortages();
+    if (shortages.length > 0) {
+      const lines = shortages.map(s => `• ${s.name}: نیاز ${toFa(s.need)} ${s.unit}، موجودی ${toFa(s.have)} ${s.unit}`);
+      const ok = await showConfirmAsync(
+        'موجودی انبار کافی نیست',
+        lines.join('\n') + '\n\nاگه ادامه بدی، موجودی صفر می‌شه ولی کمبود ثبت نمی‌شه.',
+        { danger: true },
+      );
+      if (!ok) { setSaving(false); return; }
+    }
     if (!form.flockId) { setErr('گله اجباری است'); setSaving(false); return; }
     if (!form.date.trim()) { setErr('تاریخ اجباری است'); setSaving(false); return; }
     const dCount = form.deaths.reduce((a, x) => a + (x.count || 0), 0);
