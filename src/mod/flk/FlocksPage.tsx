@@ -679,11 +679,47 @@ export default function FlocksPage() {
               autoThreshold={6}
             />
             </Field>
-            <Field label="بخش">
-              <Select value={form.zoneId} onChange={e => setForm({ ...form, zoneId: e.target.value })}>
-                <option value="">—</option>
-                {zonesForHall.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
-              </Select>
+            <Field
+              label="بخش"
+              hint={
+                form.hallId && zonesForHall.length === 0
+                  ? 'این سالن بخشی ندارد — از ماژول «سالن‌ها» بخش اضافه کنید'
+                  : form.hallId && zonesForHall.length > 0
+                  ? toFa(zonesForHall.length) + ' بخش در این سالن'
+                  : undefined
+              }
+            >
+              {!form.hallId ? (
+                <div style={{
+                  padding: '10px 12px',
+                  background: 'var(--input-bg)',
+                  border: '1px dashed var(--border)',
+                  borderRadius: 'var(--r-md)',
+                  fontSize: 'var(--fs-sm)',
+                  color: 'var(--muted)',
+                  textAlign: 'center',
+                }}>
+                  ابتدا سالن را انتخاب کنید
+                </div>
+              ) : zonesForHall.length === 0 ? (
+                <div style={{
+                  padding: '10px 12px',
+                  background: 'var(--warn-soft)',
+                  border: '1px dashed var(--warn)',
+                  borderRadius: 'var(--r-md)',
+                  fontSize: 'var(--fs-sm)',
+                  color: 'var(--warn)',
+                  textAlign: 'center',
+                  lineHeight: 1.7,
+                }}>
+                  ⚠️ این سالن هنوز بخشی ندارد
+                </div>
+              ) : (
+                <Select value={form.zoneId} onChange={e => setForm({ ...form, zoneId: e.target.value })}>
+                  <option value="">— بدون بخش —</option>
+                  {zonesForHall.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
+                </Select>
+              )}
             </Field>
           </Grid2>
 
