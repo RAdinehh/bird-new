@@ -959,6 +959,9 @@ export function Sheet({
 
   return createPortal(
     <div
+      data-sheet-open="true"
+      role="dialog"
+      aria-modal="true"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       style={{
         position: 'fixed',

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 export function RangeCard({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div style={{
-      background: 'var(--input-bg)',
+      background: 'var(--card)',
       border: '1px solid var(--border)',
       borderRadius: 'var(--r-md)',
       padding: '10px 12px',

@@ -17,6 +17,7 @@ import UndoBar from '../../cor/ui/UndoBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { useFormat } from '../../shr/units';
+import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import DependentSelect from '../../shr/components/DependentSelect';
@@ -53,6 +54,7 @@ type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'archived';
 
 export default function FlocksPage() {
   const fmt = useFormat();
+  const breedStd = useBreedStandard();
   const { flocks, add, update, remove, archive, restore } = useFlk();
   const { birds: _birdsRaw, breeds } = useBrd();
   const { halls: _hallsRaw, zones } = useHal();
@@ -267,7 +269,8 @@ export default function FlocksPage() {
           const upcoming = flocks.filter(f => {
             if (f.status !== 'active') return false;
             if (f.type !== 'layer' && f.type !== 'breeder') return false;
-            const startDay = getLayingStartDay(f);
+            const std = breedStd.byBreedId(f.breedId);
+            const startDay = getLayingStartDay(f, std?.biology?.layingStartDay ?? LAYING_START_DAY);
             const age = getAgeDays(f);
             return age < startDay && age >= startDay - 60;
           }).sort((a, b) => getAgeDays(b) - getAgeDays(a));
@@ -293,7 +296,8 @@ export default function FlocksPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {upcoming.map(f => {
                   const age = getAgeDays(f);
-                  const startDay = getLayingStartDay(f);
+                  const std = breedStd.byBreedId(f.breedId);
+            const startDay = getLayingStartDay(f, std?.biology?.layingStartDay ?? LAYING_START_DAY);
                   const remain = startDay - age;
                   const bird = birds.find(b => b.id === f.birdId);
                   return (

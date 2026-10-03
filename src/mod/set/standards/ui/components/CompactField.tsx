@@ -1,4 +1,4 @@
-import type { ChangeEvent } from 'react';
+import { useRef } from 'react';
 import { useTempUnit, toUserTemp, toCelsius, tempLabel } from '../../../../../shr/utils/temp';
 
 export function CompactField({
@@ -13,21 +13,15 @@ export function CompactField({
   const tempUnit = useTempUnit();
   const displayValue = isTemp ? toUserTemp(value, tempUnit) : value;
   const displayUnit = isTemp ? tempLabel(tempUnit) : unit;
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
-    // اعداد فارسی → انگلیسی
     v = v.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
-    // همه جداکننده‌ها → نقطه انگلیسی
-    v = v.replace(/[٫،,]/g, '.');
-    // فقط عدد، نقطه، منفی
+    v = v.replace(/[٫،]/g, '.');
     v = v.replace(/[^\d.-]/g, '');
-    // فقط یه نقطه و فقط یه منفی در ابتدا
     const parts = v.split('.');
-    if (parts.length > 2) {
-      v = parts[0] + '.' + parts.slice(1).join('');
-    }
-    // اگر خالی یا فقط علامت
+    if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
     if (v === '' || v === '-' || v === '.') {
       onChange(null);
       return;
@@ -38,7 +32,20 @@ export function CompactField({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+    <div
+      onClick={() => inputRef.current?.focus()}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 4,
+        minWidth: 0,
+        padding: '8px 10px',
+        background: 'var(--input-bg)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r-md)',
+        cursor: 'text',
+      }}
+    >
       <span style={{
         fontSize: 11,
         color: 'var(--muted)',
@@ -48,36 +55,35 @@ export function CompactField({
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
       }}>{label}</span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, direction: 'ltr' }}>
         <input
+          ref={inputRef}
           type="text"
           inputMode="decimal"
           value={displayValue === null || displayValue === undefined ? '' : String(displayValue)}
           onChange={handleChange}
           style={{
             flex: 1,
-            height: 32,
-            padding: '0 6px',
-            background: 'var(--card)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--r-sm)',
-            color: 'var(--text)',
+            height: 22,
+            padding: 0,
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--accent)',
             fontFamily: 'inherit',
-            fontSize: 13,
-            fontWeight: 600,
-            textAlign: 'center',
+            fontSize: 'var(--fs-base)',
+            fontWeight: 700,
+            textAlign: 'right',
             outline: 'none',
             fontVariantNumeric: 'tabular-nums',
-            direction: 'ltr',
+            direction: 'rtl',
             minWidth: 0,
           }}
         />
         <span style={{
-          fontSize: 10,
+          fontSize: 11,
           color: 'var(--muted)',
           flexShrink: 0,
-          minWidth: 24,
-          textAlign: 'left',
+          fontWeight: 500,
         }}>{displayUnit}</span>
       </div>
     </div>

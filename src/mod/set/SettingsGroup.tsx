@@ -1,10 +1,12 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 interface Props {
   icon: string;
   title: string;
   subtitle?: string;
   defaultOpen?: boolean;
+  /** اگه ست بشه، فقط یکی از گروه‌های هم‌نام می‌تونه باز باشه */
+  exclusiveGroup?: string;
   children: ReactNode;
   tone?: 'accent' | 'warn' | 'info' | 'purple' | 'danger';
 }
@@ -14,6 +16,7 @@ export default function SettingsGroup({
   title,
   subtitle,
   defaultOpen = false,
+  exclusiveGroup,
   children,
   tone = 'accent'
 }: Props) {
@@ -26,10 +29,28 @@ export default function SettingsGroup({
     return defaultOpen;
   });
 
+  // اگه توی گروه exclusive هستیم، به رویداد بستن گوش بده
+  useEffect(() => {
+    if (!exclusiveGroup) return;
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.group === exclusiveGroup && detail?.title !== title) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener('pm-exclusive-close', handler);
+    return () => window.removeEventListener('pm-exclusive-close', handler);
+  }, [exclusiveGroup, title]);
+
   const toggle = () => {
     const next = !open;
     setOpen(next);
     try { localStorage.setItem(STORAGE_KEY, next ? '1' : '0'); } catch {}
+    if (next && exclusiveGroup) {
+      window.dispatchEvent(new CustomEvent('pm-exclusive-close', {
+        detail: { group: exclusiveGroup, title }
+      }));
+    }
   };
 
   const color = 'var(--' + tone + ')';

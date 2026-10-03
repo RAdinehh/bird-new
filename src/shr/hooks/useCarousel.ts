@@ -149,7 +149,19 @@ export function useCarousel(
     const onStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const tgt = e.target as HTMLElement;
+      // اگه Sheet یا Modal بازه، swipe نکن
+      if (document.querySelector('[data-sheet-open="true"]')) return;
+      if (document.querySelector('[role="dialog"]')) return;
       if (tgt.closest('[role="dialog"]')) return;
+      // اگه روی یه عنصر scrollable عمودی هستیم، swipe نکن
+      let cur: HTMLElement | null = tgt;
+      while (cur && cur !== document.body) {
+        const st = window.getComputedStyle(cur);
+        if ((st.overflowY === 'auto' || st.overflowY === 'scroll') && cur.scrollHeight > cur.clientHeight + 4) {
+          return;
+        }
+        cur = cur.parentElement;
+      }
       if (hasHorizontalScroller(tgt, el)) return;
       const t = e.touches[0];
       dragging = true;
