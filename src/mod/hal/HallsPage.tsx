@@ -7,6 +7,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageCo
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { useTempUnit, toUserTemp, tempLabel } from '../../shr/utils/temp';
+import { useFormat } from '../../shr/units';
 import { showAlert } from '../../cor/store/dialog';
 import { Row, Pill } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -19,6 +20,7 @@ const empty: F = { name:'', code:'', length:'', width:'', height:'', capacity:''
 
 function TempFormField({ value, onChange, label, placeholder }: any) {
   const tempUnit = useTempUnit();
+  const fmt = useFormat();
   const celsius = (() => {
     if (!value) return null;
     const en = String(value).replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٫،]/g, '.');
@@ -75,6 +77,7 @@ export default function HallsPage() {
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const tempUnit = useTempUnit();
+  const fmt = useFormat();
 
   const halls = useMemo(() => {
     const seen = new Set<string>();
@@ -169,30 +172,30 @@ export default function HallsPage() {
             const equipValue = equipment.filter(e => e.hallId === h.id).reduce((a, e) => a + ((e.count || 0) * (e.unitPrice || 0)), 0);
             const isOpen = expandedId === h.id;
             return (
-              <ExpandableCard key={h.id} accent="accent" index={toFa(i + 1)} iconEmoji="🏭"
+              <ExpandableCard key={h.id} accent="accent" index={fmt.int(i + 1)} iconEmoji="🏭"
                 title={h.name + (h.code ? ` · ${h.code}` : '')}
                 subtitle={h.length ? `${toFa(h.length)}×${toFa(h.width || 0)}×${toFa(h.height || 0)} متر` : 'ابعاد وارد نشده'}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
-                badge={zoneCount > 0 ? <Tag tone="blue">{toFa(zoneCount)} بخش</Tag> : undefined}
+                badge={zoneCount > 0 ? <Tag tone="blue">{fmt.int(zoneCount)} بخش</Tag> : undefined}
                 stats={<>
                   {area > 0 && <span>مساحت: <b style={{ color: 'var(--text)' }}>{toFa(area.toFixed(1))} م²</b></span>}
-                  {h.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{toFa(h.capacity)}</b></span>}
-                  {equipCount > 0 && <span>تجهیز: <b style={{ color: 'var(--text)' }}>{toFa(equipCount)}</b></span>}
+                  {h.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{fmt.int(h.capacity)}</b></span>}
+                  {equipCount > 0 && <span>تجهیز: <b style={{ color: 'var(--text)' }}>{fmt.int(equipCount)}</b></span>}
                 </>}
               >
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>📐 ابعاد و ظرفیت</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="مساحت" v={`${toFa(area.toFixed(1))} م²`} />
                   <Row l="حجم" v={`${toFa(volume.toFixed(1))} م³`} />
-                  <Row l="ظرفیت" v={h.capacity ? `${toFa(h.capacity)} پرنده` : '—'} />
+                  <Row l="ظرفیت" v={h.capacity ? `${fmt.int(h.capacity)} پرنده` : '—'} />
                 </div>
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 شرایط محیطی</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <Row l="دمای هدف" v={h.targetTemp != null ? `${toFa(toUserTemp(h.targetTemp, tempUnit) ?? h.targetTemp)} ${tempLabel(tempUnit)}` : '—'} />
-                  <Row l="رطوبت هدف" v={h.targetHumidity ? `${toFa(h.targetHumidity)} ٪` : '—'} />
-                  <Row l="تهویه" v={h.ventilation ? `${toFa(h.ventilation)} m³/min` : '—'} />
-                  <Row l="روشنایی" v={h.light ? `${toFa(h.light)} lux` : '—'} />
+                  <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
+                  <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
+                  <Row l="تهویه" v={h.ventilation ? `${fmt.num(h.ventilation)} m³/min` : '—'} />
+                  <Row l="روشنایی" v={h.light ? `${fmt.num(h.light)} lux` : '—'} />
                 </div>
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🔧 تجهیزات ثابت</div>
@@ -209,7 +212,7 @@ export default function HallsPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {h.builtAt && <Row l="تاریخ ساخت" v={toFa(h.builtAt)} />}
                       {h.lastSanitizedAt && <Row l="آخرین ضدعفونی" v={toFa(h.lastSanitizedAt)} />}
-                      {equipValue > 0 && <Row l="ارزش تجهیزات" v={`${toFa(equipValue.toLocaleString('fa-IR'))} ت`} accent />}
+                      {equipValue > 0 && <Row l="ارزش تجهیزات" v={fmt.money(equipValue)} accent />}
                     </div>
                   </>
                 )}

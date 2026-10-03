@@ -3,11 +3,10 @@ import { safeStorage } from '../../shr/utils/storage';
 import { exportAll, validateBackup, importAll, getStats, downloadBackup, readFile, formatSize, type BackupFile } from '../../shr/utils/backup';
 import { useSet } from './store';
 import { showConfirmAsync } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
-import { Btn, BtnRow, Field, Grid2, Input, Modal, Select } from '../../shr/components/ui';
+import { Btn, BtnRow, Field, Grid2, Select, Modal } from '../../shr/components/ui';
 import { toFa, parseFaNum } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
-import { RowToggle, Line, SubSection } from './helpers';
+import { ToggleRow } from './helpers';
 
 export default function BackupTab() {
   const s = useSet();
@@ -16,6 +15,7 @@ export default function BackupTab() {
   const [preview, setPreview] = useState<BackupFile | null>(null);
   const [mergeMode, setMergeMode] = useState<'replace' | 'merge'>('merge');
   const [showRestore, setShowRestore] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -78,7 +78,6 @@ export default function BackupTab() {
       const ok = await showConfirmAsync('تأیید بازیابی', '⚠ تمام داده‌های فعلی پاک می‌شود و با فایل پشتیبان جایگزین می‌شود. مطمئن هستید؟', { danger: true, confirmText: 'بازیابی کن' });
       if (!ok) return;
     }
-
     const result = importAll(preview, mergeMode);
     if (result.success) {
       showMsg('✓ ' + result.message, true);
@@ -113,7 +112,9 @@ export default function BackupTab() {
   }, [preview]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+
+      {/* پیام */}
       {msg ? (
         <div style={{
           background: msg.ok ? 'var(--accent-soft)' : 'var(--danger-soft)',
@@ -122,70 +123,32 @@ export default function BackupTab() {
           borderRadius: 'var(--r-md)',
           fontSize: 'var(--fs-sm)',
           fontWeight: 600,
-          textAlign: 'center'
+          textAlign: 'center',
         }}>
           {msg.text}
         </div>
       ) : null}
 
-      {/* آمار حجم */}
-      <SettingsGroup icon="📊" title="آمار فعلی" subtitle={formatSize(stats.totalSize)} tone="accent">
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: 'var(--pad-normal)',
-          background: 'var(--accent-soft)',
-          border: '1px solid var(--accent-border)',
-          borderRadius: 'var(--r-md)'
-        }}>
-          <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
-            حجم کل داده‌ها
-          </span>
-          <span style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700 }}>
-            {formatSize(stats.totalSize)}
-          </span>
-        </div>
-
-        <div style={{ maxHeight: 300, overflowY: 'auto' }}>
-          {stats.byModule.map(m => (
-            <div key={m.key} style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: 'var(--pad-normal)',
-              background: 'var(--input-bg)',
-              borderRadius: 'var(--r-sm)',
-              marginBottom: 4,
-              fontSize: 'var(--fs-sm)'
-            }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600 }}>{m.label}</div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                  {toFa(m.records)} رکورد
-                </div>
-              </div>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                {formatSize(m.size)}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <Btn size="sm" full onClick={refresh}>🔄 به‌روزرسانی آمار</Btn>
-      </SettingsGroup>
-
-      {/* پشتیبان دستی */}
-      <SettingsGroup icon="📤" title="پشتیبان‌گیری" tone="info">
-        <SubSection label="دانلود پشتیبان" icon="📤" />
+      {/* ═══ ۱. پشتیبان‌گیری ═══ */}
+      <SettingsGroup
+        icon="📤"
+        title="پشتیبان‌گیری"
+        subtitle={`حجم کل: ${formatSize(stats.totalSize)}`}
+        tone="accent"
+      >
         <Btn variant="primary" full onClick={handleExport}>
           📥 دریافت پشتیبان کامل (JSON)
         </Btn>
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
-          همه‌ی داده‌ها — گله‌ها، معاملات، مخاطبین، تنظیمات و ... در یک فایل
-        </div>
 
-        <Btn full onClick={handleExportSettings}>
-          ⚙ فقط تنظیمات
-        </Btn>
-      
-        <SubSection label="بازیابی" icon="📥" />
+        <Grid2>
+          <Btn full onClick={handleExportSettings}>
+            ⚙ فقط تنظیمات
+          </Btn>
+          <Btn full onClick={() => { refresh(); setShowStats(true); }}>
+            📊 آمار داده‌ها
+          </Btn>
+        </Grid2>
+
         <input
           ref={fileRef}
           type="file"
@@ -194,15 +157,18 @@ export default function BackupTab() {
           onChange={handleFile}
         />
         <Btn full onClick={() => fileRef.current?.click()}>
-          📂 انتخاب فایل پشتیبان
+          📂 بازیابی از فایل پشتیبان
         </Btn>
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
-          قبل از بازیابی، پیش‌نمایش محتوا نمایش داده می‌شود
-        </div>
-      
-        <SubSection label="پشتیبان خودکار" icon="💾" />
-        <SubSection label="تنظیمات خودکار" icon="💾" />
-        <RowToggle
+      </SettingsGroup>
+
+      {/* ═══ ۲. پشتیبان خودکار ═══ */}
+      <SettingsGroup
+        icon="⏱"
+        title="پشتیبان خودکار"
+        subtitle={s.autoBackup.enabled ? `هر ${toFa(s.autoBackup.intervalHours)} ساعت` : 'غیرفعال'}
+        tone="purple"
+      >
+        <ToggleRow
           label="فعال"
           sub="در localStorage — بدون ارسال به سرور"
           value={s.autoBackup.enabled}
@@ -211,7 +177,10 @@ export default function BackupTab() {
         {s.autoBackup.enabled ? (
           <Grid2>
             <Field label="فاصله">
-              <Select value={String(s.autoBackup.intervalHours)} onChange={e => s.updateSection('autoBackup', { intervalHours: Math.round(parseFaNum(e.target.value)) })}>
+              <Select
+                value={String(s.autoBackup.intervalHours)}
+                onChange={e => s.updateSection('autoBackup', { intervalHours: Math.round(parseFaNum(e.target.value)) })}
+              >
                 <option value="6">هر ۶ ساعت</option>
                 <option value="12">هر ۱۲ ساعت</option>
                 <option value="24">هر ۲۴ ساعت</option>
@@ -219,7 +188,10 @@ export default function BackupTab() {
               </Select>
             </Field>
             <Field label="حداکثر نسخه">
-              <Select value={String(s.autoBackup.maxVersions)} onChange={e => s.updateSection('autoBackup', { maxVersions: Math.round(parseFaNum(e.target.value)) })}>
+              <Select
+                value={String(s.autoBackup.maxVersions)}
+                onChange={e => s.updateSection('autoBackup', { maxVersions: Math.round(parseFaNum(e.target.value)) })}
+              >
                 <option value="3">۳ نسخه</option>
                 <option value="5">۵ نسخه</option>
                 <option value="10">۱۰ نسخه</option>
@@ -229,19 +201,86 @@ export default function BackupTab() {
         ) : null}
       </SettingsGroup>
 
-      {/* امنیت */}
-      <SettingsGroup icon="🔐" title="امنیت و نگهداری" tone="warn">
-        <SubSection label="پاک کردن داده‌ها" icon="⚠" />
-        <SubSection label="عملیات غیرقابل بازگشت" icon="⚠️" />
+      {/* ═══ ۳. عملیات حساس — دکمه مستقل ═══ */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 6,
+        marginTop: 'var(--sp-2)',
+      }}>
         <Btn full variant="danger" onClick={() => setShowReset(true)}>
           🗑 پاک کردن همه‌ی داده‌ها
         </Btn>
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', textAlign: 'center', lineHeight: 1.7 }}>
-          تمام گله‌ها، معاملات و تنظیمات برای همیشه پاک می‌شوند
+        <div style={{
+          fontSize: 'var(--fs-xs)',
+          color: 'var(--danger)',
+          textAlign: 'center',
+          lineHeight: 1.7,
+        }}>
+          این عمل قابل بازگشت نیست
         </div>
-      </SettingsGroup>
+      </div>
 
-      {/* مودال بازیابی */}
+      {/* ═══ مودال آمار ═══ */}
+      <Modal
+        open={showStats}
+        onClose={() => setShowStats(false)}
+        title="📊 آمار داده‌ها"
+        footer={<Btn variant="primary" full onClick={() => setShowStats(false)}>بستن</Btn>}
+      >
+        <div style={{
+          padding: 'var(--pad-comfy)',
+          background: 'var(--accent-soft)',
+          border: '1px solid var(--accent-border)',
+          borderRadius: 'var(--r-md)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 12,
+        }}>
+          <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
+            حجم کل داده‌ها
+          </span>
+          <span style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700 }}>
+            {formatSize(stats.totalSize)}
+          </span>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 6,
+        }}>
+          {stats.byModule.map(m => (
+            <div key={m.key} style={{
+              padding: '8px 10px',
+              background: 'var(--input-bg)',
+              borderRadius: 'var(--r-sm)',
+              fontSize: 'var(--fs-xs)',
+              minWidth: 0,
+            }}>
+              <div style={{
+                fontWeight: 600,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}>{m.label}</div>
+              <div style={{
+                color: 'var(--muted)',
+                marginTop: 2,
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: 4,
+              }}>
+                <span>{toFa(m.records)}</span>
+                <span>{formatSize(m.size)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Modal>
+
+      {/* ═══ مودال بازیابی ═══ */}
       <Modal
         open={showRestore}
         onClose={() => { setShowRestore(false); setPreview(null); }}
@@ -260,13 +299,28 @@ export default function BackupTab() {
               background: 'var(--accent-soft)',
               border: '1px solid var(--accent-border)',
               borderRadius: 'var(--r-md)',
-              display: 'flex', flexDirection: 'column', gap: 'var(--gap-sm)',
-              fontSize: 'var(--fs-sm)'
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 8,
+              fontSize: 'var(--fs-sm)',
+              marginBottom: 12,
             }}>
-              <Line l="نسخه‌ی فایل" v={toFa(preview.version)} />
-              <Line l="نسخه‌ی ساختار" v={toFa(preview.schemaVersion)} />
-              <Line l="تاریخ" v={preview.exportedAt.slice(0, 10)} />
-              <Line l="تعداد رکوردها" v={toFa(previewTotalRecords)} />
+              <div>
+                <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>نسخه فایل</div>
+                <div style={{ fontWeight: 700 }}>{toFa(preview.version)}</div>
+              </div>
+              <div>
+                <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>نسخه ساختار</div>
+                <div style={{ fontWeight: 700 }}>{toFa(preview.schemaVersion)}</div>
+              </div>
+              <div>
+                <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>تاریخ</div>
+                <div style={{ fontWeight: 700 }}>{preview.exportedAt.slice(0, 10)}</div>
+              </div>
+              <div>
+                <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>تعداد رکورد</div>
+                <div style={{ fontWeight: 700 }}>{toFa(previewTotalRecords)}</div>
+              </div>
             </div>
 
             <Field label="روش بازیابی">
@@ -283,7 +337,8 @@ export default function BackupTab() {
               borderRadius: 'var(--r-md)',
               fontSize: 'var(--fs-xs)',
               color: 'var(--warn)',
-              lineHeight: 1.7
+              lineHeight: 1.7,
+              marginTop: 12,
             }}>
               {mergeMode === 'merge'
                 ? '➕ داده‌های جدید به داده‌های فعلی اضافه می‌شوند — رکوردهای تکراری بر اساس شناسه ادغام می‌شوند.'
@@ -293,7 +348,7 @@ export default function BackupTab() {
         ) : null}
       </Modal>
 
-      {/* مودال پاک‌سازی */}
+      {/* ═══ مودال پاک‌سازی ═══ */}
       <Modal
         open={showReset}
         onClose={() => setShowReset(false)}
@@ -313,7 +368,7 @@ export default function BackupTab() {
           </span>
         </div>
       </Modal>
+
     </div>
   );
 }
-

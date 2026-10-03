@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useBrd, type Breed } from './store';
+import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { Btn, BtnRow, Empty, Field,
   Grid2, Input, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -11,10 +12,31 @@ import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
+
+/** پیدا کردن کلید استاندارد از اسم نژاد (match نرم) */
+function findStandardKey(name: string): string | undefined {
+  const clean = name.trim();
+  if (!clean) return undefined;
+  // match دقیق با nameFa
+  for (const [key, std] of Object.entries(DEFAULT_STANDARDS)) {
+    if (std.nameFa === clean) return key;
+  }
+  // match دقیق با nameEn
+  for (const [key, std] of Object.entries(DEFAULT_STANDARDS)) {
+    if (std.nameEn && std.nameEn.toLowerCase() === clean.toLowerCase()) return key;
+  }
+  // match جزئی
+  for (const [key, std] of Object.entries(DEFAULT_STANDARDS)) {
+    if (clean.includes(std.nameFa) || std.nameFa.includes(clean)) return key;
+    if (std.nameEn && (clean.toLowerCase().includes(std.nameEn.toLowerCase()) || std.nameEn.toLowerCase().includes(clean.toLowerCase()))) return key;
+  }
+  return undefined;
+}
+
 export default function BreedsPage() {
   const { birds, breeds: _breedsRaw, dedupeBreeds, addBreed, updateBreed, deleteBreed } = useBrd();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ id:'', birdId:'', name:'', fcr:'' });
+  const [form, setForm] = useState({ id:'', birdId:'', name:'', fcr:'', standardKey:'' });
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
@@ -74,12 +96,12 @@ export default function BreedsPage() {
   }
 
   const openNew = () => {
-    setForm({ id:'', birdId: birds[0].id, name:'', fcr:'' });
+    setForm({ id:'', birdId: birds[0].id, name:'', fcr:'', standardKey:'' });
     setErr(''); setOpen(true);
   };
 
   const openEdit = (b: Breed) => {
-    setForm({ id: b.id, birdId: b.birdId, name: b.name, fcr: b.fcr ? toFa(b.fcr) : '' });
+    setForm({ id: b.id, birdId: b.birdId, name: b.name, fcr: b.fcr ? toFa(b.fcr) : '', standardKey: (b as any).standardKey || '' });
     setErr(''); setOpen(true);
   };
 
@@ -198,7 +220,18 @@ export default function BreedsPage() {
         </Field>
         <Grid2>
           <Field label="نام نژاد" required>
-            <Input placeholder="مثلاً — مرندی" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            <Input placeholder="مثلاً — مرندی" value={form.name} onChange={e => {
+                const newName = e.target.value;
+                const matchedKey = findStandardKey(newName);
+                setForm(f => ({
+                  ...f,
+                  name: newName,
+                  standardKey: matchedKey || f.standardKey,
+                  fcr: matchedKey && DEFAULT_STANDARDS[matchedKey]?.growth?.weightByAge?.[0]?.fcr
+                    ? toFa(DEFAULT_STANDARDS[matchedKey].growth.weightByAge[0].fcr)
+                    : f.fcr,
+                }));
+              }} />
           </Field>
           <Field label="FCR">
             <NumField placeholder="۲٫۰" value={form.fcr} onChange={e => setForm({ ...form, fcr: e.target.value })} min={0} unit="FCR" />

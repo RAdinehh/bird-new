@@ -15,7 +15,7 @@ export function Section({ title, children }: { title: string; children: ReactNod
   return (
     <div>
       <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', padding: '4px 4px 8px', letterSpacing: '.5px' }}>{title}</div>
-      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 'var(--sp-4)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: '10px 10px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {children}
       </div>
     </div>
@@ -200,8 +200,8 @@ export function SubSection({ label, icon }: { label: string; icon?: string }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 6,
-      padding: '8px 4px 4px',
-      marginTop: 'var(--gap-sm)',
+      padding: '6px 2px 2px',
+      marginTop: 8,
       borderTop: '1px dashed var(--border)',
       fontSize: 'var(--fs-xs)',
       fontWeight: 700,

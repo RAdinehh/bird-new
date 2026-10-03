@@ -25,7 +25,6 @@ export default function EnvStandardsTab() {
 
   const grouped = getStandardsGroupedByBird(custom);
 
-  // پرنده‌های مادری که در گله‌های فعال هستن
   const activeBirdNames = new Set<string>();
   (flocks || [])
     .filter((f: any) => f.status === 'active')
@@ -34,7 +33,6 @@ export default function EnvStandardsTab() {
       if (brd?.name) activeBirdNames.add(brd.name.trim());
     });
 
-  // نژادهایی که دستی توسط کاربر اضافه شدن (custom) — همیشه نشون بده
   const customBirdNames = new Set<string>();
   Object.values(custom).forEach((std: any) => {
     if (std.birdName) customBirdNames.add(std.birdName);
@@ -52,7 +50,6 @@ export default function EnvStandardsTab() {
     const newStd: BirdStandard = { ...template, key, nameFa, nameEn, birdName };
     updateStandard(key, newStd);
     showToast(nameFa + ' اضافه شد', 'success', 2000);
-    // خودکار همه رو نشون بده که کاربر ببینه اضافه شد
     setOnlyActive(false);
   };
 
@@ -65,18 +62,8 @@ export default function EnvStandardsTab() {
 
   return (
     <PageContainer>
-      <div style={{
-        padding: 'var(--pad-normal)',
-        background: 'var(--accent-soft)',
-        border: '1px solid var(--accent-border)',
-        borderRadius: 'var(--r-md)',
-        fontSize: 'var(--fs-sm)',
-        color: 'var(--text)',
-        lineHeight: 1.9,
-      }}>
-        <b>💡 استانداردها</b> — نژادها بر اساس پرنده مادر گروه‌بندی شده‌اند. روی هر نژاد بزن تا مقادیرش رو ویرایش کنی.
-      </div>
 
+      {/* دکمه فیلتر */}
       <button
         type="button"
         onClick={() => setOnlyActive(!onlyActive)}
@@ -155,7 +142,11 @@ export default function EnvStandardsTab() {
             subtitle={toFa(breeds.length) + ' نژاد'}
             tone="accent"
           >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 8,
+            }}>
               {breeds.map((std) => {
                 const isCustom = !!custom[std.key];
                 const isNative = std.category === 'native';
@@ -172,8 +163,9 @@ export default function EnvStandardsTab() {
                     onClick={() => setSelectedBird(std.key)}
                     style={{
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      gap: 4,
                       padding: '10px 12px',
                       background: 'var(--input-bg)',
                       border: '1px solid var(--border)',
@@ -181,32 +173,44 @@ export default function EnvStandardsTab() {
                       cursor: 'pointer',
                       fontFamily: 'inherit',
                       textAlign: 'right',
-                      minHeight: 52,
+                      minWidth: 0,
                     }}
                   >
-                    <span style={{ fontSize: 20, flexShrink: 0 }}>
-                      {isNative ? '🇮🇷' : '🔬'}
-                    </span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      width: '100%',
+                      minWidth: 0,
+                    }}>
+                      <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
+                        {isNative ? '🇮🇷' : '🔬'}
+                      </span>
+                      <span style={{
                         fontSize: 'var(--fs-base)',
                         fontWeight: 700,
                         color: 'var(--text)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}>
-                        {std.nameFa}
-                        {isCustom ? (
-                          <span style={{ fontSize: 10, color: 'var(--accent)' }}>✓</span>
-                        ) : null}
-                      </div>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                        {isNative ? 'بومی' : 'صنعتی'}
-                        {flockCount > 0 ? ' · ' + toFa(flockCount) + ' گله' : ''}
-                      </div>
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        flex: 1,
+                        minWidth: 0,
+                      }}>{std.nameFa}</span>
+                      {isCustom && (
+                        <span style={{ fontSize: 10, color: 'var(--accent)', flexShrink: 0 }}>✓</span>
+                      )}
                     </div>
-                    <span style={{ color: 'var(--muted)', fontSize: 14 }}>‹</span>
+                    <div style={{
+                      fontSize: 'var(--fs-xs)',
+                      color: 'var(--muted)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      width: '100%',
+                    }}>
+                      {isNative ? 'بومی' : 'صنعتی'}
+                      {flockCount > 0 ? ' · ' + toFa(flockCount) + ' گله' : ''}
+                    </div>
                   </button>
                 );
               })}

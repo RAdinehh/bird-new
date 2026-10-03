@@ -47,7 +47,7 @@ export default function SettingsGroup({
       <div role="button" tabIndex={0}
         onClick={toggle}
         style={{
-          padding: '11px 10px',
+          padding: '10px 10px',
           display: 'flex',
           alignItems: 'center',
           gap: 12,
@@ -57,7 +57,7 @@ export default function SettingsGroup({
         }}
       >
         <div style={{
-          width: 36, height: 36,
+          width: 32, height: 32,
           borderRadius: 'var(--r-md)',
           background: open ? 'var(--card-solid)' : soft,
           border: '1px solid ' + (open ? border : 'transparent'),
@@ -108,7 +108,7 @@ export default function SettingsGroup({
       }}>
         <div style={{ overflow: 'hidden' }}>
           <div style={{
-            padding: '10px 10px 12px',
+            padding: '8px 8px 10px',
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--sp-3)',

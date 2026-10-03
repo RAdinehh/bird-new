@@ -2,7 +2,7 @@ import { useSet } from './store';
 import { Btn, Field, Grid2, Input } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
-import { ToggleRow, LocalNumField, SubSection } from './helpers';
+import { ToggleRow, LocalNumField } from './helpers';
 
 export default function NotificationsTab() {
   const s = useSet();
@@ -11,8 +11,8 @@ export default function NotificationsTab() {
   const th = s.thresholds;
 
   const activeAlerts = [al.critical, al.important, al.info].filter(Boolean).length;
+  const activeReminders = (s.dueDateReminders || []).length;
 
-  // یادآور سرسید — کوتاه‌تر و تمیزتر
   const updateReminder = (days: number) => {
     const cur = s.dueDateReminders || [7, 3, 1];
     const next = cur.includes(days)
@@ -24,14 +24,13 @@ export default function NotificationsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
-      {/* ═══ ۱. نحوه‌ی اعلان ═══ */}
+      {/* ═══ ۱. سطوح هشدار ═══ */}
       <SettingsGroup
         icon="📡"
-        title="نحوه‌ی اعلان"
-        subtitle={`${toFa(activeAlerts)} سطح هشدار فعال`}
+        title="سطوح هشدار"
+        subtitle={`${toFa(activeAlerts)} از ۳ سطح فعال`}
         tone="accent"
       >
-        <SubSection label="سطوح هشدار" icon="🔔" />
         <ToggleRow
           label="🔴 بحرانی"
           sub="دما، تلفات بالا، آتش"
@@ -50,8 +49,15 @@ export default function NotificationsTab() {
           value={al.info}
           onChange={() => s.updateSection('alerts', { info: !al.info })}
         />
+      </SettingsGroup>
 
-        <SubSection label="ساعات سکوت" icon="🌙" />
+      {/* ═══ ۲. ساعات سکوت ═══ */}
+      <SettingsGroup
+        icon="🌙"
+        title="ساعات سکوت"
+        subtitle={qh.enabled ? `${qh.from} تا ${qh.to}` : 'غیرفعال'}
+        tone="purple"
+      >
         <ToggleRow
           label="فعال"
           sub="در این ساعات اعلان غیر‌بحرانی نیاید"
@@ -80,7 +86,7 @@ export default function NotificationsTab() {
             </Grid2>
             <ToggleRow
               label="پنجشنبه و جمعه"
-              sub="ساعات سکوت در آخر هفته هم"
+              sub="در آخر هفته هم اعمال شود"
               value={qh.weekends}
               onChange={() => s.updateSection('quietHours', { weekends: !qh.weekends })}
             />
@@ -88,67 +94,63 @@ export default function NotificationsTab() {
         ) : null}
       </SettingsGroup>
 
-      {/* ═══ ۲. یادآور سرسید ═══ */}
+      {/* ═══ ۳. یادآور سرسید ═══ */}
       <SettingsGroup
         icon="⏰"
         title="یادآور سرسید"
-        subtitle={`${toFa((s.dueDateReminders || []).length)} یادآور فعال`}
+        subtitle={`${toFa(activeReminders)} یادآور فعال`}
         tone="warn"
       >
         <div style={{
           fontSize: 'var(--fs-xs)',
           color: 'var(--muted)',
           lineHeight: 1.7,
-          padding: 'var(--pad-normal)',
+          padding: '8px 10px',
           background: 'var(--input-bg)',
           borderRadius: 'var(--r-sm)',
         }}>
-          قبل از رسیدن سرسید فاکتورهای پرداخت‌نشده، هشدار نمایش داده می‌شود.
+          قبل از رسیدن سرسید فاکتورهای پرداخت‌نشده
         </div>
         <Grid2>
           <ToggleRow
             label="۷ روز قبل"
-            sub="یادآوری زودهنگام"
             value={(s.dueDateReminders || []).includes(7)}
             onChange={() => updateReminder(7)}
           />
           <ToggleRow
             label="۳ روز قبل"
-            sub="یادآوری میانی"
             value={(s.dueDateReminders || []).includes(3)}
             onChange={() => updateReminder(3)}
           />
           <ToggleRow
             label="۱ روز قبل"
-            sub="یادآوری نزدیک"
             value={(s.dueDateReminders || []).includes(1)}
             onChange={() => updateReminder(1)}
           />
           <ToggleRow
             label="روز سرسید"
-            sub="در روز پرداخت"
             value={(s.dueDateReminders || []).includes(0)}
             onChange={() => updateReminder(0)}
           />
         </Grid2>
       </SettingsGroup>
 
-      {/* ═══ ۳. آستانه‌های هشدار ═══ */}
+      {/* ═══ ۴. آستانه‌های هشدار ═══ */}
       <SettingsGroup
         icon="📊"
         title="آستانه‌های هشدار"
-        subtitle={`افت ${toFa(th.eggDropPercent)}٪ · تلفات ${toFa(th.mortalityPerThousand)} در هزار`}
+        subtitle={`افت ${toFa(th.eggDropPercent)}٪ · تلفات ${toFa(th.mortalityPerThousand)}/هزار`}
         tone="danger"
       >
         <div style={{
           fontSize: 'var(--fs-xs)',
           color: 'var(--muted)',
           lineHeight: 1.7,
-          padding: 'var(--pad-normal)',
+          padding: '8px 10px',
           background: 'var(--input-bg)',
           borderRadius: 'var(--r-sm)',
         }}>
-          وقتی این آستانه‌ها رد شوند، هشدار خودکار ایجاد می‌شود.
+          وقتی این آستانه‌ها رد شوند، هشدار خودکار ایجاد می‌شود
         </div>
 
         <Grid2>
@@ -170,12 +172,9 @@ export default function NotificationsTab() {
             min={0}
             max={1000}
           />
-        </Grid2>
-
-        <Grid2>
           <LocalNumField
             label="انحراف دما"
-            hint="°C"
+            hint="بالاتر از هدف"
             value={th.tempDeviation}
             onChange={n => s.updateSection('thresholds', { tempDeviation: n })}
             unit="°C"
@@ -184,16 +183,13 @@ export default function NotificationsTab() {
           />
           <LocalNumField
             label="انحراف رطوبت"
-            hint="٪"
+            hint="بالاتر از هدف"
             value={th.humidityDeviation}
             onChange={n => s.updateSection('thresholds', { humidityDeviation: n })}
             unit="٪"
             min={0}
             max={100}
           />
-        </Grid2>
-
-        <Grid2>
           <LocalNumField
             label="حداقل آب/دان"
             hint="هشدار اگر کمتر"
@@ -212,9 +208,6 @@ export default function NotificationsTab() {
             min={0}
             max={10}
           />
-        </Grid2>
-
-        <Grid2>
           <LocalNumField
             label="دمای بحرانی بالا"
             hint="هشدار فوری"

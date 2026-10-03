@@ -17,6 +17,8 @@ export interface Breed {
   birdId: string;
   name: string;
   fcr: number | null;
+  /** کلید استاندارد در DEFAULT_STANDARDS (اختیاری) */
+  standardKey?: string;
   createdAt: string;
   updatedAt: string;
 }

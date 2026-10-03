@@ -186,7 +186,7 @@ export default function Set() {
         ))}
       </div>
 
-      <div style={{ padding: '8px 6px' }}>
+      <div style={{ padding: '8px 4px' }}>
         <div
           ref={containerRef}
           style={{
