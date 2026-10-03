@@ -48,7 +48,7 @@ export function useFlockEvents(flockId: string | null): FlockEventView[] {
   const hatches = useInc(s => s.hatches);
   const invoices = useTra(s => s.invoices);
   const productions = useEgg(s => s.productions);
-  const persons = useCtc(s => s.persons);
+  const contacts = useCtc(s => s.contacts);
 
   return useMemo(() => {
     if (!flockId) return [];
@@ -77,7 +77,7 @@ export function useFlockEvents(flockId: string | null): FlockEventView[] {
     for (const inv of (invoices || [])) {
       if (inv.relatedFlockId !== flockId) continue;
       const isAdd = inv.type === 'purchase';
-      const isSell = inv.type === 'sale' || inv.type === 'sell';
+      const isSell = inv.type === 'sale';
       if (!isAdd && !isSell) continue;
 
       // جمع تعداد از items
@@ -91,7 +91,7 @@ export function useFlockEvents(flockId: string | null): FlockEventView[] {
         count: itemCount,
         sex: 'mixed',
         origin: isAdd ? 'purchase' : undefined,
-        partyName: partyName(inv.partyId, persons || []),
+        partyName: partyName(inv.partyId, contacts || []),
         totalPrice: inv.total,
         notes: inv.number ? 'فاکتور ' + inv.number : '',
         source: 'tra',
