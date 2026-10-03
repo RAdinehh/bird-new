@@ -198,72 +198,85 @@ function applyInvoiceMovements(inv: Invoice, prevItems?: InvoiceItem[]): Invoice
   });
 }
 
+/** اعمال اثر فاکتور روی گله‌ها — خرید جوجه/پرنده → افزودن، فروش → کاهش */
 const BIRD_CATS = ['chick', 'adult', 'fertile_egg'];
 
-/** اعمال اثر فاکتور روی گله‌ها — خرید جوجه/پرنده → افزودن، فروش → کاهش */
 /* ITEMS_RETURNED */
 function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] {
-  const outItems: InvoiceItem[] = (inv.items || []).map(it => ({ ...it }));
   const flk = useFlk.getState();
   const brd = useBrd.getState();
+  const outItems: InvoiceItem[] = (inv.items || []).map(it => ({ ...it }));
 
-  // ۱. برگردوندن اثر قبلی (در حالت ویرایش/حذف)
-  if (prev) {
-    for (const it of prev.items || []) {
-      if (!it.birdId || !it.flockId) continue;
-      if (!BIRD_CATS.includes(prev.category)) continue;
-      const qty = it.quantity || 0;
-      if (qty <= 0) continue;
-      const f = flk.flocks.find(x => x.id === it.flockId);
-      if (!f) continue;
-      const cur = f.currentCount ?? 0;
-      if (prev.type === 'purchase') {
-        flk.update(it.flockId, { currentCount: Math.max(0, cur - qty) });
-      } else if (prev.type === 'sale') {
-        flk.update(it.flockId, { currentCount: cur + qty });
-      }
+  const keyOf = (cat: string, it: InvoiceItem) =>
+    `${cat}|${it.birdId || ''}|${it.breedId || ''}|${it.flockId || ''}`;
+
+  type G = { item: InvoiceItem; cat: string; qty: number; type: InvoiceType };
+
+  const buildMap = (inv2: Invoice | undefined): Map<string, G> => {
+    const m = new Map<string, G>();
+    if (!inv2) return m;
+    if (!BIRD_CATS.includes(inv2.category)) return m;
+    for (const it of inv2.items || []) {
+      if (!it.birdId) continue;
+      const k = keyOf(inv2.category, it);
+      const cur = m.get(k);
+      if (cur) cur.qty += (it.quantity || 0);
+      else m.set(k, { item: it, cat: inv2.category, qty: it.quantity || 0, type: inv2.type });
     }
-  }
+    return m;
+  };
 
-  // ۲. اعمال اثر جدید
-  if (!BIRD_CATS.includes(inv.category)) return outItems;
-  for (const it of inv.items || []) {
-    if (!it.birdId) continue;
-    const qty = it.quantity || 0;
-    if (qty <= 0) continue;
+  const prevMap = buildMap(prev);
+  const newMap = buildMap(inv);
+  const allKeys = new Set<string>([...prevMap.keys(), ...newMap.keys()]);
 
-    if (inv.type === 'purchase') {
-      if (it.flockId) {
-        const f = flk.flocks.find(x => x.id === it.flockId);
-        if (!f) continue;
-        flk.update(it.flockId, { currentCount: (f.currentCount ?? 0) + qty });
-      } else {
-        // EXISTING_FLOCK_CHECK — اگه قبلاً از این فاکتور گله ساختیم، همون رو استفاده کن
-        const existing = flk.flocks.find(f =>
-          f.sourceInvoiceId === inv.id &&
-          f.sourceCategory === inv.category &&
-          f.birdId === it.birdId &&
-          f.breedId === (it.breedId || '')
-        );
-        if (existing) {
-          flk.update(existing.id, { currentCount: (existing.currentCount ?? 0) + qty });
-          const idx0 = inv.items.indexOf(it);
-          if (idx0 >= 0 && outItems[idx0]) outItems[idx0].flockId = existing.id;
-          continue;
+  for (const k of allKeys) {
+    const p0 = prevMap.get(k);
+    const n0 = newMap.get(k);
+    const pq = p0?.qty || 0;
+    const nq = n0?.qty || 0;
+    const delta = nq - pq;
+    if (delta === 0) continue;
+    const ref = n0 || p0;
+    if (!ref) continue;
+    const it = ref.item;
+    const explicitFlockId = it.flockId || '';
+    const type = ref.type;
+    const sign = type === 'purchase' ? +1 : -1;
+
+    if (explicitFlockId) {
+      const f = flk.flocks.find(x => x.id === explicitFlockId);
+      if (!f) continue;
+      const next = (f.currentCount ?? 0) + sign * delta;
+      flk.update(explicitFlockId, { currentCount: Math.max(0, next) });
+    } else if (type === 'purchase') {
+      const birdId = it.birdId || '';
+      const breedId = it.breedId || '';
+      const existing = flk.flocks.find(f =>
+        f.sourceInvoiceId === inv.id &&
+        f.sourceCategory === ref.cat &&
+        f.birdId === birdId &&
+        (f.breedId || '') === breedId
+      );
+      if (existing) {
+        const next = (existing.currentCount ?? 0) + delta;
+        flk.update(existing.id, { currentCount: Math.max(0, next) });
+        for (let i = 0; i < inv.items.length; i++) {
+          if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = existing.id;
         }
-        // گله جدید بساز
+      } else if (delta > 0) {
         const breed = brd.breeds.find(b => b.id === it.breedId);
         const bird = brd.birds.find(b => b.id === it.birdId);
         const name = `گله ${breed?.name || bird?.name || '?'} — ${inv.date}`;
         const newFlockId = flk.add({
           name,
           type: 'layer',
-          birdId: it.birdId,
-          breedId: it.breedId || '',
+          birdId: birdId,
+          breedId: breedId,
           hallId: '',
           zoneId: '',
-          initialCount: qty,
-          currentCount: qty,
+          initialCount: delta,
+          currentCount: delta,
           maleCount: it.maleCount ?? null,
           femaleCount: it.femaleCount ?? null,
           layingStartDay: 0,
@@ -279,17 +292,15 @@ function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] {
           status: 'active',
           notes: `از فاکتور ${inv.number || ''}`,
           sourceInvoiceId: inv.id,
-          sourceCategory: inv.category,
+          sourceCategory: ref.cat,
         });
-        const idx = inv.items.indexOf(it);
-        if (idx >= 0 && outItems[idx]) outItems[idx].flockId = newFlockId;
+        for (let i = 0; i < inv.items.length; i++) {
+          if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = newFlockId;
+        }
       }
-    } else if (inv.type === 'sale' && it.flockId) {
-      const f = flk.flocks.find(x => x.id === it.flockId);
-      if (!f) continue;
-      flk.update(it.flockId, { currentCount: Math.max(0, (f.currentCount ?? 0) - qty) });
     }
   }
+
   return outItems;
 }
 
