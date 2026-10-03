@@ -288,28 +288,11 @@ export default function HallsPage() {
             </Select>
           </Field>
           
-          <Field label="نژاد پرنده" hint="محاسبه خودکار ظرفیت">
-            <Select value={form.breedId} onChange={e => setForm({...form, breedId: e.target.value})}>
-              <option value="">— انتخاب —</option>
-              {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </Select>
-          </Field>
+          
           
         <Grid2>
           <TempFormField label="دمای هدف" placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => setForm({...form, targetTemp: v})} />
           <Field label="رطوبت هدف"><NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => setForm({...form, targetHumidity: e.target.value})} unit="٪" min={-10} /></Field>
-        </Grid2>
-        <Grid2>
-          <Field label="تهویه"><NumField placeholder="۱۲" value={form.ventilation} onChange={e => setForm({...form, ventilation: e.target.value})} unit="m³/min" min={0} /></Field>
-          <Field label="روشنایی"><NumField placeholder="۲۰" value={form.light} onChange={e => setForm({...form, light: e.target.value})} unit="lux" min={0} /></Field>
-        </Grid2>
-        <Grid2>
-          <Field label="سیستم تهویه"><Select value={form.ventilationSystem} onChange={e => setForm({...form, ventilationSystem: e.target.value})}>{Object.entries(VENT_SYS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></Field>
-          <Field label="نوع بستر"><Select value={form.litterType} onChange={e => setForm({...form, litterType: e.target.value})}>{Object.entries(LITTER_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></Field>
-        </Grid2>
-        <Grid2>
-          <Field label="دانخوری"><Select value={form.feederType} onChange={e => setForm({...form, feederType: e.target.value})}>{Object.entries(FEEDER_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></Field>
-          <Field label="آبخوری"><Select value={form.drinkerType} onChange={e => setForm({...form, drinkerType: e.target.value})}>{Object.entries(DRINKER_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></Field>
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-sm)', fontWeight: 700,
            color: 'var(--muted)', borderTop: '1px dashed var(--border)' }}>زمان‌ها</div>
