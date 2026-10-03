@@ -384,12 +384,23 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
 
         <Grid2>
-          {!isPurchase && (
+          {isPurchase ? (
+            <Field label="گله مقصد" hint="خالی = گله جدید ساخته می‌شه">
+              <SmartSelect
+                value={item.flockId || ''}
+                onChange={v => updateItem({ flockId: v })}
+                options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))}
+                placeholder="— گله جدید —"
+                modalTitle="انتخاب گله"
+                autoThreshold={6}
+              />
+            </Field>
+          ) : (
             <Field label="گله مبدأ" hint="اگر فروش از گله خودت است">
               <SmartSelect
                 value={item.flockId || ''}
                 onChange={v => updateItem({ flockId: v })}
-                options={flocks.map(f => ({ value: f.id, label: f.name }))}
+                options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))}
                 placeholder="— بدون گله —"
                 modalTitle="انتخاب گله"
                 autoThreshold={6}
