@@ -126,9 +126,9 @@ export function sexRatio(male: number | null, female: number | null): string {
 export const LAYING_START_DAY = 140;
 
 /** سن شروع تخم‌گذاری این گله — اگر کاربر پر کرده، آن، وگرنه پیش‌فرض */
-export function getLayingStartDay(f: Flock): number {
+export function getLayingStartDay(f: Flock, fallback = LAYING_START_DAY): number {
   if (f.layingStartDay && f.layingStartDay > 0) return f.layingStartDay;
-  return LAYING_START_DAY;
+  return fallback;
 }
 
 export function isLayingReady(f: Flock): boolean {
