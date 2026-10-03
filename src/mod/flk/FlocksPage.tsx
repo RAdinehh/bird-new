@@ -7,7 +7,7 @@ import {
   LAYING_START_DAY, getLayingStartDay
 } from './store';
 import { useBrd } from '../brd/store';
-import { VACCINE_SCHEDULES, schedulesByType } from '../cal/vaccineSchedules';
+import { schedulesByType, getSchedule } from '../cal/vaccineSchedules';
 import { useHal } from '../hal/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';;
