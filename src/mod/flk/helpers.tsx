@@ -4,11 +4,21 @@
 import type { ReactNode, CSSProperties } from 'react';
 import { toFa } from '../../shr/utils/fa';
 
-export function Row({ l, v }: { l: string; v: string }) {
+export function Row({ l, v, autoFrom }: { l: string; v: string; autoFrom?: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-      <span style={{ color: 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+        <span style={{ color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+          {l}:
+          {autoFrom && <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block', flexShrink: 0 }} />}
+        </span>
+        <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
+      </div>
+      {autoFrom && (
+        <div style={{ fontSize: 10, color: 'var(--accent)', fontWeight: 600, opacity: 0.85, textAlign: 'left' }}>
+          {'✨ از ' + autoFrom}
+        </div>
+      )}
     </div>
   );
 }
