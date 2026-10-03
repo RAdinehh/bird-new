@@ -199,6 +199,17 @@ function applyInvoiceMovements(inv: Invoice, prevItems?: InvoiceItem[]): Invoice
 }
 
 /** اعمال اثر فاکتور روی گله‌ها — خرید جوجه/پرنده → افزودن، فروش → کاهش */
+/** محاسبه تاریخ هچ از تاریخ فاکتور منهای سن */
+function computeHatchDate(invDate: string, ageDays: number | null | undefined): string {
+  if (!ageDays || ageDays <= 0) return '';
+  try {
+    const en = invDate.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const d = parseJ(en, 'yyyy/MM/dd', new Date());
+    if (isNaN(d.getTime())) return '';
+    return formatJ(addDays(d, -ageDays), 'yyyy/MM/dd');
+  } catch { return ''; }
+}
+
 const BIRD_CATS = ['chick', 'adult', 'fertile_egg'];
 
 /* ITEMS_RETURNED */
@@ -282,7 +293,7 @@ function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] {
           layingStartDay: 0,
           endOfCycleDay: null,
           vaccineScheduleId: '',
-          hatchDate: '',
+          hatchDate: computeHatchDate(inv.date, it.ageDays),
           purchaseDate: inv.date,
           startDate: inv.date,
           source: 'purchase',
