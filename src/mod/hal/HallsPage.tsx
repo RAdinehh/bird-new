@@ -190,6 +190,9 @@ export default function HallsPage() {
             const zoneCount = zones.filter(z => z.hallId === h.id).length;
             const equipCount = equipment.filter(e => e.hallId === h.id).length;
             const equipValue = equipment.filter(e => e.hallId === h.id).reduce((a, e) => a + ((e.count || 0) * (e.unitPrice || 0)), 0);
+            const hallEquips = equipment.filter(e => e.hallId === h.id);
+            const totalAirflow = hallEquips.filter(e => e.type === 'fan' || e.type === 'cooler').reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
+            const totalLightW = hallEquips.filter(e => e.type === 'lamp').reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
             const isOpen = expandedId === h.id;
             return (
               <ExpandableCard key={h.id} accent="accent" index={fmt.int(i + 1)} iconEmoji="🏭"
@@ -214,8 +217,8 @@ export default function HallsPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
                   <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
-                  <Row l="تهویه" v={h.ventilation ? `${fmt.num(h.ventilation)} m³/min` : '—'} />
-                  <Row l="روشنایی" v={h.light ? `${fmt.num(h.light)} lux` : '—'} />
+                  <Row l="تهویه خودکار" v={totalAirflow > 0 ? `${fmt.num(totalAirflow)} m³/h` : '— تجهیز ثبت نشده'} />
+                  <Row l="روشنایی نصب‌شده" v={totalLightW > 0 ? `${fmt.num(totalLightW)} W` : '— تجهیز ثبت نشده'} />
                 </div>
 
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.3px' }}>🔧 تجهیزات ثابت</div>
