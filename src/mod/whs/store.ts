@@ -50,7 +50,7 @@ export interface Movement {
 interface State {
   items: Item[];
   movements: Movement[];
-  addItem: (i: Omit<Item, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addItem: (i: Omit<Item, 'id' | 'createdAt' | 'updatedAt'>) => string;
   updateItem: (id: string, patch: Partial<Item>) => void;
   deleteItem: (id: string) => void;
   addMovement: (m: Omit<Movement, 'id' | 'createdAt'>) => string;
@@ -80,7 +80,11 @@ export const useWhs = create<State>()(
       items: [],
       movements: [],
 
-      addItem: (i) => set({ items: [...get().items, { ...i, id: uuid(), createdAt: now(), updatedAt: now() }] }),
+      addItem: (i) => {
+        const id = uuid();
+        set({ items: [...get().items, { ...i, id, createdAt: now(), updatedAt: now() }] });
+        return id;
+      },
       updateItem: (id, patch) => set({ items: get().items.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) }),
       deleteItem: (id) => set({
         items: get().items.filter(x => x.id !== id),

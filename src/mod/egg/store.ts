@@ -4,7 +4,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
-import { useWhs } from '../whs/store';
+import { useWhs, generateBatchNo } from '../whs/store';
 
 export type EggType = 'eating' | 'fertile' | 'broken';
 
@@ -19,8 +19,9 @@ export interface EggProduction {
   avgWeight: number | null;
   notes: string;
   sourceLogId?: string;   // لینک به dlg (اختیاری)
-  stockItemId?: string;   // لینک به whs (اختیاری)
-  stockMovementId?: string;
+  eggCategory?: 'eating' | 'fertile';  // نوع تخم سالم
+  healthyMovementId?: string;    // movement تخم سالم
+  consumptionMovementId?: string; // movement تخم مصرفی (شکسته/نرم/کثیف)
   createdAt: string;
 }
 
@@ -58,6 +59,35 @@ interface State {
   deleteSale: (id: string) => void;
 }
 
+
+/** پیدا یا ساخت آیتم انبار برای تخم */
+function ensureEggItem(kind: 'eating' | 'fertile' | 'consumption'): string {
+  const nameMap: Record<string, string> = {
+    eating: 'تخم مرغ',
+    fertile: 'تخم نطفه‌دار',
+    consumption: 'تخم مصرفی',
+  };
+  const name = nameMap[kind];
+  const whs = useWhs.getState();
+  const found = whs.items.find(i => i.category === 'egg' && i.name === name);
+  if (found) return found.id;
+  const newId = whs.addItem({
+    name,
+    category: 'egg',
+    unit: 'pcs',
+    minStock: 0,
+    currentStock: 0,
+    lastPrice: 0,
+    supplierId: '',
+    expireDate: '',
+    withdrawalDays: null,
+    batchNo: '',
+    storage: 'room',
+    notes: 'ساخته‌شده خودکار توسط ماژول تخم',
+  });
+  return newId || '';
+}
+
 const now = () => new Date().toISOString();
 
 export const useEgg = create<State>()(
@@ -70,20 +100,42 @@ export const useEgg = create<State>()(
       packCarton: 0,
 
       addProduction: (p) => {
-        let stockMovementId = '';
-        if (p.stockItemId && p.totalCount > 0) {
-          try {
-            const whs = useWhs.getState();
-            const mid = whs.addMovement({
-              itemId: p.stockItemId, type: 'in',
-              quantity: p.totalCount, unitPrice: 0,
+        const id = uuid();
+        const consumptionCount = (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0);
+        let healthyMovementId = '';
+        let consumptionMovementId = '';
+        const whs = useWhs.getState();
+
+        if (p.totalCount > 0) {
+          const kind = p.eggCategory || 'eating';
+          const itemId = ensureEggItem(kind);
+          if (itemId) {
+            const batchNo = generateBatchNo(p.date, useWhs.getState().movements, itemId);
+            const mid = useWhs.getState().addMovement({
+              itemId, type: 'in', quantity: p.totalCount, unitPrice: 0,
               reason: 'adjustment', date: p.date, partyId: '',
-              notes: 'تولید تخم — ' + (p.date || ''),
+              notes: `تولید تخم — ${kind === 'eating' ? 'خوراکی' : 'نطفه‌دار'}`,
+              flockId: p.flockId, sourceModule: 'egg', sourceId: id, batchNo,
             });
-            if (mid) stockMovementId = mid;
-          } catch {}
+            if (mid) healthyMovementId = mid;
+          }
         }
-        const newProd = { ...p, stockMovementId, id: uuid(), createdAt: now() };
+
+        if (consumptionCount > 0) {
+          const itemId = ensureEggItem('consumption');
+          if (itemId) {
+            const batchNo = generateBatchNo(p.date, useWhs.getState().movements, itemId);
+            const mid = useWhs.getState().addMovement({
+              itemId, type: 'in', quantity: consumptionCount, unitPrice: 0,
+              reason: 'adjustment', date: p.date, partyId: '',
+              notes: 'تخم مصرفی (شکسته/نرم/کثیف)',
+              flockId: p.flockId, sourceModule: 'egg', sourceId: id, batchNo,
+            });
+            if (mid) consumptionMovementId = mid;
+          }
+        }
+
+        const newProd = { ...p, healthyMovementId, consumptionMovementId, id, createdAt: now() };
         set({ productions: [...get().productions, newProd] });
         return newProd.id;
       },
@@ -91,31 +143,58 @@ export const useEgg = create<State>()(
       updateProduction: (id, patch) => {
         const prev = get().productions.find(x => x.id === id);
         if (!prev) return;
+
+        // حذف movement های قبلی
+        const whs = useWhs.getState();
+        if (prev.healthyMovementId) { try { whs.deleteMovement(prev.healthyMovementId); } catch {} }
+        if (prev.consumptionMovementId) { try { whs.deleteMovement(prev.consumptionMovementId); } catch {} }
+
         const merged = { ...prev, ...patch };
-        if (prev.stockMovementId) {
-          try { useWhs.getState().deleteMovement(prev.stockMovementId); } catch {}
-        }
-        let stockMovementId = '';
-        if (merged.stockItemId && merged.totalCount > 0) {
-          try {
-            const whs = useWhs.getState();
-            const mid = whs.addMovement({
-              itemId: merged.stockItemId, type: 'in',
-              quantity: merged.totalCount, unitPrice: 0,
+        const consumptionCount = (merged.brokenCount || 0) + (merged.softCount || 0) + (merged.dirtyCount || 0);
+        let healthyMovementId = '';
+        let consumptionMovementId = '';
+
+        if (merged.totalCount > 0) {
+          const kind = merged.eggCategory || 'eating';
+          const itemId = ensureEggItem(kind);
+          if (itemId) {
+            const batchNo = generateBatchNo(merged.date, useWhs.getState().movements, itemId);
+            const mid = useWhs.getState().addMovement({
+              itemId, type: 'in', quantity: merged.totalCount, unitPrice: 0,
               reason: 'adjustment', date: merged.date, partyId: '',
-              notes: 'تولید تخم — ' + (merged.date || ''),
+              notes: `تولید تخم — ${kind === 'eating' ? 'خوراکی' : 'نطفه‌دار'}`,
+              flockId: merged.flockId, sourceModule: 'egg', sourceId: id, batchNo,
             });
-            if (mid) stockMovementId = mid;
-          } catch {}
+            if (mid) healthyMovementId = mid;
+          }
         }
+
+        if (consumptionCount > 0) {
+          const itemId = ensureEggItem('consumption');
+          if (itemId) {
+            const batchNo = generateBatchNo(merged.date, useWhs.getState().movements, itemId);
+            const mid = useWhs.getState().addMovement({
+              itemId, type: 'in', quantity: consumptionCount, unitPrice: 0,
+              reason: 'adjustment', date: merged.date, partyId: '',
+              notes: 'تخم مصرفی (شکسته/نرم/کثیف)',
+              flockId: merged.flockId, sourceModule: 'egg', sourceId: id, batchNo,
+            });
+            if (mid) consumptionMovementId = mid;
+          }
+        }
+
         set({
-          productions: get().productions.map(x => x.id === id ? { ...merged, stockMovementId } : x)
+          productions: get().productions.map(x => x.id === id
+            ? { ...merged, healthyMovementId, consumptionMovementId }
+            : x)
         });
       },
       deleteProduction: (id) => {
         const prev = get().productions.find(x => x.id === id);
-        if (prev?.stockMovementId) {
-          try { useWhs.getState().deleteMovement(prev.stockMovementId); } catch {}
+        if (prev) {
+          const whs = useWhs.getState();
+          if (prev.healthyMovementId) { try { whs.deleteMovement(prev.healthyMovementId); } catch {} }
+          if (prev.consumptionMovementId) { try { whs.deleteMovement(prev.consumptionMovementId); } catch {} }
         }
         set({ productions: get().productions.filter(x => x.id !== id) });
       },
