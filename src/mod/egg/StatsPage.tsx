@@ -60,8 +60,9 @@ export default function StatsPage() {
     const eatingPct = healthy > 0 ? Math.round((eating / healthy) * 1000) / 10 : 0;
     const otherPct = total > 0 ? Math.round((other / total) * 1000) / 10 : 0;
     const dayCount = new Set(filtered.map(p => p.date)).size;
-    const avgPerDay = dayCount > 0 ? Math.round(total / dayCount) : 0;
-    return { eating, fertile, broken, other, healthy, total, brokenPct, fertilePct, eatingPct, otherPct, dayCount, avgPerDay };
+    const avgHealthy = dayCount > 0 ? Math.round(healthy / dayCount) : 0;
+    const avgTotal = dayCount > 0 ? Math.round(total / dayCount) : 0;
+    return { eating, fertile, broken, other, healthy, total, brokenPct, fertilePct, eatingPct, otherPct, dayCount, avgHealthy, avgTotal };
   }, [filtered]);
 
   const flockRank = useMemo(() => {
@@ -155,6 +156,28 @@ export default function StatsPage() {
 
   const rangeLabel = range === '7' ? '۷ روز' : range === '30' ? '۳۰ روز' : range === '90' ? '۹۰ روز' : 'کل';
 
+  // اعتبارسنجی دوره
+  const coverage = useMemo(() => {
+    if (range === 'all') {
+      const allDates = new Set(productions.map(p => p.date).filter(Boolean));
+      return { days: allDates.size, rangeDays: 0, pct: 100, insufficient: false };
+    }
+    const rangeDays = parseInt(range);
+    const allDates = new Set(filtered.map(p => p.date).filter(Boolean));
+    const pct = rangeDays > 0 ? Math.round((allDates.size / rangeDays) * 100) : 100;
+    return {
+      days: allDates.size,
+      rangeDays,
+      pct,
+      insufficient: allDates.size < Math.min(3, rangeDays),
+    };
+  }, [filtered, range, productions]);
+
+  // اگه تعداد روزهای داده < 3، میانگین معنی نداره
+  const canAvg = coverage.days >= 2;
+  const canWeekly = coverage.days >= 7;
+  const canMonthly = coverage.days >= 20;
+
   return (
     <PageContainer>
       {/* فیلترها — کنار هم */}
@@ -186,6 +209,14 @@ export default function StatsPage() {
             </div>
           )}
 
+          {/* هشدار پوشش داده */}
+          {coverage.insufficient && range !== 'all' && (
+            <div style={{ padding: '8px 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: '1.2em' }}>💡</span>
+              <span>فقط {toFa(coverage.days)} روز از {toFa(coverage.rangeDays)} روز بازه داده دارید — میانگین‌ها ممکنه دقیق نباشن</span>
+            </div>
+          )}
+
           {/* خلاصه compact — ۴ کارت */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
             <div style={{ padding: '10px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -198,7 +229,12 @@ export default function StatsPage() {
             <div style={{ padding: '10px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>میانگین روزانه</div>
-                <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text)', marginTop: 2 }}>{toFa(stats.avgPerDay.toLocaleString('fa-IR'))}</div>
+                <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text)', marginTop: 2 }}>
+                  {canAvg ? toFa(stats.avgHealthy.toLocaleString('fa-IR')) : '—'}
+                </div>
+                <div style={{ fontSize: '10px', color: 'var(--muted)' }}>
+                  {canAvg ? `سالم از ${toFa(coverage.days)} روز` : 'داده کافی نیست'}
+                </div>
               </div>
               <span style={{ fontSize: '1.6em', opacity: 0.5 }}>📅</span>
             </div>
@@ -234,6 +270,12 @@ export default function StatsPage() {
                 <ChartTab active={chartType === 'dual'} onClick={() => setChartType('dual')} icon="📉" label="دو-ستونی" />
                 <ChartTab active={chartType === 'pie'} onClick={() => setChartType('pie')} icon="🥧" label="دایره‌ای" />
               </div>
+
+              {!canWeekly && (
+                <div style={{ padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center' }}>
+                  💡 برای روند هفتگی، حداقل ۷ روز داده لازمه
+                </div>
+              )}
 
               {chartType === 'bar' && (
                 <BarChart
@@ -292,7 +334,7 @@ export default function StatsPage() {
           )}
 
           {/* نمودار هفتگی */}
-          {weekly.length >= 2 && (
+          {canWeekly && weekly.length >= 2 && (
             <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>📆 روند هفتگی</span>
               <BarChart
@@ -304,7 +346,7 @@ export default function StatsPage() {
           )}
 
           {/* نمودار ماهانه */}
-          {monthly.length >= 2 && (
+          {canMonthly && monthly.length >= 2 && (
             <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>📅 روند ماهانه</span>
               <BarChart
