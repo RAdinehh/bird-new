@@ -134,6 +134,7 @@ function checkHallCapacity(
 
 function FlockEventsSection({ flockId }: { flockId: string }) {
   const events = useFlockEvents(flockId);
+  const fmt = useFormat();
   if (events.length === 0) return null;
 
   const typeMeta: Record<string, { icon: string; color: string; label: string; sign: '+' | '-' | '' }> = {
