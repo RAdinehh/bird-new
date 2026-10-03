@@ -184,6 +184,21 @@ export default function FlocksPage() {
     }
 
     if (!form.name.trim()) { setErr('نام گله اجباری است'); return; }
+
+    // ═══ قواعد منطقی ═══
+    const _init = int(form.initialCount);
+    const _curr = int(form.currentCount) || _init;
+    const _male = int(form.maleCount);
+    const _female = int(form.femaleCount);
+
+    if (_curr > _init) {
+      setErr(`تعداد فعلی (${toFa(_curr)}) نمی‌تواند بیشتر از تعداد اولیه (${toFa(_init)}) باشد`);
+      return;
+    }
+    if (form.type === 'breeder' && (_male + _female) > _init) {
+      setErr(`مجموع خروس (${toFa(_male)}) و مرغ (${toFa(_female)}) بیشتر از تعداد اولیه است`);
+      return;
+    }
     if (!form.birdId) { setErr('پرنده اجباری است'); return; }
     if (!form.startDate.trim() && !form.hatchDate.trim() && !form.purchaseDate.trim()) {
       setErr('حداقل یکی از تاریخ‌های هچ، خرید یا شروع را وارد کنید'); return;
@@ -620,10 +635,10 @@ export default function FlocksPage() {
 
           <Grid2>
             <Field label="تعداد اولیه" required>
-              <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={0} />
+              <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
             </Field>
             <Field label="تعداد فعلی">
-              <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={0} />
+              <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={0} max={100000} autoClamp />
             </Field>
           </Grid2>
 
@@ -631,10 +646,10 @@ export default function FlocksPage() {
             <DepBox title="اطلاعات گله مادر" tone="purple">
               <Grid2>
                 <Field label="تعداد خروس">
-                  <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} unit="پرنده" />
+                  <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
                 </Field>
                 <Field label="تعداد مرغ">
-                  <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} unit="پرنده" />
+                  <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
                 </Field>
               </Grid2>
               {form.maleCount && form.femaleCount && (
