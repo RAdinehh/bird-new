@@ -469,7 +469,7 @@ export default function EquipmentPage() {
         </Field>
         <Grid3>
           <Field label="تعداد">
-            <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit="عدد" min={0} />
+            <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={(UNIT_LABELS_EQ as any)[form.unit || 'pcs'] || 'عدد'} min={0} />
             {equipNeed ? (
               <div style={{
                 fontSize: 11,
@@ -490,6 +490,13 @@ export default function EquipmentPage() {
                 })()}
               </div>
             ) : null}
+          </Field>
+          <Field label="واحد">
+            <Select value={form.unit || 'pcs'} onChange={e => setForm({...form, unit: e.target.value})}>
+              {Object.entries(UNIT_LABELS_EQ).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </Select>
           </Field>
           <Field label="قیمت واحد"><MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} /></Field>
           <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
