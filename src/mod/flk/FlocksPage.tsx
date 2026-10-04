@@ -554,9 +554,16 @@ export default function FlocksPage() {
                   stats={<>
                     {ageDays > 0 && <span>🎂 <b style={{ color: 'var(--text)' }}>{fmt.int(ageDays)} روز</b></span>}
                     {f.currentCount && <span>🐔 <b style={{ color: 'var(--text)' }}>{fmt.int(f.currentCount)}</b></span>}
-                    {f.initialCount && f.currentCount && f.initialCount !== f.currentCount && (
-                      <span style={{ color: 'var(--danger)' }}>💀 <b>{fmt.int(f.initialCount - f.currentCount)}</b></span>
-                    )}
+                    {f.initialCount != null && f.currentCount != null && (f.initialCount - f.currentCount) > 0 && (() => {
+                      const deaths = f.initialCount - f.currentCount;
+                      const deathsPct = f.initialCount > 0 ? (deaths / f.initialCount) * 100 : 0;
+                      const danger = deathsPct > 5;
+                      return (
+                        <span style={{ color: danger ? 'var(--danger)' : 'var(--warn)', fontWeight: danger ? 700 : 500 }}>
+                          💀 <b>{fmt.int(deaths)}</b> {danger ? `(${fmt.int(Math.round(deathsPct))}٪)` : ''}
+                        </span>
+                      );
+                    })()}
                     {costs.perBird > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{fmt.money(Math.round(costs.perBird))}</b></span>}
                     {!ready && !isArchived && untilLay > 0 && (
                       <span style={{ color: 'var(--warn)' }}>⏳ <b>{fmt.int(untilLay)} روز</b></span>
