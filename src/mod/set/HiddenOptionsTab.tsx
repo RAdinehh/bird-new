@@ -2,6 +2,8 @@ import { useCustomOptions } from '../../shr/store/customOptions';
 import { Empty, Btn, PageContainer } from '../../shr/components/ui';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { toFa } from '../../shr/utils/fa';
+import { useHal } from '../hal/store';
 
 const KEY_LABELS: Record<string, string> = {
   'hal.equip.type.ventilation': 'تجهیزات → تهویه',
@@ -24,6 +26,8 @@ function keyLabel(key: string) {
 
 export default function HiddenOptionsTab() {
   const { getHidden, unhideOption, deleteOption } = useCustomOptions();
+  const { equipment } = useHal();
+  const usageCheck = (name: string) => equipment.filter((x: any) => x.type === name).length;
   const hidden = getHidden();
 
   if (hidden.length === 0) {
@@ -50,7 +54,11 @@ export default function HiddenOptionsTab() {
   };
 
   const handleDelete = async (id: string, name: string) => {
-    const ok = await showConfirmAsync('حذف کامل', '«' + name + '» برای همیشه پاک بشه؟', { danger: true });
+    const count = usageCheck(name);
+    const message = count > 0
+      ? '«' + name + '» در ' + count + ' مورد استفاده شده.\n\nاگه برای همیشه پاک کنی، تجهیزات سالم می‌مونن ولی توی کارت با برچسب «حذف‌شده» نمایش داده می‌شن.\n\nبرای همیشه پاک بشه؟'
+      : '«' + name + '» جای دیگه‌ای استفاده نشده.\n\nبرای همیشه پاک بشه؟';
+    const ok = await showConfirmAsync('حذف کامل', message, { danger: true });
     if (!ok) return;
     deleteOption(id);
     showToast('«' + name + '» حذف شد', 'info', 2000);
@@ -83,6 +91,14 @@ export default function HiddenOptionsTab() {
                   fontSize: 20, flexShrink: 0, opacity: .6,
                 }}>{o.icon}</span>
                 <span style={{ flex: 1, fontWeight: 600 }}>{o.name}</span>
+                {usageCheck(o.name) > 0 && (
+                  <span style={{
+                    fontSize: 10, fontWeight: 700,
+                    padding: '3px 8px', borderRadius: 6,
+                    background: 'rgba(217,119,6,.12)', color: 'var(--warn)',
+                    flexShrink: 0,
+                  }}>{toFa(usageCheck(o.name))} مورد</span>
+                )}
                 <Btn size="sm" onClick={() => handleUnhide(o.id, o.name)}>بازگردانی</Btn>
                 <Btn size="sm" variant="danger" onClick={() => handleDelete(o.id, o.name)}>حذف کامل</Btn>
               </div>

@@ -324,6 +324,7 @@ export default function EquipmentPage() {
           {list.map((e, i) => {
             const hall = halls.find(h => h.id === e.hallId);
             const _cm = (allCustomOpts as any[]).find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
+            const _isDeleted = _cm ? _cm.hidden === true : false;
             const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: '🔧' });
             const value = (e.count || 0) * (e.unitPrice || 0);
             const isOpen = expandedId === e.id;
@@ -334,7 +335,7 @@ export default function EquipmentPage() {
                 index={toFa(i + 1)}
                 iconEmoji={meta.icon}
                 title={e.name}
-                subtitle={`${meta.name} · ${hall?.name || '—'}`}
+                subtitle={`${meta.name}${_isDeleted ? ' · حذف‌شده' : ''} · ${hall?.name || '—'}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : e.id)}
                 badge={e.count ? <Tag tone="blue">{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</Tag> : undefined}
@@ -350,7 +351,17 @@ export default function EquipmentPage() {
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>نوع:</span>
-                    <span style={{ fontWeight: 600 }}>{meta.name}</span>
+                    <span style={{ fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      {meta.name}
+                      {_isDeleted && (
+                        <span style={{
+                          fontSize: 10, fontWeight: 700,
+                          padding: '2px 7px', borderRadius: 6,
+                          background: 'rgba(217,119,6,.14)', color: 'var(--warn)',
+                          letterSpacing: '.3px',
+                        }}>حذف‌شده</span>
+                      )}
+                    </span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',

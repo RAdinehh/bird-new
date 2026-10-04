@@ -92,6 +92,7 @@ export default function EditableSelect({
     ...customs.map(c => ({ value: c.name, label: c.name, icon: c.icon })),
   ];
   const current = all.find(o => o.value === value);
+  const isOrphan = !!value && !current;
 
   const resetForm = () => { setEditId(null); setFormName(''); setFormIcon('🔧'); setEmojiOpen(false); };
   const openAdd = () => { resetForm(); setView('form'); };
@@ -133,14 +134,20 @@ export default function EditableSelect({
       onClick={() => setOpen(true)}
       style={{
         width: '100%', textAlign: 'right', padding: '10px 12px',
-        background: 'var(--input-bg)', border: '1px solid var(--border)',
-        borderRadius: 'var(--r-sm)', color: current ? 'var(--text)' : 'var(--muted)',
+        background: 'var(--input-bg)',
+        border: '1px solid ' + (isOrphan ? 'rgba(217,119,6,.5)' : 'var(--border)'),
+        borderRadius: 'var(--r-sm)',
+        color: isOrphan ? 'var(--warn)' : (current ? 'var(--text)' : 'var(--muted)'),
         fontSize: 'var(--fs-base)', cursor: 'pointer', fontFamily: 'inherit',
         display: 'flex', alignItems: 'center', gap: 8,
       }}
     >
-      <span style={{ flex: 1, textAlign: 'right' }}>
-        {current ? (current.icon ? current.icon + ' ' + current.label : current.label) : (placeholder || '— انتخاب کنید —')}
+      <span style={{ flex: 1, textAlign: 'right', fontWeight: isOrphan ? 700 : 500 }}>
+        {isOrphan
+          ? '⚠ ' + value + ' (حذف‌شده)'
+          : current
+            ? (current.icon ? current.icon + ' ' + current.label : current.label)
+            : (placeholder || '— انتخاب کنید —')}
       </span>
     </button>
   );
