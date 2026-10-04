@@ -16,18 +16,26 @@ import type {
 } from './types';
 import { DEFAULT_STANDARDS, FALLBACK_ENV, FALLBACK_FEED, FALLBACK_GROWTH } from './data';
 
-// ═══ نگاشت نام فارسی → key ═══
-const NAME_TO_KEY: Record<string, string> = {
-  // نژادهای بومی
-  'مرندی': 'marandi',
-  'گلپایگانی': 'golpaygani',
-  'گلین': 'gilini',
-  // نژادهای صنعتی
-  'گوشتی': 'broiler',
-  'مرغ گوشتی': 'broiler',
-  'تخمگذار': 'layer',
-  'مرغ تخمگذار': 'layer',
-};
+// ═══ نگاشت نام فارسی/انگلیسی → key (داینامیک) ═══
+function buildNameToKey(): Record<string, string> {
+  const map: Record<string, string> = {};
+  // نژادهای قدیمی (alias)
+  map['گوشتی'] = 'broiler';
+  map['مرغ گوشتی'] = 'broiler';
+  map['تخمگذار'] = 'layer';
+  map['مرغ تخمگذار'] = 'layer';
+  map['گلین'] = 'gilini';
+  // از DEFAULT_STANDARDS
+  Object.values(DEFAULT_STANDARDS).forEach((std: any) => {
+    if (!std) return;
+    if (std.nameFa) map[std.nameFa.trim()] = std.key;
+    if (std.nameEn) map[std.nameEn.trim()] = std.key;
+    if (std.key) map[std.key] = std.key;
+  });
+  return map;
+}
+
+const NAME_TO_KEY: Record<string, string> = buildNameToKey();
 
 export function resolveBirdType(birdName: string | null | undefined): string | null {
   if (!birdName) return null;

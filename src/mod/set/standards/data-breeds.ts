@@ -48,15 +48,39 @@ const COBB_500: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 85, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 4.5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 2.5,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+    notes: 'پوشال چوب — ۵-۸ سانتی‌متر ضخامت، فقط خیس شدن موضعی تعویض شود',
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر',   dayFrom: 0, dayTo: 10, proteinPct: 21.5, energyKcal: 3000, lysinePct: 1.26, methioninePct: 0.50, calciumPct: 0.90, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'روغن', 'مکمل'] },
+      { name: 'گروئر',    dayFrom: 11, dayTo: 22, proteinPct: 19.5, energyKcal: 3100, lysinePct: 1.10, methioninePct: 0.44, calciumPct: 0.84, availablePhosphorusPct: 0.42, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'فینیشر ۱', dayFrom: 23, dayTo: 42, proteinPct: 18.5, energyKcal: 3150, lysinePct: 1.05, methioninePct: 0.43, calciumPct: 0.76, availablePhosphorusPct: 0.38, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'فینیشر ۲', dayFrom: 43, dayTo: 49, proteinPct: 17.5, energyKcal: 3200, lysinePct: 1.00, methioninePct: 0.41, calciumPct: 0.76, availablePhosphorusPct: 0.38, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+    ],
+    notes: 'طبق Cobb-Vantress 500 Broiler Performance & Nutrition Supplement 2022',
+  },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'کاب ۵۰۰',
 };
 
@@ -103,15 +127,38 @@ const ROSS_308: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 80, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 4.5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 2.5,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+    notes: 'پوشال چوب — ۵-۸ سانتی‌متر ضخامت، فقط خیس شدن موضعی تعویض شود',
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 10, proteinPct: 22.5, energyKcal: 3000, lysinePct: 1.44, methioninePct: 0.56, calciumPct: 0.96, availablePhosphorusPct: 0.48, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'روغن', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 11, dayTo: 24, proteinPct: 21.0, energyKcal: 3100, lysinePct: 1.10, methioninePct: 0.48, calciumPct: 0.87, availablePhosphorusPct: 0.435, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 25, dayTo: 49, proteinPct: 19.5, energyKcal: 3200, lysinePct: 0.96, methioninePct: 0.43, calciumPct: 0.81, availablePhosphorusPct: 0.405, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+    notes: 'طبق Aviagen Ross 308 Nutrition Specifications 2019',
+  },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'راس ۳۰۸',
 };
 
@@ -158,15 +205,32 @@ const IRAN_BROILER: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 90, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 12, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 4.5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'استاندارد ایران — گوشتی',
 };
 
@@ -213,15 +277,32 @@ const HY_LINE_W36: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3.5, fanM3PerKg: 4.5,
+    lampWattPerM2: 3.5, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'های‌لاین W36',
 };
 
@@ -268,15 +349,32 @@ const IRAN_LAYER: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 22, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3.5, fanM3PerKg: 4.5,
+    lampWattPerM2: 3.5, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'استاندارد ایران — تخم‌گذار',
 };
 
@@ -323,15 +421,32 @@ const LOHMANN: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3.5, fanM3PerKg: 4.5,
+    lampWattPerM2: 3.5, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'لوهمن',
 };
 
@@ -378,15 +493,32 @@ const LEGHORN: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 22, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3.5, fanM3PerKg: 4.5,
+    lampWattPerM2: 3.5, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'لگهورن',
 };
 
@@ -432,15 +564,32 @@ const MARANDI: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 40, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 4.5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'مرندی',
 };
 
@@ -486,15 +635,32 @@ const GOLPAYGANI: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 35, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 4.5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'گلپایگانی',
 };
 
@@ -540,15 +706,32 @@ const LARI: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 4.5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'لاری',
 };
 
@@ -594,15 +777,32 @@ const GOLIN: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 35, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 4.5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'گلین (بومی)',
 };
 
@@ -646,15 +846,32 @@ const AUSTRALORP: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3.5, fanM3PerKg: 4.5,
+    lampWattPerM2: 3.5, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'استرالوپ',
 };
 
@@ -698,15 +915,32 @@ const COCHIN: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 35, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 12, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'کوشین',
 };
 
@@ -750,15 +984,32 @@ const BRAHMA: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 12, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'برهما',
 };
 
@@ -802,15 +1053,32 @@ const SULTAN: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 4.5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'سلطان',
 };
 
@@ -851,15 +1119,32 @@ const MINIATURE: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 40, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 12, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3.5, fanM3PerKg: 5,
+    lampWattPerM2: 3.5, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.6, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 67 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 22, energyKcal: 3000, methioninePct: 0.5, lysinePct: 1.2, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 22, dayTo: 35, proteinPct: 20, energyKcal: 3100, methioninePct: 0.45, lysinePct: 1.1, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 36, dayTo: 999, proteinPct: 18, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.0, calciumPct: 0.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'مینیاتوری',
 };
 
@@ -906,15 +1191,31 @@ const QUAIL_BROILER: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 40, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 15, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 4, fanM3PerKg: 5,
+    lampWattPerM2: 4, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70 },
+  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 14, proteinPct: 24, energyKcal: 2900, calciumPct: 1.0, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی'] },
+      { name: 'رشد',    dayFrom: 15, dayTo: 42, proteinPct: 20, energyKcal: 3000, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'بلدرچین گوشتی',
 };
 
@@ -958,15 +1259,31 @@ const QUAIL_LAYER: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 15, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 4.5, fanM3PerKg: 5,
+    lampWattPerM2: 4.5, fanM3PerKg: 5.0,
   },
-  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70 },
+  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 36.8, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 14, proteinPct: 24, energyKcal: 2900, calciumPct: 1.0, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی'] },
+      { name: 'رشد',    dayFrom: 15, dayTo: 42, proteinPct: 20, energyKcal: 3000, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'مکمل'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'بلدرچین تخم‌گذار',
 };
 
@@ -1010,15 +1327,32 @@ const DUCK_PEKIN: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['straw', 'wood_shavings'],
+    kgPerM2: 6,
+    thicknessCm: 10,
+    lifetimeDays: 30,
+    replacementsPerCycle: 4,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 20, energyKcal: 2900, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'رشد',    dayFrom: 22, dayTo: 999, proteinPct: 18, energyKcal: 3000, calciumPct: 0.85, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'اردک پکنی',
 };
 
@@ -1064,15 +1398,32 @@ const DUCK_MUSCOVY: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
   incubation: { totalDays: 35, lockdownDay: 32, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['straw', 'wood_shavings'],
+    kgPerM2: 6,
+    thicknessCm: 10,
+    lifetimeDays: 30,
+    replacementsPerCycle: 4,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 20, energyKcal: 2900, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'رشد',    dayFrom: 22, dayTo: 999, proteinPct: 18, energyKcal: 3000, calciumPct: 0.85, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'اردک موسیقا',
 };
 
@@ -1116,15 +1467,32 @@ const DUCK_UKRAINIAN: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 28, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['straw', 'wood_shavings'],
+    kgPerM2: 6,
+    thicknessCm: 10,
+    lifetimeDays: 30,
+    replacementsPerCycle: 4,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 20, energyKcal: 2900, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'رشد',    dayFrom: 22, dayTo: 999, proteinPct: 18, energyKcal: 3000, calciumPct: 0.85, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'اردک اوکراینی',
 };
 
@@ -1172,12 +1540,30 @@ const TURKEY: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 7.5,
   },
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.0, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['wood_shavings', 'straw'],
+    kgPerM2: 5.5,
+    thicknessCm: 10,
+    lifetimeDays: 60,
+    replacementsPerCycle: 3,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 28, proteinPct: 28, energyKcal: 2900, methioninePct: 0.55, lysinePct: 1.6, calciumPct: 1.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 29, dayTo: 84, proteinPct: 24, energyKcal: 3100, methioninePct: 0.5, lysinePct: 1.4, calciumPct: 1.1, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'فینیشر', dayFrom: 85, dayTo: 999, proteinPct: 20, energyKcal: 3200, methioninePct: 0.4, lysinePct: 1.2, calciumPct: 1.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'بوقلمون (برنز/بوربون/بیوتی)',
 };
 
@@ -1222,15 +1608,32 @@ const GOOSE: BirdStandard = {
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5 },
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
-    lampWattPerM2: 3, fanM3PerKg: 5,
+    lampWattPerM2: 3, fanM3PerKg: 5.0,
   },
   incubation: { totalDays: 30, lockdownDay: 27, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 75 },
+  litter: {
+    recommended: ['straw', 'wood_shavings'],
+    kgPerM2: 6,
+    thicknessCm: 10,
+    lifetimeDays: 30,
+    replacementsPerCycle: 4,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 1, dayTo: 21, proteinPct: 20, energyKcal: 2900, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'رشد',    dayFrom: 22, dayTo: 999, proteinPct: 18, energyKcal: 3000, calciumPct: 0.85, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+    ],
+  },
   mortality: [
-    { dayFrom: 1, dayTo: 7, maxPct: 1 },
-    { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
-    { dayFrom: 31, dayTo: 365, maxPct: 2 },
+    { dayFrom: 1, dayTo: 7, maxPct: 1.0 },
+    { dayFrom: 8, dayTo: 14, maxPct: 0.5 },
+    { dayFrom: 15, dayTo: 21, maxPct: 0.5 },
+    { dayFrom: 22, dayTo: 28, maxPct: 0.4 },
+    { dayFrom: 29, dayTo: 35, maxPct: 0.4 },
+    { dayFrom: 36, dayTo: 42, maxPct: 0.4 },
+    { dayFrom: 43, dayTo: 49, maxPct: 0.4 },
   ],
-  mortalityTotalPct: 4.5,
+  mortalityTotalPct: 3.6,
   notes: 'غاز',
 };
 

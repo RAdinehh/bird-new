@@ -106,12 +106,50 @@ export interface EquipmentRatios {
 
 // ═══ 🆕 انکوباسیون ═══
 export interface IncubationStandard {
-  totalDays: number;         // کل روز انکوباسیون (۲۱ مرغ)
-  lockdownDay: number;       // روز شروع lockdown (۱۸ مرغ)
-  setterTemp: number;        // دمای ستر (°C)
-  setterHumidity: number;    // رطوبت ستر (٪)
-  hatcherTemp: number;       // دمای هچر (°C)
-  hatcherHumidity: number;   // رطوبت هچر (٪)
+  totalDays: number;
+  lockdownDay: number;
+  setterTemp: number;
+  setterHumidity: number;
+  hatcherTemp: number;
+  hatcherHumidity: number;
+  turningPerDay?: number;
+  candlingDays?: number[];
+  chickYieldPct?: number;
+  airExchangePer1000Eggs?: number;
+}
+
+// ═══ 🆕 بستر ═══
+export type LitterMaterial =
+  | 'wood_shavings' | 'straw' | 'sand' | 'rice_hull' | 'paper_roll'
+  | 'sawdust' | 'peat' | 'none';
+
+export interface LitterStandard {
+  recommended: LitterMaterial[];
+  kgPerM2: number;
+  thicknessCm: number;
+  lifetimeDays: number;
+  replacementsPerCycle?: number;
+  notes?: string;
+}
+
+// ═══ 🆕 جیره (فرمول) ═══
+export interface FeedFormulaPhase {
+  name: string;
+  dayFrom: number;
+  dayTo: number;
+  proteinPct: number;
+  energyKcal: number;
+  methioninePct?: number;
+  lysinePct?: number;
+  calciumPct?: number;
+  availablePhosphorusPct?: number;
+  saltPct?: number;
+  mainIngredients?: string[];
+}
+
+export interface FeedFormulaStandard {
+  phases: FeedFormulaPhase[];
+  notes?: string;
 }
 
 // ═══ استاندارد کامل پرنده ═══
@@ -129,10 +167,11 @@ export interface BirdStandard {
   space: SpaceStandard;
   equipment: EquipmentRatios;
   incubation: IncubationStandard;
+  litter?: LitterStandard;
+  formula?: FeedFormulaStandard;
   production?: ProductionStandard;
   mortality: MortalityRange[];
   mortalityTotalPct: number;
-
   notes?: string;
 }
 
