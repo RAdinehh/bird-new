@@ -647,7 +647,37 @@ export default function FlocksPage() {
 
               const accentColor: any = isArchived ? 'dim' : lc.color;
 
+              const isSelected = selectedIds.has(f.id);
               return (
+                <div key={f.id} style={{ position: 'relative' }}>
+                  {selectionMode && (
+                    <div
+                      role="checkbox"
+                      aria-checked={isSelected}
+                      onClick={(e) => { e.stopPropagation(); toggleSelect(f.id); }}
+                      style={{
+                        position: 'absolute', top: 10, left: 10, zIndex: 10,
+                        width: 24, height: 24, borderRadius: 6,
+                        background: isSelected ? 'var(--accent)' : 'var(--card)',
+                        border: '2px solid ' + (isSelected ? 'var(--accent)' : 'var(--border)'),
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', transition: 'all 150ms ease',
+                      }}
+                    >
+                      {isSelected && (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                    </div>
+                  )}
+                  {selectionMode && isSelected && (
+                    <div style={{
+                      position: 'absolute', inset: 0, zIndex: 5,
+                      border: '2px solid var(--accent)', borderRadius: 'var(--r-lg)',
+                      pointerEvents: 'none',
+                    }} />
+                  )}
                 <ExpandableCard
                   key={f.id}
                   accent={accentColor}
@@ -656,7 +686,10 @@ export default function FlocksPage() {
                   title={f.name}
                   subtitle={`${bird?.name || '—'}${breed ? ` · ${breed.name}` : ''}${hall ? ` · ${hall.name}` : ''}`}
                   isOpen={isOpen}
-                  onToggle={() => setExpandedId(isOpen ? null : f.id)}
+                  onToggle={() => {
+                    if (selectionMode) { toggleSelect(f.id); return; }
+                    setExpandedId(isOpen ? null : f.id);
+                  }}
                   badge={<>
                     <Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>
                     {f.sourceInvoiceId && <Tag tone="blue">🛒 فاکتور</Tag>}
@@ -790,10 +823,32 @@ export default function FlocksPage() {
                     )}
                   </div>
                 </ExpandableCard>
+                </div>
               );
             })}
             {tab !== 'archived' && <Btn variant="primary" full onClick={openNew}>+ افزودن گله</Btn>}
           </>
+        )}
+
+        {/* نوار شناور Multi-Select */}
+        {selectionMode && selectedIds.size > 0 && (
+          <div style={{
+            position: 'fixed', bottom: 90, left: '50%', transform: 'translateX(-50%)',
+            zIndex: 100, maxWidth: 460, width: 'calc(100% - 24px)',
+            background: 'var(--card-solid)', border: '1px solid var(--accent-border)',
+            borderRadius: 'var(--r-lg)', boxShadow: '0 6px 24px rgba(0,0,0,0.18)',
+            padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
+              {toFa(selectedIds.size)} انتخاب
+            </span>
+            <Btn size="sm" onClick={doBulkArchive} style={{ flex: 1 }}>
+              📦 آرشیو
+            </Btn>
+            <Btn size="sm" variant="danger" onClick={doBulkDelete} style={{ flex: 1 }}>
+              🗑 حذف
+            </Btn>
+          </div>
         )}
 
         <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش گله' : 'افزودن گله'}
