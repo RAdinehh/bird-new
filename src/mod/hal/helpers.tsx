@@ -396,19 +396,27 @@ export function SourceCard({
             </div>
           )}
           {sources.map((s) => (
-            <div key={s.id} style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '8px 10px',
-              background: 'var(--card-solid)',
-              border: '1.5px solid var(--border)',
-              borderRadius: 12,
-              boxShadow: '0 1px 2px rgba(15,23,42,.04)',
-            }}>
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setEditId(s.id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 14px', minHeight: 56,
+                background: 'var(--card-solid)',
+                border: '1.5px solid var(--border)',
+                borderRadius: 14,
+                color: 'var(--text)', fontFamily: 'inherit',
+                textAlign: 'right', cursor: 'pointer',
+                width: '100%', boxSizing: 'border-box',
+                boxShadow: '0 1px 2px rgba(15,23,42,.04), 0 2px 6px rgba(15,23,42,.04)',
+              }}
+            >
               <span style={{
-                width: 36, height: 36, borderRadius: 11,
+                width: 40, height: 40, borderRadius: 12,
                 background: 'linear-gradient(135deg, #f0f4f8 0%, #e2e8ef 100%)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 18, flexShrink: 0,
+                fontSize: 20, flexShrink: 0,
               }}>{sourceIcon(s.type)}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -422,19 +430,8 @@ export function SourceCard({
                   </div>
                 )}
               </div>
-              <button type="button" onClick={() => setEditId(s.id)} aria-label="ویرایش" style={{
-                width: 32, height: 32, borderRadius: 9,
-                background: 'var(--input-bg)', border: '1px solid var(--border)',
-                cursor: 'pointer', fontSize: 13, flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>✏️</button>
-              <button type="button" onClick={() => remove(s.id)} aria-label="حذف" style={{
-                width: 32, height: 32, borderRadius: 9,
-                background: 'var(--input-bg)', border: '1px solid var(--border)',
-                cursor: 'pointer', fontSize: 13, flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>🗑️</button>
-            </div>
+              <span style={{ color: 'var(--muted)', fontSize: 18, flexShrink: 0 }}>‹</span>
+            </button>
           ))}
         </div>
       </Modal>
@@ -493,13 +490,30 @@ export function SourceCard({
               />
             </Field>
             <div style={{ display: 'flex', gap: 6, paddingTop: 8 }}>
-              <button type="button" onClick={() => setEditId(null)} style={{
-                flex: 1, padding: '12px',
-                background: 'var(--btn-bg)', border: '1px solid var(--border)',
-                borderRadius: 'var(--r-sm)', color: 'var(--text)',
-                fontSize: 'var(--fs-base)', fontFamily: 'inherit',
-                fontWeight: 600, cursor: 'pointer',
-              }}>بستن</button>
+              <button
+                type="button"
+                onClick={() => { remove(editing.id); setEditId(null); }}
+                style={{
+                  flex: 1, padding: '12px',
+                  background: 'rgba(220,38,38,.08)',
+                  border: '1px solid rgba(220,38,38,.25)',
+                  borderRadius: 'var(--r-sm)', color: 'var(--danger)',
+                  fontSize: 'var(--fs-base)', fontFamily: 'inherit',
+                  fontWeight: 700, cursor: 'pointer',
+                }}
+              >حذف</button>
+              <button
+                type="button"
+                onClick={() => setEditId(null)}
+                style={{
+                  flex: 1, padding: '12px',
+                  background: 'var(--accent)', border: 'none',
+                  borderRadius: 'var(--r-sm)', color: '#fff',
+                  fontSize: 'var(--fs-base)', fontFamily: 'inherit',
+                  fontWeight: 700, cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(22,163,74,.28)',
+                }}
+              >ذخیره</button>
             </div>
           </>
         )}
