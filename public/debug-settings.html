@@ -1,0 +1,8 @@
+<!DOCTYPE html><html><body style="font:14px monospace;padding:14px;direction:ltr"><pre id="o">...</pre>
+<script>
+try {
+  const s = JSON.parse(localStorage.getItem('pm-settings'));
+  const units = s.state?.units || s.units || {};
+  document.getElementById('o').textContent = JSON.stringify(units, null, 2);
+} catch(e) { document.getElementById('o').textContent = 'ERR: ' + e.message; }
+</script></body></html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><body style="font:14px monospace;padding:14px;direction:ltr"><pre id="o">...</pre>
+<script>
+try {
+  const raw = localStorage.getItem('pm-hal');
+  const s = JSON.parse(raw);
+  const halls = s.state?.halls || s.halls || [];
+  document.getElementById('o').textContent = JSON.stringify(halls.map(h => ({
+    name: h.name,
+    length: h.length,
+    width: h.width,
+    height: h.height,
+    ventilationSystem: h.ventilationSystem,
+    feederType: h.feederType,
+    drinkerType: h.drinkerType,
+    litterType: h.litterType,
+  })), null, 2);
+} catch(e) { document.getElementById('o').textContent = 'ERR: ' + e.message; }
+</script></body></html>

@@ -35,6 +35,7 @@ import UndoBar from '../../cor/ui/UndoBar';
 import { Section, SectionTitle, Row } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
+import { bus } from '../../cor/events';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createDlgSchema } from '../../shr/validation/rules/dlg';
 
@@ -132,10 +133,16 @@ export default function DailyLogsPage() {
     const logToRestore = undoData.log;
     try {
       add(logToRestore);
-      applyDeathsCascade(
-        { flockId: logToRestore.flockId, date: logToRestore.date, deathsCount: logToRestore.deathsCount || 0, deaths: logToRestore.deaths || [] },
-        null,
-      );
+      try {
+        bus.emit('dlg:deaths:recorded', {
+          logId: logToRestore.id,
+          flockId: logToRestore.flockId,
+          date: logToRestore.date,
+          count: logToRestore.deathsCount || 0,
+          deaths: logToRestore.deaths || [],
+          isEdit: false,
+        }, { source: 'dlg/undoDelete' });
+      } catch (e) { /* silent */ }
       showToast('ثبت بازگردانی شد', 'success', 2000);
     } catch (err) {
       showToast('بازگردانی ناموفق', 'error', 2000);
@@ -241,61 +248,7 @@ export default function DailyLogsPage() {
     const sys = detectSystems(flockId);
     setForm(f => ({ ...f, flockId, feedMethod: sys.feedMethod, waterMethod: sys.waterMethod }));
   };
-  const applyDeathsCascade = (
-    log: { flockId: string; date: string; deathsCount: number; deaths: Death[] },
-    oldLog: DailyLog | null,
-  ) => {
-    try {
-      const flkState = useFlk.getState();
-      const oldFlockId = oldLog?.flockId || null;
-      const newFlockId = log.flockId;
-      const oldDeaths = oldLog?.deathsCount || 0;
-      const newDeaths = log.deathsCount || 0;
-      if (oldLog && oldFlockId && oldFlockId !== newFlockId && oldDeaths > 0) {
-        const oldFlock = flkState.flocks.find(f => f.id === oldFlockId);
-        if (oldFlock) {
-          flkState.update(oldFlockId, {
-            currentCount: (oldFlock.currentCount ?? 0) + oldDeaths,
-          });
-        }
-      }
-      const sameFlock = oldLog && oldFlockId === newFlockId;
-      const delta = sameFlock ? (newDeaths - oldDeaths) : newDeaths;
-      if (delta === 0) return;
-      const flock = flkState.flocks.find(f => f.id === newFlockId);
-      if (!flock) return;
-      flkState.update(newFlockId, {
-        currentCount: Math.max(0, (flock.currentCount ?? 0) - delta),
-      });
-      if (delta > 0) {
-        const causes = (log.deaths || [])
-          .map(d => causeLabel(d.cause))
-          .filter(x => x && x !== '—')
-          .join('، ');
-        flkState.addEvent(newFlockId, {
-          date: log.date,
-          type: 'death',
-          count: delta,
-          sex: 'mixed',
-          reason: causes || undefined,
-          notes: 'ثبت روزانه',
-        });
-      }
-    } catch { /* silent */ }
-  };
 
-  const revertDeathsCascade = (log: DailyLog) => {
-    if (!log.flockId || !log.deathsCount || log.deathsCount <= 0) return;
-    try {
-      const flkState = useFlk.getState();
-      const flock = flkState.flocks.find(f => f.id === log.flockId);
-      if (flock) {
-        flkState.update(log.flockId, {
-          currentCount: (flock.currentCount ?? 0) + log.deathsCount,
-        });
-      }
-    } catch { /* silent */ }
-  };
 
 
 const collectWhsShortages = () => {
@@ -484,7 +437,20 @@ const collectWhsShortages = () => {
       }
     } catch (e) { /* silent */ }
 
-    applyDeathsCascade(data, form.id ? (logs.find(l => l.id === form.id) || null) : null);
+    // emit event به جای cascade مستقیم
+    const oldLog = form.id ? (logs.find(l => l.id === form.id) || null) : null;
+    try {
+      bus.emit('dlg:deaths:recorded', {
+        logId,
+        flockId: data.flockId,
+        date: data.date,
+        count: data.deathsCount || 0,
+        deaths: data.deaths || [],
+        isEdit: !!form.id,
+        prevCount: oldLog?.deathsCount || 0,
+        prevFlockId: oldLog?.flockId,
+      }, { source: 'dlg/save' });
+    } catch (e) { /* silent */ }
 
     showToast(form.id ? 'ثبت روزانه به‌روز شد' : 'ثبت روزانه ذخیره شد', 'success', 2200);
     setOpen(false);
@@ -1174,7 +1140,17 @@ const collectWhsShortages = () => {
             if (log?.feedMovementIds) log.feedMovementIds.forEach(id => deleteMovement(id));
             const prod = findByLogId(idToDel);
             if (prod) deleteProduction(prod.id);
-            if (log) revertDeathsCascade(log);
+            if (log) {
+              try {
+                bus.emit('dlg:log:deleted', {
+                  logId: log.id,
+                  flockId: log.flockId,
+                  date: log.date,
+                  deathsCount: log.deathsCount || 0,
+                  feedMovementIds: log.feedMovementIds || [],
+                }, { source: 'dlg/delete' });
+              } catch (e) { /* silent */ }
+            }
             remove(idToDel);
               logAction('delete', 'dlg', 'حذف از ثبت روزانه');
             showToast('ثبت حذف شد', 'info', 1800);

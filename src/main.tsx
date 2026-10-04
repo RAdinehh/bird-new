@@ -7,6 +7,7 @@ import ErrorBoundary from './shr/components/ErrorBoundary';
 import { showAlert } from './cor/store/dialog';
 import { applyTheme } from './cor/theme/applyTheme';
 import { useSet } from './mod/set/store';
+import { registerFlkHandlers } from './mod/flk/handlers';
 
 // ═══ اعمال تم قبل از React mount (صفر پرش) ═══
 try {
@@ -26,6 +27,9 @@ try {
 } catch (e) {
   /* silent */
 }
+
+// ثبت handlerهای Event Bus
+registerFlkHandlers();
 
 // Override window.alert
 window.alert = (msg: any) => {

@@ -17,6 +17,7 @@ export interface DlgDeathsRecorded {
   deaths: Array<{ id: string; count: number; cause: string; notes: string }>;
   isEdit: boolean;
   prevCount?: number;
+  prevFlockId?: string;
 }
 
 export interface DlgFeedConsumed {
