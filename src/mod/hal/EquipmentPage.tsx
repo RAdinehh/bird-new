@@ -11,6 +11,8 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
 import { chip } from './helpers';
+import EditableSelect from '../../shr/components/EditableSelect';
+import { useCustomOptions } from '../../shr/store/customOptions';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -18,6 +20,17 @@ import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
+
+const TYPES_BY_CATEGORY: Record<string, string[]> = {
+  ventilation: ['fan', 'cooler'],
+  feeding:     ['feeder'],
+  drinking:    ['drinker'],
+  heating:     ['heater'],
+  lighting:    ['lamp'],
+  litter:      [],
+  power:       [],
+  auxiliary:   ['camera', 'sensor', 'other'],
+};
 
 function getCapacityHint(type: string, cap: number | null, hallVol: number | null, count: number = 1, eff: number | null = null): string {
   if (!cap || !hallVol || hallVol <= 0) return '';
@@ -107,6 +120,7 @@ export default function EquipmentPage() {
   const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
+  const { options: allCustomOpts } = useCustomOptions();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({ id:'', hallId:'', kind:'asset', category:'lighting', type:'lamp', name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
   const __selectedHall = halls.find(h => h.id === form.hallId);
@@ -121,6 +135,7 @@ export default function EquipmentPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [filter, setFilter] = useState('');
+  const [filterKind, setFilterKind] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   if (halls.length === 0) {
@@ -266,14 +281,20 @@ export default function EquipmentPage() {
     setErr('');
   };
 
-  const list = filter ? equipment.filter(e => e.hallId === filter) : equipment;
+  const list = equipment.filter(e => (!filter || e.hallId === filter) && (!filterKind || ((e as any).kind || 'asset') === filterKind));
   const target = delId ? equipment.find(e => e.id === delId) : null;
   const totalValue = list.reduce((acc, e) => acc + ((e.count || 0) * (e.unitPrice || 0)), 0);
 
   return (
     <PageContainer>
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilter('')} style={chip(!filter)}>همه</button>
+        <button onClick={() => setFilterKind('')} style={chip(!filterKind)}>همه انواع</button>
+        {Object.entries(KIND_LABELS).map(([k, v]: any) => (
+          <button key={k} onClick={() => setFilterKind(k)} style={chip(filterKind === k)}>{v.icon} {v.name}</button>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+        <button onClick={() => setFilter('')} style={chip(!filter)}>همه سالن‌ها</button>
         {halls.map(h => (
           <button key={h.id} onClick={() => setFilter(h.id)} style={chip(filter === h.id)}>{h.name}</button>
         ))}
@@ -302,7 +323,8 @@ export default function EquipmentPage() {
         <>
           {list.map((e, i) => {
             const hall = halls.find(h => h.id === e.hallId);
-            const meta = EQUIP_LABELS[e.type] || { name: 'سایر', icon: '🔧' };
+            const _cm = (allCustomOpts as any[]).find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
+            const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: '🔧' });
             const value = (e.count || 0) * (e.unitPrice || 0);
             const isOpen = expandedId === e.id;
             return (
@@ -315,9 +337,9 @@ export default function EquipmentPage() {
                 subtitle={`${meta.name} · ${hall?.name || '—'}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : e.id)}
-                badge={e.count ? <Tag tone="blue">{toFa(e.count)} عدد</Tag> : undefined}
+                badge={e.count ? <Tag tone="blue">{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</Tag> : undefined}
                 stats={<>
-                  {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)}</b></span>}
+                  {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</b></span>}
                   {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(value.toLocaleString('fa-IR'))} ت</b></span>}
                   {e.warranty && <span>گارانتی: <b style={{ color: 'var(--text)' }}>{toFa(e.warranty)} ماه</b></span>}
                 </>}
@@ -333,6 +355,18 @@ export default function EquipmentPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between',
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
+                    <span style={{ color: 'var(--muted)' }}>نوع دارایی:</span>
+                    <span style={{ fontWeight: 600 }}>{(KIND_LABELS as any)[(e as any).kind || 'asset']?.icon} {(KIND_LABELS as any)[(e as any).kind || 'asset']?.name}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
+                    <span style={{ color: 'var(--muted)' }}>دسته:</span>
+                    <span style={{ fontWeight: 600 }}>{(CATEGORY_LABELS as any)[(e as any).category || 'auxiliary']?.icon} {(CATEGORY_LABELS as any)[(e as any).category || 'auxiliary']?.name}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>سالن:</span>
                     <span style={{ fontWeight: 600 }}>{hall?.name || '—'}</span>
                   </div>
@@ -341,7 +375,7 @@ export default function EquipmentPage() {
                        fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>
                       <span style={{ color: 'var(--muted)' }}>تعداد:</span>
-                      <span style={{ fontWeight: 600 }}>{toFa(e.count)} عدد</span>
+                      <span style={{ fontWeight: 600 }}>{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</span>
                     </div>
                   )}
                 </div>
@@ -439,7 +473,12 @@ export default function EquipmentPage() {
             </Select>
           </Field>
           <Field label="دسته" required>
-            <Select value={form.category || 'auxiliary'} onChange={e => setForm({...form, category: e.target.value})}>
+            <Select value={form.category || 'auxiliary'} onChange={e => {
+                const cat = e.target.value;
+                const allowed = TYPES_BY_CATEGORY[cat] || [];
+                const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || '');
+                setForm({...form, category: cat, type: nextType});
+              }}>
               {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
                 <option key={k} value={k}>{v.icon} {v.name}</option>
               ))}
@@ -458,11 +497,17 @@ export default function EquipmentPage() {
               autoThreshold={6}
             />
           </Field>
-          <Field label="زیرنوع" required>
-            <Select value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
-              {Object.entries(EQUIP_LABELS).map(([k, v]) => <option key={k} value={k}>{v.icon} {v.name}</option>)}
-            </Select>
-          </Field>
+          <EditableSelect
+            label="زیرنوع"
+            required
+            value={form.type}
+            onChange={v => setForm({...form, type: v})}
+            options={(TYPES_BY_CATEGORY[form.category || 'auxiliary'] || []).map(k => {
+              const v = (EQUIP_LABELS as any)[k] || { icon: '🔧', name: k };
+              return { value: k, label: v.name, icon: v.icon };
+            })}
+            customKey={'hal.equip.type.' + (form.category || 'auxiliary')}
+          />
         </Grid2>
 
         <Grid2>

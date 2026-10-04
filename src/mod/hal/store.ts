@@ -125,7 +125,7 @@ export const useHal = create<State>()(
     }),
     {
       name: 'pm-hal',
-      version: 2,
+      version: 3,
       migrate: (persisted: any, version: number) => {
         if (!persisted?.state?.halls) return persisted;
         if (version < 2) {
@@ -161,6 +161,28 @@ export const useHal = create<State>()(
               ventSources,
               litterSections,
               systemNotes: h.systemNotes || '',
+            };
+          });
+        }
+        if (version < 3) {
+          persisted.state.equipment = (persisted.state.equipment || []).map((e: any) => {
+            const map: Record<string, { kind: string; category: string; unit: string }> = {
+              lamp:    { kind: 'asset', category: 'lighting',    unit: 'pcs' },
+              fan:     { kind: 'asset', category: 'ventilation', unit: 'pcs' },
+              cooler:  { kind: 'asset', category: 'ventilation', unit: 'pcs' },
+              heater:  { kind: 'asset', category: 'heating',     unit: 'pcs' },
+              drinker: { kind: 'asset', category: 'drinking',    unit: 'pcs' },
+              feeder:  { kind: 'asset', category: 'feeding',     unit: 'pcs' },
+              camera:  { kind: 'asset', category: 'auxiliary',   unit: 'pcs' },
+              sensor:  { kind: 'asset', category: 'auxiliary',   unit: 'pcs' },
+              other:   { kind: 'asset', category: 'auxiliary',   unit: 'pcs' },
+            };
+            const m = map[e.type] || map.other;
+            return {
+              ...e,
+              kind: e.kind || m.kind,
+              category: e.category || m.category,
+              unit: e.unit || m.unit,
             };
           });
         }
