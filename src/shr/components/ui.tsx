@@ -460,7 +460,7 @@ export function Empty({ icon, title, desc, action, tone = 'accent' }: EmptyProps
 interface ModalProps {
   open: boolean;
   onClose: () => void;
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg';
