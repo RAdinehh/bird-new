@@ -114,20 +114,17 @@ export default function EnvStandardsTab() {
   });
 
   const customBirdNames = new Set<string>();
-  Object.values(custom).forEach((std: any) => {
-    if (std.birdName) customBirdNames.add(std.birdName);
-  });
-  // نژادهای brd — اگه standardKey دارن، پرنده‌ی مربوطه رو هم اضافه کن
+  // فقط نژادهایی که از brd انتخاب شدن
   const brdBirdIdsWithBreed = new Set<string>();
   (brdBreeds || []).forEach((b: any) => {
     if (b.standardKey) brdBirdIdsWithBreed.add(b.birdId);
   });
-  // اضافه کردن نام پرنده‌ها که نژاد استاندارد دارن
   (brdBirds || []).forEach((b: any) => {
     if (brdBirdIdsWithBreed.has(b.id) && b.name) {
       customBirdNames.add(b.name.trim());
     }
   });
+  // ✅ حذف شد: اضافه کردن از custom (ویرایش‌ها) — چون باعث می‌شد هر ویرایش، گروه رو اضافه کنه
 
   // نژادهایی که کاربر در بخش «پرنده‌ها و نژادها» انتخاب کرده (standardKey)
   const selectedBreedKeys = new Set<string>();
@@ -136,16 +133,9 @@ export default function EnvStandardsTab() {
   });
 
   const visibleGroups = onlyActive
-    ? Object.entries(grouped)
-        .filter(([birdName]) => activeBirdNames.has(birdName) || customBirdNames.has(birdName))
-        .map(([birdName, breeds]) => {
-          // اگه کاربر نژادی رو در brd انتخاب کرده، فقط همون‌ها رو نشون بده
-          if (selectedBreedKeys.size > 0) {
-            const filtered = breeds.filter((std: any) => selectedBreedKeys.has(std.key));
-            return [birdName, filtered.length > 0 ? filtered : breeds] as [string, any[]];
-          }
-          return [birdName, breeds] as [string, any[]];
-        })
+    ? Object.entries(grouped).filter(([birdName]) =>
+        activeBirdNames.has(birdName) || customBirdNames.has(birdName)
+      )
     : Object.entries(grouped);
 
   const handleAddBreed = (
@@ -240,7 +230,10 @@ export default function EnvStandardsTab() {
           </button>
         </div>
       ) : (
-        visibleGroups.map(([birdName, breeds]) => (
+        visibleGroups.map(([birdName, breedsRaw]) => {
+          const breeds = selectedBreedKeys.size > 0 ? breedsRaw.filter((std: any) => selectedBreedKeys.has(std.key)) : breedsRaw;
+          if (breeds.length === 0) return null;
+          return (
           <SettingsGroup
             key={birdName}
             icon="🐔"
@@ -275,8 +268,9 @@ export default function EnvStandardsTab() {
               })}
             </div>
           </SettingsGroup>
-        ))
-      )}
+          );
+        }).filter(Boolean)
+        )}
 
       {/* نمایش کل */}
       <div style={{

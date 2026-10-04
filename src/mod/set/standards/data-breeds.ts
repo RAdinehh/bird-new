@@ -126,7 +126,7 @@ const ROSS_308: BirdStandard = {
 const IRAN_BROILER: BirdStandard = {
   key: 'iran-broiler',
   birdName: 'مرغ',
-  nameFa: 'استاندارد ایران — گوشتی',
+  nameFa: 'گوشتی ایران',
   nameEn: 'Iran Broiler',
   category: 'industrial',
   biology: {
@@ -244,7 +244,7 @@ const HY_LINE_W36: BirdStandard = {
 const IRAN_LAYER: BirdStandard = {
   key: 'iran-layer',
   birdName: 'مرغ',
-  nameFa: 'استاندارد ایران — تخم‌گذار',
+  nameFa: 'تخم‌گذار ایران',
   nameEn: 'Iran Layer',
   category: 'industrial',
   biology: {

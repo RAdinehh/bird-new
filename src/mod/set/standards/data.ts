@@ -224,93 +224,6 @@ const GOLPAYGANI: BirdStandard = {
 // ═══════════════════════════════════════════════
 // ۳. گلین (بومی)
 // ═══════════════════════════════════════════════
-const GILINI: BirdStandard = {
-  key: 'gilini',
-  birdName: 'مرغ',
-  nameFa: 'گلین',
-  nameEn: 'Gilini',
-  category: 'native',
-
-  biology: {
-    sexualMaturityDay: 145,
-    layingStartDay: 145,
-    peakLayingDay: 215,
-    endOfCycleDay: 510,
-    cullDay: 700,
-    incubationDays: 21,
-    maleFemaleRatio: 10,
-  },
-
-  env: [
-    ...COMMON_BROODING,
-    { dayFrom: 22, dayTo: 42,   temp: { min: 22, max: 26, target: 24 }, humidity: { min: 50, max: 65 }, light: { hours: 16, lux: 15 } },
-    { dayFrom: 43, dayTo: 9999, temp: { min: 15, max: 28, target: 22 }, humidity: { min: 40, max: 70 }, light: { hours: 14, lux: 15 } },
-  ],
-
-  feed: [
-    { dayFrom: 1,  dayTo: 7,    feedG: 12, waterMl: 22, proteinPct: 20, energyKcal: 2900 },
-    { dayFrom: 8,  dayTo: 14,   feedG: 26, waterMl: 47, proteinPct: 19, energyKcal: 2850 },
-    { dayFrom: 15, dayTo: 21,   feedG: 42, waterMl: 78, proteinPct: 18, energyKcal: 2800 },
-    { dayFrom: 22, dayTo: 42,   feedG: 58, waterMl: 115, proteinPct: 16, energyKcal: 2750 },
-    { dayFrom: 43, dayTo: 9999, feedG: 75, waterMl: 150, proteinPct: 15, energyKcal: 2700 },
-  ],
-
-  growth: {
-    weightByAge: [
-      { dayFrom: 1,   dayTo: 7,   weightG: 130,  adgG: 13,  fcr: 2.5 },
-      { dayFrom: 8,   dayTo: 28,  weightG: 480,  adgG: 23,  fcr: 2.6 },
-      { dayFrom: 29,  dayTo: 56,  weightG: 850,  adgG: 22,  fcr: 2.7 },
-      { dayFrom: 57,  dayTo: 84,  weightG: 1200, adgG: 18,  fcr: 2.8 },
-      { dayFrom: 85,  dayTo: 140, weightG: 2050, adgG: 14,  fcr: 2.9 },
-      { dayFrom: 141, dayTo: 9999, weightG: 2300, adgG: 5,  fcr: 2.9 },
-    ],
-    finalWeightG: 2300,
-  },
-
-  space: {
-    densityMax: 10,
-    feederSpaceCm: 12,
-    drinkerSpaceCm: 3,
-  },
-
-  equipment: {
-    feeder: {
-      chainCmPerBird: 12,
-      panBirdsPerUnit: 25,
-      tubeCmPerBird: 10,
-      manualCmPerBird: 15,
-    },
-    drinker: {
-      nippleBirdsPerUnit: 10,
-      cupBirdsPerUnit: 20,
-      troughCmPerBird: 3,
-      manualCmPerBird: 3,
-    },
-    lampWattPerM2: 3,
-    fanM3PerKg: 4.5,
-  },
-
-  production: {
-    layingStartDay: 145,
-    peakLayingPct: 55,
-    eggsPerYear: 175,
-    eggWeightG: 52,
-    cycleDays: 510,
-    fertilityPct: 83,
-    hatchabilityPct: 78,
-  },
-
-  mortality: [
-    { dayFrom: 1,  dayTo: 7,    maxPct: 1.5 },
-    { dayFrom: 8,  dayTo: 21,   maxPct: 2.5 },
-    { dayFrom: 22, dayTo: 56,   maxPct: 4 },
-    { dayFrom: 57, dayTo: 9999, maxPct: 6 },
-  ],
-  incubation: CHICKEN_INCUBATION,
-  mortalityTotalPct: 12,
-
-  notes: 'نژاد بومی ترکیبی — مقاوم و سازگار با اقلیم‌های مختلف',
-};
 
 // ═══════════════════════════════════════════════
 // ۴. مرغ گوشتی (Ross 308)
@@ -498,7 +411,6 @@ export const DEFAULT_STANDARDS: Record<string, BirdStandard> = {
   // ─── نژادهای قدیمی (سازگاری) ───
   marandi: MARANDI,
   golpaygani: GOLPAYGANI,
-  gilini: GILINI,
   broiler: BROILER,
   layer: LAYER,
   // ─── نژادهای جدید ───
