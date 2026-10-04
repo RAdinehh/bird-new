@@ -507,6 +507,7 @@ export default function EquipmentPage() {
               return { value: k, label: v.name, icon: v.icon };
             })}
             customKey={'hal.equip.type.' + (form.category || 'auxiliary')}
+            usageCheck={(name) => equipment.filter((x: any) => x.type === name).length}
           />
         </Grid2>
 

@@ -8,6 +8,7 @@ import { useCarousel } from '../../shr/hooks/useCarousel';
 import ProfileTab from './ProfileTab';
 import AppearanceTab from './AppearanceTab';
 import ModulesTab from './ModulesTab';
+import HiddenOptionsTab from './HiddenOptionsTab';
 import UnitsTab from './units/UnitsTab';
 import NotificationsTab from './NotificationsTab';
 import BackupTab from './BackupTab';
@@ -76,7 +77,8 @@ const TAB_COMPONENTS: Record<TabId, TabComponent[]> = {
   config: [
     { comp: EnvStandardsTab, icon: '📏', title: 'استانداردهای نژادها', subtitle: 'دما، رطوبت، دان، وزن، تلفات', tone: 'accent' },
     { comp: UnitsTab,        icon: '📐', title: 'واحدها و اندازه‌گیری', subtitle: 'ارز، دما، وزن، حجم، طول، مساحت', tone: 'info' },
-    { comp: ModulesTab,      icon: '🧩', title: 'ماژول‌ها',              subtitle: 'فعال / غیرفعال کردن بخش‌های نرم‌افزار', tone: 'purple' },
+    { comp: ModulesTab,       icon: '🧩', title: 'ماژول‌ها',           subtitle: 'فعال / غیرفعال کردن بخش‌های نرم‌افزار', tone: 'purple' },
+    { comp: HiddenOptionsTab, icon: '🗂', title: 'گزینه‌های مخفی',   subtitle: 'آیتم‌های حذف‌شده — بازگردانی یا حذف کامل', tone: 'info' },
   ],
   notifications: [NotificationsTab],
   system: [

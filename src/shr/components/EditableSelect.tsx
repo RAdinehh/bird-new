@@ -3,6 +3,7 @@ import { Btn, Field, Input, Modal } from './ui';
 import EmojiPicker from './EmojiPicker';
 import { useCustomOptions } from '../store/customOptions';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import UndoBar from '../../cor/ui/UndoBar';
 
 export interface EditableOption {
   value: string;
@@ -19,6 +20,7 @@ interface Props {
   placeholder?: string;
   required?: boolean;
   error?: string;
+  usageCheck?: (name: string) => number;
 }
 
 const ROW: React.CSSProperties = {
@@ -71,7 +73,7 @@ const MINI: React.CSSProperties = {
 };
 
 export default function EditableSelect({
-  label, value, onChange, options, customKey, placeholder, required, error,
+  label, value, onChange, options, customKey, placeholder, required, error, usageCheck,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<'list' | 'form'>('list');
@@ -80,8 +82,9 @@ export default function EditableSelect({
   const [formIcon, setFormIcon] = useState('🔧');
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [highlight, setHighlight] = useState<string | null>(null);
+  const [undoData, setUndoData] = useState<{ id: string; name: string } | null>(null);
 
-  const { getByKey, addOption, updateOption, removeOption } = useCustomOptions();
+  const { getByKey, addOption, updateOption, removeOption, hideOption, unhideOption } = useCustomOptions();
   const customs = customKey ? getByKey(customKey) : [];
 
   const all: EditableOption[] = [
@@ -111,8 +114,17 @@ export default function EditableSelect({
 
   const removeItem = async (e: React.MouseEvent, id: string, name: string) => {
     e.stopPropagation();
-    const ok = await showConfirmAsync('حذف آیتم', '«' + name + '» حذف شود؟', { danger: true });
-    if (ok) removeOption(id);
+    const count = usageCheck ? usageCheck(name) : 0;
+    const message = count > 0
+      ? '«' + name + '» در ' + count + ' مورد استفاده شده.\n\nاگه حذف کنی، از لیست انتخاب غیب می‌شه ولی داده‌های قبلی دست‌نخورده می‌مونن.\nاز تنظیمات → گزینه‌های مخفی می‌تونی برگردونی.'
+      : '«' + name + '» جای دیگه‌ای استفاده نشده.\n\nحذف بشه؟';
+    const ok = await showConfirmAsync('حذف آیتم', message, { danger: true });
+    if (!ok) return;
+    hideOption(id);
+    setUndoData({ id, name });
+    setTimeout(() => {
+      setUndoData(cur => cur && cur.id === id ? null : cur);
+    }, 5000);
   };
 
   const trigger = (
@@ -278,6 +290,13 @@ export default function EditableSelect({
 
   return (
     <>
+      {undoData && (
+        <UndoBar
+          label={'«' + undoData.name + '» مخفی شد'}
+          onUndo={() => { unhideOption(undoData.id); setUndoData(null); }}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
       {label ? <Field label={label} required={required} error={error}>{trigger}</Field> : trigger}
       <Modal
         open={open}
