@@ -51,6 +51,21 @@ const COBB_500: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر',   dayFrom: 0, dayTo: 10, proteinPct: 21.5, energyKcal: 3000, lysinePct: 1.26, methioninePct: 0.50, calciumPct: 0.90, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'روغن', 'مکمل'] },
+      { name: 'گروئر',    dayFrom: 11, dayTo: 22, proteinPct: 19.5, energyKcal: 3100, lysinePct: 1.10, methioninePct: 0.44, calciumPct: 0.84, availablePhosphorusPct: 0.42, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'فینیشر ۱', dayFrom: 23, dayTo: 42, proteinPct: 18.5, energyKcal: 3150, lysinePct: 1.05, methioninePct: 0.43, calciumPct: 0.76, availablePhosphorusPct: 0.38, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'فینیشر ۲', dayFrom: 43, dayTo: 49, proteinPct: 17.5, energyKcal: 3200, lysinePct: 1.00, methioninePct: 0.41, calciumPct: 0.76, availablePhosphorusPct: 0.38, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+    ],
+    notes: 'Cobb-Vantress 500 Nutrition Supplement 2022',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -106,6 +121,20 @@ const ROSS_308: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 10, proteinPct: 22.5, energyKcal: 3000, lysinePct: 1.44, methioninePct: 0.56, calciumPct: 0.96, availablePhosphorusPct: 0.48, mainIngredients: ['ذرت', 'کنجاله سویا', 'روغن', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 11, dayTo: 24, proteinPct: 21.0, energyKcal: 3100, lysinePct: 1.10, methioninePct: 0.48, calciumPct: 0.87, availablePhosphorusPct: 0.435, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'فینیشر', dayFrom: 25, dayTo: 49, proteinPct: 19.5, energyKcal: 3200, lysinePct: 0.96, methioninePct: 0.43, calciumPct: 0.81, availablePhosphorusPct: 0.405, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'مکمل'] },
+    ],
+    notes: 'Aviagen Ross 308 Nutrition Specifications 2022',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -161,6 +190,20 @@ const IRAN_BROILER: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 10, proteinPct: 21.5, energyKcal: 2950, methioninePct: 0.50, lysinePct: 1.20, calciumPct: 0.90, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 11, dayTo: 24, proteinPct: 20.0, energyKcal: 3050, methioninePct: 0.45, lysinePct: 1.10, calciumPct: 0.85, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'فینیشر', dayFrom: 25, dayTo: 49, proteinPct: 18.5, energyKcal: 3150, methioninePct: 0.40, lysinePct: 1.00, calciumPct: 0.80, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+    ],
+    notes: 'میانگین مرغداری‌های نمونه ایران ۱۴۰۳',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -216,6 +259,12 @@ const HY_LINE_W36: BirdStandard = {
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -271,6 +320,12 @@ const IRAN_LAYER: BirdStandard = {
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -326,6 +381,12 @@ const LOHMANN: BirdStandard = {
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -381,6 +442,12 @@ const LEGHORN: BirdStandard = {
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -435,6 +502,12 @@ const MARANDI: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -489,6 +562,12 @@ const GOLPAYGANI: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -543,6 +622,12 @@ const LARI: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -597,6 +682,12 @@ const GOLIN: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -649,6 +740,12 @@ const AUSTRALORP: BirdStandard = {
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -701,6 +798,12 @@ const COCHIN: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -753,6 +856,12 @@ const BRAHMA: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -805,6 +914,12 @@ const SULTAN: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -854,6 +969,12 @@ const MINIATURE: BirdStandard = {
     lampWattPerM2: 3.5, fanM3PerKg: 5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull', 'straw'],
+    kgPerM2: 3.0,
+    thicknessCm: 6,
+    lifetimeDays: 45,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -909,6 +1030,12 @@ const QUAIL_BROILER: BirdStandard = {
     lampWattPerM2: 4, fanM3PerKg: 5,
   },
   incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 2.0,
+    thicknessCm: 5,
+    lifetimeDays: 42,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -961,6 +1088,12 @@ const QUAIL_LAYER: BirdStandard = {
     lampWattPerM2: 4.5, fanM3PerKg: 5,
   },
   incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['wood_shavings', 'rice_hull'],
+    kgPerM2: 2.0,
+    thicknessCm: 5,
+    lifetimeDays: 42,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -1013,6 +1146,13 @@ const DUCK_PEKIN: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['straw', 'wood_shavings'],
+    kgPerM2: 5.0,
+    thicknessCm: 10,
+    lifetimeDays: 30,
+    replacementsPerCycle: 4,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -1067,6 +1207,13 @@ const DUCK_MUSCOVY: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 35, lockdownDay: 32, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['straw', 'wood_shavings'],
+    kgPerM2: 5.0,
+    thicknessCm: 10,
+    lifetimeDays: 30,
+    replacementsPerCycle: 4,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -1119,6 +1266,13 @@ const DUCK_UKRAINIAN: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['straw', 'wood_shavings'],
+    kgPerM2: 5.0,
+    thicknessCm: 10,
+    lifetimeDays: 30,
+    replacementsPerCycle: 4,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -1172,6 +1326,12 @@ const TURKEY: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 7.5,
   },
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.0, hatcherHumidity: 70 },
+  litter: {
+    recommended: ['wood_shavings', 'straw'],
+    kgPerM2: 4.5,
+    thicknessCm: 8,
+    lifetimeDays: 60,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -1225,6 +1385,13 @@ const GOOSE: BirdStandard = {
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 30, lockdownDay: 27, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 75 },
+  litter: {
+    recommended: ['straw', 'wood_shavings'],
+    kgPerM2: 5.5,
+    thicknessCm: 10,
+    lifetimeDays: 30,
+    replacementsPerCycle: 4,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
