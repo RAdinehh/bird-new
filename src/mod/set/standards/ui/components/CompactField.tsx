@@ -18,7 +18,7 @@ export function CompactField({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
     v = v.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
-    v = v.replace(/[٫،]/g, '.');
+    v = v.replace(/[٫،,]/g, '.');
     v = v.replace(/[^\d.-]/g, '');
     const parts = v.split('.');
     if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');

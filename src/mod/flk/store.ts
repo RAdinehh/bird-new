@@ -54,7 +54,8 @@ export interface Flock {
   maleCount: number | null;
   femaleCount: number | null;
   layingStartDay: number; // سن شروع تخم‌گذاری (روز) — قابل ویرایش کاربر
-  endOfCycleDay: number | null; // سن پایان چرخه (از استاندارد نژاد لحظه ساخت)
+  endOfCycleDay: number | null;
+  endDate?: string; // سن پایان چرخه (از استاندارد نژاد لحظه ساخت)
     vaccineScheduleId: string; // شناسه قالب واکسن (اختیاری)
   hatchDate: string;      // تاریخ هچ (اگر از جوجه‌کشی خودت)
   purchaseDate: string;   // تاریخ خرید
@@ -100,8 +101,8 @@ export const useFlk = create<State>()(
       },
       update: (id, patch) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       remove: (id) => set({ flocks: get().flocks.filter(x => x.id !== id) }),
-      archive: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', updatedAt: now()} : x) }),
-      restore: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', updatedAt: now()} : x) }),
+      archive: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', endDate: x.endDate || now(), updatedAt: now()} : x) }),
+      restore: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', endDate: '', updatedAt: now()} : x) }),
 
       addEvent: (flockId, ev) => set({
         flocks: get().flocks.map(f => {
