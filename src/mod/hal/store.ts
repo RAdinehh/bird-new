@@ -170,6 +170,31 @@ export const useHal = create<State>()(
   )
 );
 
+export const CATEGORY_LABELS: Record<EquipmentCategory, { name: string; icon: string }> = {
+  ventilation: { name: 'تهویه', icon: '🌀' },
+  feeding: { name: 'تغذیه', icon: '🍽' },
+  drinking: { name: 'آبخوری', icon: '🚰' },
+  heating: { name: 'گرمایش', icon: '🔥' },
+  lighting: { name: 'روشنایی', icon: '💡' },
+  litter: { name: 'بستر', icon: '🛏' },
+  power: { name: 'برق‌رسانی', icon: '⚡' },
+  auxiliary: { name: 'جانبی', icon: '🔧' },
+};
+
+export const KIND_LABELS: Record<EquipmentKind, { name: string; icon: string }> = {
+  asset: { name: 'دارایی ثابت', icon: '🏭' },
+  consumable: { name: 'مصرفی', icon: '📦' },
+  system: { name: 'سیستم', icon: '⚙️' },
+};
+
+export const UNIT_LABELS_EQ: Record<EquipmentUnit, string> = {
+  pcs: 'عدد',
+  kg: 'کیلوگرم',
+  m2: 'متر مربع',
+  m: 'متر',
+  L: 'لیتر',
+};
+
 export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   lamp: { name: 'لامپ', icon: '💡' },
   fan: { name: 'فن', icon: '🌀' },

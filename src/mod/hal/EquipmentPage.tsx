@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
-import { useHal, type Equipment, EQUIP_LABELS, EQUIP_CAPACITY_UNIT, EQUIP_EFFICIENCY_UNIT } from './store';
+import { useHal, type Equipment, type EquipmentKind, type EquipmentCategory, type EquipmentUnit, EQUIP_LABELS, EQUIP_CAPACITY_UNIT, EQUIP_EFFICIENCY_UNIT, CATEGORY_LABELS, KIND_LABELS, UNIT_LABELS_EQ } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -108,7 +108,7 @@ export default function EquipmentPage() {
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ id:'', hallId:'', type:'lamp', name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'' });
+  const [form, setForm] = useState<any>({ id:'', hallId:'', kind:'asset', category:'lighting', type:'lamp', name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
   const __selectedHall = halls.find(h => h.id === form.hallId);
   const hallVolume = __selectedHall
     ? (__selectedHall.length || 0) * (__selectedHall.width || 0) * (__selectedHall.height || 0)
@@ -157,11 +157,21 @@ export default function EquipmentPage() {
   const openNew = () => { setForm({ id:'', hallId: halls[0].id, type:'lamp',
      name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'' }); setErr(''); setOpen(true); };
   const openEdit = (e: Equipment) => {
-    setForm({ id: e.id, hallId: e.hallId, type: e.type, name: e.name, count: e.count ? toFa(e.count) : '',
-       unitPrice: e.unitPrice ? toFa(e.unitPrice) : '', purchasedAt: e.purchasedAt,
-       warranty: e.warranty ? toFa(e.warranty) : '', notes: e.notes,
-       capacity: (e as any).capacity ? toFa((e as any).capacity) : '',
-       efficiency: (e as any).efficiency ? toFa((e as any).efficiency) : '' });
+    setForm({
+      id: e.id, hallId: e.hallId,
+      kind: (e as any).kind || 'asset',
+      category: (e as any).category || 'lighting',
+      unit: (e as any).unit || 'pcs',
+      type: e.type, name: e.name,
+      count: e.count ? toFa(e.count) : '',
+      unitPrice: e.unitPrice ? toFa(e.unitPrice) : '',
+      purchasedAt: e.purchasedAt,
+      warranty: e.warranty ? toFa(e.warranty) : '',
+      notes: e.notes,
+      capacity: (e as any).capacity ? toFa((e as any).capacity) : '',
+      efficiency: (e as any).efficiency ? toFa((e as any).efficiency) : '',
+      consumeRate: (e as any).consumeRate || '',
+    });
     setErr(''); setOpen(true);
   };
 
@@ -172,14 +182,20 @@ export default function EquipmentPage() {
     EquipmentSchema,
     {
       hallId: form.hallId || '',
+      kind: form.kind || 'asset',
+      category: form.category || 'auxiliary',
       type: form.type || '',
       name: form.name || '',
-      count: int(form.count),
-      unitPrice: num(form.unitPrice),
+      count: form.count ? parseInt(toEn(form.count)) || 0 : 0,
+      unit: form.unit || 'pcs',
+      unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || 0 : 0,
       purchasedAt: form.purchasedAt || '',
-      warranty: num(form.warranty),
-      capacity: num(form.capacity),
-      efficiency: num(form.efficiency),
+      warranty: form.warranty ? parseInt(toEn(form.warranty)) || 0 : 0,
+      capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || 0 : 0,
+      efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || 0 : 0,
+      consumeRate: form.consumeRate || undefined,
+      sourceInvoiceId: '',
+      warehouseItemId: '',
       notes: form.notes || '',
     },
   );
@@ -201,14 +217,20 @@ export default function EquipmentPage() {
 
     if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
     const data = {
-      hallId: form.hallId, type: form.type, name: form.name.trim(),
+      hallId: form.hallId,
+      kind: form.kind || 'asset',
+      category: form.category || 'auxiliary',
+      type: form.type,
+      name: form.name.trim(),
       count: form.count ? parseInt(toEn(form.count)) || null : null,
+      unit: form.unit || 'pcs',
       unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || null : null,
       purchasedAt: form.purchasedAt.trim(),
       warranty: form.warranty ? parseInt(toEn(form.warranty)) || null : null,
       notes: form.notes.trim(),
       capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
       efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
+      consumeRate: form.consumeRate || undefined,
     };
     if (form.id) updateEquip(form.id, data); else addEquip(data);
     setOpen(false);
@@ -218,19 +240,25 @@ export default function EquipmentPage() {
     // بدون چک تکراری
     if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
     const data = {
-      hallId: form.hallId, type: form.type, name: form.name.trim(),
+      hallId: form.hallId,
+      kind: form.kind || 'asset',
+      category: form.category || 'auxiliary',
+      type: form.type,
+      name: form.name.trim(),
       count: form.count ? parseInt(toEn(form.count)) || null : null,
+      unit: form.unit || 'pcs',
       unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || null : null,
       purchasedAt: form.purchasedAt.trim(),
       warranty: form.warranty ? parseInt(toEn(form.warranty)) || null : null,
       notes: form.notes.trim(),
       capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
       efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
+      consumeRate: form.consumeRate || undefined,
     };
     addEquip(data);
     showToast('ذخیره شد — تجهیز بعدی', 'success', 1500);
     // پاک کردن فقط نام و مشخصات، نگه‌داشتن سالن و نوع
-    setForm(f => ({
+    setForm((f: any) => ({
       ...f,
       id: '', name: '', count: '', unitPrice: '', purchasedAt: '',
       warranty: '', notes: '', capacity: '', efficiency: '',
@@ -411,7 +439,7 @@ export default function EquipmentPage() {
           <Field label="سالن" required>
 <SmartSelect
               value={form.hallId}
-              onChange={v => setForm(f => ({ ...f, hallId: v }))}
+              onChange={v => setForm((f: any) => ({ ...f, hallId: v }))}
               options={halls.map(c => ({
                 value: c.id,
                 label: c.name,
