@@ -144,36 +144,6 @@ export default function EquipmentPage() {
   const [filterKind, setFilterKind] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  if (halls.length === 0) {
-  const undoDelete = () => {
-    const item = undoData;
-    if (!item) return;
-    try {
-      addEquip(item.item);
-      showToast('تجهیز بازگردانی شد', 'success', 2000);
-    } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
-    }
-    setUndoData(null);
-  };
-
-    return (
-      <PageContainer>
-      {undoData && (
-        <UndoBar
-          label="حذف شد"
-          onUndo={undoDelete}
-          onDismiss={() => setUndoData(null)}
-        />
-      )}
-        <Empty
-          icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>}
-          title="اول یک سالن بسازید"
-          desc="تجهیزات داخل سالن قرار می‌گیرند. اول از تب «سالن‌ها» استفاده کنید."
-        />
-      </PageContainer>
-    );
-  }
 
   const openNew = () => { setForm({ id:'', hallId: halls[0].id, type:'lamp',
      name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'' }); setErr(''); setOpen(true); };
@@ -220,6 +190,37 @@ export default function EquipmentPage() {
       notes: form.notes || '',
     },
   );
+
+  if (halls.length === 0) {
+  const undoDelete = () => {
+    const item = undoData;
+    if (!item) return;
+    try {
+      addEquip(item.item);
+      showToast('تجهیز بازگردانی شد', 'success', 2000);
+    } catch (err) {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
+
+    return (
+      <PageContainer>
+      {undoData && (
+        <UndoBar
+          label="حذف شد"
+          onUndo={undoDelete}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
+        <Empty
+          icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>}
+          title="اول یک سالن بسازید"
+          desc="تجهیزات داخل سالن قرار می‌گیرند. اول از تب «سالن‌ها» استفاده کنید."
+        />
+      </PageContainer>
+    );
+  }
 
   const save = async () => {
 
