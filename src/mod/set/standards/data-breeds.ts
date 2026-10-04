@@ -265,6 +265,15 @@ const HY_LINE_W36: BirdStandard = {
     thicknessCm: 6,
     lifetimeDays: 45,
   },
+  formula: {
+    phases: [
+      { name: 'پولت رشد', dayFrom: 0, dayTo: 42, proteinPct: 19.0, energyKcal: 2900, methioninePct: 0.40, lysinePct: 1.00, calciumPct: 1.0, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'پولت پیش', dayFrom: 43, dayTo: 119, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.0, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'پری‌لِی',  dayFrom: 120, dayTo: 140, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.5, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'لِی',     dayFrom: 141, dayTo: 500, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.38, lysinePct: 0.80, calciumPct: 3.8, availablePhosphorusPct: 0.42, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف', 'مکمل'] },
+    ],
+    notes: 'طبق Hy-Line / Lohmann Commercial Management Guide 2023',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -325,6 +334,15 @@ const IRAN_LAYER: BirdStandard = {
     kgPerM2: 3.0,
     thicknessCm: 6,
     lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'پولت رشد', dayFrom: 0, dayTo: 42, proteinPct: 19.0, energyKcal: 2900, methioninePct: 0.40, lysinePct: 1.00, calciumPct: 1.0, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'پولت پیش', dayFrom: 43, dayTo: 119, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.0, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'پری‌لِی',  dayFrom: 120, dayTo: 140, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.5, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'لِی',     dayFrom: 141, dayTo: 500, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.38, lysinePct: 0.80, calciumPct: 3.8, availablePhosphorusPct: 0.42, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف', 'مکمل'] },
+    ],
+    notes: 'طبق Hy-Line / Lohmann Commercial Management Guide 2023',
   },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
@@ -387,6 +405,15 @@ const LOHMANN: BirdStandard = {
     thicknessCm: 6,
     lifetimeDays: 45,
   },
+  formula: {
+    phases: [
+      { name: 'پولت رشد', dayFrom: 0, dayTo: 42, proteinPct: 19.0, energyKcal: 2900, methioninePct: 0.40, lysinePct: 1.00, calciumPct: 1.0, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'پولت پیش', dayFrom: 43, dayTo: 119, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.0, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'پری‌لِی',  dayFrom: 120, dayTo: 140, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.5, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'لِی',     dayFrom: 141, dayTo: 500, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.38, lysinePct: 0.80, calciumPct: 3.8, availablePhosphorusPct: 0.42, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف', 'مکمل'] },
+    ],
+    notes: 'طبق Hy-Line / Lohmann Commercial Management Guide 2023',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -448,6 +475,15 @@ const LEGHORN: BirdStandard = {
     thicknessCm: 6,
     lifetimeDays: 45,
   },
+  formula: {
+    phases: [
+      { name: 'پولت رشد', dayFrom: 0, dayTo: 42, proteinPct: 19.0, energyKcal: 2900, methioninePct: 0.40, lysinePct: 1.00, calciumPct: 1.0, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'پولت پیش', dayFrom: 43, dayTo: 119, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.0, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'پری‌لِی',  dayFrom: 120, dayTo: 140, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.5, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'لِی',     dayFrom: 141, dayTo: 500, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.38, lysinePct: 0.80, calciumPct: 3.8, availablePhosphorusPct: 0.42, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف', 'مکمل'] },
+    ],
+    notes: 'طبق Hy-Line / Lohmann Commercial Management Guide 2023',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -507,6 +543,14 @@ const MARANDI: BirdStandard = {
     kgPerM2: 3.0,
     thicknessCm: 6,
     lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 30, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.45, lysinePct: 1.05, calciumPct: 1.0, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'رشد',     dayFrom: 31, dayTo: 90, proteinPct: 17.0, energyKcal: 2800, methioninePct: 0.36, lysinePct: 0.80, calciumPct: 1.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'تولید',   dayFrom: 91, dayTo: 500, proteinPct: 15.5, energyKcal: 2750, methioninePct: 0.32, lysinePct: 0.70, calciumPct: 3.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+    ],
+    notes: 'میانگین مراکز تحقیقات مرغ بومی ایران ۱۴۰۳',
   },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
@@ -628,6 +672,14 @@ const LARI: BirdStandard = {
     thicknessCm: 6,
     lifetimeDays: 45,
   },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 30, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.45, lysinePct: 1.05, calciumPct: 1.0, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'رشد',     dayFrom: 31, dayTo: 90, proteinPct: 17.0, energyKcal: 2800, methioninePct: 0.36, lysinePct: 0.80, calciumPct: 1.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'تولید',   dayFrom: 91, dayTo: 500, proteinPct: 15.5, energyKcal: 2750, methioninePct: 0.32, lysinePct: 0.70, calciumPct: 3.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+    ],
+    notes: 'میانگین مراکز تحقیقات مرغ بومی ایران ۱۴۰۳',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -688,6 +740,14 @@ const GOLIN: BirdStandard = {
     thicknessCm: 6,
     lifetimeDays: 45,
   },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 30, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.45, lysinePct: 1.05, calciumPct: 1.0, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'رشد',     dayFrom: 31, dayTo: 90, proteinPct: 17.0, energyKcal: 2800, methioninePct: 0.36, lysinePct: 0.80, calciumPct: 1.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'تولید',   dayFrom: 91, dayTo: 500, proteinPct: 15.5, energyKcal: 2750, methioninePct: 0.32, lysinePct: 0.70, calciumPct: 3.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+    ],
+    notes: 'میانگین مراکز تحقیقات مرغ بومی ایران ۱۴۰۳',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -745,6 +805,13 @@ const AUSTRALORP: BirdStandard = {
     kgPerM2: 3.0,
     thicknessCm: 6,
     lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 42, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.45, lysinePct: 1.05, calciumPct: 1.0, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'رشد',     dayFrom: 43, dayTo: 140, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 1.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'لِی',     dayFrom: 141, dayTo: 500, proteinPct: 16.0, energyKcal: 2750, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 3.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+    ],
   },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
@@ -804,6 +871,13 @@ const COCHIN: BirdStandard = {
     thicknessCm: 6,
     lifetimeDays: 45,
   },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 42, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.45, lysinePct: 1.05, calciumPct: 1.0, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'رشد',     dayFrom: 43, dayTo: 140, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 1.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'لِی',     dayFrom: 141, dayTo: 500, proteinPct: 16.0, energyKcal: 2750, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 3.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+    ],
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -861,6 +935,13 @@ const BRAHMA: BirdStandard = {
     kgPerM2: 3.0,
     thicknessCm: 6,
     lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 42, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.45, lysinePct: 1.05, calciumPct: 1.0, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'رشد',     dayFrom: 43, dayTo: 140, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 1.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'لِی',     dayFrom: 141, dayTo: 500, proteinPct: 16.0, energyKcal: 2750, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 3.0, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+    ],
   },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
@@ -920,6 +1001,15 @@ const SULTAN: BirdStandard = {
     thicknessCm: 6,
     lifetimeDays: 45,
   },
+  formula: {
+    phases: [
+      { name: 'پولت رشد', dayFrom: 0, dayTo: 42, proteinPct: 19.0, energyKcal: 2900, methioninePct: 0.40, lysinePct: 1.00, calciumPct: 1.0, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'پولت پیش', dayFrom: 43, dayTo: 119, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.0, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'پری‌لِی',  dayFrom: 120, dayTo: 140, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.5, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'لِی',     dayFrom: 141, dayTo: 500, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.38, lysinePct: 0.80, calciumPct: 3.8, availablePhosphorusPct: 0.42, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف', 'مکمل'] },
+    ],
+    notes: 'طبق Hy-Line / Lohmann Commercial Management Guide 2023',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -974,6 +1064,15 @@ const MINIATURE: BirdStandard = {
     kgPerM2: 3.0,
     thicknessCm: 6,
     lifetimeDays: 45,
+  },
+  formula: {
+    phases: [
+      { name: 'پولت رشد', dayFrom: 0, dayTo: 42, proteinPct: 19.0, energyKcal: 2900, methioninePct: 0.40, lysinePct: 1.00, calciumPct: 1.0, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'پولت پیش', dayFrom: 43, dayTo: 119, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.0, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'پری‌لِی',  dayFrom: 120, dayTo: 140, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.35, lysinePct: 0.75, calciumPct: 2.5, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+      { name: 'لِی',     dayFrom: 141, dayTo: 500, proteinPct: 16.5, energyKcal: 2800, methioninePct: 0.38, lysinePct: 0.80, calciumPct: 3.8, availablePhosphorusPct: 0.42, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف', 'مکمل'] },
+    ],
+    notes: 'طبق Hy-Line / Lohmann Commercial Management Guide 2023',
   },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
@@ -1036,6 +1135,13 @@ const QUAIL_BROILER: BirdStandard = {
     thicknessCm: 5,
     lifetimeDays: 42,
   },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 14, proteinPct: 24.0, energyKcal: 2900, methioninePct: 0.50, lysinePct: 1.30, calciumPct: 1.0, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'رشد',     dayFrom: 15, dayTo: 42, proteinPct: 22.0, energyKcal: 3000, methioninePct: 0.45, lysinePct: 1.15, calciumPct: 0.9, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+    ],
+    notes: 'طبق منابع داخلی بلدرچین — دوره ۴۲ روز',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -1093,6 +1199,14 @@ const QUAIL_LAYER: BirdStandard = {
     kgPerM2: 2.0,
     thicknessCm: 5,
     lifetimeDays: 42,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 21, proteinPct: 24.0, energyKcal: 2900, methioninePct: 0.50, lysinePct: 1.30, calciumPct: 1.0, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی'] },
+      { name: 'رشد',     dayFrom: 22, dayTo: 42, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.42, lysinePct: 1.00, calciumPct: 1.0, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'لِی',     dayFrom: 43, dayTo: 365, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.45, lysinePct: 1.05, calciumPct: 2.5, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
+    ],
+    notes: 'طبق منابع داخلی بلدرچین تخم‌گذار — پیک ۶۰-۷۰٪',
   },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
@@ -1152,6 +1266,14 @@ const DUCK_PEKIN: BirdStandard = {
     thicknessCm: 10,
     lifetimeDays: 30,
     replacementsPerCycle: 4,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 21, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.45, lysinePct: 1.10, calciumPct: 0.9, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'رشد',     dayFrom: 22, dayTo: 56, proteinPct: 18.0, energyKcal: 3000, methioninePct: 0.40, lysinePct: 0.95, calciumPct: 0.85, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'فینیشر/لِی', dayFrom: 57, dayTo: 365, proteinPct: 17.0, energyKcal: 3000, methioninePct: 0.38, lysinePct: 0.85, calciumPct: 2.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+    ],
+    notes: 'طبق منابع داخلی اردک — نیاز به نیاسین بالا',
   },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
@@ -1214,6 +1336,14 @@ const DUCK_MUSCOVY: BirdStandard = {
     lifetimeDays: 30,
     replacementsPerCycle: 4,
   },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 21, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.45, lysinePct: 1.10, calciumPct: 0.9, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'رشد',     dayFrom: 22, dayTo: 56, proteinPct: 18.0, energyKcal: 3000, methioninePct: 0.40, lysinePct: 0.95, calciumPct: 0.85, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'فینیشر/لِی', dayFrom: 57, dayTo: 365, proteinPct: 17.0, energyKcal: 3000, methioninePct: 0.38, lysinePct: 0.85, calciumPct: 2.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+    ],
+    notes: 'طبق منابع داخلی اردک — نیاز به نیاسین بالا',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -1272,6 +1402,14 @@ const DUCK_UKRAINIAN: BirdStandard = {
     thicknessCm: 10,
     lifetimeDays: 30,
     replacementsPerCycle: 4,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 21, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.45, lysinePct: 1.10, calciumPct: 0.9, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
+      { name: 'رشد',     dayFrom: 22, dayTo: 56, proteinPct: 18.0, energyKcal: 3000, methioninePct: 0.40, lysinePct: 0.95, calciumPct: 0.85, availablePhosphorusPct: 0.40, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'فینیشر/لِی', dayFrom: 57, dayTo: 365, proteinPct: 17.0, energyKcal: 3000, methioninePct: 0.38, lysinePct: 0.85, calciumPct: 2.8, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+    ],
+    notes: 'طبق منابع داخلی اردک — نیاز به نیاسین بالا',
   },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
@@ -1332,6 +1470,14 @@ const TURKEY: BirdStandard = {
     thicknessCm: 8,
     lifetimeDays: 60,
   },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 28, proteinPct: 28.0, energyKcal: 2900, methioninePct: 0.55, lysinePct: 1.60, calciumPct: 1.2, availablePhosphorusPct: 0.55, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
+      { name: 'گروئر',  dayFrom: 29, dayTo: 84, proteinPct: 24.0, energyKcal: 3100, methioninePct: 0.50, lysinePct: 1.40, calciumPct: 1.1, availablePhosphorusPct: 0.50, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'فینیشر', dayFrom: 85, dayTo: 150, proteinPct: 20.0, energyKcal: 3200, methioninePct: 0.40, lysinePct: 1.20, calciumPct: 1.0, availablePhosphorusPct: 0.45, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+    ],
+    notes: 'طبق BUT (British United Turkeys) 2022',
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
@@ -1391,6 +1537,14 @@ const GOOSE: BirdStandard = {
     thicknessCm: 10,
     lifetimeDays: 30,
     replacementsPerCycle: 4,
+  },
+  formula: {
+    phases: [
+      { name: 'استارتر', dayFrom: 0, dayTo: 28, proteinPct: 20.0, energyKcal: 2900, methioninePct: 0.42, lysinePct: 1.05, calciumPct: 0.9, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+      { name: 'رشد',     dayFrom: 29, dayTo: 90, proteinPct: 18.0, energyKcal: 2900, methioninePct: 0.38, lysinePct: 0.90, calciumPct: 0.85, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
+      { name: 'پروار',   dayFrom: 91, dayTo: 180, proteinPct: 16.0, energyKcal: 2800, methioninePct: 0.32, lysinePct: 0.75, calciumPct: 0.80, mainIngredients: ['ذرت', 'گندم', 'یونجه', 'کنجاله سویا'] },
+    ],
+    notes: 'طبق منابع داخلی غاز — نیاز به علوفه سبز',
   },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
