@@ -15,6 +15,7 @@ import { useAutoBackup } from './shr/hooks/useAutoBackup';
 import OnboardingModal from './shr/components/OnboardingModal';
 import LockScreen from './shr/components/LockScreen';
 import { useAutoLock } from './shr/hooks/useAutoLock';
+import DebugPanel from './cor/events/DebugPanel';
 
 const TITLES: Record<string, string> = {
   '/': 'داشبورد', '/brd': 'پرنده‌ها و نژادها', '/hal': 'سالن‌ها', '/flk': 'گله‌ها',
@@ -67,6 +68,7 @@ function Layout() {
         <AppRouter />
       </main>
       <BottomNav />
+      <DebugPanel />
     </div>
   );
 }
