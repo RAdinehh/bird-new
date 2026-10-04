@@ -854,32 +854,31 @@ export default function FlocksPage() {
         {/* نوار شناور Multi-Select */}
         {selectionMode && selectedIds.size > 0 && (
           <div style={{
-            position: 'fixed', bottom: 92, left: '50%', transform: 'translateX(-50%)',
-            zIndex: 100, maxWidth: 440, width: 'calc(100% - 24px)',
+            position: 'fixed', bottom: 96, left: '50%', transform: 'translateX(-50%)',
+            zIndex: 100, maxWidth: 460, width: 'calc(100% - 20px)',
             background: 'var(--card-solid)',
-            border: '1px solid var(--border)',
-            borderRadius: 18,
+            border: '1px solid rgba(59,130,246,0.35)',
+            borderRadius: 20,
             boxShadow: '0 12px 36px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            padding: '10px 12px',
-            display: 'flex', alignItems: 'center', gap: 8,
-            minHeight: 52,
+            padding: '12px 14px',
+            display: 'flex', alignItems: 'center', gap: 6,
+            minHeight: 60,
           }}>
-            <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: '#3b82f6', minWidth: 40 }}>
+            <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: '#3b82f6', minWidth: 34, paddingLeft: 4 }}>
               {toFa(selectedIds.size)}
             </span>
             <button type="button" onClick={exitSelection}
-              style={{ padding: '8px 14px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer' }}>
+              style={{ flex: 1, padding: '9px 12px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
               لغو
             </button>
-            <div style={{ flex: 1 }} />
             <button type="button" onClick={doBulkArchive}
-              style={{ padding: '8px 14px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              style={{ flex: 1, padding: '9px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
               📦 آرشیو
             </button>
             <button type="button" onClick={doBulkDelete}
-              style={{ padding: '8px 14px', background: 'var(--danger-soft, rgba(220,38,38,0.1))', border: '1px solid var(--danger)', borderRadius: 10, color: 'var(--danger)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              style={{ flex: 1, padding: '9px 12px', background: 'var(--danger-soft, rgba(220,38,38,0.1))', border: '1px solid var(--danger)', borderRadius: 12, color: 'var(--danger)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
               🗑 حذف
             </button>
           </div>
