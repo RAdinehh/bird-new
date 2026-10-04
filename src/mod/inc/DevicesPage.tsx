@@ -4,6 +4,8 @@
 import { useTempUnit, toUserTemp, toCelsius, round1 } from '../../shr/utils/temp';
 import { useState, useMemo } from 'react';
 import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity, fillCapacityFromProfile } from './store';
+import { useValidation } from '../../shr/validation/useValidation';
+import { createDeviceSchema } from '../../shr/validation/rules/inc';
 import { useSet } from '../set/store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag, ErrorBox } from '../../shr/components/ui';
@@ -204,6 +206,29 @@ export default function DevicesPage() {
   }, [eggEntries]);
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
+
+  // ═══ اعتبارسنجی زنده ═══
+  const { errors: vErrors } = useValidation(
+    createDeviceSchema(),
+    {
+      name: form.name || '',
+      mode: form.mode,
+      status: form.status,
+      temp: num(form.temp),
+      humidity: num(form.humidity),
+      purchasedAt: form.purchasedAt || '',
+      price: num(form.price),
+      warranty: num(form.warranty),
+      racks: num(form.racks),
+      trays: num(form.trays),
+      fans: num(form.fans),
+      tempSensors: num(form.tempSensors),
+      humiditySensors: num(form.humiditySensors),
+      motorPower: num(form.motorPower),
+      extraCost: num(form.extraCost),
+      notes: form.notes || '',
+    },
+  );
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
   const openNew = () => { setForm(empty); setErr(''); setOpen(true); };
@@ -523,7 +548,7 @@ export default function DevicesPage() {
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش دستگاه' : 'افزودن دستگاه'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> مشخصات اصلی</SectionTitle>
         <Field label="نام دستگاه" required hint={
