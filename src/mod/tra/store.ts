@@ -577,7 +577,8 @@ export function calcItemTotal(
   } else if (discountType === 'amount') {
     discount = discountValue;
   }
-  return Math.max(0, base - discount);
+  /* moneyRoundApplied */
+  return Math.round(Math.max(0, base - discount));
 }
 
 /** محاسبه مبلغ تخفیف قلم */
@@ -589,7 +590,7 @@ export function calcItemDiscount(
 ): number {
   const base = (quantity || 0) * (unitPrice || 0);
   const net = calcItemTotal(quantity, unitPrice, discountType, discountValue);
-  return Math.max(0, base - net);
+  return Math.round(Math.max(0, base - net));
 }
 
 
@@ -614,15 +615,15 @@ export function pendingChecks(payments: Payment[]): Payment[] {
 }
 
 export function itemTotal(q: number, p: number): number {
-  return (q || 0) * (p || 0);
+  return Math.round((q || 0) * (p || 0));
 }
 
 export function itemsSum(items: InvoiceItem[]): number {
-  return items.reduce((a, x) => a + (x.total || 0), 0);
+  return Math.round(items.reduce((a, x) => a + (x.total || 0), 0));
 }
 
 export function paidSum(payments: Payment[]): number {
-  return payments.reduce((a, x) => a + (x.amount || 0), 0);
+  return Math.round(payments.reduce((a, x) => a + (x.amount || 0), 0));
 }
 
 export function invoiceStatus(inv: Invoice): InvoiceStatus {
@@ -660,7 +661,7 @@ function migrateInvDates(inv: any): any {
 
 export function remaining(inv: Invoice): number {
   const paid = paidSum(inv.payments || []);
-  return Math.max(0, (inv.total || 0) - paid);
+  return Math.round(Math.max(0, (inv.total || 0) - paid));
 }
 
 export function ageDays(inv: Invoice): number {
