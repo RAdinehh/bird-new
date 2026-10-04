@@ -51,6 +51,24 @@ export interface StandardSpace {
   densityMin: number;
 }
 
+/** پارامترهای جوجه‌کشی (انکوباسیون) */
+export interface IncubationParams {
+  totalDays: number;
+  setterTempC: number;
+  setterHumidityPct: number;
+  hatcherTempC: number;
+  hatcherHumidityPct: number;
+  turningPerDay: number;
+  /** سن شروع تخم‌گذاری (روز) */
+  layStartDay?: number;
+  /** پیک تخم‌گذاری (درصد) */
+  layPeakPct?: number;
+  /** تعداد تخم در سال */
+  eggsPerYear?: number;
+  /** وزن تخم (گرم) */
+  eggWeightG?: number;
+}
+
 export interface Standard {
   id: string;
   name: string;
@@ -59,12 +77,13 @@ export interface Standard {
   source: string;
   publishYear: number;
   version: number;
-  lastUpdated?: string;  // ISO date (optional)
+  lastUpdated?: string;
   temperature: TempPoint[];
   ventilationByWeight: VentPoint[];
   equipment: StandardEquipment;
   space: StandardSpace;
   weightByAge: WeightPoint[];
   feedByAge?: FeedPoint[];
+  incubation?: IncubationParams;
   notes?: string;
 }
