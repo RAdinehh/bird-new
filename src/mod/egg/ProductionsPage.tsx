@@ -18,6 +18,10 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { Row, SectionTitle, chip } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
+import { useValidation } from '../../shr/validation/useValidation';
+import { createEggSchema } from '../../shr/validation/rules/egg';
+import { useDraftAutosave } from '../../shr/hooks/useDraftAutosave';
+import { AutoSaveBadge } from '../../shr/hooks/AutoSaveBadge';
 
 interface F {
   id?: string;
@@ -153,6 +157,37 @@ export default function ProductionsPage() {
     setOpen(false);
   };
 
+  // ═══ اعتبارسنجی زنده ═══
+  const validationContext = {
+    flockCount: selectedFlock?.initialCount || 0,
+    flockCurrentCount: selectedFlock?.currentCount || flockCount,
+    flockType: selectedFlock?.type,
+  };
+  const { errors: vErrors } = useValidation(
+    createEggSchema(validationContext),
+    {
+      flockId: form.flockId || '',
+      date: form.date || '',
+      eatingCount: int(form.eatingCount),
+      fertileCount: int(form.fertileCount),
+      brokenCount: int(form.brokenCount),
+      softCount: int(form.softCount),
+      dirtyCount: int(form.dirtyCount),
+      avgWeight: form.avgWeight ? num(form.avgWeight) : null,
+      notes: form.notes || '',
+    },
+  );
+
+  // ═══ Autosave پیش‌نویس ═══
+  const draftKey = form.id ? `egg-draft-${form.id}` : 'egg-draft-new';
+  const { status: draftStatus, savedAt: draftSavedAt, clearDraft } = useDraftAutosave({
+    key: draftKey,
+    data: form,
+    enabled: open,
+    debounceMs: 800,
+    shouldSave: (d: any) => !!d.flockId || !!d.date || !!d.eatingCount || !!d.fertileCount,
+  });
+
   const target = delId ? productions.find(p => p.id === delId) : null;
 
   return (
@@ -266,7 +301,7 @@ export default function ProductionsPage() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title={form.id ? 'ویرایش تخم‌گذاری' : 'ثبت تخم‌گذاری'}
+        title={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}><span>{form.id ? 'ویرایش تخم‌گذاری' : 'ثبت تخم‌گذاری'}</span><AutoSaveBadge status={draftStatus} savedAt={draftSavedAt} /></div>}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Grid2>
@@ -292,7 +327,7 @@ export default function ProductionsPage() {
           <Field label="🥚 تخم خوراکی">
             <NumField placeholder="مثلاً — ۴۰" value={form.eatingCount} onChange={e => setForm({ ...form, eatingCount: e.target.value })} unit="عدد" min={0} integer />
           </Field>
-          <Field label="🌱 تخم نطفه‌دار">
+          <Field label="🌱 تخم نطفه‌دار" error={vErrors.fertileCount}>
             <NumField placeholder="مثلاً — ۱۰" value={form.fertileCount} onChange={e => setForm({ ...form, fertileCount: e.target.value })} unit="عدد" min={0} integer />
           </Field>
         </Grid2>
@@ -318,14 +353,14 @@ export default function ProductionsPage() {
         <SectionTitle>💔 تخم‌های مصرفی</SectionTitle>
 
         <Grid2>
-          <Field label="تخم شکسته">
+          <Field label="تخم شکسته" error={vErrors.brokenCount}>
             <NumField placeholder="مثلاً — ۵" value={form.brokenCount} onChange={e => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" min={0} integer />
           </Field>
-          <Field label="تخم نرم">
+          <Field label="تخم نرم" error={vErrors.softCount}>
             <NumField placeholder="مثلاً — ۲" value={form.softCount} onChange={e => setForm({ ...form, softCount: e.target.value })} unit="عدد" min={0} integer />
           </Field>
         </Grid2>
-        <Field label="تخم کثیف">
+        <Field label="تخم کثیف" error={vErrors.dirtyCount}>
           <NumField placeholder="مثلاً — ۳" value={form.dirtyCount} onChange={e => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" min={0} integer />
         </Field>
 
@@ -377,7 +412,7 @@ export default function ProductionsPage() {
         )}
 
         <SectionTitle>⚖ وزن</SectionTitle>
-        <Field label="وزن میانگین تخم" hint="اختیاری">
+        <Field label="وزن میانگین تخم" hint="اختیاری" error={vErrors.avgWeight}>
           <NumField placeholder="مثلاً — ۱.۵" value={form.avgWeight} onChange={e => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
         </Field>
 
