@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Btn, Field, Input, Modal } from './ui';
-import EmojiPicker from './EmojiPicker';
+import EmojiGrid from './EmojiGrid';
 import { useCustomOptions } from '../store/customOptions';
 import { showConfirmAsync } from '../../cor/store/dialog';
 
@@ -28,11 +28,9 @@ const ICON_BOX: React.CSSProperties = {
   display: 'flex', alignItems: 'center', justifyContent: 'center',
   fontSize: 18, flexShrink: 0,
 };
-
 const ICON_BOX_SEL: React.CSSProperties = {
   ...ICON_BOX, background: 'rgba(255,255,255,.7)',
 };
-
 const ROW: React.CSSProperties = {
   display: 'flex', alignItems: 'center', gap: 10,
   padding: '8px 10px',
@@ -43,16 +41,7 @@ const ROW: React.CSSProperties = {
   fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 500,
   textAlign: 'right', cursor: 'pointer',
   width: '100%', boxSizing: 'border-box',
-  boxShadow: '0 1px 2px rgba(15,23,42,.04)',
-  transition: 'transform 120ms, box-shadow 120ms',
-};
-
-const MINI_BTN: React.CSSProperties = {
-  width: 30, height: 30, borderRadius: 8,
-  background: 'transparent', border: 'none',
-  cursor: 'pointer', fontSize: 14, flexShrink: 0,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-  opacity: .55,
+  boxShadow: '0 1px 2px rgba(15,23,42,.05), 0 2px 8px rgba(15,23,42,.04)',
 };
 
 export default function EditableSelect({
@@ -60,11 +49,12 @@ export default function EditableSelect({
   variant = 'modal',
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
+  const [view, setView] = useState<'list' | 'form'>('list');
   const [editId, setEditId] = useState<string | null>(null);
   const [formName, setFormName] = useState('');
   const [formIcon, setFormIcon] = useState('🔧');
-  const [showEmoji, setShowEmoji] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const [highlight, setHighlight] = useState<string | null>(null);
 
   const { getByKey, addOption, updateOption, removeOption } = useCustomOptions();
   const customs = customKey ? getByKey(customKey) : [];
@@ -75,19 +65,26 @@ export default function EditableSelect({
   ];
   const current = all.find(o => o.value === value);
 
-  const openAdd = () => { setEditId(null); setFormName(''); setFormIcon('🔧'); setFormOpen(true); };
+  const resetForm = () => { setEditId(null); setFormName(''); setFormIcon('🔧'); setEmojiOpen(false); };
+
+  const openAdd = () => { resetForm(); setView('form'); };
   const openEdit = (id: string) => {
     const c = customs.find(x => x.id === id);
     if (!c) return;
-    setEditId(id); setFormName(c.name); setFormIcon(c.icon); setFormOpen(true);
+    setEditId(id); setFormName(c.name); setFormIcon(c.icon); setEmojiOpen(false); setView('form');
   };
+  const backToList = () => { resetForm(); setView('list'); };
+  const closeAll = () => { resetForm(); setView('list'); setOpen(false); };
+
   const saveItem = () => {
     const name = formName.trim();
     if (!name) return;
     if (editId) updateOption(editId, { name, icon: formIcon });
-    else if (customKey) addOption(customKey, name, formIcon);
-    setFormOpen(false);
+    else if (customKey) { addOption(customKey, name, formIcon); setHighlight(name); }
+    resetForm();
+    setView('list');
   };
+
   const removeItem = async (e: React.MouseEvent, id: string, name: string) => {
     e.stopPropagation();
     const ok = await showConfirmAsync('حذف آیتم', '«' + name + '» حذف شود؟', { danger: true });
@@ -115,7 +112,7 @@ export default function EditableSelect({
     </button>
   );
 
-  const renderList = () => (
+  const listView = (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       {customKey && (
         <button type="button" onClick={openAdd} style={{
@@ -149,7 +146,7 @@ export default function EditableSelect({
         const selected = value === o.value;
         return (
           <button key={o.value} type="button"
-            onClick={() => { onChange(o.value); setOpen(false); }}
+            onClick={() => { onChange(o.value); closeAll(); }}
             style={{
               ...ROW,
               borderColor: selected ? 'var(--accent-border)' : 'var(--border)',
@@ -171,12 +168,13 @@ export default function EditableSelect({
 
       {customs.map(c => {
         const selected = value === c.name;
+        const isHi = highlight === c.name;
         return (
           <button key={c.id} type="button"
-            onClick={() => { onChange(c.name); setOpen(false); }}
+            onClick={() => { onChange(c.name); closeAll(); }}
             style={{
               ...ROW, position: 'relative',
-              borderColor: selected ? 'var(--accent-border)' : 'var(--border)',
+              borderColor: selected || isHi ? 'var(--accent-border)' : 'var(--border)',
               background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
               paddingLeft: 6,
             }}>
@@ -186,10 +184,18 @@ export default function EditableSelect({
             <span style={{ display: 'flex', gap: 2 }}>
               <span role="button" aria-label="ویرایش"
                 onClick={(e) => { e.stopPropagation(); openEdit(c.id); }}
-                style={MINI_BTN}>✏️</span>
+                style={{
+                  width: 30, height: 30, borderRadius: 8,
+                  cursor: 'pointer', fontSize: 14, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', opacity: .55,
+                }}>✏️</span>
               <span role="button" aria-label="حذف"
                 onClick={(e) => removeItem(e, c.id, c.name)}
-                style={MINI_BTN}>🗑️</span>
+                style={{
+                  width: 30, height: 30, borderRadius: 8,
+                  cursor: 'pointer', fontSize: 14, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', opacity: .55,
+                }}>🗑️</span>
             </span>
           </button>
         );
@@ -197,36 +203,56 @@ export default function EditableSelect({
     </div>
   );
 
-  const formModal = (
-    <>
-      <Modal
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        title={editId ? 'ویرایش مورد' : 'افزودن مورد جدید'}
-        footer={
-          <div style={{ display: 'flex', gap: 6 }}>
-            <Btn onClick={() => setFormOpen(false)} style={{ flex: 1 }}>لغو</Btn>
-            <Btn variant="primary" onClick={saveItem} disabled={!formName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
-          </div>
-        }
-      >
-        <Field label="نام">
-          <Input placeholder="مثلاً — آبخوری نیپل استیل" value={formName} onChange={e => setFormName(e.target.value)} />
-        </Field>
-        <Field label="آیکن">
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <div style={{
-              width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 30, background: 'var(--input-bg)', borderRadius: 'var(--r-md)',
-              border: '1px solid var(--border)',
-            }}>{formIcon}</div>
-            <Btn onClick={() => setShowEmoji(true)} style={{ flex: 1 }}>انتخاب از ایموجی‌ها</Btn>
-          </div>
-        </Field>
-      </Modal>
-      <EmojiPicker open={showEmoji} onClose={() => setShowEmoji(false)} onPick={setFormIcon} />
-    </>
+  const formView = (
+    <div>
+      <Field label="نام">
+        <Input
+          placeholder="مثلاً — آبخوری نیپل استیل"
+          value={formName}
+          onChange={e => setFormName(e.target.value)}
+          autoFocus
+        />
+      </Field>
+
+      <Field label="آیکن">
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div style={{
+            width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 30, background: 'var(--input-bg)', borderRadius: 'var(--r-md)',
+            border: '1px solid var(--border)',
+          }}>{formIcon}</div>
+          <Btn onClick={() => setEmojiOpen(o => !o)} style={{ flex: 1 }}>
+            {emojiOpen ? 'بستن ایموجی‌ها' : 'انتخاب از ایموجی‌ها'}
+          </Btn>
+        </div>
+      </Field>
+
+      {emojiOpen && (
+        <div style={{
+          marginTop: 4,
+          padding: 10,
+          background: 'var(--input-bg)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-md)',
+        }}>
+          <EmojiGrid value={formIcon} onPick={setFormIcon} />
+        </div>
+      )}
+    </div>
   );
+
+  const modalTitle = view === 'form'
+    ? (editId ? 'ویرایش مورد' : 'افزودن مورد جدید')
+    : (label || 'انتخاب');
+
+  const modalContent = view === 'form' ? formView : listView;
+
+  const modalFooter = view === 'form' ? (
+    <div style={{ display: 'flex', gap: 6 }}>
+      <Btn onClick={backToList} style={{ flex: 1 }}>لغو</Btn>
+      <Btn variant="primary" onClick={saveItem} disabled={!formName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
+    </div>
+  ) : undefined;
 
   if (variant === 'inline') {
     return (
@@ -236,9 +262,8 @@ export default function EditableSelect({
           <div style={{
             marginTop: 8, background: 'var(--input-bg)',
             border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 10,
-          }}>{renderList()}</div>
+          }}>{listView}</div>
         )}
-        {formModal}
       </>
     );
   }
@@ -246,10 +271,14 @@ export default function EditableSelect({
   return (
     <>
       {label ? <Field label={label} required={required} error={error}>{trigger}</Field> : trigger}
-      <Modal open={open} onClose={() => setOpen(false)} title={label || 'انتخاب'}>
-        {renderList()}
+      <Modal
+        open={open}
+        onClose={view === 'form' ? backToList : closeAll}
+        title={modalTitle}
+        footer={modalFooter}
+      >
+        {modalContent}
       </Modal>
-      {formModal}
     </>
   );
 }
