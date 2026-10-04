@@ -22,19 +22,21 @@ interface Props {
   variant?: 'modal' | 'inline';
 }
 
-const CATEGORY_COLORS: Record<string, { bg: string; fg: string }> = {
-  ventilation: { bg: 'rgba(59,130,246,.14)',  fg: '#2563eb' },
-  feeding:     { bg: 'rgba(245,158,11,.16)',  fg: '#d97706' },
-  drinking:    { bg: 'rgba(6,182,212,.14)',   fg: '#0891b2' },
-  heating:     { bg: 'rgba(239,68,68,.14)',   fg: '#dc2626' },
-  lighting:    { bg: 'rgba(234,179,8,.18)',   fg: '#ca8a04' },
-  litter:      { bg: 'rgba(139,92,246,.14)',  fg: '#7c3aed' },
-  power:       { bg: 'rgba(249,115,22,.14)',  fg: '#ea580c' },
-  auxiliary:   { bg: 'rgba(100,116,139,.14)', fg: '#475569' },
+const PALETTE = {
+  blue:   { bg: 'linear-gradient(135deg,#dbeafe,#bfdbfe)', fg: '#1d4ed8' },
+  cyan:   { bg: 'linear-gradient(135deg,#cffafe,#a5f3fc)', fg: '#0e7490' },
+  red:    { bg: 'linear-gradient(135deg,#fee2e2,#fecaca)', fg: '#b91c1c' },
+  amber:  { bg: 'linear-gradient(135deg,#fef3c7,#fde68a)', fg: '#b45309' },
+  purple: { bg: 'linear-gradient(135deg,#ede9fe,#ddd6fe)', fg: '#6d28d9' },
+  green:  { bg: 'linear-gradient(135deg,#dcfce7,#bbf7d0)', fg: '#15803d' },
+  orange: { bg: 'linear-gradient(135deg,#ffedd5,#fed7aa)', fg: '#c2410c' },
+  slate:  { bg: 'linear-gradient(135deg,#e2e8f0,#cbd5e1)', fg: '#334155' },
 };
 
-function colorForIcon(_icon: string): { bg: string; fg: string } {
-  return { bg: 'rgba(22,163,74,.14)', fg: '#16a34a' };
+function paletteForIcon(icon: string): { bg: string; fg: string } {
+  const code = (icon || '').codePointAt(0) || 0;
+  const keys = Object.keys(PALETTE) as (keyof typeof PALETTE)[];
+  return PALETTE[keys[code % keys.length]];
 }
 
 export default function EditableSelect({
@@ -104,111 +106,105 @@ export default function EditableSelect({
     </button>
   );
 
-  const renderList = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+  const renderCard = (o: EditableOption, key: string, sub?: string, onEdit?: () => void, onRemove?: (e: React.MouseEvent) => void) => {
+    const selected = value === o.value;
+    const isHi = highlight === o.value;
+    const p = paletteForIcon(o.icon || '');
+    return (
+      <div key={key} style={{ display: 'flex', alignItems: 'stretch', gap: 6 }}>
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => { onChange(o.value); closeAll(); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(o.value); closeAll(); } }}
+          style={{
+            flex: 1,
+            display: 'flex', alignItems: 'center', gap: 14,
+            padding: '14px 16px',
+            background: 'var(--card-elevated)',
+            border: '1.5px solid ' + (selected || isHi ? 'var(--accent-border)' : 'var(--border)'),
+            borderRadius: 16,
+            color: 'var(--text)', fontFamily: 'inherit',
+            textAlign: 'right', cursor: 'pointer',
+            boxShadow: selected
+              ? '0 4px 20px rgba(22,163,74,.18), 0 2px 6px rgba(15,23,42,.06)'
+              : '0 1px 3px rgba(15,23,42,.05), 0 4px 12px rgba(15,23,42,.05)',
+            position: 'relative',
+            transition: 'transform 140ms, box-shadow 200ms',
+          }}>
+          <div style={{
+            width: 52, height: 52, borderRadius: 15,
+            background: p.bg, color: p.fg,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 26, flexShrink: 0,
+            boxShadow: '0 3px 8px rgba(15,23,42,.08)',
+          }}>{o.icon || '•'}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {o.label}
+            </div>
+            {sub && (
+              <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2, fontWeight: 500 }}>{sub}</div>
+            )}
+          </div>
+          {selected && (
+            <div style={{
+              width: 24, height: 24, borderRadius: '50%',
+              background: 'var(--accent)', color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 14, fontWeight: 700, flexShrink: 0,
+            }}>✓</div>
+          )}
+          {!selected && onEdit && onRemove && (
+            <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+              <button type="button" aria-label="ویرایش"
+                onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                style={{
+                  width: 32, height: 32, borderRadius: 8,
+                  background: 'transparent', border: 'none',
+                  cursor: 'pointer', fontSize: 14, padding: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: .6,
+                }}>✏️</button>
+              <button type="button" aria-label="حذف"
+                onClick={(e) => { e.stopPropagation(); onRemove(e); }}
+                style={{
+                  width: 32, height: 32, borderRadius: 8,
+                  background: 'transparent', border: 'none',
+                  cursor: 'pointer', fontSize: 14, padding: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: .6,
+                }}>🗑️</button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
+  const renderList = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {options.length > 0 && (
         <div style={{
           fontSize: 11, fontWeight: 700, color: 'var(--muted)',
-          letterSpacing: '.6px', padding: '6px 4px 4px',
+          letterSpacing: '.6px', padding: '4px 4px 0',
         }}>پیش‌فرض‌ها</div>
       )}
-
-      {options.map(o => {
-        const selected = value === o.value;
-        const c = colorForIcon(o.icon || '');
-        return (
-          <button key={o.value} type="button"
-            onClick={() => { onChange(o.value); closeAll(); }}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              padding: '10px 12px', minHeight: 52,
-              background: selected ? 'var(--accent-soft)' : 'var(--card-elevated)',
-              border: '1px solid ' + (selected ? 'var(--accent-border)' : 'var(--border)'),
-              borderRadius: 14,
-              color: 'var(--text)', fontFamily: 'inherit',
-              fontSize: 'var(--fs-base)', fontWeight: 500,
-              textAlign: 'right', cursor: 'pointer',
-              width: '100%', boxSizing: 'border-box',
-              boxShadow: selected
-                ? '0 2px 8px rgba(22,163,74,.12)'
-                : '0 1px 2px rgba(15,23,42,.05), 0 2px 6px rgba(15,23,42,.04)',
-              transition: 'transform 120ms, box-shadow 150ms',
-            }}>
-            <span style={{
-              width: 36, height: 36, borderRadius: 10,
-              background: c.bg,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 18, flexShrink: 0,
-            }}>{o.icon || '•'}</span>
-            <span style={{ flex: 1 }}>{o.label}</span>
-            {selected && <span style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700 }}>✓</span>}
-          </button>
-        );
-      })}
+      {options.map(o => renderCard(o, o.value))}
 
       {customs.length > 0 && (
         <div style={{
           fontSize: 11, fontWeight: 700, color: 'var(--muted)',
-          letterSpacing: '.6px', padding: '14px 4px 4px',
+          letterSpacing: '.6px', padding: '8px 4px 0',
         }}>سفارشی</div>
       )}
-
-      {customs.map(c => {
-        const selected = value === c.name;
-        const isHi = highlight === c.name;
-        const col = colorForIcon(c.icon);
-        return (
-          <div key={c.id} style={{ display: 'flex', alignItems: 'stretch', gap: 4 }}>
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => { onChange(c.name); closeAll(); }}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(c.name); closeAll(); } }}
-              style={{
-                flex: 1, display: 'flex', alignItems: 'center', gap: 12,
-                padding: '10px 12px', minHeight: 52,
-                background: selected ? 'var(--accent-soft)' : 'var(--card-elevated)',
-                border: '1px solid ' + (selected || isHi ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 14,
-                color: 'var(--text)', fontFamily: 'inherit',
-                fontSize: 'var(--fs-base)', fontWeight: 500,
-                textAlign: 'right', cursor: 'pointer',
-                boxSizing: 'border-box',
-                boxShadow: selected
-                  ? '0 2px 8px rgba(22,163,74,.12)'
-                  : '0 1px 2px rgba(15,23,42,.05), 0 2px 6px rgba(15,23,42,.04)',
-              }}>
-              <span style={{
-                width: 36, height: 36, borderRadius: 10,
-                background: col.bg,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 18, flexShrink: 0,
-              }}>{c.icon}</span>
-              <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-              {selected && <span style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700 }}>✓</span>}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center' }}>
-              <button type="button" aria-label="ویرایش"
-                onClick={() => openEdit(c.id)}
-                style={{
-                  width: 32, height: 22, borderRadius: 6,
-                  background: 'var(--input-bg)', border: '1px solid var(--border)',
-                  cursor: 'pointer', fontSize: 11, display: 'flex',
-                  alignItems: 'center', justifyContent: 'center', opacity: .7, padding: 0,
-                }}>✏️</button>
-              <button type="button" aria-label="حذف"
-                onClick={(e) => removeItem(e, c.id, c.name)}
-                style={{
-                  width: 32, height: 22, borderRadius: 6,
-                  background: 'var(--input-bg)', border: '1px solid var(--border)',
-                  cursor: 'pointer', fontSize: 11, display: 'flex',
-                  alignItems: 'center', justifyContent: 'center', opacity: .7, padding: 0,
-                }}>🗑️</button>
-            </div>
-          </div>
-        );
-      })}
+      {customs.map(c =>
+        renderCard(
+          { value: c.name, label: c.name, icon: c.icon },
+          c.id,
+          'قابل ویرایش',
+          () => openEdit(c.id),
+          (e) => removeItem(e, c.id, c.name)
+        )
+      )}
     </div>
   );
 
@@ -226,9 +222,12 @@ export default function EditableSelect({
       <Field label="آیکن">
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <div style={{
-            width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 30, background: 'var(--input-bg)', borderRadius: 'var(--r-md)',
-            border: '1px solid var(--border)',
+            width: 58, height: 58, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 30,
+            background: paletteForIcon(formIcon).bg,
+            color: paletteForIcon(formIcon).fg,
+            borderRadius: 16,
+            boxShadow: '0 3px 10px rgba(15,23,42,.08)',
           }}>{formIcon}</div>
           <Btn onClick={() => setEmojiOpen(o => !o)} style={{ flex: 1 }}>
             {emojiOpen ? 'بستن ایموجی‌ها' : 'انتخاب از ایموجی‌ها'}
@@ -249,22 +248,21 @@ export default function EditableSelect({
     </div>
   );
 
-  // ─── Header Action Button ───
   const headerAction = (customKey && view === 'list') ? (
     <button
       type="button"
       onClick={openAdd}
       aria-label="افزودن مورد جدید"
       style={{
-        width: 32, height: 32, borderRadius: 'var(--r-md)',
+        width: 36, height: 36, borderRadius: 11,
         background: 'var(--accent)',
         border: 'none',
         color: '#fff',
         cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 20, fontWeight: 400, lineHeight: 1,
+        fontSize: 22, fontWeight: 300, lineHeight: 1,
         fontFamily: 'inherit',
-        boxShadow: '0 2px 6px rgba(22,163,74,.3)',
+        boxShadow: '0 3px 10px rgba(22,163,74,.3)',
       }}
     >+</button>
   ) : null;
@@ -274,7 +272,7 @@ export default function EditableSelect({
     : (label || 'انتخاب');
 
   const modalFooter = view === 'form' ? (
-    <div style={{ display: 'flex', gap: 6 }}>
+    <div style={{ display: 'flex', gap: 8 }}>
       <Btn onClick={backToList} style={{ flex: 1 }}>لغو</Btn>
       <Btn variant="primary" onClick={saveItem} disabled={!formName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
     </div>
