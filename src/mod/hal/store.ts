@@ -5,6 +5,13 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 
+export interface HallSource {
+  id: string;
+  type: string;
+  count: number | null;
+  notes: string;
+}
+
 export interface Hall {
   id: string;
   name: string;
@@ -29,6 +36,12 @@ export interface Hall {
   birdId?: string;
   /** شناسه نژاد (breedId) — دقیق‌تر از پرنده */
   breedId?: string;
+  // 🆕 منابع توزیع‌شده
+  waterSources?: HallSource[];
+  feedSources?: HallSource[];
+  ventSources?: HallSource[];
+  litterSections?: HallSource[];
+  systemNotes?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -92,7 +105,50 @@ export const useHal = create<State>()(
       updateEquip: (id, patch) => set({ equipment: get().equipment.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       deleteEquip: (id) => set({ equipment: get().equipment.filter(x => x.id !== id) })
     }),
-    { name: 'pm-hal' }
+    {
+      name: 'pm-hal',
+      version: 2,
+      migrate: (persisted: any, version: number) => {
+        if (!persisted?.state?.halls) return persisted;
+        if (version < 2) {
+          persisted.state.halls = persisted.state.halls.map((h: any) => {
+            const waterSources = h.waterSources || (h.drinkerType ? [{
+              id: 'legacy-w-' + h.id,
+              type: h.drinkerType,
+              count: null,
+              notes: '',
+            }] : []);
+            const feedSources = h.feedSources || (h.feederType ? [{
+              id: 'legacy-f-' + h.id,
+              type: h.feederType,
+              count: null,
+              notes: '',
+            }] : []);
+            const ventSources = h.ventSources || (h.ventilationSystem ? [{
+              id: 'legacy-v-' + h.id,
+              type: h.ventilationSystem,
+              count: null,
+              notes: '',
+            }] : []);
+            const litterSections = h.litterSections || (h.litterType ? [{
+              id: 'legacy-l-' + h.id,
+              type: h.litterType,
+              count: h.length && h.width ? h.length * h.width : null,
+              notes: '',
+            }] : []);
+            return {
+              ...h,
+              waterSources,
+              feedSources,
+              ventSources,
+              litterSections,
+              systemNotes: h.systemNotes || '',
+            };
+          });
+        }
+        return persisted;
+      },
+    }
   )
 );
 
