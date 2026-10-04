@@ -601,24 +601,18 @@ export default function FlocksPage() {
         {list.length > 1 && !selectionMode && (
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button type="button" onClick={() => setSelectionMode(true)}
-              style={{ padding: '6px 12px', background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer' }}>
-              انتخاب چندتایی
+              aria-label="انتخاب چندتایی"
+              style={{ padding: '4px 8px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+              ☐ انتخاب
             </button>
           </div>
         )}
 
-        {selectionMode && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)' }}>
-            <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
-              {toFa(selectedIds.size)} از {toFa(list.length)} انتخاب شده
-            </span>
+        {selectionMode && list.length > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
             <button type="button" onClick={selectedIds.size === list.length ? deselectAll : selectAllVisible}
-              style={{ padding: '4px 10px', background: 'var(--card)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700, cursor: 'pointer' }}>
-              {selectedIds.size === list.length ? 'لغو همه' : 'انتخاب همه'}
-            </button>
-            <button type="button" onClick={exitSelection}
-              style={{ padding: '4px 10px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', cursor: 'pointer' }}>
-              خروج
+              style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+              {selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
             </button>
           </div>
         )}
@@ -656,8 +650,8 @@ export default function FlocksPage() {
                       aria-checked={isSelected}
                       onClick={(e) => { e.stopPropagation(); toggleSelect(f.id); }}
                       style={{
-                        position: 'absolute', top: 10, left: 10, zIndex: 10,
-                        width: 24, height: 24, borderRadius: 6,
+                        position: 'absolute', top: 10, right: 10, zIndex: 10,
+                        width: 20, height: 20, borderRadius: 5,
                         background: isSelected ? 'var(--accent)' : 'var(--card)',
                         border: '2px solid ' + (isSelected ? 'var(--accent)' : 'var(--border)'),
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -837,16 +831,19 @@ export default function FlocksPage() {
             zIndex: 100, maxWidth: 460, width: 'calc(100% - 24px)',
             background: 'var(--card-solid)', border: '1px solid var(--accent-border)',
             borderRadius: 'var(--r-lg)', boxShadow: '0 6px 24px rgba(0,0,0,0.18)',
-            padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 8,
+            padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 6,
           }}>
             <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
               {toFa(selectedIds.size)} انتخاب
             </span>
+            <Btn size="sm" variant="danger" onClick={doBulkDelete} style={{ flex: 1 }}>
+              🗑 حذف
+            </Btn>
             <Btn size="sm" onClick={doBulkArchive} style={{ flex: 1 }}>
               📦 آرشیو
             </Btn>
-            <Btn size="sm" variant="danger" onClick={doBulkDelete} style={{ flex: 1 }}>
-              🗑 حذف
+            <Btn size="sm" onClick={exitSelection} style={{ flex: 1 }}>
+              لغو
             </Btn>
           </div>
         )}
