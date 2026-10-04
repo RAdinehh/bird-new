@@ -12,6 +12,7 @@ import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
 import { chip } from './helpers';
 import EditableSelect from '../../shr/components/EditableSelect';
+import { EquipmentIcon, CATEGORY_COLORS } from '../../shr/icons/equipment';
 import { useCustomOptions } from '../../shr/store/customOptions';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
