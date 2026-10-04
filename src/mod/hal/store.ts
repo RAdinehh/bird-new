@@ -125,7 +125,7 @@ export const useHal = create<State>()(
     }),
     {
       name: 'pm-hal',
-      version: 4,
+      version: 5,
       migrate: (persisted: any, version: number) => {
         if (!persisted?.state?.halls) return persisted;
         if (version < 2) {
@@ -211,6 +211,12 @@ export const useHal = create<State>()(
             ventSources: fixSources(h.ventSources),
             litterSections: fixSources(h.litterSections),
           }));
+        }
+        if (version < 5) {
+          persisted.state.halls = (persisted.state.halls || []).map((h: any) => {
+            const { waterSources, feedSources, ventSources, litterSections, systemNotes, ...rest } = h;
+            return rest;
+          });
         }
         return persisted;
       },
@@ -313,7 +319,6 @@ export const VENT_SYS_LABELS: Record<string, string> = {
   fan_ceiling: 'فن سقفی',
   air_inlet: 'دریچه هوا',
   cooling_pad: 'پد سلولزی',
-  tunnel: 'تونلی', longitudinal: 'طولی', transverse: 'عرضی', natural: 'طبیعی', none: '—',
 };
 
 export const FEEDER_LABELS: Record<string, string> = {
@@ -322,7 +327,6 @@ export const FEEDER_LABELS: Record<string, string> = {
   feeder_chain: 'دانخوری زنجیری',
   feeder_tube: 'دانخوری لوله‌ای',
   feeder_bucket: 'دانخوری سطلی لبه‌دار',
-  chain: 'زنجیری', pan: 'بشقابی', tube: 'لوله‌ای', manual: 'دستی', none: '—',
 };
 
 export const DRINKER_LABELS: Record<string, string> = {
@@ -330,7 +334,6 @@ export const DRINKER_LABELS: Record<string, string> = {
   cup: 'کاپ',
   trough: 'ناودانی',
   fountain_drinker: 'آبخوری کله قندی',
-  manual: 'دستی', none: '—',
 };
 
 export const LITTER_LABELS: Record<string, string> = {

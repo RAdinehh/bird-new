@@ -21,8 +21,6 @@ import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
-import type { HallSource } from './helpers';
-import { SourceList } from './helpers';
 
 interface F {
   id?: string;
@@ -31,19 +29,14 @@ interface F {
   capacity: string; targetTemp: string; targetHumidity: string;
   ventilation: string; light: string;
   ventilationSystem: string; feederType: string; drinkerType: string; litterType: string;
-  waterSources: HallSource[];
-  feedSources: HallSource[];
-  ventSources: HallSource[];
-  litterSections: HallSource[];
-  systemNotes: string;
   address: string; builtAt: string; lastSanitizedAt: string; notes: string; breedId: string;
 }
 const empty: F = {
   name:'', code:'', length:'', width:'', height:'',
   capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'',
   ventilationSystem:'', feederType:'', drinkerType:'', litterType:'',
-  waterSources: [], feedSources: [], ventSources: [], litterSections: [],
-  systemNotes: '',
+ 
+  
   address:'', builtAt:'', lastSanitizedAt:'', notes:'', breedId:'',
 };
 
@@ -166,7 +159,6 @@ export default function HallsPage() {
       feederType: h.feederType || '',
       drinkerType: h.drinkerType || '',
       litterType: h.litterType || '',
-      waterSources: (h as any).waterSources || [],
       feedSources: (h as any).feedSources || [],
       ventSources: (h as any).ventSources || [],
       litterSections: (h as any).litterSections || [],
@@ -229,11 +221,6 @@ export default function HallsPage() {
       feederType: form.feederType || '',
       drinkerType: form.drinkerType || '',
       litterType: form.litterType || '',
-      waterSources: form.waterSources,
-      feedSources: form.feedSources,
-      ventSources: form.ventSources,
-      litterSections: form.litterSections,
-      systemNotes: form.systemNotes,
       address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), notes: form.notes.trim(),
       breedId: form.breedId || undefined,
     };
@@ -586,59 +573,7 @@ export default function HallsPage() {
           <Field label="عرض"><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} /></Field>
           <Field label="ارتفاع"><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} /></Field>
         </Grid3>
-        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>سیستم‌ها</div>
-
-        <SourceList
-          label="آبخوری"
-          icon="🚰"
-          sources={form.waterSources}
-          typeLabels={DRINKER_LABELS}
-          countUnit="عدد"
-          countLabel="تعداد"
-          customKey="hal.hall.drinker"
-          onChange={(s) => setForm({ ...form, waterSources: s })}
-        />
-
-        <SourceList
-          label="دانخوری"
-          icon="🍽"
-          sources={form.feedSources}
-          typeLabels={FEEDER_LABELS}
-          countUnit="عدد"
-          countLabel="تعداد"
-          customKey="hal.hall.feeder"
-          onChange={(s) => setForm({ ...form, feedSources: s })}
-        />
-
-        <SourceList
-          label="تهویه"
-          icon="🌀"
-          sources={form.ventSources}
-          typeLabels={VENT_SYS_LABELS}
-          countUnit="عدد"
-          countLabel="تعداد"
-          customKey="hal.hall.vent"
-          onChange={(s) => setForm({ ...form, ventSources: s })}
-        />
-
-        <SourceList
-          label="بستر"
-          icon="🛏"
-          sources={form.litterSections}
-          typeLabels={LITTER_LABELS}
-          countUnit="m²"
-          countLabel="مساحت"
-          customKey="hal.hall.litter"
-          onChange={(s) => setForm({ ...form, litterSections: s })}
-        />
-
-        <Field label="📝 یادداشت سیستم‌ها (اختیاری)" hint="مثلاً: بستر نیمه ماسه، نیمه رول کاغذی — بستگی به قیمت">
-          <Input
-            placeholder="هر چیزی که خودت می‌خوای بگی..."
-            value={form.systemNotes}
-            onChange={e => setForm({ ...form, systemNotes: e.target.value })}
-          />
-        </Field>
+        
 
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>شرایط</div>
           <Grid2>
