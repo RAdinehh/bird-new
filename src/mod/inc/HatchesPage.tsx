@@ -148,6 +148,36 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     setUndoData(null);
   };
 
+  // ═══ اعتبارسنجی زنده ═══
+  const vErrors = useMemo(() => {
+    const errs: Record<string, string> = {};
+    for (const [entryId, d] of Object.entries(entriesData || {})) {
+      const hatched = parseInt(toEn(d.hatched || '0')) || 0;
+      const unhatched = parseInt(toEn(d.unhatched || '0')) || 0;
+      const deadInShell = parseInt(toEn(d.deadInShell || '0')) || 0;
+      const gradeA = parseInt(toEn(d.gradeA || '0')) || 0;
+      const gradeB = parseInt(toEn(d.gradeB || '0')) || 0;
+      const male = parseInt(toEn(d.maleCount || '0')) || 0;
+      const female = parseInt(toEn(d.femaleCount || '0')) || 0;
+      const unknown = parseInt(toEn(d.unknownCount || '0')) || 0;
+      const avgW = parseFloat(toEn(d.avgWeight || '0')) || 0;
+
+      if (hatched < 0 || unhatched < 0 || deadInShell < 0) {
+        errs['neg_' + entryId] = 'مقادیر منفی مجاز نیست';
+      }
+      if ((gradeA + gradeB) > 0 && (gradeA + gradeB) !== hatched) {
+        errs['grade_' + entryId] = 'مجموع درجه A + B باید برابر تعداد جوجه باشد';
+      }
+      if ((male + female + unknown) > 0 && (male + female + unknown) !== hatched) {
+        errs['sex_' + entryId] = 'مجموع نر + ماده + نامعلوم باید برابر تعداد جوجه باشد';
+      }
+      if (avgW > 0 && (avgW < 20 || avgW > 60)) {
+        errs['avgW_' + entryId] = 'وزن جوجه باید بین ۲۰ تا ۶۰ گرم باشد';
+      }
+    }
+    return errs;
+  }, [entriesData]);
+
   const save = () => {
     if (!formDate.trim()) { setErr('تاریخ اجباری است'); return; }
     if (editingId) {
@@ -408,7 +438,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
       {/* ═══ Modal ثبت/ویرایش ═══ */}
       <Modal open={open} onClose={() => setOpen(false)} title={editingId ? '✏️ ویرایش هچ' : '🐣 ثبت هچ'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> انتخاب ورودی‌ها</SectionTitle>
 
