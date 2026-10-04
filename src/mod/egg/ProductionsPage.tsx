@@ -20,8 +20,6 @@ import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createEggSchema } from '../../shr/validation/rules/egg';
-import { useDraftAutosave } from '../../shr/hooks/useDraftAutosave';
-import { AutoSaveBadge } from '../../shr/hooks/AutoSaveBadge';
 
 interface F {
   id?: string;
@@ -178,15 +176,6 @@ export default function ProductionsPage() {
     },
   );
 
-  // ═══ Autosave پیش‌نویس ═══
-  const draftKey = form.id ? `egg-draft-${form.id}` : 'egg-draft-new';
-  const { status: draftStatus, savedAt: draftSavedAt, clearDraft } = useDraftAutosave({
-    key: draftKey,
-    data: form,
-    enabled: open,
-    debounceMs: 800,
-    shouldSave: (d: any) => !!d.flockId || !!d.date || !!d.eatingCount || !!d.fertileCount,
-  });
 
   const target = delId ? productions.find(p => p.id === delId) : null;
 
@@ -301,7 +290,7 @@ export default function ProductionsPage() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}><span>{form.id ? 'ویرایش تخم‌گذاری' : 'ثبت تخم‌گذاری'}</span><AutoSaveBadge status={draftStatus} savedAt={draftSavedAt} /></div>}
+        title={form.id ? 'ویرایش تخم‌گذاری' : 'ثبت تخم‌گذاری'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Grid2>
