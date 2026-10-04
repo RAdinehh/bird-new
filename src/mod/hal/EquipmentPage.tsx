@@ -431,23 +431,37 @@ export default function EquipmentPage() {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
         footer={<div style={{ display: "flex", gap: 6 }}><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
         <Grid2>
-          <Field label="نوع" required>
-            <Select value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
-              {Object.entries(EQUIP_LABELS).map(([k, v]) => <option key={k} value={k}>{v.icon} {v.name}</option>)}
+          <Field label="نوع دارایی" required>
+            <Select value={form.kind || 'asset'} onChange={e => setForm({...form, kind: e.target.value})}>
+              {Object.entries(KIND_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v.icon} {v.name}</option>
+              ))}
             </Select>
           </Field>
+          <Field label="دسته" required>
+            <Select value={form.category || 'auxiliary'} onChange={e => setForm({...form, category: e.target.value})}>
+              {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v.icon} {v.name}</option>
+              ))}
+            </Select>
+          </Field>
+        </Grid2>
+
+        <Grid2>
           <Field label="سالن" required>
-<SmartSelect
+            <SmartSelect
               value={form.hallId}
               onChange={v => setForm((f: any) => ({ ...f, hallId: v }))}
-              options={halls.map(c => ({
-                value: c.id,
-                label: c.name,
-              }))}
+              options={halls.map(c => ({ value: c.id, label: c.name }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب سالن"
               autoThreshold={6}
             />
+          </Field>
+          <Field label="زیرنوع" required>
+            <Select value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
+              {Object.entries(EQUIP_LABELS).map(([k, v]) => <option key={k} value={k}>{v.icon} {v.name}</option>)}
+            </Select>
           </Field>
         </Grid2>
         <Field label="نام تجهیز" required>
