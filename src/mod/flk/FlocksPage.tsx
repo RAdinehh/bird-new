@@ -173,6 +173,8 @@ export default function FlocksPage() {
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
   const [archId, setArchId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'archived'], tab, (id) => setTab(id as TabId));
 
   // فیلتر تکرارها تو render
@@ -198,14 +200,99 @@ export default function FlocksPage() {
 
   const undoDeleteFlock = () => {
     if (undoData == null) return;
-    const flockToRestore = undoData.flock;
+    const list = Array.isArray(undoData.flock) ? undoData.flock : [undoData.flock];
     try {
-      add(flockToRestore);
-      showToast('گله بازگردانی شد', 'success', 2000);
+      list.forEach((f: any) => add(f));
+      showToast(list.length > 1 ? toFa(list.length) + ' گله بازگردانی شد' : 'گله بازگردانی شد', 'success', 2000);
     } catch (err) {
       showToast('بازگردانی ناموفق', 'error', 2000);
     }
     setUndoData(null);
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+  const exitSelection = () => {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  };
+  const selectAllVisible = () => {
+    setSelectedIds(new Set(list.map(f => f.id)));
+  };
+  const deselectAll = () => setSelectedIds(new Set());
+
+  const hasRefs = (flockId: string): boolean => {
+    try {
+      const safeRead = (k: string) => {
+        try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch { return {}; }
+      };
+      const dlg = safeRead('pm-dlg');
+      const dlgLogs = dlg.state?.logs || dlg.logs || [];
+      if (dlgLogs.some((l: any) => l.flockId === flockId)) return true;
+      const egg = safeRead('pm-egg');
+      const prods = egg.state?.productions || egg.productions || [];
+      if (prods.some((p: any) => p.flockId === flockId)) return true;
+      const sales = egg.state?.sales || egg.sales || [];
+      if (sales.some((s: any) => s.flockId === flockId)) return true;
+      const tra = safeRead('pm-tra');
+      const invs = tra.state?.invoices || tra.invoices || [];
+      if (invs.some((i: any) => i.relatedFlockId === flockId)) return true;
+    } catch {}
+    return false;
+  };
+
+  const doBulkArchive = async () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' گله آرشیو شوند؟', { danger: false });
+    if (!ok) return;
+    for (const id of ids) {
+      try { archive(id); } catch {}
+    }
+    logAction('update', 'flk', 'آرشیو گروهی ' + ids.length + ' گله');
+    showToast(toFa(ids.length) + ' گله آرشیو شد', 'success', 2500);
+    exitSelection();
+  };
+
+  const doBulkDelete = async () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    const withRefs = ids.filter(id => hasRefs(id));
+    const withoutRefs = ids.filter(id => !hasRefs(id));
+    let msg = toFa(ids.length) + ' گله انتخاب شده.';
+    if (withRefs.length > 0) msg += ' ' + toFa(withRefs.length) + ' گله ارجاع دارن (آرشیو می‌شن).';
+    if (withoutRefs.length > 0) msg += ' ' + toFa(withoutRefs.length) + ' گله حذف کامل می‌شن.';
+    msg += ' ادامه؟';
+    const ok = await showConfirmAsync('حذف گروهی', msg, { danger: true });
+    if (!ok) return;
+    let arch = 0, del = 0;
+    const backups: any[] = [];
+    for (const id of ids) {
+      const fl = flocks.find(f => f.id === id);
+      if (!fl) continue;
+      if (hasRefs(id)) {
+        try { archive(id); arch++; } catch {}
+      } else {
+        backups.push(fl);
+        try { remove(id); del++; } catch {}
+      }
+    }
+    if (backups.length > 0) {
+      setUndoData({ flock: backups });
+      setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.flock) && cur.flock.length === backups.length ? null : cur), 8000);
+    }
+    let toast = '';
+    if (arch > 0) toast += toFa(arch) + ' آرشیو';
+    if (del > 0) toast += (toast ? ' · ' : '') + toFa(del) + ' حذف';
+    showToast(toast || 'انجام شد', 'success', 2500);
+    logAction('delete', 'flk', 'حذف گروهی: ' + arch + ' آرشیو، ' + del + ' حذف');
+    exitSelection();
   };
 
   const openNew = () => {
@@ -510,6 +597,31 @@ export default function FlocksPage() {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <input value={q} onChange={e => setQ(e.target.value)} placeholder="جستجوی نام، پرنده، نژاد..." style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)', minWidth: 0 }} />
         </div>
+
+        {list.length > 1 && !selectionMode && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <button type="button" onClick={() => setSelectionMode(true)}
+              style={{ padding: '6px 12px', background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer' }}>
+              انتخاب چندتایی
+            </button>
+          </div>
+        )}
+
+        {selectionMode && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)' }}>
+            <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
+              {toFa(selectedIds.size)} از {toFa(list.length)} انتخاب شده
+            </span>
+            <button type="button" onClick={selectedIds.size === list.length ? deselectAll : selectAllVisible}
+              style={{ padding: '4px 10px', background: 'var(--card)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700, cursor: 'pointer' }}>
+              {selectedIds.size === list.length ? 'لغو همه' : 'انتخاب همه'}
+            </button>
+            <button type="button" onClick={exitSelection}
+              style={{ padding: '4px 10px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', cursor: 'pointer' }}>
+              خروج
+            </button>
+          </div>
+        )}
 
         {list.length === 0 ? (
           <Empty
