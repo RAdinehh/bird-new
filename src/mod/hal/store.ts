@@ -218,15 +218,50 @@ export const UNIT_LABELS_EQ: Record<EquipmentUnit, string> = {
 };
 
 export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
-  lamp: { name: 'لامپ', icon: '💡' },
-  fan: { name: 'فن', icon: '🌀' },
-  heater: { name: 'هیتر', icon: '🔥' },
-  cooler: { name: 'کولر', icon: '❄' },
-  drinker: { name: 'آبخوری', icon: '💧' },
-  feeder: { name: 'دانخوری', icon: '🥣' },
+  // تهویه
+  fan_tunnel:   { name: 'فن تونلی', icon: '🌀' },
+  fan_ceiling:  { name: 'فن سقفی', icon: '💨' },
+  air_inlet:    { name: 'دریچه هوا', icon: '🪟' },
+  cooling_pad:  { name: 'پد سلولزی', icon: '❄' },
+  // تغذیه
+  feeder_manual: { name: 'دانخوری دستی', icon: '🪣' },
+  feeder_pan:    { name: 'دانخوری بشقابی', icon: '🥣' },
+  feeder_chain:  { name: 'دانخوری زنجیری', icon: '⛓' },
+  feeder_tube:   { name: 'دانخوری لوله‌ای', icon: '🥤' },
+  feeder_bucket: { name: 'دانخوری سطلی لبه‌دار', icon: '🪣' },
+  // آبخوری
+  nipple:           { name: 'نیپل', icon: '💧' },
+  cup:              { name: 'کاپ', icon: '🥛' },
+  trough:           { name: 'ناودانی', icon: '🛁' },
+  fountain_drinker: { name: 'آبخوری کله قندی', icon: '⛲' },
+  // گرمایش
+  radiant_brooder: { name: 'هیتر تابشی', icon: '🔥' },
+  jet_heater:      { name: 'هیتر جت', icon: '♨' },
+  duct_heater:     { name: 'هیتر کانالی', icon: '🌡' },
+  // روشنایی
+  lamp_led:         { name: 'لامپ LED', icon: '💡' },
+  lamp_fluorescent: { name: 'لامپ فلورسنت', icon: '🔆' },
+  dimmer:           { name: 'دیمر', icon: '🎚' },
+  // بستر
+  litter_wood_shavings: { name: 'پوشال چوب', icon: '🪵' },
+  litter_roll:          { name: 'رول کاغذی', icon: '📜' },
+  litter_sand:          { name: 'ماسه', icon: '🏖' },
+  // برق‌رسانی
+  generator:        { name: 'ژنراتور', icon: '⚡' },
+  electrical_panel: { name: 'تابلو برق', icon: '🔌' },
+  cable:            { name: 'کابل و سیم', icon: '🔗' },
+  // جانبی
   camera: { name: 'دوربین', icon: '📷' },
   sensor: { name: 'سنسور', icon: '📡' },
-  other: { name: 'سایر', icon: '🔧' }
+  scale:  { name: 'ترازو', icon: '⚖' },
+  // سازگاری با داده‌های قدیمی
+  lamp:    { name: 'لامپ', icon: '💡' },
+  fan:     { name: 'فن', icon: '🌀' },
+  heater:  { name: 'هیتر', icon: '🔥' },
+  cooler:  { name: 'کولر', icon: '❄' },
+  drinker: { name: 'آبخوری', icon: '💧' },
+  feeder:  { name: 'دانخوری', icon: '🥣' },
+  other:   { name: 'سایر', icon: '🔧' },
 };
 
 /** واحد ظرفیت هر نوع تجهیز */

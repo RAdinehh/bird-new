@@ -22,19 +22,19 @@ import { logAction } from '../../cor/logger/auditLog';
 
 
 const TYPES_BY_CATEGORY: Record<string, string[]> = {
-  ventilation: ['fan', 'cooler'],
-  feeding:     ['feeder'],
-  drinking:    ['drinker'],
-  heating:     ['heater'],
-  lighting:    ['lamp'],
-  litter:      ['other'],
-  power:       ['other'],
-  auxiliary:   ['camera', 'sensor', 'other'],
+  ventilation: ['fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad'],
+  feeding:     ['feeder_manual', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket'],
+  drinking:    ['nipple', 'cup', 'trough', 'fountain_drinker'],
+  heating:     ['radiant_brooder', 'jet_heater', 'duct_heater'],
+  lighting:    ['lamp_led', 'lamp_fluorescent', 'dimmer'],
+  litter:      ['litter_wood_shavings', 'litter_roll', 'litter_sand'],
+  power:       ['generator', 'electrical_panel', 'cable'],
+  auxiliary:   ['camera', 'sensor', 'scale'],
 };
 
 function typesForCategory(cat: string): string[] {
   const list = TYPES_BY_CATEGORY[cat];
-  return (list && list.length > 0) ? list : ['other'];
+  return (list && list.length > 0) ? list : [];
 }
 
 function getCapacityHint(type: string, cap: number | null, hallVol: number | null, count: number = 1, eff: number | null = null): string {
