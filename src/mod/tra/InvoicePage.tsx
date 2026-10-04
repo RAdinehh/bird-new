@@ -438,7 +438,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
       >
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
         <Grid2>
-          <Field label="تاریخ" required>
+          <Field label="تاریخ" required error={vErrors.date}>
             <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
           </Field>
           <Field label="دسته">
@@ -447,7 +447,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
             </Select>
           </Field>
         </Grid2>
-        <Field label="فروشنده" required>
+        <Field label="فروشنده" required error={vErrors.partyId}>
           <SmartSelect
             value={form.partyId}
             onChange={v => setForm({...form, partyId: v})}
