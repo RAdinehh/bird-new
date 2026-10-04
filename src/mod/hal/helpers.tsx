@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * helpers.tsx — ماژول hal
  */
