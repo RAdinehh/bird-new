@@ -21,6 +21,28 @@ interface Props {
   error?: string;
 }
 
+const ROW_BASE: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  padding: '12px 14px',
+  minHeight: 52,
+  background: 'transparent',
+  border: 'none',
+  borderRadius: 'var(--r-md)',
+  color: 'var(--text)',
+  fontFamily: 'inherit',
+  fontSize: 'var(--fs-base)',
+  textAlign: 'right',
+  cursor: 'pointer',
+  width: '100%',
+  boxSizing: 'border-box',
+};
+
+const ROW_SELECTED: React.CSSProperties = {
+  background: 'var(--accent-soft)',
+};
+
 export default function EditableSelect({
   label, value, onChange, options, customKey, placeholder, required, error,
 }: Props) {
@@ -30,6 +52,7 @@ export default function EditableSelect({
   const [formName, setFormName] = useState('');
   const [formIcon, setFormIcon] = useState('🔧');
   const [showEmoji, setShowEmoji] = useState(false);
+  const [hoverId, setHoverId] = useState<string | null>(null);
 
   const { getByKey, addOption, updateOption, removeOption } = useCustomOptions();
   const customs = customKey ? getByKey(customKey) : [];
@@ -68,7 +91,7 @@ export default function EditableSelect({
         width: '100%', textAlign: 'right', padding: '10px 12px',
         background: 'var(--input-bg)', border: '1px solid var(--border)',
         borderRadius: 'var(--r-sm)', color: current ? 'var(--text)' : 'var(--muted)',
-        fontSize: 'var(--fs-base)', cursor: 'pointer',
+        fontSize: 'var(--fs-base)', cursor: 'pointer', fontFamily: 'inherit',
       }}
     >
       {current ? (current.icon ? current.icon + ' ' + current.label : current.label) : (placeholder || '— انتخاب کنید —')}
@@ -80,47 +103,101 @@ export default function EditableSelect({
       {label ? <Field label={label} required={required} error={error}>{trigger}</Field> : trigger}
 
       <Modal open={open} onClose={() => setOpen(false)} title={label || 'انتخاب'}>
-        {customKey && (
-          <Btn variant="primary" full onClick={openAdd} style={{ marginBottom: 8 }}>
-            + افزودن مورد جدید
-          </Btn>
-        )}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: '55vh', overflowY: 'auto' }}>
-          {options.map(o => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, paddingBottom: 8 }}>
+          {customKey && (
             <button
-              key={o.value}
-              onClick={() => { onChange(o.value); setOpen(false); }}
+              type="button"
+              onClick={openAdd}
               style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '10px 12px', background: 'var(--input-bg)',
-                border: '1px solid ' + (value === o.value ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 'var(--r-sm)', cursor: 'pointer', fontSize: 'var(--fs-base)',
-                color: 'var(--text)', textAlign: 'right',
+                ...ROW_BASE,
+                justifyContent: 'flex-start',
+                color: 'var(--accent)',
+                fontWeight: 600,
+                border: '1px dashed var(--accent-border)',
+                background: 'var(--accent-soft)',
+                marginBottom: 6,
               }}
             >
-              <span>{o.icon ? o.icon + ' ' : ''}{o.label}</span>
-              {value === o.value && <span style={{ color: 'var(--accent)' }}>✓</span>}
+              <span style={{ fontSize: 18, lineHeight: 1 }}>+</span>
+              <span>افزودن مورد جدید</span>
             </button>
-          ))}
-          {customs.map(c => (
-            <div key={c.id} style={{ display: 'flex', gap: 4, alignItems: 'stretch' }}>
+          )}
+
+          {options.map(o => {
+            const selected = value === o.value;
+            return (
               <button
-                onClick={() => { onChange(c.name); setOpen(false); }}
+                key={o.value}
+                type="button"
+                onClick={() => { onChange(o.value); setOpen(false); }}
+                onMouseEnter={() => setHoverId(o.value)}
+                onMouseLeave={() => setHoverId(null)}
                 style={{
-                  flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '10px 12px', background: 'var(--input-bg)',
-                  border: '1px solid ' + (value === c.name ? 'var(--accent-border)' : 'var(--border)'),
-                  borderRadius: 'var(--r-sm)', cursor: 'pointer', fontSize: 'var(--fs-base)',
-                  color: 'var(--text)', textAlign: 'right',
+                  ...ROW_BASE,
+                  ...(selected ? ROW_SELECTED : (hoverId === o.value ? { background: 'var(--input-bg)' } : {})),
                 }}
               >
-                <span>{c.icon} {c.name}</span>
-                {value === c.name && <span style={{ color: 'var(--accent)' }}>✓</span>}
+                <span style={{ flex: 1, textAlign: 'right' }}>
+                  {o.icon ? o.icon + ' ' : ''}{o.label}
+                </span>
+                {selected && <span style={{ color: 'var(--accent)', fontSize: 16 }}>✓</span>}
               </button>
-              <Btn size="sm" onClick={() => openEdit(c.id)}>✏️</Btn>
-              <Btn size="sm" onClick={() => removeItem(c.id, c.name)}>🗑️</Btn>
-            </div>
-          ))}
+            );
+          })}
+
+          {customs.map(c => {
+            const selected = value === c.name;
+            return (
+              <div
+                key={c.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  ...(selected ? ROW_SELECTED : {}),
+                  borderRadius: 'var(--r-md)',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => { onChange(c.name); setOpen(false); }}
+                  onMouseEnter={() => setHoverId(c.id)}
+                  onMouseLeave={() => setHoverId(null)}
+                  style={{
+                    ...ROW_BASE,
+                    flex: 1,
+                    background: (!selected && hoverId === c.id) ? 'var(--input-bg)' : 'transparent',
+                  }}
+                >
+                  <span style={{ flex: 1, textAlign: 'right' }}>{c.icon} {c.name}</span>
+                  {selected && <span style={{ color: 'var(--accent)', fontSize: 16 }}>✓</span>}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openEdit(c.id)}
+                  aria-label="ویرایش"
+                  style={{
+                    width: 36, height: 36, borderRadius: 'var(--r-sm)',
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    cursor: 'pointer', fontSize: 14, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >✏️</button>
+                <button
+                  type="button"
+                  onClick={() => removeItem(c.id, c.name)}
+                  aria-label="حذف"
+                  style={{
+                    width: 36, height: 36, borderRadius: 'var(--r-sm)',
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    cursor: 'pointer', fontSize: 14, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginLeft: 4,
+                  }}
+                >🗑️</button>
+              </div>
+            );
+          })}
         </div>
       </Modal>
 
@@ -130,8 +207,8 @@ export default function EditableSelect({
         title={editId ? 'ویرایش مورد' : 'افزودن مورد جدید'}
         footer={
           <div style={{ display: 'flex', gap: 6 }}>
-            <Btn variant="primary" onClick={saveItem} disabled={!formName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
             <Btn onClick={() => setFormOpen(false)} style={{ flex: 1 }}>لغو</Btn>
+            <Btn variant="primary" onClick={saveItem} disabled={!formName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
           </div>
         }
       >
@@ -141,11 +218,11 @@ export default function EditableSelect({
         <Field label="آیکن">
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             <div style={{
-              width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 26, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
+              width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 28, background: 'var(--input-bg)', borderRadius: 'var(--r-md)',
               border: '1px solid var(--border)',
             }}>{formIcon}</div>
-            <Btn onClick={() => setShowEmoji(true)} style={{ flex: 1 }}>انتخاب آیکن</Btn>
+            <Btn onClick={() => setShowEmoji(true)} style={{ flex: 1 }}>انتخاب از ایموجی‌ها</Btn>
           </div>
         </Field>
       </Modal>
