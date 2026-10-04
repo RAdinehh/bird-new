@@ -333,6 +333,18 @@ export default function EquipmentPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between',
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
+                    <span style={{ color: 'var(--muted)' }}>نوع دارایی:</span>
+                    <span style={{ fontWeight: 600 }}>{(KIND_LABELS as any)[(e as any).kind || 'asset']?.icon} {(KIND_LABELS as any)[(e as any).kind || 'asset']?.name}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
+                    <span style={{ color: 'var(--muted)' }}>دسته:</span>
+                    <span style={{ fontWeight: 600 }}>{(CATEGORY_LABELS as any)[(e as any).category || 'auxiliary']?.icon} {(CATEGORY_LABELS as any)[(e as any).category || 'auxiliary']?.name}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+                     borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>سالن:</span>
                     <span style={{ fontWeight: 600 }}>{hall?.name || '—'}</span>
                   </div>
