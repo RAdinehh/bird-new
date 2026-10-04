@@ -267,22 +267,22 @@ export default function DialogHost() {
             display: 'flex',
             gap: 8,
             width: '100%',
-            marginTop: 4,
+            marginTop: 6,
           }}
         >
-          {isConfirm && (
-            <Btn onClick={handleCancel} style={{ flex: 1 }}>
-              {config.cancelText || 'لغو'}
-            </Btn>
-          )}
           <Btn
             id={confirmBtnId.current}
             variant={type === 'danger' ? 'danger' : 'primary'}
             onClick={handleConfirm}
-            style={{ flex: 1 }}
+            style={{ flex: 1, minHeight: 46 }}
           >
             {config.confirmText || 'تأیید'}
           </Btn>
+          {isConfirm && (
+            <Btn onClick={handleCancel} style={{ flex: 1, minHeight: 46 }}>
+              {config.cancelText || 'لغو'}
+            </Btn>
+          )}
         </div>
       </div>
     </div>
