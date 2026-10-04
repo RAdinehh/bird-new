@@ -592,7 +592,7 @@ export default function FlocksPage() {
                     {f.initialCount && f.currentCount && f.initialCount !== f.currentCount && (
                       <Row l="تلفات" v={`${fmt.int(f.initialCount - f.currentCount)} (${toFa(((f.initialCount - f.currentCount) / f.initialCount * 100).toFixed(1))}٪)`} />
                     )}
-                    {f.type === 'breeder' && f.maleCount && f.femaleCount && (
+                    {f.type === 'breeder' && f.maleCount != null && f.femaleCount != null && f.maleCount > 0 && f.femaleCount > 0 && (
                       <>
                         <Row l="تعداد خروس" v={fmt.int(f.maleCount)} />
                         <Row l="تعداد مرغ" v={fmt.int(f.femaleCount)} />
