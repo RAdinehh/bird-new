@@ -27,10 +27,15 @@ const TYPES_BY_CATEGORY: Record<string, string[]> = {
   drinking:    ['drinker'],
   heating:     ['heater'],
   lighting:    ['lamp'],
-  litter:      [],
-  power:       [],
+  litter:      ['other'],
+  power:       ['other'],
   auxiliary:   ['camera', 'sensor', 'other'],
 };
+
+function typesForCategory(cat: string): string[] {
+  const list = TYPES_BY_CATEGORY[cat];
+  return (list && list.length > 0) ? list : ['other'];
+}
 
 function getCapacityHint(type: string, cap: number | null, hallVol: number | null, count: number = 1, eff: number | null = null): string {
   if (!cap || !hallVol || hallVol <= 0) return '';
@@ -486,8 +491,8 @@ export default function EquipmentPage() {
           <Field label="دسته" required>
             <Select value={form.category || 'auxiliary'} onChange={e => {
                 const cat = e.target.value;
-                const allowed = TYPES_BY_CATEGORY[cat] || [];
-                const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || '');
+                const allowed = typesForCategory(cat);
+                const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || 'other');
                 setForm({...form, category: cat, type: nextType});
               }}>
               {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
@@ -513,7 +518,7 @@ export default function EquipmentPage() {
             required
             value={form.type}
             onChange={v => setForm({...form, type: v})}
-            options={(TYPES_BY_CATEGORY[form.category || 'auxiliary'] || []).map(k => {
+            options={typesForCategory(form.category || 'auxiliary').map(k => {
               const v = (EQUIP_LABELS as any)[k] || { icon: '🔧', name: k };
               return { value: k, label: v.name, icon: v.icon };
             })}
