@@ -8,7 +8,7 @@ import UndoBar from '../../cor/ui/UndoBar';
 export interface EditableOption {
   value: string;
   label: string;
-  icon?: string;
+  icon?: string | React.ReactNode;
 }
 
 interface Props {
