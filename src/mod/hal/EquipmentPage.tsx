@@ -467,7 +467,7 @@ export default function EquipmentPage() {
         <Field label="نام تجهیز" required>
           <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
         </Field>
-        <Grid3>
+        <Grid2>
           <Field label="تعداد">
             <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={(UNIT_LABELS_EQ as any)[form.unit || 'pcs'] || 'عدد'} min={0} />
             {equipNeed ? (
@@ -498,9 +498,12 @@ export default function EquipmentPage() {
               ))}
             </Select>
           </Field>
+        </Grid2>
+
+        <Grid2>
           <Field label="قیمت واحد"><MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} /></Field>
           <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
-        </Grid3>
+        </Grid2>
 
         {(EQUIP_CAPACITY_UNIT[form.type] && EQUIP_CAPACITY_UNIT[form.type] !== '—') || (EQUIP_EFFICIENCY_UNIT[form.type]) ? (
           <Grid2>
