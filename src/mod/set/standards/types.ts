@@ -34,6 +34,14 @@ export interface FeedRange {
   waterMl: number;
   proteinPct?: number;
   energyKcal?: number;
+  /** نام فاز (استارتر، گروئر، فینیشر، لِی...) */
+  phaseName?: string;
+  lysinePct?: number;
+  methioninePct?: number;
+  calciumPct?: number;
+  availablePhosphorusPct?: number;
+  saltPct?: number;
+  mainIngredients?: string[];
 }
 
 // ═══ تولید ═══
@@ -132,26 +140,6 @@ export interface LitterStandard {
   notes?: string;
 }
 
-// ═══ 🆕 جیره (فرمول) ═══
-export interface FeedFormulaPhase {
-  name: string;
-  dayFrom: number;
-  dayTo: number;
-  proteinPct: number;
-  energyKcal: number;
-  methioninePct?: number;
-  lysinePct?: number;
-  calciumPct?: number;
-  availablePhosphorusPct?: number;
-  saltPct?: number;
-  mainIngredients?: string[];
-}
-
-export interface FeedFormulaStandard {
-  phases: FeedFormulaPhase[];
-  notes?: string;
-}
-
 // ═══ استاندارد کامل پرنده ═══
 export interface BirdStandard {
   key: string;              // کلید نژاد (marandi, golpaygani, ...)
@@ -168,7 +156,6 @@ export interface BirdStandard {
   equipment: EquipmentRatios;
   incubation: IncubationStandard;
   litter?: LitterStandard;
-  formula?: FeedFormulaStandard;
   production?: ProductionStandard;
   mortality: MortalityRange[];
   mortalityTotalPct: number;
