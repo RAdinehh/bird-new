@@ -26,10 +26,10 @@ const ROW: React.CSSProperties = {
   alignItems: 'center',
   gap: 12,
   padding: '12px 14px',
-  minHeight: 54,
-  background: 'var(--card-solid)',
+  minHeight: 58,
+  background: 'linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%)',
   border: '1.5px solid var(--border)',
-  borderRadius: 14,
+  borderRadius: 15,
   color: 'var(--text)',
   fontFamily: 'inherit',
   fontSize: 'var(--fs-base)',
@@ -39,48 +39,34 @@ const ROW: React.CSSProperties = {
   width: '100%',
   boxSizing: 'border-box',
   transition: 'transform 120ms, box-shadow 180ms, border-color 180ms',
-  boxShadow: '0 1px 2px rgba(15,23,42,.04), 0 2px 6px rgba(15,23,42,.03)',
+  boxShadow: '0 1px 2px rgba(15,23,42,.05), 0 3px 10px rgba(15,23,42,.05)',
 };
 
 const ICON: React.CSSProperties = {
-  width: 40,
-  height: 40,
-  borderRadius: 11,
-  background: 'var(--input-bg)',
+  width: 44,
+  height: 44,
+  borderRadius: 13,
+  background: 'linear-gradient(135deg, #f0f4f8 0%, #e2e8ef 100%)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontSize: 20,
+  fontSize: 22,
   flexShrink: 0,
-};
-
-const CHECK: React.CSSProperties = {
-  width: 24,
-  height: 24,
-  borderRadius: '50%',
-  background: 'var(--accent)',
-  color: '#fff',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 14,
-  fontWeight: 700,
-  flexShrink: 0,
+  boxShadow: 'inset 0 1px 2px rgba(255,255,255,.8), 0 1px 2px rgba(15,23,42,.05)',
 };
 
 const MINI: React.CSSProperties = {
-  width: 30,
-  height: 30,
-  borderRadius: 8,
-  background: 'transparent',
-  border: 'none',
+  width: 40,
+  height: 40,
+  borderRadius: 10,
+  background: 'var(--input-bg)',
+  border: '1px solid var(--border)',
   cursor: 'pointer',
-  fontSize: 13,
+  fontSize: 17,
   padding: 0,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  opacity: .55,
   flexShrink: 0,
 };
 
@@ -162,15 +148,21 @@ export default function EditableSelect({
             onClick={() => { onChange(o.value); closeAll(); }}
             style={{
               ...ROW,
-              borderColor: selected ? 'var(--accent-border)' : 'var(--border)',
-              background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
+              borderColor: selected ? 'var(--accent)' : 'var(--border)',
+              background: selected
+                ? 'linear-gradient(180deg, rgba(22,163,74,.10) 0%, rgba(22,163,74,.04) 100%)'
+                : ROW.background,
               boxShadow: selected
-                ? '0 2px 10px rgba(22,163,74,.15)'
+                ? '0 2px 6px rgba(22,163,74,.12), 0 6px 18px rgba(22,163,74,.10)'
                 : ROW.boxShadow,
             }}>
-            <span style={ICON}>{o.icon || '•'}</span>
-            <span style={{ flex: 1, fontWeight: 600 }}>{o.label}</span>
-            {selected && <span style={CHECK}>✓</span>}
+            <span style={{
+              ...ICON,
+              background: selected
+                ? 'linear-gradient(135deg, rgba(22,163,74,.20) 0%, rgba(22,163,74,.10) 100%)'
+                : ICON.background,
+            }}>{o.icon || '•'}</span>
+            <span style={{ flex: 1, fontWeight: selected ? 700 : 600 }}>{o.label}</span>
           </button>
         );
       })}
@@ -192,14 +184,23 @@ export default function EditableSelect({
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(c.name); closeAll(); } }}
             style={{
               ...ROW,
-              paddingLeft: 8,
-              borderColor: selected || isHi ? 'var(--accent-border)' : 'var(--border)',
-              background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
-              boxShadow: selected ? '0 2px 10px rgba(22,163,74,.15)' : ROW.boxShadow,
+              padding: '10px 12px 10px 10px',
+              gap: 10,
+              borderColor: selected || isHi ? 'var(--accent)' : 'var(--border)',
+              background: selected
+                ? 'linear-gradient(180deg, rgba(22,163,74,.10) 0%, rgba(22,163,74,.04) 100%)'
+                : ROW.background,
+              boxShadow: selected
+                ? '0 2px 6px rgba(22,163,74,.12), 0 6px 18px rgba(22,163,74,.10)'
+                : ROW.boxShadow,
             }}>
-            <span style={ICON}>{c.icon}</span>
-            <span style={{ flex: 1, fontWeight: 600, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-            {selected && <span style={CHECK}>✓</span>}
+            <span style={{
+              ...ICON,
+              background: selected
+                ? 'linear-gradient(135deg, rgba(22,163,74,.20) 0%, rgba(22,163,74,.10) 100%)'
+                : ICON.background,
+            }}>{c.icon}</span>
+            <span style={{ flex: 1, fontWeight: selected ? 700 : 600, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
             <button type="button" aria-label="ویرایش" onClick={(e) => { e.stopPropagation(); openEdit(c.id); }} style={MINI}>✏️</button>
             <button type="button" aria-label="حذف" onClick={(e) => removeItem(e, c.id, c.name)} style={MINI}>🗑️</button>
           </div>
