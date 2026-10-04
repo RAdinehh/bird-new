@@ -684,8 +684,6 @@ export function Modal({
         position: 'fixed',
         inset: 0,
         background: 'var(--overlay)',
-        backdropFilter: 'blur(2px)',
-        WebkitBackdropFilter: 'blur(2px)',
         zIndex: 100 + (window.__modalDepth || 0),
         display: 'flex',
         alignItems: isDesktop ? 'center' : 'flex-end',
