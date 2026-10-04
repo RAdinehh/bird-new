@@ -555,6 +555,18 @@ export default function FlocksPage() {
                     {f.initialCount && f.currentCount && f.initialCount !== f.currentCount && (
                       <span style={{ color: 'var(--danger)' }}>💀 تلفات: <b>{fmt.int(f.initialCount - f.currentCount)}</b></span>
                     )}
+                    {!isArchived && <span style={{ color: lc.color }}>📊 {lc.label}</span>}
+                    {!isArchived && lc.progress > 0 && <span>📈 <b style={{ color: 'var(--text)' }}>{fmt.int(Math.min(100, Math.round(lc.progress)))}٪</b></span>}
+                    {f.type === 'breeder' && f.maleCount != null && f.femaleCount != null && f.maleCount > 0 && f.femaleCount > 0 && (
+                      <span>⚥ <b style={{ color: 'var(--text)' }}>{fmt.int(f.maleCount)}/{fmt.int(f.femaleCount)}</b></span>
+                    )}
+                    {costs.perBird > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{fmt.money(Math.round(costs.perBird))}</b></span>}
+                    {!ready && !isArchived && untilLay > 0 && (
+                      <span style={{ color: 'var(--warn)' }}>⏳ {fmt.int(untilLay)} روز</span>
+                    )}
+                    {ready && !isArchived && (f.type === 'layer' || f.type === 'breeder') && (
+                      <span style={{ color: 'var(--accent)' }}>✅ آماده</span>
+                    )}
                   </>}
                 >
                   {/* شمارش معکوس */}
