@@ -1,0 +1,53 @@
+import type { Standard } from './types';
+
+export const ROSS_308: Standard = {
+  id: 'ross-308',
+  name: 'راس ۳۰۸',
+  birdType: 'broiler',
+  region: 'international',
+  source: 'Aviagen',
+  publishYear: 2024,
+  version: 1,
+  temperature: [
+    { day: 0,  tempC: 33, humidityMin: 60, humidityMax: 70 },
+    { day: 3,  tempC: 31, humidityMin: 60, humidityMax: 70 },
+    { day: 7,  tempC: 28, humidityMin: 60, humidityMax: 65 },
+    { day: 14, tempC: 26, humidityMin: 60, humidityMax: 65 },
+    { day: 21, tempC: 23, humidityMin: 60, humidityMax: 65 },
+    { day: 28, tempC: 21, humidityMin: 60, humidityMax: 65 },
+    { day: 35, tempC: 20, humidityMin: 60, humidityMax: 65 },
+  ],
+  ventilationByWeight: [
+    { weightKg: 0.5, m3hPerBird: 0.52 },
+    { weightKg: 1.0, m3hPerBird: 0.88 },
+    { weightKg: 1.5, m3hPerBird: 1.18 },
+    { weightKg: 2.0, m3hPerBird: 1.48 },
+    { weightKg: 2.5, m3hPerBird: 1.77 },
+    { weightKg: 3.0, m3hPerBird: 2.10 },
+  ],
+  equipment: {
+    drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 25, fountainBirdsPerUnit: 50 },
+    feeder: { panBirdsPerUnit: 80, chainCmPerBird: 10, tubeBirdsPerUnit: 50, manualBirdsPerUnit: 60 },
+    lampWattPerM2: 3,
+    fanM3PerKg: 4.5,
+  },
+  space: { densityMax: 16, densityMin: 13 },
+  weightByAge: [
+    { day: 0,  weightG: 42 },
+    { day: 7,  weightG: 190 },
+    { day: 14, weightG: 480 },
+    { day: 21, weightG: 950 },
+    { day: 28, weightG: 1580 },
+    { day: 35, weightG: 2260 },
+    { day: 42, weightG: 2960 },
+  ],
+  feedByAge: [
+    { day: 0,  gramsPerBird: 15 },
+    { day: 7,  gramsPerBird: 35 },
+    { day: 14, gramsPerBird: 78 },
+    { day: 21, gramsPerBird: 125 },
+    { day: 28, gramsPerBird: 165 },
+    { day: 35, gramsPerBird: 190 },
+    { day: 42, gramsPerBird: 205 },
+  ],
+};

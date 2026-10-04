@@ -1,0 +1,53 @@
+import type { Standard } from './types';
+
+export const GOOSE: Standard = {
+  id: 'goose',
+  name: 'غاز',
+  birdType: 'broiler',
+  region: 'iran',
+  source: 'سازمان دامپزشکی ایران',
+  publishYear: 1403,
+  version: 1,
+  lastUpdated: '2026-10-05',
+  temperature: [
+    { day: 0,   tempC: 35, humidityMin: 60, humidityMax: 70 },
+    { day: 3,   tempC: 34, humidityMin: 60, humidityMax: 70 },
+    { day: 7,   tempC: 32, humidityMin: 60, humidityMax: 65 },
+    { day: 14,  tempC: 28, humidityMin: 55, humidityMax: 65 },
+    { day: 21,  tempC: 24, humidityMin: 55, humidityMax: 65 },
+    { day: 42,  tempC: 20, humidityMin: 55, humidityMax: 65 },
+    { day: 90,  tempC: 18, humidityMin: 55, humidityMax: 65 },
+  ],
+  ventilationByWeight: [
+    { weightKg: 0.5, m3hPerBird: 0.7 },
+    { weightKg: 1.0, m3hPerBird: 1.2 },
+    { weightKg: 2.0, m3hPerBird: 2.4 },
+    { weightKg: 3.0, m3hPerBird: 3.6 },
+    { weightKg: 4.0, m3hPerBird: 4.8 },
+  ],
+  equipment: {
+    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, fountainBirdsPerUnit: 30 },
+    feeder: { panBirdsPerUnit: 25, chainCmPerBird: 15, tubeBirdsPerUnit: 20, manualBirdsPerUnit: 20 },
+    lampWattPerM2: 3,
+    fanM3PerKg: 5,
+    waterPool: { required: true, areaM2PerBird: 0.2, notes: 'حوضچه یا استخر کم‌عمق برای شنا' },
+  },
+  space: { densityMax: 4, densityMin: 3 },
+  weightByAge: [
+    { day: 0,   weightG: 100 },
+    { day: 14,  weightG: 500 },
+    { day: 28,  weightG: 1200 },
+    { day: 60,  weightG: 2500 },
+    { day: 90,  weightG: 3800 },
+    { day: 180, weightG: 5000 },
+  ],
+  feedByAge: [
+    { day: 0,   gramsPerBird: 20 },
+    { day: 14,  gramsPerBird: 60 },
+    { day: 28,  gramsPerBird: 130 },
+    { day: 60,  gramsPerBird: 220 },
+    { day: 90,  gramsPerBird: 280 },
+    { day: 180, gramsPerBird: 320 },
+  ],
+  notes: 'مقاوم به سرما، نیاز به گردشگاه چرا، غاز گوشتی ۴ پرنده/m² فضای پرورشی و ۳ پرنده/m² گردشگاه',
+};

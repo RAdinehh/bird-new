@@ -1,10 +1,11 @@
 import {
-  Fan, Wind, Warehouse, Thermometer,
-  Drop, DropHalf, BowlFood, Grains,
-  Fire, Lightbulb, Lamp, Plug, Lightning,
-  Plant, Tree, Stack, Package,
-  Camera, Gauge, VideoCamera, Cpu,
-  Egg, Barn, Farm,
+  Fan, Wind, Warehouse, Thermometer, ThermometerSimple,
+  Drop, DropHalf, BowlFood, Grains, Bread,
+  Fire, Lightbulb, Lamp, Plug, Lightning, Power,
+  Plant, Tree, Stack, Package, Cube,
+  Camera, Gauge, VideoCamera, Cpu, Circuitry,
+  Egg, Barn, Farm, Gear, GearSix, Wrench,
+  Snowflake, Sun, LightbulbFilament,
 } from '@phosphor-icons/react';
 
 export type IconWeight = 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone';
@@ -16,79 +17,103 @@ interface IconProps {
   className?: string;
 }
 
-const ICONS: Record<string, React.ComponentType<any>> = {
-  // ─── تهویه ───
+// ═══ Equipment subtypes ═══
+const EQUIP_ICONS: Record<string, React.ComponentType<any>> = {
+  // تهویه
   fan_tunnel:     Fan,
   fan_ceiling:    Wind,
   air_inlet:      Warehouse,
-  cooling_pad:    DropHalf,
-
-  // ─── تغذیه ───
+  cooling_pad:    Snowflake,
+  // تغذیه
   feeder_manual:  BowlFood,
   feeder_pan:     BowlFood,
   feeder_chain:   Grains,
   feeder_tube:    BowlFood,
   feeder_bucket:  Package,
-
-  // ─── آبخوری ───
+  // آبخوری
   nipple:           Drop,
   cup:              DropHalf,
   trough:           Drop,
   fountain_drinker: Drop,
-
-  // ─── گرمایش ───
+  // گرمایش
   radiant_brooder: Fire,
   jet_heater:      Fire,
   duct_heater:     Thermometer,
-
-  // ─── روشنایی ───
+  // روشنایی
   lamp_led:         Lightbulb,
   lamp_fluorescent: Lamp,
   dimmer:           Gauge,
-
-  // ─── بستر ───
+  // بستر
   litter_wood_shavings: Tree,
   litter_roll:          Stack,
   litter_sand:          Plant,
-
-  // ─── برق‌رسانی ───
+  // برق‌رسانی
   generator:        Lightning,
   electrical_panel: Plug,
-  cable:            Lightning,
-
-  // ─── جانبی ───
+  cable:            Power,
+  // جانبی
   camera: Camera,
   sensor: VideoCamera,
   scale:  Gauge,
-
-  // ─── سازگاری با داده‌های قدیمی ───
+  // قدیمی
   lamp:    Lightbulb,
   fan:     Fan,
   heater:  Fire,
-  cooler:  DropHalf,
+  cooler:  Snowflake,
   drinker: Drop,
   feeder:  BowlFood,
-  other:   Package,
+  other:   Wrench,
 };
 
-/** رنگ اختصاصی هر دسته */
+// ═══ Categories ═══
+const CATEGORY_ICONS: Record<string, React.ComponentType<any>> = {
+  ventilation: Fan,
+  feeding:     Grains,
+  drinking:    Drop,
+  heating:     Fire,
+  lighting:    Lightbulb,
+  litter:      Plant,
+  power:       Lightning,
+  auxiliary:   Wrench,
+};
+
+// ═══ Kinds ═══
+const KIND_ICONS: Record<string, React.ComponentType<any>> = {
+  asset:      Warehouse,
+  consumable: Package,
+  system:     GearSix,
+};
+
 export const CATEGORY_COLORS: Record<string, string> = {
-  ventilation: '#2563eb',  // آبی
-  feeding:     '#d97706',  // نارنجی
-  drinking:    '#0891b2',  // فیروزه‌ای
-  heating:     '#dc2626',  // قرمز
-  lighting:    '#ca8a04',  // طلایی
-  litter:      '#16a34a',  // سبز
-  power:       '#ea580c',  // نارنجی-قرمز
-  auxiliary:   '#475569',  // خاکستری
+  ventilation: '#2563eb',
+  feeding:     '#d97706',
+  drinking:    '#0891b2',
+  heating:     '#dc2626',
+  lighting:    '#ca8a04',
+  litter:      '#16a34a',
+  power:       '#ea580c',
+  auxiliary:   '#475569',
+};
+
+export const KIND_COLORS: Record<string, string> = {
+  asset:      '#2563eb',
+  consumable: '#d97706',
+  system:     '#7c3aed',
 };
 
 export function EquipmentIcon({ type, size = 24, weight = 'duotone', color }: IconProps & { type: string }) {
-  const Icon = ICONS[type] || Package;
+  const Icon = EQUIP_ICONS[type] || Wrench;
   return <Icon size={size} weight={weight} color={color} />;
 }
 
-/** برای استفاده بدون React — فقط نام آیکون */
-export function hasIcon(type: string): boolean {
-  return type in ICONS;
+export function CategoryIcon({ category, size = 22, weight = 'duotone', color }: IconProps & { category: string }) {
+  const Icon = CATEGORY_ICONS[category] || Wrench;
+  const c = color || CATEGORY_COLORS[category] || '#475569';
+  return <Icon size={size} weight={weight} color={c} />;
+}
+
+export function KindIcon({ kind, size = 22, weight = 'duotone', color }: IconProps & { kind: string }) {
+  const Icon = KIND_ICONS[kind] || Package;
+  const c = color || KIND_COLORS[kind] || '#475569';
+  return <Icon size={size} weight={weight} color={c} />;
 }

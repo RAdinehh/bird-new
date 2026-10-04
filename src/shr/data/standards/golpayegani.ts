@@ -1,0 +1,51 @@
+import type { Standard } from './types';
+
+export const GOLPAYEGANI: Standard = {
+  id: 'golpayegani',
+  name: 'گلپایگانی',
+  birdType: 'breeder',
+  region: 'iran',
+  source: 'مرکز اصلاح نژاد مرغ بومی اصفهان',
+  publishYear: 1403,
+  version: 1,
+  lastUpdated: '2026-10-05',
+  temperature: [
+    { day: 0,   tempC: 35, humidityMin: 55, humidityMax: 65 },
+    { day: 7,   tempC: 31, humidityMin: 55, humidityMax: 65 },
+    { day: 14,  tempC: 27, humidityMin: 55, humidityMax: 65 },
+    { day: 21,  tempC: 24, humidityMin: 55, humidityMax: 65 },
+    { day: 42,  tempC: 22, humidityMin: 50, humidityMax: 65 },
+    { day: 84,  tempC: 20, humidityMin: 50, humidityMax: 65 },
+    { day: 180, tempC: 20, humidityMin: 50, humidityMax: 65 },
+  ],
+  ventilationByWeight: [
+    { weightKg: 0.5, m3hPerBird: 0.55 },
+    { weightKg: 1.0, m3hPerBird: 0.90 },
+    { weightKg: 1.5, m3hPerBird: 1.20 },
+    { weightKg: 2.5, m3hPerBird: 1.85 },
+  ],
+  equipment: {
+    drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 25, fountainBirdsPerUnit: 50 },
+    feeder: { panBirdsPerUnit: 35, chainCmPerBird: 12, tubeBirdsPerUnit: 28, manualBirdsPerUnit: 30 },
+    lampWattPerM2: 3,
+    fanM3PerKg: 4.5,
+  },
+  space: { densityMax: 10, densityMin: 7 },
+  weightByAge: [
+    { day: 0,   weightG: 35 },
+    { day: 30,  weightG: 300 },
+    { day: 60,  weightG: 800 },
+    { day: 120, weightG: 1500 },
+    { day: 180, weightG: 2100 },
+    { day: 365, weightG: 2700 },
+  ],
+  feedByAge: [
+    { day: 0,   gramsPerBird: 12 },
+    { day: 30,  gramsPerBird: 30 },
+    { day: 60,  gramsPerBird: 55 },
+    { day: 120, gramsPerBird: 78 },
+    { day: 180, gramsPerBird: 92 },
+    { day: 365, gramsPerBird: 105 },
+  ],
+  notes: 'تخم‌گذاری ۲۰۰ عدد در سال، وزن تخم ۵۵.۳ گرم، جیره ۲۷۵۰ kcal و ۱۷٪ پروتئین',
+};

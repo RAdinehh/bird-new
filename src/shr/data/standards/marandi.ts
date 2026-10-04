@@ -1,0 +1,51 @@
+import type { Standard } from './types';
+
+export const MARANDI: Standard = {
+  id: 'marandi',
+  name: 'مرندی',
+  birdType: 'breeder',
+  region: 'iran',
+  source: 'مرکز تحقیقات و آموزش کشاورزی آذربایجان شرقی',
+  publishYear: 1403,
+  version: 1,
+  lastUpdated: '2026-10-05',
+  temperature: [
+    { day: 0,   tempC: 36, humidityMin: 55, humidityMax: 65 },
+    { day: 7,   tempC: 32, humidityMin: 55, humidityMax: 65 },
+    { day: 14,  tempC: 28, humidityMin: 55, humidityMax: 65 },
+    { day: 21,  tempC: 25, humidityMin: 55, humidityMax: 65 },
+    { day: 42,  tempC: 22, humidityMin: 50, humidityMax: 65 },
+    { day: 84,  tempC: 20, humidityMin: 50, humidityMax: 65 },
+    { day: 180, tempC: 20, humidityMin: 50, humidityMax: 65 },
+  ],
+  ventilationByWeight: [
+    { weightKg: 0.5, m3hPerBird: 0.55 },
+    { weightKg: 1.0, m3hPerBird: 0.90 },
+    { weightKg: 2.0, m3hPerBird: 1.50 },
+    { weightKg: 3.0, m3hPerBird: 2.10 },
+  ],
+  equipment: {
+    drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 25, fountainBirdsPerUnit: 50 },
+    feeder: { panBirdsPerUnit: 40, chainCmPerBird: 12, tubeBirdsPerUnit: 30, manualBirdsPerUnit: 35 },
+    lampWattPerM2: 3,
+    fanM3PerKg: 4.5,
+  },
+  space: { densityMax: 10, densityMin: 7 },
+  weightByAge: [
+    { day: 0,   weightG: 32 },
+    { day: 30,  weightG: 320 },
+    { day: 60,  weightG: 850 },
+    { day: 120, weightG: 1600 },
+    { day: 180, weightG: 2200 },
+    { day: 365, weightG: 2800 },
+  ],
+  feedByAge: [
+    { day: 0,   gramsPerBird: 12 },
+    { day: 30,  gramsPerBird: 30 },
+    { day: 60,  gramsPerBird: 55 },
+    { day: 120, gramsPerBird: 80 },
+    { day: 180, gramsPerBird: 95 },
+    { day: 365, gramsPerBird: 105 },
+  ],
+  notes: 'نژاد بومی آذربایجان شرقی — تخم‌گذاری ۱۲۰-۱۸۰ عدد در سال، وزن تخم ۵۵ گرم، مقاوم به سرما',
+};

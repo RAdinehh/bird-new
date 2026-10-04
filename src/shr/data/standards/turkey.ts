@@ -1,0 +1,53 @@
+import type { Standard } from './types';
+
+export const TURKEY: Standard = {
+  id: 'turkey',
+  name: 'بوقلمون (برنز/بوربون/بیوتی)',
+  birdType: 'broiler',
+  region: 'iran',
+  source: 'منابع پرورش بوقلمون ایران + BUT',
+  publishYear: 1403,
+  version: 1,
+  lastUpdated: '2026-10-05',
+  temperature: [
+    { day: 0,   tempC: 36, humidityMin: 60, humidityMax: 70 },
+    { day: 7,   tempC: 32, humidityMin: 60, humidityMax: 70 },
+    { day: 14,  tempC: 28, humidityMin: 60, humidityMax: 65 },
+    { day: 28,  tempC: 24, humidityMin: 55, humidityMax: 65 },
+    { day: 42,  tempC: 21, humidityMin: 55, humidityMax: 65 },
+    { day: 84,  tempC: 18, humidityMin: 55, humidityMax: 65 },
+    { day: 150, tempC: 18, humidityMin: 55, humidityMax: 65 },
+  ],
+  ventilationByWeight: [
+    { weightKg: 0.5, m3hPerBird: 0.7 },
+    { weightKg: 1.0, m3hPerBird: 1.2 },
+    { weightKg: 2.0, m3hPerBird: 2.4 },
+    { weightKg: 4.0, m3hPerBird: 4.4 },
+    { weightKg: 7.0, m3hPerBird: 7.0 },
+    { weightKg: 10.0, m3hPerBird: 9.0 },
+  ],
+  equipment: {
+    drinker: { nippleBirdsPerUnit: 12, cupBirdsPerUnit: 20, fountainBirdsPerUnit: 40 },
+    feeder: { panBirdsPerUnit: 40, chainCmPerBird: 12, tubeBirdsPerUnit: 25, manualBirdsPerUnit: 25 },
+    lampWattPerM2: 3,
+    fanM3PerKg: 7.5,
+  },
+  space: { densityMax: 5, densityMin: 3 },
+  weightByAge: [
+    { day: 0,   weightG: 55 },
+    { day: 14,  weightG: 350 },
+    { day: 28,  weightG: 900 },
+    { day: 42,  weightG: 1800 },
+    { day: 84,  weightG: 4500 },
+    { day: 150, weightG: 8000 },
+  ],
+  feedByAge: [
+    { day: 0,   gramsPerBird: 15 },
+    { day: 14,  gramsPerBird: 40 },
+    { day: 28,  gramsPerBird: 90 },
+    { day: 42,  gramsPerBird: 160 },
+    { day: 84,  gramsPerBird: 260 },
+    { day: 150, gramsPerBird: 350 },
+  ],
+  notes: 'ماده تا ۱۶ هفتگی و نر تا ۲۰ هفتگی به بازار. از هفته ۲۱ به بعد ۰.۴ m² به ازای هر پرنده',
+};
