@@ -121,6 +121,7 @@ export default function EquipmentPage() {
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [filter, setFilter] = useState('');
+  const [filterKind, setFilterKind] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   if (halls.length === 0) {
@@ -266,14 +267,20 @@ export default function EquipmentPage() {
     setErr('');
   };
 
-  const list = filter ? equipment.filter(e => e.hallId === filter) : equipment;
+  const list = equipment.filter(e => (!filter || e.hallId === filter) && (!filterKind || ((e as any).kind || 'asset') === filterKind));
   const target = delId ? equipment.find(e => e.id === delId) : null;
   const totalValue = list.reduce((acc, e) => acc + ((e.count || 0) * (e.unitPrice || 0)), 0);
 
   return (
     <PageContainer>
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilter('')} style={chip(!filter)}>همه</button>
+        <button onClick={() => setFilterKind('')} style={chip(!filterKind)}>همه انواع</button>
+        {Object.entries(KIND_LABELS).map(([k, v]: any) => (
+          <button key={k} onClick={() => setFilterKind(k)} style={chip(filterKind === k)}>{v.icon} {v.name}</button>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+        <button onClick={() => setFilter('')} style={chip(!filter)}>همه سالن‌ها</button>
         {halls.map(h => (
           <button key={h.id} onClick={() => setFilter(h.id)} style={chip(filter === h.id)}>{h.name}</button>
         ))}
