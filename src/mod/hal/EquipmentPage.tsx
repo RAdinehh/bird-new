@@ -11,6 +11,8 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
 import { chip } from './helpers';
+import EditableSelect from '../../shr/components/EditableSelect';
+import { useCustomOptions } from '../../shr/store/customOptions';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -118,6 +120,7 @@ export default function EquipmentPage() {
   const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
+  const { options: allCustomOpts } = useCustomOptions();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({ id:'', hallId:'', kind:'asset', category:'lighting', type:'lamp', name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
   const __selectedHall = halls.find(h => h.id === form.hallId);
@@ -320,7 +323,8 @@ export default function EquipmentPage() {
         <>
           {list.map((e, i) => {
             const hall = halls.find(h => h.id === e.hallId);
-            const meta = EQUIP_LABELS[e.type] || { name: 'سایر', icon: '🔧' };
+            const _cm = (allCustomOpts as any[]).find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
+            const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: '🔧' });
             const value = (e.count || 0) * (e.unitPrice || 0);
             const isOpen = expandedId === e.id;
             return (
@@ -493,14 +497,17 @@ export default function EquipmentPage() {
               autoThreshold={6}
             />
           </Field>
-          <Field label="زیرنوع" required>
-            <Select value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
-              {(TYPES_BY_CATEGORY[form.category || 'auxiliary'] || Object.keys(EQUIP_LABELS)).map(k => {
-                const v = (EQUIP_LABELS as any)[k] || { icon: '🔧', name: k };
-                return <option key={k} value={k}>{v.icon} {v.name}</option>;
-              })}
-            </Select>
-          </Field>
+          <EditableSelect
+            label="زیرنوع"
+            required
+            value={form.type}
+            onChange={v => setForm({...form, type: v})}
+            options={(TYPES_BY_CATEGORY[form.category || 'auxiliary'] || []).map(k => {
+              const v = (EQUIP_LABELS as any)[k] || { icon: '🔧', name: k };
+              return { value: k, label: v.name, icon: v.icon };
+            })}
+            customKey={'hal.equip.type.' + (form.category || 'auxiliary')}
+          />
         </Grid2>
 
         <Grid2>

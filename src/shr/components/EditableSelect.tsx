@@ -11,7 +11,7 @@ export interface EditableOption {
 }
 
 interface Props {
-  label: string;
+  label?: string;
   value: string;
   onChange: (v: string) => void;
   options: EditableOption[];
@@ -36,7 +36,7 @@ export default function EditableSelect({
 
   const all: EditableOption[] = [
     ...options,
-    ...customs.map(c => ({ value: c.id, label: c.name, icon: c.icon })),
+    ...customs.map(c => ({ value: c.name, label: c.name, icon: c.icon })),
   ];
   const current = all.find(o => o.value === value);
 
@@ -56,28 +56,30 @@ export default function EditableSelect({
     setFormOpen(false);
   };
   const removeItem = async (id: string, name: string) => {
-    const ok = await showConfirmAsync('حذف آیتم', `«${name}» حذف شود؟`, { danger: true });
+    const ok = await showConfirmAsync('حذف آیتم', '«' + name + '» حذف شود؟', { danger: true });
     if (ok) removeOption(id);
   };
 
+  const trigger = (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      style={{
+        width: '100%', textAlign: 'right', padding: '10px 12px',
+        background: 'var(--input-bg)', border: '1px solid var(--border)',
+        borderRadius: 'var(--r-sm)', color: current ? 'var(--text)' : 'var(--muted)',
+        fontSize: 'var(--fs-base)', cursor: 'pointer',
+      }}
+    >
+      {current ? (current.icon ? current.icon + ' ' + current.label : current.label) : (placeholder || '— انتخاب کنید —')}
+    </button>
+  );
+
   return (
     <>
-      <Field label={label} required={required} error={error}>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          style={{
-            width: '100%', textAlign: 'right', padding: '10px 12px',
-            background: 'var(--input-bg)', border: '1px solid var(--border)',
-            borderRadius: 'var(--r-sm)', color: current ? 'var(--text)' : 'var(--muted)',
-            fontSize: 'var(--fs-base)', cursor: 'pointer',
-          }}
-        >
-          {current ? `${current.icon ? current.icon + ' ' : ''}${current.label}` : (placeholder || '— انتخاب کنید —')}
-        </button>
-      </Field>
+      {label ? <Field label={label} required={required} error={error}>{trigger}</Field> : trigger}
 
-      <Modal open={open} onClose={() => setOpen(false)} title={label}>
+      <Modal open={open} onClose={() => setOpen(false)} title={label || 'انتخاب'}>
         {customKey && (
           <Btn variant="primary" full onClick={openAdd} style={{ marginBottom: 8 }}>
             + افزودن مورد جدید
@@ -103,17 +105,17 @@ export default function EditableSelect({
           {customs.map(c => (
             <div key={c.id} style={{ display: 'flex', gap: 4, alignItems: 'stretch' }}>
               <button
-                onClick={() => { onChange(c.id); setOpen(false); }}
+                onClick={() => { onChange(c.name); setOpen(false); }}
                 style={{
-                  flex: 1, display: 'flex', justifyContent: 'space-between',
+                  flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   padding: '10px 12px', background: 'var(--input-bg)',
-                  border: '1px solid ' + (value === c.id ? 'var(--accent-border)' : 'var(--border)'),
+                  border: '1px solid ' + (value === c.name ? 'var(--accent-border)' : 'var(--border)'),
                   borderRadius: 'var(--r-sm)', cursor: 'pointer', fontSize: 'var(--fs-base)',
                   color: 'var(--text)', textAlign: 'right',
                 }}
               >
                 <span>{c.icon} {c.name}</span>
-                {value === c.id && <span style={{ color: 'var(--accent)' }}>✓</span>}
+                {value === c.name && <span style={{ color: 'var(--accent)' }}>✓</span>}
               </button>
               <Btn size="sm" onClick={() => openEdit(c.id)}>✏️</Btn>
               <Btn size="sm" onClick={() => removeItem(c.id, c.name)}>🗑️</Btn>
@@ -134,11 +136,7 @@ export default function EditableSelect({
         }
       >
         <Field label="نام">
-          <Input
-            placeholder="مثلاً — آبخوری نیپل استیل"
-            value={formName}
-            onChange={e => setFormName(e.target.value)}
-          />
+          <Input placeholder="مثلاً — آبخوری نیپل استیل" value={formName} onChange={e => setFormName(e.target.value)} />
         </Field>
         <Field label="آیکن">
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -152,11 +150,7 @@ export default function EditableSelect({
         </Field>
       </Modal>
 
-      <EmojiPicker
-        open={showEmoji}
-        onClose={() => setShowEmoji(false)}
-        onPick={setFormIcon}
-      />
+      <EmojiPicker open={showEmoji} onClose={() => setShowEmoji(false)} onPick={setFormIcon} />
     </>
   );
 }
