@@ -24,6 +24,7 @@ import { showToast } from '../../cor/store/toast';
 import { Row, SectionTitle, chip } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
+import { useSearchParams } from 'react-router-dom';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createInvoiceSchema } from '../../shr/validation/rules/tra';
 
@@ -73,6 +74,45 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
   const [transferModal, setTransferModal] = useState<{ id: string; to: WorkflowStatus } | null>(null);
   const [transferNote, setTransferNote] = useState('');
   const [transferDate, setTransferDate] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // بازکردن خودکار از URL (از EquipmentPage)
+  useEffect(() => {
+    if (!isPurchase) return;
+    const flag = searchParams.get('_tra');
+    if (flag !== 'equip') return;
+
+    const equipmentId = searchParams.get('equipmentId') || '';
+    const name = searchParams.get('name') || 'تجهیز';
+    const qty = parseInt(searchParams.get('qty') || '1') || 1;
+    const price = parseInt(searchParams.get('price') || '0') || 0;
+
+    if (!equipmentId) return;
+
+    const today = (() => {
+      const d = new Date();
+      return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+    })();
+
+    setForm({
+      ...empty(true),
+      date: today,
+      category: 'equipment',
+      items: [{
+        id: crypto.randomUUID(),
+        description: name,
+        unit: 'عدد',
+        quantity: qty,
+        unitPrice: price,
+        total: qty * price,
+        equipmentId,
+      } as any],
+    });
+    setErr('');
+    setOpen(true);
+
+    try { setSearchParams({}); } catch {}
+  }, [searchParams, isPurchase]);
 
   // ==== سرسید خودکار ====
   useEffect(() => {

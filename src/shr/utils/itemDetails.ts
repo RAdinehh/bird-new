@@ -131,4 +131,5 @@ export interface ItemCategoryFields {
   saleReason?: SaleReason | '';
   model?: string;
   warrantyMonths?: number | null;
+  equipmentId?: string;
 }

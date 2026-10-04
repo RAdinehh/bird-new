@@ -369,6 +369,27 @@ export default function EquipmentPage() {
                 )}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+                  {e.unitPrice && e.unitPrice > 0 && (
+                    <Btn
+                      size="sm"
+                      variant="primary"
+                      onClick={() => {
+                        const params = new URLSearchParams({
+                          _tra: 'equip',
+                          equipmentId: e.id,
+                          name: e.name,
+                          type: e.type || 'other',
+                          qty: String(e.count || 1),
+                          price: String(e.unitPrice || 0),
+                          hallId: e.hallId,
+                        });
+                        window.location.href = '/tra?' + params.toString();
+                      }}
+                      style={{ flex: 1 }}
+                    >
+                      💰 ثبت فاکتور
+                    </Btn>
+                  )}
                   <Btn size="sm" onClick={() => openEdit(e)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={() => setDelId(e.id)} style={{ flex: 1 }}>حذف</Btn>
                 </div>
