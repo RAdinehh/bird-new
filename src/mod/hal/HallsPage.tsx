@@ -331,7 +331,7 @@ export default function HallsPage() {
                   {totalAirflow > 0 ? (
                     <Row
                       l="تهویه"
-                      v={`${fmt.num(totalAirflow)} m³/h · ${fmt.num(Math.round(airChanges))} بار/ساعت — ${airAdvice}`}
+                      v={`${fmt.int(totalAirflow)} m³/h · ${fmt.int(airChanges)} بار/ساعت — ${airAdvice}`}
                       accent={airStatus === 'good'}
                     />
                   ) : (
@@ -340,14 +340,14 @@ export default function HallsPage() {
                   {totalLightW > 0 ? (
                     <Row
                       l="روشنایی"
-                      v={`${fmt.num(totalLightW)} W · ~${fmt.num(Math.round(lux))} لوکس — ${lightAdvice}`}
+                      v={`${fmt.int(totalLightW)} W · ~${fmt.int(lux)} لوکس — ${lightAdvice}`}
                       accent={lightStatus === 'good'}
                     />
                   ) : (
                     <Row l="روشنایی" v="— لامپ ثبت نشده" />
                   )}
                   {litterNeed > 0 && (
-                    <Row l="بستر موردنیاز" v={`~${fmt.num(Math.round(litterNeed))} کیلو (${LITTER_LABELS[h.litterType] || h.litterType})`} />
+                    <Row l="بستر موردنیاز" v={`~${fmt.int(litterNeed)} کیلو (${LITTER_LABELS[h.litterType] || h.litterType})`} />
                   )}
                   {realCapacity && !h.capacity && (
                     <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)} پرنده (از مساحت)`} accent />
