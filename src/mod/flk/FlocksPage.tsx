@@ -26,6 +26,8 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
 import { Row, DepBox } from './helpers';
 import { logAction } from '../../cor/logger/auditLog';
+import { useValidation } from '../../shr/validation/useValidation';
+import { createFlkSchema } from '../../shr/validation/rules/flk';
 
 interface F {
   id?: string;
@@ -243,6 +245,35 @@ export default function FlocksPage() {
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
+
+  // ═══ اعتبارسنجی زنده ═══
+  const { errors: vErrors } = useValidation(
+    createFlkSchema(),
+    {
+      name: form.name || '',
+      type: form.type,
+      birdId: form.birdId || '',
+      breedId: form.breedId || '',
+      hallId: form.hallId || '',
+      zoneId: form.zoneId || '',
+      initialCount: int(form.initialCount) ?? 0,
+      currentCount: int(form.currentCount) ?? 0,
+      maleCount: int(form.maleCount) ?? 0,
+      femaleCount: int(form.femaleCount) ?? 0,
+      layingStartDay: int(form.layingStartDay) || 150,
+      endOfCycleDay: (form as any).endOfCycleDay ? int((form as any).endOfCycleDay) : 0,
+      vaccineScheduleId: form.vaccineScheduleId || '',
+      hatchDate: form.hatchDate || '',
+      purchaseDate: form.purchaseDate || '',
+      startDate: form.startDate || '',
+      source: form.source,
+      purchasePrice: num(form.purchasePrice) ?? 0,
+      deliveryCost: num(form.deliveryCost) ?? 0,
+      otherCosts: num(form.otherCosts) ?? 0,
+      status: form.status,
+      notes: form.notes || '',
+    },
+  );
 
   const save = async () => {
     // 🔒 جلوگیری قاطع از نام تکراری گله
