@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react';
+import { useValidation } from '../../shr/validation/useValidation';
+import { createContactSchema } from '../../shr/validation/rules/ctc';
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useCtc, type Person, type Role, ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES, SALARY_TYPES, avatarLetter } from './store';
 import { Btn, BtnRow, DigitField, Empty,
