@@ -57,14 +57,20 @@ export const ZoneSchema = z.object({
 
 export const EquipmentSchema = z.object({
   hallId: requiredId('سالن'),
+  kind: z.enum(['asset', 'consumable', 'system']),
+  category: z.enum(['ventilation', 'feeding', 'drinking', 'heating', 'lighting', 'litter', 'power', 'auxiliary']),
   type: requiredStr('نوع تجهیز', 1, 50),
   name: requiredStr('نام تجهیز', 1, 50),
   count: intPos('تعداد', 100000).nullable().optional(),
+  unit: z.enum(['pcs', 'kg', 'm2', 'm', 'L']),
   unitPrice: floatNonNeg('قیمت واحد', 100_000_000_000).nullable().optional(),
   purchasedAt: persianDateOpt('تاریخ خرید'),
   warranty: floatNonNeg('گارانتی (ماه)', 200).nullable().optional(),
   capacity: floatNonNeg('ظرفیت', 1_000_000).nullable().optional(),
   efficiency: floatNonNeg('بازدهی', 10_000).nullable().optional(),
+  consumeRate: z.enum(['once', 'per-cycle']).optional(),
+  sourceInvoiceId: optionalStr(50),
+  warehouseItemId: optionalStr(50),
   notes: optionalStr(500),
 });
 
