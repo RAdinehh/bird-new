@@ -16,7 +16,11 @@ export function FeedEditor({
       {feed.map((r, i) => (
         <RangeCard
           key={i}
-          title={`روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`}
+          title={
+            r.phaseName
+              ? `${r.phaseName} · روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`
+              : `روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`
+          }
         >
           <FieldsGrid>
             <CompactField
@@ -44,6 +48,48 @@ export function FeedEditor({
               unit="kcal"
             />
           </FieldsGrid>
+          {(r.lysinePct != null || r.methioninePct != null || r.calciumPct != null || r.availablePhosphorusPct != null) && (
+            <FieldsGrid>
+              <CompactField
+                label="لیزین"
+                value={r.lysinePct ?? null}
+                onChange={v => update(i, { lysinePct: v ?? undefined })}
+                unit="٪"
+              />
+              <CompactField
+                label="متیونین"
+                value={r.methioninePct ?? null}
+                onChange={v => update(i, { methioninePct: v ?? undefined })}
+                unit="٪"
+              />
+              <CompactField
+                label="کلسیم"
+                value={r.calciumPct ?? null}
+                onChange={v => update(i, { calciumPct: v ?? undefined })}
+                unit="٪"
+              />
+              <CompactField
+                label="فسفر قابل جذب"
+                value={r.availablePhosphorusPct ?? null}
+                onChange={v => update(i, { availablePhosphorusPct: v ?? undefined })}
+                unit="٪"
+              />
+            </FieldsGrid>
+          )}
+          {r.mainIngredients && r.mainIngredients.length > 0 && (
+            <div style={{
+              marginTop: 6,
+              padding: '6px 10px',
+              background: 'var(--input-bg)',
+              borderRadius: 'var(--r-sm)',
+              fontSize: 'var(--fs-xs)',
+              color: 'var(--muted)',
+              lineHeight: 1.8,
+            }}>
+              <b style={{ color: 'var(--text)' }}>مواد اصلی:</b>{' '}
+              {r.mainIngredients.join(' · ')}
+            </div>
+          )}
         </RangeCard>
       ))}
     </div>
