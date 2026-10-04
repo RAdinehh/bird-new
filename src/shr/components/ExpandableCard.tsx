@@ -103,10 +103,10 @@ export default function ExpandableCard({
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: compact ? 'var(--fs-sm)' : 'var(--fs-md)', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
-            <div style={{ fontSize: compact ? 'var(--fs-xs)' : 'var(--fs-sm)', color: 'var(--muted)', marginTop: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{subtitle}</div>
+            <div style={{ fontSize: compact ? 'var(--fs-xs)' : 'var(--fs-sm)', color: 'var(--muted)', marginTop: 3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, wordBreak: 'break-word' }}>{subtitle}</div>
           </div>
 
-          {badge}
+          {badge && <div style={{ display: 'flex', gap: 4, flexShrink: 0, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>{badge}</div>}
 
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isOpen ? color : 'var(--dim)'} strokeWidth="2.5" strokeLinecap="round"
             style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: noAnim ? 'none' : 'transform var(--dur-slow)', flexShrink: 0 }}>
