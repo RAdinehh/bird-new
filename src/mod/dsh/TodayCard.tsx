@@ -1,7 +1,6 @@
 /**
  * TodayCard — بخش «امروز در یک نگاه»: Benchmark گله + 9 KpiCard
  */
-import BenchmarkCard from './BenchmarkCard';
 import { KpiCard, SectionTitle, MiniEmpty } from './cards';
 import { toFa } from '../../shr/utils/fa';
 
@@ -191,7 +190,6 @@ export default function TodayCard({
                 )}
 
                 <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> امروز در یک نگاه</SectionTitle>
-                <BenchmarkCard />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
                   <KpiCard
                     icon="🥚"
