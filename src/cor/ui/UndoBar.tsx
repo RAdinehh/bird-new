@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSet } from '../../mod/set/store';
 
 interface UndoBarProps {
   label: string;
@@ -17,8 +16,6 @@ export default function UndoBar({ label, onUndo, onDismiss, duration = 5000 }: U
     return () => clearTimeout(t);
   }, [onDismiss, paused, duration]);
 
-  const lowPower = useSet((st: any) => st.lowPowerMode);
-  const noAnim = !!lowPower;
 
   return (
     <div
@@ -42,7 +39,7 @@ export default function UndoBar({ label, onUndo, onDismiss, duration = 5000 }: U
         alignItems: 'center',
         gap: 10,
         boxShadow: '0 10px 32px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1)',
-        animation: noAnim ? 'none' : 'pmSheetIn 260ms cubic-bezier(.16,1,.3,1)',
+        animation: 'none',
         direction: 'rtl',
       }}
     >
@@ -106,7 +103,7 @@ export default function UndoBar({ label, onUndo, onDismiss, duration = 5000 }: U
           style={{
             height: '100%',
             background: 'rgba(255,255,255,0.85)',
-            animation: (noAnim || paused) ? 'none' : `pmUndoProgress ${duration}ms linear forwards`,
+            animation: paused ? 'none' : `pmUndoProgress ${duration}ms linear forwards`,
             transformOrigin: 'right',
           }}
         />
