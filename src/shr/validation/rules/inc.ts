@@ -101,3 +101,38 @@ export const HatchResultSchema = z.object({
 export type EggEntryFormData = z.infer<typeof EggEntrySchema>;
 export type CandlingFormData = z.infer<typeof CandlingSchema>;
 export type HatchResultFormData = z.infer<typeof HatchResultSchema>;
+
+
+// ═══════════════════════════════════════════════
+// دستگاه جوجه‌کشی
+// ═══════════════════════════════════════════════
+export function createDeviceSchema(_ctx: ValidationContext = {}) {
+  return z.object({
+    name: requiredStr('نام دستگاه', 2, 80),
+    mode: z.enum(['setter', 'hatcher', 'setter+hatcher']),
+    status: z.enum(['active', 'idle', 'maintenance', 'broken']).default('active'),
+    temp: floatRange('دما', 30, 42).nullable().optional(),
+    humidity: floatRange('رطوبت', 20, 90).nullable().optional(),
+    purchasedAt: persianDateOpt('تاریخ خرید'),
+    price: floatNonNeg('قیمت', 100_000_000_000).nullable().optional(),
+    warranty: intNonNeg('گارانتی (ماه)', 240).nullable().optional(),
+    racks: intNonNeg('طبقه', 100).nullable().optional(),
+    trays: intNonNeg('سینی', 1000).nullable().optional(),
+    fans: intNonNeg('فن', 100).nullable().optional(),
+    tempSensors: intNonNeg('سنسور دما', 100).nullable().optional(),
+    humiditySensors: intNonNeg('سنسور رطوبت', 100).nullable().optional(),
+    motorPower: floatNonNeg('قدرت موتور', 10000).nullable().optional(),
+    extraCost: floatNonNeg('هزینه جانبی', 100_000_000_000).nullable().optional(),
+    notes: optionalStr(1000),
+  }).superRefine((data, ctx) => {
+    const d = data as any;
+    if (d.temp !== null && d.temp !== undefined) {
+      if (d.mode === 'setter' && (d.temp < 37 || d.temp > 38.5)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'دمای ستر باید بین ۳۷ تا ۳۸.۵ باشد', path: ['temp'] });
+      }
+      if (d.mode === 'hatcher' && (d.temp < 36.5 || d.temp > 37.5)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'دمای هچر باید بین ۳۶.۵ تا ۳۷.۵ باشد', path: ['temp'] });
+      }
+    }
+  });
+}
