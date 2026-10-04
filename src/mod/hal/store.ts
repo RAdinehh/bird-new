@@ -283,14 +283,34 @@ export const EQUIP_EFFICIENCY_UNIT: Record<string, string> = {
 };
 
 export const VENT_SYS_LABELS: Record<string, string> = {
-  tunnel: 'تونلی', longitudinal: 'طولی', transverse: 'عرضی', natural: 'طبیعی', none: '—'
+  fan_tunnel: 'فن تونلی',
+  fan_ceiling: 'فن سقفی',
+  air_inlet: 'دریچه هوا',
+  cooling_pad: 'پد سلولزی',
+  tunnel: 'تونلی', longitudinal: 'طولی', transverse: 'عرضی', natural: 'طبیعی', none: '—',
 };
+
 export const FEEDER_LABELS: Record<string, string> = {
-  chain: 'زنجیری', pan: 'بشقابی', tube: 'لوله‌ای', manual: 'دستی', none: '—'
+  feeder_manual: 'دانخوری دستی',
+  feeder_pan: 'دانخوری بشقابی',
+  feeder_chain: 'دانخوری زنجیری',
+  feeder_tube: 'دانخوری لوله‌ای',
+  feeder_bucket: 'دانخوری سطلی لبه‌دار',
+  chain: 'زنجیری', pan: 'بشقابی', tube: 'لوله‌ای', manual: 'دستی', none: '—',
 };
+
 export const DRINKER_LABELS: Record<string, string> = {
-  nipple: 'نوپل', cup: 'کاپ', trough: 'ناودانی', manual: 'دستی', none: '—'
+  nipple: 'نیپل',
+  cup: 'کاپ',
+  trough: 'ناودانی',
+  fountain_drinker: 'آبخوری کله قندی',
+  manual: 'دستی', none: '—',
 };
+
 export const LITTER_LABELS: Record<string, string> = {
-  wood_shavings: 'پوشال چوب', straw: 'کاه', sand: 'ماسه', net: 'شبکه', none: '—'
+  litter_wood_shavings: 'پوشال چوب',
+  litter_roll: 'رول کاغذی',
+  litter_sand: 'ماسه',
+  wood_shavings: 'پوشال چوب', straw: 'کاه', sand: 'ماسه', net: 'شبکه', none: '—',
 };
+

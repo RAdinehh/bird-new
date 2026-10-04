@@ -595,6 +595,7 @@ export default function HallsPage() {
           typeLabels={DRINKER_LABELS}
           countUnit="عدد"
           countLabel="تعداد"
+          customKey="hal.hall.drinker"
           onChange={(s) => setForm({ ...form, waterSources: s })}
         />
 
@@ -605,6 +606,7 @@ export default function HallsPage() {
           typeLabels={FEEDER_LABELS}
           countUnit="عدد"
           countLabel="تعداد"
+          customKey="hal.hall.feeder"
           onChange={(s) => setForm({ ...form, feedSources: s })}
         />
 
@@ -615,6 +617,7 @@ export default function HallsPage() {
           typeLabels={VENT_SYS_LABELS}
           countUnit="عدد"
           countLabel="تعداد"
+          customKey="hal.hall.vent"
           onChange={(s) => setForm({ ...form, ventSources: s })}
         />
 
@@ -625,6 +628,7 @@ export default function HallsPage() {
           typeLabels={LITTER_LABELS}
           countUnit="m²"
           countLabel="مساحت"
+          customKey="hal.hall.litter"
           onChange={(s) => setForm({ ...form, litterSections: s })}
         />
 

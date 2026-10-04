@@ -4,6 +4,7 @@
 import type { ReactNode, CSSProperties } from 'react';
 import { toFa } from '../../shr/utils/fa';
 import { Field, Input, NumField, Select } from '../../shr/components/ui';
+import EditableSelect from '../../shr/components/EditableSelect';
 
 export function chip(active: boolean): CSSProperties {
   return {
@@ -59,12 +60,13 @@ interface SourceListProps {
   typeLabels: Record<string, string>;
   countUnit?: string;
   countLabel?: string;
+  customKey?: string;
   onChange: (sources: HallSource[]) => void;
 }
 
 export function SourceList({
   label, icon, sources, typeLabels, countUnit = 'عدد', countLabel = 'تعداد',
-  onChange,
+  customKey, onChange,
 }: SourceListProps) {
   const add = () => {
     const firstType = Object.keys(typeLabels)[0] || '';
@@ -110,12 +112,7 @@ export function SourceList({
               #{toFa(i + 1)}
             </span>
             <div style={{ flex: 1 }}>
-              <Select value={s.type} onChange={e => update(s.id, { type: e.target.value })}>
-                <option value="">— انتخاب —</option>
-                {Object.entries(typeLabels).map(([k, v]) => (
-                  <option key={k} value={k}>{v}</option>
-                ))}
-              </Select>
+              <EditableSelect value={s.type} onChange={(v) => update(s.id, { type: v })} options={Object.entries(typeLabels).map(([k, v]) => ({ value: k, label: v }))} customKey={customKey} placeholder="— انتخاب —" />
             </div>
             <button
               type="button"
