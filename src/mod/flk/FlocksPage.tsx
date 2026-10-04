@@ -848,13 +848,14 @@ export default function FlocksPage() {
               );
             })}
             {tab !== 'archived' && <Btn variant="primary" full onClick={openNew}>+ افزودن گله</Btn>}
+            {selectionMode && <div style={{ height: 90 }} />}
           </>
         )}
 
         {/* نوار شناور Multi-Select */}
         {selectionMode && selectedIds.size > 0 && (
           <div style={{
-            position: 'fixed', bottom: 96, left: '50%', transform: 'translateX(-50%)',
+            position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
             zIndex: 100, maxWidth: 460, width: 'calc(100% - 20px)',
             background: 'var(--card-solid)',
             border: '1px solid rgba(59,130,246,0.4)',
@@ -866,8 +867,8 @@ export default function FlocksPage() {
             display: 'flex', alignItems: 'center', gap: 8,
             minHeight: 72,
           }}>
-            <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: '#3b82f6', minWidth: 32, paddingLeft: 2 }}>
-              {toFa(selectedIds.size)}
+            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: '#3b82f6', paddingLeft: 4, whiteSpace: 'nowrap' }}>
+              {toFa(selectedIds.size)} انتخاب
             </span>
             <button type="button" onClick={exitSelection}
               style={{ flex: 1, padding: '12px 14px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 14, color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, minHeight: 44 }}>
