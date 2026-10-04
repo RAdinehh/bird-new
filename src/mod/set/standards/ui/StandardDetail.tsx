@@ -2,7 +2,7 @@ import { PageContainer, Sheet } from '../../../../shr/components/ui';
 import SettingsGroup from '../../SettingsGroup';
 import { showToast } from '../../../../cor/store/toast';
 import { showConfirmAsync } from '../../../../cor/store/dialog';
-import { EnvEditor, FeedEditor, GrowthEditor, MortalityEditor } from './editors';
+import { EnvEditor, FeedEditor, GrowthEditor, MortalityEditor, LitterEditor } from './editors';
 import { DEFAULT_STANDARDS, type BirdStandard } from '../index';
 import { useSet } from '../../store';
 
@@ -346,6 +346,23 @@ export function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose:
             />
           </F>
         </SettingsGroup>
+
+        {/* بستر */}
+        {std.litter ? (
+          <SettingsGroup
+            icon="🛏"
+            title="بستر"
+            subtitle={`${std.litter.recommended.length} ماده · ${std.litter.kgPerM2} kg/m²`}
+            exclusiveGroup="std-sections"
+            persist={false}
+            tone="accent"
+          >
+            <LitterEditor
+              litter={std.litter}
+              onChange={litter => updateBird({ litter })}
+            />
+          </SettingsGroup>
+        ) : null}
 
         {isCustom ? (
           <button
