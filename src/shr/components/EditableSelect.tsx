@@ -152,9 +152,7 @@ export default function EditableSelect({
               background: selected
                 ? 'linear-gradient(180deg, rgba(22,163,74,.10) 0%, rgba(22,163,74,.04) 100%)'
                 : ROW.background,
-              boxShadow: selected
-                ? '0 2px 6px rgba(22,163,74,.12), 0 6px 18px rgba(22,163,74,.10)'
-                : ROW.boxShadow,
+              boxShadow: ROW.boxShadow,
             }}>
             <span style={{
               ...ICON,
@@ -190,9 +188,7 @@ export default function EditableSelect({
               background: selected
                 ? 'linear-gradient(180deg, rgba(22,163,74,.10) 0%, rgba(22,163,74,.04) 100%)'
                 : ROW.background,
-              boxShadow: selected
-                ? '0 2px 6px rgba(22,163,74,.12), 0 6px 18px rgba(22,163,74,.10)'
-                : ROW.boxShadow,
+              boxShadow: ROW.boxShadow,
             }}>
             <span style={{
               ...ICON,
