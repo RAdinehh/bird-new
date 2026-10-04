@@ -268,6 +268,7 @@ export default function DialogHost() {
             gap: 8,
             width: '100%',
             marginTop: 6,
+            direction: 'rtl',
           }}
         >
           <Btn

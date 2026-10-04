@@ -429,3 +429,20 @@ textarea:focus-visible {
   --gap-lg: 16px;
   --touch-min: max(44px, 9vw);
 }
+
+
+/* Dialog bottom-sheet animation */
+@keyframes pmSheetIn {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@keyframes pmFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+
+@keyframes pmUndoProgress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
