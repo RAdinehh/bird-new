@@ -13,6 +13,8 @@ import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
 import { Row, SectionTitle, chip } from './helpers';
 import { logAction } from '../../cor/logger/auditLog';
+import { useValidation } from '../../shr/validation/useValidation';
+import { createMovementSchema } from '../../shr/validation/rules/whs';
 
 interface F {
   id?: string;
@@ -81,6 +83,25 @@ export default function MovesPage() {
   };
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
+
+  // ═══ اعتبارسنجی زنده ═══
+  const { errors: vErrors } = useValidation(
+    createMovementSchema(),
+    {
+      itemId: form.itemId || '',
+      type: form.type,
+      quantity: num(form.quantity),
+      unitPrice: num(form.unitPrice),
+      reason: form.reason,
+      date: form.date || '',
+      partyId: form.partyId || '',
+      notes: form.notes || '',
+      flockId: '',
+      sourceModule: 'manual',
+      sourceId: '',
+      batchNo: '',
+    },
+  );
 
   const selectedItem = items.find(i => i.id === form.itemId);
   const currentStock = selectedItem ? selectedItem.currentStock : 0;
@@ -275,7 +296,7 @@ export default function MovesPage() {
         </Field>
 
         <Grid2>
-          <Field label="تعداد" required>
+          <Field label="تعداد" required error={vErrors.quantity}>
             <NumField placeholder="مثلاً — ۱۰۰"
               value={form.quantity}
               onChange={e => setForm({ ...form, quantity: e.target.value })}
@@ -288,14 +309,14 @@ export default function MovesPage() {
         </Grid2>
 
         <Grid2>
-          <Field label="دلیل" required>
+          <Field label="دلیل" required error={vErrors.reason}>
             <Select value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value as MovementReason })}>
               {(Object.keys(MOVEMENT_REASON) as MovementReason[]).map(r =>
                 <option key={r} value={r}>{MOVEMENT_REASON[r]}</option>
               )}
             </Select>
           </Field>
-          <Field label="تاریخ" required>
+          <Field label="تاریخ" required error={vErrors.date}>
             <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
           </Field>
         </Grid2>

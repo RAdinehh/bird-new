@@ -17,6 +17,8 @@ import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
 import { Row, SectionTitle, chip } from './helpers';
 import { logAction } from '../../cor/logger/auditLog';
+import { useValidation } from '../../shr/validation/useValidation';
+import { createItemSchema } from '../../shr/validation/rules/whs';
 
 interface F {
   id?: string;
@@ -95,6 +97,25 @@ export default function ItemsPage() {
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
   const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
+
+  // ═══ اعتبارسنجی زنده ═══
+  const { errors: vErrors } = useValidation(
+    createItemSchema(),
+    {
+      name: form.name || '',
+      category: form.category,
+      unit: form.unit,
+      minStock: num(form.minStock),
+      currentStock: form.id ? 0 : num(form.initialStock),
+      lastPrice: 0,
+      supplierId: form.supplierId || '',
+      expireDate: form.expireDate || '',
+      withdrawalDays: form.withdrawalDays ? int(form.withdrawalDays) : null,
+      batchNo: form.batchNo || '',
+      storage: form.storage || 'room',
+      notes: form.notes || '',
+    },
+  );
 
   const save = () => {
     // 🔒 جلوگیری قاطع از نام تکراری کالا
@@ -312,12 +333,12 @@ export default function ItemsPage() {
         title={form.id ? 'ویرایش قلم' : 'افزودن قلم'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
-        <Field label="نام قلم" required>
+        <Field label="نام قلم" required error={vErrors.name}>
           <Input placeholder="مثلاً — ذرت، نیوکاسل، ویتامین..." value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
         </Field>
 
         <Grid2>
-          <Field label="دسته" required>
+          <Field label="دسته" required error={vErrors.category}>
             <Select value={form.category} onChange={e => {
               const newCat = e.target.value as ItemCategory;
               const def = CATEGORY_DEFAULTS[newCat];
