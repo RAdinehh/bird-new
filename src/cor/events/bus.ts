@@ -9,11 +9,10 @@
  * - dev mode با logger
  */
 import type { EventMeta, BusHistoryEntry } from './types';
-
-type Handler<T> = (data: T, meta: EventMeta) => void | Promise<void>;
+import type { AppEventName, AppEventData } from './events';
 
 interface ListenerEntry<T> {
-  handler: Handler<T>;
+  handler: (data: T, meta: EventMeta) => void | Promise<void>;
   once: boolean;
   id: string;
 }
@@ -27,24 +26,38 @@ export class EventBus {
   setDevMode(on: boolean) { this.devMode = on; }
   isDevMode() { return this.devMode; }
 
-  on<T>(event: string, handler: Handler<T>, options?: { once?: boolean; id?: string }): () => void {
+  on<K extends AppEventName>(
+    event: K,
+    handler: (data: AppEventData<K>, meta: EventMeta) => void | Promise<void>,
+    options?: { once?: boolean; id?: string },
+  ): () => void {
     const entries = this.listeners.get(event) || [];
     const id = options?.id || `h_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-    entries.push({ handler, once: options?.once || false, id });
+    entries.push({ handler: handler as any, once: options?.once || false, id });
     this.listeners.set(event, entries);
-    return () => this.off(event, handler);
+    return () => this.off(event, handler as any);
   }
 
-  off<T>(event: string, handler: Handler<T>): void {
+  off<K extends AppEventName>(
+    event: K,
+    handler: (data: AppEventData<K>, meta: EventMeta) => void | Promise<void>,
+  ): void {
     const entries = this.listeners.get(event) || [];
     this.listeners.set(event, entries.filter(e => e.handler !== handler));
   }
 
-  once<T>(event: string, handler: Handler<T>): () => void {
+  once<K extends AppEventName>(
+    event: K,
+    handler: (data: AppEventData<K>, meta: EventMeta) => void | Promise<void>,
+  ): () => void {
     return this.on(event, handler, { once: true });
   }
 
-  async emit<T>(event: string, data: T, meta?: Partial<EventMeta>): Promise<{
+  async emit<K extends AppEventName>(
+    event: K,
+    data: AppEventData<K>,
+    meta?: Partial<EventMeta> & { source?: string },
+  ): Promise<{
     traceId: string;
     duration: number;
     handlerCount: number;
