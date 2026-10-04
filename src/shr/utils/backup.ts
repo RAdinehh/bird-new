@@ -13,6 +13,7 @@ export const PM_KEYS = [
   'pm-fed',
   'pm-tra',
   'pm-alt',
+  'pm-cal-manual',
   'pm-theme'
 ] as const;
 
@@ -29,6 +30,7 @@ export const MODULE_LABELS: Record<string, string> = {
   'pm-fed': 'جیره‌نویسی',
   'pm-tra': 'معاملات',
   'pm-alt': 'هشدارها',
+  'pm-cal-manual': 'تقویم دستی',
   'pm-theme': 'تم'
 };
 
@@ -63,7 +65,7 @@ export function exportAll(): string {
 
   const payload: BackupFile = {
     version: 1,
-    schemaVersion: 1,
+    schemaVersion: 2,
     exportedAt: new Date().toISOString(),
     checksum: '',
     data
