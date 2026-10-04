@@ -155,7 +155,7 @@ export default function HallsPage() {
     createHallSchema(),
     {
       name: form.name || '',
-      code: form.code || '',
+      code: (form.code || '').trim() || (form.name || '').trim().toLowerCase().replace(/\s+/g, '-') || 'hall',
       length: num(form.length),
       width: num(form.width),
       height: num(form.height),
