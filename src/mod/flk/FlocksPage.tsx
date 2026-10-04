@@ -674,7 +674,7 @@ export default function FlocksPage() {
         <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش گله' : 'افزودن گله'}
           footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
-          <Field label="نام گله" required>
+          <Field label="نام گله" required error={vErrors.name}>
             <Input placeholder="مثلاً — گله بهار ۱۴۰۵" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </Field>
 
@@ -841,10 +841,10 @@ export default function FlocksPage() {
           </Field>
 
           <Grid2>
-            <Field label="تعداد اولیه" required>
+            <Field label="تعداد اولیه" required error={vErrors.initialCount}>
               <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
             </Field>
-            <Field label="تعداد فعلی">
+            <Field label="تعداد فعلی" error={vErrors.currentCount}>
               <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={0} max={100000} autoClamp />
             </Field>
           </Grid2>
@@ -890,14 +890,14 @@ export default function FlocksPage() {
           <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>تاریخ‌ها</div>
 
           {form.source === 'hatch' && (
-            <Field label="تاریخ هچ" hint="تاریخ خروج جوجه از دستگاه">
+            <Field label="تاریخ هچ" hint="تاریخ خروج جوجه از دستگاه" error={vErrors.hatchDate}>
               <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} />
             </Field>
           )}
 
           {form.source === 'purchase' && (
             <Grid2>
-              <Field label="تاریخ خرید / تحویل" hint="روزی که گله به دستت رسید">
+              <Field label="تاریخ خرید / تحویل" hint="روزی که گله به دستت رسید" error={vErrors.purchaseDate}>
                 <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} />
               </Field>
               <Field label="تاریخ هچ" hint="اگر فروشنده گفته (اختیاری)">
@@ -906,7 +906,7 @@ export default function FlocksPage() {
             </Grid2>
           )}
 
-          <Field label="تاریخ شروع نگهداری" hint="اگه تاریخ دقیق خرید یا هچ رو نمی‌دونی، این رو پر کن">
+          <Field label="تاریخ شروع نگهداری" hint="اگه تاریخ دقیق خرید یا هچ رو نمی‌دونی، این رو پر کن" error={vErrors.startDate}>
             <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
           </Field>
 
