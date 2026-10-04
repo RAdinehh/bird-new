@@ -19,6 +19,17 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
 
+const TYPES_BY_CATEGORY: Record<string, string[]> = {
+  ventilation: ['fan', 'cooler'],
+  feeding:     ['feeder'],
+  drinking:    ['drinker'],
+  heating:     ['heater'],
+  lighting:    ['lamp'],
+  litter:      [],
+  power:       [],
+  auxiliary:   ['camera', 'sensor', 'other'],
+};
+
 function getCapacityHint(type: string, cap: number | null, hallVol: number | null, count: number = 1, eff: number | null = null): string {
   if (!cap || !hallVol || hallVol <= 0) return '';
   if (type === 'fan' || type === 'cooler') {
@@ -458,7 +469,12 @@ export default function EquipmentPage() {
             </Select>
           </Field>
           <Field label="دسته" required>
-            <Select value={form.category || 'auxiliary'} onChange={e => setForm({...form, category: e.target.value})}>
+            <Select value={form.category || 'auxiliary'} onChange={e => {
+                const cat = e.target.value;
+                const allowed = TYPES_BY_CATEGORY[cat] || [];
+                const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || '');
+                setForm({...form, category: cat, type: nextType});
+              }}>
               {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
                 <option key={k} value={k}>{v.icon} {v.name}</option>
               ))}
@@ -479,7 +495,10 @@ export default function EquipmentPage() {
           </Field>
           <Field label="زیرنوع" required>
             <Select value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
-              {Object.entries(EQUIP_LABELS).map(([k, v]) => <option key={k} value={k}>{v.icon} {v.name}</option>)}
+              {(TYPES_BY_CATEGORY[form.category || 'auxiliary'] || Object.keys(EQUIP_LABELS)).map(k => {
+                const v = (EQUIP_LABELS as any)[k] || { icon: '🔧', name: k };
+                return <option key={k} value={k}>{v.icon} {v.name}</option>;
+              })}
             </Select>
           </Field>
         </Grid2>
