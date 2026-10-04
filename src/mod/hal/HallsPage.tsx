@@ -10,6 +10,7 @@ import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import { isFanLike, isLampLike, LITTER_KG_PER_M2 } from './helpers';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { useTempUnit, toUserTemp, tempLabel } from '../../shr/utils/temp';
 import { useFormat } from '../../shr/units';
@@ -275,8 +276,8 @@ export default function HallsPage() {
             const equipCount = equipment.filter(e => e.hallId === h.id).length;
             const equipValue = equipment.filter(e => e.hallId === h.id).reduce((a, e) => a + ((e.count || 0) * (e.unitPrice || 0)), 0);
             const hallEquips = equipment.filter(e => e.hallId === h.id);
-            const totalAirflow = hallEquips.filter(e => e.type === 'fan' || e.type === 'cooler').reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
-            const totalLightW = hallEquips.filter(e => e.type === 'lamp').reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
+            const totalAirflow = hallEquips.filter(e => isFanLike(e.type)).reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
+            const totalLightW = hallEquips.filter(e => isLampLike(e.type)).reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
 
             // ─── محاسبات هوشمند ───
             // ۱. تعویض هوا (m³/h ÷ m³ = بار در ساعت)
@@ -307,16 +308,9 @@ export default function HallsPage() {
               : null;
 
             // ۴. بستر
-            const litterNeed = area > 0 && h.litterType && h.litterType !== 'none'
-              ? (() => {
-                  const perM2: Record<string, number> = {
-                    wood_shavings: 8,
-                    straw: 6,
-                    sand: 25,
-                    net: 0,
-                  };
-                  return area * (perM2[h.litterType] || 0);
-                })()
+            const litterKey = h.litterType && h.litterType !== 'none' ? h.litterType : null;
+            const litterNeed = area > 0 && litterKey
+              ? area * (LITTER_KG_PER_M2[litterKey] || 0)
               : 0;
             const hallFlocks = (flocks || []).filter((f: any) => f.hallId === h.id && f.status === 'active');
             const totalBirds = hallFlocks.reduce((sum: number, f: any) => sum + (f.currentCount || f.initialCount || 0), 0);

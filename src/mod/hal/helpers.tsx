@@ -170,3 +170,40 @@ export function SourceList({
     </div>
   );
 }
+
+
+/** تشخیص زیرنوع‌های خانواده فن/تهویه */
+export function isFanLike(type: string): boolean {
+  return ['fan_tunnel', 'fan_ceiling', 'fan', 'cooler', 'cooling_pad', 'air_inlet'].includes(type);
+}
+
+/** تشخیص زیرنوع‌های خانواده لامپ/روشنایی */
+export function isLampLike(type: string): boolean {
+  return ['lamp_led', 'lamp_fluorescent', 'lamp', 'dimmer'].includes(type);
+}
+
+/** kg/m² بستر بر اساس زیرنوع */
+export const LITTER_KG_PER_M2: Record<string, number> = {
+  litter_wood_shavings: 4.5,
+  wood_shavings: 4.5,
+  litter_roll: 2.5,
+  litter_sand: 30,
+  sand: 30,
+  litter_straw: 6,
+  straw: 6,
+};
+
+/** تشخیص زیرنوع‌های بستر */
+export function isLitterLike(type: string): boolean {
+  return Object.keys(LITTER_KG_PER_M2).includes(type);
+}
+
+/** تشخیص زیرنوع‌های دانخوری */
+export function isFeederLike(type: string): boolean {
+  return type.startsWith('feeder') || type === 'feeder';
+}
+
+/** تشخیص زیرنوع‌های آبخوری */
+export function isDrinkerLike(type: string): boolean {
+  return ['nipple', 'cup', 'trough', 'fountain_drinker', 'drinker'].includes(type);
+}
