@@ -430,10 +430,14 @@ export default function Dashboard() {
         <>
           <TodayCard benchmarkData={benchmarkData} activeFlocks={activeFlocks} selectedFlockId={selectedFlockId} setSelectedFlockId={setSelectedFlockId} eggsToday={eggsToday} deathsToday={deathsToday} feedToday={feedToday} tempToday={tempToday} feedPerBirdGrams={feedPerBirdGrams} waterPerBirdMl={waterPerBirdMl} nav={nav} brokenToday={brokenToday} waterToday={waterToday} humidToday={humidToday} />
 
+
+
+
+
+          <BenchmarkCard />
       <AnalyticsCards survivalRate={survivalRate} survivalTone={survivalTone} henDay7={henDay7} henDayTone={henDayTone} brokenRate7={brokenRate7} brokenTone={brokenTone} cumulativeMortality={cumulativeMortality} eggTrend={eggTrend} trendDays={trendDays} setTrendDays={setTrendDays} fcr={fcr} waterFeedRatio={waterFeedRatio} weightMetrics={weightMetrics} costPerEgg={costPerEgg} salesThisMonth={salesThisMonth} purchasesThisMonth={purchasesThisMonth} profit={profit} receivables={receivables} inventoryValue={inventoryValue} momComparison={momComparison} nav={nav} />
         </>
       ) : null}
-
       <ListCards active={active} counts={counts} activeFlocks={activeFlocks} birds={birds} productions={productions} activeEntries={activeEntries} stockAlerts={stockAlerts} nav={nav} />
       <QuickActions />
     </PageContainer>
