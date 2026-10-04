@@ -381,8 +381,68 @@ export default function HallsPage() {
                   ) : (
                     <Row l="روشنایی" v="— لامپ ثبت نشده" />
                   )}
-                  {litterNeed > 0 && (
-                    <Row l="بستر موردنیاز" v={`~${fmt.int(litterNeed)} کیلو (${LITTER_LABELS[h.litterType] || h.litterType})`} />
+                  {/* 🆕 سیستم‌های توزیع‌شده */}
+                  {(() => {
+                    const water = (h as any).waterSources || [];
+                    const feed = (h as any).feedSources || [];
+                    const vent = (h as any).ventSources || [];
+                    const litter = (h as any).litterSections || [];
+                    const anySource = water.length + feed.length + vent.length + litter.length;
+                    if (anySource === 0) return null;
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        {water.length > 0 && (
+                          <>
+                            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🚰 آبخوری</div>
+                            {water.map((s: any) => (
+                              <Row key={s.id} l={`${DRINKER_LABELS[s.type] || s.type}${s.count ? ` × ${fmt.int(s.count)}` : ''}`} v={s.notes || '—'} />
+                            ))}
+                          </>
+                        )}
+                        {feed.length > 0 && (
+                          <>
+                            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🍽 دانخوری</div>
+                            {feed.map((s: any) => (
+                              <Row key={s.id} l={`${FEEDER_LABELS[s.type] || s.type}${s.count ? ` × ${fmt.int(s.count)}` : ''}`} v={s.notes || '—'} />
+                            ))}
+                          </>
+                        )}
+                        {vent.length > 0 && (
+                          <>
+                            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🌀 تهویه</div>
+                            {vent.map((s: any) => (
+                              <Row key={s.id} l={`${VENT_SYS_LABELS[s.type] || s.type}${s.count ? ` × ${fmt.int(s.count)}` : ''}`} v={s.notes || '—'} />
+                            ))}
+                          </>
+                        )}
+                        {litter.length > 0 && (
+                          <>
+                            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🛏 بستر</div>
+                            {litter.map((s: any) => {
+                              const perM2: Record<string, number> = {
+                                wood_shavings: 4.5, straw: 2.75, sand: 30, sand_soil: 20,
+                                rice_husk: 5, concrete: 0,
+                              };
+                              const kgPerM2 = perM2[s.type] || 0;
+                              const kg = s.type === 'roll' && s.count
+                                ? Math.ceil(s.count / 5)
+                                : (s.count && kgPerM2 ? Math.round(s.count * kgPerM2) : 0);
+                              const label = s.type === 'roll'
+                                ? `${LITTER_LABELS[s.type] || s.type} · ${s.count ? fmt.int(s.count) + ' m²' : '—'} → ~${fmt.int(kg)} کیلو`
+                                : `${LITTER_LABELS[s.type] || s.type} · ${s.count ? fmt.int(s.count) + ' m²' : '—'}${kg ? ` → ~${fmt.int(kg)} کیلو` : ''}`;
+                              return <Row key={s.id} l={label} v={s.notes || '—'} />;
+                            })}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {(h as any).systemNotes && (
+                    <>
+                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>📝 یادداشت سیستم‌ها</div>
+                      <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{(h as any).systemNotes}</div>
+                    </>
                   )}
                   {realCapacity && !h.capacity && (
                     <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)} پرنده (از مساحت)`} accent />
@@ -532,6 +592,56 @@ export default function HallsPage() {
           <Field label="عرض"><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} /></Field>
           <Field label="ارتفاع"><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} /></Field>
         </Grid3>
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>سیستم‌ها</div>
+
+        <SourceList
+          label="آبخوری"
+          icon="🚰"
+          sources={form.waterSources}
+          typeLabels={DRINKER_LABELS}
+          countUnit="عدد"
+          countLabel="تعداد"
+          onChange={(s) => setForm({ ...form, waterSources: s })}
+        />
+
+        <SourceList
+          label="دانخوری"
+          icon="🍽"
+          sources={form.feedSources}
+          typeLabels={FEEDER_LABELS}
+          countUnit="عدد"
+          countLabel="تعداد"
+          onChange={(s) => setForm({ ...form, feedSources: s })}
+        />
+
+        <SourceList
+          label="تهویه"
+          icon="🌀"
+          sources={form.ventSources}
+          typeLabels={VENT_SYS_LABELS}
+          countUnit="عدد"
+          countLabel="تعداد"
+          onChange={(s) => setForm({ ...form, ventSources: s })}
+        />
+
+        <SourceList
+          label="بستر"
+          icon="🛏"
+          sources={form.litterSections}
+          typeLabels={LITTER_LABELS}
+          countUnit="m²"
+          countLabel="مساحت"
+          onChange={(s) => setForm({ ...form, litterSections: s })}
+        />
+
+        <Field label="📝 یادداشت سیستم‌ها (اختیاری)" hint="مثلاً: بستر نیمه ماسه، نیمه رول کاغذی — بستگی به قیمت">
+          <Input
+            placeholder="هر چیزی که خودت می‌خوای بگی..."
+            value={form.systemNotes}
+            onChange={e => setForm({ ...form, systemNotes: e.target.value })}
+          />
+        </Field>
+
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>شرایط</div>
           <Grid2>
           <TempFormField label="دمای هدف" placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => setForm({...form, targetTemp: v})} />
