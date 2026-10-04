@@ -521,8 +521,13 @@ export default function EquipmentPage() {
             value={form.type}
             onChange={v => setForm({...form, type: v})}
             options={typesForCategory(form.category || 'auxiliary').map(k => {
-              const v = (EQUIP_LABELS as any)[k] || { icon: '🔧', name: k };
-              return { value: k, label: v.name, icon: v.icon };
+              const v = (EQUIP_LABELS as any)[k] || { name: k };
+              const catColor = CATEGORY_COLORS[form.category || 'auxiliary'] || '#475569';
+              return {
+                value: k,
+                label: v.name,
+                icon: <EquipmentIcon type={k} size={22} weight="duotone" color={catColor} />,
+              };
             })}
             customKey={'hal.equip.type.' + (form.category || 'auxiliary')}
             usageCheck={(name) => equipment.filter((x: any) => x.type === name).length}

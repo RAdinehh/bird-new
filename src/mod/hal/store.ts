@@ -226,7 +226,7 @@ export const useHal = create<State>()(
 
 export const CATEGORY_LABELS: Record<EquipmentCategory, { name: string; icon: string }> = {
   ventilation: { name: 'تهویه', icon: '🌀' },
-  feeding: { name: 'تغذیه', icon: '🍽' },
+  feeding: { name: 'دانخوری', icon: '🍽' },
   drinking: { name: 'آبخوری', icon: '🚰' },
   heating: { name: 'گرمایش', icon: '🔥' },
   lighting: { name: 'روشنایی', icon: '💡' },

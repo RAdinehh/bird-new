@@ -146,7 +146,12 @@ export default function EditableSelect({
         {isOrphan
           ? '⚠ ' + value + ' (حذف‌شده)'
           : current
-            ? (current.icon ? current.icon + ' ' + current.label : current.label)
+            ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    {current.icon && <span style={{ display: 'inline-flex' }}>{current.icon}</span>}
+                    <span>{current.label}</span>
+                  </span>
+                )
             : (placeholder || '— انتخاب کنید —')}
       </span>
     </button>
@@ -178,7 +183,7 @@ export default function EditableSelect({
               background: selected
                 ? 'linear-gradient(135deg, rgba(22,163,74,.20) 0%, rgba(22,163,74,.10) 100%)'
                 : ICON.background,
-            }}>{o.icon || '•'}</span>
+            }}>{typeof o.icon === 'string' ? o.icon : (o.icon || '•')}</span>
             <span style={{ flex: 1, fontWeight: selected ? 700 : 600 }}>{o.label}</span>
           </button>
         );
