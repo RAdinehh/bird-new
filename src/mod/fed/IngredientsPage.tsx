@@ -1,4 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useValidation } from '../../shr/validation/useValidation';
+import { IngredientSchema } from '../../shr/validation/rules/fed';
 import { useFed, CATEGORY_LABEL, CATEGORY_ICON, type Ingredient, type IngredientCategory } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { INGREDIENT_STANDARDS } from './standards';
@@ -130,6 +132,31 @@ export default function IngredientsPage() {
   };
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
+
+  // ═══ اعتبارسنجی زنده ═══
+  const { errors: vErrors } = useValidation(
+    IngredientSchema,
+    {
+      name: form.name || '',
+      category: form.category || 'energy',
+      protein: num(form.protein),
+      energy: num(form.energy),
+      fat: num(form.fat),
+      fiber: num(form.fiber),
+      calcium: num(form.calcium),
+      phosphorus: num(form.phosphorus),
+      methionine: num(form.methionine),
+      lysine: num(form.lysine),
+      minPercent: num(form.minPercent),
+      maxPercent: num(form.maxPercent),
+      price: num(form.price),
+      stockItemId: form.stockItemId || '',
+      isCore: false,
+      isHidden: false,
+      standardKey: '',
+      notes: form.notes || '',
+    },
+  );
 
   const save = async () => {
 
@@ -334,7 +361,7 @@ export default function IngredientsPage() {
         open={open}
         onClose={() => setOpen(false)}
         title={form.id ? 'ویرایش ماده' : 'افزودن ماده اولیه'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         {!form.id && (
           <Field label="انتخاب سریع از کتابخانه" hint="یکی از مواد پیش‌فرض را انتخاب کنید">

@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react';
+import { useValidation } from '../../shr/validation/useValidation';
+import { RequirementSchema } from '../../shr/validation/rules/fed';
 import { useFed, STAGE_LABEL, STAGE_LABEL_LONG, type Requirement } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -80,6 +82,23 @@ export default function RequirementsPage() {
   };
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
+
+  // ═══ اعتبارسنجی زنده ═══
+  const { errors: vErrors } = useValidation(
+    RequirementSchema,
+    {
+      name: form.name || '',
+      birdType: form.birdType || '',
+      stage: form.stage || '',
+      protein: num(form.protein),
+      energy: num(form.energy),
+      calcium: num(form.calcium),
+      phosphorus: num(form.phosphorus),
+      methionine: num(form.methionine),
+      lysine: num(form.lysine),
+      notes: form.notes || '',
+    },
+  );
 
   const save = async () => {
 
@@ -224,7 +243,7 @@ export default function RequirementsPage() {
         open={open}
         onClose={() => setOpen(false)}
         title={form.id ? 'ویرایش نیاز' : 'افزودن نیاز غذایی'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Field label="نام نیاز" required>
           <Input placeholder="مثلاً — مرغ تخم‌گذار — لیر" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />

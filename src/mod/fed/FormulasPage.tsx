@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react';
+import { useValidation } from '../../shr/validation/useValidation';
+import { createFormulaSchema } from '../../shr/validation/rules/fed';
 import { format as formatJalali } from 'date-fns-jalali';
 import { useFed, STAGE_LABEL, formulaTotal, calcNutrients, formulaValid, type Formula, type FormulaLine } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
@@ -104,6 +106,23 @@ export default function FormulasPage() {
     }));
     setForm(f => ({ ...f, lines: newLines }));
   };
+
+  // ═══ اعتبارسنجی زنده ═══
+  const { errors: vErrors } = useValidation(
+    createFormulaSchema({}),
+    {
+      name: form.name || '',
+      requirementId: form.requirementId || '',
+      date: form.date || '',
+      status: form.status || 'active',
+      lines: (form.lines || []).map(l => ({
+        id: l.id,
+        ingredientId: l.ingredientId || '',
+        percent: Number(l.percent) || 0,
+      })),
+      notes: form.notes || '',
+    },
+  );
 
   const save = () => {
     // 🔒 جلوگیری قاطع از نام تکراری جیره
@@ -272,7 +291,7 @@ export default function FormulasPage() {
         open={open}
         onClose={() => setOpen(false)}
         title={form.id ? 'ویرایش جیره' : 'ساخت جیره جدید'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
+        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Field label="نام جیره" required>
           <Input placeholder="مثلاً — جیره لیر زمستان" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
