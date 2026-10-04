@@ -464,9 +464,16 @@ export default function EquipmentPage() {
             </Select>
           </Field>
         </Grid2>
-        <Field label="نام تجهیز" required>
-          <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
-        </Field>
+
+        <Grid2>
+          <Field label="نام تجهیز" required>
+            <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+          </Field>
+          <Field label="تاریخ خرید">
+            <Input placeholder="۱۴۰۵/۰۷/۰۴" value={form.purchasedAt} onChange={e => setForm({...form, purchasedAt: e.target.value})} />
+          </Field>
+        </Grid2>
+
         <Grid2>
           <Field label="تعداد">
             <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={(UNIT_LABELS_EQ as any)[form.unit || 'pcs'] || 'عدد'} min={0} />
@@ -553,7 +560,7 @@ export default function EquipmentPage() {
             ) : null}
           </Grid2>
         ) : null}
-        <Field label="تاریخ خرید"><Input placeholder="۱۴۰۵/۰۷/۰۴" value={form.purchasedAt} onChange={e => setForm({...form, purchasedAt: e.target.value})} /></Field>
+
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
         <ErrorBox>{err}</ErrorBox>
       </Modal>
