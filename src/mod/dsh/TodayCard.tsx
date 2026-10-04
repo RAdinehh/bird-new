@@ -54,7 +54,7 @@ export default function TodayCard({
 
   return (
     <>
-                {benchmarkData && activeFlocks.length > 0 && (
+                {benchmarkData && benchmarkData.hasData && activeFlocks.length > 0 && (
                   <div style={{
                     background: 'var(--card)',
                     border: '1px solid var(--border)',

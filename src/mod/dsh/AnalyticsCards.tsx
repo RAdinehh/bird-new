@@ -66,18 +66,12 @@ export default function AnalyticsCards({
   return (
     <>
                 <SectionTitle>❤️ سلامت گله</SectionTitle>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
                   <MiniStat
                     label="نرخ زنده‌مانی"
                     value={survivalRate}
                     suffix="٪"
                     color={survivalTone}
-                  />
-                  <MiniStat
-                    label="تلفات تجمعی"
-                    value={cumulativeMortality}
-                    suffix="٪"
-                    color={cumulativeMortality <= 5 ? 'accent' : cumulativeMortality <= 10 ? 'warn' : 'danger'}
                   />
                   <MiniStat
                     label="Hen-Day ۷ روز"
