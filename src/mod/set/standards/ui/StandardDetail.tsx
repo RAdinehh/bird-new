@@ -279,6 +279,86 @@ export function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose:
               />
             </F>
           </G2>
+          <G2>
+            <F label="چرخش در روز">
+              <input
+                type="text"
+                inputMode="decimal"
+                value={std.incubation.turningPerDay ?? ''}
+                onChange={e => {
+                  const en = e.target.value.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٫،]/g, '.').replace(/[^\d.]/g, '');
+                  const n = parseFloat(en);
+                  updateBird({ incubation: { ...std.incubation, turningPerDay: !isNaN(n) ? n : undefined } });
+                }}
+                style={{
+                  width: '100%', height: 34, padding: '0 10px',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-md)',
+                  color: 'var(--text)', fontFamily: 'inherit',
+                  fontSize: 'var(--fs-base)', fontWeight: 700,
+                  textAlign: 'center', outline: 'none', boxSizing: 'border-box',
+                  direction: 'rtl',
+                }}
+              />
+            </F>
+            <F label="وزن جوجه (٪ تخم)">
+              <input
+                type="text"
+                inputMode="decimal"
+                value={std.incubation.chickYieldPct ?? ''}
+                onChange={e => {
+                  const en = e.target.value.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٫،]/g, '.').replace(/[^\d.]/g, '');
+                  const n = parseFloat(en);
+                  updateBird({ incubation: { ...std.incubation, chickYieldPct: !isNaN(n) ? n : undefined } });
+                }}
+                style={{
+                  width: '100%', height: 34, padding: '0 10px',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-md)',
+                  color: 'var(--text)', fontFamily: 'inherit',
+                  fontSize: 'var(--fs-base)', fontWeight: 700,
+                  textAlign: 'center', outline: 'none', boxSizing: 'border-box',
+                  direction: 'rtl',
+                }}
+              />
+            </F>
+          </G2>
+          {std.incubation.candlingDays && std.incubation.candlingDays.length > 0 && (
+            <div style={{
+              padding: '6px 10px',
+              background: 'var(--input-bg)',
+              borderRadius: 'var(--r-sm)',
+              fontSize: 'var(--fs-xs)',
+              color: 'var(--muted)',
+              lineHeight: 1.8,
+            }}>
+              🔍 <b style={{ color: 'var(--text)' }}>روزهای تخم‌نما:</b>{' '}
+              {std.incubation.candlingDays.join(' · ')}
+            </div>
+          )}
+          {(std.incubation.setterTemp || std.incubation.hatcherTemp) && (
+            <div style={{
+              padding: '8px 12px',
+              background: 'var(--input-bg)',
+              borderRadius: 'var(--r-md)',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 8,
+              fontSize: 'var(--fs-xs)',
+              lineHeight: 1.8,
+            }}>
+              <div>
+                <b style={{ color: 'var(--text)' }}>ستر:</b>{' '}
+                {std.incubation.setterTemp}°C · {std.incubation.setterHumidity}٪
+              </div>
+              <div>
+                <b style={{ color: 'var(--text)' }}>هچر:</b>{' '}
+                {std.incubation.hatcherTemp}°C · {std.incubation.hatcherHumidity}٪
+              </div>
+            </div>
+          )}
         </SettingsGroup>
 
         {/* دما و رطوبت */}
