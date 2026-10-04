@@ -34,7 +34,6 @@ body {
   --bg: #f1f5f9;
   --card: rgba(255,255,255,.95);
   --card-solid: #fafbfc;
-  --card-elevated: #ffffff;
   --border: rgba(203,213,225,.5);
   --border-solid: #e2e8f0;
   --text: #0f172a;
@@ -114,7 +113,7 @@ body {
   --card: rgba(30,41,59,.65);
   --card-solid: #1e293b;
   --card-elevated: #263449;
-  --border: rgba(51,65,85,.45);
+  --border: rgba(51,65,85,.55);
   --border-solid: #334155;
   --text: #e2e8f0;
   --muted: #94a3b8;

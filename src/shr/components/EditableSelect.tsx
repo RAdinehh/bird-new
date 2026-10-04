@@ -121,7 +121,7 @@ export default function EditableSelect({
             flex: 1,
             display: 'flex', alignItems: 'center', gap: 14,
             padding: '14px 16px',
-            background: 'var(--card-elevated)',
+            background: 'var(--card-solid)',
             border: '1.5px solid ' + (selected || isHi ? 'var(--accent-border)' : 'var(--border)'),
             borderRadius: 16,
             color: 'var(--text)', fontFamily: 'inherit',
