@@ -56,20 +56,38 @@ export interface Zone {
   updatedAt: string;
 }
 
+export type EquipmentKind = 'asset' | 'consumable' | 'system';
+
+export type EquipmentCategory =
+  | 'ventilation'
+  | 'feeding'
+  | 'drinking'
+  | 'heating'
+  | 'lighting'
+  | 'litter'
+  | 'power'
+  | 'auxiliary';
+
+export type EquipmentUnit = 'pcs' | 'kg' | 'm2' | 'm' | 'L';
+
 export interface Equipment {
   id: string;
   hallId: string;
+  kind: EquipmentKind;
+  category: EquipmentCategory;
   type: string;
   name: string;
   count: number | null;
+  unit: EquipmentUnit;
   unitPrice: number | null;
   purchasedAt: string;
   warranty: number | null;
   notes: string;
-  /** ظرفیت هر واحد — m³/h برای هواکش/کولر، وات برای لامپ/هیتر */
   capacity?: number | null;
-  /** بازدهی — lumen/Watt برای لامپ */
   efficiency?: number | null;
+  consumeRate?: 'once' | 'per-cycle';
+  sourceInvoiceId?: string;
+  warehouseItemId?: string;
   createdAt: string;
   updatedAt: string;
 }
