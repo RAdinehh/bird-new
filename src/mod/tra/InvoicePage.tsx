@@ -24,6 +24,8 @@ import { showToast } from '../../cor/store/toast';
 import { Row, SectionTitle, chip } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
+import { useValidation } from '../../shr/validation/useValidation';
+import { createInvoiceSchema } from '../../shr/validation/rules/tra';
 
 interface F {
   id?: string;
@@ -207,6 +209,57 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
 
   const removePayment = (id: string) =>
     setForm(f => ({ ...f, payments: f.payments.filter(p => p.id !== id) }));
+
+  // ═══ اعتبارسنجی زنده ═══
+  const { errors: vErrors } = useValidation(
+    createInvoiceSchema({}),
+    {
+      type: kind,
+      date: form.date || '',
+      partyId: form.partyId || '',
+      category: form.category || '',
+      items: form.items.map(it => ({
+        id: it.id,
+        description: it.description || '',
+        unit: it.unit || '',
+        quantity: Number(it.quantity) || 0,
+        unitPrice: Number(it.unitPrice) || 0,
+        total: Number(it.total) || 0,
+        itemId: it.itemId || '',
+        movementId: it.movementId || '',
+        discountType: it.discountType || '',
+        discountValue: Number(it.discountValue) || 0,
+        shipping: Number(it.shipping) || 0,
+        itemPartyId: it.itemPartyId || '',
+        birdId: it.birdId || '',
+        breedId: it.breedId || '',
+        flockId: it.flockId || '',
+        ageDays: it.ageDays ?? null,
+        maleCount: it.maleCount ?? null,
+        femaleCount: it.femaleCount ?? null,
+        unknownCount: it.unknownCount ?? null,
+      })),
+      discount: 0,
+      shipping: 0,
+      total: Number(total) || 0,
+      payments: form.payments.map(pp => ({
+        date: pp.date || '',
+        amount: Number(pp.amount) || 0,
+        method: pp.method,
+        checkNo: pp.checkNo || '',
+        bank: pp.bank || '',
+        dueDate: pp.dueDate || '',
+        notes: pp.notes || '',
+        status: pp.status || 'pending',
+      })),
+      dueDate: form.dueDate || '',
+      relatedFlockId: '',
+      relatedEntryId: '',
+      notes: form.notes || '',
+      paymentTerms: form.paymentTerms,
+      workflowStatus: 'draft',
+    },
+  );
 
   const save = () => {
     if (!form.partyId) { setErr(isPurchase ? 'فروشنده اجباری است' : 'مشتری اجباری است'); return; }
