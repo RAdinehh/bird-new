@@ -11,6 +11,7 @@
  * ⚠️ همه اعداد در پنل تنظیمات قابل ویرایش هستند.
  */
 
+import { NEW_BREEDS } from './data-breeds';
 import type { BirdStandard, EnvRange, FeedRange, GrowthRange, IncubationStandard } from './types';
 
 // ═══════════════════════════════════════════════
@@ -494,11 +495,14 @@ const LAYER: BirdStandard = {
 // Export
 // ═══════════════════════════════════════════════
 export const DEFAULT_STANDARDS: Record<string, BirdStandard> = {
+  // ─── نژادهای قدیمی (سازگاری) ───
   marandi: MARANDI,
   golpaygani: GOLPAYGANI,
   gilini: GILINI,
   broiler: BROILER,
   layer: LAYER,
+  // ─── نژادهای جدید ───
+  ...NEW_BREEDS,
 };
 
 export const FALLBACK_ENV: EnvRange = {
