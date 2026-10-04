@@ -322,9 +322,9 @@ export default function EquipmentPage() {
                 subtitle={`${meta.name} · ${hall?.name || '—'}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : e.id)}
-                badge={e.count ? <Tag tone="blue">{toFa(e.count)} عدد</Tag> : undefined}
+                badge={e.count ? <Tag tone="blue">{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</Tag> : undefined}
                 stats={<>
-                  {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)}</b></span>}
+                  {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</b></span>}
                   {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(value.toLocaleString('fa-IR'))} ت</b></span>}
                   {e.warranty && <span>گارانتی: <b style={{ color: 'var(--text)' }}>{toFa(e.warranty)} ماه</b></span>}
                 </>}
@@ -360,7 +360,7 @@ export default function EquipmentPage() {
                        fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>
                       <span style={{ color: 'var(--muted)' }}>تعداد:</span>
-                      <span style={{ fontWeight: 600 }}>{toFa(e.count)} عدد</span>
+                      <span style={{ fontWeight: 600 }}>{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</span>
                     </div>
                   )}
                 </div>
