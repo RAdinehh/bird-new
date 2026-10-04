@@ -305,7 +305,7 @@ export default function HallsPage() {
                   )}
                 </div>
 
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🔧</span> تجهیزات ثابت</div>
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚙️</span> سیستم‌های سالن</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {h.ventilationSystem && <Pill label="تهویه" value={VENT_SYS_LABELS[h.ventilationSystem]} />}
                   {h.feederType && <Pill label="دانخوری" value={FEEDER_LABELS[h.feederType]} />}
