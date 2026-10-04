@@ -9,6 +9,7 @@ import ProfileTab from './ProfileTab';
 import AppearanceTab from './AppearanceTab';
 import ModulesTab from './ModulesTab';
 import HiddenOptionsTab from './HiddenOptionsTab';
+import GuideTab from './guide/GuideTab';
 import UnitsTab from './units/UnitsTab';
 import NotificationsTab from './NotificationsTab';
 import BackupTab from './BackupTab';
@@ -21,7 +22,8 @@ type TabId =
   | 'appearance'
   | 'config'
   | 'notifications'
-  | 'system';
+  | 'system'
+  | 'guide';
 
 interface TabDef {
   id: TabId;
@@ -45,6 +47,7 @@ const GROUPS: GroupDef[] = [
       { id: 'config',        label: 'پیکربندی',      icon: '⚙️' },
       { id: 'notifications', label: 'اعلان‌ها',       icon: '🔔' },
       { id: 'system',        label: 'سیستم',          icon: '💾' },
+      { id: 'guide',         label: 'راهنمای علمی',   icon: '📚' },
     ],
   },
 ];
@@ -81,6 +84,9 @@ const TAB_COMPONENTS: Record<TabId, TabComponent[]> = {
     { comp: HiddenOptionsTab, icon: '🗂', title: 'گزینه‌های مخفی',   subtitle: 'آیتم‌های حذف‌شده — بازگردانی یا حذف کامل', tone: 'info' },
   ],
   notifications: [NotificationsTab],
+  guide: [
+    { comp: GuideTab, icon: '📚', title: 'راهنمای علمی', subtitle: 'استانداردها، تجهیزات، محاسبات، منابع', tone: 'purple' },
+  ],
   system: [
     { comp: BackupTab, icon: '💾', title: 'پشتیبان‌گیری',      subtitle: 'آمار، پشتیبان، بازیابی، امنیت', tone: 'accent' },
     { comp: LogsTab,   icon: '📋', title: 'لاگ عملیات',         subtitle: 'تاریخچه فعالیت‌ها و خطاها',      tone: 'info' },
