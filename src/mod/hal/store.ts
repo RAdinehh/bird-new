@@ -125,7 +125,7 @@ export const useHal = create<State>()(
     }),
     {
       name: 'pm-hal',
-      version: 3,
+      version: 4,
       migrate: (persisted: any, version: number) => {
         if (!persisted?.state?.halls) return persisted;
         if (version < 2) {
@@ -185,6 +185,32 @@ export const useHal = create<State>()(
               unit: e.unit || m.unit,
             };
           });
+        }
+        if (version < 4) {
+          const typeMap: Record<string, string> = {
+            chain: 'feeder_chain',
+            pan: 'feeder_pan',
+            tube: 'feeder_tube',
+            tunnel: 'fan_tunnel',
+            longitudinal: 'fan_tunnel',
+            transverse: 'fan_ceiling',
+            natural: 'air_inlet',
+            wood_shavings: 'litter_wood_shavings',
+            straw: 'litter_roll',
+            sand: 'litter_sand',
+            manual: 'feeder_manual',
+          };
+          const fixSources = (arr: any[]) => (arr || []).map((src: any) => ({
+            ...src,
+            type: typeMap[src.type] || src.type,
+          }));
+          persisted.state.halls = (persisted.state.halls || []).map((h: any) => ({
+            ...h,
+            waterSources: fixSources(h.waterSources),
+            feedSources: fixSources(h.feedSources),
+            ventSources: fixSources(h.ventSources),
+            litterSections: fixSources(h.litterSections),
+          }));
         }
         return persisted;
       },
@@ -311,6 +337,20 @@ export const LITTER_LABELS: Record<string, string> = {
   litter_wood_shavings: 'پوشال چوب',
   litter_roll: 'رول کاغذی',
   litter_sand: 'ماسه',
-  wood_shavings: 'پوشال چوب', straw: 'کاه', sand: 'ماسه', net: 'شبکه', none: '—',
 };
 
+
+
+/** نگاشت آیکن برای هر زیرنوع منبع */
+export function sourceIcon(type: string): string {
+  const map: Record<string, string> = {
+    nipple: '💧', cup: '🥛', trough: '🛁', fountain_drinker: '⛲',
+    feeder_manual: '🪣', feeder_pan: '🥣', feeder_chain: '⛓', feeder_tube: '🥤', feeder_bucket: '🪣',
+    fan_tunnel: '🌀', fan_ceiling: '💨', air_inlet: '🪟', cooling_pad: '❄',
+    litter_wood_shavings: '🪵', litter_roll: '📜', litter_sand: '🏖',
+    tunnel: '🌀', longitudinal: '💨', transverse: '🌬', natural: '🍃',
+    chain: '⛓', pan: '🥣', tube: '🥤', manual: '🪣',
+    wood_shavings: '🪵', straw: '🌾', sand: '🏖', net: '🕸',
+  };
+  return map[type] || '•';
+}

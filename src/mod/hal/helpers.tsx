@@ -4,8 +4,9 @@ import React from 'react';
  */
 import type { ReactNode, CSSProperties } from 'react';
 import { toFa } from '../../shr/utils/fa';
-import { Field, Input, NumField, Select } from '../../shr/components/ui';
+import { Field, Input, NumField, Select, Modal } from '../../shr/components/ui';
 import EditableSelect from '../../shr/components/EditableSelect';
+import { sourceIcon } from './store';
 
 export function chip(active: boolean): CSSProperties {
   return {
@@ -69,70 +70,165 @@ export function SourceList({
   label, icon, sources, typeLabels, countUnit = 'عدد', countLabel = 'تعداد',
   customKey, onChange,
 }: SourceListProps) {
-  const add = () => {
-    const firstType = Object.keys(typeLabels)[0] || '';
-    onChange([...sources, { id: crypto.randomUUID(), type: firstType, count: null, notes: '' }]);
+  const [editId, setEditId] = React.useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = React.useState(false);
+
+  const addWith = (type: string) => {
+    onChange([...sources, { id: crypto.randomUUID(), type, count: null, notes: '' }]);
+    setPickerOpen(false);
   };
 
-  const remove = (id: string) => {
-    onChange(sources.filter(s => s.id !== id));
-  };
-
+  const remove = (id: string) => onChange(sources.filter(s => s.id !== id));
   const update = (id: string, patch: Partial<HallSource>) => {
     onChange(sources.map(s => s.id === id ? { ...s, ...patch } : s));
   };
 
+  const editing = editId ? sources.find(s => s.id === editId) : null;
+
+  const typeOptions = Object.entries(typeLabels).map(([k, v]) => ({
+    value: k,
+    label: v,
+    icon: sourceIcon(k),
+  }));
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-          {icon} {label}
-        </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 4 }}>
+        <span style={{ fontSize: 16 }}>{icon}</span>
+        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>{label}</span>
         {sources.length > 0 && (
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-            ({toFa(sources.length)})
-          </span>
+          <span style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 600 }}>({toFa(sources.length)})</span>
         )}
+        <div style={{ flex: 1 }} />
+        <button
+          type="button"
+          onClick={() => setPickerOpen(true)}
+          style={{
+            width: 32, height: 32, borderRadius: 10,
+            background: 'var(--accent)', border: 'none',
+            color: '#fff', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 20, fontWeight: 300, lineHeight: 1,
+            fontFamily: 'inherit',
+            boxShadow: '0 2px 6px rgba(22,163,74,.28)',
+          }}
+          aria-label={'افزودن ' + label}
+        >+</button>
       </div>
 
-      {sources.map((s, i) => (
-        <div
-          key={s.id}
-          style={{
-            padding: '8px 10px',
-            background: 'var(--input-bg)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--r-md)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 6,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, minWidth: 20 }}>
-              #{toFa(i + 1)}
-            </span>
-            <div style={{ flex: 1 }}>
-              <EditableSelect value={s.type} onChange={(v) => update(s.id, { type: v })} options={Object.entries(typeLabels).map(([k, v]) => ({ value: k, label: v }))} customKey={customKey} placeholder="— انتخاب —" />
+      {sources.map((s) => (
+        <div key={s.id} style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: '8px 10px',
+          background: 'var(--card-solid)',
+          border: '1.5px solid var(--border)',
+          borderRadius: 12,
+          boxShadow: '0 1px 2px rgba(15,23,42,.04)',
+        }}>
+          <span style={{
+            width: 36, height: 36, borderRadius: 11,
+            background: 'linear-gradient(135deg, #f0f4f8 0%, #e2e8ef 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 18, flexShrink: 0,
+          }}>{sourceIcon(s.type)}</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 'var(--fs-base)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {typeLabels[s.type] || s.type}
             </div>
-            <button
-              type="button"
-              onClick={() => remove(s.id)}
-              style={{
-                background: 'none', border: '1px solid var(--border)',
-                borderRadius: 'var(--r-sm)', color: 'var(--danger)',
-                cursor: 'pointer', fontFamily: 'inherit',
-                width: 32, height: 32, flexShrink: 0, fontSize: 14,
-              }}
-              aria-label="حذف"
-            >✕</button>
+            {(s.count !== null || s.notes) && (
+              <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {s.count !== null ? toFa(s.count) + ' ' + countUnit : ''}
+                {s.count !== null && s.notes ? ' · ' : ''}
+                {s.notes || ''}
+              </div>
+            )}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <button
+            type="button"
+            onClick={() => setEditId(s.id)}
+            aria-label="ویرایش"
+            style={{
+              width: 32, height: 32, borderRadius: 9,
+              background: 'var(--input-bg)', border: '1px solid var(--border)',
+              cursor: 'pointer', fontSize: 13, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >✏️</button>
+          <button
+            type="button"
+            onClick={() => remove(s.id)}
+            aria-label="حذف"
+            style={{
+              width: 32, height: 32, borderRadius: 9,
+              background: 'var(--input-bg)', border: '1px solid var(--border)',
+              cursor: 'pointer', fontSize: 13, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >🗑️</button>
+        </div>
+      ))}
+
+      {sources.length === 0 && (
+        <div style={{
+          padding: '10px 12px',
+          background: 'var(--input-bg)',
+          border: '1px dashed var(--border)',
+          borderRadius: 12,
+          fontSize: 12, color: 'var(--muted)',
+          textAlign: 'center',
+        }}>
+          هنوز {label}ی ثبت نشده
+        </div>
+      )}
+
+      <Modal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        title={'افزودن ' + label}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {typeOptions.map((o) => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => addWith(o.value)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 14px', minHeight: 54,
+                background: 'var(--card-solid)',
+                border: '1.5px solid var(--border)',
+                borderRadius: 14,
+                color: 'var(--text)', fontFamily: 'inherit',
+                fontSize: 'var(--fs-base)', fontWeight: 500,
+                textAlign: 'right', cursor: 'pointer',
+                width: '100%', boxSizing: 'border-box',
+                boxShadow: '0 1px 2px rgba(15,23,42,.04)',
+              }}
+            >
+              <span style={{
+                width: 40, height: 40, borderRadius: 12,
+                background: 'linear-gradient(135deg, #f0f4f8 0%, #e2e8ef 100%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 20, flexShrink: 0,
+              }}>{o.icon}</span>
+              <span style={{ flex: 1, fontWeight: 600 }}>{o.label}</span>
+            </button>
+          ))}
+        </div>
+      </Modal>
+
+      <Modal
+        open={!!editing}
+        onClose={() => setEditId(null)}
+        title={label}
+      >
+        {editing && (
+          <>
             <Field label={countLabel}>
               <NumField
                 placeholder="۰"
-                value={s.count !== null ? String(s.count) : ''}
-                onChange={e => update(s.id, { count: parseInt(e.target.value) || null })}
+                value={editing.count !== null ? String(editing.count) : ''}
+                onChange={(e) => update(editing.id, { count: parseInt(e.target.value) || null })}
                 unit={countUnit}
                 min={0}
               />
@@ -140,31 +236,26 @@ export function SourceList({
             <Field label="یادداشت">
               <Input
                 placeholder="مثلاً نیمه جنوبی..."
-                value={s.notes}
-                onChange={e => update(s.id, { notes: e.target.value })}
+                value={editing.notes}
+                onChange={(e) => update(editing.id, { notes: e.target.value })}
               />
             </Field>
-          </div>
-        </div>
-      ))}
-
-      <button
-        type="button"
-        onClick={add}
-        style={{
-          padding: '8px 12px',
-          background: 'var(--btn-bg)',
-          border: '1px dashed var(--border)',
-          borderRadius: 'var(--r-md)',
-          color: 'var(--accent)',
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-          fontSize: 'var(--fs-sm)',
-          fontWeight: 600,
-        }}
-      >
-        + افزودن {label}
-      </button>
+            <div style={{ display: 'flex', gap: 6, paddingTop: 8 }}>
+              <button
+                type="button"
+                onClick={() => setEditId(null)}
+                style={{
+                  flex: 1, padding: '12px',
+                  background: 'var(--btn-bg)', border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-sm)', color: 'var(--text)',
+                  fontSize: 'var(--fs-base)', fontFamily: 'inherit',
+                  fontWeight: 600, cursor: 'pointer',
+                }}
+              >بستن</button>
+            </div>
+          </>
+        )}
+      </Modal>
     </div>
   );
 }
