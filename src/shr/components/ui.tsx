@@ -683,7 +683,7 @@ export function Modal({
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'var(--overlay)',
+        background: (window.__modalDepth || 0) > 0 ? 'rgba(15,23,42,0.12)' : 'var(--overlay)',
         zIndex: 100 + (window.__modalDepth || 0),
         display: 'flex',
         alignItems: isDesktop ? 'center' : 'flex-end',

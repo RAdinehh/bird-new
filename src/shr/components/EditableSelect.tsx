@@ -34,7 +34,7 @@ const ICON_BOX_SEL: React.CSSProperties = {
 const ROW: React.CSSProperties = {
   display: 'flex', alignItems: 'center', gap: 10,
   padding: '8px 10px',
-  background: 'var(--card-solid)',
+  background: 'var(--card-elevated)',
   border: '1px solid var(--border)',
   borderRadius: 12,
   color: 'var(--text)',
@@ -150,7 +150,7 @@ export default function EditableSelect({
             style={{
               ...ROW,
               borderColor: selected ? 'var(--accent-border)' : 'var(--border)',
-              background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
+              background: selected ? 'var(--accent-soft)' : 'var(--card-elevated)',
             }}>
             <span style={selected ? ICON_BOX_SEL : ICON_BOX}>{o.icon || '•'}</span>
             <span style={{ flex: 1 }}>{o.label}</span>
@@ -178,7 +178,7 @@ export default function EditableSelect({
             style={{
               ...ROW, paddingLeft: 4,
               borderColor: selected || isHi ? 'var(--accent-border)' : 'var(--border)',
-              background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
+              background: selected ? 'var(--accent-soft)' : 'var(--card-elevated)',
             }}>
             <span style={selected ? ICON_BOX_SEL : ICON_BOX}>{c.icon}</span>
             <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
