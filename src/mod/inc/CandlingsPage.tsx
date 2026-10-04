@@ -13,6 +13,7 @@ import { showToast } from '../../cor/store/toast';
 import { todayJalali } from './helpers';
 import { useIncubationProfile } from './hooks';
 import { logAction } from '../../cor/logger/auditLog';
+import { useMemo as _useMemoV } from 'react';
 
 const INFERTILE_REASONS: [string, string][] = [
   ['', '—'], ['season', 'فصل'], ['rooster_age', 'سن خروس'], ['nutrition', 'تغذیه'], ['genetics', 'ژنتیک'], ['storage', 'نگهداری تخم']
@@ -177,6 +178,21 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
   const updateEntryData = (id: string, patch: Partial<EntryData>) => {
     setEntriesData(d => ({ ...d, [id]: { ...(d[id] || emptyData()), ...patch } }));
   };
+
+  // ═══ اعتبارسنجی زنده ═══
+  const vErrors = _useMemoV(() => {
+    const errs: Record<string, string> = {};
+    for (const [entryId, d] of Object.entries(entriesData || {})) {
+      const alive = parseInt(toEn(d.alive || '0')) || 0;
+      const infertile = parseInt(toEn(d.infertile || '0')) || 0;
+      const dead = parseInt(toEn(d.dead || '0')) || 0;
+      const broken = parseInt(toEn(d.broken || '0')) || 0;
+      if (alive < 0 || infertile < 0 || dead < 0 || broken < 0) {
+        errs['neg_' + entryId] = 'مقادیر منفی مجاز نیست';
+      }
+    }
+    return errs;
+  }, [entriesData]);
 
   const save = () => {
     if (!modalDate.trim()) { setErr('تاریخ اجباری است'); return; }
@@ -536,7 +552,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={editingId ? '✏️ ویرایش کندلینگ' : '🔍 ثبت کندلینگ'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> زمان‌بندی</SectionTitle>
         {_firstSelectedBirdName && _profile.totalDays ? (
