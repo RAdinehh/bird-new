@@ -19,32 +19,49 @@ interface Props {
   placeholder?: string;
   required?: boolean;
   error?: string;
+  variant?: 'modal' | 'inline';
 }
 
-const ROW_BASE: React.CSSProperties = {
+const ITEM_BASE: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: 10,
+  gap: 12,
   padding: '12px 14px',
-  minHeight: 52,
-  background: 'transparent',
-  border: 'none',
+  minHeight: 56,
+  background: 'var(--card-solid)',
+  border: '1px solid var(--border)',
   borderRadius: 'var(--r-md)',
   color: 'var(--text)',
   fontFamily: 'inherit',
   fontSize: 'var(--fs-base)',
+  fontWeight: 500,
   textAlign: 'right',
   cursor: 'pointer',
   width: '100%',
   boxSizing: 'border-box',
+  transition: 'background 150ms, border-color 150ms, transform 120ms',
 };
 
-const ROW_SELECTED: React.CSSProperties = {
+const ICON_BOX: React.CSSProperties = {
+  width: 38,
+  height: 38,
+  borderRadius: 'var(--r-md)',
+  background: 'var(--input-bg)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 20,
+  flexShrink: 0,
+};
+
+const ICON_BOX_SEL: React.CSSProperties = {
+  ...ICON_BOX,
   background: 'var(--accent-soft)',
 };
 
 export default function EditableSelect({
   label, value, onChange, options, customKey, placeholder, required, error,
+  variant = 'modal',
 }: Props) {
   const [open, setOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -52,7 +69,6 @@ export default function EditableSelect({
   const [formName, setFormName] = useState('');
   const [formIcon, setFormIcon] = useState('🔧');
   const [showEmoji, setShowEmoji] = useState(false);
-  const [hoverId, setHoverId] = useState<string | null>(null);
 
   const { getByKey, addOption, updateOption, removeOption } = useCustomOptions();
   const customs = customKey ? getByKey(customKey) : [];
@@ -86,121 +102,126 @@ export default function EditableSelect({
   const trigger = (
     <button
       type="button"
-      onClick={() => setOpen(true)}
+      onClick={() => variant === 'inline' ? setOpen(o => !o) : setOpen(true)}
       style={{
         width: '100%', textAlign: 'right', padding: '10px 12px',
         background: 'var(--input-bg)', border: '1px solid var(--border)',
         borderRadius: 'var(--r-sm)', color: current ? 'var(--text)' : 'var(--muted)',
         fontSize: 'var(--fs-base)', cursor: 'pointer', fontFamily: 'inherit',
+        display: 'flex', alignItems: 'center', gap: 8,
       }}
     >
-      {current ? (current.icon ? current.icon + ' ' + current.label : current.label) : (placeholder || '— انتخاب کنید —')}
+      <span style={{ flex: 1, textAlign: 'right' }}>
+        {current ? (current.icon ? current.icon + ' ' + current.label : current.label) : (placeholder || '— انتخاب کنید —')}
+      </span>
+      {variant === 'inline' && (
+        <span style={{ color: 'var(--muted)', fontSize: 11, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 180ms' }}>▼</span>
+      )}
     </button>
   );
 
-  return (
-    <>
-      {label ? <Field label={label} required={required} error={error}>{trigger}</Field> : trigger}
+  const renderList = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {customKey && (
+        <button
+          type="button"
+          onClick={openAdd}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '12px 14px', minHeight: 52,
+            background: 'var(--accent-soft)',
+            border: '1px solid var(--accent-border)',
+            borderRadius: 'var(--r-md)',
+            color: 'var(--accent)', fontWeight: 600,
+            cursor: 'pointer', fontFamily: 'inherit',
+            fontSize: 'var(--fs-base)', textAlign: 'right',
+            width: '100%', boxSizing: 'border-box',
+          }}
+        >
+          <span style={{
+            width: 38, height: 38, borderRadius: 'var(--r-md)',
+            background: 'var(--card-solid)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 20, flexShrink: 0,
+          }}>＋</span>
+          <span style={{ flex: 1 }}>افزودن مورد جدید</span>
+        </button>
+      )}
 
-      <Modal open={open} onClose={() => setOpen(false)} title={label || 'انتخاب'}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, paddingBottom: 8 }}>
-          {customKey && (
+      {options.length > 0 && (
+        <div style={{
+          fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)',
+          letterSpacing: '.5px', padding: '8px 4px 0',
+        }}>پیش‌فرض‌ها</div>
+      )}
+
+      {options.map(o => {
+        const selected = value === o.value;
+        return (
+          <button
+            key={o.value}
+            type="button"
+            onClick={() => { onChange(o.value); setOpen(false); }}
+            style={{
+              ...ITEM_BASE,
+              borderColor: selected ? 'var(--accent-border)' : 'var(--border)',
+              background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
+            }}
+          >
+            <span style={selected ? ICON_BOX_SEL : ICON_BOX}>{o.icon || '•'}</span>
+            <span style={{ flex: 1 }}>{o.label}</span>
+            {selected && <span style={{ color: 'var(--accent)', fontSize: 18, fontWeight: 700 }}>✓</span>}
+          </button>
+        );
+      })}
+
+      {customs.length > 0 && (
+        <div style={{
+          fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)',
+          letterSpacing: '.5px', padding: '12px 4px 0',
+        }}>سفارشی (قابل ویرایش)</div>
+      )}
+
+      {customs.map(c => {
+        const selected = value === c.name;
+        return (
+          <div key={c.id} style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
             <button
               type="button"
-              onClick={openAdd}
+              onClick={() => { onChange(c.name); setOpen(false); }}
               style={{
-                ...ROW_BASE,
-                justifyContent: 'flex-start',
-                color: 'var(--accent)',
-                fontWeight: 600,
-                border: '1px dashed var(--accent-border)',
-                background: 'var(--accent-soft)',
-                marginBottom: 6,
+                ...ITEM_BASE,
+                flex: 1,
+                borderColor: selected ? 'var(--accent-border)' : 'var(--border)',
+                background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
               }}
             >
-              <span style={{ fontSize: 18, lineHeight: 1 }}>+</span>
-              <span>افزودن مورد جدید</span>
+              <span style={selected ? ICON_BOX_SEL : ICON_BOX}>{c.icon}</span>
+              <span style={{ flex: 1 }}>{c.name}</span>
+              {selected && <span style={{ color: 'var(--accent)', fontSize: 18, fontWeight: 700 }}>✓</span>}
             </button>
-          )}
+            <button type="button" onClick={() => openEdit(c.id)} aria-label="ویرایش" style={{
+              width: 40, height: 40, borderRadius: 'var(--r-md)',
+              background: 'var(--card-solid)', border: '1px solid var(--border)',
+              cursor: 'pointer', fontSize: 15, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>✏️</button>
+            <button type="button" onClick={() => removeItem(c.id, c.name)} aria-label="حذف" style={{
+              width: 40, height: 40, borderRadius: 'var(--r-md)',
+              background: 'var(--card-solid)', border: '1px solid var(--border)',
+              cursor: 'pointer', fontSize: 15, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>🗑️</button>
+          </div>
+        );
+      })}
+    </div>
+  );
 
-          {options.map(o => {
-            const selected = value === o.value;
-            return (
-              <button
-                key={o.value}
-                type="button"
-                onClick={() => { onChange(o.value); setOpen(false); }}
-                onMouseEnter={() => setHoverId(o.value)}
-                onMouseLeave={() => setHoverId(null)}
-                style={{
-                  ...ROW_BASE,
-                  ...(selected ? ROW_SELECTED : (hoverId === o.value ? { background: 'var(--input-bg)' } : {})),
-                }}
-              >
-                <span style={{ flex: 1, textAlign: 'right' }}>
-                  {o.icon ? o.icon + ' ' : ''}{o.label}
-                </span>
-                {selected && <span style={{ color: 'var(--accent)', fontSize: 16 }}>✓</span>}
-              </button>
-            );
-          })}
-
-          {customs.map(c => {
-            const selected = value === c.name;
-            return (
-              <div
-                key={c.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  ...(selected ? ROW_SELECTED : {}),
-                  borderRadius: 'var(--r-md)',
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => { onChange(c.name); setOpen(false); }}
-                  onMouseEnter={() => setHoverId(c.id)}
-                  onMouseLeave={() => setHoverId(null)}
-                  style={{
-                    ...ROW_BASE,
-                    flex: 1,
-                    background: (!selected && hoverId === c.id) ? 'var(--input-bg)' : 'transparent',
-                  }}
-                >
-                  <span style={{ flex: 1, textAlign: 'right' }}>{c.icon} {c.name}</span>
-                  {selected && <span style={{ color: 'var(--accent)', fontSize: 16 }}>✓</span>}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openEdit(c.id)}
-                  aria-label="ویرایش"
-                  style={{
-                    width: 36, height: 36, borderRadius: 'var(--r-sm)',
-                    background: 'var(--input-bg)', border: '1px solid var(--border)',
-                    cursor: 'pointer', fontSize: 14, flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >✏️</button>
-                <button
-                  type="button"
-                  onClick={() => removeItem(c.id, c.name)}
-                  aria-label="حذف"
-                  style={{
-                    width: 36, height: 36, borderRadius: 'var(--r-sm)',
-                    background: 'var(--input-bg)', border: '1px solid var(--border)',
-                    cursor: 'pointer', fontSize: 14, flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginLeft: 4,
-                  }}
-                >🗑️</button>
-              </div>
-            );
-          })}
-        </div>
-      </Modal>
-
+  const formModal = (
+    <>
       <Modal
         open={formOpen}
         onClose={() => setFormOpen(false)}
@@ -216,18 +237,47 @@ export default function EditableSelect({
           <Input placeholder="مثلاً — آبخوری نیپل استیل" value={formName} onChange={e => setFormName(e.target.value)} />
         </Field>
         <Field label="آیکن">
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <div style={{
-              width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 28, background: 'var(--input-bg)', borderRadius: 'var(--r-md)',
+              width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 30, background: 'var(--input-bg)', borderRadius: 'var(--r-md)',
               border: '1px solid var(--border)',
             }}>{formIcon}</div>
             <Btn onClick={() => setShowEmoji(true)} style={{ flex: 1 }}>انتخاب از ایموجی‌ها</Btn>
           </div>
         </Field>
       </Modal>
-
       <EmojiPicker open={showEmoji} onClose={() => setShowEmoji(false)} onPick={setFormIcon} />
+    </>
+  );
+
+  if (variant === 'inline') {
+    return (
+      <>
+        {label ? <Field label={label} required={required} error={error}>{trigger}</Field> : trigger}
+        {open && (
+          <div style={{
+            marginTop: 8,
+            background: 'var(--input-bg)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-md)',
+            padding: 10,
+          }}>
+            {renderList()}
+          </div>
+        )}
+        {formModal}
+      </>
+    );
+  }
+
+  return (
+    <>
+      {label ? <Field label={label} required={required} error={error}>{trigger}</Field> : trigger}
+      <Modal open={open} onClose={() => setOpen(false)} title={label || 'انتخاب'}>
+        {renderList()}
+      </Modal>
+      {formModal}
     </>
   );
 }
