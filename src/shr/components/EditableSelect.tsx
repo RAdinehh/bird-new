@@ -22,41 +22,37 @@ interface Props {
   variant?: 'modal' | 'inline';
 }
 
-const ITEM_BASE: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 12,
-  padding: '12px 14px',
-  minHeight: 56,
-  background: 'var(--card-solid)',
-  border: '1px solid var(--border)',
-  borderRadius: 'var(--r-md)',
-  color: 'var(--text)',
-  fontFamily: 'inherit',
-  fontSize: 'var(--fs-base)',
-  fontWeight: 500,
-  textAlign: 'right',
-  cursor: 'pointer',
-  width: '100%',
-  boxSizing: 'border-box',
-  transition: 'background 150ms, border-color 150ms, transform 120ms',
-};
-
 const ICON_BOX: React.CSSProperties = {
-  width: 38,
-  height: 38,
-  borderRadius: 'var(--r-md)',
+  width: 34, height: 34, borderRadius: 10,
   background: 'var(--input-bg)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 20,
-  flexShrink: 0,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  fontSize: 18, flexShrink: 0,
 };
 
 const ICON_BOX_SEL: React.CSSProperties = {
-  ...ICON_BOX,
-  background: 'var(--accent-soft)',
+  ...ICON_BOX, background: 'rgba(255,255,255,.7)',
+};
+
+const ROW: React.CSSProperties = {
+  display: 'flex', alignItems: 'center', gap: 10,
+  padding: '8px 10px',
+  background: 'var(--card-solid)',
+  border: '1px solid var(--border)',
+  borderRadius: 12,
+  color: 'var(--text)',
+  fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 500,
+  textAlign: 'right', cursor: 'pointer',
+  width: '100%', boxSizing: 'border-box',
+  boxShadow: '0 1px 2px rgba(15,23,42,.04)',
+  transition: 'transform 120ms, box-shadow 120ms',
+};
+
+const MINI_BTN: React.CSSProperties = {
+  width: 30, height: 30, borderRadius: 8,
+  background: 'transparent', border: 'none',
+  cursor: 'pointer', fontSize: 14, flexShrink: 0,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  opacity: .55,
 };
 
 export default function EditableSelect({
@@ -79,9 +75,7 @@ export default function EditableSelect({
   ];
   const current = all.find(o => o.value === value);
 
-  const openAdd = () => {
-    setEditId(null); setFormName(''); setFormIcon('🔧'); setFormOpen(true);
-  };
+  const openAdd = () => { setEditId(null); setFormName(''); setFormIcon('🔧'); setFormOpen(true); };
   const openEdit = (id: string) => {
     const c = customs.find(x => x.id === id);
     if (!c) return;
@@ -94,7 +88,8 @@ export default function EditableSelect({
     else if (customKey) addOption(customKey, name, formIcon);
     setFormOpen(false);
   };
-  const removeItem = async (id: string, name: string) => {
+  const removeItem = async (e: React.MouseEvent, id: string, name: string) => {
+    e.stopPropagation();
     const ok = await showConfirmAsync('حذف آیتم', '«' + name + '» حذف شود؟', { danger: true });
     if (ok) removeOption(id);
   };
@@ -121,100 +116,82 @@ export default function EditableSelect({
   );
 
   const renderList = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       {customKey && (
-        <button
-          type="button"
-          onClick={openAdd}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 12,
-            padding: '12px 14px', minHeight: 52,
-            background: 'var(--accent-soft)',
-            border: '1px solid var(--accent-border)',
-            borderRadius: 'var(--r-md)',
-            color: 'var(--accent)', fontWeight: 600,
-            cursor: 'pointer', fontFamily: 'inherit',
-            fontSize: 'var(--fs-base)', textAlign: 'right',
-            width: '100%', boxSizing: 'border-box',
-          }}
-        >
+        <button type="button" onClick={openAdd} style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: '10px 12px', minHeight: 48,
+          background: 'var(--accent-soft)',
+          border: '1px dashed var(--accent-border)',
+          borderRadius: 12,
+          color: 'var(--accent)', fontWeight: 700,
+          cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)',
+          textAlign: 'right', width: '100%', boxSizing: 'border-box',
+        }}>
           <span style={{
-            width: 38, height: 38, borderRadius: 'var(--r-md)',
+            width: 30, height: 30, borderRadius: 9,
             background: 'var(--card-solid)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 20, flexShrink: 0,
-          }}>＋</span>
+            fontSize: 18, flexShrink: 0, fontWeight: 600,
+          }}>+</span>
           <span style={{ flex: 1 }}>افزودن مورد جدید</span>
         </button>
       )}
 
       {options.length > 0 && (
         <div style={{
-          fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)',
-          letterSpacing: '.5px', padding: '8px 4px 0',
+          fontSize: 11, fontWeight: 700, color: 'var(--muted)',
+          letterSpacing: '.6px', padding: '10px 4px 2px',
         }}>پیش‌فرض‌ها</div>
       )}
 
       {options.map(o => {
         const selected = value === o.value;
         return (
-          <button
-            key={o.value}
-            type="button"
+          <button key={o.value} type="button"
             onClick={() => { onChange(o.value); setOpen(false); }}
             style={{
-              ...ITEM_BASE,
+              ...ROW,
               borderColor: selected ? 'var(--accent-border)' : 'var(--border)',
               background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
-            }}
-          >
+            }}>
             <span style={selected ? ICON_BOX_SEL : ICON_BOX}>{o.icon || '•'}</span>
             <span style={{ flex: 1 }}>{o.label}</span>
-            {selected && <span style={{ color: 'var(--accent)', fontSize: 18, fontWeight: 700 }}>✓</span>}
+            {selected && <span style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700 }}>✓</span>}
           </button>
         );
       })}
 
       {customs.length > 0 && (
         <div style={{
-          fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)',
-          letterSpacing: '.5px', padding: '12px 4px 0',
-        }}>سفارشی (قابل ویرایش)</div>
+          fontSize: 11, fontWeight: 700, color: 'var(--muted)',
+          letterSpacing: '.6px', padding: '12px 4px 2px',
+        }}>سفارشی</div>
       )}
 
       {customs.map(c => {
         const selected = value === c.name;
         return (
-          <div key={c.id} style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-          }}>
-            <button
-              type="button"
-              onClick={() => { onChange(c.name); setOpen(false); }}
-              style={{
-                ...ITEM_BASE,
-                flex: 1,
-                borderColor: selected ? 'var(--accent-border)' : 'var(--border)',
-                background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
-              }}
-            >
-              <span style={selected ? ICON_BOX_SEL : ICON_BOX}>{c.icon}</span>
-              <span style={{ flex: 1 }}>{c.name}</span>
-              {selected && <span style={{ color: 'var(--accent)', fontSize: 18, fontWeight: 700 }}>✓</span>}
-            </button>
-            <button type="button" onClick={() => openEdit(c.id)} aria-label="ویرایش" style={{
-              width: 40, height: 40, borderRadius: 'var(--r-md)',
-              background: 'var(--card-solid)', border: '1px solid var(--border)',
-              cursor: 'pointer', fontSize: 15, flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>✏️</button>
-            <button type="button" onClick={() => removeItem(c.id, c.name)} aria-label="حذف" style={{
-              width: 40, height: 40, borderRadius: 'var(--r-md)',
-              background: 'var(--card-solid)', border: '1px solid var(--border)',
-              cursor: 'pointer', fontSize: 15, flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>🗑️</button>
-          </div>
+          <button key={c.id} type="button"
+            onClick={() => { onChange(c.name); setOpen(false); }}
+            style={{
+              ...ROW, position: 'relative',
+              borderColor: selected ? 'var(--accent-border)' : 'var(--border)',
+              background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
+              paddingLeft: 6,
+            }}>
+            <span style={selected ? ICON_BOX_SEL : ICON_BOX}>{c.icon}</span>
+            <span style={{ flex: 1 }}>{c.name}</span>
+            {selected && <span style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700 }}>✓</span>}
+            <span style={{ display: 'flex', gap: 2 }}>
+              <span role="button" aria-label="ویرایش"
+                onClick={(e) => { e.stopPropagation(); openEdit(c.id); }}
+                style={MINI_BTN}>✏️</span>
+              <span role="button" aria-label="حذف"
+                onClick={(e) => removeItem(e, c.id, c.name)}
+                style={MINI_BTN}>🗑️</span>
+            </span>
+          </button>
         );
       })}
     </div>
@@ -257,14 +234,9 @@ export default function EditableSelect({
         {label ? <Field label={label} required={required} error={error}>{trigger}</Field> : trigger}
         {open && (
           <div style={{
-            marginTop: 8,
-            background: 'var(--input-bg)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--r-md)',
-            padding: 10,
-          }}>
-            {renderList()}
-          </div>
+            marginTop: 8, background: 'var(--input-bg)',
+            border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 10,
+          }}>{renderList()}</div>
         )}
         {formModal}
       </>
