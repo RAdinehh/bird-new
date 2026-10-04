@@ -20,8 +20,31 @@ import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
-interface F { id?: string; name: string; code: string; length: string; width: string; height: string; capacity: string; targetTemp: string; targetHumidity: string; ventilation: string; light: string; ventilationSystem: string; feederType: string; drinkerType: string; litterType: string; address: string; builtAt: string; lastSanitizedAt: string; notes: string; breedId: string; }
-const empty: F = { name:'', code:'', length:'', width:'', height:'', capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'', ventilationSystem:'', feederType:'', drinkerType:'', litterType:'', address:'', builtAt:'', lastSanitizedAt:'', notes:'', breedId:'' };
+import type { HallSource } from './helpers';
+import { SourceList } from './helpers';
+
+interface F {
+  id?: string;
+  name: string; code: string;
+  length: string; width: string; height: string;
+  capacity: string; targetTemp: string; targetHumidity: string;
+  ventilation: string; light: string;
+  ventilationSystem: string; feederType: string; drinkerType: string; litterType: string;
+  waterSources: HallSource[];
+  feedSources: HallSource[];
+  ventSources: HallSource[];
+  litterSections: HallSource[];
+  systemNotes: string;
+  address: string; builtAt: string; lastSanitizedAt: string; notes: string; breedId: string;
+}
+const empty: F = {
+  name:'', code:'', length:'', width:'', height:'',
+  capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'',
+  ventilationSystem:'', feederType:'', drinkerType:'', litterType:'',
+  waterSources: [], feedSources: [], ventSources: [], litterSections: [],
+  systemNotes: '',
+  address:'', builtAt:'', lastSanitizedAt:'', notes:'', breedId:'',
+};
 
 function TempFormField({ value, onChange, label, placeholder }: any) {
   const tempUnit = useTempUnit();
@@ -138,13 +161,17 @@ export default function HallsPage() {
          targetHumidity: h.targetHumidity ? toFa(h.targetHumidity) : '',
         
       ventilation: h.ventilation ? toFa(h.ventilation) : '', light: h.light ? toFa(h.light) : '',
-      ventilationSystem: h.ventilationSystem ||
-        'tunnel', feederType: h.feederType ||
-        'chain', drinkerType: h.drinkerType ||
-        'nipple', litterType: h.litterType ||
-        'wood_shavings',
+      ventilationSystem: h.ventilationSystem || '',
+      feederType: h.feederType || '',
+      drinkerType: h.drinkerType || '',
+      litterType: h.litterType || '',
+      waterSources: (h as any).waterSources || [],
+      feedSources: (h as any).feedSources || [],
+      ventSources: (h as any).ventSources || [],
+      litterSections: (h as any).litterSections || [],
+      systemNotes: (h as any).systemNotes || '',
       address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, notes: h.notes,
-        breedId: (h as any).breedId || ''
+      breedId: (h as any).breedId || ''
       });
     setErr(''); setOpen(true);
   };
@@ -197,7 +224,15 @@ export default function HallsPage() {
       capacity: form.capacity ? parseInt(toEn(form.capacity)) || null : null,
       targetTemp: num(form.targetTemp), targetHumidity: num(form.targetHumidity),
       ventilation: num(form.ventilation), light: num(form.light),
-      ventilationSystem: form.ventilationSystem, feederType: form.feederType, drinkerType: form.drinkerType, litterType: form.litterType,
+      ventilationSystem: form.ventilationSystem || '',
+      feederType: form.feederType || '',
+      drinkerType: form.drinkerType || '',
+      litterType: form.litterType || '',
+      waterSources: form.waterSources,
+      feedSources: form.feedSources,
+      ventSources: form.ventSources,
+      litterSections: form.litterSections,
+      systemNotes: form.systemNotes,
       address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), notes: form.notes.trim(),
       breedId: form.breedId || undefined,
     };
