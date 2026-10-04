@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import {
   useFlk, type Flock, type FlockType, type FlockStatus,
@@ -175,6 +175,8 @@ export default function FlocksPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const longPressTimerRef = useRef<number | null>(null);
+  const longPressFiredRef = useRef<boolean>(false);
   const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'archived'], tab, (id) => setTab(id as TabId));
 
   // فیلتر تکرارها تو render
@@ -217,6 +219,26 @@ export default function FlocksPage() {
       else next.add(id);
       return next;
     });
+  };
+
+  const startLongPress = (id: string) => {
+    if (selectionMode) return;
+    longPressFiredRef.current = false;
+    if (longPressTimerRef.current) window.clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = window.setTimeout(() => {
+      longPressFiredRef.current = true;
+      setSelectionMode(true);
+      setSelectedIds(new Set([id]));
+      try { (navigator as any).vibrate?.(30); } catch {}
+      longPressTimerRef.current = null;
+    }, 500);
+  };
+
+  const cancelLongPress = () => {
+    if (longPressTimerRef.current) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
   };
   const exitSelection = () => {
     setSelectionMode(false);
@@ -598,13 +620,9 @@ export default function FlocksPage() {
           <input value={q} onChange={e => setQ(e.target.value)} placeholder="جستجوی نام، پرنده، نژاد..." style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)', minWidth: 0 }} />
         </div>
 
-        {list.length > 1 && !selectionMode && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <button type="button" onClick={() => setSelectionMode(true)}
-              aria-label="انتخاب چندتایی"
-              style={{ padding: '4px 8px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
-              ☐ انتخاب
-            </button>
+        {!selectionMode && list.length > 1 && (
+          <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+            💡 برای انتخاب چندتایی، روی یک کارت نگه دارید
           </div>
         )}
 
@@ -643,7 +661,13 @@ export default function FlocksPage() {
 
               const isSelected = selectedIds.has(f.id);
               return (
-                <div key={f.id} style={{ position: 'relative' }}>
+                <div key={f.id} style={{ position: 'relative' }}
+                  onPointerDown={() => startLongPress(f.id)}
+                  onPointerUp={cancelLongPress}
+                  onPointerLeave={cancelLongPress}
+                  onPointerCancel={cancelLongPress}
+                  onContextMenu={(e) => e.preventDefault()}
+                >
                   {selectionMode && (
                     <div
                       role="checkbox"
@@ -681,6 +705,7 @@ export default function FlocksPage() {
                   subtitle={`${bird?.name || '—'}${breed ? ` · ${breed.name}` : ''}${hall ? ` · ${hall.name}` : ''}`}
                   isOpen={isOpen}
                   onToggle={() => {
+                    if (longPressFiredRef.current) { longPressFiredRef.current = false; return; }
                     if (selectionMode) { toggleSelect(f.id); return; }
                     setExpandedId(isOpen ? null : f.id);
                   }}
