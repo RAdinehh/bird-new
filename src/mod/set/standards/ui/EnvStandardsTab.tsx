@@ -92,7 +92,7 @@ export default function EnvStandardsTab() {
   const resetStandard = useSet(state => state.resetStandard);
 
   const { flocks } = useFlk();
-  const { birds: brdBirds } = useBrd();
+  const { birds: brdBirds, breeds: brdBreeds } = useBrd();
 
   const [selectedBird, setSelectedBird] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -101,22 +101,51 @@ export default function EnvStandardsTab() {
   const grouped = getStandardsGroupedByBird(custom);
 
   const activeBirdNames = new Set<string>();
+  // ۱. از گله‌های فعال
   (flocks || [])
     .filter((f: any) => f.status === 'active')
     .forEach((f: any) => {
       const brd = (brdBirds || []).find((b: any) => b.id === f.birdId);
       if (brd?.name) activeBirdNames.add(brd.name.trim());
     });
+  // ۲. از پرنده‌های تعریف‌شده در brd
+  (brdBirds || []).forEach((b: any) => {
+    if (b?.name) activeBirdNames.add(b.name.trim());
+  });
 
   const customBirdNames = new Set<string>();
   Object.values(custom).forEach((std: any) => {
     if (std.birdName) customBirdNames.add(std.birdName);
   });
+  // نژادهای brd — اگه standardKey دارن، پرنده‌ی مربوطه رو هم اضافه کن
+  const brdBirdIdsWithBreed = new Set<string>();
+  (brdBreeds || []).forEach((b: any) => {
+    if (b.standardKey) brdBirdIdsWithBreed.add(b.birdId);
+  });
+  // اضافه کردن نام پرنده‌ها که نژاد استاندارد دارن
+  (brdBirds || []).forEach((b: any) => {
+    if (brdBirdIdsWithBreed.has(b.id) && b.name) {
+      customBirdNames.add(b.name.trim());
+    }
+  });
+
+  // نژادهایی که کاربر در بخش «پرنده‌ها و نژادها» انتخاب کرده (standardKey)
+  const selectedBreedKeys = new Set<string>();
+  (brdBreeds || []).forEach((b: any) => {
+    if (b.standardKey) selectedBreedKeys.add(b.standardKey);
+  });
 
   const visibleGroups = onlyActive
-    ? Object.entries(grouped).filter(([birdName]) =>
-        activeBirdNames.has(birdName) || customBirdNames.has(birdName)
-      )
+    ? Object.entries(grouped)
+        .filter(([birdName]) => activeBirdNames.has(birdName) || customBirdNames.has(birdName))
+        .map(([birdName, breeds]) => {
+          // اگه کاربر نژادی رو در brd انتخاب کرده، فقط همون‌ها رو نشون بده
+          if (selectedBreedKeys.size > 0) {
+            const filtered = breeds.filter((std: any) => selectedBreedKeys.has(std.key));
+            return [birdName, filtered.length > 0 ? filtered : breeds] as [string, any[]];
+          }
+          return [birdName, breeds] as [string, any[]];
+        })
     : Object.entries(grouped);
 
   const handleAddBreed = (
