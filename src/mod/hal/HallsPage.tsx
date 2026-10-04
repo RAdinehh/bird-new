@@ -159,10 +159,6 @@ export default function HallsPage() {
       feederType: h.feederType || '',
       drinkerType: h.drinkerType || '',
       litterType: h.litterType || '',
-      feedSources: (h as any).feedSources || [],
-      ventSources: (h as any).ventSources || [],
-      litterSections: (h as any).litterSections || [],
-      systemNotes: (h as any).systemNotes || '',
       address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, notes: h.notes,
       breedId: (h as any).breedId || ''
       });
