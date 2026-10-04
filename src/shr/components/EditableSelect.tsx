@@ -21,15 +21,79 @@ interface Props {
   error?: string;
 }
 
+const ROW: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+  padding: '12px 14px',
+  minHeight: 54,
+  background: 'var(--card-solid)',
+  border: '1.5px solid var(--border)',
+  borderRadius: 14,
+  color: 'var(--text)',
+  fontFamily: 'inherit',
+  fontSize: 'var(--fs-base)',
+  fontWeight: 500,
+  textAlign: 'right',
+  cursor: 'pointer',
+  width: '100%',
+  boxSizing: 'border-box',
+  transition: 'transform 120ms, box-shadow 180ms, border-color 180ms',
+  boxShadow: '0 1px 2px rgba(15,23,42,.04), 0 2px 6px rgba(15,23,42,.03)',
+};
+
+const ICON: React.CSSProperties = {
+  width: 40,
+  height: 40,
+  borderRadius: 11,
+  background: 'var(--input-bg)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 20,
+  flexShrink: 0,
+};
+
+const CHECK: React.CSSProperties = {
+  width: 24,
+  height: 24,
+  borderRadius: '50%',
+  background: 'var(--accent)',
+  color: '#fff',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 14,
+  fontWeight: 700,
+  flexShrink: 0,
+};
+
+const MINI: React.CSSProperties = {
+  width: 30,
+  height: 30,
+  borderRadius: 8,
+  background: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  fontSize: 13,
+  padding: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  opacity: .55,
+  flexShrink: 0,
+};
+
 export default function EditableSelect({
   label, value, onChange, options, customKey, placeholder, required, error,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
+  const [view, setView] = useState<'list' | 'form'>('list');
   const [editId, setEditId] = useState<string | null>(null);
   const [formName, setFormName] = useState('');
   const [formIcon, setFormIcon] = useState('🔧');
-  const [showEmoji, setShowEmoji] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const [highlight, setHighlight] = useState<string | null>(null);
 
   const { getByKey, addOption, updateOption, removeOption } = useCustomOptions();
   const customs = customKey ? getByKey(customKey) : [];
@@ -40,22 +104,27 @@ export default function EditableSelect({
   ];
   const current = all.find(o => o.value === value);
 
-  const openAdd = () => {
-    setEditId(null); setFormName(''); setFormIcon('🔧'); setFormOpen(true);
-  };
+  const resetForm = () => { setEditId(null); setFormName(''); setFormIcon('🔧'); setEmojiOpen(false); };
+  const openAdd = () => { resetForm(); setView('form'); };
   const openEdit = (id: string) => {
     const c = customs.find(x => x.id === id);
     if (!c) return;
-    setEditId(id); setFormName(c.name); setFormIcon(c.icon); setFormOpen(true);
+    setEditId(id); setFormName(c.name); setFormIcon(c.icon); setEmojiOpen(false); setView('form');
   };
+  const backToList = () => { resetForm(); setView('list'); };
+  const closeAll = () => { resetForm(); setView('list'); setOpen(false); };
+
   const saveItem = () => {
     const name = formName.trim();
     if (!name) return;
     if (editId) updateOption(editId, { name, icon: formIcon });
-    else if (customKey) addOption(customKey, name, formIcon);
-    setFormOpen(false);
+    else if (customKey) { addOption(customKey, name, formIcon); setHighlight(name); }
+    resetForm();
+    setView('list');
   };
-  const removeItem = async (id: string, name: string) => {
+
+  const removeItem = async (e: React.MouseEvent, id: string, name: string) => {
+    e.stopPropagation();
     const ok = await showConfirmAsync('حذف آیتم', '«' + name + '» حذف شود؟', { danger: true });
     if (ok) removeOption(id);
   };
@@ -68,89 +137,202 @@ export default function EditableSelect({
         width: '100%', textAlign: 'right', padding: '10px 12px',
         background: 'var(--input-bg)', border: '1px solid var(--border)',
         borderRadius: 'var(--r-sm)', color: current ? 'var(--text)' : 'var(--muted)',
-        fontSize: 'var(--fs-base)', cursor: 'pointer',
+        fontSize: 'var(--fs-base)', cursor: 'pointer', fontFamily: 'inherit',
+        display: 'flex', alignItems: 'center', gap: 8,
       }}
     >
-      {current ? (current.icon ? current.icon + ' ' + current.label : current.label) : (placeholder || '— انتخاب کنید —')}
+      <span style={{ flex: 1, textAlign: 'right' }}>
+        {current ? (current.icon ? current.icon + ' ' + current.label : current.label) : (placeholder || '— انتخاب کنید —')}
+      </span>
     </button>
   );
+
+  const listView = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {options.length > 0 && (
+        <div style={{
+          fontSize: 11, fontWeight: 700, color: 'var(--muted)',
+          letterSpacing: '.6px', padding: '4px 4px 0',
+        }}>پیش‌فرض‌ها</div>
+      )}
+      {options.map(o => {
+        const selected = value === o.value;
+        return (
+          <button key={o.value} type="button"
+            onClick={() => { onChange(o.value); closeAll(); }}
+            style={{
+              ...ROW,
+              borderColor: selected ? 'var(--accent-border)' : 'var(--border)',
+              background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
+              boxShadow: selected
+                ? '0 2px 10px rgba(22,163,74,.15)'
+                : ROW.boxShadow,
+            }}>
+            <span style={ICON}>{o.icon || '•'}</span>
+            <span style={{ flex: 1, fontWeight: 600 }}>{o.label}</span>
+            {selected && <span style={CHECK}>✓</span>}
+          </button>
+        );
+      })}
+
+      {customs.length > 0 && (
+        <div style={{
+          fontSize: 11, fontWeight: 700, color: 'var(--muted)',
+          letterSpacing: '.6px', padding: '10px 4px 0',
+        }}>سفارشی</div>
+      )}
+      {customs.map(c => {
+        const selected = value === c.name;
+        const isHi = highlight === c.name;
+        return (
+          <div key={c.id}
+            role="button"
+            tabIndex={0}
+            onClick={() => { onChange(c.name); closeAll(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(c.name); closeAll(); } }}
+            style={{
+              ...ROW,
+              paddingLeft: 8,
+              borderColor: selected || isHi ? 'var(--accent-border)' : 'var(--border)',
+              background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
+              boxShadow: selected ? '0 2px 10px rgba(22,163,74,.15)' : ROW.boxShadow,
+            }}>
+            <span style={ICON}>{c.icon}</span>
+            <span style={{ flex: 1, fontWeight: 600, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
+            {selected && <span style={CHECK}>✓</span>}
+            <button type="button" aria-label="ویرایش" onClick={(e) => { e.stopPropagation(); openEdit(c.id); }} style={MINI}>✏️</button>
+            <button type="button" aria-label="حذف" onClick={(e) => removeItem(e, c.id, c.name)} style={MINI}>🗑️</button>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const formView = (
+    <div>
+      <Field label="نام">
+        <Input
+          placeholder="مثلاً — آبخوری نیپل استیل"
+          value={formName}
+          onChange={e => setFormName(e.target.value)}
+          autoFocus
+        />
+      </Field>
+      <Field label="آیکن">
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div style={{
+            width: 54, height: 54,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 28, background: 'var(--input-bg)',
+            borderRadius: 14, border: '1px solid var(--border)',
+          }}>{formIcon}</div>
+          <Btn onClick={() => setEmojiOpen(o => !o)} style={{ flex: 1 }}>
+            {emojiOpen ? 'بستن ایموجی‌ها' : 'انتخاب از ایموجی‌ها'}
+          </Btn>
+        </div>
+      </Field>
+      {emojiOpen && (
+        <div style={{
+          marginTop: 4, padding: 10,
+          background: 'var(--input-bg)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-md)',
+        }}>
+          <EmojiPickerInline value={formIcon} onPick={setFormIcon} />
+        </div>
+      )}
+    </div>
+  );
+
+  const headerAction = (customKey && view === 'list') ? (
+    <button
+      type="button"
+      onClick={openAdd}
+      aria-label="افزودن مورد جدید"
+      style={{
+        width: 34, height: 34,
+        borderRadius: 'var(--r-md)',
+        background: 'var(--accent)',
+        border: 'none',
+        color: '#fff',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 20,
+        fontWeight: 400,
+        lineHeight: 1,
+        fontFamily: 'inherit',
+        boxShadow: '0 2px 8px rgba(22,163,74,.28)',
+      }}
+    >+</button>
+  ) : null;
+
+  const modalTitle = view === 'form'
+    ? (editId ? 'ویرایش مورد' : 'افزودن مورد جدید')
+    : (label || 'انتخاب');
+
+  const modalFooter = view === 'form' ? (
+    <div style={{ display: 'flex', gap: 6 }}>
+      <Btn onClick={backToList} style={{ flex: 1 }}>لغو</Btn>
+      <Btn variant="primary" onClick={saveItem} disabled={!formName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
+    </div>
+  ) : undefined;
 
   return (
     <>
       {label ? <Field label={label} required={required} error={error}>{trigger}</Field> : trigger}
-
-      <Modal open={open} onClose={() => setOpen(false)} title={label || 'انتخاب'}>
-        {customKey && (
-          <Btn variant="primary" full onClick={openAdd} style={{ marginBottom: 8 }}>
-            + افزودن مورد جدید
-          </Btn>
-        )}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: '55vh', overflowY: 'auto' }}>
-          {options.map(o => (
-            <button
-              key={o.value}
-              onClick={() => { onChange(o.value); setOpen(false); }}
-              style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '10px 12px', background: 'var(--input-bg)',
-                border: '1px solid ' + (value === o.value ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 'var(--r-sm)', cursor: 'pointer', fontSize: 'var(--fs-base)',
-                color: 'var(--text)', textAlign: 'right',
-              }}
-            >
-              <span>{o.icon ? o.icon + ' ' : ''}{o.label}</span>
-              {value === o.value && <span style={{ color: 'var(--accent)' }}>✓</span>}
-            </button>
-          ))}
-          {customs.map(c => (
-            <div key={c.id} style={{ display: 'flex', gap: 4, alignItems: 'stretch' }}>
-              <button
-                onClick={() => { onChange(c.name); setOpen(false); }}
-                style={{
-                  flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '10px 12px', background: 'var(--input-bg)',
-                  border: '1px solid ' + (value === c.name ? 'var(--accent-border)' : 'var(--border)'),
-                  borderRadius: 'var(--r-sm)', cursor: 'pointer', fontSize: 'var(--fs-base)',
-                  color: 'var(--text)', textAlign: 'right',
-                }}
-              >
-                <span>{c.icon} {c.name}</span>
-                {value === c.name && <span style={{ color: 'var(--accent)' }}>✓</span>}
-              </button>
-              <Btn size="sm" onClick={() => openEdit(c.id)}>✏️</Btn>
-              <Btn size="sm" onClick={() => removeItem(c.id, c.name)}>🗑️</Btn>
-            </div>
-          ))}
-        </div>
-      </Modal>
-
       <Modal
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        title={editId ? 'ویرایش مورد' : 'افزودن مورد جدید'}
-        footer={
-          <div style={{ display: 'flex', gap: 6 }}>
-            <Btn variant="primary" onClick={saveItem} disabled={!formName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
-            <Btn onClick={() => setFormOpen(false)} style={{ flex: 1 }}>لغو</Btn>
-          </div>
-        }
+        open={open}
+        onClose={view === 'form' ? backToList : closeAll}
+        title={modalTitle}
+        footer={modalFooter}
+        headerAction={headerAction}
       >
-        <Field label="نام">
-          <Input placeholder="مثلاً — آبخوری نیپل استیل" value={formName} onChange={e => setFormName(e.target.value)} />
-        </Field>
-        <Field label="آیکن">
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <div style={{
-              width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 26, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
-              border: '1px solid var(--border)',
-            }}>{formIcon}</div>
-            <Btn onClick={() => setShowEmoji(true)} style={{ flex: 1 }}>انتخاب آیکن</Btn>
-          </div>
-        </Field>
+        {view === 'form' ? formView : listView}
       </Modal>
+    </>
+  );
+}
 
-      <EmojiPicker open={showEmoji} onClose={() => setShowEmoji(false)} onPick={setFormIcon} />
+// ─── ایموجی inline ───
+import { EMOJI_GROUPS } from '../data/emojis';
+
+function EmojiPickerInline({ onPick, value }: { onPick: (e: string) => void; value?: string }) {
+  const [tab, setTab] = useState(EMOJI_GROUPS[0].id);
+  const g = EMOJI_GROUPS.find(x => x.id === tab) || EMOJI_GROUPS[0];
+  return (
+    <>
+      <div style={{ display: 'flex', gap: 4, overflowX: 'auto', paddingBottom: 8 }}>
+        {EMOJI_GROUPS.map(x => (
+          <button key={x.id} type="button" onClick={() => setTab(x.id)} title={x.name}
+            style={{
+              padding: '6px 10px', fontSize: 18,
+              borderRadius: 'var(--r-sm)',
+              border: '1px solid ' + (tab === x.id ? 'var(--accent-border)' : 'var(--border)'),
+              background: tab === x.id ? 'var(--accent-soft)' : 'transparent',
+              cursor: 'pointer', flexShrink: 0,
+            }}>
+            {x.icon}
+          </button>
+        ))}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(42px, 1fr))', gap: 4 }}>
+        {g.emojis.map(em => {
+          const sel = value === em;
+          return (
+            <button key={em} type="button" onClick={() => onPick(em)}
+              style={{
+                padding: 8, fontSize: 22, lineHeight: 1,
+                background: sel ? 'var(--accent-soft)' : 'var(--card-solid)',
+                border: '1px solid ' + (sel ? 'var(--accent-border)' : 'var(--border)'),
+                borderRadius: 'var(--r-sm)', cursor: 'pointer',
+              }}>
+              {em}
+            </button>
+          );
+        })}
+      </div>
     </>
   );
 }

@@ -466,6 +466,7 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg';
   preventClose?: boolean;
   contentGap?: number;
+  headerAction?: React.ReactNode;
 }
 
 const MODAL_SIZES: Record<'sm' | 'md' | 'lg', number> = {
@@ -476,7 +477,7 @@ const MODAL_SIZES: Record<'sm' | 'md' | 'lg', number> = {
 
 export function Modal({
   open, onClose, title, children, footer,
-  size = 'md', preventClose = false, contentGap,
+  size = 'md', preventClose = false, contentGap, headerAction,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
@@ -746,6 +747,7 @@ export function Modal({
           >
             {title}
           </div>
+          {headerAction}
           <button
             type="button"
             onClick={onClose}
