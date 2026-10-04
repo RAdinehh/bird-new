@@ -41,7 +41,7 @@ const ROW: React.CSSProperties = {
   fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 500,
   textAlign: 'right', cursor: 'pointer',
   width: '100%', boxSizing: 'border-box',
-  boxShadow: '0 1px 2px rgba(15,23,42,.05), 0 2px 8px rgba(15,23,42,.04)',
+  boxShadow: '0 1px 2px rgba(15,23,42,.06), 0 4px 12px rgba(15,23,42,.06)',
 };
 
 export default function EditableSelect({
@@ -170,34 +170,40 @@ export default function EditableSelect({
         const selected = value === c.name;
         const isHi = highlight === c.name;
         return (
-          <button key={c.id} type="button"
+          <div key={c.id}
+            role="button"
+            tabIndex={0}
             onClick={() => { onChange(c.name); closeAll(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(c.name); closeAll(); } }}
             style={{
-              ...ROW, position: 'relative',
+              ...ROW, paddingLeft: 4,
               borderColor: selected || isHi ? 'var(--accent-border)' : 'var(--border)',
               background: selected ? 'var(--accent-soft)' : 'var(--card-solid)',
-              paddingLeft: 6,
             }}>
             <span style={selected ? ICON_BOX_SEL : ICON_BOX}>{c.icon}</span>
-            <span style={{ flex: 1 }}>{c.name}</span>
+            <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
             {selected && <span style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 700 }}>✓</span>}
-            <span style={{ display: 'flex', gap: 2 }}>
-              <span role="button" aria-label="ویرایش"
+            <span style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+              <button type="button" aria-label="ویرایش"
                 onClick={(e) => { e.stopPropagation(); openEdit(c.id); }}
                 style={{
-                  width: 30, height: 30, borderRadius: 8,
+                  width: 32, height: 32, borderRadius: 8,
+                  background: 'transparent', border: 'none',
                   cursor: 'pointer', fontSize: 14, display: 'flex',
-                  alignItems: 'center', justifyContent: 'center', opacity: .55,
-                }}>✏️</span>
-              <span role="button" aria-label="حذف"
+                  alignItems: 'center', justifyContent: 'center', opacity: .6,
+                  padding: 0,
+                }}>✏️</button>
+              <button type="button" aria-label="حذف"
                 onClick={(e) => removeItem(e, c.id, c.name)}
                 style={{
-                  width: 30, height: 30, borderRadius: 8,
+                  width: 32, height: 32, borderRadius: 8,
+                  background: 'transparent', border: 'none',
                   cursor: 'pointer', fontSize: 14, display: 'flex',
-                  alignItems: 'center', justifyContent: 'center', opacity: .55,
-                }}>🗑️</span>
+                  alignItems: 'center', justifyContent: 'center', opacity: .6,
+                  padding: 0,
+                }}>🗑️</button>
             </span>
-          </button>
+          </div>
         );
       })}
     </div>
