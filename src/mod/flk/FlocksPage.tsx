@@ -547,14 +547,19 @@ export default function FlocksPage() {
                   onToggle={() => setExpandedId(isOpen ? null : f.id)}
                   badge={<>
                     <Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>
-                    {f.sourceInvoiceId && <Tag tone="blue">🛒 از فاکتور</Tag>}
+                    {f.sourceInvoiceId && <Tag tone="blue">🛒 فاکتور</Tag>}
+                    {!f.hallId && <Tag tone="amber">🏠 بدون سالن</Tag>}
+                    {ready && !isArchived && (f.type === 'layer' || f.type === 'breeder') && <Tag tone="green">✅ آماده</Tag>}
                   </>}
                   stats={<>
                     {ageDays > 0 && <span>🎂 <b style={{ color: 'var(--text)' }}>{fmt.int(ageDays)} روز</b></span>}
                     {f.currentCount && <span>🐔 <b style={{ color: 'var(--text)' }}>{fmt.int(f.currentCount)}</b></span>}
-                    {!isArchived && <span style={{ color: lc.color }}>{lc.label}</span>}
                     {f.initialCount && f.currentCount && f.initialCount !== f.currentCount && (
                       <span style={{ color: 'var(--danger)' }}>💀 <b>{fmt.int(f.initialCount - f.currentCount)}</b></span>
+                    )}
+                    {costs.perBird > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{fmt.money(Math.round(costs.perBird))}</b></span>}
+                    {!ready && !isArchived && untilLay > 0 && (
+                      <span style={{ color: 'var(--warn)' }}>⏳ <b>{fmt.int(untilLay)} روز</b></span>
                     )}
                   </>}
                 >
