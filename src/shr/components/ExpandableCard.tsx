@@ -32,7 +32,7 @@ const COLORS: Record<AccentKey, { c: string; s: string }> = {
 };
 
 export default function ExpandableCard({
-  accent = 'accent', index, iconEmoji = '📋', compact = false,
+  accent = 'accent', index, icon, iconEmoji = '📋', compact = false,
   title, subtitle, badge, summary, stats, isOpen, onToggle, children,
 }: Props) {
   const lowPower = useSet((st: any) => st.lowPowerMode);
