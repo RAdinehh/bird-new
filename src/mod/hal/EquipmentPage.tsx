@@ -2,6 +2,8 @@
  * EquipmentPage — تجهیزات
  */
 import { useState } from 'react';
+import { useValidation } from '../../shr/validation/useValidation';
+import { EquipmentSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Equipment, EQUIP_LABELS, EQUIP_CAPACITY_UNIT, EQUIP_EFFICIENCY_UNIT } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -162,6 +164,25 @@ export default function EquipmentPage() {
        efficiency: (e as any).efficiency ? toFa((e as any).efficiency) : '' });
     setErr(''); setOpen(true);
   };
+
+  // ═══ اعتبارسنجی زنده ═══
+  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
+  const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
+  const { errors: vErrors } = useValidation(
+    EquipmentSchema,
+    {
+      hallId: form.hallId || '',
+      type: form.type || '',
+      name: form.name || '',
+      count: int(form.count),
+      unitPrice: num(form.unitPrice),
+      purchasedAt: form.purchasedAt || '',
+      warranty: num(form.warranty),
+      capacity: num(form.capacity),
+      efficiency: num(form.efficiency),
+      notes: form.notes || '',
+    },
+  );
 
   const save = async () => {
 
@@ -359,7 +380,7 @@ export default function EquipmentPage() {
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
-        footer={<div style={{ display: "flex", gap: 6 }}><Btn variant="primary" onClick={save} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
+        footer={<div style={{ display: "flex", gap: 6 }}><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
         <Grid2>
           <Field label="نوع" required>
             <Select value={form.type} onChange={e => setForm({...form, type: e.target.value})}>

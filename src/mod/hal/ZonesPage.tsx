@@ -2,6 +2,8 @@
  * ZonesPage — بخش‌های سالن
  */
 import { useState, useMemo } from 'react';
+import { useValidation } from '../../shr/validation/useValidation';
+import { ZoneSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Zone } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -78,6 +80,18 @@ export default function ZonesPage() {
   const openNew = () => { setForm({ id:'', hallId: halls[0].id, name:'', capacity:'', notes:'' }); setErr(''); setOpen(true); };
   const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId,
      name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setOpen(true); };
+
+  // ═══ اعتبارسنجی زنده ═══
+  const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
+  const { errors: vErrors } = useValidation(
+    ZoneSchema,
+    {
+      hallId: form.hallId || '',
+      name: form.name || '',
+      capacity: int(form.capacity),
+      notes: form.notes || '',
+    },
+  );
 
   const save = async () => {
 
@@ -182,7 +196,7 @@ export default function ZonesPage() {
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش بخش' : 'افزودن بخش'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="سالن" required>
 <SmartSelect
               value={form.hallId}

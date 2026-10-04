@@ -2,6 +2,8 @@
  * HallsPage — سالن‌ها
  */
 import { useState, useMemo } from 'react';
+import { useValidation } from '../../shr/validation/useValidation';
+import { createHallSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS, EQUIP_LABELS } from './store';
 import { useBrd } from '../brd/store';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
@@ -147,6 +149,33 @@ export default function HallsPage() {
     setErr(''); setOpen(true);
   };
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
+
+  // ═══ اعتبارسنجی زنده ═══
+  const { errors: vErrors } = useValidation(
+    createHallSchema(),
+    {
+      name: form.name || '',
+      code: form.code || '',
+      length: num(form.length),
+      width: num(form.width),
+      height: num(form.height),
+      capacity: num(form.capacity),
+      targetTemp: num(form.targetTemp),
+      targetHumidity: num(form.targetHumidity),
+      ventilation: num(form.ventilation),
+      light: num(form.light),
+      ventilationSystem: form.ventilationSystem || '',
+      feederType: form.feederType || '',
+      drinkerType: form.drinkerType || '',
+      litterType: form.litterType || '',
+      address: form.address || '',
+      builtAt: form.builtAt || '',
+      lastSanitizedAt: form.lastSanitizedAt || '',
+      notes: form.notes || '',
+      birdId: '',
+      breedId: form.breedId || '',
+    },
+  );
   const save = () => {
     // 🔒 جلوگیری قاطع از نام تکراری سالن
     if (!form.id) {
@@ -324,7 +353,7 @@ export default function HallsPage() {
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="نام سالن" required><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
         <Grid2>
             <Field label="نژاد پرنده">
