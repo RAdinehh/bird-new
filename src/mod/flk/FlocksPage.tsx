@@ -674,17 +674,17 @@ export default function FlocksPage() {
                       aria-checked={isSelected}
                       onClick={(e) => { e.stopPropagation(); toggleSelect(f.id); }}
                       style={{
-                        position: 'absolute', top: 8, right: 8, zIndex: 10,
-                        width: 16, height: 16, borderRadius: '50%',
-                        background: isSelected ? '#3b82f6' : 'transparent',
-                        border: '1.5px solid ' + (isSelected ? '#3b82f6' : 'var(--border)'),
+                        position: 'absolute', top: 10, right: 10, zIndex: 10,
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: isSelected ? '#3b82f6' : 'rgba(255,255,255,0.95)',
+                        border: '2px solid ' + (isSelected ? '#3b82f6' : 'var(--border)'),
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', transition: 'all 120ms ease',
-                        boxShadow: isSelected ? 'none' : '0 1px 3px rgba(0,0,0,0.08)',
+                        cursor: 'pointer', transition: 'all 150ms cubic-bezier(.4,0,.2,1)',
+                        boxShadow: isSelected ? '0 2px 6px rgba(59,130,246,0.35)' : '0 1px 3px rgba(0,0,0,0.12)',
                       }}
                     >
                       {isSelected && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
                       )}
@@ -693,7 +693,7 @@ export default function FlocksPage() {
                   {selectionMode && isSelected && (
                     <div style={{
                       position: 'absolute', inset: 0, zIndex: 5,
-                      background: 'rgba(59,130,246,0.08)',
+                      background: 'rgba(59,130,246,0.12)',
                       borderRadius: 'var(--r-lg)',
                       pointerEvents: 'none',
                     }} />
@@ -857,28 +857,28 @@ export default function FlocksPage() {
             position: 'fixed', bottom: 96, left: '50%', transform: 'translateX(-50%)',
             zIndex: 100, maxWidth: 460, width: 'calc(100% - 20px)',
             background: 'var(--card-solid)',
-            border: '1px solid rgba(59,130,246,0.35)',
-            borderRadius: 20,
-            boxShadow: '0 12px 36px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            padding: '12px 14px',
-            display: 'flex', alignItems: 'center', gap: 6,
-            minHeight: 60,
+            border: '1px solid rgba(59,130,246,0.4)',
+            borderRadius: 22,
+            boxShadow: '0 16px 44px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.1)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            padding: '14px 16px',
+            display: 'flex', alignItems: 'center', gap: 8,
+            minHeight: 72,
           }}>
-            <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: '#3b82f6', minWidth: 34, paddingLeft: 4 }}>
+            <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: '#3b82f6', minWidth: 32, paddingLeft: 2 }}>
               {toFa(selectedIds.size)}
             </span>
             <button type="button" onClick={exitSelection}
-              style={{ flex: 1, padding: '9px 12px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+              style={{ flex: 1, padding: '12px 14px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 14, color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, minHeight: 44 }}>
               لغو
             </button>
             <button type="button" onClick={doBulkArchive}
-              style={{ flex: 1, padding: '9px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+              style={{ flex: 1, padding: '12px 14px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 14, color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, minHeight: 44 }}>
               📦 آرشیو
             </button>
             <button type="button" onClick={doBulkDelete}
-              style={{ flex: 1, padding: '9px 12px', background: 'var(--danger-soft, rgba(220,38,38,0.1))', border: '1px solid var(--danger)', borderRadius: 12, color: 'var(--danger)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+              style={{ flex: 1, padding: '12px 14px', background: 'var(--danger-soft, rgba(220,38,38,0.1))', border: '1px solid var(--danger)', borderRadius: 14, color: 'var(--danger)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, minHeight: 44 }}>
               🗑 حذف
             </button>
           </div>
