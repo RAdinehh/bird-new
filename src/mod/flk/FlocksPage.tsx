@@ -674,16 +674,17 @@ export default function FlocksPage() {
                       aria-checked={isSelected}
                       onClick={(e) => { e.stopPropagation(); toggleSelect(f.id); }}
                       style={{
-                        position: 'absolute', top: 10, right: 10, zIndex: 10,
-                        width: 20, height: 20, borderRadius: 5,
-                        background: isSelected ? 'var(--accent)' : 'var(--card)',
-                        border: '2px solid ' + (isSelected ? 'var(--accent)' : 'var(--border)'),
+                        position: 'absolute', top: 8, right: 8, zIndex: 10,
+                        width: 16, height: 16, borderRadius: '50%',
+                        background: isSelected ? 'var(--accent)' : 'transparent',
+                        border: '1.5px solid ' + (isSelected ? 'var(--accent)' : 'var(--border)'),
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', transition: 'all 150ms ease',
+                        cursor: 'pointer', transition: 'all 120ms ease',
+                        boxShadow: isSelected ? 'none' : '0 1px 3px rgba(0,0,0,0.08)',
                       }}
                     >
                       {isSelected && (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
                       )}
@@ -692,8 +693,10 @@ export default function FlocksPage() {
                   {selectionMode && isSelected && (
                     <div style={{
                       position: 'absolute', inset: 0, zIndex: 5,
-                      border: '2px solid var(--accent)', borderRadius: 'var(--r-lg)',
+                      background: 'var(--accent-soft)',
+                      borderRadius: 'var(--r-lg)',
                       pointerEvents: 'none',
+                      opacity: 0.5,
                     }} />
                   )}
                 <ExpandableCard
@@ -852,24 +855,32 @@ export default function FlocksPage() {
         {/* نوار شناور Multi-Select */}
         {selectionMode && selectedIds.size > 0 && (
           <div style={{
-            position: 'fixed', bottom: 90, left: '50%', transform: 'translateX(-50%)',
-            zIndex: 100, maxWidth: 460, width: 'calc(100% - 24px)',
-            background: 'var(--card-solid)', border: '1px solid var(--accent-border)',
-            borderRadius: 'var(--r-lg)', boxShadow: '0 6px 24px rgba(0,0,0,0.18)',
-            padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 6,
+            position: 'fixed', bottom: 86, left: '50%', transform: 'translateX(-50%)',
+            zIndex: 100, maxWidth: 440, width: 'calc(100% - 32px)',
+            background: 'var(--card-solid)',
+            border: '1px solid var(--border)',
+            borderRadius: 16,
+            boxShadow: '0 8px 28px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.08)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 6,
           }}>
-            <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
-              {toFa(selectedIds.size)} انتخاب
+            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)', paddingRight: 4 }}>
+              {toFa(selectedIds.size)}
             </span>
-            <Btn size="sm" variant="danger" onClick={doBulkDelete} style={{ flex: 1 }}>
-              🗑 حذف
-            </Btn>
-            <Btn size="sm" onClick={doBulkArchive} style={{ flex: 1 }}>
+            <div style={{ flex: 1 }} />
+            <button type="button" onClick={doBulkArchive}
+              style={{ padding: '6px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               📦 آرشیو
-            </Btn>
-            <Btn size="sm" onClick={exitSelection} style={{ flex: 1 }}>
+            </button>
+            <button type="button" onClick={doBulkDelete}
+              style={{ padding: '6px 12px', background: 'var(--danger-soft, rgba(220,38,38,0.1))', border: '1px solid var(--danger)', borderRadius: 10, color: 'var(--danger)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              🗑 حذف
+            </button>
+            <button type="button" onClick={exitSelection}
+              style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer' }}>
               لغو
-            </Btn>
+            </button>
           </div>
         )}
 
