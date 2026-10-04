@@ -242,6 +242,47 @@ export default function HallsPage() {
             const hallEquips = equipment.filter(e => e.hallId === h.id);
             const totalAirflow = hallEquips.filter(e => e.type === 'fan' || e.type === 'cooler').reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
             const totalLightW = hallEquips.filter(e => e.type === 'lamp').reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
+
+            // ─── محاسبات هوشمند ───
+            // ۱. تعویض هوا (m³/h ÷ m³ = بار در ساعت)
+            const airChanges = volume > 0 && totalAirflow > 0 ? totalAirflow / volume : 0;
+            const airStatus: 'good' | 'low' | 'none' = airChanges === 0 ? 'none' : airChanges >= 15 ? 'good' : 'low';
+            const airAdvice = airChanges === 0
+              ? 'فنی ثبت نشده'
+              : airChanges >= 30 ? 'تهویه قوی — مناسب تابستان'
+              : airChanges >= 15 ? 'تهویه مناسب'
+              : airChanges >= 8 ? 'تهویه ضعیف — احتمال گرمی'
+              : 'تهویه بسیار ضعیف — خطر';
+
+            // ۲. روشنایی (lux = lumen ÷ مساحت)
+            const lampEfficiency = 100; // lm/W پیش‌فرض
+            const totalLumens = totalLightW * lampEfficiency;
+            const lux = area > 0 && totalLumens > 0 ? totalLumens / area : 0;
+            const lightStatus: 'good' | 'low' | 'none' = lux === 0 ? 'none' : lux >= 20 ? 'good' : lux >= 10 ? 'low' : 'low';
+            const lightAdvice = lux === 0
+              ? 'لامپی ثبت نشده'
+              : lux >= 30 ? 'روشنایی قوی'
+              : lux >= 20 ? 'مناسب تخم‌گذار'
+              : lux >= 10 ? 'مناسب پرورش'
+              : 'روشنایی کم — احتمال افت تولید';
+
+            // ۳. ظرفیت واقعی از ابعاد
+            const realCapacity = area > 0 && h.breedId
+              ? Math.floor(area * 9)  // ۹ پرنده/m² پیش‌فرض تخم‌گذار
+              : null;
+
+            // ۴. بستر
+            const litterNeed = area > 0 && h.litterType && h.litterType !== 'none'
+              ? (() => {
+                  const perM2: Record<string, number> = {
+                    wood_shavings: 8,
+                    straw: 6,
+                    sand: 25,
+                    net: 0,
+                  };
+                  return area * (perM2[h.litterType] || 0);
+                })()
+              : 0;
             const hallFlocks = (flocks || []).filter((f: any) => f.hallId === h.id && f.status === 'active');
             const totalBirds = hallFlocks.reduce((sum: number, f: any) => sum + (f.currentCount || f.initialCount || 0), 0);
             const isOpen = expandedId === h.id;
@@ -287,8 +328,30 @@ export default function HallsPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
                   <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
-                  <Row l="تهویه خودکار" v={totalAirflow > 0 ? `${fmt.num(totalAirflow)} m³/h` : '— تجهیز ثبت نشده'} />
-                  <Row l="روشنایی نصب‌شده" v={totalLightW > 0 ? `${fmt.num(totalLightW)} W` : '— تجهیز ثبت نشده'} />
+                  {totalAirflow > 0 ? (
+                    <Row
+                      l="تهویه"
+                      v={`${fmt.num(totalAirflow)} m³/h · ${fmt.num(Math.round(airChanges))} بار/ساعت — ${airAdvice}`}
+                      accent={airStatus === 'good'}
+                    />
+                  ) : (
+                    <Row l="تهویه" v="— تجهیز فن ثبت نشده" />
+                  )}
+                  {totalLightW > 0 ? (
+                    <Row
+                      l="روشنایی"
+                      v={`${fmt.num(totalLightW)} W · ~${fmt.num(Math.round(lux))} لوکس — ${lightAdvice}`}
+                      accent={lightStatus === 'good'}
+                    />
+                  ) : (
+                    <Row l="روشنایی" v="— لامپ ثبت نشده" />
+                  )}
+                  {litterNeed > 0 && (
+                    <Row l="بستر موردنیاز" v={`~${fmt.num(Math.round(litterNeed))} کیلو (${LITTER_LABELS[h.litterType] || h.litterType})`} />
+                  )}
+                  {realCapacity && !h.capacity && (
+                    <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)} پرنده (از مساحت)`} accent />
+                  )}
                   {hallEquips.length > 0 && (
                     <Row
                       l="تجهیزات نصب‌شده"
