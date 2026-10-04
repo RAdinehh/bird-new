@@ -649,6 +649,12 @@ export function Modal({
   }, []);
 
   // تشخیص prefers-reduced-motion
+  const [isDesktop, setIsDesktop] = React.useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth >= 640);
+  React.useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 640);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
   const [prefersReduced, setPrefersReduced] = React.useState(false);
   useEffect(() => {
     try {
@@ -678,10 +684,13 @@ export function Modal({
         position: 'fixed',
         inset: 0,
         background: 'var(--overlay)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
         zIndex: 100 + (window.__modalDepth || 0),
         display: 'flex',
-        alignItems: 'flex-end',
+        alignItems: isDesktop ? 'center' : 'flex-end',
         justifyContent: 'center',
+        padding: isDesktop ? 20 : 0,
       }}
     >
       <div
@@ -694,11 +703,13 @@ export function Modal({
           background: 'var(--card-solid)',
           borderTopLeftRadius: isFull ? 0 : 'var(--r-2xl)',
           borderTopRightRadius: isFull ? 0 : 'var(--r-2xl)',
+          borderBottomLeftRadius: isDesktop && !isFull ? 'var(--r-2xl)' : 0,
+          borderBottomRightRadius: isDesktop && !isFull ? 'var(--r-2xl)' : 0,
           boxSizing: 'border-box',
           paddingTop: 'env(safe-area-inset-top, 0px)',
           width: '100%',
           maxWidth,
-          maxHeight: isFull ? '100%' : '85vh',
+          maxHeight: isFull ? '100%' : (isDesktop ? '80vh' : '85vh'),
           height: isFull ? '100%' : undefined,
           display: 'flex',
           flexDirection: 'column',
@@ -713,8 +724,8 @@ export function Modal({
           onTouchEnd={onDragEnd}
           onTouchCancel={onDragEnd}
           style={{
-            padding: '14px 0 10px',
-            display: 'flex',
+            padding: isDesktop ? 0 : '14px 0 10px',
+            display: isDesktop ? 'none' : 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             cursor: 'grab',
