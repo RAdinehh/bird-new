@@ -1,7 +1,7 @@
 /**
  * HallsPage — سالن‌ها
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createHallSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Hall } from './store';
@@ -10,6 +10,9 @@ import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk, getAgeDays } from '../flk/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import HelpBanner from '../../shr/components/HelpBanner';
 import { isFanLike, isLampLike, LITTER_KG_PER_M2 } from './helpers';
 import { HallEquipSection } from './HallEquipSection';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -172,6 +175,54 @@ export default function HallsPage() {
     });
   }, [_hallsRaw]);
 
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: halls,
+    getId: (h: any) => h.id,
+    onDelete: async (ids: string[]) => {
+      let totalZones = 0;
+      let totalEquip = 0;
+      let hasFlocks = 0;
+      for (const id of ids) {
+        totalZones += zones.filter(z => z.hallId === id).length;
+        totalEquip += equipment.filter(e => e.hallId === id).length;
+        try {
+          const flk = JSON.parse(localStorage.getItem('pm-flk') || '{}');
+          const flocks = flk.state?.flocks || flk.flocks || [];
+          if (flocks.some((f: any) => f.hallId === id && f.status === 'active')) hasFlocks++;
+        } catch { /* silent */ }
+      }
+      let msg = toFa(ids.length) + ' سالن حذف شوند؟';
+      if (totalZones > 0 || totalEquip > 0) {
+        msg += '\n\n';
+        if (totalZones > 0) msg += '• ' + toFa(totalZones) + ' بخش\n';
+        if (totalEquip > 0) msg += '• ' + toFa(totalEquip) + ' تجهیز\n';
+        msg += 'هم حذف می‌شوند.';
+      }
+      if (hasFlocks > 0) {
+        msg += '\n\n⚠️ ' + toFa(hasFlocks) + ' سالن گله فعال دارن.';
+      }
+      const ok = await showConfirmAsync('حذف گروهی', msg, { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const item = halls.find(h => h.id === id);
+        if (!item) continue;
+        backups.push(item);
+        try { deleteHall(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' سالن حذف شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
 
   const setFromStd = (fields: Record<string, string>) => {
     setForm((f: any) => ({ ...f, ...fields }));
@@ -281,6 +332,30 @@ export default function HallsPage() {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="hal-halls-intro"
+        icon="🏭"
+        title="سالن‌ها"
+        description="سالن‌های مرغداری را اینجا تعریف کنید. برای هر سالن ابعاد، ظرفیت، شرایط محیطی و تجهیزات ثبت کنید. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        tone="info"
+      />
+
+      {!ms.selectionMode && halls.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && halls.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === halls.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === halls.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
+
       {undoData && (
         <UndoBar
           label="حذف شد"
@@ -354,9 +429,9 @@ export default function HallsPage() {
             const flockAgeDays = activeFlock ? getAgeDays(activeFlock) : 0;
             const flockBreedId = activeFlock?.breedId || h.breedId || null;
             const flockStandard = flockBreedId ? breedStd.byBreedId(flockBreedId) : null;
-            const isOpen = expandedId === h.id;
+            const isOpen = !ms.selectionMode && expandedId === h.id;
             return (
-              <ExpandableCard key={h.id} accent="accent" index={fmt.int(i + 1)} iconEmoji="🏭"
+              <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={fmt.int(i + 1)} iconEmoji="🏭"
                 title={h.name + (h.code ? ` · ${h.code}` : '')}
                 subtitle={h.length ? `${toFa(h.length)}×${toFa(h.width || 0)}×${toFa(h.height || 0)} متر` : 'ابعاد وارد نشده'}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
@@ -478,6 +553,10 @@ export default function HallsPage() {
           <Btn variant="primary" full onClick={openNew}>+ افزودن سالن</Btn>
         </>
       )}
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
