@@ -1,12 +1,15 @@
 /**
  * ZonesPage — بخش‌های سالن
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useValidation } from '../../shr/validation/useValidation';
 import { ZoneSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Zone } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
@@ -22,7 +25,7 @@ export default function ZonesPage() {
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
-  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filter, setFilter] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -46,6 +49,44 @@ export default function ZonesPage() {
     });
   }, [_zonesRaw]);
 
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: zones,
+    getId: (z: any) => z.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' بخش حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const it = zones.find(z => z.id === id);
+        if (!it) continue;
+        backups.push(it);
+        try { deleteZone(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' بخش حذف شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
+  const undoDelete = () => {
+    const item = undoData;
+    if (!item) return;
+    try {
+      const arr = Array.isArray(item.item) ? item.item : [item.item];
+      for (const it of arr) addZone(it);
+      showToast(toFa(arr.length) + ' بخش بازگردانی شد', 'success', 2000);
+    } catch {
+      showToast('بازگردانی ناموفق', 'error', 2000);
+    }
+    setUndoData(null);
+  };
 
   const openNew = () => { setForm({ id:'', hallId: halls[0].id, name:'', capacity:'', notes:'' }); setErr(''); setOpen(true); };
   const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId,
@@ -64,18 +105,6 @@ export default function ZonesPage() {
   );
 
   if (halls.length === 0) {
-  const undoDelete = () => {
-    const item = undoData;
-    if (!item) return;
-    try {
-      addZone(item.item);
-      showToast('منطقه بازگردانی شد', 'success', 2000);
-    } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
-    }
-    setUndoData(null);
-  };
-
     return (
       <PageContainer>
       {undoData && (
@@ -121,6 +150,38 @@ export default function ZonesPage() {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="hal-zones-intro"
+        icon="🗂"
+        title="بخش‌های سالن"
+        description="هر بخش داخل یک سالن تعریف می‌شود. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        tone="info"
+      />
+
+      {!ms.selectionMode && zones.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && zones.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === zones.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === zones.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
+
+      {undoData && (
+        <UndoBar
+          label="حذف شد"
+          onUndo={undoDelete}
+          onDismiss={() => setUndoData(null)}
+        />
+      )}
+
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
         <button onClick={() => setFilter('')} style={chip(!filter)}>همه</button>
         {halls.map(h => (
@@ -139,10 +200,12 @@ export default function ZonesPage() {
         <>
           {list.map((z, i) => {
             const hall = halls.find(h => h.id === z.hallId);
-            const isOpen = expandedId === z.id;
+            const isOpen = !ms.selectionMode && expandedId === z.id;
             return (
               <ExpandableCard
                 key={z.id}
+                id={z.id}
+                ms={ms}
                 accent="purple"
                 index={toFa(i + 1)}
                 iconEmoji="🗂"
@@ -195,6 +258,10 @@ export default function ZonesPage() {
           <Btn variant="primary" full onClick={openNew}>+ افزودن بخش</Btn>
         </>
       )}
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش بخش' : 'افزودن بخش'}
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
