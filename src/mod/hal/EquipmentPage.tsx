@@ -151,6 +151,7 @@ export default function EquipmentPage() {
     : 0;
   const equipNeed = calcEquipNeed(form.type, form.hallId, flocks || [], breedStd, hallArea);
   const [err, setErr] = useState('');
+  const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [filter, setFilter] = useState('');
@@ -158,9 +159,29 @@ export default function EquipmentPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
 
+
+  const markAuto = (field: string) => {
+    setAutoFields(prev => {
+      const next = new Set(prev);
+      next.add(field);
+      return next;
+    });
+  };
+
+  const clearAuto = (field: string) => {
+    if (autoFields.has(field)) {
+      setAutoFields(prev => {
+        const next = new Set(prev);
+        next.delete(field);
+        return next;
+      });
+    }
+  };
+
   const openNew = () => { setForm({ id:'', hallId: halls[0].id, type:'lamp',
      name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'' }); setErr(''); setOpen(true); };
   const openEdit = (e: Equipment) => {
+    setAutoFields(new Set());
     setForm({
       id: e.id, hallId: e.hallId,
       kind: (e as any).kind || 'asset',
@@ -541,7 +562,15 @@ export default function EquipmentPage() {
             label="زیرنوع"
             required
             value={form.type}
-            onChange={v => setForm({...form, type: v})}
+            onChange={v => {
+              const def = getEquipUnit(v);
+              const patch: any = { type: v };
+              if (def.secondary?.defaultValue && !form.capacity) {
+                patch.capacity = String(def.secondary.defaultValue);
+              }
+              setForm({ ...form, ...patch });
+              if (def.secondary?.defaultValue) markAuto('capacity');
+            }}
             options={typesForCategory(form.category || 'auxiliary').map(k => {
               const v = (EQUIP_LABELS as any)[k] || { name: k };
               const catColor = CATEGORY_COLORS[form.category || 'auxiliary'] || '#475569';
@@ -609,12 +638,16 @@ export default function EquipmentPage() {
           return (
             <Field
               label={def.secondary.label}
+              autoFrom={autoFields.has('capacity') && String(form.capacity) === String(def.secondary.defaultValue) ? 'پیش‌فرض' : undefined}
               hint={`واحد: ${def.secondary.unit}${def.secondary.defaultValue ? ` — پیش‌فرض ${def.secondary.defaultValue}` : ''}`}
             >
               <NumField
                 placeholder={def.secondary.defaultValue ? String(def.secondary.defaultValue) : '۰'}
                 value={form.capacity}
-                onChange={e => setForm({ ...form, capacity: e.target.value })}
+                onChange={e => {
+                  setForm({ ...form, capacity: e.target.value });
+                  clearAuto('capacity');
+                }}
                 unit={def.secondary.unit}
                 min={0}
               />
