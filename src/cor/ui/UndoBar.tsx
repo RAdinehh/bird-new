@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface UndoBarProps {
   label: string;
@@ -17,7 +18,7 @@ export default function UndoBar({ label, onUndo, onDismiss, duration = 5000 }: U
   }, [onDismiss, paused, duration]);
 
 
-  return (
+  const bar = (
     <div
       role="alert"
       aria-live="polite"
@@ -110,4 +111,8 @@ export default function UndoBar({ label, onUndo, onDismiss, duration = 5000 }: U
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(bar, document.body)
+    : bar;
 }
