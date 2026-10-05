@@ -7,6 +7,7 @@ import { EquipmentSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Equipment, type EquipmentKind, type EquipmentCategory, type EquipmentUnit, EQUIP_LABELS, EQUIP_CAPACITY_UNIT, EQUIP_EFFICIENCY_UNIT, CATEGORY_LABELS, KIND_LABELS, UNIT_LABELS_EQ } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
@@ -358,6 +359,14 @@ export default function EquipmentPage() {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="hal-equip-intro"
+        icon="⚙️"
+        title="مدیریت تجهیزات"
+        description="تجهیزات هر سالن (فن، لامپ، آبخوری، دانخوری، بستر و...) را اینجا ثبت کنید. با انتخاب نوع دارایی و دسته، زیرنوع‌های مربوطه نمایش داده می‌شوند."
+        tone="info"
+      />
+
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
         <button onClick={() => setFilterKind('')} style={chip(!filterKind)}>همه انواع</button>
         {Object.entries(KIND_LABELS).map(([k, v]: any) => (
@@ -370,6 +379,34 @@ export default function EquipmentPage() {
           <button key={h.id} onClick={() => setFilter(h.id)} style={chip(filter === h.id)}>{h.name}</button>
         ))}
       </div>
+
+      {!ms.selectionMode && list.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && list.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button
+            type="button"
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
+            style={{
+              padding: '4px 10px',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-sm)',
+              color: 'var(--muted)',
+              fontFamily: 'inherit',
+              fontSize: '10px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
 
       {list.length > 0 && (
         <div style={{
