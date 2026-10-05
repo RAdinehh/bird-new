@@ -1,9 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo , useEffect } from 'react';
 import { useValidation } from '../../shr/validation/useValidation';
 import { RequirementSchema } from '../../shr/validation/rules/fed';
 import { useFed, STAGE_LABEL, STAGE_LABEL_LONG, type Requirement } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import HelpBanner from '../../shr/components/HelpBanner';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import { Row, SectionTitle } from './helpers';
@@ -54,13 +57,39 @@ export default function RequirementsPage() {
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
-  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const list = useMemo(
     () => [...requirements].sort((a, b) => a.name.localeCompare(b.name)),
     [requirements]
   );
+
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (x: any) => x.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' نیاز حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const it = requirements.find(x => x.id === id);
+        if (!it) continue;
+        backups.push(it);
+        try { deleteRequirement(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' نیاز حذف شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
 
   const openNew = () => {
     const lastR = requirements.filter(x => x.birdType).slice().reverse()[0];
@@ -150,14 +179,15 @@ export default function RequirementsPage() {
   const presetAvailable = PRESETS[form.birdType.trim() + '-' + form.stage] !== undefined;
 
   const undoDelete = () => {
-    const item = undoData;
-    if (!item) return;
+    if (!undoData) return;
+    const raw = (undoData as any).item;
+    const arr: any[] = Array.isArray(raw) ? raw : [raw];
     try {
-      addRequirement(item.item);
-      showToast('نیاز بازگردانی شد', 'success', 2000);
-    } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
-    }
+      for (const it of arr) {
+        try { addRequirement(it); } catch {}
+      }
+      showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
+    } catch { showToast('بازگردانی ناموفق', 'error', 2000); }
     setUndoData(null);
   };
 
@@ -170,6 +200,22 @@ export default function RequirementsPage() {
           onDismiss={() => setUndoData(null)}
         />
       )}
+      {!ms.selectionMode && list.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && list.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
+
       {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M9 11H3v10h18V11h-6M12 2v10M9 5l3-3 3 3"/></svg>}
@@ -180,11 +226,13 @@ export default function RequirementsPage() {
       ) : (
         <>
           {list.map((r, i) => {
-            const isOpen = expandedId === r.id;
+            const isOpen = !ms.selectionMode && expandedId === r.id;
             const stageLabel = STAGE_LABEL[r.stage] || r.stage;
             return (
               <ExpandableCard
                 key={r.id}
+                id={r.id}
+                ms={ms}
                 accent="info"
                 index={toFa(i + 1)}
                 iconEmoji="📊"
@@ -238,6 +286,10 @@ export default function RequirementsPage() {
           <Btn variant="primary" full onClick={openNew}>+ افزودن نیاز</Btn>
         </>
       )}
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <Modal
         open={open}

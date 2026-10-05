@@ -1,10 +1,13 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo , useEffect } from 'react';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createFormulaSchema } from '../../shr/validation/rules/fed';
 import { format as formatJalali } from 'date-fns-jalali';
 import { useFed, STAGE_LABEL, formulaTotal, calcNutrients, formulaValid, type Formula, type FormulaLine } from './store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import HelpBanner from '../../shr/components/HelpBanner';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
@@ -37,13 +40,39 @@ export default function FormulasPage() {
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
-  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const list = useMemo(
     () => [...formulas].sort((a, b) => b.date.localeCompare(a.date)),
     [formulas]
   );
+
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (x: any) => x.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' فرمول حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const it = formulas.find(x => x.id === id);
+        if (!it) continue;
+        backups.push(it);
+        try { deleteFormula(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' فرمول حذف شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
 
   const openNew = () => {
     if (ingredients.length === 0) { showAlert('اول مواد اولیه بسازید'); return; }
@@ -163,14 +192,15 @@ export default function FormulasPage() {
   const target = delId ? formulas.find(f => f.id === delId) : null;
 
   const undoDelete = () => {
-    const item = undoData;
-    if (!item) return;
+    if (!undoData) return;
+    const raw = (undoData as any).item;
+    const arr: any[] = Array.isArray(raw) ? raw : [raw];
     try {
-      addFormula(item.item);
-      showToast('فرمول بازگردانی شد', 'success', 2000);
-    } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
-    }
+      for (const it of arr) {
+        try { addFormula(it); } catch {}
+      }
+      showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
+    } catch { showToast('بازگردانی ناموفق', 'error', 2000); }
     setUndoData(null);
   };
 
@@ -183,6 +213,22 @@ export default function FormulasPage() {
           onDismiss={() => setUndoData(null)}
         />
       )}
+      {!ms.selectionMode && list.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && list.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
+
       {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
@@ -193,7 +239,7 @@ export default function FormulasPage() {
       ) : (
         <>
           {list.map((f, i) => {
-            const isOpen = expandedId === f.id;
+            const isOpen = !ms.selectionMode && expandedId === f.id;
             const req = requirements.find(r => r.id === f.requirementId);
             const n = calcNutrients(f.lines, ingredients);
             const statusLabel = f.status === 'active' ? 'فعال' : f.status === 'archived' ? 'آرشیو' : 'پیش‌نویس';
@@ -202,6 +248,8 @@ export default function FormulasPage() {
             return (
               <ExpandableCard
                 key={f.id}
+                id={f.id}
+                ms={ms}
                 accent={f.status === 'active' ? 'accent' : f.status === 'archived' ? 'dim' : 'warn'}
                 index={toFa(i + 1)}
                 iconEmoji="🌾"
@@ -286,6 +334,10 @@ export default function FormulasPage() {
           <Btn variant="primary" full onClick={openNew}>+ ساخت جیره</Btn>
         </>
       )}
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <Modal
         open={open}
