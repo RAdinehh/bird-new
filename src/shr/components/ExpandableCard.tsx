@@ -62,42 +62,19 @@ export default function ExpandableCard({
   const safeAccent = COLORS[accent] ? accent : 'accent';
   const { c: color, s: soft } = COLORS[safeAccent];
 
-  return (
+  const card = (
     <div style={{
       position: 'relative',
       background: 'var(--card)',
-      border: '1px solid ' + (isSelected ? color : (isOpen ? color : 'var(--border)')),
+      border: '1px solid ' + (isOpen ? color : 'var(--border)'),
       borderRadius: 'var(--r-lg)',
       overflow: 'hidden',
       marginBottom: 8,
-      transition: 'border-color var(--dur-base), background var(--dur-base)',
-      boxShadow: isSelected ? '0 0 0 2px ' + soft : 'none',
+      transition: 'border-color var(--dur-base)',
     }}>
       <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: color, zIndex: 1 }} />
 
-      {/* چک‌باکس انتخاب در حالت Multi-Select */}
-      {isSelectionMode && (
-        <div style={{
-          position: 'absolute',
-          top: 8,
-          left: 8,
-          width: 26,
-          height: 26,
-          borderRadius: '50%',
-          background: isSelected ? color : 'var(--card-solid)',
-          border: '2px solid ' + (isSelected ? color : 'var(--border)'),
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 14,
-          fontWeight: 800,
-          color: '#fff',
-          zIndex: 5,
-          pointerEvents: 'none',
-        }}>
-          {isSelected ? '✓' : ''}
-        </div>
-      )}
+
 
       <div
         role="button"
@@ -105,37 +82,19 @@ export default function ExpandableCard({
         aria-expanded={isOpen}
         aria-label={(isOpen ? 'بستن ' : 'باز کردن ') + title}
         onClick={() => {
-          if (isSelectionMode && id && ms) {
-            ms.toggleSelect(id);
-            return;
-          }
+          // ۱. اگه long-press fire شده بود، فقط flag رو ریست کن
           if (ms && ms.didLongPressFire && ms.didLongPressFire()) {
             ms.resetLongPressFire();
             return;
           }
+          // ۲. توی حالت انتخاب → toggle
+          if (isSelectionMode && id && ms) {
+            ms.toggleSelect(id);
+            return;
+          }
+          // ۳. اگه onTap تعریف شده → همون؛ وگرنه رفتار عادی
           if (onTap) { onTap(); return; }
           onToggle();
-        }}
-        onTouchStart={() => {
-          if (ms && id && !isSelectionMode) ms.startLongPress(id);
-        }}
-        onTouchEnd={() => {
-          if (ms) ms.cancelLongPress();
-        }}
-        onTouchCancel={() => {
-          if (ms) ms.cancelLongPress();
-        }}
-        onTouchMove={() => {
-          if (ms) ms.cancelLongPress();
-        }}
-        onMouseDown={() => {
-          if (ms && id && !isSelectionMode) ms.startLongPress(id);
-        }}
-        onMouseUp={() => {
-          if (ms) ms.cancelLongPress();
-        }}
-        onMouseLeave={() => {
-          if (ms) ms.cancelLongPress();
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -213,6 +172,54 @@ export default function ExpandableCard({
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  // اگه ms و id نداریم → کارت ساده
+  if (!ms || !id) return card;
+
+  // ─── حالت Multi-Select (مطابق الگوی FlocksPage) ───
+  return (
+    <div
+      style={{ position: 'relative' }}
+      onPointerDown={() => { if (!isSelectionMode) ms.startLongPress(id); }}
+      onPointerUp={ms.cancelLongPress}
+      onPointerLeave={ms.cancelLongPress}
+      onPointerCancel={ms.cancelLongPress}
+      onContextMenu={(e) => e.preventDefault()}
+    >
+      {isSelectionMode && (
+        <div
+          role="checkbox"
+          aria-checked={isSelected}
+          onClick={(e) => { e.stopPropagation(); ms.toggleSelect(id); }}
+          style={{
+            position: 'absolute', top: 10, right: 10, zIndex: 10,
+            width: 22, height: 22, borderRadius: '50%',
+            background: isSelected ? '#3b82f6' : 'rgba(255,255,255,0.95)',
+            border: '2px solid ' + (isSelected ? '#3b82f6' : 'var(--border)'),
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 150ms cubic-bezier(.4,0,.2,1)',
+            boxShadow: isSelected ? '0 2px 6px rgba(59,130,246,0.35)' : '0 1px 3px rgba(0,0,0,0.12)',
+          }}
+        >
+          {isSelected && (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          )}
+        </div>
+      )}
+      {isSelectionMode && isSelected && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 5,
+          background: 'rgba(59,130,246,0.12)',
+          borderRadius: 'var(--r-lg)',
+          pointerEvents: 'none',
+        }} />
+      )}
+      {card}
     </div>
   );
 }
