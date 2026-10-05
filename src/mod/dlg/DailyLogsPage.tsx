@@ -34,7 +34,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
 import UndoBar from '../../cor/ui/UndoBar';
-import { Section, SectionTitle, Row, AccordionSection } from './helpers';
+import { Section, SectionTitle, Row } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 import { bus } from '../../cor/events';
@@ -770,7 +770,7 @@ const collectWhsShortages = () => {
             </div>
           )}
 
-          <AccordionSection icon="🌡" title="محیط و پرنده" defaultOpen summary={form.temperature ? `${toFa(form.temperature)}°${form.humidity ? ' · ' + toFa(form.humidity) + '٪' : ''}` : undefined}>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> شرایط محیطی</SectionTitle>
 
           <Grid2>
             <Field label="حداقل دما" hint="۱۵-۳۰ درجه" error={vErrors.temperatureMin}>
@@ -807,6 +807,8 @@ const collectWhsShortages = () => {
             </Field>
           </Grid2>
 
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> مشاهده پرنده</SectionTitle>
+
           <Grid3>
             <Field label="رفتار">
               <Select value={form.behavior} onChange={e => setForm({ ...form, behavior: e.target.value })}>
@@ -833,9 +835,8 @@ const collectWhsShortages = () => {
           <Field label="ظاهر عمومی">
             <Textarea rows={2} placeholder="رنگ پر، چشم، تاج، منقار..." value={form.appearance} onChange={e => setForm({ ...form, appearance: e.target.value })} />
           </Field>
-          </AccordionSection>
 
-          <AccordionSection icon="🍽" title="تغذیه و آب" defaultOpen summary={form.feedAmount ? `${toFa(form.feedAmount)} kg دان` : undefined}>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌾</span> تغذیه</SectionTitle>
 
           <Field label="منبع دان مصرفی" hint="از جیره‌ها یا دان تکی انبار">
             <SmartSelect
@@ -930,6 +931,8 @@ const collectWhsShortages = () => {
             </Field>
           </Grid2>
 
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💧</span> آب</SectionTitle>
+
           {form.waterMethod === 'manual' && (
             <>
               <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
@@ -961,7 +964,6 @@ const collectWhsShortages = () => {
               </Field>
             </>
           )}
-          </AccordionSection>
 
           {isLayerType && !isFlockMature && selectedFlock && (
             <div style={{
@@ -978,9 +980,9 @@ const collectWhsShortages = () => {
             </div>
           )}
 
-          <AccordionSection icon="🥚" title="تخم و وزن" defaultOpen summary={(() => { const e = parseInt(toEn(form.eatingEggs)) || 0; const f = parseInt(toEn(form.fertileEggs)) || 0; const t = e + f; return t > 0 ? `${toFa(t)} تخم سالم` : undefined; })()}>
           {isLayerFlock && (
           <>
+            <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم‌گذاری</SectionTitle>
             <Grid2>
                   <Field label="🥚 تخم خوراکی" error={vErrors.eatingEggs}>
                     <NumField placeholder="۰" value={form.eatingEggs} onChange={e => setForm({...form, eatingEggs: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
@@ -999,6 +1001,8 @@ const collectWhsShortages = () => {
                 </Grid2>
           </>
         )}
+
+        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚖️</span> وزن‌کشی (اختیاری)</SectionTitle>
 
           {form.weightSamples.length > 0 && (
             <Grid2>
@@ -1037,9 +1041,8 @@ const collectWhsShortages = () => {
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, weightSamples: [...f.weightSamples, { id: crypto.randomUUID(), weight: '' }] }))}>
             + افزودن نمونه وزن
           </Btn>
-          </AccordionSection>
 
-          <AccordionSection icon="🏥" title="سلامت" defaultOpen={false} summary={form.deaths.length > 0 ? `${toFa(form.deaths.reduce((a, x) => a + (x.count || 0), 0))} تلفات` : undefined}>
+          <SectionTitle>💀 تلفات</SectionTitle>
 
           {form.deaths.length > 0 && (
             <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn-border, var(--border))', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
@@ -1077,6 +1080,8 @@ const collectWhsShortages = () => {
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deaths: [...f.deaths, { id: crypto.randomUUID(), count: 0, cause: '', notes: '' }] }))}>
             + افزودن رکورد تلفات
           </Btn>
+
+          <SectionTitle>💉 واکسن و دارو</SectionTitle>
 
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: crypto.randomUUID(), name: '', dose: '', method: '', reaction: '', itemId: '', quantity: null, movementId: '' }] }))}>
             + افزودن واکسن
@@ -1157,9 +1162,8 @@ const collectWhsShortages = () => {
               )}
             </div>
           ))}
-          </AccordionSection>
 
-          <AccordionSection icon="🔧" title="فعالیت‌ها" defaultOpen={false} summary={form.activities.length > 0 ? `${toFa(form.activities.length)} فعالیت` : undefined}>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🔧</span> فعالیت‌ها</SectionTitle>
 
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, activities: [...f.activities, { id: crypto.randomUUID(), type: '', notes: '' }] }))}>
             + افزودن فعالیت
@@ -1170,7 +1174,6 @@ const collectWhsShortages = () => {
               <button onClick={() => setForm(f => ({ ...f, activities: f.activities.filter(x => x.id !== a.id) }))} style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
             </div>
           ))}
-          </AccordionSection>
 
           <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
           <Field label="یادداشت">
