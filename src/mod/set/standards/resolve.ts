@@ -24,7 +24,7 @@ function buildNameToKey(): Record<string, string> {
   map['مرغ گوشتی'] = 'broiler';
   map['تخمگذار'] = 'layer';
   map['مرغ تخمگذار'] = 'layer';
-  map['گلین'] = 'gilini';
+  map['گلین'] = 'golin';
   // از DEFAULT_STANDARDS
   Object.values(DEFAULT_STANDARDS).forEach((std: any) => {
     if (!std) return;

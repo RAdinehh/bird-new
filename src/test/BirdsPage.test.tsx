@@ -198,38 +198,39 @@ describe('BirdsPage — Expand / ویرایش / حذف', () => {
     await waitFor(() => expect(useBrd.getState().birds[0].name).toBe('جدید'));
   });
 
-  it('کلیک حذف → Modal تأیید', async () => {
+  it('کلیک حذف → showConfirmAsync صدا زده میشه', async () => {
+    const { showConfirmAsync } = await import('../cor/store/dialog');
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
     render(<BirdsPage />);
     expandCard('مرغ');
     await waitFor(() => expect(screen.getByText('حذف')).toBeInTheDocument());
     fireEvent.click(screen.getByText('حذف'));
 
-    await waitFor(() => expect(screen.getByText('حذف پرنده')).toBeInTheDocument());
+    await waitFor(() => expect(showConfirmAsync).toHaveBeenCalled());
   });
 
   it('تأیید حذف → پاک میشه', async () => {
+    const { showConfirmAsync } = await import('../cor/store/dialog');
+    (showConfirmAsync as any).mockResolvedValueOnce(true);
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
     render(<BirdsPage />);
     expandCard('مرغ');
     await waitFor(() => expect(screen.getByText('حذف')).toBeInTheDocument());
     fireEvent.click(screen.getByText('حذف'));
-    await waitFor(() => expect(screen.getByText('حذف کن')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('حذف کن'));
 
     await waitFor(() => expect(useBrd.getState().birds).toHaveLength(0));
   });
 
   it('لغو حذف → باقی میمونه', async () => {
+    const { showConfirmAsync } = await import('../cor/store/dialog');
+    (showConfirmAsync as any).mockResolvedValueOnce(false);
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
     render(<BirdsPage />);
     expandCard('مرغ');
     await waitFor(() => expect(screen.getByText('حذف')).toBeInTheDocument());
     fireEvent.click(screen.getByText('حذف'));
-    await waitFor(() => expect(screen.getByText('لغو')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('لغو'));
 
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise(r => setTimeout(r, 100));
     expect(useBrd.getState().birds).toHaveLength(1);
   });
 });

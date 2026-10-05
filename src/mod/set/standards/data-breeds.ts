@@ -435,7 +435,7 @@ const MARANDI: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 23, max: 27, target: 25 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 365, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 9999, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 30, waterMl: 60, phaseName: 'استارتر', lysinePct: 0.95, methioninePct: 0.42, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
@@ -467,13 +467,22 @@ const MARANDI: BirdStandard = {
     thicknessCm: 6,
     lifetimeDays: 45,
   },
+  production: {
+    layingStartDay: 140,
+    peakLayingPct: 65,
+    eggsPerYear: 170,
+    eggWeightG: 55,
+    cycleDays: 500,
+    fertilityPct: 82,
+    hatchabilityPct: 75,
+  },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
     { dayFrom: 31, dayTo: 365, maxPct: 2 },
   ],
   mortalityTotalPct: 4.5,
-  notes: 'مرندی',
+  notes: 'مرندی — تخم‌گذاری ۱۷۰ عدد در سال',
 };
 
 const GOLPAYGANI: BirdStandard = {
@@ -493,7 +502,7 @@ const GOLPAYGANI: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 365, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 9999, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 30, waterMl: 60, phaseName: 'استارتر', lysinePct: 1.0, methioninePct: 0.4, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا'] },
@@ -551,7 +560,7 @@ const LARI: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 365, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 60 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 9999, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 60 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 35, waterMl: 70, phaseName: 'استارتر', lysinePct: 0.95, methioninePct: 0.42, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
@@ -609,7 +618,7 @@ const GOLIN: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 365, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 9999, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 30, waterMl: 60, phaseName: 'استارتر', lysinePct: 0.95, methioninePct: 0.42, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
@@ -641,6 +650,16 @@ const GOLIN: BirdStandard = {
     thicknessCm: 6,
     lifetimeDays: 45,
   },
+  production: {
+    layingStartDay: 140,
+    peakLayingPct: 62,
+    eggsPerYear: 160,
+    eggWeightG: 55,
+    cycleDays: 500,
+    fertilityPct: 82,
+    hatchabilityPct: 72,
+  },
+
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 1 },
     { dayFrom: 8, dayTo: 30, maxPct: 1.5 },
