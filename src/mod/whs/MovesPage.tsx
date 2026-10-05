@@ -1,8 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useWhs, UNIT_LABEL, MOVEMENT_REASON, CATEGORY_ICON, CATEGORY_LABEL, type Movement, type MovementType, type MovementReason } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
@@ -40,7 +42,7 @@ export default function MovesPage() {
   });
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
-  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filterType, setFilterType] = useState<MovementType | ''>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -50,15 +52,42 @@ export default function MovesPage() {
     return arr.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 100);
   }, [movements, filterType]);
 
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (x: any) => x.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' تراکنش حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const it = movements.find(x => x.id === id);
+        if (!it) continue;
+        backups.push(it);
+        try { deleteMovement(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' تراکنش حذف شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
   const undoDelete = () => {
-    const item = undoData;
-    if (!item) return;
+    if (!undoData) return;
+    const raw = (undoData as any).item;
+    const arr: any[] = Array.isArray(raw) ? raw : [raw];
     try {
-      addMovement(item.item);
-      showToast('بازگردانی شد', 'success', 2000);
-    } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
-    }
+      for (const it of arr) {
+        try { addMovement(it); } catch {}
+      }
+      showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
+    } catch { showToast('بازگردانی ناموفق', 'error', 2000); }
     setUndoData(null);
   };
 
@@ -184,6 +213,22 @@ export default function MovesPage() {
         </button>
       </div>
 
+      {!ms.selectionMode && list.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && list.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
+
       {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4M17 8v12M17 20l4-4M17 20l-4-4"/></svg>}
@@ -196,13 +241,15 @@ export default function MovesPage() {
           {list.map((m, i) => {
             const item = items.find(x => x.id === m.itemId);
             const party = contacts.find(c => c.id === m.partyId);
-            const isOpen = expandedId === m.id;
+            const isOpen = !ms.selectionMode && expandedId === m.id;
             const accent = m.type === 'in' ? 'accent' : 'warn';
             const total = m.quantity * m.unitPrice;
 
             return (
               <ExpandableCard
                 key={m.id}
+                id={m.id}
+                ms={ms}
                 accent={accent}
                 index={toFa(i + 1)}
                 iconEmoji={m.type === 'in' ? '📥' : '📤'}
@@ -259,6 +306,10 @@ export default function MovesPage() {
           <Btn variant="primary" full onClick={openNew}>+ ثبت گردش</Btn>
         </>
       )}
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <Modal
         open={open}
