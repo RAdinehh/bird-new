@@ -46,6 +46,23 @@ export default function ZonesPage() {
     });
   }, [_zonesRaw]);
 
+
+  const openNew = () => { setForm({ id:'', hallId: halls[0].id, name:'', capacity:'', notes:'' }); setErr(''); setOpen(true); };
+  const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId,
+     name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setOpen(true); };
+
+  // ═══ اعتبارسنجی زنده ═══
+  const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
+  const { errors: vErrors } = useValidation(
+    ZoneSchema,
+    {
+      hallId: form.hallId || '',
+      name: form.name || '',
+      capacity: int(form.capacity),
+      notes: form.notes || '',
+    },
+  );
+
   if (halls.length === 0) {
   const undoDelete = () => {
     const item = undoData;
@@ -76,22 +93,6 @@ export default function ZonesPage() {
       </PageContainer>
     );
   }
-
-  const openNew = () => { setForm({ id:'', hallId: halls[0].id, name:'', capacity:'', notes:'' }); setErr(''); setOpen(true); };
-  const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId,
-     name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setOpen(true); };
-
-  // ═══ اعتبارسنجی زنده ═══
-  const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
-  const { errors: vErrors } = useValidation(
-    ZoneSchema,
-    {
-      hallId: form.hallId || '',
-      name: form.name || '',
-      capacity: int(form.capacity),
-      notes: form.notes || '',
-    },
-  );
 
   const save = async () => {
 
