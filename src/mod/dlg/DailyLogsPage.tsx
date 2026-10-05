@@ -1034,7 +1034,7 @@ const collectWhsShortages = () => {
                   unit="kg" min={0} />
               </div>
               <button type="button" onClick={() => setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) }))}
-                style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', width: 38, height: 38, flexShrink: 0 }}>✕</button>
+                style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
             </div>
           ))}
 
@@ -1045,18 +1045,18 @@ const collectWhsShortages = () => {
           <SectionTitle>💀 تلفات</SectionTitle>
 
           {form.deaths.length > 0 && (
-            <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--danger)', fontWeight: 700, textAlign: 'center' }}>
+            <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn-border, var(--border))', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
               مجموع: {toFa(form.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده
               {flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''}
             </div>
           )}
 
           {form.deaths.map((d, i) => (
-            <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700 }}>{d.count === 0 && !d.cause ? "رکورد جدید" : "رکورد " + toFa(i + 1)}</span>
                 <button type="button" onClick={() => setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) }))}
-                  style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
+                  style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
               </div>
               <Grid2>
                 <Field label="تعداد" error={vErrors.deathsCount || vErrors.deaths}>
@@ -1087,10 +1087,10 @@ const collectWhsShortages = () => {
             + افزودن واکسن
           </Btn>
           {form.vaccines.map((v, i) => (
-            <div key={v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>واکسن {toFa(i + 1)}</span>
-                <button onClick={() => setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) }))} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                <button onClick={() => setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) }))} style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
               </div>
               <Grid2>
                 <Input placeholder="نام" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
@@ -1127,10 +1127,10 @@ const collectWhsShortages = () => {
             + افزودن دارو
           </Btn>
           {form.medications.map((m, i) => (
-            <div key={m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>دارو {toFa(i + 1)}</span>
-                <button onClick={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                <button onClick={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))} style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
               </div>
               <Grid2>
                 <Input placeholder="نام" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
@@ -1171,7 +1171,7 @@ const collectWhsShortages = () => {
           {form.activities.map((a, i) => (
             <div key={a.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
               <Input placeholder="نوع فعالیت..." value={a.type} onChange={e => setForm(f => ({ ...f, activities: f.activities.map(x => x.id === a.id ? { ...x, type: e.target.value } : x) }))} />
-              <button onClick={() => setForm(f => ({ ...f, activities: f.activities.filter(x => x.id !== a.id) }))} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', width: 38, height: 38, flexShrink: 0 }}>✕</button>
+              <button onClick={() => setForm(f => ({ ...f, activities: f.activities.filter(x => x.id !== a.id) }))} style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
             </div>
           ))}
 
