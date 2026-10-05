@@ -137,7 +137,7 @@ export default function MenuDrawer() {
 
         <div style={{
           padding: '24px 20px 20px',
-          background: 'linear-gradient(135deg, var(--accent) 0%, #15803d 100%)',
+          background: 'linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 70%, black) 100%)',
           color: '#fff',
           position: 'relative',
           overflow: 'hidden',

@@ -71,7 +71,7 @@ export function ToggleRow({ label, sub, value, onChange }: any) {
 
 export function ColorBtn({ color, active, onClick }: any) {
   const colors: Record<string, string> = {
-    green: '#16a34a', blue: '#0284c7', orange: '#ea580c', purple: '#7c3aed'
+    green: '#16a34a', blue: '#0284c7', amber: '#d97706', earth: '#78350f'
   };
   return (
     <button type="button" onClick={onClick} style={{

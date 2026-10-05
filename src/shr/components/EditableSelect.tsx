@@ -174,14 +174,14 @@ export default function EditableSelect({
               ...ROW,
               borderColor: selected ? 'var(--accent)' : 'var(--border)',
               background: selected
-                ? 'linear-gradient(180deg, rgba(22,163,74,.10) 0%, rgba(22,163,74,.04) 100%)'
+                ? 'linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent) 0%, color-mix(in srgb, var(--accent) 4%, transparent) 100%)'
                 : ROW.background,
               boxShadow: ROW.boxShadow,
             }}>
             <span style={{
               ...ICON,
               background: selected
-                ? 'linear-gradient(135deg, rgba(22,163,74,.20) 0%, rgba(22,163,74,.10) 100%)'
+                ? 'linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent) 0%, color-mix(in srgb, var(--accent) 10%, transparent) 100%)'
                 : ICON.background,
             }}>{typeof o.icon === 'string' ? o.icon : (o.icon || '•')}</span>
             <span style={{ flex: 1, fontWeight: selected ? 700 : 600 }}>{o.label}</span>
@@ -210,14 +210,14 @@ export default function EditableSelect({
               gap: 10,
               borderColor: selected || isHi ? 'var(--accent)' : 'var(--border)',
               background: selected
-                ? 'linear-gradient(180deg, rgba(22,163,74,.10) 0%, rgba(22,163,74,.04) 100%)'
+                ? 'linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent) 0%, color-mix(in srgb, var(--accent) 4%, transparent) 100%)'
                 : ROW.background,
               boxShadow: ROW.boxShadow,
             }}>
             <span style={{
               ...ICON,
               background: selected
-                ? 'linear-gradient(135deg, rgba(22,163,74,.20) 0%, rgba(22,163,74,.10) 100%)'
+                ? 'linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent) 0%, color-mix(in srgb, var(--accent) 10%, transparent) 100%)'
                 : ICON.background,
             }}>{c.icon}</span>
             <span style={{ flex: 1, fontWeight: selected ? 700 : 600, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
@@ -284,7 +284,7 @@ export default function EditableSelect({
         fontWeight: 400,
         lineHeight: 1,
         fontFamily: 'inherit',
-        boxShadow: '0 2px 8px rgba(22,163,74,.28)',
+        boxShadow: '0 2px 8px color-mix(in srgb, var(--accent) 28%, transparent)',
       }}
     >+</button>
   ) : null;

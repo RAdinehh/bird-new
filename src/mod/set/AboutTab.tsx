@@ -175,7 +175,7 @@ export default function AboutTab() {
         }}>
           <div style={{
             width: 56, height: 56, borderRadius: 'var(--r-lg)',
-            background: 'linear-gradient(135deg, var(--accent), #16a34a)',
+            background: 'linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, black))',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 28, color: '#fff', fontWeight: 700,
             flexShrink: 0,

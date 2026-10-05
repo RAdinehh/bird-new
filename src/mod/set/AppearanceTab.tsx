@@ -38,8 +38,8 @@ export default function AppearanceTab() {
           <div style={{ display: 'flex', gap: 8 }}>
             <ColorBtn color="green" active={s.accentColor === 'green'} onClick={() => s.update({ accentColor: 'green' })} />
             <ColorBtn color="blue" active={s.accentColor === 'blue'} onClick={() => s.update({ accentColor: 'blue' })} />
-            <ColorBtn color="orange" active={s.accentColor === 'orange'} onClick={() => s.update({ accentColor: 'orange' })} />
-            <ColorBtn color="purple" active={s.accentColor === 'purple'} onClick={() => s.update({ accentColor: 'purple' })} />
+            <ColorBtn color="amber" active={s.accentColor === 'orange'} onClick={() => s.update({ accentColor: 'amber' })} />
+            <ColorBtn color="earth" active={s.accentColor === 'purple'} onClick={() => s.update({ accentColor: 'earth' })} />
           </div>
         </Field>
       </SettingsGroup>

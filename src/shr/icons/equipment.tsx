@@ -90,7 +90,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   drinking:    '#0891b2',
   heating:     '#dc2626',
   lighting:    '#ca8a04',
-  litter:      '#16a34a',
+  litter:      '#0d9488',
   power:       '#ea580c',
   auxiliary:   '#475569',
 };

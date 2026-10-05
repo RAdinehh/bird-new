@@ -26,13 +26,13 @@ const ACCENT_PRESETS: Record<string, { dark: any; light: any }> = {
     light: { accent: '#0284c7', soft: 'rgba(2,132,199,.12)', border: 'rgba(2,132,199,.35)', avatarText: '#ffffff' },
     dark:  { accent: '#38bdf8', soft: 'rgba(56,189,248,.15)', border: 'rgba(56,189,248,.4)',  avatarText: '#0f172a' }
   },
-  orange: {
-    light: { accent: '#ea580c', soft: 'rgba(234,88,12,.12)', border: 'rgba(234,88,12,.35)', avatarText: '#ffffff' },
-    dark:  { accent: '#fb923c', soft: 'rgba(251,146,60,.15)', border: 'rgba(251,146,60,.4)',  avatarText: '#0f172a' }
+  amber: {
+    light: { accent: '#d97706', soft: 'rgba(217,119,6,.12)', border: 'rgba(217,119,6,.35)', avatarText: '#ffffff' },
+    dark:  { accent: '#fbbf24', soft: 'rgba(251,191,36,.15)', border: 'rgba(251,191,36,.4)',  avatarText: '#0f172a' }
   },
-  purple: {
-    light: { accent: '#7c3aed', soft: 'rgba(124,58,237,.12)', border: 'rgba(124,58,237,.35)', avatarText: '#ffffff' },
-    dark:  { accent: '#a78bfa', soft: 'rgba(167,139,250,.15)', border: 'rgba(167,139,250,.4)',  avatarText: '#0f172a' }
+  earth: {
+    light: { accent: '#78350f', soft: 'rgba(120,53,15,.12)', border: 'rgba(120,53,15,.35)', avatarText: '#ffffff' },
+    dark:  { accent: '#a16207', soft: 'rgba(161,98,7,.15)', border: 'rgba(161,98,7,.4)',  avatarText: '#0f172a' }
   }
 };
 

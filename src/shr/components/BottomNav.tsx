@@ -125,7 +125,7 @@ export default function BottomNav() {
                         position: 'absolute',
                         inset: 0,
                         borderRadius: 16,
-                        background: 'linear-gradient(135deg, var(--accent) 0%, #15803d 100%)',
+                        background: 'linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 70%, black) 100%)',
                         boxShadow: '0 4px 12px var(--accent-border)',
                         animation: 'pmPillPop 0.35s cubic-bezier(.34,1.56,.64,1)'
                       }} />

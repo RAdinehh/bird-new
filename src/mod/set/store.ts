@@ -25,7 +25,7 @@ export interface Settings {
 
   // ظاهر
   theme: 'light' | 'dark';
-  accentColor: 'green' | 'blue' | 'orange' | 'purple';
+  accentColor: 'green' | 'blue' | 'amber' | 'earth';
   fontSize: 'small' | 'medium' | 'large' | 'xlarge';
   density: 'compact' | 'comfortable';
   animations: boolean;
