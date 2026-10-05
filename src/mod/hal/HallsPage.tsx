@@ -7,7 +7,7 @@ import { createHallSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS, EQUIP_LABELS } from './store';
 import { useBrd } from '../brd/store';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
-import { useFlk } from '../flk/store';
+import { useFlk, getAgeDays } from '../flk/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { isFanLike, isLampLike, LITTER_KG_PER_M2 } from './helpers';
@@ -349,6 +349,11 @@ export default function HallsPage() {
               : 0;
             const hallFlocks = (flocks || []).filter((f: any) => f.hallId === h.id && f.status === 'active');
             const totalBirds = hallFlocks.reduce((sum: number, f: any) => sum + (f.currentCount || f.initialCount || 0), 0);
+            // سن و نژاد برای محاسبه نیاز
+            const activeFlock = hallFlocks[0];
+            const flockAgeDays = activeFlock ? getAgeDays(activeFlock) : 0;
+            const flockBreedId = activeFlock?.breedId || h.breedId || null;
+            const flockStandard = flockBreedId ? breedStd.byBreedId(flockBreedId) : null;
             const isOpen = expandedId === h.id;
             return (
               <ExpandableCard key={h.id} accent="accent" index={fmt.int(i + 1)} iconEmoji="🏭"
@@ -496,6 +501,13 @@ export default function HallsPage() {
 
                 <HallEquipSection
                   hallId={h.id}
+                  needInput={{
+                    birdCount: totalBirds,
+                    ageDays: flockAgeDays,
+                    areaM2: area,
+                    volumeM3: volume,
+                    standard: flockStandard,
+                  }}
                   legacy={{
                     ventilationSystem: h.ventilationSystem,
                     feederType: h.feederType,
