@@ -20,6 +20,7 @@ import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
+import { getEquipUnit } from './equipUnits';
 
 
 
@@ -588,71 +589,39 @@ export default function EquipmentPage() {
               </div>
             ) : null}
           </Field>
-          <Field label="واحد">
-            <Select value={form.unit || 'pcs'} onChange={e => setForm({...form, unit: e.target.value})}>
-              {Object.entries(UNIT_LABELS_EQ).map(([k, v]) => (
-                <option key={k} value={k}>{v}</option>
-              ))}
-            </Select>
-          </Field>
+
         </Grid2>
 
         <Grid2>
-          <Field label="قیمت واحد"><MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} /></Field>
+          <Field label={(() => {
+            const def = getEquipUnit(form.type);
+            if (def.summaryLabel === 'عدد') return 'قیمت هر عدد';
+            return `قیمت هر ${def.summaryLabel}`;
+          })()}>
+            <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
+          </Field>
           <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
         </Grid2>
 
-        {(EQUIP_CAPACITY_UNIT[form.type] && EQUIP_CAPACITY_UNIT[form.type] !== '—') || (EQUIP_EFFICIENCY_UNIT[form.type]) ? (
-          <Grid2>
-            {EQUIP_CAPACITY_UNIT[form.type] && EQUIP_CAPACITY_UNIT[form.type] !== '—' ? (
-              <Field
-                label={`ظرفیت هر واحد (${EQUIP_CAPACITY_UNIT[form.type]})`}
-                hint={
-                  form.type === 'fan' ? 'حجم هوایی که هر فن جابه‌جا می‌کند'
-                  : form.type === 'cooler' ? 'ظرفیت سرمایشی'
-                  : form.type === 'heater' ? 'توان گرمایشی'
-                  : form.type === 'lamp' ? 'توان مصرفی هر لامپ'
-                  : undefined
-                }
-              >
-                <NumField
-                  placeholder="۰"
-                  value={form.capacity}
-                  onChange={e => setForm({...form, capacity: e.target.value})}
-                  unit={EQUIP_CAPACITY_UNIT[form.type]}
-                  min={0}
-                />
-                {form.capacity && hallVolume ? (
-                  <div style={{
-                    fontSize: 11,
-                    color: 'var(--accent)',
-                    marginTop: 4,
-                    lineHeight: 1.6,
-                    padding: '6px 8px',
-                    background: 'var(--accent-soft)',
-                    borderRadius: 'var(--r-sm)',
-                  }}>
-                    {getCapacityHint(form.type, parseFloat(toEn(form.capacity).replace('٫','.')) || null, hallVolume, parseInt(toEn(form.count)) || 1, parseFloat(toEn(form.efficiency).replace('٫','.')) || null)}
-                  </div>
-                ) : null}
-              </Field>
-            ) : null}
-            {EQUIP_EFFICIENCY_UNIT[form.type] ? (
-              <Field label={`بازدهی (${EQUIP_EFFICIENCY_UNIT[form.type]})`} hint="مثلاً LED حدود ۸۵">
-                <NumField
-                  placeholder="۸۵"
-                  value={form.efficiency}
-                  onChange={e => setForm({...form, efficiency: e.target.value})}
-                  unit={EQUIP_EFFICIENCY_UNIT[form.type]}
-                  min={0}
-                />
-              </Field>
-            ) : null}
-          </Grid2>
-        ) : null}
+        {(() => {
+          const def = getEquipUnit(form.type);
+          if (!def.secondary) return null;
+          return (
+            <Field
+              label={def.secondary.label}
+              hint={`واحد: ${def.secondary.unit}${def.secondary.defaultValue ? ` — پیش‌فرض ${def.secondary.defaultValue}` : ''}`}
+            >
+              <NumField
+                placeholder={def.secondary.defaultValue ? String(def.secondary.defaultValue) : '۰'}
+                value={form.capacity}
+                onChange={e => setForm({ ...form, capacity: e.target.value })}
+                unit={def.secondary.unit}
+                min={0}
+              />
+            </Field>
+          );
+        })()}
 
-        <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
-        <ErrorBox>{err}</ErrorBox>
       </Modal>
 
       <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف تجهیز"

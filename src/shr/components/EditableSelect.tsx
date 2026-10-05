@@ -142,18 +142,26 @@ export default function EditableSelect({
         display: 'flex', alignItems: 'center', gap: 8,
       }}
     >
-      <span style={{ flex: 1, textAlign: 'right', fontWeight: isOrphan ? 700 : 500 }}>
+      <span style={{ flex: 1, textAlign: 'right', fontWeight: isOrphan ? 700 : 500, display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
         {isOrphan
-          ? '⚠ ' + value + ' (حذف‌شده)'
+          ? <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{'⚠ ' + value + ' (حذف‌شده)'}</span>
           : current
             ? (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                    {current.icon && <span style={{ display: 'inline-flex' }}>{current.icon}</span>}
-                    <span>{current.label}</span>
-                  </span>
+                  <>
+                    {current.icon && <span style={{ display: 'inline-flex', flexShrink: 0 }}>{current.icon}</span>}
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{current.label}</span>
+                  </>
                 )
-            : (placeholder || '— انتخاب کنید —')}
+            : <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{placeholder || '— انتخاب کنید —'}</span>}
       </span>
+      <span style={{
+        color: 'var(--muted)',
+        fontSize: 11,
+        flexShrink: 0,
+        transition: 'transform 180ms',
+        transform: open ? 'rotate(180deg)' : 'none',
+        display: 'inline-block',
+      }}>▼</span>
     </button>
   );
 
