@@ -40,7 +40,7 @@ const empty: F = {
   address:'', builtAt:'', lastSanitizedAt:'', notes:'', breedId:'',
 };
 
-function TempFormField({ value, onChange, label, placeholder }: any) {
+function TempFormField({ value, onChange, label, placeholder, autoFrom }: any) {
   const tempUnit = useTempUnit();
   const [local, setLocal] = useState<string>('');
   const [editing, setEditing] = useState(false);
@@ -122,6 +122,7 @@ export default function HallsPage() {
   const { flocks } = useFlk();
   const { breeds } = useBrd();
   const [open, setOpen] = useState(false);
+  const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
@@ -146,8 +147,24 @@ export default function HallsPage() {
     });
   }, [_hallsRaw]);
 
-  const openNew = () => { setForm(empty); setErr(''); setOpen(true); };
+
+  const setFromStd = (fields: Record<string, string>) => {
+    setForm((f: any) => ({ ...f, ...fields }));
+    setAutoFields(new Set(Object.keys(fields)));
+  };
+
+  const clearAuto = (key: string) => {
+    if (autoFields.has(key)) {
+      const next = new Set(autoFields);
+      next.delete(key);
+      setAutoFields(next);
+    }
+  };
+
+  const openNew = () => {
+    setAutoFields(new Set()); setForm(empty); setErr(''); setOpen(true); };
   const openEdit = (h: Hall) => {
+    setAutoFields(new Set());
     setForm({
       id: h.id, name: h.name, code: h.code,
       length: h.length ? toFa(h.length) : '', width: h.width ? toFa(h.width) : '', height: h.height ? toFa(h.height) : '',
@@ -497,8 +514,8 @@ export default function HallsPage() {
                 {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </Select>
             </Field>
-            <Field label="ظرفیت">
-              <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} />
+            <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined}>
+              <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
               {(() => {
                 if (!form.breedId) return null;
                 const std = breedStd.byBreedId(form.breedId);
@@ -573,8 +590,8 @@ export default function HallsPage() {
 
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>شرایط</div>
           <Grid2>
-          <TempFormField label="دمای هدف" placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => setForm({...form, targetTemp: v})} />
-          <Field label="رطوبت هدف"><NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => setForm({...form, targetHumidity: e.target.value})} unit="٪" min={-10} /></Field>
+          <TempFormField label="دمای هدف" placeholder="۲۲" autoFrom={autoFields.has("targetTemp") ? "استاندارد" : undefined} value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
+          <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? "استاندارد" : undefined}><NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={-10} /></Field>
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>زمان‌ها</div>
         <Grid2>
