@@ -474,7 +474,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
     if (delInv && entry.generatedInvoiceId) { try { deleteInvoice(entry.generatedInvoiceId); } catch {} }
     if (delProd && entry.generatedProductionId) { try { deleteProduction(entry.generatedProductionId); } catch {} }
     deleteEntry(id);
-    setDelId(null);
   };
 
   const breedsForBird = useMemo(

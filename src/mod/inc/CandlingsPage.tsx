@@ -64,7 +64,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [entriesData, setEntriesData] = useState<Record<string, EntryData>>({});
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -281,8 +280,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     setErr('');
     setOpen(true);
   };
-
-  const target = delId ? candlings.find(c => c.id === delId) : null;
 
   // ═══ گروه‌بندی + تجمیع + درصد ═══
   const grouped = useMemo(() => {
@@ -720,19 +717,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
         <ErrorBox>{err}</ErrorBox>
       </Modal>
 
-      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف کندلینگ"
-        footer={<BtnRow><Btn variant="danger" onClick={() => {
-          if (!delId) return;
-          const item = candlings.find((x: any) => x.id === delId);
-          if (item) {
-            setUndoData({ candling: item });
-            setTimeout(() => setUndoData(cur => cur && cur.candling.id === item.id ? null : cur), 6000);
-          }
-          deleteCandling(delId);
-          setDelId(null);
-        }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف کندلینگ روز {toFa(target?.stage || 0)}؟</div>
-      </Modal>
     </PageContainer>
   );
 }
