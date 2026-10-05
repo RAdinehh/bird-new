@@ -1,14 +1,13 @@
 /**
  * MultiSelectBar — نوار شناور پایین صفحه برای Multi-Select
  *
- * نمایش خودکار وقتی تعداد انتخاب > 0
- * شامل: شمارش + لغو + اکشن سفارشی + آرشیو + حذف
+ * از createPortal استفاده می‌کنه تا از هر محدودیت parent آزاد باشه.
  */
+import { createPortal } from 'react-dom';
 import type { MultiSelectState } from './useMultiSelect';
 
 interface Props<T> {
   ms: MultiSelectState<T>;
-  /** متن اکشن سفارشی (اگه توی hook پاس شده باشه، خودش میاد) */
   deleteLabel?: string;
   archiveLabel?: string;
 }
@@ -22,10 +21,10 @@ export default function MultiSelectBar<T>({
 
   const btnBase: React.CSSProperties = {
     flex: 1,
-    padding: '12px 14px',
+    padding: '10px 12px',
     background: 'var(--input-bg)',
     border: '1px solid var(--border)',
-    borderRadius: 14,
+    borderRadius: 12,
     color: 'var(--text)',
     fontFamily: 'inherit',
     fontSize: 'var(--fs-sm)',
@@ -36,31 +35,30 @@ export default function MultiSelectBar<T>({
     justifyContent: 'center',
     gap: 4,
     minHeight: 44,
+    whiteSpace: 'nowrap',
   };
 
-  return (
+  const bar = (
     <div
       role="toolbar"
       aria-label="اکشن‌های گروهی"
       style={{
         position: 'fixed',
-        bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 9999,
-        maxWidth: 460,
-        width: 'calc(100% - 20px)',
+        bottom: 90,
+        left: 10,
+        right: 10,
+        zIndex: 99999,
         background: 'var(--card-solid)',
         border: '1px solid ' + (ms.customAction?.danger ? 'var(--danger)' : 'rgba(59,130,246,0.4)'),
         borderRadius: 22,
         boxShadow: '0 16px 44px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.1)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        padding: '14px 16px',
+        padding: '12px 14px',
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
-        minHeight: 72,
+        gap: 6,
+        maxWidth: 480,
+        margin: '0 auto',
+        direction: 'rtl',
       }}
     >
       <span
@@ -78,12 +76,7 @@ export default function MultiSelectBar<T>({
       <button
         type="button"
         onClick={ms.exitSelection}
-        style={{
-          ...btnBase,
-          background: 'transparent',
-          color: 'var(--muted)',
-        }}
-        aria-label="لغو انتخاب"
+        style={{ ...btnBase, background: 'transparent', color: 'var(--muted)' }}
       >
         لغو
       </button>
@@ -105,12 +98,7 @@ export default function MultiSelectBar<T>({
       )}
 
       {ms.hasArchive && (
-        <button
-          type="button"
-          onClick={ms.doArchive}
-          style={btnBase}
-          aria-label={archiveLabel}
-        >
+        <button type="button" onClick={ms.doArchive} style={btnBase}>
           📦 {archiveLabel}
         </button>
       )}
@@ -126,11 +114,12 @@ export default function MultiSelectBar<T>({
             color: 'var(--danger)',
             fontWeight: 700,
           }}
-          aria-label={deleteLabel}
         >
           🗑 {deleteLabel}
         </button>
       )}
     </div>
   );
+
+  return createPortal(bar, document.body);
 }
