@@ -475,19 +475,19 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         )}
 
         <Grid2>
+          {sellerSlot || <div />}
           <Field label="مبنای قیمت">
             <Select value={item.priceUnit || 'per_unit'} onChange={e => updateItem({ priceUnit: e.target.value as PriceUnit })}>
               <option value="per_unit">هر عدد</option>
               <option value="per_kg">هر کیلو</option>
             </Select>
           </Field>
-          {item.priceUnit === 'per_kg' && (
-            <Field label="وزن کل (کیلو)">
-              <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
-            </Field>
-          )}
         </Grid2>
-        {sellerSlot}
+        {item.priceUnit === 'per_kg' && (
+          <Field label="وزن کل (کیلو)">
+            <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
+          </Field>
+        )}
       </div>
     );
   }
