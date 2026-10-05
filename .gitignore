@@ -41,3 +41,4 @@ coverage
 *.bak
 *.bak_ms
 *.bak_*
+*.bak*
