@@ -1172,11 +1172,10 @@ const collectWhsShortages = () => {
           ))}
           </AccordionSection>
 
-          <AccordionSection icon="📝" title="یادداشت" defaultOpen={!!form.notes} summary={form.notes ? form.notes.slice(0, 30) + (form.notes.length > 30 ? '…' : '') : undefined}>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
           <Field label="یادداشت">
             <Textarea rows={3} placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>
-          </AccordionSection>
 
           <ErrorBox>{err}</ErrorBox>
         </Modal>
