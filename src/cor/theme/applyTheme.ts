@@ -48,6 +48,9 @@ export function applyTheme(
   const root = document.documentElement;
 
   // ===== رنگ اصلی =====
+  // روش ۱: data-attribute (مطمئن‌تر)
+  root.setAttribute('data-accent', accentColor);
+  // روش ۲: inline style (پشتیبان)
   const preset = ACCENT_PRESETS[accentColor] || ACCENT_PRESETS.green;
   const accent = theme === 'dark' ? preset.dark : preset.light;
   root.style.setProperty('--accent', accent.accent);
