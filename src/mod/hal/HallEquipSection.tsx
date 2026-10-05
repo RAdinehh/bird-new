@@ -1,6 +1,10 @@
 /**
- * HallEquipSection — انتخاب تجهیزات برای یک سالن
- * ۸ دکمه افزودن + لیست تجهیزات (آکاردئون)
+ * HallEquipSection — نمایش تجهیزات سالن به همراه نیاز گله
+ *
+ * ساختار:
+ *   - ۲ گروه: «ضروری» و «اختیاری»
+ *   - جدول مینیمال با ۴ ستون: دسته · نصب‌شده · نیاز · وضعیت
+ *   - ۸ دکمه افزودن پایین
  */
 import { useState } from 'react';
 import { Btn, Field, Input, Modal, NumField } from '../../shr/components/ui';
@@ -13,10 +17,10 @@ import {
   type Equipment,
 } from './store';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { NEED_CALCULATORS, type NeedInput } from './needs';
-import type { BirdStandard } from '../set/standards/types';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { NEED_CALCULATORS, type NeedInput } from './needs';
+import type { BirdStandard } from '../set/standards/types';
 
 const TYPES_BY_CATEGORY: Record<string, string[]> = {
   ventilation: ['fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad'],
@@ -33,15 +37,37 @@ function typesForCategory(cat: string): string[] {
   return TYPES_BY_CATEGORY[cat] || [];
 }
 
-const ORDER: string[] = [
-  'ventilation', 'heating', 'lighting',
-  'drinking', 'feeding',
-  'litter', 'power', 'auxiliary',
-];
+/** ترتیب نمایش */
+const REQUIRED_CATS: string[] = ['ventilation', 'heating', 'lighting', 'drinking', 'feeding', 'litter'];
+const OPTIONAL_CATS: string[] = ['power', 'auxiliary'];
+const ALL_CATS: string[] = [...REQUIRED_CATS, ...OPTIONAL_CATS];
+
+/** واحد مقدار نصب‌شده برای هر دسته */
+function unitForCategory(cat: string): string {
+  if (cat === 'ventilation') return 'm³/h';
+  if (cat === 'lighting') return 'W';
+  if (cat === 'litter') return 'kg';
+  return 'عدد';
+}
+
+/** محاسبه مقدار نصب‌شده برای یک دسته */
+function calcInstalled(cat: string, list: Equipment[]): number {
+  if (cat === 'ventilation') {
+    return list.reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
+  }
+  if (cat === 'lighting') {
+    return list.reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
+  }
+  if (cat === 'litter') {
+    return list.reduce((a, e) => a + ((e as any).capacity || 0), 0);
+  }
+  // آبخوری، دانخوری، گرمایش → تعداد
+  return list.reduce((a, e) => a + (e.count || 0), 0);
+}
 
 interface Props {
   hallId: string;
-  needInput?: Omit<NeedInput, 'standard'> & { standard: BirdStandard | null };
+  needInput?: NeedInput;
   legacy?: {
     ventilationSystem?: string;
     feederType?: string;
@@ -53,7 +79,6 @@ interface Props {
 export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const { equipment, addEquip, updateEquip, deleteEquip } = useHal();
 
-  const [expanded, setExpanded] = useState(false);
   const [picker, setPicker] = useState(false);
   const [pickerCat, setPickerCat] = useState<string>('ventilation');
   const [pickerType, setPickerType] = useState<string>('fan_tunnel');
@@ -65,8 +90,11 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const [editCount, setEditCount] = useState<string>('');
   const [editCap, setEditCap] = useState<string>('');
 
+  const [detailCat, setDetailCat] = useState<string | null>(null);
+
   const hallEquips = equipment.filter(e => e.hallId === hallId);
 
+  // گروه‌بندی
   const grouped: Record<string, Equipment[]> = {};
   hallEquips.forEach(e => {
     const cat = (e as any).category || 'auxiliary';
@@ -74,26 +102,24 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
     grouped[cat].push(e);
   });
 
-  // محاسبه نیاز هر دسته
+  // نیاز هر دسته
   const needByCategory: Record<string, { value: number; unit: string } | null> = {};
   if (needInput) {
     Object.entries(NEED_CALCULATORS).forEach(([cat, calc]) => {
-      try {
-        needByCategory[cat] = calc(needInput);
-      } catch {
-        needByCategory[cat] = null;
-      }
+      try { needByCategory[cat] = calc(needInput); } catch { needByCategory[cat] = null; }
     });
   }
 
-  const totals: Record<string, number> = {};
-  Object.entries(grouped).forEach(([cat, list]) => {
-    if (cat === 'ventilation') {
-      totals[cat] = list.reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
-    } else {
-      totals[cat] = list.reduce((a, e) => a + (e.count || 0), 0);
-    }
-  });
+  // محاسبه وضعیت (فقط برای دسته‌های ضروری)
+  function statusFor(cat: string): { pct: number | null; tone: 'ok' | 'warn' | 'danger' | 'none' } {
+    const installed = calcInstalled(cat, grouped[cat] || []);
+    const need = needByCategory[cat]?.value || 0;
+    if (need === 0 || installed === 0) return { pct: installed === 0 ? null : 999, tone: installed === 0 ? 'none' : 'ok' };
+    const pct = (installed / need) * 100;
+    if (pct >= 90 && pct <= 120) return { pct, tone: 'ok' };
+    if (pct >= 50) return { pct, tone: 'warn' };
+    return { pct, tone: 'danger' };
+  }
 
   const openPicker = (cat: string) => {
     const types = typesForCategory(cat);
@@ -111,9 +137,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
       return;
     }
     const name = pickerName.trim();
-    const dup = hallEquips.find((x: any) =>
-      x.type === pickerType && x.name.trim() === name
-    );
+    const dup = hallEquips.find((x: any) => x.type === pickerType && x.name.trim() === name);
     if (dup) {
       showToast('این تجهیز قبلاً در همین سالن ثبت شده', 'error', 2500);
       return;
@@ -162,9 +186,160 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const currentEdit = editId ? hallEquips.find(e => e.id === editId) : null;
   const editCategory = currentEdit ? ((currentEdit as any).category || 'auxiliary') : '';
 
+  /** رندر یه گروه */
+  const renderGroup = (cats: string[], isRequired: boolean) => {
+    const totalItems = cats.reduce((a, c) => a + (grouped[c] || []).length, 0);
+
+    return (
+      <div style={{ marginBottom: 12 }}>
+        <div style={{
+          fontSize: 10.5,
+          fontWeight: 800,
+          color: 'var(--muted)',
+          letterSpacing: '.5px',
+          padding: '10px 4px 6px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}>
+          <span>{isRequired ? 'ضروری برای پرورش' : 'اختیاری'}</span>
+          {totalItems > 0 && (
+            <span style={{
+              fontSize: 9.5,
+              fontWeight: 700,
+              padding: '1px 6px',
+              borderRadius: 5,
+              background: 'var(--input-bg)',
+              color: 'var(--muted)',
+              letterSpacing: 0,
+            }}>{toFa(totalItems)}</span>
+          )}
+          <span style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {cats.map(cat => {
+            const list = grouped[cat] || [];
+            const catColor = CATEGORY_COLORS[cat] || '#475569';
+            const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
+            const installed = calcInstalled(cat, list);
+            const unit = unitForCategory(cat);
+            const need = needByCategory[cat]?.value || 0;
+            const needUnit = needByCategory[cat]?.unit || unit;
+            const st = isRequired ? statusFor(cat) : { pct: null as number | null, tone: 'none' as const };
+            const isEmpty = list.length === 0;
+
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => !isEmpty && setDetailCat(cat)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: isEmpty ? 'transparent' : 'var(--input-bg)',
+                  border: '1px solid ' + (isEmpty ? 'var(--border)' : 'transparent'),
+                  borderStyle: isEmpty ? 'dashed' : 'solid',
+                  borderRadius: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  fontFamily: 'inherit',
+                  textAlign: 'right',
+                  cursor: isEmpty ? 'default' : 'pointer',
+                }}
+              >
+                <span style={{
+                  width: 28, height: 28, borderRadius: 9,
+                  background: 'var(--card-solid)',
+                  border: '1px solid var(--border)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  <CategoryIcon category={cat} size={16} weight="duotone" color={catColor} />
+                </span>
+
+                <span style={{
+                  flex: 1,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  color: isEmpty ? 'var(--muted)' : 'var(--text)',
+                  minWidth: 0,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {label}
+                  {!isEmpty && <span style={{ color: 'var(--muted)', fontWeight: 500, fontSize: 11, marginRight: 4 }}>· {toFa(list.length)}</span>}
+                </span>
+
+                {!isEmpty && (
+                  <>
+                    <span style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      fontVariantNumeric: 'tabular-nums',
+                      color: 'var(--text)',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {toFa(installed.toLocaleString('fa-IR'))}
+                      <span style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 500, marginRight: 3 }}>{unit}</span>
+                    </span>
+                    {isRequired && need > 0 && st.pct !== null && (
+                      <span style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        fontVariantNumeric: 'tabular-nums',
+                        color: st.tone === 'ok' ? 'var(--accent)'
+                             : st.tone === 'warn' ? 'var(--warn)'
+                             : st.tone === 'danger' ? 'var(--danger)'
+                             : 'var(--muted)',
+                        minWidth: 34,
+                        textAlign: 'left',
+                      }}>
+                        {toFa(Math.round(st.pct))}٪
+                      </span>
+                    )}
+                  </>
+                )}
+
+                {isEmpty && isRequired && need > 0 && (
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: 'var(--muted)',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    نیاز: {toFa(need.toLocaleString('fa-IR'))} {needUnit}
+                  </span>
+                )}
+
+                {isEmpty && !isRequired && (
+                  <span style={{ fontSize: 10, color: 'var(--muted)' }}>— ثبت نشده</span>
+                )}
+
+                {!isEmpty && (
+                  <span style={{ color: 'var(--muted)', fontSize: 14 }}>‹</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  // لیست تجهیزات یه دسته برای نمایش در مودال
+  const detailList = detailCat ? (grouped[detailCat] || []) : [];
+  const detailCatLabel = detailCat ? ((CATEGORY_LABELS as any)[detailCat]?.name || detailCat) : '';
+  const detailColor = detailCat ? (CATEGORY_COLORS[detailCat] || '#475569') : '#475569';
+  const detailInstalled = detailCat ? calcInstalled(detailCat, detailList) : 0;
+  const detailNeed = detailCat ? (needByCategory[detailCat]?.value || 0) : 0;
+  const detailNeedUnit = detailCat ? (needByCategory[detailCat]?.unit || unitForCategory(detailCat)) : '';
+  const detailUnit = detailCat ? unitForCategory(detailCat) : '';
+
   return (
     <>
-      {/* ۸ دکمه افزودن */}
       <div style={{
         marginTop: 6,
         paddingTop: 8,
@@ -175,7 +350,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
           fontWeight: 700,
           color: 'var(--text)',
           letterSpacing: '.3px',
-          marginBottom: 8,
+          marginBottom: 10,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -191,12 +366,29 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
           }}>{hallEquips.length > 0 ? toFa(hallEquips.length) + ' مورد' : 'خالی'}</span>
         </div>
 
+        {renderGroup(REQUIRED_CATS, true)}
+        {renderGroup(OPTIONAL_CATS, false)}
+
+        {/* legacy pills */}
+        {legacy && (legacy.ventilationSystem || legacy.feederType || legacy.drinkerType || legacy.litterType) && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
+            {legacy.ventilationSystem && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>تهویه پایه: {legacy.ventilationSystem}</span>}
+            {legacy.feederType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>دانخوری پایه: {legacy.feederType}</span>}
+            {legacy.drinkerType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>آبخوری پایه: {legacy.drinkerType}</span>}
+            {legacy.litterType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>بستر پایه: {legacy.litterType}</span>}
+          </div>
+        )}
+
+        {/* ۸ دکمه افزودن */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr 1fr 1fr',
           gap: 4,
+          marginTop: 12,
+          paddingTop: 12,
+          borderTop: '1px dashed var(--border)',
         }}>
-          {ORDER.map(cat => {
+          {ALL_CATS.map(cat => {
             const catColor = CATEGORY_COLORS[cat] || '#475569';
             const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
             return (
@@ -205,7 +397,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
                 type="button"
                 onClick={() => openPicker(cat)}
                 style={{
-                  padding: '6px 4px',
+                  padding: '8px 4px',
                   background: 'var(--input-bg)',
                   border: '1px dashed var(--border)',
                   borderRadius: 10,
@@ -217,7 +409,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: 2,
+                  gap: 3,
                 }}
               >
                 <CategoryIcon category={cat} size={16} weight="duotone" color={catColor} />
@@ -226,184 +418,93 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
             );
           })}
         </div>
+      </div>
 
-        {/* Legacy pills */}
-        {legacy && (legacy.ventilationSystem || legacy.feederType || legacy.drinkerType || legacy.litterType) && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
-            {legacy.ventilationSystem && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>تهویه پایه: {legacy.ventilationSystem}</span>}
-            {legacy.feederType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>دانخوری پایه: {legacy.feederType}</span>}
-            {legacy.drinkerType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>آبخوری پایه: {legacy.drinkerType}</span>}
-            {legacy.litterType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>بستر پایه: {legacy.litterType}</span>}
-          </div>
-        )}
-
-        {/* هدر لیست */}
-        {hallEquips.length > 0 && (
+      {/* مودال جزئیات گروه */}
+      <Modal
+        open={!!detailCat}
+        onClose={() => setDetailCat(null)}
+        title={detailCatLabel}
+        footer={
+          detailCat && (
+            <Btn variant="primary" full onClick={() => { const c = detailCat; setDetailCat(null); openPicker(c); }}>
+              + افزودن {detailCatLabel}
+            </Btn>
+          )
+        }
+      >
+        {detailCat && (
           <>
-            <button
-              type="button"
-              onClick={() => setExpanded(x => !x)}
-              style={{
-                marginTop: 8,
-                width: '100%',
-                padding: '8px 10px',
-                background: 'var(--card-solid)',
-                border: '1px solid var(--border)',
-                borderRadius: 10,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                textAlign: 'right',
-              }}
-            >
-              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                📋 لیست تجهیزات
+            {/* خلاصه نیاز */}
+            <div style={{
+              padding: '10px 12px',
+              background: 'var(--input-bg)',
+              borderRadius: 10,
+              marginBottom: 10,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 8,
+            }}>
+              <span style={{ fontSize: 12, color: 'var(--muted)' }}>نصب‌شده:</span>
+              <span style={{ fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                {toFa(detailInstalled.toLocaleString('fa-IR'))} {detailUnit}
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{
-                  fontSize: 11,
-                  color: 'var(--accent)',
-                  fontWeight: 700,
-                }}>{toFa(hallEquips.length)} مورد</span>
-                <span style={{
-                  color: 'var(--muted)',
-                  fontSize: 11,
-                  transition: 'transform 180ms',
-                  transform: expanded ? 'rotate(180deg)' : 'rotate(0)',
-                  display: 'inline-block',
-                }}>▼</span>
-              </span>
-            </button>
+              {detailNeed > 0 && (
+                <>
+                  <span style={{ fontSize: 12, color: 'var(--muted)' }}>نیاز:</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                    {toFa(detailNeed.toLocaleString('fa-IR'))} {detailNeedUnit}
+                  </span>
+                </>
+              )}
+            </div>
 
-            {expanded && (
-              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {ORDER.map(cat => {
-                  const list = grouped[cat] || [];
-                  if (list.length === 0) return null;
-                  const catColor = CATEGORY_COLORS[cat] || '#475569';
-                  const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
-                  return (
-                    <div key={cat} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        fontSize: 'var(--fs-xs)',
-                        color: 'var(--muted)',
-                        fontWeight: 700,
-                        paddingRight: 4,
-                        flexWrap: 'wrap',
-                      }}>
-                        <CategoryIcon category={cat} size={14} weight="duotone" color={catColor} />
-                        <span>{label}</span>
-                        <span style={{ opacity: 0.6 }}>({toFa(list.length)})</span>
-                        {totals[cat] > 0 && (
-                          <span style={{ color: catColor, fontWeight: 700 }}>
-                            {cat === 'ventilation'
-                              ? `${toFa(totals[cat].toLocaleString('fa-IR'))} m³/h`
-                              : toFa(totals[cat].toLocaleString('fa-IR'))}
-                          </span>
-                        )}
-                        {needByCategory[cat] && (
-                          <span style={{
-                            marginRight: 'auto',
-                            color: 'var(--muted)',
-                            fontWeight: 600,
-                            fontSize: 10,
-                            background: 'var(--input-bg)',
-                            padding: '2px 6px',
-                            borderRadius: 6,
-                            border: '1px solid var(--border)',
-                          }}>
-                            نیاز: {toFa(needByCategory[cat]!.value.toLocaleString('fa-IR'))} {needByCategory[cat]!.unit}
-                          </span>
-                        )}
-                      </div>
-                      {list.map(e => {
-                        const capUnit = cat === 'ventilation' ? ' m³/h'
-                                      : cat === 'lighting' ? ' W'
-                                      : '';
-                        return (
-                          <div key={e.id} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 10,
-                            padding: '8px 10px',
-                            background: 'var(--card-solid)',
-                            border: '1.5px solid var(--border)',
-                            borderRadius: 12,
-                            boxShadow: '0 1px 2px rgba(15,23,42,.04)',
-                          }}>
-                            <div style={{
-                              width: 34, height: 34, borderRadius: 10,
-                              background: 'linear-gradient(135deg, #f0f4f8 0%, #e2e8ef 100%)',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              flexShrink: 0,
-                            }}>
-                              <EquipmentIcon type={e.type} size={20} weight="duotone" color={catColor} />
-                            </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{
-                                fontSize: 'var(--fs-sm)',
-                                fontWeight: 700,
-                                color: 'var(--text)',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                              }}>{e.name}</div>
-                              <div style={{
-                                fontSize: 11,
-                                color: 'var(--muted)',
-                                marginTop: 1,
-                                display: 'flex',
-                                gap: 8,
-                              }}>
-                                {e.count != null && <span>× {toFa(e.count)}</span>}
-                                {(e as any).capacity != null && (
-                                  <span>{toFa((e as any).capacity)}{capUnit}</span>
-                                )}
-                              </div>
-                            </div>
-                            <button type="button" onClick={() => openEdit(e)} aria-label="ویرایش" style={{
-                              width: 30, height: 30, borderRadius: 8,
-                              background: 'var(--input-bg)', border: '1px solid var(--border)',
-                              cursor: 'pointer', fontSize: 13, padding: 0,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>✏️</button>
-                            <button type="button" onClick={() => removeEquip(e.id, e.name)} aria-label="حذف" style={{
-                              width: 30, height: 30, borderRadius: 8,
-                              background: 'var(--input-bg)', border: '1px solid var(--border)',
-                              cursor: 'pointer', fontSize: 13, padding: 0,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>🗑️</button>
-                          </div>
-                        );
-                      })}
+            {/* لیست تجهیزات */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {detailList.map(e => (
+                <div key={e.id} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '10px 12px',
+                  background: 'var(--card-solid)',
+                  border: '1.5px solid var(--border)',
+                  borderRadius: 12,
+                }}>
+                  <span style={{
+                    width: 36, height: 36, borderRadius: 11,
+                    background: 'linear-gradient(135deg, #f0f4f8 0%, #e2e8ef 100%)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <EquipmentIcon type={e.type} size={20} weight="duotone" color={detailColor} />
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1, display: 'flex', gap: 8 }}>
+                      {e.count != null && <span>× {toFa(e.count)}</span>}
+                      {(e as any).capacity != null && <span>{toFa((e as any).capacity)}{detailUnit === 'm³/h' ? ' m³/h' : detailUnit === 'W' ? ' W' : ''}</span>}
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                  </div>
+                  <button type="button" onClick={() => openEdit(e)} aria-label="ویرایش" style={{
+                    width: 32, height: 32, borderRadius: 8,
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    cursor: 'pointer', fontSize: 13, padding: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>✏️</button>
+                  <button type="button" onClick={() => removeEquip(e.id, e.name)} aria-label="حذف" style={{
+                    width: 32, height: 32, borderRadius: 8,
+                    background: 'var(--input-bg)', border: '1px solid var(--border)',
+                    cursor: 'pointer', fontSize: 13, padding: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>🗑️</button>
+                </div>
+              ))}
+            </div>
           </>
         )}
-
-        {hallEquips.length === 0 && (
-          <div style={{
-            marginTop: 6,
-            padding: '14px 12px',
-            background: 'var(--input-bg)',
-            border: '1px dashed var(--border)',
-            borderRadius: 12,
-            fontSize: 12,
-            color: 'var(--muted)',
-            textAlign: 'center',
-          }}>
-            هنوز تجهیزی انتخاب نشده — از دکمه‌های بالا استفاده کن
-          </div>
-        )}
-      </div>
+      </Modal>
 
       {/* مودال افزودن */}
       <Modal
@@ -444,21 +545,10 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <Field label="تعداد">
-            <NumField
-              placeholder="۰"
-              value={pickerCount}
-              onChange={e => setPickerCount(e.target.value)}
-              unit="عدد"
-              min={0}
-            />
+            <NumField placeholder="۰" value={pickerCount} onChange={e => setPickerCount(e.target.value)} unit="عدد" min={0} />
           </Field>
           <Field label={pickerCat === 'ventilation' ? 'ظرفیت (m³/h)' : pickerCat === 'lighting' ? 'توان (W)' : 'ظرفیت'}>
-            <NumField
-              placeholder="۰"
-              value={pickerCap}
-              onChange={e => setPickerCap(e.target.value)}
-              min={0}
-            />
+            <NumField placeholder="۰" value={pickerCap} onChange={e => setPickerCap(e.target.value)} min={0} />
           </Field>
         </div>
       </Modal>
@@ -477,21 +567,10 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
       >
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <Field label="تعداد">
-            <NumField
-              placeholder="۰"
-              value={editCount}
-              onChange={e => setEditCount(e.target.value)}
-              unit="عدد"
-              min={0}
-            />
+            <NumField placeholder="۰" value={editCount} onChange={e => setEditCount(e.target.value)} unit="عدد" min={0} />
           </Field>
           <Field label={editCategory === 'ventilation' ? 'ظرفیت (m³/h)' : editCategory === 'lighting' ? 'توان (W)' : 'ظرفیت'}>
-            <NumField
-              placeholder="۰"
-              value={editCap}
-              onChange={e => setEditCap(e.target.value)}
-              min={0}
-            />
+            <NumField placeholder="۰" value={editCap} onChange={e => setEditCap(e.target.value)} min={0} />
           </Field>
         </div>
       </Modal>
