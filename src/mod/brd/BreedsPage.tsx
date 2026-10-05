@@ -4,6 +4,9 @@ import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { Btn, BtnRow, Empty, Field,
   Grid2, Input, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
@@ -80,6 +83,13 @@ export default function BreedsPage() {
 
     return (
       <PageContainer>
+      <HelpBanner
+        id="brd-breeds-intro"
+        icon="🧬"
+        title="نژادها"
+        description="نژادهای هر پرنده را اینجا تعریف کنید. هر نژاد می‌تواند به استانداردهای علمی وصل شود. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        tone="info"
+      />
       {undoData && (
         <UndoBar
           label="حذف شد"
@@ -135,6 +145,33 @@ export default function BreedsPage() {
   };
 
   const list = filterBird ? breeds.filter(x => x.birdId === filterBird) : breeds;
+
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (x: any) => x.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' مورد حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const item = _breedsRaw.find((x: any) => x.id === id);
+        if (!item) continue;
+        backups.push(item);
+        try { deleteBreed(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' مورد حذف شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
   const target = delId ? breeds.find(b => b.id === delId) : null;
 
   return (
@@ -146,7 +183,23 @@ export default function BreedsPage() {
         ))}
       </div>
 
-      {list.length === 0 ? (
+              {!ms.selectionMode && list.length > 1 && (
+          <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+            برای انتخاب چندتایی، روی یک کارت نگه دارید
+          </div>
+        )}
+
+        {ms.selectionMode && list.length > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+            <button type="button"
+              onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
+              style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+              {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+            </button>
+          </div>
+        )}
+
+        {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
           title="نژادی ثبت نشده"
@@ -157,10 +210,10 @@ export default function BreedsPage() {
         <>
           {list.map((b, i) => {
             const bird = birds.find(x => x.id === b.birdId);
-            const isOpen = expandedId === b.id;
+            const isOpen = !ms.selectionMode && expandedId === b.id;
             return (
               <ExpandableCard
-                key={b.id}
+                key={b.id} id={b.id} ms={ms}
                 accent="purple"
                 index={toFa(i + 1)}
                 iconEmoji="🧬"
@@ -205,6 +258,10 @@ export default function BreedsPage() {
           <Btn variant="primary" full onClick={openNew}>+ افزودن نژاد</Btn>
         </>
       )}
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش نژاد' : 'افزودن نژاد'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
