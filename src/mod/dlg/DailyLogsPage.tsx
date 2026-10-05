@@ -770,7 +770,7 @@ const collectWhsShortages = () => {
             </div>
           )}
 
-          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> شرایط محیطی</SectionTitle>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> محیط و پرنده</SectionTitle>
 
           <Grid2>
             <Field label="حداقل دما" hint="۱۵-۳۰ درجه" error={vErrors.temperatureMin}>
@@ -807,8 +807,6 @@ const collectWhsShortages = () => {
             </Field>
           </Grid2>
 
-          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> مشاهده پرنده</SectionTitle>
-
           <Grid3>
             <Field label="رفتار">
               <Select value={form.behavior} onChange={e => setForm({ ...form, behavior: e.target.value })}>
@@ -836,7 +834,7 @@ const collectWhsShortages = () => {
             <Textarea rows={2} placeholder="رنگ پر، چشم، تاج، منقار..." value={form.appearance} onChange={e => setForm({ ...form, appearance: e.target.value })} />
           </Field>
 
-          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌾</span> تغذیه</SectionTitle>
+          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🍽</span> تغذیه و آب</SectionTitle>
 
           <Field label="منبع دان مصرفی" hint="از جیره‌ها یا دان تکی انبار">
             <SmartSelect
@@ -931,8 +929,6 @@ const collectWhsShortages = () => {
             </Field>
           </Grid2>
 
-          <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💧</span> آب</SectionTitle>
-
           {form.waterMethod === 'manual' && (
             <>
               <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
@@ -982,7 +978,7 @@ const collectWhsShortages = () => {
 
           {isLayerFlock && (
           <>
-            <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم‌گذاری</SectionTitle>
+            <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم و وزن</SectionTitle>
             <Grid2>
                   <Field label="🥚 تخم خوراکی" error={vErrors.eatingEggs}>
                     <NumField placeholder="۰" value={form.eatingEggs} onChange={e => setForm({...form, eatingEggs: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
@@ -1001,8 +997,6 @@ const collectWhsShortages = () => {
                 </Grid2>
           </>
         )}
-
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚖️</span> وزن‌کشی (اختیاری)</SectionTitle>
 
           {form.weightSamples.length > 0 && (
             <Grid2>
@@ -1042,7 +1036,7 @@ const collectWhsShortages = () => {
             + افزودن نمونه وزن
           </Btn>
 
-          <SectionTitle>💀 تلفات</SectionTitle>
+          <SectionTitle>🏥 سلامت</SectionTitle>
 
           {form.deaths.length > 0 && (
             <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn-border, var(--border))', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
@@ -1080,8 +1074,6 @@ const collectWhsShortages = () => {
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deaths: [...f.deaths, { id: crypto.randomUUID(), count: 0, cause: '', notes: '' }] }))}>
             + افزودن رکورد تلفات
           </Btn>
-
-          <SectionTitle>💉 واکسن و دارو</SectionTitle>
 
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: crypto.randomUUID(), name: '', dose: '', method: '', reaction: '', itemId: '', quantity: null, movementId: '' }] }))}>
             + افزودن واکسن
