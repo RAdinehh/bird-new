@@ -17,7 +17,7 @@ import { showAlert } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
-import { Row, SectionTitle, chip } from './helpers';
+import { Row, SectionTitle, chip, AccordionSection } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
@@ -346,13 +346,13 @@ export default function ProductionsPage() {
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Grid2>
+          <Field label="تاریخ" required>
+            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
+          </Field>
           <Field label="گله" required>
             <Select value={form.flockId} onChange={e => setForm({ ...form, flockId: e.target.value })}>
               {activeFlocks.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
             </Select>
-          </Field>
-          <Field label="تاریخ" required>
-            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
           </Field>
         </Grid2>
 
@@ -362,7 +362,7 @@ export default function ProductionsPage() {
           </div>
         ) : null}
 
-        <SectionTitle>🥚 تخم‌های سالم</SectionTitle>
+        <AccordionSection icon="🥚" title="تخم‌های سالم" defaultOpen summary={healthy > 0 ? `${toFa(healthy)} تخم` : undefined}>
 
         <Grid2>
           <Field label="🥚 تخم خوراکی">
@@ -379,6 +379,8 @@ export default function ProductionsPage() {
           </div>
         )}
 
+        </AccordionSection>
+
         {/* خطاهای زنده */}
         {liveErrors.length > 0 && (
           <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -391,7 +393,7 @@ export default function ProductionsPage() {
           </div>
         )}
 
-        <SectionTitle>💔 تخم‌های مصرفی</SectionTitle>
+        <AccordionSection icon="💔" title="تخم‌های مصرفی" defaultOpen summary={(int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount)) > 0 ? `${toFa(int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount))} تخم` : undefined}>
 
         <Grid2>
           <Field label="تخم شکسته" error={vErrors.brokenCount}>
@@ -452,10 +454,13 @@ export default function ProductionsPage() {
           </div>
         )}
 
-        <SectionTitle>⚖ وزن</SectionTitle>
+        </AccordionSection>
+
+        <AccordionSection icon="⚖" title="وزن" defaultOpen={false} summary={form.avgWeight ? `${toFa(form.avgWeight)} گرم` : undefined}>
         <Field label="وزن میانگین تخم" hint="اختیاری" error={vErrors.avgWeight}>
           <NumField placeholder="مثلاً — ۱.۵" value={form.avgWeight} onChange={e => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
         </Field>
+        </AccordionSection>
 
         <Field label="یادداشت">
           <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
