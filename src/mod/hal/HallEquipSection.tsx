@@ -20,6 +20,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { NEED_CALCULATORS, type NeedInput } from './needs';
+import { getEquipUnit } from './equipUnits';
 import type { BirdStandard } from '../set/standards/types';
 
 const TYPES_BY_CATEGORY: Record<string, string[]> = {
@@ -42,30 +43,32 @@ const REQUIRED_CATS: string[] = ['ventilation', 'heating', 'lighting', 'drinking
 const OPTIONAL_CATS: string[] = ['power', 'auxiliary'];
 const ALL_CATS: string[] = [...REQUIRED_CATS, ...OPTIONAL_CATS];
 
-/** واحد مقدار نصب‌شده برای هر دسته */
-function unitForCategory(cat: string): string {
-  if (cat === 'ventilation') return 'm³/h';
-  if (cat === 'lighting') return 'W';
-  if (cat === 'litter') return 'kg';
-  if (cat === 'heating') return 'kW';
-  return 'عدد';
+/**
+ * واحد هر دسته بر اساس زیرنوع‌های داخلش
+ * اگه همه زیرنوع‌ها هم واحد بودن، اون واحد؛ وگرنه از baseUnit اولین تجهیز
+ */
+function unitForCategory(cat: string, list: any[]): string {
+  if (list.length === 0) {
+    // پیش‌فرض بر اساس دسته
+    if (cat === 'ventilation') return 'm³/h';
+    if (cat === 'lighting') return 'W';
+    if (cat === 'litter') return 'kg';
+    if (cat === 'heating') return 'kW';
+    return 'عدد';
+  }
+  return getEquipUnit(list[0].type).baseUnit;
 }
 
 /** محاسبه مقدار نصب‌شده برای یک دسته */
 function calcInstalled(cat: string, list: Equipment[]): number {
-  if (cat === 'ventilation') {
-    return list.reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
-  }
-  if (cat === 'lighting') {
-    return list.reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
-  }
-  if (cat === 'litter') {
-    return list.reduce((a, e) => a + ((e as any).capacity || 0), 0);
-  }
-  if (cat === 'heating') {
-    return list.reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
-  }
-  return list.reduce((a, e) => a + (e.count || 0), 0);
+  return list.reduce((a, e) => {
+    const def = getEquipUnit(e.type);
+    const primary = e.count || 0;
+    const secondary = (e as any).capacity != null
+      ? (e as any).capacity
+      : (def.secondary?.defaultValue || 0);
+    return a + def.calc(primary, secondary);
+  }, 0);
 }
 
 interface Props {
@@ -147,6 +150,10 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
       showToast('این تجهیز قبلاً در همین سالن ثبت شده', 'error', 2500);
       return;
     }
+    const def = getEquipUnit(pickerType);
+    const capValue = pickerCap
+      ? parseFloat(toEn(pickerCap).replace('٫', '.')) || null
+      : (def.secondary?.defaultValue || null);
     addEquip({
       hallId,
       kind: 'asset',
@@ -159,7 +166,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
       purchasedAt: '',
       warranty: null,
       notes: '',
-      capacity: pickerCap ? parseFloat(toEn(pickerCap).replace('٫', '.')) || null : null,
+      capacity: capValue,
     } as any);
     setPicker(false);
     showToast('تجهیز اضافه شد', 'success', 1500);
@@ -232,7 +239,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
             const catColor = CATEGORY_COLORS[cat] || '#475569';
             const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
             const installed = calcInstalled(cat, list);
-            const unit = unitForCategory(cat);
+            const unit = unitForCategory(cat, list);
             const need = needByCategory[cat]?.value || 0;
             const needUnit = needByCategory[cat]?.unit || unit;
             const st = isRequired ? statusFor(cat) : { pct: null as number | null, tone: 'none' as const };
@@ -351,8 +358,8 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const detailColor = detailCat ? (CATEGORY_COLORS[detailCat] || '#475569') : '#475569';
   const detailInstalled = detailCat ? calcInstalled(detailCat, detailList) : 0;
   const detailNeed = detailCat ? (needByCategory[detailCat]?.value || 0) : 0;
-  const detailNeedUnit = detailCat ? (needByCategory[detailCat]?.unit || unitForCategory(detailCat)) : '';
-  const detailUnit = detailCat ? unitForCategory(detailCat) : '';
+  const detailNeedUnit = detailCat ? (needByCategory[detailCat]?.unit || unitForCategory(detailCat, detailList)) : '';
+  const detailUnit = detailCat ? unitForCategory(detailCat, detailList) : '';
 
   return (
     <>
@@ -552,9 +559,24 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
           <Field label="تعداد">
             <NumField placeholder="۰" value={pickerCount} onChange={e => setPickerCount(e.target.value)} unit="عدد" min={0} />
           </Field>
-          <Field label={pickerCat === 'ventilation' ? 'ظرفیت (m³/h)' : pickerCat === 'lighting' ? 'توان (W)' : 'ظرفیت'}>
-            <NumField placeholder="۰" value={pickerCap} onChange={e => setPickerCap(e.target.value)} min={0} />
-          </Field>
+          {(() => {
+            const def = getEquipUnit(pickerType);
+            if (!def.secondary) return null;
+            return (
+              <Field
+                label={def.secondary.label}
+                hint={`واحد: ${def.secondary.unit}${def.secondary.defaultValue ? ` — پیش‌فرض ${def.secondary.defaultValue}` : ''}`}
+              >
+                <NumField
+                  placeholder={def.secondary.defaultValue ? String(def.secondary.defaultValue) : '۰'}
+                  value={pickerCap}
+                  onChange={e => setPickerCap(e.target.value)}
+                  unit={def.secondary.unit}
+                  min={0}
+                />
+              </Field>
+            );
+          })()}
         </div>
       </Modal>
 
@@ -574,9 +596,24 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
           <Field label="تعداد">
             <NumField placeholder="۰" value={editCount} onChange={e => setEditCount(e.target.value)} unit="عدد" min={0} />
           </Field>
-          <Field label={editCategory === 'ventilation' ? 'ظرفیت (m³/h)' : editCategory === 'lighting' ? 'توان (W)' : 'ظرفیت'}>
-            <NumField placeholder="۰" value={editCap} onChange={e => setEditCap(e.target.value)} min={0} />
-          </Field>
+          {(() => {
+            const def = currentEdit ? getEquipUnit(currentEdit.type) : null;
+            if (!def?.secondary) return null;
+            return (
+              <Field
+                label={def.secondary.label}
+                hint={`واحد: ${def.secondary.unit}`}
+              >
+                <NumField
+                  placeholder="۰"
+                  value={editCap}
+                  onChange={e => setEditCap(e.target.value)}
+                  unit={def.secondary.unit}
+                  min={0}
+                />
+              </Field>
+            );
+          })()}
         </div>
       </Modal>
     </>
