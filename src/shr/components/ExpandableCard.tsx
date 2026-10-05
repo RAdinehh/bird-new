@@ -82,14 +82,14 @@ export default function ExpandableCard({
         aria-expanded={isOpen}
         aria-label={(isOpen ? 'بستن ' : 'باز کردن ') + title}
         onClick={() => {
-          // ۱. اگه long-press fire شده بود، فقط flag رو ریست کن
-          if (ms && ms.didLongPressFire && ms.didLongPressFire()) {
-            ms.resetLongPressFire();
-            return;
-          }
-          // ۲. توی حالت انتخاب → toggle
+          // ۱. توی حالت انتخاب → toggle فوری
           if (isSelectionMode && id && ms) {
             ms.toggleSelect(id);
+            return;
+          }
+          // ۲. اگه long-press fire شده بود، فقط flag رو ریست کن
+          if (ms && ms.didLongPressFire && ms.didLongPressFire()) {
+            ms.resetLongPressFire();
             return;
           }
           // ۳. اگه onTap تعریف شده → همون؛ وگرنه رفتار عادی
@@ -182,8 +182,13 @@ export default function ExpandableCard({
   return (
     <div
       style={{ position: 'relative' }}
-      onPointerDown={() => { if (!isSelectionMode) ms.startLongPress(id); }}
-      onPointerUp={ms.cancelLongPress}
+      onPointerDown={() => {
+        if (isSelectionMode) return;
+        ms.startLongPress(id);
+      }}
+      onPointerUp={() => {
+        ms.cancelLongPress();
+      }}
       onPointerLeave={ms.cancelLongPress}
       onPointerCancel={ms.cancelLongPress}
       onContextMenu={(e) => e.preventDefault()}

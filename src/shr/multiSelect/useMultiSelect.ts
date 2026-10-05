@@ -69,7 +69,7 @@ export interface MultiSelectState<T> {
 export function useMultiSelect<T>(config: MultiSelectConfig<T>): MultiSelectState<T> {
   const {
     items, getId, onDelete, onArchive, onCustomAction,
-    longPressMs = 500,
+    longPressMs = 350,
   } = config;
 
   const [selectionMode, setSelectionMode] = useState(false);
@@ -94,7 +94,7 @@ export function useMultiSelect<T>(config: MultiSelectConfig<T>): MultiSelectStat
       longPressFiredRef.current = true;
       setSelectionMode(true);
       setSelectedIds(new Set([id]));
-      try { (navigator as any).vibrate?.(30); } catch { /* silent */ }
+      try { (navigator as any).vibrate?.([15]); } catch { /* silent */ }
       longPressTimerRef.current = null;
     }, longPressMs);
   }, [selectionMode, longPressMs]);
