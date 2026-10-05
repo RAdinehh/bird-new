@@ -2,7 +2,7 @@
  * DailyLogsPage — ثبت روزانه (دمای سالن، آب، دان، تلفات)
  */
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   useDlg, type DailyLog, type Death, type Vaccine,
   type Medication, type Activity, VENTILATION_LABEL, LITTER_LABEL,
@@ -25,6 +25,8 @@ import { Btn, BtnRow, Empty, Field,
   NumField, PageContainer, PercentField, Select,
   Tag, Textarea, ErrorBox } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
@@ -98,7 +100,7 @@ export default function DailyLogsPage() {
   const [form, setForm] = useState<F>(newLog());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
-  const [undoData, setUndoData] = useState<{ log: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ log: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const activeFlocks = flocks.filter(f => f.status === 'active');
@@ -130,25 +132,60 @@ export default function DailyLogsPage() {
 
   const undoDeleteLog = () => {
     if (undoData == null) return;
-    const logToRestore = undoData.log;
+    const logArr: any[] = Array.isArray(undoData.log) ? undoData.log : [undoData.log];
     try {
-      add(logToRestore);
-      try {
-        bus.emit('dlg:deaths:recorded', {
-          logId: logToRestore.id,
-          flockId: logToRestore.flockId,
-          date: logToRestore.date,
-          count: logToRestore.deathsCount || 0,
-          deaths: logToRestore.deaths || [],
-          isEdit: false,
-        }, { source: 'dlg/undoDelete' });
-      } catch (e) { /* silent */ }
-      showToast('ثبت بازگردانی شد', 'success', 2000);
+      for (const logToRestore of logArr) {
+        add(logToRestore);
+        try {
+          bus.emit('dlg:deaths:recorded', {
+            logId: logToRestore.id,
+            flockId: logToRestore.flockId,
+            date: logToRestore.date,
+            count: logToRestore.deathsCount || 0,
+            deaths: logToRestore.deaths || [],
+            isEdit: false,
+          }, { source: 'dlg/undoDelete' });
+        } catch (e) { /* silent */ }
+      }
+      showToast(toFa(logArr.length) + ' ثبت بازگردانی شد', 'success', 2000);
     } catch (err) {
       showToast('بازگردانی ناموفق', 'error', 2000);
     }
     setUndoData(null);
   };
+
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: logs,
+    getId: (l: any) => l.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' ثبت روزانه حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const it = logs.find(x => x.id === id);
+        if (!it) continue;
+        backups.push(it);
+        try { remove(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ log: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.log) && cur.log.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' ثبت حذف شد', 'success', 2500);
+      logAction('delete', 'dlg', 'حذف گروهی ثبت روزانه: ' + backups.length);
+    },
+    onArchive: async (ids: string[]) => {
+      const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' ثبت آرشیو شوند؟');
+      if (!ok) return;
+      for (const id of ids) { try { archive(id); } catch {} }
+      showToast(toFa(ids.length) + ' ثبت آرشیو شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
 
   const openNew = () => {
     if (activeFlocks.length === 0) { showAlert('اول یک گله بسازید'); return; }
@@ -461,13 +498,13 @@ const collectWhsShortages = () => {
     const flock = flocks.find(f => f.id === l.flockId);
     const bird = flock ? birds.find(b => b.id === flock.birdId) : null;
     const breed = flock ? breeds.find(b => b.id === flock.breedId) : null;
-    const isOpen = expandedId === l.id;
+    const isOpen = !ms.selectionMode && expandedId === l.id;
     const tWarn = tempWarning(l.temperature);
     const hWarn = humidityWarning(l.humidity);
     const hasProblem = tWarn !== 'ok' || hWarn !== 'ok' || l.deathsCount > 0;
     const accent: any = hasProblem ? 'warn' : 'accent';
     return (
-      <ExpandableCard key={l.id} accent={accent} index={toFa(i + 1)} iconEmoji="📋"
+      <ExpandableCard key={l.id} id={l.id} ms={ms} accent={accent} index={toFa(i + 1)} iconEmoji="📋"
         title={flock?.name || '—'}
         subtitle={`${toFa(l.date)}${l.entryTime ? ` · ${toFa(l.entryTime)}` : ''}${bird ? ` · ${bird.name}` : ''}`}
         isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : l.id)}
@@ -666,7 +703,27 @@ const collectWhsShortages = () => {
           description="دما، رطوبت، دان، آب، تلفات، وزن‌کشی و تخم را ثبت کنید. برای هر گله یک ثبت جدا انجام دهید."
           tone="info"
         />
-        {currentList.length === 0 ? (
+        {!ms.selectionMode && currentList.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && currentList.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === currentList.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === currentList.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" archiveLabel="آرشیو" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
+
+      {currentList.length === 0 ? (
           <Empty
             icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>}
             title={tab === 'today' ? 'امروز ثبتی ندارید' : 'تاریخچه خالی است'}
