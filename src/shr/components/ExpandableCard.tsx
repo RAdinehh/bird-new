@@ -17,6 +17,12 @@ interface Props {
   isOpen: boolean;
   onToggle: () => void;
   children: React.ReactNode;
+  /** 🆕 شناسه آیتم برای Multi-Select */
+  id?: string;
+  /** 🆕 دستگیره Multi-Select (اگه پاس بشه، long-press و چک‌باکس فعال می‌شن) */
+  ms?: any;
+  /** 🆕 اکشن کلیک روی کارت وقتی selectionMode نیست (اختیاری) */
+  onTap?: () => void;
 }
 
 const COLORS: Record<AccentKey, { c: string; s: string }> = {
@@ -34,6 +40,7 @@ const COLORS: Record<AccentKey, { c: string; s: string }> = {
 export default function ExpandableCard({
   accent = 'accent', index, icon, iconEmoji = '📋', compact = false,
   title, subtitle, badge, summary, stats, isOpen, onToggle, children,
+  id, ms, onTap,
 }: Props) {
   const lowPower = useSet((st: any) => st.lowPowerMode);
   const [prefersReduced, setPrefersReduced] = useState(false);
@@ -48,6 +55,10 @@ export default function ExpandableCard({
   }, []);
   const noAnim = !!(lowPower || prefersReduced);
 
+  // ─── Multi-Select ───
+  const isSelectionMode = !!(ms && ms.selectionMode);
+  const isSelected = !!(id && ms && ms.isSelected && ms.isSelected(id));
+
   const safeAccent = COLORS[accent] ? accent : 'accent';
   const { c: color, s: soft } = COLORS[safeAccent];
 
@@ -55,24 +66,82 @@ export default function ExpandableCard({
     <div style={{
       position: 'relative',
       background: 'var(--card)',
-      border: '1px solid ' + (isOpen ? color : 'var(--border)'),
+      border: '1px solid ' + (isSelected ? color : (isOpen ? color : 'var(--border)')),
       borderRadius: 'var(--r-lg)',
       overflow: 'hidden',
       marginBottom: 8,
-      transition: 'border-color var(--dur-base)',
+      transition: 'border-color var(--dur-base), background var(--dur-base)',
+      boxShadow: isSelected ? '0 0 0 2px ' + soft : 'none',
     }}>
       <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: color, zIndex: 1 }} />
+
+      {/* چک‌باکس انتخاب در حالت Multi-Select */}
+      {isSelectionMode && (
+        <div style={{
+          position: 'absolute',
+          top: 8,
+          left: 8,
+          width: 26,
+          height: 26,
+          borderRadius: '50%',
+          background: isSelected ? color : 'var(--card-solid)',
+          border: '2px solid ' + (isSelected ? color : 'var(--border)'),
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 14,
+          fontWeight: 800,
+          color: '#fff',
+          zIndex: 5,
+          pointerEvents: 'none',
+        }}>
+          {isSelected ? '✓' : ''}
+        </div>
+      )}
 
       <div
         role="button"
         tabIndex={0}
         aria-expanded={isOpen}
         aria-label={(isOpen ? 'بستن ' : 'باز کردن ') + title}
-        onClick={onToggle}
+        onClick={() => {
+          if (isSelectionMode && id && ms) {
+            ms.toggleSelect(id);
+            return;
+          }
+          if (ms && ms.didLongPressFire && ms.didLongPressFire()) {
+            ms.resetLongPressFire();
+            return;
+          }
+          if (onTap) { onTap(); return; }
+          onToggle();
+        }}
+        onTouchStart={() => {
+          if (ms && id && !isSelectionMode) ms.startLongPress(id);
+        }}
+        onTouchEnd={() => {
+          if (ms) ms.cancelLongPress();
+        }}
+        onTouchCancel={() => {
+          if (ms) ms.cancelLongPress();
+        }}
+        onTouchMove={() => {
+          if (ms) ms.cancelLongPress();
+        }}
+        onMouseDown={() => {
+          if (ms && id && !isSelectionMode) ms.startLongPress(id);
+        }}
+        onMouseUp={() => {
+          if (ms) ms.cancelLongPress();
+        }}
+        onMouseLeave={() => {
+          if (ms) ms.cancelLongPress();
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            onToggle();
+            if (isSelectionMode && id && ms) ms.toggleSelect(id);
+            else onToggle();
           }
         }}
         className="ec-trigger"
@@ -80,6 +149,9 @@ export default function ExpandableCard({
           padding: compact ? '8px 14px 8px 12px' : '12px 18px 12px 16px',
           cursor: 'pointer',
           outline: 'none',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          touchAction: 'pan-y',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -108,10 +180,12 @@ export default function ExpandableCard({
 
           {badge && <div style={{ display: 'flex', gap: 4, flexShrink: 0, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>{badge}</div>}
 
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isOpen ? color : 'var(--dim)'} strokeWidth="2.5" strokeLinecap="round"
-            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: noAnim ? 'none' : 'transform var(--dur-slow)', flexShrink: 0 }}>
-            <path d="m6 9 6 6 6-6" />
-          </svg>
+          {!isSelectionMode && (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isOpen ? color : 'var(--dim)'} strokeWidth="2.5" strokeLinecap="round"
+              style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: noAnim ? 'none' : 'transform var(--dur-slow)', flexShrink: 0 }}>
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          )}
         </div>
 
         {(summary || stats) && !compact && (

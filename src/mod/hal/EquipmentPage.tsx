@@ -1,7 +1,7 @@
 /**
  * EquipmentPage — تجهیزات
  */
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Equipment, type EquipmentKind, type EquipmentCategory, type EquipmentUnit, EQUIP_LABELS, EQUIP_CAPACITY_UNIT, EQUIP_EFFICIENCY_UNIT, CATEGORY_LABELS, KIND_LABELS, UNIT_LABELS_EQ } from './store';
@@ -157,6 +157,10 @@ export default function EquipmentPage() {
   const [filter, setFilter] = useState('');
   const [filterKind, setFilterKind] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const longPressTimerRef = useRef<number | null>(null);
+  const longPressFiredRef = useRef<boolean>(false);
 
 
 
@@ -180,6 +184,70 @@ export default function EquipmentPage() {
 
   const openNew = () => { setForm({ id:'', hallId: halls[0].id, type:'lamp',
      name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'' }); setErr(''); setOpen(true); };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const startLongPress = (id: string) => {
+    if (selectionMode) return;
+    longPressFiredRef.current = false;
+    if (longPressTimerRef.current) window.clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = window.setTimeout(() => {
+      longPressFiredRef.current = true;
+      setSelectionMode(true);
+      setSelectedIds(new Set([id]));
+      try { (navigator as any).vibrate?.(30); } catch {}
+      longPressTimerRef.current = null;
+    }, 500);
+  };
+
+  const cancelLongPress = () => {
+    if (longPressTimerRef.current) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const exitSelection = () => {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const selectAllVisible = () => {
+    setSelectedIds(new Set(list.map(e => e.id)));
+  };
+
+  const doBulkDelete = async () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    const ok = await showConfirmAsync(
+      'حذف گروهی',
+      toFa(ids.length) + ' تجهیز حذف شوند؟',
+      { danger: true }
+    );
+    if (!ok) return;
+    const backups: any[] = [];
+    for (const id of ids) {
+      const item = equipment.find(x => x.id === id);
+      if (!item) continue;
+      backups.push(item);
+      try { deleteEquip(id); } catch {}
+    }
+    if (backups.length > 0) {
+      setUndoData({ item: backups });
+      setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+    }
+    showToast(toFa(backups.length) + ' تجهیز حذف شد', 'success', 2500);
+    logAction('delete', 'hal', 'حذف گروهی تجهیزات: ' + backups.length);
+    exitSelection();
+  };
+
   const openEdit = (e: Equipment) => {
     setAutoFields(new Set());
     setForm({
