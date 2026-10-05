@@ -6,6 +6,9 @@ import {
   Grid2, Input, Modal, NumField,
   PageContainer, Tag
 } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -37,6 +40,33 @@ export default function BirdsPage() {
       return true;
     });
   }, [_birdsRaw]);
+
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: birds,
+    getId: (b: any) => b.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' پرنده حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const item = birds.find(b => b.id === id);
+        if (!item) continue;
+        backups.push(item);
+        try { deleteBird(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' پرنده حذف شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
 
   const openNew = () => { setForm(empty); setError(''); setOpen(true); setCycleFromPreset(false); setFcrFromPreset(false); };
   const openEdit = (b: Bird) => {
@@ -102,10 +132,10 @@ export default function BirdsPage() {
         <>
           {birds.map((b, i) => {
             const birdBreeds = breeds.filter(x => x.birdId === b.id);
-            const isOpen = expandedId === b.id;
+            const isOpen = !ms.selectionMode && expandedId === b.id;
             return (
               <ExpandableCard
-                key={b.id}
+                key={b.id} id={b.id} ms={ms}
                 accent="accent"
                 index={toFa(i + 1)}
                 iconEmoji="🐔"
@@ -168,6 +198,10 @@ export default function BirdsPage() {
           <Btn variant="primary" full onClick={openNew}>+ افزودن پرنده</Btn>
         </>
       )}
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش پرنده' : 'افزودن پرنده'} contentGap={14}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
