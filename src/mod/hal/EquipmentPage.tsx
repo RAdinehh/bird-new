@@ -22,6 +22,18 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
 
+
+/** دسته‌های مجاز برای هر نوع دارایی */
+const CATEGORIES_BY_KIND: Record<string, string[]> = {
+  asset:      ['ventilation', 'heating', 'lighting', 'drinking', 'feeding', 'power', 'auxiliary'],
+  consumable: ['litter', 'feeding', 'drinking'],
+  system:     ['ventilation', 'heating', 'lighting', 'power', 'auxiliary'],
+};
+
+function categoriesForKind(kind: string): string[] {
+  return CATEGORIES_BY_KIND[kind] || Object.keys(CATEGORY_LABELS);
+}
+
 const TYPES_BY_CATEGORY: Record<string, string[]> = {
   ventilation: ['fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad'],
   feeding:     ['feeder_manual', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket'],
@@ -484,7 +496,14 @@ export default function EquipmentPage() {
         footer={<div style={{ display: "flex", gap: 6 }}><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
         <Grid2>
           <Field label="نوع دارایی" required>
-            <Select value={form.kind || 'asset'} onChange={e => setForm({...form, kind: e.target.value})}>
+            <Select value={form.kind || 'asset'} onChange={e => {
+              const newKind = e.target.value;
+              const allowedCats = categoriesForKind(newKind);
+              const nextCat = allowedCats.includes(form.category) ? form.category : allowedCats[0];
+              const allowedTypes = typesForCategory(nextCat);
+              const nextType = allowedTypes.includes(form.type) ? form.type : (allowedTypes[0] || 'other');
+              setForm({ ...form, kind: newKind, category: nextCat, type: nextType });
+            }}>
               {Object.entries(KIND_LABELS).map(([k, v]) => (
                 <option key={k} value={k}>{v.icon} {v.name}</option>
               ))}
@@ -492,14 +511,16 @@ export default function EquipmentPage() {
           </Field>
           <Field label="دسته" required>
             <Select value={form.category || 'auxiliary'} onChange={e => {
-                const cat = e.target.value;
-                const allowed = typesForCategory(cat);
-                const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || 'other');
-                setForm({...form, category: cat, type: nextType});
-              }}>
-              {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>{v.icon} {v.name}</option>
-              ))}
+              const cat = e.target.value;
+              const allowed = typesForCategory(cat);
+              const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || 'other');
+              setForm({...form, category: cat, type: nextType});
+            }}>
+              {categoriesForKind(form.kind || 'asset').map(k => {
+                const v = (CATEGORY_LABELS as any)[k];
+                if (!v) return null;
+                return <option key={k} value={k}>{v.icon} {v.name}</option>;
+              })}
             </Select>
           </Field>
         </Grid2>
