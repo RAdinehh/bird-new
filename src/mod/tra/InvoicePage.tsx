@@ -603,20 +603,21 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
               </Field>
             </Grid2>
 
-            <Field label="فروشنده این قلم" hint="خالی = فروشنده اصلی">
-              <SmartSelect
-                value={it.itemPartyId || ''}
-                onChange={v => updateItem(it.id, { itemPartyId: v })}
-                options={parties.map(c => ({ value: c.id, label: c.name }))}
-                placeholder="— همان اصلی —" modalTitle="انتخاب فروشنده" autoThreshold={6}
-              />
-            </Field>
-
             <ItemDetailsForm
               category={form.category}
               item={it}
               updateItem={(patch: any) => updateItem(it.id, patch)}
               isPurchase={true}
+              sellerSlot={
+                <Field label="فروشنده این قلم" hint="خالی = فروشنده اصلی">
+                  <SmartSelect
+                    value={it.itemPartyId || ''}
+                    onChange={v => updateItem(it.id, { itemPartyId: v })}
+                    options={parties.map(c => ({ value: c.id, label: c.name }))}
+                    placeholder="— همان اصلی —" modalTitle="انتخاب فروشنده" autoThreshold={6}
+                  />
+                </Field>
+              }
             />
 
             {whsItems.length > 0 && (

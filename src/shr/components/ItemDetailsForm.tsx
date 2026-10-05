@@ -19,6 +19,7 @@ interface Props {
   item: any;
   updateItem: (patch: any) => void;
   isPurchase?: boolean;   // true = خرید، false/undefined = فروش
+  sellerSlot?: React.ReactNode;   // فیلد فروشنده — در adult با مبنای قیمت ادغام می‌شود
 }
 
 // ============ helper ============
@@ -312,7 +313,7 @@ function VaccineForm({ item, updateItem }: { item: any; updateItem: (p: any) => 
 }
 
 // ============ Main Component ==========
-export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false }: Props) {
+export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, sellerSlot }: Props) {
   const { birds, breeds } = useBrd();
   const { flocks } = useFlk();
 
@@ -352,6 +353,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {mType === 'herbal' && <HerbalForm item={item} updateItem={updateItem} />}
         {mType === 'chemical' && <ChemicalForm item={item} updateItem={updateItem} />}
         {mType === 'vaccine' && <VaccineForm item={item} updateItem={updateItem} />}
+        {sellerSlot}
       </div>
     );
   }
@@ -431,22 +433,26 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Grid3>
         )}
 
-        {/* قیمت بر اساس عدد یا وزن — فقط برای بالغ */}
+        {/* فروشنده + مبنای قیمت — فقط برای بالغ */}
         {category === 'adult' && (
-          <Grid2>
-            <Field label="مبنای قیمت">
-              <Select value={item.priceUnit || 'per_unit'} onChange={e => updateItem({ priceUnit: e.target.value as PriceUnit })}>
-                <option value="per_unit">هر عدد</option>
-                <option value="per_kg">هر کیلو</option>
-              </Select>
-            </Field>
+          <>
+            <Grid2>
+              {sellerSlot || <div />}
+              <Field label="مبنای قیمت">
+                <Select value={item.priceUnit || 'per_unit'} onChange={e => updateItem({ priceUnit: e.target.value as PriceUnit })}>
+                  <option value="per_unit">هر عدد</option>
+                  <option value="per_kg">هر کیلو</option>
+                </Select>
+              </Field>
+            </Grid2>
             {item.priceUnit === 'per_kg' && (
               <Field label="وزن زنده (کیلو)">
                 <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
               </Field>
             )}
-          </Grid2>
+          </>
         )}
+        {category !== 'adult' && sellerSlot}
       </div>
     );
   }
@@ -481,6 +487,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
           )}
         </Grid2>
+        {sellerSlot}
       </div>
     );
   }
@@ -501,6 +508,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               unit="ماه" min={0} />
           </Field>
         </Grid2>
+        {sellerSlot}
       </div>
     );
   }
