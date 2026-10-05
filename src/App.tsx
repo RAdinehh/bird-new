@@ -94,7 +94,7 @@ export default function App() {
     applyTheme(
       theme,
       settings.accentColor,
-      settings.fontSize,
+      settings.fontSizePercent || 100,
       settings.animations,
       settings.lowPowerMode,
       settings.highContrast,
@@ -103,7 +103,7 @@ export default function App() {
   }, [
     theme,
     settings.accentColor,
-    settings.fontSize,
+    settings.fontSizePercent,
     settings.animations,
     settings.lowPowerMode,
     settings.highContrast,

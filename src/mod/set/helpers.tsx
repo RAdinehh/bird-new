@@ -71,19 +71,28 @@ export function ToggleRow({ label, sub, value, onChange }: any) {
 
 export function ColorBtn({ color, active, onClick }: any) {
   const colors: Record<string, string> = {
-    green: '#16a34a', blue: '#0284c7', amber: '#d97706', earth: '#78350f'
+    green: '#16a34a', blue: '#0284c7', turquoise: '#0891b2', olive: '#65a30d'
   };
   return (
     <button type="button" onClick={onClick} style={{
-      flex: 1, height: 48,
+      flex: 1, height: 52,
       borderRadius: 'var(--r-md)',
       background: colors[color],
-      border: active ? '3px solid var(--text)' : '3px solid transparent',
+      border: '2px solid transparent',
+      outline: active ? '2px solid var(--text)' : 'none',
+      outlineOffset: 2,
       cursor: 'pointer', padding: 0,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      color: '#fff', fontSize: 'var(--fs-xl)', fontWeight: 700
     }}>
-      {active ? '✓' : ''}
+      {active && (
+        <span style={{
+          color: '#ffffff',
+          fontSize: 28,
+          fontWeight: 800,
+          lineHeight: 1,
+          textShadow: '0 1px 3px rgba(0,0,0,.35)',
+        }}>✓</span>
+      )}
     </button>
   );
 }

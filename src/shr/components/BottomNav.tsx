@@ -160,7 +160,7 @@ export default function BottomNav() {
 
                   {/* متن */}
                   <span style={{
-                    fontSize: isActive ? 11 : 10.5,
+                    fontSize: isActive ? 'calc(var(--fs-xs) + 0.5px)' : 'var(--fs-xs)',
                     fontWeight: isActive ? 800 : 500,
                     color: isActive ? 'var(--accent)' : 'var(--muted)',
                     letterSpacing: isActive ? '-.2px' : '0',

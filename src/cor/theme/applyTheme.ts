@@ -1,20 +1,31 @@
 type Theme = 'light' | 'dark';
 
+// مقیاس فونت به درصد (0.85 تا 1.30)
 const FONT_SCALES: Record<string, number> = {
-  small: 0.9,
-  medium: 1,
-  large: 1.15,
-  xlarge: 1.3
+  small: 0.90,
+  medium: 0.95,
+  large: 1.00,
+  xlarge: 1.05,
+  xxlarge: 1.10,
+  huge: 1.15,
+  xhuge: 1.20,
+  max: 1.25
 };
 
+/** تبدیل عدد درصدی (۸۵ تا ۱۳۰) به scale */
+export function fontScaleFromPercent(pct: number): number {
+  const clamped = Math.max(85, Math.min(130, pct));
+  return clamped / 100;
+}
+
 const FONT_BASE = {
-  xs: 11,
-  sm: 12.5,
-  base: 13,
-  md: 14,
-  lg: 15.5,
-  xl: 19,
-  xxl: 23
+  xs: 11.8,
+  sm: 13.4,
+  base: 13.9,
+  md: 15,
+  lg: 16.6,
+  xl: 20.3,
+  xxl: 24.6
 };
 
 const ACCENT_PRESETS: Record<string, { dark: any; light: any }> = {
@@ -26,13 +37,13 @@ const ACCENT_PRESETS: Record<string, { dark: any; light: any }> = {
     light: { accent: '#0284c7', soft: 'rgba(2,132,199,.12)', border: 'rgba(2,132,199,.35)', avatarText: '#ffffff' },
     dark:  { accent: '#38bdf8', soft: 'rgba(56,189,248,.15)', border: 'rgba(56,189,248,.4)',  avatarText: '#0f172a' }
   },
-  amber: {
-    light: { accent: '#d97706', soft: 'rgba(217,119,6,.12)', border: 'rgba(217,119,6,.35)', avatarText: '#ffffff' },
-    dark:  { accent: '#fbbf24', soft: 'rgba(251,191,36,.15)', border: 'rgba(251,191,36,.4)',  avatarText: '#0f172a' }
+  turquoise: {
+    light: { accent: '#0891b2', soft: 'rgba(8,145,178,.12)', border: 'rgba(8,145,178,.35)', avatarText: '#ffffff' },
+    dark:  { accent: '#22d3ee', soft: 'rgba(34,211,238,.15)', border: 'rgba(34,211,238,.4)',  avatarText: '#0f172a' }
   },
-  earth: {
-    light: { accent: '#78350f', soft: 'rgba(120,53,15,.12)', border: 'rgba(120,53,15,.35)', avatarText: '#ffffff' },
-    dark:  { accent: '#a16207', soft: 'rgba(161,98,7,.15)', border: 'rgba(161,98,7,.4)',  avatarText: '#0f172a' }
+  olive: {
+    light: { accent: '#65a30d', soft: 'rgba(101,163,13,.12)', border: 'rgba(101,163,13,.35)', avatarText: '#ffffff' },
+    dark:  { accent: '#a3e635', soft: 'rgba(163,230,53,.15)', border: 'rgba(163,230,53,.4)',  avatarText: '#0f172a' }
   }
 };
 
@@ -59,7 +70,14 @@ export function applyTheme(
   root.style.setProperty('--avatar-text', accent.avatarText);
 
   // ===== اندازه فونت =====
-  const scale = FONT_SCALES[fontSize] || 1;
+  // اگه fontSize عددی بود، مستقیم از همون استفاده کن
+  // اگه اسمی بود، از FONT_SCALES
+  let scale = 1;
+  if (typeof fontSize === 'number') {
+    scale = Math.max(0.85, Math.min(1.30, fontSize / 100));
+  } else {
+    scale = FONT_SCALES[fontSize] || 1;
+  }
   root.style.setProperty('--fs-xs',  (FONT_BASE.xs  * scale) + 'px');
   root.style.setProperty('--fs-sm',  (FONT_BASE.sm  * scale) + 'px');
   root.style.setProperty('--fs-base',(FONT_BASE.base * scale) + 'px');

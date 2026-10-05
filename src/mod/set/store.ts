@@ -25,8 +25,9 @@ export interface Settings {
 
   // ظاهر
   theme: 'light' | 'dark';
-  accentColor: 'green' | 'blue' | 'amber' | 'earth';
-  fontSize: 'small' | 'medium' | 'large' | 'xlarge';
+  accentColor: 'green' | 'blue' | 'turquoise' | 'olive';
+  fontSize: 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'huge' | 'xhuge' | 'max';
+  fontSizePercent: number;
   density: 'compact' | 'comfortable';
   animations: boolean;
   highContrast: boolean;
@@ -73,6 +74,7 @@ const defaultSettings: Settings = {
   theme: 'light',
   accentColor: 'green',
   fontSize: 'medium',
+  fontSizePercent: 100,
   density: 'comfortable',
   animations: true,
   highContrast: false,

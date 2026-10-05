@@ -8,7 +8,6 @@ import { showToast } from '../../cor/store/toast';
 export default function AppearanceTab() {
   const s = useSet();
   const themes: [string, string, string][] = [['light', '☀', 'روشن'], ['dark', '🌙', 'تیره']];
-  const fontSizes: [string, string][] = [['small', 'کوچک'], ['medium', 'متوسط'], ['large', 'بزرگ'], ['xlarge', 'خیلی بزرگ']];
   const densities: [string, string][] = [['compact', 'فشرده'], ['comfortable', 'راحت']];
   const papers: [string, string][] = [['A4', 'A4'], ['A5', 'A5']];
 
@@ -38,25 +37,78 @@ export default function AppearanceTab() {
           <div style={{ display: 'flex', gap: 8 }}>
             <ColorBtn color="green" active={s.accentColor === 'green'} onClick={() => s.update({ accentColor: 'green' })} />
             <ColorBtn color="blue" active={s.accentColor === 'blue'} onClick={() => s.update({ accentColor: 'blue' })} />
-            <ColorBtn color="amber" active={s.accentColor === 'orange'} onClick={() => s.update({ accentColor: 'amber' })} />
-            <ColorBtn color="earth" active={s.accentColor === 'purple'} onClick={() => s.update({ accentColor: 'earth' })} />
+            <ColorBtn color="turquoise" active={s.accentColor === 'turquoise'} onClick={() => s.update({ accentColor: 'turquoise' })} />
+            <ColorBtn color="olive" active={s.accentColor === 'olive'} onClick={() => s.update({ accentColor: 'olive' })} />
           </div>
         </Field>
       </SettingsGroup>
 
-      <SettingsGroup icon="🔤" title="فونت و چیدمان" subtitle={`اندازه ${fontSizes.find(f => f[0] === s.fontSize)?.[1] || 'متوسط'}`} tone="info">
-        <Grid2>
-          <Field label="اندازه فونت">
-            <Select value={s.fontSize} onChange={e => s.update({ fontSize: e.target.value as any })}>
-              {fontSizes.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </Select>
-          </Field>
-          <Field label="حالت نمایش">
-            <Select value={s.density} onChange={e => s.update({ density: e.target.value as any })}>
-              {densities.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </Select>
-          </Field>
-        </Grid2>
+      <SettingsGroup icon="🔤" title="فونت و چیدمان" subtitle={`اندازه ${toFa(s.fontSizePercent || 100)}٪`} tone="info">
+        {/* اسلایدر اندازه فونت — تمام عرض */}
+        <div style={{
+          padding: '12px 14px',
+          background: 'var(--input-bg)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-md)',
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 8,
+          }}>
+            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+              اندازه فونت
+            </span>
+            <span style={{
+              fontSize: 'var(--fs-base)',
+              fontWeight: 800,
+              color: 'var(--accent)',
+              background: 'var(--accent-soft)',
+              padding: '2px 10px',
+              borderRadius: 10,
+              fontVariantNumeric: 'tabular-nums',
+            }}>
+              {toFa(s.fontSizePercent || 100)}٪
+            </span>
+          </div>
+
+          <input
+            type="range"
+            min="85"
+            max="130"
+            step="1"
+            value={s.fontSizePercent || 100}
+            onChange={e => s.update({ fontSizePercent: parseInt(e.target.value), fontSize: 'medium' as any })}
+            style={{
+              width: '100%',
+              height: 32,
+              accentColor: 'var(--accent)',
+              cursor: 'pointer',
+              direction: 'rtl',
+              margin: 0,
+            }}
+          />
+
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            fontSize: 'var(--fs-xs)',
+            color: 'var(--muted)',
+            marginTop: 6,
+          }}>
+            <span>۸۵٪</span>
+            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>۱۰۰٪ پیش‌فرض</span>
+            <span>۱۳۰٪</span>
+          </div>
+        </div>
+
+        {/* حالت نمایش */}
+        <Field label="حالت نمایش">
+          <Select value={s.density} onChange={e => s.update({ density: e.target.value as any })}>
+            {densities.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+          </Select>
+        </Field>
         <ToggleRow
           label="انیمیشن‌ها"
           sub="باز/بسته شدن کارت‌ها و مودال‌ها"

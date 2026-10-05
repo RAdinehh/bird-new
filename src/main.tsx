@@ -17,7 +17,7 @@ try {
     applyTheme(
       s.theme,
       s.accentColor,
-      s.fontSize,
+      s.fontSizePercent || 100,
       s.animations,
       s.lowPowerMode,
       s.highContrast,
