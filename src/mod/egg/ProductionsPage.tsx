@@ -53,7 +53,6 @@ export default function ProductionsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filterFlock, setFilterFlock] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -207,7 +206,6 @@ export default function ProductionsPage() {
   );
 
 
-  const target = delId ? productions.find(p => p.id === delId) : null;
 
   return (
     <PageContainer>
@@ -326,7 +324,15 @@ export default function ProductionsPage() {
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(p)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(p.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                    const ok = await showConfirmAsync('تأیید حذف', 'این تخم‌گذاری حذف شود؟', { danger: true });
+                    if (!ok) return;
+                    setUndoData({ item: p });
+                    setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === p.id ? null : cur), 6000);
+                    deleteProduction(p.id);
+                    logAction('delete', 'egg', 'حذف از تخم‌ها');
+                    showToast('حذف شد', 'info', 1800);
+                  }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -462,24 +468,6 @@ export default function ProductionsPage() {
         <ErrorBox>{err}</ErrorBox>
       </Modal>
 
-      <Modal
-        open={delId !== null}
-        onClose={() => setDelId(null)}
-        title="حذف تخم‌گذاری"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => {
-          const idToDel = delId; if (!idToDel) return;
-          const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true });
-          if (!ok) return;
-          const item = productions.find((x: any) => x.id === idToDel);
-          if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); }
-          deleteProduction(idToDel);
-          logAction('delete', 'egg', 'حذف از تخم‌ها');
-          setDelId(null);
-          showToast('حذف شد', 'info', 1800);
-        }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
-      >
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف ثبت <b>{toFa(target?.date)}</b>؟</div>
-      </Modal>
     </PageContainer>
   );
 }
