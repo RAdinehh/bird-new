@@ -2,7 +2,7 @@
  * DevicesPage — دستگاه‌های انکوباسیون (ظرفیت، تعمیرات، گارانتی)
  */
 import { useTempUnit, toUserTemp, toCelsius, round1 } from '../../shr/utils/temp';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity, fillCapacityFromProfile } from './store';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createDeviceSchema } from '../../shr/validation/rules/inc';
@@ -10,6 +10,9 @@ import { useSet } from '../set/store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
+import HelpBanner from '../../shr/components/HelpBanner';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showToast } from '../../cor/store/toast';
@@ -187,7 +190,7 @@ export default function DevicesPage() {
   const [undoData, setUndoData] = useState<{ birdName: string; data: any } | null>(null);
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
-  const [undoDevice, setUndoDevice] = useState<{ device: any } | null>(null);
+  const [undoDevice, setUndoDevice] = useState<{ device: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [maintDeviceId, setMaintDeviceId] = useState<string | null>(null);
   const [maintForm, setMaintForm] = useState({ date: '', type: '', cost: '', description: '' });
@@ -368,8 +371,9 @@ export default function DevicesPage() {
   const undoDeleteDevice = () => {
     if (!undoDevice) return;
     try {
-      addDevice(undoDevice.device);
-      showToast('دستگاه بازگردانی شد', 'success', 2000);
+      const arr: any[] = Array.isArray(undoDevice.device) ? undoDevice.device : [undoDevice.device];
+      for (const d of arr) addDevice(d);
+      showToast(toFa(arr.length) + ' دستگاه بازگردانی شد', 'success', 2000);
     } catch {
       showToast('بازگردانی ناموفق بود', 'error', 2000);
     }
@@ -406,6 +410,32 @@ export default function DevicesPage() {
   const accentFor = (s: DeviceStatus): any => s === 'active' ? 'accent' : s === 'idle' ? 'dim' : 'warn';
   const warrantyForm = warrantyInfo(form.purchasedAt, parseInt(toEn(form.warranty)) || null);
 
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: devices,
+    getId: (d: any) => d.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' دستگاه حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const it = devices.find(d => d.id === id);
+        if (!it) continue;
+        backups.push(it);
+        try { deleteDevice(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoDevice({ device: backups });
+        setTimeout(() => setUndoDevice((cur: any) => cur && Array.isArray(cur.device) && cur.device.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' دستگاه حذف شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
   return (
     <PageContainer>
       {undoDevice && (
@@ -425,6 +455,30 @@ export default function DevicesPage() {
           }}>بازگردانی</button>
         </div>
       )}
+      <HelpBanner
+        id="inc-devices-intro"
+        icon="🏭"
+        title="دستگاه‌های جوجه‌کشی"
+        description="دستگاه‌های انکوباسیون و هچر را اینجا تعریف کنید. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        tone="info"
+      />
+
+      {!ms.selectionMode && devices.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && devices.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === devices.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === devices.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
+
       {devices.length > 0 && (
         <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, padding: '0 4px' }}>
           🏭 {toFa(devices.length)} دستگاه
@@ -440,14 +494,14 @@ export default function DevicesPage() {
             const stats = deviceStats[d.id] || { totalEggs: 0, activeCount: 0 };
             const totalEggs = stats.totalEggs;
             const activeEntries = stats.activeCount;
-            const isOpen = expandedId === d.id;
+            const isOpen = !ms.selectionMode && expandedId === d.id;
             const caps = d.capacityByBird || [];
             const logs: any[] = (d as any).maintenanceLogs || [];
             const totalCap = caps.reduce((a, c) => a + (c.capacity || 0), 0);
             const usagePercent = totalCap > 0 ? Math.round((totalEggs / totalCap) * 100) : 0;
             const w = warrantyInfo(d.purchasedAt, d.warranty);
             return (
-              <ExpandableCard key={d.id} accent={accentFor(d.status)} index={toFa(i + 1)} iconEmoji="🥚"
+              <ExpandableCard key={d.id} id={d.id} ms={ms} accent={accentFor(d.status)} index={toFa(i + 1)} iconEmoji="🥚"
                 title={d.name} subtitle={MODE_FA[d.mode] + ' · ' + STATUS_FA[d.status]}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : d.id)}
                 badge={activeEntries > 0 ? <Tag tone="green">{toFa(activeEntries)} ورودی فعال</Tag> : undefined}
@@ -546,6 +600,10 @@ export default function DevicesPage() {
           <Btn variant="primary" full onClick={openNew}>+ افزودن دستگاه</Btn>
         </>
       )}
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش دستگاه' : 'افزودن دستگاه'}
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
