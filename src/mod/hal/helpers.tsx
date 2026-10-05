@@ -113,3 +113,48 @@ export function EnvCard({ icon, label, value, tone }: { icon: string; label: str
     </div>
   );
 }
+
+
+
+export function RowWithStatus({
+  l, v, tone, icon, hint,
+}: {
+  l: string;
+  v: string;
+  tone?: 'good' | 'warn' | 'danger' | 'none';
+  icon?: string;
+  hint?: string;
+}) {
+  const defaultIcon = tone === 'good' ? '✅'
+             : tone === 'warn' ? '⚠️'
+             : tone === 'danger' ? '❌'
+             : null;
+  const showIcon = icon || defaultIcon;
+  return (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      fontSize: 'var(--fs-sm)',
+      padding: 'var(--pad-tight)',
+      background: 'var(--input-bg)',
+      borderRadius: 'var(--r-sm)',
+      gap: 8,
+    }}>
+      <span style={{ color: 'var(--muted)', flexShrink: 0 }}>{l}:</span>
+      <span style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        fontWeight: 600,
+        fontVariantNumeric: 'tabular-nums',
+        minWidth: 0,
+      }}>
+        {showIcon && <span style={{ fontSize: 14, flexShrink: 0 }}>{showIcon}</span>}
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {v}{hint && <span style={{ color: 'var(--muted)', fontWeight: 500, marginRight: 4 }}> · {hint}</span>}
+        </span>
+      </span>
+    </div>
+  );
+}

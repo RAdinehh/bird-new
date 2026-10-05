@@ -11,11 +11,12 @@ import { useFlk } from '../flk/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { isFanLike, isLampLike, LITTER_KG_PER_M2 } from './helpers';
+import { HallEquipSection } from './HallEquipSection';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { useTempUnit, toUserTemp, tempLabel } from '../../shr/utils/temp';
 import { useFormat } from '../../shr/units';
 import { showAlert } from '../../cor/store/dialog';
-import { Row, Pill } from './helpers';
+import { Row, Pill, RowWithStatus } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -309,10 +310,15 @@ export default function HallsPage() {
             const airStatus: 'good' | 'low' | 'none' = airChanges === 0 ? 'none' : airChanges >= 15 ? 'good' : 'low';
             const airAdvice = airChanges === 0
               ? 'فنی ثبت نشده'
-              : airChanges >= 30 ? 'تهویه قوی — مناسب تابستان'
-              : airChanges >= 15 ? 'تهویه مناسب'
-              : airChanges >= 8 ? 'تهویه ضعیف — احتمال گرمی'
-              : 'تهویه بسیار ضعیف — خطر';
+              : airChanges >= 30 ? 'مناسب تابستان'
+              : airChanges >= 15 ? 'مناسب'
+              : airChanges >= 8 ? 'ضعیف — احتمال گرمی'
+              : 'بسیار ضعیف — خطر';
+            const airIcon = airChanges === 0 ? '—'
+              : airChanges >= 30 ? '❄️'
+              : airChanges >= 15 ? '✅'
+              : airChanges >= 8 ? '⚠️'
+              : '🔥';
 
             // ۲. روشنایی (lux = lumen ÷ مساحت)
             const lampEfficiency = 100; // lm/W پیش‌فرض
@@ -324,7 +330,12 @@ export default function HallsPage() {
               : lux >= 30 ? 'روشنایی قوی'
               : lux >= 20 ? 'مناسب تخم‌گذار'
               : lux >= 10 ? 'مناسب پرورش'
-              : 'روشنایی کم — احتمال افت تولید';
+              : 'کم — احتمال افت تولید';
+            const lightIcon = lux === 0 ? '—'
+              : lux >= 30 ? '☀️'
+              : lux >= 20 ? '🥚'
+              : lux >= 10 ? '🐣'
+              : '🌙';
 
             // ۳. ظرفیت واقعی از ابعاد
             const realCapacity = area > 0 && h.breedId
@@ -381,24 +392,18 @@ export default function HallsPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
                   <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
-                  {totalAirflow > 0 ? (
-                    <Row
-                      l="تهویه"
-                      v={`${fmt.int(totalAirflow)} m³/h · ${fmt.int(airChanges)} بار/ساعت — ${airAdvice}`}
-                      accent={airStatus === 'good'}
-                    />
-                  ) : (
-                    <Row l="تهویه" v="— تجهیز فن ثبت نشده" />
-                  )}
-                  {totalLightW > 0 ? (
-                    <Row
-                      l="روشنایی"
-                      v={`${fmt.int(totalLightW)} W · ~${fmt.int(lux)} لوکس — ${lightAdvice}`}
-                      accent={lightStatus === 'good'}
-                    />
-                  ) : (
-                    <Row l="روشنایی" v="— لامپ ثبت نشده" />
-                  )}
+                  <RowWithStatus
+                    l="تهویه"
+                    v={totalAirflow > 0 ? `${fmt.int(airChanges)} بار تعویض هوا در ساعت` : 'ثبت نشده'}
+                    icon={totalAirflow > 0 ? airIcon : undefined}
+                    hint={totalAirflow > 0 ? airAdvice : undefined}
+                  />
+                  <RowWithStatus
+                    l="روشنایی"
+                    v={totalLightW > 0 ? `${fmt.int(lux)} لوکس` : 'ثبت نشده'}
+                    icon={totalLightW > 0 ? lightIcon : undefined}
+                    hint={totalLightW > 0 ? lightAdvice : undefined}
+                  />
                   {/* 🆕 سیستم‌های توزیع‌شده */}
                   {(() => {
                     const water = (h as any).waterSources || [];
@@ -488,6 +493,16 @@ export default function HallsPage() {
                   {h.drinkerType && <Pill label="آبخوری" value={DRINKER_LABELS[h.drinkerType]} />}
                   {h.litterType && <Pill label="بستر" value={LITTER_LABELS[h.litterType]} />}
                 </div>
+
+                <HallEquipSection
+                  hallId={h.id}
+                  legacy={{
+                    ventilationSystem: h.ventilationSystem,
+                    feederType: h.feederType,
+                    drinkerType: h.drinkerType,
+                    litterType: h.litterType,
+                  }}
+                />
 
                 {(h.builtAt || h.lastSanitizedAt || equipValue > 0) && (
                   <>
