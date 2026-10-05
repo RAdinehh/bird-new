@@ -40,3 +40,4 @@ coverage
 .vitest
 *.bak
 *.bak_ms
+*.bak_*
