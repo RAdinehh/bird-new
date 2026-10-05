@@ -50,7 +50,7 @@ const ACCENT_PRESETS: Record<string, { dark: any; light: any }> = {
 export function applyTheme(
   theme: Theme,
   accentColor: string,
-  fontSize: string,
+  fontSize: string | number,
   animations: boolean,
   lowPowerMode: boolean,
   highContrast: boolean,

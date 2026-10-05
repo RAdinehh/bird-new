@@ -265,13 +265,23 @@ export function Field({ label, required, hint, autoFrom, error, warning, childre
       )}
       {autoFrom && (
         <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
           fontSize: 11,
           color: 'var(--accent)',
-          fontWeight: 600,
-          opacity: 0.85,
-          paddingRight: 2,
-          lineHeight: 1.4,
-        }}>{'✨ از ' + autoFrom}</div>
+          background: 'var(--accent-soft)',
+          border: '1px solid var(--accent-border)',
+          borderRadius: 8,
+          padding: '2px 8px',
+          fontWeight: 700,
+          alignSelf: 'flex-start',
+          marginRight: 2,
+          lineHeight: 1.6,
+        }}>
+          <span aria-hidden="true">✨</span>
+          <span>از {autoFrom}</span>
+        </div>
       )}
       {error && (
         <div style={{
