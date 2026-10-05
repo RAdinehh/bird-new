@@ -17,6 +17,8 @@ import { useCustomOptions } from '../../shr/store/customOptions';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
 import UndoBar from '../../cor/ui/UndoBar';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
@@ -157,10 +159,7 @@ export default function EquipmentPage() {
   const [filter, setFilter] = useState('');
   const [filterKind, setFilterKind] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const longPressTimerRef = useRef<number | null>(null);
-  const longPressFiredRef = useRef<boolean>(false);
+
 
 
 
@@ -184,69 +183,6 @@ export default function EquipmentPage() {
 
   const openNew = () => { setForm({ id:'', hallId: halls[0].id, type:'lamp',
      name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'' }); setErr(''); setOpen(true); };
-
-  const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const startLongPress = (id: string) => {
-    if (selectionMode) return;
-    longPressFiredRef.current = false;
-    if (longPressTimerRef.current) window.clearTimeout(longPressTimerRef.current);
-    longPressTimerRef.current = window.setTimeout(() => {
-      longPressFiredRef.current = true;
-      setSelectionMode(true);
-      setSelectedIds(new Set([id]));
-      try { (navigator as any).vibrate?.(30); } catch {}
-      longPressTimerRef.current = null;
-    }, 500);
-  };
-
-  const cancelLongPress = () => {
-    if (longPressTimerRef.current) {
-      window.clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  };
-
-  const exitSelection = () => {
-    setSelectionMode(false);
-    setSelectedIds(new Set());
-  };
-
-  const selectAllVisible = () => {
-    setSelectedIds(new Set(list.map(e => e.id)));
-  };
-
-  const doBulkDelete = async () => {
-    const ids = Array.from(selectedIds);
-    if (ids.length === 0) return;
-    const ok = await showConfirmAsync(
-      'حذف گروهی',
-      toFa(ids.length) + ' تجهیز حذف شوند؟',
-      { danger: true }
-    );
-    if (!ok) return;
-    const backups: any[] = [];
-    for (const id of ids) {
-      const item = equipment.find(x => x.id === id);
-      if (!item) continue;
-      backups.push(item);
-      try { deleteEquip(id); } catch {}
-    }
-    if (backups.length > 0) {
-      setUndoData({ item: backups });
-      setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
-    }
-    showToast(toFa(backups.length) + ' تجهیز حذف شد', 'success', 2500);
-    logAction('delete', 'hal', 'حذف گروهی تجهیزات: ' + backups.length);
-    exitSelection();
-  };
 
   const openEdit = (e: Equipment) => {
     setAutoFields(new Set());
@@ -391,6 +327,32 @@ export default function EquipmentPage() {
   };
 
   const list = equipment.filter(e => (!filter || e.hallId === filter) && (!filterKind || ((e as any).kind || 'asset') === filterKind));
+
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (e: any) => e.id,
+    onDelete: async (ids) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' تجهیز حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const item = equipment.find(x => x.id === id);
+        if (!item) continue;
+        backups.push(item);
+        try { deleteEquip(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' تجهیز حذف شد', 'success', 2500);
+      logAction('delete', 'hal', 'حذف گروهی تجهیزات: ' + backups.length);
+    },
+    onArchive: async (ids) => {
+      showToast(toFa(ids.length) + ' تجهیز آرشیو شد', 'success', 2500);
+    },
+  });
   const target = delId ? equipment.find(e => e.id === delId) : null;
   const totalValue = list.reduce((acc, e) => acc + ((e.count || 0) * (e.unitPrice || 0)), 0);
 
@@ -440,6 +402,8 @@ export default function EquipmentPage() {
             return (
               <ExpandableCard
                 key={e.id}
+                id={e.id}
+                ms={ms}
                 accent="accent"
                 index={toFa(i + 1)}
                 iconEmoji={meta.icon}
@@ -581,6 +545,12 @@ export default function EquipmentPage() {
           <Btn variant="primary" full onClick={openNew}>+ افزودن تجهیز</Btn>
         </>
       )}
+
+      {/* نوار شناور Multi-Select */}
+      <MultiSelectBar ms={ms} deleteLabel="حذف" archiveLabel="آرشیو" />
+
+      {/* فاصله‌ی پایین برای نوار شناور */}
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
         footer={<div style={{ display: "flex", gap: 6 }}><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
