@@ -44,10 +44,10 @@ export default function MultiSelectBar<T>({
       aria-label="اکشن‌های گروهی"
       style={{
         position: 'fixed',
-        bottom: 'calc(88px + env(safe-area-inset-bottom, 0px))',
+        bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
         left: '50%',
         transform: 'translateX(-50%)',
-        zIndex: 200,
+        zIndex: 9999,
         maxWidth: 460,
         width: 'calc(100% - 20px)',
         background: 'var(--card-solid)',
