@@ -740,26 +740,26 @@ const collectWhsShortages = () => {
         <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش ثبت روزانه' : 'ثبت روزانه جدید'}
           footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
 <Grid2>
-            <Field label="گله" required>
-              <SmartSelect
-                value={form.flockId}
-                onChange={onFlockChange}
-                options={activeFlocks.map(f => ({
-                  value: f.id,
-                  label: f.name,
-                  subtitle: f.currentCount ? `${toFa(f.currentCount)} پرنده` : undefined,
-                }))}
-                placeholder="— انتخاب گله —"
-                modalTitle="انتخاب گله"
-              />
+            <Field label="تاریخ" required>
+              <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
             </Field>
             <Field label="ساعت ورود">
               <TimePicker value={form.entryTime} onChange={v => setForm({ ...form, entryTime: v })} placeholder="انتخاب ساعت" />
             </Field>
           </Grid2>
 
-          <Field label="تاریخ" required>
-            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
+          <Field label="گله" required>
+            <SmartSelect
+              value={form.flockId}
+              onChange={onFlockChange}
+              options={activeFlocks.map(f => ({
+                value: f.id,
+                label: f.name,
+                subtitle: f.currentCount ? `${toFa(f.currentCount)} پرنده` : undefined,
+              }))}
+              placeholder="— انتخاب گله —"
+              modalTitle="انتخاب گله"
+            />
           </Field>
 
           {flockAliveCount > 0 && (
