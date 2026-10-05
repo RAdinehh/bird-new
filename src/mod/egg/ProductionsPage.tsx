@@ -362,7 +362,7 @@ export default function ProductionsPage() {
           </div>
         ) : null}
 
-        <SectionTitle>🥚 تخم‌های سالم</SectionTitle>
+        <SectionTitle>🥚 تخم‌گذاری</SectionTitle>
 
         <Grid2>
           <Field label="🥚 تخم خوراکی">
@@ -391,9 +391,7 @@ export default function ProductionsPage() {
           </div>
         )}
 
-        <SectionTitle>💔 تخم‌های مصرفی</SectionTitle>
-
-        <Grid2>
+                <Grid2>
           <Field label="تخم شکسته" error={vErrors.brokenCount}>
             <NumField placeholder="مثلاً — ۵" value={form.brokenCount} onChange={e => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" min={0} integer />
           </Field>
@@ -452,7 +450,7 @@ export default function ProductionsPage() {
           </div>
         )}
 
-        <SectionTitle>⚖ وزن</SectionTitle>
+        <SectionTitle>⚖ وزن (اختیاری)</SectionTitle>
         <Field label="وزن میانگین تخم" hint="اختیاری" error={vErrors.avgWeight}>
           <NumField placeholder="مثلاً — ۱.۵" value={form.avgWeight} onChange={e => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
         </Field>
