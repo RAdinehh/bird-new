@@ -23,7 +23,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
-import { Row, SectionTitle, chip } from './helpers';
+import { Row, SectionTitle, chip, AccordionSection } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 import { useSearchParams } from 'react-router-dom';
@@ -648,7 +648,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
         <Btn size="sm" full onClick={addItem}>+ افزودن قلم</Btn>
 
 
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> شرایط پرداخت</SectionTitle>
+        <AccordionSection icon="📅" title="شرایط پرداخت" defaultOpen summary={form.paymentTerms === 'cash' ? 'نقدی' : form.paymentTerms === 'installment' ? `${toFa(form.installmentCount || '0')} قسط` : 'توافقی'}>
         <Grid2>
           <Field label="نوع پرداخت" required>
             <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
@@ -680,7 +680,9 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
           </Grid2>
         )}
 
-        <SectionTitle>💳 پرداخت‌ها — {toFa(paid.toLocaleString('fa-IR'))} از {toFa(total.toLocaleString('fa-IR'))}</SectionTitle>
+        </AccordionSection>
+
+        <AccordionSection icon="💳" title={`پرداخت‌ها — ${toFa(paid.toLocaleString('fa-IR'))} از ${toFa(total.toLocaleString('fa-IR'))}`} defaultOpen={form.payments.length > 0}>
         {form.payments.map(p => (
           <div key={p.id} style={{ padding: 'var(--pad-normal) 0', borderBottom: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -724,6 +726,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
           </div>
         ))}
         <Btn size="sm" full onClick={addPayment}>+ افزودن پرداخت</Btn>
+        </AccordionSection>
 
         {rem > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', color: 'var(--warn)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
