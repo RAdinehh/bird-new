@@ -193,28 +193,32 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
     return (
       <div style={{ marginBottom: 12 }}>
         <div style={{
-          fontSize: 10.5,
-          fontWeight: 800,
-          color: 'var(--muted)',
-          letterSpacing: '.5px',
-          padding: '10px 4px 6px',
+          fontSize: 'var(--fs-base)',
+          fontWeight: 700,
+          color: 'var(--text)',
+          letterSpacing: '.3px',
+          paddingTop: 8,
+          paddingBottom: 6,
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
+          gap: 6,
         }}>
+          <span style={{ fontSize: '1.05em', lineHeight: 1 }}>
+            {isRequired ? '🐔' : '🔧'}
+          </span>
           <span>{isRequired ? 'ضروری برای پرورش' : 'اختیاری'}</span>
           {totalItems > 0 && (
             <span style={{
-              fontSize: 9.5,
+              fontSize: 'var(--fs-xs)',
               fontWeight: 700,
-              padding: '1px 6px',
-              borderRadius: 5,
-              background: 'var(--input-bg)',
-              color: 'var(--muted)',
+              padding: '2px 8px',
+              borderRadius: 6,
+              background: 'var(--accent-soft)',
+              color: 'var(--accent)',
               letterSpacing: 0,
-            }}>{toFa(totalItems)}</span>
+              marginRight: 'auto',
+            }}>{toFa(totalItems)} مورد</span>
           )}
-          <span style={{ flex: 1, height: 1, background: 'var(--border)' }} />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -367,7 +371,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
         </div>
 
         {renderGroup(REQUIRED_CATS, true)}
-        {renderGroup(OPTIONAL_CATS, false)}
+        {grouped['power']?.length || grouped['auxiliary']?.length ? renderGroup(OPTIONAL_CATS, false) : null}
 
         {/* legacy pills */}
         {legacy && (legacy.ventilationSystem || legacy.feederType || legacy.drinkerType || legacy.litterType) && (
