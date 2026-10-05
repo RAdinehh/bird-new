@@ -12,6 +12,8 @@ import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import SmartSelect from '../../shr/components/SmartSelect';
 import DatePicker from '../../shr/components/DatePicker';
 import ItemDetailsForm from '../../shr/components/ItemDetailsForm';
@@ -67,7 +69,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
   const [form, setForm] = useState<F>(empty(isPurchase));
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
-  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filterCat, setFilterCat] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [printId, setPrintId] = useState<string | null>(null);
@@ -154,16 +156,43 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
 
   // ==== Handlers ====
   const undoDelete = () => {
-    const item = undoData;
-    if (!item) return;
+    if (!undoData) return;
+    const raw = (undoData as any).item;
+    const arr: any[] = Array.isArray(raw) ? raw : [raw];
     try {
-      addInvoice(item.item);
-      showToast('فاکتور بازگردانی شد', 'success', 2000);
-    } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
-    }
+      for (const it of arr) {
+        try { addInvoice(it); } catch {}
+      }
+      showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
+    } catch { showToast('بازگردانی ناموفق', 'error', 2000); }
     setUndoData(null);
   };
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (x: any) => x.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' فاکتور حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const it = invoices.find(x => x.id === id);
+        if (!it) continue;
+        backups.push(it);
+        try { deleteInvoice(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' فاکتور حذف شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
 
   const openNew = () => {
     if (parties.length === 0) { showAlert(isPurchase ? 'اول یک فروشنده بسازید' : 'اول یک مشتری بسازید'); return; }
@@ -369,6 +398,22 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
         ))}
       </div>
 
+      {!ms.selectionMode && list.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && list.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
+
       {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
@@ -380,12 +425,14 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
         <>
           {list.map((inv, i) => {
             const party = parties.find(c => c.id === inv.partyId);
-            const isOpen = expandedId === inv.id;
+            const isOpen = !ms.selectionMode && expandedId === inv.id;
             const rem2 = remaining(inv);
             const st = rem2 === 0 ? 'paid' : paidSum(inv.payments || []) > 0 ? 'partial' : 'unpaid';
             return (
               <ExpandableCard
                 key={inv.id}
+                id={inv.id}
+                ms={ms}
                 accent={rem2 === 0 ? 'accent' : 'warn'}
                 index={toFa(i + 1)}
                 iconEmoji="🛒"
@@ -471,6 +518,10 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
       )}
 
       {/* ============ Modal اصلی فرم ============ */}
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
+
       <Modal
         open={open} onClose={() => setOpen(false)}
         title={form.id ? 'ویرایش خرید' : 'ثبت خرید جدید'}
