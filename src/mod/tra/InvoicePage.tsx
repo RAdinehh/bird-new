@@ -538,14 +538,41 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
             </Select>
           </Field>
         </Grid2>
-        <Field label="فروشنده" required error={vErrors.partyId}>
-          <SmartSelect
-            value={form.partyId}
-            onChange={v => setForm({...form, partyId: v})}
-            options={parties.map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
-            placeholder="— انتخاب کنید —" modalTitle="انتخاب فروشنده" autoThreshold={6}
-          />
-        </Field>
+        <Grid2>
+          <Field label="فروشنده" required error={vErrors.partyId}>
+            <SmartSelect
+              value={form.partyId}
+              onChange={v => setForm({...form, partyId: v})}
+              options={parties.map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
+              placeholder="— انتخاب کنید —" modalTitle="انتخاب فروشنده" autoThreshold={6}
+            />
+          </Field>
+          <Field label="نوع سفارش">
+            <Select value={form.isPreorder ? 'preorder' : 'stock'} onChange={e => setForm({ ...form, isPreorder: e.target.value === 'preorder' })}>
+              <option value="stock">📦 از موجودی</option>
+              <option value="preorder">📅 پیش‌خرید</option>
+            </Select>
+          </Field>
+        </Grid2>
+
+        {form.isPreorder && (
+          <>
+            <Field label="تاریخ تحویل" required>
+              <DatePicker value={form.deliveryDate} onChange={v => setForm({...form, deliveryDate: v})}  autoToday />
+            </Field>
+            <Grid2>
+              <Field label="نوع پیش‌پرداخت">
+                <Select value={form.advanceType} onChange={e => setForm({...form, advanceType: e.target.value as 'percent' | 'amount'})}>
+                  <option value="percent">درصد (٪)</option>
+                  <option value="amount">مبلغ (ت)</option>
+                </Select>
+              </Field>
+              <Field label="مقدار">
+                <NumField placeholder="مثلاً — ۱۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
+              </Field>
+            </Grid2>
+          </>
+        )}
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت</SectionTitle>
         {form.items.map((it, idx) => (
@@ -619,39 +646,13 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
         ))}
         <Btn size="sm" full onClick={addItem}>+ افزودن قلم</Btn>
 
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> نوع سفارش</SectionTitle>
-        <Field label="نوع سفارش">
-          <Select value={form.isPreorder ? 'preorder' : 'stock'} onChange={e => setForm({ ...form, isPreorder: e.target.value === 'preorder' })}>
-            <option value="stock"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> از موجودی (فوری)</option>
-            <option value="preorder"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> پیش‌خرید (تاریخ تحویل)</option>
-          </Select>
-        </Field>
-
-        {form.isPreorder && (
-          <>
-            <Field label="تاریخ تحویل" required>
-              <DatePicker value={form.deliveryDate} onChange={v => setForm({...form, deliveryDate: v})}  autoToday />
-            </Field>
-            <Grid2>
-              <Field label="نوع پیش‌پرداخت">
-                <Select value={form.advanceType} onChange={e => setForm({...form, advanceType: e.target.value as 'percent' | 'amount'})}>
-                  <option value="percent">درصد (٪)</option>
-                  <option value="amount">مبلغ (ت)</option>
-                </Select>
-              </Field>
-              <Field label="مقدار">
-                <NumField placeholder="مثلاً — ۱۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
-              </Field>
-            </Grid2>
-          </>
-        )}
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> شرایط پرداخت</SectionTitle>
         <Grid2>
           <Field label="نوع پرداخت" required>
             <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
               <option value="cash">💵 نقدی</option>
-              <option value="installment"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> قسطی</option>
+              <option value="installment">📅 قسطی</option>
               <option value="custom">✏️ توافقی</option>
             </Select>
           </Field>
