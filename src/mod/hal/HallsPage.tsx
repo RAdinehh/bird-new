@@ -475,28 +475,7 @@ export default function HallsPage() {
                   {realCapacity && !h.capacity && (
                     <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)} پرنده (از مساحت)`} accent />
                   )}
-                  {hallEquips.length > 0 && (
-                    <Row
-                      l="تجهیزات نصب‌شده"
-                      v={(() => {
-                        const counts: Record<string, number> = {};
-                        hallEquips.forEach(e => {
-                          counts[e.type] = (counts[e.type] || 0) + (e.count || 0);
-                        });
-                        return Object.entries(counts)
-                          .map(([t, c]) => `${EQUIP_LABELS[t]?.icon || '🔧'} ${fmt.int(c)}`)
-                          .join(' · ');
-                      })()}
-                    />
-                  )}
-                </div>
 
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚙️</span> سیستم‌های سالن</div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {h.ventilationSystem && <Pill label="تهویه" value={VENT_SYS_LABELS[h.ventilationSystem]} />}
-                  {h.feederType && <Pill label="دانخوری" value={FEEDER_LABELS[h.feederType]} />}
-                  {h.drinkerType && <Pill label="آبخوری" value={DRINKER_LABELS[h.drinkerType]} />}
-                  {h.litterType && <Pill label="بستر" value={LITTER_LABELS[h.litterType]} />}
                 </div>
 
                 <HallEquipSection
