@@ -16,6 +16,9 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
 import { Row, chip } from './helpers';
+import HelpBanner from '../../shr/components/HelpBanner';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { format as formatJ } from 'date-fns-jalali';
 import { useIncubationProfile } from './hooks';
 import { logAction } from '../../cor/logger/auditLog';
@@ -39,7 +42,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   const [entriesData, setEntriesData] = useState<Record<string, any>>({});
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
-  const [undoData, setUndoData] = useState<{ hatch: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ hatch: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [deviceFilter, setDeviceFilter] = useState('');
@@ -142,8 +145,9 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   const undoDeleteHatch = () => {
     if (!undoData) return;
     try {
-      addHatch(undoData.hatch);
-      showToast('هچ بازگردانی شد', 'success', 2000);
+      const arr: any[] = Array.isArray(undoData.hatch) ? undoData.hatch : [undoData.hatch];
+      for (const h of arr) addHatch(h);
+      showToast(toFa(arr.length) + ' هچ بازگردانی شد', 'success', 2000);
     } catch {}
     setUndoData(null);
   };
@@ -288,6 +292,33 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     return true;
   }).sort((a, b) => String(b.date).localeCompare(String(a.date))), [hatches, eggEntries, deviceFilter, q, birds, devices]);
 
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: filtered,
+    getId: (h: any) => h.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' هچ حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const it = hatches.find(x => x.id === id);
+        if (!it) continue;
+        backups.push(it);
+        try { deleteHatch(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ hatch: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.hatch) && cur.hatch.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' هچ حذف شد', 'success', 2500);
+      logAction('delete', 'inc', 'حذف گروهی هچ: ' + backups.length);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
   const target = delId ? hatches.find(h => h.id === delId) : null;
   const availableEntries = eggEntries.filter(e => !deviceFilter || e.deviceId === deviceFilter).sort((a, b) => String(b.entryDate).localeCompare(String(a.entryDate)));
 
@@ -308,6 +339,30 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
           }}>بازگردانی</button>
         </div>
       )}
+      <HelpBanner
+        id="inc-hatch-intro"
+        icon="🐣"
+        title="هچ — نتیجه نهایی"
+        description="نتیجه نهایی تخم‌ها را اینجا ثبت کنید: هچ، تلفات جنینی، تفکیک جنسیت، ساخت گله و فروش جوجه. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        tone="info"
+      />
+
+      {!ms.selectionMode && filtered.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && filtered.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === filtered.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === filtered.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
+
       {hatches.length > 0 && (
         <>
           <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو..." />
@@ -328,7 +383,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
             const entry = _entriesById[h.eggEntryId];
             const bird = entry ? _birdsById[entry.birdId] : null;
             const dev = entry ? _devicesById[entry.deviceId] : null;
-            const isOpen = expandedId === h.id;
+            const isOpen = !ms.selectionMode && expandedId === h.id;
             const total = entry?.count || 0;
             const hr = hatchRate(h.hatched || 0, total);
             const myCand = _latestCandByEntry[h.eggEntryId];
@@ -338,7 +393,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
             const sumH = (h.hatched||0) + (h.unhatched||0) + (h.deadInShell||0) + (h.pipped||0) + (h.other||0);
             const isComplete = total > 0 && sumH >= total;
             return (
-              <ExpandableCard key={h.id} accent="accent" index={toFa(i + 1)} iconEmoji="🐣"
+              <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={toFa(i + 1)} iconEmoji="🐣"
                 title={toFa(h.hatched || 0) + ' جوجه · ' + (bird?.name || '—')}
                 subtitle={(dev?.name || '—') + ' · ' + toFa(h.date)}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
@@ -711,6 +766,10 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       {/* ═══ Modal گله ═══ */}
       <Modal open={!!flockModal} onClose={() => setFlockModal(null)} title="🐔 ساخت گله جدید"
