@@ -62,7 +62,6 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
   const { invoices, addInvoice, updateInvoice, deleteInvoice } = useTra();
   const { contacts } = useCtc();
   const { items: whsItems } = useWhs();
-  const parties = contacts.filter(c => c.roles.includes(isPurchase ? 'supplier' : 'customer'));
 
   // ==== State ====
   const [open, setOpen] = useState(false);
@@ -77,6 +76,26 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
   const [transferNote, setTransferNote] = useState('');
   const [transferDate, setTransferDate] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // آبشاری: تأمین‌کننده‌ها بر اساس دسته فاکتور
+  const parties = (() => {
+    if (!isPurchase) return contacts.filter(c => c.roles.includes('customer'));
+    const allSuppliers = contacts.filter(c => c.roles.includes('supplier'));
+    const cat = form?.category || '';
+    if (!cat || cat === 'other') return allSuppliers;
+    const matching = allSuppliers.filter((c: any) =>
+      Array.isArray(c.supplierTypes) && c.supplierTypes.includes(cat)
+    );
+    return matching.length > 0 ? matching : allSuppliers;
+  })();
+
+  // آبشار: اگه partyId دیگه در لیست فیلترشده نیست، پاک شه
+  useEffect(() => {
+    if (!open || !form.partyId) return;
+    if (!parties.some(p => p.id === form.partyId)) {
+      setForm(f => ({ ...f, partyId: '' }));
+    }
+  }, [parties, form.partyId, open]);
 
   // بازکردن خودکار از URL (از EquipmentPage)
   useEffect(() => {
