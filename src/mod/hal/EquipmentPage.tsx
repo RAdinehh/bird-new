@@ -138,13 +138,25 @@ function calcEquipNeed(
   return null;
 }
 
+function calcEquipValue(e: any): number {
+  const count = e.count || 0;
+  const price = e.unitPrice || 0;
+  if (!count || !price) return 0;
+  const def = getEquipUnit(e.type || 'other');
+  if (def.baseUnit === 'kg') {
+    const base = def.calc(count, (e as any).capacity || 0);
+    return Math.round(base * price);
+  }
+  return count * price;
+}
+
 export default function EquipmentPage() {
   const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
   const { options: allCustomOpts } = useCustomOptions();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<any>({ id:'', hallId:'', kind:'asset', category:'lighting', type:'lamp', name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
+  const [form, setForm] = useState<any>({ id:'', hallId:'', kind:'asset', category:'ventilation', type:'', name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
   const __selectedHall = halls.find(h => h.id === form.hallId);
   const hallVolume = __selectedHall
     ? (__selectedHall.length || 0) * (__selectedHall.width || 0) * (__selectedHall.height || 0)
@@ -182,8 +194,13 @@ export default function EquipmentPage() {
     }
   };
 
-  const openNew = () => { setForm({ id:'', hallId: halls[0].id, type:'lamp',
-     name:'', count:'', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'' }); setErr(''); setOpen(true); };
+  const openNew = () => {
+    const firstCat = categoriesForKind('asset')[0] || 'ventilation';
+    setForm({ id:'', hallId: halls[0].id, kind:'asset', category: firstCat, type:'',
+      name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'',
+      warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
+    setErr(''); setOpen(true);
+  };
 
   const openEdit = (e: Equipment) => {
     setAutoFields(new Set());
@@ -355,7 +372,7 @@ export default function EquipmentPage() {
     },
   });
   const target = delId ? equipment.find(e => e.id === delId) : null;
-  const totalValue = list.reduce((acc, e) => acc + ((e.count || 0) * (e.unitPrice || 0)), 0);
+  const totalValue = list.reduce((acc, e) => acc + calcEquipValue(e), 0);
 
   return (
     <PageContainer>
@@ -434,7 +451,7 @@ export default function EquipmentPage() {
             const _cm = (allCustomOpts as any[]).find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
             const _isDeleted = _cm ? _cm.hidden === true : false;
             const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: '🔧' });
-            const value = (e.count || 0) * (e.unitPrice || 0);
+            const value = calcEquipValue(e);
             const isOpen = expandedId === e.id;
             return (
               <ExpandableCard
@@ -698,9 +715,9 @@ export default function EquipmentPage() {
 
         <Grid2>
           <Field label={(() => {
-            const def = getEquipUnit(form.type);
-            if (def.summaryLabel === 'عدد') return 'قیمت هر عدد';
-            return `قیمت هر ${def.summaryLabel}`;
+            const def = getEquipUnit(form.type || 'other');
+            if (def.baseUnit === 'kg') return 'قیمت هر kg';
+            return 'قیمت هر عدد';
           })()}>
             <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
           </Field>

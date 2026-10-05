@@ -133,13 +133,14 @@ export default function EditableSelect({
       type="button"
       onClick={() => setOpen(true)}
       style={{
-        width: '100%', textAlign: 'right', padding: '10px 12px',
+        width: '100%', height: 38, textAlign: 'right', padding: '0 12px',
         background: 'var(--input-bg)',
         border: '1px solid ' + (isOrphan ? 'rgba(217,119,6,.5)' : 'var(--border)'),
-        borderRadius: 'var(--r-sm)',
+        borderRadius: 'var(--r-md)',
         color: isOrphan ? 'var(--warn)' : (current ? 'var(--text)' : 'var(--muted)'),
         fontSize: 'var(--fs-base)', cursor: 'pointer', fontFamily: 'inherit',
         display: 'flex', alignItems: 'center', gap: 8,
+        boxSizing: 'border-box',
       }}
     >
       <span style={{ flex: 1, textAlign: 'right', fontWeight: isOrphan ? 700 : 500, display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
