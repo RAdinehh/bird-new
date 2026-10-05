@@ -24,7 +24,6 @@ export default function ZonesPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filter, setFilter] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -146,7 +145,6 @@ export default function ZonesPage() {
   };
 
   const list = filter ? zones.filter(z => z.hallId === filter) : zones;
-  const target = delId ? zones.find(z => z.id === delId) : null;
 
   return (
     <PageContainer>
@@ -250,7 +248,10 @@ export default function ZonesPage() {
                 )}
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(z)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(z.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                    const idToDel = z.id; const ok = await showConfirmAsync('تأیید حذف', 'این منطقه حذف شود؟', { danger: true }); if (!ok) return; const item = zones.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteZone(idToDel);
+                    logAction('delete', 'hal', 'حذف از سالن‌ها');  showToast('منطقه حذف شد', 'info', 1800);
+                    }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -285,12 +286,6 @@ export default function ZonesPage() {
         </Grid2>
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
         <ErrorBox>{err}</ErrorBox>
-      </Modal>
-
-      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف بخش"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این منطقه حذف شود؟', { danger: true }); if (!ok) return; const item = zones.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteZone(idToDel);
-              logAction('delete', 'hal', 'حذف از سالن‌ها'); setDelId(null); showToast('منطقه حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.name}</b>؟</div>
       </Modal>
     </PageContainer>
   );

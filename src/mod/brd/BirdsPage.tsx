@@ -26,7 +26,6 @@ export default function BirdsPage() {
   const [cycleFromPreset, setCycleFromPreset] = useState(false);
   const [fcrFromPreset, setFcrFromPreset] = useState(false);
   const [error, setError] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -98,7 +97,6 @@ export default function BirdsPage() {
     if (form.id) updateBird(form.id, payload); else addBird(payload);
     setOpen(false);
   };
-  const target = delId ? birds.find(b => b.id === delId) : null;
 
   const undoDelete = () => {
     const item = undoData;
@@ -215,7 +213,10 @@ export default function BirdsPage() {
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(b)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(b.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                    const idToDel = b.id; const ok = await showConfirmAsync('تأیید حذف', 'این پرنده حذف شود؟', { danger: true }); if (!ok) return; const item = birds.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteBird(idToDel);
+                    logAction('delete', 'brd', 'حذف از پرنده و نژاد');  showToast('پرنده حذف شد', 'info', 1800);
+                    }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -293,15 +294,6 @@ export default function BirdsPage() {
            padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
            marginBottom: 8 }}>
           💡 <b>FCR</b> یعنی چند کیلو دان لازم است تا پرنده ۱ کیلو وزن اضافه کند. هرچه کمتر، بهتر. مثال: ۱.۶ عالی، ۱.۸ متوسط، ۲.۰+ ضعیف.
-        </div>
-      </Modal>
-
-      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف پرنده"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این پرنده حذف شود؟', { danger: true }); if (!ok) return; const item = birds.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteBird(idToDel);
-              logAction('delete', 'brd', 'حذف از پرنده و نژاد'); setDelId(null); showToast('پرنده حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-          آیا از حذف <b>{target?.name}</b> مطمئن هستید؟
-          <br /><span style={{ color: 'var(--muted)', fontSize: 'var(--fs-base)' }}>تمام نژادهای مربوط به این پرنده هم حذف می‌شوند.</span>
         </div>
       </Modal>
     </PageContainer>

@@ -171,7 +171,6 @@ export default function FlocksPage() {
   const [form, setForm] = useState<F>(empty());
   const [layingFromStd, setLayingFromStd] = useState(false);
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
   const [archId, setArchId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -454,8 +453,6 @@ export default function FlocksPage() {
     const per = int(form.initialCount) ? total / (int(form.initialCount) || 1) : 0;
     return { bird, del, oth, total, per };
   }, [form]);
-
-  const target = delId ? flocks.find(f => f.id === delId) : null;
   const archTarget = archId ? flocks.find(f => f.id === archId) : null;
 
   const tabCount = (t: TabId) => {
@@ -761,7 +758,10 @@ export default function FlocksPage() {
                     {isArchived ? (
                       <>
                         <Btn size="sm" onClick={() => restore(f.id)} style={{ flex: 1 }}>بازگردانی</Btn>
-                        <Btn size="sm" onClick={() => setDelId(f.id)} style={{ flex: 1 }}>حذف</Btn>
+                        <Btn size="sm" onClick={async () => {
+                    const idToDel = f.id; const item = flocks.find(f => f.id === idToDel); if (item) { setUndoData({ flock: item }); setTimeout(() => setUndoData((cur: any) => cur && cur.flock.id === item.id ? null : cur), 6000); } remove(idToDel);
+                    logAction('delete', 'flk', 'حذف از گله‌ها');  showToast('گله حذف شد', 'info', 1800);
+                    }} style={{ flex: 1 }}>حذف</Btn>
                       </>
                     ) : (
                       <>
@@ -1081,16 +1081,6 @@ export default function FlocksPage() {
           footer={<BtnRow><Btn variant="primary" onClick={() => { if (archId) archive(archId); setArchId(null); }}>آرشیو کن</Btn><Btn onClick={() => setArchId(null)}>لغو</Btn></BtnRow>}>
           <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
             آرشیو <b>{archTarget?.name}</b>؟
-          </div>
-        </Modal>
-
-        <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف گله"
-          footer={<BtnRow><Btn variant="danger" onClick={() => { const idToDel = delId; if (!idToDel) return; const item = flocks.find(f => f.id === idToDel); if (item) { setUndoData({ flock: item }); setTimeout(() => setUndoData((cur: any) => cur && cur.flock.id === item.id ? null : cur), 6000); } remove(idToDel);
-              logAction('delete', 'flk', 'حذف از گله‌ها'); setDelId(null); showToast('گله حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-          <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>
-            حذف کامل <b>{target?.name}</b>؟
-            <br />
-            <span style={{ color: 'var(--danger)', fontSize: 'var(--fs-base)' }}>این عمل قابل بازگشت نیست.</span>
           </div>
         </Modal>
       </PageContainer>

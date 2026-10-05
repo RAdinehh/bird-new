@@ -41,7 +41,6 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [entriesData, setEntriesData] = useState<Record<string, any>>({});
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ hatch: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [q, setQ] = useState('');
@@ -229,9 +228,11 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
   const doDelete = async (id: string) => {
     const h = hatches.find(x => x.id === id) as any;
     if (!h) return;
+    const ok = await showConfirmAsync('تأیید حذف', 'این هچ حذف شود؟', { danger: true });
+    if (!ok) return;
     if (h.generatedFlockId && await showConfirmAsync('تأیید', 'این هچ یک گله ساخته. گله هم حذف شود؟', { danger: true })) { try { removeFlock(h.generatedFlockId); } catch {} }
     if (h.generatedInvoiceId && await showConfirmAsync('تأیید', 'این هچ یک فاکتور ساخته. فاکتور هم حذف شود؟', { danger: true })) { try { deleteInvoice(h.generatedInvoiceId); } catch {} }
-    deleteHatch(id); setDelId(null);
+    deleteHatch(id);
   };
 
   const createFlock = () => {
@@ -319,7 +320,6 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
-  const target = delId ? hatches.find(h => h.id === delId) : null;
   const availableEntries = eggEntries.filter(e => !deviceFilter || e.deviceId === deviceFilter).sort((a, b) => String(b.entryDate).localeCompare(String(a.entryDate)));
 
   return (
@@ -482,7 +482,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(h)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(h.id)} aria-label="حذف هچ" style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={() => doDelete(h.id)} aria-label="حذف هچ" style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -832,13 +832,6 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
         })()}
       </Modal>
 
-      {/* ═══ Modal حذف ═══ */}
-      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف هچ"
-        footer={<BtnRow><Btn variant="danger" onClick={() => delId && doDelete(delId)}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-          حذف <b>{toFa(target?.hatched || 0)} جوجه</b>؟
-        </div>
-      </Modal>
     </PageContainer>
   );
 }

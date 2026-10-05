@@ -189,7 +189,6 @@ export default function DevicesPage() {
   const [expandedBird, setExpandedBird] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ birdName: string; data: any } | null>(null);
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoDevice, setUndoDevice] = useState<{ device: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [maintDeviceId, setMaintDeviceId] = useState<string | null>(null);
@@ -405,8 +404,6 @@ export default function DevicesPage() {
     const logs = ((dev as any).maintenanceLogs || []).filter((l: any) => l.id !== logId);
     updateDevice(deviceId, { maintenanceLogs: logs } as any);
   };
-
-  const target = delId ? devices.find(d => d.id === delId) : null;
   const accentFor = (s: DeviceStatus): any => s === 'active' ? 'accent' : s === 'idle' ? 'dim' : 'warn';
   const warrantyForm = warrantyInfo(form.purchasedAt, parseInt(toEn(form.warranty)) || null);
 
@@ -592,7 +589,16 @@ export default function DevicesPage() {
 
                 <div style={{ display: 'flex', gap: 'var(--sp-2)' as any, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(d.id)} aria-label="حذف دستگاه" style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                    if (!d.id) return;
+                    const dev = devices.find(d => d.id === d.id);
+                    if (dev) {
+                    setUndoDevice({ device: dev });
+                    setTimeout(() => setUndoDevice(cur => cur && cur.device.id === dev.id ? null : cur), 6000);
+                    }
+                    deleteDevice(d.id);
+                    showToast('دستگاه حذف شد', 'info', 1800);
+                    }} aria-label="حذف دستگاه" style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -908,23 +914,6 @@ export default function DevicesPage() {
           <Field label="توضیحات">
             <Input placeholder="جزئیات..." value={maintForm.description} onChange={e => setMaintForm({ ...maintForm, description: e.target.value })} />
           </Field>
-        </div>
-      </Modal>
-
-      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف دستگاه"
-        footer={<BtnRow><Btn variant="danger" onClick={() => {
-          if (!delId) return;
-          const dev = devices.find(d => d.id === delId);
-          if (dev) {
-            setUndoDevice({ device: dev });
-            setTimeout(() => setUndoDevice(cur => cur && cur.device.id === dev.id ? null : cur), 6000);
-          }
-          deleteDevice(delId);
-          setDelId(null);
-          showToast('دستگاه حذف شد', 'info', 1800);
-        }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-          حذف <b>{target?.name}</b>؟
         </div>
       </Modal>
     </PageContainer>

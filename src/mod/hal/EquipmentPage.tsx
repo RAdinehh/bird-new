@@ -167,7 +167,6 @@ export default function EquipmentPage() {
   const equipNeed = calcEquipNeed(form.type, form.hallId, flocks || [], breedStd, hallArea);
   const [err, setErr] = useState('');
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [filter, setFilter] = useState('');
   const [filterKind, setFilterKind] = useState('');
@@ -371,7 +370,6 @@ export default function EquipmentPage() {
       showToast(toFa(ids.length) + ' تجهیز آرشیو شد', 'success', 2500);
     },
   });
-  const target = delId ? equipment.find(e => e.id === delId) : null;
   const totalValue = list.reduce((acc, e) => acc + calcEquipValue(e), 0);
 
   return (
@@ -591,7 +589,10 @@ export default function EquipmentPage() {
                     </Btn>
                   )}
                   <Btn size="sm" onClick={() => openEdit(e)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(e.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                    const idToDel = e.id; const ok = await showConfirmAsync('تأیید حذف', 'این تجهیز حذف شود؟', { danger: true }); if (!ok) return; const item = equipment.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteEquip(idToDel);
+                    logAction('delete', 'hal', 'حذف از سالن‌ها');  showToast('تجهیز حذف شد', 'info', 1800);
+                    }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -747,12 +748,6 @@ export default function EquipmentPage() {
           );
         })()}
 
-      </Modal>
-
-      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف تجهیز"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این تجهیز حذف شود؟', { danger: true }); if (!ok) return; const item = equipment.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteEquip(idToDel);
-              logAction('delete', 'hal', 'حذف از سالن‌ها'); setDelId(null); showToast('تجهیز حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.name}</b>؟</div>
       </Modal>
     </PageContainer>
   );

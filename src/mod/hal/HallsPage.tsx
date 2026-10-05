@@ -153,7 +153,6 @@ export default function HallsPage() {
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const tempUnit = useTempUnit();
@@ -316,7 +315,6 @@ export default function HallsPage() {
     if (form.id) updateHall(form.id, data); else addHall(data);
     setOpen(false);
   };
-  const target = delId ? halls.find(h => h.id === delId) : null;
 
   const undoDelete = () => {
     const item = undoData;
@@ -545,7 +543,10 @@ export default function HallsPage() {
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(h)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(h.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                    const idToDel = h.id; const ok = await showConfirmAsync('تأیید حذف', 'این سالن حذف شود؟', { danger: true }); if (!ok) return; const item = halls.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteHall(idToDel);
+                    logAction('delete', 'hal', 'حذف از سالن‌ها');  showToast('سالن حذف شد', 'info', 1800);
+                    }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -655,15 +656,6 @@ export default function HallsPage() {
         <Field label="آدرس سالن"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
         <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
         <ErrorBox>{err}</ErrorBox>
-      </Modal>
-
-      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف سالن"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این سالن حذف شود؟', { danger: true }); if (!ok) return; const item = halls.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteHall(idToDel);
-              logAction('delete', 'hal', 'حذف از سالن‌ها'); setDelId(null); showToast('سالن حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-          حذف <b>{target?.name}</b>؟
-          <br /><span style={{ color: 'var(--muted)', fontSize: 'var(--fs-base)' }}>تمام بخش‌ها و تجهیزات این سالن هم حذف می‌شوند.</span>
-        </div>
       </Modal>
     </PageContainer>
   );

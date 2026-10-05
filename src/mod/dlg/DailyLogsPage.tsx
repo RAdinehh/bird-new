@@ -99,7 +99,6 @@ export default function DailyLogsPage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<F>(newLog());
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ log: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -641,7 +640,33 @@ const collectWhsShortages = () => {
           ) : (
             <>
               <Btn size="sm" variant="primary" onClick={() => restore(l.id)} style={{ flex: 1 }}>♻️ بازگردانی</Btn>
-              <Btn size="sm" onClick={() => setDelId(l.id)} style={{ flex: 1 }}>🗑 حذف</Btn>
+              <Btn size="sm" onClick={async () => {
+                    const idToDel = l.id;
+                    const ok = await showConfirmAsync('تأیید حذف', 'این ثبت روزانه و داده‌های مرتبط حذف شوند؟', { danger: true });
+                    if (!ok) return;
+                    const log = logs.find(l => l.id === idToDel);
+                    if (log) {
+                    setUndoData({ log });
+                    setTimeout(() => setUndoData(cur => cur && cur.log.id === log.id ? null : cur), 6000);
+                    }
+                    if (log?.feedMovementIds) log.feedMovementIds.forEach(id => deleteMovement(id));
+                    const prod = findByLogId(idToDel);
+                    if (prod) deleteProduction(prod.id);
+                    if (log) {
+                    try {
+                    bus.emit('dlg:log:deleted', {
+                    logId: log.id,
+                    flockId: log.flockId,
+                    date: log.date,
+                    deathsCount: log.deathsCount || 0,
+                    feedMovementIds: log.feedMovementIds || [],
+                    }, { source: 'dlg/delete' });
+                    } catch (e) { /* silent */ }
+                    }
+                    remove(idToDel);
+                    logAction('delete', 'dlg', 'حذف از ثبت روزانه');
+                    showToast('ثبت حذف شد', 'info', 1800);
+                    }} style={{ flex: 1 }}>حذف</Btn>
             </>
           )}
         </div>
@@ -1173,39 +1198,6 @@ const collectWhsShortages = () => {
           </Field>
 
           <ErrorBox>{err}</ErrorBox>
-        </Modal>
-
-        <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف ثبت روزانه"
-          footer={<BtnRow><Btn variant="danger" onClick={async () => {
-            const idToDel = delId;
-            if (!idToDel) return;
-            const ok = await showConfirmAsync('تأیید حذف', 'این ثبت روزانه و داده‌های مرتبط حذف شوند؟', { danger: true });
-            if (!ok) return;
-            const log = logs.find(l => l.id === idToDel);
-            if (log) {
-              setUndoData({ log });
-              setTimeout(() => setUndoData(cur => cur && cur.log.id === log.id ? null : cur), 6000);
-            }
-            if (log?.feedMovementIds) log.feedMovementIds.forEach(id => deleteMovement(id));
-            const prod = findByLogId(idToDel);
-            if (prod) deleteProduction(prod.id);
-            if (log) {
-              try {
-                bus.emit('dlg:log:deleted', {
-                  logId: log.id,
-                  flockId: log.flockId,
-                  date: log.date,
-                  deathsCount: log.deathsCount || 0,
-                  feedMovementIds: log.feedMovementIds || [],
-                }, { source: 'dlg/delete' });
-              } catch (e) { /* silent */ }
-            }
-            remove(idToDel);
-              logAction('delete', 'dlg', 'حذف از ثبت روزانه');
-            showToast('ثبت حذف شد', 'info', 1800);
-            setDelId(null);
-          }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-          <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف این ثبت؟</div>
         </Modal>
       </PageContainer>
     </div>

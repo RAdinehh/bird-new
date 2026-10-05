@@ -42,7 +42,6 @@ export default function BreedsPage() {
   const [form, setForm] = useState({ id:'', birdId:'', name:'', fcr:'', standardKey:'' });
   const [fcrFromStd, setFcrFromStd] = useState(false);
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [filterBird, setFilterBird] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -172,8 +171,6 @@ export default function BreedsPage() {
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
-  const target = delId ? breeds.find(b => b.id === delId) : null;
-
   return (
     <PageContainer>
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
@@ -250,7 +247,10 @@ export default function BreedsPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(b)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(b.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                    const idToDel = b.id; const ok = await showConfirmAsync('تأیید حذف', 'این نژاد حذف شود؟', { danger: true }); if (!ok) return; const item = breeds.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteBreed(idToDel);
+                    logAction('delete', 'brd', 'حذف از پرنده و نژاد');  showToast('نژاد حذف شد', 'info', 1800);
+                    }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -323,14 +323,6 @@ export default function BreedsPage() {
           </Field>
         </Grid2>
         <ErrorBox>{err}</ErrorBox>
-      </Modal>
-
-      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف نژاد"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این نژاد حذف شود؟', { danger: true }); if (!ok) return; const item = breeds.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteBreed(idToDel);
-              logAction('delete', 'brd', 'حذف از پرنده و نژاد'); setDelId(null); showToast('نژاد حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-          آیا از حذف <b>{target?.name}</b> مطمئن هستید؟
-        </div>
       </Modal>
     </PageContainer>
   );

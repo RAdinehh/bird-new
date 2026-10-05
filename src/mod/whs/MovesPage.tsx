@@ -41,7 +41,6 @@ export default function MovesPage() {
     reason: 'purchase', date: '', partyId: '', notes: ''
   });
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filterType, setFilterType] = useState<MovementType | ''>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -181,8 +180,6 @@ export default function MovesPage() {
       ? 'مشتری'
       : 'طرف معامله';
 
-  const target = delId ? movements.find(m => m.id === delId) : null;
-
   return (
     <PageContainer>
       {undoData && (
@@ -298,7 +295,10 @@ export default function MovesPage() {
                 ) : null}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => setDelId(m.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                    const idToDel = m.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel);
+                    logAction('delete', 'whs', 'حذف از انبار');  showToast('حذف شد', 'info', 1800);
+                    }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -414,16 +414,6 @@ export default function MovesPage() {
         </Field>
 
         <ErrorBox>{err}</ErrorBox>
-      </Modal>
-
-      <Modal
-        open={delId !== null}
-        onClose={() => setDelId(null)}
-        title="حذف گردش"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel);
-              logAction('delete', 'whs', 'حذف از انبار'); setDelId(null); showToast('حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
-      >
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف این گردش؟</div>
       </Modal>
     </PageContainer>
   );
