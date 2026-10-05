@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createContactSchema } from '../../shr/validation/rules/ctc';
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
@@ -8,6 +8,9 @@ import { Btn, BtnRow, DigitField, Empty,
   Modal, NumField, PageContainer, PhoneField,
   Select, Tag, ErrorBox } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
@@ -115,6 +118,35 @@ export default function ContactsPage() {
     return arr;
   }, [contacts, tab, q]);
 
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (p: any) => p.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' مخاطب حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const item = contacts.find(c => c.id === id);
+        if (!item) continue;
+        backups.push(item);
+        try { remove(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' مخاطب حذف شد', 'success', 2500);
+    },
+  });
+
+
+  // وقتی وارد حالت انتخاب می‌شیم، کارت‌ها بسته بشن
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
+
   const target = delId ? contacts.find(c => c.id === delId) : null;
   const tabCount = (t: TabId) => t === 'all' ? contacts.length : contacts.filter(c => c.roles.includes(t as Role)).length;
 
@@ -161,6 +193,13 @@ export default function ContactsPage() {
       </div>
 
       <PageContainer>
+      <HelpBanner
+        id="ctc-intro"
+        icon="👥"
+        title="مخاطبین"
+        description="مشتریان، تأمین‌کنندگان و کارگران را اینجا ثبت کنید. هر مخاطب می‌تواند نقش‌های مختلف داشته باشد. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        tone="info"
+      />
       {undoData && (
         <UndoBar
           label="مخاطب حذف شد"
@@ -177,6 +216,34 @@ export default function ContactsPage() {
              fontFamily: 'inherit', fontSize: 'var(--fs-base)', minWidth: 0 }} />
         </div>
 
+        {!ms.selectionMode && list.length > 1 && (
+          <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+            برای انتخاب چندتایی، روی یک کارت نگه دارید
+          </div>
+        )}
+
+        {ms.selectionMode && list.length > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+            <button
+              type="button"
+              onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
+              style={{
+                padding: '4px 10px',
+                background: 'var(--input-bg)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r-sm)',
+                color: 'var(--muted)',
+                fontFamily: 'inherit',
+                fontSize: '10px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+            </button>
+          </div>
+        )}
+
         {list.length === 0 ? (
           <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>}
             title={q ? 'نتیجه‌ای یافت نشد' : 'هنوز مخاطبی ثبت نشده'} desc={q ? 'عبارت دیگری امتحان کنید' : 'اولین مخاطب خود را بسازید.'}
@@ -186,9 +253,9 @@ export default function ContactsPage() {
             {list.map((p, i) => {
               const primaryRole: Role = p.roles.includes('supplier') ? 'supplier' : p.roles.includes('worker') ? 'worker' : 'customer';
               const accent = primaryRole === 'worker' ? 'purple' : primaryRole === 'supplier' ? 'accent' : 'info';
-              const isOpen = expandedId === p.id;
+              const isOpen = !ms.selectionMode && expandedId === p.id;
               return (
-                <ExpandableCard key={p.id} accent={accent as any} index={toFa(i + 1)}
+                <ExpandableCard key={p.id} id={p.id} ms={ms} accent={accent as any} index={toFa(i + 1)}
                   iconEmoji={avatarLetter(p.name)}
                   title={p.name}
                   subtitle={`${p.phone || '—'}${p.city ? ` · ${p.city}` : ''}`}
@@ -280,7 +347,13 @@ export default function ContactsPage() {
           </>
         )}
 
-        <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش مخاطب' : 'افزودن مخاطب'}
+        {/* نوار شناور */}
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {/* فاصله زیر نوار */}
+      {ms.selectionMode && <div style={{ height: 90 }} />}
+
+      <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش مخاطب' : 'افزودن مخاطب'}
           footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
           <Field label="نقش‌ها" required hint="یک شخص می‌تواند چند نقش داشته باشد">
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
