@@ -73,11 +73,16 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom }: any) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-      <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, textAlign: 'right' }}>{label}</span>
+      <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, textAlign: 'right', display: 'inline-flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+        {autoFrom ? (
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
+        ) : null}
+        {label}
+      </span>
       <div style={{
         width: '100%', minWidth: 0, height: 38,
-        background: 'var(--input-bg)',
-        border: '1px solid var(--border)',
+        background: autoFrom ? 'var(--accent-soft)' : 'var(--input-bg)',
+        border: '1px solid ' + (autoFrom ? 'var(--accent-border)' : 'var(--border)'),
         borderRadius: 'var(--r-md)',
         padding: '0 12px',
         display: 'flex', alignItems: 'center', gap: 8,
@@ -104,6 +109,25 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom }: any) {
           {tempUnit === 'c' ? '°C' : '°F'}
         </span>
       </div>
+      {autoFrom ? (
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+          fontSize: 11,
+          color: 'var(--accent)',
+          background: 'var(--accent-soft)',
+          border: '1px solid var(--accent-border)',
+          borderRadius: 8,
+          padding: '2px 8px',
+          fontWeight: 700,
+          alignSelf: 'flex-start',
+          lineHeight: 1.6,
+        }}>
+          <span aria-hidden="true">✨</span>
+          <span>از {autoFrom}</span>
+        </div>
+      ) : null}
     </div>
   );
 }
