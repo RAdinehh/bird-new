@@ -162,6 +162,7 @@ export default function ItemsPage() {
 
     if (form.name.trim() === '') { setErr('نام قلم اجباری است'); return; }
     const isMed = form.category === 'medicine' || form.category === 'vaccine';
+    const hasExpiry = ['medicine', 'vaccine', 'herbal', 'egg'].includes(form.category);
 
     if (form.id === undefined) {
       // ایجاد جدید: موجودی اولیه از فرم + قیمت صفر
@@ -173,7 +174,7 @@ export default function ItemsPage() {
         currentStock: num(form.initialStock),   // ← موجودی اولیه
         lastPrice: 0,                            // ← صفر (بعد از خرید پر میشه)
         supplierId: form.supplierId,
-        expireDate: isMed ? form.expireDate : '',
+        expireDate: hasExpiry ? form.expireDate : '',
         withdrawalDays: isMed && form.withdrawalDays.trim() !== '' ? int(form.withdrawalDays) : null,
         batchNo: isMed ? form.batchNo.trim() : '',
         storage: form.storage,
@@ -187,7 +188,7 @@ export default function ItemsPage() {
         unit: form.unit,
         minStock: num(form.minStock),
         supplierId: form.supplierId,
-        expireDate: isMed ? form.expireDate : '',
+        expireDate: hasExpiry ? form.expireDate : '',
         withdrawalDays: isMed && form.withdrawalDays.trim() !== '' ? int(form.withdrawalDays) : null,
         batchNo: isMed ? form.batchNo.trim() : '',
         storage: form.storage,
@@ -196,6 +197,16 @@ export default function ItemsPage() {
     }
     setOpen(false);
   };
+
+  // آبشاری: کدام فیلدهای اضافی بر اساس دسته نمایش داده شوند
+  const EXTRAS: Record<string, { expiry: boolean; batch: boolean; withdrawal: boolean; storage: boolean; title: string }> = {
+    egg:       { expiry: true,  batch: false, withdrawal: false, storage: false, title: '🥚 اطلاعات تخم' },
+    medicine:  { expiry: true,  batch: true,  withdrawal: true,  storage: true,  title: '💊 اطلاعات دارویی' },
+    vaccine:   { expiry: true,  batch: true,  withdrawal: true,  storage: true,  title: '💉 اطلاعات واکسن' },
+    herbal:    { expiry: true,  batch: false, withdrawal: false, storage: false, title: '🌿 اطلاعات گیاهی' },
+  };
+  const extras = EXTRAS[form.category] || null;
+  const hasExtras = !!(extras && (extras.expiry || extras.batch || extras.withdrawal || extras.storage));
 
   const target = delId ? items.find(i => i.id === delId) : null;
   const isMedicine = form.category === 'medicine' || form.category === 'vaccine';
@@ -443,31 +454,43 @@ export default function ItemsPage() {
             />
         </Field>
 
-        {isMedicine ? (
+        {hasExtras && (
           <>
-            <SectionTitle>💊 اطلاعات دارویی</SectionTitle>
-            <Grid2>
-              <Field label="شماره بچ">
-                <Input placeholder="..." dir="ltr" value={form.batchNo} onChange={e => setForm({ ...form, batchNo: e.target.value })} />
-              </Field>
-              <Field label="تاریخ انقضا">
-                <DatePicker value={form.expireDate} onChange={v => setForm({ ...form, expireDate: v })}  autoToday />
-              </Field>
-            </Grid2>
-            <Grid2>
-              <Field label="دوره منع مصرف" hint="روز">
-                <NumField placeholder="مثلاً — ۳" value={form.withdrawalDays} onChange={e => setForm({ ...form, withdrawalDays: e.target.value })} unit="روز" min={0} />
-              </Field>
-              <Field label="نگهداری">
-                <Select value={form.storage} onChange={e => setForm({ ...form, storage: e.target.value })}>
-                  <option value="room">دمای اتاق</option>
-                  <option value="fridge">یخچال (۲-۸°)</option>
-                  <option value="freezer">فریزر</option>
-                </Select>
-              </Field>
-            </Grid2>
+            <SectionTitle>{extras!.title}</SectionTitle>
+            {(extras!.batch || extras!.expiry) && (
+              <Grid2>
+                {extras!.batch && (
+                  <Field label="شماره بچ">
+                    <Input placeholder="..." dir="ltr" value={form.batchNo} onChange={e => setForm({ ...form, batchNo: e.target.value })} />
+                  </Field>
+                )}
+                {extras!.expiry && (
+                  <Field label="تاریخ انقضا">
+                    <DatePicker value={form.expireDate} onChange={v => setForm({ ...form, expireDate: v })}  autoToday />
+                  </Field>
+                )}
+              </Grid2>
+            )}
+            {(extras!.withdrawal || extras!.storage) && (
+              <Grid2>
+                {extras!.withdrawal && (
+                  <Field label="دوره منع مصرف" hint="روز">
+                    <NumField placeholder="مثلاً — ۳" value={form.withdrawalDays} onChange={e => setForm({ ...form, withdrawalDays: e.target.value })} unit="روز" min={0} />
+                  </Field>
+                )}
+                {extras!.storage && (
+                  <Field label="نگهداری">
+                    <Select value={form.storage} onChange={e => setForm({ ...form, storage: e.target.value })}>
+                      <option value="room">دمای اتاق</option>
+                      <option value="fridge">یخچال (۲-۸°)</option>
+                      <option value="freezer">فریزر</option>
+                    </Select>
+                  </Field>
+                )}
+              </Grid2>
+            )}
           </>
-        ) : null}
+        )}
 
         <Field label="یادداشت">
           <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
