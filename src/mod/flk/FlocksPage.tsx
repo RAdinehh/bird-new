@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef , useEffect} from 'react';
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import {
   useFlk, type Flock, type FlockType, type FlockStatus,
@@ -12,6 +12,8 @@ import { schedulesByType, getSchedule } from '../cal/vaccineSchedules';
 import { useHal } from '../hal/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';;
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { MiniProgress } from '../../shr/components/ProgressTracker';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -173,10 +175,6 @@ export default function FlocksPage() {
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
   const [archId, setArchId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const longPressTimerRef = useRef<number | null>(null);
-  const longPressFiredRef = useRef<boolean>(false);
   const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'archived'], tab, (id) => setTab(id as TabId));
 
   // فیلتر تکرارها تو render
@@ -212,43 +210,6 @@ export default function FlocksPage() {
     setUndoData(null);
   };
 
-  const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const startLongPress = (id: string) => {
-    if (selectionMode) return;
-    longPressFiredRef.current = false;
-    if (longPressTimerRef.current) window.clearTimeout(longPressTimerRef.current);
-    longPressTimerRef.current = window.setTimeout(() => {
-      longPressFiredRef.current = true;
-      setSelectionMode(true);
-      setSelectedIds(new Set([id]));
-      try { (navigator as any).vibrate?.(30); } catch {}
-      longPressTimerRef.current = null;
-    }, 500);
-  };
-
-  const cancelLongPress = () => {
-    if (longPressTimerRef.current) {
-      window.clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  };
-  const exitSelection = () => {
-    setSelectionMode(false);
-    setSelectedIds(new Set());
-  };
-  const selectAllVisible = () => {
-    setSelectedIds(new Set(list.map(f => f.id)));
-  };
-  const deselectAll = () => setSelectedIds(new Set());
-
   const hasRefs = (flockId: string): boolean => {
     try {
       const safeRead = (k: string) => {
@@ -269,53 +230,6 @@ export default function FlocksPage() {
     return false;
   };
 
-  const doBulkArchive = async () => {
-    const ids = Array.from(selectedIds);
-    if (ids.length === 0) return;
-    const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' گله آرشیو شوند؟', { danger: false });
-    if (!ok) return;
-    for (const id of ids) {
-      try { archive(id); } catch {}
-    }
-    logAction('update', 'flk', 'آرشیو گروهی ' + ids.length + ' گله');
-    showToast(toFa(ids.length) + ' گله آرشیو شد', 'success', 2500);
-    exitSelection();
-  };
-
-  const doBulkDelete = async () => {
-    const ids = Array.from(selectedIds);
-    if (ids.length === 0) return;
-    const withRefs = ids.filter(id => hasRefs(id));
-    const withoutRefs = ids.filter(id => !hasRefs(id));
-    let msg = toFa(ids.length) + ' گله انتخاب شده.';
-    if (withRefs.length > 0) msg += ' ' + toFa(withRefs.length) + ' گله ارجاع دارن (آرشیو می‌شن).';
-    if (withoutRefs.length > 0) msg += ' ' + toFa(withoutRefs.length) + ' گله حذف کامل می‌شن.';
-    msg += ' ادامه؟';
-    const ok = await showConfirmAsync('حذف گروهی', msg, { danger: true });
-    if (!ok) return;
-    let arch = 0, del = 0;
-    const backups: any[] = [];
-    for (const id of ids) {
-      const fl = flocks.find(f => f.id === id);
-      if (!fl) continue;
-      if (hasRefs(id)) {
-        try { archive(id); arch++; } catch {}
-      } else {
-        backups.push(fl);
-        try { remove(id); del++; } catch {}
-      }
-    }
-    if (backups.length > 0) {
-      setUndoData({ flock: backups });
-      setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.flock) && cur.flock.length === backups.length ? null : cur), 8000);
-    }
-    let toast = '';
-    if (arch > 0) toast += toFa(arch) + ' آرشیو';
-    if (del > 0) toast += (toast ? ' · ' : '') + toFa(del) + ' حذف';
-    showToast(toast || 'انجام شد', 'success', 2500);
-    logAction('delete', 'flk', 'حذف گروهی: ' + arch + ' آرشیو، ' + del + ' حذف');
-    exitSelection();
-  };
 
   const openNew = () => {
     if (birds.length === 0) { showAlert('اول پرنده بسازید'); return; }
@@ -476,6 +390,59 @@ export default function FlocksPage() {
     return arr;
   }, [flocks, tab, q, birds, breeds]);
 
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (f: any) => f.id,
+    onDelete: async (ids: string[]) => {
+      const withRefs = ids.filter(id => hasRefs(id));
+      const withoutRefs = ids.filter(id => !hasRefs(id));
+      let msg = toFa(ids.length) + ' گله انتخاب شده.';
+      if (withRefs.length > 0) msg += ' ' + toFa(withRefs.length) + ' گله ارجاع دارن (آرشیو می‌شن).';
+      if (withoutRefs.length > 0) msg += ' ' + toFa(withoutRefs.length) + ' گله حذف کامل می‌شن.';
+      msg += ' ادامه؟';
+      const ok = await showConfirmAsync('حذف گروهی', msg, { danger: true });
+      if (!ok) return;
+      let arch = 0, del = 0;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const fl = flocks.find(f => f.id === id);
+        if (!fl) continue;
+        if (hasRefs(id)) {
+          try { archive(id); arch++; } catch {}
+        } else {
+          backups.push(fl);
+          try { remove(id); del++; } catch {}
+        }
+      }
+      if (backups.length > 0) {
+        setUndoData({ flock: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.flock) && cur.flock.length === backups.length ? null : cur), 8000);
+      }
+      let toast = '';
+      if (arch > 0) toast += toFa(arch) + ' آرشیو';
+      if (del > 0) toast += (toast ? ' · ' : '') + toFa(del) + ' حذف';
+      showToast(toast || 'انجام شد', 'success', 2500);
+      logAction('delete', 'flk', 'حذف گروهی: ' + arch + ' آرشیو، ' + del + ' حذف');
+    },
+    onArchive: async (ids: string[]) => {
+      const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' گله آرشیو شوند؟', { danger: false });
+      if (!ok) return;
+      for (const id of ids) {
+        try { archive(id); } catch {}
+      }
+      logAction('update', 'flk', 'آرشیو گروهی ' + ids.length + ' گله');
+      showToast(toFa(ids.length) + ' گله آرشیو شد', 'success', 2500);
+    },
+  });
+
+
+  // وقتی وارد حالت انتخاب می‌شیم، همه کارت‌ها بسته بشن
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
+
   const breedsForBird = breeds.filter(b => b.birdId === form.birdId);
   const zonesForHall = zones.filter(z => z.hallId === form.hallId);
 
@@ -620,17 +587,17 @@ export default function FlocksPage() {
           <input value={q} onChange={e => setQ(e.target.value)} placeholder="جستجوی نام، پرنده، نژاد..." style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)', minWidth: 0 }} />
         </div>
 
-        {!selectionMode && list.length > 1 && (
+        {!ms.selectionMode && list.length > 1 && (
           <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
             برای انتخاب چندتایی، روی یک کارت نگه دارید
           </div>
         )}
 
-        {selectionMode && list.length > 1 && (
+        {ms.selectionMode && list.length > 1 && (
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
-            <button type="button" onClick={selectedIds.size === list.length ? deselectAll : selectAllVisible}
+            <button type="button" onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
               style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
-              {selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+              {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
             </button>
           </div>
         )}
@@ -655,50 +622,14 @@ export default function FlocksPage() {
               const ready = isLayingReady(f);
               const untilLay = daysUntilLaying(f);
               const costs = calcCosts(f);
-              const isOpen = expandedId === f.id;
+              const isOpen = !ms.selectionMode && expandedId === f.id;
 
               const accentColor: any = isArchived ? 'dim' : lc.color;
 
-              const isSelected = selectedIds.has(f.id);
               return (
-                <div key={f.id} style={{ position: 'relative' }}
-                  onPointerDown={() => startLongPress(f.id)}
-                  onPointerUp={cancelLongPress}
-                  onPointerLeave={cancelLongPress}
-                  onPointerCancel={cancelLongPress}
-                  onContextMenu={(e) => e.preventDefault()}
-                >
-                  {selectionMode && (
-                    <div
-                      role="checkbox"
-                      aria-checked={isSelected}
-                      onClick={(e) => { e.stopPropagation(); toggleSelect(f.id); }}
-                      style={{
-                        position: 'absolute', top: 10, right: 10, zIndex: 10,
-                        width: 22, height: 22, borderRadius: '50%',
-                        background: isSelected ? '#3b82f6' : 'rgba(255,255,255,0.95)',
-                        border: '2px solid ' + (isSelected ? '#3b82f6' : 'var(--border)'),
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', transition: 'all 150ms cubic-bezier(.4,0,.2,1)',
-                        boxShadow: isSelected ? '0 2px 6px rgba(59,130,246,0.35)' : '0 1px 3px rgba(0,0,0,0.12)',
-                      }}
-                    >
-                      {isSelected && (
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </div>
-                  )}
-                  {selectionMode && isSelected && (
-                    <div style={{
-                      position: 'absolute', inset: 0, zIndex: 5,
-                      background: 'rgba(59,130,246,0.12)',
-                      borderRadius: 'var(--r-lg)',
-                      pointerEvents: 'none',
-                    }} />
-                  )}
                 <ExpandableCard
+                  id={f.id}
+                  ms={ms}
                   key={f.id}
                   accent={accentColor}
                   index={toFa(i + 1)}
@@ -706,11 +637,7 @@ export default function FlocksPage() {
                   title={f.name}
                   subtitle={`${bird?.name || '—'}${breed ? ` · ${breed.name}` : ''}${hall ? ` · ${hall.name}` : ''}`}
                   isOpen={isOpen}
-                  onToggle={() => {
-                    if (longPressFiredRef.current) { longPressFiredRef.current = false; return; }
-                    if (selectionMode) { toggleSelect(f.id); return; }
-                    setExpandedId(isOpen ? null : f.id);
-                  }}
+                  onToggle={() => setExpandedId(isOpen ? null : f.id)}
                   badge={<>
                     <Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>
                     {f.sourceInvoiceId && <Tag tone="blue">🛒 فاکتور</Tag>}
@@ -844,46 +771,16 @@ export default function FlocksPage() {
                     )}
                   </div>
                 </ExpandableCard>
-                </div>
               );
             })}
             {tab !== 'archived' && <Btn variant="primary" full onClick={openNew}>+ افزودن گله</Btn>}
-            {selectionMode && <div style={{ height: 90 }} />}
+            {ms.selectionMode && <div style={{ height: 90 }} />}
           </>
         )}
 
         {/* نوار شناور Multi-Select */}
-        {selectionMode && selectedIds.size > 0 && (
-          <div style={{
-            position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
-            zIndex: 100, maxWidth: 460, width: 'calc(100% - 20px)',
-            background: 'var(--card-solid)',
-            border: '1px solid rgba(59,130,246,0.4)',
-            borderRadius: 22,
-            boxShadow: '0 16px 44px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.1)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            padding: '14px 16px',
-            display: 'flex', alignItems: 'center', gap: 8,
-            minHeight: 72,
-          }}>
-            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: '#3b82f6', paddingLeft: 4, whiteSpace: 'nowrap' }}>
-              {toFa(selectedIds.size)} انتخاب
-            </span>
-            <button type="button" onClick={exitSelection}
-              style={{ flex: 1, padding: '12px 14px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 14, color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, minHeight: 44 }}>
-              لغو
-            </button>
-            <button type="button" onClick={doBulkArchive}
-              style={{ flex: 1, padding: '12px 14px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 14, color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, minHeight: 44 }}>
-              📦 آرشیو
-            </button>
-            <button type="button" onClick={doBulkDelete}
-              style={{ flex: 1, padding: '12px 14px', background: 'var(--danger-soft, rgba(220,38,38,0.1))', border: '1px solid var(--danger)', borderRadius: 14, color: 'var(--danger)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, minHeight: 44 }}>
-              🗑 حذف
-            </button>
-          </div>
-        )}
+        
+      <MultiSelectBar ms={ms} deleteLabel="حذف" archiveLabel="آرشیو" />
 
         <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش گله' : 'افزودن گله'}
           footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
