@@ -1,12 +1,14 @@
 /**
  * ProductionsPage — ثبت تخم‌گذاری
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useEgg, healthyCount, henDayRate, brokenRate, type EggProduction } from './store';
 import { useFlk, getAgeDays } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import ProgressTracker from '../../shr/components/ProgressTracker';
@@ -52,7 +54,7 @@ export default function ProductionsPage() {
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [delId, setDelId] = useState<string | null>(null);
-  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filterFlock, setFilterFlock] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -62,13 +64,41 @@ export default function ProductionsPage() {
     return arr.sort((a, b) => b.date.localeCompare(a.date));
   }, [productions, filterFlock]);
 
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (p: any) => p.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' ثبت تخم‌گذاری حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const it = productions.find(p => p.id === id);
+        if (!it) continue;
+        backups.push(it);
+        try { deleteProduction(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' ثبت حذف شد', 'success', 2500);
+      logAction('delete', 'egg', 'حذف گروهی تخم‌گذاری: ' + backups.length);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
   const undoDelete = () => {
     const item = undoData;
     if (!item) return;
     try {
-      addProduction(item.item);
-      showToast('بازگردانی شد', 'success', 2000);
-    } catch (err) {
+      const arr = Array.isArray(item.item) ? item.item : [item.item];
+      for (const it of arr) addProduction(it);
+      showToast(toFa(arr.length) + ' ثبت بازگردانی شد', 'success', 2000);
+    } catch {
       showToast('بازگردانی ناموفق', 'error', 2000);
     }
     setUndoData(null);
@@ -195,6 +225,22 @@ export default function ProductionsPage() {
         description="هر روز تعداد تخم‌ها را بین خوراکی، نطفه‌دار و مصرفی تقسیم کنید."
         tone="info"
       />
+      {!ms.selectionMode && list.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && list.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
+
       {activeFlocks.length > 0 && productions.length > 0 ? (
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
           <button onClick={() => setFilterFlock('')} style={chip(filterFlock === '')}>همه</button>
@@ -220,7 +266,7 @@ export default function ProductionsPage() {
             const flockCount2 = flock ? (flock.currentCount || flock.initialCount || 0) : 0;
             const rate = henDayRate(p, flockCount2);
             const brokenPct = brokenRate(p);
-            const isOpen = expandedId === p.id;
+            const isOpen = !ms.selectionMode && expandedId === p.id;
             const ageDays = flock ? getAgeDays(flock) : 0;
 
             let accent: 'accent' | 'warn' = 'accent';
@@ -230,6 +276,8 @@ export default function ProductionsPage() {
             return (
               <ExpandableCard
                 key={p.id}
+                id={p.id}
+                ms={ms}
                 accent={accent}
                 index={toFa(i + 1)}
                 iconEmoji="🥚"
@@ -286,6 +334,10 @@ export default function ProductionsPage() {
           <Btn variant="primary" full onClick={openNew}>+ ثبت تخم‌گذاری</Btn>
         </>
       )}
+
+      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+
+      {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <Modal
         open={open}
