@@ -87,3 +87,29 @@ export function isDrinkerLike(type: string): boolean {
 // SourceCard — کارت فشرده گروه منابع (برای Grid2)
 // ═══════════════════════════════════════════════
 
+
+
+export function EnvCard({ icon, label, value, tone }: { icon: string; label: string; value: string; tone?: 'accent' | 'warn' | 'danger' | 'info' | 'muted' }) {
+  const color = tone === 'accent' ? 'var(--accent)'
+              : tone === 'warn' ? 'var(--warn)'
+              : tone === 'danger' ? 'var(--danger)'
+              : tone === 'info' ? 'var(--info)'
+              : 'var(--text)';
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      padding: '8px 10px',
+      background: 'var(--input-bg)',
+      borderRadius: 10,
+      minWidth: 0,
+    }}>
+      <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
+      </div>
+    </div>
+  );
+}
