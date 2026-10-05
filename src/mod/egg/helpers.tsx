@@ -33,3 +33,5 @@ export function chip(active: boolean): CSSProperties {
     flexShrink: 0
   };
 }
+
+export { AccordionSection } from '../../shr/components/AccordionSection';
