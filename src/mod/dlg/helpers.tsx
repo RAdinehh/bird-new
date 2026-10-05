@@ -281,3 +281,5 @@ export function useFormGroups(initial: Record<string, boolean>) {
   const openAll = (ids: string[]) => setGroups(Object.fromEntries(ids.map(i => [i, true])));
   return { groups, toggle, openOnly, closeAll, openAll };
 }
+
+export { AccordionSection } from '../../shr/components/AccordionSection';
