@@ -47,6 +47,7 @@ function unitForCategory(cat: string): string {
   if (cat === 'ventilation') return 'm³/h';
   if (cat === 'lighting') return 'W';
   if (cat === 'litter') return 'kg';
+  if (cat === 'heating') return 'kW';
   return 'عدد';
 }
 
@@ -61,7 +62,9 @@ function calcInstalled(cat: string, list: Equipment[]): number {
   if (cat === 'litter') {
     return list.reduce((a, e) => a + ((e as any).capacity || 0), 0);
   }
-  // آبخوری، دانخوری، گرمایش → تعداد
+  if (cat === 'heating') {
+    return list.reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
+  }
   return list.reduce((a, e) => a + (e.count || 0), 0);
 }
 
@@ -111,14 +114,16 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   }
 
   // محاسبه وضعیت (فقط برای دسته‌های ضروری)
-  function statusFor(cat: string): { pct: number | null; tone: 'ok' | 'warn' | 'danger' | 'none' } {
+  function statusFor(cat: string): { pct: number | null; tone: 'ok' | 'warn' | 'danger' | 'over' | 'none' } {
     const installed = calcInstalled(cat, grouped[cat] || []);
     const need = needByCategory[cat]?.value || 0;
-    if (need === 0 || installed === 0) return { pct: installed === 0 ? null : 999, tone: installed === 0 ? 'none' : 'ok' };
+    if (installed === 0) return { pct: null, tone: 'none' };
+    if (need === 0) return { pct: null, tone: 'ok' };
     const pct = (installed / need) * 100;
-    if (pct >= 90 && pct <= 120) return { pct, tone: 'ok' };
-    if (pct >= 50) return { pct, tone: 'warn' };
-    return { pct, tone: 'danger' };
+    if (pct < 50) return { pct, tone: 'danger' };      // خیلی کم
+    if (pct < 90) return { pct, tone: 'warn' };        // کم
+    if (pct <= 150) return { pct, tone: 'ok' };        // خوب
+    return { pct, tone: 'over' };                       // اضافه
   }
 
   const openPicker = (cat: string) => {
@@ -237,7 +242,13 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
               <button
                 key={cat}
                 type="button"
-                onClick={() => !isEmpty && setDetailCat(cat)}
+                onClick={() => {
+                  if (isEmpty) {
+                    openPicker(cat);
+                  } else {
+                    setDetailCat(cat);
+                  }
+                }}
                 style={{
                   width: '100%',
                   padding: '10px 12px',
@@ -250,7 +261,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
                   gap: 10,
                   fontFamily: 'inherit',
                   textAlign: 'right',
-                  cursor: isEmpty ? 'default' : 'pointer',
+                  cursor: 'pointer',
                 }}
               >
                 <span style={{
@@ -297,6 +308,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
                         color: st.tone === 'ok' ? 'var(--accent)'
                              : st.tone === 'warn' ? 'var(--warn)'
                              : st.tone === 'danger' ? 'var(--danger)'
+                             : st.tone === 'over' ? 'var(--info)'
                              : 'var(--muted)',
                         minWidth: 34,
                         textAlign: 'left',
@@ -354,20 +366,9 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
           fontWeight: 700,
           color: 'var(--text)',
           letterSpacing: '.3px',
-          marginBottom: 10,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          marginBottom: 4,
         }}>
-          <span>⚙️ تجهیزات سالن</span>
-          <span style={{
-            fontSize: 11,
-            color: hallEquips.length > 0 ? 'var(--accent)' : 'var(--muted)',
-            fontWeight: 700,
-            background: hallEquips.length > 0 ? 'var(--accent-soft)' : 'transparent',
-            padding: hallEquips.length > 0 ? '2px 8px' : '0',
-            borderRadius: 8,
-          }}>{hallEquips.length > 0 ? toFa(hallEquips.length) + ' مورد' : 'خالی'}</span>
+          ⚙️ تجهیزات سالن
         </div>
 
         {renderGroup(REQUIRED_CATS, true)}
