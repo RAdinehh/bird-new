@@ -2,7 +2,7 @@
  * HatchesPage — هچ، تفکیک، ساخت گله، فروش، validation
  */
 import { useState, useEffect, useMemo } from 'react';
-import { useInc, hatchRate, costPerChick, type HatchResult } from './store';
+import { useInc, hatchRate, costPerChick, daysAgo, isLockdown, type HatchResult } from './store';
 import { useBrd } from '../brd/store';
 import { useFlk } from '../flk/store';
 import { useHal } from '../hal/store';
@@ -584,6 +584,35 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                                 <div style={{ padding: 'var(--pad-tight)', background: myCand ? 'var(--accent-soft)' : 'var(--warn-soft)', border: '1px solid ' + (myCand ? 'var(--accent-border)' : 'var(--warn)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: myCand ? 'var(--accent)' : 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
                                   {calc.byStage.length > 0 ? '🧬 سقف این هچ — ' + toFa(base) + ' (نطفه‌دار فعلی)' : '⚠️ بدون کندلینگ — سقف — ' + toFa(base) + ' تخم'}
                                 </div>
+                                {/* ═══ کارت اطلاعات ورودی ═══ */}
+                                <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 4, fontSize: 'var(--fs-xs)' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span style={{ color: 'var(--muted)' }}>🐦 پرنده:</span>
+                                    <span style={{ fontWeight: 700 }}>{bird?.name || '—'}</span>
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span style={{ color: 'var(--muted)' }}>🥚 تعداد کل:</span>
+                                    <span style={{ fontWeight: 700 }}>{toFa(e.count || 0)} تخم</span>
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span style={{ color: 'var(--muted)' }}>📅 تاریخ ورود:</span>
+                                    <span style={{ fontWeight: 700 }}>{toFa(e.entryDate)}</span>
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span style={{ color: 'var(--muted)' }}>🔢 روز انکوباسیون:</span>
+                                    <span style={{ fontWeight: 700, color: 'var(--accent)' }}>روز {toFa(daysAgo(e.entryDate))}</span>
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span style={{ color: 'var(--muted)' }}>📊 نطفه‌دار فعلی:</span>
+                                    <span style={{ fontWeight: 700 }}>{toFa(aliveAfter)} تخم</span>
+                                  </div>
+                                  {isLockdown(e) && (
+                                    <div style={{ padding: '3px 6px', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center', marginTop: 2 }}>
+                                      🔒 Lock-down (روز {toFa(daysAgo(e.entryDate))} از ۱۸)
+                                    </div>
+                                  )}
+                                </div>
+
                                 <Grid2>
                                   <Field label="جوجه هچ‌شده" required>
                                     <NumField placeholder="مثلاً — ۴۵۰" value={d.hatched} onChange={ev => updateData(e.id, { hatched: ev.target.value })} max={Math.max(0, base - uh - ds - pp - ot)} min={0} unit="عدد" />
