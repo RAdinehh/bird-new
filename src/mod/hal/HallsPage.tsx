@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createHallSchema } from '../../shr/validation/rules/hal';
-import { useHal, type Hall, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS, EQUIP_LABELS } from './store';
+import { useHal, type Hall } from './store';
 import { useBrd } from '../brd/store';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk, getAgeDays } from '../flk/store';
@@ -16,7 +16,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { useTempUnit, toUserTemp, tempLabel } from '../../shr/utils/temp';
 import { useFormat } from '../../shr/units';
 import { showAlert } from '../../cor/store/dialog';
-import { Row, Pill, RowWithStatus } from './helpers';
+import { Row, RowWithStatus } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -409,62 +409,7 @@ export default function HallsPage() {
                     icon={totalLightW > 0 ? lightIcon : undefined}
                     hint={totalLightW > 0 ? lightAdvice : undefined}
                   />
-                  {/* 🆕 سیستم‌های توزیع‌شده */}
-                  {(() => {
-                    const water = (h as any).waterSources || [];
-                    const feed = (h as any).feedSources || [];
-                    const vent = (h as any).ventSources || [];
-                    const litter = (h as any).litterSections || [];
-                    const anySource = water.length + feed.length + vent.length + litter.length;
-                    if (anySource === 0) return null;
-                    return (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        {water.length > 0 && (
-                          <>
-                            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🚰 آبخوری</div>
-                            {water.map((s: any) => (
-                              <Row key={s.id} l={`${DRINKER_LABELS[s.type] || s.type}${s.count ? ` × ${fmt.int(s.count)}` : ''}`} v={s.notes || '—'} />
-                            ))}
-                          </>
-                        )}
-                        {feed.length > 0 && (
-                          <>
-                            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🍽 دانخوری</div>
-                            {feed.map((s: any) => (
-                              <Row key={s.id} l={`${FEEDER_LABELS[s.type] || s.type}${s.count ? ` × ${fmt.int(s.count)}` : ''}`} v={s.notes || '—'} />
-                            ))}
-                          </>
-                        )}
-                        {vent.length > 0 && (
-                          <>
-                            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🌀 تهویه</div>
-                            {vent.map((s: any) => (
-                              <Row key={s.id} l={`${VENT_SYS_LABELS[s.type] || s.type}${s.count ? ` × ${fmt.int(s.count)}` : ''}`} v={s.notes || '—'} />
-                            ))}
-                          </>
-                        )}
-                        {litter.length > 0 && (
-                          <>
-                            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>🛏 بستر</div>
-                            {litter.map((s: any) => {
-                              const perM2: Record<string, number> = {
-                                wood_shavings: 4.5, straw: 2.75, sand: 30, sand_soil: 20,
-                                rice_husk: 5, concrete: 0,
-                              };
-                              const kgPerM2 = perM2[s.type] || 0;
-                              const kg = s.type === 'roll' && s.count
-                                ? Math.ceil(s.count / 5)
-                                : (s.count && kgPerM2 ? Math.round(s.count * kgPerM2) : 0);
-                              const label = s.type === 'roll'
-                                ? `${LITTER_LABELS[s.type] || s.type} · ${s.count ? fmt.int(s.count) + ' m²' : '—'} → ~${fmt.int(kg)} کیلو`
-                                : `${LITTER_LABELS[s.type] || s.type} · ${s.count ? fmt.int(s.count) + ' m²' : '—'}${kg ? ` → ~${fmt.int(kg)} کیلو` : ''}`;
-                              return <Row key={s.id} l={label} v={s.notes || '—'} />;
-                            })}
-                          </>
-                        )}
-                      </div>
-                    );
-                  })()}
+
 
                   {(h as any).systemNotes && (
                     <>
