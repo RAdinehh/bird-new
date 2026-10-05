@@ -320,7 +320,16 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
-  const availableEntries = eggEntries.filter(e => !deviceFilter || e.deviceId === deviceFilter).sort((a, b) => String(b.entryDate).localeCompare(String(a.entryDate)));
+  const availableEntries = eggEntries
+    .filter(e => !deviceFilter || e.deviceId === deviceFilter)
+    .filter(e => {
+      // در حالت ویرایش، ورودی خودمون رو نشون بده
+      if (editingId) return e.id === formEntryId;
+      // ورودی که قبلاً هچ شده رو نشون نده
+      const hasHatch = hatches.some(h => h.eggEntryId === e.id);
+      return !hasHatch;
+    })
+    .sort((a, b) => String(b.entryDate).localeCompare(String(a.entryDate)));
 
   return (
     <PageContainer>

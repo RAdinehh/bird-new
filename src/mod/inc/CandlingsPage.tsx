@@ -154,11 +154,23 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
   };
 
   const availableEntries = useMemo(() => {
+    const dayNum = parseInt(toEn(modalDay)) || 0;
+    const editing = editingId;
     return eggEntries
       .filter(e => !modalDevice || e.deviceId === modalDevice)
       .filter(e => e.status !== 'failed')
+      .filter(e => {
+        // در حالت ویرایش، ورودی خودمون رو نشون بده
+        if (editing) {
+          const editingCand = candlings.find(c => c.id === editing);
+          if (editingCand && editingCand.eggEntryId === e.id) return true;
+        }
+        // ورودی که قبلاً در این مرحله کندلینگ شده رو نشون نده
+        const hasThisStage = candlings.some(c => c.eggEntryId === e.id && c.stage === dayNum);
+        return !hasThisStage;
+      })
       .sort((a, b) => String(b.entryDate).localeCompare(String(a.entryDate)));
-  }, [eggEntries, modalDevice]);
+  }, [eggEntries, modalDevice, modalDay, editingId, candlings]);
 
   const toggleEntry = (id: string) => {
     setSelectedIds(prev => {
