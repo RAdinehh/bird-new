@@ -109,6 +109,14 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
+
+  const openNew = () => {
+    setForm({ id:'', birdId: birds[0].id, name:'', fcr:'', standardKey:'' });
+    setFcrFromStd(false);
+    setErr(''); setOpen(true);
+  };
+  useFab(active ? { label: 'افزودن نژاد', onClick: openNew } : null);
+
   if (birds.length === 0) {
     return (
       <PageContainer>
@@ -134,13 +142,6 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       </PageContainer>
     );
   }
-
-  const openNew = () => {
-    setForm({ id:'', birdId: birds[0].id, name:'', fcr:'', standardKey:'' });
-    setFcrFromStd(false);
-    setErr(''); setOpen(true);
-  };
-  useFab(active ? { label: 'افزودن نژاد', onClick: openNew } : null);
 
   const openEdit = (b: Breed) => {
     setForm({ id: b.id, birdId: b.birdId, name: b.name, fcr: b.fcr ? toFa(b.fcr) : '', standardKey: (b as any).standardKey || '' });
