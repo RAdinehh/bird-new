@@ -245,7 +245,6 @@ export default function EditableSelect({
           placeholder="مثلاً — آبخوری نیپل استیل"
           value={formName}
           onChange={e => setFormName(e.target.value)}
-          autoFocus
         />
       </Field>
       <Field label="آیکن">

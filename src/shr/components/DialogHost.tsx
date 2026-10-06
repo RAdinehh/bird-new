@@ -281,7 +281,6 @@ export default function DialogHost() {
             )}
             {config.input.multiline ? (
               <textarea
-                autoFocus
                 rows={config.input.rows || 3}
                 placeholder={config.input.placeholder}
                 value={inputValue}
@@ -297,7 +296,6 @@ export default function DialogHost() {
               />
             ) : (
               <input
-                autoFocus
                 type="text"
                 placeholder={config.input.placeholder}
                 value={inputValue}

@@ -164,7 +164,6 @@ export function SavedViews({ module, currentParams, onLoad }: SVProps) {
             onChange={e => setName(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setNaming(false); }}
             placeholder="نام..."
-            autoFocus
             style={{
               width: 90,
               padding: '4px 8px',
