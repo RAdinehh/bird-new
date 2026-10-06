@@ -23,7 +23,8 @@ type TabId =
   | 'config'
   | 'notifications'
   | 'system'
-  | 'guide';
+  | 'standards'
+  | 'stages';
 
 interface TabDef {
   id: TabId;
@@ -47,7 +48,20 @@ const GROUPS: GroupDef[] = [
       { id: 'config',        label: 'پیکربندی',      icon: '⚙️' },
       { id: 'notifications', label: 'اعلان‌ها',       icon: '🔔' },
       { id: 'system',        label: 'سیستم',          icon: '💾' },
-      { id: 'guide',         label: 'راهنمای علمی',   icon: '📚' },
+    ],
+  },
+  {
+    label: 'استانداردها',
+    icon: '📖',
+    tabs: [
+      { id: 'standards', label: 'استانداردها', icon: '📖' },
+    ],
+  },
+  {
+    label: 'مراحل رشد',
+    icon: '🐣',
+    tabs: [
+      { id: 'stages', label: 'مراحل رشد و سن', icon: '🐣' },
     ],
   },
 ];
@@ -84,8 +98,11 @@ const TAB_COMPONENTS: Record<TabId, TabComponent[]> = {
     { comp: HiddenOptionsTab, icon: '🗂', title: 'گزینه‌های مخفی',   subtitle: 'آیتم‌های حذف‌شده — بازگردانی یا حذف کامل', tone: 'info' },
   ],
   notifications: [NotificationsTab],
-  guide: [
-    { comp: GuideTab, icon: '📚', title: 'راهنمای علمی', subtitle: 'استانداردها، تجهیزات، محاسبات، منابع', tone: 'purple' },
+  standards: [
+    { comp: () => <GuideTab group="standards" />, icon: '📖', title: 'استانداردها', subtitle: 'استانداردها، تجهیزات، محاسبات، منابع', tone: 'purple' },
+  ],
+  stages: [
+    { comp: () => <GuideTab group="stages" />, icon: '🐣', title: 'مراحل رشد و سن', subtitle: 'اصطلاحات و سنین استاندارد صنعت مرغداری', tone: 'accent' },
   ],
   system: [
     { comp: BackupTab, icon: '💾', title: 'پشتیبان‌گیری',      subtitle: 'آمار، پشتیبان، بازیابی، امنیت', tone: 'accent' },

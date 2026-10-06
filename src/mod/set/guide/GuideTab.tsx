@@ -183,11 +183,8 @@ function ChapterView({
   );
 }
 
-type SubTab = 'standards' | 'stages';
-
-export default function GuideTab() {
+export default function GuideTab({ group = 'standards' }: { group?: 'standards' | 'stages' } = {}) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [subTab, setSubTab] = useState<SubTab>('standards');
 
   const selectedChapter = selectedId
     ? GUIDE_CONTENT.chapters.find(c => c.id === selectedId)
@@ -197,12 +194,7 @@ export default function GuideTab() {
     return <ChapterView chapter={selectedChapter} onBack={() => setSelectedId(null)} />;
   }
 
-  const subtabs: { id: SubTab; label: string; icon: string }[] = [
-    { id: 'standards', label: 'استانداردها', icon: '📖' },
-    { id: 'stages',    label: 'مراحل رشد',   icon: '🐣' },
-  ];
-
-  const filtered = GUIDE_CONTENT.chapters.filter(c => (c.group || 'standards') === subTab);
+  const filtered = GUIDE_CONTENT.chapters.filter(c => (c.group || 'standards') === group);
 
   return (
     <PageContainer>
@@ -214,37 +206,13 @@ export default function GuideTab() {
         marginBottom: 10,
       }}>
         <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
-          📚 راهنمای علمی مدیریت مرغداری
+          {group === 'stages' ? '🐣 مراحل رشد و سن' : '📖 استانداردها'}
         </div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: 4, lineHeight: 1.7 }}>
-          نسخه {GUIDE_CONTENT.version} — به‌روزرسانی {GUIDE_CONTENT.lastUpdated}
+          {group === 'stages'
+            ? 'اصطلاحات و سنین استاندارد صنعت مرغداری ایران'
+            : `راهنمای علمی مدیریت مرغداری — نسخه ${GUIDE_CONTENT.version}`}
         </div>
-      </div>
-
-      {/* زیرتب‌ها */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-        {subtabs.map(st => {
-          const active = subTab === st.id;
-          return (
-            <button
-              key={st.id}
-              type="button"
-              onClick={() => setSubTab(st.id)}
-              style={{
-                flex: 1, padding: '8px 12px',
-                background: active ? 'var(--accent-soft)' : 'var(--card-solid)',
-                border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 'var(--r-md)',
-                color: active ? 'var(--accent)' : 'var(--muted)',
-                fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                fontWeight: active ? 700 : 600,
-                cursor: 'pointer',
-              }}
-            >
-              {st.icon} {st.label}
-            </button>
-          );
-        })}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
