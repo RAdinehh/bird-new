@@ -11,6 +11,13 @@ import { LEVEL_ICON, LEVEL_LABEL } from '../alt/store';
 import type { AlertLevel } from '../alt/store';
 import { dateDiffDays } from './utils';
 
+// نقاط عطف چرخه (روز) برای هر نوع گله
+const CYCLE_MILESTONES: Record<string, { day: number; label: string }[]> = {
+  layer:    [{ day: 7, label: 'جوجه' }, { day: 90, label: 'نیمچه' }, { day: 120, label: 'پولت' }, { day: 140, label: 'پیش‌تخم‌گذار' }],
+  breeder:  [{ day: 7, label: 'جوجه' }, { day: 90, label: 'نیمچه' }, { day: 120, label: 'پولت' }, { day: 140, label: 'پیش‌تخم‌گذار' }],
+  broiler:  [{ day: 7, label: 'آغازین' }, { day: 21, label: 'رشد' }],
+};
+
 interface Props {
   active: Array<{ level: AlertLevel; [k: string]: any }>;
   counts: Record<string, number>;
@@ -170,14 +177,44 @@ export default function ListCards({
                                 <span>{toFa(age)} از {toFa((f.endOfCycleDay || bird?.cycleDays) ?? 0)} روز</span>
                               ) : null}
                             </div>
-                            <div style={{ height: 4, background: 'var(--input-bg)', borderRadius: 2, overflow: 'hidden' }}>
+                            <div style={{ position: 'relative', height: 6, background: 'var(--input-bg)', borderRadius: 3, overflow: 'visible' }}>
                               <div style={{
                                 height: '100%',
                                 width: Math.min(100, lc.progress) + '%',
                                 background: lc.progress >= 95 ? 'var(--danger)' : lc.progress >= 80 ? 'var(--warn)' : 'var(--accent)',
-                                borderRadius: 2,
+                                borderRadius: 3,
                                 transition: 'width .3s',
                               }} />
+                              {/* نقاط عطف */}
+                              {(() => {
+                                const cycleDays = f.endOfCycleDay || bird?.cycleDays || 0;
+                                if (!cycleDays) return null;
+                                const milestones = CYCLE_MILESTONES[f.type] || [];
+                                return milestones
+                                  .filter(m => m.day > 0 && m.day < cycleDays)
+                                  .map((m, idx) => {
+                                    const pct = (m.day / cycleDays) * 100;
+                                    const passed = age >= m.day;
+                                    return (
+                                      <div
+                                        key={idx}
+                                        title={m.label + ' · روز ' + toFa(m.day)}
+                                        style={{
+                                          position: 'absolute',
+                                          top: -1,
+                                          bottom: -1,
+                                          right: pct + '%',
+                                          width: 2,
+                                          background: passed ? 'var(--avatar-text, #fff)' : 'var(--card-solid)',
+                                          borderRadius: 1,
+                                          boxShadow: '0 0 0 1px var(--border)',
+                                          pointerEvents: 'auto',
+                                          transition: 'background .2s',
+                                        }}
+                                      />
+                                    );
+                                  });
+                              })()}
                             </div>
                           </div>
                         )}
