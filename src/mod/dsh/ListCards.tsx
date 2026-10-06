@@ -199,7 +199,7 @@ export default function ListCards({
                                 {/* نوار اصلی */}
                                 <div style={{
                                   position: 'relative',
-                                  height: 6,
+                                  height: 14,
                                   background: 'var(--input-bg)',
                                   borderRadius: 5,
                                   border: '1px solid var(--border)',
@@ -223,10 +223,10 @@ export default function ListCards({
                                       title={mk.label + ' · روز ' + toFa(mk.day)}
                                       style={{
                                         position: 'absolute',
-                                        top: 20,
+                                        top: 29,
                                         right: `calc(${pct}% - 3px)`,
-                                        width: 6,
-                                        height: 10,
+                                        width: 8,
+                                        height: 8,
                                         borderRadius: '50%',
                                         background: passed ? progressColor : 'var(--input-bg)',
                                         border: '2px solid ' + (passed ? progressColor : 'var(--border)'),
@@ -239,10 +239,10 @@ export default function ListCards({
                                 {/* نقطه متحرک (نقطه فعلی) */}
                                 <div style={{
                                   position: 'absolute',
-                                  top: 25,
+                                  top: 26,
                                   right: `calc(${markerPct}% - 6px)`,
-                                  width: 12,
-                                  height: 12,
+                                  width: 14,
+                                  height: 14,
                                   borderRadius: '50%',
                                   background: progressColor,
                                   border: '2.5px solid var(--card-solid)',
@@ -275,7 +275,7 @@ export default function ListCards({
                                 {/* خط اتصال بج به نقطه */}
                                 <div style={{
                                   position: 'absolute',
-                                  top: 18,
+                                  top: 20,
                                   right: `calc(${markerPct}% - 1px)`,
                                   width: 2,
                                   height: 6,
