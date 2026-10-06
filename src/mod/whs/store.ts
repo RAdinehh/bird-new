@@ -22,6 +22,12 @@ export interface Item {
   batchNo: string;                 // فقط برای دارو/واکسن
   storage: string;                 // fridge | freezer | room
   notes: string;
+  // ─── فیلدهای تجهیزات (اختیاری) ───
+  purchaseDate?: string;           // تاریخ خرید
+  purchasePrice?: number;          // قیمت خرید کل
+  hallId?: string;                 // سالن محل استقرار
+  equipmentStatus?: string;        // active | repair | scrapped
+  warrantyUntil?: string;          // گارانتی تا
   createdAt: string;
   updatedAt: string;
 }
@@ -163,15 +169,16 @@ export const CATEGORY_DEFAULTS: Record<ItemCategory, {
   needsWithdrawal: boolean;
   needsBatch: boolean;
   needsStorage: boolean;
+  needsEquipment: boolean;
   title: string;
 }> = {
-  egg:        { unit: 'pcs',  storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, title: '🥚 اطلاعات تخم' },
-  feed:       { unit: 'kg',   storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, title: '' },
-  medicine:   { unit: 'ml',   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  title: '💊 اطلاعات دارویی' },
-  vaccine:    { unit: 'vial', storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  title: '💉 اطلاعات واکسن' },
-  herbal:     { unit: 'g',    storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, title: '🌿 اطلاعات گیاهی' },
-  equipment:  { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, title: '' },
-  consumable: { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, title: '' },
+  egg:        { unit: 'pcs',  storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🥚 اطلاعات تخم' },
+  feed:       { unit: 'kg',   storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '' },
+  medicine:   { unit: 'ml',   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: '💊 اطلاعات دارویی' },
+  vaccine:    { unit: 'vial', storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: '💉 اطلاعات واکسن' },
+  herbal:     { unit: 'g',    storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🌿 اطلاعات گیاهی' },
+  equipment:  { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: true,  title: '' },
+  consumable: { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '' },
 };
 
 export const UNIT_LABEL: Record<ItemUnit, string> = {

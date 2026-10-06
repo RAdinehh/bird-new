@@ -6,7 +6,8 @@ import {
   daysToExpiry, type Item, type ItemCategory, type ItemUnit
 } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
+import { useHal } from '../hal/store';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -36,6 +37,12 @@ interface F {
   batchNo: string;
   storage: string;
   notes: string;
+  // ─── تجهیزات ───
+  purchaseDate: string;
+  purchasePrice: string;
+  hallId: string;
+  equipmentStatus: string;
+  warrantyUntil: string;
 }
 
 const empty = (): F => ({
@@ -43,13 +50,17 @@ const empty = (): F => ({
   minStock: '', initialStock: '',
   supplierId: '', expireDate: '',
   withdrawalDays: '', batchNo: '', storage: 'room',
-  notes: ''
+  notes: '',
+  purchaseDate: '', purchasePrice: '', hallId: '', equipmentStatus: 'active', warrantyUntil: ''
 });
+
+const EQUIP_STATUS: Record<string, string> = { active: 'فعال', repair: 'در تعمیر', scrapped: 'اسقاط' };
 
 export default function ItemsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
   const { items, movements, addItem, updateItem, deleteItem } = useWhs();
   const { contacts } = useCtc();
+  const { halls } = useHal();
   const suppliers = contacts.filter(c => c.roles.includes('supplier'));
 
   const [open, setOpen] = useState(false);
@@ -115,7 +126,12 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       withdrawalDays: it.withdrawalDays === null || it.withdrawalDays === undefined ? '' : toFa(it.withdrawalDays),
       batchNo: it.batchNo || '',
       storage: it.storage || 'room',
-      notes: it.notes || ''
+      notes: it.notes || '',
+      purchaseDate: it.purchaseDate || '',
+      purchasePrice: it.purchasePrice ? toFa(it.purchasePrice) : '',
+      hallId: it.hallId || '',
+      equipmentStatus: it.equipmentStatus || 'active',
+      warrantyUntil: it.warrantyUntil || ''
     });
     setErr(''); setOpen(true);
   };
@@ -174,7 +190,12 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         withdrawalDays: isMed && form.withdrawalDays.trim() !== '' ? int(form.withdrawalDays) : null,
         batchNo: isMed ? form.batchNo.trim() : '',
         storage: form.storage,
-        notes: form.notes.trim()
+        notes: form.notes.trim(),
+        purchaseDate: form.category === 'equipment' ? form.purchaseDate : '',
+        purchasePrice: form.category === 'equipment' ? num(form.purchasePrice) : 0,
+        hallId: form.category === 'equipment' ? form.hallId : '',
+        equipmentStatus: form.category === 'equipment' ? form.equipmentStatus : '',
+        warrantyUntil: form.category === 'equipment' ? form.warrantyUntil : ''
       });
     } else {
       // ویرایش: currentStock و lastPrice نباید تغییر کنن
@@ -188,7 +209,12 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         withdrawalDays: isMed && form.withdrawalDays.trim() !== '' ? int(form.withdrawalDays) : null,
         batchNo: isMed ? form.batchNo.trim() : '',
         storage: form.storage,
-        notes: form.notes.trim()
+        notes: form.notes.trim(),
+        purchaseDate: form.category === 'equipment' ? form.purchaseDate : '',
+        purchasePrice: form.category === 'equipment' ? num(form.purchasePrice) : 0,
+        hallId: form.category === 'equipment' ? form.hallId : '',
+        equipmentStatus: form.category === 'equipment' ? form.equipmentStatus : '',
+        warrantyUntil: form.category === 'equipment' ? form.warrantyUntil : ''
       });
     }
     setOpen(false);
@@ -246,6 +272,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
             const stock = stockWarning(it);
             const exp = expiryWarning(it);
             const sup = contacts.find(c => c.id === it.supplierId);
+            const hall = it.hallId ? halls.find(h => h.id === it.hallId) : null;
             const myMovements = movements.filter(m => m.itemId === it.id);
             const isOpen = !ms.selectionMode && expandedId === it.id;
 
@@ -319,6 +346,17 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                     ) : null}
                     {it.withdrawalDays !== null && it.withdrawalDays !== undefined ? <Row l="دوره منع مصرف" v={`${toFa(it.withdrawalDays)} روز`} /> : null}
                     {it.storage ? <Row l="نگهداری" v={STORAGE_LABEL[it.storage] || it.storage} /> : null}
+                  </>
+                ) : null}
+
+                {it.category === 'equipment' ? (
+                  <>
+                    <SectionTitle>🔧 اطلاعات تجهیزات</SectionTitle>
+                    {it.purchaseDate ? <Row l="تاریخ خرید" v={toFa(it.purchaseDate)} /> : null}
+                    {it.purchasePrice ? <Row l="قیمت خرید" v={`${toFa(it.purchasePrice.toLocaleString('fa-IR'))} ت`} /> : null}
+                    {hall ? <Row l="سالن" v={hall.name} /> : null}
+                    {it.equipmentStatus ? <Row l="وضعیت" v={EQUIP_STATUS[it.equipmentStatus] || it.equipmentStatus} /> : null}
+                    {it.warrantyUntil ? <Row l="گارانتی تا" v={toFa(it.warrantyUntil)} /> : null}
                   </>
                 ) : null}
 
@@ -463,6 +501,38 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                 )}
               </Grid2>
             )}
+          </>
+        )}
+
+        {form.category === 'equipment' && (
+          <>
+            <SectionTitle>🔧 اطلاعات تجهیزات</SectionTitle>
+            <Grid2>
+              <Field label="تاریخ خرید">
+                <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} />
+              </Field>
+              <Field label="قیمت خرید (کل)">
+                <MoneyField placeholder="مثلاً — ۵٬۰۰۰٬۰۰۰" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
+              </Field>
+            </Grid2>
+            <Grid2>
+              <Field label="سالن استقرار" hint="اختیاری">
+                <Select value={form.hallId} onChange={e => setForm({ ...form, hallId: e.target.value })}>
+                  <option value="">— بدون سالن —</option>
+                  {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
+                </Select>
+              </Field>
+              <Field label="وضعیت">
+                <Select value={form.equipmentStatus} onChange={e => setForm({ ...form, equipmentStatus: e.target.value })}>
+                  <option value="active">✅ فعال</option>
+                  <option value="repair">🔧 در تعمیر</option>
+                  <option value="scrapped">❌ اسقاط</option>
+                </Select>
+              </Field>
+            </Grid2>
+            <Field label="گارانتی تا" hint="اختیاری — برای هشدار تموم‌شدن">
+              <DatePicker value={form.warrantyUntil} onChange={v => setForm({ ...form, warrantyUntil: v })} />
+            </Field>
           </>
         )}
 
