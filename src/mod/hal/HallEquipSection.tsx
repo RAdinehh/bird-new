@@ -185,7 +185,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
       capacity: editCap ? parseFloat(toEn(editCap).replace('٫', '.')) || null : null,
     } as any);
     setEditId(null);
-    toastMsg.saved()
+    toastMsg.saved(currentEdit?.name || 'تجهیز')
   };
 
   const removeEquip = async (id: string, name: string) => {

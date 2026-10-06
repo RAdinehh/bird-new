@@ -365,7 +365,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       consumeRate: form.consumeRate || undefined,
     };
     addEquip(data);
-    toastMsg.saved()
+    toastMsg.added(form.name || 'تجهیز')
     // پاک کردن فقط نام و مشخصات، نگه‌داشتن سالن و نوع
     setForm((f: any) => ({
       ...f,

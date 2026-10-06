@@ -358,7 +358,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
     };
     if (form.id) {
       updateDevice(form.id, data);
-      toastMsg.saved()
+      toastMsg.saved(form.name || 'دستگاه')
     } else {
       addDevice(data);
       toastMsg.added(data.name, 'دستگاه')
