@@ -25,7 +25,7 @@ import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import DependentSelect from '../../shr/components/DependentSelect';
-import { showConfirmAsync } from '../../cor/store/dialog';
+import { showConfirmAsync, showPromptAsync } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
 import { Row, DepBox } from './helpers';
 import { logAction } from '../../cor/logger/auditLog';
@@ -174,7 +174,6 @@ export default function FlocksPage() {
   const [layingFromStd, setLayingFromStd] = useState(false);
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
-  const [archId, setArchId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'archived'], tab, (id) => setTab(id as TabId));
 
@@ -455,7 +454,6 @@ export default function FlocksPage() {
     const per = int(form.initialCount) ? total / (int(form.initialCount) || 1) : 0;
     return { bird, del, oth, total, per };
   }, [form]);
-  const archTarget = archId ? flocks.find(f => f.id === archId) : null;
 
   const tabCount = (t: TabId) => {
     if (t === 'all') return flocks.filter(f => f.status === 'active').length;
@@ -768,7 +766,24 @@ export default function FlocksPage() {
                     ) : (
                       <>
                         <Btn size="sm" onClick={() => openEdit(f)} style={{ flex: 1 }}>ویرایش</Btn>
-                        <Btn size="sm" onClick={() => setArchId(f.id)} style={{ flex: 1 }}>آرشیو</Btn>
+                        <Btn size="sm" onClick={async () => {
+                          const reason = await showPromptAsync(
+                            'آرشیو گله',
+                            'آرشیو «' + f.name + '»؟ این گله به بخش آرشیو منتقل می‌شود.',
+                            {
+                              label: 'دلیل آرشیو',
+                              placeholder: 'مثلاً: فروش، پایان چرخه، تلفات کامل...',
+                              required: true,
+                              multiline: true,
+                              rows: 2,
+                              confirmText: 'آرشیو کن',
+                            }
+                          );
+                          if (reason === null || !reason.trim()) return;
+                          archive(f.id, reason.trim());
+                          showToast('گله آرشیو شد', 'success', 2000);
+                          logAction('update', 'flk', 'آرشیو گله: ' + f.name);
+                        }} style={{ flex: 1 }}>آرشیو</Btn>
                       </>
                     )}
                   </div>
@@ -1081,12 +1096,6 @@ export default function FlocksPage() {
           <ErrorBox>{err}</ErrorBox>
         </Modal>
 
-        <Modal open={!!archId} onClose={() => setArchId(null)} title="آرشیو گله"
-          footer={<BtnRow><Btn variant="primary" onClick={() => { if (archId) archive(archId); setArchId(null); }}>آرشیو کن</Btn><Btn onClick={() => setArchId(null)}>لغو</Btn></BtnRow>}>
-          <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-            آرشیو <b>{archTarget?.name}</b>؟
-          </div>
-        </Modal>
       </PageContainer>
     </div>
   );
