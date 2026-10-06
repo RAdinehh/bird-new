@@ -31,6 +31,12 @@ interface F {
   notes: string;
 }
 
+const REASONS_BY_TYPE: Record<MovementType, MovementReason[]> = {
+  in:  ['purchase', 'return', 'adjustment'],
+  out: ['consumption', 'sale', 'loss', 'return', 'adjustment'],
+  adjust: ['adjustment'],
+};
+
 export default function MovesPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
   const { items, movements, addMovement, deleteMovement } = useWhs();
@@ -312,14 +318,19 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
       >
         <Grid2>
           <Field label="نوع گردش" required>
-            <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as MovementType })}>
+            <Select value={form.type} onChange={e => {
+              const newType = e.target.value as MovementType;
+              const validReasons = REASONS_BY_TYPE[newType];
+              const newReason = validReasons.includes(form.reason) ? form.reason : validReasons[0];
+              setForm({ ...form, type: newType, reason: newReason });
+            }}>
               <option value="in">📥 ورود به انبار</option>
               <option value="out">📤 خروج از انبار</option>
             </Select>
           </Field>
           <Field label="دلیل" required error={vErrors.reason}>
             <Select value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value as MovementReason })}>
-              {(Object.keys(MOVEMENT_REASON) as MovementReason[]).map(r =>
+              {REASONS_BY_TYPE[form.type].map(r =>
                 <option key={r} value={r}>{MOVEMENT_REASON[r]}</option>
               )}
             </Select>
