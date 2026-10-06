@@ -37,6 +37,11 @@ export interface Settings {
   // ماژول‌ها
   modules: Record<string, boolean>;
 
+  // ویژگی‌های داخلی (زیرماژول‌ها)
+  features: {
+    vaccine: boolean;         // واکسن و برنامه واکسن
+  };
+
   // منوی پایین — ۵ ماژول انتخابی
   bottomNav: string[];
 
@@ -81,6 +86,7 @@ const defaultSettings: Settings = {
   lowPowerMode: false,
   printPaper: 'A4',
   modules: {},
+  features: { vaccine: true },
   customStandards: {},
 
   autoBackup: { enabled: true, intervalHours: 24, maxVersions: 5 },
@@ -132,7 +138,8 @@ export const useSet = create<State>()(
           channels: { ...current.channels, ...(p.channels || {}) },
           alerts: { ...current.alerts, ...(p.alerts || {}) },
           quietHours: { ...current.quietHours, ...(p.quietHours || {}) },
-          thresholds: { ...current.thresholds, ...(p.thresholds || {}) }
+          thresholds: { ...current.thresholds, ...(p.thresholds || {}) },
+          features: { ...current.features, ...(p.features || {}) }
         };
       }
     }

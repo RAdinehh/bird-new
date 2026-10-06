@@ -30,6 +30,31 @@ function Toggle({ enabled, disabled, onToggle }: { enabled: boolean; disabled?: 
   );
 }
 
+
+function FeatureToggle({ icon, title, desc, featureKey }: { icon: string; title: string; desc: string; featureKey: string }) {
+  const features = useSet(s => (s as any).features || {});
+  const updateSection = useSet(s => s.updateSection);
+  const enabled = features[featureKey] !== false;
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 10,
+      padding: 'var(--pad-normal)',
+      background: 'var(--card)', border: '1px solid var(--border)',
+      borderRadius: 'var(--r-md)',
+    }}>
+      <span style={{ fontSize: '1.2em', lineHeight: 1 }}>{icon}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{title}</div>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{desc}</div>
+      </div>
+      <Toggle
+        enabled={enabled}
+        onToggle={() => updateSection('features' as any, { [featureKey]: !enabled } as any)}
+      />
+    </div>
+  );
+}
+
 // ترتیب همه ماژول‌ها
 const ALL_IDS = [
   'brd', 'hal', 'ctc',
@@ -69,6 +94,24 @@ export default function ModulesTab() {
         <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
           {toFa(enabledCount)} از {toFa(totalCount)}
         </span>
+      </div>
+
+      {/* ویژگی‌های داخلی */}
+      <div style={{
+        marginTop: 4, marginBottom: 4,
+        fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)',
+        display: 'flex', alignItems: 'center', gap: 6,
+      }}>
+        <span style={{ fontSize: '1.05em', lineHeight: 1 }}>🎛</span> ویژگی‌های داخلی
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <FeatureToggle
+          icon="💉"
+          title="واکسن و دارو"
+          desc="نمایش بخش واکسن در ثبت روزانه، برنامه واکسن گله، تقویم"
+          featureKey="vaccine"
+        />
       </div>
 
       {/* گرید ۲ ستونه */}
