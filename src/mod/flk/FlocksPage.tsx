@@ -11,7 +11,7 @@ import { useSet } from '../set/store';
 import { format, addDays, subMonths } from 'date-fns-jalali';
 import { schedulesByType, getSchedule } from '../cal/vaccineSchedules';
 import { useHal } from '../hal/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, Textarea, ErrorBox } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';;
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';

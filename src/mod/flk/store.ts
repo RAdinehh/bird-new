@@ -65,6 +65,12 @@ export interface Flock {
   deliveryCost: number | null;     // هزینه حمل
   otherCosts: number | null;       // سایر هزینه‌ها
   status: FlockStatus;
+  /** پنهان از لیست اصلی */
+  hidden?: boolean;
+  /** غیرفعال موقت (توی آمار و هشدارها نمیاد) */
+  paused?: boolean;
+  /** دلیل آرشیو (اجباری هنگام بستن) */
+  archivedReason?: string;
   notes: string;
   /** رویدادهای دستی گله */
   events?: FlockEvent[];
@@ -84,8 +90,10 @@ interface State {
   add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => string;
   update: (id: string, patch: Partial<Flock>) => void;
   remove: (id: string) => void;
-  archive: (id: string) => void;
+  archive: (id: string, reason?: string) => void;
   restore: (id: string) => void;
+  toggleHidden: (id: string) => void;
+  togglePaused: (id: string) => void;
 }
 
 const now = () => new Date().toISOString();
@@ -101,8 +109,10 @@ export const useFlk = create<State>()(
       },
       update: (id, patch) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       remove: (id) => set({ flocks: get().flocks.filter(x => x.id !== id) }),
-      archive: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', endDate: x.endDate || now(), updatedAt: now()} : x) }),
-      restore: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', endDate: '', updatedAt: now()} : x) }),
+      archive: (id, reason) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', endDate: x.endDate || now(), archivedReason: reason || '', updatedAt: now()} : x) }),
+      restore: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', endDate: '', archivedReason: '', updatedAt: now()} : x) }),
+      toggleHidden: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, hidden: !x.hidden, updatedAt: now()} : x) }),
+      togglePaused: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, paused: !x.paused, updatedAt: now()} : x) }),
 
       addEvent: (flockId, ev) => set({
         flocks: get().flocks.map(f => {
