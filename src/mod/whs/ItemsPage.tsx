@@ -236,6 +236,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   };
 
   // آبشاری: فیلدهای اضافی مستقیماً از CATEGORY_DEFAULTS (منبع واحد حقیقت)
+  const currentStockForEdit = form.id ? (items.find(x => x.id === form.id)?.currentStock || 0) : 0;
   const extras = CATEGORY_DEFAULTS[form.category];
   const hasExtras = !!(extras && (extras.needsExpiry || extras.needsBatch || extras.needsWithdrawal || extras.needsStorage));
   const isMedicine = form.category === 'medicine' || form.category === 'vaccine';
@@ -485,9 +486,25 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
             </Field>
           </Grid2>
         ) : (
-          <Field label="حداقل موجودی" hint="هشدار کمبود">
-            <NumField placeholder="مثلاً — ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
-          </Field>
+          <Grid2>
+            <Field label="موجودی فعلی" hint="برای تغییر، از تب «ورود/خروج» استفاده کن">
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '8px 12px', background: 'var(--input-bg)',
+                border: '1px dashed var(--border)', borderRadius: 'var(--r-sm)',
+                fontFamily: 'inherit', fontSize: 'var(--fs-base)',
+                color: 'var(--text)', fontWeight: 700, minHeight: 38,
+              }}>
+                <span>{toFa(currentStockForEdit)}</span>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>
+                  {UNIT_LABEL[form.unit] || 'عدد'}
+                </span>
+              </div>
+            </Field>
+            <Field label="حداقل موجودی" hint="هشدار کمبود">
+              <NumField placeholder="مثلاً — ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
+            </Field>
+          </Grid2>
         )}
 
         {hasExtras && (
