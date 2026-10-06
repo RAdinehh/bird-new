@@ -213,6 +213,8 @@ export default function ListCards({
                                 {milestones.map((m, idx) => {
                                   const pct = (m.day / cycleDays) * 100;
                                   const passed = age >= m.day;
+                                  // پله‌ای: برچسب‌های فرد یک خط بالاتر
+                                  const labelOffset = idx % 2 === 0 ? 22 : 34;
                                   return (
                                     <div
                                       key={idx}
@@ -239,10 +241,17 @@ export default function ListCards({
                                         marginTop: passed ? 11 : 12,
                                         transition: 'all .2s',
                                       }} />
+                                      {/* خط اتصال کوتاه */}
+                                      <div style={{
+                                        width: 1,
+                                        height: idx % 2 === 0 ? 4 : 16,
+                                        background: 'var(--border)',
+                                        opacity: 0.6,
+                                      }} />
                                       {/* برچسب */}
                                       <div style={{
                                         position: 'absolute',
-                                        top: 22,
+                                        top: labelOffset,
                                         fontSize: 9,
                                         fontWeight: passed ? 700 : 500,
                                         color: passed ? progressColor : 'var(--muted)',
