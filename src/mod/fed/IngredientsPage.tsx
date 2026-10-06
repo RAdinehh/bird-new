@@ -46,7 +46,6 @@ export default function IngredientsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filterCat, setFilterCat] = useState<IngredientCategory | ''>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -217,8 +216,6 @@ export default function IngredientsPage() {
     else updateIngredient(form.id, data);
     setOpen(false);
   };
-
-  const target = delId ? ingredients.find(i => i.id === delId) : null;
 
   const undoDelete = () => {
     if (!undoData) return;
@@ -394,7 +391,13 @@ export default function IngredientsPage() {
                       {it.isHidden ? '👁️ نمایش' : '👁️‍🗨️ پنهان'}
                     </Btn>
                   ) : (
-                    <Btn size="sm" onClick={() => setDelId(it.id)} style={{ flex: 1 }}>حذف</Btn>
+                    <Btn size="sm" onClick={async () => {
+                          const ok = await showConfirmAsync('تأیید حذف', 'این ماده از تمام جیره‌ها هم حذف می‌شود حذف شود؟', { danger: true });
+                          if (!ok) return;
+                          deleteIngredient(it.id);
+                          logAction('delete', 'fed', 'حذف از جیره‌نویسی');
+                          showToast('حذف شد', 'info', 1800);
+                        }} style={{ flex: 1 }}>حذف</Btn>
                   )}
                 </div>
               </ExpandableCard>
@@ -487,19 +490,6 @@ export default function IngredientsPage() {
         </Field>
 
         <ErrorBox>{err}</ErrorBox>
-      </Modal>
-
-      <Modal
-        open={delId !== null}
-        onClose={() => setDelId(null)}
-        title="حذف ماده"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این ماده حذف شود؟', { danger: true }); if (!ok) return; const item = ingredients.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteIngredient(idToDel);
-              logAction('delete', 'fed', 'حذف از جیره‌نویسی'); setDelId(null); showToast('ماده حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
-      >
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>
-          حذف <b>{target?.name}</b>؟
-          <br /><span style={{ color: 'var(--muted)', fontSize: 'var(--fs-base)' }}>از تمام جیره‌ها هم حذف می‌شود.</span>
-        </div>
       </Modal>
     </PageContainer>
   );

@@ -67,7 +67,6 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty(isPurchase));
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filterCat, setFilterCat] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -390,8 +389,6 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
     setTransferModal(null); setTransferNote(''); setTransferDate('');
   };
 
-  const target = delId ? invoices.find(i => i.id === delId) : null;
-
   return (
     <PageContainer>
       {undoData && (
@@ -527,7 +524,13 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => setPrintId(inv.id)} style={{ flex: 1 }}>🖨 چاپ</Btn>
                   <Btn size="sm" onClick={() => openEdit(inv)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(inv.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                          const ok = await showConfirmAsync('تأیید حذف', 'این فاکتور حذف شود؟', { danger: true });
+                          if (!ok) return;
+                          deleteInvoice(inv.id);
+                          logAction('delete', 'tra', 'حذف از معاملات');
+                          showToast('فاکتور حذف شد', 'info', 1800);
+                        }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -777,15 +780,6 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
             )}
           </>
         )}
-      </Modal>
-
-      {/* Modal حذف */}
-      <Modal
-        open={delId !== null} onClose={() => setDelId(null)} title="حذف خرید"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این فاکتور حذف شود؟', { danger: true }); if (!ok) return; const item = invoices.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteInvoice(idToDel);
-              logAction('delete', 'tra', 'حذف از معاملات'); setDelId(null); showToast('فاکتور حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
-      >
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.number}</b>؟</div>
       </Modal>
 
       {/* چاپ */}

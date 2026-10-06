@@ -47,7 +47,6 @@ export default function DealsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filterType, setFilterType] = useState<DealType | ''>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -150,8 +149,6 @@ export default function DealsPage() {
     }
     setOpen(false);
   };
-
-  const target = delId ? deals.find(d => d.id === delId) : null;
 
   const accentFor = (status: string): 'accent' | 'warn' | 'dim' => {
     if (status === 'settled') return 'accent';
@@ -263,7 +260,13 @@ export default function DealsPage() {
                     <Btn size="sm" onClick={() => updateDeal(d.id, { status: 'settled' })} style={{ flex: 1 }}>تسویه شد</Btn>
                   ) : null}
                   <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(d.id)} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                          const ok = await showConfirmAsync('تأیید حذف', 'این معامله حذف شود؟', { danger: true });
+                          if (!ok) return;
+                          deleteDeal(d.id);
+                          logAction('delete', 'tra', 'حذف از معاملات');
+                          showToast('معامله حذف شد', 'info', 1800);
+                        }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -342,16 +345,6 @@ export default function DealsPage() {
         </Field>
 
         <ErrorBox>{err}</ErrorBox>
-      </Modal>
-
-      <Modal
-        open={delId !== null}
-        onClose={() => setDelId(null)}
-        title="حذف معامله"
-        footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این معامله حذف شود؟', { danger: true }); if (!ok) return; const item = deals.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteDeal(idToDel);
-              logAction('delete', 'tra', 'حذف از معاملات'); setDelId(null); showToast('معامله حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
-      >
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.description}</b>؟</div>
       </Modal>
     </PageContainer>
   );
