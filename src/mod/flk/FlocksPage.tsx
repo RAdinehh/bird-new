@@ -9,6 +9,7 @@ import {
 } from './store';
 import { useBrd } from '../brd/store';
 import { useSet } from '../set/store';
+import { useTra } from '../tra/store';
 import { format, addDays, subMonths } from 'date-fns-jalali';
 import { schedulesByType, getSchedule } from '../cal/vaccineSchedules';
 import { useHal } from '../hal/store';
@@ -167,6 +168,7 @@ export default function FlocksPage() {
   const vaccineEnabled = useSet(s => (s as any).features?.vaccine !== false);
   const { birds: _birdsRaw, breeds } = useBrd();
   const { halls: _hallsRaw, zones } = useHal();
+  const { invoices } = useTra();
 
   const [tab, setTab] = useState<TabId>('all');
   const [q, setQ] = useState('');
@@ -446,6 +448,13 @@ export default function FlocksPage() {
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
+
+  // محاسبه درآمد هر گله از فاکتورهای فروش
+  const getFlockRevenue = (flockId: string): number => {
+    return (invoices || [])
+      .filter((inv: any) => inv.type === 'sale' && inv.relatedFlockId === flockId)
+      .reduce((sum: number, inv: any) => sum + (inv.total || 0), 0);
+  };
 
   const breedsForBird = breeds.filter(b => b.birdId === form.birdId);
   const zonesForHall = zones.filter(z => z.hallId === form.hallId);
@@ -753,7 +762,44 @@ export default function FlocksPage() {
                     </>
                   )}
 
-
+                  {/* درآمد و ROI */}
+                  {(() => {
+                    const revenue = getFlockRevenue(f.id);
+                    if (revenue === 0 && costs.total === 0) return null;
+                    const profit = revenue - costs.total;
+                    const roi = costs.total > 0 ? (profit / costs.total) * 100 : 0;
+                    const isProfit = profit >= 0;
+                    const color = isProfit ? 'var(--accent)' : 'var(--danger)';
+                    return (
+                      <>
+                        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
+                          <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> درآمد و سود
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <Row l="فروش کل" v={fmt.money(revenue)} />
+                          <div style={{
+                            display: 'flex', justifyContent: 'space-between',
+                            fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
+                            background: isProfit ? 'var(--accent-soft)' : 'var(--danger-soft)',
+                            color: color, borderRadius: 'var(--r-sm)', fontWeight: 700,
+                          }}>
+                            <span>{isProfit ? '📈 سود خالص:' : '📉 زیان:'}</span>
+                            <span>{fmt.money(Math.abs(profit))}</span>
+                          </div>
+                          {costs.total > 0 && (
+                            <div style={{
+                              display: 'flex', justifyContent: 'space-between',
+                              fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
+                              background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontWeight: 700,
+                            }}>
+                              <span>ROI:</span>
+                              <span style={{ color }}>{toFa(roi.toFixed(1))}٪</span>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    );
+                  })()}
 
                   {/* نمایش دلیل آرشیو */}
                   {isArchived && f.archivedReason && (
