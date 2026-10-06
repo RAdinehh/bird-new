@@ -163,7 +163,7 @@ function checkHallCapacity(
 export default function FlocksPage() {
   const fmt = useFormat();
   const breedStd = useBreedStandard();
-  const { flocks, add, update, remove, archive, restore } = useFlk();
+  const { flocks, add, update, remove, archive, restore, toggleHidden, togglePaused } = useFlk();
   const vaccineEnabled = useSet(s => (s as any).features?.vaccine !== false);
   const { birds: _birdsRaw, breeds } = useBrd();
   const { halls: _hallsRaw, zones } = useHal();
@@ -379,8 +379,8 @@ export default function FlocksPage() {
   const list = useMemo(() => {
     let arr = flocks;
     if (tab === 'archived') arr = arr.filter(f => f.status === 'archived' || f.status === 'sold');
-    else if (tab === 'all') arr = arr.filter(f => f.status === 'active');
-    else arr = arr.filter(f => f.status === 'active' && f.type === tab);
+    else if (tab === 'all') arr = arr.filter(f => f.status === 'active' && !f.hidden);
+    else arr = arr.filter(f => f.status === 'active' && f.type === tab && !f.hidden);
     if (q.trim()) {
       const t = q.trim();
       arr = arr.filter(f => {
@@ -640,6 +640,8 @@ export default function FlocksPage() {
                   badge={<>
                     <Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>
                     {f.sourceInvoiceId && <Tag tone="blue">🛒 فاکتور</Tag>}
+                    {f.hidden && <Tag tone="gray">👁 پنهان</Tag>}
+                    {f.paused && <Tag tone="amber">⏸ غیرفعال</Tag>}
                     {!f.hallId && <Tag tone="amber">🏠 بدون سالن</Tag>}
                     {ready && !isArchived && (f.type === 'layer' || f.type === 'breeder') && <Tag tone="green">✅ آماده</Tag>}
                   </>}
@@ -746,6 +748,34 @@ export default function FlocksPage() {
                     </>
                   )}
 
+
+                  {/* کنترل گله */}
+                  {!isArchived && (
+                    <>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
+                        <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🎛</span> کنترل گله
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', cursor: 'pointer' }}>
+                          <input type="checkbox" checked={!!f.hidden} onChange={() => toggleHidden(f.id)} style={{ cursor: 'pointer', accentColor: 'var(--accent)', width: 18, height: 18 }} />
+                          <span style={{ flex: 1, fontWeight: 600 }}>👁 پنهان از لیست</span>
+                          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{f.hidden ? 'پنهان' : 'نمایان'}</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', cursor: 'pointer' }}>
+                          <input type="checkbox" checked={!!f.paused} onChange={() => togglePaused(f.id)} style={{ cursor: 'pointer', accentColor: 'var(--warn)', width: 18, height: 18 }} />
+                          <span style={{ flex: 1, fontWeight: 600 }}>⏸ غیرفعال موقت</span>
+                          <span style={{ fontSize: 'var(--fs-xs)', color: f.paused ? 'var(--warn)' : 'var(--muted)' }}>{f.paused ? 'غیرفعال' : 'فعال'}</span>
+                        </label>
+                      </div>
+                    </>
+                  )}
+
+                  {/* نمایش دلیل آرشیو */}
+                  {isArchived && f.archivedReason && (
+                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)' }}>
+                      <b>دلیل آرشیو:</b> {f.archivedReason}
+                    </div>
+                  )}
 
                   {/* یادداشت */}
                   {f.notes && (
