@@ -168,106 +168,125 @@ export default function ListCards({
                             {lc.label}
                           </Tag>
                         </div>
-                        {/* نوار پیشرفت چرخه — بخش‌بندی شده */}
+                        {/* نوار پیشرفت چرخه — استاندارد صنعت (Hy-Line style) */}
                         {lc.progress > 0 && (() => {
                           const cycleDays = f.endOfCycleDay || bird?.cycleDays || 0;
                           if (!cycleDays) return null;
                           
                           const stageMilestones = (CYCLE_MILESTONES[f.type] || []).filter(m => m.day > 0 && m.day < cycleDays);
-                          const breakpoints = [1, ...stageMilestones.map(m => m.day), cycleDays];
-                          
-                          // ساخت بخش‌ها با حداقل روز مؤثر (برای خوانایی)
-                          const MIN_DAYS = cycleDays * 0.13; // حداقل ۱۳٪ از کل
-                          const rawSegments = [];
-                          for (let i = 0; i < breakpoints.length - 1; i++) {
-                            const start = breakpoints[i];
-                            const end = breakpoints[i + 1];
-                            const days = end - start;
-                            const effectiveDays = Math.max(days, MIN_DAYS);
-                            const label = i === 0 ? 'شروع' : stageMilestones[i - 1]?.label || 'پایان';
-                            const passed = age >= end;
-                            const isCurrent = age >= start && age < end;
-                            rawSegments.push({ start, end, days, effectiveDays, label, passed, isCurrent });
-                          }
-                          
-                          // نرمال‌سازی عرض‌ها
-                          const totalEffective = rawSegments.reduce((sum, s) => sum + s.effectiveDays, 0);
-                          const segments = rawSegments.map(s => ({ ...s, widthPct: (s.effectiveDays / totalEffective) * 100 }));
-                          
-                          // محاسبه موقعیت نقطه متحرک بر اساس عرض نمایش‌داده‌شده
-                          let markerPct = 0;
-                          let accumulated = 0;
-                          for (const seg of segments) {
-                            if (age >= seg.end) {
-                              accumulated += seg.widthPct;
-                            } else if (age >= seg.start) {
-                              const ratio = (age - seg.start) / (seg.end - seg.start);
-                              markerPct = accumulated + ratio * seg.widthPct;
-                              break;
-                            }
-                          }
-                          if (age >= cycleDays) markerPct = 100;
-                          
                           const progressColor = lc.progress >= 95 ? 'var(--danger)' : lc.progress >= 80 ? 'var(--warn)' : 'var(--accent)';
+                          const markerPct = Math.min(100, Math.max(0, lc.progress));
                           
                           return (
-                            <div style={{ marginTop: 10 }}>
-                              {/* درصد پیشرفت */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                            <div style={{ marginTop: 12 }}>
+                              {/* ردیف بالا: برچسب + درصد */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
                                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
                                   چرخه زندگی
                                 </span>
                                 <span style={{ fontSize: 'var(--fs-sm)', color: progressColor, fontWeight: 700 }}>
-                                  روز {toFa(age)} از {toFa(cycleDays)} — {toFa(Math.round(lc.progress))}٪
+                                  {toFa(Math.round(lc.progress))}٪
                                 </span>
                               </div>
 
-                              {/* نوار بخش‌بندی */}
-                              <div style={{ display: 'flex', gap: 2, marginBottom: 6 }}>
-                                {segments.map((seg, idx) => (
-                                  <div
-                                    key={idx}
-                                    title={`${seg.label} · روز ${toFa(seg.start)} تا ${toFa(seg.end)}`}
-                                    style={{
-                                      flex: `0 0 ${seg.widthPct}%`,
-                                      padding: '8px 4px',
-                                      background: seg.isCurrent ? progressColor : seg.passed ? 'var(--accent-soft)' : 'var(--input-bg)',
-                                      color: seg.isCurrent ? 'var(--avatar-text, #fff)' : seg.passed ? 'var(--accent)' : 'var(--muted)',
-                                      fontSize: 'var(--fs-xs)',
-                                      fontWeight: seg.isCurrent ? 700 : seg.passed ? 600 : 500,
-                                      textAlign: 'center',
-                                      borderRadius: 5,
-                                      whiteSpace: 'nowrap',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                      transition: 'all .2s',
-                                    }}
-                                  >
-                                    {seg.label}
-                                  </div>
-                                ))}
-                              </div>
-
-                              {/* نشانگر متحرک سن */}
-                              <div style={{ position: 'relative', height: 8 }}>
+                              {/* نوار خطی با بج متحرک */}
+                              <div style={{ position: 'relative', height: 28, marginBottom: 4 }}>
+                                {/* نوار پس‌زمینه */}
                                 <div style={{
                                   position: 'absolute',
-                                  right: `calc(${markerPct}% - 5px)`,
+                                  top: 13,
+                                  left: 0,
+                                  right: 0,
+                                  height: 6,
+                                  background: 'var(--input-bg)',
+                                  borderRadius: 3,
+                                  border: '1px solid var(--border)',
+                                  overflow: 'hidden',
+                                }}>
+                                  {/* پیشرفت */}
+                                  <div style={{
+                                    height: '100%',
+                                    width: markerPct + '%',
+                                    background: progressColor,
+                                    transition: 'width .3s',
+                                  }} />
+                                </div>
+
+                                {/* دات‌های نقاط عطف */}
+                                {stageMilestones.map((mk, idx) => {
+                                  const pct = (mk.day / cycleDays) * 100;
+                                  const passed = age >= mk.day;
+                                  return (
+                                    <div
+                                      key={idx}
+                                      title={mk.label + ' · روز ' + toFa(mk.day)}
+                                      style={{
+                                        position: 'absolute',
+                                        top: 12,
+                                        right: `calc(${pct}% - 4px)`,
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: '50%',
+                                        background: passed ? progressColor : 'var(--card-solid)',
+                                        border: '2px solid ' + (passed ? progressColor : 'var(--border)'),
+                                        zIndex: 1,
+                                      }}
+                                    />
+                                  );
+                                })}
+
+                                {/* نقطه متحرک سن — بالای نوار */}
+                                <div style={{
+                                  position: 'absolute',
                                   top: 0,
-                                  width: 10,
-                                  height: 10,
-                                  borderRadius: '50%',
-                                  background: progressColor,
-                                  border: '2px solid var(--card-solid)',
-                                  boxShadow: '0 1px 3px rgba(0,0,0,.2)',
+                                  right: `calc(${markerPct}% - 14px)`,
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  zIndex: 2,
                                   transition: 'right .3s',
-                                }} />
+                                }}>
+                                  <div style={{
+                                    background: progressColor,
+                                    color: 'var(--avatar-text, #fff)',
+                                    padding: '1px 6px',
+                                    borderRadius: 4,
+                                    fontSize: 10,
+                                    fontWeight: 700,
+                                    whiteSpace: 'nowrap',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,.15)',
+                                  }}>{toFa(age)}</div>
+                                </div>
                               </div>
 
                               {/* اعداد دو سر */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--muted)', fontWeight: 600 }}>
                                 <span>۱</span>
                                 <span>{toFa(cycleDays)} روز</span>
+                              </div>
+
+                              {/* Legend مراحل — زیر نوار */}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 10px', marginTop: 8 }}>
+                                {stageMilestones.map((mk, idx) => {
+                                  const passed = age >= mk.day;
+                                  return (
+                                    <div key={idx} style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 4,
+                                      fontSize: 10,
+                                      color: passed ? 'var(--accent)' : 'var(--muted)',
+                                      fontWeight: passed ? 700 : 500,
+                                    }}>
+                                      <span style={{
+                                        width: 6, height: 6, borderRadius: '50%',
+                                        background: passed ? progressColor : 'var(--border)',
+                                      }} />
+                                      <span>{mk.label}</span>
+                                      <span style={{ opacity: 0.6 }}>·{toFa(mk.day)}</span>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           );
