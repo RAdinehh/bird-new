@@ -189,7 +189,7 @@ export default function ListCards({
                           return (
                             <div style={{ marginTop: 10 }}>
                               {/* اعداد دو سر — بالای نوار */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 22, paddingRight: 2, paddingLeft: 2 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 12, paddingRight: 2, paddingLeft: 2 }}>
                                 <span>۱</span>
                                 <span>{toFa(cycleDays)} روز</span>
                               </div>
