@@ -4,6 +4,7 @@ import MonthView from './MonthView';
 import DayView from './DayView';
 import AddEventModal from './AddEventModal';
 import { toFa } from '../../shr/utils/fa';
+import { useFab } from '../../shr/hooks/useFab';
 
 const FILTERS: { id: EventType | 'all'; label: string; icon: string }[] = [
   { id: 'all', label: 'همه', icon: '📋' },
@@ -18,6 +19,7 @@ export default function Cal() {
   const [filter, setFilter] = useState<EventType | 'all'>('all');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  useFab({ label: 'رویداد جدید', onClick: () => setAddOpen(true) });
   const [refreshKey, setRefreshKey] = useState(0);
 
   // جمع‌آوری رویدادها — هر بار با refreshKey از نو
@@ -45,15 +47,6 @@ export default function Cal() {
           onBack={() => setSelectedDate(null)}
           onChanged={() => setRefreshKey(k => k + 1)}
         />
-        <button
-          type="button"
-          onClick={() => setAddOpen(true)}
-          style={fabStyle}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </button>
         <AddEventModal
           open={addOpen}
           onClose={handleAddClose}

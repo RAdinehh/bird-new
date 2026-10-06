@@ -8,6 +8,7 @@ import UploadModal from './UploadModal';
 import { Btn, BtnRow, Empty, Modal, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
+import { useFab } from '../../shr/hooks/useFab';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
 import { ListCard, fabStyle, GridCard, chip } from './helpers';
@@ -22,6 +23,7 @@ export default function FilesPage() {
   const [filterCat, setFilterCat] = useState<DocCategory | 'all'>('all');
   const [search, setSearch] = useState('');
   const [uploadOpen, setUploadOpen] = useState(false);
+  useFab({ label: 'افزودن فایل', onClick: () => setUploadOpen(true) });
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
 
@@ -218,17 +220,6 @@ export default function FilesPage() {
                 }} />)}
         </div>
       )}
-
-      {/* FAB */}
-      <button
-        type="button"
-        onClick={() => setUploadOpen(true)}
-        style={fabStyle}
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-      </button>
 
       {/* مودال آپلود */}
       <UploadModal
