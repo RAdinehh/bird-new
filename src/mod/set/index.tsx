@@ -90,9 +90,7 @@ const TAB_COMPONENTS: Record<TabId, TabComponent[]> = {
     { comp: HiddenOptionsTab, icon: '🗂', title: 'گزینه‌های مخفی',   subtitle: 'آیتم‌های حذف‌شده — بازگردانی یا حذف کامل', tone: 'info' },
   ],
   notifications: [NotificationsTab],
-  guide: [
-    { comp: GuideTab, icon: '📚', title: 'راهنمای علمی', subtitle: 'استانداردها + مراحل رشد و سن', tone: 'purple' },
-  ],
+  guide: [GuideTab],
   system: [
     { comp: BackupTab, icon: '💾', title: 'پشتیبان‌گیری',      subtitle: 'آمار، پشتیبان، بازیابی، امنیت', tone: 'accent' },
     { comp: LogsTab,   icon: '📋', title: 'لاگ عملیات',         subtitle: 'تاریخچه فعالیت‌ها و خطاها',      tone: 'info' },
