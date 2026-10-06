@@ -528,23 +528,23 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
             {isMedicine && (
               <>
                 <SectionTitle>💊 اطلاعات مصرف</SectionTitle>
-                <Grid2>
+                <Grid3>
                   <Field label="نوع مصرف">
                     <Select value={form.usageType} onChange={e => setForm({ ...form, usageType: e.target.value })}>
-                      <option value="">— انتخاب کنید —</option>
+                      <option value="">— انتخاب —</option>
                       <option value="oral">🍽 خوراکی</option>
                       <option value="injectable">💉 تزریقی</option>
-                      <option value="water">💧 محلول در آب</option>
+                      <option value="water">💧 محلول</option>
                       <option value="spray">🌫 اسپری</option>
                     </Select>
                   </Field>
                   <Field label="دوز هر پرنده" hint="اختیاری">
-                    <NumField placeholder="مثلاً — ۰.۵" value={form.dosePerBird} onChange={e => setForm({ ...form, dosePerBird: e.target.value })} unit="ml" min={0} />
+                    <NumField placeholder="۰.۵" value={form.dosePerBird} onChange={e => setForm({ ...form, dosePerBird: e.target.value })} unit="ml" min={0} />
                   </Field>
-                </Grid2>
-                <Field label="تاریخ تولید" hint="اختیاری">
-                  <DatePicker value={form.productionDate} onChange={v => setForm({ ...form, productionDate: v })} />
-                </Field>
+                  <Field label="تاریخ تولید" hint="اختیاری">
+                    <DatePicker value={form.productionDate} onChange={v => setForm({ ...form, productionDate: v })} />
+                  </Field>
+                </Grid3>
               </>
             )}
           </>
