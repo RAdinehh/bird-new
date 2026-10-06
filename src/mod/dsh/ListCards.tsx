@@ -151,16 +151,16 @@ export default function ListCards({
                           }}>🐔</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{
-                              fontSize: 'var(--fs-sm)', fontWeight: 600,
+                              fontSize: 'var(--fs-base)', fontWeight: 700,
                               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
                             }}>
                               {f.name}
                             </div>
                             <div style={{
-                              fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2,
+                              fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 3,
                               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
                             }}>
-                              {bird?.name || '—'} · {toFa(age)} روز · {toFa(flockCount)} پرنده
+                              {bird?.name || '—'} · {toFa(age)} روز · 🐔 {toFa(flockCount)}
                               {flockHenDay > 0 ? ' · ' + toFa(flockHenDay.toFixed(0)) + '٪' : ''}
                             </div>
                           </div>
@@ -177,18 +177,15 @@ export default function ListCards({
                           const stageLabels = stageMilestones.map(m => m.label);
                           return (
                             <div style={{ marginTop: 12 }}>
-                              {/* ردیف بالا */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', marginBottom: 8 }}>
+                              {/* ردیف بالا — فقط درصد */}
+                              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', fontSize: 'var(--fs-sm)', marginBottom: 6 }}>
                                 <span style={{ color: progressColor, fontWeight: 700 }}>
-                                  🔄 {lc.label}
-                                </span>
-                                <span style={{ color: 'var(--muted)', fontWeight: 600 }}>
-                                  {toFa(Math.round(lc.progress))}٪
+                                  {toFa(Math.round(lc.progress))}٪ پیشرفت
                                 </span>
                               </div>
 
                               {/* اعداد دو سر — بالای نوار */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--muted)', fontWeight: 600, marginBottom: 2, paddingRight: 2, paddingLeft: 2 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginBottom: 3, paddingRight: 2, paddingLeft: 2 }}>
                                 <span>۱</span>
                                 <span>{toFa(cycleDays)} روز</span>
                               </div>
@@ -233,15 +230,15 @@ export default function ListCards({
                                   position: 'absolute',
                                   right: `calc(${clampedPct}% - 18px)`,
                                   top: 0,
-                                  width: 36,
-                                  height: 18,
+                                  width: 42,
+                                  height: 22,
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   background: progressColor,
                                   color: 'var(--avatar-text, #fff)',
-                                  borderRadius: 4,
-                                  fontSize: 10,
+                                  borderRadius: 6,
+                                  fontSize: 'var(--fs-xs)',
                                   fontWeight: 700,
                                   transition: 'right .3s',
                                   boxShadow: '0 1px 3px rgba(0,0,0,.15)',
@@ -287,7 +284,7 @@ export default function ListCards({
                                     <div
                                       key={idx}
                                       style={{
-                                        fontSize: 10,
+                                        fontSize: 'var(--fs-xs)',
                                         fontWeight: passed ? 700 : 500,
                                         color: passed ? 'var(--accent)' : 'var(--muted)',
                                         whiteSpace: 'nowrap',
