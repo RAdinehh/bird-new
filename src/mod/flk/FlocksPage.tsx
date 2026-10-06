@@ -57,7 +57,7 @@ const empty = (): F => ({
   status: 'active', notes: ''
 });
 
-type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'archived';
+type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'hidden' | 'archived';
 
 
 /** چک ظرفیت سالن — مجموع گله‌های فعال + گله جدید */
@@ -176,9 +176,8 @@ export default function FlocksPage() {
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [menuId, setMenuId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
-  const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'archived'], tab, (id) => setTab(id as TabId));
+  const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'hidden', 'archived'], tab, (id) => setTab(id as TabId));
 
   // فیلتر تکرارها تو render
   const birds = useMemo(() => {
@@ -381,9 +380,9 @@ export default function FlocksPage() {
   const list = useMemo(() => {
     let arr = flocks;
     if (tab === 'archived') arr = arr.filter(f => f.status === 'archived' || f.status === 'sold');
-    else if (tab === 'all') arr = arr.filter(f => f.status === 'active');
-    else arr = arr.filter(f => f.status === 'active' && f.type === tab);
-    if (!showHidden) arr = arr.filter(f => !f.hidden);
+    else if (tab === 'hidden') arr = arr.filter(f => f.status === 'active' && f.hidden);
+    else if (tab === 'all') arr = arr.filter(f => f.status === 'active' && !f.hidden);
+    else arr = arr.filter(f => f.status === 'active' && f.type === tab && !f.hidden);
     if (q.trim()) {
       const t = q.trim();
       arr = arr.filter(f => {
@@ -473,6 +472,7 @@ export default function FlocksPage() {
     { id: 'layer', label: 'تخم‌گذار' },
     { id: 'broiler', label: 'گوشتی' },
     { id: 'breeder', label: 'مادر' },
+    { id: 'hidden', label: 'پنهان' },
     { id: 'archived', label: 'آرشیو' }
   ];
 
@@ -642,21 +642,6 @@ export default function FlocksPage() {
                   subtitle={`${bird?.name || '—'}${breed ? ` · ${breed.name}` : ''}${hall ? ` · ${hall.name}` : ''}`}
                   isOpen={isOpen}
                   onToggle={() => setExpandedId(isOpen ? null : f.id)}
-                  headerAction={
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); setMenuId(f.id); }}
-                      aria-label="کنترل‌های گله"
-                      style={{
-                        width: 32, height: 32, padding: 0,
-                        background: 'transparent', border: 'none',
-                        color: 'var(--muted)', cursor: 'pointer',
-                        fontFamily: 'inherit', fontSize: 20,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        borderRadius: 'var(--r-sm)',
-                      }}
-                    >⋯</button>
-                  }
                   badge={<>
                     <Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>
                     {f.sourceInvoiceId && <Tag tone="blue">🛒 فاکتور</Tag>}
@@ -769,6 +754,30 @@ export default function FlocksPage() {
                   )}
 
 
+
+                  {/* نمایش دلیل آرشیو */}
+                  {isArchived && f.archivedReason && (
+                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)' }}>
+                      <b>دلیل آرشیو:</b> {f.archivedReason}
+                    </div>
+                  )}
+
+                  {/* کنترل گله */}
+                  {!isArchived && (
+                    <>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
+                        <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🎛</span> کنترل گله
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <Btn size="sm" onClick={() => { toggleHidden(f.id); showToast(f.hidden ? 'نمایان شد' : 'پنهان شد', 'success', 1500); }} style={{ flex: 1 }}>
+                          {f.hidden ? '👁 نمایان' : '👁 پنهان'}
+                        </Btn>
+                        <Btn size="sm" onClick={() => { togglePaused(f.id); showToast(f.paused ? 'فعال شد' : 'غیرفعال شد', 'success', 1500); }} style={{ flex: 1 }}>
+                          {f.paused ? '▶️ فعال' : '⏸ غیرفعال'}
+                        </Btn>
+                      </div>
+                    </>
+                  )}
 
                   {/* نمایش دلیل آرشیو */}
                   {isArchived && f.archivedReason && (
