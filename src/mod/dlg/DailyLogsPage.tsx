@@ -12,6 +12,7 @@ import {
   totalWater
 } from './store';
 import { useFlk , isLayingReady, getAgeDays } from '../flk/store';
+import { useSet } from '../set/store';
 import { useFormat } from '../../shr/units';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useBrd } from '../brd/store';
@@ -81,6 +82,7 @@ type TabId = 'today' | 'history' | 'archive';
 
 export default function DailyLogsPage() {
   const { logs, add, update, remove, archive, restore } = useDlg();
+  const vaccineEnabled = useSet(s => (s as any).features?.vaccine !== false);
   const fmt = useFormat();
   const { flocks } = useFlk();
   const { birds, breeds } = useBrd();
@@ -595,7 +597,7 @@ const collectWhsShortages = () => {
           </Section>
         )}
 
-        {l.vaccines.length > 0 && (
+        {vaccineEnabled && l.vaccines.length > 0 && (
           <Section title="💉 واکسن">
             {l.vaccines.map(v => (
               <div key={v.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', color: 'var(--accent)' }}>
@@ -1100,6 +1102,7 @@ const collectWhsShortages = () => {
             + افزودن رکورد تلفات
           </Btn>
 
+          {vaccineEnabled && (<>
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: crypto.randomUUID(), name: '', dose: '', method: '', reaction: '', itemId: '', quantity: null, movementId: '' }] }))}>
             + افزودن واکسن
           </Btn>
@@ -1139,6 +1142,7 @@ const collectWhsShortages = () => {
               )}
             </div>
           ))}
+          </>)}
 
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, medications: [...f.medications, { id: crypto.randomUUID(), name: '', dose: '', method: '', withdrawalDays: null, itemId: '', quantity: null, movementId: '' }] }))}>
             + افزودن دارو
