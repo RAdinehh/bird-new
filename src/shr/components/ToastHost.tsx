@@ -37,7 +37,7 @@ export default function ToastHost() {
   return (
     <div style={{
       position: 'fixed',
-      top: 80,
+      top: 90,
       left: 0,
       right: 0,
       zIndex: 9999,
@@ -61,15 +61,15 @@ export default function ToastHost() {
               background: isSuccess ? 'var(--accent)' : 'var(--card-solid)',
               border: isSuccess ? 'none' : '1px solid ' + color,
               borderRadius: 12,
-              padding: '10px 14px',
-              maxWidth: 360,
+              padding: '8px 12px',
+              maxWidth: 200,
               width: '100%',
               boxShadow: isSuccess
                 ? '0 4px 12px rgba(0,0,0,.18), 0 2px 4px rgba(0,0,0,.10)'
                 : '0 4px 12px rgba(0,0,0,.12), 0 2px 4px rgba(0,0,0,.06)',
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
+              gap: 8,
               fontSize: 'var(--fs-sm)',
               fontWeight: 600,
               color: isSuccess ? 'var(--avatar-text, #fff)' : 'var(--text)',
@@ -83,11 +83,11 @@ export default function ToastHost() {
             <span
               aria-hidden="true"
               style={{
-                width: 26, height: 26, borderRadius: '50%',
+                width: 22, height: 22, borderRadius: '50%',
                 background: isSuccess ? 'rgba(255,255,255,0.22)' : 'var(--card-solid)',
                 color: isSuccess ? 'var(--avatar-text, #fff)' : color,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 14, flexShrink: 0,
+                fontSize: 12, flexShrink: 0,
               }}
             >{TYPE_ICON[t.type]}</span>
             <span style={{ flex: 1, lineHeight: 1.6, wordBreak: 'break-word' }}>{t.message}</span>
