@@ -18,7 +18,7 @@ import UndoBar from '../../cor/ui/UndoBar';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
-import { Row, SectionTitle, chip } from './helpers';
+import { Row, SectionTitle } from './helpers';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createItemSchema } from '../../shr/validation/rules/whs';
@@ -56,22 +56,9 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
-  const [filterCat, setFilterCat] = useState<ItemCategory | ''>('');
-  const [filterStatus, setFilterStatus] = useState<'' | 'ok' | 'low' | 'critical' | 'soon' | 'expired'>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const list = useMemo(() => {
-    let arr = items;
-    if (filterCat) arr = arr.filter(i => i.category === filterCat);
-    if (filterStatus) {
-      if (filterStatus === 'ok') arr = arr.filter(i => stockWarning(i) === 'ok' && expiryWarning(i) === 'ok');
-      else if (filterStatus === 'low') arr = arr.filter(i => stockWarning(i) === 'low');
-      else if (filterStatus === 'critical') arr = arr.filter(i => stockWarning(i) === 'critical');
-      else if (filterStatus === 'soon') arr = arr.filter(i => expiryWarning(i) === 'soon');
-      else if (filterStatus === 'expired') arr = arr.filter(i => expiryWarning(i) === 'expired');
-    }
-    return arr;
-  }, [items, filterCat, filterStatus]);
+  const list = items;
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -230,42 +217,6 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         actionLabel="برو به خرید ←"
         onAction={() => navigate('/tra/purchases')}
         />
-      {/* فیلتر دسته */}
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterCat('')} style={chip(filterCat === '')}>
-          همه ({toFa(items.length)})
-        </button>
-        {(Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => {
-          const cnt = items.filter(i => i.category === c).length;
-          if (cnt === 0) return null;
-          return (
-            <button key={c} onClick={() => setFilterCat(c)} style={chip(filterCat === c)}>
-              {CATEGORY_ICON[c]} {CATEGORY_LABEL[c]} ({toFa(cnt)})
-            </button>
-          );
-        })}
-      </div>
-
-      {/* فیلتر وضعیت — فقط اگر موردی وجود داشته باشد */}
-      {(() => {
-        const cLow = items.filter(i => stockWarning(i) === 'low').length;
-        const cCrit = items.filter(i => stockWarning(i) === 'critical').length;
-        const cSoon = items.filter(i => expiryWarning(i) === 'soon').length;
-        const cExp = items.filter(i => expiryWarning(i) === 'expired').length;
-        if (cLow + cCrit + cSoon + cExp === 0) return null;
-        return (
-          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-            <button onClick={() => setFilterStatus('')} style={chip(filterStatus === '')}>
-              وضعیت: همه
-            </button>
-            {cLow > 0 && <button onClick={() => setFilterStatus('low')} style={chip(filterStatus === 'low')}>🟡 کم ({toFa(cLow)})</button>}
-            {cCrit > 0 && <button onClick={() => setFilterStatus('critical')} style={chip(filterStatus === 'critical')}>🔴 تمام ({toFa(cCrit)})</button>}
-            {cSoon > 0 && <button onClick={() => setFilterStatus('soon')} style={chip(filterStatus === 'soon')}>⏰ نزدیک انقضا ({toFa(cSoon)})</button>}
-            {cExp > 0 && <button onClick={() => setFilterStatus('expired')} style={chip(filterStatus === 'expired')}>❌ منقضی ({toFa(cExp)})</button>}
-          </div>
-        );
-      })()}
-
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید
