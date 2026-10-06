@@ -133,6 +133,37 @@ export function detectAllAlerts(): RuleAlert[] {
         date: today(), notes: ''
       });
     }
+
+    // ─── تجهیزات: گارانتی نزدیک پایان ───
+    if (cat === 'equipment') {
+      const eq = item as any;
+      if (eq.warrantyUntil) {
+        const wDays = daysToExpiry(eq.warrantyUntil);
+        if (wDays !== null && wDays >= 0 && wDays <= 7) {
+          alerts.push({
+            level: 'important',
+            category: 'other',
+            title: 'گارانتی نزدیک پایان: ' + item.name,
+            message: toFa(wDays) + ' روز تا پایان گارانتی — قبل از اتمام، بررسی کنید.',
+            source: 'whs',
+            sourceId: item.id + ':warranty-ending',
+            date: today(), notes: ''
+          });
+        }
+      }
+      // ─── تجهیز در حال تعمیر ───
+      if (eq.equipmentStatus === 'repair') {
+        alerts.push({
+          level: 'important',
+          category: 'other',
+          title: 'تجهیز در تعمیر: ' + item.name,
+          message: 'این تجهیز در حال تعمیر است — پیگیری کنید.',
+          source: 'whs',
+          sourceId: item.id + ':equip-repair',
+          date: today(), notes: ''
+        });
+      }
+    }
   });
 
   // ============ ۲. معاملات ============
