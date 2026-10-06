@@ -38,6 +38,8 @@ export interface Item {
   dosePerBird?: number;            // دوز مصرفی هر پرنده
   /** موجودی اولیه هنگام ایجاد — پایه راستی‌آزمایی */
   initialStock?: number;
+  /** قیمت موجودی اولیه (برای میانگین موزون) */
+  initialPrice?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -195,7 +197,15 @@ export const useWhs = create<State>()(
       addItem: (i) => {
         assertItem(i);
         const id = uuid();
-        set({ items: [...get().items, { ...i, id, initialStock: (i as any).currentStock || 0, createdAt: now(), updatedAt: now() }] });
+        set({ items: [...get().items, {
+          ...i,
+          id,
+          initialStock: (i as any).currentStock || 0,
+          initialPrice: (i as any).initialPrice || 0,
+          avgPrice: (i as any).initialPrice || (i as any).lastPrice || 0,
+          createdAt: now(),
+          updatedAt: now()
+        }] });
         return id;
       },
       updateItem: (id, patch) => {

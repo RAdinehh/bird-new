@@ -13,8 +13,10 @@ import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { format as formatJ } from 'date-fns-jalali';
+const todayJalali = () => formatJ(new Date(), 'yyyy/MM/dd');
 import SmartSelect from '../../shr/components/SmartSelect';
-import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import { showAlert, showConfirmAsync, showPromptAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import HelpBanner from '../../shr/components/HelpBanner';
@@ -43,6 +45,7 @@ interface F {
   hallId: string;
   equipmentStatus: string;
   warrantyUntil: string;
+  initialPrice: string;
   // ─── دارو/واکسن ───
   usageType: string;
   productionDate: string;
@@ -55,7 +58,7 @@ const empty = (): F => ({
   supplierId: '', expireDate: '',
   withdrawalDays: '', batchNo: '', storage: 'room',
   notes: '',
-  purchaseDate: '', purchasePrice: '', hallId: '', equipmentStatus: 'active', warrantyUntil: '',
+  purchaseDate: '', purchasePrice: '', hallId: '', equipmentStatus: 'active', warrantyUntil: '', initialPrice: '',
   usageType: '', productionDate: '', dosePerBird: ''
 });
 
@@ -122,6 +125,45 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   };
   useFab(active ? { label: 'افزودن کالا', onClick: openNew } : null);
 
+  /** اصلاح موجودی — از prompt می‌گیره، adjust می‌سازه */
+  const adjustStock = async (it: Item) => {
+    const current = it.currentStock || 0;
+    const input = await showPromptAsync(
+      '🔄 اصلاح موجودی',
+      `موجودی فعلی: ${toFa(current)} ${UNIT_LABEL[it.unit]}\n\nموجودی واقعی چقدر است؟`,
+      {
+        placeholder: 'مثلاً — ۱۵۰',
+        confirmText: 'ثبت اصلاح',
+        defaultValue: String(current),
+      }
+    );
+    if (input === null || input === undefined) return;
+    const val = parseFloat(toEn(String(input)).replace('٫', '.')) || 0;
+    if (val === current) { toastMsg.info('موجودی تغییری نکرد'); return; }
+    const ok = await showConfirmAsync(
+      'تأیید اصلاح',
+      `موجودی از ${toFa(current)} به ${toFa(val)} ${UNIT_LABEL[it.unit]} تغییر کند؟\n(در تاریخچه ثبت می‌شود)`,
+      { danger: false }
+    );
+    if (!ok) return;
+    try {
+      const { addMovement } = useWhs.getState();
+      const newId = addMovement({
+        itemId: it.id,
+        type: 'adjust',
+        quantity: val,
+        unitPrice: 0,
+        reason: 'adjustment',
+        date: todayJalali(),
+        partyId: '',
+        notes: 'اصلاح موجودی از کارت قلم',
+      });
+      if (newId) toastMsg.saved('اصلاح موجودی');
+    } catch (e: any) {
+      showAlert(e.message || 'خطا در اصلاح موجودی');
+    }
+  };
+
   const openEdit = (it: Item) => {
     setForm({
       id: it.id, name: it.name, category: it.category, unit: it.unit,
@@ -138,6 +180,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       hallId: it.hallId || '',
       equipmentStatus: it.equipmentStatus || 'active',
       warrantyUntil: it.warrantyUntil || '',
+      initialPrice: '',
       usageType: it.usageType || '',
       productionDate: it.productionDate || '',
       dosePerBird: it.dosePerBird ? toFa(it.dosePerBird) : ''
@@ -205,6 +248,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         hallId: form.category === 'equipment' ? form.hallId : '',
         equipmentStatus: form.category === 'equipment' ? form.equipmentStatus : '',
         warrantyUntil: form.category === 'equipment' ? form.warrantyUntil : '',
+        initialPrice: num(form.initialPrice),
         usageType: isMed ? form.usageType : '',
         productionDate: isMed ? form.productionDate : '',
         dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0
@@ -406,6 +450,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                 ) : null}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+                  <Btn size="sm" onClick={() => adjustStock(it)} style={{ flex: 1 }}>🔄 اصلاح</Btn>
                   <Btn size="sm" onClick={() => openEdit(it)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = it.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = items.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteItem(idToDel);
@@ -477,14 +522,19 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         </Grid2>
 
         {!form.id ? (
-          <Grid2>
-            <Field label="موجودی اولیه" hint="فقط هنگام ایجاد">
-              <NumField placeholder="مثلاً — ۱۰۰" value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={UNIT_LABEL[form.unit]} min={0} />
+          <>
+            <Grid2>
+              <Field label="موجودی اولیه" hint="فقط هنگام ایجاد">
+                <NumField placeholder="مثلاً — ۱۰۰" value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={UNIT_LABEL[form.unit]} min={0} />
+              </Field>
+              <Field label="حداقل موجودی" hint="هشدار کمبود">
+                <NumField placeholder="مثلاً — ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
+              </Field>
+            </Grid2>
+            <Field label="قیمت موجودی اولیه" hint="اختیاری — برای محاسبه قیمت میانگین">
+              <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={form.initialPrice} onChange={e => setForm({ ...form, initialPrice: e.target.value })} />
             </Field>
-            <Field label="حداقل موجودی" hint="هشدار کمبود">
-              <NumField placeholder="مثلاً — ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
-            </Field>
-          </Grid2>
+          </>
         ) : (
           <Grid2>
             <Field label="موجودی فعلی" hint="برای تغییر، از تب «ورود/خروج» استفاده کن">
