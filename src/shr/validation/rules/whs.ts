@@ -48,7 +48,7 @@ export function createMovementSchema(_ctx: ValidationContext = {}) {
   return z.object({
     itemId: requiredId('کالا'),
     type: oneOf('نوع گردش', ['in', 'out', 'adjust'] as const),
-    quantity: floatPos('مقدار', 10_000_000),
+    quantity: floatNonNeg('مقدار', 10_000_000),
     unitPrice: floatNonNeg('قیمت واحد', 1_000_000_000_000),
     reason: oneOf('دلیل', ['purchase', 'consumption', 'sale', 'loss', 'adjustment', 'return'] as const),
     date: persianDateOpt('تاریخ'),
@@ -58,6 +58,15 @@ export function createMovementSchema(_ctx: ValidationContext = {}) {
     sourceModule: oneOf('ماژول مبدأ', ['egg', 'dlg', 'tra', 'inc', 'fed', 'manual'] as const).optional(),
     sourceId: optionalId(),
     batchNo: optionalStr(50),
+  }).superRefine((data, ctx) => {
+    // فقط adjust می‌تونه صفر باشه (تنظیم به صفر)
+    if (data.type !== 'adjust' && data.quantity <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'مقدار باید بیشتر از صفر باشد',
+        path: ['quantity'],
+      });
+    }
   });
 }
 

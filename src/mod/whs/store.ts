@@ -202,12 +202,13 @@ export const useWhs = create<State>()(
         const item = get().items.find(x => x.id === mv.itemId);
         if (item === undefined) return;
 
-        let newStock = item.currentStock;
-        if (mv.type === 'in') newStock = Math.max(0, newStock - mv.quantity);
-        else if (mv.type === 'out') newStock += mv.quantity;
+        // 🎯 محاسبه مجدد از تاریخچه بعد از حذف — درست برای همه انواع (in/out/adjust)
+        const remaining = get().movements.filter(x => x.id !== id);
+        const recalc = recalcStock(item, remaining);
+        const newStock = Math.max(0, recalc.expected);
 
         set({
-          movements: get().movements.filter(x => x.id !== id),
+          movements: remaining,
           items: get().items.map(x => x.id === mv.itemId ? { ...x, currentStock: newStock, updatedAt: now() } : x)
         });
       }
