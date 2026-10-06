@@ -57,13 +57,21 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [filterCat, setFilterCat] = useState<ItemCategory | ''>('');
+  const [filterStatus, setFilterStatus] = useState<'' | 'ok' | 'low' | 'critical' | 'soon' | 'expired'>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const list = useMemo(() => {
     let arr = items;
     if (filterCat) arr = arr.filter(i => i.category === filterCat);
+    if (filterStatus) {
+      if (filterStatus === 'ok') arr = arr.filter(i => stockWarning(i) === 'ok' && expiryWarning(i) === 'ok');
+      else if (filterStatus === 'low') arr = arr.filter(i => stockWarning(i) === 'low');
+      else if (filterStatus === 'critical') arr = arr.filter(i => stockWarning(i) === 'critical');
+      else if (filterStatus === 'soon') arr = arr.filter(i => expiryWarning(i) === 'soon');
+      else if (filterStatus === 'expired') arr = arr.filter(i => expiryWarning(i) === 'expired');
+    }
     return arr;
-  }, [items, filterCat]);
+  }, [items, filterCat, filterStatus]);
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -237,6 +245,26 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
           );
         })}
       </div>
+
+      {/* فیلتر وضعیت — فقط اگر موردی وجود داشته باشد */}
+      {(() => {
+        const cLow = items.filter(i => stockWarning(i) === 'low').length;
+        const cCrit = items.filter(i => stockWarning(i) === 'critical').length;
+        const cSoon = items.filter(i => expiryWarning(i) === 'soon').length;
+        const cExp = items.filter(i => expiryWarning(i) === 'expired').length;
+        if (cLow + cCrit + cSoon + cExp === 0) return null;
+        return (
+          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+            <button onClick={() => setFilterStatus('')} style={chip(filterStatus === '')}>
+              وضعیت: همه
+            </button>
+            {cLow > 0 && <button onClick={() => setFilterStatus('low')} style={chip(filterStatus === 'low')}>🟡 کم ({toFa(cLow)})</button>}
+            {cCrit > 0 && <button onClick={() => setFilterStatus('critical')} style={chip(filterStatus === 'critical')}>🔴 تمام ({toFa(cCrit)})</button>}
+            {cSoon > 0 && <button onClick={() => setFilterStatus('soon')} style={chip(filterStatus === 'soon')}>⏰ نزدیک انقضا ({toFa(cSoon)})</button>}
+            {cExp > 0 && <button onClick={() => setFilterStatus('expired')} style={chip(filterStatus === 'expired')}>❌ منقضی ({toFa(cExp)})</button>}
+          </div>
+        );
+      })()}
 
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
@@ -424,17 +452,17 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
 
         <Grid2>
           {!form.id && (
-            <Field label="موجودی اولیه" hint="اگه الان موجودی داری، اینجا وارد کن — بعد از این، فقط از معاملات به‌روز میشه">
+            <Field label="موجودی اولیه" hint="فقط هنگام ایجاد">
               <NumField placeholder="مثلاً — ۱۰۰" value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={UNIT_LABEL[form.unit]} min={0} />
             </Field>
           )}
-          <Field label="حداقل موجودی" hint="برای هشدار">
+          <Field label="حداقل موجودی" hint="هشدار کمبود">
             <NumField placeholder="مثلاً — ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
           </Field>
           
         </Grid2>
 
-        <Field label="تأمین‌کننده" hint="از مخاطبین">
+        <Field label="تأمین‌کننده" hint="فقط فروشنده‌ها">
 <SmartSelect
               value={form.supplierId}
               onChange={v => setForm(f => ({ ...f, supplierId: v }))}
@@ -469,7 +497,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
             {(extras.needsWithdrawal || extras.needsStorage) && (
               <Grid2>
                 {extras.needsWithdrawal && (
-                  <Field label="دوره منع مصرف" hint="روز">
+                  <Field label="دوره منع مصرف">
                     <NumField placeholder="مثلاً — ۳" value={form.withdrawalDays} onChange={e => setForm({ ...form, withdrawalDays: e.target.value })} unit="روز" min={0} />
                   </Field>
                 )}
