@@ -228,21 +228,6 @@ export default function GuideTab() {
 
   return (
     <PageContainer>
-      <div style={{
-        padding: '12px 14px',
-        background: 'var(--accent-soft)',
-        border: '1px solid var(--accent-border)',
-        borderRadius: 'var(--r-md)',
-        marginBottom: 10,
-      }}>
-        <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
-          📚 راهنمای علمی مدیریت مرغداری
-        </div>
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: 4, lineHeight: 1.7 }}>
-          نسخه {GUIDE_CONTENT.version} — به‌روزرسانی {GUIDE_CONTENT.lastUpdated}
-        </div>
-      </div>
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div style={{
           fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700,
