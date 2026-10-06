@@ -83,6 +83,7 @@ type TabId = 'today' | 'history' | 'archive';
 export default function DailyLogsPage() {
   const { logs, add, update, remove, archive, restore } = useDlg();
   const vaccineEnabled = useSet(s => (s as any).features?.vaccine !== false);
+  const medicineEnabled = useSet(s => (s as any).features?.medicine !== false);
   const fmt = useFormat();
   const { flocks } = useFlk();
   const { birds, breeds } = useBrd();
@@ -607,7 +608,7 @@ const collectWhsShortages = () => {
           </Section>
         )}
 
-        {l.medications.length > 0 && (
+        {medicineEnabled && l.medications.length > 0 && (
           <Section title="💊 دارو">
             {l.medications.map(m => (
               <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: 'var(--text)' }}>
@@ -1144,6 +1145,7 @@ const collectWhsShortages = () => {
           ))}
           </>)}
 
+          {medicineEnabled && (<>
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, medications: [...f.medications, { id: crypto.randomUUID(), name: '', dose: '', method: '', withdrawalDays: null, itemId: '', quantity: null, movementId: '' }] }))}>
             + افزودن دارو
           </Btn>
@@ -1183,6 +1185,7 @@ const collectWhsShortages = () => {
               )}
             </div>
           ))}
+          </>)}
 
           <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🔧</span> فعالیت‌ها</SectionTitle>
 
