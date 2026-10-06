@@ -425,9 +425,25 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         title={form.id ? 'ویرایش قلم' : 'افزودن قلم'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
-        <Field label="نام قلم" required error={vErrors.name}>
-          <Input placeholder="مثلاً — ذرت، نیوکاسل، ویتامین..." value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-        </Field>
+        <Grid2>
+          <Field label="نام قلم" required error={vErrors.name}>
+            <Input placeholder="ذرت، نیوکاسل، ویتامین..." value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+          </Field>
+          <Field label="تأمین‌کننده" hint="فقط فروشنده‌ها">
+            <SmartSelect
+              value={form.supplierId}
+              onChange={v => setForm(f => ({ ...f, supplierId: v }))}
+              options={suppliers.map(c => ({
+                value: c.id,
+                label: c.name,
+                subtitle: (s => s.phone || undefined)(c),
+              }))}
+              placeholder="— انتخاب —"
+              modalTitle="انتخاب فروشنده"
+              autoThreshold={6}
+            />
+          </Field>
+        </Grid2>
 
         <Grid2>
           <Field label="دسته" required error={vErrors.category}>
@@ -457,32 +473,20 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
           </Field>
         </Grid2>
 
-        <Grid2>
-          {!form.id && (
+        {!form.id ? (
+          <Grid2>
             <Field label="موجودی اولیه" hint="فقط هنگام ایجاد">
               <NumField placeholder="مثلاً — ۱۰۰" value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={UNIT_LABEL[form.unit]} min={0} />
             </Field>
-          )}
+            <Field label="حداقل موجودی" hint="هشدار کمبود">
+              <NumField placeholder="مثلاً — ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
+            </Field>
+          </Grid2>
+        ) : (
           <Field label="حداقل موجودی" hint="هشدار کمبود">
             <NumField placeholder="مثلاً — ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
           </Field>
-          
-        </Grid2>
-
-        <Field label="تأمین‌کننده" hint="فقط فروشنده‌ها">
-<SmartSelect
-              value={form.supplierId}
-              onChange={v => setForm(f => ({ ...f, supplierId: v }))}
-              options={suppliers.map(c => ({
-                value: c.id,
-                label: c.name,
-                subtitle: (s => s.phone || undefined)(c),
-              }))}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب فروشنده"
-              autoThreshold={6}
-            />
-        </Field>
+        )}
 
         {hasExtras && (
           <>
@@ -551,8 +555,8 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
               <Field label="تاریخ خرید">
                 <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} />
               </Field>
-              <Field label="قیمت خرید (کل)">
-                <MoneyField placeholder="مثلاً — ۵٬۰۰۰٬۰۰۰" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
+              <Field label="گارانتی تا" hint="اختیاری">
+                <DatePicker value={form.warrantyUntil} onChange={v => setForm({ ...form, warrantyUntil: v })} />
               </Field>
             </Grid2>
             <Grid2>
@@ -570,8 +574,8 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                 </Select>
               </Field>
             </Grid2>
-            <Field label="گارانتی تا" hint="اختیاری — برای هشدار تموم‌شدن">
-              <DatePicker value={form.warrantyUntil} onChange={v => setForm({ ...form, warrantyUntil: v })} />
+            <Field label="قیمت خرید (کل)">
+              <MoneyField placeholder="مثلاً — ۵٬۰۰۰٬۰۰۰" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
             </Field>
           </>
         )}
