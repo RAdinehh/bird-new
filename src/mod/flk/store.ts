@@ -226,9 +226,8 @@ export function getLifecycle(
     return { stage: 'end', label: 'پایان دوره', color: 'gray', progress: 100 };
   }
 
-  if (ageDays <= 7) return { stage: 'chick1', label: 'جوجه یک‌روزه', color: 'blue', progress: p };
-  if (ageDays <= 28) return { stage: 'chick2', label: 'نیمچه', color: 'blue', progress: p };
-  if (ageDays <= 70) return { stage: 'growing', label: 'در حال رشد', color: 'blue', progress: p };
+  if (ageDays <= 7) return { stage: 'chick1', label: 'جوجه', color: 'blue', progress: p };
+  if (ageDays <= 90) return { stage: 'chick2', label: 'نیمچه', color: 'blue', progress: p };
   if (ageDays <= 120) return { stage: 'grower', label: 'پولت', color: 'amber', progress: p };
   if (ageDays <= 140) return { stage: 'prelayer', label: 'پیش‌تخم‌گذار', color: 'amber', progress: p };
   if (ageDays <= cycle) return { stage: 'layer', label: 'تخم‌گذار', color: 'green', progress: p };
