@@ -6,6 +6,7 @@ import { CHAPTER_EQUIPMENT } from './04-equipment';
 import { CHAPTER_CALCULATIONS } from './05-calculations';
 import { CHAPTER_SOURCES } from './06-sources';
 import { CHAPTER_GLOSSARY } from './07-glossary';
+import { CHAPTER_GROWTH_STAGES } from './08-growth-stages';
 
 export const GUIDE_CONTENT: GuideContent = {
   version: '1.0.0',
@@ -18,5 +19,6 @@ export const GUIDE_CONTENT: GuideContent = {
     CHAPTER_CALCULATIONS,
     CHAPTER_SOURCES,
     CHAPTER_GLOSSARY,
+    CHAPTER_GROWTH_STAGES,
   ],
 };
