@@ -14,7 +14,7 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import SmartSelect from '../../shr/components/SmartSelect';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
-import { Row, SectionTitle, chip } from './helpers';
+import { Row, SectionTitle } from './helpers';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createMovementSchema } from '../../shr/validation/rules/whs';
@@ -43,21 +43,11 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
   });
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
-  const [filterType, setFilterType] = useState<MovementType | ''>('');
-  const [filterReason, setFilterReason] = useState<MovementReason | ''>('');
-  const [filterCat, setFilterCat] = useState<string>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const list = useMemo(() => {
-    let arr = [...movements];
-    if (filterType) arr = arr.filter(m => m.type === filterType);
-    if (filterReason) arr = arr.filter(m => m.reason === filterReason);
-    if (filterCat) {
-      const catIds = new Set(items.filter(i => i.category === filterCat).map(i => i.id));
-      arr = arr.filter(m => catIds.has(m.itemId));
-    }
-    return arr.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 100);
-  }, [movements, filterType, filterReason, filterCat, items]);
+    return [...movements].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 100);
+  }, [movements]);
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -207,51 +197,6 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
         actionLabel="برو به معاملات ←"
         onAction={() => navigate('/tra/purchases')}
         />
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterType('')} style={chip(filterType === '')}>
-          همه ({toFa(movements.length)})
-        </button>
-        <button onClick={() => setFilterType('in')} style={chip(filterType === 'in')}>
-          📥 ورود ({toFa(movements.filter(m => m.type === 'in').length)})
-        </button>
-        <button onClick={() => setFilterType('out')} style={chip(filterType === 'out')}>
-          📤 خروج ({toFa(movements.filter(m => m.type === 'out').length)})
-        </button>
-      </div>
-
-      {/* فیلتر دلیل */}
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterReason('')} style={chip(filterReason === '')}>
-          دلیل: همه
-        </button>
-        {(Object.keys(MOVEMENT_REASON) as MovementReason[]).map(r => {
-          const cnt = movements.filter(m => m.reason === r).length;
-          if (cnt === 0) return null;
-          return (
-            <button key={r} onClick={() => setFilterReason(r)} style={chip(filterReason === r)}>
-              {MOVEMENT_REASON[r]} ({toFa(cnt)})
-            </button>
-          );
-        })}
-      </div>
-
-      {/* فیلتر دسته */}
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterCat('')} style={chip(filterCat === '')}>
-          دسته: همه
-        </button>
-        {(Object.keys(CATEGORY_LABEL) as string[]).map(c => {
-          const catIds = new Set(items.filter(i => i.category === c).map(i => i.id));
-          const cnt = movements.filter(m => catIds.has(m.itemId)).length;
-          if (cnt === 0) return null;
-          return (
-            <button key={c} onClick={() => setFilterCat(c)} style={chip(filterCat === c)}>
-              {CATEGORY_ICON[c as keyof typeof CATEGORY_ICON]} {CATEGORY_LABEL[c as keyof typeof CATEGORY_LABEL]} ({toFa(cnt)})
-            </button>
-          );
-        })}
-      </div>
-
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید
