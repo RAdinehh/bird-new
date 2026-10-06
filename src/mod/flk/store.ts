@@ -196,8 +196,17 @@ export interface Lifecycle {
   progress: number;
 }
 
-export function getLifecycle(type: FlockType, ageDays: number, endOfCycleDay?: number | null): Lifecycle {
-  const cycle = endOfCycleDay && endOfCycleDay > 0 ? endOfCycleDay : (type === 'broiler' ? 42 : 500);
+export function getLifecycle(
+  type: FlockType,
+  ageDays: number,
+  endOfCycleDay?: number | null,
+  birdCycleDays?: number | null,
+): Lifecycle {
+  // اولویت: endOfCycleDay گله > cycleDays پرنده > پیش‌فرض صنعتی
+  const cycle =
+    (endOfCycleDay && endOfCycleDay > 0) ? endOfCycleDay :
+    (birdCycleDays && birdCycleDays > 0) ? birdCycleDays :
+    (type === 'broiler' ? 42 : 500);
   const p = (ageDays / cycle) * 100;
 
   if (type === 'broiler') {

@@ -43,7 +43,7 @@ export default function FlockReportPage() {
       ? myProductions.reduce((a, p) => a + brokenRate(p), 0) / myProductions.length
       : 0;
     const bird = birds.find(b => b.id === f.birdId);
-    const lc = getLifecycle(f.type, getAgeDays(f), f.endOfCycleDay ?? null);
+    const lc = getLifecycle(f.type, getAgeDays(f), f.endOfCycleDay ?? null, bird?.cycleDays ?? null);
 
     return {
       flock: f,
