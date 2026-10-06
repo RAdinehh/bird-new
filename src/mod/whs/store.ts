@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { parse as parseJ, differenceInCalendarDays as diffCalDays, startOfDay } from 'date-fns-jalali';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
+import { validate } from '../../shr/validation/helpers';
+import { createItemSchema, createMovementSchema } from '../../shr/validation/rules/whs';
 
 export type ItemCategory = 'feed' | 'medicine' | 'vaccine' | 'herbal' | 'equipment' | 'consumable' | 'egg';
 export type ItemUnit = 'kg' | 'g' | 'L' | 'ml' | 'pcs' | 'vial' | 'pack';
@@ -86,6 +88,24 @@ export function generateBatchNo(date: string, existingMovements: Movement[], ite
 
 const now = () => new Date().toISOString();
 
+/** اعتبارسنجی Item — پرتاب خطا در صورت نامعتبر */
+function assertItem(data: any): void {
+  const r = validate(createItemSchema({}), data);
+  if (!r.ok) {
+    const msgs = Object.values(r.errors).join(' · ');
+    throw new Error('اعتبارسنجی کالا: ' + msgs);
+  }
+}
+
+/** اعتبارسنجی Movement */
+function assertMovement(data: any): void {
+  const r = validate(createMovementSchema({}), data);
+  if (!r.ok) {
+    const msgs = Object.values(r.errors).join(' · ');
+    throw new Error('اعتبارسنجی گردش: ' + msgs);
+  }
+}
+
 /**
  * recalcStock — محاسبه موجودی از تاریخچه تراکنش‌ها
  * expected = initialStock + Σ(in) − Σ(out) + Σ(adjust net)
@@ -138,17 +158,23 @@ export const useWhs = create<State>()(
       movements: [],
 
       addItem: (i) => {
+        assertItem(i);
         const id = uuid();
         set({ items: [...get().items, { ...i, id, initialStock: (i as any).currentStock || 0, createdAt: now(), updatedAt: now() }] });
         return id;
       },
-      updateItem: (id, patch) => set({ items: get().items.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) }),
+      updateItem: (id, patch) => {
+        const current = get().items.find(x => x.id === id);
+        if (current) assertItem({ ...current, ...patch });
+        set({ items: get().items.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) });
+      },
       deleteItem: (id) => set({
         items: get().items.filter(x => x.id !== id),
         movements: get().movements.filter(x => x.itemId !== id)
       }),
 
       addMovement: (m) => {
+        assertMovement(m);
         const item = get().items.find(x => x.id === m.itemId);
         if (item === undefined) return '';
 
