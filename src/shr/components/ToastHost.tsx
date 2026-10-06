@@ -37,20 +37,20 @@ export default function ToastHost() {
   return (
     <div style={{
       position: 'fixed',
-      top: 68,
+      top: 80,
       left: 0,
       right: 0,
       zIndex: 9999,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      gap: 4,
+      gap: 6,
       pointerEvents: 'none',
       padding: '0 12px',
     }}>
       {toasts.map((t: Toast) => {
         const color = TYPE_COLOR[t.type];
-        const soft = TYPE_SOFT[t.type];
+        const isSuccess = t.type === 'success';
         return (
           <div
             key={t.id}
@@ -58,19 +58,21 @@ export default function ToastHost() {
             role="status"
             aria-live="polite"
             style={{
-              background: 'var(--card-solid)',
-              border: '1px solid ' + color,
-              borderRight: '3px solid ' + color,
-              borderRadius: 'var(--r-md)',
-              padding: '6px 10px',
-              maxWidth: 300,
-              boxShadow: '0 3px 10px rgba(0,0,0,.10), 0 1px 3px rgba(0,0,0,.06)',
+              background: isSuccess ? 'var(--accent)' : 'var(--card-solid)',
+              border: isSuccess ? 'none' : '1px solid ' + color,
+              borderRadius: 12,
+              padding: '10px 14px',
+              maxWidth: 360,
+              width: '100%',
+              boxShadow: isSuccess
+                ? '0 4px 12px rgba(0,0,0,.18), 0 2px 4px rgba(0,0,0,.10)'
+                : '0 4px 12px rgba(0,0,0,.12), 0 2px 4px rgba(0,0,0,.06)',
               display: 'flex',
               alignItems: 'center',
-              gap: 6,
-              fontSize: 'var(--fs-xs)',
+              gap: 10,
+              fontSize: 'var(--fs-sm)',
               fontWeight: 600,
-              color: 'var(--text)',
+              color: isSuccess ? 'var(--avatar-text, #fff)' : 'var(--text)',
               pointerEvents: 'auto',
               cursor: 'pointer',
               animation: 'pmToastIn 220ms cubic-bezier(.16,1,.3,1)',
@@ -81,10 +83,11 @@ export default function ToastHost() {
             <span
               aria-hidden="true"
               style={{
-                width: 22, height: 22, borderRadius: '50%',
-                background: soft, color: color,
+                width: 26, height: 26, borderRadius: '50%',
+                background: isSuccess ? 'rgba(255,255,255,0.22)' : 'var(--card-solid)',
+                color: isSuccess ? 'var(--avatar-text, #fff)' : color,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 12, flexShrink: 0,
+                fontSize: 14, flexShrink: 0,
               }}
             >{TYPE_ICON[t.type]}</span>
             <span style={{ flex: 1, lineHeight: 1.6, wordBreak: 'break-word' }}>{t.message}</span>
