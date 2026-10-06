@@ -274,7 +274,7 @@ describe('سناریو — ماه عملیات ذرت', () => {
     expect(stock()).toBe(780);
     am({ itemId: id, type: 'in', quantity: 500, unitPrice: 18000, date: '1405/07/15' });
     expect(stock()).toBe(1280);
-    am({ itemId: id, type: 'out', quantity: 200, unitPrice: 25000, reason: 'sale', date: '1405/07/22' });
+    am({ itemId: id, type: 'out', quantity: 200, unitPrice: 25000, reason: 'gift', date: '1405/07/22' });
     expect(stock()).toBe(1080);
     am({ itemId: id, type: 'adjust', quantity: 1050, reason: 'adjustment', date: '1405/07/29' });
     expect(stock()).toBe(1050);

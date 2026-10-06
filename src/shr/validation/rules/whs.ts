@@ -50,7 +50,7 @@ export function createMovementSchema(_ctx: ValidationContext = {}) {
     type: oneOf('نوع گردش', ['in', 'out', 'adjust'] as const),
     quantity: floatNonNeg('مقدار', 1_000_000_000),
     unitPrice: floatNonNeg('قیمت واحد', 1_000_000_000_000),
-    reason: oneOf('دلیل', ['purchase', 'consumption', 'sale', 'loss', 'adjustment', 'return'] as const),
+    reason: oneOf('دلیل', ['purchase', 'consumption', 'sale', 'gift', 'loss', 'adjustment', 'return'] as const),
     date: persianDateOpt('تاریخ'),
     partyId: optionalId(),
     notes: optionalStr(500),

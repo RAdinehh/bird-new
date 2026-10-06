@@ -8,7 +8,7 @@ import { createItemSchema, createMovementSchema } from '../../shr/validation/rul
 export type ItemCategory = 'feed' | 'medicine' | 'vaccine' | 'herbal' | 'equipment' | 'consumable' | 'egg';
 export type ItemUnit = 'kg' | 'g' | 'L' | 'ml' | 'pcs' | 'vial' | 'pack';
 export type MovementType = 'in' | 'out' | 'adjust';
-export type MovementReason = 'purchase' | 'consumption' | 'sale' | 'loss' | 'adjustment' | 'return';
+export type MovementReason = 'purchase' | 'consumption' | 'sale' | 'gift' | 'loss' | 'adjustment' | 'return';
 
 export interface Item {
   id: string;
@@ -330,9 +330,10 @@ export const UNIT_LABEL: Record<ItemUnit, string> = {
 };
 
 export const MOVEMENT_REASON: Record<MovementReason, string> = {
-  purchase: '🛒 خرید',
+  purchase: '🛒 خرید نقدی',
   consumption: '🍽 مصرف',
   sale: '💰 فروش',
+  gift: '🎁 هدیه',
   loss: '⚠️ ضایعات',
   adjustment: '🔄 اصلاح',
   return: '↩️ برگشت',

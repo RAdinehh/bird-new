@@ -32,8 +32,8 @@ interface F {
 }
 
 const REASONS_BY_TYPE: Record<MovementType, MovementReason[]> = {
-  in:  ['purchase', 'return', 'adjustment'],
-  out: ['consumption', 'sale', 'loss', 'return', 'adjustment'],
+  in:  ['purchase', 'gift', 'return', 'adjustment'],
+  out: ['consumption', 'gift', 'loss', 'return', 'adjustment'],
   adjust: ['adjustment'],
 };
 
@@ -140,8 +140,8 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
   const currentStock = selectedItem ? selectedItem.currentStock : 0;
 
   const save = async () => {
-    if ((form.reason === 'purchase' || form.reason === 'sale') && !form.partyId) {
-      setErr(form.reason === 'purchase' ? 'فروشنده اجباری است' : 'مشتری اجباری است');
+    if (form.reason === 'purchase' && !form.partyId) {
+      setErr('فروشنده اجباری است');
       return;
     }
 

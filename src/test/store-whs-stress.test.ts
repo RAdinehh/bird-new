@@ -147,7 +147,7 @@ describe('🌪️ سناریو ۵ — داده‌های ظریف', () => {
   it('اعداد بزرگ ۹۹۹ میلیون', () => {
     const id = ai({ currentStock: 0 });
     am({ itemId: id, type: 'in', quantity: 999_999_999 });
-    am({ itemId: id, type: 'out', quantity: 500_000_000, reason: 'sale' });
+    am({ itemId: id, type: 'out', quantity: 500_000_000, reason: 'gift' });
     expect(stock()).toBe(499_999_999);
     expect(recalcStock(IT()[0], MV()).drift).toBe(0);
   });
@@ -174,11 +174,11 @@ describe('🌪️ سناریو ۷ — خرید، فروش، برگشت، باز�
     // خرید اول
     const p1 = am({ itemId: id, type: 'in', quantity: 1000, unitPrice: 15000, reason: 'purchase' });
     // فروش به مشتری
-    const s1 = am({ itemId: id, type: 'out', quantity: 300, unitPrice: 22000, reason: 'sale' });
+    const s1 = am({ itemId: id, type: 'out', quantity: 300, unitPrice: 22000, reason: 'gift' });
     // مشتری برگرداند
     const r1 = am({ itemId: id, type: 'in', quantity: 50, unitPrice: 22000, reason: 'return' });
     // فروش دوباره
-    const s2 = am({ itemId: id, type: 'out', quantity: 200, unitPrice: 24000, reason: 'sale' });
+    const s2 = am({ itemId: id, type: 'out', quantity: 200, unitPrice: 24000, reason: 'gift' });
     // خرید دوم
     const p2 = am({ itemId: id, type: 'in', quantity: 500, unitPrice: 17000, reason: 'purchase' });
     // مصرف
