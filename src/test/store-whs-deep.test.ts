@@ -106,10 +106,12 @@ describe('addMovement — out', () => {
     am({ itemId: id, type: 'out', quantity: 50, reason: 'consumption' });
     expect(stock()).toBe(0);
   });
-  it('خروج بیشتر از موجودی → clamp (shows bug)', () => {
+  it('خروج بیشتر از موجودی → اجازه منفی (soft)', () => {
     const id = ai({ currentStock: 50 });
     am({ itemId: id, type: 'out', quantity: 100, reason: 'consumption' });
-    expect(stock()).toBe(0); // به صفر می‌رسه، ولی ۱۰۰ خروج ثبت شده
+    expect(stock()).toBe(-50); // ✅ الان حقیقت نمایان می‌شه
+    const r = recalcStock(IT()[0], MV());
+    expect(r.drift).toBe(0);
   });
   it('خروج صفر → Zod می‌گیره', () => {
     const id = ai({ currentStock: 50 });

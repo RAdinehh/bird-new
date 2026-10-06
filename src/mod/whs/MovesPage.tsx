@@ -133,7 +133,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
   const selectedItem = items.find(i => i.id === form.itemId);
   const currentStock = selectedItem ? selectedItem.currentStock : 0;
 
-  const save = () => {
+  const save = async () => {
     if ((form.reason === 'purchase' || form.reason === 'sale') && !form.partyId) {
       setErr(form.reason === 'purchase' ? 'فروشنده اجباری است' : 'مشتری اجباری است');
       return;
@@ -144,8 +144,14 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
     const qty = num(form.quantity);
     if (qty <= 0) { setErr('تعداد باید بیشتر از صفر باشد'); return; }
     if (form.type === 'out' && qty > currentStock) {
-      setErr(`موجودی (${toFa(currentStock)}) کافی نیست`);
-      return;
+      const ok = await showConfirmAsync(
+        '⚠️ موجودی کافی نیست',
+        `موجودی فعلی: ${toFa(currentStock)} ${selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}\n` +
+        `مقدار خروج: ${toFa(qty)}\n\n` +
+        `با ثبت این گردش، موجودی منفی می‌شود. ادامه می‌دهید؟`,
+        { danger: true }
+      );
+      if (!ok) return;
     }
 
     const data = {

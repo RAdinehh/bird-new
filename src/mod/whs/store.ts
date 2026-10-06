@@ -180,7 +180,7 @@ export const useWhs = create<State>()(
 
         let newStock = item.currentStock;
         if (m.type === 'in') newStock += m.quantity;
-        else if (m.type === 'out') newStock = Math.max(0, newStock - m.quantity);
+        else if (m.type === 'out') newStock = newStock - m.quantity;  // soft: اجازه منفی (UI هشدار می‌ده)
         else newStock = m.quantity;
 
         const newId = uuid();
@@ -205,7 +205,7 @@ export const useWhs = create<State>()(
         // 🎯 محاسبه مجدد از تاریخچه بعد از حذف — درست برای همه انواع (in/out/adjust)
         const remaining = get().movements.filter(x => x.id !== id);
         const recalc = recalcStock(item, remaining);
-        const newStock = Math.max(0, recalc.expected);
+        const newStock = recalc.expected;  // soft: اجازه منفی
 
         set({
           movements: remaining,

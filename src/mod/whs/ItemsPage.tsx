@@ -311,6 +311,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : it.id)}
                 badge={
+                  it.currentStock < 0 ? <Tag tone="red">⚠️ منفی</Tag> :
                   stock === 'critical' ? <Tag tone="red">تمام شد</Tag> :
                   stock === 'low' ? <Tag tone="amber">کم</Tag> :
                   exp === 'expired' ? <Tag tone="red">منقضی</Tag> :
