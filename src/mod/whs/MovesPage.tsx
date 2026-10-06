@@ -318,12 +318,21 @@ export default function MovesPage() {
         title="ثبت گردش انبار"
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
-        <Field label="نوع گردش" required>
-          <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as MovementType })}>
-            <option value="in"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> ورود به انبار</option>
-            <option value="out"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📤</span> خروج از انبار</option>
-          </Select>
-        </Field>
+        <Grid2>
+          <Field label="نوع گردش" required>
+            <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as MovementType })}>
+              <option value="in">📥 ورود به انبار</option>
+              <option value="out">📤 خروج از انبار</option>
+            </Select>
+          </Field>
+          <Field label="دلیل" required error={vErrors.reason}>
+            <Select value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value as MovementReason })}>
+              {(Object.keys(MOVEMENT_REASON) as MovementReason[]).map(r =>
+                <option key={r} value={r}>{MOVEMENT_REASON[r]}</option>
+              )}
+            </Select>
+          </Field>
+        </Grid2>
 
         <Field label="کالا" required hint={selectedItem ? `موجودی فعلی — ${toFa(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined}>
           <SmartSelect
@@ -361,54 +370,46 @@ export default function MovesPage() {
         </Grid2>
 
         <Grid2>
-          <Field label="دلیل" required error={vErrors.reason}>
-            <Select value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value as MovementReason })}>
-              {(Object.keys(MOVEMENT_REASON) as MovementReason[]).map(r =>
-                <option key={r} value={r}>{MOVEMENT_REASON[r]}</option>
-              )}
-            </Select>
-          </Field>
           <Field label="تاریخ" required error={vErrors.date}>
             <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
           </Field>
+          {!isAdjustment && (
+            <Field
+              label={partyLabel}
+              required={partyRequired}
+              hint={partyRequired ? undefined : 'اختیاری — از مخاطبین'}
+            >
+              {filteredContacts.length === 0 ? (
+                <div style={{
+                  padding: 'var(--pad-normal)',
+                  background: 'var(--warn-soft)',
+                  border: '1px dashed var(--warn)',
+                  borderRadius: 'var(--r-sm)',
+                  fontSize: 'var(--fs-xs)',
+                  color: 'var(--warn)',
+                  fontWeight: 600,
+                }}>
+                  ⚠️ {isPurchase ? 'هیچ فروشنده‌ای تعریف نشده' : isSale ? 'هیچ مشتری‌ای تعریف نشده' : 'مخاطبی تعریف نشده'} — از بخش «مخاطبین» اضافه کنید
+                </div>
+              ) : (
+                <SmartSelect
+                  value={form.partyId}
+                  onChange={v => setForm({ ...form, partyId: v })}
+                  options={filteredContacts.map(c => ({
+                    value: c.id,
+                    label: c.name,
+                    subtitle: c.roles.length > 0
+                      ? c.roles.map(r => r === 'customer' ? 'مشتری' : r === 'supplier' ? 'فروشنده' : 'کارگر').join('، ')
+                      : undefined,
+                  }))}
+                  placeholder={partyRequired ? `— انتخاب ${partyLabel} —` : '— بدون مخاطب —'}
+                  modalTitle={`انتخاب ${partyLabel}`}
+                  autoThreshold={6}
+                />
+              )}
+            </Field>
+          )}
         </Grid2>
-
-        {!isAdjustment && (
-          <Field
-            label={partyLabel}
-            required={partyRequired}
-            hint={partyRequired ? undefined : 'اختیاری — از مخاطبین'}
-          >
-            {filteredContacts.length === 0 ? (
-              <div style={{
-                padding: 'var(--pad-normal)',
-                background: 'var(--warn-soft)',
-                border: '1px dashed var(--warn)',
-                borderRadius: 'var(--r-sm)',
-                fontSize: 'var(--fs-xs)',
-                color: 'var(--warn)',
-                fontWeight: 600,
-              }}>
-                ⚠️ {isPurchase ? 'هیچ فروشنده‌ای تعریف نشده' : isSale ? 'هیچ مشتری‌ای تعریف نشده' : 'مخاطبی تعریف نشده'} — از بخش «مخاطبین» اضافه کنید
-              </div>
-            ) : (
-              <SmartSelect
-                value={form.partyId}
-                onChange={v => setForm({ ...form, partyId: v })}
-                options={filteredContacts.map(c => ({
-                  value: c.id,
-                  label: c.name,
-                  subtitle: c.roles.length > 0
-                    ? c.roles.map(r => r === 'customer' ? 'مشتری' : r === 'supplier' ? 'فروشنده' : 'کارگر').join('، ')
-                    : undefined,
-                }))}
-                placeholder={partyRequired ? `— انتخاب ${partyLabel} —` : '— بدون مخاطب —'}
-                modalTitle={`انتخاب ${partyLabel}`}
-                autoThreshold={6}
-              />
-            )}
-          </Field>
-        )}
 
         <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />

@@ -428,7 +428,7 @@ export default function ItemsPage() {
           </Field>
         </Grid2>
 
-        <Grid3>
+        <Grid2>
           {!form.id && (
             <Field label="موجودی اولیه" hint="اگه الان موجودی داری، اینجا وارد کن — بعد از این، فقط از معاملات به‌روز میشه">
               <NumField placeholder="مثلاً — ۱۰۰" value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={UNIT_LABEL[form.unit]} min={0} />
@@ -438,7 +438,7 @@ export default function ItemsPage() {
             <NumField placeholder="مثلاً — ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
           </Field>
           
-        </Grid3>
+        </Grid2>
 
         <Field label="تأمین‌کننده" hint="از مخاطبین">
 <SmartSelect
