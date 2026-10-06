@@ -187,6 +187,12 @@ export default function ListCards({
                                 </span>
                               </div>
 
+                              {/* اعداد دو سر — بالای نوار */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--muted)', fontWeight: 600, marginBottom: 2, paddingRight: 2, paddingLeft: 2 }}>
+                                <span>۱</span>
+                                <span>{toFa(cycleDays)} روز</span>
+                              </div>
+
                               {/* نوار با نقطه متحرک و بج عدد */}
                               <div style={{ position: 'relative', paddingTop: 26, paddingBottom: 4 }}>
                                 {/* نوار اصلی */}
@@ -207,11 +213,11 @@ export default function ListCards({
                                   }} />
                                 </div>
 
-                                {/* نقطه متحرک */}
+                                {/* نقطه متحرک — وسط نوار */}
                                 <div style={{
                                   position: 'absolute',
                                   right: `calc(${clampedPct}% - 8px)`,
-                                  top: 18,
+                                  top: 23,
                                   width: 16,
                                   height: 16,
                                   borderRadius: '50%',
@@ -219,6 +225,7 @@ export default function ListCards({
                                   border: '3px solid var(--card-solid)',
                                   boxShadow: '0 2px 6px rgba(0,0,0,.15)',
                                   transition: 'right .3s',
+                                  zIndex: 2,
                                 }} />
 
                                 {/* بج عدد سن — بالای نقطه */}
@@ -246,7 +253,7 @@ export default function ListCards({
                                   right: `calc(${clampedPct}% - 1px)`,
                                   top: 18,
                                   width: 2,
-                                  height: 8,
+                                  height: 5,
                                   background: progressColor,
                                   opacity: 0.5,
                                   transition: 'right .3s',
@@ -270,12 +277,6 @@ export default function ListCards({
                                     />
                                   );
                                 })}
-                              </div>
-
-                              {/* اعداد دو سر نوار */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 10, color: 'var(--muted)', fontWeight: 600 }}>
-                                <span>۱</span>
-                                <span>{toFa(cycleDays)} روز</span>
                               </div>
 
                               {/* برچسب مرحله‌ها زیر نوار */}
