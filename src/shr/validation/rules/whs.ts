@@ -48,7 +48,7 @@ export function createMovementSchema(_ctx: ValidationContext = {}) {
   return z.object({
     itemId: requiredId('کالا'),
     type: oneOf('نوع گردش', ['in', 'out', 'adjust'] as const),
-    quantity: floatNonNeg('مقدار', 10_000_000),
+    quantity: floatNonNeg('مقدار', 1_000_000_000),
     unitPrice: floatNonNeg('قیمت واحد', 1_000_000_000_000),
     reason: oneOf('دلیل', ['purchase', 'consumption', 'sale', 'loss', 'adjustment', 'return'] as const),
     date: persianDateOpt('تاریخ'),

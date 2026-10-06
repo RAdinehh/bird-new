@@ -188,13 +188,14 @@ describe('deleteMovement — برگشت', () => {
     dm(mid);
     expect(stock()).toBe(200);
   });
-  it('حذف adjust → کد فعلی برنمی‌گردونه (باگ)', () => {
+  it('حذف adjust → بازگشت به مقدار قبلی', () => {
     const id = ai({ currentStock: 100 });
     const mid = am({ itemId: id, type: 'adjust', quantity: 60, reason: 'adjustment' });
     expect(stock()).toBe(60);
     dm(mid);
-    // انتظار: 100 — ولی فعلاً 60 می‌مونه چون deleteMovement برای adjust کار نمی‌کنه
-    expect(stock()).toBe(60); // ← نشان‌دهنده باگ
+    // حالا deleteMovement با recalc کار می‌کنه → 100 برمی‌گرده
+    expect(stock()).toBe(100);
+    expect(recalcStock(IT()[0], MV()).drift).toBe(0);
   });
 });
 
