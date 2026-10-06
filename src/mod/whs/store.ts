@@ -330,8 +330,12 @@ export const UNIT_LABEL: Record<ItemUnit, string> = {
 };
 
 export const MOVEMENT_REASON: Record<MovementReason, string> = {
-  purchase: 'خرید', consumption: 'مصرف', sale: 'فروش',
-  loss: 'ضایعات', adjustment: 'اصلاح', return: 'برگشت'
+  purchase: '🛒 خرید',
+  consumption: '🍽 مصرف',
+  sale: '💰 فروش',
+  loss: '⚠️ ضایعات',
+  adjustment: '🔄 اصلاح',
+  return: '↩️ برگشت',
 };
 
 export const STORAGE_LABEL: Record<string, string> = {
