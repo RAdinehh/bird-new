@@ -354,15 +354,15 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
           </Field>
         </Grid2>
 
-        <Grid2>
-          <Field label="تاریخ" required error={vErrors.date}>
-            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
-          </Field>
-          {!isAdjustment && (
+        {!isAdjustment ? (
+          <Grid2>
+            <Field label="تاریخ" required error={vErrors.date}>
+              <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
+            </Field>
             <Field
               label={partyLabel}
               required={partyRequired}
-              hint={partyRequired ? undefined : 'اختیاری — از مخاطبین'}
+              hint={partyRequired ? undefined : 'اختیاری'}
             >
               {filteredContacts.length === 0 ? (
                 <div style={{
@@ -374,7 +374,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                   color: 'var(--warn)',
                   fontWeight: 600,
                 }}>
-                  ⚠️ {isPurchase ? 'هیچ فروشنده‌ای تعریف نشده' : isSale ? 'هیچ مشتری‌ای تعریف نشده' : 'مخاطبی تعریف نشده'} — از بخش «مخاطبین» اضافه کنید
+                  ⚠️ {isPurchase ? 'هیچ فروشنده‌ای تعریف نشده' : isSale ? 'هیچ مشتری‌ای تعریف نشده' : 'مخاطبی تعریف نشده'}
                 </div>
               ) : (
                 <SmartSelect
@@ -393,8 +393,12 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                 />
               )}
             </Field>
-          )}
-        </Grid2>
+          </Grid2>
+        ) : (
+          <Field label="تاریخ" required error={vErrors.date}>
+            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
+          </Field>
+        )}
 
         <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
