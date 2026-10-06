@@ -5,19 +5,21 @@
  *   useFab({ label: 'افزودن گله', onClick: openNew });
  *   useFab(active ? { label: '...', onClick } : null);
  */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useFabStore, type FabConfig } from '../../cor/ui/fabStore';
 
 export function useFab(cfg: FabConfig | null) {
-  const setConfig = useFabStore(s => s.set);
+  const set = useFabStore(s => s.set);
+  const myId = useRef('fab_' + Math.random().toString(36).slice(2, 10));
 
   useEffect(() => {
+    const id = myId.current;
     if (!cfg || cfg.hidden) {
-      setConfig(null);
+      set(null, id);
       return;
     }
-    setConfig(cfg);
-    return () => setConfig(null);
+    set(cfg, id);
+    return () => set(null, id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cfg?.label, cfg?.hidden, cfg?.onClick]);
 }
