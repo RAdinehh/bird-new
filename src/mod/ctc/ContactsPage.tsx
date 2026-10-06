@@ -38,7 +38,6 @@ export default function ContactsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const swipeRef = useSwipeTabs(['all', 'customer', 'supplier', 'worker'], tab, (id) => setTab(id as TabId));
@@ -145,9 +144,6 @@ export default function ContactsPage() {
   useEffect(() => {
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
-
-
-  const target = delId ? contacts.find(c => c.id === delId) : null;
   const tabCount = (t: TabId) => t === 'all' ? contacts.length : contacts.filter(c => c.roles.includes(t as Role)).length;
 
   const tabs: { id: TabId; label: string }[] = [
@@ -338,7 +334,15 @@ export default function ContactsPage() {
 
                   <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                     <Btn size="sm" onClick={() => openEdit(p)} style={{ flex: 1 }}>ویرایش</Btn>
-                    <Btn size="sm" onClick={() => setDelId(p.id)} style={{ flex: 1 }}>حذف</Btn>
+                    <Btn size="sm" onClick={async () => {
+                          const ok = await showConfirmAsync('تأیید حذف', 'این مخاطب حذف شود؟', { danger: true });
+                          if (!ok) return;
+                          setUndoData({ item: p });
+                          setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === p.id ? null : cur), 6000);
+                          remove(p.id);
+                          logAction('delete', 'ctc', 'حذف از مخاطبین');
+                          showToast('مخاطب حذف شد', 'info', 1800);
+                        }} style={{ flex: 1 }}>حذف</Btn>
                   </div>
                 </ExpandableCard>
               );
@@ -408,12 +412,6 @@ export default function ContactsPage() {
 
           <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
           <ErrorBox>{err}</ErrorBox>
-        </Modal>
-
-        <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف مخاطب"
-          footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این مخاطب حذف شود؟', { danger: true }); if (!ok) return; const item = contacts.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } remove(idToDel);
-              logAction('delete', 'ctc', 'حذف از مخاطبین'); setDelId(null); showToast('مخاطب حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-          <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>حذف <b>{target?.name}</b>؟</div>
         </Modal>
       </PageContainer>
     </div>

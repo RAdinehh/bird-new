@@ -17,15 +17,12 @@ export default function ArchivePage() {
 
   const [kind, setKind] = useState<Kind>('flocks');
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [delId, setDelId] = useState<string | null>(null);
 
   const archivedFlocks = useMemo(
     () => flocks.filter(f => f.status === 'archived' || f.status === 'sold')
       .sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || '')),
     [flocks]
   );
-
-  const target = delId ? flocks.find(f => f.id === delId) : null;
 
   return (
     <PageContainer>
@@ -115,28 +112,18 @@ export default function ArchivePage() {
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => { restore(f.id); setExpandedId(null); }} style={{ flex: 1 }}>🔄 بازیابی</Btn>
-                  <Btn size="sm" onClick={() => setDelId(f.id)} style={{ flex: 1 }}>🗑 حذف نهایی</Btn>
+                  <Btn size="sm" onClick={async () => {
+                          const ok = await showConfirmAsync('حذف نهایی گله', 'حذف کامل «' + f.name + '»؟\n\nاین عمل قابل بازگشت نیست. برای همیشه پاک می‌شود.', { danger: true, confirmText: 'حذف کن' });
+                          if (!ok) return;
+                          remove(f.id);
+                          showToast('گله حذف شد', 'info', 1800);
+                        }} style={{ flex: 1 }}>🗑 حذف نهایی</Btn>
                 </div>
               </ExpandableCard>
             );
           })}
         </>
       )}
-
-      <Modal
-        open={delId !== null}
-        onClose={() => setDelId(null)}
-        title="حذف نهایی گله"
-        footer={<BtnRow><Btn variant="danger" onClick={() => { if (delId) remove(delId); setDelId(null); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
-      >
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-          حذف کامل <b>{target?.name}</b>؟
-          <br />
-          <span style={{ color: 'var(--danger)', fontSize: 'var(--fs-sm)' }}>
-            ⚠ این عمل قابل بازگشت نیست. برای همیشه پاک می‌شود.
-          </span>
-        </div>
-      </Modal>
     </PageContainer>
   );
 }
