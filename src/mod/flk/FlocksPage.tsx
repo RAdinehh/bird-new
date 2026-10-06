@@ -426,7 +426,7 @@ export default function FlocksPage() {
       let toast = '';
       if (arch > 0) toast += toFa(arch) + ' آرشیو';
       if (del > 0) toast += (toast ? ' · ' : '') + toFa(del) + ' حذف';
-      showToast(toast || 'انجام شد', 'success', 2500);
+      showToast(toast || 'انجام شد', 'success');
       logAction('delete', 'flk', 'حذف گروهی: ' + arch + ' آرشیو، ' + del + ' حذف');
     },
     onArchive: async (ids: string[]) => {

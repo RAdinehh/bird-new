@@ -429,7 +429,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
     try { localStorage.removeItem(DRAFT_KEY(multiDeviceId)); } catch {}
     setDraftRows([]);
     setOpen(false);
-    showToast(savedCount + ' ورودی ثبت شد', 'success', 2500);
+    toastMsg.info(toFa(savedCount) + ' ورودی ثبت شد');
     if (onGoTo && await showConfirmAsync('تأیید', 'به کندلینگ برو؟')) {
       setTimeout(() => onGoTo('candlings'), 100);
     }
