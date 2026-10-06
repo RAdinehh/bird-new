@@ -32,6 +32,8 @@ export interface Item {
   usageType?: string;              // oral | injectable | water | spray
   productionDate?: string;         // تاریخ تولید
   dosePerBird?: number;            // دوز مصرفی هر پرنده
+  /** موجودی اولیه هنگام ایجاد — پایه راستی‌آزمایی */
+  initialStock?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -84,6 +86,51 @@ export function generateBatchNo(date: string, existingMovements: Movement[], ite
 
 const now = () => new Date().toISOString();
 
+/**
+ * recalcStock — محاسبه موجودی از تاریخچه تراکنش‌ها
+ * expected = initialStock + Σ(in) − Σ(out) + Σ(adjust net)
+ */
+export function recalcStock(
+  item: Item,
+  movements: Movement[]
+): { expected: number; actual: number; drift: number; totalIn: number; totalOut: number; totalAdjust: number } {
+  const itemMovements = movements.filter(m => m.itemId === item.id);
+  let totalIn = 0, totalOut = 0, totalAdjust = 0;
+
+  // برای محاسبه دقیق adjust، ترتیب زمانی مهمه
+  const sorted = [...itemMovements].sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+  let running = item.initialStock ?? 0;
+  for (const m of sorted) {
+    if (m.type === 'in') { running += m.quantity; totalIn += m.quantity; }
+    else if (m.type === 'out') { running -= m.quantity; totalOut += m.quantity; }
+    else { // adjust: تنظیم روی مقدار جدید
+      totalAdjust += (m.quantity - running);
+      running = m.quantity;
+    }
+  }
+  const expected = Math.round(running * 1000) / 1000;
+  const actual = Math.round((item.currentStock || 0) * 1000) / 1000;
+  const drift = Math.round((actual - expected) * 1000) / 1000;
+  return { expected, actual, drift, totalIn, totalOut, totalAdjust };
+}
+
+/**
+ * checkIntegrity — چک همه اقلام برای مغایرت
+ */
+export function checkIntegrity(
+  items: Item[],
+  movements: Movement[]
+): Array<{ item: Item; expected: number; actual: number; drift: number }> {
+  const drift: Array<{ item: Item; expected: number; actual: number; drift: number }> = [];
+  for (const it of items) {
+    const r = recalcStock(it, movements);
+    if (Math.abs(r.drift) >= 0.001) {
+      drift.push({ item: it, expected: r.expected, actual: r.actual, drift: r.drift });
+    }
+  }
+  return drift;
+}
+
 export const useWhs = create<State>()(
   persist(
     (set, get) => ({
@@ -92,7 +139,7 @@ export const useWhs = create<State>()(
 
       addItem: (i) => {
         const id = uuid();
-        set({ items: [...get().items, { ...i, id, createdAt: now(), updatedAt: now() }] });
+        set({ items: [...get().items, { ...i, id, initialStock: (i as any).currentStock || 0, createdAt: now(), updatedAt: now() }] });
         return id;
       },
       updateItem: (id, patch) => set({ items: get().items.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) }),
