@@ -242,33 +242,25 @@ export default function ListCards({
                               </div>
 
                               {/* برچسب مرحله‌ها زیر نوار */}
-                              <div style={{ position: 'relative', height: 14, marginTop: 4 }}>
-                                {/* شروع */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, gap: 4 }}>
                                 <div style={{
-                                  position: 'absolute',
-                                  right: '0%',
-                                  transform: 'translateX(50%)',
                                   fontSize: 10,
                                   fontWeight: 500,
                                   color: 'var(--muted)',
                                   whiteSpace: 'nowrap',
                                 }}>شروع</div>
-
                                 {stageMilestones.map((milestone, idx) => {
-                                  const pct = (milestone.day / cycleDays) * 100;
                                   const passed = age >= milestone.day;
                                   return (
                                     <div
                                       key={idx}
                                       style={{
-                                        position: 'absolute',
-                                        right: `${pct}%`,
-                                        transform: 'translateX(50%)',
                                         fontSize: 10,
                                         fontWeight: passed ? 700 : 500,
                                         color: passed ? 'var(--accent)' : 'var(--muted)',
                                         whiteSpace: 'nowrap',
                                         transition: 'all .2s',
+                                        textAlign: 'center',
                                       }}
                                     >{milestone.label}</div>
                                   );
