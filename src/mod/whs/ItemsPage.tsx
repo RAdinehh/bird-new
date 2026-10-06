@@ -43,6 +43,10 @@ interface F {
   hallId: string;
   equipmentStatus: string;
   warrantyUntil: string;
+  // ─── دارو/واکسن ───
+  usageType: string;
+  productionDate: string;
+  dosePerBird: string;
 }
 
 const empty = (): F => ({
@@ -51,10 +55,12 @@ const empty = (): F => ({
   supplierId: '', expireDate: '',
   withdrawalDays: '', batchNo: '', storage: 'room',
   notes: '',
-  purchaseDate: '', purchasePrice: '', hallId: '', equipmentStatus: 'active', warrantyUntil: ''
+  purchaseDate: '', purchasePrice: '', hallId: '', equipmentStatus: 'active', warrantyUntil: '',
+  usageType: '', productionDate: '', dosePerBird: ''
 });
 
 const EQUIP_STATUS: Record<string, string> = { active: 'فعال', repair: 'در تعمیر', scrapped: 'اسقاط' };
+const USAGE_LABEL: Record<string, string> = { oral: '🍽 خوراکی', injectable: '💉 تزریقی', water: '💧 محلول در آب', spray: '🌫 اسپری' };
 
 export default function ItemsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
@@ -131,7 +137,10 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       purchasePrice: it.purchasePrice ? toFa(it.purchasePrice) : '',
       hallId: it.hallId || '',
       equipmentStatus: it.equipmentStatus || 'active',
-      warrantyUntil: it.warrantyUntil || ''
+      warrantyUntil: it.warrantyUntil || '',
+      usageType: it.usageType || '',
+      productionDate: it.productionDate || '',
+      dosePerBird: it.dosePerBird ? toFa(it.dosePerBird) : ''
     });
     setErr(''); setOpen(true);
   };
@@ -195,7 +204,10 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         purchasePrice: form.category === 'equipment' ? num(form.purchasePrice) : 0,
         hallId: form.category === 'equipment' ? form.hallId : '',
         equipmentStatus: form.category === 'equipment' ? form.equipmentStatus : '',
-        warrantyUntil: form.category === 'equipment' ? form.warrantyUntil : ''
+        warrantyUntil: form.category === 'equipment' ? form.warrantyUntil : '',
+        usageType: isMed ? form.usageType : '',
+        productionDate: isMed ? form.productionDate : '',
+        dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0
       });
     } else {
       // ویرایش: currentStock و lastPrice نباید تغییر کنن
@@ -214,7 +226,10 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         purchasePrice: form.category === 'equipment' ? num(form.purchasePrice) : 0,
         hallId: form.category === 'equipment' ? form.hallId : '',
         equipmentStatus: form.category === 'equipment' ? form.equipmentStatus : '',
-        warrantyUntil: form.category === 'equipment' ? form.warrantyUntil : ''
+        warrantyUntil: form.category === 'equipment' ? form.warrantyUntil : '',
+        usageType: isMed ? form.usageType : '',
+        productionDate: isMed ? form.productionDate : '',
+        dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0
       });
     }
     setOpen(false);
@@ -346,6 +361,9 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                     ) : null}
                     {it.withdrawalDays !== null && it.withdrawalDays !== undefined ? <Row l="دوره منع مصرف" v={`${toFa(it.withdrawalDays)} روز`} /> : null}
                     {it.storage ? <Row l="نگهداری" v={STORAGE_LABEL[it.storage] || it.storage} /> : null}
+                    {it.usageType ? <Row l="نوع مصرف" v={USAGE_LABEL[it.usageType] || it.usageType} /> : null}
+                    {it.dosePerBird ? <Row l="دوز هر پرنده" v={`${toFa(it.dosePerBird)} ml`} /> : null}
+                    {it.productionDate ? <Row l="تاریخ تولید" v={toFa(it.productionDate)} /> : null}
                   </>
                 ) : null}
 
@@ -500,6 +518,28 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                   </Field>
                 )}
               </Grid2>
+            )}
+            {isMedicine && (
+              <>
+                <SectionTitle>💊 اطلاعات مصرف</SectionTitle>
+                <Grid2>
+                  <Field label="نوع مصرف">
+                    <Select value={form.usageType} onChange={e => setForm({ ...form, usageType: e.target.value })}>
+                      <option value="">— انتخاب کنید —</option>
+                      <option value="oral">🍽 خوراکی</option>
+                      <option value="injectable">💉 تزریقی</option>
+                      <option value="water">💧 محلول در آب</option>
+                      <option value="spray">🌫 اسپری</option>
+                    </Select>
+                  </Field>
+                  <Field label="دوز هر پرنده" hint="اختیاری">
+                    <NumField placeholder="مثلاً — ۰.۵" value={form.dosePerBird} onChange={e => setForm({ ...form, dosePerBird: e.target.value })} unit="ml" min={0} />
+                  </Field>
+                </Grid2>
+                <Field label="تاریخ تولید" hint="اختیاری">
+                  <DatePicker value={form.productionDate} onChange={v => setForm({ ...form, productionDate: v })} />
+                </Field>
+              </>
             )}
           </>
         )}

@@ -28,6 +28,10 @@ export interface Item {
   hallId?: string;                 // سالن محل استقرار
   equipmentStatus?: string;        // active | repair | scrapped
   warrantyUntil?: string;          // گارانتی تا
+  // ─── فیلدهای دارو/واکسن ───
+  usageType?: string;              // oral | injectable | water | spray
+  productionDate?: string;         // تاریخ تولید
+  dosePerBird?: number;            // دوز مصرفی هر پرنده
   createdAt: string;
   updatedAt: string;
 }
