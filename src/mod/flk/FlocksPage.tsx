@@ -176,6 +176,8 @@ export default function FlocksPage() {
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [menuId, setMenuId] = useState<string | null>(null);
+  const [showHidden, setShowHidden] = useState(false);
   const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'archived'], tab, (id) => setTab(id as TabId));
 
   // فیلتر تکرارها تو render
@@ -379,8 +381,9 @@ export default function FlocksPage() {
   const list = useMemo(() => {
     let arr = flocks;
     if (tab === 'archived') arr = arr.filter(f => f.status === 'archived' || f.status === 'sold');
-    else if (tab === 'all') arr = arr.filter(f => f.status === 'active' && !f.hidden);
-    else arr = arr.filter(f => f.status === 'active' && f.type === tab && !f.hidden);
+    else if (tab === 'all') arr = arr.filter(f => f.status === 'active');
+    else arr = arr.filter(f => f.status === 'active' && f.type === tab);
+    if (!showHidden) arr = arr.filter(f => !f.hidden);
     if (q.trim()) {
       const t = q.trim();
       arr = arr.filter(f => {
@@ -462,6 +465,8 @@ export default function FlocksPage() {
     if (t === 'archived') return flocks.filter(f => f.status === 'archived' || f.status === 'sold').length;
     return flocks.filter(f => f.status === 'active' && f.type === t).length;
   };
+
+  const hiddenCount = flocks.filter(f => f.hidden && f.status === 'active').length;
 
   const tabs: { id: TabId; label: string }[] = [
     { id: 'all', label: 'فعال' },
@@ -637,6 +642,21 @@ export default function FlocksPage() {
                   subtitle={`${bird?.name || '—'}${breed ? ` · ${breed.name}` : ''}${hall ? ` · ${hall.name}` : ''}`}
                   isOpen={isOpen}
                   onToggle={() => setExpandedId(isOpen ? null : f.id)}
+                  headerAction={
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setMenuId(f.id); }}
+                      aria-label="کنترل‌های گله"
+                      style={{
+                        width: 32, height: 32, padding: 0,
+                        background: 'transparent', border: 'none',
+                        color: 'var(--muted)', cursor: 'pointer',
+                        fontFamily: 'inherit', fontSize: 20,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        borderRadius: 'var(--r-sm)',
+                      }}
+                    >⋯</button>
+                  }
                   badge={<>
                     <Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>
                     {f.sourceInvoiceId && <Tag tone="blue">🛒 فاکتور</Tag>}
@@ -749,26 +769,6 @@ export default function FlocksPage() {
                   )}
 
 
-                  {/* کنترل گله */}
-                  {!isArchived && (
-                    <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-                        <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🎛</span> کنترل گله
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', cursor: 'pointer' }}>
-                          <input type="checkbox" checked={!!f.hidden} onChange={() => toggleHidden(f.id)} style={{ cursor: 'pointer', accentColor: 'var(--accent)', width: 18, height: 18 }} />
-                          <span style={{ flex: 1, fontWeight: 600 }}>👁 پنهان از لیست</span>
-                          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{f.hidden ? 'پنهان' : 'نمایان'}</span>
-                        </label>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', cursor: 'pointer' }}>
-                          <input type="checkbox" checked={!!f.paused} onChange={() => togglePaused(f.id)} style={{ cursor: 'pointer', accentColor: 'var(--warn)', width: 18, height: 18 }} />
-                          <span style={{ flex: 1, fontWeight: 600 }}>⏸ غیرفعال موقت</span>
-                          <span style={{ fontSize: 'var(--fs-xs)', color: f.paused ? 'var(--warn)' : 'var(--muted)' }}>{f.paused ? 'غیرفعال' : 'فعال'}</span>
-                        </label>
-                      </div>
-                    </>
-                  )}
 
                   {/* نمایش دلیل آرشیو */}
                   {isArchived && f.archivedReason && (

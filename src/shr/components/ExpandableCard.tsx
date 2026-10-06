@@ -23,6 +23,8 @@ interface Props {
   ms?: any;
   /** 🆕 اکشن کلیک روی کارت وقتی selectionMode نیست (اختیاری) */
   onTap?: () => void;
+  /** 🆕 دکمه/آیکون اضافه در هدر کارت (مثلاً ⋯ برای منو) */
+  headerAction?: React.ReactNode;
 }
 
 const COLORS: Record<AccentKey, { c: string; s: string }> = {
@@ -40,7 +42,7 @@ const COLORS: Record<AccentKey, { c: string; s: string }> = {
 export default function ExpandableCard({
   accent = 'accent', index, icon, iconEmoji = '📋', compact = false,
   title, subtitle, badge, summary, stats, isOpen, onToggle, children,
-  id, ms, onTap,
+  id, ms, onTap, headerAction,
 }: Props) {
   const lowPower = useSet((st: any) => st.lowPowerMode);
   const [prefersReduced, setPrefersReduced] = useState(false);
@@ -138,6 +140,12 @@ export default function ExpandableCard({
           </div>
 
           {badge && <div style={{ display: 'flex', gap: 4, flexShrink: 0, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>{badge}</div>}
+
+          {headerAction && (
+            <div onClick={(e) => e.stopPropagation()} style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+              {headerAction}
+            </div>
+          )}
 
           {!isSelectionMode && (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isOpen ? color : 'var(--dim)'} strokeWidth="2.5" strokeLinecap="round"
