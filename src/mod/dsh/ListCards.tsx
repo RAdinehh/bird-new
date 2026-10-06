@@ -171,26 +171,51 @@ export default function ListCards({
                         {/* نوار پیشرفت چرخه */}
                         {lc.progress > 0 && (() => {
                           const cycleDays = f.endOfCycleDay || bird?.cycleDays || 0;
+                          if (!cycleDays) return null;
+                          
                           const stageMilestones = (CYCLE_MILESTONES[f.type] || []).filter(m => m.day > 0 && m.day < cycleDays);
                           const progressColor = lc.progress >= 95 ? 'var(--danger)' : lc.progress >= 80 ? 'var(--warn)' : 'var(--accent)';
-                          const clampedPct = Math.min(100, Math.max(0, lc.progress));
-                          const stageLabels = stageMilestones.map(m => m.label);
+                          
+                          // بازه‌ها: [شروع=1, m1], [m1, m2], ..., [mLast, cycleDays]
+                          const breakpoints = [1, ...stageMilestones.map(m => m.day), cycleDays];
+                          const totalSegments = breakpoints.length - 1;
+                          
+                          // محاسبه موقعیت نقطه متحرک روی مقیاس غیرخطی
+                          let markerPct = 0;
+                          for (let i = 0; i < totalSegments; i++) {
+                            const segStart = breakpoints[i];
+                            const segEnd = breakpoints[i + 1];
+                            const segWidth = 100 / totalSegments;
+                            if (age < segStart) break;
+                            if (age >= segEnd) {
+                              markerPct = (i + 1) * segWidth;
+                            } else {
+                              const ratio = (age - segStart) / (segEnd - segStart);
+                              markerPct = i * segWidth + ratio * segWidth;
+                              break;
+                            }
+                          }
+                          markerPct = Math.min(100, Math.max(0, markerPct));
+                          
                           return (
-                            <div style={{ marginTop: 12 }}>
-                              {/* ردیف بالا — فقط درصد */}
-                              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', fontSize: 'var(--fs-sm)', marginBottom: 6 }}>
-                                <span style={{ color: progressColor, fontWeight: 700 }}>
-                                  {toFa(Math.round(lc.progress))}٪ پیشرفت
+                            <div style={{ marginTop: 10 }}>
+                              {/* درصد پیشرفت */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+                                  پیشرفت چرخه
+                                </span>
+                                <span style={{ fontSize: 'var(--fs-sm)', color: progressColor, fontWeight: 700 }}>
+                                  {toFa(Math.round(lc.progress))}٪
                                 </span>
                               </div>
 
-                              {/* اعداد دو سر — بالای نوار */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginBottom: 3, paddingRight: 2, paddingLeft: 2 }}>
+                              {/* اعداد دو سر */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginBottom: 4, paddingRight: 2, paddingLeft: 2 }}>
                                 <span>۱</span>
                                 <span>{toFa(cycleDays)} روز</span>
                               </div>
 
-                              {/* نوار با نقطه متحرک و بج عدد */}
+                              {/* نوار با نقطه متحرک */}
                               <div style={{ position: 'relative', paddingTop: 26, paddingBottom: 4 }}>
                                 {/* نوار اصلی */}
                                 <div style={{
@@ -203,17 +228,17 @@ export default function ListCards({
                                 }}>
                                   <div style={{
                                     height: '100%',
-                                    width: clampedPct + '%',
+                                    width: markerPct + '%',
                                     background: progressColor,
                                     borderRadius: 5,
                                     transition: 'width .3s',
                                   }} />
                                 </div>
 
-                                {/* نقطه متحرک — وسط نوار */}
+                                {/* نقطه متحرک */}
                                 <div style={{
                                   position: 'absolute',
-                                  right: `calc(${clampedPct}% - 8px)`,
+                                  right: `calc(${markerPct}% - 8px)`,
                                   top: 23,
                                   width: 16,
                                   height: 16,
@@ -225,10 +250,10 @@ export default function ListCards({
                                   zIndex: 2,
                                 }} />
 
-                                {/* بج عدد سن — بالای نقطه */}
+                                {/* بج سن */}
                                 <div style={{
                                   position: 'absolute',
-                                  right: `calc(${clampedPct}% - 18px)`,
+                                  right: `calc(${markerPct}% - 21px)`,
                                   top: 0,
                                   width: 42,
                                   height: 22,
@@ -244,10 +269,10 @@ export default function ListCards({
                                   boxShadow: '0 1px 3px rgba(0,0,0,.15)',
                                 }}>{toFa(age)}</div>
 
-                                {/* خط اتصال بج به نقطه */}
+                                {/* خط اتصال */}
                                 <div style={{
                                   position: 'absolute',
-                                  right: `calc(${clampedPct}% - 1px)`,
+                                  right: `calc(${markerPct}% - 1px)`,
                                   top: 18,
                                   width: 2,
                                   height: 5,
@@ -257,8 +282,8 @@ export default function ListCards({
                                 }} />
 
                                 {/* خطوط جداکننده نقاط عطف */}
-                                {stageMilestones.map((milestone, idx) => {
-                                  const pct = (milestone.day / cycleDays) * 100;
+                                {breakpoints.slice(1, -1).map((bp, idx) => {
+                                  const pct = ((idx + 1) / totalSegments) * 100;
                                   return (
                                     <div
                                       key={idx}
@@ -276,24 +301,28 @@ export default function ListCards({
                                 })}
                               </div>
 
-                              {/* برچسب مرحله‌ها زیر نوار */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2, gap: 4 }}>
+                              {/* برچسب مراحل */}
+                              <div style={{ display: 'flex', marginTop: 4 }}>
                                 {stageMilestones.map((milestone, idx) => {
                                   const passed = age >= milestone.day;
                                   return (
                                     <div
                                       key={idx}
                                       style={{
+                                        flex: 1,
                                         fontSize: 'var(--fs-xs)',
                                         fontWeight: passed ? 700 : 500,
                                         color: passed ? 'var(--accent)' : 'var(--muted)',
                                         whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
                                         transition: 'all .2s',
                                         textAlign: 'center',
                                       }}
                                     >{milestone.label}</div>
                                   );
                                 })}
+                                <div style={{ flex: 1 }} />
                               </div>
                             </div>
                           );
