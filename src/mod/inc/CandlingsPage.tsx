@@ -558,7 +558,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={() => openNew()} aria-label="ثبت کندلینگ جدید">+ ثبت کندلینگ</Btn>
+          
         </>
       )}
 

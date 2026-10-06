@@ -763,7 +763,7 @@ const collectWhsShortages = () => {
         ) : (
           <>
             {currentList.map((l, i) => renderLogCard(l, i))}
-            <Btn variant="primary" full onClick={openNew}>+ ثبت روز جدید</Btn>
+            
           </>
         )}
 
