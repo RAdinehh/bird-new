@@ -106,7 +106,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
   const { addProduction, deleteProduction } = useEgg();
 
   const [open, setOpen] = useState(false);
-  const [delId, setDelId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const _profiles = useSet((s: any) => s.incubationProfiles) || [];
@@ -572,8 +571,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
       return true;
     });
   }, [eggEntries, filterDev, filterSource, filterStatus, q, devices, birds, contacts]);
-
-  const target = delId ? eggEntries.find(e => e.id === delId) : null;
   const multiDevice = devices.find(d => d.id === multiDeviceId);
 
   const renderRowSummary = (row: DraftRow, idx: number) => {
@@ -752,7 +749,11 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(e)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => setDelId(e.id)} aria-label="حذف ورودی" style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" onClick={async () => {
+                      const ok = await showConfirmAsync('تأیید حذف', 'این ورودی تخم حذف شود؟', { danger: true });
+                      if (!ok) return;
+                      deleteEntryWithCascade(e.id);
+                    }} aria-label="حذف ورودی" style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
@@ -1093,13 +1094,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
             </Btn>
             {editingRowId && <Btn onClick={() => { setEditingRowId(null); setCurrentRow({ ...makeRow(), birdId: birds[0]?.id || '', entryDate: todayJalali(), entryTime: nowTime() }); }}>لغو</Btn>}
           </div>
-        </div>
-      </Modal>
-
-      <Modal open={!!delId} onClose={() => setDelId(null)} title="حذف ورودی تخم"
-        footer={<BtnRow><Btn variant="danger" onClick={() => delId && deleteEntryWithCascade(delId)}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-          حذف <b>{toFa(target?.count || 0)} تخم</b>؟
         </div>
       </Modal>
     </PageContainer>
