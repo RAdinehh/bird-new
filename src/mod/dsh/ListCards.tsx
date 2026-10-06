@@ -175,32 +175,34 @@ export default function ListCards({
                           
                           const stageMilestones = (CYCLE_MILESTONES[f.type] || []).filter(m => m.day > 0 && m.day < cycleDays);
                           const progressColor = lc.progress >= 95 ? 'var(--danger)' : lc.progress >= 80 ? 'var(--warn)' : 'var(--accent)';
+                          const markerPct = Math.min(100, Math.max(0, lc.progress));
                           
-                          // بازه‌ها: [شروع=1, m1], [m1, m2], ..., [mLast, cycleDays]
-                          const breakpoints = [1, ...stageMilestones.map(m => m.day), cycleDays];
-                          const totalSegments = breakpoints.length - 1;
+                          // محاسبه موقعیت‌ها بر اساس نسبت واقعی
+                          const markers = stageMilestones.map(m => ({
+                            day: m.day,
+                            label: m.label,
+                            pct: (m.day / cycleDays) * 100,
+                            passed: age >= m.day,
+                          }));
                           
-                          // محاسبه موقعیت نقطه متحرک روی مقیاس غیرخطی
-                          let markerPct = 0;
-                          for (let i = 0; i < totalSegments; i++) {
-                            const segStart = breakpoints[i];
-                            const segEnd = breakpoints[i + 1];
-                            const segWidth = 100 / totalSegments;
-                            if (age < segStart) break;
-                            if (age >= segEnd) {
-                              markerPct = (i + 1) * segWidth;
+                          // تشخیص روی‌هم افتادن: اگه فاصله دو marker کمتر از 8٪ باشه
+                          const MIN_GAP = 8;
+                          const levels: number[] = [];  // 0 = پایین، 1 = بالا
+                          for (let i = 0; i < markers.length; i++) {
+                            if (i === 0) { levels.push(0); continue; }
+                            const gap = markers[i].pct - markers[i - 1].pct;
+                            if (gap < MIN_GAP) {
+                              // یک پله بالاتر از قبلی
+                              levels.push(1 - levels[i - 1]);
                             } else {
-                              const ratio = (age - segStart) / (segEnd - segStart);
-                              markerPct = i * segWidth + ratio * segWidth;
-                              break;
+                              levels.push(0);
                             }
                           }
-                          markerPct = Math.min(100, Math.max(0, markerPct));
                           
                           return (
                             <div style={{ marginTop: 10 }}>
                               {/* درصد پیشرفت */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
                                   پیشرفت چرخه
                                 </span>
@@ -209,14 +211,8 @@ export default function ListCards({
                                 </span>
                               </div>
 
-                              {/* اعداد دو سر */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginBottom: 4, paddingRight: 2, paddingLeft: 2 }}>
-                                <span>۱</span>
-                                <span>{toFa(cycleDays)} روز</span>
-                              </div>
-
                               {/* نوار با نقطه متحرک */}
-                              <div style={{ position: 'relative', paddingTop: 26, paddingBottom: 4 }}>
+                              <div style={{ position: 'relative', paddingTop: 26, paddingBottom: 20 }}>
                                 {/* نوار اصلی */}
                                 <div style={{
                                   height: 10,
@@ -281,48 +277,63 @@ export default function ListCards({
                                   transition: 'right .3s',
                                 }} />
 
-                                {/* خطوط جداکننده نقاط عطف */}
-                                {breakpoints.slice(1, -1).map((bp, idx) => {
-                                  const pct = ((idx + 1) / totalSegments) * 100;
+                                {/* میل‌ها روی نوار */}
+                                {markers.map((mk, idx) => (
+                                  <div
+                                    key={idx}
+                                    style={{
+                                      position: 'absolute',
+                                      right: `calc(${mk.pct}% - 1px)`,
+                                      top: 23,
+                                      width: 2,
+                                      height: 10,
+                                      background: mk.passed ? 'var(--accent)' : 'var(--border)',
+                                      opacity: mk.passed ? 1 : 0.6,
+                                      zIndex: 1,
+                                    }}
+                                  />
+                                ))}
+
+                                {/* خطوط اتصال + برچسب‌ها */}
+                                {markers.map((mk, idx) => {
+                                  const level = levels[idx];
+                                  const lineTop = 33;
+                                  const lineHeight = level === 0 ? 4 : 12;
+                                  const labelTop = lineTop + lineHeight;
                                   return (
-                                    <div
-                                      key={idx}
-                                      style={{
+                                    <div key={'lbl-' + idx}>
+                                      {/* خط اتصال */}
+                                      <div style={{
                                         position: 'absolute',
-                                        right: pct + '%',
-                                        top: 12,
+                                        right: `calc(${mk.pct}% - 1px)`,
+                                        top: lineTop,
                                         width: 1,
-                                        height: 8,
+                                        height: lineHeight,
                                         background: 'var(--border)',
                                         opacity: 0.5,
-                                      }}
-                                    />
+                                      }} />
+                                      {/* برچسب */}
+                                      <div style={{
+                                        position: 'absolute',
+                                        right: `${mk.pct}%`,
+                                        top: labelTop,
+                                        transform: 'translateX(50%)',
+                                        fontSize: 'var(--fs-xs)',
+                                        fontWeight: mk.passed ? 700 : 500,
+                                        color: mk.passed ? 'var(--accent)' : 'var(--muted)',
+                                        whiteSpace: 'nowrap',
+                                        transition: 'all .2s',
+                                        textAlign: 'center',
+                                      }}>{mk.label}</div>
+                                    </div>
                                   );
                                 })}
                               </div>
 
-                              {/* برچسب مراحل */}
-                              <div style={{ display: 'flex', marginTop: 4 }}>
-                                {stageMilestones.map((milestone, idx) => {
-                                  const passed = age >= milestone.day;
-                                  return (
-                                    <div
-                                      key={idx}
-                                      style={{
-                                        flex: 1,
-                                        fontSize: 'var(--fs-xs)',
-                                        fontWeight: passed ? 700 : 500,
-                                        color: passed ? 'var(--accent)' : 'var(--muted)',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        transition: 'all .2s',
-                                        textAlign: 'center',
-                                      }}
-                                    >{milestone.label}</div>
-                                  );
-                                })}
-                                <div style={{ flex: 1 }} />
+                              {/* اعداد دو سر — نزدیک نوار */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginTop: -16 }}>
+                                <span>۱</span>
+                                <span>{toFa(cycleDays)} روز</span>
                               </div>
                             </div>
                           );
