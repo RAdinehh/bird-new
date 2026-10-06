@@ -37,7 +37,7 @@ export default function ToastHost() {
   return (
     <div style={{
       position: 'fixed',
-      top: 90,
+      top: 100,
       left: 0,
       right: 0,
       zIndex: 9999,
