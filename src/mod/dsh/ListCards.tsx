@@ -183,12 +183,12 @@ export default function ListCards({
                                   🔄 {lc.label}
                                 </span>
                                 <span style={{ color: 'var(--muted)', fontWeight: 600 }}>
-                                  روز {toFa(age)} از {toFa(cycleDays)}
+                                  {toFa(Math.round(lc.progress))}٪
                                 </span>
                               </div>
 
-                              {/* نوار با نقطه متحرک */}
-                              <div style={{ position: 'relative', paddingTop: 14, paddingBottom: 4 }}>
+                              {/* نوار با نقطه متحرک و بج عدد */}
+                              <div style={{ position: 'relative', paddingTop: 26, paddingBottom: 4 }}>
                                 {/* نوار اصلی */}
                                 <div style={{
                                   height: 10,
@@ -211,13 +211,44 @@ export default function ListCards({
                                 <div style={{
                                   position: 'absolute',
                                   right: `calc(${clampedPct}% - 8px)`,
-                                  top: 6,
+                                  top: 18,
                                   width: 16,
                                   height: 16,
                                   borderRadius: '50%',
                                   background: progressColor,
                                   border: '3px solid var(--card-solid)',
                                   boxShadow: '0 2px 6px rgba(0,0,0,.15)',
+                                  transition: 'right .3s',
+                                }} />
+
+                                {/* بج عدد سن — بالای نقطه */}
+                                <div style={{
+                                  position: 'absolute',
+                                  right: `calc(${clampedPct}% - 18px)`,
+                                  top: 0,
+                                  width: 36,
+                                  height: 18,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  background: progressColor,
+                                  color: 'var(--avatar-text, #fff)',
+                                  borderRadius: 4,
+                                  fontSize: 10,
+                                  fontWeight: 700,
+                                  transition: 'right .3s',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,.15)',
+                                }}>{toFa(age)}</div>
+
+                                {/* خط اتصال بج به نقطه */}
+                                <div style={{
+                                  position: 'absolute',
+                                  right: `calc(${clampedPct}% - 1px)`,
+                                  top: 18,
+                                  width: 2,
+                                  height: 8,
+                                  background: progressColor,
+                                  opacity: 0.5,
                                   transition: 'right .3s',
                                 }} />
 
