@@ -9,6 +9,7 @@ import MenuDrawer from './shr/components/MenuDrawer';
 import HelpModal from './shr/components/HelpModal';
 import ShortcutsModal from './shr/components/ShortcutsModal';
 import DialogHost from './shr/components/DialogHost';
+import ToastHost from './shr/components/ToastHost';
 import AppRouter from './cor/router/AppRouter';
 import { useKeyboard } from './shr/hooks/useKeyboard';
 import { useAutoBackup } from './shr/hooks/useAutoBackup';
@@ -65,6 +66,7 @@ function Layout() {
       <HelpModal />
       <ShortcutsModal />
       <FloatingAdd />
+      <ToastHost />
       <DialogHost />
       <main key={loc.pathname}>
         <AppRouter />
