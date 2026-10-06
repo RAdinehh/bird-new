@@ -282,7 +282,7 @@ export default function RequirementsPage() {
                           if (!ok) return;
                           deleteRequirement(r.id);
                           logAction('delete', 'fed', 'حذف از جیره‌نویسی');
-                          toastMsg.deleted('')
+                          toastMsg.deleted()
                         }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

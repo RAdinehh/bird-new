@@ -74,15 +74,15 @@ export const toastMsg = {
     showToast(`«${name}» به‌روز شد`, 'success'),
 
   // ─── حذف ───
-  deleted: (name: string) =>
-    showToast(`«${name}» حذف شد`, 'error'),
+  deleted: (name?: string) =>
+    showToast(name ? `«${name}» حذف شد` : 'حذف شد', 'error'),
 
   deletedBulk: (count: number, itemType: string) =>
     showToast(`${toFa(count)} ${itemType} حذف شد`, 'error'),
 
   // ─── آرشیو ───
-  archived: (name: string) =>
-    showToast(`«${name}» آرشیو شد`, 'warn'),
+  archived: (name?: string) =>
+    showToast(name ? `«${name}» آرشیو شد` : 'آرشیو شد', 'warn'),
 
   archivedBulk: (count: number, itemType: string) =>
     showToast(`${toFa(count)} ${itemType} آرشیو شد`, 'warn'),

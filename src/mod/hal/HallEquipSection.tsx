@@ -192,7 +192,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
     const ok = await showConfirmAsync('حذف تجهیز', '«' + name + '» از این سالن حذف شود؟', { danger: true });
     if (!ok) return;
     deleteEquip(id);
-    toastMsg.deleted('')
+    toastMsg.deleted()
   };
 
   const currentEdit = editId ? hallEquips.find(e => e.id === editId) : null;

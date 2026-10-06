@@ -195,7 +195,16 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
     <PageContainer>
       {undoData && (
         <UndoBar
-          label="حذف شد"
+          label={(() => {
+            const raw = (undoData as any).item;
+            const arr: any[] = Array.isArray(raw) ? raw : [raw];
+            if (arr.length === 1) {
+              const it = arr[0];
+              const name = it?.itemId ? (items.find(x => x.id === it.itemId)?.name || 'گردش') : 'گردش';
+              return `«${name}» حذف شد`;
+            }
+            return `${toFa(arr.length)} گردش حذف شد`;
+          })()}
           onUndo={undoDelete}
           onDismiss={() => setUndoData(null)}
         />
@@ -297,7 +306,9 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                   <Btn size="sm" onClick={() => openEdit(m)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = m.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel);
-                    logAction('delete', 'whs', 'حذف از انبار');  toastMsg.deleted('')
+                    logAction('delete', 'whs', 'حذف از انبار');
+                    const itemName = item ? (items.find(x => x.id === (item as any).itemId)?.name || 'گردش') : 'گردش';
+                    toastMsg.deleted(itemName)
                     }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
