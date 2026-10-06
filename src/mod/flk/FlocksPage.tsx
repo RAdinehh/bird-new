@@ -910,28 +910,29 @@ export default function FlocksPage() {
             >
               {!form.hallId ? (
                 <div style={{
-                  padding: '10px 12px',
+                  width: '100%', height: 38, padding: '0 12px',
                   background: 'var(--input-bg)',
                   border: '1px dashed var(--border)',
                   borderRadius: 'var(--r-md)',
                   fontSize: 'var(--fs-sm)',
                   color: 'var(--muted)',
-                  textAlign: 'center',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxSizing: 'border-box',
                 }}>
                   ابتدا سالن را انتخاب کنید
                 </div>
               ) : zonesForHall.length === 0 ? (
                 <div style={{
-                  padding: '10px 12px',
+                  width: '100%', height: 38, padding: '0 12px',
                   background: 'var(--warn-soft)',
                   border: '1px dashed var(--warn)',
                   borderRadius: 'var(--r-md)',
                   fontSize: 'var(--fs-sm)',
                   color: 'var(--warn)',
-                  textAlign: 'center',
-                  lineHeight: 1.7,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 600, boxSizing: 'border-box',
                 }}>
-                  ⚠️ این سالن هنوز بخشی ندارد
+                  ⚠️ بدون بخش
                 </div>
               ) : (
                 <Select value={form.zoneId} onChange={e => setForm({ ...form, zoneId: e.target.value })}>
