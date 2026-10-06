@@ -589,39 +589,34 @@ export function Modal({
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
 
-    // autofocus فقط بار اول
+    // autofocus فقط بار اول — فقط روی دکمه‌ها (کیبورد خودکار باز نشود)
     if (!focusedRef.current) {
       focusedRef.current = true;
-      setTimeout(() => {
-        // ۱. ترجیح: input/textarea/select
-        let target = modalRef.current?.querySelector(
-          'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled])'
-        ) as HTMLElement | null;
-        
-        // ۲. اگه input نبود، آخرین دکمه (معمولاً confirm در footer)
-        // این روش X (که اول Modal هست) رو skip می‌کنه
-        if (!target) {
-          const btns = modalRef.current?.querySelectorAll('button:not([disabled])');
-          if (btns && btns.length > 0) {
-            // از آخر به اول — footer buttons معمولاً آخرین‌ها هستن
-            for (let i = btns.length - 1; i >= 0; i--) {
-              const btn = btns[i] as HTMLElement;
-              const text = (btn.textContent || '').trim();
-              const aria = btn.getAttribute('aria-label') || '';
-              // skip X (✕، ×، X، آیکون بستن)
-              const isClose = /^[✕×xX]$/.test(text) 
-                || aria.includes('بستن') 
-                || aria.includes('close')
-                || aria.includes('Close');
-              if (!isClose) {
-                target = btn;
-                break;
-              }
-            }
+      const t = setTimeout(() => {
+        // اگه کاربر خودش چیزی focus کرده، دست نزن
+        const active = document.activeElement as HTMLElement | null;
+        if (active && modalRef.current?.contains(active)) return;
+        let target: HTMLElement | null = null;
+        const btns = modalRef.current?.querySelectorAll('button:not([disabled])');
+        if (btns && btns.length > 0) {
+          for (let i = btns.length - 1; i >= 0; i--) {
+            const btn = btns[i] as HTMLElement;
+            const text = (btn.textContent || '').trim();
+            const aria = btn.getAttribute('aria-label') || '';
+            const isClose = /^[✕×xX]$/.test(text)
+              || aria.includes('بستن')
+              || aria.includes('close')
+              || aria.includes('Close');
+            if (!isClose) { target = btn; break; }
           }
         }
-        target?.focus();
-      }, 100);
+        if (target) {
+          try { target.focus({ preventScroll: true }); } catch { /* silent */ }
+        }
+      }, 250);
+      // اگه Modal بسته شد، تایمر پاک شه
+      (window as any).__modalFocusTimers = (window as any).__modalFocusTimers || [];
+      (window as any).__modalFocusTimers.push(() => clearTimeout(t));
     }
 
     return () => {
