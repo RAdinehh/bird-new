@@ -249,7 +249,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     });
     setErr(''); setOpen(true);
   };
-  useFab({ label: 'ثبت فاکتور', onClick: openNew });
+  useFab(active ? { label: 'ثبت فاکتور', onClick: openNew } : null);
 
   const openEdit = (inv: Invoice) => {
     setForm({

@@ -105,7 +105,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     setForm({ ...empty(), partyId: contacts[0].id });
     setErr(''); setOpen(true);
   };
-  useFab({ label: 'افزودن معامله', onClick: openNew });
+  useFab(active ? { label: 'افزودن معامله', onClick: openNew } : null);
 
   const openEdit = (d: Deal) => {
     setForm({
