@@ -183,11 +183,8 @@ function ChapterView({
   );
 }
 
-type SubTab = 'standards' | 'stages';
-
 export default function GuideTab() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [subTab, setSubTab] = useState<SubTab>('standards');
 
   const selectedChapter = selectedId
     ? GUIDE_CONTENT.chapters.find(c => c.id === selectedId)
@@ -197,7 +194,37 @@ export default function GuideTab() {
     return <ChapterView chapter={selectedChapter} onBack={() => setSelectedId(null)} />;
   }
 
-  const filtered = GUIDE_CONTENT.chapters.filter(c => (c.group || 'standards') === subTab);
+  const standardsChapters = GUIDE_CONTENT.chapters.filter(c => (c.group || 'standards') === 'standards');
+  const stagesChapters = GUIDE_CONTENT.chapters.filter(c => c.group === 'stages');
+
+  const ChapterButton = ({ ch }: { ch: GuideChapter }) => (
+    <button
+      type="button"
+      onClick={() => setSelectedId(ch.id)}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '12px 14px',
+        background: 'var(--card-solid)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r-md)',
+        color: 'var(--text)', fontFamily: 'inherit',
+        textAlign: 'right', cursor: 'pointer',
+        boxShadow: '0 1px 2px rgba(15,23,42,.05)',
+      }}
+    >
+      <span style={{
+        width: 40, height: 40, borderRadius: 12,
+        background: 'var(--input-bg)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 22, flexShrink: 0,
+      }}>{ch.icon}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700 }}>{ch.title}</div>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{ch.subtitle}</div>
+      </div>
+      <span style={{ color: 'var(--muted)', fontSize: 18 }}>‹</span>
+    </button>
+  );
 
   return (
     <PageContainer>
@@ -216,78 +243,19 @@ export default function GuideTab() {
         </div>
       </div>
 
-      {/* زیرتب‌ها */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-        {([
-          { id: 'standards' as SubTab, label: 'استانداردها', icon: '📖' },
-          { id: 'stages' as SubTab,    label: 'مراحل رشد',   icon: '🐣' },
-        ]).map(st => {
-          const active = subTab === st.id;
-          return (
-            <button
-              key={st.id}
-              type="button"
-              onClick={() => setSubTab(st.id)}
-              style={{
-                flex: 1, padding: '8px 12px',
-                background: active ? 'var(--accent-soft)' : 'var(--card-solid)',
-                border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 'var(--r-md)',
-                color: active ? 'var(--accent)' : 'var(--muted)',
-                fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                fontWeight: active ? 700 : 600,
-                cursor: 'pointer',
-              }}
-            >
-              {st.icon} {st.label}
-            </button>
-          );
-        })}
-      </div>
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {filtered.map((ch) => (
-          <button
-            key={ch.id}
-            type="button"
-            onClick={() => setSelectedId(ch.id)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '12px 14px',
-              background: 'var(--card-solid)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--r-md)',
-              color: 'var(--text)',
-              fontFamily: 'inherit',
-              textAlign: 'right',
-              cursor: 'pointer',
-              boxShadow: '0 1px 2px rgba(15,23,42,.05)',
-            }}
-          >
-            <span style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              background: 'var(--input-bg)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 22,
-              flexShrink: 0,
-            }}>{ch.icon}</span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700 }}>
-                {ch.title}
-              </div>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                {ch.subtitle}
-              </div>
-            </div>
-            <span style={{ color: 'var(--muted)', fontSize: 18 }}>‹</span>
-          </button>
-        ))}
+        <div style={{
+          fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700,
+          padding: '4px 4px 2px', letterSpacing: '.5px',
+        }}>📖 استانداردها</div>
+        {standardsChapters.map(ch => <ChapterButton key={ch.id} ch={ch} />)}
+
+        <div style={{
+          fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700,
+          padding: '14px 4px 2px', letterSpacing: '.5px',
+          borderTop: '1px dashed var(--border)', marginTop: 6,
+        }}>🐣 مراحل رشد و سن</div>
+        {stagesChapters.map(ch => <ChapterButton key={ch.id} ch={ch} />)}
       </div>
     </PageContainer>
   );
