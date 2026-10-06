@@ -175,6 +175,37 @@ export function collectEvents(): CalEvent[] {
     });
   } catch (e) { /* ignore */ }
 
+  // ============ ۲.۵ واکسن‌های گله (برنامه واکسن) ============
+  try {
+    const flocks = useFlk.getState().flocks || [];
+    flocks.forEach((f: any) => {
+      if (f.status !== 'active') return;
+      if (!f.vaccineScheduleId) return;
+      const sch = getSchedule(f.vaccineScheduleId);
+      if (!sch) return;
+      const startDate = getEffectiveStartDate(f);
+      if (!startDate) return;
+      const startD = jalaliToDate(startDate);
+      if (!startD) return;
+
+      sch.items.forEach((item, i) => {
+        const targetD = addDays(startD, item.day);
+        const targetStr = formatJ(targetD, 'yyyy/MM/dd');
+        const daysLeft = daysFromToday(targetStr);
+        events.push({
+          id: 'vac-sched-' + f.id + '-' + i,
+          date: targetStr,
+          type: 'vaccine',
+          title: '💉 ' + item.name,
+          subtitle: f.name + ' — ' + item.method + (daysLeft >= 0 ? ' · ' + daysLeft + ' روز مانده' : ' · گذشته'),
+          status: daysLeft === 0 ? 'today' : (daysLeft < 0 ? 'past' : 'future'),
+          icon: '💉',
+          refId: f.id,
+        });
+      });
+    });
+  } catch (e) { /* ignore */ }
+
   // ============ ۳. مالی — سرسید ============
   try {
     const invoices = useTra.getState().invoices || [];
