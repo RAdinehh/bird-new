@@ -8,6 +8,8 @@ import UploadModal from './UploadModal';
 import { Btn, BtnRow, Empty, Modal, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
+import { showConfirmAsync } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 import { ListCard, fabStyle, GridCard, chip } from './helpers';
 
 type ViewMode = 'grid' | 'list';
@@ -21,7 +23,6 @@ export default function FilesPage() {
   const [search, setSearch] = useState('');
   const [uploadOpen, setUploadOpen] = useState(false);
   const [previewId, setPreviewId] = useState<string | null>(null);
-  const [delId, setDelId] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
@@ -59,13 +60,11 @@ export default function FilesPage() {
   files.forEach(f => { counts[f.category] = (counts[f.category] || 0) + 1; });
 
   const previewFile = previewId ? files.find(f => f.id === previewId) : null;
-  const delFile = delId ? files.find(f => f.id === delId) : null;
 
-  const handleDelete = async () => {
-    if (delId === null) return;
-    await deleteFile(delId);
-    setDelId(null);
+  const doDelete = async (id: string) => {
+    await deleteFile(id);
     setRefresh(r => r + 1);
+    showToast('فایل حذف شد', 'success', 2000);
   };
 
   return (
@@ -204,11 +203,19 @@ export default function FilesPage() {
           gridTemplateColumns: 'repeat(2, 1fr)',
           gap: 8
         }}>
-          {filtered.map(f => <GridCard key={f.id} file={f} onPreview={() => setPreviewId(f.id)} onDelete={() => setDelId(f.id)} />)}
+          {filtered.map(f => <GridCard key={f.id} file={f} onPreview={() => setPreviewId(f.id)} onDelete={async () => {
+                  const ok = await showConfirmAsync('حذف فایل', 'حذف «' + f.name + '»؟\n\nاین عمل قابل بازگشت نیست.', { danger: true, confirmText: 'حذف کن' });
+                  if (!ok) return;
+                  await doDelete(f.id);
+                }} />)}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {filtered.map(f => <ListCard key={f.id} file={f} onPreview={() => setPreviewId(f.id)} onDelete={() => setDelId(f.id)} />)}
+          {filtered.map(f => <ListCard key={f.id} file={f} onPreview={() => setPreviewId(f.id)} onDelete={async () => {
+                  const ok = await showConfirmAsync('حذف فایل', 'حذف «' + f.name + '»؟\n\nاین عمل قابل بازگشت نیست.', { danger: true, confirmText: 'حذف کن' });
+                  if (!ok) return;
+                  await doDelete(f.id);
+                }} />)}
         </div>
       )}
 
@@ -336,20 +343,6 @@ export default function FilesPage() {
             </div>
           </>
         ) : null}
-      </Modal>
-
-      {/* تأیید حذف */}
-      <Modal
-        open={delId !== null}
-        onClose={() => setDelId(null)}
-        title="حذف فایل"
-        footer={<BtnRow><Btn variant="danger" onClick={handleDelete}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
-      >
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-          حذف <b>{delFile?.name}</b>؟
-          <br />
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>این عمل قابل بازگشت نیست.</span>
-        </div>
       </Modal>
     </PageContainer>
   );
