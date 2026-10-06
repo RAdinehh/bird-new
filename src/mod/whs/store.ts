@@ -18,6 +18,8 @@ export interface Item {
   minStock: number;
   currentStock: number;
   lastPrice: number;
+  /** میانگین موزون قیمت (fallback: lastPrice) */
+  avgPrice?: number;
   supplierId: string;
   expireDate: string;
   withdrawalDays: number | null;  // فقط برای دارو
@@ -87,6 +89,39 @@ export function generateBatchNo(date: string, existingMovements: Movement[], ite
 }
 
 const now = () => new Date().toISOString();
+
+/** میانگین موزون قیمت یک قلم (با fallback) */
+export function getAvgPrice(item: Item): number {
+  return item.avgPrice ?? item.lastPrice ?? 0;
+}
+
+/**
+ * recalcAvgPrice — بازمحاسبه میانگین موزون از تاریخچه
+ * startAvg: میانگین شروع (fallback: lastPrice)
+ */
+export function recalcAvgPrice(
+  item: Item,
+  movements: Movement[]
+): { avg: number; stock: number } {
+  let stock = item.initialStock ?? 0;
+  let avg = item.lastPrice || 0;
+  const sorted = movements
+    .filter(m => m.itemId === item.id)
+    .sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+  for (const m of sorted) {
+    if (m.type === 'in') {
+      if (m.unitPrice > 0 && stock + m.quantity > 0) {
+        avg = (stock * avg + m.quantity * m.unitPrice) / (stock + m.quantity);
+      }
+      stock += m.quantity;
+    } else if (m.type === 'out') {
+      stock -= m.quantity;
+    } else {
+      stock = m.quantity;
+    }
+  }
+  return { avg: Math.round(avg * 100) / 100, stock };
+}
 
 /** اعتبارسنجی Item — پرتاب خطا در صورت نامعتبر */
 function assertItem(data: any): void {
@@ -183,6 +218,19 @@ export const useWhs = create<State>()(
         else if (m.type === 'out') newStock = newStock - m.quantity;  // soft: اجازه منفی (UI هشدار می‌ده)
         else newStock = m.quantity;
 
+        // میانگین موزون: فقط برای in با قیمت > 0
+        let newAvg = getAvgPrice(item);
+        if (m.type === 'in' && m.unitPrice > 0) {
+          const stockBefore = item.currentStock;
+          const stockAfter = stockBefore + m.quantity;
+          if (stockAfter > 0) {
+            newAvg = (stockBefore * newAvg + m.quantity * m.unitPrice) / stockAfter;
+          } else {
+            newAvg = m.unitPrice;
+          }
+          newAvg = Math.round(newAvg * 100) / 100;
+        }
+
         const newId = uuid();
         set({
           movements: [...get().movements, { ...m, id: newId, createdAt: now() }],
@@ -190,6 +238,7 @@ export const useWhs = create<State>()(
             ...x,
             currentStock: newStock,
             lastPrice: m.unitPrice > 0 ? m.unitPrice : x.lastPrice,
+            avgPrice: newAvg,
             updatedAt: now()
           } : x)
         });
@@ -206,10 +255,16 @@ export const useWhs = create<State>()(
         const remaining = get().movements.filter(x => x.id !== id);
         const recalc = recalcStock(item, remaining);
         const newStock = recalc.expected;  // soft: اجازه منفی
+        const recalcAvg = recalcAvgPrice({ ...item, currentStock: newStock }, remaining);
 
         set({
           movements: remaining,
-          items: get().items.map(x => x.id === mv.itemId ? { ...x, currentStock: newStock, updatedAt: now() } : x)
+          items: get().items.map(x => x.id === mv.itemId ? {
+            ...x,
+            currentStock: newStock,
+            avgPrice: recalcAvg.avg,
+            updatedAt: now()
+          } : x)
         });
       }
     }),
@@ -306,5 +361,5 @@ export function expiryWarning(item: Item): 'ok' | 'soon' | 'expired' {
 
 /** ارزش کل انبار */
 export function totalInventoryValue(items: Item[]): number {
-  return items.reduce((a, x) => a + (x.currentStock * x.lastPrice), 0);
+  return items.reduce((a, x) => a + (x.currentStock * getAvgPrice(x)), 0);
 }

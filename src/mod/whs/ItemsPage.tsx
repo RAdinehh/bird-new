@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import {
-  useWhs, CATEGORY_LABEL, CATEGORY_ICON, CATEGORY_DEFAULTS,
+  useWhs, getAvgPrice, CATEGORY_LABEL, CATEGORY_ICON, CATEGORY_DEFAULTS,
   UNIT_LABEL, STORAGE_LABEL, stockWarning, expiryWarning,
   daysToExpiry, type Item, type ItemCategory, type ItemUnit
 } from './store';
@@ -322,7 +322,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                   <>
                     <span>موجودی: <b style={{ color: 'var(--text)' }}>{toFa(it.currentStock)} {UNIT_LABEL[it.unit]}</b></span>
                     {it.minStock > 0 ? <span>حد: <b style={{ color: 'var(--text)' }}>{toFa(it.minStock)}</b></span> : null}
-                    {it.lastPrice > 0 ? <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa((it.currentStock * it.lastPrice).toLocaleString('fa-IR'))} ت</b></span> : null}
+                    {it.lastPrice > 0 ? <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa((it.currentStock * getAvgPrice(it)).toLocaleString('fa-IR'))} ت</b></span> : null}
                   </>
                 }
               >
@@ -331,7 +331,8 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                 <Row l="واحد" v={UNIT_LABEL[it.unit]} />
                 <Row l="موجودی فعلی" v={`${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`} />
                 {it.minStock > 0 ? <Row l="حداقل موجودی" v={`${toFa(it.minStock)} ${UNIT_LABEL[it.unit]}`} /> : null}
-                {it.lastPrice > 0 ? <Row l="قیمت آخرین خرید" v={`${toFa(it.lastPrice.toLocaleString('fa-IR'))} ت`} /> : null}
+                {it.avgPrice && it.avgPrice > 0 ? <Row l="💰 قیمت میانگین" v={`${toFa(getAvgPrice(it).toLocaleString('fa-IR'))} ت`} /> : null}
+                {it.lastPrice > 0 ? <Row l="آخرین قیمت خرید" v={`${toFa(it.lastPrice.toLocaleString('fa-IR'))} ت`} /> : null}
                 {sup ? <Row l="تأمین‌کننده" v={sup.name} /> : null}
 
                 {it.currentStock > 0 && it.lastPrice > 0 ? (
@@ -340,7 +341,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                      background: 'var(--accent-soft)', color: 'var(--accent)',
                      borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                     <span>ارزش موجودی:</span>
-                    <span>{toFa((it.currentStock * it.lastPrice).toLocaleString('fa-IR'))} ت</span>
+                    <span>{toFa((it.currentStock * getAvgPrice(it)).toLocaleString('fa-IR'))} ت</span>
                   </div>
                 ) : null}
 
