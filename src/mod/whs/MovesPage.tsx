@@ -249,14 +249,14 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                 accent={accent}
                 index={toFa(i + 1)}
                 iconEmoji={m.type === 'in' ? '📥' : '📤'}
-                title={`${m.type === 'in' ? 'ورود' : 'خروج'} ${toFa(m.quantity)} ${item ? UNIT_LABEL[item.unit] : ''} — ${item?.name || '—'}`}
+                title={item?.name || '—'}
                 subtitle={`${toFa(m.date)} · ${MOVEMENT_REASON[m.reason]}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : m.id)}
                 badge={<Tag tone={m.type === 'in' ? 'green' : 'amber'}>{m.type === 'in' ? 'ورود' : 'خروج'}</Tag>}
                 stats={
                   <>
-                    <span>مقدار: <b style={{ color: 'var(--text)' }}>{toFa(m.quantity)}</b></span>
+                    <span>مقدار: <b style={{ color: 'var(--text)' }}>{toFa(m.quantity)} {item ? UNIT_LABEL[item.unit] : ''}</b></span>
                     {m.unitPrice > 0 ? <span>قیمت: <b style={{ color: 'var(--text)' }}>{toFa(m.unitPrice.toLocaleString('fa-IR'))}</b></span> : null}
                     {total > 0 ? <span>جمع: <b style={{ color: 'var(--text)' }}>{toFa(total.toLocaleString('fa-IR'))} ت</b></span> : null}
                   </>
