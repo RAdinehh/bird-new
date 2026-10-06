@@ -183,8 +183,11 @@ function ChapterView({
   );
 }
 
-export default function GuideTab({ group = 'standards' }: { group?: 'standards' | 'stages' } = {}) {
+type SubTab = 'standards' | 'stages';
+
+export default function GuideTab() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [subTab, setSubTab] = useState<SubTab>('standards');
 
   const selectedChapter = selectedId
     ? GUIDE_CONTENT.chapters.find(c => c.id === selectedId)
@@ -194,7 +197,7 @@ export default function GuideTab({ group = 'standards' }: { group?: 'standards' 
     return <ChapterView chapter={selectedChapter} onBack={() => setSelectedId(null)} />;
   }
 
-  const filtered = GUIDE_CONTENT.chapters.filter(c => (c.group || 'standards') === group);
+  const filtered = GUIDE_CONTENT.chapters.filter(c => (c.group || 'standards') === subTab);
 
   return (
     <PageContainer>
@@ -206,13 +209,40 @@ export default function GuideTab({ group = 'standards' }: { group?: 'standards' 
         marginBottom: 10,
       }}>
         <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
-          {group === 'stages' ? '🐣 مراحل رشد و سن' : '📖 استانداردها'}
+          📚 راهنمای علمی مدیریت مرغداری
         </div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: 4, lineHeight: 1.7 }}>
-          {group === 'stages'
-            ? 'اصطلاحات و سنین استاندارد صنعت مرغداری ایران'
-            : `راهنمای علمی مدیریت مرغداری — نسخه ${GUIDE_CONTENT.version}`}
+          نسخه {GUIDE_CONTENT.version} — به‌روزرسانی {GUIDE_CONTENT.lastUpdated}
         </div>
+      </div>
+
+      {/* زیرتب‌ها */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+        {([
+          { id: 'standards' as SubTab, label: 'استانداردها', icon: '📖' },
+          { id: 'stages' as SubTab,    label: 'مراحل رشد',   icon: '🐣' },
+        ]).map(st => {
+          const active = subTab === st.id;
+          return (
+            <button
+              key={st.id}
+              type="button"
+              onClick={() => setSubTab(st.id)}
+              style={{
+                flex: 1, padding: '8px 12px',
+                background: active ? 'var(--accent-soft)' : 'var(--card-solid)',
+                border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+                borderRadius: 'var(--r-md)',
+                color: active ? 'var(--accent)' : 'var(--muted)',
+                fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                fontWeight: active ? 700 : 600,
+                cursor: 'pointer',
+              }}
+            >
+              {st.icon} {st.label}
+            </button>
+          );
+        })}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
