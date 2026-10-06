@@ -2,6 +2,7 @@ import type { GuideChapter } from '../types';
 
 export const CHAPTER_IRAN: GuideChapter = {
   id: 'iran',
+  group: 'standards',
   title: 'استانداردهای ایران',
   icon: '🇮🇷',
   subtitle: 'دما، تراکم، تجهیزات بر اساس منابع داخلی',

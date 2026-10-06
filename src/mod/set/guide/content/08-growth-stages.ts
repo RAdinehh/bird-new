@@ -2,6 +2,7 @@ import type { GuideChapter } from '../types';
 
 export const CHAPTER_GROWTH_STAGES: GuideChapter = {
   id: 'growth-stages',
+  group: 'stages',
   title: 'مراحل رشد و سن',
   icon: '🐣',
   subtitle: 'اصطلاحات و سنین استاندارد صنعت مرغداری ایران',

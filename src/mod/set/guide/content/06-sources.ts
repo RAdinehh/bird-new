@@ -2,6 +2,7 @@ import type { GuideChapter } from '../types';
 
 export const CHAPTER_SOURCES: GuideChapter = {
   id: 'sources',
+  group: 'standards',
   title: 'منابع',
   icon: '📚',
   subtitle: 'مراجع علمی و استانداردها',

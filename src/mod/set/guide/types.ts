@@ -23,6 +23,8 @@ export interface GuideSection {
 
 export interface GuideChapter {
   id: string;
+  /** گروه فصل */
+  group?: 'standards' | 'stages';
   title: string;
   icon: string;
   subtitle: string;

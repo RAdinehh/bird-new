@@ -2,6 +2,7 @@ import type { GuideChapter } from '../types';
 
 export const CHAPTER_INTERNATIONAL: GuideChapter = {
   id: 'international',
+  group: 'standards',
   title: 'استانداردهای بین‌المللی',
   icon: '🌍',
   subtitle: 'Cobb، Aviagen، Hy-Line، Lohmann',

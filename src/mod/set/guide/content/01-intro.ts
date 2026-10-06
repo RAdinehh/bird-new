@@ -2,6 +2,7 @@ import type { GuideChapter } from '../types';
 
 export const CHAPTER_INTRO: GuideChapter = {
   id: 'intro',
+  group: 'standards',
   title: 'مقدمه',
   icon: '📖',
   subtitle: 'چرا استانداردها مهم هستند',

@@ -2,6 +2,7 @@ import type { GuideChapter } from '../types';
 
 export const CHAPTER_CALCULATIONS: GuideChapter = {
   id: 'calculations',
+  group: 'standards',
   title: 'محاسبات',
   icon: '🧮',
   subtitle: 'فرمول‌ها و روش‌های محاسبه',

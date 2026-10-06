@@ -183,8 +183,11 @@ function ChapterView({
   );
 }
 
+type SubTab = 'standards' | 'stages';
+
 export default function GuideTab() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [subTab, setSubTab] = useState<SubTab>('standards');
 
   const selectedChapter = selectedId
     ? GUIDE_CONTENT.chapters.find(c => c.id === selectedId)
@@ -194,6 +197,13 @@ export default function GuideTab() {
     return <ChapterView chapter={selectedChapter} onBack={() => setSelectedId(null)} />;
   }
 
+  const subtabs: { id: SubTab; label: string; icon: string }[] = [
+    { id: 'standards', label: 'استانداردها', icon: '📖' },
+    { id: 'stages',    label: 'مراحل رشد',   icon: '🐣' },
+  ];
+
+  const filtered = GUIDE_CONTENT.chapters.filter(c => (c.group || 'standards') === subTab);
+
   return (
     <PageContainer>
       <div style={{
@@ -201,17 +211,44 @@ export default function GuideTab() {
         background: 'var(--accent-soft)',
         border: '1px solid var(--accent-border)',
         borderRadius: 'var(--r-md)',
-        marginBottom: 12,
+        marginBottom: 10,
       }}>
         <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
-          📖 راهنمای علمی مدیریت مرغداری
+          📚 راهنمای علمی مدیریت مرغداری
         </div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: 4, lineHeight: 1.7 }}>
-          ۷ فصل — استانداردها، تجهیزات، محاسبات، منابع. نسخه {GUIDE_CONTENT.version} — به‌روزرسانی {GUIDE_CONTENT.lastUpdated}
+          نسخه {GUIDE_CONTENT.version} — به‌روزرسانی {GUIDE_CONTENT.lastUpdated}
         </div>
       </div>
+
+      {/* زیرتب‌ها */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+        {subtabs.map(st => {
+          const active = subTab === st.id;
+          return (
+            <button
+              key={st.id}
+              type="button"
+              onClick={() => setSubTab(st.id)}
+              style={{
+                flex: 1, padding: '8px 12px',
+                background: active ? 'var(--accent-soft)' : 'var(--card-solid)',
+                border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+                borderRadius: 'var(--r-md)',
+                color: active ? 'var(--accent)' : 'var(--muted)',
+                fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                fontWeight: active ? 700 : 600,
+                cursor: 'pointer',
+              }}
+            >
+              {st.icon} {st.label}
+            </button>
+          );
+        })}
+      </div>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {GUIDE_CONTENT.chapters.map((ch) => (
+        {filtered.map((ch) => (
           <button
             key={ch.id}
             type="button"

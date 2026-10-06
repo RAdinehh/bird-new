@@ -2,6 +2,7 @@ import type { GuideChapter } from '../types';
 
 export const CHAPTER_EQUIPMENT: GuideChapter = {
   id: 'equipment',
+  group: 'standards',
   title: 'تجهیزات',
   icon: '⚙️',
   subtitle: 'آبخوری، دانخوری، تهویه، گرمایش، روشنایی',

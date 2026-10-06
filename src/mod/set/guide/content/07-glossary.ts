@@ -2,6 +2,7 @@ import type { GuideChapter } from '../types';
 
 export const CHAPTER_GLOSSARY: GuideChapter = {
   id: 'glossary',
+  group: 'standards',
   title: 'واژه‌نامه',
   icon: '📔',
   subtitle: 'اصطلاحات تخصصی مرغداری',
