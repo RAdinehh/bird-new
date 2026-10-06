@@ -169,55 +169,95 @@ export default function ListCards({
                           </Tag>
                         </div>
                         {/* نوار پیشرفت چرخه */}
-                        {lc.progress > 0 && (
-                          <div style={{ marginTop: 8 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--muted)', marginBottom: 3 }}>
-                              <span>چرخه: {toFa(Math.round(lc.progress))}٪</span>
-                              {f.endOfCycleDay || bird?.cycleDays ? (
-                                <span>{toFa(age)} از {toFa((f.endOfCycleDay || bird?.cycleDays) ?? 0)} روز</span>
-                              ) : null}
+                        {lc.progress > 0 && (() => {
+                          const cycleDays = f.endOfCycleDay || bird?.cycleDays || 0;
+                          const milestones = (CYCLE_MILESTONES[f.type] || [])
+                            .filter(m => m.day > 0 && m.day < cycleDays);
+                          const progressColor = lc.progress >= 95 ? 'var(--danger)' : lc.progress >= 80 ? 'var(--warn)' : 'var(--accent)';
+                          const currentStageLabel = lc.label;
+                          return (
+                            <div style={{ marginTop: 10 }}>
+                              {/* ردیف بالا: عنوان + آمار */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)', marginBottom: 6 }}>
+                                <span style={{ color: progressColor, fontWeight: 700 }}>
+                                  🔄 {currentStageLabel} · {toFa(Math.round(lc.progress))}٪
+                                </span>
+                                {cycleDays > 0 && (
+                                  <span style={{ color: 'var(--muted)' }}>
+                                    روز {toFa(age)} از {toFa(cycleDays)}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* نوار پیشرفت با نقاط عطف */}
+                              <div style={{ position: 'relative', paddingTop: 10, paddingBottom: 16 }}>
+                                {/* نوار اصلی */}
+                                <div style={{
+                                  position: 'relative',
+                                  height: 10,
+                                  background: 'var(--input-bg)',
+                                  borderRadius: 5,
+                                  border: '1px solid var(--border)',
+                                  overflow: 'hidden',
+                                }}>
+                                  <div style={{
+                                    height: '100%',
+                                    width: Math.min(100, lc.progress) + '%',
+                                    background: progressColor,
+                                    borderRadius: 5,
+                                    transition: 'width .3s',
+                                  }} />
+                                </div>
+
+                                {/* نقاط عطف */}
+                                {milestones.map((m, idx) => {
+                                  const pct = (m.day / cycleDays) * 100;
+                                  const passed = age >= m.day;
+                                  return (
+                                    <div
+                                      key={idx}
+                                      style={{
+                                        position: 'absolute',
+                                        right: `calc(${pct}% - 8px)`,
+                                        top: 0,
+                                        width: 16,
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        pointerEvents: 'none',
+                                      }}
+                                      title={m.label + ' · روز ' + toFa(m.day)}
+                                    >
+                                      {/* نقطه روی نوار */}
+                                      <div style={{
+                                        width: passed ? 8 : 6,
+                                        height: passed ? 8 : 6,
+                                        borderRadius: '50%',
+                                        background: passed ? progressColor : 'var(--card-solid)',
+                                        border: '2px solid ' + (passed ? progressColor : 'var(--border)'),
+                                        boxShadow: '0 0 0 2px var(--card-solid)',
+                                        marginTop: passed ? 11 : 12,
+                                        transition: 'all .2s',
+                                      }} />
+                                      {/* برچسب */}
+                                      <div style={{
+                                        position: 'absolute',
+                                        top: 22,
+                                        fontSize: 9,
+                                        fontWeight: passed ? 700 : 500,
+                                        color: passed ? progressColor : 'var(--muted)',
+                                        whiteSpace: 'nowrap',
+                                        textAlign: 'center',
+                                        transform: 'translateX(50%)',
+                                        right: '50%',
+                                      }}>{m.label}</div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             </div>
-                            <div style={{ position: 'relative', height: 6, background: 'var(--input-bg)', borderRadius: 3, overflow: 'visible' }}>
-                              <div style={{
-                                height: '100%',
-                                width: Math.min(100, lc.progress) + '%',
-                                background: lc.progress >= 95 ? 'var(--danger)' : lc.progress >= 80 ? 'var(--warn)' : 'var(--accent)',
-                                borderRadius: 3,
-                                transition: 'width .3s',
-                              }} />
-                              {/* نقاط عطف */}
-                              {(() => {
-                                const cycleDays = f.endOfCycleDay || bird?.cycleDays || 0;
-                                if (!cycleDays) return null;
-                                const milestones = CYCLE_MILESTONES[f.type] || [];
-                                return milestones
-                                  .filter(m => m.day > 0 && m.day < cycleDays)
-                                  .map((m, idx) => {
-                                    const pct = (m.day / cycleDays) * 100;
-                                    const passed = age >= m.day;
-                                    return (
-                                      <div
-                                        key={idx}
-                                        title={m.label + ' · روز ' + toFa(m.day)}
-                                        style={{
-                                          position: 'absolute',
-                                          top: -1,
-                                          bottom: -1,
-                                          right: pct + '%',
-                                          width: 2,
-                                          background: passed ? 'var(--avatar-text, #fff)' : 'var(--card-solid)',
-                                          borderRadius: 1,
-                                          boxShadow: '0 0 0 1px var(--border)',
-                                          pointerEvents: 'auto',
-                                          transition: 'background .2s',
-                                        }}
-                                      />
-                                    );
-                                  });
-                              })()}
-                            </div>
-                          </div>
-                        )}
+                          );
+                        })()}
                       </div>
                     );
                   })}
