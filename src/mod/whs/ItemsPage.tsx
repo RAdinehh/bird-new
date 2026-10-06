@@ -199,15 +199,9 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
     setOpen(false);
   };
 
-  // آبشاری: کدام فیلدهای اضافی بر اساس دسته نمایش داده شوند
-  const EXTRAS: Record<string, { expiry: boolean; batch: boolean; withdrawal: boolean; storage: boolean; title: string }> = {
-    egg:       { expiry: true,  batch: false, withdrawal: false, storage: false, title: '🥚 اطلاعات تخم' },
-    medicine:  { expiry: true,  batch: true,  withdrawal: true,  storage: true,  title: '💊 اطلاعات دارویی' },
-    vaccine:   { expiry: true,  batch: true,  withdrawal: true,  storage: true,  title: '💉 اطلاعات واکسن' },
-    herbal:    { expiry: true,  batch: false, withdrawal: false, storage: false, title: '🌿 اطلاعات گیاهی' },
-  };
-  const extras = EXTRAS[form.category] || null;
-  const hasExtras = !!(extras && (extras.expiry || extras.batch || extras.withdrawal || extras.storage));
+  // آبشاری: فیلدهای اضافی مستقیماً از CATEGORY_DEFAULTS (منبع واحد حقیقت)
+  const extras = CATEGORY_DEFAULTS[form.category];
+  const hasExtras = !!(extras && (extras.needsExpiry || extras.needsBatch || extras.needsWithdrawal || extras.needsStorage));
   const isMedicine = form.category === 'medicine' || form.category === 'vaccine';
 
   return (
@@ -457,29 +451,29 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
 
         {hasExtras && (
           <>
-            <SectionTitle>{extras!.title}</SectionTitle>
-            {(extras!.batch || extras!.expiry) && (
+            <SectionTitle>{extras.title}</SectionTitle>
+            {(extras.needsBatch || extras.needsExpiry) && (
               <Grid2>
-                {extras!.batch && (
+                {extras.needsBatch && (
                   <Field label="شماره بچ">
                     <Input placeholder="..." dir="ltr" value={form.batchNo} onChange={e => setForm({ ...form, batchNo: e.target.value })} />
                   </Field>
                 )}
-                {extras!.expiry && (
+                {extras.needsExpiry && (
                   <Field label="تاریخ انقضا">
                     <DatePicker value={form.expireDate} onChange={v => setForm({ ...form, expireDate: v })}  autoToday />
                   </Field>
                 )}
               </Grid2>
             )}
-            {(extras!.withdrawal || extras!.storage) && (
+            {(extras.needsWithdrawal || extras.needsStorage) && (
               <Grid2>
-                {extras!.withdrawal && (
+                {extras.needsWithdrawal && (
                   <Field label="دوره منع مصرف" hint="روز">
                     <NumField placeholder="مثلاً — ۳" value={form.withdrawalDays} onChange={e => setForm({ ...form, withdrawalDays: e.target.value })} unit="روز" min={0} />
                   </Field>
                 )}
-                {extras!.storage && (
+                {extras.needsStorage && (
                   <Field label="نگهداری">
                     <Select value={form.storage} onChange={e => setForm({ ...form, storage: e.target.value })}>
                       <option value="room">دمای اتاق</option>

@@ -161,14 +161,17 @@ export const CATEGORY_DEFAULTS: Record<ItemCategory, {
   storage: string;
   needsExpiry: boolean;
   needsWithdrawal: boolean;
+  needsBatch: boolean;
+  needsStorage: boolean;
+  title: string;
 }> = {
-  egg:        { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false },
-  feed:       { unit: 'kg',   storage: 'room',   needsExpiry: false, needsWithdrawal: false },
-  medicine:   { unit: 'ml',   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true  },
-  vaccine:    { unit: 'vial', storage: 'fridge', needsExpiry: true,  needsWithdrawal: true  },
-  herbal:     { unit: 'g',    storage: 'room',   needsExpiry: false, needsWithdrawal: false },
-  equipment:  { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false },
-  consumable: { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false },
+  egg:        { unit: 'pcs',  storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, title: '🥚 اطلاعات تخم' },
+  feed:       { unit: 'kg',   storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, title: '' },
+  medicine:   { unit: 'ml',   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  title: '💊 اطلاعات دارویی' },
+  vaccine:    { unit: 'vial', storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  title: '💉 اطلاعات واکسن' },
+  herbal:     { unit: 'g',    storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, title: '🌿 اطلاعات گیاهی' },
+  equipment:  { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, title: '' },
+  consumable: { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, title: '' },
 };
 
 export const UNIT_LABEL: Record<ItemUnit, string> = {
