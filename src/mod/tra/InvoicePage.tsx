@@ -537,7 +537,6 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ ثبت خرید</Btn>
         </>
       )}
 

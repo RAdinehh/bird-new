@@ -383,7 +383,6 @@ export default function ItemsPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ افزودن قلم</Btn>
         </>
       )}
 

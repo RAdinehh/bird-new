@@ -405,7 +405,6 @@ export default function IngredientsPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ افزودن ماده اولیه جدید</Btn>
         </>
       )}
 

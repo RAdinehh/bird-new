@@ -288,7 +288,6 @@ export default function RequirementsPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ افزودن نیاز</Btn>
         </>
       )}
 

@@ -305,7 +305,6 @@ export default function MovesPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ ثبت گردش</Btn>
         </>
       )}
 

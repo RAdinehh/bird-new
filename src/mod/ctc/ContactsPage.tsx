@@ -349,7 +349,6 @@ export default function ContactsPage() {
                 </ExpandableCard>
               );
             })}
-            <Btn variant="primary" full onClick={openNew}>+ افزودن مخاطب</Btn>
           </>
         )}
 

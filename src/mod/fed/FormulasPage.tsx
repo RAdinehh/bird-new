@@ -336,7 +336,6 @@ export default function FormulasPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ ساخت جیره</Btn>
         </>
       )}
 

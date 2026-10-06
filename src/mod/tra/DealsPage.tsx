@@ -273,7 +273,6 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ ثبت معامله</Btn>
         </>
       )}
 
