@@ -168,25 +168,45 @@ export default function ListCards({
                             {lc.label}
                           </Tag>
                         </div>
-                        {/* نوار پیشرفت چرخه —分段 (Segmented) */}
+                        {/* نوار پیشرفت چرخه — بخش‌بندی شده */}
                         {lc.progress > 0 && (() => {
                           const cycleDays = f.endOfCycleDay || bird?.cycleDays || 0;
                           if (!cycleDays) return null;
                           
                           const stageMilestones = (CYCLE_MILESTONES[f.type] || []).filter(m => m.day > 0 && m.day < cycleDays);
-                          
-                          // ساخت بخش‌ها: [شروع(۱) → m1]، [m1 → m2]، ...، [mLast → پایان]
                           const breakpoints = [1, ...stageMilestones.map(m => m.day), cycleDays];
-                          const segments = [];
+                          
+                          // ساخت بخش‌ها با حداقل روز مؤثر (برای خوانایی)
+                          const MIN_DAYS = cycleDays * 0.13; // حداقل ۱۳٪ از کل
+                          const rawSegments = [];
                           for (let i = 0; i < breakpoints.length - 1; i++) {
                             const start = breakpoints[i];
                             const end = breakpoints[i + 1];
+                            const days = end - start;
+                            const effectiveDays = Math.max(days, MIN_DAYS);
                             const label = i === 0 ? 'شروع' : stageMilestones[i - 1]?.label || 'پایان';
                             const passed = age >= end;
                             const isCurrent = age >= start && age < end;
-                            const width = ((end - start) / (cycleDays - 1)) * 100;
-                            segments.push({ start, end, label, passed, isCurrent, width });
+                            rawSegments.push({ start, end, days, effectiveDays, label, passed, isCurrent });
                           }
+                          
+                          // نرمال‌سازی عرض‌ها
+                          const totalEffective = rawSegments.reduce((sum, s) => sum + s.effectiveDays, 0);
+                          const segments = rawSegments.map(s => ({ ...s, widthPct: (s.effectiveDays / totalEffective) * 100 }));
+                          
+                          // محاسبه موقعیت نقطه متحرک بر اساس عرض نمایش‌داده‌شده
+                          let markerPct = 0;
+                          let accumulated = 0;
+                          for (const seg of segments) {
+                            if (age >= seg.end) {
+                              accumulated += seg.widthPct;
+                            } else if (age >= seg.start) {
+                              const ratio = (age - seg.start) / (seg.end - seg.start);
+                              markerPct = accumulated + ratio * seg.widthPct;
+                              break;
+                            }
+                          }
+                          if (age >= cycleDays) markerPct = 100;
                           
                           const progressColor = lc.progress >= 95 ? 'var(--danger)' : lc.progress >= 80 ? 'var(--warn)' : 'var(--accent)';
                           
@@ -202,16 +222,15 @@ export default function ListCards({
                                 </span>
                               </div>
 
-                              {/* نوار分段 */}
+                              {/* نوار بخش‌بندی */}
                               <div style={{ display: 'flex', gap: 2, marginBottom: 6 }}>
                                 {segments.map((seg, idx) => (
                                   <div
                                     key={idx}
                                     title={`${seg.label} · روز ${toFa(seg.start)} تا ${toFa(seg.end)}`}
                                     style={{
-                                      flex: seg.width,
-                                      minWidth: 28,
-                                      padding: '7px 2px',
+                                      flex: `0 0 ${seg.widthPct}%`,
+                                      padding: '8px 4px',
                                       background: seg.isCurrent ? progressColor : seg.passed ? 'var(--accent-soft)' : 'var(--input-bg)',
                                       color: seg.isCurrent ? 'var(--avatar-text, #fff)' : seg.passed ? 'var(--accent)' : 'var(--muted)',
                                       fontSize: 'var(--fs-xs)',
@@ -230,13 +249,13 @@ export default function ListCards({
                               </div>
 
                               {/* نشانگر متحرک سن */}
-                              <div style={{ position: 'relative', height: 6, marginBottom: 2 }}>
+                              <div style={{ position: 'relative', height: 8 }}>
                                 <div style={{
                                   position: 'absolute',
-                                  right: `calc(${Math.min(100, Math.max(0, lc.progress))}% - 4px)`,
-                                  top: -2,
-                                  width: 8,
-                                  height: 8,
+                                  right: `calc(${markerPct}% - 5px)`,
+                                  top: 0,
+                                  width: 10,
+                                  height: 10,
                                   borderRadius: '50%',
                                   background: progressColor,
                                   border: '2px solid var(--card-solid)',
