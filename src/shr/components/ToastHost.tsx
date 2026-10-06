@@ -37,14 +37,14 @@ export default function ToastHost() {
   return (
     <div style={{
       position: 'fixed',
-      top: 60,
+      top: 68,
       left: 0,
       right: 0,
       zIndex: 9999,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      gap: 6,
+      gap: 4,
       pointerEvents: 'none',
       padding: '0 12px',
     }}>
@@ -59,18 +59,16 @@ export default function ToastHost() {
             aria-live="polite"
             style={{
               background: 'var(--card-solid)',
-              border: '1.5px solid ' + color,
-              borderRight: '4px solid ' + color,
+              border: '1px solid ' + color,
+              borderRight: '3px solid ' + color,
               borderRadius: 'var(--r-md)',
-              padding: '10px 14px',
-              minWidth: 220,
-              maxWidth: 400,
-              width: '100%',
-              boxShadow: '0 6px 18px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08)',
+              padding: '6px 10px',
+              maxWidth: 300,
+              boxShadow: '0 3px 10px rgba(0,0,0,.10), 0 1px 3px rgba(0,0,0,.06)',
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
-              fontSize: 'var(--fs-sm)',
+              gap: 6,
+              fontSize: 'var(--fs-xs)',
               fontWeight: 600,
               color: 'var(--text)',
               pointerEvents: 'auto',
@@ -83,10 +81,10 @@ export default function ToastHost() {
             <span
               aria-hidden="true"
               style={{
-                width: 32, height: 32, borderRadius: '50%',
+                width: 22, height: 22, borderRadius: '50%',
                 background: soft, color: color,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 16, flexShrink: 0,
+                fontSize: 12, flexShrink: 0,
               }}
             >{TYPE_ICON[t.type]}</span>
             <span style={{ flex: 1, lineHeight: 1.6, wordBreak: 'break-word' }}>{t.message}</span>
