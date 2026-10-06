@@ -1,5 +1,6 @@
 import { useSet } from './store';
 import { Btn, Field, Grid2, Input } from '../../shr/components/ui';
+import TimePicker from '../../shr/components/TimePicker';
 import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow, LocalNumField } from './helpers';
@@ -68,19 +69,17 @@ export default function NotificationsTab() {
           <>
             <Grid2>
               <Field label="از ساعت">
-                <Input
+                <TimePicker
                   value={qh.from}
-                  onChange={e => s.updateSection('quietHours', { from: e.target.value })}
-                  placeholder="22:00"
-                  dir="ltr"
+                  onChange={v => s.updateSection('quietHours', { from: v })}
+                  placeholder="انتخاب ساعت"
                 />
               </Field>
               <Field label="تا ساعت">
-                <Input
+                <TimePicker
                   value={qh.to}
-                  onChange={e => s.updateSection('quietHours', { to: e.target.value })}
-                  placeholder="07:00"
-                  dir="ltr"
+                  onChange={v => s.updateSection('quietHours', { to: v })}
+                  placeholder="انتخاب ساعت"
                 />
               </Field>
             </Grid2>

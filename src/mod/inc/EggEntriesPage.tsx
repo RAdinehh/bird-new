@@ -14,6 +14,7 @@ import { useCtc } from '../ctc/store';
 import { useTra } from '../tra/store';
 import { useEgg } from '../egg/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
+import TimePicker from '../../shr/components/TimePicker';
 import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -966,7 +967,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
               <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ"  autoToday />
             </Field>
             <Field label="ساعت ورود">
-              <Input value={currentRow.entryTime} onChange={e => setCurrentRow(f => ({ ...f, entryTime: e.target.value }))} placeholder="۱۴:۳۵" dir="ltr" />
+              <TimePicker value={currentRow.entryTime} onChange={v => setCurrentRow(f => ({ ...f, entryTime: v }))} placeholder="انتخاب ساعت" />
             </Field>
           </Grid2>
 
