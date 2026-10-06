@@ -445,6 +445,7 @@ export default function ReceivablesPage() {
       {/* Modal تعویق */}
       <Modal
         open={!!deferModal}
+        center
         onClose={() => setDeferModal(null)}
         title="⏰ تعویق سرسید"
         footer={

@@ -768,6 +768,7 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
       {/* Modal انتقال workflow */}
       <Modal
         open={!!transferModal}
+        center
         onClose={() => { setTransferModal(null); setTransferNote(''); setTransferDate(''); }}
         title={transferModal ? `تغییر به ${WORKFLOW_LABEL[transferModal.to]}` : ''}
         footer={<BtnRow><Btn variant="primary" onClick={doTransfer}>تأیید</Btn><Btn onClick={() => setTransferModal(null)}>لغو</Btn></BtnRow>}

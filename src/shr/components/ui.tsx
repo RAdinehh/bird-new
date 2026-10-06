@@ -477,6 +477,8 @@ interface ModalProps {
   preventClose?: boolean;
   contentGap?: number;
   headerAction?: React.ReactNode;
+  /** اگه true، وسط صفحه باز می‌شه (نه از پایین) */
+  center?: boolean;
 }
 
 const MODAL_SIZES: Record<'sm' | 'md' | 'lg', number> = {
@@ -488,6 +490,7 @@ const MODAL_SIZES: Record<'sm' | 'md' | 'lg', number> = {
 export function Modal({
   open, onClose, title, children, footer,
   size = 'md', preventClose = false, contentGap, headerAction,
+  center = false,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
@@ -691,8 +694,9 @@ export function Modal({
         background: 'var(--overlay)',
         zIndex: 100 + (window.__modalDepth || 0),
         display: 'flex',
-        alignItems: 'flex-end',
+        alignItems: center ? 'center' : 'flex-end',
         justifyContent: 'center',
+        padding: center ? '16px' : 0,
       }}
     >
       <div
@@ -705,6 +709,8 @@ export function Modal({
           background: 'var(--card-solid)',
           borderTopLeftRadius: isFull ? 0 : 'var(--r-2xl)',
           borderTopRightRadius: isFull ? 0 : 'var(--r-2xl)',
+          borderBottomLeftRadius: center && !isFull ? 'var(--r-2xl)' : 0,
+          borderBottomRightRadius: center && !isFull ? 'var(--r-2xl)' : 0,
           boxSizing: 'border-box',
           paddingTop: 'env(safe-area-inset-top, 0px)',
           width: '100%',
@@ -717,7 +723,8 @@ export function Modal({
           transition: 'max-height 320ms cubic-bezier(.2,.9,.3,1), height 320ms cubic-bezier(.2,.9,.3,1), border-radius 220ms ease, transform 300ms cubic-bezier(.2,.9,.3,1)',
         }}
       >
-        {/* Drag handle (فقط موبایل) */}
+        {/* Drag handle (فقط موبایل و نه در حالت center) */}
+        {!center && (
         <div
           onTouchStart={onDragStart}
           onTouchMove={onDragMove}
@@ -740,6 +747,7 @@ export function Modal({
             background: 'var(--border)',
           }} />
         </div>
+        )}
         {/* Header */}
         <div
           style={{
