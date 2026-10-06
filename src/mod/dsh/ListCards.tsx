@@ -272,14 +272,14 @@ export default function ListCards({
                                 })}
                               </div>
 
+                              {/* اعداد دو سر نوار */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 10, color: 'var(--muted)', fontWeight: 600 }}>
+                                <span>۱</span>
+                                <span>{toFa(cycleDays)} روز</span>
+                              </div>
+
                               {/* برچسب مرحله‌ها زیر نوار */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, gap: 4 }}>
-                                <div style={{
-                                  fontSize: 10,
-                                  fontWeight: 500,
-                                  color: 'var(--muted)',
-                                  whiteSpace: 'nowrap',
-                                }}>شروع</div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2, gap: 4 }}>
                                 {stageMilestones.map((milestone, idx) => {
                                   const passed = age >= milestone.day;
                                   return (
