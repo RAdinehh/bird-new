@@ -327,7 +327,10 @@ export const useTra = create<State>()(
         const num = generateInvoiceNumber(i.type, i.date, get().invoices);
         const newInv = { ...i, id, number: i.number || num, createdAt: now(), updatedAt: now() } as any;
         let items: InvoiceItem[] = newInv.items || [];
-        try { items = applyInvoiceFlocks(newInv); } catch(e) {}
+        // 🎯 ۱. اتصال به انبار (اگه قلم‌ها به whs وصل باشن)
+        try { items = applyInvoiceMovements({ ...newInv, items }); } catch(e) {}
+        // 🎯 ۲. اعمال روی گله‌ها (خرید/فروش پرنده)
+        try { items = applyInvoiceFlocks({ ...newInv, items }); } catch(e) {}
         const final = { ...newInv, items };
         set({ invoices: [...get().invoices, final] });
         return id;
