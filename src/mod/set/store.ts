@@ -40,6 +40,7 @@ export interface Settings {
   // ویژگی‌های داخلی (زیرماژول‌ها)
   features: {
     vaccine: boolean;         // واکسن و برنامه واکسن
+    medicine: boolean;        // دارو (گیاهی + شیمیایی)
   };
 
   // منوی پایین — ۵ ماژول انتخابی
@@ -86,7 +87,7 @@ const defaultSettings: Settings = {
   lowPowerMode: false,
   printPaper: 'A4',
   modules: {},
-  features: { vaccine: true },
+  features: { vaccine: true, medicine: true },
   customStandards: {},
 
   autoBackup: { enabled: true, intervalHours: 24, maxVersions: 5 },

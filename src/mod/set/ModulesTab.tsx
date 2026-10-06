@@ -108,9 +108,15 @@ export default function ModulesTab() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <FeatureToggle
           icon="💉"
-          title="واکسن و دارو"
-          desc="نمایش بخش واکسن در ثبت روزانه، برنامه واکسن گله، تقویم"
+          title="واکسن"
+          desc="واکسن‌ها: فرم ثبت روزانه، برنامه واکسن گله، هشدار انقضا، تقویم"
           featureKey="vaccine"
+        />
+        <FeatureToggle
+          icon="🌿"
+          title="دارو (گیاهی + شیمیایی)"
+          desc="داروها: فرم ثبت روزانه، هشدار انقضا"
+          featureKey="medicine"
         />
       </div>
 
