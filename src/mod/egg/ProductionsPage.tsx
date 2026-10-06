@@ -48,7 +48,7 @@ export default function ProductionsPage() {
   const { flocks } = useFlk();
   const { birds } = useBrd();
 
-  const activeFlocks = flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder'));
+  const activeFlocks = flocks.filter(f => f.status === 'active' && !f.paused && (f.type === 'layer' || f.type === 'breeder'));
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());

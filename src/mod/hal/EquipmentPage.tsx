@@ -87,7 +87,7 @@ function calcEquipNeed(
   hallArea: number,
 ): { need: number; unit: string; desc: string } | null {
   // گله فعال این سالن
-  const flock = flocks.find((f: any) => f.hallId === hallId && f.status === 'active');
+  const flock = flocks.find((f: any) => f.hallId === hallId && f.status === 'active' && !f.paused);
   if (!flock) return null;
 
   const std = breedStd.byBreedId(flock.breedId);

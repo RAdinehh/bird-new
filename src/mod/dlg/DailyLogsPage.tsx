@@ -105,7 +105,7 @@ export default function DailyLogsPage() {
   const [undoData, setUndoData] = useState<{ log: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const activeFlocks = flocks.filter(f => f.status === 'active');
+  const activeFlocks = flocks.filter(f => f.status === 'active' && !f.paused);
   const today = new Date();
   const todayStr = formatJ(today, 'yyyy/MM/dd');
 

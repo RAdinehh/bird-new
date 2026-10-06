@@ -34,7 +34,7 @@ export default function StatsPage() {
   const [range, setRange] = useState<Range>('30');
   const [chartType, setChartType] = useState<ChartType>('bar');
 
-  const activeFlocks = flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder'));
+  const activeFlocks = flocks.filter(f => f.status === 'active' && !f.paused && (f.type === 'layer' || f.type === 'breeder'));
 
   const filtered = useMemo(() => {
     let arr = [...productions];

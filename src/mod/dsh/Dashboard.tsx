@@ -61,7 +61,7 @@ export default function Dashboard() {
   const thisMonth = currentMonth();
 
   // ============ گله‌های فعال ============
-  const activeFlocks = useMemo(() => flocks.filter(f => f.status === 'active'), [flocks]);
+  const activeFlocks = useMemo(() => flocks.filter(f => f.status === 'active' && !f.paused), [flocks]);
 
   // انتخاب خودکار اولین گله فعال
   useEffect(() => {

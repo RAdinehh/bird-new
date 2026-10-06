@@ -893,7 +893,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
           {currentRow.dealType === 'own' && (
             <Field label="انتخاب گله" required>
               {(() => {
-                const activeFlocks = flocks.filter((fl: any) => fl.status === 'active');
+                const activeFlocks = flocks.filter((fl: any) => fl.status === 'active' && !fl.paused);
                 const readyFlocks = activeFlocks.filter((fl: any) => {
                   const brd = birds.find(b => b.id === fl.birdId);
                   const r = flockReadyForEggs(fl, brd);
