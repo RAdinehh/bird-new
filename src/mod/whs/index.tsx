@@ -102,10 +102,10 @@ export default function Whs() {
           }}
         >
           <div key="items" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <ItemsPage />
+            <ItemsPage active={tab === 'items'} />
           </div>
           <div key="moves" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <MovesPage />
+            <MovesPage active={tab === 'moves'} />
           </div>
           <div key="warnings" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <WarningsPage />

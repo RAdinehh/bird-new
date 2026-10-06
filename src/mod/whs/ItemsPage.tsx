@@ -46,7 +46,7 @@ const empty = (): F => ({
   notes: ''
 });
 
-export default function ItemsPage() {
+export default function ItemsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
   const { items, movements, addItem, updateItem, deleteItem } = useWhs();
   const { contacts } = useCtc();
@@ -108,7 +108,7 @@ export default function ItemsPage() {
     const lastR = items.filter(x => x.category).slice().reverse()[0];
     setForm({ ...empty(), ...(lastR?.category ? { category: lastR.category } : {}) }); setErr(''); setOpen(true);
   };
-  useFab({ label: 'افزودن کالا', onClick: openNew });
+  useFab(active ? { label: 'افزودن کالا', onClick: openNew } : null);
 
   const openEdit = (it: Item) => {
     setForm({

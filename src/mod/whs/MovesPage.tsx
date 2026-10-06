@@ -31,7 +31,7 @@ interface F {
   notes: string;
 }
 
-export default function MovesPage() {
+export default function MovesPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
   const { items, movements, addMovement, deleteMovement } = useWhs();
   const { contacts } = useCtc();
@@ -99,7 +99,7 @@ export default function MovesPage() {
     });
     setErr(''); setOpen(true);
   };
-  useFab({ label: 'ثبت تراکنش', onClick: openNew });
+  useFab(active ? { label: 'ثبت تراکنش', onClick: openNew } : null);
 
   const openEdit = (m: Movement) => {
     setForm({
