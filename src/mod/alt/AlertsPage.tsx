@@ -23,9 +23,7 @@ export default function AlertsPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [snoozeId, setSnoozeId] = useState<string | null>(null);
   const [snoozeDate, setSnoozeDate] = useState('');
-  const [delId, setDelId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
-  const [showClear, setShowClear] = useState(false);
 
   // اجرای خودکار قواعد در بار اول
   useEffect(() => {
@@ -138,7 +136,12 @@ export default function AlertsPage() {
         <div style={{ display: 'flex', gap: 6 }}>
           <Btn full onClick={handleRefresh}>🔄 بررسی مجدد</Btn>
           {tab === 'history' && alerts.length > 0 ? (
-            <Btn variant="danger" onClick={() => setShowClear(true)}>🗑 پاک‌سازی</Btn>
+            <Btn variant="danger" onClick={async () => {
+              const ok = await showConfirmAsync('پاک‌سازی همه‌ی تاریخچه', 'تمام هشدارهای بسته‌شده حذف می‌شوند.\nاین عمل قابل بازگشت نیست.', { danger: true, confirmText: 'همه را پاک کن' });
+              if (!ok) return;
+              clearAll();
+              showToast('تاریخچه پاک شد', 'success', 2000);
+            }}>🗑 پاک‌سازی</Btn>
           ) : null}
         </div>
 
@@ -210,7 +213,15 @@ export default function AlertsPage() {
                     ) : (
                       <>
                         <Btn size="sm" onClick={() => restore(a.id)} style={{ flex: 1 }}>🔄 بازیابی</Btn>
-                        <Btn size="sm" onClick={() => setDelId(a.id)} style={{ flex: 1 }}>🗑 حذف</Btn>
+                        <Btn size="sm" onClick={async () => {
+                          const ok = await showConfirmAsync('تأیید حذف', 'این هشدار حذف شود؟', { danger: true });
+                          if (!ok) return;
+                          setUndoData({ item: a });
+                          setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === a.id ? null : cur), 6000);
+                          remove(a.id);
+                          logAction('delete', 'alt', 'حذف از هشدارها');
+                          showToast('هشدار حذف شد', 'info', 1800);
+                        }} style={{ flex: 1 }}>🗑 حذف</Btn>
                       </>
                     )}
                   </div>
@@ -231,35 +242,6 @@ export default function AlertsPage() {
             این هشدار تا تاریخ انتخاب‌شده پنهان می‌شود
           </div>
           <DatePicker value={snoozeDate} onChange={setSnoozeDate} placeholder="انتخاب تاریخ"  autoToday />
-        </Modal>
-
-        {/* مودال حذف */}
-        <Modal
-          open={delId !== null}
-          onClose={() => setDelId(null)}
-          title="حذف هشدار"
-          footer={<BtnRow><Btn variant="danger" onClick={async () => { const idToDel = delId; if (!idToDel) return; const ok = await showConfirmAsync('تأیید حذف', 'این هشدار حذف شود؟', { danger: true }); if (!ok) return; const item = alerts.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } remove(idToDel);
-              logAction('delete', 'alt', 'حذف از هشدارها'); setDelId(null); showToast('هشدار حذف شد', 'info', 1800); }}>حذف کن</Btn><Btn onClick={() => setDelId(null)}>لغو</Btn></BtnRow>}
-        >
-          <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)' }}>
-            حذف این هشدار از تاریخچه؟
-          </div>
-        </Modal>
-
-        {/* مودال پاک‌سازی همه */}
-        <Modal
-          open={showClear}
-          onClose={() => setShowClear(false)}
-          title="پاک‌سازی همه‌ی تاریخچه"
-          footer={<BtnRow><Btn variant="danger" onClick={() => { clearAll(); setShowClear(false); }}>همه را پاک کن</Btn><Btn onClick={() => setShowClear(false)}>لغو</Btn></BtnRow>}
-        >
-          <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-            تمام هشدارهای بسته‌شده حذف می‌شوند.
-            <br />
-            <span style={{ color: 'var(--danger)', fontSize: 'var(--fs-sm)' }}>
-              این عمل قابل بازگشت نیست.
-            </span>
-          </div>
         </Modal>
       </PageContainer>
     </div>
