@@ -10,6 +10,7 @@ import {
   type Invoice, type InvoiceItem, type Payment, type WorkflowStatus, type CheckStatus,
 } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
+import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -47,6 +48,7 @@ interface F {
   advanceValue: string;
   dueDate: string;
   payments: Payment[];
+  relatedFlockId: string;
   notes: string;
 }
 
@@ -55,13 +57,14 @@ const empty = (isPurchase: boolean): F => ({
   paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
   customDueDate: '', isPreorder: false, deliveryDate: '',
   advanceType: 'percent', advanceValue: '',
-  dueDate: '', payments: [], notes: '',
+  dueDate: '', payments: [], relatedFlockId: '', notes: '',
 });
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
   const isPurchase = kind === 'purchase';
   const { invoices, addInvoice, updateInvoice, deleteInvoice } = useTra();
   const { contacts } = useCtc();
+  const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
 
   // ==== State ====
@@ -264,7 +267,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         : (inv.advancePayment ? toFa(inv.advancePayment) : ''),
       dueDate: inv.dueDate || '',
       payments: inv.payments || [],
-      notes: inv.notes || '',
+      relatedFlockId: (inv as any).relatedFlockId || '', notes: inv.notes || '',
     });
     setErr(''); setOpen(true);
   };
@@ -360,7 +363,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
       date: form.date, partyId: form.partyId, category: form.category,
       items: form.items, discount: 0, shipping: 0, total,
       payments: form.payments, dueDate: form.dueDate,
-      relatedFlockId: '', relatedEntryId: '', notes: form.notes.trim(),
+      relatedFlockId: form.relatedFlockId || '', relatedEntryId: '', notes: form.notes.trim(),
       paymentTerms: form.paymentTerms,
       installmentCount: form.paymentTerms === 'installment' ? (parseInt(toEn(form.installmentCount)) || 1) : undefined,
       installmentGapDays: form.paymentTerms === 'installment' ? (parseInt(toEn(form.installmentGapDays)) || 30) : undefined,
@@ -577,6 +580,17 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
             </Select>
           </Field>
         </Grid2>
+
+        {!isPurchase && (
+          <Field label="گله مربوطه" hint="اختیاری — برای محاسبه ROI گله">
+            <Select value={form.relatedFlockId} onChange={e => setForm({ ...form, relatedFlockId: e.target.value })}>
+              <option value="">— بدون گله —</option>
+              {flocks.filter(f => f.status === 'active').map(f => (
+                <option key={f.id} value={f.id}>{f.name}</option>
+              ))}
+            </Select>
+          </Field>
+        )}
 
         {form.isPreorder && (
           <>
