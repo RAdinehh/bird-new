@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef , useEffect} from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import {
   useFlk, type Flock, type FlockType, type FlockStatus,
@@ -245,6 +246,7 @@ export default function FlocksPage() {
     });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن گله', onClick: openNew });
 
   const openEdit = (f: Flock) => {
     setForm({
@@ -790,7 +792,6 @@ export default function FlocksPage() {
                 </ExpandableCard>
               );
             })}
-            {tab !== 'archived' && <Btn variant="primary" full onClick={openNew}>+ افزودن گله</Btn>}
             {ms.selectionMode && <div style={{ height: 90 }} />}
           </>
         )}

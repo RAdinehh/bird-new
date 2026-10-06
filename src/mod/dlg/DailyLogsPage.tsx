@@ -2,6 +2,7 @@
  * DailyLogsPage — ثبت روزانه (دمای سالن، آب، دان، تلفات)
  */
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
+import { useFab } from '../../shr/hooks/useFab';
 import { useState, useMemo, useEffect } from 'react';
 import {
   useDlg, type DailyLog, type Death, type Vaccine,
@@ -196,6 +197,7 @@ export default function DailyLogsPage() {
     setForm({ ...newLog(flock.id), date: todayStr, entryTime: currentTime(), ...sys });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'ثبت امروز', onClick: openNew });
 
   const openEdit = (l: DailyLog) => {
     setForm({

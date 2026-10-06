@@ -2,6 +2,7 @@
  * CandlingsPage — کندلینگ با Multi-select و تجمیع
  */
 import { useState, useEffect, useMemo } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useInc, type Candling } from './store';
 import { useBrd } from '../brd/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, SectionTitle, Select, Tag, ErrorBox } from '../../shr/components/ui';
@@ -152,6 +153,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     setErr('');
     setOpen(true);
   };
+  useFab({ label: 'ثبت کندلینگ', onClick: () => openNew() });
 
   const availableEntries = useMemo(() => {
     const dayNum = parseInt(toEn(modalDay)) || 0;

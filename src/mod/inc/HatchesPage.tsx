@@ -2,6 +2,7 @@
  * HatchesPage — هچ، تفکیک، ساخت گله، فروش، validation
  */
 import { useState, useEffect, useMemo } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useInc, hatchRate, costPerChick, daysAgo, isLockdown, type HatchResult } from './store';
 import { useBrd } from '../brd/store';
 import { useFlk } from '../flk/store';
@@ -125,6 +126,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     setSelectedIds(preId ? new Set([preId]) : new Set());
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'ثبت هچ', onClick: () => openNew() });
 
   const openEdit = (h: HatchResult) => {
     setEditingId(h.id);
@@ -496,7 +498,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={() => openNew()}>+ ثبت هچ</Btn>
+          
         </>
       )}
 

@@ -2,6 +2,7 @@
  * ProductionsPage — ثبت تخم‌گذاری
  */
 import { useState, useMemo, useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useEgg, healthyCount, henDayRate, brokenRate, type EggProduction } from './store';
 import { useFlk, getAgeDays } from '../flk/store';
 import { useBrd } from '../brd/store';
@@ -108,6 +109,7 @@ export default function ProductionsPage() {
     setForm({ ...empty(), flockId: activeFlocks[0].id });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'ثبت تخم‌گذاری', onClick: openNew });
 
   const openEdit = (p: EggProduction) => {
     setForm({
@@ -337,7 +339,7 @@ export default function ProductionsPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ ثبت تخم‌گذاری</Btn>
+          
         </>
       )}
 

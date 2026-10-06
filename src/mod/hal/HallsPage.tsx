@@ -2,6 +2,7 @@
  * HallsPage — سالن‌ها
  */
 import { useState, useMemo, useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createHallSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Hall } from './store';
@@ -256,6 +257,7 @@ export default function HallsPage() {
       });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن سالن', onClick: openNew });
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
 
   // ═══ اعتبارسنجی زنده ═══
@@ -551,7 +553,7 @@ export default function HallsPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ افزودن سالن</Btn>
+          
         </>
       )}
 

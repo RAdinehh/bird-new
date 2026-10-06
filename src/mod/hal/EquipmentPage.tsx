@@ -2,6 +2,7 @@
  * EquipmentPage — تجهیزات
  */
 import { useState, useRef } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Equipment, type EquipmentKind, type EquipmentCategory, type EquipmentUnit, EQUIP_LABELS, EQUIP_CAPACITY_UNIT, EQUIP_EFFICIENCY_UNIT, CATEGORY_LABELS, KIND_LABELS, UNIT_LABELS_EQ } from './store';
@@ -200,6 +201,7 @@ export default function EquipmentPage() {
       warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن تجهیز', onClick: openNew });
 
   const openEdit = (e: Equipment) => {
     setAutoFields(new Set());
@@ -599,7 +601,7 @@ export default function EquipmentPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ افزودن تجهیز</Btn>
+          
         </>
       )}
 

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Bird } from './store';
 import { findBirdPreset } from './presets';
 import {
@@ -73,6 +74,7 @@ export default function BirdsPage() {
     setCycleFromPreset(false); setFcrFromPreset(false);
     setError(''); setOpen(true);
   };
+  useFab({ label: 'افزودن پرنده', onClick: openNew });
   const save = async () => {
 
     // 🔒 جلوگیری قاطع از نام تکراری پرنده
@@ -221,7 +223,7 @@ export default function BirdsPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ افزودن پرنده</Btn>
+          
         </>
       )}
 

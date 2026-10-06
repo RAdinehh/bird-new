@@ -2,6 +2,7 @@
  * ZonesPage — بخش‌های سالن
  */
 import { useState, useMemo, useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { ZoneSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Zone } from './store';
@@ -143,6 +144,7 @@ export default function ZonesPage() {
     if (form.id) updateZone(form.id, data); else addZone(data);
     setOpen(false);
   };
+  useFab({ label: 'افزودن بخش', onClick: openNew });
 
   const list = filter ? zones.filter(z => z.hallId === filter) : zones;
 
@@ -256,7 +258,7 @@ export default function ZonesPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ افزودن بخش</Btn>
+          
         </>
       )}
 

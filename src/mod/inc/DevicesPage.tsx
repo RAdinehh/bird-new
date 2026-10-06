@@ -2,6 +2,7 @@
  * DevicesPage — دستگاه‌های انکوباسیون (ظرفیت، تعمیرات، گارانتی)
  */
 import { useTempUnit, toUserTemp, toCelsius, round1 } from '../../shr/utils/temp';
+import { useFab } from '../../shr/hooks/useFab';
 import { useState, useMemo, useEffect } from 'react';
 import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity, fillCapacityFromProfile } from './store';
 import { useValidation } from '../../shr/validation/useValidation';
@@ -256,6 +257,7 @@ export default function DevicesPage() {
     });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن دستگاه', onClick: openNew });
 
   const addCapacity = (birdName: string) => {
     if (!birdName.trim()) return;
@@ -603,7 +605,7 @@ export default function DevicesPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ افزودن دستگاه</Btn>
+          
         </>
       )}
 

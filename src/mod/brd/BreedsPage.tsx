@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Breed } from './store';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { Btn, BtnRow, Empty, Field,
@@ -110,6 +111,7 @@ export default function BreedsPage() {
     setFcrFromStd(false);
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن نژاد', onClick: openNew });
 
   const openEdit = (b: Breed) => {
     setForm({ id: b.id, birdId: b.birdId, name: b.name, fcr: b.fcr ? toFa(b.fcr) : '', standardKey: (b as any).standardKey || '' });
@@ -255,7 +257,7 @@ export default function BreedsPage() {
               </ExpandableCard>
             );
           })}
-          <Btn variant="primary" full onClick={openNew}>+ افزودن نژاد</Btn>
+          
         </>
       )}
 
