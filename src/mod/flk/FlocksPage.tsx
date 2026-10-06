@@ -7,6 +7,7 @@ import {
   DEFAULT_LAYING_START, getLayingStartDay
 } from './store';
 import { useBrd } from '../brd/store';
+import { useSet } from '../set/store';
 import { format, addDays, subMonths } from 'date-fns-jalali';
 import { schedulesByType, getSchedule } from '../cal/vaccineSchedules';
 import { useHal } from '../hal/store';
@@ -162,6 +163,7 @@ export default function FlocksPage() {
   const fmt = useFormat();
   const breedStd = useBreedStandard();
   const { flocks, add, update, remove, archive, restore } = useFlk();
+  const vaccineEnabled = useSet(s => (s as any).features?.vaccine !== false);
   const { birds: _birdsRaw, breeds } = useBrd();
   const { halls: _hallsRaw, zones } = useHal();
 
@@ -715,7 +717,7 @@ export default function FlocksPage() {
                       const fromStd = !f.layingStartDay;
                       return <Row l="سن تخم‌گذاری" v={`${fmt.int(layStart)} روز${fromStd ? ' (پیش‌فرض)' : ''}`} />;
                     })()}
-                    {f.vaccineScheduleId && (() => {
+                    {vaccineEnabled && f.vaccineScheduleId && (() => {
                       const sch = getSchedule(f.vaccineScheduleId);
                       if (!sch) return null;
                       return <Row l="برنامه واکسن" v={`${sch.label} · ${toFa(sch.items.length)} مرحله`} />;
