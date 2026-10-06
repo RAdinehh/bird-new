@@ -68,7 +68,6 @@ export default function BreedsPage() {
     });
   }, [_breedsRaw]);
 
-  if (birds.length === 0) {
   const undoDelete = () => {
     const item = undoData;
     if (!item) return;
@@ -81,6 +80,36 @@ export default function BreedsPage() {
     setUndoData(null);
   };
 
+
+  const list = filterBird ? breeds.filter(x => x.birdId === filterBird) : breeds;
+
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (x: any) => x.id,
+    onDelete: async (ids: string[]) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' مورد حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const item = _breedsRaw.find((x: any) => x.id === id);
+        if (!item) continue;
+        backups.push(item);
+        try { deleteBreed(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' مورد حذف شد', 'success', 2500);
+    },
+  });
+
+  useEffect(() => {
+    if (ms.selectionMode) setExpandedId(null);
+  }, [ms.selectionMode]);
+
+  if (birds.length === 0) {
     return (
       <PageContainer>
       <HelpBanner
@@ -145,33 +174,6 @@ export default function BreedsPage() {
     setOpen(false);
   };
 
-  const list = filterBird ? breeds.filter(x => x.birdId === filterBird) : breeds;
-
-  // ─── Multi-Select ───
-  const ms = useMultiSelect({
-    items: list,
-    getId: (x: any) => x.id,
-    onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' مورد حذف شوند؟', { danger: true });
-      if (!ok) return;
-      const backups: any[] = [];
-      for (const id of ids) {
-        const item = _breedsRaw.find((x: any) => x.id === id);
-        if (!item) continue;
-        backups.push(item);
-        try { deleteBreed(id); } catch {}
-      }
-      if (backups.length > 0) {
-        setUndoData({ item: backups });
-        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
-      }
-      showToast(toFa(backups.length) + ' مورد حذف شد', 'success', 2500);
-    },
-  });
-
-  useEffect(() => {
-    if (ms.selectionMode) setExpandedId(null);
-  }, [ms.selectionMode]);
 
   return (
     <PageContainer>
