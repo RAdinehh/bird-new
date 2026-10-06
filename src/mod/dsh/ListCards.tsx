@@ -161,6 +161,26 @@ export default function ListCards({
                             {lc.label}
                           </Tag>
                         </div>
+                        {/* نوار پیشرفت چرخه */}
+                        {lc.progress > 0 && (
+                          <div style={{ marginTop: 8 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--muted)', marginBottom: 3 }}>
+                              <span>چرخه: {toFa(Math.round(lc.progress))}٪</span>
+                              {f.endOfCycleDay || bird?.cycleDays ? (
+                                <span>{toFa(age)} از {toFa((f.endOfCycleDay || bird?.cycleDays) ?? 0)} روز</span>
+                              ) : null}
+                            </div>
+                            <div style={{ height: 4, background: 'var(--input-bg)', borderRadius: 2, overflow: 'hidden' }}>
+                              <div style={{
+                                height: '100%',
+                                width: Math.min(100, lc.progress) + '%',
+                                background: lc.progress >= 95 ? 'var(--danger)' : lc.progress >= 80 ? 'var(--warn)' : 'var(--accent)',
+                                borderRadius: 2,
+                                transition: 'width .3s',
+                              }} />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
