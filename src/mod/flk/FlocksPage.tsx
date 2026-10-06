@@ -926,32 +926,34 @@ export default function FlocksPage() {
             </Field>
           </Grid2>
 
-          <Field
-            label="برنامه واکسن"
-            hint={
-              form.vaccineScheduleId
-                ? undefined
-                : 'برای افزودن خودکار واکسن‌ها به تقویم'
-            }
-            autoFrom={
-              form.vaccineScheduleId
-                ? (() => {
-                    const sch = getSchedule(form.vaccineScheduleId);
-                    return sch ? `تقویم · ${sch.items.length} مرحله` : 'تقویم';
-                  })()
-                : undefined
-            }
-          >
-            <Select
-              value={form.vaccineScheduleId}
-              onChange={e => setForm({ ...form, vaccineScheduleId: e.target.value })}
+          {vaccineEnabled && (
+            <Field
+              label="برنامه واکسن"
+              hint={
+                form.vaccineScheduleId
+                  ? undefined
+                  : 'برای افزودن خودکار واکسن‌ها به تقویم'
+              }
+              autoFrom={
+                form.vaccineScheduleId
+                  ? (() => {
+                      const sch = getSchedule(form.vaccineScheduleId);
+                      return sch ? `تقویم · ${sch.items.length} مرحله` : 'تقویم';
+                    })()
+                  : undefined
+              }
             >
-              <option value="">— بدون برنامه —</option>
-              {schedulesByType(form.type as 'layer' | 'broiler' | 'breeder').map(sch => (
-                <option key={sch.id} value={sch.id}>{sch.label}</option>
-              ))}
-            </Select>
-          </Field>
+              <Select
+                value={form.vaccineScheduleId}
+                onChange={e => setForm({ ...form, vaccineScheduleId: e.target.value })}
+              >
+                <option value="">— بدون برنامه —</option>
+                {schedulesByType(form.type as 'layer' | 'broiler' | 'breeder').map(sch => (
+                  <option key={sch.id} value={sch.id}>{sch.label}</option>
+                ))}
+              </Select>
+            </Field>
+          )}
 
           <Grid2>
             <Field label="تعداد اولیه" required error={vErrors.initialCount}>
