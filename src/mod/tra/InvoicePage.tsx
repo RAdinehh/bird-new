@@ -10,7 +10,7 @@ import {
 } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';;
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -759,8 +759,8 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
         <Field label="یادداشت">
-          <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
-        </Field>
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+          </Field>
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>
@@ -777,7 +777,9 @@ export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
           <>
             <Field label="تاریخ"><DatePicker value={transferDate} onChange={v => setTransferDate(v)}  autoToday /></Field>
             {(transferModal.to === 'received' || transferModal.to === 'paid') && (
-              <Field label="یادداشت"><Input placeholder="یادداشت..." value={transferNote} onChange={e => setTransferNote(e.target.value)} /></Field>
+              <Field label="یادداشت">
+            <Textarea placeholder="یادداشت..." value={transferNote} onChange={e => setTransferNote(e.target.value)} />
+          </Field>
             )}
           </>
         )}

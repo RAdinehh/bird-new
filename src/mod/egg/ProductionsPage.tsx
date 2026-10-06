@@ -6,7 +6,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useEgg, healthyCount, henDayRate, brokenRate, type EggProduction } from './store';
 import { useFlk, getAgeDays } from '../flk/store';
 import { useBrd } from '../brd/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -464,8 +464,8 @@ export default function ProductionsPage() {
         </Field>
 
         <Field label="یادداشت">
-          <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-        </Field>
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+          </Field>
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>

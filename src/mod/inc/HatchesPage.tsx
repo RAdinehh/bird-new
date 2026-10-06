@@ -10,7 +10,7 @@ import { useHal } from '../hal/store';
 import { useCtc } from '../ctc/store';
 import { useTra } from '../tra/store';
 import { useNavigate } from 'react-router-dom';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -709,7 +709,9 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                               </>
                             );
                           })()}
-                          <Field label="یادداشت"><Input value={d.notes || ''} onChange={ev => updateData(e.id, { notes: ev.target.value })} placeholder="..." /></Field>
+                          <Field label="یادداشت">
+            <Textarea value={d.notes || ''} onChange={ev => updateData(e.id, { notes: ev.target.value })} placeholder="..." />
+          </Field>
                           <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid ' + (rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
                             این هچ: {toFa(sumE)} از {toFa(e.count || 0)}{rem > 0 && ' · باقی — ' + toFa(rem)}{rem < 0 && ' — بیشتر!'}{rem === 0 && ' ✅'}
                           </div>
@@ -796,7 +798,9 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
                 </>
               );
             })()}
-            <Field label="یادداشت"><Input value={dataFor(formEntryId).notes || ''} onChange={ev => updateData(formEntryId, { notes: ev.target.value })} placeholder="..." /></Field>
+            <Field label="یادداشت">
+            <Textarea value={dataFor(formEntryId).notes || ''} onChange={ev => updateData(formEntryId, { notes: ev.target.value })} placeholder="..." />
+          </Field>
           </>
         )}
 

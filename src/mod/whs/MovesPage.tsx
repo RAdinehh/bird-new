@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useWhs, UNIT_LABEL, MOVEMENT_REASON, CATEGORY_ICON, CATEGORY_LABEL, type Movement, type MovementType, type MovementReason } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';;
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -410,8 +410,8 @@ export default function MovesPage() {
         )}
 
         <Field label="یادداشت">
-          <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-        </Field>
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+          </Field>
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>

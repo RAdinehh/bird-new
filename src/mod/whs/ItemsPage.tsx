@@ -5,7 +5,7 @@ import {
   daysToExpiry, type Item, type ItemCategory, type ItemUnit
 } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -493,8 +493,8 @@ export default function ItemsPage() {
         )}
 
         <Field label="یادداشت">
-          <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-        </Field>
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+          </Field>
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>

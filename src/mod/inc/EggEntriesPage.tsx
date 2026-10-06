@@ -13,7 +13,7 @@ import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
 import { useTra } from '../tra/store';
 import { useEgg } from '../egg/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag , Textarea } from '../../shr/components/ui';
 import TimePicker from '../../shr/components/TimePicker';
 import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
@@ -1085,7 +1085,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo }: { initial
 
           {/* یادداشت */}
           <Field label="یادداشت">
-            <Input placeholder="..." value={currentRow.notes} onChange={e => setCurrentRow(f => ({ ...f, notes: e.target.value }))} />
+            <Textarea placeholder="..." value={currentRow.notes} onChange={e => setCurrentRow(f => ({ ...f, notes: e.target.value }))} />
           </Field>
 
           {/* دکمه‌ها */}

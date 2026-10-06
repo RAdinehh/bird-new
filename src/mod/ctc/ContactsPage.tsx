@@ -6,7 +6,7 @@ import { useCtc, type Person, type Role, ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TY
 import { Btn, BtnRow, DigitField, Empty,
   Field, Grid2, Grid3, Input,
   Modal, NumField, PageContainer, PhoneField,
-  Select, Tag, ErrorBox , MoneyField } from '../../shr/components/ui';
+  Select, Tag, ErrorBox , MoneyField , Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -410,7 +410,9 @@ export default function ContactsPage() {
             <Field label="آدرس"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
           </Grid2>
 
-          <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
+          <Field label="یادداشت">
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+          </Field>
           <ErrorBox>{err}</ErrorBox>
         </Modal>
       </PageContainer>

@@ -9,7 +9,7 @@ import { useHal, type Hall } from './store';
 import { useBrd } from '../brd/store';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk, getAgeDays } from '../flk/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import DatePicker from '../../shr/components/DatePicker';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -657,7 +657,9 @@ export default function HallsPage() {
           <Field label="آخرین ضدعفونی"><DatePicker value={form.lastSanitizedAt} onChange={v => setForm({...form, lastSanitizedAt: v})} placeholder="انتخاب تاریخ" /></Field>
         </Grid2>
         <Field label="آدرس سالن"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
-        <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
+        <Field label="یادداشت">
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+          </Field>
         <ErrorBox>{err}</ErrorBox>
       </Modal>
     </PageContainer>

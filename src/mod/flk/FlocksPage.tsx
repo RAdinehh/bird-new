@@ -1091,7 +1091,7 @@ export default function FlocksPage() {
           )}
 
           <Field label="یادداشت">
-            <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
           <ErrorBox>{err}</ErrorBox>

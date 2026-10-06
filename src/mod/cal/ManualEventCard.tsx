@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useManual, TYPE_OPTIONS, type ManualEvent } from './manual';
 import { TYPE_COLORS, statusOf } from './store';
-import { Btn, BtnRow, Field, Grid2, Input, Modal, Select } from '../../shr/components/ui';
+import { Btn, BtnRow, Field, Grid2, Input, Modal, Select , Textarea } from '../../shr/components/ui';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
 import { toFa } from '../../shr/utils/fa';
@@ -140,8 +140,8 @@ export default function ManualEventCard({ event, onChanged }: Props) {
           </Select>
         </Field>
         <Field label="یادداشت">
-          <Input placeholder="یادداشت..." value={notes} onChange={e => setNotes(e.target.value)} />
-        </Field>
+            <Textarea placeholder="یادداشت..." value={notes} onChange={e => setNotes(e.target.value)} />
+          </Field>
       </Modal>
 
       {/* مودال تأیید حذف */}

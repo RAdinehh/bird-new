@@ -2,7 +2,7 @@ import { useState, useMemo , useEffect } from 'react';
 import { useValidation } from '../../shr/validation/useValidation';
 import { RequirementSchema } from '../../shr/validation/rules/fed';
 import { useFed, STAGE_LABEL, STAGE_LABEL_LONG, type Requirement } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -338,8 +338,8 @@ export default function RequirementsPage() {
         </Grid2>
 
         <Field label="یادداشت">
-          <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-        </Field>
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+          </Field>
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>

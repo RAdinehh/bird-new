@@ -3,7 +3,7 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { createFormulaSchema } from '../../shr/validation/rules/fed';
 import { format as formatJalali } from 'date-fns-jalali';
 import { useFed, STAGE_LABEL, formulaTotal, calcNutrients, formulaValid, type Formula, type FormulaLine } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -478,8 +478,8 @@ export default function FormulasPage() {
         </Select>
 
         <Field label="یادداشت">
-          <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-        </Field>
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+          </Field>
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>

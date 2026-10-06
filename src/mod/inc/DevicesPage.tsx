@@ -9,7 +9,7 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { createDeviceSchema } from '../../shr/validation/rules/inc';
 import { useSet } from '../set/store';
 import { useBrd } from '../brd/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -914,7 +914,7 @@ export default function DevicesPage() {
             <MoneyField placeholder="۰" value={maintForm.cost} onChange={e => setMaintForm({ ...maintForm, cost: e.target.value })} />
           </Field>
           <Field label="توضیحات">
-            <Input placeholder="جزئیات..." value={maintForm.description} onChange={e => setMaintForm({ ...maintForm, description: e.target.value })} />
+            <Textarea placeholder="جزئیات..." value={maintForm.description} onChange={e => setMaintForm({ ...maintForm, description: e.target.value })} />
           </Field>
         </div>
       </Modal>

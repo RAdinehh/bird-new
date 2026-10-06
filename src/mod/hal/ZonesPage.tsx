@@ -6,7 +6,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { ZoneSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Zone } from './store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -286,7 +286,9 @@ export default function ZonesPage() {
           <Field label="نام بخش" required><Input placeholder="مثلاً — بخش A" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
           <Field label="ظرفیت"><NumField placeholder="۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} /></Field>
         </Grid2>
-        <Field label="یادداشت"><Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} /></Field>
+        <Field label="یادداشت">
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+          </Field>
         <ErrorBox>{err}</ErrorBox>
       </Modal>
     </PageContainer>

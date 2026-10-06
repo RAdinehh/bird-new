@@ -4,7 +4,7 @@ import { IngredientSchema } from '../../shr/validation/rules/fed';
 import { useFed, CATEGORY_LABEL, CATEGORY_ICON, type Ingredient, type IngredientCategory } from './store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { INGREDIENT_STANDARDS } from './standards';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -486,8 +486,8 @@ export default function IngredientsPage() {
         </Field>
 
         <Field label="یادداشت">
-          <Input placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-        </Field>
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+          </Field>
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { addFile, fileCategory, CATEGORY_LABEL, LINKED_TYPE_LABEL, formatSize, type DocCategory } from './store';
-import { Btn, BtnRow, Field, Input, Modal, Select, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Field, Input, Modal, Select, ErrorBox , Textarea } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 
 interface Props {
@@ -176,8 +176,8 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
 
       {/* یادداشت */}
       <Field label="یادداشت">
-        <Input value={notes} onChange={e => setNotes(e.target.value)} placeholder="..." />
-      </Field>
+            <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="..." />
+          </Field>
 
       <ErrorBox>{err}</ErrorBox>
     </Modal>

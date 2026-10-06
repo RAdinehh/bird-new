@@ -6,7 +6,7 @@ import { useTra, DEAL_LABEL, type Deal, type DealType } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field,
   Grid2, Input, Modal, NumField,
-  PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
+  PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -312,8 +312,8 @@ export default function DealsPage() {
         </Field>
 
         <Field label="توضیحات" required>
-          <Input placeholder="مثلاً — ۲۰۰ کیلو تخم امانی به مغازه..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
-        </Field>
+            <Textarea placeholder="مثلاً — ۲۰۰ کیلو تخم امانی به مغازه..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+          </Field>
 
         <Grid2>
           <Field label="ارزش (تومان)">
@@ -341,8 +341,8 @@ export default function DealsPage() {
         </Field>
 
         <Field label="یادداشت">
-          <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
-        </Field>
+            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+          </Field>
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>
