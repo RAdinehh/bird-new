@@ -152,7 +152,7 @@ function calcEquipValue(e: any): number {
   return count * price;
 }
 
-export default function EquipmentPage() {
+export default function EquipmentPage({ active = true }: { active?: boolean } = {}) {
   const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
@@ -202,7 +202,7 @@ export default function EquipmentPage() {
       warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
     setErr(''); setOpen(true);
   };
-  useFab({ label: 'افزودن تجهیز', onClick: openNew });
+  useFab(active ? { label: 'افزودن تجهیز', onClick: openNew } : null);
 
   const openEdit = (e: Equipment) => {
     setAutoFields(new Set());

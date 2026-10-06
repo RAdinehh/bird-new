@@ -2,7 +2,8 @@
  * useFab — ثبت FAB برای ماژول فعلی
  *
  * استفاده:
- *   useFab({ label: 'افزودن گله', onClick: openNew, hidden: tab === 'archived' });
+ *   useFab({ label: 'افزودن گله', onClick: openNew });
+ *   useFab(active ? { label: '...', onClick } : null);
  */
 import { useEffect } from 'react';
 import { useFabStore, type FabConfig } from '../../cor/ui/fabStore';
@@ -11,7 +12,7 @@ export function useFab(cfg: FabConfig | null) {
   const setConfig = useFabStore(s => s.set);
 
   useEffect(() => {
-    if (!cfg) {
+    if (!cfg || cfg.hidden) {
       setConfig(null);
       return;
     }

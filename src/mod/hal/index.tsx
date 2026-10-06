@@ -84,13 +84,13 @@ export default function Hal() {
           }}
         >
           <div key="halls" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <HallsPage />
+            <HallsPage active={tab === 'halls'} />
           </div>
           <div key="zones" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <ZonesPage />
+            <ZonesPage active={tab === 'zones'} />
           </div>
           <div key="equip" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <EquipmentPage />
+            <EquipmentPage active={tab === 'equip'} />
           </div>
         </div>
       </div>

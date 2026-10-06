@@ -146,7 +146,7 @@ function calcSuggestedCapacity(length: number | null, width: number | null, dens
   return Math.floor(area * densityMax);
 }
 
-export default function HallsPage() {
+export default function HallsPage({ active = true }: { active?: boolean } = {}) {
   const { halls: _hallsRaw, zones, equipment, addHall, updateHall, deleteHall } = useHal();
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
@@ -258,7 +258,7 @@ export default function HallsPage() {
       });
     setErr(''); setOpen(true);
   };
-  useFab({ label: 'افزودن سالن', onClick: openNew });
+  useFab(active ? { label: 'افزودن سالن', onClick: openNew } : null);
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
 
   // ═══ اعتبارسنجی زنده ═══

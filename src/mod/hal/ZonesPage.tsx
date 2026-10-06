@@ -20,7 +20,7 @@ import { showToast } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
-export default function ZonesPage() {
+export default function ZonesPage({ active = true }: { active?: boolean } = {}) {
   const { halls: _hallsRaw, zones: _zonesRaw, addZone, updateZone, deleteZone } = useHal();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
@@ -144,7 +144,7 @@ export default function ZonesPage() {
     if (form.id) updateZone(form.id, data); else addZone(data);
     setOpen(false);
   };
-  useFab({ label: 'افزودن بخش', onClick: openNew });
+  useFab(active ? { label: 'افزودن بخش', onClick: openNew } : null);
 
   const list = filter ? zones.filter(z => z.hallId === filter) : zones;
 
