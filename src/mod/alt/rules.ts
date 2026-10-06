@@ -2,6 +2,7 @@ import { useAlt, type AlertLevel, type AlertCategory } from './store';
 import { useWhs, stockWarning, expiryWarning, daysToExpiry } from '../whs/store';
 import { useTra, remaining, ageDays, agingBucket } from '../tra/store';
 import { useFlk, getAgeDays } from '../flk/store';
+import { useBrd } from '../brd/store';
 import { useDlg } from '../dlg/store';
 import { useEgg, henDayRate } from '../egg/store';
 import { useInc, daysToHatch, isLockdown, isHatchWindow } from '../inc/store';
@@ -193,25 +194,61 @@ export function detectAllAlerts(): RuleAlert[] {
   });
 
   // ============ ۳. گله ============
-  const flocks = useFlk.getState().flocks.filter(f => f.status === 'active');
+  const flocks = useFlk.getState().flocks.filter(f => f.status === 'active' && !f.paused);
+  const birds = useBrd.getState().birds;
   flocks.forEach(flock => {
     const age = getAgeDays(flock);
 
-    // گله به پایان دوره نزدیک است
-    if (flock.type === 'layer' && age > 450 && age < 500) {
-      alerts.push({
-        level: 'important',
-        category: 'other',
-        title: 'گله نزدیک پایان دوره: ' + flock.name,
-        message: 'سن: ' + toFa(age) + ' روز — آماده‌ی جایگزینی',
-        source: 'flk',
-        sourceId: flock.id + ':end-of-cycle',
-        date: today(), notes: ''
-      });
+    // ── هشدار چرخه زندگی (بر اساس cycleDays پرنده یا endOfCycleDay گله) ──
+    const bird = birds.find(b => b.id === flock.birdId);
+    const cycleDays =
+      (flock.endOfCycleDay && flock.endOfCycleDay > 0) ? flock.endOfCycleDay :
+      (bird?.cycleDays && bird.cycleDays > 0) ? bird.cycleDays :
+      null;
+
+    if (cycleDays && cycleDays > 0) {
+      const progress = (age / cycleDays) * 100;
+
+      // ≥ ۹۵٪ — پایان نزدیک (critical)
+      if (progress >= 95 && progress < 100) {
+        alerts.push({
+          level: 'critical',
+          category: 'other',
+          title: 'پایان چرخه گله: ' + flock.name,
+          message: 'سن: ' + toFa(age) + ' از ' + toFa(cycleDays) + ' روز (' + toFa(Math.round(progress)) + '٪) — آماده‌ی جایگزینی فوری',
+          source: 'flk',
+          sourceId: flock.id + ':end-cycle-95',
+          date: today(), notes: ''
+        });
+      }
+      // ≥ ۸۰٪ — نزدیک پایان (important)
+      else if (progress >= 80 && progress < 95) {
+        alerts.push({
+          level: 'important',
+          category: 'other',
+          title: 'نزدیک پایان چرخه: ' + flock.name,
+          message: 'سن: ' + toFa(age) + ' از ' + toFa(cycleDays) + ' روز (' + toFa(Math.round(progress)) + '٪) — برنامه‌ی جایگزینی',
+          source: 'flk',
+          sourceId: flock.id + ':end-cycle-80',
+          date: today(), notes: ''
+        });
+      }
+      // ≥ ۱۰۰٪ — گذشته از چرخه (info)
+      else if (progress >= 100) {
+        alerts.push({
+          level: 'info',
+          category: 'other',
+          title: 'چرخه تمام شده: ' + flock.name,
+          message: 'سن: ' + toFa(age) + ' روز (از ' + toFa(cycleDays) + ' روز گذشته)',
+          source: 'flk',
+          sourceId: flock.id + ':cycle-over',
+          date: today(), notes: ''
+        });
+      }
     }
 
-    // گله مادر — سن اوج
-    if (flock.type === 'breeder' && age > 280 && age < 320) {
+    // ── گله مادر — سن اوج (۳۵-۴۵ هفته) ──
+    if (flock.type === 'breeder' && age >= 245 && age <= 315) {
       alerts.push({
         level: 'info',
         category: 'reproduction',
