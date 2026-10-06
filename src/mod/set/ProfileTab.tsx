@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSet } from './store';
 import { Field, Grid2, Input, NumField, PhoneField, DigitField, Select } from '../../shr/components/ui';
+import DatePicker from '../../shr/components/DatePicker';
 import { parseFaNum } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow } from './helpers';
@@ -120,10 +121,10 @@ export default function ProfileTab() {
           </Field>
         </Grid2>
         <Field label="تاریخ تأسیس">
-          <Input
+          <DatePicker
             value={farm.establishedAt}
-            onChange={e => updateSection('farm', { establishedAt: e.target.value })}
-            placeholder="۱۴۰۰/۰۱/۰۱"
+            onChange={v => updateSection('farm', { establishedAt: v })}
+            placeholder="انتخاب تاریخ"
           />
         </Field>
         <Field label="آدرس">
