@@ -70,6 +70,9 @@ function getThresholds() {
 
 export function detectAllAlerts(): RuleAlert[] {
   const alerts: RuleAlert[] = [];
+  const _s = useSet.getState() as any;
+  const vaccineEnabled = _s.features?.vaccine !== false;
+  const medicineEnabled = _s.features?.medicine !== false;
 
   // ============ ۱. انبار ============
   const whsItems = useWhs.getState().items;
@@ -98,13 +101,20 @@ export function detectAllAlerts(): RuleAlert[] {
       });
     }
 
-    // انقضا
+    // انقضا — بر اساس دسته
+    const cat = (item as any).category;
+    const isVaccine = cat === 'vaccine';
+    const isMedicine = cat === 'medicine' || cat === 'herbal';
+    if (isVaccine && !vaccineEnabled) return;
+    if (isMedicine && !medicineEnabled) return;
+
     const ew = expiryWarning(item);
     const days = daysToExpiry(item.expireDate);
+    const alertCat: any = isVaccine ? 'vaccine' : isMedicine ? 'other' : 'stock';
     if (ew === 'expired') {
       alerts.push({
         level: 'critical',
-        category: 'vaccine',
+        category: alertCat,
         title: 'منقضی‌شده: ' + item.name,
         message: 'تاریخ انقضا گذشته است. از مصرف خودداری کنید.',
         source: 'whs',
@@ -114,7 +124,7 @@ export function detectAllAlerts(): RuleAlert[] {
     } else if (ew === 'soon' && days !== null) {
       alerts.push({
         level: 'important',
-        category: 'vaccine',
+        category: alertCat,
         title: 'نزدیک انقضا: ' + item.name,
         message: toFa(days) + ' روز تا انقضا',
         source: 'whs',
