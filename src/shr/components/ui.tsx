@@ -931,19 +931,44 @@ interface TextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaEl
   error?: string;
   warn?: string;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  rows?: number;
+  autoGrow?: boolean;
+  minRows?: number;
+  maxHeight?: number;
 }
 
-export function Textarea({ error, warn, style, rows = 3, ...rest }: TextareaProps) {
+export function Textarea({ error, warn, style, rows = 2, autoGrow = true, minRows = 2, maxHeight = 180, ...rest }: TextareaProps) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const value = (rest as any).value;
+  
+  // auto-grow
+  useEffect(() => {
+    if (!autoGrow || !ref.current) return;
+    const el = ref.current;
+    el.style.height = 'auto';
+    const lineHeight = 22;
+    const padding = 20; // 10 top + 10 bottom
+    const minH = minRows * lineHeight + padding;
+    const newH = Math.min(maxHeight, Math.max(minH, el.scrollHeight));
+    el.style.height = newH + 'px';
+    el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
+  }, [value, autoGrow, minRows, maxHeight]);
+  
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-      <textarea rows={rows} {...rest} style={{
-        width: '100%', minWidth: 0, minHeight: 80,
+      <textarea ref={ref} rows={rows} {...rest} style={{
+        width: '100%', minWidth: 0,
         background: 'var(--input-bg)',
         border: '1px solid ' + (error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)'),
         borderRadius: 'var(--r-md)', padding: '10px 12px',
         color: 'var(--text)', fontFamily: 'inherit',
         fontSize: 'var(--fs-base)', outline: 'none',
-        resize: 'vertical', ...style
+        resize: 'none',
+        overflowY: 'hidden',
+        transition: 'height .1s',
+        boxSizing: 'border-box',
+        lineHeight: 1.55,
+        ...style
       }} />
       {error && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {error}</div>}
       {warn && !error && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠ {warn}</div>}
