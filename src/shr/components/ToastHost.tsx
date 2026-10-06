@@ -90,21 +90,6 @@ export default function ToastHost() {
               }}
             >{TYPE_ICON[t.type]}</span>
             <span style={{ flex: 1, lineHeight: 1.6, wordBreak: 'break-word' }}>{t.message}</span>
-            {/* نوار پیشرفت */}
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute', bottom: 0, right: 0, left: 0,
-                height: 2, background: soft, overflow: 'hidden',
-              }}
-            >
-              <div style={{
-                height: '100%',
-                background: color,
-                animation: `pmToastProgress ${t.duration}ms linear forwards`,
-                transformOrigin: 'right',
-              }} />
-            </div>
           </div>
         );
       })}
@@ -112,10 +97,6 @@ export default function ToastHost() {
         @keyframes pmToastIn {
           from { opacity: 0; transform: translateY(-12px) scale(.96); }
           to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes pmToastProgress {
-          from { transform: scaleX(1); }
-          to   { transform: scaleX(0); }
         }
       `}</style>
     </div>
