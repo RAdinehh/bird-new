@@ -398,7 +398,7 @@ export default function IngredientsPage() {
                           if (!ok) return;
                           deleteIngredient(it.id);
                           logAction('delete', 'fed', 'حذف از جیره‌نویسی');
-                          toastMsg.deleted()
+                          toastMsg.deleted(it.name)
                         }} style={{ flex: 1 }}>حذف</Btn>
                   )}
                 </div>

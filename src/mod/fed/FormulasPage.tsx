@@ -330,7 +330,7 @@ export default function FormulasPage() {
                           if (!ok) return;
                           deleteFormula(f.id);
                           logAction('delete', 'fed', 'حذف از جیره‌نویسی');
-                          toastMsg.deleted()
+                          toastMsg.deleted(f.name)
                         }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

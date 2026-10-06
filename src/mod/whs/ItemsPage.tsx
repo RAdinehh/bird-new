@@ -454,7 +454,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                   <Btn size="sm" onClick={() => openEdit(it)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = it.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = items.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteItem(idToDel);
-                    logAction('delete', 'whs', 'حذف از انبار');  toastMsg.deleted()
+                    logAction('delete', 'whs', 'حذف از انبار');  toastMsg.deleted(it.name)
                     }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

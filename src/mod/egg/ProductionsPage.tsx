@@ -333,7 +333,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
                     setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === p.id ? null : cur), 6000);
                     deleteProduction(p.id);
                     logAction('delete', 'egg', 'حذف از تخم‌ها');
-                    toastMsg.deleted()
+                    toastMsg.deleted('تخم‌گذاری ' + (p.date || ''))
                   }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
