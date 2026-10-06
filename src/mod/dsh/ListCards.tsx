@@ -310,7 +310,7 @@ export default function ListCards({
                                       fontWeight: passed ? 700 : 500,
                                     }}>
                                       <span>{mk.label}</span>
-                                      <span style={{ opacity: 0.6 }}>·{toFa(mk.day)}</span>
+                                      <span style={{ opacity: 0.6 }}>{toFa(mk.day)}</span>
                                     </div>
                                   );
                                 })}
