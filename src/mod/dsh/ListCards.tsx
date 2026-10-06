@@ -168,7 +168,7 @@ export default function ListCards({
                             {lc.label}
                           </Tag>
                         </div>
-                        {/* نوار پیشرفت چرخه — استاندارد صنعت (Hy-Line style) */}
+                        {/* نوار پیشرفت چرخه */}
                         {lc.progress > 0 && (() => {
                           const cycleDays = f.endOfCycleDay || bird?.cycleDays || 0;
                           if (!cycleDays) return null;
@@ -178,41 +178,34 @@ export default function ListCards({
                           const markerPct = Math.min(100, Math.max(0, lc.progress));
                           
                           return (
-                            <div style={{ marginTop: 12 }}>
-                              {/* ردیف بالا: برچسب + درصد */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                                <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', fontWeight: 700 }}>
-                                  چرخه زندگی
-                                </span>
-                                <span style={{ fontSize: 'var(--fs-md)', color: progressColor, fontWeight: 700 }}>
-                                  {toFa(Math.round(lc.progress))}٪
-                                </span>
+                            <div style={{ marginTop: 10 }}>
+                              {/* اعداد دو سر — بالای نوار */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 4, paddingRight: 2, paddingLeft: 2 }}>
+                                <span>۱</span>
+                                <span>{toFa(cycleDays)} روز</span>
                               </div>
 
-                              {/* نوار خطی با بج متحرک */}
-                              <div style={{ position: 'relative', height: 38, marginBottom: 6 }}>
-                                {/* نوار پس‌زمینه */}
+                              {/* نوار + بج متحرک */}
+                              <div style={{ position: 'relative', paddingTop: 26, paddingBottom: 18 }}>
+                                {/* نوار اصلی */}
                                 <div style={{
-                                  position: 'absolute',
-                                  top: 18,
-                                  left: 0,
-                                  right: 0,
+                                  position: 'relative',
                                   height: 10,
                                   background: 'var(--input-bg)',
                                   borderRadius: 5,
                                   border: '1px solid var(--border)',
                                   overflow: 'hidden',
                                 }}>
-                                  {/* پیشرفت */}
                                   <div style={{
                                     height: '100%',
                                     width: markerPct + '%',
                                     background: progressColor,
+                                    borderRadius: 5,
                                     transition: 'width .3s',
                                   }} />
                                 </div>
 
-                                {/* دات‌های نقاط عطف */}
+                                {/* دات‌های نقاط عطف — روی نوار */}
                                 {stageMilestones.map((mk, idx) => {
                                   const pct = (mk.day / cycleDays) * 100;
                                   const passed = age >= mk.day;
@@ -222,12 +215,12 @@ export default function ListCards({
                                       title={mk.label + ' · روز ' + toFa(mk.day)}
                                       style={{
                                         position: 'absolute',
-                                        top: 16,
-                                        right: `calc(${pct}% - 6px)`,
-                                        width: 12,
-                                        height: 12,
+                                        top: 24,
+                                        right: `calc(${pct}% - 5px)`,
+                                        width: 10,
+                                        height: 10,
                                         borderRadius: '50%',
-                                        background: passed ? progressColor : 'var(--card-solid)',
+                                        background: passed ? progressColor : 'var(--input-bg)',
                                         border: '2px solid ' + (passed ? progressColor : 'var(--border)'),
                                         zIndex: 1,
                                       }}
@@ -235,38 +228,68 @@ export default function ListCards({
                                   );
                                 })}
 
-                                {/* نقطه متحرک سن — بالای نوار */}
+                                {/* نقطه متحرک (نقطه فعلی) */}
+                                <div style={{
+                                  position: 'absolute',
+                                  top: 23,
+                                  right: `calc(${markerPct}% - 8px)`,
+                                  width: 16,
+                                  height: 16,
+                                  borderRadius: '50%',
+                                  background: progressColor,
+                                  border: '3px solid var(--card-solid)',
+                                  boxShadow: '0 1px 4px rgba(0,0,0,.2)',
+                                  zIndex: 2,
+                                  transition: 'right .3s',
+                                }} />
+
+                                {/* بج سن — بالای نوار */}
                                 <div style={{
                                   position: 'absolute',
                                   top: 0,
-                                  right: `calc(${markerPct}% - 18px)`,
+                                  right: `calc(${markerPct}% - 20px)`,
+                                  width: 40,
+                                  height: 20,
                                   display: 'flex',
-                                  flexDirection: 'column',
                                   alignItems: 'center',
+                                  justifyContent: 'center',
+                                  background: progressColor,
+                                  color: 'var(--avatar-text, #fff)',
+                                  borderRadius: 5,
+                                  fontSize: 'var(--fs-xs)',
+                                  fontWeight: 700,
+                                  whiteSpace: 'nowrap',
+                                  boxShadow: '0 1px 4px rgba(0,0,0,.2)',
+                                  zIndex: 3,
+                                  transition: 'right .3s',
+                                }}>{toFa(age)}</div>
+
+                                {/* خط اتصال بج به نقطه */}
+                                <div style={{
+                                  position: 'absolute',
+                                  top: 18,
+                                  right: `calc(${markerPct}% - 1px)`,
+                                  width: 2,
+                                  height: 6,
+                                  background: progressColor,
+                                  opacity: 0.6,
                                   zIndex: 2,
                                   transition: 'right .3s',
-                                }}>
-                                  <div style={{
-                                    background: progressColor,
-                                    color: 'var(--avatar-text, #fff)',
-                                    padding: '3px 10px',
-                                    borderRadius: 6,
-                                    fontSize: 'var(--fs-xs)',
-                                    fontWeight: 700,
-                                    whiteSpace: 'nowrap',
-                                    boxShadow: '0 1px 4px rgba(0,0,0,.2)',
-                                  }}>{toFa(age)}</div>
-                                </div>
+                                }} />
+
+                                {/* درصد پایین-راست نوار */}
+                                <div style={{
+                                  position: 'absolute',
+                                  bottom: 0,
+                                  right: 2,
+                                  fontSize: 'var(--fs-xs)',
+                                  color: progressColor,
+                                  fontWeight: 700,
+                                }}>{toFa(Math.round(lc.progress))}٪</div>
                               </div>
 
-                              {/* اعداد دو سر */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>
-                                <span>۱</span>
-                                <span>{toFa(cycleDays)} روز</span>
-                              </div>
-
-                              {/* Legend مراحل — زیر نوار */}
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', marginTop: 10 }}>
+                              {/* Legend مراحل */}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', marginTop: 6 }}>
                                 {stageMilestones.map((mk, idx) => {
                                   const passed = age >= mk.day;
                                   return (
@@ -280,7 +303,8 @@ export default function ListCards({
                                     }}>
                                       <span style={{
                                         width: 8, height: 8, borderRadius: '50%',
-                                        background: passed ? progressColor : 'var(--border)',
+                                        background: passed ? progressColor : 'var(--input-bg)',
+                                        border: passed ? 'none' : '1.5px solid var(--border)',
                                       }} />
                                       <span>{mk.label}</span>
                                       <span style={{ opacity: 0.6 }}>·{toFa(mk.day)}</span>
