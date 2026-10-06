@@ -178,12 +178,22 @@ export default function ListCards({
                           const markerPct = Math.min(100, Math.max(0, lc.progress));
                           
                           // محاسبه موقعیت‌ها بر اساس نسبت واقعی
-                          const markers = stageMilestones.map(m => ({
-                            day: m.day,
-                            label: m.label,
-                            pct: (m.day / cycleDays) * 100,
-                            passed: age >= m.day,
-                          }));
+                          const rawMarkers = [
+                            { day: 1, label: 'شروع', pct: 0, passed: true },
+                            ...stageMilestones.map(m => ({
+                              day: m.day,
+                              label: m.label,
+                              pct: (m.day / cycleDays) * 100,
+                              passed: age >= m.day,
+                            })),
+                          ];
+                          // حذف marker هایی که خیلی نزدیک به هم هستن (نگه‌داشتن اولی)
+                          const markers: typeof rawMarkers = [];
+                          for (const m of rawMarkers) {
+                            const last = markers[markers.length - 1];
+                            if (last && (m.pct - last.pct) < 4) continue; // اگه خیلی نزدیکه، رد کن
+                            markers.push(m);
+                          }
                           
                           // تشخیص روی‌هم افتادن: اگه فاصله دو marker کمتر از 8٪ باشه
                           const MIN_GAP = 8;
