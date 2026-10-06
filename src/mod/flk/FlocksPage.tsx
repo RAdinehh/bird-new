@@ -577,7 +577,7 @@ export default function FlocksPage() {
                         </span>
                       </div>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 6 }}>
-                        {bird?.name || '—'}  سن فعلی: {toFa(age)} روز
+                        {bird?.name || '—'}  |  سن فعلی: {toFa(age)} روز
                       </div>
                       <MiniProgress
                         current={age}
@@ -648,7 +648,7 @@ export default function FlocksPage() {
                   index={toFa(i + 1)}
                   iconEmoji="🐔"
                   title={f.name}
-                  subtitle={`${bird?.name || '—'}${breed ? `  ${breed.name}` : ''}${hall ? `  ${hall.name}` : ''}`}
+                  subtitle={[bird?.name || '—', breed?.name, hall?.name].filter(Boolean).join('  |  ')}
                   isOpen={isOpen}
                   onToggle={() => setExpandedId(isOpen ? null : f.id)}
                   badge={<>

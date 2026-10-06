@@ -158,10 +158,18 @@ export default function ListCards({
                             </div>
                             <div style={{
                               fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 3,
-                              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                              display: 'flex', alignItems: 'center', gap: 8,
+                              whiteSpace: 'nowrap', overflow: 'hidden'
                             }}>
-                              {bird?.name || '—'}  {toFa(age)} روز  🐔 {toFa(flockCount)}
-                              {flockHenDay > 0 ? '  ' + toFa(flockHenDay.toFixed(0)) + '٪' : ''}
+                              <span>{bird?.name || '—'}</span>
+                              <span style={{ color: 'var(--border)' }}>|</span>
+                              <span>{toFa(age)} روز</span>
+                              <span style={{ color: 'var(--border)' }}>|</span>
+                              <span>🐔 {toFa(flockCount)}</span>
+                              {flockHenDay > 0 && (<>
+                                <span style={{ color: 'var(--border)' }}>|</span>
+                                <span>{toFa(flockHenDay.toFixed(0))}٪</span>
+                              </>)}
                             </div>
                           </div>
                           <Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : 'blue'}>
