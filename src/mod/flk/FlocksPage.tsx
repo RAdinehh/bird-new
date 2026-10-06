@@ -27,7 +27,7 @@ import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import DependentSelect from '../../shr/components/DependentSelect';
 import { showConfirmAsync, showPromptAsync } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { Row, DepBox } from './helpers';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
@@ -205,9 +205,9 @@ export default function FlocksPage() {
     const list = Array.isArray(undoData.flock) ? undoData.flock : [undoData.flock];
     try {
       list.forEach((f: any) => add(f));
-      showToast(list.length > 1 ? toFa(list.length) + ' گله بازگردانی شد' : 'گله بازگردانی شد', 'success', 2000);
+      toastMsg.restoredBulk(list.length, 'گله');
     } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
+      toastMsg.error('بازگردانی ناموفق');
     }
     setUndoData(null);
   };
@@ -436,7 +436,7 @@ export default function FlocksPage() {
         try { archive(id); } catch {}
       }
       logAction('update', 'flk', 'آرشیو گروهی ' + ids.length + ' گله');
-      showToast(toFa(ids.length) + ' گله آرشیو شد', 'success', 2500);
+      toastMsg.archivedBulk(ids.length, 'گله');
     },
   });
 
@@ -769,10 +769,10 @@ export default function FlocksPage() {
                         <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🎛</span> کنترل گله
                       </div>
                       <div style={{ display: 'flex', gap: 6 }}>
-                        <Btn size="sm" onClick={() => { toggleHidden(f.id); showToast(f.hidden ? 'نمایان شد' : 'پنهان شد', 'success', 1500); }} style={{ flex: 1 }}>
+                        <Btn size="sm" onClick={() => { toggleHidden(f.id); f.hidden ? toastMsg.visible(f.name) : toastMsg.hidden(f.name); }} style={{ flex: 1 }}>
                           {f.hidden ? '👁 نمایان' : '👁 پنهان'}
                         </Btn>
-                        <Btn size="sm" onClick={() => { togglePaused(f.id); showToast(f.paused ? 'فعال شد' : 'غیرفعال شد', 'success', 1500); }} style={{ flex: 1 }}>
+                        <Btn size="sm" onClick={() => { togglePaused(f.id); f.paused ? toastMsg.activated(f.name) : toastMsg.paused(f.name); }} style={{ flex: 1 }}>
                           {f.paused ? '▶️ فعال' : '⏸ غیرفعال'}
                         </Btn>
                       </div>
@@ -801,7 +801,7 @@ export default function FlocksPage() {
                         <Btn size="sm" onClick={() => restore(f.id)} style={{ flex: 1 }}>بازگردانی</Btn>
                         <Btn size="sm" onClick={async () => {
                     const idToDel = f.id; const item = flocks.find(f => f.id === idToDel); if (item) { setUndoData({ flock: item }); setTimeout(() => setUndoData((cur: any) => cur && cur.flock.id === item.id ? null : cur), 6000); } remove(idToDel);
-                    logAction('delete', 'flk', 'حذف از گله‌ها');  showToast('گله حذف شد', 'info', 1800);
+                    logAction('delete', 'flk', 'حذف از گله‌ها');  toastMsg.deleted(f.name);
                     }} style={{ flex: 1 }}>حذف</Btn>
                       </>
                     ) : (
@@ -822,7 +822,7 @@ export default function FlocksPage() {
                           );
                           if (reason === null || !reason.trim()) return;
                           archive(f.id, reason.trim());
-                          showToast('گله آرشیو شد', 'success', 2000);
+                          toastMsg.archived(f.name);
                           logAction('update', 'flk', 'آرشیو گله: ' + f.name);
                         }} style={{ flex: 1 }}>آرشیو</Btn>
                       </>
