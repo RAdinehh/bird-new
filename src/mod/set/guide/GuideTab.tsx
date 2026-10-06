@@ -228,20 +228,93 @@ export default function GuideTab() {
 
   return (
     <PageContainer>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <div style={{
-          fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700,
-          padding: '4px 4px 2px', letterSpacing: '.5px',
-        }}>📖 استانداردها</div>
-        {standardsChapters.map(ch => <ChapterButton key={ch.id} ch={ch} />)}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <AccordionSection
+          icon="📖"
+          title="استانداردها"
+          count={standardsChapters.length}
+          defaultOpen
+        >
+          {standardsChapters.map(ch => <ChapterButton key={ch.id} ch={ch} />)}
+        </AccordionSection>
 
-        <div style={{
-          fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700,
-          padding: '14px 4px 2px', letterSpacing: '.5px',
-          borderTop: '1px dashed var(--border)', marginTop: 6,
-        }}>🐣 مراحل رشد و سن</div>
-        {stagesChapters.map(ch => <ChapterButton key={ch.id} ch={ch} />)}
+        <AccordionSection
+          icon="🐣"
+          title="مراحل رشد و سن"
+          count={stagesChapters.length}
+          defaultOpen
+        >
+          {stagesChapters.map(ch => <ChapterButton key={ch.id} ch={ch} />)}
+        </AccordionSection>
       </div>
     </PageContainer>
+  );
+}
+
+function AccordionSection({
+  icon, title, count, defaultOpen = true, children,
+}: {
+  icon: string;
+  title: string;
+  count: number;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div style={{
+      background: 'var(--card-solid)',
+      border: '1px solid var(--border)',
+      borderRadius: 'var(--r-md)',
+      overflow: 'hidden',
+    }}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          padding: '12px 14px',
+          background: 'transparent',
+          border: 'none',
+          color: 'var(--text)',
+          fontFamily: 'inherit',
+          cursor: 'pointer',
+          textAlign: 'right',
+        }}
+      >
+        <span style={{ fontSize: 20, lineHeight: 1 }}>{icon}</span>
+        <span style={{ flex: 1, fontSize: 'var(--fs-base)', fontWeight: 700 }}>
+          {title}
+        </span>
+        <span style={{
+          fontSize: 'var(--fs-xs)',
+          color: 'var(--muted)',
+          background: 'var(--input-bg)',
+          padding: '2px 8px',
+          borderRadius: 10,
+          fontWeight: 700,
+        }}>{count}</span>
+        <span style={{
+          fontSize: 10,
+          color: 'var(--muted)',
+          transform: open ? 'rotate(180deg)' : 'rotate(0)',
+          transition: 'transform 180ms',
+          display: 'inline-block',
+        }}>▼</span>
+      </button>
+      {open && (
+        <div style={{
+          padding: '0 10px 10px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
+        }}>
+          {children}
+        </div>
+      )}
+    </div>
   );
 }
