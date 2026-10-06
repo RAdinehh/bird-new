@@ -104,6 +104,8 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     },
   );
 
+  useFab(active ? { label: 'افزودن بخش', onClick: openNew } : null);
+
   if (halls.length === 0) {
     return (
       <PageContainer>
@@ -144,7 +146,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     if (form.id) updateZone(form.id, data); else addZone(data);
     setOpen(false);
   };
-  useFab(active ? { label: 'افزودن بخش', onClick: openNew } : null);
 
   const list = filter ? zones.filter(z => z.hallId === filter) : zones;
 
