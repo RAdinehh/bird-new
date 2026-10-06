@@ -15,7 +15,7 @@ import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/Exp
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { Row, chip } from './helpers';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -148,7 +148,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
     try {
       const arr: any[] = Array.isArray(undoData.hatch) ? undoData.hatch : [undoData.hatch];
       for (const h of arr) addHatch(h);
-      showToast(toFa(arr.length) + ' هچ بازگردانی شد', 'success', 2000);
+      toastMsg.restoredBulk(arr.length, 'هچ')
     } catch {}
     setUndoData(null);
   };
@@ -313,7 +313,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
         setUndoData({ hatch: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.hatch) && cur.hatch.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' هچ حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'هچ')
       logAction('delete', 'inc', 'حذف گروهی هچ: ' + backups.length);
     },
   });

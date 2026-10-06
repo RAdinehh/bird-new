@@ -82,7 +82,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' ثبت حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'ثبت')
       logAction('delete', 'egg', 'حذف گروهی تخم‌گذاری: ' + backups.length);
     },
   });
@@ -97,9 +97,9 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
     try {
       const arr = Array.isArray(item.item) ? item.item : [item.item];
       for (const it of arr) addProduction(it);
-      showToast(toFa(arr.length) + ' ثبت بازگردانی شد', 'success', 2000);
+      toastMsg.restoredBulk(arr.length, 'ثبت')
     } catch {
-      showToast('بازگردانی ناموفق', 'error', 2000);
+      toastMsg.error('بازگردانی ناموفق')
     }
     setUndoData(null);
   };

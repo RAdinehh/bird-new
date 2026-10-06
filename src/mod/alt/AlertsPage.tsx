@@ -7,7 +7,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
@@ -65,9 +65,9 @@ export default function AlertsPage() {
     if (!item) return;
     try {
       restore(item.item.id);
-      showToast('هشدار بازگردانی شد', 'success', 2000);
+      toastMsg.restored('هشدار')
     } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
+      toastMsg.error('بازگردانی ناموفق')
     }
     setUndoData(null);
   };
@@ -220,7 +220,7 @@ export default function AlertsPage() {
                           setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === a.id ? null : cur), 6000);
                           remove(a.id);
                           logAction('delete', 'alt', 'حذف از هشدارها');
-                          showToast('هشدار حذف شد', 'info', 1800);
+                          toastMsg.deleted('هشدار')
                         }} style={{ flex: 1 }}>🗑 حذف</Btn>
                       </>
                     )}

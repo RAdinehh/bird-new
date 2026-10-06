@@ -14,7 +14,7 @@ import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
@@ -137,7 +137,7 @@ export default function ContactsPage() {
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' مخاطب حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'مخاطب')
     },
   });
 
@@ -158,9 +158,9 @@ export default function ContactsPage() {
     if (!item) return;
     try {
       add(item.item);
-      showToast('مخاطب بازگردانی شد', 'success', 2000);
+      toastMsg.restored('مخاطب')
     } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
+      toastMsg.error('بازگردانی ناموفق')
     }
     setUndoData(null);
   };
@@ -343,7 +343,7 @@ export default function ContactsPage() {
                           setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === p.id ? null : cur), 6000);
                           remove(p.id);
                           logAction('delete', 'ctc', 'حذف از مخاطبین');
-                          showToast('مخاطب حذف شد', 'info', 1800);
+                          toastMsg.deleted('مخاطب')
                         }} style={{ flex: 1 }}>حذف</Btn>
                   </div>
                 </ExpandableCard>

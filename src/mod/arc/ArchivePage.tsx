@@ -5,7 +5,7 @@ import { useHal } from '../hal/store';
 import { Btn, BtnRow, Empty, Modal, PageContainer, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 
 type Kind = 'flocks';
@@ -116,7 +116,7 @@ export default function ArchivePage() {
                           const ok = await showConfirmAsync('حذف نهایی گله', 'حذف کامل «' + f.name + '»؟\n\nاین عمل قابل بازگشت نیست. برای همیشه پاک می‌شود.', { danger: true, confirmText: 'حذف کن' });
                           if (!ok) return;
                           remove(f.id);
-                          showToast('گله حذف شد', 'info', 1800);
+                          toastMsg.deleted('گله')
                         }} style={{ flex: 1 }}>🗑 حذف نهایی</Btn>
                 </div>
               </ExpandableCard>

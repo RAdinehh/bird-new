@@ -16,7 +16,7 @@ import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { parse as parseJ, addMonths, format as formatJ } from 'date-fns-jalali';
 import { Row, normalizeBird } from './helpers';
@@ -358,7 +358,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
     };
     if (form.id) {
       updateDevice(form.id, data);
-      showToast('تغییرات ذخیره شد', 'success', 2000);
+      toastMsg.saved()
     } else {
       addDevice(data);
       showToast('دستگاه «' + data.name + '» افزوده شد', 'success', 2200);
@@ -374,9 +374,9 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
     try {
       const arr: any[] = Array.isArray(undoDevice.device) ? undoDevice.device : [undoDevice.device];
       for (const d of arr) addDevice(d);
-      showToast(toFa(arr.length) + ' دستگاه بازگردانی شد', 'success', 2000);
+      toastMsg.restoredBulk(arr.length, 'دستگاه')
     } catch {
-      showToast('بازگردانی ناموفق بود', 'error', 2000);
+      toastMsg.error('بازگردانی ناموفق بود')
     }
     setUndoDevice(null);
   };
@@ -427,7 +427,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
         setUndoDevice({ device: backups });
         setTimeout(() => setUndoDevice((cur: any) => cur && Array.isArray(cur.device) && cur.device.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' دستگاه حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'دستگاه')
     },
   });
 
@@ -599,7 +599,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
                     setTimeout(() => setUndoDevice(cur => cur && cur.device.id === dev.id ? null : cur), 6000);
                     }
                     deleteDevice(d.id);
-                    showToast('دستگاه حذف شد', 'info', 1800);
+                    toastMsg.deleted('دستگاه')
                     }} aria-label="حذف دستگاه" style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

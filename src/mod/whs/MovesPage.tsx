@@ -70,7 +70,7 @@ export default function MovesPage() {
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' تراکنش حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'تراکنش')
     },
   });
 
@@ -87,7 +87,7 @@ export default function MovesPage() {
         try { addMovement(it); } catch {}
       }
       showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
-    } catch { showToast('بازگردانی ناموفق', 'error', 2000); }
+    } catch { toastMsg.error('بازگردانی ناموفق') }
     setUndoData(null);
   };
 

@@ -16,7 +16,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 
@@ -67,7 +67,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         try { addDeal(it); } catch {}
       }
       showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
-    } catch { showToast('بازگردانی ناموفق', 'error', 2000); }
+    } catch { toastMsg.error('بازگردانی ناموفق') }
     setUndoData(null);
   };
   // ─── Multi-Select ───
@@ -88,7 +88,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' معامله حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'معامله')
     },
   });
 
@@ -267,7 +267,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                           if (!ok) return;
                           deleteDeal(d.id);
                           logAction('delete', 'tra', 'حذف از معاملات');
-                          showToast('معامله حذف شد', 'info', 1800);
+                          toastMsg.deleted('معامله')
                         }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

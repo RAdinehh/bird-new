@@ -22,7 +22,7 @@ import { useFlk } from '../flk/store';
 import UndoBar from '../../cor/ui/UndoBar';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 import { getEquipUnit } from './equipUnits';
@@ -269,11 +269,11 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' تجهیز حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'تجهیز')
       logAction('delete', 'hal', 'حذف گروهی تجهیزات: ' + backups.length);
     },
     onArchive: async (ids) => {
-      showToast(toFa(ids.length) + ' تجهیز آرشیو شد', 'success', 2500);
+      toastMsg.archivedBulk(ids.length, 'تجهیز')
     },
   });
   const totalValue = list.reduce((acc, e) => acc + calcEquipValue(e), 0);
@@ -284,9 +284,9 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     if (!item) return;
     try {
       addEquip(item.item);
-      showToast('تجهیز بازگردانی شد', 'success', 2000);
+      toastMsg.restored('تجهیز')
     } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
+      toastMsg.error('بازگردانی ناموفق')
     }
     setUndoData(null);
   };
@@ -365,7 +365,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       consumeRate: form.consumeRate || undefined,
     };
     addEquip(data);
-    showToast('ذخیره شد — تجهیز بعدی', 'success', 1500);
+    toastMsg.saved()
     // پاک کردن فقط نام و مشخصات، نگه‌داشتن سالن و نوع
     setForm((f: any) => ({
       ...f,
@@ -596,7 +596,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
                   <Btn size="sm" onClick={() => openEdit(e)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = e.id; const ok = await showConfirmAsync('تأیید حذف', 'این تجهیز حذف شود؟', { danger: true }); if (!ok) return; const item = equipment.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteEquip(idToDel);
-                    logAction('delete', 'hal', 'حذف از سالن‌ها');  showToast('تجهیز حذف شد', 'info', 1800);
+                    logAction('delete', 'hal', 'حذف از سالن‌ها');  toastMsg.deleted('تجهیز')
                     }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

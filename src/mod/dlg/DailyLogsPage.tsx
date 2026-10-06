@@ -34,7 +34,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import UndoBar from '../../cor/ui/UndoBar';
 import { Section, SectionTitle, Row } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
@@ -150,9 +150,9 @@ export default function DailyLogsPage() {
           }, { source: 'dlg/undoDelete' });
         } catch (e) { /* silent */ }
       }
-      showToast(toFa(logArr.length) + ' ثبت بازگردانی شد', 'success', 2000);
+      toastMsg.restoredBulk(logArr.length, 'ثبت')
     } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
+      toastMsg.error('بازگردانی ناموفق')
     }
     setUndoData(null);
   };
@@ -175,14 +175,14 @@ export default function DailyLogsPage() {
         setUndoData({ log: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.log) && cur.log.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' ثبت حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'ثبت')
       logAction('delete', 'dlg', 'حذف گروهی ثبت روزانه: ' + backups.length);
     },
     onArchive: async (ids: string[]) => {
       const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' ثبت آرشیو شوند؟');
       if (!ok) return;
       for (const id of ids) { try { archive(id); } catch {} }
-      showToast(toFa(ids.length) + ' ثبت آرشیو شد', 'success', 2500);
+      toastMsg.archivedBulk(ids.length, 'ثبت')
     },
   });
 
@@ -670,7 +670,7 @@ const collectWhsShortages = () => {
                     }
                     remove(idToDel);
                     logAction('delete', 'dlg', 'حذف از ثبت روزانه');
-                    showToast('ثبت حذف شد', 'info', 1800);
+                    toastMsg.deleted('ثبت')
                     }} style={{ flex: 1 }}>حذف</Btn>
             </>
           )}

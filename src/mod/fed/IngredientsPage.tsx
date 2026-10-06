@@ -228,7 +228,7 @@ export default function IngredientsPage() {
         try { addIngredient(it); } catch {}
       }
       showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
-    } catch { showToast('بازگردانی ناموفق', 'error', 2000); }
+    } catch { toastMsg.error('بازگردانی ناموفق') }
     setUndoData(null);
   };
 

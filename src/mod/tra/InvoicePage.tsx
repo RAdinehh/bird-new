@@ -23,7 +23,7 @@ import InvoicePrint from './InvoicePrint';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { Row, SectionTitle, chip, AccordionSection } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
@@ -183,7 +183,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         try { addInvoice(it); } catch {}
       }
       showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
-    } catch { showToast('بازگردانی ناموفق', 'error', 2000); }
+    } catch { toastMsg.error('بازگردانی ناموفق') }
     setUndoData(null);
   };
   // ─── Multi-Select ───
@@ -204,7 +204,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' فاکتور حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'فاکتور')
     },
   });
 
@@ -531,7 +531,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
                           if (!ok) return;
                           deleteInvoice(inv.id);
                           logAction('delete', 'tra', 'حذف از معاملات');
-                          showToast('فاکتور حذف شد', 'info', 1800);
+                          toastMsg.deleted('فاکتور')
                         }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

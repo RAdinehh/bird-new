@@ -20,7 +20,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { clampPercent, complement } from '../../shr/utils/smart';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { todayJalali, Row, chip } from './helpers';
 import { useSet } from '../set/store';
@@ -324,7 +324,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
     setDraftRows(rows => rows.filter(r => r._id !== id));
     setUndoRow({ row, idx });
     setTimeout(() => setUndoRow(cur => cur && cur.row._id === id ? null : cur), 6000);
-    showToast('ردیف حذف شد', 'info', 1800);
+    toastMsg.deleted('ردیف')
   };
 
   const undoRemoveRow = () => {
@@ -335,7 +335,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
       return next;
     });
     setUndoRow(null);
-    showToast('ردیف بازگردانی شد', 'success', 1800);
+    toastMsg.restored('ردیف')
   };
 
   const saveAll = async () => {

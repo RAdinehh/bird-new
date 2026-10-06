@@ -23,7 +23,7 @@ import { useFormat } from '../../shr/units';
 import { showAlert } from '../../cor/store/dialog';
 import { Row, RowWithStatus } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
@@ -216,7 +216,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' سالن حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'سالن')
     },
   });
 
@@ -324,9 +324,9 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     if (!item) return;
     try {
       addHall(item.item);
-      showToast('سالن بازگردانی شد', 'success', 2000);
+      toastMsg.restored('سالن')
     } catch (err) {
-      showToast('بازگردانی ناموفق', 'error', 2000);
+      toastMsg.error('بازگردانی ناموفق')
     }
     setUndoData(null);
   };
@@ -548,7 +548,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
                   <Btn size="sm" onClick={() => openEdit(h)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = h.id; const ok = await showConfirmAsync('تأیید حذف', 'این سالن حذف شود؟', { danger: true }); if (!ok) return; const item = halls.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteHall(idToDel);
-                    logAction('delete', 'hal', 'حذف از سالن‌ها');  showToast('سالن حذف شد', 'info', 1800);
+                    logAction('delete', 'hal', 'حذف از سالن‌ها');  toastMsg.deleted('سالن')
                     }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

@@ -16,7 +16,7 @@ import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
 import { chip } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
@@ -67,7 +67,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' بخش حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'بخش')
     },
   });
 
@@ -81,9 +81,9 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     try {
       const arr = Array.isArray(item.item) ? item.item : [item.item];
       for (const it of arr) addZone(it);
-      showToast(toFa(arr.length) + ' بخش بازگردانی شد', 'success', 2000);
+      toastMsg.restoredBulk(arr.length, 'بخش')
     } catch {
-      showToast('بازگردانی ناموفق', 'error', 2000);
+      toastMsg.error('بازگردانی ناموفق')
     }
     setUndoData(null);
   };
@@ -253,7 +253,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
                   <Btn size="sm" onClick={() => openEdit(z)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = z.id; const ok = await showConfirmAsync('تأیید حذف', 'این منطقه حذف شود؟', { danger: true }); if (!ok) return; const item = zones.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteZone(idToDel);
-                    logAction('delete', 'hal', 'حذف از سالن‌ها');  showToast('منطقه حذف شد', 'info', 1800);
+                    logAction('delete', 'hal', 'حذف از سالن‌ها');  toastMsg.deleted('منطقه')
                     }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

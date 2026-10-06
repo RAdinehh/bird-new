@@ -83,7 +83,7 @@ export default function ItemsPage() {
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' کالا حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'کالا')
     },
   });
 
@@ -100,7 +100,7 @@ export default function ItemsPage() {
         try { addItem(it); } catch {}
       }
       showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
-    } catch { showToast('بازگردانی ناموفق', 'error', 2000); }
+    } catch { toastMsg.error('بازگردانی ناموفق') }
     setUndoData(null);
   };
 
