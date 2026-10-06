@@ -5,7 +5,7 @@ import { Btn, BtnRow, Empty, Modal } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 
 type Tab = 'activity' | 'errors';
 
@@ -48,7 +48,7 @@ export default function LogsTab() {
     else clearLogs();
     setShowClear(false);
     refresh();
-    showToast('لاگ‌ها پاک شدند', 'success', 2000);
+    toastMsg.info('لاگ‌ها پاک شدند')
   };
 
   const handleExport = () => {
@@ -61,13 +61,13 @@ export default function LogsTab() {
     a.download = filename + Date.now() + '.json';
     a.click();
     URL.revokeObjectURL(url);
-    showToast('خروجی ذخیره شد', 'success', 2000);
+    toastMsg.saved('خروجی')
   };
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(tab === 'activity' ? exportAuditLogs() : exportLogs());
-      showToast('در کلیپ‌بورد کپی شد', 'success', 2000);
+      toastMsg.info('در کلیپ‌بورد کپی شد')
     } catch {
       showAlert('✕ خطا در کپی');
     }

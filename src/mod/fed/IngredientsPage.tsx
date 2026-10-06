@@ -179,7 +179,7 @@ export default function IngredientsPage() {
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      showToast(toFa(backups.length) + ' ماده اولیه حذف شد', 'success', 2500);
+      toastMsg.deletedBulk(backups.length, 'ماده اولیه')
     },
   });
 
@@ -227,7 +227,7 @@ export default function IngredientsPage() {
       for (const it of arr) {
         try { addIngredient(it); } catch {}
       }
-      showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
+      toastMsg.restoredBulk(arr.length, 'مورد')
     } catch { toastMsg.error('بازگردانی ناموفق') }
     setUndoData(null);
   };

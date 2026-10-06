@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Btn, PageContainer } from '../../../../shr/components/ui';
 import SettingsGroup from '../../SettingsGroup';
-import { showToast } from '../../../../cor/store/toast';
+import { showToast, toastMsg } from '../../../../cor/store/toast';
 import { showConfirmAsync } from '../../../../cor/store/dialog';
 import { useBrd } from '../../../brd/store';
 import { useFlk } from '../../../flk/store';
@@ -143,7 +143,7 @@ export default function EnvStandardsTab() {
   ) => {
     const newStd: BirdStandard = { ...template, key, nameFa, nameEn, birdName };
     updateStandard(key, newStd);
-    showToast(nameFa + ' اضافه شد', 'success', 2000);
+    toastMsg.added(nameFa)
     setOnlyActive(false);
   };
 
@@ -151,7 +151,7 @@ export default function EnvStandardsTab() {
     const ok = await showConfirmAsync('بازگشت همه', 'همه ویرایش‌های استانداردها حذف شود؟', { danger: true });
     if (!ok) return;
     Object.keys(custom).forEach(k => resetStandard(k));
-    showToast('همه به پیش‌فرض برگشتند', 'success', 2000);
+    toastMsg.info('همه به پیش‌فرض برگشتند')
   };
 
   const totalBreeds = Object.values(grouped).reduce((sum, arr) => sum + arr.length, 0);

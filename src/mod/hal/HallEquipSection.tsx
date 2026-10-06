@@ -141,13 +141,13 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
 
   const saveNewEquip = () => {
     if (!pickerName.trim()) {
-      showToast('نام تجهیز اجباری است', 'error', 2000);
+      toastMsg.error('نام تجهیز اجباری است')
       return;
     }
     const name = pickerName.trim();
     const dup = hallEquips.find((x: any) => x.type === pickerType && x.name.trim() === name);
     if (dup) {
-      showToast('این تجهیز قبلاً در همین سالن ثبت شده', 'error', 2500);
+      toastMsg.error('این تجهیز قبلاً در همین سالن ثبت شده')
       return;
     }
     const def = getEquipUnit(pickerType);
@@ -169,7 +169,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
       capacity: capValue,
     } as any);
     setPicker(false);
-    showToast('تجهیز اضافه شد', 'success', 1500);
+    toastMsg.added('تجهیز')
   };
 
   const openEdit = (e: Equipment) => {

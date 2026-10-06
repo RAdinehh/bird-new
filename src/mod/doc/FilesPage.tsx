@@ -10,7 +10,7 @@ import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 import { useFab } from '../../shr/hooks/useFab';
 import { showConfirmAsync } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { ListCard, fabStyle, GridCard, chip } from './helpers';
 
 type ViewMode = 'grid' | 'list';
@@ -66,7 +66,7 @@ export default function FilesPage() {
   const doDelete = async (id: string) => {
     await deleteFile(id);
     setRefresh(r => r + 1);
-    showToast('فایل حذف شد', 'success', 2000);
+    toastMsg.deleted('فایل')
   };
 
   return (

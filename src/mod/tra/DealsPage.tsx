@@ -66,7 +66,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       for (const it of arr) {
         try { addDeal(it); } catch {}
       }
-      showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
+      toastMsg.restoredBulk(arr.length, 'مورد')
     } catch { toastMsg.error('بازگردانی ناموفق') }
     setUndoData(null);
   };

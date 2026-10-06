@@ -1,6 +1,6 @@
 import { useCustomOptions } from '../../shr/store/customOptions';
 import { Empty, Btn, PageContainer } from '../../shr/components/ui';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { toFa } from '../../shr/utils/fa';
 import { useHal } from '../hal/store';
@@ -50,7 +50,7 @@ export default function HiddenOptionsTab() {
 
   const handleUnhide = (id: string, name: string) => {
     unhideOption(id);
-    showToast('«' + name + '» بازگردانی شد', 'success', 2000);
+    toastMsg.restored(name)
   };
 
   const handleDelete = async (id: string, name: string) => {
@@ -61,7 +61,7 @@ export default function HiddenOptionsTab() {
     const ok = await showConfirmAsync('حذف کامل', message, { danger: true });
     if (!ok) return;
     deleteOption(id);
-    showToast('«' + name + '» حذف شد', 'info', 2000);
+    toastMsg.deleted(name)
   };
 
   return (

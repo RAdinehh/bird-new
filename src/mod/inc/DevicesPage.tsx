@@ -266,9 +266,9 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
     const newCap: any = { birdName, capacity: null, ...(defaults || {}) };
     setForm(f => ({ ...f, capacityByBird: [...f.capacityByBird, newCap] }));
     if (defaults) {
-      showToast(`«${birdName}» با مقادیر پیش‌فرض پروفایل افزوده شد`, 'success', 2200);
+      toastMsg.added(birdName)
     } else {
-      showToast(`«${birdName}» افزوده شد`, 'info', 1800);
+      toastMsg.added(birdName)
     }
   };
 
@@ -361,7 +361,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
       toastMsg.saved()
     } else {
       addDevice(data);
-      showToast('دستگاه «' + data.name + '» افزوده شد', 'success', 2200);
+      toastMsg.added(data.name, 'دستگاه')
     }
     setForm(empty);
     setErr('');

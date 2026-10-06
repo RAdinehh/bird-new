@@ -618,7 +618,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
                 if (env?.temp?.target != null) patch.targetTemp = String(env.temp.target);
                 if (env?.humidity?.min != null) patch.targetHumidity = String(env.humidity.min);
                 setForm(f => ({ ...f, ...patch }));
-                showToast('مقادیر از استاندارد پر شد', 'success', 1500);
+                toastMsg.info('مقادیر از استاندارد پر شد')
               }}
               style={{
                 marginTop: 6,

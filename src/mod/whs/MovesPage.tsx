@@ -86,7 +86,7 @@ export default function MovesPage() {
       for (const it of arr) {
         try { addMovement(it); } catch {}
       }
-      showToast(toFa(arr.length) + ' بازگردانی شد', 'success', 2000);
+      toastMsg.restoredBulk(arr.length, 'مورد')
     } catch { toastMsg.error('بازگردانی ناموفق') }
     setUndoData(null);
   };

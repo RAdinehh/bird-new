@@ -10,7 +10,7 @@ import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/Exp
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { todayJalali } from './helpers';
 import { useIncubationProfile } from './hooks';
 import { logAction } from '../../cor/logger/auditLog';
@@ -239,7 +239,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
       });
       setOpen(false);
       setEditingId(null);
-      showToast('کندلینگ ذخیره شد', 'success', 2000);
+      toastMsg.saved('کندلینگ')
       setEntriesData({});
       return;
     }

@@ -493,7 +493,7 @@ const collectWhsShortages = () => {
       }, { source: 'dlg/save' });
     } catch (e) { /* silent */ }
 
-    showToast(form.id ? 'ثبت روزانه به‌روز شد' : 'ثبت روزانه ذخیره شد', 'success', 2200);
+    toastMsg.saved('ثبت روزانه')
     setOpen(false);
     setSaving(false);
   };

@@ -1,6 +1,6 @@
 import { PageContainer, Sheet } from '../../../../shr/components/ui';
 import SettingsGroup from '../../SettingsGroup';
-import { showToast } from '../../../../cor/store/toast';
+import { showToast, toastMsg } from '../../../../cor/store/toast';
 import { showConfirmAsync } from '../../../../cor/store/dialog';
 import { EnvEditor, FeedEditor, GrowthEditor, MortalityEditor, LitterEditor } from './editors';
 import { DEFAULT_STANDARDS, type BirdStandard } from '../index';
@@ -56,7 +56,7 @@ export function StandardDetail({ birdKey, onClose }: { birdKey: string; onClose:
     const ok = await showConfirmAsync('بازگشت به پیش‌فرض', 'همه ویرایش‌های این نژاد حذف شود؟', { danger: true });
     if (!ok) return;
     (s as any).resetStandard(birdKey);
-    showToast('بازگشت به پیش‌فرض انجام شد', 'success', 2000);
+    toastMsg.info('بازگشت به پیش‌فرض انجام شد')
   };
 
   const nameChanged = std.nameFa !== def.nameFa || std.nameEn !== def.nameEn || std.birdName !== def.birdName;

@@ -140,7 +140,7 @@ export default function AlertsPage() {
               const ok = await showConfirmAsync('پاک‌سازی همه‌ی تاریخچه', 'تمام هشدارهای بسته‌شده حذف می‌شوند.\nاین عمل قابل بازگشت نیست.', { danger: true, confirmText: 'همه را پاک کن' });
               if (!ok) return;
               clearAll();
-              showToast('تاریخچه پاک شد', 'success', 2000);
+              toastMsg.info('تاریخچه پاک شد')
             }}>🗑 پاک‌سازی</Btn>
           ) : null}
         </div>
