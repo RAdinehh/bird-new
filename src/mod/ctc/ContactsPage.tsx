@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createContactSchema } from '../../shr/validation/rules/ctc';
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
@@ -55,6 +56,7 @@ export default function ContactsPage() {
     });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن مخاطب', onClick: openNew });
   const toggleRole = (r: Role) => setForm(f => ({ ...f, roles: f.roles.includes(r) ? f.roles.filter(x => x !== r) : [...f.roles, r] }));
   const toggleSupType = (t: string) => setForm(f => ({ ...f, supplierTypes: f.supplierTypes.includes(t) ? f.supplierTypes.filter(x => x !== t) : [...f.supplierTypes, t] }));
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;

@@ -1,4 +1,5 @@
 import { useState, useMemo , useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { RequirementSchema } from '../../shr/validation/rules/fed';
 import { useFed, STAGE_LABEL, STAGE_LABEL_LONG, type Requirement } from './store';
@@ -94,6 +95,7 @@ export default function RequirementsPage() {
     const lastR = requirements.filter(x => x.birdType).slice().reverse()[0];
     setForm({ ...empty(), ...(lastR?.birdType ? { birdType: lastR.birdType } : {}) }); setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن نیاز', onClick: openNew });
 
   const openEdit = (r: Requirement) => {
     setForm({

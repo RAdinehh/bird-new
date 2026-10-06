@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useWhs, UNIT_LABEL, MOVEMENT_REASON, CATEGORY_ICON, CATEGORY_LABEL, type Movement, type MovementType, type MovementReason } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';;
@@ -98,6 +99,7 @@ export default function MovesPage() {
     });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'ثبت تراکنش', onClick: openNew });
 
   const openEdit = (m: Movement) => {
     setForm({

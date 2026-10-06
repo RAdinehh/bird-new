@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import {
   useWhs, CATEGORY_LABEL, CATEGORY_ICON, CATEGORY_DEFAULTS,
   UNIT_LABEL, STORAGE_LABEL, stockWarning, expiryWarning,
@@ -107,6 +108,7 @@ export default function ItemsPage() {
     const lastR = items.filter(x => x.category).slice().reverse()[0];
     setForm({ ...empty(), ...(lastR?.category ? { category: lastR.category } : {}) }); setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن کالا', onClick: openNew });
 
   const openEdit = (it: Item) => {
     setForm({

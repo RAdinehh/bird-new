@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { IngredientSchema } from '../../shr/validation/rules/fed';
 import { useFed, CATEGORY_LABEL, CATEGORY_ICON, type Ingredient, type IngredientCategory } from './store';
@@ -91,6 +92,7 @@ export default function IngredientsPage() {
     const lastR = ingredients.filter(x => x.category).slice().reverse()[0];
     setForm({ ...empty(), ...(lastR?.category ? { category: lastR.category } : {}) }); setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن ماده اولیه', onClick: openNew });
 
   // === انتخاب از کتابخانه ===
   const pickFromLibrary = (key: string) => {

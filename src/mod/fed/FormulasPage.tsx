@@ -1,4 +1,5 @@
 import { useState, useMemo , useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createFormulaSchema } from '../../shr/validation/rules/fed';
 import { format as formatJalali } from 'date-fns-jalali';
@@ -85,6 +86,7 @@ export default function FormulasPage() {
     });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن فرمول', onClick: openNew });
 
   const openEdit = (f: Formula) => {
     setForm({

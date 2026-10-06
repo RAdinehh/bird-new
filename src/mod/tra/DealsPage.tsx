@@ -2,6 +2,7 @@
  * DealsPage — معاملات خاص
  */
 import { useState, useMemo , useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field,
@@ -104,6 +105,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     setForm({ ...empty(), partyId: contacts[0].id });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'افزودن معامله', onClick: openNew });
 
   const openEdit = (d: Deal) => {
     setForm({

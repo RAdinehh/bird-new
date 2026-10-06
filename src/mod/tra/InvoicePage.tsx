@@ -2,6 +2,7 @@
  * InvoicePage — صفحه مشترک خرید و فروش
  */
 import { useState, useMemo, useEffect } from 'react';
+import { useFab } from '../../shr/hooks/useFab';
 import {
   useTra, CATEGORIES, itemsSum, paidSum, remaining, STATUS_LABEL,
   WORKFLOW_LABEL, calcDueDate, calcItemTotal, calcItemDiscount,
@@ -245,6 +246,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     });
     setErr(''); setOpen(true);
   };
+  useFab({ label: 'ثبت فاکتور', onClick: openNew });
 
   const openEdit = (inv: Invoice) => {
     setForm({
