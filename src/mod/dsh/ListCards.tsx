@@ -181,25 +181,25 @@ export default function ListCards({
                             <div style={{ marginTop: 12 }}>
                               {/* ردیف بالا: برچسب + درصد */}
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+                                <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', fontWeight: 700 }}>
                                   چرخه زندگی
                                 </span>
-                                <span style={{ fontSize: 'var(--fs-sm)', color: progressColor, fontWeight: 700 }}>
+                                <span style={{ fontSize: 'var(--fs-md)', color: progressColor, fontWeight: 700 }}>
                                   {toFa(Math.round(lc.progress))}٪
                                 </span>
                               </div>
 
                               {/* نوار خطی با بج متحرک */}
-                              <div style={{ position: 'relative', height: 28, marginBottom: 4 }}>
+                              <div style={{ position: 'relative', height: 38, marginBottom: 6 }}>
                                 {/* نوار پس‌زمینه */}
                                 <div style={{
                                   position: 'absolute',
-                                  top: 13,
+                                  top: 18,
                                   left: 0,
                                   right: 0,
-                                  height: 6,
+                                  height: 10,
                                   background: 'var(--input-bg)',
-                                  borderRadius: 3,
+                                  borderRadius: 5,
                                   border: '1px solid var(--border)',
                                   overflow: 'hidden',
                                 }}>
@@ -222,10 +222,10 @@ export default function ListCards({
                                       title={mk.label + ' · روز ' + toFa(mk.day)}
                                       style={{
                                         position: 'absolute',
-                                        top: 12,
-                                        right: `calc(${pct}% - 4px)`,
-                                        width: 8,
-                                        height: 8,
+                                        top: 16,
+                                        right: `calc(${pct}% - 6px)`,
+                                        width: 12,
+                                        height: 12,
                                         borderRadius: '50%',
                                         background: passed ? progressColor : 'var(--card-solid)',
                                         border: '2px solid ' + (passed ? progressColor : 'var(--border)'),
@@ -239,7 +239,7 @@ export default function ListCards({
                                 <div style={{
                                   position: 'absolute',
                                   top: 0,
-                                  right: `calc(${markerPct}% - 14px)`,
+                                  right: `calc(${markerPct}% - 18px)`,
                                   display: 'flex',
                                   flexDirection: 'column',
                                   alignItems: 'center',
@@ -249,37 +249,37 @@ export default function ListCards({
                                   <div style={{
                                     background: progressColor,
                                     color: 'var(--avatar-text, #fff)',
-                                    padding: '1px 6px',
-                                    borderRadius: 4,
-                                    fontSize: 10,
+                                    padding: '3px 10px',
+                                    borderRadius: 6,
+                                    fontSize: 'var(--fs-xs)',
                                     fontWeight: 700,
                                     whiteSpace: 'nowrap',
-                                    boxShadow: '0 1px 3px rgba(0,0,0,.15)',
+                                    boxShadow: '0 1px 4px rgba(0,0,0,.2)',
                                   }}>{toFa(age)}</div>
                                 </div>
                               </div>
 
                               {/* اعداد دو سر */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--muted)', fontWeight: 600 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>
                                 <span>۱</span>
                                 <span>{toFa(cycleDays)} روز</span>
                               </div>
 
                               {/* Legend مراحل — زیر نوار */}
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 10px', marginTop: 8 }}>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', marginTop: 10 }}>
                                 {stageMilestones.map((mk, idx) => {
                                   const passed = age >= mk.day;
                                   return (
                                     <div key={idx} style={{
                                       display: 'flex',
                                       alignItems: 'center',
-                                      gap: 4,
-                                      fontSize: 10,
+                                      gap: 5,
+                                      fontSize: 'var(--fs-xs)',
                                       color: passed ? 'var(--accent)' : 'var(--muted)',
                                       fontWeight: passed ? 700 : 500,
                                     }}>
                                       <span style={{
-                                        width: 6, height: 6, borderRadius: '50%',
+                                        width: 8, height: 8, borderRadius: '50%',
                                         background: passed ? progressColor : 'var(--border)',
                                       }} />
                                       <span>{mk.label}</span>
