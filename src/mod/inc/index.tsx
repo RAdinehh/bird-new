@@ -114,7 +114,7 @@ export default function Inc() {
           }}
         >
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <DevicesPage />
+            <DevicesPage active={tab === 'devices'} />
           </div>
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} />

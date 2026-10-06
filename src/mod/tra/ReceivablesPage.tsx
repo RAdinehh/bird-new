@@ -14,7 +14,7 @@ import { Line, tab, filterChip } from './helpers';
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 type QuickFilter = 'all' | 'overdue' | 'soon';
 
-export default function ReceivablesPage() {
+export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
   const { invoices, updateInvoice } = useTra();
   const { contacts } = useCtc();
   const [kind, setKind] = useState<'sale' | 'purchase'>('sale');

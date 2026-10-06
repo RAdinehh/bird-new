@@ -40,7 +40,7 @@ const STATUS_LABEL: Record<string, string> = {
   open: 'باز', settled: 'تسویه‌شده', cancelled: 'لغوشده'
 };
 
-export default function DealsPage() {
+export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const { deals, addDeal, updateDeal, deleteDeal } = useTra();
   const { contacts } = useCtc();
 

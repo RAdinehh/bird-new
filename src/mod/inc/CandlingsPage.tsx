@@ -54,7 +54,7 @@ function calcAvailableBase(entryId: string, currentStage: number, excludeCandlin
   return { base: prev.alive || 0, source: 'مرحله ' + prev.stage };
 }
 
-export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void } = {}) {
+export default function CandlingsPage({ initialEntry = '', onGoTo, active = true }: { initialEntry?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void; active?: boolean } = {}) {
   const { devices, eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
   const { birds } = useBrd();
 
@@ -153,7 +153,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo }: { initialEn
     setErr('');
     setOpen(true);
   };
-  useFab({ label: 'ثبت کندلینگ', onClick: () => openNew() });
+  useFab(active ? { label: 'ثبت کندلینگ', onClick: () => openNew() } : null);
 
   const availableEntries = useMemo(() => {
     const dayNum = parseInt(toEn(modalDay)) || 0;

@@ -3,6 +3,6 @@
  */
 import InvoicePage from './InvoicePage';
 
-export default function PurchasesPage() {
-  return <InvoicePage kind="purchase" />;
+export default function PurchasesPage({ active = true }: { active?: boolean } = {}) {
+  return <InvoicePage kind="purchase" active={active} />;
 }

@@ -27,7 +27,7 @@ function shortDate(d: string): string {
   return `${p[1]}/${p[2]}`;
 }
 
-export default function StatsPage() {
+export default function StatsPage({ active = true }: { active?: boolean } = {}) {
   const { productions } = useEgg();
   const { flocks } = useFlk();
   const [filterFlock, setFilterFlock] = useState('');

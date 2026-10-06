@@ -86,16 +86,16 @@ export default function Tra() {
           }}
         >
           <div key="purchases" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <PurchasesPage />
+            <PurchasesPage active={tab === 'purchases'} />
           </div>
           <div key="sales" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <SalesPage />
+            <SalesPage active={tab === 'sales'} />
           </div>
           <div key="deals" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <DealsPage />
+            <DealsPage active={tab === 'deals'} />
           </div>
           <div key="receivables" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <ReceivablesPage />
+            <ReceivablesPage active={tab === 'receivables'} />
           </div>
         </div>
       </div>

@@ -180,7 +180,7 @@ function warrantyInfo(purchasedAt: string, months: number | null): { end: string
   } catch { return null; }
 }
 
-export default function DevicesPage() {
+export default function DevicesPage({ active = true }: { active?: boolean } = {}) {
   const { devices, eggEntries, addDevice, updateDevice, deleteDevice } = useInc();
   const settings = useSet();
   const { birds } = useBrd();
@@ -257,7 +257,7 @@ export default function DevicesPage() {
     });
     setErr(''); setOpen(true);
   };
-  useFab({ label: 'افزودن دستگاه', onClick: openNew });
+  useFab(active ? { label: 'افزودن دستگاه', onClick: openNew } : null);
 
   const addCapacity = (birdName: string) => {
     if (!birdName.trim()) return;

@@ -44,7 +44,7 @@ const empty = (): F => ({
   avgWeight: '', notes: '',
 });
 
-export default function ProductionsPage() {
+export default function ProductionsPage({ active = true }: { active?: boolean } = {}) {
   const { productions, addProduction, updateProduction, deleteProduction } = useEgg();
   const { flocks } = useFlk();
   const { birds } = useBrd();
@@ -109,7 +109,7 @@ export default function ProductionsPage() {
     setForm({ ...empty(), flockId: activeFlocks[0].id });
     setErr(''); setOpen(true);
   };
-  useFab({ label: 'ثبت تخم‌گذاری', onClick: openNew });
+  useFab(active ? { label: 'ثبت تخم‌گذاری', onClick: openNew } : null);
 
   const openEdit = (p: EggProduction) => {
     setForm({

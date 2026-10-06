@@ -37,7 +37,7 @@ function findStandardKey(name: string): string | undefined {
   return undefined;
 }
 
-export default function BreedsPage() {
+export default function BreedsPage({ active = true }: { active?: boolean } = {}) {
   const { birds, breeds: _breedsRaw, dedupeBreeds, addBreed, updateBreed, deleteBreed } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', birdId:'', name:'', fcr:'', standardKey:'' });
@@ -140,7 +140,7 @@ export default function BreedsPage() {
     setFcrFromStd(false);
     setErr(''); setOpen(true);
   };
-  useFab({ label: 'افزودن نژاد', onClick: openNew });
+  useFab(active ? { label: 'افزودن نژاد', onClick: openNew } : null);
 
   const openEdit = (b: Breed) => {
     setForm({ id: b.id, birdId: b.birdId, name: b.name, fcr: b.fcr ? toFa(b.fcr) : '', standardKey: (b as any).standardKey || '' });

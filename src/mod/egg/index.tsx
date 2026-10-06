@@ -63,10 +63,10 @@ export default function Egg() {
         <div ref={trackRef} style={{ display: 'flex', direction: 'ltr', willChange: 'transform',
             backfaceVisibility: 'hidden', touchAction: 'pan-y' }}>
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <ProductionsPage />
+            <ProductionsPage active={tab === 'productions'} />
           </div>
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <StatsPage />
+            <StatsPage active={tab === 'stock'} />
           </div>
         </div>
       </div>

@@ -77,10 +77,10 @@ export default function Brd() {
           }}
         >
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <BirdsPage />
+            <BirdsPage active={tab === 'birds'} />
           </div>
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <BreedsPage />
+            <BreedsPage active={tab === 'breeds'} />
           </div>
         </div>
       </div>

@@ -20,7 +20,7 @@ import { logAction } from '../../cor/logger/auditLog';
 interface F { id?: string; name: string; cycleDays: string; fcrStandard: string; }
 const empty: F = { name: '', cycleDays: '', fcrStandard: '' };
 
-export default function BirdsPage() {
+export default function BirdsPage({ active = true }: { active?: boolean } = {}) {
   const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird, dedupeBirds } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
@@ -74,7 +74,7 @@ export default function BirdsPage() {
     setCycleFromPreset(false); setFcrFromPreset(false);
     setError(''); setOpen(true);
   };
-  useFab({ label: 'افزودن پرنده', onClick: openNew });
+  useFab(active ? { label: 'افزودن پرنده', onClick: openNew } : null);
   const save = async () => {
 
     // 🔒 جلوگیری قاطع از نام تکراری پرنده

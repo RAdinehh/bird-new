@@ -57,7 +57,7 @@ const empty = (isPurchase: boolean): F => ({
   dueDate: '', payments: [], notes: '',
 });
 
-export default function InvoicePage({ kind }: { kind: 'purchase' | 'sale' }) {
+export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
   const isPurchase = kind === 'purchase';
   const { invoices, addInvoice, updateInvoice, deleteInvoice } = useTra();
   const { contacts } = useCtc();

@@ -26,7 +26,7 @@ import { logAction } from '../../cor/logger/auditLog';
 
 const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
 
-export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntry?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void } = {}) {
+export default function HatchesPage({ initialEntry = '', onGoTo, active = true }: { initialEntry?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void; active?: boolean } = {}) {
   const { devices, eggEntries, hatches, candlings, addHatch, updateHatch, deleteHatch } = useInc();
   const { birds } = useBrd();
   const { add: addFlock, remove: removeFlock } = useFlk();
@@ -126,7 +126,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo }: { initialEntr
     setSelectedIds(preId ? new Set([preId]) : new Set());
     setErr(''); setOpen(true);
   };
-  useFab({ label: 'ثبت هچ', onClick: () => openNew() });
+  useFab(active ? { label: 'ثبت هچ', onClick: () => openNew() } : null);
 
   const openEdit = (h: HatchResult) => {
     setEditingId(h.id);
