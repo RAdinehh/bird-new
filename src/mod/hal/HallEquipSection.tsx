@@ -17,7 +17,7 @@ import {
   type Equipment,
 } from './store';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { NEED_CALCULATORS, type NeedInput } from './needs';
 import { getEquipUnit } from './equipUnits';
@@ -192,7 +192,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
     const ok = await showConfirmAsync('حذف تجهیز', '«' + name + '» از این سالن حذف شود؟', { danger: true });
     if (!ok) return;
     deleteEquip(id);
-    showToast('حذف شد', 'info', 1500);
+    toastMsg.deleted('')
   };
 
   const currentEdit = editId ? hallEquips.find(e => e.id === editId) : null;

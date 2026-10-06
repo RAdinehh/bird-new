@@ -16,7 +16,7 @@ import ProgressTracker from '../../shr/components/ProgressTracker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { Row, SectionTitle, chip } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
@@ -333,7 +333,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
                     setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === p.id ? null : cur), 6000);
                     deleteProduction(p.id);
                     logAction('delete', 'egg', 'حذف از تخم‌ها');
-                    showToast('حذف شد', 'info', 1800);
+                    toastMsg.deleted('')
                   }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

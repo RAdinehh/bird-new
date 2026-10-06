@@ -15,7 +15,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
 import { Row, SectionTitle, chip } from './helpers';
@@ -377,7 +377,7 @@ export default function ItemsPage() {
                   <Btn size="sm" onClick={() => openEdit(it)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = it.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = items.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteItem(idToDel);
-                    logAction('delete', 'whs', 'حذف از انبار');  showToast('حذف شد', 'info', 1800);
+                    logAction('delete', 'whs', 'حذف از انبار');  toastMsg.deleted('')
                     }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

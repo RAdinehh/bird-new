@@ -10,7 +10,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import SmartSelect from '../../shr/components/SmartSelect';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
@@ -299,7 +299,7 @@ export default function MovesPage() {
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = m.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel);
-                    logAction('delete', 'whs', 'حذف از انبار');  showToast('حذف شد', 'info', 1800);
+                    logAction('delete', 'whs', 'حذف از انبار');  toastMsg.deleted('')
                     }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>

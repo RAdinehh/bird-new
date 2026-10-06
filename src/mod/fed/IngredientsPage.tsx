@@ -15,7 +15,7 @@ import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
 import { Row, SectionTitle, chip } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
@@ -398,7 +398,7 @@ export default function IngredientsPage() {
                           if (!ok) return;
                           deleteIngredient(it.id);
                           logAction('delete', 'fed', 'حذف از جیره‌نویسی');
-                          showToast('حذف شد', 'info', 1800);
+                          toastMsg.deleted('')
                         }} style={{ flex: 1 }}>حذف</Btn>
                   )}
                 </div>

@@ -15,7 +15,7 @@ import { showAlert } from '../../cor/store/dialog';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { Row, SectionTitle, NutrientRow } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
@@ -330,7 +330,7 @@ export default function FormulasPage() {
                           if (!ok) return;
                           deleteFormula(f.id);
                           logAction('delete', 'fed', 'حذف از جیره‌نویسی');
-                          showToast('حذف شد', 'info', 1800);
+                          toastMsg.deleted('')
                         }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
               </ExpandableCard>
