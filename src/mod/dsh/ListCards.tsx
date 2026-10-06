@@ -176,6 +176,15 @@ export default function ListCards({
                           const stageMilestones = (CYCLE_MILESTONES[f.type] || []).filter(m => m.day > 0 && m.day < cycleDays);
                           const progressColor = lc.progress >= 95 ? 'var(--danger)' : lc.progress >= 80 ? 'var(--warn)' : 'var(--accent)';
                           const markerPct = Math.min(100, Math.max(0, lc.progress));
+                          const visibleMilestones: Array<{ mk: typeof stageMilestones[0]; pct: number }> = [];
+                          { let ld = -1;
+                            for (const mk of stageMilestones) {
+                              if (ld < 0 || (mk.day - ld) >= cycleDays * 0.1) {
+                                visibleMilestones.push({ mk, pct: (mk.day / cycleDays) * 100 });
+                                ld = mk.day;
+                              }
+                            }
+                          }
                           
                           return (
                             <div style={{ marginTop: 10 }}>
@@ -206,8 +215,7 @@ export default function ListCards({
                                 </div>
 
                                 {/* دات‌های نقاط عطف — روی نوار */}
-                                {stageMilestones.map((mk, idx) => {
-                                  const pct = (mk.day / cycleDays) * 100;
+                                {visibleMilestones.map(({ mk, pct }, idx) => {
                                   const passed = age >= mk.day;
                                   return (
                                     <div
@@ -301,11 +309,6 @@ export default function ListCards({
                                       color: passed ? 'var(--accent)' : 'var(--muted)',
                                       fontWeight: passed ? 700 : 500,
                                     }}>
-                                      <span style={{
-                                        width: 8, height: 8, borderRadius: '50%',
-                                        background: passed ? progressColor : 'var(--input-bg)',
-                                        border: passed ? 'none' : '1.5px solid var(--border)',
-                                      }} />
                                       <span>{mk.label}</span>
                                       <span style={{ opacity: 0.6 }}>·{toFa(mk.day)}</span>
                                     </div>
