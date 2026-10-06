@@ -8,8 +8,17 @@ export interface DialogConfig {
   message?: string;
   confirmText?: string;
   cancelText?: string;
-  onConfirm?: () => void;
+  onConfirm?: (inputValue?: string) => void;
   onCancel?: () => void;
+  /** اگه تنظیم شه، input وسط دیالوگ نشون داده می‌شه */
+  input?: {
+    label?: string;
+    placeholder?: string;
+    defaultValue?: string;
+    required?: boolean;
+    multiline?: boolean;
+    rows?: number;
+  };
 }
 
 interface DialogState {
@@ -60,6 +69,43 @@ export function showConfirm(
   });
 }
 
+
+/** نسخه‌ی Promise از prompt — برای گرفتن ورودی متنی وسط صفحه */
+export function showPromptAsync(
+  title: string,
+  message: string,
+  options: {
+    label?: string;
+    placeholder?: string;
+    defaultValue?: string;
+    required?: boolean;
+    multiline?: boolean;
+    rows?: number;
+    danger?: boolean;
+    confirmText?: string;
+    cancelText?: string;
+  } = {}
+): Promise<string | null> {
+  return new Promise((resolve) => {
+    useDialog.getState().show({
+      type: options.danger ? 'danger' : 'confirm',
+      title,
+      message,
+      confirmText: options.confirmText || (options.danger ? 'حذف کن' : 'تأیید'),
+      cancelText: options.cancelText || 'لغو',
+      input: {
+        label: options.label,
+        placeholder: options.placeholder,
+        defaultValue: options.defaultValue,
+        required: options.required,
+        multiline: options.multiline,
+        rows: options.rows,
+      },
+      onConfirm: (val) => resolve(val ?? ''),
+      onCancel: () => resolve(null),
+    });
+  });
+}
 
 /** نسخه‌ی Promise از showConfirm — برای async/await */
 export function showConfirmAsync(

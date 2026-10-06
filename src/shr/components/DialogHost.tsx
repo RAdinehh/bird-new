@@ -56,6 +56,14 @@ function isQuietHour(): boolean {
 export default function DialogHost() {
   const { open, config, close } = useDialog();
   const noAnim = useNoAnim();
+  const [inputValue, setInputValue] = useState('');
+
+  // sync ورودی با config
+  useEffect(() => {
+    if (open && config?.input) {
+      setInputValue(config.input.defaultValue || '');
+    }
+  }, [open, config]);
 
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
@@ -65,12 +73,13 @@ export default function DialogHost() {
 
   const handleConfirm = useCallback(() => {
     try {
-      config?.onConfirm?.();
+      if (config?.input?.required && !inputValue.trim()) return;
+      config?.onConfirm?.(config?.input ? inputValue : undefined);
     } catch {
       /* silent */
     }
     close();
-  }, [config, close]);
+  }, [config, close, inputValue]);
 
   const handleCancel = useCallback(() => {
     try {
@@ -262,6 +271,50 @@ export default function DialogHost() {
           </div>
         )}
 
+        {config.input && (
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {config.input.label && (
+              <label style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, textAlign: 'right' }}>
+                {config.input.label}
+                {config.input.required && <span style={{ color: 'var(--danger)', marginRight: 4 }}>*</span>}
+              </label>
+            )}
+            {config.input.multiline ? (
+              <textarea
+                autoFocus
+                rows={config.input.rows || 3}
+                placeholder={config.input.placeholder}
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); handleConfirm(); } }}
+                style={{
+                  width: '100%', minHeight: 60, padding: '8px 10px',
+                  background: 'var(--input-bg)', border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-sm)', color: 'var(--text)',
+                  fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                  resize: 'vertical', boxSizing: 'border-box',
+                }}
+              />
+            ) : (
+              <input
+                autoFocus
+                type="text"
+                placeholder={config.input.placeholder}
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleConfirm(); } }}
+                style={{
+                  width: '100%', padding: '8px 10px',
+                  background: 'var(--input-bg)', border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-sm)', color: 'var(--text)',
+                  fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                  textAlign: 'right', boxSizing: 'border-box',
+                }}
+              />
+            )}
+          </div>
+        )}
+
         <div
           style={{
             display: 'flex',
@@ -275,6 +328,7 @@ export default function DialogHost() {
             id={confirmBtnId.current}
             variant={type === 'danger' ? 'danger' : 'primary'}
             onClick={handleConfirm}
+            disabled={!!(config.input?.required && !inputValue.trim())}
             style={{ flex: 1, minHeight: 46 }}
           >
             {config.confirmText || 'تأیید'}
