@@ -246,6 +246,35 @@ export default function EquipmentPage() {
     },
   );
 
+  const list = equipment.filter(e => (!filter || e.hallId === filter) && (!filterKind || ((e as any).kind || 'asset') === filterKind));
+
+  // ─── Multi-Select ───
+  const ms = useMultiSelect({
+    items: list,
+    getId: (e: any) => e.id,
+    onDelete: async (ids) => {
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' تجهیز حذف شوند؟', { danger: true });
+      if (!ok) return;
+      const backups: any[] = [];
+      for (const id of ids) {
+        const item = equipment.find(x => x.id === id);
+        if (!item) continue;
+        backups.push(item);
+        try { deleteEquip(id); } catch {}
+      }
+      if (backups.length > 0) {
+        setUndoData({ item: backups });
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+      }
+      showToast(toFa(backups.length) + ' تجهیز حذف شد', 'success', 2500);
+      logAction('delete', 'hal', 'حذف گروهی تجهیزات: ' + backups.length);
+    },
+    onArchive: async (ids) => {
+      showToast(toFa(ids.length) + ' تجهیز آرشیو شد', 'success', 2500);
+    },
+  });
+  const totalValue = list.reduce((acc, e) => acc + calcEquipValue(e), 0);
+
   if (halls.length === 0) {
   const undoDelete = () => {
     const item = undoData;
@@ -343,34 +372,7 @@ export default function EquipmentPage() {
     setErr('');
   };
 
-  const list = equipment.filter(e => (!filter || e.hallId === filter) && (!filterKind || ((e as any).kind || 'asset') === filterKind));
 
-  // ─── Multi-Select ───
-  const ms = useMultiSelect({
-    items: list,
-    getId: (e: any) => e.id,
-    onDelete: async (ids) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' تجهیز حذف شوند؟', { danger: true });
-      if (!ok) return;
-      const backups: any[] = [];
-      for (const id of ids) {
-        const item = equipment.find(x => x.id === id);
-        if (!item) continue;
-        backups.push(item);
-        try { deleteEquip(id); } catch {}
-      }
-      if (backups.length > 0) {
-        setUndoData({ item: backups });
-        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
-      }
-      showToast(toFa(backups.length) + ' تجهیز حذف شد', 'success', 2500);
-      logAction('delete', 'hal', 'حذف گروهی تجهیزات: ' + backups.length);
-    },
-    onArchive: async (ids) => {
-      showToast(toFa(ids.length) + ' تجهیز آرشیو شد', 'success', 2500);
-    },
-  });
-  const totalValue = list.reduce((acc, e) => acc + calcEquipValue(e), 0);
 
   return (
     <PageContainer>
