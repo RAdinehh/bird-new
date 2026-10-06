@@ -5,6 +5,7 @@ import { useWhs, expiryWarning, daysToExpiry } from '../whs/store';
 import { useBrd } from '../brd/store';
 import { useFlk, getEffectiveStartDate } from '../flk/store';
 import { getSchedule } from './vaccineSchedules';
+import { useSet } from '../set/store';
 import { toEn } from '../../shr/utils/fa';
 import { format, parse, differenceInDays, format as formatJ, startOfDay, addDays} from 'date-fns-jalali';
 
@@ -134,7 +135,8 @@ export function collectEvents(): CalEvent[] {
   } catch (e) { /* ignore */ }
 
   // ============ ۲. واکسن و دارو ============
-  try {
+  const vaccineEnabled = (useSet.getState() as any).features?.vaccine !== false;
+  if (vaccineEnabled) try {
     const logs = useDlg.getState().logs || [];
     logs.forEach((log: any) => {
       const vaccines = log.vaccines || [];
@@ -176,7 +178,7 @@ export function collectEvents(): CalEvent[] {
   } catch (e) { /* ignore */ }
 
   // ============ ۲.۵ واکسن‌های گله (برنامه واکسن) ============
-  try {
+  if (vaccineEnabled) try {
     const flocks = useFlk.getState().flocks || [];
     flocks.forEach((f: any) => {
       if (f.status !== 'active') return;
