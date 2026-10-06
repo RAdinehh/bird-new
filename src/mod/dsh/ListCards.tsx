@@ -189,7 +189,7 @@ export default function ListCards({
                           return (
                             <div style={{ marginTop: 10 }}>
                               {/* اعداد دو سر — بالای نوار */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 4, paddingRight: 2, paddingLeft: 2 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 10, paddingRight: 2, paddingLeft: 2 }}>
                                 <span>۱</span>
                                 <span>{toFa(cycleDays)} روز</span>
                               </div>
@@ -199,7 +199,7 @@ export default function ListCards({
                                 {/* نوار اصلی */}
                                 <div style={{
                                   position: 'relative',
-                                  height: 10,
+                                  height: 6,
                                   background: 'var(--input-bg)',
                                   borderRadius: 5,
                                   border: '1px solid var(--border)',
@@ -223,9 +223,9 @@ export default function ListCards({
                                       title={mk.label + ' · روز ' + toFa(mk.day)}
                                       style={{
                                         position: 'absolute',
-                                        top: 24,
-                                        right: `calc(${pct}% - 5px)`,
-                                        width: 10,
+                                        top: 20,
+                                        right: `calc(${pct}% - 3px)`,
+                                        width: 6,
                                         height: 10,
                                         borderRadius: '50%',
                                         background: passed ? progressColor : 'var(--input-bg)',
@@ -239,13 +239,13 @@ export default function ListCards({
                                 {/* نقطه متحرک (نقطه فعلی) */}
                                 <div style={{
                                   position: 'absolute',
-                                  top: 23,
-                                  right: `calc(${markerPct}% - 8px)`,
-                                  width: 16,
-                                  height: 16,
+                                  top: 25,
+                                  right: `calc(${markerPct}% - 6px)`,
+                                  width: 12,
+                                  height: 12,
                                   borderRadius: '50%',
                                   background: progressColor,
-                                  border: '3px solid var(--card-solid)',
+                                  border: '2.5px solid var(--card-solid)',
                                   boxShadow: '0 1px 4px rgba(0,0,0,.2)',
                                   zIndex: 2,
                                   transition: 'right .3s',
@@ -304,8 +304,8 @@ export default function ListCards({
                                     <div key={idx} style={{
                                       display: 'flex',
                                       alignItems: 'center',
-                                      gap: 5,
-                                      fontSize: 'var(--fs-xs)',
+                                      gap: 6,
+                                      fontSize: '13px',
                                       color: passed ? 'var(--accent)' : 'var(--muted)',
                                       fontWeight: passed ? 700 : 500,
                                     }}>
