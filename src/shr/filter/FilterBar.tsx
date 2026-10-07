@@ -32,8 +32,8 @@ function summarizeChip<T>(def: FilterDef<T>, v: any): { text: string; icon?: Rea
     const labels = opts.map((o, i) => o?.label || arr[i]);
     const icon = opts[0]?.icon;
     if (labels.length === 1) return { text: labels[0], icon };
-    if (labels.length === 2) return { text: labels.join('، '), icon };
-    return { text: `${labels[0]} +${labels.length - 1}`, icon };
+    // اگه چندتایی: فقط تعداد + آیکون
+    return { text: `${labels.length} مورد`, icon };
   }
   if (def.kind === 'dateRange') {
     const [a, b] = v as [string, string];
@@ -206,8 +206,6 @@ export function FilterBar<T>({
               whiteSpace: 'nowrap', flexShrink: 0,
             }}>
               {c.icon && <span style={{ fontSize: 12, lineHeight: 1, display: 'inline-flex' }}>{c.icon}</span>}
-              <span style={{ opacity: 0.75, fontWeight: 600 }}>{c.label}</span>
-              <span style={{ opacity: 0.4 }}>·</span>
               <span>{c.text}</span>
               <button type="button" onClick={() => clearFilter(c.key)}
                 aria-label="حذف فیلتر"
@@ -249,7 +247,7 @@ export function FilterBar<T>({
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     <button type="button"
                       onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
-                      style={chipIn(!noneActive && false ? true : false)}>همه</button>
+                      style={chipIn(noneActive)}>همه</button>
                     {def.options?.map(o => {
                       const active = isMulti ? arr.includes(o.value) : v === o.value;
                       return (
