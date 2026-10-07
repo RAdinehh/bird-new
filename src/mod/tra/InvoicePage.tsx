@@ -54,7 +54,7 @@ interface F {
 }
 
 const empty = (isPurchase: boolean): F => ({
-  date: '', partyId: '', category: isPurchase ? 'egg' : 'chick', items: [],
+  date: '', partyId: '', category: isPurchase ? 'egg' : 'fertile_egg', items: [],
   paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
   customDueDate: '', isPreorder: false, deliveryDate: '',
   advanceType: 'percent', advanceValue: '',
