@@ -1,9 +1,9 @@
 /**
- * filter/FilterBar.tsx — نوار فیلتر مرکزی
- * شامل: جستجو + دکمه فیلتر + دکمه sort + چیپ‌های فعال
+ * filter/FilterBar.tsx — نوار فیلتر و مرتب‌سازی مرکزی
+ * طراحی موبایل-اول: بدون Native Select، تاچ بزرگ، حداقل ارتفاع
  */
 import { useState } from 'react';
-import { Sheet, Field, Input, Select, Btn } from '../components/ui';
+import { Sheet, Field, Input, Btn } from '../components/ui';
 import type { FilterDef, SortDef, FilterState, SortState } from './types';
 
 interface Props<T> {
@@ -11,8 +11,6 @@ interface Props<T> {
   sortDefs: SortDef<T>[];
   filterState: FilterState;
   sortState: SortState | null;
-  search: string;
-  setSearch: (s: string) => void;
   setFilter: (key: string, value: any) => void;
   clearFilter: (key: string) => void;
   setSort: (s: SortState | null) => void;
@@ -21,13 +19,34 @@ interface Props<T> {
   hasActiveFilters: boolean;
   total: number;
   count: number;
-  placeholder?: string;
+}
+
+function summarizeChip<T>(def: FilterDef<T>, v: any): string | null {
+  if (v === undefined || v === null || v === '') return null;
+  if (Array.isArray(v) && (v.length === 0 || v.every((x: any) => x === ''))) return null;
+  if (def.kind === 'enum') {
+    const arr = Array.isArray(v) ? (v as string[]) : [String(v)];
+    const labels = arr.map(x => def.options?.find(o => o.value === x)?.label || x);
+    if (labels.length === 1) return labels[0];
+    if (labels.length === 2) return labels.join('، ');
+    return `${labels[0]} +${labels.length - 1}`;
+  }
+  if (def.kind === 'dateRange') {
+    const [a, b] = v as [string, string];
+    return `${a || '?'} تا ${b || '?'}`;
+  }
+  if (def.kind === 'numberRange') {
+    const [a, b] = v as [number, number];
+    return `${a ?? '?'}–${b ?? '?'}`;
+  }
+  if (def.kind === 'boolean') return v ? 'بله' : 'خیر';
+  return String(v);
 }
 
 export function FilterBar<T>({
-  filterDefs, sortDefs, filterState, sortState, search, setSearch,
+  filterDefs, sortDefs, filterState, sortState,
   setFilter, clearFilter, setSort: _setSort, toggleSort, resetAll,
-  hasActiveFilters, total, count, placeholder = 'جستجو...',
+  hasActiveFilters, total, count,
 }: Props<T>) {
   const [openFilters, setOpenFilters] = useState(false);
   const [openSort, setOpenSort] = useState(false);
@@ -35,32 +54,15 @@ export function FilterBar<T>({
   const activeCount = Object.keys(filterState).filter(k => {
     const v = filterState[k];
     if (v === undefined || v === null || v === '') return false;
-    if (Array.isArray(v)) return v.length > 0 && v.some(x => x !== '');
+    if (Array.isArray(v)) return v.length > 0 && v.some((x: any) => x !== '');
     return true;
   }).length;
 
-  // چیپ‌های فیلتر فعال
   const chips = filterDefs
     .map(def => {
       const v = filterState[def.key];
-      if (v === undefined || v === null || v === '') return null;
-      if (Array.isArray(v) && (v.length === 0 || v.every(x => x === ''))) return null;
-      let label = '';
-      if (def.kind === 'enum') {
-        if (Array.isArray(v)) {
-          label = (v as string[]).map(x => def.options?.find(o => o.value === x)?.label || x).join('، ');
-        } else {
-          label = def.options?.find(o => o.value === v)?.label || String(v);
-        }
-      } else if (def.kind === 'dateRange') {
-        const [a, b] = v as [string, string];
-        label = (a || '?') + ' تا ' + (b || '?');
-      } else if (def.kind === 'numberRange') {
-        const [a, b] = v as [number, number];
-        label = `${a ?? '?'} تا ${b ?? '?'}`;
-      } else if (def.kind === 'boolean') {
-        label = v ? 'بله' : 'خیر';
-      }
+      const label = summarizeChip(def, v);
+      if (!label) return null;
       return { key: def.key, label: def.label, value: label };
     })
     .filter(Boolean) as Array<{ key: string; label: string; value: string }>;
@@ -70,158 +72,184 @@ export function FilterBar<T>({
       (sortState.dir === 'asc' ? ' ↑' : ' ↓')
     : null;
 
+  const btn = (active: boolean): React.CSSProperties => ({
+    display: 'inline-flex', alignItems: 'center', gap: 4,
+    padding: '6px 10px', minHeight: 34,
+    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
+    border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+    borderRadius: 10,
+    color: active ? 'var(--accent)' : 'var(--text)',
+    fontFamily: 'inherit', fontSize: 12, fontWeight: 700,
+    cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+  });
+
+  // ─── چیپ‌های داخل Sheet ───
+  const chipIn = (active: boolean): React.CSSProperties => ({
+    padding: '8px 12px', minHeight: 38,
+    background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
+    border: '1.5px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
+    borderRadius: 10,
+    color: active ? 'var(--accent)' : 'var(--text)',
+    fontFamily: 'inherit', fontSize: 13,
+    fontWeight: active ? 700 : 500, cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    display: 'inline-flex', alignItems: 'center', gap: 4,
+  });
+
   return (
     <>
+      {/* ═══ نوار بالا — باریک ═══ */}
       <div style={{
-        display: 'flex', gap: 6, padding: '8px 12px', alignItems: 'center',
-        overflowX: 'auto', scrollbarWidth: 'none',
+        display: 'flex', gap: 6, padding: '8px 12px',
+        alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none',
         borderBottom: '1px solid var(--border)', background: 'var(--bg)',
       }}>
-        <Input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder={placeholder}
-          style={{ flex: 1, minWidth: 120, fontSize: 'var(--fs-sm)' }}
-        />
-        {filterDefs.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setOpenFilters(true)}
-            style={{
-              padding: '6px 10px',
-              background: activeCount > 0 ? 'var(--accent-soft)' : 'var(--btn-bg)',
-              border: '1px solid ' + (activeCount > 0 ? 'var(--accent-border)' : 'var(--border)'),
-              borderRadius: 'var(--r-sm)',
-              color: activeCount > 0 ? 'var(--accent)' : 'var(--text)',
-              fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700,
-              cursor: 'pointer', whiteSpace: 'nowrap',
-            }}
-          >
-            🔍 فیلتر{activeCount > 0 ? ` (${activeCount})` : ''}
-          </button>
-        )}
+        <button type="button" onClick={() => setOpenFilters(true)}
+          style={btn(activeCount > 0)} aria-label="فیلترها">
+          <span>🔍</span>
+          <span>فیلتر</span>
+          {activeCount > 0 && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              minWidth: 18, height: 18, padding: '0 4px',
+              background: 'var(--accent)', color: 'var(--avatar-text, #fff)',
+              borderRadius: 9, fontSize: 10, fontWeight: 800,
+            }}>{activeCount}</span>
+          )}
+        </button>
+
         {sortDefs.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setOpenSort(true)}
-            style={{
-              padding: '6px 10px',
-              background: sortState ? 'var(--accent-soft)' : 'var(--btn-bg)',
-              border: '1px solid ' + (sortState ? 'var(--accent-border)' : 'var(--border)'),
-              borderRadius: 'var(--r-sm)',
-              color: sortState ? 'var(--accent)' : 'var(--text)',
-              fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700,
-              cursor: 'pointer', whiteSpace: 'nowrap',
-            }}
-          >
-            ⇅ {sortLabel || 'مرتب‌سازی'}
+          <button type="button" onClick={() => setOpenSort(true)}
+            style={btn(!!sortState)} aria-label="مرتب‌سازی">
+            <span>⇅</span>
+            <span>{sortLabel || 'مرتب'}</span>
           </button>
         )}
+
         {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={resetAll}
+          <button type="button" onClick={resetAll} aria-label="پاک‌سازی"
             style={{
-              padding: '6px 10px', background: 'none', border: 'none',
+              display: 'inline-flex', alignItems: 'center',
+              padding: '6px 10px', minHeight: 34,
+              background: 'none', border: 'none',
               color: 'var(--danger)', fontFamily: 'inherit',
-              fontSize: 'var(--fs-xs)', fontWeight: 700,
-              cursor: 'pointer', whiteSpace: 'nowrap',
-            }}
-          >
-            ✕ پاک‌سازی
-          </button>
+              fontSize: 12, fontWeight: 700, cursor: 'pointer',
+              whiteSpace: 'nowrap', flexShrink: 0,
+            }}>✕ پاک</button>
         )}
+
+        <span style={{
+          marginRight: 'auto', fontSize: 11, color: 'var(--muted)',
+          fontWeight: 600, whiteSpace: 'nowrap', paddingRight: 4,
+        }}>
+          {count === total ? `${total} مورد` : `${count} از ${total}`}
+        </span>
       </div>
 
-      {(chips.length > 0 || (count !== total && (search || hasActiveFilters))) && (
+      {/* ═══ چیپ‌های فیلتر فعال ═══ */}
+      {chips.length > 0 && (
         <div style={{
-          display: 'flex', gap: 6, padding: '6px 12px', alignItems: 'center',
-          overflowX: 'auto', scrollbarWidth: 'none',
-          borderBottom: '1px solid var(--border)', background: 'var(--bg)',
+          display: 'flex', gap: 5, padding: '6px 12px 8px',
+          alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none',
+          background: 'var(--bg)', borderBottom: '1px solid var(--border)',
         }}>
           {chips.map(c => (
             <div key={c.key} style={{
               display: 'inline-flex', alignItems: 'center', gap: 4,
               padding: '4px 8px', background: 'var(--accent-soft)',
-              border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)',
-              color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 600,
-              whiteSpace: 'nowrap',
+              border: '1px solid var(--accent-border)', borderRadius: 20,
+              color: 'var(--accent)', fontSize: 11, fontWeight: 600,
+              whiteSpace: 'nowrap', flexShrink: 0,
             }}>
-              <span style={{ color: 'var(--muted)' }}>{c.label}:</span>
+              <span style={{ color: 'var(--muted)', fontWeight: 500 }}>{c.label}:</span>
               <span>{c.value}</span>
               <button type="button" onClick={() => clearFilter(c.key)}
                 aria-label="حذف فیلتر"
-                style={{ background: 'none', border: 'none', color: 'var(--accent)',
-                  cursor: 'pointer', padding: '0 2px', fontFamily: 'inherit',
-                  fontSize: 12, fontWeight: 700 }}>✕</button>
+                style={{
+                  background: 'none', border: 'none', color: 'var(--accent)',
+                  cursor: 'pointer', padding: 0, marginRight: 2,
+                  fontFamily: 'inherit', fontSize: 12, fontWeight: 700,
+                  lineHeight: 1, display: 'inline-flex', alignItems: 'center',
+                }}>✕</button>
             </div>
           ))}
-          {count !== total && (
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', whiteSpace: 'nowrap' }}>
-              {count} از {total}
-            </span>
-          )}
         </div>
       )}
 
-      {/* Sheet فیلترها */}
+      {/* ═══ Sheet فیلترها ═══ */}
       <Sheet open={openFilters} onClose={() => setOpenFilters(false)} title="فیلترها">
         {filterDefs.map(def => {
           const v = filterState[def.key];
+
           if (def.kind === 'enum') {
+            const isMulti = !!def.multi;
+            const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
+            const noneActive = isMulti ? arr.length === 0 : !v;
             return (
-              <Field key={def.key} label={def.label}>
-                {def.multi ? (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {def.options?.map(o => {
-                      const arr = Array.isArray(v) ? (v as string[]) : [];
-                      const active = arr.includes(o.value);
-                      return (
-                        <button key={o.value} type="button"
-                          onClick={() => {
-                            const next = active
-                              ? arr.filter(x => x !== o.value)
-                              : [...arr, o.value];
+              <div key={def.key} style={{ marginBottom: 16 }}>
+                <div style={{
+                  fontSize: 13, fontWeight: 700, color: 'var(--text)',
+                  marginBottom: 8, paddingRight: 2,
+                }}>{def.label}</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  <button type="button"
+                    onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
+                    style={chipIn(noneActive)}>
+                    همه
+                  </button>
+                  {def.options?.map(o => {
+                    const active = isMulti ? arr.includes(o.value) : v === o.value;
+                    return (
+                      <button key={o.value} type="button"
+                        onClick={() => {
+                          if (isMulti) {
+                            const next = active ? arr.filter(x => x !== o.value) : [...arr, o.value];
                             setFilter(def.key, next);
-                          }}
-                          style={{
-                            padding: '6px 10px',
-                            background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
-                            border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                            borderRadius: 'var(--r-sm)',
-                            color: active ? 'var(--accent)' : 'var(--text)',
-                            fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                            fontWeight: active ? 700 : 500, cursor: 'pointer',
-                          }}>
-                          {o.icon ? o.icon + ' ' : ''}{o.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <Select value={(v as string) || ''} onChange={e => setFilter(def.key, e.target.value)}>
-                    <option value="">— همه —</option>
-                    {def.options?.map(o => (
-                      <option key={o.value} value={o.value}>{o.icon ? o.icon + ' ' : ''}{o.label}</option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
+                          } else {
+                            setFilter(def.key, active ? '' : o.value);
+                          }
+                        }}
+                        style={chipIn(active)}>
+                        {o.icon && <span>{o.icon}</span>}
+                        <span>{o.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             );
           }
+
+          if (def.kind === 'boolean') {
+            return (
+              <div key={def.key} style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{def.label}</div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button type="button" onClick={() => clearFilter(def.key)}
+                    style={chipIn(v === undefined || v === null)}>همه</button>
+                  <button type="button" onClick={() => setFilter(def.key, true)}
+                    style={chipIn(v === true)}>بله</button>
+                  <button type="button" onClick={() => setFilter(def.key, false)}
+                    style={chipIn(v === false)}>خیر</button>
+                </div>
+              </div>
+            );
+          }
+
           if (def.kind === 'dateRange') {
             const [a, b] = (v as [string, string]) || ['', ''];
             return (
               <Field key={def.key} label={def.label}>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <Input type="text" placeholder="از" value={a || ''}
+                  <Input placeholder="از" value={a || ''}
                     onChange={e => setFilter(def.key, [e.target.value, b || ''])} />
-                  <Input type="text" placeholder="تا" value={b || ''}
+                  <Input placeholder="تا" value={b || ''}
                     onChange={e => setFilter(def.key, [a || '', e.target.value])} />
                 </div>
               </Field>
             );
           }
+
           if (def.kind === 'numberRange') {
             const [a, b] = (v as [number, number]) || [null, null];
             return (
@@ -235,27 +263,16 @@ export function FilterBar<T>({
               </Field>
             );
           }
-          if (def.kind === 'boolean') {
-            return (
-              <Field key={def.key} label={def.label}>
-                <Select value={v === true ? '1' : v === false ? '0' : ''}
-                  onChange={e => setFilter(def.key, e.target.value === '' ? null : e.target.value === '1')}>
-                  <option value="">— همه —</option>
-                  <option value="1">بله</option>
-                  <option value="0">خیر</option>
-                </Select>
-              </Field>
-            );
-          }
           return null;
         })}
-        <div style={{ display: 'flex', gap: 6, paddingTop: 8 }}>
-          <Btn full onClick={resetAll}>پاک‌سازی همه</Btn>
-          <Btn full variant="primary" onClick={() => setOpenFilters(false)}>تأیید</Btn>
+
+        <div style={{ display: 'flex', gap: 8, paddingTop: 12 }}>
+          <Btn onClick={resetAll} full>پاک‌سازی</Btn>
+          <Btn variant="primary" onClick={() => setOpenFilters(false)} full>تأیید</Btn>
         </div>
       </Sheet>
 
-      {/* Sheet مرتب‌سازی */}
+      {/* ═══ Sheet مرتب‌سازی ═══ */}
       <Sheet open={openSort} onClose={() => setOpenSort(false)} title="مرتب‌سازی">
         {sortDefs.map(def => {
           const active = sortState?.key === def.key;
@@ -263,17 +280,25 @@ export function FilterBar<T>({
             <button key={def.key} type="button" onClick={() => toggleSort(def.key)}
               style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                width: '100%', padding: '10px 12px',
+                width: '100%', padding: '12px 14px', minHeight: 48,
                 background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
-                border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 'var(--r-sm)',
+                border: '1.5px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
+                borderRadius: 12,
                 color: active ? 'var(--accent)' : 'var(--text)',
-                fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                fontFamily: 'inherit', fontSize: 14,
                 fontWeight: active ? 700 : 500, cursor: 'pointer',
-                marginBottom: 6, textAlign: 'right',
+                marginBottom: 8, textAlign: 'right',
               }}>
               <span>{def.label}</span>
-              {active && <span>{sortState?.dir === 'asc' ? '↑ صعودی' : '↓ نزولی'}</span>}
+              {active && (
+                <span style={{
+                  fontSize: 11, fontWeight: 800,
+                  padding: '3px 8px', borderRadius: 6,
+                  background: 'var(--accent)', color: 'var(--avatar-text, #fff)',
+                }}>
+                  {sortState?.dir === 'asc' ? 'صعودی ↑' : 'نزولی ↓'}
+                </span>
+              )}
             </button>
           );
         })}

@@ -108,11 +108,10 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   ], []);
 
   // ─── فیلتر / جستجو / مرتب‌سازی ───
-  const { filtered: list, search, setSearch, filters, setFilter, clearFilter,
+  const { filtered: list, filters, setFilter, clearFilter,
           sort, setSort, toggleSort, resetAll, hasActiveFilters,
           total, count } = useFilterSort<Item>({
     items,
-    searchKeys: (it: Item) => `${it.name} ${it.notes || ''} ${it.batchNo || ''}`,
     filters: filterDefs,
     sorts: sortDefs,
     persistKey: 'whs-items',
@@ -347,8 +346,6 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
           sortDefs={sortDefs}
           filterState={filters}
           sortState={sort}
-          search={search}
-          setSearch={setSearch}
           setFilter={setFilter}
           clearFilter={clearFilter}
           setSort={setSort}
@@ -357,7 +354,6 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
           hasActiveFilters={hasActiveFilters}
           total={total}
           count={count}
-          placeholder="جستجوی کالا، بچ، یادداشت..."
         />
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
