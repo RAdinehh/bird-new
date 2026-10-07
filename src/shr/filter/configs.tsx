@@ -10,7 +10,7 @@ import {
   IconUser, IconCalendar, IconPackage,
 } from '../icons';
 import {
-  CATEGORY_LABEL, CATEGORY_ICON, stockWarning, MOVEMENT_REASON,
+  CATEGORY_LABEL, CATEGORY_ICON, stockWarning, expiryWarning, MOVEMENT_REASON,
   type Item, type ItemCategory, type Movement, type MovementType,
 } from '../../mod/whs/store';
 import type { Person } from '../../mod/ctc/store';
@@ -153,5 +153,65 @@ export function getWhsMovesConfig(ctx: { items: Item[] }): FilterConfig<Movement
     ],
     persistKey: 'whs-moves',
     initialSort: { key: 'date', dir: 'desc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// whs/WarningsPage — هشدارهای انبار
+// ═══════════════════════════════════════════════════
+export function getWhsWarningsConfig(): FilterConfig<Item> {
+  return {
+    filterDefs: [
+      {
+        key: 'category', label: 'دسته', kind: 'enum',
+        icon: <IconFolder size={18} />,
+        options: (Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => ({
+          value: c,
+          label: CATEGORY_LABEL[c],
+          icon: CATEGORY_ICON[c],
+        })),
+        getValue: (it: Item) => it.category,
+        multi: true,
+      },
+      {
+        key: 'warnKind', label: 'نوع هشدار', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: [
+          { value: 'expired', label: 'منقضی', icon: '⛔' },
+          { value: 'critical', label: 'تمام‌شده', icon: '🔴' },
+          { value: 'soon', label: 'نزدیک انقضا', icon: '⏰' },
+          { value: 'low', label: 'موجودی کم', icon: '⚠' },
+        ],
+        getValue: (it: Item) => {
+          const exp = it.expireDate ? expiryWarning(it) : 'ok';
+          const stock = stockWarning(it);
+          if (exp === 'expired') return 'expired';
+          if (stock === 'critical') return 'critical';
+          if (exp === 'soon') return 'soon';
+          if (stock === 'low') return 'low';
+          return '';
+        },
+        multi: true,
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'name', label: 'نام کالا', icon: <IconTag size={18} />,
+        hint: 'از الف به ی',
+        compare: (a: Item, b: Item) => a.name.localeCompare(b.name, 'fa'),
+      },
+      {
+        key: 'stock', label: 'موجودی', icon: <IconChart size={18} />,
+        hint: 'بر اساس تعداد',
+        compare: (a: Item, b: Item) => (a.currentStock || 0) - (b.currentStock || 0),
+      },
+      {
+        key: 'expireDate', label: 'تاریخ انقضا', icon: <IconCalendar size={18} />,
+        hint: 'نزدیک‌ترین انقضا اول',
+        compare: (a: Item, b: Item) => (a.expireDate || '').localeCompare(b.expireDate || ''),
+      },
+    ],
+    persistKey: 'whs-warnings',
+    initialSort: { key: 'expireDate', dir: 'asc' },
   };
 }
