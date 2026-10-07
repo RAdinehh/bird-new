@@ -28,6 +28,7 @@ import { Btn, BtnRow, Empty, Field,
   Tag, Textarea, ErrorBox } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import { useFilterSort, FilterBar, getDlgLogsConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
@@ -684,7 +685,24 @@ const collectWhsShortages = () => {
     [logs]
   );
 
-  const currentList = tab === 'today' ? todaysLogs : tab === 'history' ? historicalLogs : archivedLogs;
+  // مرحله ۱: tab (نگه‌داشته شده)
+  const tabFiltered = tab === 'today' ? todaysLogs : tab === 'history' ? historicalLogs : archivedLogs;
+
+  // مرحله ۲: FilterBar (فیلتر عمیق)
+  const config = useMemo(
+    () => getDlgLogsConfig({
+      flocks: activeFlocks.map(f => ({ id: f.id, name: f.name })),
+    }),
+    [activeFlocks]
+  );
+  const { filtered: currentList, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<DailyLog>({
+    items: tabFiltered,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   return (
     <div ref={swipeRef} style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', minHeight: 'calc(100vh - 120px)' }}>
@@ -732,6 +750,20 @@ const collectWhsShortages = () => {
           title="ثبت روزانه هر گله"
           description="دما، رطوبت، دان، آب، تلفات، وزن‌کشی و تخم را ثبت کنید. برای هر گله یک ثبت جدا انجام دهید."
           tone="info"
+        />
+        <FilterBar
+          filterDefs={config.filterDefs}
+          sortDefs={config.sortDefs}
+          filterState={filters}
+          sortState={sort}
+          setFilter={setFilter}
+          clearFilter={clearFilter}
+          setSort={setSort}
+          toggleSort={toggleSort}
+          resetAll={resetAll}
+          hasActiveFilters={hasActiveFilters}
+          total={total}
+          count={count}
         />
         {!ms.selectionMode && currentList.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
