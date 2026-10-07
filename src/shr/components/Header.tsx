@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../cor/store/theme';
 import { useUI } from '../../cor/store/ui';
@@ -5,15 +6,29 @@ import { useAlt, countByLevel } from '../../mod/alt/store';
 import { useTra } from '../../mod/tra/store';
 import { useSet } from '../../mod/set/store';
 import { toFa } from '../utils/fa';
+import { GlobalSearch } from '../search';
 
 export default function Header({ title }: { title: string }) {
   const { theme, toggle } = useTheme();
   const { openMenu, openHelp } = useUI();
+  const [searchOpen, setSearchOpen] = useState(false);
   const nav = useNavigate();
   const alerts = useAlt(s => s.alerts);
   const invoices = useTra(s => s.invoices);
   const reminders = useSet(s => s.dueDateReminders) || [7, 3, 1];
   const counts = countByLevel(alerts);
+
+  // میان‌بر Ctrl+K / Cmd+K
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchOpen(v => !v);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -84,6 +99,13 @@ export default function Header({ title }: { title: string }) {
         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
       }}>{title}</h1>
 
+      <IconBtn onClick={() => setSearchOpen(true)}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+      </IconBtn>
+
       <IconBtn onClick={openHelp}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <circle cx="12" cy="12" r="10" />
@@ -115,6 +137,8 @@ export default function Header({ title }: { title: string }) {
           <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
         </svg>
       </IconBtn>
+
+      <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }
