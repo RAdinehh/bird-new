@@ -8,6 +8,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageCo
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import { useFilterSort, FilterBar, getFedFormulasConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -43,10 +44,21 @@ export default function FormulasPage() {
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const list = useMemo(
-    () => [...formulas].sort((a, b) => b.date.localeCompare(a.date)),
-    [formulas]
+  // فیلتر/مرتب
+  const config = useMemo(
+    () => getFedFormulasConfig({
+      requirements: requirements.map(r => ({ id: r.id, name: r.name, stage: r.stage })),
+    }),
+    [requirements]
   );
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<Formula>({
+    items: formulas,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -212,6 +224,20 @@ export default function FormulasPage() {
           onDismiss={() => setUndoData(null)}
         />
       )}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={totalFiltered}
+        count={count}
+      />
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید

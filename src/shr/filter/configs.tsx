@@ -14,7 +14,11 @@ import {
   type Item, type ItemCategory, type Movement, type MovementType,
 } from '../../mod/whs/store';
 import type { Person, Role } from '../../mod/ctc/store';
-import { type Ingredient, CATEGORY_LABEL as FED_CAT_LABEL, CATEGORY_ICON as FED_CAT_ICON } from '../../mod/fed/store';
+import {
+  type Ingredient, type Formula,
+  CATEGORY_LABEL as FED_CAT_LABEL, CATEGORY_ICON as FED_CAT_ICON,
+  STAGE_LABEL as FED_STAGE_LABEL,
+} from '../../mod/fed/store';
 import type { Breed, Bird } from '../../mod/brd/store';
 import type { Zone, Hall, Equipment } from '../../mod/hal/store';
 import { type Flock, isLayingReady } from '../../mod/flk/store';
@@ -1156,5 +1160,72 @@ export function getFedIngredientsConfig(): FilterConfig<Ingredient> {
     ],
     persistKey: 'fed-ingredients',
     initialSort: { key: 'name', dir: 'asc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// fed/FormulasPage — جیره‌ها
+// ═══════════════════════════════════════════════════
+export function getFedFormulasConfig(ctx: {
+  requirements: Array<{ id: string; name: string; stage: string }>;
+}): FilterConfig<Formula> {
+  return {
+    filterDefs: [
+      {
+        key: 'status', label: 'وضعیت', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: [
+          { value: 'draft', label: 'پیش‌نویس' },
+          { value: 'active', label: 'فعال' },
+          { value: 'archived', label: 'آرشیو' },
+        ],
+        getValue: (f: Formula) => f.status || 'draft',
+        multi: true,
+      },
+      {
+        key: 'stage', label: 'مرحله', kind: 'enum',
+        icon: <IconChart size={18} />,
+        options: Object.keys(FED_STAGE_LABEL).map(s => ({
+          value: s,
+          label: FED_STAGE_LABEL[s],
+        })),
+        getValue: (f: Formula) => {
+          const req = ctx.requirements.find(r => r.id === f.requirementId);
+          return req?.stage || '';
+        },
+        multi: true,
+      },
+      {
+        key: 'requirementId', label: 'نیاز', kind: 'enum',
+        icon: <IconTag size={18} />,
+        options: ctx.requirements.map(r => ({ value: r.id, label: r.name })),
+        getValue: (f: Formula) => f.requirementId || '',
+        layout: 'chips',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'date', label: 'تاریخ', icon: <IconCalendar size={18} />,
+        hint: 'جدیدترین اول',
+        compare: (a: Formula, b: Formula) => (a.date || '').localeCompare(b.date || ''),
+      },
+      {
+        key: 'name', label: 'نام جیره', icon: <IconTag size={18} />,
+        hint: 'از الف به ی',
+        compare: (a: Formula, b: Formula) => (a.name || '').localeCompare(b.name || '', 'fa'),
+      },
+      {
+        key: 'lineCount', label: 'تعداد مواد', icon: <IconChart size={18} />,
+        hint: 'بر اساس تعداد مواد اولیه',
+        compare: (a: Formula, b: Formula) => (a.lines?.length || 0) - (b.lines?.length || 0),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین ثبت', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: Formula, b: Formula) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'fed-formulas',
+    initialSort: { key: 'date', dir: 'desc' },
   };
 }
