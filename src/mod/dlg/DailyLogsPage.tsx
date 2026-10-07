@@ -40,6 +40,7 @@ import UndoBar from '../../cor/ui/UndoBar';
 import { Section, SectionTitle, Row } from './helpers';
 import { checkStock } from './api/checkStock';
 import { buildLogData } from './api/buildData';
+import { decideEggAction } from './api/toEgg';
 import type { F } from './types';
 import { buildFeedMovements, buildVaccineMovement, buildMedicationMovement } from './api/toWhs';
 import { format as formatJ } from 'date-fns-jalali';
@@ -373,30 +374,22 @@ const collectWhsShortages = () => checkStock({
 
     // === sync با egg ===
     try {
-      const eating = int(form.eatingEggs) || 0;
-      const fertile = int(form.fertileEggs) || 0;
-      const broken = int(form.brokenEggs) || 0;
-      const other = int(form.otherEggs) || 0;
-      const existingProd = findByLogId(logId);
-      if (isLayerFlock && (eating + fertile + broken + other > 0)) {
-        const prodData = {
+      const action = decideEggAction({
+        input: {
+          logId,
           flockId: form.flockId,
           date: form.date,
-          eatingCount: eating,
-          fertileCount: fertile,
-          totalCount: eating + fertile + broken + other,
-          brokenCount: broken,
-          softCount: 0,
-          dirtyCount: other,
-          avgWeight: null,
-          notes: '',
-          sourceLogId: logId,
-        };
-        if (existingProd) { updateProduction(existingProd.id, prodData); }
-        else { addProduction(prodData); }
-      } else if (existingProd) {
-        deleteProduction(existingProd.id);
-      }
+          isLayerFlock,
+          eatingEggs: int(form.eatingEggs) || 0,
+          fertileEggs: int(form.fertileEggs) || 0,
+          brokenEggs: int(form.brokenEggs) || 0,
+          otherEggs: int(form.otherEggs) || 0,
+        },
+        existing: findByLogId(logId),
+      });
+      if (action.type === 'add') addProduction(action.data);
+      else if (action.type === 'update') updateProduction(action.id, action.data);
+      else if (action.type === 'delete') deleteProduction(action.id);
     } catch (e) { /* silent */ }
 
     // emit event به جای cascade مستقیم
