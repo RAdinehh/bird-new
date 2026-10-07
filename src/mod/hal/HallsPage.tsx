@@ -14,6 +14,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getHalHallsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { isFanLike, isLampLike, LITTER_KG_PER_M2 } from './helpers';
 import { HallEquipSection } from './HallEquipSection';
@@ -150,7 +151,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const { halls: _hallsRaw, zones, equipment, addHall, updateHall, deleteHall } = useHal();
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
-  const { breeds } = useBrd();
+  const { breeds, birds } = useBrd();
   const [open, setOpen] = useState(false);
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [form, setForm] = useState<F>(empty);
@@ -175,6 +176,26 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       return true;
     });
   }, [_hallsRaw]);
+
+  // ─── فیلتر/مرتب (از config مرکزی) ───
+  const config = useMemo(
+    () => getHalHallsConfig({
+      birdNames: birds.map(b => ({ id: b.id, name: b.name })),
+      zones,
+      equipment,
+      flocks: flocks.map(f => ({ id: f.id, hallId: (f as any).hallId, status: f.status })),
+    }),
+    [birds, zones, equipment, flocks]
+  );
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Hall>({
+    items: halls,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
+
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -340,19 +361,33 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         description="سالن‌های مرغداری را اینجا تعریف کنید. برای هر سالن ابعاد، ظرفیت، شرایط محیطی و تجهیزات ثبت کنید. برای انتخاب چندتایی، روی یک کارت نگه دارید."
         tone="info"
       />
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
-      {!ms.selectionMode && halls.length > 1 && (
+      {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید
         </div>
       )}
 
-      {ms.selectionMode && halls.length > 1 && (
+      {ms.selectionMode && list.length > 1 && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
           <button type="button"
-            onClick={ms.selectedIds.size === halls.length ? ms.clearSelection : ms.selectAll}
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
             style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
-            {ms.selectedIds.size === halls.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
           </button>
         </div>
       )}
@@ -364,13 +399,13 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
           onDismiss={() => setUndoData(null)}
         />
       )}
-      {halls.length === 0 ? (
+      {list.length === 0 ? (
         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>}
           title="هنوز سالنی نساخته‌اید" desc="اولین سالن خود را بسازید. ابعاد را وارد کنید تا مساحت و حجم خودکار محاسبه شود."
           action={<Btn variant="primary" onClick={openNew}>+ افزودن سالن</Btn>} />
       ) : (
         <>
-          {halls.map((h, i) => {
+          {list.map((h, i) => {
             const area = (h.length || 0) * (h.width || 0);
             const volume = area * (h.height || 0);
             const zoneCount = zones.filter(z => z.hallId === h.id).length;

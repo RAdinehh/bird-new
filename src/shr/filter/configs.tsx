@@ -402,3 +402,75 @@ export function getHalZonesConfig(ctx: { halls: Hall[] }): FilterConfig<Zone> {
     initialSort: { key: 'name', dir: 'asc' },
   };
 }
+
+// ═══════════════════════════════════════════════════
+// hal/HallsPage — سالن‌ها
+// ═══════════════════════════════════════════════════
+export function getHalHallsConfig(ctx: {
+  birdNames: Array<{ id: string; name: string }>;
+  zones: Zone[];
+  equipment: Array<{ id: string; hallId?: string }>;
+  flocks: Array<{ id: string; hallId?: string; status: string }>;
+}): FilterConfig<Hall> {
+  return {
+    filterDefs: [
+      {
+        key: 'birdId', label: 'پرنده', kind: 'enum',
+        icon: <IconUser size={18} />,
+        options: ctx.birdNames.map(b => ({ value: b.id, label: b.name })),
+        getValue: (h: Hall) => h.birdId || '',
+      },
+      {
+        key: 'hasZone', label: 'بخش', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: [
+          { value: 'yes', label: 'دارد' },
+          { value: 'no', label: 'ندارد' },
+        ],
+        getValue: (h: Hall) => ctx.zones.some(z => z.hallId === h.id) ? 'yes' : 'no',
+      },
+      {
+        key: 'hasEquip', label: 'تجهیزات', kind: 'enum',
+        icon: <IconPackage size={18} />,
+        options: [
+          { value: 'yes', label: 'دارد' },
+          { value: 'no', label: 'ندارد' },
+        ],
+        getValue: (h: Hall) => ctx.equipment.some(e => e.hallId === h.id) ? 'yes' : 'no',
+      },
+      {
+        key: 'hasFlock', label: 'گله فعال', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: [
+          { value: 'yes', label: 'دارد' },
+          { value: 'no', label: 'ندارد' },
+        ],
+        getValue: (h: Hall) => ctx.flocks.some(f => f.hallId === h.id && f.status === 'active') ? 'yes' : 'no',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'name', label: 'نام سالن', icon: <IconTag size={18} />,
+        hint: 'از الف به ی',
+        compare: (a: Hall, b: Hall) => (a.name || '').localeCompare(b.name || '', 'fa'),
+      },
+      {
+        key: 'area', label: 'مساحت', icon: <IconChart size={18} />,
+        hint: 'طول × عرض',
+        compare: (a: Hall, b: Hall) => ((a.length || 0) * (a.width || 0)) - ((b.length || 0) * (b.width || 0)),
+      },
+      {
+        key: 'capacity', label: 'ظرفیت', icon: <IconChart size={18} />,
+        hint: 'بر اساس تعداد پرنده',
+        compare: (a: Hall, b: Hall) => (a.capacity || 0) - (b.capacity || 0),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: Hall, b: Hall) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'hal-halls',
+    initialSort: { key: 'name', dir: 'asc' },
+  };
+}
