@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createContactSchema } from '../../shr/validation/rules/ctc';
-import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useCtc, type Person, type Role, ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES, SALARY_TYPES, avatarLetter } from './store';
 import { Btn, BtnRow, DigitField, Empty,
   Field, Grid2, Grid3, Input,
@@ -11,6 +10,7 @@ import { Btn, BtnRow, DigitField, Empty,
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getCtcContactsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -30,18 +30,14 @@ const empty: F = {
   customerType:'wholesale', customerTypes: [], trustScore:'', defaultDiscount:'', supplierTypes: [],
   position:'', startDate:'', salaryType:'monthly', salaryAmount:'', insurance:false
 };
-type TabId = 'all' | 'customer' | 'supplier' | 'worker';
 
 export default function ContactsPage() {
   const { contacts, add, update, remove } = useCtc();
-  const [tab, setTab] = useState<TabId>('all');
-  const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const swipeRef = useSwipeTabs(['all', 'customer', 'supplier', 'worker'], tab, (id) => setTab(id as TabId));
 
   const openNew = () => { setForm(empty); setErr(''); setOpen(true); };
   const openEdit = (p: Person) => {
@@ -109,15 +105,16 @@ export default function ContactsPage() {
     setOpen(false);
   };
 
-  const list = useMemo(() => {
-    let arr = contacts;
-    if (tab !== 'all') arr = arr.filter(c => c.roles.includes(tab as Role));
-    if (q.trim()) {
-      const t = q.trim();
-      arr = arr.filter(c => c.name.includes(t) || c.phone.includes(t) || c.city.includes(t) || c.address.includes(t));
-    }
-    return arr;
-  }, [contacts, tab, q]);
+  // ─── فیلتر/مرتب (از config مرکزی) ───
+  const config = useMemo(() => getCtcContactsConfig(), []);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Person>({
+    items: contacts,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -146,13 +143,6 @@ export default function ContactsPage() {
   useEffect(() => {
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
-  const tabCount = (t: TabId) => t === 'all' ? contacts.length : contacts.filter(c => c.roles.includes(t as Role)).length;
-
-  const tabs: { id: TabId; label: string }[] = [
-    { id: 'all', label: 'همه' }, { id: 'customer', label: 'مشتریان' },
-    { id: 'supplier', label: 'فروشندگان' }, { id: 'worker', label: 'کارگران' }
-  ];
-
   const undoDelete = () => {
     const item = undoData;
     if (!item) return;
@@ -166,30 +156,6 @@ export default function ContactsPage() {
   };
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', minHeight: 'calc(100vh - 120px)' }}>
-      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
-         padding: '0 12px', background: 'var(--header-bg)', position: 'sticky',
-         top: 52, zIndex: 11, overflowX: 'auto', scrollbarWidth: 'none' }}>
-        {tabs.map(t => (
-          <div key={t.id} onClick={() => setTab(t.id)} style={{
-            padding: '11px 12px', fontSize: 'var(--fs-base)', fontWeight: 600,
-            color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
-            cursor: 'pointer', position: 'relative', whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: 'flex', alignItems: 'center', gap: 5
-          }}>
-            {t.label}
-            <span style={{ fontSize: 12, background: tab === t.id ? 'var(--accent-soft)' : 'var(--input-bg)',
-               color: tab === t.id ? 'var(--accent)' : 'var(--muted)', padding: '1px 5px',
-               borderRadius: 8, fontWeight: 700 }}>{toFa(tabCount(t.id))}</span>
-            {tab === t.id && <div style={{ position: 'absolute', bottom: 0,
-               right: 12, left: 12, height: 3, background: 'var(--accent)',
-               borderRadius: '3px 3px 0 0' }} />}
-          </div>
-        ))}
-      </div>
-
       <PageContainer>
       <HelpBanner
         id="ctc-intro"
@@ -205,15 +171,20 @@ export default function ContactsPage() {
           onDismiss={() => setUndoData(null)}
         />
       )}
-        <div style={{ height: 38, background: 'var(--input-bg)', border: '1px solid var(--border)',
-           borderRadius: 'var(--r-md)', padding: '0 12px', display: 'flex',
-           alignItems: 'center', gap: 8 }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="جستجو..." style={{ flex: 1,
-             background: 'none', border: 'none', outline: 'none', color: 'var(--text)',
-             fontFamily: 'inherit', fontSize: 'var(--fs-base)', minWidth: 0 }} />
-        </div>
-
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
         {!ms.selectionMode && list.length > 1 && (
           <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
             برای انتخاب چندتایی، روی یک کارت نگه دارید
@@ -243,9 +214,10 @@ export default function ContactsPage() {
         )}
 
         {list.length === 0 ? (
-          <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>}
-            title={q ? 'نتیجه‌ای یافت نشد' : 'هنوز مخاطبی ثبت نشده'} desc={q ? 'عبارت دیگری امتحان کنید' : 'اولین مخاطب خود را بسازید.'}
-            action={!q ? <Btn variant="primary" onClick={openNew}>+ افزودن مخاطب</Btn> : undefined} />
+          <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>}
+            title={hasActiveFilters ? 'نتیجه‌ای پیدا نشد' : 'هنوز مخاطبی ثبت نشده'}
+            desc={hasActiveFilters ? 'فیلترها را تغییر دهید یا پاک کنید.' : 'اولین مخاطب خود را بسازید.'}
+            action={!hasActiveFilters ? <Btn variant="primary" onClick={openNew}>+ افزودن مخاطب</Btn> : undefined} />
         ) : (
           <>
             {list.map((p, i) => {
@@ -417,7 +389,6 @@ export default function ContactsPage() {
           <ErrorBox>{err}</ErrorBox>
         </Modal>
       </PageContainer>
-    </div>
   );
 }
 

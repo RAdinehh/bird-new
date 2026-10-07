@@ -13,7 +13,8 @@ import {
   CATEGORY_LABEL, CATEGORY_ICON, stockWarning, expiryWarning, MOVEMENT_REASON,
   type Item, type ItemCategory, type Movement, type MovementType,
 } from '../../mod/whs/store';
-import type { Person } from '../../mod/ctc/store';
+import type { Person, Role } from '../../mod/ctc/store';
+import { ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES } from '../../mod/ctc/store';
 import type { FilterDef, SortDef, SortState } from './types';
 
 /** خروجی مشترک همه کانفیگ‌ها */
@@ -213,5 +214,54 @@ export function getWhsWarningsConfig(): FilterConfig<Item> {
     ],
     persistKey: 'whs-warnings',
     initialSort: { key: 'expireDate', dir: 'asc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// ctc/ContactsPage — مخاطبین
+// ═══════════════════════════════════════════════════
+export function getCtcContactsConfig(): FilterConfig<Person> {
+  return {
+    filterDefs: [
+      {
+        key: 'role', label: 'نقش', kind: 'enum',
+        icon: <IconUser size={18} />,
+        options: (Object.keys(ROLE_LABEL) as Role[]).map(r => ({
+          value: r,
+          label: ROLE_LABEL[r],
+        })),
+        getValue: (p: Person) => p.roles[0] || '',
+        multi: true,
+      },
+      {
+        key: 'city', label: 'شهر', kind: 'enum',
+        icon: <IconTag size={18} />,
+        options: [
+          // شهرها به صورت داینامیک از داده‌ها میاد
+          // فعلاً این فیلد خالی می‌مونه و در صورت نیاز پر می‌شه
+        ],
+        getValue: (p: Person) => p.city || '',
+        layout: 'chips',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'name', label: 'نام', icon: <IconTag size={18} />,
+        hint: 'از الف به ی',
+        compare: (a: Person, b: Person) => a.name.localeCompare(b.name, 'fa'),
+      },
+      {
+        key: 'city', label: 'شهر', icon: <IconUser size={18} />,
+        hint: 'بر اساس شهر',
+        compare: (a: Person, b: Person) => (a.city || '').localeCompare(b.city || '', 'fa'),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: Person, b: Person) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'ctc-contacts',
+    initialSort: { key: 'name', dir: 'asc' },
   };
 }
