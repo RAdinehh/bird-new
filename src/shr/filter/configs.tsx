@@ -19,7 +19,10 @@ import type { Zone, Hall, Equipment } from '../../mod/hal/store';
 import { type Flock, isLayingReady } from '../../mod/flk/store';
 import type { EggProduction } from '../../mod/egg/store';
 import type { DailyLog } from '../../mod/dlg/store';
-import { type HatchResult, type Device, type EggEntry } from '../../mod/inc/store';
+import {
+  type HatchResult, type Device, type EggEntry,
+  DEVICE_MODE_LABEL, DEVICE_STATUS_LABEL,
+} from '../../mod/inc/store';
 import { EQUIP_LABELS } from '../../mod/hal/store';
 import { ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES } from '../../mod/ctc/store';
 import type { FilterDef, SortDef, SortState } from './types';
@@ -857,5 +860,82 @@ export function getIncHatchesConfig(ctx: {
     ],
     persistKey: 'inc-hatches',
     initialSort: { key: 'date', dir: 'desc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// inc/DevicesPage — دستگاه‌های جوجه‌کشی
+// ═══════════════════════════════════════════════════
+export function getIncDevicesConfig(): FilterConfig<Device> {
+  return {
+    filterDefs: [
+      {
+        key: 'mode', label: 'حالت', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: (Object.keys(DEVICE_MODE_LABEL) as Array<keyof typeof DEVICE_MODE_LABEL>).map(m => ({
+          value: m,
+          label: DEVICE_MODE_LABEL[m],
+        })),
+        getValue: (d: Device) => d.mode || 'setter',
+        multi: true,
+      },
+      {
+        key: 'status', label: 'وضعیت', kind: 'enum',
+        icon: <IconTag size={18} />,
+        options: (Object.keys(DEVICE_STATUS_LABEL) as Array<keyof typeof DEVICE_STATUS_LABEL>).map(s => ({
+          value: s,
+          label: DEVICE_STATUS_LABEL[s],
+        })),
+        getValue: (d: Device) => d.status || 'active',
+        multi: true,
+      },
+      {
+        key: 'hasWarranty', label: 'گارانتی', kind: 'enum',
+        icon: <IconClock size={18} />,
+        options: [
+          { value: 'yes', label: 'دارد' },
+          { value: 'no', label: 'ندارد' },
+        ],
+        getValue: (d: Device) => (d.warranty && d.warranty > 0) ? 'yes' : 'no',
+      },
+      {
+        key: 'hasMaintenance', label: 'سابقه تعمیر', kind: 'enum',
+        icon: <IconPackage size={18} />,
+        options: [
+          { value: 'yes', label: 'دارد' },
+          { value: 'no', label: 'ندارد' },
+        ],
+        getValue: (d: Device) => (d.maintenanceLogs && d.maintenanceLogs.length > 0) ? 'yes' : 'no',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'name', label: 'نام دستگاه', icon: <IconTag size={18} />,
+        hint: 'از الف به ی',
+        compare: (a: Device, b: Device) => (a.name || '').localeCompare(b.name || '', 'fa'),
+      },
+      {
+        key: 'capacity', label: 'ظرفیت', icon: <IconChart size={18} />,
+        hint: 'بر اساس تعداد تخم',
+        compare: (a: Device, b: Device) => (a.capacity || 0) - (b.capacity || 0),
+      },
+      {
+        key: 'price', label: 'قیمت خرید', icon: <IconDollar size={18} />,
+        hint: 'ارزش دستگاه',
+        compare: (a: Device, b: Device) => (a.price || 0) - (b.price || 0),
+      },
+      {
+        key: 'purchasedAt', label: 'تاریخ خرید', icon: <IconCalendar size={18} />,
+        hint: 'قدیمی‌ترین اول',
+        compare: (a: Device, b: Device) => (a.purchasedAt || '').localeCompare(b.purchasedAt || ''),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: Device, b: Device) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'inc-devices',
+    initialSort: { key: 'name', dir: 'asc' },
   };
 }

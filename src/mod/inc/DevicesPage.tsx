@@ -13,6 +13,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, P
 import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import { useFilterSort, FilterBar, getIncDevicesConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -410,8 +411,19 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
   const warrantyForm = warrantyInfo(form.purchasedAt, parseInt(toEn(form.warranty)) || null);
 
   // ─── Multi-Select ───
-  const ms = useMultiSelect({
+  // فیلتر/مرتب
+  const config = useMemo(() => getIncDevicesConfig(), []);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Device>({
     items: devices,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
+
+  const ms = useMultiSelect({
+    items: list,
     getId: (d: any) => d.id,
     onDelete: async (ids: string[]) => {
       const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' دستگاه حذف شوند؟', { danger: true });
@@ -461,19 +473,33 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
         description="دستگاه‌های انکوباسیون و هچر را اینجا تعریف کنید. برای انتخاب چندتایی، روی یک کارت نگه دارید."
         tone="info"
       />
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
-      {!ms.selectionMode && devices.length > 1 && (
+      {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید
         </div>
       )}
 
-      {ms.selectionMode && devices.length > 1 && (
+      {ms.selectionMode && list.length > 1 && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
           <button type="button"
-            onClick={ms.selectedIds.size === devices.length ? ms.clearSelection : ms.selectAll}
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
             style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
-            {ms.selectedIds.size === devices.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
           </button>
         </div>
       )}
@@ -483,13 +509,13 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
           🏭 {toFa(devices.length)} دستگاه
         </div>
       )}
-      {devices.length === 0 ? (
+      {list.length === 0 ? (
         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>}
           title="هنوز دستگاهی نساخته‌اید" desc="اولین دستگاه جوجه‌کشی خود را اضافه کنید."
           action={<Btn variant="primary" onClick={openNew}>+ افزودن دستگاه</Btn>} />
       ) : (
         <>
-          {devices.map((d, i) => {
+          {list.map((d, i) => {
             const stats = deviceStats[d.id] || { totalEggs: 0, activeCount: 0 };
             const totalEggs = stats.totalEggs;
             const activeEntries = stats.activeCount;
