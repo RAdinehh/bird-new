@@ -98,7 +98,7 @@ export function FilterBar<T>({
     height: 32, padding: '0 var(--sp-3)',
     background: active ? 'var(--accent)' : 'var(--card)',
     border: '1px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
-    borderRadius: 4,
+    borderRadius: 6,
     color: active ? 'var(--avatar-text)' : 'var(--text)',
     fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700,
     cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
@@ -124,7 +124,7 @@ export function FilterBar<T>({
     }}>
       {icon && (
         <span style={{
-          width: 26, height: 26, borderRadius: 4,
+          width: 26, height: 26, borderRadius: 6,
           background: active ? 'var(--accent)' : 'var(--input-bg)',
           color: active ? 'var(--avatar-text)' : 'var(--muted)',
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -198,7 +198,7 @@ export function FilterBar<T>({
                 minHeight: 40, padding: '6px 8px',
                 background: noneActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                 border: '1px solid ' + (noneActive ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 4,
+                borderRadius: 6,
                 color: noneActive ? 'var(--accent)' : 'var(--text)',
                 fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
                 fontWeight: noneActive ? 700 : 600, cursor: 'pointer',
@@ -224,7 +224,7 @@ export function FilterBar<T>({
                     minHeight: 40, padding: '6px 8px',
                     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                    borderRadius: 4,
+                    borderRadius: 6,
                     color: active ? 'var(--accent)' : 'var(--text)',
                     fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
                     fontWeight: active ? 700 : 600, cursor: 'pointer',
@@ -403,7 +403,7 @@ export function FilterBar<T>({
               width: 32, height: 32, padding: 0,
               background: 'var(--card)',
               border: '1px solid var(--border)',
-              borderRadius: 4,
+              borderRadius: 6,
               color: 'var(--muted)',
               cursor: 'pointer', flexShrink: 0,
               transition: 'all var(--dur-fast) var(--ease-out)',
@@ -442,7 +442,7 @@ export function FilterBar<T>({
               padding: '4px 4px 4px 10px', height: 28,
               background: 'var(--card)',
               border: '1px solid var(--accent)',
-              borderRadius: 4,
+              borderRadius: 6,
               color: 'var(--accent)', fontSize: 11.5, fontWeight: 700,
               whiteSpace: 'nowrap', flexShrink: 0,
             }}>
@@ -483,7 +483,7 @@ export function FilterBar<T>({
                   padding: '3px 6px 3px 8px',
                   background: 'var(--card-solid, #fff)',
                   border: '1px solid var(--accent-border)',
-                  borderRadius: 4,
+                  borderRadius: 6,
                   color: 'var(--accent)', fontSize: 10.5, fontWeight: 700,
                   fontFamily: 'inherit', cursor: 'pointer',
                   whiteSpace: 'nowrap',
@@ -592,7 +592,7 @@ export function FilterBar<T>({
                 }}>
                 {def.icon && (
                   <span style={{
-                    width: 30, height: 30, borderRadius: 4,
+                    width: 30, height: 30, borderRadius: 6,
                     background: active ? 'var(--accent)' : 'var(--input-bg)',
                     color: active ? 'var(--avatar-text)' : 'var(--muted)',
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
