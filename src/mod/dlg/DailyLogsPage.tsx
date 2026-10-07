@@ -156,13 +156,6 @@ export default function DailyLogsPage() {
   useFab({ label: 'ثبت امروز', onClick: openNew });
 
 
-  const selectedFlock = activeFlocks.find(f => f.id === form.flockId);
-  const isLayerType = selectedFlock?.type === 'layer' || selectedFlock?.type === 'breeder';
-  const isFlockMature = selectedFlock ? isLayingReady(selectedFlock) : false;
-  const isLayerFlock = isLayerType && isFlockMature;  // فقط اگه بالغ باشه فرم تخمگذاری فعال میشه
-  const flockAliveCount = selectedFlock?.currentCount || selectedFlock?.initialCount || 0;
-  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
-  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
   // ═══ اعتبارسنجی زنده ═══
   const validationContext = {
