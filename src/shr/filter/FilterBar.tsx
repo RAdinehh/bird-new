@@ -190,12 +190,12 @@ export function FilterBar<T>({
         const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
         const noneActive = isMulti ? arr.length === 0 : !v;
         return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
             <button type="button"
               onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                minHeight: 34, padding: '5px 8px',
+                minHeight: 40, padding: '8px 10px',
                 background: noneActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                 border: '1px solid ' + (noneActive ? 'var(--accent-border)' : 'var(--border)'),
                 borderRadius: 'var(--r-md)',
@@ -221,7 +221,7 @@ export function FilterBar<T>({
                   }}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                    minHeight: 34, padding: '5px 8px',
+                    minHeight: 40, padding: '8px 10px',
                     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
                     borderRadius: 'var(--r-md)',
@@ -456,15 +456,15 @@ export function FilterBar<T>({
             const cnt = countActiveInGroup(def);
             return (
               <div key={def.key} style={{
-                paddingTop: idx === 0 ? 0 : 10,
-                paddingBottom: 6,
+                paddingTop: idx === 0 ? 0 : 16,
+                paddingBottom: 8,
                 borderTop: idx === 0 ? 'none' : '1px solid var(--border)',
-                marginTop: idx === 0 ? 0 : 4,
+                marginTop: idx === 0 ? 0 : 12,
               }}>
                 {/* تیتر گروه */}
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 6,
-                  marginBottom: 8,
+                  marginBottom: 10,
                 }}>
                   {def.icon && (
                     <span style={{
