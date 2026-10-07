@@ -7,6 +7,7 @@ import { Btn, BtnRow, Empty, Field,
   PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getBrdBreedsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
@@ -81,7 +82,22 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   };
 
 
-  const list = filterBird ? breeds.filter(x => x.birdId === filterBird) : breeds;
+  // مرحله ۱: tab (نگه‌داشته شده)
+  const tabFiltered = useMemo(
+    () => filterBird ? breeds.filter(x => x.birdId === filterBird) : breeds,
+    [breeds, filterBird]
+  );
+
+  // مرحله ۲: FilterBar
+  const config = useMemo(() => getBrdBreedsConfig({ birds: _birdsUnique }), [_birdsUnique]);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Breed>({
+    items: tabFiltered,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -184,6 +200,20 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
           <button key={b.id} onClick={() => setFilterBird(b.id)} style={chip(filterBird === b.id)}>{b.name}</button>
         ))}
       </div>
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
               {!ms.selectionMode && list.length > 1 && (
           <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
