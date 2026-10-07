@@ -22,7 +22,7 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
 import { Row, SectionTitle } from './helpers';
-import { useFilterSort, FilterBar } from '../../shr/filter';
+import { useFilterSort, FilterBar, getWhsItemsConfig } from '../../shr/filter';
 import {
   IconPackage, IconChart, IconTag, IconDollar,
   IconEgg, IconWheat, IconPill, IconSyringe, IconLeaf, IconTool, IconBox,
@@ -96,53 +96,20 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // ─── تعریف مشترک فیلترها و مرتب‌سازی ───
-  const filterDefs = useMemo(() => [
-    {
-      key: 'category', label: 'دسته', kind: 'enum' as const,
-      icon: <IconFolder size={18} />,
-      options: (Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => ({
-        value: c,
-        label: CATEGORY_LABEL[c],
-        icon: CATEGORY_ICON[c],
-      })),
-      getValue: (it: Item) => it.category,
-      multi: true,
-    },
-    {
-      key: 'stockStatus', label: 'وضعیت موجودی', kind: 'enum' as const,
-      icon: <IconActivity size={18} />,
-      options: [
-        { value: 'critical', label: 'تمام شده' },
-        { value: 'low', label: 'کم' },
-        { value: 'ok', label: 'موجود' },
-      ],
-      getValue: (it: Item) => stockWarning(it),
-    },
-    {
-      key: 'supplier', label: 'تأمین‌کننده', kind: 'enum' as const,
-      icon: <IconTag size={18} />,
-      options: suppliers.map(c => ({ value: c.id, label: c.name })),
-      getValue: (it: Item) => it.supplierId || '',
-      layout: 'chips' as const,
-    },
-  ], [suppliers]);
+  // ─── فیلتر / جستجو / مرتب‌سازی (از config مرکزی) ───
+  const config = useMemo(
+    () => getWhsItemsConfig({ suppliers }),
+    [suppliers]
+  );
 
-  const sortDefs = useMemo(() => [
-    { key: 'name',     label: 'نام کالا',   icon: <IconTag size={18} />,     hint: 'از الف به ی', compare: (a: Item, b: Item) => a.name.localeCompare(b.name, 'fa') },
-    { key: 'stock',    label: 'موجودی',     icon: <IconChart size={18} />,   hint: 'بر اساس تعداد', compare: (a: Item, b: Item) => (a.currentStock || 0) - (b.currentStock || 0) },
-    { key: 'value',    label: 'ارزش موجودی',icon: <IconDollar size={18} />,  hint: 'موجودی × قیمت میانگین', compare: (a: Item, b: Item) => ((a.currentStock || 0) * getAvgPrice(a)) - ((b.currentStock || 0) * getAvgPrice(b)) },
-    { key: 'createdAt',label: 'جدیدترین',   icon: <IconClock size={18} />,   hint: 'بر اساس تاریخ ایجاد', compare: (a: Item, b: Item) => (a.createdAt || '').localeCompare(b.createdAt || '') },
-  ], []);
-
-  // ─── فیلتر / جستجو / مرتب‌سازی ───
   const { filtered: list, filters, setFilter, clearFilter,
           sort, setSort, toggleSort, resetAll, hasActiveFilters,
           total, count } = useFilterSort<Item>({
     items,
-    filters: filterDefs,
-    sorts: sortDefs,
-    persistKey: 'whs-items',
-    initialSort: { key: 'createdAt', dir: 'desc' },
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
   });
 
   // ─── Multi-Select ───
@@ -369,8 +336,8 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         onAction={() => navigate('/tra/purchases')}
         />
         <FilterBar
-          filterDefs={filterDefs}
-          sortDefs={sortDefs}
+          filterDefs={config.filterDefs}
+          sortDefs={config.sortDefs}
           filterState={filters}
           sortState={sort}
           setFilter={setFilter}
