@@ -1,6 +1,5 @@
 /**
- * filter/FilterBar.tsx — نوار فیلتر و مرتب‌سازی مرکزی
- * کارت-محور، SVG آیکون، design tokens
+ * filter/FilterBar.tsx — نوار فیلتر و مرتب‌سازی مرکزی (Compact)
  */
 import { useState, type ReactNode } from 'react';
 import { Sheet, Input, Btn } from '../components/ui';
@@ -38,7 +37,7 @@ function summarizeChip<T>(def: FilterDef<T>, v: any): { text: string; icon?: Rea
   }
   if (def.kind === 'dateRange') {
     const [a, b] = v as [string, string];
-    return { text: `${a || '?'} تا ${b || '?'}` };
+    return { text: `${a || '?'}–${b || '?'}` };
   }
   if (def.kind === 'numberRange') {
     const [a, b] = v as [number, number];
@@ -46,22 +45,6 @@ function summarizeChip<T>(def: FilterDef<T>, v: any): { text: string; icon?: Rea
   }
   if (def.kind === 'boolean') return { text: v ? 'بله' : 'خیر' };
   return { text: String(v) };
-}
-
-/** آیکون گروه — اگه ReactNode بود، در ظرف رنگی می‌ذاریم */
-function GroupIcon({ icon, active }: { icon?: ReactNode; active: boolean }) {
-  if (!icon) return null;
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      width: 36, height: 36, flexShrink: 0,
-      background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
-      color: active ? 'var(--accent)' : 'var(--muted)',
-      borderRadius: 'var(--r-md)',
-      fontSize: 18, lineHeight: 1,
-      transition: 'background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out)',
-    }}>{icon}</span>
-  );
 }
 
 export function FilterBar<T>({
@@ -92,24 +75,62 @@ export function FilterBar<T>({
     ? (sortDefs.find(s => s.key === sortState.key)?.label || '')
     : null;
 
-  // ─── دکمه‌های نوار بالا ───
   const topBtn = (active: boolean): React.CSSProperties => ({
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
     gap: 'var(--sp-1)',
-    height: 36, padding: '0 var(--sp-3)',
+    height: 32, padding: '0 var(--sp-3)',
     background: active ? 'var(--accent)' : 'var(--card)',
     border: '1px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
-    borderRadius: 'var(--r-md)',
+    borderRadius: 'var(--r-sm)',
     color: active ? 'var(--avatar-text)' : 'var(--text)',
-    fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
+    fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700,
     cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-    boxShadow: active ? 'var(--elev-2)' : 'none',
     transition: 'all var(--dur-fast) var(--ease-out)',
   });
 
+  // ─── چیپ داخل Sheet — ۳۰px ───
+  const chipIn = (active: boolean): React.CSSProperties => ({
+    display: 'inline-flex', alignItems: 'center', gap: 4,
+    height: 30, padding: '0 var(--sp-3)',
+    background: active ? 'var(--accent)' : 'var(--input-bg)',
+    border: '1px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
+    borderRadius: 999,
+    color: active ? 'var(--avatar-text)' : 'var(--text)',
+    fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
+    fontWeight: active ? 700 : 500, cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    transition: 'all var(--dur-fast) var(--ease-out)',
+  });
+
+  // ─── Header ساده گروه — بدون کارت ───
+  const groupHeader = (label: string, activeNow: number, activeText: string, clearKey: string) => (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
+      marginBottom: 'var(--sp-2)',
+    }}>
+      <span style={{
+        fontSize: 'var(--fs-xs)', fontWeight: 800, color: 'var(--text)',
+        letterSpacing: 0.2,
+      }}>{label}</span>
+      <span style={{
+        fontSize: 'var(--fs-xs)', fontWeight: 500, color: 'var(--muted)',
+        flex: 1,
+      }}>· {activeText}</span>
+      {activeNow > 0 && (
+        <button type="button" onClick={() => clearFilter(clearKey)}
+          style={{
+            background: 'none', border: 'none',
+            color: 'var(--muted)', fontFamily: 'inherit',
+            fontSize: 'var(--fs-xs)', fontWeight: 700,
+            cursor: 'pointer', padding: '2px 4px',
+          }}>پاک</button>
+      )}
+    </div>
+  );
+
   return (
     <>
-      {/* ═══ نوار بالا ═══ */}
+      {/* ═══ نوار بالا — ۳۲px ═══ */}
       <div style={{
         display: 'flex', gap: 'var(--sp-2)',
         padding: 'var(--sp-2) var(--sp-3)',
@@ -118,15 +139,15 @@ export function FilterBar<T>({
       }}>
         <button type="button" onClick={() => setOpenFilters(true)}
           aria-label="فیلترها" style={topBtn(activeCount > 0)}>
-          <IconFilter size={15} />
+          <IconFilter size={13} />
           <span>فیلتر</span>
           {activeCount > 0 && (
             <span style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              minWidth: 18, height: 18, padding: '0 5px',
+              minWidth: 16, height: 16, padding: '0 4px',
               background: 'rgba(255,255,255,0.28)',
-              borderRadius: 9, fontSize: 10.5, fontWeight: 800,
-              marginRight: -3,
+              borderRadius: 8, fontSize: 10, fontWeight: 800,
+              marginRight: -2,
             }}>{activeCount}</span>
           )}
         </button>
@@ -134,11 +155,11 @@ export function FilterBar<T>({
         {sortDefs.length > 0 && (
           <button type="button" onClick={() => setOpenSort(true)}
             aria-label="مرتب‌سازی" style={topBtn(!!sortState)}>
-            <IconSort size={15} />
+            <IconSort size={13} />
             <span>{sortLabel || 'مرتب'}</span>
             {sortState && (
-              <span style={{ display: 'inline-flex', marginRight: -3 }}>
-                {sortState.dir === 'asc' ? <IconArrowUp size={13} /> : <IconArrowDown size={13} />}
+              <span style={{ display: 'inline-flex', marginRight: -2 }}>
+                {sortState.dir === 'asc' ? <IconArrowUp size={11} /> : <IconArrowDown size={11} />}
               </span>
             )}
           </button>
@@ -151,7 +172,7 @@ export function FilterBar<T>({
           {hasActiveFilters && (
             <button type="button" onClick={resetAll} aria-label="پاک‌سازی"
               style={{
-                background: 'none', border: 'none', padding: '6px 8px',
+                background: 'none', border: 'none', padding: '4px 6px',
                 color: 'var(--muted)', fontFamily: 'inherit',
                 fontSize: 'var(--fs-xs)', fontWeight: 700, cursor: 'pointer',
                 whiteSpace: 'nowrap',
@@ -161,10 +182,6 @@ export function FilterBar<T>({
             fontSize: 'var(--fs-xs)', color: 'var(--muted)',
             fontWeight: 700, whiteSpace: 'nowrap',
             fontVariantNumeric: 'tabular-nums',
-            padding: '4px 10px',
-            background: 'var(--input-bg)',
-            borderRadius: 'var(--r-sm)',
-            border: '1px solid var(--border)',
           }}>
             {count === total ? `${total} مورد` : `${count} از ${total}`}
           </span>
@@ -174,22 +191,21 @@ export function FilterBar<T>({
       {/* ═══ چیپ‌های فیلتر فعال ═══ */}
       {chips.length > 0 && (
         <div style={{
-          display: 'flex', gap: 'var(--sp-2)',
-          padding: 'var(--sp-2) var(--sp-3)',
+          display: 'flex', gap: 6, padding: '6px var(--sp-3)',
           alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none',
           background: 'var(--bg)', borderBottom: '1px solid var(--border)',
         }}>
           {chips.map(c => (
             <div key={c.key} style={{
-              display: 'inline-flex', alignItems: 'center', gap: 'var(--sp-1)',
-              padding: '5px 8px 5px 10px', height: 30,
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '3px 4px 3px 8px', height: 24,
               background: 'var(--accent-soft)',
               border: '1px solid var(--accent-border)',
               borderRadius: 999,
-              color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 700,
+              color: 'var(--accent)', fontSize: 11, fontWeight: 700,
               whiteSpace: 'nowrap', flexShrink: 0,
             }}>
-              {c.icon && <span style={{ fontSize: 13, lineHeight: 1, display: 'inline-flex' }}>{c.icon}</span>}
+              {c.icon && <span style={{ fontSize: 12, lineHeight: 1, display: 'inline-flex' }}>{c.icon}</span>}
               <span style={{ opacity: 0.75, fontWeight: 600 }}>{c.label}</span>
               <span style={{ opacity: 0.4 }}>·</span>
               <span>{c.text}</span>
@@ -197,21 +213,28 @@ export function FilterBar<T>({
                 aria-label="حذف فیلتر"
                 style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  width: 18, height: 18, marginRight: 2,
+                  width: 16, height: 16,
                   background: 'var(--accent)', color: 'var(--avatar-text)',
                   border: 'none', borderRadius: '50%',
                   cursor: 'pointer', padding: 0, lineHeight: 1,
-                }}><IconX size={11} /></button>
+                }}><IconX size={9} /></button>
             </div>
           ))}
         </div>
       )}
 
-      {/* ═══ Sheet فیلترها ═══ */}
+      {/* ═══ Sheet فیلترها — Compact ═══ */}
       <Sheet open={openFilters} onClose={() => setOpenFilters(false)} title="فیلترها">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
-          {filterDefs.map(def => {
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {filterDefs.map((def, idx) => {
             const v = filterState[def.key];
+            const wrap = (children: ReactNode) => (
+              <div key={def.key} style={{
+                paddingTop: idx === 0 ? 0 : 'var(--sp-4)',
+                paddingBottom: 'var(--sp-4)',
+                borderTop: idx === 0 ? 'none' : '1px solid var(--border)',
+              }}>{children}</div>
+            );
 
             // ═══ enum ═══
             if (def.kind === 'enum') {
@@ -219,50 +242,14 @@ export function FilterBar<T>({
               const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
               const noneActive = isMulti ? arr.length === 0 : !v;
               const activeNow = isMulti ? arr.length : (v ? 1 : 0);
-              const chip = (active: boolean): React.CSSProperties => ({
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                height: 36, padding: '0 var(--sp-3)',
-                background: active ? 'var(--accent)' : 'var(--bg)',
-                border: '1.5px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
-                borderRadius: 999,
-                color: active ? 'var(--avatar-text)' : 'var(--text)',
-                fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                fontWeight: active ? 700 : 500, cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'all var(--dur-fast) var(--ease-out)',
-              });
-              return (
-                <div key={def.key} style={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-lg)',
-                  padding: 'var(--sp-3) var(--sp-3) var(--sp-4)',
-                  boxShadow: 'var(--elev-1)',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}>
-                    <GroupIcon icon={def.icon} active={activeNow > 0} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--text)', lineHeight: 1.2 }}>
-                        {def.label}
-                      </div>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500, marginTop: 2 }}>
-                        {activeNow > 0 ? `${activeNow} مورد انتخاب شده` : 'همه نمایش داده می‌شود'}
-                      </div>
-                    </div>
-                    {activeNow > 0 && (
-                      <button type="button" onClick={() => clearFilter(def.key)}
-                        style={{
-                          background: 'none', border: 'none',
-                          color: 'var(--muted)', fontFamily: 'inherit',
-                          fontSize: 'var(--fs-xs)', fontWeight: 700,
-                          cursor: 'pointer', padding: '4px 6px',
-                        }}>پاک</button>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-2)' }}>
+              const activeText = activeNow > 0 ? `${activeNow} مورد انتخاب` : 'همه';
+              return wrap(
+                <div>
+                  {groupHeader(def.label, activeNow, activeText, def.key)}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     <button type="button"
                       onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
-                      style={chip(noneActive)}>همه</button>
+                      style={chipIn(!noneActive && false ? true : false)}>همه</button>
                     {def.options?.map(o => {
                       const active = isMulti ? arr.includes(o.value) : v === o.value;
                       return (
@@ -275,8 +262,8 @@ export function FilterBar<T>({
                               setFilter(def.key, active ? '' : o.value);
                             }
                           }}
-                          style={chip(active)}>
-                          {o.icon && <span style={{ fontSize: 14, lineHeight: 1, display: 'inline-flex' }}>{o.icon}</span>}
+                          style={chipIn(active)}>
+                          {o.icon && <span style={{ fontSize: 12, lineHeight: 1, display: 'inline-flex' }}>{o.icon}</span>}
                           <span>{o.label}</span>
                         </button>
                       );
@@ -288,40 +275,18 @@ export function FilterBar<T>({
 
             // ═══ boolean ═══
             if (def.kind === 'boolean') {
-              const chip = (active: boolean): React.CSSProperties => ({
-                height: 36, padding: '0 var(--sp-4)',
-                background: active ? 'var(--accent)' : 'var(--bg)',
-                border: '1.5px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
-                borderRadius: 999,
-                color: active ? 'var(--avatar-text)' : 'var(--text)',
-                fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                fontWeight: active ? 700 : 500, cursor: 'pointer',
-              });
               const activeNow = v === true || v === false;
-              return (
-                <div key={def.key} style={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-lg)',
-                  padding: 'var(--sp-3) var(--sp-3) var(--sp-4)',
-                  boxShadow: 'var(--elev-1)',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}>
-                    <GroupIcon icon={def.icon} active={activeNow} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--text)' }}>{def.label}</div>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                        {activeNow ? (v ? 'فقط بله' : 'فقط خیر') : 'همه نمایش داده می‌شود'}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
+              const activeText = activeNow ? (v ? 'فقط بله' : 'فقط خیر') : 'همه';
+              return wrap(
+                <div>
+                  {groupHeader(def.label, activeNow ? 1 : 0, activeText, def.key)}
+                  <div style={{ display: 'flex', gap: 6 }}>
                     <button type="button" onClick={() => clearFilter(def.key)}
-                      style={chip(v === undefined || v === null)}>همه</button>
+                      style={chipIn(v === undefined || v === null)}>همه</button>
                     <button type="button" onClick={() => setFilter(def.key, true)}
-                      style={chip(v === true)}>بله</button>
+                      style={chipIn(v === true)}>بله</button>
                     <button type="button" onClick={() => setFilter(def.key, false)}
-                      style={chip(v === false)}>خیر</button>
+                      style={chipIn(v === false)}>خیر</button>
                   </div>
                 </div>
               );
@@ -331,36 +296,15 @@ export function FilterBar<T>({
             if (def.kind === 'dateRange') {
               const [a, b] = (v as [string, string]) || ['', ''];
               const activeNow = !!(a || b);
-              return (
-                <div key={def.key} style={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-lg)',
-                  padding: 'var(--sp-3)',
-                  boxShadow: 'var(--elev-1)',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', marginBottom: 'var(--sp-2)' }}>
-                    <GroupIcon icon={def.icon} active={activeNow} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--text)' }}>{def.label}</div>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                        {activeNow ? `${a || '?'} تا ${b || '?'}` : 'محدوده‌ای انتخاب نشده'}
-                      </div>
-                    </div>
-                    {activeNow && (
-                      <button type="button" onClick={() => clearFilter(def.key)}
-                        style={{
-                          background: 'none', border: 'none',
-                          color: 'var(--muted)', fontFamily: 'inherit',
-                          fontSize: 'var(--fs-xs)', fontWeight: 700, cursor: 'pointer',
-                        }}>پاک</button>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', gap: 'var(--sp-2)', alignItems: 'center' }}>
-                    <Input placeholder="از تاریخ" value={a || ''}
+              const activeText = activeNow ? `${a || '?'} تا ${b || '?'}` : 'همه';
+              return wrap(
+                <div>
+                  {groupHeader(def.label, activeNow ? 1 : 0, activeText, def.key)}
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <Input placeholder="از" value={a || ''}
                       onChange={e => setFilter(def.key, [e.target.value, b || ''])} />
-                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0, fontWeight: 700 }}>تا</span>
-                    <Input placeholder="تا تاریخ" value={b || ''}
+                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0 }}>—</span>
+                    <Input placeholder="تا" value={b || ''}
                       onChange={e => setFilter(def.key, [a || '', e.target.value])} />
                   </div>
                 </div>
@@ -371,35 +315,14 @@ export function FilterBar<T>({
             if (def.kind === 'numberRange') {
               const [a, b] = (v as [number, number]) || [null, null];
               const activeNow = a != null || b != null;
-              return (
-                <div key={def.key} style={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-lg)',
-                  padding: 'var(--sp-3)',
-                  boxShadow: 'var(--elev-1)',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', marginBottom: 'var(--sp-2)' }}>
-                    <GroupIcon icon={def.icon} active={activeNow} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--text)' }}>{def.label}</div>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                        {activeNow ? `${a ?? '?'} تا ${b ?? '?'}` : 'محدوده‌ای انتخاب نشده'}
-                      </div>
-                    </div>
-                    {activeNow && (
-                      <button type="button" onClick={() => clearFilter(def.key)}
-                        style={{
-                          background: 'none', border: 'none',
-                          color: 'var(--muted)', fontFamily: 'inherit',
-                          fontSize: 'var(--fs-xs)', fontWeight: 700, cursor: 'pointer',
-                        }}>پاک</button>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', gap: 'var(--sp-2)', alignItems: 'center' }}>
+              const activeText = activeNow ? `${a ?? '?'} تا ${b ?? '?'}` : 'همه';
+              return wrap(
+                <div>
+                  {groupHeader(def.label, activeNow ? 1 : 0, activeText, def.key)}
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                     <Input type="number" placeholder="از" value={a ?? ''}
                       onChange={e => setFilter(def.key, [e.target.value ? Number(e.target.value) : null, b ?? null])} />
-                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0, fontWeight: 700 }}>تا</span>
+                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0 }}>—</span>
                     <Input type="number" placeholder="تا" value={b ?? ''}
                       onChange={e => setFilter(def.key, [a ?? null, e.target.value ? Number(e.target.value) : null])} />
                   </div>
@@ -410,62 +333,65 @@ export function FilterBar<T>({
           })}
         </div>
 
-        <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-4)', paddingBottom: 'var(--sp-2)' }}>
+        <div style={{
+          display: 'flex', gap: 'var(--sp-2)',
+          paddingTop: 'var(--sp-4)',
+          borderTop: '1px solid var(--border)',
+          marginTop: 'var(--sp-2)',
+        }}>
           <Btn onClick={resetAll} full>پاک‌سازی</Btn>
           <Btn variant="primary" onClick={() => setOpenFilters(false)} full>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <IconCheck size={15} /> تأیید
+              <IconCheck size={14} /> تأیید
             </span>
           </Btn>
         </div>
       </Sheet>
 
-      {/* ═══ Sheet مرتب‌سازی ═══ */}
+      {/* ═══ Sheet مرتب‌سازی — Compact ═══ */}
       <Sheet open={openSort} onClose={() => setOpenSort(false)} title="مرتب‌سازی">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {sortDefs.map(def => {
             const active = sortState?.key === def.key;
             const dir = sortState?.dir || 'asc';
             return (
               <button key={def.key} type="button" onClick={() => toggleSort(def.key)}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
-                  width: '100%', padding: 'var(--sp-3)', minHeight: 60,
-                  background: active ? 'var(--accent-soft)' : 'var(--card)',
-                  border: '1.5px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
-                  borderRadius: 'var(--r-lg)',
+                  display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
+                  width: '100%', padding: '10px 12px', minHeight: 44,
+                  background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
+                  border: '1px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
+                  borderRadius: 'var(--r-md)',
                   color: 'var(--text)',
                   fontFamily: 'inherit', cursor: 'pointer',
                   textAlign: 'right',
-                  boxShadow: active ? 'var(--elev-2)' : 'var(--elev-1)',
                   transition: 'all var(--dur-fast) var(--ease-out)',
                 }}>
-                <GroupIcon icon={def.icon} active={active} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
-                    fontSize: 'var(--fs-md)', fontWeight: 700,
+                    fontSize: 'var(--fs-sm)', fontWeight: 700,
                     color: active ? 'var(--accent)' : 'var(--text)',
                     lineHeight: 1.2,
                   }}>{def.label}</div>
                   <div style={{
-                    fontSize: 'var(--fs-xs)', color: 'var(--muted)',
-                    marginTop: 3, fontWeight: 500,
+                    fontSize: 10.5, color: 'var(--muted)',
+                    marginTop: 2, fontWeight: 500,
                   }}>
                     {active
-                      ? (dir === 'asc' ? 'صعودی — از کوچک به بزرگ' : 'نزولی — از بزرگ به کوچک')
-                      : (def.hint || 'برای مرتب‌سازی لمس کن')}
+                      ? (dir === 'asc' ? 'صعودی' : 'نزولی')
+                      : (def.hint || 'لمس کن')}
                   </div>
                 </div>
                 {active && (
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    width: 30, height: 30, flexShrink: 0,
+                    width: 22, height: 22, flexShrink: 0,
                     background: 'var(--accent)',
                     color: 'var(--avatar-text)',
                     borderRadius: '50%',
                     lineHeight: 1,
                   }}>
-                    {dir === 'asc' ? <IconArrowUp size={15} /> : <IconArrowDown size={15} />}
+                    {dir === 'asc' ? <IconArrowUp size={12} /> : <IconArrowDown size={12} />}
                   </span>
                 )}
               </button>
