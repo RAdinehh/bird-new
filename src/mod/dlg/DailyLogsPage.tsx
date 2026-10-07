@@ -38,6 +38,7 @@ import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import UndoBar from '../../cor/ui/UndoBar';
 import { Section, SectionTitle, Row } from './helpers';
+import { checkStock } from './api/checkStock';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 import { bus } from '../../cor/events';
@@ -293,24 +294,14 @@ export default function DailyLogsPage() {
 
 
 
-const collectWhsShortages = () => {
-    type S = { name: string; need: number; have: number; unit: string };
-    const list: S[] = [];
-    const check = (itemId: string | undefined, qty: number | null | undefined) => {
-      if (!itemId || !qty || qty <= 0) return;
-      const it = whsItems.find(x => x.id === itemId);
-      if (!it) return;
-      if (it.currentStock < qty) {
-        list.push({ name: it.name, need: qty, have: it.currentStock, unit: UNIT_LABEL[it.unit] || '' });
-      }
-    };
-    form.vaccines.forEach(v => check(v.itemId, v.quantity));
-    form.medications.forEach(m => check(m.itemId, m.quantity));
-    if (form.feedSourceType === 'item' && form.feedSourceId) {
-      check(form.feedSourceId, num(form.feedAmount));
-    }
-    return list;
-  };
+const collectWhsShortages = () => checkStock({
+    vaccines: form.vaccines,
+    medications: form.medications,
+    feedSourceType: form.feedSourceType,
+    feedSourceId: form.feedSourceId,
+    feedAmount: form.feedAmount,
+    whsItems,
+  });
 
   const save = async () => {
     if (saving) return;
