@@ -113,8 +113,8 @@ export function FilterBar<T>({
     onClick: () => void;
   }) => (
     <button type="button" onClick={onClick} style={{
-      display: 'flex', alignItems: 'center', gap: 10,
-      padding: '10px 12px', minHeight: 48, width: '100%',
+      display: 'flex', alignItems: 'center', gap: 8,
+      padding: '8px 10px', minHeight: 42, width: '100%',
       background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
       border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
       borderRadius: 'var(--r-lg)',
@@ -124,7 +124,7 @@ export function FilterBar<T>({
     }}>
       {icon && (
         <span style={{
-          width: 30, height: 30, borderRadius: 'var(--r-sm)',
+          width: 26, height: 26, borderRadius: 'var(--r-sm)',
           background: active ? 'var(--accent)' : 'var(--input-bg)',
           color: active ? 'var(--avatar-text)' : 'var(--muted)',
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -167,7 +167,7 @@ export function FilterBar<T>({
 
   const chipIn = (active: boolean): React.CSSProperties => ({
     display: 'inline-flex', alignItems: 'center', gap: 5,
-    height: 36, padding: '0 var(--sp-3)',
+    height: 32, padding: '0 10px',
     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
     borderRadius: 'var(--r-md)',
@@ -190,12 +190,12 @@ export function FilterBar<T>({
         const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
         const noneActive = isMulti ? arr.length === 0 : !v;
         return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
             <button type="button"
               onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                minHeight: 38, padding: '6px 8px',
+                minHeight: 34, padding: '5px 8px',
                 background: noneActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                 border: '1px solid ' + (noneActive ? 'var(--accent-border)' : 'var(--border)'),
                 borderRadius: 'var(--r-md)',
@@ -221,7 +221,7 @@ export function FilterBar<T>({
                   }}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                    minHeight: 38, padding: '6px 8px',
+                    minHeight: 34, padding: '5px 8px',
                     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
                     borderRadius: 'var(--r-md)',
@@ -456,14 +456,15 @@ export function FilterBar<T>({
             const cnt = countActiveInGroup(def);
             return (
               <div key={def.key} style={{
-                paddingTop: idx === 0 ? 0 : 'var(--sp-3)',
-                paddingBottom: 'var(--sp-2)',
+                paddingTop: idx === 0 ? 0 : 10,
+                paddingBottom: 6,
                 borderTop: idx === 0 ? 'none' : '1px solid var(--border)',
+                marginTop: idx === 0 ? 0 : 4,
               }}>
                 {/* تیتر گروه */}
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 6,
-                  marginBottom: 'var(--sp-2)',
+                  marginBottom: 8,
                 }}>
                   {def.icon && (
                     <span style={{
@@ -476,7 +477,7 @@ export function FilterBar<T>({
                     }}>{def.icon}</span>
                   )}
                   <span style={{
-                    fontSize: 'var(--fs-sm)', fontWeight: 700,
+                    fontSize: 'var(--fs-xs)', fontWeight: 700,
                     color: 'var(--text)', lineHeight: 1.2,
                   }}>{def.label}</span>
                   {cnt > 0 && (
@@ -518,7 +519,7 @@ export function FilterBar<T>({
           </Btn>
           <button type="button" onClick={resetAll} style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            gap: 6, height: 44, padding: '0 16px',
+            gap: 6, height: 40, padding: '0 14px',
             background: 'var(--danger-soft)',
             border: '1px solid var(--danger)',
             borderRadius: 'var(--r-md)',
@@ -538,7 +539,7 @@ export function FilterBar<T>({
               <button key={def.key} type="button" onClick={() => toggleSort(def.key)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
-                  width: '100%', padding: '10px 12px', minHeight: 48,
+                  width: '100%', padding: '8px 10px', minHeight: 42,
                   background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                   border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
                   borderRadius: 'var(--r-lg)',
@@ -549,7 +550,7 @@ export function FilterBar<T>({
                 }}>
                 {def.icon && (
                   <span style={{
-                    width: 34, height: 34, borderRadius: 'var(--r-sm)',
+                    width: 30, height: 30, borderRadius: 'var(--r-sm)',
                     background: active ? 'var(--accent)' : 'var(--input-bg)',
                     color: active ? 'var(--avatar-text)' : 'var(--muted)',
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
