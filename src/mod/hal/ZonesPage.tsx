@@ -10,6 +10,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getHalZonesConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
@@ -26,7 +27,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
-  const [filter, setFilter] = useState('');
+  const [filterHall, setFilterHall] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const halls = useMemo(() => {
@@ -147,7 +148,22 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     setOpen(false);
   };
 
-  const list = filter ? zones.filter(z => z.hallId === filter) : zones;
+  // مرحله ۱: tab
+  const tabFiltered = useMemo(
+    () => filterHall ? zones.filter(z => z.hallId === filterHall) : zones,
+    [zones, filterHall]
+  );
+
+  // مرحله ۲: FilterBar
+  const config = useMemo(() => getHalZonesConfig({ halls }), [halls]);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Zone>({
+    items: tabFiltered,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   return (
     <PageContainer>
@@ -184,11 +200,25 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
       )}
 
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilter('')} style={chip(!filter)}>همه</button>
+        <button onClick={() => setFilterHall('')} style={chip(!filterHall)}>همه</button>
         {halls.map(h => (
-          <button key={h.id} onClick={() => setFilter(h.id)} style={chip(filter === h.id)}>{h.name}</button>
+          <button key={h.id} onClick={() => setFilterHall(h.id)} style={chip(filterHall === h.id)}>{h.name}</button>
         ))}
       </div>
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
       {list.length === 0 ? (
         <Empty
