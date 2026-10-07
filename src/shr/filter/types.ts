@@ -8,6 +8,7 @@ export type FilterKind = 'enum' | 'dateRange' | 'numberRange' | 'boolean';
 export interface FilterOption {
   value: string;
   label: string;
+  /** می‌تونه SVG component، ایموجی string، یا هر ReactNode باشه */
   icon?: ReactNode;
 }
 

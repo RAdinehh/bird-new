@@ -252,7 +252,7 @@ export function FilterBar<T>({
                 style={chipIn(active)}>
                 {o.icon && <span style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  width: 14, height: 14,
+                  fontSize: typeof o.icon === 'string' ? 14 : undefined,
                 }}>{o.icon}</span>}
                 <span>{o.label}</span>
               </button>

@@ -100,14 +100,11 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
     {
       key: 'category', label: 'دسته', kind: 'enum' as const,
       icon: <IconFolder size={18} />,
-      options: (Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => {
-        const IconComp = CATEGORY_SVG[c];
-        return {
-          value: c,
-          label: CATEGORY_LABEL[c].replace(/^[^\u0600-\u06FFa-zA-Z]+\s*/, '').trim() || CATEGORY_LABEL[c],
-          icon: IconComp ? <IconComp size={15} /> : undefined,
-        };
-      }),
+      options: (Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => ({
+        value: c,
+        label: CATEGORY_LABEL[c],
+        icon: CATEGORY_ICON[c],
+      })),
       getValue: (it: Item) => it.category,
       multi: true,
     },
@@ -590,7 +587,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
               }));
             }}>
               {(Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c =>
-                <option key={c} value={c}>{CATEGORY_LABEL[c].replace(/^[^\u0600-\u06FFa-zA-Z]+\s*/, '').trim() || CATEGORY_LABEL[c]}</option>
+                <option key={c} value={c}>{CATEGORY_ICON[c]} {CATEGORY_LABEL[c]}</option>
               )}
             </Select>
           </Field>
