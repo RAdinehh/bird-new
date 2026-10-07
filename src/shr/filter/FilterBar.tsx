@@ -194,13 +194,13 @@ export function FilterBar<T>({
             <button type="button"
               onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
               style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                minHeight: 42, padding: '6px 6px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                minHeight: 40, padding: '6px 8px',
                 background: noneActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                 border: '1px solid ' + (noneActive ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 'var(--r-md)',
+                borderRadius: 'var(--r-sm)',
                 color: noneActive ? 'var(--accent)' : 'var(--text)',
-                fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
                 fontWeight: noneActive ? 700 : 600, cursor: 'pointer',
                 textAlign: 'center',
                 transition: 'all var(--dur-fast) var(--ease-out)',
@@ -220,11 +220,11 @@ export function FilterBar<T>({
                     }
                   }}
                   style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                    minHeight: 42, padding: '6px 6px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                    minHeight: 40, padding: '6px 8px',
                     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                    borderRadius: 'var(--r-md)',
+                    borderRadius: 'var(--r-sm)',
                     color: active ? 'var(--accent)' : 'var(--text)',
                     fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
                     fontWeight: active ? 700 : 600, cursor: 'pointer',
@@ -401,10 +401,10 @@ export function FilterBar<T>({
             style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               width: 32, height: 32, padding: 0,
-              background: 'var(--danger-soft)',
-              border: '1px solid var(--danger)',
+              background: 'var(--card)',
+              border: '1px solid var(--border)',
               borderRadius: 'var(--r-sm)',
-              color: 'var(--danger)',
+              color: 'var(--muted)',
               cursor: 'pointer', flexShrink: 0,
               transition: 'all var(--dur-fast) var(--ease-out)',
             }}>
