@@ -379,22 +379,20 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
         </div>
       )}
 
-      {hatches.length > 0 && (
-        <FilterBar
-          filterDefs={config.filterDefs}
-          sortDefs={config.sortDefs}
-          filterState={filters}
-          sortState={sort}
-          setFilter={setFilter}
-          clearFilter={clearFilter}
-          setSort={setSort}
-          toggleSort={toggleSort}
-          resetAll={resetAll}
-          hasActiveFilters={hasActiveFilters}
-          total={total}
-          count={count}
-        />
-      )}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
       {filtered.length === 0 ? (
         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><ellipse cx="12" cy="14" rx="7" ry="9"/></svg>}

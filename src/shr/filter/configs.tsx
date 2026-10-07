@@ -14,6 +14,7 @@ import {
   type Item, type ItemCategory, type Movement, type MovementType,
 } from '../../mod/whs/store';
 import type { Person, Role } from '../../mod/ctc/store';
+import { type Ingredient, CATEGORY_LABEL as FED_CAT_LABEL, CATEGORY_ICON as FED_CAT_ICON } from '../../mod/fed/store';
 import type { Breed, Bird } from '../../mod/brd/store';
 import type { Zone, Hall, Equipment } from '../../mod/hal/store';
 import { type Flock, isLayingReady } from '../../mod/flk/store';
@@ -1087,5 +1088,73 @@ export function getIncCandlingsConfig(ctx: {
     ],
     persistKey: 'inc-candlings',
     initialSort: { key: 'date', dir: 'desc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// fed/IngredientsPage — مواد اولیه جیره
+// ═══════════════════════════════════════════════════
+export function getFedIngredientsConfig(): FilterConfig<Ingredient> {
+  return {
+    filterDefs: [
+      {
+        key: 'category', label: 'دسته', kind: 'enum',
+        icon: <IconFolder size={18} />,
+        options: Object.keys(FED_CAT_LABEL).map(c => ({
+          value: c,
+          label: FED_CAT_LABEL[c as keyof typeof FED_CAT_LABEL],
+          icon: FED_CAT_ICON[c as keyof typeof FED_CAT_ICON],
+        })),
+        getValue: (i: Ingredient) => i.category || '',
+        multi: true,
+      },
+      {
+        key: 'isCore', label: 'پیش‌فرض', kind: 'enum',
+        icon: <IconTag size={18} />,
+        options: [
+          { value: 'yes', label: 'پیش‌فرض' },
+          { value: 'no', label: 'سفارشی' },
+        ],
+        getValue: (i: Ingredient) => i.isCore ? 'yes' : 'no',
+      },
+      {
+        key: 'hasStock', label: 'اتصال انبار', kind: 'enum',
+        icon: <IconPackage size={18} />,
+        options: [
+          { value: 'yes', label: 'وصل شده' },
+          { value: 'no', label: 'وصل نشده' },
+        ],
+        getValue: (i: Ingredient) => i.stockItemId ? 'yes' : 'no',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'name', label: 'نام', icon: <IconTag size={18} />,
+        hint: 'از الف به ی',
+        compare: (a: Ingredient, b: Ingredient) => (a.name || '').localeCompare(b.name || '', 'fa'),
+      },
+      {
+        key: 'protein', label: 'پروتئین', icon: <IconChart size={18} />,
+        hint: 'درصد پروتئین',
+        compare: (a: Ingredient, b: Ingredient) => (a.protein || 0) - (b.protein || 0),
+      },
+      {
+        key: 'energy', label: 'انرژی', icon: <IconChart size={18} />,
+        hint: 'انرژی متابولیزه',
+        compare: (a: Ingredient, b: Ingredient) => (a.energy || 0) - (b.energy || 0),
+      },
+      {
+        key: 'price', label: 'قیمت', icon: <IconDollar size={18} />,
+        hint: 'قیمت هر واحد',
+        compare: (a: Ingredient, b: Ingredient) => (a.price || 0) - (b.price || 0),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: Ingredient, b: Ingredient) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'fed-ingredients',
+    initialSort: { key: 'name', dir: 'asc' },
   };
 }

@@ -416,22 +416,20 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
         </div>
       )}
 
-      {candlings.length > 0 && (
-        <FilterBar
-          filterDefs={config.filterDefs}
-          sortDefs={config.sortDefs}
-          filterState={filters}
-          sortState={sort}
-          setFilter={setFilter}
-          clearFilter={clearFilter}
-          setSort={setSort}
-          toggleSort={toggleSort}
-          resetAll={resetAll}
-          hasActiveFilters={hasActiveFilters}
-          total={total}
-          count={count}
-        />
-      )}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
       {candlings.length === 0 ? (
         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>}

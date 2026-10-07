@@ -10,6 +10,7 @@ import HelpBanner from '../../shr/components/HelpBanner';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getFedIngredientsConfig } from '../../shr/filter';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
@@ -48,7 +49,6 @@ export default function IngredientsPage() {
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
-  const [filterCat, setFilterCat] = useState<IngredientCategory | ''>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
 
@@ -79,12 +79,23 @@ export default function IngredientsPage() {
     });
   }, []);
 
-  const list = useMemo(() => {
+  // مرحله ۱: tab (showHidden نگه‌داشته شده)
+  const tabFiltered = useMemo(() => {
     let arr = ingredients;
     if (!showHidden) arr = arr.filter(i => !i.isHidden);
-    if (filterCat) arr = arr.filter(i => i.category === filterCat);
     return arr;
-  }, [ingredients, filterCat, showHidden]);
+  }, [ingredients, showHidden]);
+
+  // مرحله ۲: FilterBar
+  const config = useMemo(() => getFedIngredientsConfig(), []);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Ingredient>({
+    items: tabFiltered,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   const hiddenCount = useMemo(() => ingredients.filter(i => i.isHidden).length, [ingredients]);
 
@@ -248,20 +259,20 @@ export default function IngredientsPage() {
           description="ذرت، کنجاله، سبوس و... را اینجا تعریف کنید. درصد پروتئین و انرژی هر ماده برای ساخت جیره لازم است."
           tone="info"
         />
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterCat('')} style={chip(filterCat === '')}>
-          همه ({toFa(ingredients.length)})
-        </button>
-        {(Object.keys(CATEGORY_LABEL) as IngredientCategory[]).map(c => {
-          const cnt = ingredients.filter(i => i.category === c).length;
-          if (cnt === 0) return null;
-          return (
-            <button key={c} onClick={() => setFilterCat(c)} style={chip(filterCat === c)}>
-              {CATEGORY_ICON[c]} {CATEGORY_LABEL[c]} ({toFa(cnt)})
-            </button>
-          );
-        })}
-      </div>
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
       {hiddenCount > 0 && (
         <button
