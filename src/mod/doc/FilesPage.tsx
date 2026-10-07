@@ -12,6 +12,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import { ListCard, fabStyle, GridCard, chip } from './helpers';
+import { useFilterSort, FilterBar, getDocFilesConfig } from '../../shr/filter';
 
 type ViewMode = 'grid' | 'list';
 
@@ -20,7 +21,6 @@ export default function FilesPage() {
   const [loading, setLoading] = useState(true);
   const [totalBytes, setTotalBytes] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [filterCat, setFilterCat] = useState<DocCategory | 'all'>('all');
   const [search, setSearch] = useState('');
   const [uploadOpen, setUploadOpen] = useState(false);
   useFab({ label: 'افزودن فایل', onClick: () => setUploadOpen(true) });
@@ -44,19 +44,27 @@ export default function FilesPage() {
     return () => { mounted = false; };
   }, [refresh]);
 
-  const filtered = useMemo(() => {
-    let arr = files;
-    if (filterCat !== 'all') arr = arr.filter(f => f.category === filterCat);
-    if (search.trim() !== '') {
-      const q = search.trim();
-      arr = arr.filter(f =>
-        f.name.includes(q) ||
-        f.notes.includes(q) ||
-        f.tags.some(t => t.includes(q))
-      );
-    }
-    return arr;
-  }, [files, filterCat, search]);
+  // مرحله ۱: search
+  const searchFiltered = useMemo(() => {
+    if (search.trim() === '') return files;
+    const q = search.trim();
+    return files.filter(f =>
+      f.name.includes(q) ||
+      f.notes.includes(q) ||
+      f.tags.some(t => t.includes(q))
+    );
+  }, [files, search]);
+
+  // مرحله ۲: FilterBar
+  const config = useMemo(() => getDocFilesConfig(), []);
+  const { filtered, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<DocFile>({
+    items: searchFiltered,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   const counts: Record<string, number> = { all: files.length };
   files.forEach(f => { counts[f.category] = (counts[f.category] || 0) + 1; });
@@ -157,23 +165,23 @@ export default function FilesPage() {
         />
       </div>
 
-      {/* فیلتر */}
-      {files.length > 0 ? (
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-          <button type="button" onClick={() => setFilterCat('all')} style={chip(filterCat === 'all')}>
-            همه ({toFa(counts.all || 0)})
-          </button>
-          {(Object.keys(CATEGORY_LABEL) as DocCategory[]).map(c => {
-            const n = counts[c] || 0;
-            if (n === 0) return null;
-            return (
-              <button key={c} type="button" onClick={() => setFilterCat(c)} style={chip(filterCat === c)}>
-                {CATEGORY_ICON[c]} {CATEGORY_LABEL[c]} ({toFa(n)})
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
+      {/* FilterBar */}
+      {files.length > 0 && (
+        <FilterBar
+          filterDefs={config.filterDefs}
+          sortDefs={config.sortDefs}
+          filterState={filters}
+          sortState={sort}
+          setFilter={setFilter}
+          clearFilter={clearFilter}
+          setSort={setSort}
+          toggleSort={toggleSort}
+          resetAll={resetAll}
+          hasActiveFilters={hasActiveFilters}
+          total={totalFiltered}
+          count={count}
+        />
+      )}
 
       {/* محتوا */}
       {loading ? (
