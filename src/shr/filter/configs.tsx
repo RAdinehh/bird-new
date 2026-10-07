@@ -14,6 +14,7 @@ import {
   type Item, type ItemCategory, type Movement, type MovementType,
 } from '../../mod/whs/store';
 import type { Person, Role } from '../../mod/ctc/store';
+import { type Deal, DEAL_LABEL as TRA_DEAL_LABEL } from '../../mod/tra/store';
 import {
   type Ingredient, type Formula, type Requirement,
   CATEGORY_LABEL as FED_CAT_LABEL, CATEGORY_ICON as FED_CAT_ICON,
@@ -1280,5 +1281,69 @@ export function getFedRequirementsConfig(ctx: {
     ],
     persistKey: 'fed-requirements',
     initialSort: { key: 'name', dir: 'asc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// tra/DealsPage — معاملات خاص
+// ═══════════════════════════════════════════════════
+export function getTraDealsConfig(ctx: {
+  partyNames: Record<string, string>;
+}): FilterConfig<Deal> {
+  return {
+    filterDefs: [
+      {
+        key: 'type', label: 'نوع', kind: 'enum',
+        icon: <IconTag size={18} />,
+        options: (Object.keys(TRA_DEAL_LABEL) as Array<keyof typeof TRA_DEAL_LABEL>).map(t => ({
+          value: t,
+          label: TRA_DEAL_LABEL[t],
+        })),
+        getValue: (d: Deal) => d.type || '',
+        multi: true,
+      },
+      {
+        key: 'status', label: 'وضعیت', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: [
+          { value: 'open', label: 'باز' },
+          { value: 'settled', label: 'تسویه شده' },
+          { value: 'cancelled', label: 'لغو شده' },
+        ],
+        getValue: (d: Deal) => d.status || 'open',
+        multi: true,
+      },
+      {
+        key: 'partyId', label: 'طرف معامله', kind: 'enum',
+        icon: <IconUser size={18} />,
+        options: Object.entries(ctx.partyNames).map(([id, name]) => ({ value: id, label: name })),
+        getValue: (d: Deal) => d.partyId || '',
+        layout: 'chips',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'date', label: 'تاریخ', icon: <IconCalendar size={18} />,
+        hint: 'جدیدترین اول',
+        compare: (a: Deal, b: Deal) => (a.date || '').localeCompare(b.date || ''),
+      },
+      {
+        key: 'value', label: 'مبلغ', icon: <IconDollar size={18} />,
+        hint: 'ارزش معامله',
+        compare: (a: Deal, b: Deal) => (a.value || 0) - (b.value || 0),
+      },
+      {
+        key: 'dueDate', label: 'سرسید', icon: <IconCalendar size={18} />,
+        hint: 'نزدیک‌ترین سرسید اول',
+        compare: (a: Deal, b: Deal) => (a.dueDate || '').localeCompare(b.dueDate || ''),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین ثبت', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: Deal, b: Deal) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'tra-deals',
+    initialSort: { key: 'date', dir: 'desc' },
   };
 }

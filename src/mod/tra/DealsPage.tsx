@@ -11,6 +11,7 @@ import { Btn, BtnRow, Empty, Field,
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import { useFilterSort, FilterBar, getTraDealsConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -49,14 +50,27 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
-  const [filterType, setFilterType] = useState<DealType | ''>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const list = useMemo(() => {
-    let arr = deals;
-    if (filterType) arr = arr.filter(d => d.type === filterType);
-    return arr.sort((a, b) => b.date.localeCompare(a.date));
-  }, [deals, filterType]);
+  // فیلتر/مرتب
+  const config = useMemo(() => {
+    const partyNames: Record<string, string> = {};
+    deals.forEach(d => {
+      if (d.partyId && !partyNames[d.partyId]) {
+        const c = contacts.find(x => x.id === d.partyId);
+        if (c) partyNames[d.partyId] = c.name;
+      }
+    });
+    return getTraDealsConfig({ partyNames });
+  }, [deals, contacts]);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Deal>({
+    items: deals,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   const undoDelete = () => {
     if (!undoData) return;
@@ -167,20 +181,20 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           onDismiss={() => setUndoData(null)}
         />
       )}
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterType('')} style={chip(filterType === '')}>
-          همه ({toFa(deals.length)})
-        </button>
-        {(Object.keys(DEAL_LABEL) as DealType[]).map(t => {
-          const c = deals.filter(d => d.type === t).length;
-          if (c === 0) return null;
-          return (
-            <button key={t} onClick={() => setFilterType(t)} style={chip(filterType === t)}>
-              {DEAL_LABEL[t]} ({toFa(c)})
-            </button>
-          );
-        })}
-      </div>
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
