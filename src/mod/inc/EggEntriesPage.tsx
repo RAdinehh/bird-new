@@ -22,6 +22,7 @@ import { clampPercent, complement } from '../../shr/utils/smart';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import SmartSelect from '../../shr/components/SmartSelect';
+import { useFilterSort, FilterBar, getIncEntriesConfig } from '../../shr/filter';
 import { todayJalali, Row, chip } from './helpers';
 import { useSet } from '../set/store';
 
@@ -132,10 +133,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
     return daysByName.get(name) || daysFromProfiles(name, _profiles);
   };
 
-  const [filterDev, setFilterDev] = useState('');
-  const [filterSource, setFilterSource] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
-  const [q, setQ] = useState('');
 
   // ═══ Bulk mode state ═══
   const [multiDeviceId, setMultiDeviceId] = useState('');
@@ -555,23 +552,22 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
   }, [multiDeviceId, draftRows, eggEntries, birds, devices, currentRow.birdId, currentRow.count, editingRowId]);
 
   // ═══ فیلتر لیست ═══
-  const list = useMemo(() => {
-    return eggEntries.filter(e => {
-      if (filterDev && e.deviceId !== filterDev) return false;
-      if (filterSource && e.dealType !== filterSource) return false;
-      if (filterStatus && e.status !== filterStatus) return false;
-      if (q.trim()) {
-        const t = q.trim().toLowerCase();
-        const dev = devices.find(d => d.id === e.deviceId);
-        const bird = birds.find(b => b.id === e.birdId);
-        const partnerName = (e.dealData?.partnerId && (contacts.find((c: any) => c.id === e.dealData.partnerId) as any)?.name) || e.dealData?.partnerName || '';
-        const sellerName = (e.dealData?.sellerId && (contacts.find((c: any) => c.id === e.dealData.sellerId) as any)?.name) || e.dealData?.sellerName || '';
-        const haystack = [dev?.name, bird?.name, partnerName, sellerName, e.trayNumbers, e.notes].filter(Boolean).join(' ').toLowerCase();
-        if (!haystack.includes(t)) return false;
-      }
-      return true;
-    });
-  }, [eggEntries, filterDev, filterSource, filterStatus, q, devices, birds, contacts]);
+  // فیلتر/مرتب (FilterBar)
+  const config = useMemo(
+    () => getIncEntriesConfig({
+      devices: devices.map(d => ({ id: d.id, name: d.name })),
+      birds: birds.map(b => ({ id: b.id, name: b.name })),
+    }),
+    [devices, birds]
+  );
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<EggEntry>({
+    items: eggEntries,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
   const multiDevice = devices.find(d => d.id === multiDeviceId);
 
   const renderRowSummary = (row: DraftRow, idx: number) => {
@@ -617,28 +613,20 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
         </div>
       )}
       {devices.length > 0 && eggEntries.length > 0 && (
-        <>
-          <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (گله، فروشنده، شریک، یادداشت...)" aria-label="جستجو در ورودی‌های تخم" />
-          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-            <button onClick={() => { setFilterDev(''); setFilterSource(''); setFilterStatus(''); }} style={chip(!filterDev && !filterSource && !filterStatus)}>همه</button>
-            {devices.map(d => (
-              <button key={d.id} onClick={() => setFilterDev(filterDev === d.id ? '' : d.id)} style={chip(filterDev === d.id)}>{d.name}</button>
-            ))}
-          </div>
-          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-            <span style={{ color: 'var(--muted)', alignSelf: 'center', fontSize: 'var(--fs-xs)' }}>منبع:</span>
-            {[
-              { id: 'own', label: '🏠 خودم' },
-              { id: 'purchase', label: '📥 خریداری' },
-              { id: 'partnership', label: '🤝 شراکتی' },
-              { id: 'rent', label: '🏢 اجاره' },
-              { id: 'consignment', label: '📦 امانی' },
-            ].map(src => (
-              <button key={src.id} onClick={() => setFilterSource(filterSource === src.id ? '' : src.id)} style={chip(filterSource === src.id)}>{src.label}</button>
-            ))}
-          </div>
-          </>
-
+        <FilterBar
+          filterDefs={config.filterDefs}
+          sortDefs={config.sortDefs}
+          filterState={filters}
+          sortState={sort}
+          setFilter={setFilter}
+          clearFilter={clearFilter}
+          setSort={setSort}
+          toggleSort={toggleSort}
+          resetAll={resetAll}
+          hasActiveFilters={hasActiveFilters}
+          total={total}
+          count={count}
+        />
       )}
 
       {list.length === 0 ? (
