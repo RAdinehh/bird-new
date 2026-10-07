@@ -23,6 +23,12 @@ export interface FilterDef<T> {
   getValue: (item: T) => string | number | boolean | null | undefined;
   /** آیا فیلتر چند انتخابی؟ (پیش‌فرض: تکی) */
   multi?: boolean;
+  /**
+   * چیدمان نمایش در Sheet:
+   * - 'rows'  → ردیف‌های بلند با چک‌باکس/رادیو (پیش‌فرض برای تک‌انتخابی)
+   * - 'chips' → چیپ‌های افقی (پیش‌فرض برای چند‌انتخابی)
+   */
+  layout?: 'rows' | 'chips';
   /** نمایش فقط وقتی که این شرط true باشد */
   visible?: (item: T) => boolean;
 }

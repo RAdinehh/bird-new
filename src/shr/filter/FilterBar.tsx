@@ -1,7 +1,8 @@
 /**
- * filter/FilterBar.tsx — نوار فیلتر و مرتب‌سازی مرکزی (Compact)
+ * filter/FilterBar.tsx — نوار فیلتر و مرتب‌سازی مرکزی
+ * طراحی: Tabs بین گروه‌ها + ردیف‌های بلند + بدون گرادیانت
  */
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { Sheet, Input, Btn } from '../components/ui';
 import {
   IconFilter, IconSort, IconX, IconArrowUp, IconArrowDown, IconCheck,
@@ -32,7 +33,6 @@ function summarizeChip<T>(def: FilterDef<T>, v: any): { text: string; icon?: Rea
     const labels = opts.map((o, i) => o?.label || arr[i]);
     const icon = opts[0]?.icon;
     if (labels.length === 1) return { text: labels[0], icon };
-    // اگه چندتایی: فقط تعداد + آیکون
     return { text: `${labels.length} مورد`, icon };
   }
   if (def.kind === 'dateRange') {
@@ -47,20 +47,32 @@ function summarizeChip<T>(def: FilterDef<T>, v: any): { text: string; icon?: Rea
   return { text: String(v) };
 }
 
+function isEmptyVal(v: any): boolean {
+  if (v === undefined || v === null || v === '') return true;
+  if (Array.isArray(v)) return v.length === 0 || v.every((x: any) => x === '');
+  return false;
+}
+
 export function FilterBar<T>({
   filterDefs, sortDefs, filterState, sortState,
   setFilter, clearFilter, setSort: _setSort, toggleSort, resetAll,
-  hasActiveFilters, total, count,
+  hasActiveFilters: _hasActiveFilters, total, count,
 }: Props<T>) {
   const [openFilters, setOpenFilters] = useState(false);
   const [openSort, setOpenSort] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('');
 
-  const activeCount = Object.keys(filterState).filter(k => {
-    const v = filterState[k];
-    if (v === undefined || v === null || v === '') return false;
-    if (Array.isArray(v)) return v.length > 0 && v.some((x: any) => x !== '');
-    return true;
-  }).length;
+  useEffect(() => {
+    if (openFilters && filterDefs.length > 0) {
+      setActiveTab(prev => {
+        if (prev && filterDefs.some(d => d.key === prev)) return prev;
+        return filterDefs[0].key;
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openFilters]);
+
+  const activeCount = Object.keys(filterState).filter(k => !isEmptyVal(filterState[k])).length;
 
   const chips = filterDefs
     .map(def => {
@@ -75,6 +87,21 @@ export function FilterBar<T>({
     ? (sortDefs.find(s => s.key === sortState.key)?.label || '')
     : null;
 
+  const countActiveInGroup = (def: FilterDef<T>): number => {
+    const v = filterState[def.key];
+    if (isEmptyVal(v)) return 0;
+    if (def.kind === 'enum') {
+      if (Array.isArray(v)) return (v as string[]).filter(x => x !== '').length;
+      return 1;
+    }
+    if (def.kind === 'dateRange' || def.kind === 'numberRange') {
+      const [a, b] = v as any[];
+      return (a != null && a !== '') || (b != null && b !== '') ? 1 : 0;
+    }
+    if (def.kind === 'boolean') return 1;
+    return 0;
+  };
+
   const topBtn = (active: boolean): React.CSSProperties => ({
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
     gap: 'var(--sp-1)',
@@ -88,49 +115,199 @@ export function FilterBar<T>({
     transition: 'all var(--dur-fast) var(--ease-out)',
   });
 
-  // ─── چیپ داخل Sheet — ۳۰px ───
+  const RowItem = ({
+    active, multi, icon, label, count: cnt, onClick,
+  }: {
+    active: boolean; multi: boolean;
+    icon?: ReactNode; label: string; count?: number;
+    onClick: () => void;
+  }) => (
+    <button type="button" onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 10,
+      padding: '10px 12px', minHeight: 48, width: '100%',
+      background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
+      border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+      borderRadius: 'var(--r-lg)',
+      cursor: 'pointer', fontFamily: 'inherit',
+      textAlign: 'right',
+      transition: 'all var(--dur-fast) var(--ease-out)',
+    }}>
+      {icon && (
+        <span style={{
+          width: 30, height: 30, borderRadius: 'var(--r-sm)',
+          background: active ? 'var(--accent)' : 'var(--input-bg)',
+          color: active ? 'var(--avatar-text)' : 'var(--muted)',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+          transition: 'all var(--dur-fast) var(--ease-out)',
+        }}>{icon}</span>
+      )}
+      <span style={{
+        flex: 1, fontSize: 'var(--fs-base)',
+        fontWeight: active ? 700 : 600,
+        color: active ? 'var(--accent)' : 'var(--text)',
+      }}>{label}</span>
+      {cnt !== undefined && (
+        <span style={{
+          fontSize: 10.5, fontWeight: 700,
+          color: active ? 'var(--accent)' : 'var(--muted)',
+          background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
+          border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+          padding: '2px 8px', borderRadius: 8,
+          fontVariantNumeric: 'tabular-nums',
+          flexShrink: 0,
+        }}>{cnt}</span>
+      )}
+      <span style={{
+        width: 22, height: 22, flexShrink: 0,
+        borderRadius: multi ? 6 : 11,
+        background: active ? 'var(--accent)' : 'var(--input-bg)',
+        border: '2px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        color: '#fff',
+        transition: 'all var(--dur-fast) var(--ease-out)',
+      }}>
+        {active && (multi
+          ? <IconCheck size={12} />
+          : <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }} />
+        )}
+      </span>
+    </button>
+  );
+
   const chipIn = (active: boolean): React.CSSProperties => ({
-    display: 'inline-flex', alignItems: 'center', gap: 4,
-    height: 30, padding: '0 var(--sp-3)',
-    background: active ? 'var(--accent)' : 'var(--input-bg)',
-    border: '1px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
-    borderRadius: 999,
-    color: active ? 'var(--avatar-text)' : 'var(--text)',
-    fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
-    fontWeight: active ? 700 : 500, cursor: 'pointer',
+    display: 'inline-flex', alignItems: 'center', gap: 5,
+    height: 36, padding: '0 var(--sp-3)',
+    background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
+    border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+    borderRadius: 'var(--r-md)',
+    color: active ? 'var(--accent)' : 'var(--text)',
+    fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+    fontWeight: active ? 700 : 600, cursor: 'pointer',
     whiteSpace: 'nowrap',
     transition: 'all var(--dur-fast) var(--ease-out)',
   });
 
-  // ─── Header ساده گروه — بدون کارت ───
-  const groupHeader = (label: string, activeNow: number, activeText: string, clearKey: string) => (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
-      marginBottom: 'var(--sp-2)',
-    }}>
-      <span style={{
-        fontSize: 'var(--fs-xs)', fontWeight: 800, color: 'var(--text)',
-        letterSpacing: 0.2,
-      }}>{label}</span>
-      <span style={{
-        fontSize: 'var(--fs-xs)', fontWeight: 500, color: 'var(--muted)',
-        flex: 1,
-      }}>· {activeText}</span>
-      {activeNow > 0 && (
-        <button type="button" onClick={() => clearFilter(clearKey)}
-          style={{
-            background: 'none', border: 'none',
-            color: 'var(--muted)', fontFamily: 'inherit',
-            fontSize: 'var(--fs-xs)', fontWeight: 700,
-            cursor: 'pointer', padding: '2px 4px',
-          }}>پاک</button>
-      )}
-    </div>
-  );
+  const renderGroupBody = (def: FilterDef<T>) => {
+    const v = filterState[def.key];
+
+    if (def.kind === 'enum') {
+      const isMulti = !!def.multi;
+      const layout = def.layout || (isMulti ? 'chips' : 'rows');
+
+      if (layout === 'rows') {
+        const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
+        const noneActive = isMulti ? arr.length === 0 : !v;
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <RowItem
+              active={noneActive}
+              multi={isMulti}
+              label="همه"
+              onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
+            />
+            {def.options?.map(o => {
+              const active = isMulti ? arr.includes(o.value) : v === o.value;
+              return (
+                <RowItem
+                  key={o.value}
+                  active={active}
+                  multi={isMulti}
+                  icon={o.icon}
+                  label={o.label}
+                  onClick={() => {
+                    if (isMulti) {
+                      const next = active ? arr.filter(x => x !== o.value) : [...arr, o.value];
+                      setFilter(def.key, next);
+                    } else {
+                      setFilter(def.key, active ? '' : o.value);
+                    }
+                  }}
+                />
+              );
+            })}
+          </div>
+        );
+      }
+
+      const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
+      const noneActive = isMulti ? arr.length === 0 : !v;
+      return (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          <button type="button"
+            onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
+            style={chipIn(noneActive)}>همه</button>
+          {def.options?.map(o => {
+            const active = isMulti ? arr.includes(o.value) : v === o.value;
+            return (
+              <button key={o.value} type="button"
+                onClick={() => {
+                  if (isMulti) {
+                    const next = active ? arr.filter(x => x !== o.value) : [...arr, o.value];
+                    setFilter(def.key, next);
+                  } else {
+                    setFilter(def.key, active ? '' : o.value);
+                  }
+                }}
+                style={chipIn(active)}>
+                {o.icon && <span style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: 14, height: 14,
+                }}>{o.icon}</span>}
+                <span>{o.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (def.kind === 'boolean') {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <RowItem active={v === undefined || v === null} multi={false}
+            label="همه" onClick={() => clearFilter(def.key)} />
+          <RowItem active={v === true} multi={false}
+            label="بله" onClick={() => setFilter(def.key, true)} />
+          <RowItem active={v === false} multi={false}
+            label="خیر" onClick={() => setFilter(def.key, false)} />
+        </div>
+      );
+    }
+
+    if (def.kind === 'dateRange') {
+      const [a, b] = (v as [string, string]) || ['', ''];
+      return (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <Input placeholder="از" value={a || ''}
+            onChange={e => setFilter(def.key, [e.target.value, b || ''])} />
+          <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0 }}>—</span>
+          <Input placeholder="تا" value={b || ''}
+            onChange={e => setFilter(def.key, [a || '', e.target.value])} />
+        </div>
+      );
+    }
+
+    if (def.kind === 'numberRange') {
+      const [a, b] = (v as [number, number]) || [null, null];
+      return (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <Input type="number" placeholder="از" value={a ?? ''}
+            onChange={e => setFilter(def.key, [e.target.value ? Number(e.target.value) : null, b ?? null])} />
+          <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0 }}>—</span>
+          <Input type="number" placeholder="تا" value={b ?? ''}
+            onChange={e => setFilter(def.key, [a ?? null, e.target.value ? Number(e.target.value) : null])} />
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const activeDef = filterDefs.find(d => d.key === activeTab) || filterDefs[0];
 
   return (
     <>
-      {/* ═══ نوار بالا — ۳۲px ═══ */}
       <div style={{
         display: 'flex', gap: 'var(--sp-2)',
         padding: 'var(--sp-2) var(--sp-3)',
@@ -169,15 +346,6 @@ export function FilterBar<T>({
           marginRight: 'auto', display: 'flex', alignItems: 'center',
           gap: 'var(--sp-2)', paddingLeft: 'var(--sp-1)',
         }}>
-          {hasActiveFilters && (
-            <button type="button" onClick={resetAll} aria-label="پاک‌سازی"
-              style={{
-                background: 'none', border: 'none', padding: '4px 6px',
-                color: 'var(--muted)', fontFamily: 'inherit',
-                fontSize: 'var(--fs-xs)', fontWeight: 700, cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}>پاک همه</button>
-          )}
           <span style={{
             fontSize: 'var(--fs-xs)', color: 'var(--muted)',
             fontWeight: 700, whiteSpace: 'nowrap',
@@ -188,7 +356,6 @@ export function FilterBar<T>({
         </div>
       </div>
 
-      {/* ═══ چیپ‌های فیلتر فعال ═══ */}
       {chips.length > 0 && (
         <div style={{
           display: 'flex', gap: 6, padding: '6px var(--sp-3)',
@@ -205,7 +372,6 @@ export function FilterBar<T>({
               borderRadius: 999,
               color: 'var(--accent)', fontSize: 11.5, fontWeight: 700,
               whiteSpace: 'nowrap', flexShrink: 0,
-              boxShadow: 'var(--elev-1)',
             }}>
               <span style={{
                 opacity: 0.65, fontWeight: 600, fontSize: 10.5,
@@ -231,122 +397,65 @@ export function FilterBar<T>({
         </div>
       )}
 
-      {/* ═══ Sheet فیلترها — Compact ═══ */}
       <Sheet open={openFilters} onClose={() => setOpenFilters(false)} title="فیلترها">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-          {filterDefs.map((def, idx) => {
-            const v = filterState[def.key];
-            const wrap = (children: ReactNode) => (
-              <div key={def.key} style={{
-                paddingTop: idx === 0 ? 0 : 'var(--sp-4)',
-                paddingBottom: 'var(--sp-4)',
-                borderTop: idx === 0 ? 'none' : '1px solid var(--border)',
-              }}>{children}</div>
-            );
-
-            // ═══ enum ═══
-            if (def.kind === 'enum') {
-              const isMulti = !!def.multi;
-              const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
-              const noneActive = isMulti ? arr.length === 0 : !v;
-              const activeNow = isMulti ? arr.length : (v ? 1 : 0);
-              const activeText = activeNow > 0 ? `${activeNow} مورد انتخاب` : 'همه';
-              return wrap(
-                <div>
-                  {groupHeader(def.label, activeNow, activeText, def.key)}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    <button type="button"
-                      onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
-                      style={chipIn(noneActive)}>همه</button>
-                    {def.options?.map(o => {
-                      const active = isMulti ? arr.includes(o.value) : v === o.value;
-                      return (
-                        <button key={o.value} type="button"
-                          onClick={() => {
-                            if (isMulti) {
-                              const next = active ? arr.filter(x => x !== o.value) : [...arr, o.value];
-                              setFilter(def.key, next);
-                            } else {
-                              setFilter(def.key, active ? '' : o.value);
-                            }
-                          }}
-                          style={chipIn(active)}>
-                          {o.icon && <span style={{ fontSize: 12, lineHeight: 1, display: 'inline-flex' }}>{o.icon}</span>}
-                          <span>{o.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+        {filterDefs.length > 1 && (
+          <div style={{
+            display: 'flex', gap: 6,
+            overflowX: 'auto', scrollbarWidth: 'none',
+            paddingBottom: 8, marginBottom: 4,
+            borderBottom: '1px solid var(--border)',
+          }}>
+            {filterDefs.map(def => {
+              const active = def.key === (activeDef?.key || '');
+              const cnt = countActiveInGroup(def);
+              return (
+                <button key={def.key} type="button"
+                  onClick={() => setActiveTab(def.key)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    height: 34, padding: '0 12px',
+                    background: active ? 'var(--accent)' : 'var(--card-solid, #fff)',
+                    border: '1px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
+                    borderRadius: 'var(--r-sm)',
+                    color: active ? 'var(--avatar-text)' : 'var(--text)',
+                    fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 700,
+                    cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+                    transition: 'all var(--dur-fast) var(--ease-out)',
+                  }}>
+                  {def.icon && (
+                    <span style={{ display: 'inline-flex', width: 14, height: 14 }}>{def.icon}</span>
+                  )}
+                  <span>{def.label}</span>
+                  {cnt > 0 && (
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      minWidth: 16, height: 16, padding: '0 4px',
+                      background: active ? 'rgba(255,255,255,.28)' : 'var(--accent-soft)',
+                      color: active ? 'var(--avatar-text)' : 'var(--accent)',
+                      borderRadius: 8, fontSize: 10, fontWeight: 800,
+                    }}>{cnt}</span>
+                  )}
+                </button>
               );
-            }
+            })}
+          </div>
+        )}
 
-            // ═══ boolean ═══
-            if (def.kind === 'boolean') {
-              const activeNow = v === true || v === false;
-              const activeText = activeNow ? (v ? 'فقط بله' : 'فقط خیر') : 'همه';
-              return wrap(
-                <div>
-                  {groupHeader(def.label, activeNow ? 1 : 0, activeText, def.key)}
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <button type="button" onClick={() => clearFilter(def.key)}
-                      style={chipIn(v === undefined || v === null)}>همه</button>
-                    <button type="button" onClick={() => setFilter(def.key, true)}
-                      style={chipIn(v === true)}>بله</button>
-                    <button type="button" onClick={() => setFilter(def.key, false)}
-                      style={chipIn(v === false)}>خیر</button>
-                  </div>
-                </div>
-              );
-            }
-
-            // ═══ dateRange ═══
-            if (def.kind === 'dateRange') {
-              const [a, b] = (v as [string, string]) || ['', ''];
-              const activeNow = !!(a || b);
-              const activeText = activeNow ? `${a || '?'} تا ${b || '?'}` : 'همه';
-              return wrap(
-                <div>
-                  {groupHeader(def.label, activeNow ? 1 : 0, activeText, def.key)}
-                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                    <Input placeholder="از" value={a || ''}
-                      onChange={e => setFilter(def.key, [e.target.value, b || ''])} />
-                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0 }}>—</span>
-                    <Input placeholder="تا" value={b || ''}
-                      onChange={e => setFilter(def.key, [a || '', e.target.value])} />
-                  </div>
-                </div>
-              );
-            }
-
-            // ═══ numberRange ═══
-            if (def.kind === 'numberRange') {
-              const [a, b] = (v as [number, number]) || [null, null];
-              const activeNow = a != null || b != null;
-              const activeText = activeNow ? `${a ?? '?'} تا ${b ?? '?'}` : 'همه';
-              return wrap(
-                <div>
-                  {groupHeader(def.label, activeNow ? 1 : 0, activeText, def.key)}
-                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                    <Input type="number" placeholder="از" value={a ?? ''}
-                      onChange={e => setFilter(def.key, [e.target.value ? Number(e.target.value) : null, b ?? null])} />
-                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0 }}>—</span>
-                    <Input type="number" placeholder="تا" value={b ?? ''}
-                      onChange={e => setFilter(def.key, [a ?? null, e.target.value ? Number(e.target.value) : null])} />
-                  </div>
-                </div>
-              );
-            }
-            return null;
-          })}
+        <div style={{ paddingTop: 'var(--sp-3)' }}>
+          {activeDef && renderGroupBody(activeDef)}
         </div>
 
         <div style={{
           display: 'flex', gap: 'var(--sp-2)',
           paddingTop: 'var(--sp-4)',
           borderTop: '1px solid var(--border)',
-          marginTop: 'var(--sp-2)',
+          marginTop: 'var(--sp-4)',
         }}>
+          <Btn variant="primary" onClick={() => setOpenFilters(false)} full>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <IconCheck size={14} /> تأیید
+            </span>
+          </Btn>
           <button type="button" onClick={resetAll} style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             gap: 6, height: 44, padding: '0 16px',
@@ -355,17 +464,11 @@ export function FilterBar<T>({
             borderRadius: 'var(--r-md)',
             color: 'var(--danger)', fontFamily: 'inherit',
             fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer',
-            flex: 1,
-          }}>پاک‌سازی همه</button>
-          <Btn variant="primary" onClick={() => setOpenFilters(false)} full>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <IconCheck size={14} /> تأیید
-            </span>
-          </Btn>
+            flexShrink: 0,
+          }}>پاک‌سازی</button>
         </div>
       </Sheet>
 
-      {/* ═══ Sheet مرتب‌سازی — Compact ═══ */}
       <Sheet open={openSort} onClose={() => setOpenSort(false)} title="مرتب‌سازی">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {sortDefs.map(def => {
@@ -375,18 +478,27 @@ export function FilterBar<T>({
               <button key={def.key} type="button" onClick={() => toggleSort(def.key)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
-                  width: '100%', padding: '10px 12px', minHeight: 44,
-                  background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
-                  border: '1px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
-                  borderRadius: 'var(--r-md)',
+                  width: '100%', padding: '10px 12px', minHeight: 48,
+                  background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
+                  border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
+                  borderRadius: 'var(--r-lg)',
                   color: 'var(--text)',
                   fontFamily: 'inherit', cursor: 'pointer',
                   textAlign: 'right',
                   transition: 'all var(--dur-fast) var(--ease-out)',
                 }}>
+                {def.icon && (
+                  <span style={{
+                    width: 34, height: 34, borderRadius: 'var(--r-sm)',
+                    background: active ? 'var(--accent)' : 'var(--input-bg)',
+                    color: active ? 'var(--avatar-text)' : 'var(--muted)',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>{def.icon}</span>
+                )}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
-                    fontSize: 'var(--fs-sm)', fontWeight: 700,
+                    fontSize: 'var(--fs-base)', fontWeight: 700,
                     color: active ? 'var(--accent)' : 'var(--text)',
                     lineHeight: 1.2,
                   }}>{def.label}</div>
@@ -395,14 +507,14 @@ export function FilterBar<T>({
                     marginTop: 2, fontWeight: 500,
                   }}>
                     {active
-                      ? (dir === 'asc' ? 'صعودی' : 'نزولی')
-                      : (def.hint || 'لمس کن')}
+                      ? (dir === 'asc' ? 'صعودی — از کوچک به بزرگ' : 'نزولی — از بزرگ به کوچک')
+                      : (def.hint || 'برای مرتب‌سازی لمس کن')}
                   </div>
                 </div>
                 {active && (
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    width: 22, height: 22, flexShrink: 0,
+                    width: 24, height: 24, flexShrink: 0,
                     background: 'var(--accent)',
                     color: 'var(--avatar-text)',
                     borderRadius: '50%',
