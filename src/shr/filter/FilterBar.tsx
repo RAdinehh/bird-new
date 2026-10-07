@@ -451,66 +451,92 @@ export function FilterBar<T>({
       )}
 
       <Sheet open={openFilters} onClose={() => setOpenFilters(false)} title="فیلترها">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+        {/* پیش‌نمایش زنده فیلترهای فعال */}
+        {chips.length > 0 && (
+          <div style={{
+            display: 'flex', gap: 4, flexWrap: 'wrap',
+            padding: '6px 8px', marginBottom: 6,
+            background: 'var(--accent-soft)',
+            border: '1px solid var(--accent-border)',
+            borderRadius: 'var(--r-md)',
+          }}>
+            {chips.map(c => (
+              <button key={c.key} type="button"
+                onClick={() => clearFilter(c.key)}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 3,
+                  padding: '3px 6px 3px 8px',
+                  background: 'var(--card-solid, #fff)',
+                  border: '1px solid var(--accent-border)',
+                  borderRadius: 999,
+                  color: 'var(--accent)', fontSize: 10.5, fontWeight: 700,
+                  fontFamily: 'inherit', cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}>
+                {c.icon && <span style={{
+                  display: 'inline-flex', alignItems: 'center',
+                  fontSize: typeof c.icon === 'string' ? 12 : undefined,
+                }}>{c.icon}</span>}
+                <span>{c.text}</span>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: 14, height: 14,
+                  background: 'var(--accent)', color: 'var(--avatar-text)',
+                  borderRadius: '50%', fontSize: 9, fontWeight: 800,
+                }}>✕</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* گروه‌های آکاردئونی */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {filterDefs.map((def, idx) => {
             const cnt = countActiveInGroup(def);
             return (
               <div key={def.key} style={{
-                paddingTop: idx === 0 ? 0 : 16,
-                paddingBottom: 8,
                 borderTop: idx === 0 ? 'none' : '1px solid var(--border)',
-                marginTop: idx === 0 ? 0 : 12,
               }}>
                 {/* تیتر گروه */}
                 <div style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  marginBottom: 10,
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '8px 4px',
                 }}>
                   {def.icon && (
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                      width: 22, height: 22, flexShrink: 0,
-                      background: cnt > 0 ? 'var(--accent-soft)' : 'transparent',
+                      flexShrink: 0,
+                      fontSize: typeof def.icon === 'string' ? 16 : undefined,
                       color: cnt > 0 ? 'var(--accent)' : 'var(--muted)',
-                      borderRadius: 'var(--r-sm)',
-                      fontSize: typeof def.icon === 'string' ? 14 : undefined,
                     }}>{def.icon}</span>
                   )}
                   <span style={{
-                    fontSize: 'var(--fs-xs)', fontWeight: 700,
-                    color: 'var(--text)', lineHeight: 1.2,
+                    flex: 1, fontSize: 'var(--fs-base)', fontWeight: 700,
+                    color: cnt > 0 ? 'var(--accent)' : 'var(--text)',
                   }}>{def.label}</span>
                   {cnt > 0 && (
                     <span style={{
-                      fontSize: 10, color: 'var(--accent)',
-                      fontWeight: 700,
-                      background: 'var(--accent-soft)',
-                      padding: '1px 6px', borderRadius: 6,
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      minWidth: 18, height: 18, padding: '0 5px',
+                      background: 'var(--accent)', color: 'var(--avatar-text)',
+                      borderRadius: 9, fontSize: 10, fontWeight: 800,
                     }}>{cnt}</span>
                   )}
-                  <div style={{ flex: 1 }} />
-                  {cnt > 0 && (
-                    <button type="button" onClick={() => clearFilter(def.key)}
-                      style={{
-                        background: 'none', border: 'none',
-                        color: 'var(--muted)', fontFamily: 'inherit',
-                        fontSize: 11, fontWeight: 600,
-                        cursor: 'pointer', padding: '2px 6px',
-                      }}>پاک</button>
-                  )}
                 </div>
-                {/* بدنه */}
-                {renderGroupBody(def)}
+                {/* محتوا — همیشه باز */}
+                <div style={{ paddingBottom: 10, paddingTop: 2 }}>
+                  {renderGroupBody(def)}
+                </div>
               </div>
             );
           })}
         </div>
-
+        {/* دکمه‌های پایین */}
         <div style={{
-          display: 'flex', gap: 'var(--sp-2)',
-          paddingTop: 'var(--sp-4)',
+          display: 'flex', gap: 8,
+          paddingTop: 12,
           borderTop: '1px solid var(--border)',
-          marginTop: 'var(--sp-4)',
+          marginTop: 8,
         }}>
           <Btn variant="primary" onClick={() => setOpenFilters(false)} full>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -530,6 +556,7 @@ export function FilterBar<T>({
         </div>
       </Sheet>
 
+      {/* ═══ Sheet مرتب‌سازی ═══ */}
       <Sheet open={openSort} onClose={() => setOpenSort(false)} title="مرتب‌سازی">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {sortDefs.map(def => {

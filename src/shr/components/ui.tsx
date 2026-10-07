@@ -1105,15 +1105,10 @@ export function Sheet({
   React.useEffect(() => {
     if (open) {
       setMounted(true);
-      // یک فریم صبر کن، بعد انیمیشن شروع
-      const t = requestAnimationFrame(() => {
-        requestAnimationFrame(() => setAnimating(true));
-      });
-      return () => cancelAnimationFrame(t);
+      setAnimating(true);
     } else {
       setAnimating(false);
-      const t = setTimeout(() => setMounted(false), 220);
-      return () => clearTimeout(t);
+      setMounted(false);
     }
   }, [open]);
 
@@ -1146,8 +1141,7 @@ export function Sheet({
         alignItems: 'flex-end',
         justifyContent: 'center',
         touchAction: 'none',
-        opacity: animating ? 1 : 0,
-        transition: 'opacity 200ms ease',
+        opacity: 1,
       }}
     >
       <div
@@ -1160,13 +1154,11 @@ export function Sheet({
           borderTopRightRadius: 20,
           padding: '10px 14px 18px',
           boxShadow: '0 -8px 30px rgba(0,0,0,.25)',
-          maxHeight: '80vh',
+          maxHeight: '55vh',
           display: 'flex',
           flexDirection: 'column',
           gap: 8,
-          transform: animating ? 'translateY(0)' : 'translateY(100%)',
-          transition: 'transform 320ms cubic-bezier(.34, 1.4, .64, 1)',
-          willChange: 'transform',
+          transform: 'translateY(0)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 4px' }}>
