@@ -45,7 +45,6 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const [fcrFromStd, setFcrFromStd] = useState(false);
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
-  const [filterBird, setFilterBird] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // فیلتر تکرارها تو render (per bird + name)
@@ -82,17 +81,11 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   };
 
 
-  // مرحله ۱: tab (نگه‌داشته شده)
-  const tabFiltered = useMemo(
-    () => filterBird ? breeds.filter(x => x.birdId === filterBird) : breeds,
-    [breeds, filterBird]
-  );
-
-  // مرحله ۲: FilterBar
+  // فیلتر/مرتب
   const config = useMemo(() => getBrdBreedsConfig({ birds: _birdsUnique }), [_birdsUnique]);
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total, count } = useFilterSort<Breed>({
-    items: tabFiltered,
+    items: breeds,
     filters: config.filterDefs,
     sorts: config.sortDefs,
     persistKey: config.persistKey,
@@ -194,12 +187,6 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
   return (
     <PageContainer>
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterBird('')} style={chip(!filterBird)}>همه</button>
-        {_birdsUnique.map(b => (
-          <button key={b.id} onClick={() => setFilterBird(b.id)} style={chip(filterBird === b.id)}>{b.name}</button>
-        ))}
-      </div>
       <FilterBar
         filterDefs={config.filterDefs}
         sortDefs={config.sortDefs}
