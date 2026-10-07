@@ -19,6 +19,7 @@ import type { Zone, Hall, Equipment } from '../../mod/hal/store';
 import { type Flock, isLayingReady } from '../../mod/flk/store';
 import type { EggProduction } from '../../mod/egg/store';
 import type { DailyLog } from '../../mod/dlg/store';
+import { type HatchResult, type Device, type EggEntry } from '../../mod/inc/store';
 import { EQUIP_LABELS } from '../../mod/hal/store';
 import { ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES } from '../../mod/ctc/store';
 import type { FilterDef, SortDef, SortState } from './types';
@@ -781,6 +782,80 @@ export function getDlgLogsConfig(ctx: {
       },
     ],
     persistKey: 'dlg-logs',
+    initialSort: { key: 'date', dir: 'desc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// inc/HatchesPage — هچ (نتیجه نهایی)
+// ═══════════════════════════════════════════════════
+export function getIncHatchesConfig(ctx: {
+  devices: Array<{ id: string; name: string }>;
+  eggEntriesById: Record<string, EggEntry>;
+}): FilterConfig<HatchResult> {
+  return {
+    filterDefs: [
+      {
+        key: 'deviceId', label: 'دستگاه', kind: 'enum',
+        icon: <IconPackage size={18} />,
+        options: ctx.devices.map(d => ({ value: d.id, label: d.name })),
+        getValue: (h: HatchResult) => {
+          const entry = ctx.eggEntriesById[h.eggEntryId];
+          return entry?.deviceId || '';
+        },
+        multi: true,
+      },
+      {
+        key: 'hasGrade', label: 'درجه‌بندی', kind: 'enum',
+        icon: <IconTag size={18} />,
+        options: [
+          { value: 'yes', label: 'دارد' },
+          { value: 'no', label: 'ندارد' },
+        ],
+        getValue: (h: HatchResult) => (h.gradeA || h.gradeB) ? 'yes' : 'no',
+      },
+      {
+        key: 'hasFlock', label: 'گله ساخته', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: [
+          { value: 'yes', label: 'ساخته شده' },
+          { value: 'no', label: 'ساخته نشده' },
+        ],
+        getValue: (h: HatchResult) => h.generatedFlockId ? 'yes' : 'no',
+      },
+      {
+        key: 'hasInvoice', label: 'فاکتور فروش', kind: 'enum',
+        icon: <IconDollar size={18} />,
+        options: [
+          { value: 'yes', label: 'دارد' },
+          { value: 'no', label: 'ندارد' },
+        ],
+        getValue: (h: HatchResult) => h.generatedInvoiceId ? 'yes' : 'no',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'date', label: 'تاریخ', icon: <IconCalendar size={18} />,
+        hint: 'جدیدترین اول',
+        compare: (a: HatchResult, b: HatchResult) => (a.date || '').localeCompare(b.date || ''),
+      },
+      {
+        key: 'hatched', label: 'تعداد هچ', icon: <IconChart size={18} />,
+        hint: 'بر اساس تعداد جوجه',
+        compare: (a: HatchResult, b: HatchResult) => (a.hatched || 0) - (b.hatched || 0),
+      },
+      {
+        key: 'deadInShell', label: 'تلفات جنینی', icon: <IconChart size={18} />,
+        hint: 'بر اساس تعداد',
+        compare: (a: HatchResult, b: HatchResult) => (a.deadInShell || 0) - (b.deadInShell || 0),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین ثبت', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: HatchResult, b: HatchResult) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'inc-hatches',
     initialSort: { key: 'date', dir: 'desc' },
   };
 }

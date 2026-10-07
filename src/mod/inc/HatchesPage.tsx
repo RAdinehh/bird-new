@@ -19,6 +19,7 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import { Row, chip } from './helpers';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import { useFilterSort, FilterBar, getIncHatchesConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { format as formatJ } from 'date-fns-jalali';
 import { useIncubationProfile } from './hooks';
@@ -44,7 +45,6 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ hatch: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [q, setQ] = useState('');
   const [deviceFilter, setDeviceFilter] = useState('');
 
   const [flockModal, setFlockModal] = useState<{ hatchId: string; count: number } | null>(null);
@@ -283,17 +283,22 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
     showAlert('فاکتور ثبت شد', '✅ موفق');
   };
 
-  const filtered = useMemo(() => hatches.filter(h => {
-    const entry = _entriesById[h.eggEntryId];
-    if (deviceFilter && entry?.deviceId !== deviceFilter) return false;
-    if (q.trim()) {
-      const t = q.trim().toLowerCase();
-      const bird = entry ? _birdsById[entry.birdId] : null;
-      const dev = entry ? _devicesById[entry.deviceId] : null;
-      if (![bird?.name, dev?.name, h.date, h.notes].filter(Boolean).join(' ').toLowerCase().includes(t)) return false;
-    }
-    return true;
-  }).sort((a, b) => String(b.date).localeCompare(String(a.date))), [hatches, eggEntries, deviceFilter, q, birds, devices]);
+  // فیلتر/مرتب
+  const config = useMemo(
+    () => getIncHatchesConfig({
+      devices: devices.map(d => ({ id: d.id, name: d.name })),
+      eggEntriesById: _entriesById,
+    }),
+    [devices, _entriesById]
+  );
+  const { filtered, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<HatchResult>({
+    items: hatches,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -375,13 +380,20 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
       )}
 
       {hatches.length > 0 && (
-        <>
-          <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو..." />
-          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-            <button onClick={() => setDeviceFilter('')} style={chip(!deviceFilter)}>همه</button>
-            {devices.map(d => <button key={d.id} onClick={() => setDeviceFilter(deviceFilter === d.id ? '' : d.id)} style={chip(deviceFilter === d.id)}>{d.name}</button>)}
-          </div>
-        </>
+        <FilterBar
+          filterDefs={config.filterDefs}
+          sortDefs={config.sortDefs}
+          filterState={filters}
+          sortState={sort}
+          setFilter={setFilter}
+          clearFilter={clearFilter}
+          setSort={setSort}
+          toggleSort={toggleSort}
+          resetAll={resetAll}
+          hasActiveFilters={hasActiveFilters}
+          total={total}
+          count={count}
+        />
       )}
 
       {filtered.length === 0 ? (
