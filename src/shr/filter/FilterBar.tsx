@@ -190,12 +190,12 @@ export function FilterBar<T>({
         const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
         const noneActive = isMulti ? arr.length === 0 : !v;
         return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 5 }}>
             <button type="button"
               onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                minHeight: 40, padding: '8px 10px',
+                minHeight: 42, padding: '6px 6px',
                 background: noneActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                 border: '1px solid ' + (noneActive ? 'var(--accent-border)' : 'var(--border)'),
                 borderRadius: 'var(--r-md)',
@@ -221,12 +221,12 @@ export function FilterBar<T>({
                   }}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                    minHeight: 40, padding: '8px 10px',
+                    minHeight: 42, padding: '6px 6px',
                     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
                     borderRadius: 'var(--r-md)',
                     color: active ? 'var(--accent)' : 'var(--text)',
-                    fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                    fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
                     fontWeight: active ? 700 : 600, cursor: 'pointer',
                     textAlign: 'center',
                     whiteSpace: 'nowrap',
