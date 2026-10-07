@@ -1,7 +1,7 @@
 /**
  * EquipmentPage — تجهیزات
  */
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
@@ -13,7 +13,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
-import { useFilterSort, FilterBar, getHalEquipmentConfig } from '../../shr/filter';
+import { chip } from './helpers';
 import EditableSelect from '../../shr/components/EditableSelect';
 import { EquipmentIcon, CATEGORY_COLORS } from '../../shr/icons/equipment';
 import { useCustomOptions } from '../../shr/store/customOptions';
@@ -170,6 +170,8 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const [err, setErr] = useState('');
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
+  const [filter, setFilter] = useState('');
+  const [filterKind, setFilterKind] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
 
@@ -247,16 +249,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     },
   );
 
-  // ─── فیلتر/مرتب (از config مرکزی) ───
-  const config = useMemo(() => getHalEquipmentConfig({ halls }), [halls]);
-  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
-          resetAll, hasActiveFilters, total, count } = useFilterSort<Equipment>({
-    items: equipment,
-    filters: config.filterDefs,
-    sorts: config.sortDefs,
-    persistKey: config.persistKey,
-    initialSort: config.initialSort,
-  });
+  const list = equipment.filter(e => (!filter || e.hallId === filter) && (!filterKind || ((e as any).kind || 'asset') === filterKind));
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -393,21 +386,19 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         description="تجهیزات هر سالن (فن، لامپ، آبخوری، دانخوری، بستر و...) را اینجا ثبت کنید. با انتخاب نوع دارایی و دسته، زیرنوع‌های مربوطه نمایش داده می‌شوند."
         tone="info"
       />
-      <FilterBar
-        filterDefs={config.filterDefs}
-        sortDefs={config.sortDefs}
-        filterState={filters}
-        sortState={sort}
-        setFilter={setFilter}
-        clearFilter={clearFilter}
-        setSort={setSort}
-        toggleSort={toggleSort}
-        resetAll={resetAll}
-        hasActiveFilters={hasActiveFilters}
-        total={total}
-        count={count}
-      />
 
+      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+        <button onClick={() => setFilterKind('')} style={chip(!filterKind)}>همه انواع</button>
+        {Object.entries(KIND_LABELS).map(([k, v]: any) => (
+          <button key={k} onClick={() => setFilterKind(k)} style={chip(filterKind === k)}>{v.icon} {v.name}</button>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+        <button onClick={() => setFilter('')} style={chip(!filter)}>همه سالن‌ها</button>
+        {halls.map(h => (
+          <button key={h.id} onClick={() => setFilter(h.id)} style={chip(filter === h.id)}>{h.name}</button>
+        ))}
+      </div>
 
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>

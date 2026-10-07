@@ -7,7 +7,6 @@ import { Btn, BtnRow, Empty, Field,
   PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
-import { useFilterSort, FilterBar, getBrdBreedsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
@@ -45,6 +44,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const [fcrFromStd, setFcrFromStd] = useState(false);
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
+  const [filterBird, setFilterBird] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // فیلتر تکرارها تو render (per bird + name)
@@ -81,16 +81,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   };
 
 
-  // ─── فیلتر/مرتب (از config مرکزی) ───
-  const config = useMemo(() => getBrdBreedsConfig({ birds: _birdsUnique }), [_birdsUnique]);
-  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
-          resetAll, hasActiveFilters, total, count } = useFilterSort<Breed>({
-    items: breeds,
-    filters: config.filterDefs,
-    sorts: config.sortDefs,
-    persistKey: config.persistKey,
-    initialSort: config.initialSort,
-  });
+  const list = filterBird ? breeds.filter(x => x.birdId === filterBird) : breeds;
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -143,20 +134,6 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
           onDismiss={() => setUndoData(null)}
         />
       )}
-      <FilterBar
-        filterDefs={config.filterDefs}
-        sortDefs={config.sortDefs}
-        filterState={filters}
-        sortState={sort}
-        setFilter={setFilter}
-        clearFilter={clearFilter}
-        setSort={setSort}
-        toggleSort={toggleSort}
-        resetAll={resetAll}
-        hasActiveFilters={hasActiveFilters}
-        total={total}
-        count={count}
-      />
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
           title="اول باید پرنده بسازید"
@@ -201,6 +178,12 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
   return (
     <PageContainer>
+      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+        <button onClick={() => setFilterBird('')} style={chip(!filterBird)}>همه</button>
+        {_birdsUnique.map(b => (
+          <button key={b.id} onClick={() => setFilterBird(b.id)} style={chip(filterBird === b.id)}>{b.name}</button>
+        ))}
+      </div>
 
               {!ms.selectionMode && list.length > 1 && (
           <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
