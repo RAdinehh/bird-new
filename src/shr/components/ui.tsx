@@ -1090,13 +1090,15 @@ export function DeleteBtn({ onClick, title = 'حذف', size = 'md' }: {
    با createPortal روی body رندر میشه، پس داخل گروه‌ها گیر نمی‌کنه
    ═══════════════════════════════════════════════════════════════ */
 export function Sheet({
-  open, onClose, title, footer, children,
+  open, onClose, title, footer, children, noScroll = false,
 }: {
   open: boolean;
   onClose: () => void;
   title?: string;
   footer?: React.ReactNode;
   children: React.ReactNode;
+  /** اگه true، بدنه اسکرول نمی‌شه و ارتفاع به محتوا میاد */
+  noScroll?: boolean;
 }) {
   // انیمیشن ورود: اول mount با translateY(100%)، بعد به translateY(0)
   const [mounted, setMounted] = React.useState(false);
@@ -1154,7 +1156,7 @@ export function Sheet({
           borderTopRightRadius: 20,
           padding: '10px 14px 18px',
           boxShadow: '0 -8px 30px rgba(0,0,0,.25)',
-          maxHeight: '55vh',
+          maxHeight: noScroll ? 'none' : '55vh',
           display: 'flex',
           flexDirection: 'column',
           gap: 8,
@@ -1198,7 +1200,7 @@ export function Sheet({
           </button>
         </div>
         <div style={{
-          overflowY: 'auto',
+          overflowY: noScroll ? 'visible' : 'auto',
           overscrollBehavior: 'contain',
           WebkitOverflowScrolling: 'touch',
           flex: 1,

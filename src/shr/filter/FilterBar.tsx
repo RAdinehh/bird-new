@@ -450,7 +450,7 @@ export function FilterBar<T>({
         </div>
       )}
 
-      <Sheet open={openFilters} onClose={() => setOpenFilters(false)} title="فیلترها">
+      <Sheet open={openFilters} onClose={() => setOpenFilters(false)} title="فیلترها" noScroll>
         {/* پیش‌نمایش زنده فیلترهای فعال */}
         {chips.length > 0 && (
           <div style={{
