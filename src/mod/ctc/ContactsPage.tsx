@@ -11,6 +11,7 @@ import { Btn, BtnRow, DigitField, Empty,
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getCtcContactsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -109,7 +110,8 @@ export default function ContactsPage() {
     setOpen(false);
   };
 
-  const list = useMemo(() => {
+  // مرحله ۱: tab + search (نگه‌داشته شده)
+  const tabFiltered = useMemo(() => {
     let arr = contacts;
     if (tab !== 'all') arr = arr.filter(c => c.roles.includes(tab as Role));
     if (q.trim()) {
@@ -118,6 +120,17 @@ export default function ContactsPage() {
     }
     return arr;
   }, [contacts, tab, q]);
+
+  // مرحله ۲: FilterBar (فیلتر عمیق)
+  const config = useMemo(() => getCtcContactsConfig(), []);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Person>({
+    items: tabFiltered,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -205,6 +218,20 @@ export default function ContactsPage() {
           onDismiss={() => setUndoData(null)}
         />
       )}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
         <div style={{ height: 38, background: 'var(--input-bg)', border: '1px solid var(--border)',
            borderRadius: 'var(--r-md)', padding: '0 12px', display: 'flex',
            alignItems: 'center', gap: 8 }}>
