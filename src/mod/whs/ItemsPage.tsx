@@ -105,7 +105,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         return {
           value: c,
           label: CATEGORY_LABEL[c].replace(/[🥚🌾💊💉🌿🔧📦]/g, '').trim(),
-          icon: IconComp ? <IconComp size={14} /> : undefined,
+          icon: IconComp ? <IconComp size={15} /> : undefined,
         };
       }),
       getValue: (it: Item) => it.category,

@@ -198,24 +198,34 @@ export function FilterBar<T>({
           {chips.map(c => (
             <div key={c.key} style={{
               display: 'inline-flex', alignItems: 'center', gap: 4,
-              padding: '3px 4px 3px 8px', height: 24,
-              background: 'var(--accent-soft)',
-              border: '1px solid var(--accent-border)',
+              padding: '4px 4px 4px 10px', height: 28,
+              maxWidth: 220,
+              background: 'var(--card)',
+              border: '1px solid var(--accent)',
               borderRadius: 999,
-              color: 'var(--accent)', fontSize: 11, fontWeight: 700,
+              color: 'var(--accent)', fontSize: 11.5, fontWeight: 700,
               whiteSpace: 'nowrap', flexShrink: 0,
+              boxShadow: 'var(--elev-1)',
             }}>
-              {c.icon && <span style={{ fontSize: 12, lineHeight: 1, display: 'inline-flex' }}>{c.icon}</span>}
-              <span>{c.text}</span>
+              <span style={{
+                opacity: 0.65, fontWeight: 600, fontSize: 10.5,
+                overflow: 'hidden', textOverflow: 'ellipsis',
+                maxWidth: 70,
+              }}>{c.label}</span>
+              <span style={{ opacity: 0.3 }}>·</span>
+              <span style={{
+                overflow: 'hidden', textOverflow: 'ellipsis',
+                maxWidth: 110,
+              }}>{c.text}</span>
               <button type="button" onClick={() => clearFilter(c.key)}
                 aria-label="حذف فیلتر"
                 style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  width: 16, height: 16,
+                  width: 18, height: 18, flexShrink: 0, marginRight: 2,
                   background: 'var(--accent)', color: 'var(--avatar-text)',
                   border: 'none', borderRadius: '50%',
                   cursor: 'pointer', padding: 0, lineHeight: 1,
-                }}><IconX size={9} /></button>
+                }}><IconX size={10} /></button>
             </div>
           ))}
         </div>
