@@ -7,11 +7,11 @@
 import type { ReactNode } from 'react';
 import {
   IconFolder, IconActivity, IconTag, IconChart, IconDollar, IconClock,
-  IconUser, IconCalendar,
+  IconUser, IconCalendar, IconPackage,
 } from '../icons';
 import {
-  CATEGORY_LABEL, CATEGORY_ICON, stockWarning,
-  type Item, type ItemCategory,
+  CATEGORY_LABEL, CATEGORY_ICON, stockWarning, MOVEMENT_REASON,
+  type Item, type ItemCategory, type Movement, type MovementType,
 } from '../../mod/whs/store';
 import type { Person } from '../../mod/ctc/store';
 import type { FilterDef, SortDef, SortState } from './types';
@@ -88,5 +88,70 @@ export function getWhsItemsConfig(ctx: { suppliers: Person[] }): FilterConfig<It
     ],
     persistKey: 'whs-items',
     initialSort: { key: 'createdAt', dir: 'desc' },
+  };
+}
+
+
+// ═══════════════════════════════════════════════════
+// whs/MovesPage — گردش انبار
+// ═══════════════════════════════════════════════════
+export function getWhsMovesConfig(ctx: { items: Item[] }): FilterConfig<Movement> {
+  const itemCategoryOf = (m: Movement): string => {
+    const it = ctx.items.find(x => x.id === m.itemId);
+    return it?.category || '';
+  };
+
+  return {
+    filterDefs: [
+      {
+        key: 'type', label: 'نوع', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: [
+          { value: 'in', label: 'ورود', icon: '📥' },
+          { value: 'out', label: 'خروج', icon: '📤' },
+        ],
+        getValue: (m: Movement) => m.type,
+      },
+      {
+        key: 'reason', label: 'دلیل', kind: 'enum',
+        icon: <IconTag size={18} />,
+        options: (Object.keys(MOVEMENT_REASON) as Array<keyof typeof MOVEMENT_REASON>).map(r => ({
+          value: r,
+          label: MOVEMENT_REASON[r],
+        })),
+        getValue: (m: Movement) => m.reason,
+        multi: true,
+      },
+      {
+        key: 'category', label: 'دسته کالا', kind: 'enum',
+        icon: <IconFolder size={18} />,
+        options: (Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => ({
+          value: c,
+          label: CATEGORY_LABEL[c],
+          icon: CATEGORY_ICON[c],
+        })),
+        getValue: itemCategoryOf,
+        multi: true,
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'date', label: 'تاریخ', icon: <IconCalendar size={18} />,
+        hint: 'بر اساس تاریخ ثبت',
+        compare: (a: Movement, b: Movement) => (a.date || '').localeCompare(b.date || ''),
+      },
+      {
+        key: 'quantity', label: 'مقدار', icon: <IconChart size={18} />,
+        hint: 'بر اساس تعداد',
+        compare: (a: Movement, b: Movement) => (a.quantity || 0) - (b.quantity || 0),
+      },
+      {
+        key: 'unitPrice', label: 'قیمت واحد', icon: <IconDollar size={18} />,
+        hint: 'قیمت هر واحد',
+        compare: (a: Movement, b: Movement) => (a.unitPrice || 0) - (b.unitPrice || 0),
+      },
+    ],
+    persistKey: 'whs-moves',
+    initialSort: { key: 'date', dir: 'desc' },
   };
 }

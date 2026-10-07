@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { Row, SectionTitle } from './helpers';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
+import { useFilterSort, FilterBar, getWhsMovesConfig } from '../../shr/filter';
 import { createMovementSchema } from '../../shr/validation/rules/whs';
 
 interface F {
@@ -51,9 +52,21 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const list = useMemo(() => {
-    return [...movements].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 100);
-  }, [movements]);
+  // ─── فیلتر / مرتب‌سازی (از config مرکزی) ───
+  const config = useMemo(
+    () => getWhsMovesConfig({ items }),
+    [items]
+  );
+
+  const { filtered: list, filters, setFilter, clearFilter,
+          sort, setSort, toggleSort, resetAll, hasActiveFilters,
+          total, count } = useFilterSort<Movement>({
+    items: movements,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -217,6 +230,20 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
           tone="warn"
         actionLabel="برو به معاملات ←"
         onAction={() => navigate('/tra/purchases')}
+        />
+        <FilterBar
+          filterDefs={config.filterDefs}
+          sortDefs={config.sortDefs}
+          filterState={filters}
+          sortState={sort}
+          setFilter={setFilter}
+          clearFilter={clearFilter}
+          setSort={setSort}
+          toggleSort={toggleSort}
+          resetAll={resetAll}
+          hasActiveFilters={hasActiveFilters}
+          total={total}
+          count={count}
         />
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
