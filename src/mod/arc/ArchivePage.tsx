@@ -61,22 +61,20 @@ export default function ArchivePage() {
         <div style={{ fontSize: 40 }}>🗄</div>
       </div>
 
-      {archivedRaw.length > 0 && (
-        <FilterBar
-          filterDefs={config.filterDefs}
-          sortDefs={config.sortDefs}
-          filterState={filters}
-          sortState={sort}
-          setFilter={setFilter}
-          clearFilter={clearFilter}
-          setSort={setSort}
-          toggleSort={toggleSort}
-          resetAll={resetAll}
-          hasActiveFilters={hasActiveFilters}
-          total={totalFiltered}
-          count={count}
-        />
-      )}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={totalFiltered}
+        count={count}
+      />
 
       {archivedFlocks.length === 0 ? (
         <Empty

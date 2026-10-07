@@ -166,22 +166,20 @@ export default function FilesPage() {
       </div>
 
       {/* FilterBar */}
-      {files.length > 0 && (
-        <FilterBar
-          filterDefs={config.filterDefs}
-          sortDefs={config.sortDefs}
-          filterState={filters}
-          sortState={sort}
-          setFilter={setFilter}
-          clearFilter={clearFilter}
-          setSort={setSort}
-          toggleSort={toggleSort}
-          resetAll={resetAll}
-          hasActiveFilters={hasActiveFilters}
-          total={totalFiltered}
-          count={count}
-        />
-      )}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={totalFiltered}
+        count={count}
+      />
 
       {/* محتوا */}
       {loading ? (
