@@ -426,10 +426,12 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         />
       )}
       <HelpBanner
-        id="purchases-intro"
-        icon="📥"
-        title="ثبت خرید از فروشنده"
-        description="اگر می‌خواهید این خرید به انبار اضافه شود، در بخش اقلام گزینه «اتصال به انبار» را فعال کنید."
+        id={isPurchase ? 'purchases-intro' : 'sales-intro'}
+        icon={isPurchase ? '📥' : '📤'}
+        title={isPurchase ? 'ثبت خرید از فروشنده' : 'ثبت فروش به مشتری'}
+        description={isPurchase
+          ? 'اگر می‌خواهید این خرید به انبار اضافه شود، در بخش اقلام گزینه «اتصال به انبار» را فعال کنید.'
+          : 'فروش می‌تواند از موجودی انبار یا مستقیماً از تولید باشد. برای محاسبه‌ی ROI، گله مربوطه را انتخاب کنید.'}
         tone="success"
       />
 
@@ -468,9 +470,9 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
       {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
-          title="خریدی ثبت نشده"
-          desc="اولین خرید خود را ثبت کنید."
-          action={<Btn variant="primary" onClick={openNew}>+ ثبت خرید</Btn>}
+          title={isPurchase ? 'خریدی ثبت نشده' : 'فروشی ثبت نشده'}
+          desc={isPurchase ? 'اولین خرید خود را ثبت کنید.' : 'اولین فروش خود را ثبت کنید.'}
+          action={<Btn variant="primary" onClick={openNew}>{isPurchase ? '+ ثبت خرید' : '+ ثبت فروش'}</Btn>}
         />
       ) : (
         <>
@@ -580,7 +582,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
 
       <Modal
         open={open} onClose={() => setOpen(false)}
-        title={form.id ? 'ویرایش خرید' : 'ثبت خرید جدید'}
+        title={form.id ? (isPurchase ? 'ویرایش خرید' : 'ویرایش فروش') : (isPurchase ? 'ثبت خرید' : 'ثبت فروش')}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
@@ -590,17 +592,17 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
           </Field>
           <Field label="دسته">
             <Select value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
-              {CATEGORIES.purchase.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+              {(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </Select>
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="فروشنده" required error={vErrors.partyId}>
+          <Field label={isPurchase ? 'فروشنده' : 'مشتری'} required error={vErrors.partyId}>
             <SmartSelect
               value={form.partyId}
               onChange={v => setForm({...form, partyId: v})}
               options={parties.map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
-              placeholder="— انتخاب کنید —" modalTitle="انتخاب فروشنده" autoThreshold={6}
+              placeholder="— انتخاب کنید —" modalTitle={isPurchase ? 'انتخاب فروشنده' : 'انتخاب مشتری'} autoThreshold={6}
             />
           </Field>
           <Field label="نوع سفارش">
