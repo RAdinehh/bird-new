@@ -428,9 +428,13 @@ export function FilterBar<T>({
 
       {chips.length > 0 && (
         <div dir="rtl" style={{
-          display: 'flex', gap: 6, padding: '6px var(--sp-3)',
-          alignItems: 'center', flexWrap: 'wrap',
+          display: 'flex', gap: 6,
+          padding: '6px var(--sp-3)',
+          alignItems: 'center',
+          overflowX: 'auto', overflowY: 'hidden',
+          scrollbarWidth: 'none',
           background: 'var(--bg)', borderBottom: '1px solid var(--border)',
+          WebkitOverflowScrolling: 'touch',
         }}>
           {chips.map(c => (
             <div key={c.key} style={{
