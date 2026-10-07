@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useAlt, LEVEL_LABEL, LEVEL_ICON, CATEGORY_LABEL, activeAlerts, countByLevel, type Alert, type AlertLevel } from './store';
 import { runRules } from './rules';
+import { useFilterSort, FilterBar, getAltAlertsConfig } from '../../shr/filter';
 import { Btn, BtnRow, Empty, Modal, PageContainer, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
@@ -19,7 +20,6 @@ export default function AlertsPage() {
 
   const [tab, setTab] = useState<TabId>('active');
   const swipeRef = useSwipeTabs(['active', 'history'], tab, (id) => setTab(id as TabId));
-  const [filterLevel, setFilterLevel] = useState<FilterLevel>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [snoozeId, setSnoozeId] = useState<string | null>(null);
   const [snoozeDate, setSnoozeDate] = useState('');
@@ -31,22 +31,30 @@ export default function AlertsPage() {
   }, []);
 
   const active = useMemo(() => {
-    let arr = activeAlerts(alerts);
-    if (filterLevel) arr = arr.filter(a => a.level === filterLevel);
-    return arr.sort((a, b) => {
+    return activeAlerts(alerts).sort((a, b) => {
       const order: Record<AlertLevel, number> = { critical: 0, important: 1, info: 2 };
       return order[a.level] - order[b.level];
     });
-  }, [alerts, filterLevel]);
+  }, [alerts]);
 
   const history = useMemo(() => {
-    let arr = alerts.filter(a => a.status === 'dismissed');
-    if (filterLevel) arr = arr.filter(a => a.level === filterLevel);
-    return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }, [alerts, filterLevel]);
+    return alerts.filter(a => a.status === 'dismissed').sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }, [alerts]);
 
   const counts = countByLevel(alerts);
-  const list = tab === 'active' ? active : history;
+  // مرحله ۱: tab
+  const tabFiltered = tab === 'active' ? active : history;
+
+  // مرحله ۲: FilterBar
+  const config = useMemo(() => getAltAlertsConfig(), []);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<Alert>({
+    items: tabFiltered,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   const handleRefresh = () => {
     runRules();
@@ -116,21 +124,21 @@ export default function AlertsPage() {
           </div>
         ) : null}
 
-        {/* فیلتر */}
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-          <button onClick={() => setFilterLevel('')} style={chip(filterLevel === '')}>
-            همه
-          </button>
-          <button onClick={() => setFilterLevel('critical')} style={chip(filterLevel === 'critical')}>
-            🔴 بحرانی
-          </button>
-          <button onClick={() => setFilterLevel('important')} style={chip(filterLevel === 'important')}>
-            🟡 مهم
-          </button>
-          <button onClick={() => setFilterLevel('info')} style={chip(filterLevel === 'info')}>
-            🔵 اطلاعی
-          </button>
-        </div>
+      {/* FilterBar */}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={totalFiltered}
+        count={count}
+      />
 
         {/* دکمه‌ی refresh */}
         <div style={{ display: 'flex', gap: 6 }}>
