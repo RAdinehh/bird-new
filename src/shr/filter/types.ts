@@ -13,6 +13,8 @@ export interface FilterOption {
 export interface FilterDef<T> {
   key: string;
   label: string;
+  /** ایموجی گروه — مثل 📦 یا 📊 */
+  icon?: string;
   kind: FilterKind;
   /** برای enum */
   options?: FilterOption[];
@@ -27,6 +29,10 @@ export interface FilterDef<T> {
 export interface SortDef<T> {
   key: string;
   label: string;
+  /** ایموجی — مثل 📅 یا 🔤 */
+  icon?: string;
+  /** توضیح کوتاه — مثل «از الف به ی» */
+  hint?: string;
   compare: (a: T, b: T) => number;
 }
 
