@@ -15,7 +15,8 @@ import {
 } from '../../mod/whs/store';
 import type { Person, Role } from '../../mod/ctc/store';
 import type { Breed, Bird } from '../../mod/brd/store';
-import type { Zone, Hall } from '../../mod/hal/store';
+import type { Zone, Hall, Equipment } from '../../mod/hal/store';
+import { EQUIP_LABELS } from '../../mod/hal/store';
 import { ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES } from '../../mod/ctc/store';
 import type { FilterDef, SortDef, SortState } from './types';
 
@@ -471,6 +472,81 @@ export function getHalHallsConfig(ctx: {
       },
     ],
     persistKey: 'hal-halls',
+    initialSort: { key: 'name', dir: 'asc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// hal/EquipmentPage — تجهیزات
+// ═══════════════════════════════════════════════════
+export function getHalEquipmentConfig(ctx: { halls: Hall[] }): FilterConfig<Equipment> {
+  const KIND_LABELS: Record<string, string> = {
+    asset: 'دارایی',
+    consumable: 'مصرفی',
+    system: 'سیستمی',
+  };
+  return {
+    filterDefs: [
+      {
+        key: 'hallId', label: 'سالن', kind: 'enum',
+        icon: <IconUser size={18} />,
+        options: ctx.halls.map(h => ({ value: h.id, label: h.name })),
+        getValue: (e: Equipment) => e.hallId || '',
+      },
+      {
+        key: 'kind', label: 'نوع', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: Object.keys(KIND_LABELS).map(k => ({ value: k, label: KIND_LABELS[k] })),
+        getValue: (e: Equipment) => e.kind || 'asset',
+      },
+      {
+        key: 'category', label: 'دسته', kind: 'enum',
+        icon: <IconFolder size={18} />,
+        options: Object.entries(EQUIP_LABELS || {}).map(([k, v]: any) => ({
+          value: k,
+          label: v.name || v.label || k,
+        })),
+        getValue: (e: Equipment) => e.category || '',
+        multi: true,
+      },
+      {
+        key: 'hasWarranty', label: 'گارانتی', kind: 'enum',
+        icon: <IconClock size={18} />,
+        options: [
+          { value: 'yes', label: 'دارد' },
+          { value: 'no', label: 'ندارد' },
+        ],
+        getValue: (e: Equipment) => (e.warranty && e.warranty > 0) ? 'yes' : 'no',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'name', label: 'نام', icon: <IconTag size={18} />,
+        hint: 'از الف به ی',
+        compare: (a: Equipment, b: Equipment) => (a.name || '').localeCompare(b.name || '', 'fa'),
+      },
+      {
+        key: 'count', label: 'تعداد', icon: <IconChart size={18} />,
+        hint: 'بر اساس تعداد',
+        compare: (a: Equipment, b: Equipment) => (a.count || 0) - (b.count || 0),
+      },
+      {
+        key: 'value', label: 'ارزش', icon: <IconDollar size={18} />,
+        hint: 'تعداد × قیمت',
+        compare: (a: Equipment, b: Equipment) => ((a.count || 0) * (a.unitPrice || 0)) - ((b.count || 0) * (b.unitPrice || 0)),
+      },
+      {
+        key: 'purchasedAt', label: 'تاریخ خرید', icon: <IconCalendar size={18} />,
+        hint: 'قدیمی‌ترین اول',
+        compare: (a: Equipment, b: Equipment) => (a.purchasedAt || '').localeCompare(b.purchasedAt || ''),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: Equipment, b: Equipment) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'hal-equipment',
     initialSort: { key: 'name', dir: 'asc' },
   };
 }
