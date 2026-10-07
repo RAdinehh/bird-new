@@ -190,12 +190,12 @@ export function FilterBar<T>({
         const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
         const noneActive = isMulti ? arr.length === 0 : !v;
         return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>
             <button type="button"
               onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
               style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                minHeight: 44, padding: '8px 10px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                minHeight: 38, padding: '6px 8px',
                 background: noneActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                 border: '1px solid ' + (noneActive ? 'var(--accent-border)' : 'var(--border)'),
                 borderRadius: 'var(--r-md)',
@@ -220,8 +220,8 @@ export function FilterBar<T>({
                     }
                   }}
                   style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    minHeight: 44, padding: '8px 10px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                    minHeight: 38, padding: '6px 8px',
                     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
                     borderRadius: 'var(--r-md)',
@@ -456,45 +456,45 @@ export function FilterBar<T>({
             const cnt = countActiveInGroup(def);
             return (
               <div key={def.key} style={{
-                paddingTop: idx === 0 ? 0 : 'var(--sp-4)',
-                paddingBottom: 'var(--sp-4)',
+                paddingTop: idx === 0 ? 0 : 'var(--sp-3)',
+                paddingBottom: 'var(--sp-2)',
                 borderTop: idx === 0 ? 'none' : '1px solid var(--border)',
               }}>
                 {/* تیتر گروه */}
                 <div style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  marginBottom: 'var(--sp-3)',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  marginBottom: 'var(--sp-2)',
                 }}>
                   {def.icon && (
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                      width: 30, height: 30, flexShrink: 0,
-                      background: cnt > 0 ? 'var(--accent-soft)' : 'var(--input-bg)',
+                      width: 22, height: 22, flexShrink: 0,
+                      background: cnt > 0 ? 'var(--accent-soft)' : 'transparent',
                       color: cnt > 0 ? 'var(--accent)' : 'var(--muted)',
                       borderRadius: 'var(--r-sm)',
-                      fontSize: typeof def.icon === 'string' ? 16 : undefined,
+                      fontSize: typeof def.icon === 'string' ? 14 : undefined,
                     }}>{def.icon}</span>
                   )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{
-                      fontSize: 'var(--fs-base)', fontWeight: 700,
-                      color: 'var(--text)', lineHeight: 1.2,
-                    }}>{def.label}</div>
-                    {cnt > 0 && (
-                      <div style={{
-                        fontSize: 'var(--fs-xs)', color: 'var(--accent)',
-                        marginTop: 2, fontWeight: 600,
-                      }}>{cnt} مورد انتخاب شده</div>
-                    )}
-                  </div>
+                  <span style={{
+                    fontSize: 'var(--fs-sm)', fontWeight: 700,
+                    color: 'var(--text)', lineHeight: 1.2,
+                  }}>{def.label}</span>
+                  {cnt > 0 && (
+                    <span style={{
+                      fontSize: 10, color: 'var(--accent)',
+                      fontWeight: 700,
+                      background: 'var(--accent-soft)',
+                      padding: '1px 6px', borderRadius: 6,
+                    }}>{cnt}</span>
+                  )}
+                  <div style={{ flex: 1 }} />
                   {cnt > 0 && (
                     <button type="button" onClick={() => clearFilter(def.key)}
                       style={{
                         background: 'none', border: 'none',
-                        color: 'var(--danger)', fontFamily: 'inherit',
-                        fontSize: 'var(--fs-xs)', fontWeight: 700,
-                        cursor: 'pointer', padding: '4px 8px',
-                        borderRadius: 'var(--r-sm)',
+                        color: 'var(--muted)', fontFamily: 'inherit',
+                        fontSize: 11, fontWeight: 600,
+                        cursor: 'pointer', padding: '2px 6px',
                       }}>پاک</button>
                   )}
                 </div>
