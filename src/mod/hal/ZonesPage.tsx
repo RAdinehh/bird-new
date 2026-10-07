@@ -10,11 +10,11 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getHalZonesConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
-import { chip } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -26,7 +26,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
-  const [filter, setFilter] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const halls = useMemo(() => {
@@ -106,25 +105,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
 
   useFab(active ? { label: 'افزودن بخش', onClick: openNew } : null);
 
-  if (halls.length === 0) {
-    return (
-      <PageContainer>
-      {undoData && (
-        <UndoBar
-          label="حذف شد"
-          onUndo={undoDelete}
-          onDismiss={() => setUndoData(null)}
-        />
-      )}
-        <Empty
-          icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>}
-          title="اول یک سالن بسازید"
-          desc="بخش، داخل سالن تعریف می‌شود. اول از تب «سالن‌ها» استفاده کنید."
-        />
-      </PageContainer>
-    );
-  }
-
   const save = async () => {
 
     // 🔒 جلوگیری قاطع از نام تکراری بخش
@@ -147,7 +127,16 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     setOpen(false);
   };
 
-  const list = filter ? zones.filter(z => z.hallId === filter) : zones;
+  // ─── فیلتر/مرتب (از config مرکزی) ───
+  const config = useMemo(() => getHalZonesConfig({ halls }), [halls]);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Zone>({
+    items: zones,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   return (
     <PageContainer>
@@ -158,19 +147,33 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         description="هر بخش داخل یک سالن تعریف می‌شود. برای انتخاب چندتایی، روی یک کارت نگه دارید."
         tone="info"
       />
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
-      {!ms.selectionMode && zones.length > 1 && (
+      {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید
         </div>
       )}
 
-      {ms.selectionMode && zones.length > 1 && (
+      {ms.selectionMode && list.length > 1 && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
           <button type="button"
-            onClick={ms.selectedIds.size === zones.length ? ms.clearSelection : ms.selectAll}
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
             style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
-            {ms.selectedIds.size === zones.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
           </button>
         </div>
       )}
@@ -183,12 +186,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         />
       )}
 
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilter('')} style={chip(!filter)}>همه</button>
-        {halls.map(h => (
-          <button key={h.id} onClick={() => setFilter(h.id)} style={chip(filter === h.id)}>{h.name}</button>
-        ))}
-      </div>
 
       {list.length === 0 ? (
         <Empty

@@ -15,6 +15,7 @@ import {
 } from '../../mod/whs/store';
 import type { Person, Role } from '../../mod/ctc/store';
 import type { Breed, Bird } from '../../mod/brd/store';
+import type { Zone, Hall } from '../../mod/hal/store';
 import { ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES } from '../../mod/ctc/store';
 import type { FilterDef, SortDef, SortState } from './types';
 
@@ -354,6 +355,50 @@ export function getBrdBirdsConfig(ctx: { breeds: Breed[] }): FilterConfig<Bird> 
       },
     ],
     persistKey: 'brd-birds',
+    initialSort: { key: 'name', dir: 'asc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// hal/ZonesPage — بخش‌های سالن
+// ═══════════════════════════════════════════════════
+export function getHalZonesConfig(ctx: { halls: Hall[] }): FilterConfig<Zone> {
+  return {
+    filterDefs: [
+      {
+        key: 'hallId', label: 'سالن', kind: 'enum',
+        icon: <IconUser size={18} />,
+        options: ctx.halls.map(h => ({ value: h.id, label: h.name })),
+        getValue: (z: Zone) => z.hallId || '',
+      },
+      {
+        key: 'hasCapacity', label: 'ظرفیت', kind: 'enum',
+        icon: <IconChart size={18} />,
+        options: [
+          { value: 'yes', label: 'تعریف شده' },
+          { value: 'no', label: 'تعریف نشده' },
+        ],
+        getValue: (z: Zone) => (z.capacity && z.capacity > 0) ? 'yes' : 'no',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'name', label: 'نام', icon: <IconTag size={18} />,
+        hint: 'از الف به ی',
+        compare: (a: Zone, b: Zone) => (a.name || '').localeCompare(b.name || '', 'fa'),
+      },
+      {
+        key: 'capacity', label: 'ظرفیت', icon: <IconChart size={18} />,
+        hint: 'بر اساس تعداد',
+        compare: (a: Zone, b: Zone) => (a.capacity || 0) - (b.capacity || 0),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: Zone, b: Zone) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'hal-zones',
     initialSort: { key: 'name', dir: 'asc' },
   };
 }
