@@ -10,6 +10,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getEggProductionsConfig } from '../../shr/filter';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import DatePicker from '../../shr/components/DatePicker';
 import ProgressTracker from '../../shr/components/ProgressTracker';
@@ -18,7 +19,7 @@ import { showAlert } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
-import { Row, SectionTitle, chip } from './helpers';
+import { Row, SectionTitle } from './helpers';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
@@ -55,14 +56,23 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
   const [form, setForm] = useState<F>(empty());
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
-  const [filterFlock, setFilterFlock] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const list = useMemo(() => {
-    let arr = [...productions];
-    if (filterFlock) arr = arr.filter(p => p.flockId === filterFlock);
-    return arr.sort((a, b) => b.date.localeCompare(a.date));
-  }, [productions, filterFlock]);
+  // ─── فیلتر/مرتب (از config مرکزی) ───
+  const config = useMemo(
+    () => getEggProductionsConfig({
+      flocks: activeFlocks.map(f => ({ id: f.id, name: f.name })),
+    }),
+    [activeFlocks]
+  );
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<EggProduction>({
+    items: productions,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -225,6 +235,20 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
         description="هر روز تعداد تخم‌ها را بین خوراکی، نطفه‌دار و مصرفی تقسیم کنید."
         tone="info"
       />
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید
@@ -241,14 +265,6 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
         </div>
       )}
 
-      {activeFlocks.length > 0 && productions.length > 0 ? (
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-          <button onClick={() => setFilterFlock('')} style={chip(filterFlock === '')}>همه</button>
-          {activeFlocks.map(f => (
-            <button key={f.id} onClick={() => setFilterFlock(f.id)} style={chip(filterFlock === f.id)}>{f.name}</button>
-          ))}
-        </div>
-      ) : null}
 
       {list.length === 0 ? (
         <Empty
