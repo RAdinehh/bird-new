@@ -11,6 +11,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { showToast, toastMsg } from '../../cor/store/toast';
+import { useFilterSort, FilterBar, getIncCandlingsConfig } from '../../shr/filter';
 import { todayJalali } from './helpers';
 import { useIncubationProfile } from './hooks';
 import { logAction } from '../../cor/logger/auditLog';
@@ -65,7 +66,6 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [entriesData, setEntriesData] = useState<Record<string, EntryData>>({});
   const [err, setErr] = useState('');
-  const [q, setQ] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ candling: any } | null>(null);
@@ -295,10 +295,28 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
     setOpen(true);
   };
 
+  // فیلتر/مرتب
+  const config = useMemo(
+    () => getIncCandlingsConfig({
+      devices: devices.map(d => ({ id: d.id, name: d.name })),
+      birds: birds.map(b => ({ id: b.id, name: b.name })),
+      eggEntriesById: _entriesById,
+    }),
+    [devices, birds, _entriesById]
+  );
+  const { filtered: filteredCandlings, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Candling>({
+    items: candlings,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
+
   // ═══ گروه‌بندی + تجمیع + درصد ═══
   const grouped = useMemo(() => {
     const byEntry: Record<string, Candling[]> = {};
-    candlings.forEach(c => {
+    filteredCandlings.forEach(c => {
       if (!byEntry[c.eggEntryId]) byEntry[c.eggEntryId] = [];
       byEntry[c.eggEntryId].push(c);
     });
@@ -316,20 +334,12 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
       const lossPercent = entryTotal > 0 ? ((total - agg.alive) / entryTotal * 100) : 0;
       const deadPercent = total > 0 ? ((agg.dead + agg.infertile) / total * 100) : 0;
       return { entryId, list: list.sort((a, b) => a.stage - b.stage), agg, total, entryTotal, fertilePercent, lossPercent, deadPercent };
-    }).filter(({ entryId }) => {
-      if (!q.trim()) return true;
-      const t = q.trim().toLowerCase();
-      const entry = _entriesById[entryId];
-      const bird = entry ? _birdsById[entry.birdId] : null;
-      const dev = entry ? _devicesById[entry.deviceId] : null;
-      const haystack = [bird?.name, dev?.name, entry?.entryDate].filter(Boolean).join(' ').toLowerCase();
-      return haystack.includes(t);
     }).sort(({ entryId: a }, { entryId: b }) => {
       const ea = _entriesById[a];
       const eb = _entriesById[b];
       return String(eb?.entryDate || '').localeCompare(String(ea?.entryDate || ''));
     });
-  }, [candlings, eggEntries, birds, devices, q]);
+  }, [filteredCandlings, _entriesById]);
 
   // ═══ خلاصه کل ═══
   const summary = useMemo(() => {
@@ -407,7 +417,20 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
       )}
 
       {candlings.length > 0 && (
-        <Input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍 جستجو (نام پرنده، دستگاه، تاریخ...)" aria-label="جستجو در کندلینگ‌ها" />
+        <FilterBar
+          filterDefs={config.filterDefs}
+          sortDefs={config.sortDefs}
+          filterState={filters}
+          sortState={sort}
+          setFilter={setFilter}
+          clearFilter={clearFilter}
+          setSort={setSort}
+          toggleSort={toggleSort}
+          resetAll={resetAll}
+          hasActiveFilters={hasActiveFilters}
+          total={total}
+          count={count}
+        />
       )}
 
       {candlings.length === 0 ? (
