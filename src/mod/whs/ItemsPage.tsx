@@ -126,6 +126,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       icon: <IconTag size={18} />,
       options: suppliers.map(c => ({ value: c.id, label: c.name })),
       getValue: (it: Item) => it.supplierId || '',
+      layout: 'chips' as const,
     },
   ], [suppliers]);
 

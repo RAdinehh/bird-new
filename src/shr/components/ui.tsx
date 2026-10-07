@@ -1177,38 +1177,33 @@ export function Sheet({
           justifyContent: 'space-between',
           paddingBottom: 4, gap: 8,
         }}>
-          {/* Close button اول (راست در RTL) */}
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="بستن"
-            style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              width: 34, height: 34, flexShrink: 0,
-              background: 'var(--input-bg)',
-              border: '1px solid var(--border)',
-              borderRadius: '50%',
-              color: 'var(--muted)',
-              cursor: 'pointer', padding: 0,
-              fontFamily: 'inherit',
-              transition: 'background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out)',
-            }}
-            onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.92)')}
-            onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2.4"
-              strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-          </button>
           {title ? (
             <div style={{
               fontSize: 'var(--fs-md)', fontWeight: 700,
               textAlign: 'right', flex: 1, minWidth: 0,
             }}>{title}</div>
           ) : <div style={{ flex: 1 }} />}
+          {/* Close button — چپ */}
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="بستن"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 32, height: 32, flexShrink: 0,
+              background: 'var(--btn-bg)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-md)',
+              color: 'var(--muted)',
+              cursor: 'pointer', padding: 0,
+              fontFamily: 'inherit',
+              fontSize: 14,
+              outline: 'none',
+              transition: 'background var(--dur-fast) var(--ease-out)',
+            }}
+          >
+            ✕
+          </button>
         </div>
         <div style={{
           overflowY: 'auto',

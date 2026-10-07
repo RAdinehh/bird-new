@@ -193,7 +193,7 @@ export function FilterBar<T>({
 
     if (def.kind === 'enum') {
       const isMulti = !!def.multi;
-      const layout = def.layout || (isMulti ? 'chips' : 'rows');
+      const layout = def.layout || 'rows';
 
       if (layout === 'rows') {
         const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
