@@ -429,30 +429,25 @@ export function FilterBar<T>({
       {chips.length > 0 && (
         <div style={{
           display: 'flex', gap: 6, padding: '6px var(--sp-3)',
-          alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none',
+          alignItems: 'center', justifyContent: 'center',
+          overflowX: 'auto', scrollbarWidth: 'none',
           background: 'var(--bg)', borderBottom: '1px solid var(--border)',
         }}>
           {chips.map(c => (
             <div key={c.key} style={{
               display: 'inline-flex', alignItems: 'center', gap: 4,
               padding: '4px 4px 4px 10px', height: 28,
-              maxWidth: 220,
               background: 'var(--card)',
               border: '1px solid var(--accent)',
-              borderRadius: 999,
+              borderRadius: 'var(--r-sm)',
               color: 'var(--accent)', fontSize: 11.5, fontWeight: 700,
               whiteSpace: 'nowrap', flexShrink: 0,
             }}>
               <span style={{
                 opacity: 0.65, fontWeight: 600, fontSize: 10.5,
-                overflow: 'hidden', textOverflow: 'ellipsis',
-                maxWidth: 70,
               }}>{c.label}</span>
               <span style={{ opacity: 0.3 }}>·</span>
-              <span style={{
-                overflow: 'hidden', textOverflow: 'ellipsis',
-                maxWidth: 110,
-              }}>{c.text}</span>
+              <span>{c.text}</span>
               <button type="button" onClick={() => clearFilter(c.key)}
                 aria-label="حذف فیلتر"
                 style={{
@@ -485,7 +480,7 @@ export function FilterBar<T>({
                   padding: '3px 6px 3px 8px',
                   background: 'var(--card-solid, #fff)',
                   border: '1px solid var(--accent-border)',
-                  borderRadius: 999,
+                  borderRadius: 'var(--r-sm)',
                   color: 'var(--accent)', fontSize: 10.5, fontWeight: 700,
                   fontFamily: 'inherit', cursor: 'pointer',
                   whiteSpace: 'nowrap',
