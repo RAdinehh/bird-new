@@ -41,6 +41,7 @@ import { buildLogData } from './api/buildData';
 import { decideEggAction } from './api/toEgg';
 import FormModal from './components/FormModal';
 import { useDlgForm } from './hooks/useDlgForm';
+import { useDlgSave } from './hooks/useDlgSave';
 import LogCard from './components/LogCard';
 import type { F } from './types';
 import { buildFeedMovements, buildVaccineMovement, buildMedicationMovement } from './api/toWhs';
@@ -86,6 +87,21 @@ export default function DailyLogsPage() {
     openNew, openEdit, onFlockChange,
     selectedFlock, isLayerType, isFlockMature, isLayerFlock, flockAliveCount,
   } = useDlgForm({ activeFlocks, halls, todayStr });
+
+  // ⭐ hook ذخیره‌سازی + حذف
+  const { save, deleteLog } = useDlgSave({
+    form, setForm, saving, setSaving, setErr, setOpen,
+    selectedFlock, flockAliveCount, isLayerFlock, num, int,
+  });
+
+  const handleDeleteLog = async (l: DailyLog) => {
+    const { ok, undoData: log } = await deleteLog(l);
+    if (!ok || !log) return;
+    setUndoData({ log });
+    setTimeout(() => setUndoData((cur: any) => cur && cur.log.id === log.id ? null : cur), 6000);
+    remove(l.id);
+    toastMsg.deleted('ثبت');
+  };
 
   const todaysLogs = useMemo(() => logs.filter(l => l.date === todayStr && (l.status || 'active') === 'active'), [logs, todayStr]);
   const historicalLogs = useMemo(() => logs.filter(l => l.date !== todayStr && (l.status || 'active') === 'active').sort((a, b) => b.date.localeCompare(a.date)), [logs, todayStr]);
@@ -198,168 +214,6 @@ export default function DailyLogsPage() {
     },
   );
 
-
-
-
-const collectWhsShortages = () => checkStock({
-    vaccines: form.vaccines,
-    medications: form.medications,
-    feedSourceType: form.feedSourceType,
-    feedSourceId: form.feedSourceId,
-    feedAmount: form.feedAmount,
-    whsItems,
-  });
-
-  const save = async () => {
-    if (saving) return;
-    setSaving(true);
-
-    // چک موجودی انبار
-    const shortages = collectWhsShortages();
-    if (shortages.length > 0) {
-      const lines = shortages.map(s => `• ${s.name}: نیاز ${toFa(s.need)} ${s.unit}، موجودی ${toFa(s.have)} ${s.unit}`);
-      const ok = await showConfirmAsync(
-        'موجودی انبار کافی نیست',
-        lines.join('\n') + '\n\nاگه ادامه بدی، موجودی صفر می‌شه ولی کمبود ثبت نمی‌شه.',
-        { danger: true },
-      );
-      if (!ok) { setSaving(false); return; }
-    }
-    if (!form.flockId) { setErr('گله اجباری است'); setSaving(false); return; }
-    if (!form.date.trim()) { setErr('تاریخ اجباری است'); setSaving(false); return; }
-    const dCount = form.deaths.reduce((a, x) => a + (x.count || 0), 0);
-    if (flockAliveCount && dCount > flockAliveCount) {
-      setErr(`مجموع تلفات (${toFa(dCount)}) از تعداد زنده گله (${toFa(flockAliveCount)}) بیشتر است`);
-      setSaving(false);
-      return;
-    }
-
-    const feedAmt = num(form.feedAmount);
-    const newMovementIds: string[] = [];
-
-    if (form.feedMovementIds.length > 0) {
-      form.feedMovementIds.forEach(id => deleteMovement(id));
-    }
-
-    if (form.feedSourceId && feedAmt && feedAmt > 0) {
-      const feedData = buildFeedMovements({
-        feedSourceType: form.feedSourceType,
-        feedSourceId: form.feedSourceId,
-        feedAmount: feedAmt,
-        flockName: selectedFlock?.name || '',
-        formulas,
-        ingredients,
-      });
-      feedData.forEach(d => {
-        const mid = addMovement({
-          itemId: d.itemId, type: 'out',
-          quantity: d.quantity, unitPrice: 0, reason: 'consumption',
-          date: form.date, partyId: '',
-          notes: d.notes,
-        });
-        if (mid) newMovementIds.push(mid);
-      });
-    }
-
-    // ===== whs cascade: حذف movement های قبلی =====
-    if (form.id) {
-      const oldLog = logs.find(l => l.id === form.id);
-      oldLog?.vaccines?.forEach(v => { if (v.movementId) { try { deleteMovement(v.movementId); } catch {} } });
-      oldLog?.medications?.forEach(m => { if (m.movementId) { try { deleteMovement(m.movementId); } catch {} } });
-    }
-    const processedVaccines = form.vaccines.map(v => {
-      const d = buildVaccineMovement(v);
-      if (!d) return { ...v, movementId: '' };
-      const mid = addMovement({ ...d, type: 'out', unitPrice: 0, reason: 'consumption', date: form.date, partyId: '' });
-      return { ...v, movementId: mid || '' };
-    });
-    const processedMedications = form.medications.map(m => {
-      const d = buildMedicationMovement(m);
-      if (!d) return { ...m, movementId: '' };
-      const mid = addMovement({ ...d, type: 'out', unitPrice: 0, reason: 'consumption', date: form.date, partyId: '' });
-      return { ...m, movementId: mid || '' };
-    });
-
-    const data = buildLogData({
-      form,
-      processedVaccines,
-      processedMedications,
-      feedMovementIds: newMovementIds,
-    });
-    let logId: string;
-    if (form.id) {
-      update(form.id, data);
-      logId = form.id;
-    } else {
-      logId = add(data);
-    }
-
-    // === sync با egg ===
-    try {
-      const action = decideEggAction({
-        input: {
-          logId,
-          flockId: form.flockId,
-          date: form.date,
-          isLayerFlock,
-          eatingEggs: int(form.eatingEggs) || 0,
-          fertileEggs: int(form.fertileEggs) || 0,
-          brokenEggs: int(form.brokenEggs) || 0,
-          otherEggs: int(form.otherEggs) || 0,
-        },
-        existing: findByLogId(logId),
-      });
-      if (action.type === 'add') addProduction(action.data);
-      else if (action.type === 'update') updateProduction(action.id, action.data);
-      else if (action.type === 'delete') deleteProduction(action.id);
-    } catch (e) { /* silent */ }
-
-    // emit event به جای cascade مستقیم
-    const oldLog = form.id ? (logs.find(l => l.id === form.id) || null) : null;
-    try {
-      bus.emit('dlg:deaths:recorded', {
-        logId,
-        flockId: data.flockId,
-        date: data.date,
-        count: data.deathsCount || 0,
-        deaths: data.deaths || [],
-        isEdit: !!form.id,
-        prevCount: oldLog?.deathsCount || 0,
-        prevFlockId: oldLog?.flockId,
-      }, { source: 'dlg/save' });
-    } catch (e) { /* silent */ }
-
-    toastMsg.saved('ثبت روزانه')
-    setOpen(false);
-    setSaving(false);
-  };
-
-  const handleDeleteLog = async (l: DailyLog) => {
-    const ok = await showConfirmAsync('تأیید حذف', 'این ثبت روزانه و داده‌های مرتبط حذف شوند؟', { danger: true });
-    if (!ok) return;
-    const log = logs.find(x => x.id === l.id);
-    if (log) {
-      setUndoData({ log });
-      setTimeout(() => setUndoData((cur: any) => cur && cur.log.id === log.id ? null : cur), 6000);
-    }
-    if (log?.feedMovementIds) log.feedMovementIds.forEach(id => deleteMovement(id));
-    const prod = findByLogId(l.id);
-    if (prod) deleteProduction(prod.id);
-    if (log) {
-      try {
-        bus.emit('dlg:log:deleted', {
-          logId: log.id,
-          flockId: log.flockId,
-          date: log.date,
-          deathsCount: log.deathsCount || 0,
-          feedMovementIds: log.feedMovementIds || [],
-        }, { source: 'dlg/delete' });
-      } catch (e) { /* silent */ }
-    }
-    remove(l.id);
-    logAction('delete', 'dlg', 'حذف از ثبت روزانه');
-    toastMsg.deleted('ثبت');
-  };
 
   const renderLogCard = (l: DailyLog, i: number) => {
     const flock = flocks.find(f => f.id === l.flockId);
