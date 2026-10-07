@@ -9,6 +9,7 @@ import {
 } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getBrdBirdsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
@@ -41,9 +42,20 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     });
   }, [_birdsRaw]);
 
+  // ─── فیلتر/مرتب (از config مرکزی) ───
+  const config = useMemo(() => getBrdBirdsConfig({ breeds }), [breeds]);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Bird>({
+    items: birds,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
+
   // ─── Multi-Select ───
   const ms = useMultiSelect({
-    items: birds,
+    items: list,
     getId: (b: any) => b.id,
     onDelete: async (ids: string[]) => {
       const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' پرنده حذف شوند؟', { danger: true });
@@ -129,24 +141,38 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         description="پرنده‌های اصلی (مرغ، بوقلمون، اردک، بلدرچین، غاز و...) را اینجا تعریف کنید. برای انتخاب چندتایی، روی یک کارت نگه دارید."
         tone="info"
       />
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
-      {!ms.selectionMode && birds.length > 1 && (
+      {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید
         </div>
       )}
 
-      {ms.selectionMode && birds.length > 1 && (
+      {ms.selectionMode && list.length > 1 && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
           <button type="button"
-            onClick={ms.selectedIds.size === birds.length ? ms.clearSelection : ms.selectAll}
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
             style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
-            {ms.selectedIds.size === birds.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
           </button>
         </div>
       )}
 
-      {birds.length === 0 ? (
+      {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>}
           title="هنوز پرنده‌ای اضافه نکرده‌اید"
@@ -155,7 +181,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         />
       ) : (
         <>
-          {birds.map((b, i) => {
+          {list.map((b, i) => {
             const birdBreeds = breeds.filter(x => x.birdId === b.id);
             const isOpen = !ms.selectionMode && expandedId === b.id;
             return (

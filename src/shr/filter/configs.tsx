@@ -310,3 +310,50 @@ export function getBrdBreedsConfig(ctx: { birds: Bird[] }): FilterConfig<Breed> 
     initialSort: { key: 'name', dir: 'asc' },
   };
 }
+
+// ═══════════════════════════════════════════════════
+// brd/BirdsPage — پرنده‌ها
+// ═══════════════════════════════════════════════════
+export function getBrdBirdsConfig(ctx: { breeds: Breed[] }): FilterConfig<Bird> {
+  return {
+    filterDefs: [
+      {
+        key: 'hasBreeds', label: 'نژاد', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: [
+          { value: 'yes', label: 'دارد' },
+          { value: 'no', label: 'ندارد' },
+        ],
+        getValue: (b: Bird) => ctx.breeds.some(x => x.birdId === b.id) ? 'yes' : 'no',
+      },
+      {
+        key: 'hasCycle', label: 'چرخه', kind: 'enum',
+        icon: <IconClock size={18} />,
+        options: [
+          { value: 'yes', label: 'تعریف شده' },
+          { value: 'no', label: 'تعریف نشده' },
+        ],
+        getValue: (b: Bird) => (b.cycleDays && b.cycleDays > 0) ? 'yes' : 'no',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'name', label: 'نام', icon: <IconTag size={18} />,
+        hint: 'از الف به ی',
+        compare: (a: Bird, b: Bird) => (a.name || '').localeCompare(b.name || '', 'fa'),
+      },
+      {
+        key: 'cycleDays', label: 'طول چرخه', icon: <IconClock size={18} />,
+        hint: 'بر اساس تعداد روز',
+        compare: (a: Bird, b: Bird) => (a.cycleDays || 0) - (b.cycleDays || 0),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: Bird, b: Bird) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'brd-birds',
+    initialSort: { key: 'name', dir: 'asc' },
+  };
+}
