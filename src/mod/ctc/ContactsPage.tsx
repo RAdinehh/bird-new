@@ -36,7 +36,6 @@ type TabId = 'all' | 'customer' | 'supplier' | 'worker';
 export default function ContactsPage() {
   const { contacts, add, update, remove } = useCtc();
   const [tab, setTab] = useState<TabId>('all');
-  const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
@@ -110,16 +109,12 @@ export default function ContactsPage() {
     setOpen(false);
   };
 
-  // مرحله ۱: tab + search (نگه‌داشته شده)
+  // مرحله ۱: tab (نگه‌داشته شده)
   const tabFiltered = useMemo(() => {
     let arr = contacts;
     if (tab !== 'all') arr = arr.filter(c => c.roles.includes(tab as Role));
-    if (q.trim()) {
-      const t = q.trim();
-      arr = arr.filter(c => c.name.includes(t) || c.phone.includes(t) || c.city.includes(t) || c.address.includes(t));
-    }
     return arr;
-  }, [contacts, tab, q]);
+  }, [contacts, tab]);
 
   // مرحله ۲: FilterBar (فیلتر عمیق)
   const config = useMemo(() => getCtcContactsConfig(), []);
@@ -232,14 +227,6 @@ export default function ContactsPage() {
         total={total}
         count={count}
       />
-        <div style={{ height: 38, background: 'var(--input-bg)', border: '1px solid var(--border)',
-           borderRadius: 'var(--r-md)', padding: '0 12px', display: 'flex',
-           alignItems: 'center', gap: 8 }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="جستجو..." style={{ flex: 1,
-             background: 'none', border: 'none', outline: 'none', color: 'var(--text)',
-             fontFamily: 'inherit', fontSize: 'var(--fs-base)', minWidth: 0 }} />
-        </div>
 
         {!ms.selectionMode && list.length > 1 && (
           <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
@@ -270,9 +257,10 @@ export default function ContactsPage() {
         )}
 
         {list.length === 0 ? (
-          <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>}
-            title={q ? 'نتیجه‌ای یافت نشد' : 'هنوز مخاطبی ثبت نشده'} desc={q ? 'عبارت دیگری امتحان کنید' : 'اولین مخاطب خود را بسازید.'}
-            action={!q ? <Btn variant="primary" onClick={openNew}>+ افزودن مخاطب</Btn> : undefined} />
+          <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>}
+            title={hasActiveFilters ? 'نتیجه‌ای پیدا نشد' : 'هنوز مخاطبی ثبت نشده'}
+            desc={hasActiveFilters ? 'فیلترها را تغییر دهید یا پاک کنید.' : 'اولین مخاطب خود را بسازید.'}
+            action={!hasActiveFilters ? <Btn variant="primary" onClick={openNew}>+ افزودن مخاطب</Btn> : undefined} />
         ) : (
           <>
             {list.map((p, i) => {
