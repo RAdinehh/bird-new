@@ -22,6 +22,7 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
 import { Row, SectionTitle } from './helpers';
+import { useFilterSort, FilterBar } from '../../shr/filter';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createItemSchema } from '../../shr/validation/rules/whs';
@@ -78,7 +79,45 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const list = items;
+  // ─── تعریف مشترک فیلترها و مرتب‌سازی ───
+  const filterDefs = useMemo(() => [
+    {
+      key: 'category', label: 'دسته', kind: 'enum' as const,
+      options: (Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => ({
+        value: c, label: CATEGORY_LABEL[c], icon: CATEGORY_ICON[c],
+      })),
+      getValue: (it: Item) => it.category,
+      multi: true,
+    },
+    {
+      key: 'stockStatus', label: 'وضعیت', kind: 'enum' as const,
+      options: [
+        { value: 'critical', label: 'تمام شده' },
+        { value: 'low', label: 'کم' },
+        { value: 'ok', label: 'موجود' },
+      ],
+      getValue: (it: Item) => stockWarning(it),
+    },
+  ], []);
+
+  const sortDefs = useMemo(() => [
+    { key: 'name',     label: 'نام',         compare: (a: Item, b: Item) => a.name.localeCompare(b.name, 'fa') },
+    { key: 'stock',    label: 'موجودی',      compare: (a: Item, b: Item) => (a.currentStock || 0) - (b.currentStock || 0) },
+    { key: 'value',    label: 'ارزش موجودی', compare: (a: Item, b: Item) => ((a.currentStock || 0) * getAvgPrice(a)) - ((b.currentStock || 0) * getAvgPrice(b)) },
+    { key: 'createdAt',label: 'جدیدترین',    compare: (a: Item, b: Item) => (a.createdAt || '').localeCompare(b.createdAt || '') },
+  ], []);
+
+  // ─── فیلتر / جستجو / مرتب‌سازی ───
+  const { filtered: list, search, setSearch, filters, setFilter, clearFilter,
+          sort, setSort, toggleSort, resetAll, hasActiveFilters,
+          total, count } = useFilterSort<Item>({
+    items,
+    searchKeys: (it: Item) => `${it.name} ${it.notes || ''} ${it.batchNo || ''}`,
+    filters: filterDefs,
+    sorts: sortDefs,
+    persistKey: 'whs-items',
+    initialSort: { key: 'createdAt', dir: 'desc' },
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -302,6 +341,23 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
           tone="info"
         actionLabel="برو به خرید ←"
         onAction={() => navigate('/tra/purchases')}
+        />
+        <FilterBar
+          filterDefs={filterDefs}
+          sortDefs={sortDefs}
+          filterState={filters}
+          sortState={sort}
+          search={search}
+          setSearch={setSearch}
+          setFilter={setFilter}
+          clearFilter={clearFilter}
+          setSort={setSort}
+          toggleSort={toggleSort}
+          resetAll={resetAll}
+          hasActiveFilters={hasActiveFilters}
+          total={total}
+          count={count}
+          placeholder="جستجوی کالا، بچ، یادداشت..."
         />
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
