@@ -8,7 +8,18 @@ vi.mock('../cor/store/dialog', () => ({
   showConfirmAsync: vi.fn().mockResolvedValue(true),
   showAlert: vi.fn().mockResolvedValue(undefined),
 }));
-vi.mock('../cor/store/toast', () => ({ showToast: vi.fn() }));
+vi.mock('../cor/store/toast', () => ({
+  showToast: vi.fn(),
+  toastMsg: {
+    added: vi.fn(), saved: vi.fn(), updated: vi.fn(),
+    deleted: vi.fn(), deletedBulk: vi.fn(),
+    archived: vi.fn(), archivedBulk: vi.fn(),
+    restored: vi.fn(), restoredBulk: vi.fn(),
+    hidden: vi.fn(), visible: vi.fn(),
+    paused: vi.fn(), activated: vi.fn(),
+    error: vi.fn(), warn: vi.fn(), info: vi.fn(),
+  },
+}));
 vi.mock('../cor/logger/auditLog', () => ({ logAction: vi.fn() }));
 
 const makeIng = (o: any = {}) => ({
@@ -35,7 +46,7 @@ describe('IngredientsPage', () => {
 
   it('دکمه افزودن وجود داره', () => {
     renderWithRouter(<IngredientsPage />);
-    expect(screen.getAllByText(/افزودن ماده/).length).toBeGreaterThan(0);
+    expect(screen.getAllByLabelText(/افزودن ماده اولیه/).length).toBeGreaterThan(0);
   });
 
   it('با ماده → رندر بدون خطا', () => {
@@ -46,7 +57,7 @@ describe('IngredientsPage', () => {
 
   it('کلیک افزودن → Modal باز', async () => {
     renderWithRouter(<IngredientsPage />);
-    fireEvent.click(screen.getAllByText(/افزودن ماده/)[0]);
+    fireEvent.click(screen.getAllByLabelText(/افزودن ماده اولیه/)[0]);
     await waitFor(() => {
       expect(screen.getByText('لغو')).toBeInTheDocument();
     });

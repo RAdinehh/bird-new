@@ -186,19 +186,52 @@ describe('rules — invoices', () => {
 // ۴. گله
 // ═══════════════════════════════════════════════
 describe('rules — flocks', () => {
-  it('گله layer سن 470 روز → end-of-cycle alert', () => {
+  it('گله layer سن 470 روز از ۵۰۰ → end-cycle-80 (important)', () => {
     useFlk.setState({
       flocks: [{
         id: 'f1', name: 'گله ۱', type: 'layer', status: 'active',
         startDate: daysAgoJ(470), birdId: 'b1', breedId: 'br1',
         currentCount: 1000, initialCount: 1000,
+        endOfCycleDay: 500,
       }] as any,
     });
 
     const alerts = detectAllAlerts();
-    const a = alerts.find(x => x.sourceId === 'f1:end-of-cycle');
+    const a = alerts.find(x => x.sourceId === 'f1:end-cycle-80');
     expect(a).toBeTruthy();
     expect(a!.level).toBe('important');
+  });
+
+  it('گله layer سن 480 روز از ۵۰۰ → end-cycle-95 (critical)', () => {
+    useFlk.setState({
+      flocks: [{
+        id: 'f1', name: 'گله ۱', type: 'layer', status: 'active',
+        startDate: daysAgoJ(480), birdId: 'b1', breedId: 'br1',
+        currentCount: 1000, initialCount: 1000,
+        endOfCycleDay: 500,
+      }] as any,
+    });
+
+    const alerts = detectAllAlerts();
+    const a = alerts.find(x => x.sourceId === 'f1:end-cycle-95');
+    expect(a).toBeTruthy();
+    expect(a!.level).toBe('critical');
+  });
+
+  it('گله layer سن 520 روز از ۵۰۰ → cycle-over (info)', () => {
+    useFlk.setState({
+      flocks: [{
+        id: 'f1', name: 'گله ۱', type: 'layer', status: 'active',
+        startDate: daysAgoJ(520), birdId: 'b1', breedId: 'br1',
+        currentCount: 1000, initialCount: 1000,
+        endOfCycleDay: 500,
+      }] as any,
+    });
+
+    const alerts = detectAllAlerts();
+    const a = alerts.find(x => x.sourceId === 'f1:cycle-over');
+    expect(a).toBeTruthy();
+    expect(a!.level).toBe('info');
   });
 
   it('گله breeder سن 300 روز → optimal alert', () => {
@@ -207,6 +240,7 @@ describe('rules — flocks', () => {
         id: 'f1', name: 'گله مادر', type: 'breeder', status: 'active',
         startDate: daysAgoJ(300), birdId: 'b1', breedId: 'br1',
         currentCount: 500, initialCount: 500,
+        endOfCycleDay: 500,
       }] as any,
     });
 

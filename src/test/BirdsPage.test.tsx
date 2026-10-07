@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { renderWithRouter } from './helpers';
 import BirdsPage from '../mod/brd/BirdsPage';
 import { useBrd } from '../mod/brd/store';
 
@@ -7,7 +8,18 @@ vi.mock('../cor/store/dialog', () => ({
   showConfirmAsync: vi.fn().mockResolvedValue(true),
   showAlert: vi.fn().mockResolvedValue(undefined),
 }));
-vi.mock('../cor/store/toast', () => ({ showToast: vi.fn() }));
+vi.mock('../cor/store/toast', () => ({
+  showToast: vi.fn(),
+  toastMsg: {
+    added: vi.fn(), saved: vi.fn(), updated: vi.fn(),
+    deleted: vi.fn(), deletedBulk: vi.fn(),
+    archived: vi.fn(), archivedBulk: vi.fn(),
+    restored: vi.fn(), restoredBulk: vi.fn(),
+    hidden: vi.fn(), visible: vi.fn(),
+    paused: vi.fn(), activated: vi.fn(),
+    error: vi.fn(), warn: vi.fn(), info: vi.fn(),
+  },
+}));
 vi.mock('../cor/logger/auditLog', () => ({ logAction: vi.fn() }));
 
 // helper: با id معتبر
@@ -30,26 +42,26 @@ beforeEach(() => {
 
 describe('BirdsPage — حالت خالی', () => {
   it('پیام خالی', () => {
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expect(screen.getByText('هنوز پرنده‌ای اضافه نکرده‌اید')).toBeInTheDocument();
   });
   it('دکمه افزودن', () => {
-    render(<BirdsPage />);
-    expect(screen.getByText('+ افزودن پرنده')).toBeInTheDocument();
+    renderWithRouter(<BirdsPage />);
+    expect(screen.getAllByLabelText(/افزودن پرنده/).length).toBeGreaterThan(0);
   });
 });
 
 describe('BirdsPage — نمایش لیست', () => {
   it('پرنده‌ها دیده میشن', () => {
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' }), makeBird({ name: 'بوقلمون' })] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expect(screen.getByText('مرغ')).toBeInTheDocument();
     expect(screen.getByText('بوقلمون')).toBeInTheDocument();
   });
 
   it('badge نژاد صفر', () => {
     useBrd.setState({ birds: [makeBird()] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expect(screen.getByText(/۰ نژاد/)).toBeInTheDocument();
   });
 
@@ -62,34 +74,34 @@ describe('BirdsPage — نمایش لیست', () => {
         { id: 'br2', birdId: bid, name: 'پلیموث', fcr: 1.7 } as any,
       ],
     });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expect(screen.getByText(/۲ نژاد/)).toBeInTheDocument();
   });
 
   it('cycleDays نمایش', () => {
     useBrd.setState({ birds: [makeBird({ cycleDays: 42 })] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expect(screen.getAllByText(/۴۲/).length).toBeGreaterThan(0);
   });
 
   it('fcr نمایش', () => {
     useBrd.setState({ birds: [makeBird({ fcrStandard: 1.8 })] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expect(screen.getAllByText(/۱[\.٫]۸/).length).toBeGreaterThan(0);
   });
 });
 
 describe('BirdsPage — افزودن', () => {
   it('باز شدن Modal', () => {
-    render(<BirdsPage />);
-    fireEvent.click(screen.getByText('+ افزودن پرنده'));
+    renderWithRouter(<BirdsPage />);
+    fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
     expect(screen.getByText('افزودن پرنده')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('مثلاً — مرغ')).toBeInTheDocument();
   });
 
   it('پر کردن + ذخیره → اضافه میشه', async () => {
-    render(<BirdsPage />);
-    fireEvent.click(screen.getByText('+ افزودن پرنده'));
+    renderWithRouter(<BirdsPage />);
+    fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
     fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ'), { target: { value: 'اردک' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
@@ -100,16 +112,16 @@ describe('BirdsPage — افزودن', () => {
   });
 
   it('نام خالی → ذخیره نشه', async () => {
-    render(<BirdsPage />);
-    fireEvent.click(screen.getByText('+ افزودن پرنده'));
+    renderWithRouter(<BirdsPage />);
+    fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
     fireEvent.click(screen.getByText('ذخیره'));
     await new Promise(r => setTimeout(r, 50));
     expect(useBrd.getState().birds).toHaveLength(0);
   });
 
   it('لغو → بسته میشه', async () => {
-    render(<BirdsPage />);
-    fireEvent.click(screen.getByText('+ افزودن پرنده'));
+    renderWithRouter(<BirdsPage />);
+    fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
     fireEvent.click(screen.getByText('لغو'));
     await waitFor(() => {
       expect(screen.queryByText('افزودن پرنده')).not.toBeInTheDocument();
@@ -120,8 +132,8 @@ describe('BirdsPage — افزودن', () => {
     const { showAlert } = await import('../cor/store/dialog');
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
 
-    render(<BirdsPage />);
-    fireEvent.click(screen.getByText('+ افزودن پرنده'));
+    renderWithRouter(<BirdsPage />);
+    fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
     fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ'), { target: { value: 'مرغ' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
@@ -132,8 +144,8 @@ describe('BirdsPage — افزودن', () => {
     const { showAlert } = await import('../cor/store/dialog');
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
 
-    render(<BirdsPage />);
-    fireEvent.click(screen.getByText('+ افزودن پرنده'));
+    renderWithRouter(<BirdsPage />);
+    fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
     fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ'), { target: { value: 'اردک' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
@@ -145,7 +157,7 @@ describe('BirdsPage — افزودن', () => {
 describe('BirdsPage — Expand / ویرایش / حذف', () => {
   it('expand → مشخصات', async () => {
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expandCard('مرغ');
 
     await waitFor(() => expect(screen.getByText(/مشخصات کامل/)).toBeInTheDocument());
@@ -154,7 +166,7 @@ describe('BirdsPage — Expand / ویرایش / حذف', () => {
 
   it('expand → دکمه‌ها', async () => {
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expandCard('مرغ');
     await waitFor(() => {
       expect(screen.getByText('ویرایش')).toBeInTheDocument();
@@ -168,14 +180,14 @@ describe('BirdsPage — Expand / ویرایش / حذف', () => {
       birds: [makeBird({ id: bid, name: 'مرغ' })] as any,
       breeds: [{ id: 'br1', birdId: bid, name: 'لگهورن', fcr: 1.5 } as any],
     });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expandCard('مرغ');
     await waitFor(() => expect(screen.getByText(/لگهورن/)).toBeInTheDocument());
   });
 
   it('کلیک ویرایش → Modal', async () => {
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expandCard('مرغ');
     await waitFor(() => expect(screen.getByText('ویرایش')).toBeInTheDocument());
     fireEvent.click(screen.getByText('ویرایش'));
@@ -185,7 +197,7 @@ describe('BirdsPage — Expand / ویرایش / حذف', () => {
 
   it('ویرایش + save → آپدیت', async () => {
     useBrd.setState({ birds: [makeBird({ name: 'قدیم' })] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expandCard('قدیم');
     await waitFor(() => expect(screen.getByText('ویرایش')).toBeInTheDocument());
     fireEvent.click(screen.getByText('ویرایش'));
@@ -201,7 +213,7 @@ describe('BirdsPage — Expand / ویرایش / حذف', () => {
   it('کلیک حذف → showConfirmAsync صدا زده میشه', async () => {
     const { showConfirmAsync } = await import('../cor/store/dialog');
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expandCard('مرغ');
     await waitFor(() => expect(screen.getByText('حذف')).toBeInTheDocument());
     fireEvent.click(screen.getByText('حذف'));
@@ -213,7 +225,7 @@ describe('BirdsPage — Expand / ویرایش / حذف', () => {
     const { showConfirmAsync } = await import('../cor/store/dialog');
     (showConfirmAsync as any).mockResolvedValueOnce(true);
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expandCard('مرغ');
     await waitFor(() => expect(screen.getByText('حذف')).toBeInTheDocument());
     fireEvent.click(screen.getByText('حذف'));
@@ -225,7 +237,7 @@ describe('BirdsPage — Expand / ویرایش / حذف', () => {
     const { showConfirmAsync } = await import('../cor/store/dialog');
     (showConfirmAsync as any).mockResolvedValueOnce(false);
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
-    render(<BirdsPage />);
+    renderWithRouter(<BirdsPage />);
     expandCard('مرغ');
     await waitFor(() => expect(screen.getByText('حذف')).toBeInTheDocument());
     fireEvent.click(screen.getByText('حذف'));
