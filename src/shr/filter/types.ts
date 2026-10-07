@@ -8,7 +8,7 @@ export type FilterKind = 'enum' | 'dateRange' | 'numberRange' | 'boolean';
 export interface FilterOption {
   value: string;
   label: string;
-  icon?: string;
+  icon?: ReactNode;
 }
 
 export interface FilterDef<T> {

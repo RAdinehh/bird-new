@@ -337,7 +337,16 @@ export function FilterBar<T>({
           borderTop: '1px solid var(--border)',
           marginTop: 'var(--sp-2)',
         }}>
-          <Btn onClick={resetAll} full>پاک‌سازی</Btn>
+          <button type="button" onClick={resetAll} style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            gap: 6, height: 44, padding: '0 16px',
+            background: 'var(--danger-soft)',
+            border: '1px solid var(--danger)',
+            borderRadius: 'var(--r-md)',
+            color: 'var(--danger)', fontFamily: 'inherit',
+            fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer',
+            flex: 1,
+          }}>پاک‌سازی همه</button>
           <Btn variant="primary" onClick={() => setOpenFilters(false)} full>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <IconCheck size={14} /> تأیید

@@ -1172,11 +1172,40 @@ export function Sheet({
         <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 4px' }}>
           <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--dim)', opacity: 0.5 }} />
         </div>
-        {title ? (
-          <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, textAlign: 'right', paddingBottom: 2 }}>
-            {title}
-          </div>
-        ) : null}
+        <div style={{
+          display: 'flex', alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingBottom: 4, gap: 8,
+        }}>
+          {title ? (
+            <div style={{
+              fontSize: 'var(--fs-md)', fontWeight: 700,
+              textAlign: 'right', flex: 1, minWidth: 0,
+            }}>{title}</div>
+          ) : <div style={{ flex: 1 }} />}
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="بستن"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 32, height: 32, flexShrink: 0,
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border)',
+              borderRadius: '50%',
+              color: 'var(--muted)',
+              cursor: 'pointer', padding: 0,
+              fontFamily: 'inherit',
+              transition: 'background var(--dur-fast) var(--ease-out)',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2.5"
+              strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
         <div style={{
           overflowY: 'auto',
           overscrollBehavior: 'contain',

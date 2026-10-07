@@ -124,3 +124,61 @@ export const IconSearch = ({ size = 16, ...p }: IconProps) => (
     <path d="m21 21-4.3-4.3" />
   </svg>
 );
+
+export const IconEgg = ({ size = 16, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M12 2c-3.5 0-7 5.5-7 10a7 7 0 1 0 14 0c0-4.5-3.5-10-7-10z" />
+  </svg>
+);
+
+export const IconWheat = ({ size = 16, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M2 22 22 2M12 8v12M8 12h8M9 16h6" />
+    <path d="M12 8c0-2 1-4 4-4M12 8c0-2-1-4-4-4" />
+  </svg>
+);
+
+export const IconPill = ({ size = 16, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7z" />
+    <path d="m8.5 8.5 7 7" />
+  </svg>
+);
+
+export const IconSyringe = ({ size = 16, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="m18 2 4 4M17 7l3-3M19 9 9 19l-5 1 1-5 10-10z" />
+    <path d="m13 11-2-2M15 9l-2-2" />
+  </svg>
+);
+
+export const IconLeaf = ({ size = 16, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M11 20A7 7 0 0 1 4 13c0-5 5-9 16-9 0 11-4 16-9 16z" />
+    <path d="M2 22c6-2 9-7 13-13" />
+  </svg>
+);
+
+export const IconTool = ({ size = 16, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+  </svg>
+);
+
+export const IconBox = ({ size = 16, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4" />
+  </svg>
+);
+
+export const IconFolder = ({ size = 16, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
+export const IconActivity = ({ size = 16, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+  </svg>
+);

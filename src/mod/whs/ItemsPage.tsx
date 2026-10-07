@@ -25,7 +25,20 @@ import { Row, SectionTitle } from './helpers';
 import { useFilterSort, FilterBar } from '../../shr/filter';
 import {
   IconPackage, IconChart, IconTag, IconDollar,
+  IconEgg, IconWheat, IconPill, IconSyringe, IconLeaf, IconTool, IconBox,
+  IconFolder, IconActivity,
 } from '../../shr/icons';
+
+// map دسته به SVG
+const CATEGORY_SVG: Record<string, (props: { size?: number }) => React.ReactElement> = {
+  egg: IconEgg,
+  feed: IconWheat,
+  medicine: IconPill,
+  vaccine: IconSyringe,
+  herbal: IconLeaf,
+  equipment: IconTool,
+  consumable: IconBox,
+};
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createItemSchema } from '../../shr/validation/rules/whs';
@@ -87,15 +100,20 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
     {
       key: 'category', label: 'دسته', kind: 'enum' as const,
       icon: <IconPackage size={18} />,
-      options: (Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => ({
-        value: c, label: CATEGORY_LABEL[c], icon: CATEGORY_ICON[c],
-      })),
+      options: (Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => {
+        const IconComp = CATEGORY_SVG[c];
+        return {
+          value: c,
+          label: CATEGORY_LABEL[c].replace(/[🥚🌾💊💉🌿🔧📦]/g, '').trim(),
+          icon: IconComp ? <IconComp size={14} /> : undefined,
+        };
+      }),
       getValue: (it: Item) => it.category,
       multi: true,
     },
     {
       key: 'stockStatus', label: 'وضعیت موجودی', kind: 'enum' as const,
-      icon: <IconChart size={18} />,
+      icon: <IconActivity size={18} />,
       options: [
         { value: 'critical', label: 'تمام شده' },
         { value: 'low', label: 'کم' },
