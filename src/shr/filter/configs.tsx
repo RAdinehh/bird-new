@@ -14,7 +14,11 @@ import {
   type Item, type ItemCategory, type Movement, type MovementType,
 } from '../../mod/whs/store';
 import type { Person, Role } from '../../mod/ctc/store';
-import { type Deal, DEAL_LABEL as TRA_DEAL_LABEL } from '../../mod/tra/store';
+import {
+  type Deal, type Invoice,
+  DEAL_LABEL as TRA_DEAL_LABEL,
+  remaining as traRemaining, ageDays as traAgeDays, agingBucket as traAgingBucket,
+} from '../../mod/tra/store';
 import {
   type Ingredient, type Formula, type Requirement,
   CATEGORY_LABEL as FED_CAT_LABEL, CATEGORY_ICON as FED_CAT_ICON,
@@ -1345,5 +1349,80 @@ export function getTraDealsConfig(ctx: {
     ],
     persistKey: 'tra-deals',
     initialSort: { key: 'date', dir: 'desc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// tra/ReceivablesPage — مطالبات
+// ═══════════════════════════════════════════════════
+export function getTraReceivablesConfig(ctx: {
+  partyNames: Record<string, string>;
+}): FilterConfig<Invoice> {
+  return {
+    filterDefs: [
+      {
+        key: 'dueStatus', label: 'وضعیت سرسید', kind: 'enum',
+        icon: <IconCalendar size={18} />,
+        options: [
+          { value: 'overdue', label: 'معوق' },
+          { value: 'soon', label: 'نزدیک سرسید' },
+        ],
+        getValue: (i: Invoice) => {
+          if (!i.dueDate) return '';
+          const parts = i.dueDate.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString()).split('/');
+          if (parts.length !== 3) return '';
+          const d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+          const days = Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+          if (days < 0) return 'overdue';
+          if (days <= 7) return 'soon';
+          return '';
+        },
+        multi: true,
+      },
+      {
+        key: 'aging', label: 'سن بدهی', kind: 'enum',
+        icon: <IconClock size={18} />,
+        options: [
+          { value: '0-15', label: '۰ تا ۱۵ روز' },
+          { value: '16-30', label: '۱۶ تا ۳۰ روز' },
+          { value: '31-60', label: '۳۱ تا ۶۰ روز' },
+          { value: '61-90', label: '۶۱ تا ۹۰ روز' },
+          { value: '+90', label: 'بیش از ۹۰ روز' },
+        ],
+        getValue: (i: Invoice) => traAgingBucket(traAgeDays(i)),
+        multi: true,
+      },
+      {
+        key: 'partyId', label: 'طرف معامله', kind: 'enum',
+        icon: <IconUser size={18} />,
+        options: Object.entries(ctx.partyNames).map(([id, name]) => ({ value: id, label: name })),
+        getValue: (i: Invoice) => i.partyId || '',
+        layout: 'chips',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'dueDate', label: 'سرسید', icon: <IconCalendar size={18} />,
+        hint: 'نزدیک‌ترین سرسید اول',
+        compare: (a: Invoice, b: Invoice) => (a.dueDate || '').localeCompare(b.dueDate || ''),
+      },
+      {
+        key: 'date', label: 'تاریخ فاکتور', icon: <IconCalendar size={18} />,
+        hint: 'جدیدترین اول',
+        compare: (a: Invoice, b: Invoice) => (a.date || '').localeCompare(b.date || ''),
+      },
+      {
+        key: 'remaining', label: 'باقی‌مانده', icon: <IconDollar size={18} />,
+        hint: 'مبلغ باقی‌مانده',
+        compare: (a: Invoice, b: Invoice) => traRemaining(a) - traRemaining(b),
+      },
+      {
+        key: 'total', label: 'مبلغ کل', icon: <IconDollar size={18} />,
+        hint: 'مبلغ کل فاکتور',
+        compare: (a: Invoice, b: Invoice) => (a.total || 0) - (b.total || 0),
+      },
+    ],
+    persistKey: 'tra-receivables',
+    initialSort: { key: 'dueDate', dir: 'asc' },
   };
 }

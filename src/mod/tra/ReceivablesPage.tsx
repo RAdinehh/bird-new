@@ -10,6 +10,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa } from '../../shr/utils/fa';
 import { showSuccess } from '../../cor/store/dialog';
 import { Line, tab, filterChip } from './helpers';
+import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/filter';
 
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 type QuickFilter = 'all' | 'overdue' | 'soon';
@@ -18,7 +19,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const { invoices, updateInvoice } = useTra();
   const { contacts } = useCtc();
   const [kind, setKind] = useState<'sale' | 'purchase'>('sale');
-  const [quickFilter, setQuickFilter] = useState<QuickFilter>('all');
   const [expandedBucket, setExpandedBucket] = useState<BucketKey | null>(null);
   const [expandedInvoice, setExpandedInvoice] = useState<string | null>(null);
   const [deferModal, setDeferModal] = useState<{ id: string; oldDate: string } | null>(null);
@@ -55,21 +55,25 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
     return `${toFa(days)} روز مانده`;
   };
 
-  const filtered = useMemo(() => {
-    if (quickFilter === 'overdue') {
-      return openInvoices.filter(i => {
-        const d = daysUntilDue(i);
-        return d !== null && d < 0;
-      });
-    }
-    if (quickFilter === 'soon') {
-      return openInvoices.filter(i => {
-        const d = daysUntilDue(i);
-        return d !== null && d >= 0 && d <= 7;
-      });
-    }
-    return openInvoices;
-  }, [openInvoices, quickFilter]);
+  // فیلتر/مرتب
+  const config = useMemo(() => {
+    const partyNames: Record<string, string> = {};
+    openInvoices.forEach(i => {
+      if (i.partyId && !partyNames[i.partyId]) {
+        const c = contacts.find(x => x.id === i.partyId);
+        if (c) partyNames[i.partyId] = c.name;
+      }
+    });
+    return getTraReceivablesConfig({ partyNames });
+  }, [openInvoices, contacts]);
+  const { filtered, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<Invoice>({
+    items: openInvoices,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   const upcoming = useMemo(() => {
     return openInvoices
@@ -270,24 +274,21 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         </div>
       ) : null}
 
-      {/* فیلتر سریع — فقط اگه لازم بود */}
-      {(overdueCount > 0 || soonCount > 0) ? (
-        <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-          <button onClick={() => setQuickFilter('all')} style={filterChip(quickFilter === 'all')}>
-            همه ({toFa(openInvoices.length)})
-          </button>
-          {overdueCount > 0 ? (
-            <button onClick={() => setQuickFilter('overdue')} style={filterChip(quickFilter === 'overdue', 'danger')}>
-              🔴 {toFa(overdueCount)}
-            </button>
-          ) : null}
-          {soonCount > 0 ? (
-            <button onClick={() => setQuickFilter('soon')} style={filterChip(quickFilter === 'soon', 'warn')}>
-              🟡 {toFa(soonCount)}
-            </button>
-          ) : null}
-        </div>
-      ) : null}
+      {/* FilterBar */}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={totalFiltered}
+        count={count}
+      />
 
       {/* خالی */}
       {totalOpen === 0 ? (
