@@ -39,6 +39,7 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import UndoBar from '../../cor/ui/UndoBar';
 import { Section, SectionTitle, Row } from './helpers';
 import { checkStock } from './api/checkStock';
+import { buildFeedMovements, buildVaccineMovement, buildMedicationMovement } from './api/toWhs';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 import { bus } from '../../cor/events';
@@ -335,32 +336,23 @@ const collectWhsShortages = () => checkStock({
     }
 
     if (form.feedSourceId && feedAmt && feedAmt > 0) {
-      if (form.feedSourceType === 'formula') {
-        const formula = formulas.find(f => f.id === form.feedSourceId);
-        if (formula) {
-          formula.lines.forEach(line => {
-            const ing = ingredients.find(i => i.id === line.ingredientId);
-            if (!ing || !ing.stockItemId) return;
-            const qty = (line.percent / 100) * feedAmt;
-            const mid = addMovement({
-              itemId: ing.stockItemId, type: 'out',
-              quantity: Math.round(qty * 1000) / 1000,
-              unitPrice: 0, reason: 'consumption',
-              date: form.date, partyId: '',
-              notes: `ثبت روزانه — جیره ${formula.name}`
-            });
-            if (mid) newMovementIds.push(mid);
-          });
-        }
-      } else if (form.feedSourceType === 'item') {
+      const feedData = buildFeedMovements({
+        feedSourceType: form.feedSourceType,
+        feedSourceId: form.feedSourceId,
+        feedAmount: feedAmt,
+        flockName: selectedFlock?.name || '',
+        formulas,
+        ingredients,
+      });
+      feedData.forEach(d => {
         const mid = addMovement({
-          itemId: form.feedSourceId, type: 'out',
-          quantity: feedAmt, unitPrice: 0, reason: 'consumption',
+          itemId: d.itemId, type: 'out',
+          quantity: d.quantity, unitPrice: 0, reason: 'consumption',
           date: form.date, partyId: '',
-          notes: `ثبت روزانه — ${selectedFlock?.name || ''}`
+          notes: d.notes,
         });
         if (mid) newMovementIds.push(mid);
-      }
+      });
     }
 
     const calcWater = form.waterMethod === 'manual'
@@ -386,13 +378,15 @@ const collectWhsShortages = () => checkStock({
       oldLog?.medications?.forEach(m => { if (m.movementId) { try { deleteMovement(m.movementId); } catch {} } });
     }
     const processedVaccines = form.vaccines.map(v => {
-      if (!v.itemId || !v.quantity || v.quantity <= 0) return { ...v, movementId: '' };
-      const mid = addMovement({ itemId: v.itemId, type: 'out', quantity: v.quantity, unitPrice: 0, reason: 'consumption', date: form.date, partyId: '', notes: `ثبت روزانه — واکسن ${v.name || ''}` });
+      const d = buildVaccineMovement(v);
+      if (!d) return { ...v, movementId: '' };
+      const mid = addMovement({ ...d, type: 'out', unitPrice: 0, reason: 'consumption', date: form.date, partyId: '' });
       return { ...v, movementId: mid || '' };
     });
     const processedMedications = form.medications.map(m => {
-      if (!m.itemId || !m.quantity || m.quantity <= 0) return { ...m, movementId: '' };
-      const mid = addMovement({ itemId: m.itemId, type: 'out', quantity: m.quantity, unitPrice: 0, reason: 'consumption', date: form.date, partyId: '', notes: `ثبت روزانه — دارو ${m.name || ''}` });
+      const d = buildMedicationMovement(m);
+      if (!d) return { ...m, movementId: '' };
+      const mid = addMovement({ ...d, type: 'out', unitPrice: 0, reason: 'consumption', date: form.date, partyId: '' });
       return { ...m, movementId: mid || '' };
     });
 
