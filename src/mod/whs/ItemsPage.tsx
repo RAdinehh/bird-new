@@ -26,7 +26,7 @@ import { useFilterSort, FilterBar } from '../../shr/filter';
 import {
   IconPackage, IconChart, IconTag, IconDollar,
   IconEgg, IconWheat, IconPill, IconSyringe, IconLeaf, IconTool, IconBox,
-  IconFolder, IconActivity,
+  IconFolder, IconActivity, IconClock,
 } from '../../shr/icons';
 
 // map دسته به SVG
@@ -99,12 +99,12 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   const filterDefs = useMemo(() => [
     {
       key: 'category', label: 'دسته', kind: 'enum' as const,
-      icon: <IconPackage size={18} />,
+      icon: <IconFolder size={18} />,
       options: (Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => {
         const IconComp = CATEGORY_SVG[c];
         return {
           value: c,
-          label: CATEGORY_LABEL[c].replace(/[🥚🌾💊💉🌿🔧📦]/g, '').trim(),
+          label: CATEGORY_LABEL[c].replace(/^[^\u0600-\u06FFa-zA-Z]+\s*/, '').trim() || CATEGORY_LABEL[c],
           icon: IconComp ? <IconComp size={15} /> : undefined,
         };
       }),
@@ -134,7 +134,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
     { key: 'name',     label: 'نام کالا',   icon: <IconTag size={18} />,     hint: 'از الف به ی', compare: (a: Item, b: Item) => a.name.localeCompare(b.name, 'fa') },
     { key: 'stock',    label: 'موجودی',     icon: <IconChart size={18} />,   hint: 'بر اساس تعداد', compare: (a: Item, b: Item) => (a.currentStock || 0) - (b.currentStock || 0) },
     { key: 'value',    label: 'ارزش موجودی',icon: <IconDollar size={18} />,  hint: 'موجودی × قیمت میانگین', compare: (a: Item, b: Item) => ((a.currentStock || 0) * getAvgPrice(a)) - ((b.currentStock || 0) * getAvgPrice(b)) },
-    { key: 'createdAt',label: 'جدیدترین',   icon: <IconPackage size={18} />, hint: 'بر اساس تاریخ ایجاد', compare: (a: Item, b: Item) => (a.createdAt || '').localeCompare(b.createdAt || '') },
+    { key: 'createdAt',label: 'جدیدترین',   icon: <IconClock size={18} />,   hint: 'بر اساس تاریخ ایجاد', compare: (a: Item, b: Item) => (a.createdAt || '').localeCompare(b.createdAt || '') },
   ], []);
 
   // ─── فیلتر / جستجو / مرتب‌سازی ───
@@ -590,7 +590,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
               }));
             }}>
               {(Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c =>
-                <option key={c} value={c}>{CATEGORY_ICON[c]} {CATEGORY_LABEL[c]}</option>
+                <option key={c} value={c}>{CATEGORY_LABEL[c].replace(/^[^\u0600-\u06FFa-zA-Z]+\s*/, '').trim() || CATEGORY_LABEL[c]}</option>
               )}
             </Select>
           </Field>
