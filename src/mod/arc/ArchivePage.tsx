@@ -7,6 +7,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { useFilterSort, FilterBar, getArcArchiveConfig } from '../../shr/filter';
 
 type Kind = 'flocks';
 
@@ -18,11 +19,28 @@ export default function ArchivePage() {
   const [kind, setKind] = useState<Kind>('flocks');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const archivedFlocks = useMemo(
-    () => flocks.filter(f => f.status === 'archived' || f.status === 'sold')
-      .sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || '')),
+  // مرحله ۱: pre-filter آرشیو
+  const archivedRaw = useMemo(
+    () => flocks.filter(f => f.status === 'archived' || f.status === 'sold'),
     [flocks]
   );
+
+  // مرحله ۲: FilterBar
+  const config = useMemo(
+    () => getArcArchiveConfig({
+      birds: birds.map(b => ({ id: b.id, name: b.name })),
+      halls: halls.map(h => ({ id: h.id, name: h.name })),
+    }),
+    [birds, halls]
+  );
+  const { filtered: archivedFlocks, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<Flock>({
+    items: archivedRaw,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   return (
     <PageContainer>
@@ -42,6 +60,23 @@ export default function ArchivePage() {
         </div>
         <div style={{ fontSize: 40 }}>🗄</div>
       </div>
+
+      {archivedRaw.length > 0 && (
+        <FilterBar
+          filterDefs={config.filterDefs}
+          sortDefs={config.sortDefs}
+          filterState={filters}
+          sortState={sort}
+          setFilter={setFilter}
+          clearFilter={clearFilter}
+          setSort={setSort}
+          toggleSort={toggleSort}
+          resetAll={resetAll}
+          hasActiveFilters={hasActiveFilters}
+          total={totalFiltered}
+          count={count}
+        />
+      )}
 
       {archivedFlocks.length === 0 ? (
         <Empty
