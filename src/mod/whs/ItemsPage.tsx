@@ -23,6 +23,9 @@ import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
 import { Row, SectionTitle } from './helpers';
 import { useFilterSort, FilterBar } from '../../shr/filter';
+import {
+  IconPackage, IconChart, IconTag, IconDollar,
+} from '../../shr/icons';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createItemSchema } from '../../shr/validation/rules/whs';
@@ -83,6 +86,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   const filterDefs = useMemo(() => [
     {
       key: 'category', label: 'دسته', kind: 'enum' as const,
+      icon: <IconPackage size={18} />,
       options: (Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => ({
         value: c, label: CATEGORY_LABEL[c], icon: CATEGORY_ICON[c],
       })),
@@ -90,7 +94,8 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       multi: true,
     },
     {
-      key: 'stockStatus', label: 'وضعیت', kind: 'enum' as const,
+      key: 'stockStatus', label: 'وضعیت موجودی', kind: 'enum' as const,
+      icon: <IconChart size={18} />,
       options: [
         { value: 'critical', label: 'تمام شده' },
         { value: 'low', label: 'کم' },
@@ -98,13 +103,19 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       ],
       getValue: (it: Item) => stockWarning(it),
     },
-  ], []);
+    {
+      key: 'supplier', label: 'تأمین‌کننده', kind: 'enum' as const,
+      icon: <IconTag size={18} />,
+      options: suppliers.map(c => ({ value: c.id, label: c.name })),
+      getValue: (it: Item) => it.supplierId || '',
+    },
+  ], [suppliers]);
 
   const sortDefs = useMemo(() => [
-    { key: 'name',     label: 'نام',         compare: (a: Item, b: Item) => a.name.localeCompare(b.name, 'fa') },
-    { key: 'stock',    label: 'موجودی',      compare: (a: Item, b: Item) => (a.currentStock || 0) - (b.currentStock || 0) },
-    { key: 'value',    label: 'ارزش موجودی', compare: (a: Item, b: Item) => ((a.currentStock || 0) * getAvgPrice(a)) - ((b.currentStock || 0) * getAvgPrice(b)) },
-    { key: 'createdAt',label: 'جدیدترین',    compare: (a: Item, b: Item) => (a.createdAt || '').localeCompare(b.createdAt || '') },
+    { key: 'name',     label: 'نام کالا',   icon: <IconTag size={18} />,     hint: 'از الف به ی', compare: (a: Item, b: Item) => a.name.localeCompare(b.name, 'fa') },
+    { key: 'stock',    label: 'موجودی',     icon: <IconChart size={18} />,   hint: 'بر اساس تعداد', compare: (a: Item, b: Item) => (a.currentStock || 0) - (b.currentStock || 0) },
+    { key: 'value',    label: 'ارزش موجودی',icon: <IconDollar size={18} />,  hint: 'موجودی × قیمت میانگین', compare: (a: Item, b: Item) => ((a.currentStock || 0) * getAvgPrice(a)) - ((b.currentStock || 0) * getAvgPrice(b)) },
+    { key: 'createdAt',label: 'جدیدترین',   icon: <IconPackage size={18} />, hint: 'بر اساس تاریخ ایجاد', compare: (a: Item, b: Item) => (a.createdAt || '').localeCompare(b.createdAt || '') },
   ], []);
 
   // ─── فیلتر / جستجو / مرتب‌سازی ───

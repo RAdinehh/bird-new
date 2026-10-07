@@ -1,6 +1,7 @@
 /**
  * filter/types.ts — تایپ‌های سیستم فیلتر مرکزی
  */
+import type { ReactNode } from 'react';
 
 export type FilterKind = 'enum' | 'dateRange' | 'numberRange' | 'boolean';
 
@@ -13,8 +14,8 @@ export interface FilterOption {
 export interface FilterDef<T> {
   key: string;
   label: string;
-  /** ایموجی گروه — مثل 📦 یا 📊 */
-  icon?: string;
+  /** آیکون گروه — می‌تونه emoji string یا SVG component باشه */
+  icon?: ReactNode;
   kind: FilterKind;
   /** برای enum */
   options?: FilterOption[];
@@ -29,8 +30,8 @@ export interface FilterDef<T> {
 export interface SortDef<T> {
   key: string;
   label: string;
-  /** ایموجی — مثل 📅 یا 🔤 */
-  icon?: string;
+  /** آیکون — emoji یا SVG */
+  icon?: ReactNode;
   /** توضیح کوتاه — مثل «از الف به ی» */
   hint?: string;
   compare: (a: T, b: T) => number;
