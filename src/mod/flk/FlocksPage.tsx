@@ -17,6 +17,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, P
 import HelpBanner from '../../shr/components/HelpBanner';;
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getFlkFlocksConfig } from '../../shr/filter';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { MiniProgress } from '../../shr/components/ProgressTracker';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -170,8 +171,6 @@ export default function FlocksPage() {
   const { halls: _hallsRaw, zones } = useHal();
   const { invoices } = useTra();
 
-  const [tab, setTab] = useState<TabId>('all');
-  const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
   const [layingFromStd, setLayingFromStd] = useState(false);
@@ -179,7 +178,6 @@ export default function FlocksPage() {
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
-  const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'hidden', 'archived'], tab, (id) => setTab(id as TabId));
 
   // فیلتر تکرارها تو render
   const birds = useMemo(() => {
@@ -379,22 +377,22 @@ export default function FlocksPage() {
 
   const addEvent = useFlk(s => s.addEvent);
 
-  const list = useMemo(() => {
-    let arr = flocks;
-    if (tab === 'archived') arr = arr.filter(f => f.status === 'archived' || f.status === 'sold');
-    else if (tab === 'hidden') arr = arr.filter(f => f.status === 'active' && f.hidden);
-    else if (tab === 'all') arr = arr.filter(f => f.status === 'active' && !f.hidden);
-    else arr = arr.filter(f => f.status === 'active' && f.type === tab && !f.hidden);
-    if (q.trim()) {
-      const t = q.trim();
-      arr = arr.filter(f => {
-        const bird = birds.find(b => b.id === f.birdId);
-        const breed = breeds.find(b => b.id === f.breedId);
-        return f.name.includes(t) || bird?.name.includes(t) || breed?.name.includes(t);
-      });
-    }
-    return arr;
-  }, [flocks, tab, q, birds, breeds]);
+  // ─── فیلتر/مرتب (از config مرکزی) ───
+  const config = useMemo(
+    () => getFlkFlocksConfig({
+      birds: birds.map(b => ({ id: b.id, name: b.name })),
+      halls: halls.map(h => ({ id: h.id, name: h.name })),
+    }),
+    [birds, halls]
+  );
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Flock>({
+    items: flocks,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -468,46 +466,8 @@ export default function FlocksPage() {
     return { bird, del, oth, total, per };
   }, [form]);
 
-  const tabCount = (t: TabId) => {
-    if (t === 'all') return flocks.filter(f => f.status === 'active').length;
-    if (t === 'archived') return flocks.filter(f => f.status === 'archived' || f.status === 'sold').length;
-    return flocks.filter(f => f.status === 'active' && f.type === t).length;
-  };
-
-  const hiddenCount = flocks.filter(f => f.hidden && f.status === 'active').length;
-
-  const tabs: { id: TabId; label: string }[] = [
-    { id: 'all', label: 'فعال' },
-    { id: 'layer', label: 'تخم‌گذار' },
-    { id: 'broiler', label: 'گوشتی' },
-    { id: 'breeder', label: 'مادر' },
-    { id: 'hidden', label: 'پنهان' },
-    { id: 'archived', label: 'آرشیو' }
-  ];
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y', minHeight: 'calc(100vh - 120px)' }}>
-      <div style={{
-        display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
-        padding: '0 12px', background: 'var(--header-bg)',
-        position: 'sticky', top: 52, zIndex: 11, overflowX: 'auto', scrollbarWidth: 'none'
-      }}>
-        {tabs.map(t => (
-          <div key={t.id} onClick={() => setTab(t.id)} style={{
-            padding: '11px 12px', fontSize: 'var(--fs-base)', fontWeight: 600,
-            color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
-            cursor: 'pointer', position: 'relative', whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: 'flex', alignItems: 'center', gap: 5
-          }}>
-            {t.label}
-            <span style={{ fontSize: 12, background: tab === t.id ? 'var(--accent-soft)' : 'var(--input-bg)', color: tab === t.id ? 'var(--accent)' : 'var(--muted)', padding: '1px 5px', borderRadius: 8, fontWeight: 700 }}>{toFa(tabCount(t.id))}</span>
-            {tab === t.id && <div style={{ position: 'absolute', bottom: 0, right: 12, left: 12, height: 3, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />}
-          </div>
-        ))}
-      </div>
-
       <PageContainer>
       {undoData && (
         <UndoBar
@@ -522,6 +482,20 @@ export default function FlocksPage() {
           title="مدیریت گله‌ها"
           description="اینجا گله‌های فعال، تخم‌گذار و گوشتی را تعریف و مدیریت می‌کنید. با تعریف گله، امکان ثبت روزانه فعال می‌شود."
           tone="info"
+        />
+        <FilterBar
+          filterDefs={config.filterDefs}
+          sortDefs={config.sortDefs}
+          filterState={filters}
+          sortState={sort}
+          setFilter={setFilter}
+          clearFilter={clearFilter}
+          setSort={setSort}
+          toggleSort={toggleSort}
+          resetAll={resetAll}
+          hasActiveFilters={hasActiveFilters}
+          total={total}
+          count={count}
         />
         {/* گله‌های نزدیک به تخم‌گذاری */}
         {(() => {
@@ -592,13 +566,6 @@ export default function FlocksPage() {
           );
         })()}
 
-        <div style={{
-          height: 38, background: 'var(--input-bg)', border: '1px solid var(--border)',
-          borderRadius: 'var(--r-md)', padding: '0 12px', display: 'flex', alignItems: 'center', gap: 8
-        }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="جستجوی نام، پرنده، نژاد..." style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)', minWidth: 0 }} />
-        </div>
 
         {!ms.selectionMode && list.length > 1 && (
           <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
@@ -617,10 +584,10 @@ export default function FlocksPage() {
 
         {list.length === 0 ? (
           <Empty
-            icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>}
-            title={q ? 'نتیجه‌ای یافت نشد' : tab === 'archived' ? 'آرشیو خالی است' : 'هنوز گله‌ای نساخته‌اید'}
-            desc={q ? 'عبارت دیگری امتحان کنید' : 'اولین گله‌ی خود را بسازید — گله‌ها به پرنده، نژاد و سالن متصل می‌شوند.'}
-            action={!q && tab !== 'archived' ? <Btn variant="primary" onClick={openNew}>+ افزودن گله</Btn> : undefined}
+            icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>}
+            title={hasActiveFilters ? 'نتیجه‌ای پیدا نشد' : 'هنوز گله‌ای نساخته‌اید'}
+            desc={hasActiveFilters ? 'فیلترها را تغییر دهید یا پاک کنید.' : 'اولین گله‌ی خود را بسازید — گله‌ها به پرنده، نژاد و سالن متصل می‌شوند.'}
+            action={!hasActiveFilters ? <Btn variant="primary" onClick={openNew}>+ افزودن گله</Btn> : undefined}
           />
         ) : (
           <>
@@ -1184,6 +1151,5 @@ export default function FlocksPage() {
         </Modal>
 
       </PageContainer>
-    </div>
   );
 }
