@@ -26,10 +26,11 @@ export interface FilterDef<T> {
   multi?: boolean;
   /**
    * چیدمان نمایش در Sheet:
-   * - 'rows'  → ردیف‌های بلند با چک‌باکس/رادیو (پیش‌فرض برای تک‌انتخابی)
-   * - 'chips' → چیپ‌های افقی (پیش‌فرض برای چند‌انتخابی)
+   * - 'grid'  → دوستونه (پیش‌فرض)
+   * - 'rows'  → ردیف‌های بلند
+   * - 'chips' → چیپ‌های افقی
    */
-  layout?: 'rows' | 'chips';
+  layout?: 'grid' | 'rows' | 'chips';
   /** نمایش فقط وقتی که این شرط true باشد */
   visible?: (item: T) => boolean;
 }
