@@ -21,7 +21,6 @@ export default function FilesPage() {
   const [loading, setLoading] = useState(true);
   const [totalBytes, setTotalBytes] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [search, setSearch] = useState('');
   const [uploadOpen, setUploadOpen] = useState(false);
   useFab({ label: 'افزودن فایل', onClick: () => setUploadOpen(true) });
   const [previewId, setPreviewId] = useState<string | null>(null);
@@ -44,22 +43,11 @@ export default function FilesPage() {
     return () => { mounted = false; };
   }, [refresh]);
 
-  // مرحله ۱: search
-  const searchFiltered = useMemo(() => {
-    if (search.trim() === '') return files;
-    const q = search.trim();
-    return files.filter(f =>
-      f.name.includes(q) ||
-      f.notes.includes(q) ||
-      f.tags.some(t => t.includes(q))
-    );
-  }, [files, search]);
-
-  // مرحله ۲: FilterBar
+  // FilterBar
   const config = useMemo(() => getDocFilesConfig(), []);
   const { filtered, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<DocFile>({
-    items: searchFiltered,
+    items: files,
     filters: config.filterDefs,
     sorts: config.sortDefs,
     persistKey: config.persistKey,
@@ -131,38 +119,6 @@ export default function FilesPage() {
           <Dot />
           <StatBox icon="📂" label="دسته‌ها" value={toFa(Object.keys(counts).length - 1)} />
         </div>
-      </div>
-
-      {/* جستجو */}
-      <div style={{
-        height: 38,
-        background: 'var(--input-bg)',
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--r-md)',
-        padding: '0 12px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8
-      }}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2">
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.3-4.3" />
-        </svg>
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="جستجو در نام، برچسب، یادداشت..."
-          style={{
-            flex: 1,
-            background: 'none',
-            border: 'none',
-            outline: 'none',
-            color: 'var(--text)',
-            fontFamily: 'inherit',
-            fontSize: 'var(--fs-base)',
-            minWidth: 0
-          }}
-        />
       </div>
 
       {/* FilterBar */}
