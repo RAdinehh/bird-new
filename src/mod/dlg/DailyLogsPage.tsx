@@ -39,6 +39,8 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import UndoBar from '../../cor/ui/UndoBar';
 import { Section, SectionTitle, Row } from './helpers';
 import { checkStock } from './api/checkStock';
+import { buildLogData } from './api/buildData';
+import type { F } from './types';
 import { buildFeedMovements, buildVaccineMovement, buildMedicationMovement } from './api/toWhs';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
@@ -46,26 +48,7 @@ import { bus } from '../../cor/events';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createDlgSchema } from '../../shr/validation/rules/dlg';
 
-interface F {
-  id?: string;
-  flockId: string; date: string; entryTime: string;
-  temperature: string; temperatureMin: string; temperatureMax: string;
-  humidity: string; humidityMin: string; humidityMax: string;
-  ventilation: string; litter: string;
-  lightHours: string;
-  behavior: string; distribution: string; appearance: string; sound: string;
-  feedType: string; feedAmount: string; feedRemaining: string;
-  feedSourceType: 'formula' | 'item' | ''; feedSourceId: string; feedMovementIds: string[];
-  feedMethod: 'manual' | 'auto' | '';
-  waterMethod: 'manual' | 'nipple' | 'trough' | 'tank' | '';
-  waterAmount: string; waterFillCount: string; waterFillVolume: string;
-  weightSamples: { id: string; weight: string }[];
-  eatingEggs: string; fertileEggs: string; brokenEggs: string; otherEggs: string;
-  weightGender: '' | 'male' | 'female' | 'mixed';
-  deaths: Death[];
-  vaccines: Vaccine[]; medications: Medication[]; activities: Activity[];
-  notes: string;
-}
+
 
 const newLog = (flockId = ''): F => ({
   flockId, date: '', entryTime: '',
@@ -355,22 +338,6 @@ const collectWhsShortages = () => checkStock({
       });
     }
 
-    const calcWater = form.waterMethod === 'manual'
-      ? totalWater(int(form.waterFillCount), num(form.waterFillVolume)) ?? num(form.waterAmount)
-      : num(form.waterAmount);
-
-    // محاسبه خودکار میانگین از min/max
-    const tMin = num(form.temperatureMin);
-    const tMax = num(form.temperatureMax);
-    const hMin = num(form.humidityMin);
-    const hMax = num(form.humidityMax);
-    const calcTemp = (tMin !== null && tMax !== null)
-      ? Math.round(((tMin + tMax) / 2) * 10) / 10
-      : num(form.temperature);
-    const calcHumidity = (hMin !== null && hMax !== null)
-      ? Math.round(((hMin + hMax) / 2) * 10) / 10
-      : num(form.humidity);
-
     // ===== whs cascade: حذف movement های قبلی =====
     if (form.id) {
       const oldLog = logs.find(l => l.id === form.id);
@@ -390,44 +357,12 @@ const collectWhsShortages = () => checkStock({
       return { ...m, movementId: mid || '' };
     });
 
-    const data: Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'> = {
-      flockId: form.flockId, date: form.date, entryTime: form.entryTime,
-      temperature: calcTemp,
-      temperatureMin: tMin,
-      temperatureMax: tMax,
-      humidity: calcHumidity,
-      humidityMin: hMin,
-      humidityMax: hMax,
-      ventilation: form.ventilation, litter: form.litter,
-      lightHours: int(form.lightHours),
-      behavior: form.behavior, distribution: form.distribution,
-      appearance: form.appearance.trim(), sound: form.sound,
-      feedType: form.feedType.trim(), feedAmount: feedAmt,
-      feedRemaining: num(form.feedRemaining),
-      feedSourceType: form.feedSourceType,
-      feedSourceId: form.feedSourceId,
+    const data = buildLogData({
+      form,
+      processedVaccines,
+      processedMedications,
       feedMovementIds: newMovementIds,
-      feedMethod: form.feedMethod,
-      waterMethod: form.waterMethod,
-      waterAmount: calcWater,
-      waterFillCount: int(form.waterFillCount),
-      waterFillVolume: num(form.waterFillVolume),
-      eatingEggs: int(form.eatingEggs),
-      fertileEggs: int(form.fertileEggs),
-      brokenEggs: int(form.brokenEggs),
-      otherEggs: int(form.otherEggs),
-      brokenTarget: (form as any).brokenTarget || 'consumption',
-      otherTarget: (form as any).otherTarget || 'consumption',
-      eggsCount: int(form.eatingEggs),
-      dirtyEggs: int(form.otherEggs),
-      weightSamples: form.weightSamples
-        .map(w => ({ id: w.id, weight: parseFloat(toEn(w.weight).replace('٫','.')) || 0 }))
-        .filter(w => w.weight > 0),
-      weightGender: form.weightGender,
-      deathsCount: dCount, deaths: form.deaths,
-      vaccines: processedVaccines, medications: processedMedications,
-      activities: form.activities, notes: form.notes.trim()
-    };
+    });
     let logId: string;
     if (form.id) {
       update(form.id, data);
