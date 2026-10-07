@@ -366,6 +366,7 @@ export function FilterBar<T>({
         padding: 'var(--sp-2) var(--sp-3)',
         alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none',
         borderBottom: '1px solid var(--border)', background: 'var(--bg)',
+        touchAction: 'pan-x',
       }}>
         <button type="button" onClick={() => setOpenFilters(true)}
           aria-label="فیلترها" style={topBtn(activeCount > 0)}>
@@ -436,6 +437,7 @@ export function FilterBar<T>({
           background: 'var(--bg)',
           borderBottom: '1px solid var(--border)',
           WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-x',
         }}>
           {chips.map(c => (
             <div key={c.key} style={{
@@ -547,12 +549,17 @@ export function FilterBar<T>({
             );
           })}
         </div>
-        {/* دکمه‌های پایین */}
+        {/* دکمه‌های پایین — sticky */}
         <div style={{
           display: 'flex', gap: 8,
           paddingTop: 12,
+          paddingBottom: 4,
           borderTop: '1px solid var(--border)',
           marginTop: 8,
+          position: 'sticky',
+          bottom: 0,
+          background: 'var(--card-solid, #fff)',
+          zIndex: 10,
         }}>
           <Btn variant="primary" onClick={() => setOpenFilters(false)} full>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>

@@ -112,7 +112,7 @@ export default function ExpandableCard({
           outline: 'none',
           userSelect: 'none',
           WebkitUserSelect: 'none',
-          touchAction: 'pan-y',
+          touchAction: 'pan-x pan-y',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

@@ -18,6 +18,7 @@ import {
   type Deal, type Invoice,
   DEAL_LABEL as TRA_DEAL_LABEL,
   remaining as traRemaining, ageDays as traAgeDays, agingBucket as traAgingBucket,
+  WORKFLOW_LABEL as TRA_WORKFLOW_LABEL,
 } from '../../mod/tra/store';
 import {
   type Ingredient, type Formula, type Requirement,
@@ -1424,5 +1425,83 @@ export function getTraReceivablesConfig(ctx: {
     ],
     persistKey: 'tra-receivables',
     initialSort: { key: 'dueDate', dir: 'asc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// tra/InvoicePage — فاکتورهای خرید/فروش
+// ═══════════════════════════════════════════════════
+export function getTraInvoicesConfig(ctx: {
+  partyNames: Record<string, string>;
+  categories: Array<[string, string]>;
+}): FilterConfig<Invoice> {
+  return {
+    filterDefs: [
+      {
+        key: 'category', label: 'دسته', kind: 'enum',
+        icon: <IconFolder size={18} />,
+        options: ctx.categories.map(([v, l]) => ({ value: v, label: l })),
+        getValue: (i: Invoice) => i.category || '',
+        multi: true,
+      },
+      {
+        key: 'workflow', label: 'وضعیت پرداخت', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: (Object.keys(TRA_WORKFLOW_LABEL) as Array<keyof typeof TRA_WORKFLOW_LABEL>).map(w => ({
+          value: w,
+          label: TRA_WORKFLOW_LABEL[w],
+        })),
+        getValue: (i: Invoice) => i.workflowStatus || 'draft',
+        multi: true,
+      },
+      {
+        key: 'paymentStatus', label: 'وضعیت تسویه', kind: 'enum',
+        icon: <IconDollar size={18} />,
+        options: [
+          { value: 'paid', label: 'تسویه شده' },
+          { value: 'partial', label: 'جزئی' },
+          { value: 'unpaid', label: 'تسویه نشده' },
+        ],
+        getValue: (i: Invoice) => {
+          const rem = traRemaining(i);
+          const total = i.total || 0;
+          if (rem <= 0) return 'paid';
+          if (rem < total) return 'partial';
+          return 'unpaid';
+        },
+        multi: true,
+      },
+      {
+        key: 'partyId', label: 'طرف معامله', kind: 'enum',
+        icon: <IconUser size={18} />,
+        options: Object.entries(ctx.partyNames).map(([id, name]) => ({ value: id, label: name })),
+        getValue: (i: Invoice) => i.partyId || '',
+        layout: 'chips',
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'date', label: 'تاریخ', icon: <IconCalendar size={18} />,
+        hint: 'جدیدترین اول',
+        compare: (a: Invoice, b: Invoice) => (a.date || '').localeCompare(b.date || ''),
+      },
+      {
+        key: 'total', label: 'مبلغ کل', icon: <IconDollar size={18} />,
+        hint: 'بر اساس مبلغ',
+        compare: (a: Invoice, b: Invoice) => (a.total || 0) - (b.total || 0),
+      },
+      {
+        key: 'remaining', label: 'باقی‌مانده', icon: <IconDollar size={18} />,
+        hint: 'مبلغ باقی‌مانده',
+        compare: (a: Invoice, b: Invoice) => traRemaining(a) - traRemaining(b),
+      },
+      {
+        key: 'dueDate', label: 'سرسید', icon: <IconCalendar size={18} />,
+        hint: 'نزدیک‌ترین سرسید اول',
+        compare: (a: Invoice, b: Invoice) => (a.dueDate || '').localeCompare(b.dueDate || ''),
+      },
+    ],
+    persistKey: 'tra-invoices',
+    initialSort: { key: 'date', dir: 'desc' },
   };
 }

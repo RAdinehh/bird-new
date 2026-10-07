@@ -1156,7 +1156,7 @@ export function Sheet({
           borderTopRightRadius: 20,
           padding: '10px 14px 18px',
           boxShadow: '0 -8px 30px rgba(0,0,0,.25)',
-          maxHeight: noScroll ? 'none' : '55vh',
+          maxHeight: noScroll ? 'calc(100dvh - 80px)' : '85vh',
           display: 'flex',
           flexDirection: 'column',
           gap: 8,
@@ -1200,7 +1200,7 @@ export function Sheet({
           </button>
         </div>
         <div style={{
-          overflowY: noScroll ? 'visible' : 'auto',
+          overflowY: 'auto',
           overscrollBehavior: 'contain',
           WebkitOverflowScrolling: 'touch',
           flex: 1,

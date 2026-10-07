@@ -153,16 +153,17 @@ export function useCarousel(
       if (document.querySelector('[data-sheet-open="true"]')) return;
       if (document.querySelector('[role="dialog"]')) return;
       if (tgt.closest('[role="dialog"]')) return;
-      // اگه روی یه عنصر scrollable عمودی هستیم، swipe نکن
+      // اگه روی یه اسکرول مستقل افقی/عمودی هستیم، swipe نکن — فقط تا ۳ سطح بالا
       let cur: HTMLElement | null = tgt;
-      while (cur && cur !== document.body) {
+      let depth = 0;
+      while (cur && cur !== document.body && depth < 3) {
         const st = window.getComputedStyle(cur);
-        if ((st.overflowY === 'auto' || st.overflowY === 'scroll') && cur.scrollHeight > cur.clientHeight + 4) {
-          return;
-        }
+        const isH = (st.overflowX === 'auto' || st.overflowX === 'scroll') && cur.scrollWidth > cur.clientWidth + 4;
+        const isV = (st.overflowY === 'auto' || st.overflowY === 'scroll') && cur.scrollHeight > cur.clientHeight + 4;
+        if (isH || isV) return;
         cur = cur.parentElement;
+        depth++;
       }
-      if (hasHorizontalScroller(tgt, el)) return;
       const t = e.touches[0];
       dragging = true;
       startX = t.clientX;

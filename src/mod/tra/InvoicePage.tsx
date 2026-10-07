@@ -15,6 +15,7 @@ import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import { useFilterSort, FilterBar, getTraInvoicesConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import SmartSelect from '../../shr/components/SmartSelect';
 import DatePicker from '../../shr/components/DatePicker';
@@ -72,7 +73,6 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const [form, setForm] = useState<F>(empty(isPurchase));
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
-  const [filterCat, setFilterCat] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [printId, setPrintId] = useState<string | null>(null);
   const [transferModal, setTransferModal] = useState<{ id: string; to: WorkflowStatus } | null>(null);
@@ -155,12 +155,34 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   }, [open, form.date, form.paymentTerms, form.customDueDate, form.installmentGapDays]);
 
   // ==== Computed ====
-  const list = useMemo(
-    () => invoices.filter(i => i.type === kind)
-      .filter(i => !filterCat || i.category === filterCat)
-      .sort((a, b) => b.date.localeCompare(a.date)),
-    [invoices, filterCat]
+  // مرحله ۱: tab (kind)
+  const kindFiltered = useMemo(
+    () => invoices.filter(i => i.type === kind),
+    [invoices, kind]
   );
+
+  // مرحله ۲: FilterBar
+  const config = useMemo(() => {
+    const partyNames: Record<string, string> = {};
+    kindFiltered.forEach(i => {
+      if (i.partyId && !partyNames[i.partyId]) {
+        const c = parties.find(x => x.id === i.partyId);
+        if (c) partyNames[i.partyId] = c.name;
+      }
+    });
+    const cats = isPurchase
+      ? (CATEGORIES.purchase as Array<[string, string]>)
+      : (CATEGORIES.sale as Array<[string, string]>);
+    return getTraInvoicesConfig({ partyNames, categories: cats });
+  }, [kindFiltered, parties, isPurchase]);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<Invoice>({
+    items: kindFiltered,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   const total = useMemo(
     () => form.items.reduce((acc, it) => {
@@ -411,13 +433,21 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         tone="success"
       />
 
-      {/* فیلتر دسته */}
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterCat('')} style={chip(filterCat === '')}>همه</button>
-        {CATEGORIES.purchase.map(([v, l]) => (
-          <button key={v} onClick={() => setFilterCat(v)} style={chip(filterCat === v)}>{l}</button>
-        ))}
-      </div>
+      {/* FilterBar */}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={totalFiltered}
+        count={count}
+      />
 
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
