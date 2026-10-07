@@ -8,6 +8,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
+import { useFilterSort, FilterBar, getFedRequirementsConfig } from '../../shr/filter';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
 import { Row, SectionTitle } from './helpers';
@@ -60,10 +61,22 @@ export default function RequirementsPage() {
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const list = useMemo(
-    () => [...requirements].sort((a, b) => a.name.localeCompare(b.name)),
-    [requirements]
-  );
+  // فیلتر/مرتب
+  const config = useMemo(() => {
+    // استخراج birdType های یکتا
+    const uniqueBirdTypes = Array.from(new Set(requirements.map(r => r.birdType).filter(Boolean)));
+    return getFedRequirementsConfig({
+      birdTypes: uniqueBirdTypes.map(bt => ({ value: bt, label: bt })),
+    });
+  }, [requirements]);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<Requirement>({
+    items: requirements,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -199,6 +212,20 @@ export default function RequirementsPage() {
           onDismiss={() => setUndoData(null)}
         />
       )}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={totalFiltered}
+        count={count}
+      />
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید

@@ -15,7 +15,7 @@ import {
 } from '../../mod/whs/store';
 import type { Person, Role } from '../../mod/ctc/store';
 import {
-  type Ingredient, type Formula,
+  type Ingredient, type Formula, type Requirement,
   CATEGORY_LABEL as FED_CAT_LABEL, CATEGORY_ICON as FED_CAT_ICON,
   STAGE_LABEL as FED_STAGE_LABEL,
 } from '../../mod/fed/store';
@@ -1227,5 +1227,58 @@ export function getFedFormulasConfig(ctx: {
     ],
     persistKey: 'fed-formulas',
     initialSort: { key: 'date', dir: 'desc' },
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// fed/RequirementsPage — نیازهای غذایی
+// ═══════════════════════════════════════════════════
+export function getFedRequirementsConfig(ctx: {
+  birdTypes: Array<{ value: string; label: string }>;
+}): FilterConfig<Requirement> {
+  return {
+    filterDefs: [
+      {
+        key: 'stage', label: 'مرحله', kind: 'enum',
+        icon: <IconChart size={18} />,
+        options: Object.keys(FED_STAGE_LABEL).map(s => ({
+          value: s,
+          label: FED_STAGE_LABEL[s],
+        })),
+        getValue: (r: Requirement) => r.stage || '',
+        multi: true,
+      },
+      {
+        key: 'birdType', label: 'نوع پرنده', kind: 'enum',
+        icon: <IconUser size={18} />,
+        options: ctx.birdTypes,
+        getValue: (r: Requirement) => r.birdType || '',
+        multi: true,
+      },
+    ],
+    sortDefs: [
+      {
+        key: 'name', label: 'نام', icon: <IconTag size={18} />,
+        hint: 'از الف به ی',
+        compare: (a: Requirement, b: Requirement) => (a.name || '').localeCompare(b.name || '', 'fa'),
+      },
+      {
+        key: 'protein', label: 'پروتئین', icon: <IconChart size={18} />,
+        hint: 'درصد پروتئین',
+        compare: (a: Requirement, b: Requirement) => (a.protein || 0) - (b.protein || 0),
+      },
+      {
+        key: 'energy', label: 'انرژی', icon: <IconChart size={18} />,
+        hint: 'انرژی متابولیزه',
+        compare: (a: Requirement, b: Requirement) => (a.energy || 0) - (b.energy || 0),
+      },
+      {
+        key: 'createdAt', label: 'جدیدترین', icon: <IconClock size={18} />,
+        hint: 'بر اساس تاریخ ایجاد',
+        compare: (a: Requirement, b: Requirement) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+      },
+    ],
+    persistKey: 'fed-requirements',
+    initialSort: { key: 'name', dir: 'asc' },
   };
 }
