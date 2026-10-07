@@ -171,8 +171,6 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const [err, setErr] = useState('');
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
-  const [filterHall, setFilterHall] = useState('');
-  const [filterKind, setFilterKind] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
 
@@ -250,20 +248,11 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     },
   );
 
-  // مرحله ۱: tab (نوع + سالن — نگه‌داشته شده)
-  const tabFiltered = useMemo(
-    () => equipment.filter(e =>
-      (!filterHall || e.hallId === filterHall) &&
-      (!filterKind || ((e as any).kind || 'asset') === filterKind)
-    ),
-    [equipment, filterHall, filterKind]
-  );
-
-  // مرحله ۲: FilterBar (فیلتر عمیق)
+  // فیلتر/مرتب
   const config = useMemo(() => getHalEquipmentConfig({ halls }), [halls]);
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total, count } = useFilterSort<Equipment>({
-    items: tabFiltered,
+    items: equipment,
     filters: config.filterDefs,
     sorts: config.sortDefs,
     persistKey: config.persistKey,
@@ -406,18 +395,6 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         tone="info"
       />
 
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterKind('')} style={chip(!filterKind)}>همه انواع</button>
-        {Object.entries(KIND_LABELS).map(([k, v]: any) => (
-          <button key={k} onClick={() => setFilterKind(k)} style={chip(filterKind === k)}>{v.icon} {v.name}</button>
-        ))}
-      </div>
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterHall('')} style={chip(!filterHall)}>همه سالن‌ها</button>
-        {halls.map(h => (
-          <button key={h.id} onClick={() => setFilterHall(h.id)} style={chip(filterHall === h.id)}>{h.name}</button>
-        ))}
-      </div>
       <FilterBar
         filterDefs={config.filterDefs}
         sortDefs={config.sortDefs}
