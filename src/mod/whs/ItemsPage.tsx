@@ -411,12 +411,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
             icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>}
             title="نتیجه‌ای پیدا نشد"
             desc="هیچ کالایی با فیلترهای فعلی هم‌خوانی ندارد. فیلترها را تغییر دهید یا پاک کنید."
-            action={
-              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Btn variant="primary" onClick={resetAll}>حذف فیلترها</Btn>
-                <Btn onClick={openNew}>+ افزودن قلم</Btn>
-              </div>
-            }
+            action={<Btn variant="primary" onClick={openNew}>+ افزودن قلم</Btn>}
           />
         )
       ) : (

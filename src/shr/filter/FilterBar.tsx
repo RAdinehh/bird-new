@@ -395,6 +395,23 @@ export function FilterBar<T>({
           </button>
         )}
 
+        {activeCount > 0 && (
+          <button type="button" onClick={resetAll}
+            aria-label="پاک کردن فیلترها"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 32, height: 32, padding: 0,
+              background: 'var(--danger-soft)',
+              border: '1px solid var(--danger)',
+              borderRadius: 'var(--r-sm)',
+              color: 'var(--danger)',
+              cursor: 'pointer', flexShrink: 0,
+              transition: 'all var(--dur-fast) var(--ease-out)',
+            }}>
+            <IconX size={13} />
+          </button>
+        )}
+
         <div style={{
           marginRight: 'auto', display: 'flex', alignItems: 'center',
           gap: 'var(--sp-2)', paddingLeft: 'var(--sp-1)',
