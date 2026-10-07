@@ -27,7 +27,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
-  const [filterHall, setFilterHall] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const halls = useMemo(() => {
@@ -148,17 +147,11 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     setOpen(false);
   };
 
-  // مرحله ۱: tab
-  const tabFiltered = useMemo(
-    () => filterHall ? zones.filter(z => z.hallId === filterHall) : zones,
-    [zones, filterHall]
-  );
-
-  // مرحله ۲: FilterBar
+  // فیلتر/مرتب
   const config = useMemo(() => getHalZonesConfig({ halls }), [halls]);
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total, count } = useFilterSort<Zone>({
-    items: tabFiltered,
+    items: zones,
     filters: config.filterDefs,
     sorts: config.sortDefs,
     persistKey: config.persistKey,
@@ -199,12 +192,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         />
       )}
 
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilterHall('')} style={chip(!filterHall)}>همه</button>
-        {halls.map(h => (
-          <button key={h.id} onClick={() => setFilterHall(h.id)} style={chip(filterHall === h.id)}>{h.name}</button>
-        ))}
-      </div>
       <FilterBar
         filterDefs={config.filterDefs}
         sortDefs={config.sortDefs}
