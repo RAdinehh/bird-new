@@ -1,7 +1,7 @@
 /**
  * EquipmentPage — تجهیزات
  */
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
@@ -10,6 +10,7 @@ import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumF
 import DatePicker from '../../shr/components/DatePicker';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
+import { useFilterSort, FilterBar, getHalEquipmentConfig } from '../../shr/filter';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
@@ -170,7 +171,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const [err, setErr] = useState('');
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
-  const [filter, setFilter] = useState('');
+  const [filterHall, setFilterHall] = useState('');
   const [filterKind, setFilterKind] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -249,7 +250,25 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     },
   );
 
-  const list = equipment.filter(e => (!filter || e.hallId === filter) && (!filterKind || ((e as any).kind || 'asset') === filterKind));
+  // مرحله ۱: tab (نوع + سالن — نگه‌داشته شده)
+  const tabFiltered = useMemo(
+    () => equipment.filter(e =>
+      (!filterHall || e.hallId === filterHall) &&
+      (!filterKind || ((e as any).kind || 'asset') === filterKind)
+    ),
+    [equipment, filterHall, filterKind]
+  );
+
+  // مرحله ۲: FilterBar (فیلتر عمیق)
+  const config = useMemo(() => getHalEquipmentConfig({ halls }), [halls]);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Equipment>({
+    items: tabFiltered,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -394,11 +413,25 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         ))}
       </div>
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        <button onClick={() => setFilter('')} style={chip(!filter)}>همه سالن‌ها</button>
+        <button onClick={() => setFilterHall('')} style={chip(!filterHall)}>همه سالن‌ها</button>
         {halls.map(h => (
-          <button key={h.id} onClick={() => setFilter(h.id)} style={chip(filter === h.id)}>{h.name}</button>
+          <button key={h.id} onClick={() => setFilterHall(h.id)} style={chip(filterHall === h.id)}>{h.name}</button>
         ))}
       </div>
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
