@@ -2,7 +2,9 @@
  * EquipmentPage — تجهیزات
  */
 import { useState, useRef, useMemo } from 'react';
+import { categoriesForKind, typesForCategory, calcEquipNeed, calcEquipValue, getCapacityHint, CATEGORIES_BY_KIND, TYPES_BY_CATEGORY } from './api/equipmentCalc';
 import EquipmentFormModal from './components/EquipmentFormModal';
+import EquipmentCard from './components/EquipmentCard';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
@@ -32,128 +34,6 @@ import { getEquipUnit } from './equipUnits';
 
 
 /** دسته‌های مجاز برای هر نوع دارایی */
-const CATEGORIES_BY_KIND: Record<string, string[]> = {
-  asset:      ['ventilation', 'heating', 'lighting', 'drinking', 'feeding', 'power', 'auxiliary'],
-  consumable: ['litter', 'feeding', 'drinking'],
-  system:     ['ventilation', 'heating', 'lighting', 'power', 'auxiliary'],
-};
-
-function categoriesForKind(kind: string): string[] {
-  return CATEGORIES_BY_KIND[kind] || Object.keys(CATEGORY_LABELS);
-}
-
-const TYPES_BY_CATEGORY: Record<string, string[]> = {
-  ventilation: ['fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad'],
-  feeding:     ['feeder_manual', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket'],
-  drinking:    ['nipple', 'cup', 'trough', 'fountain_drinker'],
-  heating:     ['radiant_brooder', 'jet_heater', 'duct_heater'],
-  lighting:    ['lamp_led', 'lamp_fluorescent', 'dimmer'],
-  litter:      ['litter_wood_shavings', 'litter_roll', 'litter_sand'],
-  power:       ['generator', 'electrical_panel', 'cable'],
-  auxiliary:   ['camera', 'sensor', 'scale'],
-};
-
-function typesForCategory(cat: string): string[] {
-  const list = TYPES_BY_CATEGORY[cat];
-  return (list && list.length > 0) ? list : [];
-}
-
-function getCapacityHint(type: string, cap: number | null, hallVol: number | null, count: number = 1, eff: number | null = null): string {
-  if (!cap || !hallVol || hallVol <= 0) return '';
-  if (type === 'fan' || type === 'cooler') {
-    const totalCap = cap * count;
-    const changesPerHour = totalCap / hallVol;
-    const minPerChange = Math.round(60 / changesPerHour);
-    if (minPerChange <= 1) return 'هر دقیقه ۱ بار تعویض هوا — مناسب گرمای شدید';
-    if (minPerChange <= 3) return 'هر ' + minPerChange + ' دقیقه ۱ بار تعویض هوا — مناسب تابستان';
-    if (minPerChange <= 10) return 'هر ' + minPerChange + ' دقیقه ۱ بار تعویض هوا — مناسب بهار/پاییز';
-    return 'هر ' + minPerChange + ' دقیقه ۱ بار تعویض هوا — مناسب زمستان';
-  }
-  if (type === 'lamp') {
-    const luxPerWatt = eff || 85;
-    const totalLumens = cap * count * luxPerWatt;
-    const area = hallVol / 3;
-    const lux = totalLumens / area;
-    if (lux >= 20) return '~' + Math.round(lux) + ' لوکس — مناسب تخم‌گذار';
-    if (lux >= 10) return '~' + Math.round(lux) + ' لوکس — مناسب پرورش';
-    return '~' + Math.round(lux) + ' لوکس — نور کم';
-  }
-  return '';
-}
-
-
-/** محاسبه نیاز تجهیزات بر اساس گله فعال سالن و استاندارد نژاد */
-function calcEquipNeed(
-  type: string,
-  hallId: string,
-  flocks: any[],
-  breedStd: any,
-  hallArea: number,
-): { need: number; unit: string; desc: string } | null {
-  // گله فعال این سالن
-  const flock = flocks.find((f: any) => f.hallId === hallId && f.status === 'active' && !f.paused);
-  if (!flock) return null;
-
-  const std = breedStd.byBreedId(flock.breedId);
-  if (!std || !std.equipment) return null;
-
-  const count = flock.currentCount || 0;
-  if (count <= 0) return null;
-
-  if (type === 'feeder') {
-    const eq = std.equipment.feeder;
-    if (eq.panBirdsPerUnit) {
-      const need = Math.ceil(count / eq.panBirdsPerUnit);
-      return { need, unit: 'عدد', desc: count + ' پرنده ÷ ' + eq.panBirdsPerUnit + ' پرنده/واحد' };
-    }
-    if (eq.chainCmPerBird) {
-      const meters = Math.ceil((count * eq.chainCmPerBird) / 100);
-      return { need: meters, unit: 'متر', desc: count + ' پرنده × ' + eq.chainCmPerBird + ' سانتی‌متر' };
-    }
-  }
-
-  if (type === 'drinker') {
-    const eq = std.equipment.drinker;
-    if (eq.nippleBirdsPerUnit) {
-      const need = Math.ceil(count / eq.nippleBirdsPerUnit);
-      return { need, unit: 'عدد', desc: count + ' پرنده ÷ ' + eq.nippleBirdsPerUnit + ' پرنده/نوپل' };
-    }
-    if (eq.cupBirdsPerUnit) {
-      const need = Math.ceil(count / eq.cupBirdsPerUnit);
-      return { need, unit: 'عدد', desc: count + ' پرنده ÷ ' + eq.cupBirdsPerUnit + ' پرنده/کاپ' };
-    }
-  }
-
-  if (type === 'lamp' && hallArea > 0) {
-    const w = std.equipment.lampWattPerM2 || 3;
-    const totalW = Math.ceil(hallArea * w);
-    return { need: totalW, unit: 'W', desc: hallArea + ' m² × ' + w + ' W/m²' };
-  }
-
-  if (type === 'fan') {
-    const kg = std.equipment.fanM3PerKg || 4.5;
-    // وزن هدف از growth یا فرض ۲ کیلوگرم
-    const targetW = std.growth?.weightByAge?.[std.growth.weightByAge.length - 1]?.weightG || 2000;
-    const totalKg = (count * targetW) / 1000;
-    const need = Math.ceil(totalKg * kg);
-    return { need, unit: 'm³/h', desc: 'وزن کل ' + Math.round(totalKg) + ' kg × ' + kg };
-  }
-
-  return null;
-}
-
-function calcEquipValue(e: any): number {
-  const count = e.count || 0;
-  const price = e.unitPrice || 0;
-  if (!count || !price) return 0;
-  const def = getEquipUnit(e.type || 'other');
-  if (def.baseUnit === 'kg') {
-    const base = def.calc(count, (e as any).capacity || 0);
-    return Math.round(base * price);
-  }
-  return count * price;
-}
-
 export default function EquipmentPage({ active = true }: { active?: boolean } = {}) {
   const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
   const breedStd = useBreedStandard();
@@ -462,155 +342,24 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         <>
           {list.map((e, i) => {
             const hall = halls.find(h => h.id === e.hallId);
-            const _cm = (allCustomOpts as any[]).find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
-            const _isDeleted = _cm ? _cm.hidden === true : false;
-            const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: '🔧' });
-            const value = calcEquipValue(e);
             const isOpen = expandedId === e.id;
             return (
-              <ExpandableCard
+              <EquipmentCard
                 key={e.id}
-                id={e.id}
-                ms={ms}
-                accent="accent"
-                index={toFa(i + 1)}
-                iconEmoji={meta.icon}
-                title={e.name}
-                subtitle={`${meta.name}${_isDeleted ? ' · حذف‌شده' : ''} · ${hall?.name || '—'}`}
+                e={e}
+                i={i}
+                hall={hall}
+                allCustomOpts={allCustomOpts}
                 isOpen={isOpen}
+                ms={ms}
                 onToggle={() => setExpandedId(isOpen ? null : e.id)}
-                badge={e.count ? <Tag tone="blue">{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</Tag> : undefined}
-                stats={<>
-                  {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</b></span>}
-                  {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(value.toLocaleString('fa-IR'))} ت</b></span>}
-                  {e.warranty && <span>گارانتی: <b style={{ color: 'var(--text)' }}>{toFa(e.warranty)} ماه</b></span>}
-                </>}
-              >
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🔧</span> مشخصات</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>نوع:</span>
-                    <span style={{ fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                      {meta.name}
-                      {_isDeleted && (
-                        <span style={{
-                          fontSize: 10, fontWeight: 700,
-                          padding: '2px 7px', borderRadius: 6,
-                          background: 'rgba(217,119,6,.14)', color: 'var(--warn)',
-                          letterSpacing: '.3px',
-                        }}>حذف‌شده</span>
-                      )}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>نوع دارایی:</span>
-                    <span style={{ fontWeight: 600 }}>{(KIND_LABELS as any)[(e as any).kind || 'asset']?.icon} {(KIND_LABELS as any)[(e as any).kind || 'asset']?.name}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>دسته:</span>
-                    <span style={{ fontWeight: 600 }}>{(CATEGORY_LABELS as any)[(e as any).category || 'auxiliary']?.icon} {(CATEGORY_LABELS as any)[(e as any).category || 'auxiliary']?.name}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>سالن:</span>
-                    <span style={{ fontWeight: 600 }}>{hall?.name || '—'}</span>
-                  </div>
-                  {e.count && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>
-                      <span style={{ color: 'var(--muted)' }}>تعداد:</span>
-                      <span style={{ fontWeight: 600 }}>{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</span>
-                    </div>
-                  )}
-                </div>
-
-                {(e.unitPrice || value > 0 || e.purchasedAt || e.warranty) && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {e.unitPrice && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
-                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                          <span style={{ color: 'var(--muted)' }}>قیمت واحد:</span>
-                          <span style={{ fontWeight: 600 }}>{toFa(e.unitPrice.toLocaleString('fa-IR'))} ت</span>
-                        </div>
-                      )}
-                      {value > 0 && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
-                           background: 'var(--accent-soft)', color: 'var(--accent)',
-                           borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                          <span>ارزش کل:</span>
-                          <span>{toFa(value.toLocaleString('fa-IR'))} ت</span>
-                        </div>
-                      )}
-                      {e.purchasedAt && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
-                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                          <span style={{ color: 'var(--muted)' }}>تاریخ خرید:</span>
-                          <span style={{ fontWeight: 600 }}>{toFa(e.purchasedAt)}</span>
-                        </div>
-                      )}
-                      {e.warranty && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
-                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                          <span style={{ color: 'var(--muted)' }}>گارانتی:</span>
-                          <span style={{ fontWeight: 600 }}>{toFa(e.warranty)} ماه</span>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-
-                {e.notes && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
-                  </>
-                )}
-
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  {e.unitPrice && e.unitPrice > 0 && (
-                    <Btn
-                      size="sm"
-                      variant="primary"
-                      onClick={() => {
-                        const params = new URLSearchParams({
-                          _tra: 'equip',
-                          equipmentId: e.id,
-                          name: e.name,
-                          type: e.type || 'other',
-                          qty: String(e.count || 1),
-                          price: String(e.unitPrice || 0),
-                          hallId: e.hallId,
-                        });
-                        window.location.href = '/tra?' + params.toString();
-                      }}
-                      style={{ flex: 1 }}
-                    >
-                      💰 ثبت فاکتور
-                    </Btn>
-                  )}
-                  <Btn size="sm" onClick={() => openEdit(e)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                    const idToDel = e.id; const ok = await showConfirmAsync('تأیید حذف', 'این تجهیز حذف شود؟', { danger: true }); if (!ok) return; const item = equipment.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteEquip(idToDel);
-                    logAction('delete', 'hal', 'حذف از سالن‌ها');  toastMsg.deleted('تجهیز')
-                    }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+                onEdit={() => openEdit(e)}
+                onDelete={deleteEquip}
+                onUndo={(item) => {
+                  setUndoData({ item });
+                  setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
+                }}
+              />
             );
           })}
           
