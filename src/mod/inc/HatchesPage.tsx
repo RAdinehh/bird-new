@@ -28,6 +28,7 @@ import { buildFlockFromHatch, buildSaleInvoiceFromHatch } from './api/hatchActio
 import FlockCreateModal from './components/FlockCreateModal';
 import SellModal from './components/SellModal';
 import HatchFormModal from './components/HatchFormModal';
+import HatchCard from './components/HatchCard';
 import { logAction } from '../../cor/logger/auditLog';
 
 const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
@@ -418,100 +419,28 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
             const realRate = aliveAfter ? ((h.hatched || 0) / aliveAfter * 100) : 0;
             const tone = hr >= 70 ? 'green' : hr >= 50 ? 'amber' : 'red';
             const sumH = (h.hatched||0) + (h.unhatched||0) + (h.deadInShell||0) + (h.pipped||0) + (h.other||0);
-            const isComplete = total > 0 && sumH >= total;
-            return (
-              <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={toFa(i + 1)} iconEmoji="🐣"
-                title={toFa(h.hatched || 0) + ' جوجه · ' + (bird?.name || '—')}
-                subtitle={(dev?.name || '—') + ' · ' + toFa(h.date)}
-                isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
-                badge={<Tag tone={tone}>{toFa(hr.toFixed(1))}٪</Tag>}
-                stats={<>
-                  <StatBox icon="📊" label="نرخ" value={toFa(hr.toFixed(0)) + '٪'} tone={hr >= 70 ? 'accent' : 'warn'} />
-                  <Dot />
-                  <StatBox icon="🥚" label="تخم" value={toFa(total)} />
-                </>}
-              >
-                {isComplete && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, padding: 'var(--pad-tight)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', textAlign: 'center' }}>✅ تکمیل — همه تخم‌ها شمارش شدن</div>}
-
-                {total > 0 && (h.hatched || 0) > 0 && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> توزیع</div>
-                    <div style={{ display: 'flex', height: 36, borderRadius: 4, overflow: 'hidden', background: 'var(--input-bg)' }}>
-                      {(h.hatched||0) > 0 && <div style={{ width: ((h.hatched||0)/total*100)+'%', background: 'var(--accent)' }} />}
-                      {(h.deadInShell||0) > 0 && <div style={{ width: ((h.deadInShell||0)/total*100)+'%', background: 'var(--danger)' }} />}
-                      {(h.pipped||0) > 0 && <div style={{ width: ((h.pipped||0)/total*100)+'%', background: 'var(--warn)' }} />}
-                      {(h.unhatched||0) > 0 && <div style={{ width: ((h.unhatched||0)/total*100)+'%', background: 'var(--muted)' }} />}
-                    </div>
-                  </>
-                )}
-
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> نتیجه هچ</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <Row l="جوجه هچ‌شده" v={toFa(h.hatched || 0)} />
-                  <Row l="هچ‌نشده" v={toFa(h.unhatched || 0)} />
-                  {h.deadInShell ? <Row l="مرده در پوسته" v={toFa(h.deadInShell)} /> : null}
-                  {h.pipped ? <Row l="نوک‌زده" v={toFa(h.pipped)} /> : null}
-                  {h.other ? <Row l="سایر" v={toFa(h.other)} /> : null}
-                </div>
-
-                {(h.gradeA || h.gradeB) && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🏅</span> تفکیک کیفی</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {h.gradeA ? <Row l="درجه A" v={toFa(h.gradeA)} /> : null}
-                      {h.gradeB ? <Row l="درجه B" v={toFa(h.gradeB)} /> : null}
-                    </div>
-                  </>
-                )}
-
-                {(h.maleCount || h.femaleCount || h.unknownCount) && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚖️</span> جنسیت</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {h.maleCount ? <Row l="♂ نر" v={toFa(h.maleCount)} /> : null}
-                      {h.femaleCount ? <Row l="♀ ماده" v={toFa(h.femaleCount)} /> : null}
-                      {h.unknownCount ? <Row l="? نامعلوم" v={toFa(h.unknownCount)} /> : null}
-                    </div>
-                  </>
-                )}
-
-                {h.avgWeight ? <><div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚖️</span> وزن</div><Row l="وزن متوسط" v={toFa(h.avgWeight) + ' گرم'} /></> : null}
-
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📈</span> نرخ‌ها</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <Row l="نرخ هچ کل" v={toFa(hr.toFixed(1)) + '٪'} />
-                  {aliveAfter !== total && <Row l="نرخ از نطفه‌دار" v={toFa(realRate.toFixed(1)) + '٪'} />}
-                </div>
-
-                {entry?.totalPrice && h.hatched ? (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هزینه</div>
-                    <Row l="💰 هزینه هر جوجه" v={toFa(Math.round(costPerChick(entry.totalPrice, h.hatched)).toLocaleString('fa-IR')) + ' ت'} />
-                  </>
-                ) : null}
-
-                {h.notes && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
-                  </>
-                )}
-
-                {isComplete && (h.hatched || 0) > 0 && (
-                  <div style={{ padding: 10, background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', textAlign: 'center' }}>مرحله بعد:</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                      <Btn size="sm" onClick={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(formatJ(new Date(), 'yyyy')), type: 'layer', hallId: '', zoneId: '' }); }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> گله</Btn>
-                      <Btn size="sm" onClick={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> فروش</Btn>
-                    </div>
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(h)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={() => doDelete(h.id)} aria-label="حذف هچ" style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+              return (
+              <HatchCard
+                key={h.id}
+                hatch={h}
+                index={i}
+                bird={bird}
+                dev={dev}
+                entry={entry}
+                isOpen={isOpen}
+                ms={ms}
+                hr={hr}
+                realRate={realRate}
+                aliveAfter={aliveAfter}
+                total={total}
+                isComplete={(h.hatched||0)+(h.unhatched||0)+(h.deadInShell||0)+(h.pipped||0)+(h.other||0) >= total}
+                tone={tone}
+                onToggle={() => setExpandedId(isOpen ? null : h.id)}
+                onEdit={() => openEdit(h)}
+                onDelete={() => doDelete(h.id)}
+                onOpenFlock={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(formatJ(new Date(), 'yyyy')), type: 'layer', hallId: '', zoneId: '' }); }}
+                onOpenSell={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}
+              />
             );
           })}
           
