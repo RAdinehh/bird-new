@@ -5,9 +5,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useInc, type Candling } from './store';
 import { useBrd } from '../brd/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, SectionTitle, Select, Tag, ErrorBox } from '../../shr/components/ui';
+import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
-import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { showToast, toastMsg } from '../../cor/store/toast';
@@ -17,6 +16,7 @@ import { useIncubationProfile } from './hooks';
 import { calcAvailableBase, aggregateCandlings, calcSummary } from './api/calc';
 import { useCandlingForm, type EntryData, emptyData } from './hooks/useCandlingForm';
 import CandlingCard from './components/CandlingCard';
+import CandlingFormModal from './components/CandlingFormModal';
 import { logAction } from '../../cor/logger/auditLog';
 import { useMemo as _useMemoV } from 'react';
 
@@ -306,174 +306,33 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
         </>
       )}
 
-      <Modal open={open} onClose={() => setOpen(false)} title={editingId ? '✏️ ویرایش کندلینگ' : '🔍 ثبت کندلینگ'}
-        footer={<BtnRow><Btn variant="primary" onClick={handleSave} disabled={Object.keys(vErrors).length > 0}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={close}>لغو</Btn></BtnRow>}>
-
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> زمان‌بندی</SectionTitle>
-        {_firstSelectedBirdName && _profile.totalDays ? (
-          <div style={{
-            fontSize: 'var(--fs-xs)',
-            padding: '6px 10px',
-            background: 'var(--accent-soft)',
-            border: '1px solid var(--accent-border)',
-            borderRadius: 'var(--r-sm)',
-            color: 'var(--accent)',
-            fontWeight: 700,
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}>
-            <span>🐣 {_firstSelectedBirdName}</span>
-            <span>مدت {toFa(_profile.totalDays)} روز · قفل {toFa(_profile.lockdownDay)}</span>
-          </div>
-        ) : null}
-        <Grid2>
-          <Field label="روز انکوباسیون" required hint="۷، ۱۰، ۱۵...">
-            <NumField value={modalDay} onChange={e => setModalDay(e.target.value)} unit="روز" min={1} max={30} autoClamp />
-          </Field>
-          <Field label="تاریخ" required>
-            <DatePicker value={modalDate} onChange={v => setModalDate(v)} placeholder="انتخاب"  autoToday />
-          </Field>
-        </Grid2>
-
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> انتخاب ورودی‌ها</SectionTitle>
-        <Field label="فیلتر دستگاه">
-          <Select value={modalDevice} onChange={e => { setModalDevice(e.target.value); setSelectedIds(new Set()); setEntriesData({}); }}>
-            <option value="">— همه دستگاه‌ها —</option>
-            {devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-          </Select>
-        </Field>
-
-        {availableEntries.length === 0 ? (
-          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-            ورودی‌ای برای این دستگاه نیست
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {availableEntries.map(e => {
-              const bird = _birdsById[e.birdId];
-              const isSelected = selectedIds.has(e.id);
-              const d = dataFor(e.id);
-              const sum = (parseInt(toEn(d.infertile))||0) + (parseInt(toEn(d.dead))||0) + (parseInt(toEn(d.broken))||0);
-              const dayNum = parseInt(toEn(modalDay)) || 0;
-              const baseInfo = calcAvailableBase(e.id, dayNum, null, candlings, e.count || 0);
-              const remaining = baseInfo.base - sum;
-              const existingCandlings = candlings.filter(c => c.eggEntryId === e.id);
-              const alreadyAgg = existingCandlings.reduce((acc, c) => ({
-                alive: acc.alive + (c.alive || 0),
-                infertile: acc.infertile + (c.infertile || 0),
-                dead: acc.dead + (c.dead || 0),
-                broken: acc.broken + (c.broken || 0),
-              }), { alive: 0, infertile: 0, dead: 0, broken: 0 });
-
-              return (
-                <div key={e.id} style={{
-                  border: '1px solid ' + (isSelected ? 'var(--accent-border)' : 'var(--border)'),
-                  background: isSelected ? 'var(--accent-soft)' : 'var(--card)',
-                  borderRadius: 'var(--r-md)',
-                  padding: 10,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={isSelected} onChange={() => toggleEntry(e.id)} aria-label="انتخاب این ورودی" style={{ width: 20, height: 20, accentColor: 'var(--accent)', cursor: 'pointer', flexShrink: 0 }} />
-                    <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
-                      {bird?.name || '—'} · {toFa(e.count || 0)} تخم
-                    </span>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(e.entryDate)}</span>
-                  </label>
-
-                  {existingCandlings.length > 0 && (
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '4px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                      تجمیع قبلی: سالم {toFa(alreadyAgg.alive)} · بی‌نطفه {toFa(alreadyAgg.infertile)} · مرده {toFa(alreadyAgg.dead)}
-                    </div>
-                  )}
-
-                  {/* مبنا */}
-                  <div style={{
-                    fontSize: 'var(--fs-xs)',
-                    padding: 'var(--pad-tight)',
-                    background: 'var(--accent-soft)',
-                    border: '1px solid var(--accent-border)',
-                    borderRadius: 'var(--r-sm)',
-                    color: 'var(--accent)',
-                    fontWeight: 700,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                  }}>
-                    <span>🎯 مبنای این کندلینگ:</span>
-                    <span>{toFa(baseInfo.base)} تخم ({baseInfo.source})</span>
-                  </div>
-
-                  {isSelected && (
-                    <>
-                      <Grid2>
-                        <Field label="بی‌نطفه"><NumField placeholder="۰" value={d.infertile} onChange={ev => updateEntryData(e.id, { infertile: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
-                        <Field label="سالم" hint="خودکار">
-                          {(() => {
-                            const _inf = parseInt(toEn(d.infertile)) || 0;
-                            const _dead = parseInt(toEn(d.dead)) || 0;
-                            const _brk = parseInt(toEn(d.broken)) || 0;
-                            const _base = baseInfo.base || 0;
-                            const _alive = Math.max(0, _base - _inf - _dead - _brk);
-                            const _over = (_inf + _dead + _brk) > _base;
-                            return (
-                              <div style={{
-                                height: 38, display: "flex", alignItems: "center", justifyContent: "flex-end",
-                                padding: "0 12px",
-                                background: _over ? "var(--danger-soft)" : "var(--accent-soft)",
-                                border: "1px solid " + (_over ? "var(--danger)" : "var(--accent-border)"),
-                                borderRadius: "var(--r-md)",
-                                fontSize: "var(--fs-base)", fontWeight: 700,
-                                color: _over ? "var(--danger)" : "var(--accent)",
-                              }}>{toFa(_alive)} عدد</div>
-                            );
-                          })()}
-                        </Field>
-                      </Grid2>
-                      <Grid2>
-                        <Field label="مرده"><NumField placeholder="۰" value={d.dead} onChange={ev => updateEntryData(e.id, { dead: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
-                        <Field label="شکسته"><NumField placeholder="۰" value={d.broken} onChange={ev => updateEntryData(e.id, { broken: ev.target.value })} max={e.count || 0} min={0} unit="عدد" autoClamp /></Field>
-                      </Grid2>
-
-                      <div style={{
-                        padding: 'var(--pad-tight)',
-                        background: remaining < 0 ? 'var(--danger-soft)' : remaining === 0 ? 'var(--accent-soft)' : 'var(--input-bg)',
-                        border: '1px solid ' + (remaining < 0 ? 'var(--danger)' : remaining === 0 ? 'var(--accent-border)' : 'var(--border)'),
-                        borderRadius: 'var(--r-sm)',
-                        fontSize: 'var(--fs-xs)',
-                        color: remaining < 0 ? 'var(--danger)' : remaining === 0 ? 'var(--accent)' : 'var(--text)',
-                        fontWeight: 700,
-                        textAlign: 'center',
-                      }}>
-                        مجموع تلفات: {toFa(sum)} از {toFa(baseInfo.base)}
-                        {remaining > 0 && ' · باقی — ' + toFa(remaining)}
-                        {remaining < 0 && ' — بیشتر از مبنای مرحله قبل!'}
-                        {remaining === 0 && ' ✅ کامل'}
-                      </div>
-
-                      <Grid2>
-                        <Field label="دلیل بی‌نطفه">
-                          <Select value={d.infertileReason} onChange={ev => updateEntryData(e.id, { infertileReason: ev.target.value })}>
-                            {INFERTILE_REASONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                          </Select>
-                        </Field>
-                        <Field label="دلیل مرگ">
-                          <Select value={d.deadReason} onChange={ev => updateEntryData(e.id, { deadReason: ev.target.value })}>
-                            {DEAD_REASONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                          </Select>
-                        </Field>
-                      </Grid2>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        <ErrorBox>{err}</ErrorBox>
-      </Modal>
+      <CandlingFormModal
+        open={open}
+        onClose={close}
+        editingId={editingId}
+        modalDay={modalDay}
+        setModalDay={setModalDay}
+        modalDate={modalDate}
+        setModalDate={setModalDate}
+        modalDevice={modalDevice}
+        setModalDevice={setModalDevice}
+        selectedIds={selectedIds}
+        setSelectedIds={setSelectedIds}
+        setEntriesData={setEntriesData}
+        toggleEntry={toggleEntry}
+        updateEntryData={updateEntryData}
+        entriesData={entriesData}
+        devices={devices}
+        availableEntries={availableEntries}
+        birdsById={_birdsById}
+        candlings={candlings}
+        firstSelectedBirdName={_firstSelectedBirdName}
+        profile={_profile}
+        onSave={handleSave}
+        saving={false}
+        err={err}
+        vErrors={vErrors}
+      />
 
     </PageContainer>
   );
