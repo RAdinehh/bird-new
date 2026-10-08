@@ -8,10 +8,18 @@ export interface CandlingLike {
   id: string;
   eggEntryId: string;
   stage: number;
-  alive?: number | null;
-  infertile?: number | null;
-  dead?: number | null;
-  broken?: number | null;
+  date: string;
+  alive: number | null;
+  infertile: number | null;
+  dead: number | null;
+  broken: number | null;
+  infertileReason: string;
+  deadReason: string;
+  notes: string;
+  createdAt: string;
+  deadEarly?: number | null;
+  deadMid?: number | null;
+  deadLate?: number | null;
 }
 
 export interface AvailableBase {

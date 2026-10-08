@@ -16,6 +16,7 @@ import { todayJalali } from './helpers';
 import { useIncubationProfile } from './hooks';
 import { calcAvailableBase, aggregateCandlings, calcSummary } from './api/calc';
 import { useCandlingForm, type EntryData, emptyData } from './hooks/useCandlingForm';
+import CandlingCard from './components/CandlingCard';
 import { logAction } from '../../cor/logger/auditLog';
 import { useMemo as _useMemoV } from 'react';
 
@@ -275,145 +276,30 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
           action={<Btn variant="primary" onClick={() => handleOpenNew()}>+ ثبت کندلینگ</Btn>} />
       ) : (
         <>
-          {grouped.map(({ entryId, list, agg, total, entryTotal, fertilePercent, lossPercent, deadPercent }, i) => {
+          {grouped.map(({ entryId, list, agg, total, entryTotal, fertilePercent, lossPercent }) => {
             const entry = _entriesById[entryId];
             const bird = entry ? _birdsById[entry.birdId] : null;
             const dev = entry ? _devicesById[entry.deviceId] : null;
             const isOpen = expandedId === entryId;
-            const lossTone = lossPercent > 20 ? 'danger' : lossPercent > 10 ? 'warn' : 'green';
-
             return (
-              <ExpandableCard key={entryId} accent="accent" index={toFa(i + 1)} iconEmoji="🔍"
-                title={bird?.name || '—'}
-                subtitle={(dev?.name || '—') + ' · ' + toFa(entryTotal) + ' تخم · ' + toFa(entry?.entryDate || '—')}
-                isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : entryId)}
-                badge={<Tag tone={lossTone}>تلفات {toFa(lossPercent.toFixed(0))}٪</Tag>}
-                stats={<>
-                  <StatBox icon="🧬" label="نطفه" value={toFa(Math.round(fertilePercent)) + '٪'} tone="accent" />
-                  <Dot />
-                  <StatBox icon="📊" label="کندلینگ" value={toFa(list.length)} />
-                </>}
-              >
-                {/* ═══ دکمه‌های روز ═══ */}
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> کندلینگ‌های این ورودی</div>
-                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                  {list.map((c, idx) => (
-                    <div key={c.id} style={{ position: 'relative' }}>
-                      <button
-                        type="button"
-                        aria-label={'ویرایش کندلینگ روز ' + c.stage}
-                        onClick={() => openEdit(c)}
-                        title={toFa(c.date)}
-                        style={{
-                          padding: '6px 12px 6px 28px',
-                          background: 'var(--accent-soft)',
-                          border: '1px solid var(--accent-border)',
-                          borderRadius: 'var(--r-sm)',
-                          fontSize: 'var(--fs-xs)',
-                          fontWeight: 700,
-                          color: 'var(--accent)',
-                          cursor: 'pointer',
-                          fontFamily: 'inherit',
-                        }}
-                      >
-                        ✓ روز {toFa(c.stage)}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          const subsequent = list.filter(x => x.stage > c.stage);
-                          const msg = subsequent.length > 0
-                            ? 'این کندلینگ و ' + toFa(subsequent.length) + ' کندلینگ بعدی حذف می‌شوند.\n\nادامه؟'
-                            : 'این کندلینگ حذف شود؟';
-                          if (await showConfirmAsync('تأیید', msg)) {
-                            deleteCandling(c.id);
-                            subsequent.forEach(s => deleteCandling(s.id));
-                          }
-                        }}
-                        title="بازگردانی و حذف بعدی‌ها" aria-label="حذف کندلینگ"
-                        style={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: 4,
-                          transform: 'translateY(-50%)',
-                          background: 'var(--danger-soft)',
-                          border: '1px solid var(--danger)',
-                          color: 'var(--danger)',
-                          cursor: 'pointer',
-                          fontSize: 12,
-                          lineHeight: 1,
-                          padding: '2px 4px',
-                          borderRadius: 'var(--r-sm)',
-                          fontWeight: 700,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          minWidth: 16,
-                          height: 36,
-                        }}
-                      >✕</button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => handleOpenNew(entryId)}
-                    style={{
-                      padding: 'var(--pad-tight)',
-                      background: 'var(--input-bg)',
-                      border: '1px dashed var(--border)',
-                      borderRadius: 'var(--r-sm)',
-                      fontSize: 'var(--fs-xs)',
-                      fontWeight: 700,
-                      color: 'var(--muted)',
-                      cursor: 'pointer',
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    + کندلینگ جدید
-                  </button>
-                </div>
-
-                {/* ═══ تجمیع با درصد ═══ */}
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> تجمیع ({toFa(list.length)} کندلینگ)</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> نطفه‌داری</span>
-                    <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(fertilePercent.toFixed(1))}٪</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>📉 تلفات کل</span>
-                    <span style={{ fontWeight: 700, color: lossPercent > 10 ? 'var(--danger)' : 'var(--text)' }}>{toFa(lossPercent.toFixed(1))}٪</span>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--muted)' }}>✅ سالم</span>
-                      <span style={{ fontWeight: 700 }}>{toFa(agg.alive)}</span>
-                    </div>
-                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--muted)' }}>⚪ بی‌نطفه</span>
-                      <span style={{ fontWeight: 700 }}>{toFa(agg.infertile)}</span>
-                    </div>
-                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--muted)' }}>💀 مرده</span>
-                      <span style={{ fontWeight: 700 }}>{toFa(agg.dead)}</span>
-                    </div>
-                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--muted)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> شکسته</span>
-                      <span style={{ fontWeight: 700 }}>{toFa(agg.broken)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ═══ نوار پیشرفت بصری ═══ */}
-                {total > 0 && (
-                  <div style={{ display: 'flex', height: 36, borderRadius: 4, overflow: 'hidden', background: 'var(--input-bg)' }}>
-                    <div style={{ width: (agg.alive / total * 100) + '%', background: 'var(--accent)' }} />
-                    <div style={{ width: (agg.infertile / total * 100) + '%', background: 'var(--warn)' }} />
-                    <div style={{ width: (agg.dead / total * 100) + '%', background: 'var(--danger)' }} />
-                    <div style={{ width: (agg.broken / total * 100) + '%', background: 'var(--muted)' }} />
-                  </div>
-                )}
-              </ExpandableCard>
+              <CandlingCard
+                key={entryId}
+                entryId={entryId}
+                list={list}
+                agg={agg}
+                total={total}
+                entryTotal={entryTotal}
+                fertilePercent={fertilePercent}
+                lossPercent={lossPercent}
+                birdName={bird?.name}
+                deviceName={dev?.name}
+                entryDate={entry?.entryDate}
+                isOpen={isOpen}
+                onToggle={() => setExpandedId(isOpen ? null : entryId)}
+                onEdit={openEdit}
+                onNew={handleOpenNew}
+                onDelete={deleteCandling}
+              />
             );
           })}
           
