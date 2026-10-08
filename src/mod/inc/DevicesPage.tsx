@@ -4,7 +4,7 @@
 import { useTempUnit, toUserTemp, toCelsius, round1 } from '../../shr/utils/temp';
 import { useFab } from '../../shr/hooks/useFab';
 import { useState, useMemo, useEffect } from 'react';
-import { useInc, type Device, type DeviceMode, type DeviceStatus, type DeviceCapacity, fillCapacityFromProfile } from './store';
+import { useInc, type Device, type DeviceMode, type DeviceStatus } from './store';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createDeviceSchema } from '../../shr/validation/rules/inc';
 import { useSet } from '../set/store';
@@ -20,166 +20,15 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import { parse as parseJ, addMonths, format as formatJ } from 'date-fns-jalali';
-import { Row, normalizeBird } from './helpers';
+import { Row } from './helpers';
+import OvNumField from './components/OvNumField';
+import MaintenanceModal from './components/MaintenanceModal';
+import CapacityEditor from './components/CapacityEditor';
+import { STATUS_FA, MODE_FA, emptyForm as empty, type F } from './types-devices';
+import { warrantyInfo } from './api/warranty';
 import { useIncubationProfile } from './hooks';
 import { logAction } from '../../cor/logger/auditLog';
 
-function OvNumField({ label, hint, value, defValue, onChange, unit, min, max, placeholder, isTemp }: any) {
-  const tempUnit = useTempUnit();
-
-  // اگه دما هست: مقدار ذخیره‌شده سلسیوس است، نمایش تبدیل می‌شود
-  const displayValue = isTemp
-    ? (value == null || value === '' ? '' : String(toUserTemp(Number(value), tempUnit)))
-    : String(value ?? '');
-
-  const displayDef = isTemp && defValue != null
-    ? toUserTemp(Number(defValue), tempUnit)
-    : defValue;
-
-  const displayUnit = isTemp
-    ? (tempUnit === 'c' ? '°C' : '°F')
-    : unit;
-
-  const overridden = defValue != null && value != null && value !== ''
-    && Math.abs(Number(value) - Number(defValue)) > 0.05;
-
-  // برای نمایش hint به‌روز
-  const dynamicHint = isTemp ? displayUnit : hint;
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isTemp) {
-      onChange(e);
-      return;
-    }
-    // تبدیل به سلسیوس برای ذخیره
-    let v = e.target.value;
-    v = v.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
-    v = v.replace(/[٫،]/g, '.');
-    v = v.replace(/[^\d.-]/g, '');
-    if (v === '' || v === '-' || v === '.') {
-      onChange({ target: { value: '' } });
-      return;
-    }
-    const n = Number(v);
-    if (isNaN(n)) return;
-    const celsius = toCelsius(n, tempUnit);
-    if (celsius != null) {
-      onChange({ target: { value: String(round1(celsius)) } });
-    }
-  };
-
-  return (
-    <Field label={label} hint={dynamicHint}>
-      <div style={{ position: 'relative' }}>
-        {isTemp ? (
-          <input
-            type="text"
-            inputMode="decimal"
-            value={displayValue}
-            onChange={handleChange}
-            onFocus={(e) => e.target.select()}
-            style={{
-              width: '100%',
-              height: 38,
-              padding: '0 12px',
-              background: 'var(--input-bg)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--r-md)',
-              color: 'var(--text)',
-              fontFamily: 'inherit',
-              fontSize: 'var(--fs-base)',
-              fontWeight: 600,
-              textAlign: 'right',
-              outline: 'none',
-              fontVariantNumeric: 'tabular-nums',
-              direction: 'ltr',
-            }}
-          />
-        ) : (
-          <NumField value={String(value ?? '')} onChange={onChange} unit={unit} min={min} max={max} placeholder={placeholder} />
-        )}
-        {overridden && (
-          <span title={`دستی — پیش‌فرض: ${toFa(String(displayDef))}${isTemp ? displayUnit : ''}`} style={{
-            position: 'absolute', top: -2, left: -2,
-            width: 8, height: 8, borderRadius: '50%',
-            background: 'var(--warn)',
-            cursor: 'help',
-            zIndex: 2,
-            boxShadow: '0 0 0 2px var(--card)',
-          }} />
-        )}
-      </div>
-    </Field>
-  );
-}
-
-const STATUS_FA: Record<DeviceStatus, string> = {
-  active: '✅ فعال',
-  idle: '⏸ غیرفعال',
-  maintenance: '🔧 تعمیر',
-  broken: '❌ خراب',
-};
-
-const MODE_FA: Record<DeviceMode, string> = {
-  'setter': 'ستر',
-  'hatcher': 'هچر',
-  'setter+hatcher': 'ستر + هچر',
-};
-
-interface F {
-  id?: string;
-  name: string;
-  capacityByBird: DeviceCapacity[];
-  mode: DeviceMode;
-  status: DeviceStatus;
-  temp: string;
-  humidity: string;
-  purchasedAt: string;
-  price: string;
-  warranty: string;
-  racks: string;
-  trays: string;
-  fans: string;
-  tempSensors: string;
-  humiditySensors: string;
-  motorPower: string;
-  extraCost: string;
-  notes: string;
-}
-
-const empty: F = {
-  name: '',
-  capacityByBird: [],
-  mode: 'setter+hatcher',
-  status: 'active',
-  temp: '',
-  humidity: '',
-  purchasedAt: '',
-  price: '',
-  warranty: '',
-  racks: '',
-  trays: '',
-  fans: '',
-  tempSensors: '',
-  humiditySensors: '',
-  motorPower: '',
-  extraCost: '',
-  notes: '',
-};
-
-
-
-function warrantyInfo(purchasedAt: string, months: number | null): { end: string; expired: boolean } | null {
-  if (!purchasedAt || !months) return null;
-  try {
-    const d = parseJ(toEn(purchasedAt), 'yyyy/MM/dd', new Date());
-    if (isNaN(d.getTime())) return null;
-    const end = formatJ(addMonths(d, months), 'yyyy/MM/dd');
-    const t = new Date();
-    const today = formatJ(t, 'yyyy/MM/dd');
-    return { end, expired: end < today };
-  } catch { return null; }
-}
 
 export default function DevicesPage({ active = true }: { active?: boolean } = {}) {
   const { devices, eggEntries, addDevice, updateDevice, deleteDevice } = useInc();
@@ -188,8 +37,6 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
-  const [expandedBird, setExpandedBird] = useState<string | null>(null);
-  const [undoData, setUndoData] = useState<{ birdName: string; data: any } | null>(null);
   const [err, setErr] = useState('');
   const [undoDevice, setUndoDevice] = useState<{ device: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -260,71 +107,13 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
   };
   useFab(active ? { label: 'افزودن دستگاه', onClick: openNew } : null);
 
-  const addCapacity = (birdName: string) => {
-    if (!birdName.trim()) return;
-    if (form.capacityByBird.some(c => normalizeBird(c.birdName) === normalizeBird(birdName))) return;
-    const defaults = fillCapacityFromProfile(birdName);
-    const newCap: any = { birdName, capacity: null, ...(defaults || {}) };
-    setForm(f => ({ ...f, capacityByBird: [...f.capacityByBird, newCap] }));
-    if (defaults) {
-      toastMsg.added(birdName)
-    } else {
-      toastMsg.added(birdName)
-    }
-  };
 
-  const removeCapacity = (birdName: string) => {
-    const removed = form.capacityByBird.find(c => normalizeBird(c.birdName) === normalizeBird(birdName));
-    if (!removed) return;
-    setForm(f => ({ ...f, capacityByBird: f.capacityByBird.filter(c => normalizeBird(c.birdName) !== normalizeBird(birdName)) }));
-    setUndoData({ birdName, data: removed });
-    setTimeout(() => setUndoData(cur => cur && cur.birdName === birdName ? null : cur), 5000);
-  };
 
-  const undoRemoveCapacity = () => {
-    if (!undoData) return;
-    const { data } = undoData;
-    setForm(f => ({ ...f, capacityByBird: [...f.capacityByBird, data] }));
-    setUndoData(null);
-  };
 
-  const updateCapacity = (birdName: string, capacity: number | null) => {
-    setForm(f => ({
-      ...f,
-      capacityByBird: f.capacityByBird.map(c => normalizeBird(c.birdName) === normalizeBird(birdName) ? { ...c, capacity } : c),
-    }));
-  };
 
-  const updateCapacityFull = (birdName: string, patch: Partial<DeviceCapacity>) => {
-    setForm(f => ({
-      ...f,
-      capacityByBird: f.capacityByBird.map(c =>
-        normalizeBird(c.birdName) === normalizeBird(birdName) ? { ...c, ...patch } : c
-      ),
-    }));
-  };
 
-  const fillProfile = (birdName: string) => {
-    const p = fillCapacityFromProfile(birdName);
-    if (!p) { return; }
-    updateCapacityFull(birdName, p);
-  };
 
-  const getProfileDefaults = (birdName: string) => {
-    return fillCapacityFromProfile(birdName);
-  };
 
-  const resetSection = (birdName: string, section: 'setter' | 'hatcher' | 'time') => {
-    const prof: any = getProfileDefaults(birdName);
-    if (!prof) return;
-    if (section === 'setter') {
-      updateCapacityFull(birdName, { setterTemp: prof.setterTemp, setterHumidity: prof.setterHumidity });
-    } else if (section === 'hatcher') {
-      updateCapacityFull(birdName, { hatcherTemp: prof.hatcherTemp, hatcherHumidity: prof.hatcherHumidity });
-    } else {
-      updateCapacityFull(birdName, { totalDays: prof.totalDays, lockdownDay: prof.lockdownDay });
-    }
-  };
 
 
   const save = () => {
@@ -366,7 +155,6 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
     }
     setForm(empty);
     setErr('');
-    setExpandedBird(null);
     setOpen(false);
   };
 
@@ -674,203 +462,11 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
         </Grid2>
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> ظرفیت بر اساس پرنده</SectionTitle>
-        {birds.length === 0 ? (
-          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
-            هنوز پرنده‌ای در ماژول «پرنده و نژاد» ثبت نشده
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {birds.map(b => {
-              const isSelected = form.capacityByBird.some(
-                cc => normalizeBird(cc.birdName) === normalizeBird(b.name)
-              );
-              return (
-                <button
-                  key={b.id}
-                  type="button"
-                  onClick={() => isSelected ? removeCapacity(b.name) : addCapacity(b.name)}
-                  aria-pressed={isSelected}
-                  style={{
-                    padding: '6px 12px',
-                    background: isSelected ? 'var(--accent-soft)' : 'var(--btn-bg)',
-                    border: isSelected ? '1.5px solid var(--accent)' : '1px solid var(--border)',
-                    borderRadius: 'var(--r-md)',
-                    color: isSelected ? 'var(--accent)' : 'var(--text)',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    fontSize: 'var(--fs-sm)',
-                    fontWeight: isSelected ? 700 : 600,
-                    boxShadow: isSelected ? '0 0 0 2px var(--accent-soft)' : 'none',
-                    transition: 'all .15s',
-                  }}
-                >+ {b.name}</button>
-              );
-            })}</div>
-        )}
-        {undoData && (
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '8px 12px',
-            background: 'var(--input-bg)',
-            border: '1px solid var(--warn)',
-            borderRadius: 'var(--r-md)',
-            marginTop: 6,
-            fontSize: 'var(--fs-sm)',
-          }}>
-            <span>«{undoData.birdName}» حذف شد</span>
-            <button type="button" onClick={undoRemoveCapacity} style={{
-              background: 'none', border: 'none',
-              color: 'var(--warn)', fontWeight: 700, cursor: 'pointer',
-              fontFamily: 'inherit', fontSize: 'var(--fs-sm)', padding: '2px 8px',
-            }}>بازگردانی</button>
-          </div>
-        )}
-        {form.capacityByBird.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' as any, marginTop: 6 }}>
-            {form.capacityByBird.map(c => {
-              const prof: any = getProfileDefaults(c.birdName);
-              const d: any = prof || {};
-              const setterOv = (d.setterTemp != null && c.setterTemp != null && Number(c.setterTemp) !== Number(d.setterTemp))
-                            || (d.setterHumidity != null && c.setterHumidity != null && Number(c.setterHumidity) !== Number(d.setterHumidity));
-              const hatcherOv = (d.hatcherTemp != null && c.hatcherTemp != null && Number(c.hatcherTemp) !== Number(d.hatcherTemp))
-                             || (d.hatcherHumidity != null && c.hatcherHumidity != null && Number(c.hatcherHumidity) !== Number(d.hatcherHumidity));
-              const timeOv = (d.totalDays != null && c.totalDays != null && Number(c.totalDays) !== Number(d.totalDays))
-                          || (d.lockdownDay != null && c.lockdownDay != null && Number(c.lockdownDay) !== Number(d.lockdownDay));
-              const resetBtnStyle = {
-                background: 'none', border: 'none', color: 'var(--warn)',
-                cursor: 'pointer', fontSize: 'var(--fs-xs)', fontFamily: 'inherit',
-                fontWeight: 600, padding: 0,
-              } as any;
-              const isExpanded = expandedBird === c.birdName;
-              const fmt = (v: any) => (v != null && v !== '') ? toFa(String(v)) : '—';
-              return (
-                <div key={c.birdName} style={{
-                  borderRadius: 'var(--r-md)',
-                  overflow: 'hidden',
-                  background: isExpanded ? 'var(--accent-soft)' : 'var(--input-bg)',
-                  transition: 'background .15s',
-                }}>
-                  <div
-                    onClick={() => setExpandedBird(isExpanded ? null : c.birdName)}
-                    role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); () => setExpandedBird(isExpanded ? null : c.birdName); } }}
-                    aria-expanded={isExpanded}
-                    style={{
-                      padding: '10px 12px',
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700, flex: 1 }}>
-                      {c.birdName}
-                      {getProfileDefaults(c.birdName) ? (
-                        <span title="از پروفایل انکوباسیون" style={{ fontSize: 10, color: 'var(--accent)', marginRight: 4 }}>🪄</span>
-                      ) : null}
-                    </span>
-                      <span style={{ fontSize: 12, color: 'var(--muted)', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s', flexShrink: 0 }}>▼</span>
-                      <button type="button" onClick={(e) => { e.stopPropagation(); removeCapacity(c.birdName); }} aria-label={`حذف ${c.birdName}`} style={{
-                        background: 'var(--danger-soft)',
-                        border: '1px solid var(--danger)',
-                        color: 'var(--danger)',
-                        cursor: 'pointer',
-                        borderRadius: 'var(--r-sm)',
-                        width: 26, height: 26,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 12, padding: 0, fontFamily: 'inherit', fontWeight: 700,
-                        flexShrink: 0,
-                      }}>✕</button>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' as any, flexWrap: 'wrap', marginTop: 6, fontSize: 'var(--fs-sm)' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> ستر</span>
-                        <span style={{ fontWeight: 700 }}>{fmt(c.setterTemp)}°</span>
-                        <span style={{ color: 'var(--dim)', fontWeight: 600 }}>{fmt(c.setterHumidity)}٪</span>
-                      </span>
-                      <span style={{ color: 'var(--dim)', fontSize: 14 }}>→</span>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐣 هچر</span>
-                        <span style={{ fontWeight: 700 }}>{fmt(c.hatcherTemp)}°</span>
-                        <span style={{ color: 'var(--dim)', fontWeight: 600 }}>{fmt(c.hatcherHumidity)}٪</span>
-                      </span>
-                      <span style={{ color: 'var(--dim)', fontSize: 14 }}>·</span>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>⏱</span>
-                        <span style={{ fontWeight: 600 }}>{fmt(c.totalDays)}/{fmt(c.lockdownDay)}</span>
-                      </span>
-                    </div>
-                  </div>
-
-                  {isExpanded && (
-                    <div style={{ padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' as any, background: 'var(--card)' }}>
-                      <Field label="ظرفیت" hint="حداکثر تعداد تخم">
-                        <NumField value={String(c.capacity || '')} onChange={e => updateCapacity(c.birdName, parseInt(toEn(e.target.value)) || null)} unit="تخم" min={0} placeholder="۰" />
-                      </Field>
-
-                      <button type="button" onClick={() => fillProfile(c.birdName)} style={{
-                        padding: '6px 10px',
-                        background: 'var(--accent-soft)',
-                        border: '1px solid var(--accent-border)',
-                        color: 'var(--accent)',
-                        borderRadius: 'var(--r-sm)',
-                        cursor: 'pointer',
-                        fontFamily: 'inherit',
-                        fontSize: 'var(--fs-sm)',
-                        fontWeight: 600,
-                      }}>🔄 پر کردن از پروفایل</button>
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-                        <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> ستر</span>
-                        {setterOv && prof ? (
-                          <button type="button" onClick={() => resetSection(c.birdName, 'setter')} style={resetBtnStyle}>↩️ پیش‌فرض</button>
-                        ) : null}
-                      </div>
-                      <Grid2>
-                        <OvNumField label="دما" hint="°C" isTemp={true} defValue={d.setterTemp}
-                          value={c.setterTemp} onChange={(e: any) => updateCapacityFull(c.birdName, { setterTemp: parseFloat(toEn(e.target.value)) || 0 })}
-                          unit="°C" min={20} max={45} placeholder="۳۷٫۷" />
-                        <OvNumField label="رطوبت" hint="٪" defValue={d.setterHumidity}
-                          value={c.setterHumidity} onChange={(e: any) => updateCapacityFull(c.birdName, { setterHumidity: parseFloat(toEn(e.target.value)) || 0 })}
-                          unit="٪" min={0} max={100} placeholder="۵۰" />
-                      </Grid2>
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-                        <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐣 هچر</span>
-                        {hatcherOv && prof ? (
-                          <button type="button" onClick={() => resetSection(c.birdName, 'hatcher')} style={resetBtnStyle}>↩️ پیش‌فرض</button>
-                        ) : null}
-                      </div>
-                      <Grid2>
-                        <OvNumField label="دما" hint="°C" isTemp={true} defValue={d.hatcherTemp}
-                          value={c.hatcherTemp} onChange={(e: any) => updateCapacityFull(c.birdName, { hatcherTemp: parseFloat(toEn(e.target.value)) || 0 })}
-                          unit="°C" min={20} max={45} placeholder="۳۷٫۲" />
-                        <OvNumField label="رطوبت" hint="٪" defValue={d.hatcherHumidity}
-                          value={c.hatcherHumidity} onChange={(e: any) => updateCapacityFull(c.birdName, { hatcherHumidity: parseFloat(toEn(e.target.value)) || 0 })}
-                          unit="٪" min={0} max={100} placeholder="۶۲" />
-                      </Grid2>
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-                        <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>⏱ زمان</span>
-                        {timeOv && prof ? (
-                          <button type="button" onClick={() => resetSection(c.birdName, 'time')} style={resetBtnStyle}>↩️ پیش‌فرض</button>
-                        ) : null}
-                      </div>
-                      <Grid2>
-                        <OvNumField label="مدت کل" hint="از ورود تا هچ" defValue={d.totalDays}
-                          value={c.totalDays} onChange={(e: any) => updateCapacityFull(c.birdName, { totalDays: parseInt(toEn(e.target.value)) || 0 })}
-                          unit="روز" min={0} max={60} placeholder="۲۱" />
-                        <OvNumField label="روز قفل" hint="Lockdown" defValue={d.lockdownDay}
-                          value={c.lockdownDay} onChange={(e: any) => updateCapacityFull(c.birdName, { lockdownDay: parseInt(toEn(e.target.value)) || 0 })}
-                          unit="روز" min={0} max={60} placeholder="۱۸" />
-                      </Grid2>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
+        <CapacityEditor
+          birds={birds}
+          capacityByBird={form.capacityByBird}
+          onChange={(next) => setForm(f => ({ ...f, capacityByBird: next }))}
+        />
 
         <SectionTitle>⚙ مشخصات فنی</SectionTitle>
         <Grid2>
@@ -927,23 +523,13 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
         <ErrorBox>{err}</ErrorBox>
       </Modal>
 
-      <Modal open={!!maintDeviceId} onClose={() => setMaintDeviceId(null)} title="ثبت تعمیر"
-        footer={<BtnRow><Btn variant="primary" onClick={() => { if (maintDeviceId) addMaintenance(maintDeviceId); }}>ذخیره</Btn><Btn onClick={() => setMaintDeviceId(null)}>لغو</Btn></BtnRow>}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          <Field label="تاریخ" required>
-            <DatePicker value={maintForm.date} onChange={v => setMaintForm({ ...maintForm, date: v })}  autoToday />
-          </Field>
-          <Field label="نوع تعمیر" required>
-            <Input placeholder="تعویض فن..." value={maintForm.type} onChange={e => setMaintForm({ ...maintForm, type: e.target.value })} />
-          </Field>
-          <Field label="هزینه">
-            <MoneyField placeholder="۰" value={maintForm.cost} onChange={e => setMaintForm({ ...maintForm, cost: e.target.value })} />
-          </Field>
-          <Field label="توضیحات">
-            <Textarea placeholder="جزئیات..." value={maintForm.description} onChange={e => setMaintForm({ ...maintForm, description: e.target.value })} />
-          </Field>
-        </div>
-      </Modal>
+      <MaintenanceModal
+        open={!!maintDeviceId}
+        form={maintForm}
+        setForm={setMaintForm}
+        onSave={() => { if (maintDeviceId) addMaintenance(maintDeviceId); }}
+        onClose={() => setMaintDeviceId(null)}
+      />
     </PageContainer>
   );
 }
