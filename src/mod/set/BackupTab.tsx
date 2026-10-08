@@ -6,6 +6,9 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { Btn, BtnRow, Field, Grid2, Select, Modal } from '../../shr/components/ui';
 import { toFa, parseFaNum } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
+import StatsModal from './components/StatsModal';
+import RestoreModal from './components/RestoreModal';
+import ResetModal from './components/ResetModal';
 import { ToggleRow } from './helpers';
 
 export default function BackupTab() {
@@ -221,154 +224,28 @@ export default function BackupTab() {
         </div>
       </div>
 
-      {/* ═══ مودال آمار ═══ */}
-      <Modal
+
+      <StatsModal
         open={showStats}
         onClose={() => setShowStats(false)}
-        title="📊 آمار داده‌ها"
-        footer={<Btn variant="primary" full onClick={() => setShowStats(false)}>بستن</Btn>}
-      >
-        <div style={{
-          padding: 'var(--pad-comfy)',
-          background: 'var(--accent-soft)',
-          border: '1px solid var(--accent-border)',
-          borderRadius: 'var(--r-md)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 12,
-        }}>
-          <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
-            حجم کل داده‌ها
-          </span>
-          <span style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700 }}>
-            {formatSize(stats.totalSize)}
-          </span>
-        </div>
+        stats={stats}
+      />
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 6,
-        }}>
-          {stats.byModule.map(m => (
-            <div key={m.key} style={{
-              padding: '8px 10px',
-              background: 'var(--input-bg)',
-              borderRadius: 'var(--r-sm)',
-              fontSize: 'var(--fs-xs)',
-              minWidth: 0,
-            }}>
-              <div style={{
-                fontWeight: 600,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}>{m.label}</div>
-              <div style={{
-                color: 'var(--muted)',
-                marginTop: 2,
-                display: 'flex',
-                justifyContent: 'space-between',
-                gap: 4,
-              }}>
-                <span>{toFa(m.records)}</span>
-                <span>{formatSize(m.size)}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Modal>
-
-      {/* ═══ مودال بازیابی ═══ */}
-      <Modal
+      <RestoreModal
         open={showRestore}
         onClose={() => { setShowRestore(false); setPreview(null); }}
-        title="بازیابی پشتیبان"
-        footer={
-          <BtnRow>
-            <Btn variant="primary" onClick={confirmRestore}>بازیابی کن</Btn>
-            <Btn onClick={() => { setShowRestore(false); setPreview(null); }}>لغو</Btn>
-          </BtnRow>
-        }
-      >
-        {preview ? (
-          <>
-            <div style={{
-              padding: 'var(--pad-comfy)',
-              background: 'var(--accent-soft)',
-              border: '1px solid var(--accent-border)',
-              borderRadius: 'var(--r-md)',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 8,
-              fontSize: 'var(--fs-sm)',
-              marginBottom: 12,
-            }}>
-              <div>
-                <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>نسخه فایل</div>
-                <div style={{ fontWeight: 700 }}>{toFa(preview.version)}</div>
-              </div>
-              <div>
-                <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>نسخه ساختار</div>
-                <div style={{ fontWeight: 700 }}>{toFa(preview.schemaVersion)}</div>
-              </div>
-              <div>
-                <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>تاریخ</div>
-                <div style={{ fontWeight: 700 }}>{preview.exportedAt.slice(0, 10)}</div>
-              </div>
-              <div>
-                <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>تعداد رکورد</div>
-                <div style={{ fontWeight: 700 }}>{toFa(previewTotalRecords)}</div>
-              </div>
-            </div>
+        preview={preview}
+        previewTotalRecords={previewTotalRecords}
+        mergeMode={mergeMode}
+        setMergeMode={setMergeMode}
+        onConfirm={confirmRestore}
+      />
 
-            <Field label="روش بازیابی">
-              <Select value={mergeMode} onChange={e => setMergeMode(e.target.value as 'replace' | 'merge')}>
-                <option value="merge">➕ ادغام با داده‌های فعلی</option>
-                <option value="replace">🔁 جایگزینی کامل (پاک کردن فعلی)</option>
-              </Select>
-            </Field>
-
-            <div style={{
-              padding: 'var(--pad-normal)',
-              background: 'var(--warn-soft)',
-              border: '1px solid var(--warn)',
-              borderRadius: 'var(--r-md)',
-              fontSize: 'var(--fs-xs)',
-              color: 'var(--warn)',
-              lineHeight: 1.7,
-              marginTop: 12,
-            }}>
-              {mergeMode === 'merge'
-                ? '➕ داده‌های جدید به داده‌های فعلی اضافه می‌شوند — رکوردهای تکراری بر اساس شناسه ادغام می‌شوند.'
-                : '🔁 تمام داده‌های فعلی پاک می‌شوند و با فایل پشتیبان جایگزین می‌شوند.'}
-            </div>
-          </>
-        ) : null}
-      </Modal>
-
-      {/* ═══ مودال پاک‌سازی ═══ */}
-      <Modal
+      <ResetModal
         open={showReset}
         onClose={() => setShowReset(false)}
-        title="پاک کردن همه‌ی داده‌ها"
-        footer={
-          <BtnRow>
-            <Btn variant="danger" onClick={clearAll}>بله، پاک کن</Btn>
-            <Btn onClick={() => setShowReset(false)}>لغو</Btn>
-          </BtnRow>
-        }
-      >
-        <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
-          ⚠ تمام گله‌ها، سالن‌ها، معاملات، مخاطبین و تنظیمات پاک می‌شوند.
-          <br />
-          <span style={{ color: 'var(--danger)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
-            این عمل قابل بازگشت نیست.
-          </span>
-        </div>
-      </Modal>
-
+        onConfirm={clearAll}
+      />
     </div>
   );
 }
