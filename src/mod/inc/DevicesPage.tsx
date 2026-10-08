@@ -113,10 +113,6 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
 
 
 
-
-
-
-
   const save = () => {
     setErr('');
     if (!form.id) {

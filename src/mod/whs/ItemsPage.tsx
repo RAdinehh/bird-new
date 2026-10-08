@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import ItemCard from './components/ItemCard';
 import ItemsFormModal from './components/ItemsFormModal';
 import { useFab } from '../../shr/hooks/useFab';
 import {
@@ -385,135 +386,29 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       ) : (
         <>
           {list.map((it, i) => {
-            const stock = stockWarning(it);
-            const exp = expiryWarning(it);
             const sup = contacts.find(c => c.id === it.supplierId);
             const hall = it.hallId ? halls.find(h => h.id === it.hallId) : null;
             const myMovements = movements.filter(m => m.itemId === it.id);
             const isOpen = !ms.selectionMode && expandedId === it.id;
-
-            let accent: 'accent' | 'warn' | 'dim' = 'accent';
-            if (stock === 'critical' || exp === 'expired') accent = 'warn';
-            else if (stock === 'low' || exp === 'soon') accent = 'warn';
-            else if (it.currentStock === 0) accent = 'dim';
-
-            const days = daysToExpiry(it.expireDate);
-
             return (
-              <ExpandableCard
+              <ItemCard
                 key={it.id}
-                id={it.id}
-                ms={ms}
-                accent={accent}
-                index={toFa(i + 1)}
-                iconEmoji={CATEGORY_ICON[it.category]}
-                title={it.name}
-                subtitle={`${CATEGORY_LABEL[it.category]} · ${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`}
+                it={it}
+                i={i}
+                hall={hall}
+                sup={sup}
+                myMovements={myMovements}
                 isOpen={isOpen}
+                ms={ms}
                 onToggle={() => setExpandedId(isOpen ? null : it.id)}
-                badge={
-                  it.currentStock < 0 ? <Tag tone="red">⚠️ منفی</Tag> :
-                  stock === 'critical' ? <Tag tone="red">تمام شد</Tag> :
-                  stock === 'low' ? <Tag tone="amber">کم</Tag> :
-                  exp === 'expired' ? <Tag tone="red">منقضی</Tag> :
-                  exp === 'soon' ? <Tag tone="amber">نزدیک انقضا</Tag> :
-                  <Tag tone="green">موجود</Tag>
-                }
-                stats={
-                  <>
-                    <span>موجودی: <b style={{ color: 'var(--text)' }}>{toFa(it.currentStock)} {UNIT_LABEL[it.unit]}</b></span>
-                    {it.minStock > 0 ? <span>حد: <b style={{ color: 'var(--text)' }}>{toFa(it.minStock)}</b></span> : null}
-                    {it.lastPrice > 0 ? <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa((it.currentStock * getAvgPrice(it)).toLocaleString('fa-IR'))} ت</b></span> : null}
-                  </>
-                }
-              >
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> مشخصات قلم</SectionTitle>
-                <Row l="دسته" v={CATEGORY_LABEL[it.category]} />
-                <Row l="واحد" v={UNIT_LABEL[it.unit]} />
-                <Row l="موجودی فعلی" v={`${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`} />
-                {it.minStock > 0 ? <Row l="حداقل موجودی" v={`${toFa(it.minStock)} ${UNIT_LABEL[it.unit]}`} /> : null}
-                {it.avgPrice && it.avgPrice > 0 ? <Row l="💰 قیمت میانگین" v={`${toFa(getAvgPrice(it).toLocaleString('fa-IR'))} ت`} /> : null}
-                {it.lastPrice > 0 ? <Row l="آخرین قیمت خرید" v={`${toFa(it.lastPrice.toLocaleString('fa-IR'))} ت`} /> : null}
-                {sup ? <Row l="تأمین‌کننده" v={sup.name} /> : null}
-
-                {it.currentStock > 0 && it.lastPrice > 0 ? (
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
-                     background: 'var(--accent-soft)', color: 'var(--accent)',
-                     borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                    <span>ارزش موجودی:</span>
-                    <span>{toFa((it.currentStock * getAvgPrice(it)).toLocaleString('fa-IR'))} ت</span>
-                  </div>
-                ) : null}
-
-                {it.category === 'medicine' || it.category === 'vaccine' ? (
-                  <>
-                    <SectionTitle>💊 اطلاعات دارویی</SectionTitle>
-                    {it.batchNo ? <Row l="شماره بچ" v={it.batchNo} /> : null}
-                    {it.expireDate ? <Row l="تاریخ انقضا" v={toFa(it.expireDate)} /> : null}
-                    {days !== null ? (
-                      <div style={{
-                        display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
-                        background: days < 0 ? 'var(--danger-soft)' : days <= 30 ? 'var(--warn-soft)' : 'var(--input-bg)',
-                        color: days < 0 ? 'var(--danger)' : days <= 30 ? 'var(--warn)' : 'var(--muted)',
-                        borderRadius: 'var(--r-sm)', fontWeight: 700
-                      }}>
-                        <span>وضعیت انقضا:</span>
-                        <span>{days < 0 ? `${toFa(Math.abs(days))} روز گذشته` : `${toFa(days)} روز مانده`}</span>
-                      </div>
-                    ) : null}
-                    {it.withdrawalDays !== null && it.withdrawalDays !== undefined ? <Row l="دوره منع مصرف" v={`${toFa(it.withdrawalDays)} روز`} /> : null}
-                    {it.storage ? <Row l="نگهداری" v={STORAGE_LABEL[it.storage] || it.storage} /> : null}
-                    {it.usageType ? <Row l="نوع مصرف" v={USAGE_LABEL[it.usageType] || it.usageType} /> : null}
-                    {it.dosePerBird ? <Row l="دوز هر پرنده" v={`${toFa(it.dosePerBird)} ml`} /> : null}
-                    {it.productionDate ? <Row l="تاریخ تولید" v={toFa(it.productionDate)} /> : null}
-                  </>
-                ) : null}
-
-                {it.category === 'equipment' ? (
-                  <>
-                    <SectionTitle>🔧 اطلاعات تجهیزات</SectionTitle>
-                    {it.purchaseDate ? <Row l="تاریخ خرید" v={toFa(it.purchaseDate)} /> : null}
-                    {it.purchasePrice ? <Row l="قیمت خرید" v={`${toFa(it.purchasePrice.toLocaleString('fa-IR'))} ت`} /> : null}
-                    {hall ? <Row l="سالن" v={hall.name} /> : null}
-                    {it.equipmentStatus ? <Row l="وضعیت" v={EQUIP_STATUS[it.equipmentStatus] || it.equipmentStatus} /> : null}
-                    {it.warrantyUntil ? <Row l="گارانتی تا" v={toFa(it.warrantyUntil)} /> : null}
-                  </>
-                ) : null}
-
-                {myMovements.length > 0 ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> آخرین گردش‌ها ({toFa(myMovements.length)})</SectionTitle>
-                    {myMovements.slice(-3).reverse().map(m => (
-                      <div key={m.id} style={{ fontSize: 'var(--fs-sm)',
-                         padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                         borderRadius: 'var(--r-sm)', display: 'flex',
-                         justifyContent: 'space-between' }}>
-                        <span>{m.type === 'in' ? '📥' : '📤'} {toFa(m.quantity)} {UNIT_LABEL[it.unit]}</span>
-                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{toFa(m.date)}</span>
-                      </div>
-                    ))}
-                  </>
-                ) : null}
-
-                {it.notes ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
-                  </>
-                ) : null}
-
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => adjustStock(it)} style={{ flex: 1 }}>🔄 اصلاح</Btn>
-                  <Btn size="sm" onClick={() => openEdit(it)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                    const idToDel = it.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = items.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteItem(idToDel);
-                    logAction('delete', 'whs', 'حذف از انبار');  toastMsg.deleted(it.name)
-                    }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+                onEdit={() => openEdit(it)}
+                onAdjust={() => adjustStock(it)}
+                onDelete={deleteItem}
+                onUndo={(item: any) => {
+                  setUndoData({ item });
+                  setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
+                }}
+              />
             );
           })}
         </>

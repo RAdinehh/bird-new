@@ -2,6 +2,8 @@
  * ReceivablesPage — مطالبات/بدهی با aging
  */
 import { useState, useMemo } from 'react';
+import { daysUntilDue, dueTone, dueLabel } from './helpers';
+import DeferModal from './components/DeferModal';
 import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSum, WORKFLOW_LABEL, type Invoice, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Input, Modal, PageContainer } from '../../shr/components/ui';
@@ -31,29 +33,8 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
     [invoices, kind]
   );
 
-  const daysUntilDue = (inv: Invoice): number | null => {
-    if (!inv.dueDate) return null;
-    const parts = inv.dueDate.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString()).split('/');
-    if (parts.length !== 3) return null;
-    const d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
-    return Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-  };
 
-  const dueTone = (days: number | null): 'green' | 'amber' | 'orange' | 'red' => {
-    if (days === null) return 'green';
-    if (days < 0) return 'red';
-    if (days <= 2) return 'orange';
-    if (days <= 7) return 'amber';
-    return 'green';
-  };
 
-  const dueLabel = (days: number | null): string => {
-    if (days === null) return 'بدون سرسید';
-    if (days < 0) return `${toFa(Math.abs(days))} روز گذشته`;
-    if (days === 0) return 'امروز';
-    if (days === 1) return 'فردا';
-    return `${toFa(days)} روز مانده`;
-  };
 
   // فیلتر/مرتب
   const config = useMemo(() => {
@@ -444,29 +425,15 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       ) : null}
 
       {/* Modal تعویق */}
-      <Modal
-        open={!!deferModal}
-        center
+      <DeferModal
+        deferModal={deferModal}
         onClose={() => setDeferModal(null)}
-        title="⏰ تعویق سرسید"
-        footer={
-          <BtnRow>
-            <Btn variant="primary" onClick={doDefer}>تأیید</Btn>
-            <Btn onClick={() => setDeferModal(null)}>لغو</Btn>
-          </BtnRow>
-        }
-      >
-        {deferModal ? (
-          <>
-            <Field label="سرسید جدید" required>
-              <DatePicker value={deferDate} onChange={v => setDeferDate(v)}  autoToday />
-            </Field>
-            <Field label="دلیل تعویق">
-              <Input placeholder="..." value={deferReason} onChange={e => setDeferReason(e.target.value)} />
-            </Field>
-          </>
-        ) : null}
-      </Modal>
+        deferDate={deferDate}
+        setDeferDate={setDeferDate}
+        deferReason={deferReason}
+        setDeferReason={setDeferReason}
+        onConfirm={doDefer}
+      />
     </PageContainer>
   );
 }

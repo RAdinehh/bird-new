@@ -68,3 +68,37 @@ export function filterChip(active: boolean, color = 'accent'): React.CSSProperti
 }
 
 export { AccordionSection } from '../../shr/components/AccordionSection';
+
+
+// ═══ توابع کمکی ReceivablesPage ═══
+import type { Invoice } from './store';
+
+export function daysUntilDue(inv: Invoice): number | null {
+  if (!inv.dueDate) return null;
+  try {
+    const en = inv.dueDate.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const parts = en.split('/').map(Number);
+    if (parts.length !== 3) return null;
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    if (isNaN(d.getTime())) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Math.round((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  } catch { return null; }
+}
+
+export function dueTone(days: number | null): 'green' | 'amber' | 'orange' | 'red' {
+  if (days === null) return 'green';
+  if (days < 0) return 'red';
+  if (days <= 3) return 'red';
+  if (days <= 7) return 'orange';
+  if (days <= 14) return 'amber';
+  return 'green';
+}
+
+export function dueLabel(days: number | null): string {
+  if (days === null) return '—';
+  if (days < 0) return `${Math.abs(days)} روز گذشته`;
+  if (days === 0) return 'امروز';
+  return `${days} روز مانده`;
+}

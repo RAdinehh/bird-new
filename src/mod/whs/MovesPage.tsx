@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import MoveFormModal from './components/MoveFormModal';
 import { useFab } from '../../shr/hooks/useFab';
 import { useWhs, UNIT_LABEL, MOVEMENT_REASON, CATEGORY_ICON, CATEGORY_LABEL, type Movement, type MovementType, type MovementReason } from './store';
 import { useCtc } from '../ctc/store';
@@ -348,120 +349,17 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
 
       {ms.selectionMode && <div style={{ height: 90 }} />}
 
-      <Modal
+      <MoveFormModal
         open={open}
-        onClose={() => setOpen(false)}
-        title="ثبت گردش انبار"
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
-      >
-        <Grid2>
-          <Field label="نوع گردش" required>
-            <Select value={form.type} onChange={e => {
-              const newType = e.target.value as MovementType;
-              const validReasons = REASONS_BY_TYPE[newType];
-              const newReason = validReasons.includes(form.reason) ? form.reason : validReasons[0];
-              setForm({ ...form, type: newType, reason: newReason });
-            }}>
-              <option value="in">📥 ورود به انبار</option>
-              <option value="out">📤 خروج از انبار</option>
-            </Select>
-          </Field>
-          <Field label="دلیل" required error={vErrors.reason}>
-            <Select value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value as MovementReason })}>
-              {REASONS_BY_TYPE[form.type].map(r =>
-                <option key={r} value={r}>{MOVEMENT_REASON[r]}</option>
-              )}
-            </Select>
-          </Field>
-        </Grid2>
-
-        <Field label="کالا" required hint={selectedItem ? `موجودی فعلی — ${toFa(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined}>
-          <SmartSelect
-            value={form.itemId}
-            onChange={v => setForm({ ...form, itemId: v })}
-            options={items.map(it => ({
-              value: it.id,
-              label: it.name,
-              subtitle: `${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`,
-              group: it.category,
-            }))}
-            groupLabels={Object.fromEntries(
-              Object.entries(CATEGORY_LABEL).map(([k, v]) => [k, v])
-            ) as Record<string, string>}
-            groupIcons={Object.fromEntries(
-              Object.entries(CATEGORY_ICON).map(([k, v]) => [k, v])
-            ) as Record<string, string>}
-            placeholder="— انتخاب کالا —"
-            modalTitle="انتخاب کالای انبار"
-            autoThreshold={6}
-          />
-        </Field>
-
-        <Grid2>
-          <Field label="تعداد" required error={vErrors.quantity}>
-            <NumField placeholder="مثلاً — ۱۰۰"
-              value={form.quantity}
-              onChange={e => setForm({ ...form, quantity: e.target.value })}
-              unit={selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}
-              max={form.type === 'out' ? currentStock : undefined} min={0} />
-          </Field>
-          <Field label="قیمت واحد">
-            <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
-          </Field>
-        </Grid2>
-
-        {!isAdjustment ? (
-          <Grid2>
-            <Field label="تاریخ" required error={vErrors.date}>
-              <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
-            </Field>
-            <Field
-              label={partyLabel}
-              required={partyRequired}
-              hint={partyRequired ? undefined : 'اختیاری'}
-            >
-              {filteredContacts.length === 0 ? (
-                <div style={{
-                  padding: 'var(--pad-normal)',
-                  background: 'var(--warn-soft)',
-                  border: '1px dashed var(--warn)',
-                  borderRadius: 'var(--r-sm)',
-                  fontSize: 'var(--fs-xs)',
-                  color: 'var(--warn)',
-                  fontWeight: 600,
-                }}>
-                  ⚠️ {isPurchase ? 'هیچ فروشنده‌ای تعریف نشده' : isSale ? 'هیچ مشتری‌ای تعریف نشده' : 'مخاطبی تعریف نشده'}
-                </div>
-              ) : (
-                <SmartSelect
-                  value={form.partyId}
-                  onChange={v => setForm({ ...form, partyId: v })}
-                  options={filteredContacts.map(c => ({
-                    value: c.id,
-                    label: c.name,
-                    subtitle: c.roles.length > 0
-                      ? c.roles.map(r => r === 'customer' ? 'مشتری' : r === 'supplier' ? 'فروشنده' : 'کارگر').join('، ')
-                      : undefined,
-                  }))}
-                  placeholder={partyRequired ? `— انتخاب ${partyLabel} —` : '— بدون مخاطب —'}
-                  modalTitle={`انتخاب ${partyLabel}`}
-                  autoThreshold={6}
-                />
-              )}
-            </Field>
-          </Grid2>
-        ) : (
-          <Field label="تاریخ" required error={vErrors.date}>
-            <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
-          </Field>
-        )}
-
-        <Field label="یادداشت">
-            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-          </Field>
-
-        <ErrorBox>{err}</ErrorBox>
-      </Modal>
+        setOpen={setOpen}
+        form={form}
+        setForm={setForm}
+        err={err}
+        vErrors={vErrors}
+        items={items}
+        filteredContacts={filteredContacts}
+        onSave={save}
+      />
     </PageContainer>
   );
 }

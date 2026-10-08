@@ -2,6 +2,7 @@
  * HallsPage — سالن‌ها
  */
 import { useState, useMemo, useEffect } from 'react';
+import HallCard from './components/HallCard';
 import HallsFormModal from './components/HallsFormModal';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
@@ -316,187 +317,27 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       ) : (
         <>
           {list.map((h, i) => {
-            const area = (h.length || 0) * (h.width || 0);
-            const volume = area * (h.height || 0);
-            const zoneCount = zones.filter(z => z.hallId === h.id).length;
-            const equipCount = equipment.filter(e => e.hallId === h.id).length;
-            const equipValue = equipment.filter(e => e.hallId === h.id).reduce((a, e) => a + ((e.count || 0) * (e.unitPrice || 0)), 0);
-            const hallEquips = equipment.filter(e => e.hallId === h.id);
-            const totalAirflow = hallEquips.filter(e => isFanLike(e.type)).reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
-            const totalLightW = hallEquips.filter(e => isLampLike(e.type)).reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
-
-            // ─── محاسبات هوشمند ───
-            // ۱. تعویض هوا (m³/h ÷ m³ = بار در ساعت)
-            const airChanges = volume > 0 && totalAirflow > 0 ? totalAirflow / volume : 0;
-            const airStatus: 'good' | 'low' | 'none' = airChanges === 0 ? 'none' : airChanges >= 15 ? 'good' : 'low';
-            const airAdvice = airChanges === 0
-              ? 'فنی ثبت نشده'
-              : airChanges >= 30 ? 'مناسب تابستان'
-              : airChanges >= 15 ? 'مناسب'
-              : airChanges >= 8 ? 'ضعیف — احتمال گرمی'
-              : 'بسیار ضعیف — خطر';
-            const airIcon = airChanges === 0 ? '—'
-              : airChanges >= 30 ? '❄️'
-              : airChanges >= 15 ? '✅'
-              : airChanges >= 8 ? '⚠️'
-              : '🔥';
-
-            // ۲. روشنایی (lux = lumen ÷ مساحت)
-            const lampEfficiency = 100; // lm/W پیش‌فرض
-            const totalLumens = totalLightW * lampEfficiency;
-            const lux = area > 0 && totalLumens > 0 ? totalLumens / area : 0;
-            const lightStatus: 'good' | 'low' | 'none' = lux === 0 ? 'none' : lux >= 20 ? 'good' : lux >= 10 ? 'low' : 'low';
-            const lightAdvice = lux === 0
-              ? 'لامپی ثبت نشده'
-              : lux >= 30 ? 'روشنایی قوی'
-              : lux >= 20 ? 'مناسب تخم‌گذار'
-              : lux >= 10 ? 'مناسب پرورش'
-              : 'کم — احتمال افت تولید';
-            const lightIcon = lux === 0 ? '—'
-              : lux >= 30 ? '☀️'
-              : lux >= 20 ? '🥚'
-              : lux >= 10 ? '🐣'
-              : '🌙';
-
-            // ۳. ظرفیت واقعی از ابعاد
-            const realCapacity = area > 0 && h.breedId
-              ? Math.floor(area * 9)  // ۹ پرنده/m² پیش‌فرض تخم‌گذار
-              : null;
-
-            // ۴. بستر
-            const litterKey = h.litterType && h.litterType !== 'none' ? h.litterType : null;
-            const litterNeed = area > 0 && litterKey
-              ? area * (LITTER_KG_PER_M2[litterKey] || 0)
-              : 0;
-            const hallFlocks = (flocks || []).filter((f: any) => f.hallId === h.id && f.status === 'active');
-            const totalBirds = hallFlocks.reduce((sum: number, f: any) => sum + (f.currentCount || f.initialCount || 0), 0);
-            // سن و نژاد برای محاسبه نیاز
-            const activeFlock = hallFlocks[0];
-            const flockAgeDays = activeFlock ? getAgeDays(activeFlock) : 0;
-            const flockBreedId = activeFlock?.breedId || h.breedId || null;
-            const flockStandard = flockBreedId ? breedStd.byBreedId(flockBreedId) : null;
             const isOpen = !ms.selectionMode && expandedId === h.id;
             return (
-              <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={fmt.int(i + 1)} iconEmoji="🏭"
-                title={h.name + (h.code ? ` · ${h.code}` : '')}
-                subtitle={h.length ? `${toFa(h.length)}×${toFa(h.width || 0)}×${toFa(h.height || 0)} متر` : 'ابعاد وارد نشده'}
-                isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : h.id)}
-                badge={<>{zoneCount > 0 ? <Tag tone="blue">{fmt.int(zoneCount)} بخش</Tag> : null}{hallFlocks.length > 0 ? <Tag tone="green">{fmt.int(hallFlocks.length)} گله</Tag> : null}</>}
-                stats={<>
-                  {area > 0 && <span>مساحت: <b style={{ color: 'var(--text)' }}>{toFa(area.toFixed(1))} م²</b></span>}
-                  {h.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{fmt.int(h.capacity)}</b></span>}
-                  {equipCount > 0 && <span>تجهیز: <b style={{ color: 'var(--text)' }}>{fmt.int(equipCount)}</b></span>}
-                    {totalBirds > 0 && <span>پرنده: <b style={{ color: 'var(--text)' }}>{fmt.int(totalBirds)}</b></span>}
-                </>}
-              >
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📐</span> ابعاد و ظرفیت</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <Row l="مساحت" v={`${toFa(area.toFixed(1))} م²`} />
-                  <Row l="حجم" v={`${toFa(volume.toFixed(1))} م³`} />
-                  <Row l="ظرفیت" v={h.capacity ? `${fmt.int(h.capacity)} پرنده` : '—'} />
-                </div>
-
-                {hallFlocks.length > 0 && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-                      <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> گله‌های فعال ({fmt.int(hallFlocks.length)})
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {hallFlocks.map((fl: any) => (
-                        <Row
-                          key={fl.id}
-                          l={fl.name}
-                          v={`${fmt.int(fl.currentCount || fl.initialCount || 0)} پرنده`}
-                        />
-                      ))}
-                      <Row l="جمع کل" v={`${fmt.int(totalBirds)} پرنده`} accent />
-                    </div>
-                  </>
-                )}
-
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🌡</span> شرایط محیطی</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
-                  <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
-                  <RowWithStatus
-                    l="تهویه"
-                    v={totalAirflow > 0 ? `${fmt.int(airChanges)} بار تعویض هوا در ساعت` : 'ثبت نشده'}
-                    icon={totalAirflow > 0 ? airIcon : undefined}
-                    hint={totalAirflow > 0 ? airAdvice : undefined}
-                  />
-                  <RowWithStatus
-                    l="روشنایی"
-                    v={totalLightW > 0 ? `${fmt.int(lux)} لوکس` : 'ثبت نشده'}
-                    icon={totalLightW > 0 ? lightIcon : undefined}
-                    hint={totalLightW > 0 ? lightAdvice : undefined}
-                  />
-
-
-                  {(h as any).systemNotes && (
-                    <>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>📝 یادداشت سیستم‌ها</div>
-                      <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{(h as any).systemNotes}</div>
-                    </>
-                  )}
-                  {realCapacity && !h.capacity && (
-                    <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)} پرنده (از مساحت)`} accent />
-                  )}
-
-                </div>
-
-                <HallEquipSection
-                  hallId={h.id}
-                  needInput={{
-                    birdCount: totalBirds,
-                    ageDays: flockAgeDays,
-                    areaM2: area,
-                    volumeM3: volume,
-                    standard: flockStandard,
-                  }}
-                  legacy={{
-                    ventilationSystem: h.ventilationSystem,
-                    feederType: h.feederType,
-                    drinkerType: h.drinkerType,
-                    litterType: h.litterType,
-                  }}
-                />
-
-                {(h.builtAt || h.lastSanitizedAt || equipValue > 0) && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> زمان‌ها و ارزش</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {h.builtAt && <Row l="تاریخ ساخت" v={toFa(h.builtAt)} />}
-                      {h.lastSanitizedAt && <Row l="آخرین ضدعفونی" v={toFa(h.lastSanitizedAt)} />}
-                      {equipValue > 0 && <Row l="ارزش تجهیزات" v={fmt.money(equipValue)} accent />}
-                    </div>
-                  </>
-                )}
-
-                {h.address && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📍 آدرس</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
-                       background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.address}</div>
-                  </>
-                )}
-
-                {h.notes && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
-                  </>
-                )}
-
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(h)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                    const idToDel = h.id; const ok = await showConfirmAsync('تأیید حذف', 'این سالن حذف شود؟', { danger: true }); if (!ok) return; const item = halls.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteHall(idToDel);
-                    logAction('delete', 'hal', 'حذف از سالن‌ها');  toastMsg.deleted('سالن')
-                    }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+              <HallCard
+                key={h.id}
+                h={h}
+                i={i}
+                zones={zones}
+                equipment={equipment}
+                flocks={flocks}
+                breedStd={breedStd}
+                fmt={fmt}
+                isOpen={isOpen}
+                ms={ms}
+                onToggle={() => setExpandedId(isOpen ? null : h.id)}
+                onEdit={() => openEdit(h)}
+                onDelete={deleteHall}
+                onUndo={(item: any) => {
+                  setUndoData({ item });
+                  setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
+                }}
+              />
             );
           })}
           

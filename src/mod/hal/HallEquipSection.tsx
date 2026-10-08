@@ -1,11 +1,4 @@
-/**
- * HallEquipSection — نمایش تجهیزات سالن به همراه نیاز گله
- *
- * ساختار:
- *   - ۲ گروه: «ضروری» و «اختیاری»
- *   - جدول مینیمال با ۴ ستون: دسته · نصب‌شده · نیاز · وضعیت
- *   - ۸ دکمه افزودن پایین
- */
+/** HallEquipSection — تجهیزات سالن + نیاز گله */
 import { useState } from 'react';
 import HallEquipModals from './components/HallEquipModals';
 import { Btn, Field, Input, Modal, NumField } from '../../shr/components/ui';

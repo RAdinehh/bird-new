@@ -2,6 +2,7 @@
  * InvoicePage — صفحه مشترک خرید و فروش
  */
 import { useState, useMemo, useEffect } from 'react';
+import { useInvoiceSelection } from './hooks/useInvoiceSelection';
 import { useFab } from '../../shr/hooks/useFab';
 import {
   useTra, CATEGORIES, itemsSum, paidSum, remaining, STATUS_LABEL,
@@ -43,8 +44,6 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const { contacts } = useCtc();
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
-
-  // ==== State ====
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [printId, setPrintId] = useState<string | null>(null);
@@ -61,7 +60,6 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     addPayment, updatePayment, removePayment,
     openNew, openEdit, save,
   } = useInvoiceForm({ kind, invoices, contacts, addInvoice, updateInvoice });
-
 
   // آبشار: اگه partyId دیگه در لیست فیلترشده نیست، پاک شه
   useEffect(() => {
@@ -108,8 +106,6 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
 
     try { setSearchParams({}); } catch {}
   }, [searchParams, isPurchase]);
-
-  // ==== سرسید خودکار ====
   useEffect(() => {
     if (!open) return;
     setForm(f => {
@@ -124,15 +120,8 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
       return newDue !== f.dueDate ? { ...f, dueDate: newDue } : f;
     });
   }, [open, form.date, form.paymentTerms, form.customDueDate, form.installmentGapDays]);
+  const kindFiltered = useMemo(() => invoices.filter(i => i.type === kind), [invoices, kind]);
 
-  // ==== Computed ====
-  // مرحله ۱: tab (kind)
-  const kindFiltered = useMemo(
-    () => invoices.filter(i => i.type === kind),
-    [invoices, kind]
-  );
-
-  // مرحله ۲: FilterBar
   const config = useMemo(() => {
     const partyNames: Record<string, string> = {};
     kindFiltered.forEach(i => {
@@ -146,64 +135,34 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
       : (CATEGORIES.sale as Array<[string, string]>);
     return getTraInvoicesConfig({ partyNames, categories: cats });
   }, [kindFiltered, parties, isPurchase]);
-  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
-          resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<Invoice>({
+  const fsResult = useFilterSort<Invoice>({
     items: kindFiltered,
     filters: config.filterDefs,
     sorts: config.sortDefs,
     persistKey: config.persistKey,
     initialSort: config.initialSort,
   });
-
-
-  // ==== Handlers ====
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total: totalFiltered, count } = fsResult;
   const undoDelete = () => {
     if (!undoData) return;
-    const raw = (undoData as any).item;
-    const arr: any[] = Array.isArray(raw) ? raw : [raw];
-    try {
-      for (const it of arr) {
-        try { addInvoice(it); } catch {}
-      }
-      toastMsg.restoredBulk(arr.length, 'مورد')
-    } catch { toastMsg.error('بازگردانی ناموفق') }
+    const arr = Array.isArray((undoData as any).item) ? (undoData as any).item : [(undoData as any).item];
+    try { arr.forEach((it: any) => { try { addInvoice(it); } catch {} }); toastMsg.restoredBulk(arr.length, 'مورد'); }
+    catch { toastMsg.error('بازگردانی ناموفق'); }
     setUndoData(null);
   };
-  // ─── Multi-Select ───
-  const ms = useMultiSelect({
-    items: list,
-    getId: (x: any) => x.id,
-    onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' فاکتور حذف شوند؟', { danger: true });
-      if (!ok) return;
-      const backups: any[] = [];
-      for (const id of ids) {
-        const it = invoices.find(x => x.id === id);
-        if (!it) continue;
-        backups.push(it);
-        try { deleteInvoice(id); } catch {}
-      }
-      if (backups.length > 0) {
-        setUndoData({ item: backups });
-        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
-      }
-      toastMsg.deletedBulk(backups.length, 'فاکتور')
-    },
+  const ms = useInvoiceSelection({
+    list,
+    invoices,
+    deleteInvoice,
+    setUndoData,
   });
 
   useEffect(() => {
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
-
   useFab(active ? { label: 'ثبت فاکتور', onClick: openNew } : null);
-
-
-
-
-
-
-
 
   // ═══ اعتبارسنجی زنده ═══
   const { errors: vErrors } = useValidation(
@@ -256,7 +215,6 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     },
   );
 
-
   const doTransfer = () => {
     if (!transferModal) return;
     const inv = invoices.find(i => i.id === transferModal.id);
@@ -287,9 +245,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         id={isPurchase ? 'purchases-intro' : 'sales-intro'}
         icon={isPurchase ? '📥' : '📤'}
         title={isPurchase ? 'ثبت خرید از فروشنده' : 'ثبت فروش به مشتری'}
-        description={isPurchase
-          ? 'اگر می‌خواهید این خرید به انبار اضافه شود، در بخش اقلام گزینه «اتصال به انبار» را فعال کنید.'
-          : 'فروش می‌تواند از موجودی انبار یا مستقیماً از تولید باشد. برای محاسبه‌ی ROI، گله مربوطه را انتخاب کنید.'}
+        description={isPurchase ? 'اگر می‌خواهید این خرید به انبار اضافه شود، «اتصال به انبار» را فعال کنید.' : 'فروش از انبار یا تولید. برای ROI، گله را انتخاب کنید.'}
         tone="success"
       />
 
