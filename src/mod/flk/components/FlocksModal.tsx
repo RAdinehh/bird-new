@@ -1,0 +1,308 @@
+/**
+ * FlocksModal.tsx — فرم افزودن/ویرایش گله
+ */
+import { toFa, toEn } from '../../../shr/utils/fa';
+import {
+  Btn, BtnRow, ErrorBox, Field, Grid2, Input, Modal, MoneyField,
+  NumField, Select, Textarea,
+} from '../../../shr/components/ui';
+import DatePicker from '../../../shr/components/DatePicker';
+import SmartSelect from '../../../shr/components/SmartSelect';
+import DependentSelect from '../../../shr/components/DependentSelect';
+import { DepBox } from '../helpers';
+import { SOURCE_LABEL, DEFAULT_LAYING_START, sexRatio } from '../store';
+import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
+import { todayJ, jalaliBounds, checkDateBounds } from '../api/flocksCalc';
+import type { F } from '../types-flocks';
+
+export interface FlocksModalProps {
+  open: boolean;
+  onClose: () => void;
+  form: F;
+  setForm: React.Dispatch<React.SetStateAction<F>>;
+  layingFromStd: boolean;
+  setLayingFromStd: (v: boolean) => void;
+  err: string;
+  vErrors: Record<string, string>;
+  // داده
+  birds: any[];
+  breedsForBird: any[];
+  halls: any[];
+  zonesForHall: any[];
+  breedStd: any;
+  vaccineEnabled: boolean;
+  fmt: any;
+  // actions
+  onSave: () => void;
+}
+
+export default function FlocksModal(props: FlocksModalProps) {
+  const {
+    open, onClose, form, setForm, layingFromStd, setLayingFromStd,
+    err, vErrors, birds, breedsForBird, halls, zonesForHall,
+    breedStd, vaccineEnabled, fmt, onSave,
+  } = props;
+
+  const formStd = breedStd.byBreedId(form.breedId);
+  const formLaying = formStd?.biology?.layingStartDay ?? DEFAULT_LAYING_START;
+
+  const liveCosts = (() => {
+    const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || 0 : 0;
+    const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
+    const bird = int(form.initialCount) * num(form.purchasePrice);
+    const del = num(form.deliveryCost);
+    const oth = num(form.otherCosts);
+    const total = bird + del + oth;
+    const per = int(form.initialCount) ? total / (int(form.initialCount) || 1) : 0;
+    return { bird, del, oth, total, per };
+  })();
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={form.id ? 'ویرایش گله' : 'افزودن گله'}
+      footer={
+        <BtnRow>
+          <Btn variant="primary" onClick={onSave}>ذخیره</Btn>
+          <Btn onClick={onClose}>لغو</Btn>
+        </BtnRow>
+      }
+    >
+      <Field label="نام گله" required error={vErrors.name}>
+        <Input placeholder="مثلاً — گله بهار ۱۴۰۵" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+      </Field>
+
+      <Grid2>
+        <Field label="نوع گله" required>
+          <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as any })}>
+            <option value="layer">تخم‌گذار</option>
+            <option value="broiler">گوشتی</option>
+            <option value="breeder">مادر (تخم نطفه‌دار)</option>
+          </Select>
+        </Field>
+        <Field label="منبع">
+          <Select value={form.source} onChange={e => {
+            const newSource = e.target.value;
+            const today = todayJ();
+            setForm(f => {
+              if (newSource === 'hatch') {
+                return { ...f, source: newSource, hatchDate: f.hatchDate || today, purchaseDate: '', purchasePrice: '', deliveryCost: '' };
+              }
+              if (newSource === 'purchase') {
+                return { ...f, source: newSource, purchaseDate: f.purchaseDate || today, purchasePrice: f.purchasePrice, deliveryCost: f.deliveryCost };
+              }
+              return { ...f, source: newSource };
+            });
+          }}>
+            {Object.entries(SOURCE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </Select>
+        </Field>
+      </Grid2>
+
+      <Grid2>
+        <Field label="پرنده" required>
+          <SmartSelect
+            value={form.birdId}
+            onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))}
+            options={birds.map(c => ({ value: c.id, label: c.name }))}
+            placeholder="— انتخاب کنید —"
+            modalTitle="انتخاب پرنده"
+            autoThreshold={6}
+          />
+        </Field>
+        <Field label="نژاد">
+          <DependentSelect
+            value={form.breedId}
+            onChange={v => {
+              const std = breedStd.byBreedId(v);
+              const layStart = std?.biology?.layingStartDay;
+              setForm(f => ({ ...f, breedId: v, layingStartDay: layStart ? String(layStart) : f.layingStartDay }));
+              setLayingFromStd(!!layStart);
+            }}
+            parentValue={form.birdId}
+            parentLabel="پرنده"
+            options={breedsForBird.map(b => ({ value: b.id, label: b.name }))}
+            emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
+            placeholder="— انتخاب نژاد —"
+            modalTitle="انتخاب نژاد"
+          />
+        </Field>
+      </Grid2>
+
+      <Grid2>
+        <Field label="سالن" required>
+          <SmartSelect
+            value={form.hallId}
+            onChange={v => setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
+            options={halls.map(c => ({ value: c.id, label: c.name }))}
+            placeholder="— انتخاب کنید —"
+            modalTitle="انتخاب سالن"
+            autoThreshold={6}
+          />
+        </Field>
+        <Field
+          label="بخش"
+          hint={
+            form.hallId && zonesForHall.length === 0
+              ? 'این سالن بخشی ندارد — از ماژول «سالن‌ها» بخش اضافه کنید'
+              : form.hallId && zonesForHall.length > 0
+              ? toFa(zonesForHall.length) + ' بخش در این سالن'
+              : undefined
+          }
+        >
+          {!form.hallId ? (
+            <div style={{ width: '100%', height: 38, padding: '0 12px', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>
+              ابتدا سالن را انتخاب کنید
+            </div>
+          ) : zonesForHall.length === 0 ? (
+            <div style={{ width: '100%', height: 38, padding: '0 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, boxSizing: 'border-box' }}>
+              ⚠️ بدون بخش
+            </div>
+          ) : (
+            <Select value={form.zoneId} onChange={e => setForm({ ...form, zoneId: e.target.value })}>
+              <option value="">— بدون بخش —</option>
+              {zonesForHall.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
+            </Select>
+          )}
+        </Field>
+      </Grid2>
+
+      {vaccineEnabled && (
+        <Field
+          label="برنامه واکسن"
+          hint={form.vaccineScheduleId ? undefined : 'برای افزودن خودکار واکسن‌ها به تقویم'}
+          autoFrom={form.vaccineScheduleId ? (() => {
+            const sch = getSchedule(form.vaccineScheduleId);
+            return sch ? `تقویم · ${sch.items.length} مرحله` : 'تقویم';
+          })() : undefined}
+        >
+          <Select value={form.vaccineScheduleId} onChange={e => setForm({ ...form, vaccineScheduleId: e.target.value })}>
+            <option value="">— بدون برنامه —</option>
+            {schedulesByType(form.type as 'layer' | 'broiler' | 'breeder').map(sch => (
+              <option key={sch.id} value={sch.id}>{sch.label}</option>
+            ))}
+          </Select>
+        </Field>
+      )}
+
+      <Grid2>
+        <Field label="تعداد اولیه" required error={vErrors.initialCount}>
+          <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
+        </Field>
+        <Field label="تعداد فعلی" error={vErrors.currentCount}>
+          <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={0} max={100000} autoClamp />
+        </Field>
+      </Grid2>
+
+      {form.type === 'breeder' && (
+        <DepBox title="اطلاعات گله مادر" tone="purple">
+          <Grid2>
+            <Field label="تعداد خروس">
+              <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
+            </Field>
+            <Field label="تعداد مرغ">
+              <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
+            </Field>
+          </Grid2>
+          {form.maleCount && form.femaleCount && (
+            <div style={{ padding: 'var(--pad-normal)', background: 'var(--purple-soft)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--purple)', fontWeight: 600 }}>
+              نسبت خروس به مرغ: {sexRatio(parseInt(toEn(form.maleCount)), parseInt(toEn(form.femaleCount)))}
+            </div>
+          )}
+        </DepBox>
+      )}
+
+      {(form.type === 'layer' || form.type === 'breeder') ? (
+        <Field
+          label="سن شروع تخم‌گذاری (روز)"
+          hint={layingFromStd ? 'عدد را تغییر بده اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)}
+          autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
+        >
+          <NumField
+            value={form.layingStartDay}
+            onChange={e => { setForm({ ...form, layingStartDay: e.target.value }); setLayingFromStd(false); }}
+            placeholder={fmt.int(formLaying)}
+            unit="روز"
+            max={400}
+            min={80}
+          />
+        </Field>
+      ) : null}
+
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>تاریخ‌ها</div>
+
+      {form.source === 'hatch' && (
+        <Field label="تاریخ هچ" hint="تاریخ خروج جوجه از دستگاه" error={vErrors.hatchDate}>
+          <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} />
+        </Field>
+      )}
+
+      {form.source === 'purchase' && (
+        <Grid2>
+          <Field label="تاریخ خرید / تحویل" hint="روزی که گله به دستت رسید" error={vErrors.purchaseDate}>
+            <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} />
+          </Field>
+          <Field label="تاریخ هچ" hint="اگر فروشنده گفته (اختیاری)">
+            <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="اختیاری" />
+          </Field>
+        </Grid2>
+      )}
+
+      <Field label="تاریخ شروع نگهداری" hint="اگه تاریخ دقیق خرید یا هچ رو نمی‌دونی، این رو پر کن" error={vErrors.startDate}>
+        <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
+      </Field>
+
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>هزینه‌ها</div>
+
+      <Grid2>
+        <Field label="قیمت هر پرنده">
+          <MoneyField placeholder="۰" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
+        </Field>
+        <Field label="هزینه حمل">
+          <MoneyField placeholder="۰" value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
+        </Field>
+      </Grid2>
+      <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه">
+        <MoneyField placeholder="۰" value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} />
+      </Field>
+
+      {liveCosts.total > 0 && (
+        <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 'var(--fs-sm)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
+            <span>قیمت پرنده‌ها:</span>
+            <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.bird.toLocaleString('fa-IR'))} ت</span>
+          </div>
+          {liveCosts.del > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
+              <span>هزینه حمل:</span>
+              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.del.toLocaleString('fa-IR'))} ت</span>
+            </div>
+          )}
+          {liveCosts.oth > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
+              <span>سایر:</span>
+              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.oth.toLocaleString('fa-IR'))} ت</span>
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 6, marginTop: 2 }}>
+            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>جمع کل:</span>
+            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{toFa(liveCosts.total.toLocaleString('fa-IR'))} ت</span>
+          </div>
+          {liveCosts.per > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--accent)', fontWeight: 700 }}>💰 هر پرنده:</span>
+              <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{toFa(Math.round(liveCosts.per).toLocaleString('fa-IR'))} ت</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      <Field label="یادداشت">
+        <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+      </Field>
+
+      <ErrorBox>{err}</ErrorBox>
+    </Modal>
+  );
+}

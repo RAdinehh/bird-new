@@ -30,136 +30,17 @@ import DependentSelect from '../../shr/components/DependentSelect';
 import { showConfirmAsync, showPromptAsync } from '../../cor/store/dialog';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import { Row, DepBox } from './helpers';
+import FlockCard from './components/FlockCard';
+import FlocksModal from './components/FlocksModal';
+import UpcomingFlocks from './components/UpcomingFlocks';
+import { useFlocksForm } from './hooks/useFlocksForm';
+import { checkHallCapacity } from './api/hallCapacity';
+import { todayJ, jalaliBounds, checkDateBounds, hasRefs, getFlockRevenue } from './api/flocksCalc';
+import { emptyForm as empty, type F, type TabId } from './types-flocks';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createFlkSchema } from '../../shr/validation/rules/flk';
 
-interface F {
-  id?: string;
-  name: string; type: FlockType; birdId: string; breedId: string;
-  hallId: string; zoneId: string;
-  initialCount: string; currentCount: string;
-  maleCount: string; femaleCount: string;
-  layingStartDay: string;
-  vaccineScheduleId: string;
-  hatchDate: string; purchaseDate: string; startDate: string;
-  source: string;
-  purchasePrice: string; deliveryCost: string; otherCosts: string;
-  status: FlockStatus; notes: string;
-}
-
-const empty = (): F => ({
-  name: '', type: 'layer', birdId: '', breedId: '', hallId: '', zoneId: '',
-  initialCount: '', currentCount: '', maleCount: '', femaleCount: '',
-  layingStartDay: '',
-  vaccineScheduleId: '',
-  hatchDate: '', purchaseDate: '', startDate: '',
-  source: 'purchase', purchasePrice: '', deliveryCost: '', otherCosts: '',
-  status: 'active', notes: ''
-});
-
-type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'hidden' | 'archived';
-
-
-/** چک ظرفیت سالن — مجموع گله‌های فعال + گله جدید */
-function todayJ(): string {
-  try { return format(new Date(), 'yyyy/MM/dd'); } catch { return ''; }
-}
-
-/** محدوده‌ی مجاز تاریخ شمسی */
-function jalaliBounds(monthsBack: number, daysForward = 60): { min: string; max: string } {
-  try {
-    const now = new Date();
-    return {
-      min: format(subMonths(now, monthsBack), 'yyyy/MM/dd'),
-      max: format(addDays(now, daysForward), 'yyyy/MM/dd'),
-    };
-  } catch { return { min: '', max: '' }; }
-}
-
-/** پیام هشدار اگه تاریخ خارج از محدوده باشه */
-function checkDateBounds(date: string, bounds: { min: string; max: string }): string | undefined {
-  if (!date) return undefined;
-  if (bounds.max && date > bounds.max) {
-    return 'بیش از ۲ ماه در آینده — گله هنوز وجود ندارد';
-  }
-  if (bounds.min && date < bounds.min) {
-    return 'بیش از ۱۸ ماه در گذشته — سن غیرمنطقی';
-  }
-  return undefined;
-}
-
-function checkHallCapacity(
-  hallId: string,
-  newCount: number,
-  flocks: any[],
-  halls: any[],
-  breedStd: any,
-  excludeFlockId?: string,
-  newBreedId?: string,
-): { ok: boolean; capacity: number; current: number; total: number; over: number; mode: 'count' | 'area'; note?: string } | null {
-  if (!hallId || !newCount) return null;
-  const hall = halls.find(h => h.id === hallId);
-  if (!hall) return null;
-
-  // اگه ابعاد سالن داره، از مساحت استفاده کن
-  const area = (hall.length || 0) * (hall.width || 0);
-  const hasArea = area > 0;
-
-  if (hasArea) {
-    // چک بر اساس مساحت مصرفی
-    let usedArea = 0;
-    let hasUnknownDensity = false;
-    const activeFlocks = (flocks || []).filter(f => f.hallId === hallId && f.status === 'active' && f.id !== excludeFlockId);
-
-    for (const f of activeFlocks) {
-      const std = breedStd.byBreedId(f.breedId);
-      const density = std?.space?.densityMax;
-      const count = f.currentCount || f.initialCount || 0;
-      if (density && density > 0) {
-        usedArea += count / density;
-      } else {
-        hasUnknownDensity = true;
-      }
-    }
-
-    // گله جدید
-    const newStd = newBreedId ? breedStd.byBreedId(newBreedId) : null;
-    const newDensity = newStd?.space?.densityMax;
-    if (newDensity && newDensity > 0) {
-      usedArea += newCount / newDensity;
-    } else {
-      hasUnknownDensity = true;
-    }
-
-    const over = usedArea - area;
-    return {
-      ok: over <= 0 && !hasUnknownDensity,
-      capacity: Math.round(area),
-      current: Math.round(usedArea - (newDensity && newDensity > 0 ? newCount / newDensity : 0)),
-      total: Math.round(usedArea),
-      over: over > 0 ? Math.round(over) : 0,
-      mode: 'area',
-      note: hasUnknownDensity ? 'بعضی نژادها تراکم تعریف نشده — دقیق نیست' : undefined,
-    };
-  }
-
-  // fallback: چک بر اساس تعداد
-  if (!hall.capacity) return null;
-  const current = (flocks || [])
-    .filter(f => f.hallId === hallId && f.status === 'active' && f.id !== excludeFlockId)
-    .reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);
-  const total = current + newCount;
-  const over = total - hall.capacity;
-  return {
-    ok: over <= 0,
-    capacity: hall.capacity,
-    current,
-    total,
-    over: over > 0 ? over : 0,
-    mode: 'count',
-  };
-}
 
 export default function FlocksPage() {
   const fmt = useFormat();
@@ -172,10 +53,6 @@ export default function FlocksPage() {
 
   const [tab, setTab] = useState<TabId>('all');
   const [q, setQ] = useState('');
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<F>(empty());
-  const [layingFromStd, setLayingFromStd] = useState(false);
-  const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
@@ -202,6 +79,17 @@ export default function FlocksPage() {
     });
   }, [_hallsRaw]);
 
+  // ⭐ hook فرم گله
+  const {
+    open, setOpen, form, setForm, layingFromStd, setLayingFromStd, err, setErr,
+    openNew, openEdit, save,
+  } = useFlocksForm({ birds, halls, flocks, breedStd, add, update });
+
+  // helpers محلی (برای validation و liveCosts)
+  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
+  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
+
+  // بازگردانی گله‌های حذف‌شده
   const undoDeleteFlock = () => {
     if (undoData == null) return;
     const list = Array.isArray(undoData.flock) ? undoData.flock : [undoData.flock];
@@ -214,65 +102,11 @@ export default function FlocksPage() {
     setUndoData(null);
   };
 
-  const hasRefs = (flockId: string): boolean => {
-    try {
-      const safeRead = (k: string) => {
-        try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch { return {}; }
-      };
-      const dlg = safeRead('pm-dlg');
-      const dlgLogs = dlg.state?.logs || dlg.logs || [];
-      if (dlgLogs.some((l: any) => l.flockId === flockId)) return true;
-      const egg = safeRead('pm-egg');
-      const prods = egg.state?.productions || egg.productions || [];
-      if (prods.some((p: any) => p.flockId === flockId)) return true;
-      const sales = egg.state?.sales || egg.sales || [];
-      if (sales.some((s: any) => s.flockId === flockId)) return true;
-      const tra = safeRead('pm-tra');
-      const invs = tra.state?.invoices || tra.invoices || [];
-      if (invs.some((i: any) => i.relatedFlockId === flockId)) return true;
-    } catch {}
-    return false;
-  };
 
 
-  const openNew = () => {
-    if (birds.length === 0) { showAlert('اول پرنده بسازید'); return; }
-    if (halls.length === 0) { showAlert('اول سالن بسازید'); return; }
-    const lastF = flocks
-      .slice()
-      .sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''))[0];
-    setForm({
-      ...empty(),
-      birdId: lastF?.birdId || birds[0].id,
-      hallId: lastF?.hallId || halls[0].id,
-      ...(lastF?.breedId ? { breedId: lastF.breedId } : {}),
-    });
-    setErr(''); setOpen(true);
-  };
+
   useFab({ label: 'افزودن گله', onClick: openNew });
 
-  const openEdit = (f: Flock) => {
-    setForm({
-      id: f.id, name: f.name, type: f.type, birdId: f.birdId, breedId: f.breedId,
-      hallId: f.hallId, zoneId: f.zoneId,
-      initialCount: f.initialCount ? toFa(f.initialCount) : '',
-      currentCount: f.currentCount ? toFa(f.currentCount) : '',
-      maleCount: f.maleCount ? toFa(f.maleCount) : '',
-      femaleCount: f.femaleCount ? toFa(f.femaleCount) : '',
-      layingStartDay: f.layingStartDay ? toFa(f.layingStartDay) : '',
-      vaccineScheduleId: f.vaccineScheduleId || '',
-      hatchDate: f.hatchDate || '', purchaseDate: f.purchaseDate || '', startDate: f.startDate || '',
-      source: f.source,
-      purchasePrice: f.purchasePrice ? toFa(f.purchasePrice) : '',
-      deliveryCost: f.deliveryCost ? toFa(f.deliveryCost) : '',
-      otherCosts: f.otherCosts ? toFa(f.otherCosts) : '',
-      status: f.status, notes: f.notes
-    });
-    setErr(''); setOpen(true);
-  };
-
-  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
-  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
   // ═══ اعتبارسنجی زنده ═══
   const { errors: vErrors } = useValidation(
@@ -303,76 +137,6 @@ export default function FlocksPage() {
     },
   );
 
-  const save = async () => {
-    // 🔒 جلوگیری قاطع از نام تکراری گله
-    if (!form.id) {
-      const _trimmed = form.name.trim();
-      const _dup = flocks.find((x: any) => x.name.trim() === _trimmed);
-      if (_dup) {
-        showAlert(
-          `گلهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
-          '❌ نام تکراری'
-        );
-        return;
-      }
-    }
-
-    if (!form.name.trim()) { setErr('نام گله اجباری است'); return; }
-
-    // ═══ قواعد منطقی ═══
-    const _init = int(form.initialCount) || 0;
-    const _curr = int(form.currentCount) || _init;
-    const _male = int(form.maleCount) || 0;
-    const _female = int(form.femaleCount) || 0;
-
-    if (_curr > _init) {
-      setErr(`تعداد فعلی (${toFa(_curr)}) نمی‌تواند بیشتر از تعداد اولیه (${toFa(_init)}) باشد`);
-      return;
-    }
-    if (form.type === 'breeder' && (_male + _female) > _init) {
-      setErr(`مجموع خروس (${toFa(_male)}) و مرغ (${toFa(_female)}) بیشتر از تعداد اولیه است`);
-      return;
-    }
-    if (!form.birdId) { setErr('پرنده اجباری است'); return; }
-    if (!form.startDate.trim() && !form.hatchDate.trim() && !form.purchaseDate.trim()) {
-      setErr('حداقل یکی از تاریخ‌های هچ، خرید یا شروع را وارد کنید'); return;
-    }
-    const data = {
-      name: form.name.trim(), type: form.type,
-      birdId: form.birdId, breedId: form.breedId,
-      hallId: form.hallId, zoneId: form.zoneId,
-      initialCount: int(form.initialCount),
-      currentCount: int(form.currentCount) || int(form.initialCount),
-      maleCount: int(form.maleCount), femaleCount: int(form.femaleCount),
-      layingStartDay: form.layingStartDay.trim() === '' ? (breedStd.byBreedId(form.breedId)?.biology?.layingStartDay ?? DEFAULT_LAYING_START) : (int(form.layingStartDay) || DEFAULT_LAYING_START),
-      endOfCycleDay: breedStd.byBreedId(form.breedId)?.biology?.endOfCycleDay ?? null,
-      hatchDate: form.hatchDate.trim(), purchaseDate: form.purchaseDate.trim(),
-      startDate: form.startDate.trim(), source: form.source,
-      purchasePrice: num(form.purchasePrice),
-      deliveryCost: num(form.deliveryCost),
-      otherCosts: num(form.otherCosts),
-      vaccineScheduleId: form.vaccineScheduleId,
-      status: form.status, notes: form.notes.trim()
-    };
-    // 🔒 چک ظرفیت سالن
-    const newCount = data.currentCount || data.initialCount || 0;
-    const cap = checkHallCapacity(form.hallId, newCount, flocks, halls, breedStd, form.id || undefined, form.breedId);
-    if (cap && !cap.ok) {
-      const ok = await showConfirmAsync(
-        '⚠️ ظرفیت سالن پر می‌شود',
-        (cap.mode === 'area'
-          ? `فضای سالن: ${cap.capacity} m²\nفعلی: ${cap.current} m²\nبعد از این گله: ${cap.total} m²\nاضافه‌بار: ${cap.over} m²\n`
-          : `ظرفیت سالن: ${cap.capacity} پرنده\nفعلی: ${cap.current} پرنده\nبعد از این گله: ${cap.total} پرنده\nاضافه‌بار: ${cap.over} پرنده\n`) +
-        (cap.note ? `\n⚠️ ${cap.note}\n` : '') + '\n' +
-        `آیا می‌خواهید ادامه دهید؟`,
-        { danger: true, confirmText: 'بله، ادامه' }
-      );
-      if (!ok) return;
-    }
-
-    if (form.id) update(form.id, data); else add(data);
-    setOpen(false);
-  };
 
   const formStd = breedStd.byBreedId(form.breedId);
   const formLaying = formStd?.biology?.layingStartDay ?? DEFAULT_LAYING_START;
@@ -449,13 +213,6 @@ export default function FlocksPage() {
   }, [ms.selectionMode]);
 
 
-  // محاسبه درآمد هر گله از فاکتورهای فروش
-  const getFlockRevenue = (flockId: string): number => {
-    return (invoices || [])
-      .filter((inv: any) => inv.type === 'sale' && inv.relatedFlockId === flockId)
-      .reduce((sum: number, inv: any) => sum + (inv.total || 0), 0);
-  };
-
   const breedsForBird = breeds.filter(b => b.birdId === form.birdId);
   const zonesForHall = zones.filter(z => z.hallId === form.hallId);
 
@@ -524,73 +281,7 @@ export default function FlocksPage() {
           tone="info"
         />
         {/* گله‌های نزدیک به تخم‌گذاری */}
-        {(() => {
-          const upcoming = flocks.filter(f => {
-            if (f.status !== 'active') return false;
-            if (f.type !== 'layer' && f.type !== 'breeder') return false;
-            const std = breedStd.byBreedId(f.breedId);
-            const startDay = getLayingStartDay(f, std?.biology?.layingStartDay ?? DEFAULT_LAYING_START);
-            const age = getAgeDays(f);
-            return age < startDay && age >= startDay - 60;
-          }).sort((a, b) => getAgeDays(b) - getAgeDays(a));
-
-          if (upcoming.length === 0) return null;
-
-          return (
-            <div style={{
-              background: 'var(--accent-soft)',
-              border: '1px solid var(--accent-border)',
-              borderRadius: 'var(--r-lg)',
-              padding: 'var(--pad-comfy)'
-            }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                marginBottom: 10
-              }}>
-                <span style={{ fontSize: 'var(--fs-md)' }}>⏳</span>
-                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>
-                  نزدیک به شروع تخم‌گذاری ({fmt.int(upcoming.length)})
-                </span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {upcoming.map(f => {
-                  const age = getAgeDays(f);
-                  const std = breedStd.byBreedId(f.breedId);
-            const startDay = getLayingStartDay(f, std?.biology?.layingStartDay ?? DEFAULT_LAYING_START);
-                  const remain = startDay - age;
-                  const bird = birds.find(b => b.id === f.birdId);
-                  return (
-                    <div key={f.id} style={{
-                      padding: 'var(--pad-normal)',
-                      background: 'var(--card)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--r-md)'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                        <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{f.name}</span>
-                        <span style={{
-                          fontSize: 'var(--fs-xs)',
-                          color: remain <= 14 ? 'var(--warn)' : 'var(--muted)',
-                          fontWeight: 700
-                        }}>
-                          {fmt.int(remain)} روز مانده
-                        </span>
-                      </div>
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 6 }}>
-                        {bird?.name || '—'}  |  سن فعلی: {toFa(age)} روز
-                      </div>
-                      <MiniProgress
-                        current={age}
-                        target={startDay}
-                        color={remain <= 14 ? 'warn' : 'info'}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })()}
+        <UpcomingFlocks flocks={flocks} birds={birds} breedStd={breedStd} fmt={fmt} />
 
         <div style={{
           height: 38, background: 'var(--input-bg)', border: '1px solid var(--border)',
@@ -629,255 +320,45 @@ export default function FlocksPage() {
               const breed = breeds.find(b => b.id === f.breedId);
               const hall = halls.find(h => h.id === f.hallId);
               const zone = zones.find(z => z.id === f.zoneId);
-              const ageDays = getAgeDays(f);
-              const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, bird?.cycleDays ?? null);
-              const isArchived = f.status === 'archived' || f.status === 'sold';
-              const ready = isLayingReady(f);
-              const untilLay = daysUntilLaying(f);
-              const costs = calcCosts(f);
+              const revenue = getFlockRevenue(f.id, invoices);
               const isOpen = !ms.selectionMode && expandedId === f.id;
-
-              const accentColor: any = isArchived ? 'dim' : lc.color;
-
               return (
-                <ExpandableCard
-                  id={f.id}
-                  ms={ms}
+                <FlockCard
                   key={f.id}
-                  accent={accentColor}
-                  index={toFa(i + 1)}
-                  iconEmoji="🐔"
-                  title={f.name}
-                  subtitle={[bird?.name || '—', breed?.name, hall?.name].filter(Boolean).join('  |  ')}
+                  flock={f}
+                  index={i}
+                  bird={bird}
+                  breed={breed}
+                  hall={hall}
+                  zone={zone}
+                  invoiceRevenue={revenue}
+                  vaccineEnabled={vaccineEnabled}
                   isOpen={isOpen}
+                  ms={ms}
+                  fmt={fmt}
                   onToggle={() => setExpandedId(isOpen ? null : f.id)}
-                  badge={<>
-                    <Tag tone={lc.color === 'green' ? 'green' : lc.color === 'amber' ? 'amber' : lc.color === 'blue' ? 'blue' : 'gray'}>{isArchived ? 'آرشیو' : lc.label}</Tag>
-                    {f.sourceInvoiceId && <Tag tone="blue">🛒 فاکتور</Tag>}
-                    {f.hidden && <Tag tone="gray">👁 پنهان</Tag>}
-                    {f.paused && <Tag tone="amber">⏸ غیرفعال</Tag>}
-                    {!f.hallId && <Tag tone="amber">🏠 بدون سالن</Tag>}
-                    {ready && !isArchived && (f.type === 'layer' || f.type === 'breeder') && <Tag tone="green">✅ آماده</Tag>}
-                  </>}
-                  stats={<>
-                    {ageDays > 0 && <span>🎂 <b style={{ color: 'var(--text)' }}>{fmt.int(ageDays)} روز</b></span>}
-                    {f.currentCount && <span>🐔 <b style={{ color: 'var(--text)' }}>{fmt.int(f.currentCount)}</b></span>}
-                    {f.initialCount != null && f.currentCount != null && (f.initialCount - f.currentCount) > 0 && (() => {
-                      const deaths = f.initialCount - f.currentCount;
-                      const deathsPct = f.initialCount > 0 ? (deaths / f.initialCount) * 100 : 0;
-                      const danger = deathsPct > 5;
-                      return (
-                        <span style={{ color: danger ? 'var(--danger)' : 'var(--warn)', fontWeight: danger ? 700 : 500 }}>
-                          💀 <b>{fmt.int(deaths)}</b> {danger ? `(${fmt.int(Math.round(deathsPct))}٪)` : ''}
-                        </span>
-                      );
-                    })()}
-                    {costs.perBird > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{fmt.money(Math.round(costs.perBird))}</b></span>}
-                    {!ready && !isArchived && untilLay > 0 && (
-                      <span style={{ color: 'var(--warn)' }}>⏳ <b>{fmt.int(untilLay)} روز</b></span>
-                    )}
-                  </>}
-                >
-                  {/* شمارش معکوس */}
-                  
-
-                  {/* نوار پیشرفت */}
-                  {!isArchived && (
-                    <div style={{ height: 36, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}>
-                      <div style={{
-                        height: '100%', width: `${Math.min(100, lc.progress)}%`,
-                        background: lc.color === 'green' ? 'linear-gradient(90deg, var(--accent), #16a34a)' : lc.color === 'amber' ? 'linear-gradient(90deg, var(--warn), #dc2626)' : 'linear-gradient(90deg, var(--accent), #16a34a)',
-                        borderRadius: 4
-                      }} />
-                    </div>
-                  )}
-
-                  {/* تاریخ‌ها */}
-                  {(f.hatchDate || f.purchaseDate || f.startDate) && (
-                    <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تاریخ‌ها</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        {f.hatchDate && <Row l="هچ" v={toFa(f.hatchDate)} autoFrom={f.sourceInvoiceId ? 'فاکتور خرید' : undefined} />}
-                        {f.purchaseDate && <Row l="خرید" v={toFa(f.purchaseDate)} />}
-                        {f.startDate && <Row l="شروع نگهداری" v={toFa(f.startDate)} />}
-                      </div>
-                    </>
-                  )}
-
-                  {/* مشخصات */}
-                  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مشخصات</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {ageDays > 0 && <Row l="سن (روز)" v={`${fmt.int(ageDays)} روز`} />}
-                    {f.initialCount && <Row l="تعداد اولیه" v={toFa(f.initialCount)} autoFrom={f.sourceInvoiceId ? 'فاکتور خرید' : undefined} />}
-                    {f.currentCount && <Row l="تعداد فعلی" v={fmt.int(f.currentCount)} />}
-                    {f.initialCount && f.currentCount && f.initialCount !== f.currentCount && (
-                      <Row l="تلفات" v={`${fmt.int(f.initialCount - f.currentCount)} (${toFa(((f.initialCount - f.currentCount) / f.initialCount * 100).toFixed(1))}٪)`} />
-                    )}
-                    {f.type === 'breeder' && f.maleCount != null && f.femaleCount != null && f.maleCount > 0 && f.femaleCount > 0 && (
-                      <>
-                        <Row l="تعداد خروس" v={fmt.int(f.maleCount)} />
-                        <Row l="تعداد مرغ" v={fmt.int(f.femaleCount)} />
-                        <Row l="نسبت خروس/مرغ" v={sexRatio(f.maleCount, f.femaleCount)} />
-                      </>
-                    )}
-                    {breed && <Row l="نژاد" v={breed.name} autoFrom={f.sourceInvoiceId ? 'فاکتور خرید' : undefined} />}
-                    {hall && <Row l="سالن" v={hall.name} />}
-                    {zone && <Row l="بخش" v={zone.name} />}
-                    <Row l="منبع" v={SOURCE_LABEL[f.source] || '—'} />
-                    {f.endOfCycleDay && (
-                      <Row l="چرخه زندگی" v={`${fmt.int(f.endOfCycleDay)} روز`} />
-                    )}
-                    {(() => {
-                      if (f.type !== 'layer' && f.type !== 'breeder') return null;
-                      const layStart = f.layingStartDay || DEFAULT_LAYING_START;
-                      const fromStd = !f.layingStartDay;
-                      return <Row l="سن تخم‌گذاری" v={`${fmt.int(layStart)} روز${fromStd ? ' (پیش‌فرض)' : ''}`} />;
-                    })()}
-                    {vaccineEnabled && f.vaccineScheduleId && (() => {
-                      const sch = getSchedule(f.vaccineScheduleId);
-                      if (!sch) return null;
-                      return <Row l="برنامه واکسن" v={`${sch.label} · ${toFa(sch.items.length)} مرحله`} />;
-                    })()}
-                  </div>
-
-                  {/* هزینه‌ها */}
-                  {costs.total > 0 && (
-                    <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هزینه‌ها</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        {costs.birdCost > 0 && <Row l="قیمت پرنده‌ها" v={fmt.money(costs.birdCost)} autoFrom={f.sourceInvoiceId ? 'فاکتور خرید' : undefined} />}
-                        {costs.delivery > 0 && <Row l="هزینه حمل" v={fmt.money(costs.delivery)} autoFrom={f.sourceInvoiceId ? 'فاکتور خرید' : undefined} />}
-                        {costs.other > 0 && <Row l="سایر" v={fmt.money(costs.other)} />}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                          <span>جمع کل:</span>
-                          <span>{fmt.money(costs.total)}</span>
-                        </div>
-                        {costs.perBird > 0 && (
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هر پرنده:</span>
-                            <span>{fmt.money(Math.round(costs.perBird))}</span>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-
-                  {/* درآمد و ROI */}
-                  {(() => {
-                    const revenue = getFlockRevenue(f.id);
-                    if (revenue === 0 && costs.total === 0) return null;
-                    const profit = revenue - costs.total;
-                    const roi = costs.total > 0 ? (profit / costs.total) * 100 : 0;
-                    const isProfit = profit >= 0;
-                    const color = isProfit ? 'var(--accent)' : 'var(--danger)';
-                    return (
-                      <>
-                        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-                          <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> درآمد و سود
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                          <Row l="فروش کل" v={fmt.money(revenue)} />
-                          <div style={{
-                            display: 'flex', justifyContent: 'space-between',
-                            fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
-                            background: isProfit ? 'var(--accent-soft)' : 'var(--danger-soft)',
-                            color: color, borderRadius: 'var(--r-sm)', fontWeight: 700,
-                          }}>
-                            <span>{isProfit ? '📈 سود خالص:' : '📉 زیان:'}</span>
-                            <span>{fmt.money(Math.abs(profit))}</span>
-                          </div>
-                          {costs.total > 0 && (
-                            <div style={{
-                              display: 'flex', justifyContent: 'space-between',
-                              fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
-                              background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontWeight: 700,
-                            }}>
-                              <span>ROI:</span>
-                              <span style={{ color }}>{toFa(roi.toFixed(1))}٪</span>
-                            </div>
-                          )}
-                        </div>
-                      </>
-                    );
-                  })()}
-
-                  {/* نمایش دلیل آرشیو */}
-                  {isArchived && f.archivedReason && (
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)' }}>
-                      <b>دلیل آرشیو:</b> {f.archivedReason}
-                    </div>
-                  )}
-
-                  {/* کنترل گله */}
-                  {!isArchived && (
-                    <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-                        <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🎛</span> کنترل گله
-                      </div>
-                      <div style={{ display: 'flex', gap: 6 }}>
-                        <Btn size="sm" onClick={() => { toggleHidden(f.id); f.hidden ? toastMsg.visible(f.name) : toastMsg.hidden(f.name); }} style={{ flex: 1 }}>
-                          {f.hidden ? '👁 نمایان' : '👁 پنهان'}
-                        </Btn>
-                        <Btn size="sm" onClick={() => { togglePaused(f.id); f.paused ? toastMsg.activated(f.name) : toastMsg.paused(f.name); }} style={{ flex: 1 }}>
-                          {f.paused ? '▶️ فعال' : '⏸ غیرفعال'}
-                        </Btn>
-                      </div>
-                    </>
-                  )}
-
-                  {/* نمایش دلیل آرشیو */}
-                  {isArchived && f.archivedReason && (
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)' }}>
-                      <b>دلیل آرشیو:</b> {f.archivedReason}
-                    </div>
-                  )}
-
-                  {/* یادداشت */}
-                  {f.notes && (
-                    <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
-                      <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
-                    </>
-                  )}
-
-                  {/* دکمه‌ها */}
-                  <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                    {isArchived ? (
-                      <>
-                        <Btn size="sm" onClick={() => restore(f.id)} style={{ flex: 1 }}>بازگردانی</Btn>
-                        <Btn size="sm" onClick={async () => {
-                    const idToDel = f.id; const item = flocks.find(f => f.id === idToDel); if (item) { setUndoData({ flock: item }); setTimeout(() => setUndoData((cur: any) => cur && cur.flock.id === item.id ? null : cur), 6000); } remove(idToDel);
-                    logAction('delete', 'flk', 'حذف از گله‌ها');  toastMsg.deleted(f.name);
-                    }} style={{ flex: 1 }}>حذف</Btn>
-                      </>
-                    ) : (
-                      <>
-                        <Btn size="sm" onClick={() => openEdit(f)} style={{ flex: 1 }}>ویرایش</Btn>
-                        <Btn size="sm" onClick={async () => {
-                          const reason = await showPromptAsync(
-                            'آرشیو گله',
-                            'آرشیو «' + f.name + '»؟ این گله به بخش آرشیو منتقل می‌شود.',
-                            {
-                              label: 'دلیل آرشیو',
-                              placeholder: 'مثلاً: فروش، پایان چرخه، تلفات کامل...',
-                              required: true,
-                              multiline: true,
-                              rows: 2,
-                              confirmText: 'آرشیو کن',
-                            }
-                          );
-                          if (reason === null || !reason.trim()) return;
-                          archive(f.id, reason.trim());
-                          toastMsg.archived(f.name);
-                          logAction('update', 'flk', 'آرشیو گله: ' + f.name);
-                        }} style={{ flex: 1 }}>آرشیو</Btn>
-                      </>
-                    )}
-                  </div>
-                </ExpandableCard>
+                  onEdit={() => openEdit(f)}
+                  onArchive={(reason) => {
+                    archive(f.id, reason);
+                    toastMsg.archived(f.name);
+                    logAction('update', 'flk', 'آرشیو گله: ' + f.name);
+                  }}
+                  onRestore={() => restore(f.id)}
+                  onDelete={() => {
+                    const item = flocks.find(fl => fl.id === f.id);
+                    if (item) {
+                      setUndoData({ flock: item });
+                      setTimeout(() => setUndoData((cur: any) => cur && cur.flock.id === item.id ? null : cur), 6000);
+                    }
+                    remove(f.id);
+                    logAction('delete', 'flk', 'حذف از گله‌ها');
+                    toastMsg.deleted(f.name);
+                  }}
+                  onToggleHidden={() => { toggleHidden(f.id); f.hidden ? toastMsg.visible(f.name) : toastMsg.hidden(f.name); }}
+                  onTogglePaused={() => { togglePaused(f.id); f.paused ? toastMsg.activated(f.name) : toastMsg.paused(f.name); }}
+                />
               );
             })}
-            {ms.selectionMode && <div style={{ height: 90 }} />}
           </>
         )}
 
@@ -885,303 +366,24 @@ export default function FlocksPage() {
         
       <MultiSelectBar ms={ms} deleteLabel="حذف" archiveLabel="آرشیو" />
 
-        <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش گله' : 'افزودن گله'}
-          footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-
-          <Field label="نام گله" required error={vErrors.name}>
-            <Input placeholder="مثلاً — گله بهار ۱۴۰۵" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-          </Field>
-
-          <Grid2>
-            <Field label="نوع گله" required>
-              <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as FlockType })}>
-                <option value="layer">تخم‌گذار</option>
-                <option value="broiler">گوشتی</option>
-                <option value="breeder">مادر (تخم نطفه‌دار)</option>
-              </Select>
-            </Field>
-            <Field label="منبع">
-              <Select value={form.source} onChange={e => {
-                  const newSource = e.target.value;
-                  const today = todayJ();
-                  setForm(f => {
-                    if (newSource === 'hatch') {
-                      return {
-                        ...f,
-                        source: newSource,
-                        hatchDate: f.hatchDate || today,
-                        purchaseDate: '',
-                        purchasePrice: '',
-                        deliveryCost: '',
-                      };
-                    }
-                    if (newSource === 'purchase') {
-                      return {
-                        ...f,
-                        source: newSource,
-                        purchaseDate: f.purchaseDate || today,
-                        purchasePrice: f.purchasePrice,
-                        deliveryCost: f.deliveryCost,
-                      };
-                    }
-                    return { ...f, source: newSource };
-                  });
-                }}>
-                {Object.entries(SOURCE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-              </Select>
-            </Field>
-          </Grid2>
-
-          <Grid2>
-            <Field label="پرنده" required>
-<SmartSelect
-              value={form.birdId}
-              onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))}
-              options={birds.map(c => ({
-                value: c.id,
-                label: c.name,
-              }))}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب پرنده"
-              autoThreshold={6}
-            />
-            </Field>
-            <Field label="نژاد">
-              <DependentSelect
-                value={form.breedId}
-                onChange={v => {
-                  const std = breedStd.byBreedId(v);
-                  const layStart = std?.biology?.layingStartDay;
-                  setForm(f => ({
-                    ...f,
-                    breedId: v,
-                    layingStartDay: layStart ? String(layStart) : f.layingStartDay,
-                  }));
-                  setLayingFromStd(!!layStart);
-                }}
-                parentValue={form.birdId}
-                parentLabel="پرنده"
-                options={breedsForBird.map(b => ({ value: b.id, label: b.name }))}
-                emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
-                placeholder="— انتخاب نژاد —"
-                modalTitle="انتخاب نژاد"
-              />
-            </Field>
-          </Grid2>
-
-          <Grid2>
-            <Field label="سالن" required>
-<SmartSelect
-              value={form.hallId}
-              onChange={v => setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
-              options={halls.map(c => ({
-                value: c.id,
-                label: c.name,
-              }))}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب سالن"
-              autoThreshold={6}
-            />
-            </Field>
-            <Field
-              label="بخش"
-              hint={
-                form.hallId && zonesForHall.length === 0
-                  ? 'این سالن بخشی ندارد — از ماژول «سالن‌ها» بخش اضافه کنید'
-                  : form.hallId && zonesForHall.length > 0
-                  ? toFa(zonesForHall.length) + ' بخش در این سالن'
-                  : undefined
-              }
-            >
-              {!form.hallId ? (
-                <div style={{
-                  width: '100%', height: 38, padding: '0 12px',
-                  background: 'var(--input-bg)',
-                  border: '1px dashed var(--border)',
-                  borderRadius: 'var(--r-md)',
-                  fontSize: 'var(--fs-sm)',
-                  color: 'var(--muted)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxSizing: 'border-box',
-                }}>
-                  ابتدا سالن را انتخاب کنید
-                </div>
-              ) : zonesForHall.length === 0 ? (
-                <div style={{
-                  width: '100%', height: 38, padding: '0 12px',
-                  background: 'var(--warn-soft)',
-                  border: '1px dashed var(--warn)',
-                  borderRadius: 'var(--r-md)',
-                  fontSize: 'var(--fs-sm)',
-                  color: 'var(--warn)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 600, boxSizing: 'border-box',
-                }}>
-                  ⚠️ بدون بخش
-                </div>
-              ) : (
-                <Select value={form.zoneId} onChange={e => setForm({ ...form, zoneId: e.target.value })}>
-                  <option value="">— بدون بخش —</option>
-                  {zonesForHall.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
-                </Select>
-              )}
-            </Field>
-          </Grid2>
-
-          {vaccineEnabled && (
-            <Field
-              label="برنامه واکسن"
-              hint={
-                form.vaccineScheduleId
-                  ? undefined
-                  : 'برای افزودن خودکار واکسن‌ها به تقویم'
-              }
-              autoFrom={
-                form.vaccineScheduleId
-                  ? (() => {
-                      const sch = getSchedule(form.vaccineScheduleId);
-                      return sch ? `تقویم · ${sch.items.length} مرحله` : 'تقویم';
-                    })()
-                  : undefined
-              }
-            >
-              <Select
-                value={form.vaccineScheduleId}
-                onChange={e => setForm({ ...form, vaccineScheduleId: e.target.value })}
-              >
-                <option value="">— بدون برنامه —</option>
-                {schedulesByType(form.type as 'layer' | 'broiler' | 'breeder').map(sch => (
-                  <option key={sch.id} value={sch.id}>{sch.label}</option>
-                ))}
-              </Select>
-            </Field>
-          )}
-
-          <Grid2>
-            <Field label="تعداد اولیه" required error={vErrors.initialCount}>
-              <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
-            </Field>
-            <Field label="تعداد فعلی" error={vErrors.currentCount}>
-              <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={0} max={100000} autoClamp />
-            </Field>
-          </Grid2>
-
-          {form.type === 'breeder' && (
-            <DepBox title="اطلاعات گله مادر" tone="purple">
-              <Grid2>
-                <Field label="تعداد خروس">
-                  <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
-                </Field>
-                <Field label="تعداد مرغ">
-                  <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
-                </Field>
-              </Grid2>
-              {form.maleCount && form.femaleCount && (
-                <div style={{ padding: 'var(--pad-normal)', background: 'var(--purple-soft)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--purple)', fontWeight: 600 }}>
-                  نسبت خروس به مرغ: {sexRatio(parseInt(toEn(form.maleCount)), parseInt(toEn(form.femaleCount)))}
-                </div>
-              )}
-            </DepBox>
-          )}
-
-          {(form.type === 'layer' || form.type === 'breeder') ? (
-            <Field
-              label="سن شروع تخم‌گذاری (روز)"
-              hint={layingFromStd ? 'عدد را تغییر بده اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)}
-              autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
-            >
-              <NumField
-                value={form.layingStartDay}
-                onChange={e => {
-                  setForm({ ...form, layingStartDay: e.target.value });
-                  setLayingFromStd(false);
-                }}
-                placeholder={fmt.int(formLaying)}
-                unit="روز"
-                max={400}
-                min={80}
-              />
-            </Field>
-          ) : null}
-
-          <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>تاریخ‌ها</div>
-
-          {form.source === 'hatch' && (
-            <Field label="تاریخ هچ" hint="تاریخ خروج جوجه از دستگاه" error={vErrors.hatchDate}>
-              <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} />
-            </Field>
-          )}
-
-          {form.source === 'purchase' && (
-            <Grid2>
-              <Field label="تاریخ خرید / تحویل" hint="روزی که گله به دستت رسید" error={vErrors.purchaseDate}>
-                <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} />
-              </Field>
-              <Field label="تاریخ هچ" hint="اگر فروشنده گفته (اختیاری)">
-                <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="اختیاری" />
-              </Field>
-            </Grid2>
-          )}
-
-          <Field label="تاریخ شروع نگهداری" hint="اگه تاریخ دقیق خرید یا هچ رو نمی‌دونی، این رو پر کن" error={vErrors.startDate}>
-            <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
-          </Field>
-
-          <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>هزینه‌ها</div>
-
-          <Grid2>
-            <Field label="قیمت هر پرنده">
-              <MoneyField placeholder="۰" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
-            </Field>
-            <Field label="هزینه حمل">
-              <MoneyField placeholder="۰" value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
-            </Field>
-          </Grid2>
-          <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه">
-            <MoneyField placeholder="۰" value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} />
-          </Field>
-
-          {liveCosts.total > 0 && (
-            <div style={{
-              padding: 'var(--pad-comfy)', background: 'var(--accent-soft)',
-              border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)',
-              display: 'flex', flexDirection: 'column', gap: 6, fontSize: 'var(--fs-sm)'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
-                <span>قیمت پرنده‌ها:</span>
-                <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.bird.toLocaleString('fa-IR'))} ت</span>
-              </div>
-              {liveCosts.del > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
-                  <span>هزینه حمل:</span>
-                  <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.del.toLocaleString('fa-IR'))} ت</span>
-                </div>
-              )}
-              {liveCosts.oth > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
-                  <span>سایر:</span>
-                  <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.oth.toLocaleString('fa-IR'))} ت</span>
-                </div>
-              )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 6, marginTop: 2 }}>
-                <span style={{ color: 'var(--accent)', fontWeight: 700 }}>جمع کل:</span>
-                <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{toFa(liveCosts.total.toLocaleString('fa-IR'))} ت</span>
-              </div>
-              {liveCosts.per > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--accent)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هر پرنده:</span>
-                  <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{toFa(Math.round(liveCosts.per).toLocaleString('fa-IR'))} ت</span>
-                </div>
-              )}
-            </div>
-          )}
-
-          <Field label="یادداشت">
-            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-          </Field>
-
-          <ErrorBox>{err}</ErrorBox>
-        </Modal>
+        <FlocksModal
+        open={open}
+        onClose={() => setOpen(false)}
+        form={form}
+        setForm={setForm}
+        layingFromStd={layingFromStd}
+        setLayingFromStd={setLayingFromStd}
+        err={err}
+        vErrors={vErrors}
+        birds={birds}
+        breedsForBird={breedsForBird}
+        halls={halls}
+        zonesForHall={zonesForHall}
+        breedStd={breedStd}
+        vaccineEnabled={vaccineEnabled}
+        fmt={fmt}
+        onSave={save}
+      />
 
       </PageContainer>
     </div>
