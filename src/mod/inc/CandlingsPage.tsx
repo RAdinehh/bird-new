@@ -14,6 +14,7 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import { useFilterSort, FilterBar, getIncCandlingsConfig } from '../../shr/filter';
 import { todayJalali } from './helpers';
 import { useIncubationProfile } from './hooks';
+import { calcAvailableBase, aggregateCandlings, calcSummary } from './api/calc';
 import { logAction } from '../../cor/logger/auditLog';
 import { useMemo as _useMemoV } from 'react';
 
@@ -38,22 +39,6 @@ const emptyData = (): EntryData => ({ alive: '', infertile: '', dead: '', broken
 
 
 
-// مبنا: تعداد تخم موجود برای این مرحله (از مرحله قبل یا کل ورودی)
-function calcAvailableBase(entryId: string, currentStage: number, excludeCandlingId: string | null, allCandlings: any[], entryTotal: number): { base: number; source: string } {
-  // همه کندلینگ‌های این ورودی (به جز خودمون اگه ویرایش می‌کنیم)
-  const myCandlings = allCandlings
-    .filter(c => c.eggEntryId === entryId)
-    .filter(c => !excludeCandlingId || c.id !== excludeCandlingId)
-    .sort((a, b) => a.stage - b.stage);
-
-  // اگه مرحله اوله، یا هیچ کندلینگ قبلی نیست
-  const prevs = myCandlings.filter(c => c.stage < currentStage);
-  if (prevs.length === 0) {
-    return { base: entryTotal, source: 'کل ورودی' };
-  }
-  const prev = prevs[prevs.length - 1];
-  return { base: prev.alive || 0, source: 'مرحله ' + prev.stage };
-}
 
 export default function CandlingsPage({ initialEntry = '', onGoTo, active = true }: { initialEntry?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void; active?: boolean } = {}) {
   const { devices, eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
@@ -321,12 +306,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
       byEntry[c.eggEntryId].push(c);
     });
     return Object.entries(byEntry).map(([entryId, list]) => {
-      const agg = list.reduce((acc, c) => ({
-        alive: acc.alive + (c.alive || 0),
-        infertile: acc.infertile + (c.infertile || 0),
-        dead: acc.dead + (c.dead || 0),
-        broken: acc.broken + (c.broken || 0),
-      }), { alive: 0, infertile: 0, dead: 0, broken: 0 });
+      const agg = aggregateCandlings(list);
       const total = agg.alive + agg.infertile + agg.dead + agg.broken;
       const entry = _entriesById[entryId];
       const entryTotal = entry?.count || 0;
@@ -345,27 +325,10 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
   const summary = useMemo(() => {
     const totalEntries = eggEntries.filter(e => e.status !== 'failed').length;
     const totalCandlings = candlings.length;
-
-    // برای هر کندلینگ، از baseinfo مربوطه alive رو محاسبه کن
-    const allData = candlings.map(c => {
-      const entry = _entriesById[c.eggEntryId];
-      const entryTotal = entry?.count || 0;
-      const baseInfo = calcAvailableBase(c.eggEntryId, c.stage, c.id, candlings, entryTotal);
-      const inf = c.infertile || 0;
-      const dead = c.dead || 0;
-      const brk = c.broken || 0;
-      const alive = Math.max(0, (baseInfo.base || 0) - inf - dead - brk);
-      return { alive, inf, dead, brk };
-    });
-
-    const totalAlive = allData.reduce((a, x) => a + x.alive, 0);
-    const totalInfertile = allData.reduce((a, x) => a + x.inf, 0);
-    const totalDead = allData.reduce((a, x) => a + x.dead, 0);
-    const totalBroken = allData.reduce((a, x) => a + x.brk, 0);
-    const grandTotal = totalAlive + totalInfertile + totalDead + totalBroken;
-    const fertilePercent = grandTotal > 0 ? (totalAlive / grandTotal * 100) : 0;
-    const lossPercent = grandTotal > 0 ? ((totalInfertile + totalDead + totalBroken) / grandTotal * 100) : 0;
-    return { totalEntries, totalCandlings, totalAlive, totalInfertile, totalDead, totalBroken, fertilePercent, lossPercent };
+    const entryTotalMap: Record<string, number> = {};
+    eggEntries.forEach(e => { entryTotalMap[e.id] = e.count || 0; });
+    const s = calcSummary(candlings, entryTotalMap);
+    return { totalEntries, totalCandlings, ...s };
   }, [eggEntries, candlings]);
 
   const dataFor = (id: string): EntryData => entriesData[id] || emptyData();
