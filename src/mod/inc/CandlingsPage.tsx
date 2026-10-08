@@ -15,6 +15,7 @@ import { useFilterSort, FilterBar, getIncCandlingsConfig } from '../../shr/filte
 import { todayJalali } from './helpers';
 import { useIncubationProfile } from './hooks';
 import { calcAvailableBase, aggregateCandlings, calcSummary } from './api/calc';
+import { useCandlingForm, type EntryData, emptyData } from './hooks/useCandlingForm';
 import { logAction } from '../../cor/logger/auditLog';
 import { useMemo as _useMemoV } from 'react';
 
@@ -25,17 +26,6 @@ const DEAD_REASONS: [string, string][] = [
   ['', '—'], ['temp_fluctuation', 'نوسان دما'], ['humidity', 'رطوبت نامناسب'], ['ventilation', 'تهویه ضعیف'], ['genetics', 'ژنتیک'], ['infection', 'عفونت']
 ];
 
-interface EntryData {
-  alive: string;
-  infertile: string;
-  dead: string;
-  broken: string;
-  infertileReason: string;
-  deadReason: string;
-  notes: string;
-}
-
-const emptyData = (): EntryData => ({ alive: '', infertile: '', dead: '', broken: '', infertileReason: '', deadReason: '', notes: '' });
 
 
 
@@ -44,15 +34,14 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
   const { devices, eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
   const { birds } = useBrd();
 
-  const [open, setOpen] = useState(false);
-  const [modalDevice, setModalDevice] = useState('');
-  const [modalDay, setModalDay] = useState('');
-  const [modalDate, setModalDate] = useState('');
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [entriesData, setEntriesData] = useState<Record<string, EntryData>>({});
-  const [err, setErr] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
+
+  // ⭐ hook فرم کندلینگ
+  const {
+    open, modalDevice, modalDay, modalDate, selectedIds, entriesData, err, editingId,
+    setOpen, setModalDevice, setModalDay, setModalDate, setSelectedIds, setEntriesData, setErr,
+    openNew, openEdit, toggleEntry, updateEntryData, save, close,
+  } = useCandlingForm({ eggEntries, devices, candlings, addCandling, updateCandling });
   const [undoData, setUndoData] = useState<{ candling: any } | null>(null);
 
   // profile پرنده انتخاب‌شده اول
@@ -71,6 +60,15 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
     (eggEntries || []).forEach(e => { m[e.id] = e; });
     return m;
   }, [eggEntries]);
+
+  // ⭐ wrapperها — چون _entriesById لازمه
+  const handleOpenNew = (preEntryId?: string) => openNew(preEntryId, _entriesById);
+  const handleSave = () => {
+    const result = save(_entriesById);
+    if (result.ok && result.savedCount > 0 && !editingId) {
+      showAlert(toFa(result.savedCount) + ' کندلینگ ثبت شد', '✅ موفق');
+    }
+  };
 
   const _birdsById = useMemo(() => {
     const m: Record<string, any> = {};
@@ -110,35 +108,13 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialEntry]);
 
-  const nextDayFor = (eggEntryId: string): number => {
-    const stages = candlings.filter(c => c.eggEntryId === eggEntryId).map(c => c.stage);
-    if (stages.length === 0) return 7;
-    return Math.max(...stages) + 3;
-  };
-
   const undoDeleteCandling = () => {
     if (!undoData) return;
     try { addCandling(undoData.candling); } catch {}
     setUndoData(null);
   };
 
-  const openNew = (preEntryId?: string) => {
-    if (eggEntries.length === 0) { showAlert('اول یک ورودی تخم ثبت کنید'); return; }
-    const initialDev = preEntryId
-      ? _entriesById[preEntryId]?.deviceId || devices[0]?.id || ''
-      : devices[0]?.id || '';
-    setModalDevice(initialDev);
-    setSelectedIds(preEntryId ? new Set([preEntryId]) : new Set());
-    const data: Record<string, EntryData> = {};
-    if (preEntryId) data[preEntryId] = emptyData();
-    setEntriesData(data);
-    setModalDay(preEntryId ? String(nextDayFor(preEntryId)) : '7');
-    setModalDate(todayJalali());
-    setEditingId(null);
-    setErr('');
-    setOpen(true);
-  };
-  useFab(active ? { label: 'ثبت کندلینگ', onClick: () => openNew() } : null);
+  useFab(active ? { label: 'ثبت کندلینگ', onClick: () => handleOpenNew() } : null);
 
   const availableEntries = useMemo(() => {
     const dayNum = parseInt(toEn(modalDay)) || 0;
@@ -159,23 +135,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
       .sort((a, b) => String(b.entryDate).localeCompare(String(a.entryDate)));
   }, [eggEntries, modalDevice, modalDay, editingId, candlings]);
 
-  const toggleEntry = (id: string) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-        setEntriesData(d => { const nd = { ...d }; delete nd[id]; return nd; });
-      } else {
-        next.add(id);
-        setEntriesData(d => ({ ...d, [id]: emptyData() }));
-      }
-      return next;
-    });
-  };
 
-  const updateEntryData = (id: string, patch: Partial<EntryData>) => {
-    setEntriesData(d => ({ ...d, [id]: { ...(d[id] || emptyData()), ...patch } }));
-  };
 
   // ═══ اعتبارسنجی زنده ═══
   const vErrors = _useMemoV(() => {
@@ -192,93 +152,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
     return errs;
   }, [entriesData]);
 
-  const save = () => {
-    if (!modalDate.trim()) { setErr('تاریخ اجباری است'); return; }
-    if (!modalDay.trim()) { setErr('روز انکوباسیون اجباری است'); return; }
-    const dayNum = parseInt(toEn(modalDay)) || 0;
-    if (dayNum <= 0 || dayNum > 30) { setErr('روز باید بین ۱ تا ۳۰ باشد'); return; }
-    if (selectedIds.size === 0) { setErr('حداقل یک ورودی انتخاب کنید'); return; }
 
-    let saved = 0;
-    let hasError = false;
-
-    if (editingId) {
-      const entry = _entriesById[editingId];
-      const baseInfo = calcAvailableBase(editingId, dayNum, editingId, candlings, entry?.count || 0);
-      const d = entriesData[editingId] || emptyData();
-      const _inf = parseInt(toEn(d.infertile)) || 0;
-      const _dead = parseInt(toEn(d.dead)) || 0;
-      const _brk = parseInt(toEn(d.broken)) || 0;
-      const _alive = Math.max(0, (baseInfo.base || 0) - _inf - _dead - _brk);
-      if (_inf + _dead + _brk === 0 && _alive === 0) { setErr('حداقل یک مقدار وارد کنید'); return; }
-      if (_inf + _dead + _brk > baseInfo.base) { setErr('مجموع بیشتر از مبنا'); return; }
-      updateCandling(editingId, {
-        stage: dayNum, date: modalDate,
-        alive: _alive,
-        infertile: _inf,
-        dead: _dead,
-        broken: _brk,
-        infertileReason: d.infertileReason,
-        deadReason: d.deadReason,
-        notes: d.notes,
-      });
-      setOpen(false);
-      setEditingId(null);
-      toastMsg.saved('کندلینگ')
-      setEntriesData({});
-      return;
-    }
-
-    Array.from(selectedIds).forEach(id => {
-      const entry = _entriesById[id];
-      if (!entry) return;
-      const d = entriesData[id] || emptyData();
-      const _inf = parseInt(toEn(d.infertile)) || 0;
-      const _dead = parseInt(toEn(d.dead)) || 0;
-      const _brk = parseInt(toEn(d.broken)) || 0;
-      const baseInfo = calcAvailableBase(id, dayNum, null, candlings, entry.count || 0);
-      const _alive = Math.max(0, (baseInfo.base || 0) - _inf - _dead - _brk);
-      const sum = _inf + _dead + _brk;
-      if (sum === 0) { hasError = true; return; }
-      if (baseInfo.base && (_inf + _dead + _brk) > baseInfo.base) { hasError = true; return; }
-      addCandling({
-        eggEntryId: id, stage: dayNum, date: modalDate,
-        alive: parseInt(toEn(d.alive)) || null,
-        infertile: parseInt(toEn(d.infertile)) || null,
-        dead: parseInt(toEn(d.dead)) || null,
-        broken: parseInt(toEn(d.broken)) || null,
-        infertileReason: d.infertileReason,
-        deadReason: d.deadReason,
-        notes: d.notes,
-      });
-      saved++;
-    });
-
-    if (hasError && saved === 0) { setErr('هیچ کندلینگی ذخیره نشد'); return; }
-    setOpen(false);
-    showAlert(toFa(saved) + ' کندلینگ ثبت شد', '✅ موفق');
-  };
-
-  const openEdit = (c: Candling) => {
-    setEditingId(c.id);
-    setModalDevice('');
-    setSelectedIds(new Set([c.eggEntryId]));
-    setEntriesData({
-      [c.eggEntryId]: {
-        alive: c.alive ? toFa(c.alive) : '',
-        infertile: c.infertile ? toFa(c.infertile) : '',
-        dead: c.dead ? toFa(c.dead) : '',
-        broken: c.broken ? toFa(c.broken) : '',
-        infertileReason: c.infertileReason,
-        deadReason: c.deadReason,
-        notes: c.notes,
-      }
-    });
-    setModalDay(String(c.stage));
-    setModalDate(c.date);
-    setErr('');
-    setOpen(true);
-  };
 
   // فیلتر/مرتب
   const config = useMemo(
@@ -398,7 +272,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
         <Empty icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>}
           title="کندلینگی ثبت نشده"
           desc="کندلینگ در روزهای دلخواه انجام می‌شود."
-          action={<Btn variant="primary" onClick={() => openNew()}>+ ثبت کندلینگ</Btn>} />
+          action={<Btn variant="primary" onClick={() => handleOpenNew()}>+ ثبت کندلینگ</Btn>} />
       ) : (
         <>
           {grouped.map(({ entryId, list, agg, total, entryTotal, fertilePercent, lossPercent, deadPercent }, i) => {
@@ -482,7 +356,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
                   ))}
                   <button
                     type="button"
-                    onClick={() => openNew(entryId)}
+                    onClick={() => handleOpenNew(entryId)}
                     style={{
                       padding: 'var(--pad-tight)',
                       background: 'var(--input-bg)',
@@ -547,7 +421,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={editingId ? '✏️ ویرایش کندلینگ' : '🔍 ثبت کندلینگ'}
-        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="primary" onClick={handleSave} disabled={Object.keys(vErrors).length > 0}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={close}>لغو</Btn></BtnRow>}>
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> زمان‌بندی</SectionTitle>
         {_firstSelectedBirdName && _profile.totalDays ? (
