@@ -24,6 +24,7 @@ import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { format as formatJ } from 'date-fns-jalali';
 import { useIncubationProfile } from './hooks';
 import { calcCurrentFertile, smartHatchRate, estimateHatched } from './api/hatchCalc';
+import { buildFlockFromHatch, buildSaleInvoiceFromHatch } from './api/hatchActions';
 import { logAction } from '../../cor/logger/auditLog';
 
 const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
@@ -241,23 +242,22 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
   const createFlock = () => {
     if (!flockModal) return;
     if (!flockForm.name.trim()) { showAlert('نام گله اجباری است'); return; }
-    const h = hatches.find(x => x.id === flockModal.hatchId); if (!h) return;
+    const h = hatches.find(x => x.id === flockModal.hatchId);
+    if (!h) return;
     const entry = _entriesById[h.eggEntryId];
     const bird = entry ? _birdsById[entry.birdId] : null;
     if (!bird) { showAlert('پرنده پیدا نشد'); return; }
-    const newFlockId = addFlock({
-      name: flockForm.name.trim(), type: flockForm.type as any,
-      birdId: bird.id, breedId: entry?.breedId || '',
-      hallId: flockForm.hallId, zoneId: flockForm.zoneId,
-      initialCount: flockModal.count, currentCount: flockModal.count,
-      maleCount: h.maleCount || null, femaleCount: h.femaleCount || null,
-      layingStartDay: 0, vaccineScheduleId: '',
-      hatchDate: h.date, purchaseDate: '', startDate: h.date, source: 'hatch',
-      purchasePrice: null, deliveryCost: null, otherCosts: null,
-      status: 'active', notes: 'از هچ ' + toFa(h.date),
-      sourceHatchId: h.id,
-    } as any);
-    if (h && newFlockId) {
+    const data = buildFlockFromHatch({
+      formName: flockForm.name.trim(),
+      formType: flockForm.type,
+      formHallId: flockForm.hallId,
+      formZoneId: flockForm.zoneId,
+      hatch: { ...h, hatched: flockModal.count } as any,
+      bird,
+      breedId: entry?.breedId || '',
+    });
+    const newFlockId = addFlock(data as any);
+    if (newFlockId) {
       try { updateHatch(h.id, { generatedFlockId: newFlockId } as any); } catch {}
     }
     setFlockModal(null);
@@ -272,14 +272,16 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
     const unitPrice = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;
     if (count <= 0 || unitPrice <= 0) { showAlert('مقادیر باید بیشتر از صفر'); return; }
     const h = hatches.find(x => x.id === sellModal.hatchId);
-    const invId = addInvoice({
-      type: 'sale', date: sellForm.date || h?.date || '',
-      partyId: sellForm.buyerId, category: 'chick',
-      items: [{ id: 'chick-' + Date.now(), name: 'جوجه یک‌روزه', quantity: count, unit: 'عدد', unitPrice, total: count * unitPrice }],
-      total: count * unitPrice, payments: [], dueDate: sellForm.date || h?.date || '',
-      relatedFlockId: '', relatedEntryId: h?.eggEntryId || '', notes: 'فروش جوجه'
-    } as any);
-    if (h && invId) updateHatch(h.id, { generatedInvoiceId: invId } as any);
+    if (!h) return;
+    const data = buildSaleInvoiceFromHatch({
+      buyerId: sellForm.buyerId,
+      count,
+      unitPrice,
+      date: sellForm.date || h.date,
+      hatch: h as any,
+    });
+    const invId = addInvoice(data as any);
+    if (invId) updateHatch(h.id, { generatedInvoiceId: invId } as any);
     setSellModal(null);
     showAlert('فاکتور ثبت شد', '✅ موفق');
   };
