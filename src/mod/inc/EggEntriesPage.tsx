@@ -26,43 +26,10 @@ import { useFilterSort, FilterBar, getIncEntriesConfig } from '../../shr/filter'
 import { todayJalali, Row, chip } from './helpers';
 import EggEntryModal from './components/EggEntryModal';
 import { makeRow, type DraftRow } from './types-eggentries';
-import { nowTime, flockReadyForEggs, calcEntryDateForSyncHatch } from './api/eggEntriesCalc';
+import { nowTime, flockReadyForEggs, calcEntryDateForSyncHatch, DRAFT_KEY, calcDeviceUsage } from './api/eggEntriesCalc';
+import EggEntryCard from './components/EggEntryCard';
 import { useSet } from '../set/store';
 
-const DRAFT_KEY = (devId: string) => 'pm-inc-egg-draft-' + devId;
-
-function calcDeviceUsage(
-  device: any,
-  entries: any[],
-  newEntry?: { birdName: string; count: number }
-): { used: number; total: number; percent: number } {
-  const caps: any[] = device?.capacityByBird || [];
-  if (caps.length === 0) return { used: 0, total: 0, percent: 0 };
-  const refCap = Math.max(...caps.map(c => c.capacity || 0));
-  if (refCap === 0) return { used: 0, total: 0, percent: 0 };
-  const byBird: Record<string, number> = {};
-  caps.forEach(c => {
-    if (!c.birdName) return;
-    const factor = (c.capacity && c.capacity > 0) ? (refCap / c.capacity) : 1;
-    byBird[c.birdName] = factor;
-  });
-  let used = 0;
-  entries.forEach(e => {
-    if (e.status === 'failed') return;
-    const factor = byBird[e.__birdName || ''];
-    if (!factor) return;
-    used += (e.count || 0) * factor;
-  });
-  if (newEntry) {
-    const factor = byBird[newEntry.birdName];
-    if (factor) used += newEntry.count * factor;
-  }
-  return {
-    used: Math.round(used * 10) / 10,
-    total: refCap,
-    percent: Math.round((used / refCap) * 100),
-  };
-}
 
 export default function EggEntriesPage({ initialDevice = '', onGoTo, active = true }: { initialDevice?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void; active?: boolean } = {}) {
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
@@ -604,110 +571,34 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
             const bird = birds.find(b => b.id === e.birdId);
             const breed = breeds.find(b => b.id === e.breedId);
             const age = daysAgo(e.entryDate);
-            const expHatch = addDaysJalali(e.entryDate, (_daysLookup(bird?.name) || 21));
-            const remain = daysToHatch(expHatch);
-            const locked = isLockdown({ ...e, expectedHatchDate: expHatch });
-            const hatchWindow = isHatchWindow({ ...e, expectedHatchDate: expHatch });
-            const myHatch = hatches.find(h => h.eggEntryId === e.id);
-            const isOpen = expandedId === e.id;
-
-            let accent: any = 'accent';
-            if (hatchWindow) accent = 'purple';
-            else if (locked) accent = 'warn';
-
-            let statusLabel = '';
-            let statusTone: any = 'muted';
             const totalDays = (_daysLookup(bird?.name) || 21);
-            if (myHatch) { statusLabel = '✅ هچ‌شده'; statusTone = 'green'; }
-            else if (hatchWindow) { statusLabel = '🐣 پنجره هچ'; statusTone = 'purple'; }
-            else if (locked) { statusLabel = '🔒 Lock-down'; statusTone = 'amber'; }
-            else if (remain > 0) { statusLabel = toFa(remain) + ' روز مانده'; statusTone = 'accent'; }
-            else if (remain === 0) { statusLabel = '🎯 امروز هچ'; statusTone = 'purple'; }
-            else { statusLabel = '⚠️ گذشته از موعد هچ'; statusTone = 'amber'; }
-
-            const partnerName = (e.dealData?.partnerId && (contacts.find((c: any) => c.id === e.dealData.partnerId) as any)?.name) || e.dealData?.partnerName || '';
-            const sellerName = (e.dealData?.sellerId && (contacts.find((c: any) => c.id === e.dealData.sellerId) as any)?.name) || e.dealData?.sellerName || '';
-            const consigneeName = (e.dealData?.consigneeId && (contacts.find((c: any) => c.id === e.dealData.consigneeId) as any)?.name) || e.dealData?.consigneeName || '';
-            const lessorName = (e.dealData?.lessorId && (contacts.find((c: any) => c.id === e.dealData.lessorId) as any)?.name) || '';
-
+            const expHatch = addDaysJalali(e.entryDate, totalDays);
+            const remain = daysToHatch(expHatch);
+            const isOpen = expandedId === e.id;
             return (
-              <ExpandableCard key={e.id} accent={accent} index={toFa(i + 1)} iconEmoji="🥚"
-                title={toFa(e.count || 0) + ' تخم · ' + (bird?.name || '—') + (breed ? ' (' + breed.name + ')' : '')}
-                subtitle={dev?.name || '—'}
-                isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : e.id)}
-                badge={<Tag tone={statusTone}>{statusLabel}</Tag>}
-                stats={<>
-                  <StatBox icon="⏳" label="مانده" value={toFa(remain) + ' روز'} tone={remain <= 3 ? 'warn' : 'default'} />
-                  <Dot />
-                  <StatBox icon="📊" label="پیشرفت" value={toFa(Math.min(100, Math.round(age / Math.max(1, (_daysLookup(bird?.name) || 21)) * 100))) + '٪'} tone="accent" />
-                </>}
-              >
-                {(() => {
-                  const b = birds.find(x => x.id === e.birdId);
-                  const total = (_daysLookup(b?.name) || 21);
-                  const lbl = hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : ('روز ' + toFa(age) + ' از ' + toFa(total));
-                  return <ProgressTracker current={age} target={total} label={lbl} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
-                })()}
-
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> مشخصات</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <Row l="دستگاه" v={dev?.name || '—'} />
-                  <Row l="پرنده" v={(bird?.name || '—') + (breed ? ' · ' + breed.name : '')} />
-                  <Row l="تعداد" v={toFa(e.count || 0) + ' تخم'} />
-                  <Row l="تاریخ ورود" v={toFa(e.entryDate)} />
-                  <Row l="هچ پیش‌بینی" v={toFa(expHatch)} />
-                  {e.trayNumbers && <Row l="طبقات" v={e.trayNumbers} />}
-                  <Row l="وضعیت" v={ENTRY_STATUS_LABEL[e.status]} />
-                </div>
-
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🤝 منبع</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <Row l="نوع" v={DEAL_LABEL[e.dealType]} />
-                  {e.dealType === 'own' && (e as any).flockId && <Row l="گله" v={(flocks.find((f: any) => f.id === (e as any).flockId)?.name) || '—'} />}
-                  {e.dealType === 'purchase' && sellerName && <Row l="فروشنده" v={String(sellerName)} />}
-                  {e.dealType === 'partnership' && partnerName && <Row l="شریک" v={String(partnerName)} />}
-                  {e.dealType === 'partnership' && e.dealData.partnerPercent && <Row l="درصد شریک" v={toFa(e.dealData.partnerPercent) + '٪'} />}
-                  {e.dealType === 'rent' && lessorName && <Row l="اجاره‌دهنده" v={String(lessorName)} />}
-                  {e.dealType === 'rent' && e.dealData.rentAmount && <Row l="اجاره" v={toFa(Number(e.dealData.rentAmount).toLocaleString('fa-IR')) + ' ت'} />}
-                  {e.dealType === 'consignment' && consigneeName && <Row l="امانت‌دار" v={String(consigneeName)} />}
-                  {(e as any).dealStatus === 'withdrawn' && (
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)' }}>
-                      ⚠️ کنار کشیده {((e as any).dealWithdrawnAt ? ' (' + toFa((e as any).dealWithdrawnAt) + ')' : '')}
-                    </div>
-                  )}
-                </div>
-
-                {(e.unitPrice || e.totalPrice || (e as any).shippingCost) && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {e.unitPrice && <Row l="قیمت هر تخم" v={toFa(e.unitPrice.toLocaleString('fa-IR')) + ' ت'} />}
-                      {(e as any).shippingCost && <Row l="هزینه حمل" v={toFa((e as any).shippingCost.toLocaleString('fa-IR')) + ' ت'} />}
-                      {e.totalPrice && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', color: 'var(--text)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                          <span>جمع تخم:</span><span>{toFa(e.totalPrice.toLocaleString('fa-IR'))} ت</span>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-
-                {e.notes && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
-                  </>
-                )}
-
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(e)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                      const ok = await showConfirmAsync('تأیید حذف', 'این ورودی تخم حذف شود؟', { danger: true });
-                      if (!ok) return;
-                      deleteEntryWithCascade(e.id);
-                    }} aria-label="حذف ورودی" style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+              <EggEntryCard
+                key={e.id}
+                entry={e}
+                index={i}
+                device={dev}
+                bird={bird}
+                breed={breed}
+                flocks={flocks}
+                contacts={contacts}
+                hatches={hatches}
+                age={age}
+                expectedHatch={expHatch}
+                remain={remain}
+                totalDays={totalDays}
+                isOpen={isOpen}
+                onToggle={() => setExpandedId(isOpen ? null : e.id)}
+                onEdit={() => openEdit(e)}
+                onDelete={async () => {
+                  const ok = await showConfirmAsync('تأیید حذف', 'این ورودی تخم حذف شود؟', { danger: true });
+                  if (!ok) return;
+                  deleteEntryWithCascade(e.id);
+                }}
+              />
             );
           })}
           <Btn variant="primary" full onClick={openMulti}>+ ورود تخم</Btn>

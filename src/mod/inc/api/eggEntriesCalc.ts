@@ -40,3 +40,40 @@ export function calcEntryDateForSyncHatch(targetHatchDate: string, totalDays: nu
   if (!targetHatchDate || !totalDays) return '';
   return addDaysJalali(targetHatchDate, -totalDays);
 }
+
+/** کلید localStorage برای draft هر دستگاه */
+export const DRAFT_KEY = (devId: string) => 'pm-inc-egg-draft-' + devId;
+
+/** محاسبه استفاده‌ی دستگاه (بر اساس ظرفیت‌های مختلف پرنده‌ها) */
+export function calcDeviceUsage(
+  device: any,
+  entries: any[],
+  newEntry?: { birdName: string; count: number }
+): { used: number; total: number; percent: number } {
+  const caps: any[] = device?.capacityByBird || [];
+  if (caps.length === 0) return { used: 0, total: 0, percent: 0 };
+  const refCap = Math.max(...caps.map(c => c.capacity || 0));
+  if (refCap === 0) return { used: 0, total: 0, percent: 0 };
+  const byBird: Record<string, number> = {};
+  caps.forEach(c => {
+    if (!c.birdName) return;
+    const factor = (c.capacity && c.capacity > 0) ? (refCap / c.capacity) : 1;
+    byBird[c.birdName] = factor;
+  });
+  let used = 0;
+  entries.forEach(e => {
+    if (e.status === 'failed') return;
+    const factor = byBird[e.__birdName || ''];
+    if (!factor) return;
+    used += (e.count || 0) * factor;
+  });
+  if (newEntry) {
+    const factor = byBird[newEntry.birdName];
+    if (factor) used += newEntry.count * factor;
+  }
+  return {
+    used: Math.round(used * 10) / 10,
+    total: refCap,
+    percent: Math.round((used / refCap) * 100),
+  };
+}
