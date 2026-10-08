@@ -1,0 +1,32 @@
+/**
+ * types-invoice.ts — نوع‌های InvoicePage
+ */
+import type { InvoiceItem, Payment } from './store';
+
+export interface F {
+  id?: string;
+  date: string;
+  partyId: string;
+  category: string;
+  items: InvoiceItem[];
+  paymentTerms: 'cash' | 'installment' | 'custom';
+  installmentCount: string;
+  installmentGapDays: string;
+  customDueDate: string;
+  isPreorder: boolean;
+  deliveryDate: string;
+  advanceType: 'percent' | 'amount';
+  advanceValue: string;
+  dueDate: string;
+  payments: Payment[];
+  relatedFlockId: string;
+  notes: string;
+}
+
+export const emptyForm = (isPurchase: boolean): F => ({
+  date: '', partyId: '', category: isPurchase ? 'egg' : 'fertile_egg', items: [],
+  paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
+  customDueDate: '', isPreorder: false, deliveryDate: '',
+  advanceType: 'percent', advanceValue: '',
+  dueDate: '', payments: [], relatedFlockId: '', notes: '',
+});
