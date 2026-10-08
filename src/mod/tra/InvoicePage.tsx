@@ -34,6 +34,8 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { createInvoiceSchema } from '../../shr/validation/rules/tra';
 import { emptyForm as empty, type F } from './types-invoice';
 import { useInvoiceForm } from './hooks/useInvoiceForm';
+import TransferModal from './components/TransferModal';
+import InvoiceFormModal from './components/InvoiceFormModal';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
   const isPurchase = kind === 'purchase';
@@ -436,257 +438,39 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
 
       {ms.selectionMode && <div style={{ height: 90 }} />}
 
-      <Modal
-        open={open} onClose={() => setOpen(false)}
-        title={form.id ? (isPurchase ? 'ویرایش خرید' : 'ویرایش فروش') : (isPurchase ? 'ثبت خرید' : 'ثبت فروش')}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
-      >
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
-        <Grid2>
-          <Field label="تاریخ" required error={vErrors.date}>
-            <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
-          </Field>
-          <Field label="دسته">
-            <Select value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
-              {(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </Select>
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label={isPurchase ? 'فروشنده' : 'مشتری'} required error={vErrors.partyId}>
-            <SmartSelect
-              value={form.partyId}
-              onChange={v => setForm({...form, partyId: v})}
-              options={parties.map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
-              placeholder="— انتخاب کنید —" modalTitle={isPurchase ? 'انتخاب فروشنده' : 'انتخاب مشتری'} autoThreshold={6}
-            />
-          </Field>
-          <Field label="نوع سفارش">
-            <Select value={form.isPreorder ? 'preorder' : 'stock'} onChange={e => setForm({ ...form, isPreorder: e.target.value === 'preorder' })}>
-              <option value="stock">📦 از موجودی</option>
-              <option value="preorder">📅 پیش‌خرید</option>
-            </Select>
-          </Field>
-        </Grid2>
-
-        {!isPurchase && (
-          <Field label="گله مربوطه" hint="اختیاری — برای محاسبه ROI گله">
-            <Select value={form.relatedFlockId} onChange={e => setForm({ ...form, relatedFlockId: e.target.value })}>
-              <option value="">— بدون گله —</option>
-              {flocks.filter(f => f.status === 'active').map(f => (
-                <option key={f.id} value={f.id}>{f.name}</option>
-              ))}
-            </Select>
-          </Field>
-        )}
-
-        {form.isPreorder && (
-          <>
-            <Field label="تاریخ تحویل" required>
-              <DatePicker value={form.deliveryDate} onChange={v => setForm({...form, deliveryDate: v})}  autoToday />
-            </Field>
-            <Grid2>
-              <Field label="نوع پیش‌پرداخت">
-                <Select value={form.advanceType} onChange={e => setForm({...form, advanceType: e.target.value as 'percent' | 'amount'})}>
-                  <option value="percent">درصد (٪)</option>
-                  <option value="amount">مبلغ (ت)</option>
-                </Select>
-              </Field>
-              <Field label="مقدار">
-                <NumField placeholder="مثلاً — ۱۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
-              </Field>
-            </Grid2>
-          </>
-        )}
-
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت</SectionTitle>
-        {form.items.map((it, idx) => (
-          <div key={it.id} style={{ padding: 'var(--pad-normal) 0', borderBottom: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>قلم {toFa(idx + 1)}</span>
-              <button type="button" onClick={() => removeItem(it.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
-            </div>
-
-            <Input placeholder="توضیح" value={it.description} onChange={e => updateItem(it.id, { description: e.target.value })} />
-
-            <Grid3>
-              <Field label="واحد"><Input placeholder="عدد" value={it.unit} onChange={e => updateItem(it.id, { unit: e.target.value })} /></Field>
-              <Field label="تعداد"><NumField value={String(it.quantity)} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} /></Field>
-              <Field label="قیمت"><MoneyField value={String(it.unitPrice)} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
-            </Grid3>
-
-            <Grid2>
-              <Field label="تخفیف">
-                <MoneyField placeholder="مثلاً — ۱۰٬۰۰۰" value={String(it.discountValue ||
-                  '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) ||
-                  0 })} />
-              </Field>
-              <Field label="حمل">
-                <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={String(it.shipping ||
-                  '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) ||
-                  0 })} />
-              </Field>
-            </Grid2>
-
-            <ItemDetailsForm
-              category={form.category}
-              item={it}
-              updateItem={(patch: any) => updateItem(it.id, patch)}
-              isPurchase={true}
-              sellerSlot={
-                <Field label="فروشنده این قلم" hint="خالی = فروشنده اصلی">
-                  <SmartSelect
-                    value={it.itemPartyId || ''}
-                    onChange={v => updateItem(it.id, { itemPartyId: v })}
-                    options={parties.map(c => ({ value: c.id, label: c.name }))}
-                    placeholder="— همان اصلی —" modalTitle="انتخاب فروشنده" autoThreshold={6}
-                  />
-                </Field>
-              }
-            />
-
-            {whsItems.length > 0 && (
-              <>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', cursor: 'pointer' }}>
-                  <input type="checkbox" checked={!!it.itemId}
-                    onChange={e => updateItem(it.id, { itemId: e.target.checked ? (whsItems[0]?.id || '') : '' })}
-                    style={{ cursor: 'pointer', accentColor: 'var(--accent)' }} />
-                  اتصال به انبار
-                </label>
-                {it.itemId && (
-                  <SmartSelect
-                    value={it.itemId}
-                    onChange={v => updateItem(it.id, { itemId: v })}
-                    options={whsItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${toFa(w.currentStock)} ${UNIT_LABEL[w.unit]}`, group: w.category }))}
-                    placeholder="— انتخاب کالا —" modalTitle="انتخاب کالای انبار" autoThreshold={6}
-                  />
-                )}
-              </>
-            )}
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-base)', color: 'var(--accent)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-              <span>جمع قلم:</span>
-              <span>{toFa(it.total.toLocaleString('fa-IR'))} ت</span>
-            </div>
-          </div>
-        ))}
-        <Btn size="sm" full onClick={addItem}>+ افزودن قلم</Btn>
-
-
-        <AccordionSection icon="📅" title="شرایط پرداخت" defaultOpen summary={form.paymentTerms === 'cash' ? 'نقدی' : form.paymentTerms === 'installment' ? `${toFa(form.installmentCount || '0')} قسط` : 'توافقی'}>
-        <Grid2>
-          <Field label="نوع پرداخت" required>
-            <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
-              <option value="cash">💵 نقدی</option>
-              <option value="installment">📅 قسطی</option>
-              <option value="custom">✏️ توافقی</option>
-            </Select>
-          </Field>
-          {form.paymentTerms !== 'custom' && (
-            <Field label="سرسید (خودکار)">
-              <Input placeholder="خودکار محاسبه می‌شود" readOnly value={form.dueDate} dir="ltr" />
-            </Field>
-          )}
-          {form.paymentTerms === 'custom' && (
-            <Field label="تاریخ سرسید" required>
-              <DatePicker value={form.customDueDate} onChange={v => setForm({...form, customDueDate: v, dueDate: v})}  autoToday />
-            </Field>
-          )}
-        </Grid2>
-
-        {form.paymentTerms === 'installment' && (
-          <Grid2>
-            <Field label="تعداد اقساط" required>
-              <NumField placeholder="مثلاً — ۱۰۰" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
-            </Field>
-            <Field label="فاصله" required>
-              <NumField placeholder="مثلاً — ۷" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
-            </Field>
-          </Grid2>
-        )}
-
-        </AccordionSection>
-
-        <AccordionSection icon="💳" title={`پرداخت‌ها — ${toFa(paid.toLocaleString('fa-IR'))} از ${toFa(total.toLocaleString('fa-IR'))}`} defaultOpen={form.payments.length > 0}>
-        {form.payments.map(p => (
-          <div key={p.id} style={{ padding: 'var(--pad-normal) 0', borderBottom: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>پرداخت</span>
-              <button type="button" onClick={() => removePayment(p.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
-            </div>
-            <Grid2>
-              <Field label="روش">
-                <Select value={p.method} onChange={e => updatePayment(p.id, { method: e.target.value as 'cash' | 'card' | 'check' })}>
-                  <option value="cash">نقدی</option>
-                  <option value="card">کارت</option>
-                  <option value="check">چک</option>
-                </Select>
-              </Field>
-              <Field label="مبلغ">
-                <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={String(p.amount)} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
-              </Field>
-            </Grid2>
-            <Field label="تاریخ">
-              <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })}  autoToday />
-            </Field>
-            {p.method === 'check' && (
-              <>
-                <Grid3>
-                  <Field label="شماره چک"><Input placeholder="مثلاً — ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
-                  <Field label="بانک"><Input placeholder="مثلاً — ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
-                  <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
-                </Grid3>
-                <Field label="وضعیت چک">
-                  <Select value={p.status || 'pending'} onChange={e => updatePayment(p.id, { status: e.target.value as CheckStatus })}>
-                    <option value="pending">🟡 در جریان</option>
-                    <option value="cleared">✅ نقد شد</option>
-                    <option value="bounced">❌ برگشتی</option>
-                  </Select>
-                </Field>
-                {p.status === 'cleared' && (
-                  <Field label="تاریخ نقد"><DatePicker value={p.clearedDate || ''} onChange={v => updatePayment(p.id, { clearedDate: v })}  autoToday /></Field>
-                )}
-              </>
-            )}
-          </div>
-        ))}
-        <Btn size="sm" full onClick={addPayment}>+ افزودن پرداخت</Btn>
-        </AccordionSection>
-
-        {rem > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', color: 'var(--warn)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-            <span>مانده:</span>
-            <span>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
-          </div>
-        )}
-
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-        <Field label="یادداشت">
-            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
-          </Field>
-
-        <ErrorBox>{err}</ErrorBox>
-      </Modal>
+      <InvoiceFormModal
+        open={open}
+        setOpen={setOpen}
+        form={form}
+        setForm={setForm}
+        isPurchase={isPurchase}
+        parties={parties}
+        flocks={flocks}
+        whsItems={whsItems}
+        vErrors={vErrors}
+        err={err}
+        total={total}
+        paid={paid}
+        rem={rem}
+        save={save}
+        addItem={addItem}
+        updateItem={updateItem}
+        removeItem={removeItem}
+        addPayment={addPayment}
+        updatePayment={updatePayment}
+        removePayment={removePayment}
+      />
 
       {/* Modal انتقال workflow */}
-      <Modal
-        open={!!transferModal}
-        center
+      <TransferModal
+        transferModal={transferModal}
+        transferNote={transferNote}
+        transferDate={transferDate}
+        setTransferNote={setTransferNote}
+        setTransferDate={setTransferDate}
         onClose={() => { setTransferModal(null); setTransferNote(''); setTransferDate(''); }}
-        title={transferModal ? `تغییر به ${WORKFLOW_LABEL[transferModal.to]}` : ''}
-        footer={<BtnRow><Btn variant="primary" onClick={doTransfer}>تأیید</Btn><Btn onClick={() => setTransferModal(null)}>لغو</Btn></BtnRow>}
-      >
-        {transferModal && (
-          <>
-            <Field label="تاریخ"><DatePicker value={transferDate} onChange={v => setTransferDate(v)}  autoToday /></Field>
-            {(transferModal.to === 'received' || transferModal.to === 'paid') && (
-              <Field label="یادداشت">
-            <Textarea placeholder="یادداشت..." value={transferNote} onChange={e => setTransferNote(e.target.value)} />
-          </Field>
-            )}
-          </>
-        )}
-      </Modal>
+        onConfirm={doTransfer}
+      />
 
       {/* چاپ */}
       {printId && (() => {
