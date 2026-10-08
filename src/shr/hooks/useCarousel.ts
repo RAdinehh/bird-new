@@ -42,23 +42,13 @@ export function useCarousel(
   const txRef = useRef(0);
   const clickToRef = useRef(false);
 
-  const apply = useCallback((tx: number, animate: boolean) => {
+  const apply = useCallback((tx: number, _animate?: boolean) => {
     const tr = trackRef.current;
     if (!tr) return;
-
-    if (!animate) {
-      tr.style.transition = 'none';
-      tr.style.transform = `translate3d(${tx}px, 0, 0)`;
-      void tr.offsetWidth;
-      txRef.current = tx;
-      return;
-    }
-
-    tr.style.transition = 'transform 260ms cubic-bezier(.25,.8,.3,1)';
+    // بدون انیمیشن — کاربر گفت نمی‌خواد. فوری جابجا شو.
+    tr.style.transition = 'none';
+    tr.style.transform = `translate3d(${tx}px, 0, 0)`;
     void tr.offsetWidth;
-    requestAnimationFrame(() => {
-      tr.style.transform = `translate3d(${tx}px, 0, 0)`;
-    });
     txRef.current = tx;
   }, []);
 
@@ -66,6 +56,8 @@ export function useCarousel(
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    // اطمینان: هیچ انیمیشنی روی track نباشه
+    if (trackRef.current) trackRef.current.style.transition = 'none';
     const measure = () => {
       const w = el.clientWidth;
       if (w <= 0) return;
@@ -114,7 +106,10 @@ export function useCarousel(
 
     const apply = () => {
       const h = panel.getBoundingClientRect().height;
-      if (h > 0) c.style.height = h + 'px';
+      if (h > 0) {
+        c.style.transition = 'none';
+        c.style.height = h + 'px';
+      }
     };
 
     apply();

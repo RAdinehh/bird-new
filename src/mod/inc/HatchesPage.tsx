@@ -25,6 +25,9 @@ import { format as formatJ } from 'date-fns-jalali';
 import { useIncubationProfile } from './hooks';
 import { calcCurrentFertile, smartHatchRate, estimateHatched } from './api/hatchCalc';
 import { buildFlockFromHatch, buildSaleInvoiceFromHatch } from './api/hatchActions';
+import FlockCreateModal from './components/FlockCreateModal';
+import SellModal from './components/SellModal';
+import HatchFormModal from './components/HatchFormModal';
 import { logAction } from '../../cor/logger/auditLog';
 
 const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
@@ -515,380 +518,61 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
         </>
       )}
 
-      {/* ═══ Modal ثبت/ویرایش ═══ */}
-      <Modal open={open} onClose={() => setOpen(false)} title={editingId ? '✏️ ویرایش هچ' : '🐣 ثبت هچ'}
-        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره ({toFa(editingId ? 1 : selectedIds.size)})</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> انتخاب ورودی‌ها</SectionTitle>
-
-        {editingId ? (
-          <Field label="ورودی تخم" required>
-            <Select value={formEntryId} onChange={e => setFormEntryId(e.target.value)}>
-              {eggEntries.map(e => {
-                const bird = _birdsById[e.birdId];
-                const dev = _devicesById[e.deviceId];
-                return <option key={e.id} value={e.id}>{bird?.name || '—'} · {toFa(e.entryDate)} · {toFa(e.count || 0)} تخم · {dev?.name || ''}</option>;
-              })}
-            </Select>
-          </Field>
-        ) : (
-          <>
-            <Field label="فیلتر دستگاه" hint={selectedIds.size > 0 ? toFa(selectedIds.size) + ' انتخاب‌شده' : undefined}>
-              <Select value={deviceFilter} onChange={e => setDeviceFilter(e.target.value)}>
-                <option value="">— همه دستگاه‌ها —</option>
-                {devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-              </Select>
-            </Field>
-
-            {availableEntries.length === 0 ? (
-              <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>ورودی‌ای نیست</div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {availableEntries.map(e => {
-                  const bird = _birdsById[e.birdId];
-                  const dev = _devicesById[e.deviceId];
-                  const isSel = selectedIds.has(e.id);
-                  const d = dataFor(e.id);
-                  const calc = calcCurrentFertile(e.id, e.count || 0, candlings);
-                  const aliveAfter = calc.fertile;
-                  const myCand = _latestCandByEntry[e.id];
-                  const sumE = (parseInt(toEn(d.hatched))||0) + (parseInt(toEn(d.unhatched))||0) + (parseInt(toEn(d.deadInShell))||0) + (parseInt(toEn(d.pipped))||0) + (parseInt(toEn(d.other))||0);
-                  const rem = (e.count || 0) - sumE;
-                  return (
-                    <div key={e.id} style={{ border: '1px solid ' + (isSel ? 'var(--accent-border)' : 'var(--border)'), background: isSel ? 'var(--card-solid, var(--card))' : 'var(--card)', borderRadius: 'var(--r-md)', padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <div role="button" tabIndex={0} onClick={() => toggleEntry(e.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', padding: 4, margin: -4, borderRadius: 'var(--r-sm)' }}>
-                        <input type="checkbox" checked={isSel} onChange={() => {}} onClick={(ev) => { ev.stopPropagation(); toggleEntry(e.id); }} aria-label="انتخاب ورودی" style={{ width: 20, height: 20, accentColor: 'var(--accent)', cursor: 'pointer', flexShrink: 0 }} />
-                        <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{bird?.name || '—'} · {toFa(e.count || 0)} تخم</span>
-                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{dev?.name || ''}</span>
-                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700, transform: isSel ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform .2s' }}>▶</span>
-                      </div>
-
-                      {calc.byStage.length > 0 && (
-                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
-                          {calc.byStage.map((st, i) => (
-                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                              <span>کندلینگ روز {toFa(st.stage)}:</span>
-                              <span>بی‌نطفه {toFa(st.infertile)} · مرده {toFa(st.dead)} · شکسته {toFa(st.broken)}</span>
-                            </div>
-                          ))}
-                          <div style={{ paddingTop: 4, marginTop: 4, borderTop: '1px dashed var(--border)', display: 'flex', justifyContent: 'space-between', color: 'var(--accent)', fontWeight: 700 }}>
-                            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مجموع تلفات کندلینگ:</span>
-                            <span>{toFa(calc.totalLoss)}</span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--accent)', fontWeight: 700 }}>
-                            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> نطفه‌دار فعلی:</span>
-                            <span>{toFa(calc.fertile)}</span>
-                          </div>
-                        </div>
-                      )}
-
-                      {isSel && (
-                        <>
-                          {(() => {
-                            const base = aliveAfter;
-                            const h = parseInt(toEn(d.hatched)) || 0;
-                            const uh = parseInt(toEn(d.unhatched)) || 0;
-                            const ds = parseInt(toEn(d.deadInShell)) || 0;
-                            const pp = parseInt(toEn(d.pipped)) || 0;
-                            const ot = parseInt(toEn(d.other)) || 0;
-                            const sum = h + uh + ds + pp + ot;
-                            const remaining = base - sum;
-                            const ok = remaining >= 0;
-                            return (
-                              <>
-                                {/* ═══ کارت اطلاعات ورودی ═══ */}
-                                <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 4, fontSize: 'var(--fs-xs)' }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: 'var(--muted)' }}>🐦 پرنده:</span>
-                                    <span style={{ fontWeight: 700 }}>{bird?.name || '—'}</span>
-                                  </div>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: 'var(--muted)' }}>🥚 تعداد کل:</span>
-                                    <span style={{ fontWeight: 700 }}>{toFa(e.count || 0)} تخم</span>
-                                  </div>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: 'var(--muted)' }}>📅 تاریخ ورود:</span>
-                                    <span style={{ fontWeight: 700 }}>{toFa(e.entryDate)}</span>
-                                  </div>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: 'var(--muted)' }}>🔢 روز انکوباسیون:</span>
-                                    <span style={{ fontWeight: 700, color: 'var(--accent)' }}>روز {toFa(daysAgo(e.entryDate))}</span>
-                                  </div>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: 'var(--muted)' }}>📊 نطفه‌دار فعلی:</span>
-                                    <span style={{ fontWeight: 700 }}>{toFa(aliveAfter)} تخم</span>
-                                  </div>
-                                  {isLockdown(e) && (
-                                    <div style={{ padding: '3px 6px', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center', marginTop: 2 }}>
-                                      🔒 Lock-down (روز {toFa(daysAgo(e.entryDate))} از ۱۸)
-                                    </div>
-                                  )}
-                                </div>
-
-                                <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px dashed ' + (myCand ? 'var(--accent-border)' : 'var(--warn)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: myCand ? 'var(--accent)' : 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
-                                  {calc.byStage.length > 0 ? '🧬 سقف این هچ: ' + toFa(base) + ' تخم نطفه‌دار' : '⚠️ بدون کندلینگ — سقف: ' + toFa(base) + ' تخم'}
-                                </div>
-
-                                <Grid2>
-                                  <Field label="جوجه هچ‌شده" required>
-                                    <NumField placeholder="مثلاً — ۴۵۰" value={d.hatched} onChange={ev => updateData(e.id, { hatched: ev.target.value })} max={Math.max(0, base - uh - ds - pp - ot)} min={0} unit="عدد" />
-                                  </Field>
-                                  <Field label="هچ‌نشده">
-                                    <NumField placeholder="مثلاً — ۲۰" value={d.unhatched} onChange={ev => updateData(e.id, { unhatched: ev.target.value })} max={Math.max(0, base - h - ds - pp - ot)} min={0} unit="عدد" />
-                                  </Field>
-                                </Grid2>
-                                <Grid2>
-                                  <Field label="مرده در پوسته">
-                                    <NumField placeholder="مثلاً — ۱۰" value={d.deadInShell} onChange={ev => updateData(e.id, { deadInShell: ev.target.value })} max={Math.max(0, base - h - uh - pp - ot)} min={0} unit="عدد" />
-                                  </Field>
-                                  <Field label="نوک‌زده">
-                                    <NumField placeholder="مثلاً — ۵" value={d.pipped} onChange={ev => updateData(e.id, { pipped: ev.target.value })} max={Math.max(0, base - h - uh - ds - ot)} min={0} unit="عدد" />
-                                  </Field>
-                                </Grid2>
-                                <Grid2>
-                                  <Field label="سایر">
-                                    <NumField value={d.other} onChange={ev => updateData(e.id, { other: ev.target.value })} max={Math.max(0, base - h - uh - ds - pp)} min={0} unit="عدد" />
-                                  </Field>
-                                  <Field label="وزن متوسط" hint="۲۰-۶۰ گرم">
-                                    <NumField placeholder="مثلاً — ۱.۵" value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" />
-                                  </Field>
-                                </Grid2>
-                                <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid ' + (!ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
-                                  <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مجموع: {toFa(sum)} / {toFa(base)}</span>
-                                  <span>
-                                    {ok && remaining > 0 && '⏳ ' + toFa(remaining) + ' باقی'}
-                                    {ok && remaining === 0 && '✅ کامل'}
-                                    {!ok && '🔴 ' + toFa(Math.abs(remaining)) + ' اضافی'}
-                                  </span>
-                                </div>
-                              </>
-                            );
-                          })()}
-                          {(() => {
-                            const hatchedNum = parseInt(toEn(d.hatched)) || 0;
-                            if (hatchedNum === 0) {
-                              return (
-                                <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
-                                  ⬆️ اول «جوجه هچ‌شده» را وارد کن — سپس می‌توانی کیفیت، جنسیت و وزن را تکمیل کنی
-                                </div>
-                              );
-                            }
-                            return (
-                              <>
-                                {(() => {
-                                const gA = parseInt(toEn(d.gradeA)) || 0;
-                                const gB = parseInt(toEn(d.gradeB)) || 0;
-                                const gradesUsed = gA + gB;
-                                const gradesRem = hatchedNum - gradesUsed;
-                                const gradesOk = gradesRem >= 0;
-                                return (
-                                  <>
-                                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🏅</span> تفکیک کیفی (اختیاری) — از {toFa(hatchedNum)} هچ‌شده</div>
-                                    <Grid2>
-                                      <Field label="درجه A"><NumField value={d.gradeA} onChange={ev => updateData(e.id, { gradeA: ev.target.value })} max={hatchedNum - gB} min={0} unit="عدد" /></Field>
-                                      <Field label="درجه B"><NumField value={d.gradeB} onChange={ev => updateData(e.id, { gradeB: ev.target.value })} max={hatchedNum - gA} min={0} unit="عدد" /></Field>
-                                    </Grid2>
-                                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid ' + (!gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
-                                      A + B: {toFa(gradesUsed)} / {toFa(hatchedNum)}{!gradesOk ? ' 🔴 ' + toFa(Math.abs(gradesRem)) + ' اضافی' : gradesRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(gradesRem) + ' باقی'}
-                                    </div>
-                                  </>
-                                );
-                              })()}
-
-                              {(() => {
-                                const m = parseInt(toEn(d.maleCount)) || 0;
-                                const f_ = parseInt(toEn(d.femaleCount)) || 0;
-                                const u = parseInt(toEn(d.unknownCount)) || 0;
-                                const genderUsed = m + f_ + u;
-                                const genderRem = hatchedNum - genderUsed;
-                                const genderOk = genderRem >= 0;
-                                return (
-                                  <>
-                                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚖️</span> جنسیت (اختیاری)</div>
-                                    <Grid2>
-                                      <Field label="♂ نر"><NumField value={d.maleCount} onChange={ev => updateData(e.id, { maleCount: ev.target.value })} max={hatchedNum - f_ - u} min={0} unit="عدد" /></Field>
-                                      <Field label="♀ ماده"><NumField value={d.femaleCount} onChange={ev => updateData(e.id, { femaleCount: ev.target.value })} max={hatchedNum - m - u} min={0} unit="عدد" /></Field>
-                                    </Grid2>
-                                    <Grid2>
-                                      <Field label="? نامعلوم"><NumField value={d.unknownCount} onChange={ev => updateData(e.id, { unknownCount: ev.target.value })} max={hatchedNum - m - f_} min={0} unit="عدد" /></Field>
-                                      <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={d.avgWeight} onChange={ev => updateData(e.id, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
-                                    </Grid2>
-                                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid ' + (!genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
-                                      ♂ + ♀ + ?: {toFa(genderUsed)} / {toFa(hatchedNum)}{!genderOk ? ' 🔴 ' + toFa(Math.abs(genderRem)) + ' اضافی' : genderRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(genderRem) + ' باقی'}
-                                    </div>
-                                  </>
-                                );
-                              })()}
-                              </>
-                            );
-                          })()}
-                          <Field label="یادداشت">
-            <Textarea value={d.notes || ''} onChange={ev => updateData(e.id, { notes: ev.target.value })} placeholder="..." />
-          </Field>
-                          <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid ' + (rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
-                            این هچ: {toFa(sumE)} از {toFa(e.count || 0)}{rem > 0 && ' · باقی — ' + toFa(rem)}{rem < 0 && ' — بیشتر!'}{rem === 0 && ' ✅'}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        )}
-
-        {editingId && (
-          <>
-            <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> نتیجه</SectionTitle>
-            <Grid2>
-              <Field label="جوجه هچ‌شده" required><NumField value={dataFor(formEntryId).hatched} onChange={ev => updateData(formEntryId, { hatched: ev.target.value })} min={0} unit="عدد" /></Field>
-              <Field label="هچ‌نشده"><NumField value={dataFor(formEntryId).unhatched} onChange={ev => updateData(formEntryId, { unhatched: ev.target.value })} min={0} unit="عدد" /></Field>
-            </Grid2>
-            <Grid2>
-              <Field label="مرده در پوسته"><NumField value={dataFor(formEntryId).deadInShell} onChange={ev => updateData(formEntryId, { deadInShell: ev.target.value })} min={0} unit="عدد" /></Field>
-              <Field label="نوک‌زده"><NumField value={dataFor(formEntryId).pipped} onChange={ev => updateData(formEntryId, { pipped: ev.target.value })} min={0} unit="عدد" /></Field>
-            </Grid2>
-            <Grid2>
-              <Field label="سایر"><NumField value={dataFor(formEntryId).other} onChange={ev => updateData(formEntryId, { other: ev.target.value })} min={0} unit="عدد" /></Field>
-              <Field label="وزن متوسط"><NumField value={dataFor(formEntryId).avgWeight} onChange={ev => updateData(formEntryId, { avgWeight: ev.target.value })} min={0} unit="گرم" /></Field>
-            </Grid2>
-            {(() => {
-              const hatchedNum = parseInt(toEn(dataFor(formEntryId).hatched)) || 0;
-              if (hatchedNum === 0) {
-                return (
-                  <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
-                    ⬆️ اول «جوجه هچ‌شده» را وارد کن
-                  </div>
-                );
-              }
-              return (
-                <>
-                  {(() => {
-                    const gA = parseInt(toEn(dataFor(formEntryId).gradeA)) || 0;
-                    const gB = parseInt(toEn(dataFor(formEntryId).gradeB)) || 0;
-                    const gradesUsed = gA + gB;
-                    const gradesRem = hatchedNum - gradesUsed;
-                    const gradesOk = gradesRem >= 0;
-                    return (
-                      <>
-                        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🏅</span> تفکیک کیفی — از {toFa(hatchedNum)} هچ‌شده</div>
-                        <Grid2>
-                          <Field label="درجه A"><NumField value={dataFor(formEntryId).gradeA} onChange={ev => updateData(formEntryId, { gradeA: ev.target.value })} max={hatchedNum - gB} min={0} unit="عدد" /></Field>
-                          <Field label="درجه B"><NumField value={dataFor(formEntryId).gradeB} onChange={ev => updateData(formEntryId, { gradeB: ev.target.value })} max={hatchedNum - gA} min={0} unit="عدد" /></Field>
-                        </Grid2>
-                        <div style={{ padding: 'var(--pad-tight)', background: !gradesOk ? 'var(--danger-soft)' : gradesRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !gradesOk ? 'var(--danger)' : gradesRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
-                          A + B: {toFa(gradesUsed)} / {toFa(hatchedNum)}{!gradesOk ? ' 🔴 اضافی' : gradesRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(gradesRem) + ' باقی'}
-                        </div>
-                      </>
-                    );
-                  })()}
-
-                  {(() => {
-                    const m = parseInt(toEn(dataFor(formEntryId).maleCount)) || 0;
-                    const f_ = parseInt(toEn(dataFor(formEntryId).femaleCount)) || 0;
-                    const u = parseInt(toEn(dataFor(formEntryId).unknownCount)) || 0;
-                    const genderUsed = m + f_ + u;
-                    const genderRem = hatchedNum - genderUsed;
-                    const genderOk = genderRem >= 0;
-                    return (
-                      <>
-                        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>⚖️</span> جنسیت و وزن</div>
-                        <Grid2>
-                          <Field label="♂ نر"><NumField value={dataFor(formEntryId).maleCount} onChange={ev => updateData(formEntryId, { maleCount: ev.target.value })} max={hatchedNum - f_ - u} min={0} unit="عدد" /></Field>
-                          <Field label="♀ ماده"><NumField value={dataFor(formEntryId).femaleCount} onChange={ev => updateData(formEntryId, { femaleCount: ev.target.value })} max={hatchedNum - m - u} min={0} unit="عدد" /></Field>
-                        </Grid2>
-                        <Grid2>
-                          <Field label="? نامعلوم"><NumField value={dataFor(formEntryId).unknownCount} onChange={ev => updateData(formEntryId, { unknownCount: ev.target.value })} max={hatchedNum - m - f_} min={0} unit="عدد" /></Field>
-                          <Field label="وزن متوسط" hint="۲۰-۶۰ گرم"><NumField value={dataFor(formEntryId).avgWeight} onChange={ev => updateData(formEntryId, { avgWeight: ev.target.value })} min={0} max={60} unit="گرم" /></Field>
-                        </Grid2>
-                        <div style={{ padding: 'var(--pad-tight)', background: !genderOk ? 'var(--danger-soft)' : genderRem === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (!genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: !genderOk ? 'var(--danger)' : genderRem === 0 ? 'var(--accent)' : 'var(--text)', fontWeight: 700, textAlign: 'center' }}>
-                          ♂ + ♀ + ?: {toFa(genderUsed)} / {toFa(hatchedNum)}{!genderOk ? ' 🔴 اضافی' : genderRem === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(genderRem) + ' باقی'}
-                        </div>
-                      </>
-                    );
-                  })()}
-                </>
-              );
-            })()}
-            <Field label="یادداشت">
-            <Textarea value={dataFor(formEntryId).notes || ''} onChange={ev => updateData(formEntryId, { notes: ev.target.value })} placeholder="..." />
-          </Field>
-          </>
-        )}
-
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تاریخ هچ</SectionTitle>
-        <Field label="تاریخ" required>
-          <DatePicker value={formDate} onChange={v => setFormDate(v)} placeholder="انتخاب تاریخ"  autoToday />
-        </Field>
-
-        <ErrorBox>{err}</ErrorBox>
-      </Modal>
+      <HatchFormModal
+        open={open}
+        editingId={editingId}
+        formDate={formDate}
+        setFormDate={setFormDate}
+        formEntryId={formEntryId}
+        setFormEntryId={setFormEntryId}
+        deviceFilter={deviceFilter}
+        setDeviceFilter={setDeviceFilter}
+        selectedIds={selectedIds}
+        entriesData={entriesData}
+        err={err}
+        vErrors={vErrors}
+        eggEntries={eggEntries}
+        devices={devices}
+        availableEntries={availableEntries}
+        birdsById={_birdsById}
+        devicesById={_devicesById}
+        candlings={candlings}
+        latestCandByEntry={_latestCandByEntry}
+        daysAgo={daysAgo}
+        isLockdown={isLockdown}
+        toggleEntry={toggleEntry}
+        updateData={updateData}
+        dataFor={dataFor}
+        onSave={save}
+        onClose={() => setOpen(false)}
+      />
 
       <MultiSelectBar ms={ms} deleteLabel="حذف" />
 
       {ms.selectionMode && <div style={{ height: 90 }} />}
 
       {/* ═══ Modal گله ═══ */}
-      <Modal open={!!flockModal} onClose={() => setFlockModal(null)} title="🐔 ساخت گله جدید"
-        footer={<BtnRow><Btn variant="primary" onClick={createFlock}>ساخت گله</Btn><Btn onClick={() => setFlockModal(null)}>لغو</Btn></BtnRow>}>
-        <Field label="نام گله" required>
-          <Input placeholder="مثلاً — گله بهار ۱۴۰۵" value={flockForm.name} onChange={e => setFlockForm({...flockForm, name: e.target.value})} />
-        </Field>
-        <Grid2>
-          <Field label="نوع" required>
-            <Select value={flockForm.type} onChange={e => setFlockForm({...flockForm, type: e.target.value})}>
-              <option value="layer">تخم‌گذار</option>
-              <option value="broiler">گوشتی</option>
-              <option value="breeder">مادر</option>
-            </Select>
-          </Field>
-          <Field label="تعداد">
-            <Input placeholder="مثلاً — ۱۰۰" value={String(flockModal?.count || 0)} readOnly dir="ltr" unit="پرنده" />
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label="سالن">
-            <Select value={flockForm.hallId} onChange={e => setFlockForm({...flockForm, hallId: e.target.value, zoneId: ''})}>
-              <option value="">—</option>
-              {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-            </Select>
-          </Field>
-          <Field label="بخش">
-            <Select value={flockForm.zoneId} onChange={e => setFlockForm({...flockForm, zoneId: e.target.value})}>
-              <option value="">—</option>
-              {zones.filter(z => !flockForm.hallId || z.hallId === flockForm.hallId).map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
-            </Select>
-          </Field>
-        </Grid2>
-      </Modal>
+      <FlockCreateModal
+        open={!!flockModal}
+        count={flockModal?.count || 0}
+        form={flockForm}
+        setForm={setFlockForm}
+        halls={halls}
+        zones={zones}
+        onCreate={createFlock}
+        onClose={() => setFlockModal(null)}
+      />
 
       {/* ═══ Modal فروش ═══ */}
-      <Modal open={!!sellModal} onClose={() => setSellModal(null)} title="📥 ثبت فروش جوجه"
-        footer={<BtnRow><Btn variant="primary" onClick={doSell}>ثبت فاکتور</Btn><Btn onClick={() => setSellModal(null)}>لغو</Btn></BtnRow>}>
-        <Field label="خریدار" required>
-          {contacts.length === 0 ? (
-            <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>مخاطبی نیست</div>
-          ) : (
-            <Select value={sellForm.buyerId} onChange={e => setSellForm({...sellForm, buyerId: e.target.value})}>
-              <option value="">— انتخاب خریدار —</option>
-              {contacts.filter((c: any) => (c.roles || []).includes('customer')).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </Select>
-          )}
-        </Field>
-        <Grid2>
-          <Field label="تعداد" required><NumField value={sellForm.count} onChange={e => setSellForm({...sellForm, count: e.target.value})} max={sellModal?.count} min={0} unit="عدد" /></Field>
-          <Field label="قیمت هر جوجه" required><MoneyField value={sellForm.unitPrice} onChange={e => setSellForm({...sellForm, unitPrice: e.target.value})} /></Field>
-        </Grid2>
-        <Field label="تاریخ"><DatePicker value={sellForm.date} onChange={v => setSellForm({...sellForm, date: v})}  autoToday /></Field>
-        {(() => {
-          const cnt = parseInt(toEn(sellForm.count)) || 0;
-          const up = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;
-          const total = cnt * up;
-          if (total > 0) return <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> جمع کل:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
-          return null;
-        })()}
-      </Modal>
+      <SellModal
+        open={!!sellModal}
+        maxCount={sellModal?.count || 0}
+        form={sellForm}
+        setForm={setSellForm}
+        contacts={contacts}
+        onSell={doSell}
+        onClose={() => setSellModal(null)}
+      />
 
     </PageContainer>
   );
