@@ -85,20 +85,20 @@ const KIND_ICONS: Record<string, React.ComponentType<any>> = {
 };
 
 export const CATEGORY_COLORS: Record<string, string> = {
-  ventilation: '#2563eb',
-  feeding:     '#d97706',
-  drinking:    '#0891b2',
-  heating:     '#dc2626',
-  lighting:    '#ca8a04',
-  litter:      '#0d9488',
-  power:       '#ea580c',
-  auxiliary:   '#475569',
+  ventilation: 'var(--cat-ventilation)',
+  feeding:     'var(--cat-feeding)',
+  drinking:    'var(--cat-drinking)',
+  heating:     'var(--cat-heating)',
+  lighting:    'var(--cat-lighting)',
+  litter:      'var(--cat-litter)',
+  power:       'var(--cat-power)',
+  auxiliary:   'var(--cat-auxiliary)',
 };
 
 export const KIND_COLORS: Record<string, string> = {
-  asset:      '#2563eb',
-  consumable: '#d97706',
-  system:     '#7c3aed',
+  asset:      'var(--cat-ventilation)',
+  consumable: 'var(--cat-feeding)',
+  system:     'var(--purple)',
 };
 
 export function EquipmentIcon({ type, size = 24, weight = 'duotone', color }: IconProps & { type: string }) {
@@ -108,12 +108,12 @@ export function EquipmentIcon({ type, size = 24, weight = 'duotone', color }: Ic
 
 export function CategoryIcon({ category, size = 22, weight = 'duotone', color }: IconProps & { category: string }) {
   const Icon = CATEGORY_ICONS[category] || Wrench;
-  const c = color || CATEGORY_COLORS[category] || '#475569';
+  const c = color || CATEGORY_COLORS[category] || 'var(--cat-auxiliary)';
   return <Icon size={size} weight={weight} color={c} />;
 }
 
 export function KindIcon({ kind, size = 22, weight = 'duotone', color }: IconProps & { kind: string }) {
   const Icon = KIND_ICONS[kind] || Package;
-  const c = color || KIND_COLORS[kind] || '#475569';
+  const c = color || KIND_COLORS[kind] || 'var(--cat-auxiliary)';
   return <Icon size={size} weight={weight} color={c} />;
 }

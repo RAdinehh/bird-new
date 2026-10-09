@@ -111,7 +111,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
                 }}>
                   <span style={{
                     width: 36, height: 36, borderRadius: 11,
-                    background: 'linear-gradient(135deg, #f0f4f8 0%, #e2e8ef 100%)',
+                    background: 'var(--input-bg)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>

@@ -50,6 +50,16 @@ body {
   --info-soft: rgba(2,132,199,.12);
   --purple: #7c3aed;
   --purple-soft: rgba(124,58,237,.12);
+
+  /* ═══ رنگ دسته‌بندی تجهیزات (مستقل از تم) ═══ */
+  --cat-ventilation: #2563eb;
+  --cat-feeding:     #d97706;
+  --cat-drinking:    #0891b2;
+  --cat-heating:     #dc2626;
+  --cat-lighting:    #ca8a04;
+  --cat-litter:      #0d9488;
+  --cat-power:       #ea580c;
+  --cat-auxiliary:   #475569;
   --header-bg: rgba(241,245,249,.95);
   --btn-bg: rgba(255,255,255,.9);
   --input-bg: rgba(241,245,249,.7);
