@@ -11,6 +11,9 @@ import {
   tempWarning, humidityWarning, avgWeight, sumWeight, cvWeight,
 } from '../store';
 import { toFa } from '../../../shr/utils/fa';
+import { getEffectiveEnv } from '../../set/standards/resolve';
+import { useSet } from '../../set/store';
+import { getAgeDays } from '../../flk/store';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Section, Row } from '../helpers';
@@ -40,8 +43,28 @@ export default function LogCard(props: LogCardProps) {
     onToggle, onEdit, onArchive, onRestore, onDelete,
   } = props;
 
-  const tWarn = tempWarning(l.temperature);
-  const hWarn = humidityWarning(l.humidity);
+  // 🆕 خواندن محدوده استاندارد بر اساس پرنده و سن
+  const customStandards = useSet((s: any) => s.customStandards) || {};
+  let stdTempMin: number | null = null;
+  let stdTempMax: number | null = null;
+  let stdTempTarget: number | null = null;
+  let stdHumMin: number | null = null;
+  let stdHumMax: number | null = null;
+
+  if (flock && birdName) {
+    try {
+      const age = getAgeDays(flock);
+      const env = getEffectiveEnv(birdName, age, null, { customStandards });
+      stdTempMin = env.temp?.min ?? null;
+      stdTempMax = env.temp?.max ?? null;
+      stdTempTarget = env.temp?.target ?? null;
+      stdHumMin = env.humidity?.min ?? null;
+      stdHumMax = env.humidity?.max ?? null;
+    } catch { /* silent */ }
+  }
+
+  const tWarn = tempWarning(l.temperature, stdTempMin, stdTempMax, stdTempTarget);
+  const hWarn = humidityWarning(l.humidity, stdHumMin, stdHumMax);
   const hasProblem = tWarn !== 'ok' || hWarn !== 'ok' || l.deathsCount > 0;
   const accent: any = hasProblem ? 'warn' : 'accent';
 

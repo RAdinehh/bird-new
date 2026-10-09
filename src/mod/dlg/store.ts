@@ -254,16 +254,58 @@ export function waterFeedRatio(water: number | null, feed: number | null): numbe
 }
 
 /** تشخیص هشدار دما (مرغ تخم‌گذار: ۱۸-۲۴) */
-export function tempWarning(temp: number | null): 'ok' | 'warn' | 'danger' {
+/**
+ * هشدار دما — بر اساس محدوده استاندارد (اگه داده شده) یا fallback
+ * @param temp دما
+ * @param min حداقل مجاز (از standards)
+ * @param max حداکثر مجاز (از standards)
+ * @param target دمای هدف
+ */
+export function tempWarning(
+  temp: number | null,
+  min?: number | null,
+  max?: number | null,
+  target?: number | null,
+): 'ok' | 'warn' | 'danger' {
   if (!temp) return 'ok';
+
+  // اگه standards داشتیم، بر اساسش
+  if (min != null && max != null) {
+    if (temp < min || temp > max) return 'danger';
+    // داخل محدوده ولی دور از هدف
+    if (target != null) {
+      const range = max - min;
+      const tolerance = Math.max(1, range * 0.15);  // ۱۵٪ محدوده
+      if (Math.abs(temp - target) > tolerance) return 'warn';
+    }
+    return 'ok';
+  }
+
+  // fallback (بدون standards)
   if (temp < 15 || temp > 30) return 'danger';
   if (temp < 18 || temp > 26) return 'warn';
   return 'ok';
 }
 
-/** تشخیص هشدار رطوبت (۴۰-۷۰) */
-export function humidityWarning(h: number | null): 'ok' | 'warn' | 'danger' {
+/**
+ * هشدار رطوبت — بر اساس محدوده استاندارد (اگه داده شده)
+ */
+export function humidityWarning(
+  h: number | null,
+  min?: number | null,
+  max?: number | null,
+): 'ok' | 'warn' | 'danger' {
   if (!h) return 'ok';
+
+  if (min != null && max != null) {
+    const range = max - min;
+    const tolerance = Math.max(5, range * 0.3);
+    if (h < min - tolerance || h > max + tolerance) return 'danger';
+    if (h < min || h > max) return 'warn';
+    return 'ok';
+  }
+
+  // fallback
   if (h < 30 || h > 80) return 'danger';
   if (h < 40 || h > 70) return 'warn';
   return 'ok';
