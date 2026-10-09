@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { useBrd, type Bird } from './store';
 import { findBirdPreset } from './presets';
 import { getKindInfo, getPurposeInfo, getCategoryInfo } from './_display';
@@ -42,6 +43,12 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   const [error, setError] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // 🆕 focus از URL → باز کردن کارت
+  const focusId = useFocusParam();
+  useEffect(() => {
+    if (focusId) setExpandedId(focusId);
+  }, [focusId]);
 
   // فیلتر تکرارها تو render
   const birds = useMemo(() => {
@@ -349,11 +356,11 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 )}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(b)} style={{ flex: 1 }}>ویرایش</Btn>
+                  <Btn size="sm" onClick={() => openEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش پرنده ${b.name}`}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = b.id; const ok = await showConfirmAsync('تأیید حذف', 'این پرنده حذف شود؟', { danger: true }); if (!ok) return; const item = birds.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteBird(idToDel);
                     logAction('delete', 'brd', 'حذف از پرنده و نژاد');  toastMsg.deleted('پرنده')
-                    }} style={{ flex: 1 }}>حذف</Btn>
+                    }} style={{ flex: 1 }} aria-label={`حذف پرنده ${b.name}`}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );

@@ -25,6 +25,8 @@ interface Props {
   onTap?: () => void;
   /** 🆕 دکمه/آیکون اضافه در هدر کارت (مثلاً ⋯ برای منو) */
   headerAction?: React.ReactNode;
+  /** 🆕 شناسه برای scroll خودکار از URL ?focus=xxx */
+  'data-focus-id'?: string;
 }
 
 const COLORS: Record<AccentKey, { c: string; s: string }> = {
@@ -43,6 +45,7 @@ export default function ExpandableCard({
   accent = 'accent', index, icon, iconEmoji = '📋', compact = false,
   title, subtitle, badge, summary, stats, isOpen, onToggle, children,
   id, ms, onTap, headerAction,
+  'data-focus-id': focusId,
 }: Props) {
   const lowPower = useSet((st: any) => st.lowPowerMode);
   const [prefersReduced, setPrefersReduced] = useState(false);
@@ -65,7 +68,9 @@ export default function ExpandableCard({
   const { c: color, s: soft } = COLORS[safeAccent];
 
   const card = (
-    <div style={{
+    <div
+      data-focus-id={focusId}
+      style={{
       position: 'relative',
       background: 'var(--card)',
       border: '1px solid ' + (isOpen ? color : 'var(--border)'),

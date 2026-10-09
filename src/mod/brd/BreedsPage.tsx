@@ -303,11 +303,11 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
                 )}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(b)} style={{ flex: 1 }}>ویرایش</Btn>
+                  <Btn size="sm" onClick={() => openEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش نژاد ${b.name}`}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = b.id; const ok = await showConfirmAsync('تأیید حذف', 'این نژاد حذف شود؟', { danger: true }); if (!ok) return; const item = breeds.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteBreed(idToDel);
                     logAction('delete', 'brd', 'حذف از پرنده و نژاد');  toastMsg.deleted('نژاد')
-                    }} style={{ flex: 1 }}>حذف</Btn>
+                    }} style={{ flex: 1 }} aria-label={`حذف نژاد ${b.name}`}>حذف</Btn>
                 </div>
               </ExpandableCard>
             );
