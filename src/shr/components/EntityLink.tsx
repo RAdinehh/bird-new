@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { toFa } from '../utils/fa';
 
-type EntityType = 'flock' | 'bird' | 'hall' | 'party' | 'invoice' | 'item' | 'device' | 'log';
+type EntityType = 'flock' | 'bird' | 'breed' | 'hall' | 'party' | 'invoice' | 'item' | 'device' | 'log';
 
-const MAP: Record<EntityType, { path: string; icon: string; color: string }> = {
+const MAP: Record<EntityType, { path: string; icon: string; color: string; tab?: string }> = {
   flock:   { path: '/flk', icon: '🐔', color: 'var(--accent)' },
-  bird:    { path: '/brd', icon: '🐣', color: 'var(--purple)' },
+  bird:    { path: '/brd', icon: '🐣', color: 'var(--purple)', tab: 'birds' },
+  breed:   { path: '/brd', icon: '🧬', color: 'var(--purple)', tab: 'breeds' },
   hall:    { path: '/hal', icon: '🏠', color: 'var(--info)' },
   party:   { path: '/ctc', icon: '👤', color: 'var(--warn)' },
   invoice: { path: '/tra', icon: '📄', color: 'var(--info)' },
@@ -19,9 +20,15 @@ interface Props {
   id: string;
   label: string;
   sub?: string;
+  /** 🆕 حالت بج (پس‌زمینه رنگی، بدون underline) */
+  badge?: boolean;
+  /** 🆕 رنگ پس‌زمینه بج */
+  badgeBg?: string;
+  /** 🆕 رنگ متن بج */
+  badgeColor?: string;
 }
 
-export default function EntityLink({ type, id, label, sub }: Props) {
+export default function EntityLink({ type, id, label, sub, badge, badgeBg, badgeColor }: Props) {
   const nav = useNavigate();
   const conf = MAP[type];
   if (!conf || !id) return <span>{label}</span>;
@@ -29,9 +36,22 @@ export default function EntityLink({ type, id, label, sub }: Props) {
   return (
     <button
       type="button"
-      onClick={() => nav(`${conf.path}?focus=${id}`)}
+      onClick={() => nav(`${conf.path}?${conf.tab ? `tab=${conf.tab}&` : ''}focus=${id}`)}
       aria-label={`برو به ${label}`}
-      style={{
+      style={badge ? {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        background: badgeBg || 'transparent',
+        color: badgeColor || conf.color,
+        border: 'none',
+        fontFamily: 'inherit',
+        fontSize: 'var(--fs-xs)',
+        fontWeight: 600,
+        cursor: 'pointer',
+        padding: '4px 10px',
+        borderRadius: 6,
+      } : {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 4,

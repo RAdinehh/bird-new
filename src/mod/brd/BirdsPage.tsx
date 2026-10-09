@@ -9,6 +9,7 @@ import SourceBadge, { type SourceType } from '../../shr/components/SourceBadge';
 import { detectCycleDaysSource, detectFcrSource, getOverrideInfo } from './_source';
 import OverrideHint from '../../shr/components/OverrideHint';
 import BirdNameField, { type BirdPresetPick } from './BirdNameField';
+import EntityLink from '../../shr/components/EntityLink';
 import {
   Btn, BtnRow, Empty, Field,
   Grid2, Input, Modal, NumField,
@@ -277,11 +278,15 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> نژادهای این پرنده</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {birdBreeds.map(bd => (
-                        <span key={bd.id} style={{ padding: '4px 10px',
-                           background: 'var(--purple-soft)', color: 'var(--purple)',
-                           borderRadius: 6, fontSize: 'var(--fs-xs)', fontWeight: 600 }}>
-                          {bd.name}{bd.fcr ? ` · FCR ${toFa(bd.fcr)}` : ''}
-                        </span>
+                        <EntityLink
+                          key={bd.id}
+                          type="breed"
+                          id={bd.id}
+                          label={`${bd.name}${bd.fcr ? ` · FCR ${toFa(bd.fcr)}` : ''}`}
+                          badge
+                          badgeBg="var(--purple-soft)"
+                          badgeColor="var(--purple)"
+                        />
                       ))}
                     </div>
                   </>
