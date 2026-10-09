@@ -65,5 +65,14 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     strictPort: true
-  }
+  },
+    test: {
+    environment: 'jsdom',
+    pool: 'vmThreads',
+    isolate: true,
+    globals: true,
+    testTimeout: 15000,
+    hookTimeout: 15000,
+    cache: true,
+  },
 });

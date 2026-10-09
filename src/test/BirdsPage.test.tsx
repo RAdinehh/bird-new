@@ -96,13 +96,13 @@ describe('BirdsPage — افزودن', () => {
     renderWithRouter(<BirdsPage />);
     fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
     expect(screen.getByText('افزودن پرنده')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('مثلاً — مرغ')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('مثلاً — مرغ یا شترمرغ')).toBeInTheDocument();
   });
 
   it('پر کردن + ذخیره → اضافه میشه', async () => {
     renderWithRouter(<BirdsPage />);
     fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
-    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ'), { target: { value: 'اردک' } });
+    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا شترمرغ'), { target: { value: 'اردک' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
     await waitFor(() => {
@@ -134,7 +134,7 @@ describe('BirdsPage — افزودن', () => {
 
     renderWithRouter(<BirdsPage />);
     fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
-    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ'), { target: { value: 'مرغ' } });
+    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا شترمرغ'), { target: { value: 'مرغ' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
     await waitFor(() => expect(showAlert).toHaveBeenCalled());
@@ -146,7 +146,7 @@ describe('BirdsPage — افزودن', () => {
 
     renderWithRouter(<BirdsPage />);
     fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
-    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ'), { target: { value: 'اردک' } });
+    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا شترمرغ'), { target: { value: 'اردک' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
     await waitFor(() => expect(useBrd.getState().birds).toHaveLength(2));
@@ -204,7 +204,7 @@ describe('BirdsPage — Expand / ویرایش / حذف', () => {
 
     await waitFor(() => expect(screen.getByText('ویرایش پرنده')).toBeInTheDocument());
 
-    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ'), { target: { value: 'جدید' } });
+    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا شترمرغ'), { target: { value: 'جدید' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
     await waitFor(() => expect(useBrd.getState().birds[0].name).toBe('جدید'));
