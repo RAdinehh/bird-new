@@ -235,7 +235,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                     }}>{purpose.emoji} {purpose.label}</span>}
                     {category && <span style={{
                       padding: '2px 8px', borderRadius: 10,
-                      background: 'var(--info-soft, #dbeafe)', color: 'var(--info, #1e40af)',
+                      background: 'var(--accent-soft)', color: 'var(--accent)',
                       fontSize: 10.5, fontWeight: 700,
                     }}>{category.emoji} {category.label}</span>}
                     {b.cycleDays ? <span>چرخه: <b style={{ color: 'var(--text)' }}>{toFa(b.cycleDays)} روز</b></span> : null}
@@ -284,8 +284,8 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 {stdData ? (
                   <div style={{
                     padding: '10px 12px',
-                    background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-                    border: '1px solid #93c5fd',
+                    background: 'var(--accent-soft)',
+                    border: '1px solid var(--accent-border)',
                     borderRadius: 12,
                     display: 'flex',
                     alignItems: 'center',
@@ -293,20 +293,20 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                   }}>
                     <div style={{
                       width: 38, height: 38, borderRadius: 11,
-                      background: '#fff',
+                      background: 'var(--card-solid)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 18, flexShrink: 0,
                       boxShadow: '0 1px 4px rgba(0,0,0,.06)',
                     }}>📖</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
-                        fontSize: 14, fontWeight: 900, color: '#1e3a8a',
+                        fontSize: 14, fontWeight: 900, color: 'var(--accent)',
                         display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
                       }}>
                         {stdData.nameFa || stdData.nameEn || stdKey}
                         <span style={{
                           fontSize: 8, fontWeight: 600,
-                          color: '#3b82f6',
+                          color: 'var(--accent)',
                           opacity: 0.85,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
@@ -322,15 +322,15 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                     <div style={{
                       fontSize: 9.5, fontWeight: 800,
                       padding: '2px 7px', borderRadius: 8,
-                      background: '#16a34a', color: '#fff',
+                      background: 'var(--accent)', color: 'var(--card-solid)',
                       flexShrink: 0,
                     }}>متصل</div>
                   </div>
                 ) : (
                   <div style={{
                     padding: '10px 12px',
-                    background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-                    border: '1px solid #fcd34d',
+                    background: 'var(--warn-soft)',
+                    border: '1px solid var(--warn)',
                     borderRadius: 12,
                     display: 'flex',
                     alignItems: 'center',
@@ -338,11 +338,11 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                   }}>
                     <div style={{
                       width: 38, height: 38, borderRadius: 11,
-                      background: '#fff',
+                      background: 'var(--card-solid)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 18, flexShrink: 0,
                     }}>💡</div>
-                    <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 800, color: '#b45309' }}>
+                    <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 800, color: 'var(--warn)' }}>
                       استاندارد متصل نیست
                     </div>
                   </div>
