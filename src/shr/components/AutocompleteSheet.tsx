@@ -271,7 +271,15 @@ export default function AutocompleteSheet({
             justifyContent: 'center',
             flexShrink: 0,
           }}
-        >▾</button>
+        ><svg
+          aria-hidden="true"
+          width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="var(--muted)"
+          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          style={{ flexShrink: 0 }}
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg></button>
       </div>
 
       {(error || typedError) && (
@@ -372,11 +380,12 @@ export default function AutocompleteSheet({
                 <div key={key}>
                   {!isSearching && g.label && (
                     <div style={{
-                      padding: '8px 16px 4px',
-                      fontSize: 11, fontWeight: 700,
-                      color: 'var(--muted)',
+                      padding: '10px 16px 6px',
+                      fontSize: 13.5, fontWeight: 900,
+                      color: 'var(--accent)',
                       background: 'var(--input-bg)',
                       borderBottom: '1px solid var(--border)',
+                      letterSpacing: '.2px',
                     }}>
                       {g.label}
                     </div>
@@ -389,16 +398,16 @@ export default function AutocompleteSheet({
                         type="button"
                         onClick={() => handlePick(opt)}
                         style={{
-                          display: 'flex', alignItems: 'center', gap: 12,
-                          width: '100%', minHeight: 48, padding: '11px 16px',
+                          display: 'flex', alignItems: 'center', gap: 10,
+                          width: '100%', minHeight: 42, padding: '8px 16px 8px 34px',
                           background: 'transparent', border: 'none',
                           borderBottom: '1px solid var(--border)',
                           color: 'var(--text)', fontFamily: 'inherit',
-                          fontSize: 'var(--fs-sm)', cursor: 'pointer',
+                          fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
                           textAlign: 'right', direction: 'rtl',
                         }}
                       >
-                        {opt.icon && <span style={{ fontSize: 17, flexShrink: 0 }}>{opt.icon}</span>}
+                        {opt.icon && <span style={{ fontSize: 14, flexShrink: 0 }}>{opt.icon}</span>}
                         <span style={{ flex: 1, fontWeight: 600 }}>{opt.label}</span>
                         {selected && <span style={{ color: 'var(--accent)', fontWeight: 900 }}>✓</span>}
                       </button>
