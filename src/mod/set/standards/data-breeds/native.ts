@@ -29,14 +29,14 @@ export const MARANDI: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 23, max: 27, target: 25 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 9999, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 500, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 30, waterMl: 60, phaseName: 'استارتر', lysinePct: 0.95, methioninePct: 0.42, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
   { dayFrom: 31, dayTo: 60, feedG: 55, waterMl: 110, phaseName: 'رشد', lysinePct: 0.75, methioninePct: 0.35, calciumPct: 1.0, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
   { dayFrom: 61, dayTo: 120, feedG: 80, waterMl: 160, phaseName: 'رشد', lysinePct: 0.75, methioninePct: 0.35, calciumPct: 1.0, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
   { dayFrom: 121, dayTo: 180, feedG: 95, waterMl: 190, phaseName: 'تولید', lysinePct: 0.68, methioninePct: 0.32, calciumPct: 3.0, availablePhosphorusPct: 0.42, saltPct: 0.22, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
-  { dayFrom: 181, dayTo: 365, feedG: 105, waterMl: 210, phaseName: 'تولید', lysinePct: 0.68, methioninePct: 0.32, calciumPct: 3.0, availablePhosphorusPct: 0.42, saltPct: 0.22, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+  { dayFrom: 181, dayTo: 500, feedG: 105, waterMl: 210, phaseName: 'تولید', lysinePct: 0.68, methioninePct: 0.32, calciumPct: 3.0, availablePhosphorusPct: 0.42, saltPct: 0.22, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
   ],
   growth: {
     weightByAge: [
@@ -107,14 +107,14 @@ export const GOLPAYGANI: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 9999, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 500, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 30, waterMl: 60, phaseName: 'استارتر', lysinePct: 1.0, methioninePct: 0.4, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا'] },
   { dayFrom: 31, dayTo: 60, feedG: 55, waterMl: 110, phaseName: 'استارتر', lysinePct: 1.0, methioninePct: 0.4, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا'] },
   { dayFrom: 61, dayTo: 120, feedG: 78, waterMl: 156, phaseName: 'استارتر', lysinePct: 1.0, methioninePct: 0.4, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا'] },
   { dayFrom: 121, dayTo: 180, feedG: 92, waterMl: 184, phaseName: 'استارتر', lysinePct: 1.0, methioninePct: 0.4, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا'] },
-  { dayFrom: 181, dayTo: 365, feedG: 105, waterMl: 210, phaseName: 'استارتر', lysinePct: 1.0, methioninePct: 0.4, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا'] },
+  { dayFrom: 181, dayTo: 500, feedG: 105, waterMl: 210, phaseName: 'استارتر', lysinePct: 1.0, methioninePct: 0.4, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا'] },
   ],
   growth: {
     weightByAge: [
@@ -173,14 +173,14 @@ export const LARI: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 9999, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 60 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 500, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 60 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 35, waterMl: 70, phaseName: 'استارتر', lysinePct: 0.95, methioninePct: 0.42, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
   { dayFrom: 31, dayTo: 60, feedG: 60, waterMl: 120, phaseName: 'رشد', lysinePct: 0.75, methioninePct: 0.35, calciumPct: 1.0, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
   { dayFrom: 61, dayTo: 120, feedG: 85, waterMl: 170, phaseName: 'رشد', lysinePct: 0.75, methioninePct: 0.35, calciumPct: 1.0, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
   { dayFrom: 121, dayTo: 180, feedG: 100, waterMl: 200, phaseName: 'تولید', lysinePct: 0.68, methioninePct: 0.32, calciumPct: 3.0, availablePhosphorusPct: 0.42, saltPct: 0.22, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
-  { dayFrom: 181, dayTo: 365, feedG: 115, waterMl: 230, phaseName: 'تولید', lysinePct: 0.68, methioninePct: 0.32, calciumPct: 3.0, availablePhosphorusPct: 0.42, saltPct: 0.22, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+  { dayFrom: 181, dayTo: 500, feedG: 115, waterMl: 230, phaseName: 'تولید', lysinePct: 0.68, methioninePct: 0.32, calciumPct: 3.0, availablePhosphorusPct: 0.42, saltPct: 0.22, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
   ],
   growth: {
     weightByAge: [
@@ -239,14 +239,14 @@ export const GOLIN: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 9999, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 500, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 30, waterMl: 60, phaseName: 'استارتر', lysinePct: 0.95, methioninePct: 0.42, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
   { dayFrom: 31, dayTo: 60, feedG: 55, waterMl: 110, phaseName: 'رشد', lysinePct: 0.75, methioninePct: 0.35, calciumPct: 1.0, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
   { dayFrom: 61, dayTo: 120, feedG: 75, waterMl: 150, phaseName: 'رشد', lysinePct: 0.75, methioninePct: 0.35, calciumPct: 1.0, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
   { dayFrom: 121, dayTo: 180, feedG: 88, waterMl: 176, phaseName: 'تولید', lysinePct: 0.68, methioninePct: 0.32, calciumPct: 3.0, availablePhosphorusPct: 0.42, saltPct: 0.22, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
-  { dayFrom: 181, dayTo: 365, feedG: 100, waterMl: 200, phaseName: 'تولید', lysinePct: 0.68, methioninePct: 0.32, calciumPct: 3.0, availablePhosphorusPct: 0.42, saltPct: 0.22, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
+  { dayFrom: 181, dayTo: 500, feedG: 100, waterMl: 200, phaseName: 'تولید', lysinePct: 0.68, methioninePct: 0.32, calciumPct: 3.0, availablePhosphorusPct: 0.42, saltPct: 0.22, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا', 'پودر صدف'] },
   ],
   growth: {
     weightByAge: [

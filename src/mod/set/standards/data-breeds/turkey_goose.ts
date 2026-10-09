@@ -64,7 +64,7 @@ export const TURKEY: BirdStandard = {
     { dayFrom: 1, dayTo: 7, maxPct: 2.0 },
     { dayFrom: 8, dayTo: 28, maxPct: 2.5 },
     { dayFrom: 29, dayTo: 84, maxPct: 3.0 },
-    { dayFrom: 85, dayTo: 140, maxPct: 3.5 },
+    { dayFrom: 85, dayTo: 150, maxPct: 3.5 },
   ],
   mortalityTotalPct: 4.5,
   notes: 'بوقلمون (برنز/بوربون/بیوتی)',
@@ -92,14 +92,14 @@ export const GOOSE: BirdStandard = {
   { dayFrom: 8, dayTo: 14, temp: { min: 26, max: 30, target: 28 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 15, dayTo: 21, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 43, dayTo: 90, temp: { min: 16, max: 20, target: 18 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 43, dayTo: 365, temp: { min: 16, max: 20, target: 18 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 14, feedG: 60, waterMl: 120, phaseName: 'استارتر', lysinePct: 1.05, methioninePct: 0.42, calciumPct: 0.9, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
   { dayFrom: 15, dayTo: 28, feedG: 130, waterMl: 260, phaseName: 'استارتر', lysinePct: 1.05, methioninePct: 0.42, calciumPct: 0.9, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
   { dayFrom: 29, dayTo: 60, feedG: 220, waterMl: 440, phaseName: 'رشد', lysinePct: 0.9, methioninePct: 0.38, calciumPct: 0.85, availablePhosphorusPct: 0.38, saltPct: 0.2, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
   { dayFrom: 61, dayTo: 90, feedG: 280, waterMl: 560, phaseName: 'رشد', lysinePct: 0.9, methioninePct: 0.38, calciumPct: 0.85, availablePhosphorusPct: 0.38, saltPct: 0.2, mainIngredients: ['ذرت', 'گندم', 'کنجاله سویا'] },
-  { dayFrom: 91, dayTo: 180, feedG: 320, waterMl: 640, phaseName: 'پروار', lysinePct: 0.75, methioninePct: 0.32, calciumPct: 0.8, availablePhosphorusPct: 0.35, saltPct: 0.18, mainIngredients: ['ذرت', 'گندم', 'یونجه', 'کنجاله سویا'] },
+  { dayFrom: 91, dayTo: 365, feedG: 320, waterMl: 640, phaseName: 'پروار', lysinePct: 0.75, methioninePct: 0.32, calciumPct: 0.8, availablePhosphorusPct: 0.35, saltPct: 0.18, mainIngredients: ['ذرت', 'گندم', 'یونجه', 'کنجاله سویا'] },
   ],
   growth: {
     weightByAge: [

@@ -28,7 +28,7 @@ export const QUAIL_BROILER: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 30, max: 34, target: 32 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 28, temp: { min: 27, max: 31, target: 29 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 29, dayTo: 35, temp: { min: 23, max: 27, target: 25 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 36, dayTo: 42, temp: { min: 21, max: 25, target: 23 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 36, dayTo: 45, temp: { min: 21, max: 25, target: 23 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 7, feedG: 8, waterMl: 16, phaseName: 'استارتر', lysinePct: 1.3, methioninePct: 0.5, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'پودر ماهی', 'مکمل'] },
@@ -36,7 +36,7 @@ export const QUAIL_BROILER: BirdStandard = {
   { dayFrom: 15, dayTo: 21, feedG: 22, waterMl: 44, phaseName: 'رشد', lysinePct: 1.15, methioninePct: 0.45, calciumPct: 0.9, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
   { dayFrom: 22, dayTo: 28, feedG: 27, waterMl: 54, phaseName: 'رشد', lysinePct: 1.15, methioninePct: 0.45, calciumPct: 0.9, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
   { dayFrom: 29, dayTo: 35, feedG: 30, waterMl: 60, phaseName: 'رشد', lysinePct: 1.15, methioninePct: 0.45, calciumPct: 0.9, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
-  { dayFrom: 36, dayTo: 42, feedG: 32, waterMl: 64, phaseName: 'رشد', lysinePct: 1.15, methioninePct: 0.45, calciumPct: 0.9, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
+  { dayFrom: 36, dayTo: 45, feedG: 32, waterMl: 64, phaseName: 'رشد', lysinePct: 1.15, methioninePct: 0.45, calciumPct: 0.9, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
   ],
   growth: {
     weightByAge: [

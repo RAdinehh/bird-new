@@ -240,7 +240,7 @@ export const LEGHORN: BirdStandard = {
   { dayFrom: 85, dayTo: 126, feedG: 75, waterMl: 150, phaseName: 'پولت پیش', lysinePct: 0.7, methioninePct: 0.33, calciumPct: 2.0, availablePhosphorusPct: 0.4, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
   { dayFrom: 127, dayTo: 168, feedG: 95, waterMl: 190, phaseName: 'پری‌لِی', lysinePct: 0.72, methioninePct: 0.34, calciumPct: 2.5, availablePhosphorusPct: 0.42, saltPct: 0.22, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف'] },
   { dayFrom: 169, dayTo: 300, feedG: 105, waterMl: 210, phaseName: 'لِی', lysinePct: 0.78, methioninePct: 0.36, calciumPct: 3.8, availablePhosphorusPct: 0.45, saltPct: 0.25, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف', 'مکمل'] },
-  { dayFrom: 301, dayTo: 365, feedG: 110, waterMl: 220, phaseName: 'لِی', lysinePct: 0.78, methioninePct: 0.36, calciumPct: 3.8, availablePhosphorusPct: 0.45, saltPct: 0.25, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف', 'مکمل'] },
+  { dayFrom: 301, dayTo: 500, feedG: 110, waterMl: 220, phaseName: 'لِی', lysinePct: 0.78, methioninePct: 0.36, calciumPct: 3.8, availablePhosphorusPct: 0.45, saltPct: 0.25, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'پودر صدف', 'مکمل'] },
   ],
   growth: {
     weightByAge: [
