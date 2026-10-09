@@ -9,17 +9,21 @@ export interface BirdPreset {
   cycleDays: number | null;
   fcrStandard: number | null;
   notes: string;
+  /** 🆕 نوع پرنده */
+  birdKind?: 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
+  /** 🆕 هدف پرورش */
+  purpose?: 'broiler' | 'layer' | 'breeder' | 'dual' | 'ornamental';
 }
 
 export const BIRD_PRESETS: Record<string, BirdPreset> = {
-  'مرغ': { name: 'مرغ', cycleDays: 500, fcrStandard: 2.0, notes: 'مرغ تخم‌گذار تجاری' },
-  'مرغ گوشتی': { name: 'مرغ گوشتی', cycleDays: 42, fcrStandard: 1.65, notes: 'جوجه گوشتی' },
-  'مرغ تخم‌گذار': { name: 'مرغ تخم‌گذار', cycleDays: 500, fcrStandard: 2.05, notes: 'مرغ تخم‌گذار تجاری' },
-  'مرغ مادر': { name: 'مرغ مادر', cycleDays: 500, fcrStandard: 2.2, notes: 'مرغ مادر' },
-  'اردک': { name: 'اردک', cycleDays: 60, fcrStandard: 2.5, notes: 'اردک گوشتی' },
-  'بوقلمون': { name: 'بوقلمون', cycleDays: 120, fcrStandard: 2.8, notes: 'بوقلمون گوشتی' },
-  'بلدرچین': { name: 'بلدرچین', cycleDays: 45, fcrStandard: 3.0, notes: 'بلدرچین' },
-  'غاز': { name: 'غاز', cycleDays: 90, fcrStandard: 3.0, notes: 'غاز گوشتی' },
+  'مرغ':          { name: 'مرغ',          cycleDays: 500, fcrStandard: 2.0,  notes: 'مرغ تخم‌گذار تجاری',  birdKind: 'chicken', purpose: 'layer' },
+  'مرغ گوشتی':    { name: 'مرغ گوشتی',    cycleDays: 42,  fcrStandard: 1.65, notes: 'جوجه گوشتی',          birdKind: 'chicken', purpose: 'broiler' },
+  'مرغ تخم‌گذار': { name: 'مرغ تخم‌گذار', cycleDays: 500, fcrStandard: 2.05, notes: 'مرغ تخم‌گذار تجاری', birdKind: 'chicken', purpose: 'layer' },
+  'مرغ مادر':     { name: 'مرغ مادر',     cycleDays: 500, fcrStandard: 2.2,  notes: 'مرغ مادر',             birdKind: 'chicken', purpose: 'breeder' },
+  'اردک':         { name: 'اردک',         cycleDays: 60,  fcrStandard: 2.5,  notes: 'اردک گوشتی',           birdKind: 'duck',    purpose: 'broiler' },
+  'بوقلمون':      { name: 'بوقلمون',      cycleDays: 120, fcrStandard: 2.8,  notes: 'بوقلمون گوشتی',        birdKind: 'turkey',  purpose: 'broiler' },
+  'بلدرچین':      { name: 'بلدرچین',      cycleDays: 45,  fcrStandard: 3.0,  notes: 'بلدرچین',              birdKind: 'quail',   purpose: 'broiler' },
+  'غاز':          { name: 'غاز',          cycleDays: 90,  fcrStandard: 3.0,  notes: 'غاز گوشتی',            birdKind: 'goose',   purpose: 'broiler' },
 };
 
 /** نژادهای پیشنهادی (فقط راهنما — کاربر آزاد است) */
@@ -40,6 +44,8 @@ export function findBirdPreset(name: string): BirdPreset | undefined {
         cycleDays: std.biology.cullDay ?? null,
         fcrStandard: lastGrowth?.fcr ?? null,
         notes: std.nameEn || '',
+        birdKind: (std as any).birdKind,
+        purpose: (std as any).primaryPurpose,
       };
     }
   }

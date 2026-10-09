@@ -9,6 +9,9 @@ import type { BirdStandard } from '../types';
 export const COBB_500: BirdStandard = {
   key: 'cobb-500',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['broiler'],
+  primaryPurpose: 'broiler',
   nameFa: 'کاب ۵۰۰',
   nameEn: 'Cobb 500',
   category: 'industrial',
@@ -68,6 +71,9 @@ export const COBB_500: BirdStandard = {
 export const ROSS_308: BirdStandard = {
   key: 'ross-308',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['broiler'],
+  primaryPurpose: 'broiler',
   nameFa: 'راس ۳۰۸',
   nameEn: 'Ross 308',
   category: 'industrial',
@@ -127,6 +133,9 @@ export const ROSS_308: BirdStandard = {
 export const IRAN_BROILER: BirdStandard = {
   key: 'iran-broiler',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['broiler'],
+  primaryPurpose: 'broiler',
   nameFa: 'گوشتی ایران',
   nameEn: 'Iran Broiler',
   category: 'industrial',

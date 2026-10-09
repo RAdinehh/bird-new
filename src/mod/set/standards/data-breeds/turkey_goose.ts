@@ -9,6 +9,9 @@ import type { BirdStandard } from '../types';
 export const TURKEY: BirdStandard = {
   key: 'turkey',
   birdName: 'بوقلمون',
+  birdKind: 'turkey',
+  purposes: ['broiler'],
+  primaryPurpose: 'broiler',
   nameFa: 'بوقلمون (برنز/بوربون/بیوتی)',
   nameEn: 'Turkey',
   category: 'industrial',
@@ -66,6 +69,9 @@ export const TURKEY: BirdStandard = {
 export const GOOSE: BirdStandard = {
   key: 'goose',
   birdName: 'غاز',
+  birdKind: 'goose',
+  purposes: ['broiler', 'dual'],
+  primaryPurpose: 'dual',
   nameFa: 'غاز',
   nameEn: 'Goose',
   category: 'industrial',

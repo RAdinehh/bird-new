@@ -9,6 +9,9 @@ import type { BirdStandard } from '../types';
 export const MARANDI: BirdStandard = {
   key: 'marandi',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['layer', 'breeder', 'dual'],
+  primaryPurpose: 'layer',
   nameFa: 'مرندی',
   nameEn: 'Marandi',
   category: 'native',
@@ -76,6 +79,9 @@ export const MARANDI: BirdStandard = {
 export const GOLPAYGANI: BirdStandard = {
   key: 'golpaygani',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['layer', 'breeder', 'dual'],
+  primaryPurpose: 'layer',
   nameFa: 'گلپایگانی',
   nameEn: 'Golpayegani',
   category: 'native',
@@ -134,6 +140,9 @@ export const GOLPAYGANI: BirdStandard = {
 export const LARI: BirdStandard = {
   key: 'lari',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['layer', 'breeder', 'dual'],
+  primaryPurpose: 'layer',
   nameFa: 'لاری',
   nameEn: 'Lari',
   category: 'native',
@@ -192,6 +201,9 @@ export const LARI: BirdStandard = {
 export const GOLIN: BirdStandard = {
   key: 'golin',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['layer', 'breeder', 'dual'],
+  primaryPurpose: 'layer',
   nameFa: 'گلین (بومی)',
   nameEn: 'Golin',
   category: 'native',

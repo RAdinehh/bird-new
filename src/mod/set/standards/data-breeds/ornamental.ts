@@ -9,6 +9,9 @@ import type { BirdStandard } from '../types';
 export const AUSTRALORP: BirdStandard = {
   key: 'australorp',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['layer', 'ornamental'],
+  primaryPurpose: 'ornamental',
   nameFa: 'استرالوپ',
   nameEn: 'Australorp',
   category: 'industrial',
@@ -65,6 +68,9 @@ export const AUSTRALORP: BirdStandard = {
 export const COCHIN: BirdStandard = {
   key: 'cochin',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['ornamental'],
+  primaryPurpose: 'ornamental',
   nameFa: 'کوشین',
   nameEn: 'Cochin',
   category: 'industrial',
@@ -121,6 +127,9 @@ export const COCHIN: BirdStandard = {
 export const BRAHMA: BirdStandard = {
   key: 'brahma',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['dual', 'ornamental'],
+  primaryPurpose: 'ornamental',
   nameFa: 'برهما',
   nameEn: 'Brahma',
   category: 'industrial',
@@ -177,6 +186,9 @@ export const BRAHMA: BirdStandard = {
 export const SULTAN: BirdStandard = {
   key: 'sultan',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['ornamental'],
+  primaryPurpose: 'ornamental',
   nameFa: 'سلطان',
   nameEn: 'Sultan',
   category: 'industrial',
@@ -233,6 +245,9 @@ export const SULTAN: BirdStandard = {
 export const MINIATURE: BirdStandard = {
   key: 'miniature',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['ornamental'],
+  primaryPurpose: 'ornamental',
   nameFa: 'مینیاتوری',
   nameEn: 'Miniature',
   category: 'industrial',

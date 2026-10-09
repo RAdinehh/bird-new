@@ -9,6 +9,9 @@ import type { BirdStandard } from '../types';
 export const HY_LINE_W36: BirdStandard = {
   key: 'hy-line-w36',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['layer', 'breeder'],
+  primaryPurpose: 'layer',
   nameFa: 'های‌لاین W36',
   nameEn: 'Hy-Line W36',
   category: 'industrial',
@@ -68,6 +71,9 @@ export const HY_LINE_W36: BirdStandard = {
 export const IRAN_LAYER: BirdStandard = {
   key: 'iran-layer',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['layer', 'breeder'],
+  primaryPurpose: 'layer',
   nameFa: 'تخم‌گذار ایران',
   nameEn: 'Iran Layer',
   category: 'industrial',
@@ -127,6 +133,9 @@ export const IRAN_LAYER: BirdStandard = {
 export const LOHMANN: BirdStandard = {
   key: 'lohmann',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['layer', 'breeder'],
+  primaryPurpose: 'layer',
   nameFa: 'لوهمن',
   nameEn: 'Lohmann',
   category: 'industrial',
@@ -186,6 +195,9 @@ export const LOHMANN: BirdStandard = {
 export const LEGHORN: BirdStandard = {
   key: 'leghorn',
   birdName: 'مرغ',
+  birdKind: 'chicken',
+  purposes: ['layer'],
+  primaryPurpose: 'layer',
   nameFa: 'لگهورن',
   nameEn: 'Leghorn',
   category: 'industrial',

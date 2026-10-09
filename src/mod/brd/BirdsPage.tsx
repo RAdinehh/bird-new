@@ -21,7 +21,15 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
-interface F { id?: string; name: string; cycleDays: string; fcrStandard: string; standardKey?: string; }
+interface F {
+  id?: string;
+  name: string;
+  cycleDays: string;
+  fcrStandard: string;
+  standardKey?: string;
+  birdKind?: 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
+  purpose?: 'broiler' | 'layer' | 'breeder' | 'dual' | 'ornamental';
+}
 const empty: F = { name: '', cycleDays: '', fcrStandard: '', standardKey: '' };
 
 export default function BirdsPage({ active = true }: { active?: boolean } = {}) {
@@ -83,7 +91,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
 
   const openNew = () => { setForm(empty); setError(''); setOpen(true);  };
   const openEdit = (b: Bird) => {
-    setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '', standardKey: (b as any).standardKey || '' });
+    setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '', standardKey: (b as any).standardKey || '', birdKind: (b as any).birdKind, purpose: (b as any).purpose });
     
     setError(''); setOpen(true);
   };
@@ -107,8 +115,11 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     const payload = {
       name: form.name.trim(),
       cycleDays: form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null,
-      fcrStandard: form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null
-    };
+      fcrStandard: form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null,
+      standardKey: form.standardKey,
+      birdKind: form.birdKind,
+      purpose: form.purpose,
+    } as any;
     if (form.id) updateBird(form.id, payload); else addBird(payload);
     setOpen(false);
   };
@@ -271,6 +282,8 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 cycleDays: pick.cycleDays ? toFa(pick.cycleDays) : f.cycleDays,
                 fcrStandard: pick.fcrStandard ? toFa(pick.fcrStandard) : f.fcrStandard,
                 standardKey: pick.standardKey || f.standardKey,
+                birdKind: pick.birdKind || f.birdKind,
+                purpose: pick.purpose || f.purpose,
               }));
             }}
             error={error || undefined}

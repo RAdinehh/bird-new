@@ -3,6 +3,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Breed } from './store';
 import SourceBadge from '../../shr/components/SourceBadge';
 import { detectBreedFcrSource } from './_source';
+import BreedNameField, { type BreedPick } from './BreedNameField';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { Btn, BtnRow, Empty, Field,
   Grid2, Input, Modal, NumField,
@@ -20,22 +21,13 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
 
-/** پیدا کردن کلید استاندارد از اسم نژاد (match نرم) */
+/** پیدا کردن کلید استاندارد از اسم نژاد — فقط match دقیق (طبق استاندارد) */
 function findStandardKey(name: string): string | undefined {
-  const clean = name.trim();
+  const clean = name.trim().toLowerCase();
   if (!clean) return undefined;
-  // match دقیق با nameFa
-  for (const [key, std] of Object.entries(DEFAULT_STANDARDS)) {
-    if (std.nameFa === clean) return key;
-  }
-  // match دقیق با nameEn
-  for (const [key, std] of Object.entries(DEFAULT_STANDARDS)) {
-    if (std.nameEn && std.nameEn.toLowerCase() === clean.toLowerCase()) return key;
-  }
-  // match جزئی
-  for (const [key, std] of Object.entries(DEFAULT_STANDARDS)) {
-    if (clean.includes(std.nameFa) || std.nameFa.includes(clean)) return key;
-    if (std.nameEn && (clean.toLowerCase().includes(std.nameEn.toLowerCase()) || std.nameEn.toLowerCase().includes(clean.toLowerCase()))) return key;
+  for (const [key, std] of Object.entries(DEFAULT_STANDARDS as any) as [string, any][]) {
+    if (std.nameFa?.trim().toLowerCase() === clean) return key;
+    if (std.nameEn?.trim().toLowerCase() === clean) return key;
   }
   return undefined;
 }
@@ -311,51 +303,50 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
             autoThreshold={6}
           />
         </Field>
-        <Grid2>
-          <Field label="نام نژاد" required hint="مثال: مرندی، گلپایگانی">
-            <Input placeholder="مثلاً — مرندی" value={form.name} onChange={e => {
-                const newName = e.target.value;
-                const matchedKey = findStandardKey(newName);
-                // اگه FCR دستی تغییر نکرده، از استاندارد پر کن
-                const hasManualFcr = !!form.fcr;
-                setForm(f => ({
-                  ...f,
-                  name: newName,
-                  standardKey: matchedKey || f.standardKey,
-                  fcr: (matchedKey && !hasManualFcr && DEFAULT_STANDARDS[matchedKey]?.growth?.weightByAge?.length)
-                    ? toFa(DEFAULT_STANDARDS[matchedKey].growth.weightByAge[
-                        DEFAULT_STANDARDS[matchedKey].growth.weightByAge.length - 1
-                      ].fcr)
-                    : f.fcr,
-                }));
-                if (matchedKey && !hasManualFcr) setFcrFromStd(true);
-              }} />
-          </Field>
-          <Field
-            label={
-              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-                FCR
-                {(() => {
-                  const fcr = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
-                  const parent = birds.find(x => x.id === form.birdId);
-                  const src = detectBreedFcrSource(fcr, form.standardKey, parent?.fcrStandard ?? null);
-                  return <SourceBadge source={src.source} label={src.label} />;
-                })()}
-              </span>
-            }
-            hint="ضریب تبدیل غذایی"
-          >
-            <NumField
-              placeholder="۲٫۰"
-              value={form.fcr}
-              onChange={e => {
-                setForm({ ...form, fcr: e.target.value });
-                setFcrFromStd(false);
-              }}
-              min={0.5} max={5} unit="FCR" autoClamp
-            />
-          </Field>
-        </Grid2>
+        <Field label="نام نژاد" required hint="از لیست انتخاب کن یا نژاد دلخواه بنویس">
+          <BreedNameField
+            value={form.name}
+            onChange={v => setForm(f => ({ ...f, name: v }))}
+            onPick={(pick: BreedPick) => {
+              setForm(f => ({
+                ...f,
+                name: pick.name,
+                standardKey: pick.standardKey || f.standardKey,
+                fcr: pick.fcr !== null ? toFa(pick.fcr) : f.fcr,
+              }));
+            }}
+            excludeNames={breeds
+              .filter(b => b.id !== form.id && b.birdId === form.birdId)
+              .map(b => b.name)}
+            parentBirdName={birds.find(x => x.id === form.birdId)?.name}
+            parentPurpose={(birds.find(x => x.id === form.birdId) as any)?.birdType}
+          />
+        </Field>
+
+        <Field
+          label={
+            <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+              FCR
+              {(() => {
+                const fcr = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
+                const parent = birds.find(x => x.id === form.birdId);
+                const src = detectBreedFcrSource(fcr, form.standardKey, parent?.fcrStandard ?? null);
+                return <SourceBadge source={src.source} label={src.label} />;
+              })()}
+            </span>
+          }
+          hint="ضریب تبدیل غذایی"
+        >
+          <NumField
+            placeholder="۲٫۰"
+            value={form.fcr}
+            onChange={e => {
+              setForm({ ...form, fcr: e.target.value });
+              setFcrFromStd(false);
+            }}
+            min={0.5} max={5} unit="FCR" autoClamp
+          />
+        </Field>
         <ErrorBox>{err}</ErrorBox>
       </Modal>
     </PageContainer>

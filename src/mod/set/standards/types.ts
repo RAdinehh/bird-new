@@ -10,6 +10,33 @@
 
 export type BirdCategory = 'native' | 'industrial';
 
+/** 🆕 نوع پرنده (برای فیلتر نژادها) */
+export type BirdKind = 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
+
+/** 🆕 هدف پرورش (نژادها می‌تونن چندتایی داشته باشن) */
+export type BirdPurpose =
+  | 'broiler'      // گوشتی
+  | 'layer'        // تخم‌گذار
+  | 'breeder'      // مادر
+  | 'dual'         // دوگانه (گوشتی + تخم‌گذار)
+  | 'ornamental';  // تزئینی
+
+export const BIRD_KIND_LABEL: Record<BirdKind, string> = {
+  chicken: '🐔 مرغ',
+  duck: '🦆 اردک',
+  turkey: '🦃 بوقلمون',
+  quail: '🐦 بلدرچین',
+  goose: '🦢 غاز',
+};
+
+export const BIRD_PURPOSE_LABEL: Record<BirdPurpose, string> = {
+  broiler: 'گوشتی',
+  layer: 'تخم‌گذار',
+  breeder: 'مادر',
+  dual: 'دوگانه',
+  ornamental: 'تزئینی',
+};
+
 export type BirdType =
   | 'marandi'
   | 'golpaygani'
@@ -143,7 +170,13 @@ export interface LitterStandard {
 // ═══ استاندارد کامل پرنده ═══
 export interface BirdStandard {
   key: string;              // کلید نژاد (marandi, golpaygani, ...)
-  birdName: string;         // پرنده مادر (مرغ، بوقلمون، ...)
+  birdName: string;         // پرنده مادر (مرغ، بوقلمون، ...) — legacy
+  /** 🆕 نوع پرنده — برای فیلتر دقیق‌تر */
+  birdKind?: BirdKind;
+  /** 🆕 اهداف پرورش — می‌تونه چندتایی باشه (مثلاً مرندی: layer, breeder, dual) */
+  purposes?: BirdPurpose[];
+  /** 🆕 هدف اصلی (برای نمایش با ⭐) */
+  primaryPurpose?: BirdPurpose;
   nameFa: string;           // نام نژاد
   nameEn: string;
   category: BirdCategory;

@@ -7,6 +7,10 @@ export interface Bird {
   name: string;
   /** کلید استاندارد در DEFAULT_STANDARDS (اختیاری) */
   standardKey?: string;
+  /** 🆕 نوع پرنده (برای فیلتر نژادها) */
+  birdKind?: 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
+  /** 🆕 هدف پرورش */
+  purpose?: 'broiler' | 'layer' | 'breeder' | 'dual' | 'ornamental';
   cycleDays: number | null;
   fcrStandard: number | null;
   createdAt: string;
