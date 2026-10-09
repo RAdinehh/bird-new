@@ -2,7 +2,9 @@ import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Breed } from './store';
 import SourceBadge from '../../shr/components/SourceBadge';
-import { detectBreedFcrSource } from './_source';
+import { detectBreedFcrSource, getBreedFcrBaseline } from './_source';
+import { useOverride } from '../../shr/hooks/useOverride';
+import OverrideHint from '../../shr/components/OverrideHint';
 import BreedNameField, { type BreedPick } from './BreedNameField';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { getPurposeInfo, getCategoryInfo } from './_display';
@@ -178,6 +180,18 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     if (form.id) updateBreed(form.id, payload); else addBreed(payload);
     setOpen(false);
   };
+
+  // 🆕 Override برای FCR نژاد
+  const parentBird = birds.find(x => x.id === form.birdId);
+  const fcrBaseline = getBreedFcrBaseline(form.standardKey, parentBird?.fcrStandard ?? null);
+  const fcrCurrent = form.fcr ? parseFloat(toEn(form.fcr).replace('٫','.')) || null : null;
+  const { hint: fcrHint } = useOverride({
+    current: fcrCurrent,
+    stdValue: fcrBaseline.value,
+    onReset: () => setForm(f => ({ ...f, fcr: fcrBaseline.value != null ? toFa(fcrBaseline.value) : '' })),
+    unit: 'FCR',
+    decimals: 1,
+  });
 
 
   return (
@@ -358,7 +372,8 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
                 const fcr = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
                 const parent = birds.find(x => x.id === form.birdId);
                 const src = detectBreedFcrSource(fcr, form.standardKey, parent?.fcrStandard ?? null);
-                return <SourceBadge source={src.source} label={src.label} />;
+                const source = fcrHint.overridden ? 'manual' : src.source;
+                return <SourceBadge source={source} label={src.label} />;
               })()}
             </span>
           }
@@ -373,6 +388,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
             }}
             min={0.5} max={5} unit="FCR" autoClamp
           />
+          <OverrideHint {...fcrHint} />
         </Field>
         <ErrorBox>{err}</ErrorBox>
       </Modal>

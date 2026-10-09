@@ -190,3 +190,25 @@ export function getOverrideInfo(
   }
   return { overridden: current !== stdValue, stdValue, stdLabel };
 }
+
+
+// ═══ Breed FCR Baseline ═══
+/** مقدار مرجع FCR نژاد: اول standardKey، اگه نبود والد */
+export function getBreedFcrBaseline(
+  standardKey: string | undefined,
+  parentFcr: number | null | undefined,
+): { value: number | null; label: string; kind: 'standard' | 'parent' | 'none' } {
+  if (standardKey) {
+    const std = (DEFAULT_STANDARDS as any)[standardKey];
+    if (std) {
+      const last = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
+      if (last?.fcr != null) {
+        return { value: last.fcr, label: std.nameFa || std.nameEn || '', kind: 'standard' };
+      }
+    }
+  }
+  if (parentFcr != null) {
+    return { value: parentFcr, label: 'والد', kind: 'parent' };
+  }
+  return { value: null, label: '', kind: 'none' };
+}
