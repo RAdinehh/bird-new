@@ -17,6 +17,7 @@ import StandardSections from './StandardSections';
 import { showToast, toastMsg } from '../../../../cor/store/toast';
 import { showConfirmAsync } from '../../../../cor/store/dialog';
 import { DEFAULT_STANDARDS, type BirdStandard } from '../index';
+import { getEffectiveStandard } from '../_override';
 import { useSet } from '../../store';
 
 export default function BreedDetailPage() {
@@ -26,12 +27,15 @@ export default function BreedDetailPage() {
 
   const s = useSet();
   const custom = (s as any).customStandards || {};
-  const overrides = ((s as any).customOverrides || {})[birdKey];
+  const allOverrides = (s as any).customOverrides || {};
+  const overrides = allOverrides[birdKey];
   const setOverride = (s as any).setOverride;
   const clearOverride = (s as any).clearOverride;
-  const isCustom = !!custom[birdKey];
+  const clearAllOverrides = (s as any).clearAllOverrides;
+  const isCustom = !!custom[birdKey] || !!overrides;
 
-  const std: BirdStandard = custom[birdKey] || (DEFAULT_STANDARDS as any)[birdKey] || (
+  // 🆕 اعمال Override روی استاندارد پایه
+  const std: BirdStandard = (getEffectiveStandard(birdKey, overrides, custom[birdKey]) as BirdStandard) || (
     (DEFAULT_STANDARDS as any).marandi
       ? { ...(DEFAULT_STANDARDS as any).marandi, key: birdKey }
       : ({} as BirdStandard)
@@ -70,6 +74,8 @@ export default function BreedDetailPage() {
   const resetBird = async () => {
     const ok = await showConfirmAsync('بازگشت به پیش‌فرض', 'همه ویرایش‌های این نژاد حذف شود؟', { danger: true });
     if (!ok) return;
+    if (clearAllOverrides) clearAllOverrides(birdKey);
+    if (clearAllOverrides) clearAllOverrides(birdKey);
     (s as any).resetStandard(birdKey);
     toastMsg.info('بازگشت به پیش‌فرض انجام شد');
   };

@@ -1,35 +1,14 @@
 /**
  * ProductionSection.tsx — گروه ۶: تولید
  *
- * شامل: بیولوژی (biology) + تولید تخم (production) + جوجه‌کشی (hatchingParams)
+ * شامل: بیولوژی + تولید تخم + انکوباسیون + جوجه‌کشی
+ * همه فیلدها با OverridableField
  */
 import SettingsGroup from '../../../SettingsGroup';
 import { HatchingEditor } from '../editors';
-import OverridableField from './OverridableField';
 import type { SectionProps } from './types';
-import { isChanged, parseNum } from './types';
-
-const inputStyle = (changed: boolean) => ({
-  width: '100%', height: 34, padding: '0 10px',
-  background: 'var(--input-bg)',
-  border: '1px solid ' + (changed ? 'var(--warn)' : 'var(--border)'),
-  borderRadius: 'var(--r-md)',
-  color: 'var(--text)', fontFamily: 'inherit',
-  fontSize: 'var(--fs-base)', fontWeight: 700,
-  textAlign: 'center' as const, outline: 'none', boxSizing: 'border-box' as const,
-  direction: 'rtl' as const,
-});
-
-const F = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-    <label style={{ fontSize: 11.5, color: 'var(--muted)', fontWeight: 600 }}>{label}</label>
-    {children}
-  </div>
-);
-
-const G2 = ({ children }: { children: React.ReactNode }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>{children}</div>
-);
+import { isChanged } from './types';
+import OverridableField from './OverridableField';
 
 export default function ProductionSection({ std, def, updateBird, overrides, setOverride, clearOverride }: SectionProps) {
   const bioChanged = isChanged(std.biology, def.biology);
@@ -44,6 +23,10 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
       ? `${std.production.eggsPerYear} تخم/سال`
       : `${std.incubation.totalDays} روز انکوباسیون`;
 
+  // helper: تبدیل مسیر به onOverride
+  const onOver = (path: string) => (v: any) => setOverride?.(path, v);
+  const onReset = (path: string) => () => clearOverride?.(path);
+
   return (
     <SettingsGroup
       icon="🥚"
@@ -56,70 +39,152 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
       {/* بیولوژی */}
       <div style={{ marginBottom: 12 }}>
         <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700, marginBottom: 6 }}>
-          🧬 بیولوژی {bioChanged && <span style={{ color: 'var(--warn)' }}>🔸</span>}
+          🧬 بیولوژی
         </div>
-        <G2>
-          <F label="سن بلوغ جنسی (روز)">
-            <input
-              type="text" inputMode="decimal"
-              value={std.biology.sexualMaturityDay ?? ''}
-              onChange={e => updateBird({ biology: { ...std.biology, sexualMaturityDay: parseNum(e.target.value) } })}
-              style={inputStyle(std.biology.sexualMaturityDay !== def.biology.sexualMaturityDay)}
-            />
-          </F>
-          <F label="سن تخم‌گذاری (روز)">
-            <input
-              type="text" inputMode="decimal"
-              value={std.biology.layingStartDay ?? ''}
-              onChange={e => updateBird({ biology: { ...std.biology, layingStartDay: parseNum(e.target.value) } })}
-              style={inputStyle(std.biology.layingStartDay !== def.biology.layingStartDay)}
-            />
-          </F>
-        </G2>
-        <G2>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <OverridableField
-            label="سن کشتار (روز)"
+            label="سن بلوغ جنسی"
+            value={std.biology.sexualMaturityDay}
+            defaultValue={def.biology.sexualMaturityDay}
+            unit="روز"
+            type="number"
+            min={1} max={2000}
+            onOverride={onOver('biology.sexualMaturityDay')}
+            onClear={onReset('biology.sexualMaturityDay')}
+          />
+          <OverridableField
+            label="سن تخم‌گذاری"
+            value={std.biology.layingStartDay}
+            defaultValue={def.biology.layingStartDay}
+            unit="روز"
+            type="number"
+            min={1} max={2000}
+            onOverride={onOver('biology.layingStartDay')}
+            onClear={onReset('biology.layingStartDay')}
+          />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+          <OverridableField
+            label="سن کشتار"
             value={std.biology.cullDay}
             defaultValue={def.biology.cullDay}
             unit="روز"
             type="number"
-            min={1}
-            max={2000}
-            onOverride={v => setOverride?.('biology.cullDay', v)}
-            onClear={() => clearOverride?.('biology.cullDay')}
+            min={1} max={2000}
+            onOverride={onOver('biology.cullDay')}
+            onClear={onReset('biology.cullDay')}
           />
-          <F label="نسبت نر:ماده">
-            <input
-              type="text" inputMode="decimal"
-              value={std.biology.maleFemaleRatio ?? ''}
-              onChange={e => updateBird({ biology: { ...std.biology, maleFemaleRatio: parseNum(e.target.value) } })}
-              style={inputStyle(std.biology.maleFemaleRatio !== def.biology.maleFemaleRatio)}
-            />
-          </F>
-        </G2>
+          <OverridableField
+            label="نسبت نر:ماده"
+            value={std.biology.maleFemaleRatio}
+            defaultValue={def.biology.maleFemaleRatio}
+            type="number"
+            min={0} max={100}
+            onOverride={onOver('biology.maleFemaleRatio')}
+            onClear={onReset('biology.maleFemaleRatio')}
+          />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+          <OverridableField
+            label="سن پیک تولید"
+            value={std.biology.peakLayingDay}
+            defaultValue={def.biology.peakLayingDay}
+            unit="روز"
+            type="number"
+            min={1} max={2000}
+            onOverride={onOver('biology.peakLayingDay')}
+            onClear={onReset('biology.peakLayingDay')}
+          />
+          <OverridableField
+            label="پایان چرخه"
+            value={std.biology.endOfCycleDay}
+            defaultValue={def.biology.endOfCycleDay}
+            unit="روز"
+            type="number"
+            min={1} max={2000}
+            onOverride={onOver('biology.endOfCycleDay')}
+            onClear={onReset('biology.endOfCycleDay')}
+          />
+        </div>
       </div>
 
       {/* تولید تخم */}
       {std.production && (
         <div style={{ marginBottom: 12, paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
           <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700, marginBottom: 6 }}>
-            🥚 تولید تخم {prodChanged && <span style={{ color: 'var(--warn)' }}>🔸</span>}
+            🥚 تولید تخم
           </div>
-          <div style={{
-            padding: '8px 12px', background: 'var(--input-bg)',
-            borderRadius: 'var(--r-md)', display: 'grid',
-            gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 12, lineHeight: 1.7,
-          }}>
-            <div>تخم/سال: <b>{std.production.eggsPerYear}</b></div>
-            <div>پیک: <b>{std.production.peakLayingPct}٪</b></div>
-            <div>وزن تخم: <b>{std.production.eggWeightG}g</b></div>
-            <div>چرخه: <b>{std.production.cycleDays} روز</b></div>
-            {std.production.fertilityPct != null && (
-              <div>نطفه‌داری: <b>{std.production.fertilityPct}٪</b></div>
-            )}
-            {std.production.hatchabilityPct != null && (
-              <div>هچ: <b>{std.production.hatchabilityPct}٪</b></div>
-            )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <OverridableField
+              label="تخم در سال"
+              value={std.production.eggsPerYear}
+              defaultValue={def.production?.eggsPerYear ?? null}
+              unit="عدد"
+              type="number"
+              min={0} max={1000}
+              onOverride={onOver('production.eggsPerYear')}
+              onClear={onReset('production.eggsPerYear')}
+            />
+            <OverridableField
+              label="وزن تخم"
+              value={std.production.eggWeightG}
+              defaultValue={def.production?.eggWeightG ?? null}
+              unit="گرم"
+              type="number"
+              min={10} max={200}
+              onOverride={onOver('production.eggWeightG')}
+              onClear={onReset('production.eggWeightG')}
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+            <OverridableField
+              label="پیک تولید"
+              value={std.production.peakLayingPct}
+              defaultValue={def.production?.peakLayingPct ?? null}
+              unit="٪"
+              type="number"
+              min={0} max={100}
+              onOverride={onOver('production.peakLayingPct')}
+              onClear={onReset('production.peakLayingPct')}
+            />
+            <OverridableField
+              label="طول چرخه"
+              value={std.production.cycleDays}
+              defaultValue={def.production?.cycleDays ?? null}
+              unit="روز"
+              type="number"
+              min={1} max={2000}
+              onOverride={onOver('production.cycleDays')}
+              onClear={onReset('production.cycleDays')}
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+            <OverridableField
+              label="نطفه‌داری"
+              value={std.production.fertilityPct ?? null}
+              defaultValue={def.production?.fertilityPct ?? null}
+              unit="٪"
+              type="number"
+              min={0} max={100}
+              onOverride={onOver('production.fertilityPct')}
+              onClear={onReset('production.fertilityPct')}
+            />
+            <OverridableField
+              label="درصد هچ"
+              value={std.production.hatchabilityPct ?? null}
+              defaultValue={def.production?.hatchabilityPct ?? null}
+              unit="٪"
+              type="number"
+              min={0} max={100}
+              onOverride={onOver('production.hatchabilityPct')}
+              onClear={onReset('production.hatchabilityPct')}
+            />
           </div>
         </div>
       )}
@@ -127,49 +192,104 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
       {/* انکوباسیون */}
       <div style={{ marginBottom: 12, paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
         <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700, marginBottom: 6 }}>
-          🐣 انکوباسیون {incChanged && <span style={{ color: 'var(--warn)' }}>🔸</span>}
+          🐣 انکوباسیون
         </div>
-        <G2>
-          <F label="کل دوره (روز)">
-            <input
-              type="text" inputMode="decimal"
-              value={std.incubation.totalDays}
-              onChange={e => {
-                const n = parseNum(e.target.value);
-                if (n !== null && n > 0) updateBird({ incubation: { ...std.incubation, totalDays: n } });
-              }}
-              style={inputStyle(std.incubation.totalDays !== def.incubation.totalDays)}
-            />
-          </F>
-          <F label="روز Lockdown">
-            <input
-              type="text" inputMode="decimal"
-              value={std.incubation.lockdownDay}
-              onChange={e => {
-                const n = parseNum(e.target.value);
-                if (n !== null && n > 0) updateBird({ incubation: { ...std.incubation, lockdownDay: n } });
-              }}
-              style={inputStyle(std.incubation.lockdownDay !== def.incubation.lockdownDay)}
-            />
-          </F>
-        </G2>
-        <div style={{
-          padding: '8px 12px', background: 'var(--input-bg)',
-          borderRadius: 'var(--r-md)', display: 'grid',
-          gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 11.5, lineHeight: 1.7,
-        }}>
-          <div>ستر: <b>{std.incubation.setterTemp}°C · {std.incubation.setterHumidity}٪</b></div>
-          <div>هچر: <b>{std.incubation.hatcherTemp}°C · {std.incubation.hatcherHumidity}٪</b></div>
-          {std.incubation.turningPerDay != null && (
-            <div>چرخش/روز: <b>{std.incubation.turningPerDay}</b></div>
-          )}
-          {std.incubation.chickYieldPct != null && (
-            <div>وزن جوجه: <b>{std.incubation.chickYieldPct}٪</b></div>
-          )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <OverridableField
+            label="کل دوره"
+            value={std.incubation.totalDays}
+            defaultValue={def.incubation.totalDays}
+            unit="روز"
+            type="number"
+            min={1} max={60}
+            onOverride={onOver('incubation.totalDays')}
+            onClear={onReset('incubation.totalDays')}
+          />
+          <OverridableField
+            label="روز Lockdown"
+            value={std.incubation.lockdownDay}
+            defaultValue={def.incubation.lockdownDay}
+            unit="روز"
+            type="number"
+            min={1} max={60}
+            onOverride={onOver('incubation.lockdownDay')}
+            onClear={onReset('incubation.lockdownDay')}
+          />
         </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+          <OverridableField
+            label="دمای ستر"
+            value={std.incubation.setterTemp}
+            defaultValue={def.incubation.setterTemp}
+            unit="°C"
+            type="number"
+            min={30} max={45}
+            onOverride={onOver('incubation.setterTemp')}
+            onClear={onReset('incubation.setterTemp')}
+          />
+          <OverridableField
+            label="رطوبت ستر"
+            value={std.incubation.setterHumidity}
+            defaultValue={def.incubation.setterHumidity}
+            unit="٪"
+            type="number"
+            min={0} max={100}
+            onOverride={onOver('incubation.setterHumidity')}
+            onClear={onReset('incubation.setterHumidity')}
+          />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+          <OverridableField
+            label="دمای هچر"
+            value={std.incubation.hatcherTemp}
+            defaultValue={def.incubation.hatcherTemp}
+            unit="°C"
+            type="number"
+            min={30} max={45}
+            onOverride={onOver('incubation.hatcherTemp')}
+            onClear={onReset('incubation.hatcherTemp')}
+          />
+          <OverridableField
+            label="رطوبت هچر"
+            value={std.incubation.hatcherHumidity}
+            defaultValue={def.incubation.hatcherHumidity}
+            unit="٪"
+            type="number"
+            min={0} max={100}
+            onOverride={onOver('incubation.hatcherHumidity')}
+            onClear={onReset('incubation.hatcherHumidity')}
+          />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+          <OverridableField
+            label="چرخش در روز"
+            value={std.incubation.turningPerDay ?? null}
+            defaultValue={def.incubation.turningPerDay ?? null}
+            type="number"
+            min={0} max={48}
+            onOverride={onOver('incubation.turningPerDay')}
+            onClear={onReset('incubation.turningPerDay')}
+          />
+          <OverridableField
+            label="وزن جوجه"
+            value={std.incubation.chickYieldPct ?? null}
+            defaultValue={def.incubation.chickYieldPct ?? null}
+            unit="٪"
+            type="number"
+            min={0} max={100}
+            onOverride={onOver('incubation.chickYieldPct')}
+            onClear={onReset('incubation.chickYieldPct')}
+          />
+        </div>
+
+        {/* روزهای تخم‌نما (فقط نمایش) */}
         {std.incubation.candlingDays && std.incubation.candlingDays.length > 0 && (
           <div style={{
-            marginTop: 8, padding: '6px 10px',
+            marginTop: 10, padding: '6px 10px',
             background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
             fontSize: 11, color: 'var(--muted)', lineHeight: 1.8,
           }}>
@@ -182,7 +302,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
       {/* پارامترهای جوجه‌کشی (اختیاری) */}
       <div style={{ paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
         <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700, marginBottom: 6 }}>
-          📦 پارامترهای جوجه‌کشی {hatchChanged && <span style={{ color: 'var(--warn)' }}>🔸</span>}
+          📦 پارامترهای جوجه‌کشی
         </div>
         <HatchingEditor std={std} def={def} updateBird={updateBird} />
       </div>
