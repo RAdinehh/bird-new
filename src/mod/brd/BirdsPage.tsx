@@ -278,38 +278,44 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         </Field>
 
         <Grid2>
-          <div>
-            <Field label="چرخه زندگی (روز)" hint="از شروع تا پایان دوره">
-              <NumField
-                placeholder="۰"
-                value={form.cycleDays}
-                onChange={e => setForm({ ...form, cycleDays: e.target.value })}
-                min={1} max={2000} unit="روز" autoClamp />
-            </Field>
-            <div style={{ marginTop: -4, marginBottom: 6 }}>
-              {(() => {
-                const cd = form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null;
-                const src = detectCycleDaysSource(cd, form.standardKey, form.name);
-                return <SourceBadge source={src.source} label={src.label} />;
-              })()}
-            </div>
-          </div>
-          <div>
-            <Field label="FCR استاندارد" hint="ضریب تبدیل غذایی مرجع">
-              <NumField
-                placeholder="۲٫۰"
-                value={form.fcrStandard}
-                onChange={e => setForm({ ...form, fcrStandard: e.target.value })}
-                min={0.5} max={5} unit="FCR" autoClamp />
-            </Field>
-            <div style={{ marginTop: -4, marginBottom: 6 }}>
-              {(() => {
-                const fcr = form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null;
-                const src = detectFcrSource(fcr, form.standardKey, form.name);
-                return <SourceBadge source={src.source} label={src.label} />;
-              })()}
-            </div>
-          </div>
+          <Field
+            label={
+              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                چرخه زندگی (روز)
+                {(() => {
+                  const cd = form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null;
+                  const src = detectCycleDaysSource(cd, form.standardKey, form.name);
+                  return <SourceBadge source={src.source} label={src.label} />;
+                })()}
+              </span>
+            }
+            hint="از شروع تا پایان دوره"
+          >
+            <NumField
+              placeholder="۰"
+              value={form.cycleDays}
+              onChange={e => setForm({ ...form, cycleDays: e.target.value })}
+              min={1} max={2000} unit="روز" autoClamp />
+          </Field>
+          <Field
+            label={
+              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                FCR استاندارد
+                {(() => {
+                  const fcr = form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null;
+                  const src = detectFcrSource(fcr, form.standardKey, form.name);
+                  return <SourceBadge source={src.source} label={src.label} />;
+                })()}
+              </span>
+            }
+            hint="ضریب تبدیل غذایی مرجع"
+          >
+            <NumField
+              placeholder="۲٫۰"
+              value={form.fcrStandard}
+              onChange={e => setForm({ ...form, fcrStandard: e.target.value })}
+              min={0.5} max={5} unit="FCR" autoClamp />
+          </Field>
         </Grid2>
 
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7,
