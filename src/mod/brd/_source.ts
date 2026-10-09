@@ -145,3 +145,32 @@ export function detectBreedFcrSource(
   // ۴. دستی
   return { source: 'manual' };
 }
+
+
+// ═══ Override Detection ═══
+export function getStandardValue(
+  standardKey: string | undefined,
+  field: 'cycleDays' | 'fcr',
+): { value: number | null; label: string } {
+  if (!standardKey) return { value: null, label: '' };
+  const std = (DEFAULT_STANDARDS as any)[standardKey];
+  if (!std) return { value: null, label: '' };
+  const label = std.nameFa || std.nameEn || '';
+  if (field === 'cycleDays') {
+    return { value: std?.biology?.cullDay ?? null, label };
+  }
+  const last = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
+  return { value: last?.fcr ?? null, label };
+}
+
+export function getOverrideInfo(
+  current: number | null | undefined,
+  standardKey: string | undefined,
+  field: 'cycleDays' | 'fcr',
+): { overridden: boolean; stdValue: number | null; stdLabel: string } {
+  const { value: stdValue, label: stdLabel } = getStandardValue(standardKey, field);
+  if (stdValue == null || current == null) {
+    return { overridden: false, stdValue: null, stdLabel: '' };
+  }
+  return { overridden: current !== stdValue, stdValue, stdLabel };
+}

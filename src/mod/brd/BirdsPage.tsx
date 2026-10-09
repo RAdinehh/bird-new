@@ -5,7 +5,8 @@ import { findBirdPreset } from './presets';
 import { getKindInfo, getPurposeInfo, getCategoryInfo } from './_display';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import SourceBadge, { type SourceType } from '../../shr/components/SourceBadge';
-import { detectCycleDaysSource, detectFcrSource } from './_source';
+import { detectCycleDaysSource, detectFcrSource, getOverrideInfo } from './_source';
+import OverrideHint from '../../shr/components/OverrideHint';
 import BirdNameField, { type BirdPresetPick } from './BirdNameField';
 import {
   Btn, BtnRow, Empty, Field,
@@ -137,6 +138,17 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     }
     setUndoData(null);
   };
+
+  // 🆕 Override Info
+  const overrideCycle = useMemo(() => {
+    const cd = form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null;
+    return getOverrideInfo(cd, form.standardKey, 'cycleDays');
+  }, [form.cycleDays, form.standardKey]);
+
+  const overrideFcr = useMemo(() => {
+    const fcr = form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null;
+    return getOverrideInfo(fcr, form.standardKey, 'fcr');
+  }, [form.fcrStandard, form.standardKey]);
 
   return (
     <PageContainer>
@@ -395,6 +407,13 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
               value={form.cycleDays}
               onChange={e => setForm({ ...form, cycleDays: e.target.value })}
               min={1} max={2000} unit="روز" autoClamp />
+              <OverrideHint
+                overridden={overrideCycle.overridden}
+                stdValue={overrideCycle.stdValue}
+                unit="روز"
+                decimals={0}
+                onReset={() => setForm(f => ({ ...f, cycleDays: overrideCycle.stdValue != null ? toFa(overrideCycle.stdValue) : '' }))}
+              />
           </Field>
           <Field
             label={
@@ -414,6 +433,13 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
               value={form.fcrStandard}
               onChange={e => setForm({ ...form, fcrStandard: e.target.value })}
               min={0.5} max={5} unit="FCR" autoClamp />
+              <OverrideHint
+                overridden={overrideFcr.overridden}
+                stdValue={overrideFcr.stdValue}
+                unit="FCR"
+                decimals={1}
+                onReset={() => setForm(f => ({ ...f, fcrStandard: overrideFcr.stdValue != null ? toFa(overrideFcr.stdValue) : '' }))}
+              />
           </Field>
         </Grid2>
 
