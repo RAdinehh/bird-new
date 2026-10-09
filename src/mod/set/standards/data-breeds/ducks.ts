@@ -8,6 +8,9 @@ import type { BirdStandard } from '../types';
 
 export const DUCK_PEKIN: BirdStandard = {
   key: 'duck-pekin',
+  source: 'منابع پرورش اردک ایران',
+  publishYear: 2024,
+  region: 'iran',
   birdName: 'اردک',
   birdKind: 'duck',
   purposes: ['broiler'],
@@ -68,6 +71,9 @@ export const DUCK_PEKIN: BirdStandard = {
 
 export const DUCK_MUSCOVY: BirdStandard = {
   key: 'duck-muscovy',
+  source: 'منابع پرورش اردک ایران',
+  publishYear: 2024,
+  region: 'iran',
   birdName: 'اردک',
   birdKind: 'duck',
   purposes: ['dual'],
@@ -130,6 +136,9 @@ export const DUCK_MUSCOVY: BirdStandard = {
 
 export const DUCK_UKRAINIAN: BirdStandard = {
   key: 'duck-ukrainian',
+  source: 'منابع پرورش اردک ایران',
+  publishYear: 2024,
+  region: 'iran',
   birdName: 'اردک',
   birdKind: 'duck',
   purposes: ['dual', 'layer'],

@@ -8,6 +8,9 @@ import type { BirdStandard } from '../types';
 
 export const QUAIL_BROILER: BirdStandard = {
   key: 'quail-broiler',
+  source: 'مرکز تحقیقات بلدرچین ایران',
+  publishYear: 2024,
+  region: 'iran',
   birdName: 'بلدرچین',
   birdKind: 'quail',
   purposes: ['broiler'],
@@ -70,6 +73,9 @@ export const QUAIL_BROILER: BirdStandard = {
 
 export const QUAIL_LAYER: BirdStandard = {
   key: 'quail-layer',
+  source: 'مرکز تحقیقات بلدرچین ایران',
+  publishYear: 2024,
+  region: 'iran',
   birdName: 'بلدرچین',
   birdKind: 'quail',
   purposes: ['layer'],

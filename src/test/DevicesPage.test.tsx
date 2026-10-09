@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import DevicesPage from '../mod/inc/DevicesPage';
 import { useInc } from '../mod/inc/store';
 import { useBrd } from '../mod/brd/store';
@@ -38,6 +38,12 @@ beforeEach(() => {
   useInc.setState({ devices: [], eggEntries: [], candlings: [], hatchGroups: [], hatchResults: [] } as any);
   useBrd.setState({ birds: [], breeds: [] });
   vi.clearAllMocks();
+});
+
+afterEach(() => {
+  cleanup();
+  vi.clearAllTimers();
+  vi.useRealTimers();
 });
 
 describe('DevicesPage', () => {

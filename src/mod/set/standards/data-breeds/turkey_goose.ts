@@ -8,6 +8,9 @@ import type { BirdStandard } from '../types';
 
 export const TURKEY: BirdStandard = {
   key: 'turkey',
+  source: 'منابع پرورش بوقلمون ایران + BUT',
+  publishYear: 1403,
+  region: 'iran',
   birdName: 'بوقلمون',
   birdKind: 'turkey',
   purposes: ['broiler'],
@@ -68,6 +71,9 @@ export const TURKEY: BirdStandard = {
 
 export const GOOSE: BirdStandard = {
   key: 'goose',
+  source: 'سازمان دامپزشکی ایران',
+  publishYear: 1403,
+  region: 'iran',
   birdName: 'غاز',
   birdKind: 'goose',
   purposes: ['broiler', 'dual'],

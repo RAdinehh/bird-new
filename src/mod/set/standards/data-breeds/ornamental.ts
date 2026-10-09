@@ -8,6 +8,9 @@ import type { BirdStandard } from '../types';
 
 export const AUSTRALORP: BirdStandard = {
   key: 'australorp',
+  source: 'APA',
+  publishYear: 2024,
+  region: 'international',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['layer', 'ornamental'],
@@ -67,6 +70,9 @@ export const AUSTRALORP: BirdStandard = {
 
 export const COCHIN: BirdStandard = {
   key: 'cochin',
+  source: 'APA',
+  publishYear: 2024,
+  region: 'international',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['ornamental'],
@@ -126,6 +132,9 @@ export const COCHIN: BirdStandard = {
 
 export const BRAHMA: BirdStandard = {
   key: 'brahma',
+  source: 'APA',
+  publishYear: 2024,
+  region: 'international',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['dual', 'ornamental'],
@@ -185,6 +194,9 @@ export const BRAHMA: BirdStandard = {
 
 export const SULTAN: BirdStandard = {
   key: 'sultan',
+  source: 'APA',
+  publishYear: 2024,
+  region: 'international',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['ornamental'],
@@ -244,6 +256,9 @@ export const SULTAN: BirdStandard = {
 
 export const MINIATURE: BirdStandard = {
   key: 'miniature',
+  source: 'ABA',
+  publishYear: 2024,
+  region: 'international',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['ornamental'],

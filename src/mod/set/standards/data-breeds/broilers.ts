@@ -8,6 +8,9 @@ import type { BirdStandard } from '../types';
 
 export const COBB_500: BirdStandard = {
   key: 'cobb-500',
+  source: 'Cobb-Vantress',
+  publishYear: 2024,
+  region: 'international',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['broiler'],
@@ -70,6 +73,9 @@ export const COBB_500: BirdStandard = {
 
 export const ROSS_308: BirdStandard = {
   key: 'ross-308',
+  source: 'Aviagen',
+  publishYear: 2024,
+  region: 'international',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['broiler'],
@@ -132,6 +138,9 @@ export const ROSS_308: BirdStandard = {
 
 export const IRAN_BROILER: BirdStandard = {
   key: 'iran-broiler',
+  source: 'وزارت جهاد کشاورزی + مرغداری‌های نمونه',
+  publishYear: 1403,
+  region: 'iran',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['broiler'],

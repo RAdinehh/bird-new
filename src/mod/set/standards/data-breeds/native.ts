@@ -8,6 +8,9 @@ import type { BirdStandard } from '../types';
 
 export const MARANDI: BirdStandard = {
   key: 'marandi',
+  source: 'مرکز تحقیقات و آموزش کشاورزی آذربایجان شرقی',
+  publishYear: 1403,
+  region: 'iran',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['layer', 'breeder', 'dual'],
@@ -78,6 +81,12 @@ export const MARANDI: BirdStandard = {
 
 export const GOLPAYGANI: BirdStandard = {
   key: 'golpaygani',
+
+  source: 'مرکز اصلاح نژاد مرغ بومی اصفهان',
+
+  publishYear: 1403,
+
+  region: 'iran',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['layer', 'breeder', 'dual'],
@@ -139,6 +148,9 @@ export const GOLPAYGANI: BirdStandard = {
 
 export const LARI: BirdStandard = {
   key: 'lari',
+  source: 'مرکز تحقیقات مرغ بومی لارستان',
+  publishYear: 1403,
+  region: 'iran',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['layer', 'breeder', 'dual'],
@@ -200,6 +212,9 @@ export const LARI: BirdStandard = {
 
 export const GOLIN: BirdStandard = {
   key: 'golin',
+  source: 'منابع مرغ بومی ایران',
+  publishYear: 2024,
+  region: 'iran',
   birdName: 'مرغ',
   birdKind: 'chicken',
   purposes: ['layer', 'breeder', 'dual'],

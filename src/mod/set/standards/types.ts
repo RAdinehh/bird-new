@@ -8,7 +8,7 @@
  *   4. Fallback
  */
 
-export type BirdCategory = 'native' | 'industrial';
+export type BirdCategory = 'native' | 'industrial' | 'fancy';
 
 /** 🆕 نوع پرنده (برای فیلتر نژادها) */
 export type BirdKind = 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
@@ -36,13 +36,6 @@ export const BIRD_PURPOSE_LABEL: Record<BirdPurpose, string> = {
   dual: 'دوگانه',
   ornamental: 'تزئینی',
 };
-
-export type BirdType =
-  | 'marandi'
-  | 'golpaygani'
-  | 'gilini'
-  | 'broiler'
-  | 'layer';
 
 // ═══ محیط ═══
 export interface EnvRange {
@@ -167,20 +160,109 @@ export interface LitterStandard {
   notes?: string;
 }
 
+
+// ═══ 🆕 برنامه نوری ═══
+export interface LightingPhase {
+  dayFrom: number;
+  dayTo: number;
+  hours: number;
+  lux?: number;
+  colorTempK?: number;
+  notes?: string;
+}
+
+export interface LightingProgram {
+  phases: LightingPhase[];
+  lightType?: 'LED' | 'CFL' | 'incandescent' | 'mixed';
+  notes?: string;
+}
+
+// ═══ 🆕 تهویه دقیق ═══
+export interface VentilationStandard {
+  airVolumeM3HMin?: number;
+  airVolumeM3HMax?: number;
+  airSpeedMS?: number;
+  co2MaxPpm?: number;
+  nh3MaxPpm?: number;
+  coMaxPpm?: number;
+  humidityOptimalPct?: number;
+  ventilationType?: 'tunnel' | 'cross' | 'natural' | 'combined';
+  notes?: string;
+}
+
+// ═══ 🆕 کیفیت آب (اختیاری) ═══
+export interface WaterQualityStandard {
+  phMin?: number;
+  phMax?: number;
+  tdsMaxPpm?: number;
+  hardnessMaxPpm?: number;
+  chlorineMaxPpm?: number;
+  bacterialMaxCfu?: number;
+  notes?: string;
+}
+
+// ═══ 🆕 اهداف عملکردی ═══
+export interface PerformanceTargets {
+  targetFCR?: number;
+  targetADGG?: number;
+  targetMortalityPct?: number;
+  targetLivabilityPct?: number;
+  targetEggProdPct?: number;
+  targetFeedIntakeG?: number;
+  targetWeightG?: number;
+}
+
+// ═══ 🆕 نقاط کلیدی بیولوژیک ═══
+export interface KeyMilestones {
+  firstEggDay?: number;
+  peakProductionDay?: number;
+  peakProductionPct?: number;
+  endOfCycleDay?: number;
+  cullDay?: number;
+  adultWeightMaleG?: number;
+  adultWeightFemaleG?: number;
+  notes?: string;
+}
+
+// ═══ 🆕 پارامترهای جوجه‌کشی ═══
+export interface HatchingParams {
+  setterCapacityEggs?: number;
+  hatcherCapacityEggs?: number;
+  eggStorageDaysMin?: number;
+  eggStorageDaysMax?: number;
+  eggStorageTempC?: number;
+  eggStorageHumidityPct?: number;
+  preWarmingHours?: number;
+  notes?: string;
+}
+
 // ═══ استاندارد کامل پرنده ═══
 export interface BirdStandard {
-  key: string;              // کلید نژاد (marandi, golpaygani, ...)
-  birdName: string;         // پرنده مادر (مرغ، بوقلمون، ...) — legacy
-  /** 🆕 نوع پرنده — برای فیلتر دقیق‌تر */
+  // ═══ شناسه ═══
+  key: string;
+  birdName: string;
   birdKind?: BirdKind;
-  /** 🆕 اهداف پرورش — می‌تونه چندتایی باشه (مثلاً مرندی: layer, breeder, dual) */
   purposes?: BirdPurpose[];
-  /** 🆕 هدف اصلی (برای نمایش با ⭐) */
   primaryPurpose?: BirdPurpose;
-  nameFa: string;           // نام نژاد
+  nameFa: string;
   nameEn: string;
   category: BirdCategory;
 
+  // ═══ 🆕 متادیتای منبع ═══
+  source?: string;
+  publishYear?: number;
+  version?: number;
+  lastUpdated?: string;
+  region?: 'iran' | 'international';
+  references?: string[];
+  changelog?: Array<{
+    version: number;
+    date: string;
+    changes: string[];
+    author?: string;
+  }>;
+
+  // ═══ استانداردهای اصلی ═══
   biology: BiologyStandard;
   env: EnvRange[];
   feed: FeedRange[];
@@ -192,6 +274,15 @@ export interface BirdStandard {
   production?: ProductionStandard;
   mortality: MortalityRange[];
   mortalityTotalPct: number;
+
+  // ═══ 🆕 استانداردهای تکمیلی ═══
+  lightingProgram?: LightingProgram;
+  ventilation?: VentilationStandard;
+  waterQuality?: WaterQualityStandard;
+  targets?: PerformanceTargets;
+  keyMilestones?: KeyMilestones;
+  hatchingParams?: HatchingParams;
+
   notes?: string;
 }
 
