@@ -151,24 +151,40 @@ export function detectBreedFcrSource(
 export function getStandardValue(
   standardKey: string | undefined,
   field: 'cycleDays' | 'fcr',
+  birdName?: string,
 ): { value: number | null; label: string } {
-  if (!standardKey) return { value: null, label: '' };
-  const std = (DEFAULT_STANDARDS as any)[standardKey];
-  if (!std) return { value: null, label: '' };
-  const label = std.nameFa || std.nameEn || '';
-  if (field === 'cycleDays') {
-    return { value: std?.biology?.cullDay ?? null, label };
+  // ۱. اول standardKey
+  if (standardKey) {
+    const std = (DEFAULT_STANDARDS as any)[standardKey];
+    if (std) {
+      const label = std.nameFa || std.nameEn || '';
+      if (field === 'cycleDays') {
+        return { value: std?.biology?.cullDay ?? null, label };
+      }
+      const last = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
+      return { value: last?.fcr ?? null, label };
+    }
   }
-  const last = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
-  return { value: last?.fcr ?? null, label };
+  // ۲. اگه standardKey نبود، از preset با اسم پرنده
+  if (birdName) {
+    const preset = (BIRD_PRESETS as any)[birdName.trim()];
+    if (preset) {
+      return {
+        value: field === 'cycleDays' ? (preset.cycleDays ?? null) : (preset.fcrStandard ?? null),
+        label: preset.name,
+      };
+    }
+  }
+  return { value: null, label: '' };
 }
 
 export function getOverrideInfo(
   current: number | null | undefined,
   standardKey: string | undefined,
   field: 'cycleDays' | 'fcr',
+  birdName?: string,
 ): { overridden: boolean; stdValue: number | null; stdLabel: string } {
-  const { value: stdValue, label: stdLabel } = getStandardValue(standardKey, field);
+  const { value: stdValue, label: stdLabel } = getStandardValue(standardKey, field, birdName);
   if (stdValue == null || current == null) {
     return { overridden: false, stdValue: null, stdLabel: '' };
   }

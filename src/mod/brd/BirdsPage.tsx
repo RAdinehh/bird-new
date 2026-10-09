@@ -142,13 +142,13 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   // 🆕 Override Info
   const overrideCycle = useMemo(() => {
     const cd = form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null;
-    return getOverrideInfo(cd, form.standardKey, 'cycleDays');
-  }, [form.cycleDays, form.standardKey]);
+    return getOverrideInfo(cd, form.standardKey, 'cycleDays', form.name);
+  }, [form.cycleDays, form.standardKey, form.name]);
 
   const overrideFcr = useMemo(() => {
     const fcr = form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null;
-    return getOverrideInfo(fcr, form.standardKey, 'fcr');
-  }, [form.fcrStandard, form.standardKey]);
+    return getOverrideInfo(fcr, form.standardKey, 'fcr', form.name);
+  }, [form.fcrStandard, form.standardKey, form.name]);
 
   return (
     <PageContainer>
@@ -396,7 +396,8 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 {(() => {
                   const cd = form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null;
                   const src = detectCycleDaysSource(cd, form.standardKey, form.name);
-                  return <SourceBadge source={src.source} label={src.label} />;
+                  const source = overrideCycle.overridden ? 'manual' : src.source;
+                  return <SourceBadge source={source} label={src.label} />;
                 })()}
               </span>
             }
@@ -422,7 +423,8 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 {(() => {
                   const fcr = form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null;
                   const src = detectFcrSource(fcr, form.standardKey, form.name);
-                  return <SourceBadge source={src.source} label={src.label} />;
+                  const source = overrideFcr.overridden ? 'manual' : src.source;
+                  return <SourceBadge source={source} label={src.label} />;
                 })()}
               </span>
             }
