@@ -19,10 +19,6 @@ import { showConfirmAsync } from '../../../../cor/store/dialog';
 import { DEFAULT_STANDARDS, type BirdStandard } from '../index';
 import { useSet } from '../../store';
 
-function isChanged(a: unknown, b: unknown): boolean {
-  try { return JSON.stringify(a) !== JSON.stringify(b); } catch { return false; }
-}
-
 export default function BreedDetailPage() {
   const navigate = useNavigate();
   const { key } = useParams<{ key: string }>();
@@ -74,13 +70,6 @@ export default function BreedDetailPage() {
     (s as any).resetStandard(birdKey);
     toastMsg.info('بازگشت به پیش‌فرض انجام شد');
   };
-
-  const nameChanged = std.nameFa !== def.nameFa || std.nameEn !== def.nameEn || std.birdName !== def.birdName;
-  const bioChanged = isChanged(std.biology, def.biology);
-  const spaceChanged = isChanged(std.space, def.space);
-  const envChanged = isChanged(std.env, def.env);
-  const feedChanged = isChanged(std.feed, def.feed) || isChanged(std.growth, def.growth);
-  const mortChanged = isChanged(std.mortality, def.mortality) || std.mortalityTotalPct !== def.mortalityTotalPct;
 
   return (
     <>
@@ -137,12 +126,6 @@ export default function BreedDetailPage() {
           std={std}
           def={def}
           isCustom={isCustom}
-          nameChanged={nameChanged}
-          bioChanged={bioChanged}
-          spaceChanged={spaceChanged}
-          envChanged={envChanged}
-          feedChanged={feedChanged}
-          mortChanged={mortChanged}
           updateBird={updateBird}
         />
 
