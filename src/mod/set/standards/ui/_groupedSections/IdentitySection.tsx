@@ -75,6 +75,7 @@ export default function IdentitySection({ std, def, updateBird, overrides, setOv
           defaultValue={def.publishYear}
           type="number"
           min={1300} max={1500}
+          noSeparator
           onOverride={onOver('publishYear')}
           onClear={onReset('publishYear')}
         />

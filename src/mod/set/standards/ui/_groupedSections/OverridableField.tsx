@@ -14,6 +14,7 @@
  */
 import { useState, useEffect } from 'react';
 import { useFormat } from '../../../../../shr/units/useFormat';
+import { intRange, intNonNeg, floatRange, floatNonNeg, requiredStr } from '../../../../../shr/validation/helpers';
 
 interface Props {
   label: string;
@@ -26,6 +27,8 @@ interface Props {
   placeholder?: string;
   min?: number;
   max?: number;
+  /** 🆕 بدون جداکننده هزار (برای سال، کد و ...) */
+  noSeparator?: boolean;
 }
 
 const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
@@ -37,17 +40,26 @@ function toEnDigits(text: string): string {
     .replace(/٫/g, '.');
 }
 
-function parseNum(text: string): number | null {
-  if (!text || !text.trim()) return null;
-  const en = toEnDigits(text).replace(/[^\d.-]/g, '');
-  if (!en) return null;
-  const n = parseFloat(en);
-  return isNaN(n) ? null : n;
+function buildSchema(type: 'number' | 'text', label: string, min?: number, max?: number) {
+  if (type === 'text') {
+    return requiredStr(label, 1, 500);
+  }
+  // نوع عددی — انتخاب بین int/float
+  const isFloat = (min !== undefined && !Number.isInteger(min)) || (max !== undefined && !Number.isInteger(max));
+  const maxVal = max ?? 1000000;
+
+  if (isFloat) {
+    if (min !== undefined && min > 0) return floatRange(label, min, maxVal);
+    return floatNonNeg(label, maxVal);
+  }
+  // صحیح
+  if (min !== undefined && min > 0) return intRange(label, min, maxVal);
+  return intNonNeg(label, maxVal);
 }
 
 export default function OverridableField({
   label, value, defaultValue, onOverride, onClear,
-  type = 'number', unit, placeholder, min, max,
+  type = 'number', unit, placeholder, min, max, noSeparator = false,
 }: Props) {
   const fmt = useFormat();
 
@@ -58,7 +70,7 @@ export default function OverridableField({
   const displayValue = (() => {
     if (value == null || value === '') return '';
     if (type === 'number' && typeof value === 'number') {
-      return fmt.int(value);  // 🆕 از تنظیمات کاربر استفاده می‌کنه
+      return noSeparator ? String(value).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]) : fmt.int(value);
     }
     return String(value);
   })();
@@ -66,45 +78,56 @@ export default function OverridableField({
   const displayDefault = (() => {
     if (defaultValue == null || defaultValue === '') return '—';
     if (type === 'number' && typeof defaultValue === 'number') {
-      return fmt.int(defaultValue);
+      return noSeparator ? String(defaultValue).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]) : fmt.int(defaultValue);
     }
     return String(defaultValue);
   })();
 
   const [draft, setDraft] = useState(displayValue);
   const [focused, setFocused] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // وقتی value از بیرون عوض شد، draft رو آپدیت کن (فقط وقتی فوکوس نیست)
   useEffect(() => {
     if (!focused) setDraft(displayValue);
   }, [value, focused, displayValue]);
 
-  // ذخیره هنگام blur یا Enter
+  // ذخیره هنگام blur یا Enter — با Zod
   const commit = () => {
     setFocused(false);
+    setError(null);
+
+    // خالی → برگشت به استاندارد
+    if (!draft || !draft.trim()) {
+      if (hasOverride) onClear();
+      setDraft(defaultValue == null ? '' : (type === 'number' && typeof defaultValue === 'number' ? fmt.int(defaultValue) : String(defaultValue)));
+      return;
+    }
+
+    const schema = buildSchema(type, label, min, max);
+    const input = type === 'number' ? toEnDigits(draft) : draft.trim();
+    const result = schema.safeParse(input);
+
+    if (!result.success) {
+      const msg = result.error.errors[0]?.message || 'مقدار نامعتبر';
+      setError(msg);
+      setDraft(displayValue);  // برگردون به مقدار قبلی
+      return;
+    }
+
+    const parsed = result.data as any;
+
     if (type === 'number') {
-      const n = parseNum(draft);
-      if (n === null) {
-        if (hasOverride) onClear();
-        setDraft(defaultValue == null ? '' : fmt.int(defaultValue));
+      if (parsed !== defaultValue) {
+        onOverride(parsed);
+        setDraft(fmt.int(parsed));
       } else {
-        let final = n;
-        if (min !== undefined && final < min) final = min;
-        if (max !== undefined && final > max) final = max;
-        if (final !== defaultValue) {
-          onOverride(final);
-          setDraft(fmt.int(final));
-        } else {
-          if (hasOverride) onClear();
-          setDraft(fmt.int(final));
-        }
+        if (hasOverride) onClear();
+        setDraft(fmt.int(parsed));
       }
     } else {
-      const v = draft.trim();
-      if (!v) {
-        if (hasOverride) onClear();
-      } else if (v !== defaultValue) {
-        onOverride(v);
+      if (parsed !== defaultValue) {
+        onOverride(parsed);
       } else if (hasOverride) {
         onClear();
       }
@@ -158,9 +181,12 @@ export default function OverridableField({
           type="text"
           inputMode={type === 'number' ? 'decimal' : 'text'}
           value={draft}
-          onChange={e => setDraft(e.target.value)}
+          onChange={e => { setDraft(e.target.value); if (error) setError(null); }}
           onFocus={() => setFocused(true)}
           onBlur={commit}
+          aria-label={label}
+          aria-invalid={!!error}
+          aria-describedby={error ? `err-${label.replace(/\s/g, '-')}` : undefined}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault();
@@ -185,9 +211,9 @@ export default function OverridableField({
             height: 38,
             padding: unit ? '0 45px 0 12px' : '0 12px',
             background: hasOverride ? 'var(--warn-soft, #fef3c7)' : 'var(--input-bg)',
-            border: '1px solid ' + (hasOverride ? 'var(--warn)' : (focused ? 'var(--accent)' : 'var(--border)')),
+            border: '1px solid ' + (error ? 'var(--danger, #dc2626)' : hasOverride ? 'var(--warn)' : (focused ? 'var(--accent)' : 'var(--border)')),
             borderRadius: 'var(--r-md)',
-            color: hasOverride ? 'var(--warn)' : 'var(--text)',
+            color: error ? 'var(--danger, #dc2626)' : hasOverride ? 'var(--warn)' : 'var(--text)',
             fontFamily: 'inherit',
             fontSize: 'var(--fs-base)',
             fontWeight: hasOverride ? 700 : 600,
@@ -195,7 +221,8 @@ export default function OverridableField({
             outline: 'none',
             boxSizing: 'border-box',
             direction: 'rtl',
-            transition: 'background .15s ease, border-color .15s ease',
+            transition: 'background .15s ease, border-color .15s ease, box-shadow .15s ease',
+            boxShadow: focused && !error ? '0 0 0 3px var(--accent-soft)' : error ? '0 0 0 3px rgba(220,38,38,.15)' : 'none',
           }}
         />
         {unit && (
@@ -212,8 +239,28 @@ export default function OverridableField({
         )}
       </div>
 
+      {/* پیام خطا */}
+      {error && (
+        <div
+          id={`err-${label.replace(/\s/g, '-')}`}
+          role="alert"
+          aria-live="polite"
+          style={{
+            fontSize: 10.5,
+            color: 'var(--danger, #dc2626)',
+            fontWeight: 700,
+            paddingRight: 4,
+            lineHeight: 1.4,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 3,
+          }}>
+          ⚠️ {error}
+        </div>
+      )}
+
       {/* پیام تغییر */}
-      {hasOverride && (
+      {hasOverride && !error && (
         <div style={{
           fontSize: 10,
           color: 'var(--warn)',

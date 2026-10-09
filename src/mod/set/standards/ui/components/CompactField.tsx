@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useTempUnit, toUserTemp, toCelsius, tempLabel } from '../../../../../shr/utils/temp';
 
 export function CompactField({
@@ -14,6 +14,7 @@ export function CompactField({
   const displayValue = isTemp ? toUserTemp(value, tempUnit) : value;
   const displayUnit = isTemp ? tempLabel(tempUnit) : unit;
   const inputRef = useRef<HTMLInputElement>(null);
+  const [focused, setFocused] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
@@ -65,8 +66,11 @@ export function CompactField({
           ref={inputRef}
           type="text"
           inputMode="decimal"
+          aria-label={`${label} (${displayUnit})`}
           value={displayValue === null || displayValue === undefined ? '' : String(displayValue)}
           onChange={handleChange}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
           style={{
             width: 70,
             height: 22,
