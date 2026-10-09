@@ -1,5 +1,11 @@
 export { EnvEditor } from './EnvEditor';
 export { FeedEditor } from './FeedEditor';
 export { GrowthEditor } from './GrowthEditor';
-export { MortalityEditor } from './MortalityEditor';
 export { LitterEditor } from './LitterEditor';
+export { MortalityEditor } from './MortalityEditor';
+export { default as LightingEditor } from './LightingEditor';
+export { default as VentilationEditor } from './VentilationEditor';
+export { default as WaterQualityEditor } from './WaterQualityEditor';
+export { default as TargetsEditor } from './TargetsEditor';
+export { default as MilestonesEditor } from './MilestonesEditor';
+export { default as HatchingEditor } from './HatchingEditor';

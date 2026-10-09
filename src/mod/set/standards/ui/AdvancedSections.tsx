@@ -2,7 +2,7 @@
  * AdvancedSections — دما/تغذیه/فضا/تجهیزات/تلفات/بستر
  */
 import SettingsGroup from '../../SettingsGroup';
-import { EnvEditor, FeedEditor, GrowthEditor, MortalityEditor, LitterEditor } from './editors';
+import { EnvEditor, FeedEditor, GrowthEditor, MortalityEditor, LitterEditor, LightingEditor, VentilationEditor, WaterQualityEditor, TargetsEditor, MilestonesEditor, HatchingEditor } from './editors';
 import type { BirdStandard } from '../types';
 
 const F = ({ label, children }: { label: string; children: React.ReactNode }) => (
@@ -272,6 +272,78 @@ export default function AdvancedSections({ std, def, envChanged, feedChanged, mo
             />
           </SettingsGroup>
         ) : null}
+
+        {/* 🆕 برنامه نوری */}
+        <SettingsGroup
+          icon="💡"
+          title="برنامه نوری"
+          subtitle={std.lightingProgram ? `${std.lightingProgram.phases?.length || 0} فاز` : 'تنظیم نشده'}
+          exclusiveGroup="std-sections"
+          persist={false}
+          tone="accent"
+        >
+          <LightingEditor std={std} def={def} updateBird={updateBird} />
+        </SettingsGroup>
+
+        {/* 🆕 تهویه دقیق */}
+        <SettingsGroup
+          icon="🌬"
+          title="تهویه"
+          subtitle={std.ventilation?.ventilationType ? std.ventilation.ventilationType : 'تنظیم نشده'}
+          exclusiveGroup="std-sections"
+          persist={false}
+          tone="info"
+        >
+          <VentilationEditor std={std} def={def} updateBird={updateBird} />
+        </SettingsGroup>
+
+        {/* 🆕 کیفیت آب */}
+        <SettingsGroup
+          icon="💧"
+          title="کیفیت آب"
+          subtitle={std.waterQuality?.phMin ? `pH ${std.waterQuality.phMin}–${std.waterQuality.phMax}` : 'اختیاری — تنظیم نشده'}
+          exclusiveGroup="std-sections"
+          persist={false}
+          tone="info"
+        >
+          <WaterQualityEditor std={std} def={def} updateBird={updateBird} />
+        </SettingsGroup>
+
+        {/* 🆕 اهداف عملکردی */}
+        <SettingsGroup
+          icon="🎯"
+          title="اهداف عملکردی"
+          subtitle={std.targets?.targetFCR ? `FCR ${std.targets.targetFCR}` : 'تنظیم نشده'}
+          exclusiveGroup="std-sections"
+          persist={false}
+          tone="accent"
+        >
+          <TargetsEditor std={std} def={def} updateBird={updateBird} />
+        </SettingsGroup>
+
+        {/* 🆕 نقاط کلیدی */}
+        <SettingsGroup
+          icon="🏁"
+          title="نقاط کلیدی"
+          subtitle={std.keyMilestones?.firstEggDay ? `اولین تخم: روز ${std.keyMilestones.firstEggDay}` : 'تنظیم نشده'}
+          exclusiveGroup="std-sections"
+          persist={false}
+          tone="purple"
+        >
+          <MilestonesEditor std={std} def={def} updateBird={updateBird} />
+        </SettingsGroup>
+
+        {/* 🆕 پارامترهای جوجه‌کشی */}
+        <SettingsGroup
+          icon="🥚"
+          title="پارامترهای جوجه‌کشی"
+          subtitle={std.hatchingParams?.setterCapacityEggs ? `ظرفیت: ${std.hatchingParams.setterCapacityEggs} تخم` : 'تنظیم نشده'}
+          exclusiveGroup="std-sections"
+          persist={false}
+          tone="danger"
+        >
+          <HatchingEditor std={std} def={def} updateBird={updateBird} />
+        </SettingsGroup>
       </>
     );
   }
