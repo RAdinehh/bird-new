@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Btn, PageContainer } from '../../../../shr/components/ui';
 import SettingsGroup from '../../SettingsGroup';
 import { showToast, toastMsg } from '../../../../cor/store/toast';
@@ -8,7 +9,6 @@ import { useFlk } from '../../../flk/store';
 import { toFa } from '../../../../shr/utils/fa';
 import { getStandardsGroupedByBird, type BirdStandard } from '../index';
 import { useSet } from '../../store';
-import { StandardDetail } from './StandardDetail';
 import { AddBirdModal } from './AddBirdModal';
 import ImportExportPanel from './ImportExportPanel';
 
@@ -88,6 +88,7 @@ function BreedCard({
 }
 
 export default function EnvStandardsTab() {
+  const navigate = useNavigate();
   const custom = useSet(state => state.customStandards) || {};
   const updateStandard = useSet(state => state.updateStandard);
   const resetStandard = useSet(state => state.resetStandard);
@@ -95,7 +96,6 @@ export default function EnvStandardsTab() {
   const { flocks } = useFlk();
   const { birds: brdBirds, breeds: brdBreeds } = useBrd();
 
-  const [selectedBird, setSelectedBird] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [onlyActive, setOnlyActive] = useState(true);
 
@@ -263,7 +263,7 @@ export default function EnvStandardsTab() {
                     isNative={isNative}
                     isCustom={isCustom}
                     flockCount={flockCount}
-                    onClick={() => setSelectedBird(std.key)}
+                    onClick={() => navigate(`/set/standards/${std.key}`)}
                   />
                 );
               })}
@@ -291,10 +291,6 @@ export default function EnvStandardsTab() {
 
       {/* 💾 صادرات/واردات */}
       <ImportExportPanel />
-
-      {selectedBird ? (
-        <StandardDetail birdKey={selectedBird} onClose={() => setSelectedBird(null)} />
-      ) : null}
 
       <AddBirdModal
         open={showAddModal}

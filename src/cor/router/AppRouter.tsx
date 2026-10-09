@@ -19,6 +19,7 @@ const Cal = lazy(() => import('../../mod/cal'));
 const Doc = lazy(() => import('../../mod/doc'));
 const Arc = lazy(() => import('../../mod/arc'));
 const Tra = lazy(() => import('../../mod/tra'));
+const BreedDetailPage = lazy(() => import('../../mod/set/standards/ui/BreedDetailPage'));
 
 function PageLoader() {
   return (
@@ -52,6 +53,7 @@ export default function AppRouter() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/set" element={<Settings />} />
+        <Route path="/set/standards/:key" element={<BreedDetailPage />} />
         <Route path="/brd" element={<Brd />} />
         <Route path="/hal" element={<Hal />} />
         <Route path="/flk" element={<Flk />} />
