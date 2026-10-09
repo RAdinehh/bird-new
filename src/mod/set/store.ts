@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import type { BirdStandard } from './standards';
+import type { StandardOverrides, DeepPartial } from './standards/_override';
+import { setByPath, unsetByPath } from './standards/_override';
 import { persist } from 'zustand/middleware';
 import { DEFAULT_UNITS, type Units } from '../../shr/units';
 
@@ -53,8 +55,11 @@ export interface Settings {
   thresholds: { eggDropPercent: number; mortalityPerThousand: number; tempDeviation: number; humidityDeviation: number; waterFeedMin: number; waterFeedMax: number; criticalTempHigh: number; criticalTempLow: number; },
   dueDateReminders: number[];
 
-  /** استانداردهای سفارشی (ویرایش‌شده توسط کاربر) */
+  /** استانداردهای سفارشی (ویرایش‌شده توسط کاربر) — legacy */
   customStandards?: Record<string, BirdStandard>;
+
+  /** 🆕 تغییرات کاربر بر پایه Diff — سبک‌تر */
+  customOverrides?: Record<string, StandardOverrides>;
 
   // پشتیبان
   autoBackup: { enabled: boolean; intervalHours: number; maxVersions: number; };
@@ -89,6 +94,7 @@ const defaultSettings: Settings = {
   modules: {},
   features: { vaccine: true, medicine: true },
   customStandards: {},
+  customOverrides: {},
 
   autoBackup: { enabled: true, intervalHours: 24, maxVersions: 5 },
   encryption: { enabled: false, password: '' },
@@ -101,6 +107,12 @@ interface State extends Settings {
   reset: () => void;
   updateStandard: (key: string, std: BirdStandard) => void;
   resetStandard: (key: string) => void;
+  /** 🆕 ذخیره یک override فیلد خاص */
+  setOverride: (key: string, path: string, value: any) => void;
+  /** 🆕 حذف override یک فیلد (بازگشت به استاندارد) */
+  clearOverride: (key: string, path: string) => void;
+  /** 🆕 حذف همه overrideهای یه نژاد */
+  clearAllOverrides: (key: string) => void;
   toggleModule: (id: string) => void;
 }
 
@@ -119,6 +131,25 @@ export const useSet = create<State>()(
         const next = { ...(state.customStandards || {}) };
         delete next[key];
         return { ...state, customStandards: next };
+      }),
+      setOverride: (key: string, path: string, value: any) => set((state: any) => {
+        const overrides = { ...(state.customOverrides || {}) };
+        const current = overrides[key] || {};
+        overrides[key] = setByPath(current, path, value);
+        return { ...state, customOverrides: overrides };
+      }),
+      clearOverride: (key: string, path: string) => set((state: any) => {
+        const overrides = { ...(state.customOverrides || {}) };
+        if (!overrides[key]) return state;
+        overrides[key] = unsetByPath(overrides[key], path);
+        // اگه خالی شد، حذفش کن
+        if (Object.keys(overrides[key]).length === 0) delete overrides[key];
+        return { ...state, customOverrides: overrides };
+      }),
+      clearAllOverrides: (key: string) => set((state: any) => {
+        const overrides = { ...(state.customOverrides || {}) };
+        delete overrides[key];
+        return { ...state, customOverrides: overrides };
       }),
       toggleModule: (id) => set({
         modules: { ...get().modules, [id]: !get().modules[id] }
