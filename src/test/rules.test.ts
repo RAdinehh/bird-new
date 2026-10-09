@@ -323,8 +323,7 @@ describe('rules — daily logs', () => {
     expect(a!.level).toBe('critical');
   });
 
-  it('دمای 16 درجه → critical (زیر 15 نه، 16=warn)', () => {
-    // طبق threshold کد: < 15 → critical, 15-18 → warn (important)
+  it('دمای 16 درجه → critical (خارج محدوده fallback 18-32)', () => {
     useDlg.setState({
       logs: [{
         id: 'l1', date: todayJ(), temperature: 16,
@@ -333,9 +332,9 @@ describe('rules — daily logs', () => {
     });
 
     const alerts = detectAllAlerts();
-    const a = alerts.find(x => x.sourceId === 'l1:temp-warning');
+    const a = alerts.find(x => x.sourceId === 'l1:temp-critical');
     expect(a).toBeTruthy();
-    expect(a!.level).toBe('important');
+    expect(a!.level).toBe('critical');
   });
 
   it('دمای 22 (خوب) → هیچ alert', () => {

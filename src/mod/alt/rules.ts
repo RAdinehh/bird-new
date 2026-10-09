@@ -9,6 +9,8 @@ import { useInc, daysToHatch, isLockdown, isHatchWindow } from '../inc/store';
 import { toFa } from '../../shr/utils/fa';
 import { format as formatJ, startOfDay, differenceInCalendarDays as diffCalDays, parse as parseJ} from 'date-fns-jalali';
 import { useSet } from '../set/store';
+import { getEffectiveEnv } from '../set/standards/resolve';
+import { getStandardFor } from '../set/standards/index';
 
 interface RuleAlert {
   level: AlertLevel;
@@ -33,42 +35,13 @@ function jalaliDate(s: string): Date | null {
     return startOfDay(d);
   } catch { return null; }
 }
+
 const todayJalali = () => {
   const d = new Date();
   return formatJ(d, 'yyyy/MM/dd');
 };
 
 /** تشخیص همه‌ی هشدارهای خودکار */
-
-
-/** خواندن thresholds از store (با fallback) */
-function getThresholds() {
-  try {
-    const s = useSet.getState();
-    return s.thresholds || {
-      eggDropPercent: 10,
-      mortalityPerThousand: 5,
-      tempDeviation: 2,
-      humidityDeviation: 10,
-      waterFeedMin: 1.6,
-      waterFeedMax: 2.2,
-      criticalTempHigh: 32,
-      criticalTempLow: 18,
-    };
-  } catch {
-    return {
-      eggDropPercent: 10,
-      mortalityPerThousand: 5,
-      tempDeviation: 2,
-      humidityDeviation: 10,
-      waterFeedMin: 1.6,
-      waterFeedMax: 2.2,
-      criticalTempHigh: 32,
-      criticalTempLow: 18,
-    };
-  }
-}
-
 export function detectAllAlerts(): RuleAlert[] {
   const alerts: RuleAlert[] = [];
   const _s = useSet.getState() as any;
@@ -310,17 +283,32 @@ export function detectAllAlerts(): RuleAlert[] {
     const mortality = flockCount > 0 ? (deaths / flockCount) * 1000 : 0;
 
     // تلفات بالا
-    if (mortality > 5) {
+    // 🆕 حداکثر تلفات از standards بر اساس سن
+    const birdForMort = birds.find(b => b.id === flock?.birdId);
+    const customStandardsForMort = _s.customStandards || {};
+    const flockAgeForMort = flock ? getAgeDays(flock) : 0;
+    let maxMortalityPerThousand = 5;  // fallback
+    try {
+      const stdForMort = getEffectiveEnv(birdForMort?.name, flockAgeForMort, null, { customStandards: customStandardsForMort });
+      // target از standards نیومده، از mortality جداگانه بخونیم
+      const stdFull = getStandardFor(birdForMort?.name, { customStandards: customStandardsForMort }) as any;
+      if (stdFull?.mortality && Array.isArray(stdFull.mortality)) {
+        const range = stdFull.mortality.find((m: any) => flockAgeForMort >= m.dayFrom && flockAgeForMort <= m.dayTo);
+        if (range?.maxPct) maxMortalityPerThousand = range.maxPct * 10;
+      }
+    } catch { /* silent */ }
+
+    if (mortality > maxMortalityPerThousand) {
       alerts.push({
         level: 'critical',
         category: 'mortality',
         title: 'تلفات بالا در ' + (flock?.name || 'گله'),
-        message: toFa(deaths) + ' مورد در ' + toFa(log.date) + ' (' + toFa(mortality.toFixed(1)) + ' در هزار)',
+        message: toFa(deaths) + ' مورد در ' + toFa(log.date) + ' (' + toFa(mortality.toFixed(1)) + ' در هزار، حداکثر ' + toFa(maxMortalityPerThousand.toFixed(1)) + ')',
         source: 'dlg',
         sourceId: log.id + ':high-mortality',
         date: log.date, notes: ''
       });
-    } else if (mortality > 2) {
+    } else if (mortality > maxMortalityPerThousand * 0.4) {
       alerts.push({
         level: 'important',
         category: 'mortality',
@@ -334,27 +322,34 @@ export function detectAllAlerts(): RuleAlert[] {
 
     // دما غیرعادی
     if (log.temperature !== null && log.temperature !== undefined) {
-      if (log.temperature < 15 || log.temperature > 30) {
+      // 🆕 هدف از standards بر اساس سن گله
+      const bird = birds.find(b => b.id === flock?.birdId);
+      const customStandards = _s.customStandards || {};
+      const flockAge = flock ? getAgeDays(flock) : 0;
+      let target: number | null = null;
+      try {
+        const std = getEffectiveEnv(bird?.name, flockAge, null, { customStandards });
+        target = std.temp?.target ?? null;
+      } catch { /* silent */ }
+
+      // ۱. بحرانی — از thresholds
+      // 🆕 محدوده بحرانی از env[سن]
+      const stdEnv = target !== null ? getEffectiveEnv(bird?.name, flockAge, null, { customStandards }) : null;
+      const criticalLow = stdEnv?.temp?.min ?? 18;
+      const criticalHigh = stdEnv?.temp?.max ?? 32;
+
+      if (log.temperature < criticalLow || log.temperature > criticalHigh) {
         alerts.push({
           level: 'critical',
           category: 'temp',
           title: 'دمای بحرانی: ' + toFa(log.temperature) + '°C',
-          message: 'در ' + (flock?.name || 'گله') + ' — تاریخ ' + toFa(log.date),
+          message: 'در ' + (flock?.name || 'گله') + ' — محدوده: ' + toFa(criticalLow) + '-' + toFa(criticalHigh) + '°C — تاریخ ' + toFa(log.date),
           source: 'dlg',
           sourceId: log.id + ':temp-critical',
           date: log.date, notes: ''
         });
-      } else if (log.temperature < 18 || log.temperature > 26) {
-        alerts.push({
-          level: 'important',
-          category: 'temp',
-          title: 'دما خارج از محدوده: ' + toFa(log.temperature) + '°C',
-          message: 'در ' + (flock?.name || 'گله'),
-          source: 'dlg',
-          sourceId: log.id + ':temp-warning',
-          date: log.date, notes: ''
-        });
       }
+      // داخل محدوده استاندارد → OK (هیچ هشداری)
     }
   });
 

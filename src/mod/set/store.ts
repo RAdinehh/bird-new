@@ -52,7 +52,8 @@ export interface Settings {
   channels: { inApp: boolean; sound: boolean; vibration: boolean; sms: boolean; email: boolean; telegram: boolean; };
   alerts: { critical: boolean; important: boolean; info: boolean; };
   quietHours: { enabled: boolean; from: string; to: string; weekends: boolean; };
-  thresholds: { eggDropPercent: number; mortalityPerThousand: number; tempDeviation: number; humidityDeviation: number; waterFeedMin: number; waterFeedMax: number; criticalTempHigh: number; criticalTempLow: number; },
+  /** 🆕 حذف شد — همه از standards میان */
+
   dueDateReminders: number[];
 
   /** استانداردهای سفارشی (ویرایش‌شده توسط کاربر) — legacy */
@@ -79,7 +80,7 @@ const defaultSettings: Settings = {
   channels: { inApp: true, sound: true, vibration: true, sms: false, email: false, telegram: false },
   alerts: { critical: true, important: true, info: true },
   quietHours: { enabled: false, from: '22:00', to: '07:00', weekends: true },
-  thresholds: { eggDropPercent: 10, mortalityPerThousand: 5, tempDeviation: 2, humidityDeviation: 10, waterFeedMin: 1.6, waterFeedMax: 2.2, criticalTempHigh: 32, criticalTempLow: 18 },
+
   dueDateReminders: [7, 3, 1],
   security: { pinEnabled: false, pin: '', autoLockMin: 0 },
   theme: 'light',
@@ -170,7 +171,6 @@ export const useSet = create<State>()(
           channels: { ...current.channels, ...(p.channels || {}) },
           alerts: { ...current.alerts, ...(p.alerts || {}) },
           quietHours: { ...current.quietHours, ...(p.quietHours || {}) },
-          thresholds: { ...current.thresholds, ...(p.thresholds || {}) },
           features: { ...current.features, ...(p.features || {}) }
         };
       }

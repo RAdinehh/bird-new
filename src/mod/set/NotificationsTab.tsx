@@ -9,7 +9,6 @@ export default function NotificationsTab() {
   const s = useSet();
   const al = s.alerts;
   const qh = s.quietHours;
-  const th = s.thresholds;
 
   const activeAlerts = [al.critical, al.important, al.info].filter(Boolean).length;
   const activeReminders = (s.dueDateReminders || []).length;
@@ -134,116 +133,6 @@ export default function NotificationsTab() {
         </Grid2>
       </SettingsGroup>
 
-      {/* ═══ ۴. آستانه‌های هشدار ═══ */}
-      <SettingsGroup
-        icon="📊"
-        title="آستانه‌های هشدار"
-        subtitle={`افت ${toFa(th.eggDropPercent)}٪ · تلفات ${toFa(th.mortalityPerThousand)}/هزار`}
-        tone="danger"
-      >
-        <div style={{
-          fontSize: 'var(--fs-xs)',
-          color: 'var(--muted)',
-          lineHeight: 1.7,
-          padding: '8px 10px',
-          background: 'var(--input-bg)',
-          borderRadius: 'var(--r-sm)',
-        }}>
-          وقتی این آستانه‌ها رد شوند، هشدار خودکار ایجاد می‌شود
-        </div>
-
-        <Grid2>
-          <LocalNumField
-            label="افت تخم بیش از"
-            hint="٪ نسبت به میانگین"
-            value={th.eggDropPercent}
-            onChange={n => s.updateSection('thresholds', { eggDropPercent: n })}
-            unit="٪"
-            min={0}
-            max={100}
-          />
-          <LocalNumField
-            label="تلفات بیش از"
-            hint="در هزار پرنده"
-            value={th.mortalityPerThousand}
-            onChange={n => s.updateSection('thresholds', { mortalityPerThousand: n })}
-            unit="در هزار"
-            min={0}
-            max={1000}
-          />
-          <LocalNumField
-            label="انحراف دما"
-            hint="بالاتر از هدف"
-            value={th.tempDeviation}
-            onChange={n => s.updateSection('thresholds', { tempDeviation: n })}
-            unit="°C"
-            min={0}
-            max={30}
-          />
-          <LocalNumField
-            label="انحراف رطوبت"
-            hint="بالاتر از هدف"
-            value={th.humidityDeviation}
-            onChange={n => s.updateSection('thresholds', { humidityDeviation: n })}
-            unit="٪"
-            min={0}
-            max={100}
-          />
-          <LocalNumField
-            label="حداقل آب/دان"
-            hint="هشدار اگر کمتر"
-            value={th.waterFeedMin ?? 1.6}
-            onChange={n => s.updateSection('thresholds', { waterFeedMin: n })}
-            unit=""
-            min={0}
-            max={10}
-          />
-          <LocalNumField
-            label="حداکثر آب/دان"
-            hint="هشدار اگر بیشتر"
-            value={th.waterFeedMax ?? 2.2}
-            onChange={n => s.updateSection('thresholds', { waterFeedMax: n })}
-            unit=""
-            min={0}
-            max={10}
-          />
-          <LocalNumField
-            label="دمای بحرانی بالا"
-            hint="هشدار فوری"
-            value={th.criticalTempHigh ?? 32}
-            onChange={n => s.updateSection('thresholds', { criticalTempHigh: n })}
-            unit="°C"
-            min={0}
-            max={60}
-          />
-          <LocalNumField
-            label="دمای بحرانی پایین"
-            hint="هشدار فوری"
-            value={th.criticalTempLow ?? 18}
-            onChange={n => s.updateSection('thresholds', { criticalTempLow: n })}
-            unit="°C"
-            min={-10}
-            max={40}
-          />
-        </Grid2>
-
-        <Btn
-          size="sm"
-          full
-          onClick={() => s.updateSection('thresholds', {
-            eggDropPercent: 10,
-            mortalityPerThousand: 5,
-            tempDeviation: 2,
-            humidityDeviation: 10,
-            waterFeedMin: 1.6,
-            waterFeedMax: 2.2,
-            criticalTempHigh: 32,
-            criticalTempLow: 18,
-          })}
-        >
-          🔄 بازنشانی به پیش‌فرض
-        </Btn>
-      </SettingsGroup>
 
     </div>
   );

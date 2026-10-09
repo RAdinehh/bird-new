@@ -15,18 +15,6 @@ describe('useSet — تنظیمات پیش‌فرض', () => {
     expect(useSet.getState().accentColor).toBeTruthy();
   });
 
-  it('thresholds پیش‌فرض', () => {
-    const t = useSet.getState().thresholds;
-    expect(t.eggDropPercent).toBe(10);
-    expect(t.mortalityPerThousand).toBe(5);
-    expect(t.tempDeviation).toBe(2);
-    expect(t.humidityDeviation).toBe(10);
-    expect(t.waterFeedMin).toBe(1.6);
-    expect(t.waterFeedMax).toBe(2.2);
-    expect(t.criticalTempHigh).toBe(32);
-    expect(t.criticalTempLow).toBe(18);
-  });
-});
 
 describe('useSet — update', () => {
   it('update یک فیلد ساده', () => {
@@ -40,25 +28,6 @@ describe('useSet — update', () => {
     expect(useSet.getState().accentColor).toBe('blue');
   });
 
-  it('update thresholds — merge نه replace', () => {
-    useSet.getState().update({
-      thresholds: { ...useSet.getState().thresholds, eggDropPercent: 15 },
-    });
-    expect(useSet.getState().thresholds.eggDropPercent).toBe(15);
-    // بقیه حفظ شن
-    expect(useSet.getState().thresholds.mortalityPerThousand).toBe(5);
-  });
-
-  it('update partial thresholds — merge', () => {
-    // اگه فقط eggDropPercent بدیم، بقیه هم باید بمونن (migration)
-    const before = useSet.getState().thresholds;
-    useSet.getState().update({
-      thresholds: { ...before, eggDropPercent: 20 },
-    });
-    const after = useSet.getState().thresholds;
-    expect(after.eggDropPercent).toBe(20);
-    expect(after.mortalityPerThousand).toBe(before.mortalityPerThousand);
-  });
 });
 
 describe('useSet — reset', () => {
@@ -69,14 +38,6 @@ describe('useSet — reset', () => {
     expect(useSet.getState().theme).not.toBe('dark');
   });
 
-  it('reset thresholds رو برمیگردونه', () => {
-    useSet.getState().update({
-      thresholds: { ...useSet.getState().thresholds, eggDropPercent: 99 },
-    });
-    useSet.getState().reset();
-    expect(useSet.getState().thresholds.eggDropPercent).toBe(10);
-  });
-});
 
 describe('MODULE_LABELS', () => {
   it('شامل ماژول‌های اصلی', () => {
