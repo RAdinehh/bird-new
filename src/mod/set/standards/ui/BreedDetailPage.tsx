@@ -92,6 +92,7 @@ export default function BreedDetailPage() {
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10,
           padding: '8px 14px 12px',
+          flexDirection: 'row-reverse',
         }}>
           <button
             type="button"
@@ -107,7 +108,7 @@ export default function BreedDetailPage() {
               fontFamily: 'inherit',
             }}
           >←</button>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
             <div style={{
               fontSize: 15, fontWeight: 800,
               color: 'var(--text)',

@@ -34,6 +34,8 @@ const FIRST_VISIT_KEY = 'pm-onboarding-done';
 function Layout() {
   const loc = useLocation();
   const title = TITLES[loc.pathname] ?? 'مدیریت مرغداری';
+  // پنهان کردن هدر اصلی در صفحه‌های detail (خودشون Back دارن)
+  const isDetailPage = /^\/set\/standards\/.+/.test(loc.pathname);
   useKeyboard();
   useKeyboardSafeFocus();
   useAutoBackup();
@@ -47,7 +49,7 @@ function Layout() {
     <div style={{
       maxWidth: 480, margin: '0 auto', minHeight: '100svh', paddingBottom: 80, boxSizing: 'border-box'
     }}>
-      <Header title={title} />
+      {!isDetailPage && <Header title={title} />}
       <MenuDrawer />
       <HelpModal />
       <ShortcutsModal />
