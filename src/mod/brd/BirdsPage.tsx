@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Bird } from './store';
 import { findBirdPreset } from './presets';
+import { getKindInfo, getPurposeInfo, getCategoryInfo } from './_display';
+import { DEFAULT_STANDARDS } from '../set/standards/data';
 import SourceBadge, { type SourceType } from '../../shr/components/SourceBadge';
 import { detectCycleDaysSource, detectFcrSource } from './_source';
 import BirdNameField, { type BirdPresetPick } from './BirdNameField';
@@ -196,12 +198,17 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
           {list.map((b, i) => {
             const birdBreeds = breeds.filter(x => x.birdId === b.id);
             const isOpen = !ms.selectionMode && expandedId === b.id;
+            const kind = getKindInfo((b as any).birdKind);
+            const purpose = getPurposeInfo((b as any).purpose);
+            const category = getCategoryInfo((b as any).category);
+            const stdKey = (b as any).standardKey;
+            const stdData = stdKey ? (DEFAULT_STANDARDS as any)[stdKey] : null;
             return (
               <ExpandableCard
                 key={b.id} id={b.id} ms={ms}
                 accent="accent"
                 index={toFa(i + 1)}
-                iconEmoji="🐔"
+                iconEmoji={kind.emoji}
                 title={b.name}
                 subtitle=""
                 isOpen={isOpen}
@@ -209,6 +216,16 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 badge={<Tag tone="blue">{toFa(birdBreeds.length)} نژاد</Tag>}
                 stats={
                   <>
+                    {purpose && <span style={{
+                      padding: '2px 8px', borderRadius: 10,
+                      background: 'var(--accent-soft)', color: 'var(--accent)',
+                      fontSize: 10.5, fontWeight: 700,
+                    }}>{purpose.emoji} {purpose.label}</span>}
+                    {category && <span style={{
+                      padding: '2px 8px', borderRadius: 10,
+                      background: 'var(--info-soft, #dbeafe)', color: 'var(--info, #1e40af)',
+                      fontSize: 10.5, fontWeight: 700,
+                    }}>{category.emoji} {category.label}</span>}
                     {b.cycleDays ? <span>چرخه: <b style={{ color: 'var(--text)' }}>{toFa(b.cycleDays)} روز</b></span> : null}
                     {b.fcrStandard ? <span>FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcrStandard)}</b></span> : null}
                   </>
@@ -249,6 +266,77 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                       ))}
                     </div>
                   </>
+                )}
+
+                {/* 📖 کادر استاندارد متصل */}
+                {stdData ? (
+                  <div style={{
+                    padding: '10px 12px',
+                    background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                    border: '1px solid #93c5fd',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                  }}>
+                    <div style={{
+                      width: 38, height: 38, borderRadius: 11,
+                      background: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 18, flexShrink: 0,
+                      boxShadow: '0 1px 4px rgba(0,0,0,.06)',
+                    }}>📖</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: 14, fontWeight: 900, color: '#1e3a8a',
+                        display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
+                      }}>
+                        {stdData.nameFa || stdData.nameEn || stdKey}
+                        {stdData.source && (
+                          <span style={{
+                            fontSize: 9, fontWeight: 700,
+                            padding: '2px 7px', borderRadius: 8,
+                            background: '#fff', border: '1px solid rgba(0,0,0,.06)',
+                            color: '#3b82f6',
+                          }}>📚 {stdData.source}</span>
+                        )}
+                        {stdData.publishYear && (
+                          <span style={{
+                            fontSize: 9, fontWeight: 700,
+                            padding: '2px 6px', borderRadius: 8,
+                            background: '#fff', border: '1px solid rgba(0,0,0,.06)',
+                            color: '#3b82f6',
+                          }}>{toFa(stdData.publishYear)}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{
+                      fontSize: 9.5, fontWeight: 800,
+                      padding: '2px 7px', borderRadius: 8,
+                      background: '#16a34a', color: '#fff',
+                      flexShrink: 0,
+                    }}>متصل</div>
+                  </div>
+                ) : (
+                  <div style={{
+                    padding: '10px 12px',
+                    background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                    border: '1px solid #fcd34d',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                  }}>
+                    <div style={{
+                      width: 38, height: 38, borderRadius: 11,
+                      background: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 18, flexShrink: 0,
+                    }}>💡</div>
+                    <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 800, color: '#b45309' }}>
+                      استاندارد متصل نیست
+                    </div>
+                  </div>
                 )}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>

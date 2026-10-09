@@ -5,6 +5,7 @@ import SourceBadge from '../../shr/components/SourceBadge';
 import { detectBreedFcrSource } from './_source';
 import BreedNameField, { type BreedPick } from './BreedNameField';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
+import { getPurposeInfo, getCategoryInfo } from './_display';
 import { Btn, BtnRow, Empty, Field,
   Grid2, Input, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -224,6 +225,11 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
           {list.map((b, i) => {
             const bird = birds.find(x => x.id === b.birdId);
             const isOpen = !ms.selectionMode && expandedId === b.id;
+            const stdKey = (b as any).standardKey;
+            const stdData = stdKey ? (DEFAULT_STANDARDS as any)[stdKey] : null;
+            const category = stdData?.category ? getCategoryInfo(stdData.category) : null;
+            const purpose = stdData?.primaryPurpose ? getPurposeInfo(stdData.primaryPurpose) : null;
+            const hasStandard = !!stdData;
             return (
               <ExpandableCard
                 key={b.id} id={b.id} ms={ms}
@@ -231,12 +237,22 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
                 index={toFa(i + 1)}
                 iconEmoji="🧬"
                 title={b.name}
-                subtitle={`پرنده — ${bird?.name || '—'}`}
+                subtitle=""
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
                 badge={b.fcr ? <Tag tone="purple">FCR {toFa(b.fcr)}</Tag> : undefined}
                 stats={<>
-                  <span>پرنده: <b style={{ color: 'var(--text)' }}>{bird?.name || '—'}</b></span>
+                  {category && <span style={{
+                    padding: '2px 8px', borderRadius: 10,
+                    background: 'var(--info-soft, #dbeafe)', color: 'var(--info, #1e40af)',
+                    fontSize: 10.5, fontWeight: 700,
+                  }}>{category.emoji} {category.label}</span>}
+                  {purpose && <span style={{
+                    padding: '2px 8px', borderRadius: 10,
+                    background: 'var(--accent-soft)', color: 'var(--accent)',
+                    fontSize: 10.5, fontWeight: 700,
+                  }}>{purpose.emoji} {purpose.label}</span>}
+                  <span>🐔 <b style={{ color: 'var(--text)' }}>{bird?.name || '—'}</b></span>
                   {b.fcr && <span>FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcr)}</b></span>}
                 </>}
               >
@@ -261,6 +277,77 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
                     <span style={{ fontWeight: 600 }}>{b.fcr ? toFa(b.fcr) : '—'}</span>
                   </div>
                 </div>
+                {/* 📖 کادر استاندارد متصل */}
+                {hasStandard ? (
+                  <div style={{
+                    padding: '10px 12px',
+                    background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                    border: '1px solid #93c5fd',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                  }}>
+                    <div style={{
+                      width: 38, height: 38, borderRadius: 11,
+                      background: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 18, flexShrink: 0,
+                      boxShadow: '0 1px 4px rgba(0,0,0,.06)',
+                    }}>📖</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: 14, fontWeight: 900, color: '#1e3a8a',
+                        display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
+                      }}>
+                        {stdData.nameFa || stdData.nameEn || stdKey}
+                        {stdData.source && (
+                          <span style={{
+                            fontSize: 9, fontWeight: 700,
+                            padding: '2px 7px', borderRadius: 8,
+                            background: '#fff', border: '1px solid rgba(0,0,0,.06)',
+                            color: '#3b82f6',
+                          }}>📚 {stdData.source}</span>
+                        )}
+                        {stdData.publishYear && (
+                          <span style={{
+                            fontSize: 9, fontWeight: 700,
+                            padding: '2px 6px', borderRadius: 8,
+                            background: '#fff', border: '1px solid rgba(0,0,0,.06)',
+                            color: '#3b82f6',
+                          }}>{toFa(stdData.publishYear)}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{
+                      fontSize: 9.5, fontWeight: 800,
+                      padding: '2px 7px', borderRadius: 8,
+                      background: '#16a34a', color: '#fff',
+                      flexShrink: 0,
+                    }}>متصل</div>
+                  </div>
+                ) : (
+                  <div style={{
+                    padding: '10px 12px',
+                    background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                    border: '1px solid #fcd34d',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                  }}>
+                    <div style={{
+                      width: 38, height: 38, borderRadius: 11,
+                      background: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 18, flexShrink: 0,
+                    }}>💡</div>
+                    <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 800, color: '#b45309' }}>
+                      استاندارد متصل نیست — در تنظیمات بسازید
+                    </div>
+                  </div>
+                )}
+
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(b)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
