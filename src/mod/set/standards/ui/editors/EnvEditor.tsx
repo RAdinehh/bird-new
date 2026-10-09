@@ -1,5 +1,5 @@
 import { RangeCard, CompactField, FieldsGrid } from '../components';
-import { toFa } from '../../../../../shr/utils/fa';
+import { useFormat } from '../../../../../shr/units/useFormat';
 import type { EnvRange } from '../../types';
 
 export function EnvEditor({
@@ -8,6 +8,7 @@ export function EnvEditor({
   env: EnvRange[];
   onChange: (n: EnvRange[]) => void;
 }) {
+  const fmt = useFormat();
   const update = (i: number, patch: Partial<EnvRange>) => {
     onChange(env.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   };
@@ -16,7 +17,7 @@ export function EnvEditor({
       {env.map((r, i) => (
         <RangeCard
           key={i}
-          title={`روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`}
+          title={`روز ${fmt.int(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : fmt.int(r.dayTo)}`}
         >
           <FieldsGrid>
             <CompactField

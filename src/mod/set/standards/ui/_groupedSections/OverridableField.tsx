@@ -29,6 +29,8 @@ interface Props {
   max?: number;
   /** 🆕 بدون جداکننده هزار (برای سال، کد و ...) */
   noSeparator?: boolean;
+  /** 🆕 تعداد اعشار (پیش‌فرض ۰ = عدد صحیح) */
+  decimals?: number;
 }
 
 const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
@@ -59,9 +61,17 @@ function buildSchema(type: 'number' | 'text', label: string, min?: number, max?:
 
 export default function OverridableField({
   label, value, defaultValue, onOverride, onClear,
-  type = 'number', unit, placeholder, min, max, noSeparator = false,
+  type = 'number', unit, placeholder, min, max, noSeparator = false, decimals = 0,
 }: Props) {
   const fmt = useFormat();
+
+  /** 🆕 فرمت‌کننده با پشتیبانی از decimals */
+  const fmtValue = (v: number) => {
+    if (noSeparator) {
+      return String(v).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]);
+    }
+    return decimals > 0 ? fmt.num(v, { decimals }) : fmt.int(v);
+  };
 
   // آیا override فعاله؟
   const hasOverride = JSON.stringify(value) !== JSON.stringify(defaultValue);
@@ -70,7 +80,7 @@ export default function OverridableField({
   const displayValue = (() => {
     if (value == null || value === '') return '';
     if (type === 'number' && typeof value === 'number') {
-      return noSeparator ? String(value).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]) : fmt.int(value);
+      return fmtValue(value);
     }
     return String(value);
   })();
@@ -78,7 +88,7 @@ export default function OverridableField({
   const displayDefault = (() => {
     if (defaultValue == null || defaultValue === '') return '—';
     if (type === 'number' && typeof defaultValue === 'number') {
-      return noSeparator ? String(defaultValue).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]) : fmt.int(defaultValue);
+      return fmtValue(defaultValue);
     }
     return String(defaultValue);
   })();
@@ -100,7 +110,7 @@ export default function OverridableField({
     // خالی → برگشت به استاندارد
     if (!draft || !draft.trim()) {
       if (hasOverride) onClear();
-      setDraft(defaultValue == null ? '' : (type === 'number' && typeof defaultValue === 'number' ? fmt.int(defaultValue) : String(defaultValue)));
+      setDraft(defaultValue == null ? '' : (type === 'number' && typeof defaultValue === 'number' ? fmtValue(defaultValue) : String(defaultValue)));
       return;
     }
 
@@ -123,7 +133,7 @@ export default function OverridableField({
         setDraft(fmt.int(parsed));
       } else {
         if (hasOverride) onClear();
-        setDraft(fmt.int(parsed));
+        setDraft(fmtValue(parsed));
       }
     } else {
       if (parsed !== defaultValue) {
@@ -136,7 +146,7 @@ export default function OverridableField({
 
   const reset = () => {
     onClear();
-    const v = defaultValue == null ? '' : (type === 'number' && typeof defaultValue === 'number' ? fmt.int(defaultValue) : String(defaultValue));
+    const v = defaultValue == null ? '' : (type === 'number' && typeof defaultValue === 'number' ? fmtValue(defaultValue) : String(defaultValue));
     setDraft(v);
     setFocused(false);
   };

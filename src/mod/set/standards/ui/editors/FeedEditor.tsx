@@ -1,5 +1,5 @@
 import { RangeCard, CompactField, FieldsGrid } from '../components';
-import { toFa } from '../../../../../shr/utils/fa';
+import { useFormat } from '../../../../../shr/units/useFormat';
 import type { FeedRange } from '../../types';
 
 export function FeedEditor({
@@ -8,6 +8,7 @@ export function FeedEditor({
   feed: FeedRange[];
   onChange: (n: FeedRange[]) => void;
 }) {
+  const fmt = useFormat();
   const update = (i: number, patch: Partial<FeedRange>) => {
     onChange(feed.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   };
@@ -18,8 +19,8 @@ export function FeedEditor({
           key={i}
           title={
             r.phaseName
-              ? `${r.phaseName} · روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`
-              : `روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`
+              ? `${r.phaseName} · روز ${fmt.int(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : fmt.int(r.dayTo)}`
+              : `روز ${fmt.int(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : fmt.int(r.dayTo)}`
           }
         >
           <FieldsGrid>
@@ -36,7 +37,8 @@ export function FeedEditor({
               unit="ml"
             />
             <CompactField
-              label="🥩 پروتئین"
+              decimals={2}
+          label="🥩 پروتئین"
               value={r.proteinPct ?? null}
               onChange={v => update(i, { proteinPct: v ?? undefined })}
               unit="٪"
@@ -51,25 +53,29 @@ export function FeedEditor({
           {(r.lysinePct != null || r.methioninePct != null || r.calciumPct != null || r.availablePhosphorusPct != null) && (
             <FieldsGrid>
               <CompactField
-                label="لیزین"
+                decimals={2}
+          label="لیزین"
                 value={r.lysinePct ?? null}
                 onChange={v => update(i, { lysinePct: v ?? undefined })}
                 unit="٪"
               />
               <CompactField
-                label="متیونین"
+                decimals={2}
+          label="متیونین"
                 value={r.methioninePct ?? null}
                 onChange={v => update(i, { methioninePct: v ?? undefined })}
                 unit="٪"
               />
               <CompactField
-                label="کلسیم"
+                decimals={2}
+          label="کلسیم"
                 value={r.calciumPct ?? null}
                 onChange={v => update(i, { calciumPct: v ?? undefined })}
                 unit="٪"
               />
               <CompactField
-                label="فسفر قابل جذب"
+                decimals={2}
+          label="فسفر قابل جذب"
                 value={r.availablePhosphorusPct ?? null}
                 onChange={v => update(i, { availablePhosphorusPct: v ?? undefined })}
                 unit="٪"

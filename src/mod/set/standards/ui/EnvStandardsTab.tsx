@@ -10,6 +10,7 @@ import { toFa } from '../../../../shr/utils/fa';
 import { getStandardsGroupedByBird, type BirdStandard } from '../index';
 import { useSet } from '../../store';
 import { AddBirdModal } from './AddBirdModal';
+import { useFormat } from '../../../../shr/units/useFormat';
 import ImportExportPanel from './ImportExportPanel';
 
 // ═══ کارت نژاد — ۲ ستونه جمع‌وجور ═══
@@ -22,6 +23,7 @@ function BreedCard({
   flockCount: number;
   onClick: () => void;
 }) {
+  const fmt = useFormat();
   return (
     <button
       type="button"
@@ -80,7 +82,7 @@ function BreedCard({
           whiteSpace: 'nowrap',
         }}>
           {isNative ? 'بومی' : 'صنعتی'}
-          {flockCount > 0 ? ` · ${toFa(flockCount)} گله` : ''}
+          {flockCount > 0 ? ` · ${fmt.int(flockCount)} گله` : ''}
         </div>
       </div>
     </button>
@@ -88,6 +90,7 @@ function BreedCard({
 }
 
 export default function EnvStandardsTab() {
+  const fmt = useFormat();
   const navigate = useNavigate();
   const custom = useSet(state => state.customStandards) || {};
   const updateStandard = useSet(state => state.updateStandard);
@@ -240,7 +243,7 @@ export default function EnvStandardsTab() {
             key={birdName}
             icon="🐔"
             title={birdName}
-            subtitle={`${toFa(breeds.length)} نژاد`}
+            subtitle={`${fmt.int(breeds.length)} نژاد`}
             tone="accent"
           >
             <div style={{
@@ -281,7 +284,7 @@ export default function EnvStandardsTab() {
         textAlign: 'center',
         padding: '4px 0',
       }}>
-        {toFa(totalBreeds)} نژاد در {toFa(Object.keys(grouped).length)} پرنده
+        {fmt.int(totalBreeds)} نژاد در {fmt.int(Object.keys(grouped).length)} پرنده
       </div>
 
       <Btn onClick={() => setShowAddModal(true)} full>➕ افزودن نژاد جدید</Btn>

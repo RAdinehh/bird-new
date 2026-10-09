@@ -82,6 +82,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
             defaultValue={def.biology.maleFemaleRatio}
             type="number"
             min={0} max={100}
+            decimals={2}
             onOverride={onOver('biology.maleFemaleRatio')}
             onClear={onReset('biology.maleFemaleRatio')}
           />
@@ -136,6 +137,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
               unit="گرم"
               type="number"
               min={10} max={200}
+            decimals={1}
               onOverride={onOver('production.eggWeightG')}
               onClear={onReset('production.eggWeightG')}
             />
@@ -149,6 +151,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
               unit="٪"
               type="number"
               min={0} max={100}
+            decimals={1}
               onOverride={onOver('production.peakLayingPct')}
               onClear={onReset('production.peakLayingPct')}
             />
@@ -172,6 +175,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
               unit="٪"
               type="number"
               min={0} max={100}
+            decimals={1}
               onOverride={onOver('production.fertilityPct')}
               onClear={onReset('production.fertilityPct')}
             />
@@ -182,6 +186,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
               unit="٪"
               type="number"
               min={0} max={100}
+            decimals={1}
               onOverride={onOver('production.hatchabilityPct')}
               onClear={onReset('production.hatchabilityPct')}
             />
@@ -226,6 +231,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
             unit="°C"
             type="number"
             min={30} max={45}
+            decimals={1}
             onOverride={onOver('incubation.setterTemp')}
             onClear={onReset('incubation.setterTemp')}
           />
@@ -249,6 +255,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
             unit="°C"
             type="number"
             min={30} max={45}
+            decimals={1}
             onOverride={onOver('incubation.hatcherTemp')}
             onClear={onReset('incubation.hatcherTemp')}
           />
@@ -281,6 +288,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
             unit="٪"
             type="number"
             min={0} max={100}
+            decimals={1}
             onOverride={onOver('incubation.chickYieldPct')}
             onClear={onReset('incubation.chickYieldPct')}
           />

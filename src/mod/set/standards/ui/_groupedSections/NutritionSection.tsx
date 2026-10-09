@@ -7,15 +7,17 @@ import SettingsGroup from '../../../SettingsGroup';
 import { FeedEditor, GrowthEditor } from '../editors';
 import type { SectionProps } from './types';
 import { isChanged } from './types';
+import { useFormat } from '../../../../../shr/units/useFormat';
 
 export default function NutritionSection({ std, def, updateBird }: SectionProps) {
+  const fmt = useFormat();
   const feedChanged = isChanged(std.feed, def.feed);
   const growthChanged = isChanged(std.growth, def.growth);
   const changed = feedChanged || growthChanged;
 
   const subtitle = changed
     ? '🔸 تغییر یافته'
-    : `${std.feed.length} مرحله دان · ${std.growth.weightByAge.length} نقطه رشد`;
+    : `${fmt.int(std.feed.length)} مرحله دان · ${fmt.int(std.growth.weightByAge.length)} نقطه رشد`;
 
   return (
     <SettingsGroup

@@ -1,5 +1,5 @@
 import { RangeCard, CompactField } from '../components';
-import { toFa } from '../../../../../shr/utils/fa';
+import { useFormat } from '../../../../../shr/units/useFormat';
 import type { MortalityRange } from '../../types';
 
 export function MortalityEditor({
@@ -8,6 +8,7 @@ export function MortalityEditor({
   mortality: MortalityRange[];
   onChange: (n: MortalityRange[]) => void;
 }) {
+  const fmt = useFormat();
   const update = (i: number, patch: Partial<MortalityRange>) => {
     onChange(mortality.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   };
@@ -16,9 +17,10 @@ export function MortalityEditor({
       {mortality.map((r, i) => (
         <RangeCard
           key={i}
-          title={`روز ${toFa(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : toFa(r.dayTo)}`}
+          title={`روز ${fmt.int(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : fmt.int(r.dayTo)}`}
         >
           <CompactField
+            decimals={1}
             label="💀 حداکثر تلفات"
             value={r.maxPct}
             onChange={v => update(i, { maxPct: v ?? 0 })}

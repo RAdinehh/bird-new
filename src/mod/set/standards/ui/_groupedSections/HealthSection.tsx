@@ -7,9 +7,11 @@ import SettingsGroup from '../../../SettingsGroup';
 import { MortalityEditor, TargetsEditor, MilestonesEditor } from '../editors';
 import type { SectionProps } from './types';
 import { isChanged } from './types';
+import { useFormat } from '../../../../../shr/units/useFormat';
 import OverridableField from './OverridableField';
 
 export default function HealthSection({ std, def, updateBird, overrides, setOverride, clearOverride }: SectionProps) {
+  const fmt = useFormat();
   const mortChanged = isChanged(std.mortality, def.mortality) || std.mortalityTotalPct !== def.mortalityTotalPct;
   const targetsChanged = isChanged(std.targets, def.targets);
   const milestonesChanged = isChanged(std.keyMilestones, def.keyMilestones);
@@ -17,7 +19,7 @@ export default function HealthSection({ std, def, updateBird, overrides, setOver
 
   const subtitle = changed
     ? '🔸 تغییر یافته'
-    : `${std.mortality.length} مرحله · کل ${std.mortalityTotalPct}٪`;
+    : `${fmt.int(std.mortality.length)} مرحله · کل ${fmt.num(std.mortalityTotalPct)}٪`;
 
   const onOver = (path: string) => (v: any) => setOverride?.(path, v);
   const onReset = (path: string) => () => clearOverride?.(path);
@@ -48,6 +50,7 @@ export default function HealthSection({ std, def, updateBird, overrides, setOver
             unit="٪"
             type="number"
             min={0} max={100}
+            decimals={1}
             onOverride={onOver('mortalityTotalPct')}
             onClear={onReset('mortalityTotalPct')}
           />
