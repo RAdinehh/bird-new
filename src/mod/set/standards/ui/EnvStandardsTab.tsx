@@ -10,6 +10,7 @@ import { getStandardsGroupedByBird, type BirdStandard } from '../index';
 import { useSet } from '../../store';
 import { StandardDetail } from './StandardDetail';
 import { AddBirdModal } from './AddBirdModal';
+import ImportExportPanel from './ImportExportPanel';
 
 // ═══ کارت نژاد — ۲ ستونه جمع‌وجور ═══
 function BreedCard({
@@ -287,6 +288,9 @@ export default function EnvStandardsTab() {
       {Object.keys(custom).length > 0 ? (
         <Btn onClick={resetAll} full>🔄 بازگشت همه به پیش‌فرض</Btn>
       ) : null}
+
+      {/* 💾 صادرات/واردات */}
+      <ImportExportPanel />
 
       {selectedBird ? (
         <StandardDetail birdKey={selectedBird} onClose={() => setSelectedBird(null)} />
