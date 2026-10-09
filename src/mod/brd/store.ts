@@ -5,6 +5,8 @@ import { v4 as uuid } from 'uuid';
 export interface Bird {
   id: string;
   name: string;
+  /** کلید استاندارد در DEFAULT_STANDARDS (اختیاری) */
+  standardKey?: string;
   cycleDays: number | null;
   fcrStandard: number | null;
   createdAt: string;

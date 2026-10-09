@@ -12,6 +12,7 @@ import DialogHost from './shr/components/DialogHost';
 import ToastHost from './shr/components/ToastHost';
 import AppRouter from './cor/router/AppRouter';
 import { useKeyboard } from './shr/hooks/useKeyboard';
+import { useKeyboardSafeFocus } from './shr/hooks/useKeyboardSafeFocus';
 import { useAutoBackup } from './shr/hooks/useAutoBackup';
 import OnboardingModal from './shr/components/OnboardingModal';
 import LockScreen from './shr/components/LockScreen';
@@ -34,6 +35,7 @@ function Layout() {
   const loc = useLocation();
   const title = TITLES[loc.pathname] ?? 'مدیریت مرغداری';
   useKeyboard();
+  useKeyboardSafeFocus();
   useAutoBackup();
 
   // اسکرول به بالا موقع ناوبری (بجای remount کردن main)

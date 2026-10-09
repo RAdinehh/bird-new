@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Bird } from './store';
 import { findBirdPreset } from './presets';
+import SourceBadge, { type SourceType } from '../../shr/components/SourceBadge';
+import { detectCycleDaysSource, detectFcrSource } from './_source';
 import {
   Btn, BtnRow, Empty, Field,
   Grid2, Input, Modal, NumField,
@@ -18,15 +20,13 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
-interface F { id?: string; name: string; cycleDays: string; fcrStandard: string; }
-const empty: F = { name: '', cycleDays: '', fcrStandard: '' };
+interface F { id?: string; name: string; cycleDays: string; fcrStandard: string; standardKey?: string; }
+const empty: F = { name: '', cycleDays: '', fcrStandard: '', standardKey: '' };
 
 export default function BirdsPage({ active = true }: { active?: boolean } = {}) {
   const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird, dedupeBirds } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
-  const [cycleFromPreset, setCycleFromPreset] = useState(false);
-  const [fcrFromPreset, setFcrFromPreset] = useState(false);
   const [error, setError] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -80,10 +80,10 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   }, [ms.selectionMode]);
 
 
-  const openNew = () => { setForm(empty); setError(''); setOpen(true); setCycleFromPreset(false); setFcrFromPreset(false); };
+  const openNew = () => { setForm(empty); setError(''); setOpen(true);  };
   const openEdit = (b: Bird) => {
-    setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '' });
-    setCycleFromPreset(false); setFcrFromPreset(false);
+    setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '', standardKey: (b as any).standardKey || '' });
+    
     setError(''); setOpen(true);
   };
   useFab(active ? { label: 'افزودن پرنده', onClick: openNew } : null);
@@ -261,67 +261,61 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="نام پرنده" required>
           <Input
-          placeholder="مثلاً — مرغ"
-          value={form.name}
-          onChange={e => {
-            const newName = e.target.value;
-            const preset = findBirdPreset(newName);
-            setForm(f => ({
-              ...f,
-              name: newName,
-              cycleDays: preset?.cycleDays ? toFa(preset.cycleDays) : f.cycleDays,
-              fcrStandard: preset?.fcrStandard ? toFa(preset.fcrStandard) : f.fcrStandard,
-            }));
-            setCycleFromPreset(!!preset?.cycleDays);
-            setFcrFromPreset(!!preset?.fcrStandard);
-          }}
-          error={error || undefined}
-        />
+            placeholder="مثلاً — مرغ"
+            value={form.name}
+            onChange={e => {
+              const newName = e.target.value;
+              const preset = findBirdPreset(newName);
+              setForm(f => ({
+                ...f,
+                name: newName,
+                cycleDays: preset?.cycleDays ? toFa(preset.cycleDays) : f.cycleDays,
+                fcrStandard: preset?.fcrStandard ? toFa(preset.fcrStandard) : f.fcrStandard,
+              }));
+            }}
+            error={error || undefined}
+          />
         </Field>
-        <Field
-            label={
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                چرخه زندگی (روز)
-                {cycleFromPreset ? (
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
-                ) : null}
-              </span>
-            }
-            hint={cycleFromPreset ? '✨ از استاندارد' : 'از شروع تا پایان دوره'}
-          >
-            <NumField
-              placeholder="۰"
-              value={form.cycleDays}
-              onChange={e => { setForm({ ...form, cycleDays: e.target.value }); setCycleFromPreset(false); }}
-              min={1} max={2000} unit="روز" autoClamp />
-        </Field>
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7,
-           padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
-           marginBottom: 8 }}>
-          💡 <b>چرخه زندگی</b> یعنی چند روز طول می‌کشد تا این پرنده دوره‌اش کامل شود. مثال: جوجه گوشتی ۴۲ روز، مرغ تخم‌گذار ۵۰۰ روز.
-        </div>
 
-        <Field
-            label={
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                FCR استاندارد
-                {fcrFromPreset ? (
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
-                ) : null}
-              </span>
-            }
-            hint={fcrFromPreset ? '✨ از استاندارد' : 'ضریب تبدیل غذایی مرجع'}
-          >
-            <NumField
-              placeholder="۲٫۰"
-              value={form.fcrStandard}
-              onChange={e => { setForm({ ...form, fcrStandard: e.target.value }); setFcrFromPreset(false); }}
-              min={0.5} max={5} unit="FCR" autoClamp />
-        </Field>
+        <Grid2>
+          <div>
+            <Field label="چرخه زندگی (روز)" hint="از شروع تا پایان دوره">
+              <NumField
+                placeholder="۰"
+                value={form.cycleDays}
+                onChange={e => setForm({ ...form, cycleDays: e.target.value })}
+                min={1} max={2000} unit="روز" autoClamp />
+            </Field>
+            <div style={{ marginTop: -4, marginBottom: 6 }}>
+              {(() => {
+                const cd = form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null;
+                const src = detectCycleDaysSource(cd, form.standardKey, form.name);
+                return <SourceBadge source={src.source} label={src.label} />;
+              })()}
+            </div>
+          </div>
+          <div>
+            <Field label="FCR استاندارد" hint="ضریب تبدیل غذایی مرجع">
+              <NumField
+                placeholder="۲٫۰"
+                value={form.fcrStandard}
+                onChange={e => setForm({ ...form, fcrStandard: e.target.value })}
+                min={0.5} max={5} unit="FCR" autoClamp />
+            </Field>
+            <div style={{ marginTop: -4, marginBottom: 6 }}>
+              {(() => {
+                const fcr = form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null;
+                const src = detectFcrSource(fcr, form.standardKey, form.name);
+                return <SourceBadge source={src.source} label={src.label} />;
+              })()}
+            </div>
+          </div>
+        </Grid2>
+
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7,
            padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
            marginBottom: 8 }}>
-          💡 <b>FCR</b> یعنی چند کیلو دان لازم است تا پرنده ۱ کیلو وزن اضافه کند. هرچه کمتر، بهتر. مثال: ۱.۶ عالی، ۱.۸ متوسط، ۲.۰+ ضعیف.
+          💡 <b>چرخه زندگی</b> = چند روز طول می‌کشد تا دوره این پرنده کامل شود (گوشتی ۴۲، تخم‌گذار ۵۰۰). <b>FCR</b> = چند کیلو دان برای ۱ کیلو وزن (۱.۶ عالی، ۱.۸ متوسط، ۲.۰+ ضعیف).
         </div>
       </Modal>
     </PageContainer>
