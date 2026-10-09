@@ -6,6 +6,7 @@ import { detectBreedFcrSource, getBreedFcrBaseline } from './_source';
 import { useOverride } from '../../shr/hooks/useOverride';
 import OverrideHint from '../../shr/components/OverrideHint';
 import BreedNameField, { type BreedPick } from './BreedNameField';
+import EntityLink from '../../shr/components/EntityLink';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { getPurposeInfo, getCategoryInfo } from './_display';
 import { Btn, BtnRow, Empty, Field,
@@ -261,7 +262,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
                   </div>
                 }
                 stats={<>
-                  <span>🐔 پرنده: <b style={{ color: 'var(--text)' }}>{bird?.name || '—'}</b></span>
+                  <span>🐔 پرنده: {bird ? <b><EntityLink type="bird" id={bird.id} label={bird.name} /></b> : <b style={{ color: 'var(--text)' }}>—</b>}</span>
                   {b.fcr && <span>📊 FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcr)}</b></span>}
                 </>}
               >
@@ -277,7 +278,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>پرنده:</span>
-                    <span style={{ fontWeight: 600 }}>{bird?.name || '—'}</span>
+                    <span style={{ fontWeight: 600 }}>{bird ? <EntityLink type="bird" id={bird.id} label={bird.name} /> : '—'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
