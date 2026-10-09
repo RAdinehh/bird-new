@@ -1,36 +1,16 @@
 /**
  * HousingSection.tsx — گروه ۴: تأسیسات
  *
- * شامل: فضا (space) + تجهیزات (equipment) + بستر (litter)
+ * شامل: فضا + تجهیزات + بستر
+ * همه با OverridableField
  */
 import SettingsGroup from '../../../SettingsGroup';
 import { LitterEditor } from '../editors';
 import type { SectionProps } from './types';
-import { isChanged, parseNum } from './types';
+import { isChanged } from './types';
+import OverridableField from './OverridableField';
 
-const inputStyle = (changed: boolean) => ({
-  width: '100%', height: 34, padding: '0 10px',
-  background: 'var(--input-bg)',
-  border: '1px solid ' + (changed ? 'var(--warn)' : 'var(--border)'),
-  borderRadius: 'var(--r-md)',
-  color: 'var(--text)', fontFamily: 'inherit',
-  fontSize: 'var(--fs-base)', fontWeight: 700,
-  textAlign: 'center' as const, outline: 'none', boxSizing: 'border-box' as const,
-  direction: 'rtl' as const,
-});
-
-const F = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-    <label style={{ fontSize: 11.5, color: 'var(--muted)', fontWeight: 600 }}>{label}</label>
-    {children}
-  </div>
-);
-
-const G2 = ({ children }: { children: React.ReactNode }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>{children}</div>
-);
-
-export default function HousingSection({ std, def, updateBird }: SectionProps) {
+export default function HousingSection({ std, def, updateBird, overrides, setOverride, clearOverride }: SectionProps) {
   const spaceChanged = isChanged(std.space, def.space);
   const equipChanged = isChanged(std.equipment, def.equipment);
   const litterChanged = isChanged(std.litter, def.litter);
@@ -39,6 +19,9 @@ export default function HousingSection({ std, def, updateBird }: SectionProps) {
   const subtitle = changed
     ? '🔸 تغییر یافته'
     : `تراکم ${std.space.densityMax} پرنده/m²`;
+
+  const onOver = (path: string) => (v: any) => setOverride?.(path, v);
+  const onReset = (path: string) => () => clearOverride?.(path);
 
   return (
     <SettingsGroup
@@ -52,51 +35,54 @@ export default function HousingSection({ std, def, updateBird }: SectionProps) {
       {/* فضا */}
       <div style={{ marginBottom: 12 }}>
         <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700, marginBottom: 6 }}>
-          📐 فضای پرورش {spaceChanged && <span style={{ color: 'var(--warn)' }}>🔸</span>}
+          📐 فضای پرورش
         </div>
-        <G2>
-          <F label="تراکم (پرنده/m²)">
-            <input
-              type="text" inputMode="decimal"
-              value={std.space.densityMax}
-              onChange={e => {
-                const n = parseNum(e.target.value);
-                if (n !== null && n >= 0) updateBird({ space: { ...std.space, densityMax: n } });
-              }}
-              style={inputStyle(std.space.densityMax !== def.space.densityMax)}
-            />
-          </F>
-          <F label="فضای دانخوری (cm/پرنده)">
-            <input
-              type="text" inputMode="decimal"
-              value={std.space.feederSpaceCm}
-              onChange={e => {
-                const n = parseNum(e.target.value);
-                if (n !== null && n >= 0) updateBird({ space: { ...std.space, feederSpaceCm: n } });
-              }}
-              style={inputStyle(std.space.feederSpaceCm !== def.space.feederSpaceCm)}
-            />
-          </F>
-        </G2>
-        <F label="فضای آبخوری (cm/پرنده)">
-          <input
-            type="text" inputMode="decimal"
-            value={std.space.drinkerSpaceCm}
-            onChange={e => {
-              const n = parseNum(e.target.value);
-              if (n !== null && n >= 0) updateBird({ space: { ...std.space, drinkerSpaceCm: n } });
-            }}
-            style={inputStyle(std.space.drinkerSpaceCm !== def.space.drinkerSpaceCm)}
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <OverridableField
+            label="تراکم"
+            value={std.space.densityMax}
+            defaultValue={def.space.densityMax}
+            unit="پرنده/m²"
+            type="number"
+            min={1} max={100}
+            onOverride={onOver('space.densityMax')}
+            onClear={onReset('space.densityMax')}
           />
-        </F>
+          <OverridableField
+            label="فضای دانخوری"
+            value={std.space.feederSpaceCm}
+            defaultValue={def.space.feederSpaceCm}
+            unit="cm"
+            type="number"
+            min={0} max={50}
+            onOverride={onOver('space.feederSpaceCm')}
+            onClear={onReset('space.feederSpaceCm')}
+          />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+          <OverridableField
+            label="فضای آبخوری"
+            value={std.space.drinkerSpaceCm}
+            defaultValue={def.space.drinkerSpaceCm}
+            unit="cm"
+            type="number"
+            min={0} max={50}
+            onOverride={onOver('space.drinkerSpaceCm')}
+            onClear={onReset('space.drinkerSpaceCm')}
+          />
+          <div />
+        </div>
       </div>
 
-      {/* تجهیزات */}
+      {/* تجهیزات — نسبتها */}
       <div style={{ marginBottom: 12, paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
         <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700, marginBottom: 6 }}>
-          ⚙️ تجهیزات {equipChanged && <span style={{ color: 'var(--warn)' }}>🔸</span>}
+          ⚙️ تجهیزات
         </div>
 
+        {/* دانخوری — نمایش فقط (پیچیده‌تر از فیلد تکی) */}
         <div style={{
           padding: '8px 12px', background: 'var(--input-bg)',
           borderRadius: 'var(--r-md)', marginBottom: 8,
@@ -110,6 +96,7 @@ export default function HousingSection({ std, def, updateBird }: SectionProps) {
           </div>
         </div>
 
+        {/* آبخوری — نمایش فقط */}
         <div style={{
           padding: '8px 12px', background: 'var(--input-bg)',
           borderRadius: 'var(--r-md)', marginBottom: 8,
@@ -123,37 +110,36 @@ export default function HousingSection({ std, def, updateBird }: SectionProps) {
           </div>
         </div>
 
-        <G2>
-          <F label="روشنایی (W/m²)">
-            <input
-              type="text" inputMode="decimal"
-              value={std.equipment.lampWattPerM2}
-              onChange={e => {
-                const n = parseNum(e.target.value);
-                if (n !== null && n >= 0) updateBird({ equipment: { ...std.equipment, lampWattPerM2: n } });
-              }}
-              style={inputStyle(std.equipment.lampWattPerM2 !== def.equipment.lampWattPerM2)}
-            />
-          </F>
-          <F label="فن (m³/h/kg)">
-            <input
-              type="text" inputMode="decimal"
-              value={std.equipment.fanM3PerKg}
-              onChange={e => {
-                const n = parseNum(e.target.value);
-                if (n !== null && n >= 0) updateBird({ equipment: { ...std.equipment, fanM3PerKg: n } });
-              }}
-              style={inputStyle(std.equipment.fanM3PerKg !== def.equipment.fanM3PerKg)}
-            />
-          </F>
-        </G2>
+        {/* روشنایی و فن — قابل ویرایش */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <OverridableField
+            label="روشنایی"
+            value={std.equipment.lampWattPerM2}
+            defaultValue={def.equipment.lampWattPerM2}
+            unit="W/m²"
+            type="number"
+            min={0} max={30}
+            onOverride={onOver('equipment.lampWattPerM2')}
+            onClear={onReset('equipment.lampWattPerM2')}
+          />
+          <OverridableField
+            label="فن"
+            value={std.equipment.fanM3PerKg}
+            defaultValue={def.equipment.fanM3PerKg}
+            unit="m³/h/kg"
+            type="number"
+            min={0} max={20}
+            onOverride={onOver('equipment.fanM3PerKg')}
+            onClear={onReset('equipment.fanM3PerKg')}
+          />
+        </div>
       </div>
 
       {/* بستر */}
       {std.litter && (
         <div style={{ paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
           <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700, marginBottom: 6 }}>
-            🛏 بستر {litterChanged && <span style={{ color: 'var(--warn)' }}>🔸</span>}
+            🛏 بستر
           </div>
           <LitterEditor
             litter={std.litter}

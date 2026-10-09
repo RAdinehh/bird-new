@@ -164,6 +164,7 @@ export default function EnvStandardsTab() {
       <button
         type="button"
         onClick={() => setOnlyActive(!onlyActive)}
+        aria-label={onlyActive ? 'نمایش فقط پرنده‌های فعال' : 'نمایش همه پرنده‌ها'}
         style={{
           display: 'flex',
           alignItems: 'center',

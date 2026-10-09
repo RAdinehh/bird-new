@@ -1,41 +1,24 @@
 /**
  * IdentitySection.tsx — گروه ۱: شناسه نژاد
  *
- * شامل: نام فارسی، نام انگلیسی، پرنده مادر، دسته، منبع، یادداشت
+ * همه فیلدها با OverridableField
  */
 import SettingsGroup from '../../../SettingsGroup';
 import type { SectionProps } from './types';
 import { isChanged } from './types';
+import OverridableField from './OverridableField';
 
-const inputStyle = (changed: boolean) => ({
-  width: '100%', height: 38, padding: '0 12px',
-  background: 'var(--input-bg)',
-  border: '1px solid ' + (changed ? 'var(--warn)' : 'var(--border)'),
-  borderRadius: 'var(--r-md)',
-  color: 'var(--text)', fontFamily: 'inherit',
-  fontSize: 'var(--fs-base)', fontWeight: 600,
-  textAlign: 'right' as const, outline: 'none', boxSizing: 'border-box' as const,
-  direction: 'rtl' as const,
-});
-
-const F = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-    <label style={{ fontSize: 11.5, color: 'var(--muted)', fontWeight: 600 }}>{label}</label>
-    {children}
-  </div>
-);
-
-const G2 = ({ children }: { children: React.ReactNode }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>{children}</div>
-);
-
-export default function IdentitySection({ std, def, updateBird }: SectionProps) {
+export default function IdentitySection({ std, def, updateBird, overrides, setOverride, clearOverride }: SectionProps) {
   const changed =
-    std.nameFa !== def.nameFa ||
-    std.nameEn !== def.nameEn ||
-    std.birdName !== def.birdName ||
+    isChanged(std.nameFa, def.nameFa) ||
+    isChanged(std.nameEn, def.nameEn) ||
+    isChanged(std.birdName, def.birdName) ||
     isChanged(std.source, def.source) ||
-    isChanged(std.publishYear, def.publishYear);
+    isChanged(std.publishYear, def.publishYear) ||
+    isChanged(std.notes, def.notes);
+
+  const onOver = (path: string) => (v: any) => setOverride?.(path, v);
+  const onReset = (path: string) => () => clearOverride?.(path);
 
   return (
     <SettingsGroup
@@ -46,86 +29,87 @@ export default function IdentitySection({ std, def, updateBird }: SectionProps) 
       persist={false}
       tone="info"
     >
-      <G2>
-        <F label="نام فارسی">
-          <input
-            type="text"
-            value={std.nameFa}
-            onChange={e => updateBird({ nameFa: e.target.value })}
-            style={inputStyle(std.nameFa !== def.nameFa)}
-          />
-        </F>
-        <F label="نام انگلیسی">
-          <input
-            type="text"
-            value={std.nameEn}
-            onChange={e => updateBird({ nameEn: e.target.value })}
-            dir="ltr"
-            style={{ ...inputStyle(std.nameEn !== def.nameEn), textAlign: 'left' as const }}
-          />
-        </F>
-      </G2>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <OverridableField
+          label="نام فارسی"
+          value={std.nameFa}
+          defaultValue={def.nameFa}
+          type="text"
+          onOverride={onOver('nameFa')}
+          onClear={onReset('nameFa')}
+        />
+        <OverridableField
+          label="نام انگلیسی"
+          value={std.nameEn}
+          defaultValue={def.nameEn}
+          type="text"
+          onOverride={onOver('nameEn')}
+          onClear={onReset('nameEn')}
+        />
+      </div>
 
-      <G2>
-        <F label="پرنده مادر">
-          <input
-            type="text"
-            value={std.birdName}
-            onChange={e => updateBird({ birdName: e.target.value })}
-            style={inputStyle(std.birdName !== def.birdName)}
-          />
-        </F>
-        <F label="دسته">
-          <select
-            value={std.category}
-            onChange={e => updateBird({ category: e.target.value as any })}
-            style={inputStyle(std.category !== def.category)}
-          >
-            <option value="native">بومی 🇮🇷</option>
-            <option value="industrial">صنعتی 🔬</option>
-            <option value="fancy">تزئینی 🦚</option>
-          </select>
-        </F>
-      </G2>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+        <OverridableField
+          label="پرنده مادر"
+          value={std.birdName}
+          defaultValue={def.birdName}
+          type="text"
+          onOverride={onOver('birdName')}
+          onClear={onReset('birdName')}
+        />
+        <OverridableField
+          label="منبع علمی"
+          value={std.source || ''}
+          defaultValue={def.source || ''}
+          type="text"
+          placeholder="مثلاً: Aviagen 2024"
+          onOverride={onOver('source')}
+          onClear={onReset('source')}
+        />
+      </div>
 
-      <G2>
-        <F label="منبع (Source)">
-          <input
-            type="text"
-            value={std.source || ''}
-            onChange={e => updateBird({ source: e.target.value || undefined })}
-            placeholder="مثلاً: Aviagen 2024"
-            style={inputStyle((std.source || '') !== (def.source || ''))}
-          />
-        </F>
-        <F label="سال انتشار">
-          <input
-            type="text"
-            inputMode="numeric"
-            value={std.publishYear ?? ''}
-            onChange={e => {
-              const n = parseInt(e.target.value.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/\D/g, ''), 10);
-              updateBird({ publishYear: isNaN(n) ? undefined : n });
-            }}
-            placeholder="۱۴۰۳ یا 2024"
-            style={inputStyle(std.publishYear !== def.publishYear)}
-          />
-        </F>
-      </G2>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+        <OverridableField
+          label="سال انتشار"
+          value={std.publishYear}
+          defaultValue={def.publishYear}
+          type="number"
+          min={1300} max={1500}
+          onOverride={onOver('publishYear')}
+          onClear={onReset('publishYear')}
+        />
+        <div /> {/* spacer */}
+      </div>
 
-      <F label="یادداشت">
+      {/* یادداشت — textarea */}
+      <div style={{ marginTop: 10 }}>
+        <div style={{
+          fontSize: 11.5, color: 'var(--muted)', fontWeight: 600,
+          marginBottom: 4,
+        }}>یادداشت</div>
         <textarea
           value={std.notes || ''}
           onChange={e => updateBird({ notes: e.target.value || undefined })}
           rows={2}
           placeholder="توضیحات آزاد..."
           style={{
-            ...inputStyle((std.notes || '') !== (def.notes || '')),
-            height: 'auto', minHeight: 50, padding: '8px 12px',
+            width: '100%',
+            minHeight: 60,
+            padding: '8px 12px',
+            background: 'var(--input-bg)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-md)',
+            color: 'var(--text)',
+            fontFamily: 'inherit',
+            fontSize: 'var(--fs-base)',
+            outline: 'none',
+            boxSizing: 'border-box',
+            direction: 'rtl',
+            textAlign: 'right',
             resize: 'vertical',
           }}
         />
-      </F>
+      </div>
     </SettingsGroup>
   );
 }

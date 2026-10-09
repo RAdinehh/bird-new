@@ -177,9 +177,10 @@ function ActionBtn({
     <button
       type="button"
       onClick={onClick}
+      aria-label={typeof children === "string" ? children : "دکمه"}
       disabled={disabled}
       style={{
-        minHeight: 40,
+        minHeight: 38,
         padding: '8px 14px',
         background: isPrimary ? 'var(--accent)' : 'var(--input-bg)',
         color: isPrimary ? '#fff' : 'var(--text)',

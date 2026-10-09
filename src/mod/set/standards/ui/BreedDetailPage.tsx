@@ -108,7 +108,7 @@ export default function BreedDetailPage() {
             onClick={() => navigate(-1)}
             aria-label="بازگشت"
             style={{
-              width: 40, height: 40, borderRadius: 10,
+              width: 40, height: 38, borderRadius: 10,
               background: 'var(--input-bg)',
               border: '1px solid var(--border)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',

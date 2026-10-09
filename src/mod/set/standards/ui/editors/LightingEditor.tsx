@@ -11,7 +11,7 @@ const F = ({ label, children }: { label: string; children: React.ReactNode }) =>
 );
 
 const inputStyle = (changed: boolean) => ({
-  width: '100%', height: 34, padding: '0 10px',
+  width: '100%', height: 38, padding: '0 10px',
   background: 'var(--input-bg)',
   border: '1px solid ' + (changed ? 'var(--warn)' : 'var(--border)'),
   borderRadius: 'var(--r-md)' as any,

@@ -50,6 +50,7 @@ export function LitterEditor({
                   key={m}
                   type="button"
                   onClick={() => toggleMaterial(m)}
+                  aria-pressed={selected}
                   style={{
                     padding: '5px 10px',
                     background: selected ? 'var(--accent-soft)' : 'var(--card)',

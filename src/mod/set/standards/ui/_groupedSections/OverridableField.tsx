@@ -134,7 +134,8 @@ export default function OverridableField({
             title={`بازگشت به استاندارد (${displayDefault})`}
             aria-label="بازگشت به استاندارد"
             style={{
-              width: 22, height: 22,
+              width: 44, height: 44,
+              marginInline: -11, marginBlock: -11,
               background: 'transparent',
               border: 'none',
               color: 'var(--warn)',
@@ -161,8 +162,19 @@ export default function OverridableField({
           onFocus={() => setFocused(true)}
           onBlur={commit}
           onKeyDown={e => {
-            if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-            else if (e.key === 'Escape') {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              commit();
+              // Enter → برو فیلد بعدی
+              const form = (e.target as HTMLElement).closest('[data-fields-group]') || document.body;
+              const inputs = Array.from(form.querySelectorAll('input:not([type="hidden"])')) as HTMLElement[];
+              const idx = inputs.indexOf(e.target as HTMLElement);
+              if (idx >= 0 && idx + 1 < inputs.length) {
+                inputs[idx + 1].focus();
+              } else {
+                (e.target as HTMLInputElement).blur();
+              }
+            } else if (e.key === 'Escape') {
               setDraft(displayValue);
               (e.target as HTMLInputElement).blur();
             }
