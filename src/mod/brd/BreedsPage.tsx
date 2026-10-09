@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Breed } from './store';
+import SourceBadge from '../../shr/components/SourceBadge';
+import { detectBreedFcrSource } from './_source';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { Btn, BtnRow, Empty, Field,
   Grid2, Input, Modal, NumField,
@@ -288,50 +290,60 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش نژاد' : 'افزودن نژاد'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="پرنده" required hint="نژاد به این پرنده متصل می‌شود">
-<SmartSelect
-              value={form.birdId}
-              onChange={v => setForm(f => ({ ...f, birdId: v }))}
-              options={birds.map(c => ({
-                value: c.id,
-                label: c.name,
-                subtitle: undefined,
-              }))}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب پرنده"
-              autoThreshold={6}
-            />
+          <SmartSelect
+            value={form.birdId}
+            onChange={v => {
+              const parent = birds.find(x => x.id === v);
+              // 🔄 Cascade: اگه FCR خالیه، از پرنده والد پر کن
+              setForm(f => ({
+                ...f,
+                birdId: v,
+                fcr: !f.fcr && parent?.fcrStandard ? toFa(parent.fcrStandard) : f.fcr,
+              }));
+            }}
+            options={birds.map(c => ({
+              value: c.id,
+              label: c.name,
+              subtitle: c.fcrStandard ? `FCR ${toFa(c.fcrStandard)}` : undefined,
+            }))}
+            placeholder="— انتخاب کنید —"
+            modalTitle="انتخاب پرنده"
+            autoThreshold={6}
+          />
         </Field>
         <Grid2>
-          <Field label="نام نژاد" required>
+          <Field label="نام نژاد" required hint="مثال: مرندی، گلپایگانی">
             <Input placeholder="مثلاً — مرندی" value={form.name} onChange={e => {
                 const newName = e.target.value;
                 const matchedKey = findStandardKey(newName);
+                // اگه FCR دستی تغییر نکرده، از استاندارد پر کن
+                const hasManualFcr = !!form.fcr;
                 setForm(f => ({
                   ...f,
                   name: newName,
                   standardKey: matchedKey || f.standardKey,
-                  fcr: matchedKey && DEFAULT_STANDARDS[matchedKey]?.growth?.weightByAge?.length
+                  fcr: (matchedKey && !hasManualFcr && DEFAULT_STANDARDS[matchedKey]?.growth?.weightByAge?.length)
                     ? toFa(DEFAULT_STANDARDS[matchedKey].growth.weightByAge[
                         DEFAULT_STANDARDS[matchedKey].growth.weightByAge.length - 1
                       ].fcr)
                     : f.fcr,
                 }));
-                setFcrFromStd(!!matchedKey);
+                if (matchedKey && !hasManualFcr) setFcrFromStd(true);
               }} />
           </Field>
           <Field
             label={
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
                 FCR
-                {fcrFromStd ? (
-                  <span style={{
-                    width: 6, height: 6, borderRadius: '50%',
-                    background: 'var(--accent)', display: 'inline-block',
-                  }} />
-                ) : null}
+                {(() => {
+                  const fcr = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
+                  const parent = birds.find(x => x.id === form.birdId);
+                  const src = detectBreedFcrSource(fcr, form.standardKey, parent?.fcrStandard ?? null);
+                  return <SourceBadge source={src.source} label={src.label} />;
+                })()}
               </span>
             }
-            hint={fcrFromStd ? '✨ از استاندارد' : undefined}
+            hint="ضریب تبدیل غذایی"
           >
             <NumField
               placeholder="۲٫۰"

@@ -44,10 +44,7 @@ export function findBirdPreset(name: string): BirdPreset | undefined {
     }
   }
 
-  // ۲. اگه پیدا نشد، از presets قدیمی
+  // ۲. اگه پیدا نشد، از presets قدیمی — فقط match دقیق
   if (BIRD_PRESETS[trimmed]) return BIRD_PRESETS[trimmed];
-  for (const key of Object.keys(BIRD_PRESETS)) {
-    if (trimmed.includes(key) || key.includes(trimmed)) return BIRD_PRESETS[key];
-  }
   return undefined;
 }

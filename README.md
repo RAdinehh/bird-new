@@ -1,34 +1,32 @@
-# Bird-new
+# 🐔 Bird-new — مدیریت مرغداری
 
-PWA مدیریت مرغداری برای پرورش نژادهای بومی و تجاری ایران.
+PWA جامع مدیریت مزرعه طیور — آفلاین
 
-## نصب و اجرا
+## 📖 مستندات کامل
+- [راهنمای پروژه](docs/PROJECT-GUIDE.md) — معرفی، وضعیت، کارها
+- [استانداردها](docs/STANDARDS.md) — UI/UX، معماری، A11y
+- [قوانین AI](docs/AI-RULES.md) — قوانین توسعه، دستورات، مسیر
 
-git clone https://github.com/RAdinehh/bird-new.git
-cd bird-new
+## 🚀 شروع سریع
 npm install
 npm run dev -- --host 0.0.0.0 --port 3000
 
-## دستورات
+## 🧪 تست
+npm test -- --run       # ۱۰۷۰ تست
+npx tsc --noEmit        # چک تایپ
+npm run build           # build
 
-npm run dev       — اجرا روی localhost:3000
-npm test          — تست
-npx tsc --noEmit  — چک تایپ
-npm run build     — build production
+## 📱 APK
+هر git push → APK جدید در Actions
 
-## مستندات
+## 🎯 وضعیت
+- ۱۸ ماژول CRUD
+- ۱۰۷۰ تست pass
+- Android APK فعال
+- ~۹۰٪ تکمیل
 
-وضعیت پروژه و نقشه راه: docs/STATUS.md
-
-## Stack
-
-- React 18 و TypeScript
-- Vite و PWA
-- Zustand برای state
-- Zod برای validation
-- date-fns-jalali برای تاریخ شمسی
-- Vitest برای تست
-
-## لایسنس
-
-Private
+## 🏛️ استانداردها
+- Apple HIG
+- Material Design 3
+- WCAG 2.1 AA
+- ISO/IEC 25010

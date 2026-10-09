@@ -4,6 +4,7 @@ import { useBrd, type Bird } from './store';
 import { findBirdPreset } from './presets';
 import SourceBadge, { type SourceType } from '../../shr/components/SourceBadge';
 import { detectCycleDaysSource, detectFcrSource } from './_source';
+import BirdNameField, { type BirdPresetPick } from './BirdNameField';
 import {
   Btn, BtnRow, Empty, Field,
   Grid2, Input, Modal, NumField,
@@ -259,21 +260,21 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش پرنده' : 'افزودن پرنده'} contentGap={14}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-        <Field label="نام پرنده" required>
-          <Input
-            placeholder="مثلاً — مرغ"
+        <Field label="نام پرنده" required hint="از لیست انتخاب کن یا پرنده دلخواه بنویس">
+          <BirdNameField
             value={form.name}
-            onChange={e => {
-              const newName = e.target.value;
-              const preset = findBirdPreset(newName);
+            onChange={v => setForm(f => ({ ...f, name: v }))}
+            onPick={(pick: BirdPresetPick) => {
               setForm(f => ({
                 ...f,
-                name: newName,
-                cycleDays: preset?.cycleDays ? toFa(preset.cycleDays) : f.cycleDays,
-                fcrStandard: preset?.fcrStandard ? toFa(preset.fcrStandard) : f.fcrStandard,
+                name: pick.name,
+                cycleDays: pick.cycleDays ? toFa(pick.cycleDays) : f.cycleDays,
+                fcrStandard: pick.fcrStandard ? toFa(pick.fcrStandard) : f.fcrStandard,
+                standardKey: pick.standardKey || f.standardKey,
               }));
             }}
             error={error || undefined}
+            excludeNames={birds.filter(b => b.id !== form.id).map(b => b.name)}
           />
         </Field>
 
