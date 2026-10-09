@@ -44,3 +44,7 @@ coverage
 *.bak*
 .sref/
 .sref
+
+# Backup files (all variants)
+*.save_*
+*.save-*

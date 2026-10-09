@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" width="800" height="300">
+  <defs>
+    <linearGradient id="g4bg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- آیکون سمت راست -->
+  <g transform="translate(600 150)">
+    <circle r="90" fill="#ffffff"/>
+    <g transform="translate(0 -5)">
+      <ellipse cx="0" cy="15" rx="35" ry="28" fill="#16a34a"/>
+      <circle cx="0" cy="-15" r="20" fill="#16a34a"/>
+      <path d="M -10 -28 Q -6 -40, 0 -28 Q 6 -40, 10 -28"
+            stroke="#dc2626" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 16 -15 L 28 -13 L 16 -10 Z" fill="#f59e0b"/>
+      <circle cx="7" cy="-17" r="2.5" fill="#fff"/>
+    </g>
+  </g>
+
+  <!-- متن -->
+  <text x="500" y="130" font-family="sans-serif" font-size="52" font-weight="800"
+        text-anchor="end" fill="#ffffff">مزرعه طیور ایران</text>
+  <text x="500" y="180" font-family="sans-serif" font-size="22" font-weight="500"
+        text-anchor="end" fill="#86efac" letter-spacing="2">IRAN POULTRY FARM</text>
+
+  <!-- خط تزئینی -->
+  <line x1="300" y1="210" x2="700" y2="210" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="310" cy="210" r="6" fill="#fbbf24"/>
+</svg>

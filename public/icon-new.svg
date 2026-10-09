@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#15803d"/>
+    </linearGradient>
+    <linearGradient id="egg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="192" height="192" rx="42" fill="url(#bg)"/>
+
+  <!-- Subtle pattern dots -->
+  <circle cx="40" cy="40" r="3" fill="#ffffff" opacity="0.15"/>
+  <circle cx="152" cy="40" r="3" fill="#ffffff" opacity="0.15"/>
+  <circle cx="40" cy="152" r="3" fill="#ffffff" opacity="0.15"/>
+  <circle cx="152" cy="152" r="3" fill="#ffffff" opacity="0.15"/>
+
+  <!-- Egg (behind chicken) -->
+  <ellipse cx="96" cy="118" rx="38" ry="48" fill="url(#egg)"/>
+
+  <!-- Chicken body -->
+  <g fill="#ffffff">
+    <!-- Body -->
+    <path d="M 96 60
+             C 78 60, 66 74, 66 92
+             C 66 108, 78 118, 96 118
+             C 114 118, 126 108, 126 92
+             C 126 74, 114 60, 96 60 Z"/>
+    <!-- Wing -->
+    <ellipse cx="82" cy="92" rx="14" ry="10" fill="#dcfce7" opacity="0.6"/>
+  </g>
+
+  <!-- Chicken head -->
+  <circle cx="96" cy="52" r="18" fill="#ffffff"/>
+
+  <!-- Comb -->
+  <path d="M 88 38 Q 92 30, 96 38 Q 100 30, 104 38"
+        stroke="#ef4444" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <!-- Beak -->
+  <path d="M 112 52 L 122 54 L 112 57 Z" fill="#f59e0b"/>
+
+  <!-- Eye -->
+  <circle cx="103" cy="50" r="2.5" fill="#15803d"/>
+
+  <!-- Legs -->
+  <line x1="88" y1="118" x2="88" y2="128" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <line x1="104" y1="118" x2="104" y2="128" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <line x1="83" y1="128" x2="93" y2="128" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <line x1="99" y1="128" x2="109" y2="128" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+</svg>
