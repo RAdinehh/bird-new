@@ -4,6 +4,7 @@ import { useBrd, type Breed } from './store';
 import SourceBadge from '../../shr/components/SourceBadge';
 import { detectBreedFcrSource, getBreedFcrBaseline } from './_source';
 import { useOverride } from '../../shr/hooks/useOverride';
+import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import OverrideHint from '../../shr/components/OverrideHint';
 import BreedNameField, { type BreedPick } from './BreedNameField';
 import EntityLink from '../../shr/components/EntityLink';
@@ -44,6 +45,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const draft = useFormDraft('brd-breed', form, (v: any) => setForm(v));
 
   // فیلتر تکرارها تو render (per bird + name)
   const _birdsUnique = useMemo(() => {
@@ -118,7 +120,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
 
   const openNew = () => {
-    setForm({ id:'', birdId: birds[0].id, name:'', fcr:'', standardKey:'' });
+    if (!draft.hasDraft) setForm({ id:'', birdId: birds[0].id, name:'', fcr:'', standardKey:'' });
     setFcrFromStd(false);
     setErr(''); setOpen(true);
   };
@@ -179,6 +181,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       standardKey: form.standardKey || undefined,
     };
     if (form.id) updateBreed(form.id, payload); else addBreed(payload);
+    draft.clear();
     setOpen(false);
   };
 

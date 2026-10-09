@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useFocusParam } from '../../shr/hooks/useFocusParam';
+import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useBrd, type Bird } from './store';
 import { findBirdPreset } from './presets';
 import { getKindInfo, getPurposeInfo, getCategoryInfo } from './_display';
@@ -44,6 +45,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   const [error, setError] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const draft = useFormDraft('brd-bird', form, (v: any) => setForm(v));
 
   // 🆕 focus از URL → باز کردن کارت
   const focusId = useFocusParam();
@@ -100,7 +102,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   }, [ms.selectionMode]);
 
 
-  const openNew = () => { setForm(empty); setError(''); setOpen(true);  };
+  const openNew = () => { if (!draft.hasDraft) setForm(empty); setError(''); setOpen(true);  };
   const openEdit = (b: Bird) => {
     setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '', standardKey: (b as any).standardKey || '', birdKind: (b as any).birdKind, purpose: (b as any).purpose });
     
@@ -132,6 +134,8 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
       purpose: form.purpose,
     } as any;
     if (form.id) updateBird(form.id, payload); else addBird(payload);
+    draft.clear();
+    setForm(empty);
     setOpen(false);
   };
 
