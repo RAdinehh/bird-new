@@ -5,6 +5,7 @@
  */
 import SettingsGroup from '../../../SettingsGroup';
 import { HatchingEditor } from '../editors';
+import OverridableField from './OverridableField';
 import type { SectionProps } from './types';
 import { isChanged, parseNum } from './types';
 
@@ -30,7 +31,7 @@ const G2 = ({ children }: { children: React.ReactNode }) => (
   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>{children}</div>
 );
 
-export default function ProductionSection({ std, def, updateBird }: SectionProps) {
+export default function ProductionSection({ std, def, updateBird, overrides, setOverride, clearOverride }: SectionProps) {
   const bioChanged = isChanged(std.biology, def.biology);
   const prodChanged = isChanged(std.production, def.production);
   const hatchChanged = isChanged(std.hatchingParams, def.hatchingParams);
@@ -76,14 +77,17 @@ export default function ProductionSection({ std, def, updateBird }: SectionProps
           </F>
         </G2>
         <G2>
-          <F label="سن کشتار (روز)">
-            <input
-              type="text" inputMode="decimal"
-              value={std.biology.cullDay ?? ''}
-              onChange={e => updateBird({ biology: { ...std.biology, cullDay: parseNum(e.target.value) } })}
-              style={inputStyle(std.biology.cullDay !== def.biology.cullDay)}
-            />
-          </F>
+          <OverridableField
+            label="سن کشتار (روز)"
+            value={std.biology.cullDay}
+            defaultValue={def.biology.cullDay}
+            unit="روز"
+            type="number"
+            min={1}
+            max={2000}
+            onOverride={v => setOverride?.('biology.cullDay', v)}
+            onClear={() => clearOverride?.('biology.cullDay')}
+          />
           <F label="نسبت نر:ماده">
             <input
               type="text" inputMode="decimal"

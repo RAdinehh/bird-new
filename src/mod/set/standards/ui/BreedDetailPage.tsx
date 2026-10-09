@@ -26,6 +26,9 @@ export default function BreedDetailPage() {
 
   const s = useSet();
   const custom = (s as any).customStandards || {};
+  const overrides = ((s as any).customOverrides || {})[birdKey];
+  const setOverride = (s as any).setOverride;
+  const clearOverride = (s as any).clearOverride;
   const isCustom = !!custom[birdKey];
 
   const std: BirdStandard = custom[birdKey] || (DEFAULT_STANDARDS as any)[birdKey] || (
@@ -128,6 +131,9 @@ export default function BreedDetailPage() {
           def={def}
           isCustom={isCustom}
           updateBird={updateBird}
+          overrides={overrides}
+          setOverride={setOverride ? (path: string, value: any) => setOverride(birdKey, path, value) : undefined}
+          clearOverride={clearOverride ? (path: string) => clearOverride(birdKey, path) : undefined}
         />
 
         {isCustom ? (

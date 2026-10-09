@@ -10,6 +10,7 @@
  *   ۶. تولید
  */
 import type { BirdStandard } from '../types';
+import type { StandardOverrides } from '../_override';
 import { isChanged } from './_groupedSections';
 import {
   IdentitySection,
@@ -25,10 +26,14 @@ interface Props {
   def: BirdStandard;
   isCustom?: boolean;
   updateBird: (patch: Partial<BirdStandard>) => void;
+  /** 🆕 Overrides */
+  overrides?: StandardOverrides;
+  setOverride?: (path: string, value: any) => void;
+  clearOverride?: (path: string) => void;
 }
 
 export default function StandardSections(props: Props) {
-  const { std, def, updateBird } = props;
+  const { std, def, updateBird, overrides, setOverride, clearOverride } = props;
 
   // ═══ تشخیص تغییرات هر گروه ═══
   const identityChanged =
@@ -71,31 +76,49 @@ export default function StandardSections(props: Props) {
         std={std} def={def}
         isChanged={identityChanged}
         updateBird={updateBird}
+        overrides={overrides}
+        setOverride={setOverride}
+        clearOverride={clearOverride}
       />
       <EnvironmentSection
         std={std} def={def}
         isChanged={envChanged}
         updateBird={updateBird}
+        overrides={overrides}
+        setOverride={setOverride}
+        clearOverride={clearOverride}
       />
       <NutritionSection
         std={std} def={def}
         isChanged={nutritionChanged}
         updateBird={updateBird}
+        overrides={overrides}
+        setOverride={setOverride}
+        clearOverride={clearOverride}
       />
       <HousingSection
         std={std} def={def}
         isChanged={housingChanged}
         updateBird={updateBird}
+        overrides={overrides}
+        setOverride={setOverride}
+        clearOverride={clearOverride}
       />
       <HealthSection
         std={std} def={def}
         isChanged={healthChanged}
         updateBird={updateBird}
+        overrides={overrides}
+        setOverride={setOverride}
+        clearOverride={clearOverride}
       />
       <ProductionSection
         std={std} def={def}
         isChanged={productionChanged}
         updateBird={updateBird}
+        overrides={overrides}
+        setOverride={setOverride}
+        clearOverride={clearOverride}
       />
     </>
   );
