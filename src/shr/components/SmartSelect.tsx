@@ -18,6 +18,8 @@ interface Props {
   placeholder?: string;
   groupLabels?: Record<string, string>;
   groupIcons?: Record<string, string>;
+  /** 🆕 حالت سلسله‌مراتبی */
+  hierarchical?: boolean;
   autoThreshold?: number;
   disabled?: boolean;
   modalTitle?: string;
@@ -35,6 +37,7 @@ export default function SmartSelect({
   placeholder = '— انتخاب کنید —',
   groupLabels = {},
   groupIcons = {},
+  hierarchical = false,
   autoThreshold = 8,
   disabled = false,
   modalTitle = 'انتخاب',
@@ -209,12 +212,15 @@ export default function SmartSelect({
             <span style={{ color: 'var(--danger)', marginRight: 4 }}> *</span>
           ) : null}
         </span>
-        <span
+        <svg
           aria-hidden="true"
-          style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0 }}
+          width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="var(--muted)"
+          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          style={{ flexShrink: 0 }}
         >
-          ▾
-        </span>
+          <path d="m6 9 6 6 6-6" />
+        </svg>
       </button>
 
       {(error || warn) && (
@@ -311,6 +317,67 @@ export default function SmartSelect({
                 </div>
               ) : null}
             </div>
+          ) : hierarchical && groups.length > 0 ? (
+            /* 🆕 حالت سلسله‌مراتبی — والد با هدر، فرزندان indent */
+            groups.map(g => {
+              const groupOptions = filtered.filter(o => o.group === g);
+              if (groupOptions.length === 0) return null;
+              const headerLabel = groupLabels[g] || g;
+              const headerIcon = groupIcons[g] || '';
+              return (
+                <div key={g} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '8px 10px 4px',
+                    fontSize: 'var(--fs-sm)', fontWeight: 800,
+                    color: 'var(--accent)',
+                    borderBottom: '1px solid var(--border)',
+                  }}>
+                    {headerIcon && <span style={{ fontSize: 16 }}>{headerIcon}</span>}
+                    <span>{headerLabel}</span>
+                    <span style={{
+                      marginInlineStart: 'auto', fontSize: 10,
+                      color: 'var(--muted)', fontWeight: 600,
+                    }}>({toFa(groupOptions.length)})</span>
+                  </div>
+                  {groupOptions.map(o => {
+                    const isSelected = o.value === value;
+                    return (
+                      <button
+                        key={o.value}
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        disabled={o.disabled}
+                        onClick={() => handlePick(o.value)}
+                        style={{
+                          width: '100%', textAlign: 'right',
+                          padding: compact ? '6px 10px 6px 28px' : '8px 12px 8px 32px',
+                          background: isSelected ? 'var(--accent-soft)' : 'transparent',
+                          border: '1px solid ' + (isSelected ? 'var(--accent-border)' : 'transparent'),
+                          borderRadius: 'var(--r-sm)',
+                          cursor: o.disabled ? 'not-allowed' : 'pointer',
+                          fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                          display: 'flex', justifyContent: 'space-between',
+                          alignItems: 'center', gap: 8,
+                          color: isSelected ? 'var(--accent)' : 'var(--text)',
+                          opacity: o.disabled ? 0.5 : 1,
+                          outline: 'none',
+                          fontWeight: isSelected ? 700 : 500,
+                        }}
+                      >
+                        <span>{o.label}</span>
+                        {o.subtitle && (
+                          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0 }}>
+                            {o.subtitle}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })
           ) : (
             filtered.map(o => {
               const isSelected = o.value === value;

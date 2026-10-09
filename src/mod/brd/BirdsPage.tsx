@@ -292,22 +292,19 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                         display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
                       }}>
                         {stdData.nameFa || stdData.nameEn || stdKey}
-                        {stdData.source && (
-                          <span style={{
-                            fontSize: 9, fontWeight: 700,
-                            padding: '2px 7px', borderRadius: 8,
-                            background: '#fff', border: '1px solid rgba(0,0,0,.06)',
-                            color: '#3b82f6',
-                          }}>📚 {stdData.source}</span>
-                        )}
-                        {stdData.publishYear && (
-                          <span style={{
-                            fontSize: 9, fontWeight: 700,
-                            padding: '2px 6px', borderRadius: 8,
-                            background: '#fff', border: '1px solid rgba(0,0,0,.06)',
-                            color: '#3b82f6',
-                          }}>{toFa(stdData.publishYear)}</span>
-                        )}
+                        <span style={{
+                          fontSize: 8, fontWeight: 600,
+                          color: '#3b82f6',
+                          opacity: 0.85,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: 140,
+                        }}>
+                          {stdData.source && `📚 ${stdData.source}`}
+                          {stdData.source && stdData.publishYear && ' · '}
+                          {stdData.publishYear && toFa(stdData.publishYear)}
+                        </span>
                       </div>
                     </div>
                     <div style={{
