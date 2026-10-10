@@ -51,6 +51,11 @@ body {
   --purple: #7c3aed;
   --purple-soft: rgba(124,58,237,.12);
 
+  /* ═══ سرگروه SelectSheet (استاندارد اپل) ═══ */
+  --group-bg: #f2f2f7;
+  --group-text: #6d6d72;
+  --scroll-thumb: rgba(142,142,147,.5);
+
   /* ═══ رنگ دسته‌بندی تجهیزات (مستقل از تم) ═══ */
   --cat-ventilation: #2563eb;
   --cat-feeding:     #d97706;
