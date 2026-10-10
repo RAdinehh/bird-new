@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { useTempUnit } from '../../../shr/utils/temp';
 import { Field, Grid2, Grid3, Input, Modal, BtnRow, Btn, NumField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
+import { useOverride } from '../../../shr/hooks/useOverride';
+import OverrideHint from '../../../shr/components/OverrideHint';
 import DependentSelect from '../../../shr/components/DependentSelect';
 import DatePicker from '../../../shr/components/DatePicker';
 import { toFa, toEn } from '../../../shr/utils/fa';
@@ -115,15 +117,40 @@ export interface HallsFormModalProps {
   autoFields: Set<string>;
   clearAuto: (k: string) => void;
   save: () => void;
+  stdCapacity?: number | null;
+  stdTemp?: number | null;
+  stdHumidity?: number | null;
 }
 
 export default function HallsFormModal(props: HallsFormModalProps) {
   const breedsForBird = (props.breeds || []).filter((b: any) => b.birdId === props.form.birdId);
-  const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save } = props;
+
+  const capCurrent = form.capacity ? parseInt(toEn(form.capacity)) || null : null;
+  const { hint: capHint } = useOverride({
+    current: capCurrent, stdValue: stdCapacity ?? null,
+    onReset: () => setForm(f => ({ ...f, capacity: stdCapacity != null ? String(stdCapacity) : '' })),
+    unit: 'پرنده', decimals: 0,
+  });
+
+  const tempCurrent = form.targetTemp ? parseFloat(toEn(form.targetTemp)) || null : null;
+  const { hint: tempHint } = useOverride({
+    current: tempCurrent, stdValue: stdTemp ?? null,
+    onReset: () => setForm(f => ({ ...f, targetTemp: stdTemp != null ? String(stdTemp) : '' })),
+    unit: '°C', decimals: 1,
+  });
+
+  const humCurrent = form.targetHumidity ? parseFloat(toEn(form.targetHumidity)) || null : null;
+  const { hint: humHint } = useOverride({
+    current: humCurrent, stdValue: stdHumidity ?? null,
+    onReset: () => setForm(f => ({ ...f, targetHumidity: stdHumidity != null ? String(stdHumidity) : '' })),
+    unit: '٪', decimals: 0,
+  });
+  const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save, stdCapacity, stdTemp, stdHumidity } = props;
 
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        <Field label="نام سالن" required><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
         <Grid2>
             <Field label="پرنده">
               <SmartSelect
@@ -232,7 +259,6 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           <Field label="آخرین ضدعفونی"><DatePicker value={form.lastSanitizedAt} onChange={v => setForm({...form, lastSanitizedAt: v})} placeholder="انتخاب تاریخ" /></Field>
         </Grid2>
         <Field label="آدرس سالن"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
-        <Field label="نام سالن" required><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
         <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>

@@ -76,6 +76,8 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     parseFloat(toEn(form.width)) || null,
     __breedStd?.space?.densityMax ?? null,
   );
+  const __stdTemp = __breedStd?.env?.[0]?.temp?.target ?? null;
+  const __stdHumidity = __breedStd?.env?.[0]?.humidity?.min ?? null;
   const fmt = useFormat();
 
   const halls = useMemo(() => {
@@ -362,6 +364,9 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         vErrors={vErrors}
         birds={birds}
         breeds={breeds}
+        stdCapacity={__suggestedCap}
+        stdTemp={__stdTemp}
+        stdHumidity={__stdHumidity}
         breedStd={breedStd}
         autoFields={autoFields}
         clearAuto={clearAuto}
