@@ -5,9 +5,13 @@ import { getEquipUnit } from '../equipUnits';
 import { CATEGORY_LABELS } from '../store';
 
 export const CATEGORIES_BY_KIND: Record<string, string[]> = {
-  asset:      ['ventilation', 'heating', 'lighting', 'drinking', 'feeding', 'power', 'cooling', 'water_treatment', 'safety', 'weighing', 'auxiliary'],
-  consumable: ['litter', 'feeding', 'drinking', 'cleaning'],
-  system:     ['ventilation', 'heating', 'lighting', 'power', 'water_treatment', 'safety', 'auxiliary'],
+  asset: [
+    'ventilation', 'heating', 'lighting', 'drinking', 'feeding',
+    'power', 'cooling', 'water_treatment', 'safety', 'weighing',
+    'cleaning', 'hand_tools', 'auxiliary',
+  ],
+  consumable: ['litter'],
+  // system قبلاً ادغام شد با asset (رفع ابهام برای کاربر)
 };
 
 export function categoriesForKind(kind: string): string[] {
@@ -154,4 +158,31 @@ export function getStdDefaultForType(type: string, std: any): number | null {
   // top-level مثل lampWattPerM2 یا fanM3PerKg
   const v = eq[key];
   return typeof v === 'number' ? v : null;
+}
+
+
+/** 🆕 آیا این زیرنوع مصرفیه؟ (خودکار از نوع) */
+export const CONSUMABLE_TYPES = new Set([
+  // روشنایی — لامپ‌ها مصرفی
+  'lamp_led', 'lamp_fluorescent', 'lamp', 'dimmer',
+  // بستر — کاملاً مصرفی
+  'litter_wood_shavings', 'litter_roll', 'litter_sand',
+  // تصفیه — فیلتر مصرفی
+  'water_filter',
+  // شستشو — سمپاش/واش‌پرس سبک
+  'sprayer', 'flame_gun',
+  // ابزار دستی — همه مصرفی
+  'shovel', 'wheelbarrow', 'rake', 'feed_scoop', 'broom', 'bucket',
+  // جانبی — سنسور
+  'sensor',
+]);
+
+/** 🆕 تشخیص خودکار نوع: مصرفی یا دارایی */
+export function isConsumable(type: string): boolean {
+  return CONSUMABLE_TYPES.has(type);
+}
+
+/** 🆕 تشخیص خودکار نوع برای نمایش/گزارش */
+export function kindForType(type: string): 'asset' | 'consumable' {
+  return isConsumable(type) ? 'consumable' : 'asset';
 }

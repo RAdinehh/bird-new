@@ -62,7 +62,7 @@ export interface Zone {
   updatedAt: string;
 }
 
-export type EquipmentKind = 'asset' | 'consumable' | 'system';
+export type EquipmentKind = 'asset' | 'consumable';
 
 export type EquipmentStatus = 'active' | 'broken' | 'maintenance' | 'repairing' | 'retired';
 
@@ -87,7 +87,7 @@ export type EquipmentUnit = 'pcs' | 'kg' | 'm2' | 'm' | 'L';
 export interface Equipment {
   id: string;
   hallId: string;
-  kind: EquipmentKind;
+  kind?: EquipmentKind;  // 🆕 optional — از type خودکار محاسبه می‌شه
   category: EquipmentCategory;
   type: string;
   name: string;
@@ -147,6 +147,13 @@ export const useHal = create<State>()(
       name: 'pm-hal',
       version: 5,
       migrate: (persisted: any, version: number) => {
+      // 🆕 migration: kind 'system' → 'asset'
+      if (Array.isArray((persisted as any).equipment)) {
+        (persisted as any).equipment.forEach((e: any) => {
+          if (e.kind === 'system') e.kind = 'asset';
+        });
+      }
+
         if (!persisted?.state?.halls) return persisted;
         if (version < 2) {
           persisted.state.halls = persisted.state.halls.map((h: any) => {
@@ -264,7 +271,6 @@ export const CATEGORY_LABELS: Record<EquipmentCategory, { name: string; icon: st
 export const KIND_LABELS: Record<EquipmentKind, { name: string; icon: string }> = {
   asset: { name: 'دارایی ثابت', icon: '🏭' },
   consumable: { name: 'مصرفی', icon: '📦' },
-  system: { name: 'سیستم', icon: '⚙️' },
 };
 
 export const STATUS_LABELS: Record<EquipmentStatus, { name: string; icon: string; tone: string }> = {

@@ -44,7 +44,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const suppliers = allContacts.filter((c: any) => (c.roles || []).includes('supplier'));
   const { options: allCustomOpts } = useCustomOptions();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<any>({ id:'', hallId:'', kind:'asset', category:'ventilation', type:'', name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
+  const [form, setForm] = useState<any>({ id:'', hallId:'', category:'ventilation', type:'', name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
   const draft = useFormDraft('hal-equip', form, (v: any) => setForm(v));
   const __selectedHall = halls.find(h => h.id === form.hallId);
   const hallVolume = __selectedHall
@@ -84,7 +84,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
 
   const openNew = () => {
     const firstCat = categoriesForKind('asset')[0] || 'ventilation';
-    setForm({ id:'', hallId: halls[0].id, kind:'asset', category: firstCat, type:'',
+    setForm({ id:'', hallId: halls[0].id, category: firstCat, type:'',
       name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'',
       warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'', status:'active', brand:'', supplierId:'' });
     setErr(''); setOpen(true);
@@ -95,7 +95,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     setAutoFields(new Set());
     setForm({
       id: e.id, hallId: e.hallId,
-      kind: (e as any).kind || 'asset',
+      // kind حذف شد — از type خودکار
       category: (e as any).category || 'lighting',
       unit: (e as any).unit || 'pcs',
       type: e.type, name: e.name,
@@ -121,7 +121,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     EquipmentSchema,
     {
       hallId: form.hallId || '',
-      kind: form.kind || 'asset',
+      // kind حذف
       category: form.category || 'auxiliary',
       type: form.type || '',
       name: form.name || '',
@@ -226,7 +226,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
     const data = {
       hallId: form.hallId,
-      kind: form.kind || 'asset',
+      // kind حذف
       category: form.category || 'auxiliary',
       type: form.type,
       name: form.name.trim(),
@@ -253,7 +253,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
     const data = {
       hallId: form.hallId,
-      kind: form.kind || 'asset',
+      // kind حذف
       category: form.category || 'auxiliary',
       type: form.type,
       name: form.name.trim(),

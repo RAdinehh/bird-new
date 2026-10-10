@@ -258,19 +258,31 @@ export default function EditableSelect({
     <>
       <button type="button" aria-label="حذف" title="حذف"
         onClick={(e) => removeItem(e, c.id, c.name)}
-        style={ACTION_BTN}
-        onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--danger-soft)'; e.currentTarget.style.color = 'var(--danger)'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--muted)'; }}
+        style={{
+          width: 34, height: 34, borderRadius: 10,
+          border: 'none',
+          background: 'var(--danger-soft)',
+          color: 'var(--danger)',
+          cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 0, flexShrink: 0,
+        }}
       >
-        <Trash2 size={17} strokeWidth={2} />
+        <Trash2 size={17} strokeWidth={2.2} />
       </button>
       <button type="button" aria-label="ویرایش" title="ویرایش"
         onClick={(e) => { e.stopPropagation(); openEdit(c.id); }}
-        style={ACTION_BTN}
-        onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--accent-soft)'; e.currentTarget.style.color = 'var(--accent)'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--muted)'; }}
+        style={{
+          width: 34, height: 34, borderRadius: 10,
+          border: 'none',
+          background: 'var(--accent-soft)',
+          color: 'var(--accent)',
+          cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 0, flexShrink: 0,
+        }}
       >
-        <Pencil size={17} strokeWidth={2} />
+        <Pencil size={17} strokeWidth={2.2} />
       </button>
     </>
   );

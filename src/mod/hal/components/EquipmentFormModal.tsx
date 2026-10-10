@@ -24,7 +24,7 @@ export interface EquipmentFormModalProps {
   autoFields: Set<string>;
   clearAuto: (k: string) => void;
   markAuto: (k: string) => void;
-  categoriesForKind: (k: string) => string[];
+  categoriesForKind?: (k: string) => string[];  // اختیاری — سازگاری
   typesForCategory: (c: string) => string[];
   equipNeed: any;
   save: () => void;
@@ -33,7 +33,7 @@ export interface EquipmentFormModalProps {
 }
 
 export default function EquipmentFormModal(props: EquipmentFormModalProps) {
-  const { open, setOpen, form, setForm, vErrors, halls, equipment, autoFields, clearAuto, markAuto, categoriesForKind, typesForCategory, equipNeed, save, suppliers, stdForDefaults } = props;
+  const { open, setOpen, form, setForm, vErrors, halls, equipment, autoFields, clearAuto, markAuto, typesForCategory, equipNeed, save, suppliers, stdForDefaults } = props;
 
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
@@ -49,20 +49,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               autoThreshold={6}
             />
           </Field>
-          <Field label="نوع دارایی" required>
-            <Select value={form.kind || 'asset'} onChange={e => {
-              const newKind = e.target.value;
-              const allowedCats = categoriesForKind(newKind);
-              const nextCat = allowedCats.includes(form.category) ? form.category : allowedCats[0];
-              const allowedTypes = typesForCategory(nextCat);
-              const nextType = allowedTypes.includes(form.type) ? form.type : (allowedTypes[0] || 'other');
-              setForm({ ...form, kind: newKind, category: nextCat, type: nextType, capacity: '' });
-            }}>
-              {Object.entries(KIND_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>{v.icon} {v.name}</option>
-              ))}
-            </Select>
-          </Field>
+
         </Grid2>
 
         <Grid2>
@@ -73,11 +60,9 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || 'other');
               setForm({...form, category: cat, type: nextType, capacity: ''});
             }}>
-              {categoriesForKind(form.kind || 'asset').map(k => {
-                const v = (CATEGORY_LABELS as any)[k];
-                if (!v) return null;
-                return <option key={k} value={k}>{v.icon} {v.name}</option>;
-              })}
+              {Object.entries(CATEGORY_LABELS).map(([k, v]: [string, any]) => (
+                <option key={k} value={k}>{v.icon} {v.name}</option>
+              ))}
             </Select>
           </Field>
           <EditableSelect

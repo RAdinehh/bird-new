@@ -1,6 +1,7 @@
 /** filter/configs/hal.tsx */
 import { IconFolder, IconActivity, IconTag, IconChart, IconDollar, IconClock, IconUser, IconCalendar, IconPackage } from '../../icons';
 import { type Zone, type Hall, type Equipment, EQUIP_LABELS, STATUS_LABELS } from '../../../mod/hal/store';
+import { kindForType } from '../../../mod/hal/api/equipmentCalc';
 import type { FilterConfig } from './_types';
 
 export function getHalZonesConfig(ctx: { halls: Hall[] }): FilterConfig<Zone> {
@@ -127,11 +128,6 @@ export function getHalHallsConfig(ctx: {
 // hal/EquipmentPage — تجهیزات
 // ═══════════════════════════════════════════════════
 export function getHalEquipmentConfig(ctx: { halls: Hall[] }): FilterConfig<Equipment> {
-  const KIND_LABELS: Record<string, string> = {
-    asset: 'دارایی',
-    consumable: 'مصرفی',
-    system: 'سیستمی',
-  };
   return {
     filterDefs: [
       {
@@ -149,8 +145,11 @@ export function getHalEquipmentConfig(ctx: { halls: Hall[] }): FilterConfig<Equi
       {
         key: 'kind', label: 'نوع', kind: 'enum',
         icon: <IconActivity size={18} />,
-        options: Object.keys(KIND_LABELS).map(k => ({ value: k, label: KIND_LABELS[k] })),
-        getValue: (e: Equipment) => e.kind || 'asset',
+        options: [
+          { value: 'asset', label: '🏭 دارایی ثابت' },
+          { value: 'consumable', label: '📦 مصرفی' },
+        ],
+        getValue: (e: Equipment) => kindForType(e.type),
       },
       {
         key: 'category', label: 'دسته', kind: 'enum',

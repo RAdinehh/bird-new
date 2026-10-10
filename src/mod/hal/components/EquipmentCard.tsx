@@ -5,7 +5,7 @@ import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { EQUIP_LABELS, KIND_LABELS, CATEGORY_LABELS, UNIT_LABELS_EQ, STATUS_LABELS } from '../store';
-import { calcEquipValue } from '../api/equipmentCalc';
+import { calcEquipValue, kindForType } from '../api/equipmentCalc';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
@@ -80,7 +80,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>نوع دارایی:</span>
-                    <span style={{ fontWeight: 600 }}>{(KIND_LABELS as any)[(e as any).kind || 'asset']?.icon} {(KIND_LABELS as any)[(e as any).kind || 'asset']?.name}</span>
+                    <span style={{ fontWeight: 600 }}>{(KIND_LABELS as any)[kindForType(e.type) || 'asset']?.icon} {(KIND_LABELS as any)[kindForType(e.type) || 'asset']?.name}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
