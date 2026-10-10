@@ -91,7 +91,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             }}
             options={typesForCategory(form.category || 'auxiliary').map(k => {
               const v = (EQUIP_LABELS as any)[k] || { name: k };
-              const catColor = CATEGORY_COLORS[form.category || 'auxiliary'] || '#475569';
+              const catColor = CATEGORY_COLORS[form.category || 'auxiliary'] || 'var(--cat-auxiliary)';
               return {
                 value: k,
                 label: v.name,

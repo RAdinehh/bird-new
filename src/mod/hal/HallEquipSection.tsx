@@ -1,9 +1,7 @@
 /** HallEquipSection — تجهیزات سالن + نیاز گله */
 import { useState } from 'react';
 import HallEquipModals from './components/HallEquipModals';
-import { Btn, Field, Input, Modal, NumField } from '../../shr/components/ui';
-import { CategoryIcon, EquipmentIcon, CATEGORY_COLORS } from '../../shr/icons/equipment';
-import EditableSelect from '../../shr/components/EditableSelect';
+import { CategoryIcon, CATEGORY_COLORS } from '../../shr/icons/equipment';
 import {
   useHal,
   CATEGORY_LABELS,
@@ -11,59 +9,14 @@ import {
   type Equipment,
 } from './store';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showToast, toastMsg } from '../../cor/store/toast';
+import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { NEED_CALCULATORS, type NeedInput } from './needs';
+import {
+  typesForCategory, unitForCategory, calcInstalled,
+  REQUIRED_CATS, OPTIONAL_CATS, ALL_CATS,
+} from './_equipHelpers';
 import { getEquipUnit } from './equipUnits';
-import type { BirdStandard } from '../set/standards/types';
-
-const TYPES_BY_CATEGORY: Record<string, string[]> = {
-  ventilation: ['fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad'],
-  feeding:     ['feeder_manual', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket'],
-  drinking:    ['nipple', 'cup', 'trough', 'fountain_drinker'],
-  heating:     ['radiant_brooder', 'jet_heater', 'duct_heater'],
-  lighting:    ['lamp_led', 'lamp_fluorescent', 'dimmer'],
-  litter:      ['litter_wood_shavings', 'litter_roll', 'litter_sand'],
-  power:       ['generator', 'electrical_panel', 'cable'],
-  auxiliary:   ['camera', 'sensor', 'scale'],
-};
-
-function typesForCategory(cat: string): string[] {
-  return TYPES_BY_CATEGORY[cat] || [];
-}
-
-/** ترتیب نمایش */
-const REQUIRED_CATS: string[] = ['ventilation', 'heating', 'lighting', 'drinking', 'feeding', 'litter'];
-const OPTIONAL_CATS: string[] = ['power', 'auxiliary'];
-const ALL_CATS: string[] = [...REQUIRED_CATS, ...OPTIONAL_CATS];
-
-/**
- * واحد هر دسته بر اساس زیرنوع‌های داخلش
- * اگه همه زیرنوع‌ها هم واحد بودن، اون واحد؛ وگرنه از baseUnit اولین تجهیز
- */
-function unitForCategory(cat: string, list: any[]): string {
-  if (list.length === 0) {
-    // پیش‌فرض بر اساس دسته
-    if (cat === 'ventilation') return 'm³/h';
-    if (cat === 'lighting') return 'W';
-    if (cat === 'litter') return 'kg';
-    if (cat === 'heating') return 'kW';
-    return 'عدد';
-  }
-  return getEquipUnit(list[0].type).baseUnit;
-}
-
-/** محاسبه مقدار نصب‌شده برای یک دسته */
-function calcInstalled(cat: string, list: Equipment[]): number {
-  return list.reduce((a, e) => {
-    const def = getEquipUnit(e.type);
-    const primary = e.count || 0;
-    const secondary = (e as any).capacity != null
-      ? (e as any).capacity
-      : (def.secondary?.defaultValue || 0);
-    return a + def.calc(primary, secondary);
-  }, 0);
-}
 
 interface Props {
   hallId: string;
@@ -230,7 +183,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {cats.map(cat => {
             const list = grouped[cat] || [];
-            const catColor = CATEGORY_COLORS[cat] || '#475569';
+            const catColor = CATEGORY_COLORS[cat] || 'var(--cat-auxiliary)';
             const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
             const installed = calcInstalled(cat, list);
             const unit = unitForCategory(cat, list);
@@ -349,7 +302,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   // لیست تجهیزات یه دسته برای نمایش در مودال
   const detailList = detailCat ? (grouped[detailCat] || []) : [];
   const detailCatLabel = detailCat ? ((CATEGORY_LABELS as any)[detailCat]?.name || detailCat) : '';
-  const detailColor = detailCat ? (CATEGORY_COLORS[detailCat] || '#475569') : '#475569';
+  const detailColor = detailCat ? (CATEGORY_COLORS[detailCat] || 'var(--cat-auxiliary)') : 'var(--cat-auxiliary)';
   const detailInstalled = detailCat ? calcInstalled(detailCat, detailList) : 0;
   const detailNeed = detailCat ? (needByCategory[detailCat]?.value || 0) : 0;
   const detailNeedUnit = detailCat ? (needByCategory[detailCat]?.unit || unitForCategory(detailCat, detailList)) : '';
@@ -395,7 +348,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
           borderTop: '1px dashed var(--border)',
         }}>
           {ALL_CATS.map(cat => {
-            const catColor = CATEGORY_COLORS[cat] || '#475569';
+            const catColor = CATEGORY_COLORS[cat] || 'var(--cat-auxiliary)';
             const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
             return (
               <button
