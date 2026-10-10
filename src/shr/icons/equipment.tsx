@@ -24,6 +24,7 @@ import {
   Biohazard, Sparkles,
   Truck, Warehouse,
   Weight, Anchor, Cloudy, Waves,
+  Hand, Disc, Link, Pipette, Beer, Cable, Brush,
 } from 'lucide-react';
 
 export type IconWeight = 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone';
@@ -43,11 +44,11 @@ const EQUIP_ICONS: Record<string, ComponentType<any>> = {
   air_inlet:      PanelTop,
   cooling_pad:    Snowflake,
   // تغذیه
-  feeder_manual:  Utensils,
-  feeder_pan:     Utensils,
-  feeder_chain:   Wheat,
-  feeder_tube:    Utensils,
-  feeder_bucket:  Package,
+  feeder_manual:  Hand,
+  feeder_pan:     Disc,
+  feeder_chain:   Link,
+  feeder_tube:    Pipette,
+  feeder_bucket:  Beer,
   // آبخوری
   nipple:           Droplet,
   cup:              CupSoda,
@@ -76,7 +77,7 @@ const EQUIP_ICONS: Record<string, ComponentType<any>> = {
   // تصفیه آب
   water_tank:   Container,
   water_filter: Droplet,
-  water_pipe:   Power,
+  water_pipe:   Cable,
   // ایمنی
   fire_extinguisher: ShieldAlert,
   smoke_detector:    AlarmSmoke,
@@ -89,7 +90,7 @@ const EQUIP_ICONS: Record<string, ComponentType<any>> = {
   // ابزار دستی
   shovel:      Shovel,
   wheelbarrow: Package2,
-  rake:        Hammer,
+  rake:        Brush,
   feed_scoop:  Briefcase,
   broom:       Sparkles,
   bucket:      Package,
