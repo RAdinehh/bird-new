@@ -33,6 +33,7 @@ export function Modal({
   const preventCloseRef = useRef(preventClose);
   preventCloseRef.current = preventClose;
   const titleId = useRef<string>('modal-title-' + Math.random().toString(36).slice(2, 9));
+  const [zDepth, setZDepth] = React.useState(0);
 
   // ─── Snap / drag (mobile bottom-sheet) ───
   const [snap, setSnap] = React.useState<'partial' | 'full'>('partial');
@@ -110,7 +111,9 @@ export function Modal({
   // Esc + body scroll lock + focus return
   useEffect(() => {
     if (!open) return;
-    window.__modalDepth = (window.__modalDepth || 0) + 1;
+    const myDepth = (window.__modalDepth || 0);
+    window.__modalDepth = myDepth + 1;
+    setZDepth(myDepth);
 
     previousFocus.current = document.activeElement as HTMLElement;
 
@@ -220,7 +223,7 @@ export function Modal({
         position: 'fixed',
         inset: 0,
         background: 'var(--overlay)',
-        zIndex: 100 + (window.__modalDepth || 0),
+        zIndex: 100 + zDepth * 100,
         display: 'flex',
         alignItems: center ? 'center' : 'flex-end',
         justifyContent: 'center',
