@@ -150,7 +150,18 @@ export default function HallsFormModal(props: HallsFormModalProps) {
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-        <Field label="نام سالن" required><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
+        <Grid2>
+          <Field label="نام سالن" required><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
+          <Field label="وضعیت سالن">
+            <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
+              <option value="active">🟢 فعال</option>
+              <option value="empty">⚪ خالی</option>
+              <option value="sanitizing">🟡 ضدعفونی</option>
+              <option value="maintenance">🔴 تعمیر</option>
+              <option value="inactive">⚫ غیرفعال</option>
+            </Select>
+          </Field>
+        </Grid2>
         <Grid2>
             <Field label="پرنده">
               <SmartSelect

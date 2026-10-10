@@ -38,6 +38,8 @@ export interface Hall {
   breedId?: string;
   /** 🆕 یادداشت ضدعفونی (دستی) */
   sanitizeNotes?: string;
+  /** 🆕 وضعیت سالن */
+  status?: 'active' | 'empty' | 'sanitizing' | 'maintenance' | 'inactive';
   // 🆕 منابع توزیع‌شده
   waterSources?: HallSource[];
   feedSources?: HallSource[];
