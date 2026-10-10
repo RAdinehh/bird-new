@@ -11,16 +11,13 @@ import { EquipmentSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Equipment } from './store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { Btn, Empty, PageContainer, Select } from '../../shr/components/ui';
-
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useFilterSort, FilterBar, getHalEquipmentConfig } from '../../shr/filter';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
-
 import EditableSelect from '../../shr/components/EditableSelect';
-
 import { useCustomOptions } from '../../shr/store/customOptions';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
@@ -32,8 +29,6 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 import { getEquipUnit } from './equipUnits';
-
-
 
 /** دسته‌های مجاز برای هر نوع دارایی */
 export default function EquipmentPage({ active = true }: { active?: boolean } = {}) {
@@ -60,9 +55,6 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-
-
 
   const markAuto = (field: string) => {
     setAutoFields(prev => {
@@ -189,7 +181,6 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     }
     setUndoData(null);
   };
-
     return (
       <PageContainer>
       {undoData && (
@@ -280,9 +271,6 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     }));
     setErr('');
   };
-
-
-
   return (
     <PageContainer>
       <HelpBanner
@@ -379,7 +367,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
               />
             );
           })}
-          
+
         </>
       )}
 
