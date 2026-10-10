@@ -2,7 +2,7 @@
  * EquipmentPage — تجهیزات
  */
 import { useState, useRef, useMemo } from 'react';
-import { categoriesForKind, typesForCategory, calcEquipNeed, calcEquipValue, getCapacityHint, CATEGORIES_BY_KIND, TYPES_BY_CATEGORY } from './api/equipmentCalc';
+import { categoriesForKind, typesForCategory, calcEquipNeed, calcEquipValue, getCapacityHint, getStdDefaultForType, CATEGORIES_BY_KIND, TYPES_BY_CATEGORY } from './api/equipmentCalc';
 import EquipmentFormModal from './components/EquipmentFormModal';
 import EquipmentCard from './components/EquipmentCard';
 import { useFab } from '../../shr/hooks/useFab';
@@ -54,6 +54,8 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     ? (__selectedHall.length || 0) * (__selectedHall.width || 0)
     : 0;
   const equipNeed = calcEquipNeed(form.type, form.hallId, flocks || [], breedStd, hallArea);
+  // 🆕 استاندارد نژاد سالن انتخاب‌شده
+  const selectedBreedStd = __selectedHall?.breedId ? breedStd.byBreedId(__selectedHall.breedId) : null;
   const [err, setErr] = useState('');
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
@@ -402,6 +404,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         categoriesForKind={categoriesForKind}
         typesForCategory={typesForCategory}
         equipNeed={equipNeed}
+        stdForDefaults={selectedBreedStd}
         save={save}
       />
     </PageContainer>

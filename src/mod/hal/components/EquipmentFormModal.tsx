@@ -9,6 +9,7 @@ import EditableSelect from '../../../shr/components/EditableSelect';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { CATEGORY_LABELS, KIND_LABELS, UNIT_LABELS_EQ, EQUIP_LABELS } from '../store';
 import { getEquipUnit } from '../equipUnits';
+import { getStdDefaultForType } from '../api/equipmentCalc';
 import { EquipmentIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
 
 export interface EquipmentFormModalProps {
@@ -28,10 +29,11 @@ export interface EquipmentFormModalProps {
   equipNeed: any;
   save: () => void;
   suppliers?: any[];
+  stdForDefaults?: any;
 }
 
 export default function EquipmentFormModal(props: EquipmentFormModalProps) {
-  const { open, setOpen, form, setForm, vErrors, halls, equipment, autoFields, clearAuto, markAuto, categoriesForKind, typesForCategory, equipNeed, save, suppliers } = props;
+  const { open, setOpen, form, setForm, vErrors, halls, equipment, autoFields, clearAuto, markAuto, categoriesForKind, typesForCategory, equipNeed, save, suppliers, stdForDefaults } = props;
 
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
@@ -85,14 +87,17 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             onChange={v => {
               const def = getEquipUnit(v);
               const patch: any = { type: v };
-              if (def.secondary?.defaultValue) {
-                patch.capacity = String(def.secondary.defaultValue);
+              // 🆕 اول از std نژاد، بعد از defaultValue
+              const stdVal = stdForDefaults ? getStdDefaultForType(v, stdForDefaults) : null;
+              const finalVal = stdVal ?? def.secondary?.defaultValue ?? null;
+              if (finalVal != null) {
+                patch.capacity = String(finalVal);
+                markAuto('capacity');
               } else {
                 patch.capacity = '';
+                clearAuto('capacity');
               }
               setForm({ ...form, ...patch });
-              if (def.secondary?.defaultValue) markAuto('capacity');
-              else clearAuto('capacity');
             }}
             options={typesForCategory(form.category || 'auxiliary').map(k => {
               const v = (EQUIP_LABELS as any)[k] || { name: k };

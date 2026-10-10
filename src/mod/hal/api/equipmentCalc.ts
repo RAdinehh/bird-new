@@ -126,3 +126,26 @@ export function calcEquipValue(e: any): number {
   return count * price;
 }
 
+
+
+/** 🆕 پیش‌فرض فیلد ثانویه از استاندارد نژاد (اگه موجود) */
+export function getStdDefaultForType(type: string, std: any): number | null {
+  if (!std?.equipment) return null;
+  const eq = std.equipment;
+
+  // آبخوری
+  if (type === 'nipple') return eq.drinker?.nippleBirdsPerUnit ?? null;
+  if (type === 'cup') return eq.drinker?.cupBirdsPerUnit ?? null;
+
+  // دانخوری
+  if (type === 'feeder_pan') return eq.feeder?.panBirdsPerUnit ?? null;
+  if (type === 'feeder_manual' || type === 'feeder_bucket') return eq.feeder?.manualCmPerBird ?? null;
+
+  // روشنایی (W/m² → تبدیل به W هر لامپ)
+  if (type === 'lamp_led' || type === 'lamp_fluorescent') return eq.lampWattPerM2 ?? null;
+
+  // تهویه (کل m³/h گله — تقریبی)
+  if (type === 'fan_tunnel' || type === 'fan_ceiling') return eq.fanM3PerKg ?? null;
+
+  return null;
+}
