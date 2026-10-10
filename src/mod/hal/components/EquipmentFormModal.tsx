@@ -133,7 +133,8 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <>
               <Grid2>
                 <Field label="تعداد">
-                  <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={(UNIT_LABELS_EQ as any)[form.unit || 'pcs'] || 'عدد'} min={0} />
+                  <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={(UNIT_LABELS_EQ as any)[form.unit || 'pcs'] || 'عدد'} min={0} max={100000} autoClamp />
+                  {vErrors.count && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 3 }}>⚠ {vErrors.count}</div>}
                 </Field>
                 {hasSec ? (
                   <Field
@@ -143,6 +144,8 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   >
                     <NumField
                       placeholder={def.secondary!.defaultValue ? String(def.secondary!.defaultValue) : '۰'}
+                      max={10000000}
+                      autoClamp
                       value={form.capacity}
                       onChange={e => {
                         setForm({ ...form, capacity: e.target.value });
@@ -170,7 +173,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   })()}>
                     <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
                   </Field>
-                  <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
+                  <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} autoClamp /></Field>
                 </Grid2>
               )}
 
@@ -189,7 +192,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                     </Field>
                   </Grid2>
                   <Grid2>
-                    <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
+                    <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} autoClamp /></Field>
                     <div />
                   </Grid2>
                 </>

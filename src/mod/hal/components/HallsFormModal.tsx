@@ -152,7 +152,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Grid2>
-          <Field label="نام سالن" required><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
+          <Field label="نام سالن" required error={vErrors.name}><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
           <Field label="وضعیت سالن">
             <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
               <option value="active">🟢 فعال</option>
@@ -202,12 +202,12 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
         <Grid3>
-          <Field label="طول"><NumField placeholder="۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} /></Field>
-          <Field label="عرض"><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} /></Field>
-          <Field label="ارتفاع"><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} /></Field>
+          <Field label="طول" error={vErrors.length}><NumField placeholder="۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} autoClamp /></Field>
+          <Field label="عرض" error={vErrors.width}><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} autoClamp /></Field>
+          <Field label="ارتفاع" error={vErrors.height}><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} autoClamp /></Field>
         </Grid3>
         <Grid2>
-              <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined}>
+              <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity}>
                 <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
               </Field>
               {(() => {
@@ -289,7 +289,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
             <TempFormField label="دمای هدف" placeholder="۲۲" autoFrom={autoFields.has("targetTemp") ? "استاندارد" : undefined} value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
             <OverrideHint {...tempHint} />
           </div>
-          <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? "استاندارد" : undefined}>
+          <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? "استاندارد" : undefined} error={vErrors.targetHumidity}>
             <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={-10} />
             <OverrideHint {...humHint} />
           </Field>

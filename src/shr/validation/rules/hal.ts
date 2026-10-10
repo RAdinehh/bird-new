@@ -57,16 +57,23 @@ export const ZoneSchema = z.object({
 
 export const EquipmentSchema = z.object({
   hallId: requiredId('سالن'),
-  kind: z.enum(['asset', 'consumable', 'system']),
-  category: z.enum(['ventilation', 'feeding', 'drinking', 'heating', 'lighting', 'litter', 'power', 'auxiliary']),
+  // 🆕 نوع دارایی اختیاری — از type خودکار محاسبه می‌شه
+  kind: z.enum(['asset', 'consumable']).optional(),
+  // 🆕 ۱۴ دسته جدید
+  category: z.enum([
+    'ventilation', 'feeding', 'drinking', 'heating', 'lighting', 'litter', 'power', 'auxiliary',
+    'water_treatment', 'safety', 'cleaning', 'hand_tools', 'weighing', 'cooling',
+  ]),
   type: requiredStr('نوع تجهیز', 1, 50),
   name: requiredStr('نام تجهیز', 1, 50),
-  count: intPos('تعداد', 100000).nullable().optional(),
+  // محدوده‌های واقعی صنعت مرغداری
+  count: intNonNeg('تعداد', 100_000).nullable().optional(),
   unit: z.enum(['pcs', 'kg', 'm2', 'm', 'L']),
   unitPrice: floatNonNeg('قیمت واحد', 100_000_000_000).nullable().optional(),
   purchasedAt: persianDateOpt('تاریخ خرید'),
-  warranty: floatNonNeg('گارانتی (ماه)', 200).nullable().optional(),
-  capacity: floatNonNeg('ظرفیت', 1_000_000).nullable().optional(),
+  warranty: floatNonNeg('گارانتی (ماه)', 120).nullable().optional(),
+  // ظرفیت — حداکثر ۱۰ میلیون (برای فن بزرگ یا مخزن)
+  capacity: floatNonNeg('ظرفیت', 10_000_000).nullable().optional(),
   efficiency: floatNonNeg('بازدهی', 10_000).nullable().optional(),
   consumeRate: z.enum(['once', 'per-cycle']).optional(),
   sourceInvoiceId: optionalStr(50),
