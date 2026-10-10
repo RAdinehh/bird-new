@@ -192,7 +192,7 @@ export default function DialogHost() {
         position: 'fixed',
         inset: 0,
         background: 'var(--overlay)',
-        zIndex: 200,
+        zIndex: 50000,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

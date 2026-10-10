@@ -23,6 +23,7 @@ import {
   SprayCan, Droplet as Spray,
   Biohazard, Sparkles,
   Truck, Warehouse,
+  Weight, Anchor, Cloudy, Waves,
 } from 'lucide-react';
 
 export type IconWeight = 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone';
@@ -93,12 +94,12 @@ const EQUIP_ICONS: Record<string, ComponentType<any>> = {
   broom:       Sparkles,
   bucket:      Package,
   // وزن‌کشی
-  bird_scale:     Scale,
+  bird_scale:     Weight,
   feed_scale:     Scale,
-  platform_scale: Scale,
+  platform_scale: Anchor,
   // سردکننده
-  fogger:         Droplets,
-  misting_system: Droplets,
+  fogger:         Cloudy,
+  misting_system: Waves,
   swamp_cooler:   Snowflake,
   // قدیمی
   lamp:    Lightbulb,
