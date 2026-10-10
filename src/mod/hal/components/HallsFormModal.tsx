@@ -175,41 +175,39 @@ export default function HallsFormModal(props: HallsFormModalProps) {
               />
             </Field>
             <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 6, alignItems: 'center' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, alignItems: 'center' }}>
                 <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
                 {(() => {
-                  if (!form.breedId) return null;
+                  if (!form.breedId) return <div />;
                   const std = breedStd.byBreedId(form.breedId);
                   const density = std?.space?.densityMax;
                   const L = parseFloat(toEn(form.length)) || 0;
                   const W = parseFloat(toEn(form.width)) || 0;
                   const area = L * W;
-                  if (area > 0 && density) {
-                    const cap = Math.floor(area * density);
-                    return (
-                      <div
-                        dir="ltr"
-                        style={{
-                          padding: '0 10px',
-                          height: 38,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          background: 'var(--input-bg)',
-                          border: '1px dashed var(--border)',
-                          borderRadius: 'var(--r-md)',
-                          fontSize: 11,
-                          color: 'var(--muted)',
-                          fontVariantNumeric: 'tabular-nums',
-                          fontWeight: 600,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {toFa(area)} × {toFa(density)} = {toFa(cap)}
-                      </div>
-                    );
-                  }
-                  return null;
+                  if (!(area > 0 && density)) return <div />;
+                  const cap = Math.floor(area * density);
+                  return (
+                    <div
+                      dir="ltr"
+                      style={{
+                        padding: '0 10px',
+                        height: 38,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'var(--input-bg)',
+                        border: '1px dashed var(--border)',
+                        borderRadius: 'var(--r-md)',
+                        fontSize: 11,
+                        color: 'var(--muted)',
+                        fontVariantNumeric: 'tabular-nums',
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {toFa(area)} × {toFa(density)} = {toFa(cap)}
+                    </div>
+                  );
                 })()}
               </div>
               <OverrideHint {...capHint} />
