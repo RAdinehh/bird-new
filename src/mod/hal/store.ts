@@ -96,6 +96,8 @@ export interface Equipment {
   status?: EquipmentStatus;
   /** 🆕 برند سازنده (پارس، ستاره، آکو، ...) */
   brand?: string;
+  /** 🆕 شناسه تأمین‌کننده (FK → ctc) */
+  supplierId?: string;
   sourceInvoiceId?: string;
   warehouseItemId?: string;
   createdAt: string;

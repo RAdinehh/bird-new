@@ -24,6 +24,7 @@ import { EquipmentIcon, CATEGORY_COLORS } from '../../shr/icons/equipment';
 import { useCustomOptions } from '../../shr/store/customOptions';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
+import { useCtc } from '../ctc/store';
 import UndoBar from '../../cor/ui/UndoBar';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -39,6 +40,8 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
+  const { contacts: allContacts } = useCtc();
+  const suppliers = allContacts.filter((c: any) => (c.roles || []).includes('supplier'));
   const { options: allCustomOpts } = useCustomOptions();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({ id:'', hallId:'', kind:'asset', category:'ventilation', type:'', name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
@@ -81,7 +84,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     const firstCat = categoriesForKind('asset')[0] || 'ventilation';
     setForm({ id:'', hallId: halls[0].id, kind:'asset', category: firstCat, type:'',
       name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'',
-      warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'', status:'active', brand:'' });
+      warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'', status:'active', brand:'', supplierId:'' });
     setErr(''); setOpen(true);
   };
   useFab(active ? { label: 'افزودن تجهیز', onClick: openNew } : null);
@@ -104,6 +107,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       consumeRate: (e as any).consumeRate || '',
       status: (e as any).status || 'active',
       brand: (e as any).brand || '',
+      supplierId: (e as any).supplierId || '',
     });
     setErr(''); setOpen(true);
   };
@@ -235,6 +239,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       consumeRate: form.consumeRate || undefined,
       status: form.status || 'active',
       brand: (form.brand || '').trim(),
+      supplierId: (form.supplierId || '').trim() || undefined,
     };
     if (form.id) updateEquip(form.id, data); else addEquip(data);
     draft.clear();
@@ -261,6 +266,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       consumeRate: form.consumeRate || undefined,
       status: form.status || 'active',
       brand: (form.brand || '').trim(),
+      supplierId: (form.supplierId || '').trim() || undefined,
     };
     addEquip(data);
     toastMsg.added(form.name || 'تجهیز')

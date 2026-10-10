@@ -27,10 +27,11 @@ export interface EquipmentFormModalProps {
   typesForCategory: (c: string) => string[];
   equipNeed: any;
   save: () => void;
+  suppliers?: any[];
 }
 
 export default function EquipmentFormModal(props: EquipmentFormModalProps) {
-  const { open, setOpen, form, setForm, vErrors, halls, equipment, autoFields, clearAuto, markAuto, categoriesForKind, typesForCategory, equipNeed, save } = props;
+  const { open, setOpen, form, setForm, vErrors, halls, equipment, autoFields, clearAuto, markAuto, categoriesForKind, typesForCategory, equipNeed, save, suppliers } = props;
 
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
@@ -115,6 +116,19 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <Input placeholder="پارس" value={form.brand || ''} onChange={e => setForm({...form, brand: e.target.value})} />
           </Field>
         </Grid2>
+
+        {(suppliers && suppliers.length > 0) && (
+          <Field label="تأمین‌کننده" hint="فروشنده‌ی این تجهیز">
+            <SmartSelect
+              value={form.supplierId || ''}
+              onChange={v => setForm({...form, supplierId: v})}
+              options={suppliers.map((s: any) => ({ value: s.id, label: s.name, subtitle: s.phone }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب تأمین‌کننده"
+              autoThreshold={6}
+            />
+          </Field>
+        )}
 
         <Grid2>
           <Field label="تعداد">
