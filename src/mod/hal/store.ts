@@ -36,6 +36,8 @@ export interface Hall {
   birdId?: string;
   /** شناسه نژاد (breedId) — دقیق‌تر از پرنده */
   breedId?: string;
+  /** 🆕 یادداشت ضدعفونی (دستی) */
+  sanitizeNotes?: string;
   // 🆕 منابع توزیع‌شده
   waterSources?: HallSource[];
   feedSources?: HallSource[];

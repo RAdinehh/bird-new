@@ -39,7 +39,7 @@ interface F {
   capacity: string; targetTemp: string; targetHumidity: string;
   ventilation: string; light: string;
   ventilationSystem: string; feederType: string; drinkerType: string; litterType: string;
-  address: string; builtAt: string; lastSanitizedAt: string; notes: string; birdId: string; breedId: string;
+  address: string; builtAt: string; lastSanitizedAt: string; sanitizeNotes: string; notes: string; birdId: string; breedId: string;
 }
 const empty: F = {
   name:'', code:'', length:'', width:'', height:'',
@@ -47,7 +47,7 @@ const empty: F = {
   ventilationSystem:'', feederType:'', drinkerType:'', litterType:'',
  
   
-  address:'', builtAt:'', lastSanitizedAt:'', notes:'', birdId:'', breedId:'',
+  address:'', builtAt:'', lastSanitizedAt:'', sanitizeNotes:'', notes:'', birdId:'', breedId:'',
 };
 
 
@@ -190,7 +190,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       feederType: h.feederType || '',
       drinkerType: h.drinkerType || '',
       litterType: h.litterType || '',
-      address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, notes: h.notes,
+      address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, sanitizeNotes: (h as any).sanitizeNotes || '', notes: h.notes,
       birdId: (h as any).birdId || '',
       breedId: (h as any).breedId || ''
       });
@@ -253,7 +253,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       feederType: form.feederType || '',
       drinkerType: form.drinkerType || '',
       litterType: form.litterType || '',
-      address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), notes: form.notes.trim(),
+      address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), sanitizeNotes: form.sanitizeNotes.trim(), notes: form.notes.trim(),
       birdId: form.birdId || undefined,
       breedId: form.breedId || undefined,
     };

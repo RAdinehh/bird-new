@@ -273,6 +273,9 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         <Grid2>
           <Field label="تاریخ ساخت"><DatePicker value={form.builtAt} onChange={v => setForm({...form, builtAt: v})} placeholder="انتخاب تاریخ" /></Field>
           <Field label="آخرین ضدعفونی"><DatePicker value={form.lastSanitizedAt} onChange={v => setForm({...form, lastSanitizedAt: v})} placeholder="انتخاب تاریخ" /></Field>
+        <Field label="یادداشت ضدعفونی" hint="روش یا ماده‌ی ضدعفونی (دستی)">
+          <Input placeholder="مثلاً — سرکه سیب ۵٪، همه دیوارها" value={form.sanitizeNotes || ''} onChange={e => setForm({...form, sanitizeNotes: e.target.value})} />
+        </Field>
         </Grid2>
         <Field label="آدرس سالن"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
         <Field label="یادداشت">

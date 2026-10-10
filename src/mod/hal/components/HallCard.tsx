@@ -140,6 +140,7 @@ export default function HallCard(props: HallCardProps) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {h.builtAt && <Row l="تاریخ ساخت" v={toFa(h.builtAt)} />}
             {h.lastSanitizedAt && <Row l="آخرین ضدعفونی" v={toFa(h.lastSanitizedAt)} />}
+            {h.sanitizeNotes && <Row l="روش ضدعفونی" v={h.sanitizeNotes} />}
             {equipValue > 0 && <Row l="ارزش تجهیزات" v={fmt.money(equipValue)} accent />}
           </div>
         </>
