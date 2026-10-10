@@ -148,8 +148,8 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
         title={`افزودن ${(CATEGORY_LABELS as any)[pickerCat]?.name || pickerCat}`}
         footer={
           <div style={{ display: 'flex', gap: 6 }}>
-            <Btn onClick={() => setPicker(false)} style={{ flex: 1 }}>لغو</Btn>
             <Btn variant="primary" onClick={saveNewEquip} disabled={!pickerName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
+            <Btn onClick={() => setPicker(false)} style={{ flex: 1 }}>لغو</Btn>
           </div>
         }
       >
@@ -208,8 +208,8 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
         title={currentEdit?.name || 'ویرایش'}
         footer={
           <div style={{ display: 'flex', gap: 6 }}>
-            <Btn onClick={() => setEditId(null)} style={{ flex: 1 }}>لغو</Btn>
             <Btn variant="primary" onClick={saveEdit} style={{ flex: 1 }}>ذخیره</Btn>
+            <Btn onClick={() => setEditId(null)} style={{ flex: 1 }}>لغو</Btn>
           </div>
         }
       >

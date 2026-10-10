@@ -366,9 +366,9 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         </>
       )}
 
-      <MultiSelectBar ms={ms} deleteLabel="حذف" />
+      {!open && <MultiSelectBar ms={ms} deleteLabel="حذف" />}
 
-      {ms.selectionMode && <div style={{ height: 90 }} />}
+      {ms.selectionMode && !open && <div style={{ height: 90 }} />}
 
       <HallsFormModal
         open={open}
