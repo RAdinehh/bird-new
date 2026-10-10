@@ -174,22 +174,25 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 modalTitle="انتخاب نژاد"
               />
             </Field>
-            <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, alignItems: 'center' }}>
+            <Grid2>
+              <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined}>
                 <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
-                {(() => {
-                  if (!form.breedId) return <div />;
-                  const std = breedStd.byBreedId(form.breedId);
-                  const density = std?.space?.densityMax;
-                  const L = parseFloat(toEn(form.length)) || 0;
-                  const W = parseFloat(toEn(form.width)) || 0;
-                  const area = L * W;
-                  if (!(area > 0 && density)) return <div />;
-                  const cap = Math.floor(area * density);
-                  return (
+                <OverrideHint {...capHint} />
+              </Field>
+              {(() => {
+                const std = form.breedId ? breedStd.byBreedId(form.breedId) : null;
+                const density = std?.space?.densityMax;
+                const L = parseFloat(toEn(form.length)) || 0;
+                const W = parseFloat(toEn(form.width)) || 0;
+                const area = L * W;
+                if (!(area > 0 && density)) return <div />;
+                const cap = Math.floor(area * density);
+                return (
+                  <div style={{ display: 'flex', alignItems: 'flex-end' }}>
                     <div
                       dir="ltr"
                       style={{
+                        width: '100%',
                         padding: '0 10px',
                         height: 38,
                         display: 'flex',
@@ -207,11 +210,10 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                     >
                       {toFa(area)} × {toFa(density)} = {toFa(cap)}
                     </div>
-                  );
-                })()}
-              </div>
-              <OverrideHint {...capHint} />
-            </Field>
+                  </div>
+                );
+              })()}
+            </Grid2>
           </Grid2>
           {form.breedId && (
             <button
