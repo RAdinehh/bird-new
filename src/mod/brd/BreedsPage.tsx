@@ -126,6 +126,18 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   };
   useFab(active ? { label: 'افزودن نژاد', onClick: openNew } : null);
 
+  // 🆕 Override برای FCR نژاد (قبل از return شرطی)
+  const parentBird = birds.find(x => x.id === form.birdId);
+  const fcrBaseline = getBreedFcrBaseline(form.standardKey, parentBird?.fcrStandard ?? null);
+  const fcrCurrent = form.fcr ? parseFloat(toEn(form.fcr).replace('٫','.')) || null : null;
+  const { hint: fcrHint } = useOverride({
+    current: fcrCurrent,
+    stdValue: fcrBaseline.value,
+    onReset: () => setForm(f => ({ ...f, fcr: fcrBaseline.value != null ? toFa(fcrBaseline.value) : '' })),
+    unit: 'FCR',
+    decimals: 1,
+  });
+
   if (birds.length === 0) {
     return (
       <PageContainer>
@@ -184,18 +196,6 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     draft.clear();
     setOpen(false);
   };
-
-  // 🆕 Override برای FCR نژاد
-  const parentBird = birds.find(x => x.id === form.birdId);
-  const fcrBaseline = getBreedFcrBaseline(form.standardKey, parentBird?.fcrStandard ?? null);
-  const fcrCurrent = form.fcr ? parseFloat(toEn(form.fcr).replace('٫','.')) || null : null;
-  const { hint: fcrHint } = useOverride({
-    current: fcrCurrent,
-    stdValue: fcrBaseline.value,
-    onReset: () => setForm(f => ({ ...f, fcr: fcrBaseline.value != null ? toFa(fcrBaseline.value) : '' })),
-    unit: 'FCR',
-    decimals: 1,
-  });
 
 
   return (

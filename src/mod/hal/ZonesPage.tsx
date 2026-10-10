@@ -127,6 +127,17 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     return null;
   })();
 
+  // فیلتر/مرتب (قبل از return شرطی)
+  const config = useMemo(() => getHalZonesConfig({ halls }), [halls]);
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Zone>({
+    items: zones,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    persistKey: config.persistKey,
+    initialSort: config.initialSort,
+  });
+
   if (halls.length === 0) {
     return (
       <PageContainer>
@@ -168,17 +179,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     draft.clear();
     setOpen(false);
   };
-
-  // فیلتر/مرتب
-  const config = useMemo(() => getHalZonesConfig({ halls }), [halls]);
-  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
-          resetAll, hasActiveFilters, total, count } = useFilterSort<Zone>({
-    items: zones,
-    filters: config.filterDefs,
-    sorts: config.sortDefs,
-    persistKey: config.persistKey,
-    initialSort: config.initialSort,
-  });
 
   return (
     <PageContainer>
