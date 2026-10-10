@@ -1,9 +1,22 @@
-import { useState } from 'react';
-import { Btn, Field, Input, Modal } from './ui';
-import EmojiPicker from './EmojiPicker';
+/**
+ * EditableSelect.tsx — انتخاب‌گر با قابلیت افزودن/ویرایش/حذف
+ *
+ * از SelectSheetShell استفاده می‌کند (استاندارد مشترک):
+ *   - هدر RTL: [عنوان] [+] [🔍] [✕]
+ *   - سرگروه متمایز (سبز ملایم)
+ *   - آیتم‌های مینیمال (بدون border، خط جداکننده)
+ *   - اسکرول ایندیکیتور ۳ نقطه پالسی
+ *   - ویرایش/حذف داخل آیتم‌های سفارشی
+ *   - جستجو فقط اگه > ۵ آیتم
+ */
+
+import { useState, useMemo } from 'react';
+import { Btn, Field, Input } from './ui';
 import { useCustomOptions } from '../store/customOptions';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
+import SelectSheetShell, { SheetGroup, SheetItem } from './SelectSheetShell';
+import { EMOJI_GROUPS } from '../data/emojis';
 
 export interface EditableOption {
   value: string;
@@ -23,53 +36,12 @@ interface Props {
   usageCheck?: (name: string) => number;
 }
 
-const ROW: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 12,
-  padding: '12px 14px',
-  minHeight: 58,
-  background: 'linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%)',
-  border: '1.5px solid var(--border)',
-  borderRadius: 15,
-  color: 'var(--text)',
-  fontFamily: 'inherit',
-  fontSize: 'var(--fs-base)',
-  fontWeight: 500,
-  textAlign: 'right',
-  cursor: 'pointer',
-  width: '100%',
-  boxSizing: 'border-box',
-  transition: 'transform 120ms, box-shadow 180ms, border-color 180ms',
-  boxShadow: '0 1px 2px rgba(15,23,42,.05), 0 3px 10px rgba(15,23,42,.05)',
-};
-
-const ICON: React.CSSProperties = {
-  width: 44,
-  height: 44,
-  borderRadius: 13,
-  background: 'linear-gradient(135deg, #f0f4f8 0%, #e2e8ef 100%)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 22,
-  flexShrink: 0,
-  boxShadow: 'inset 0 1px 2px rgba(255,255,255,.8), 0 1px 2px rgba(15,23,42,.05)',
-};
-
-const MINI: React.CSSProperties = {
-  width: 40,
-  height: 40,
-  borderRadius: 10,
-  background: 'var(--input-bg)',
-  border: '1px solid var(--border)',
-  cursor: 'pointer',
-  fontSize: 17,
+const ACTION_BTN: React.CSSProperties = {
+  width: 32, height: 32, borderRadius: 8,
+  border: 'none', background: 'transparent',
+  color: 'var(--dim)', cursor: 'pointer',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
   padding: 0,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
 };
 
 export default function EditableSelect({
@@ -81,10 +53,10 @@ export default function EditableSelect({
   const [formName, setFormName] = useState('');
   const [formIcon, setFormIcon] = useState('🔧');
   const [emojiOpen, setEmojiOpen] = useState(false);
-  const [highlight, setHighlight] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
   const [undoData, setUndoData] = useState<{ id: string; name: string } | null>(null);
 
-  const { getByKey, addOption, updateOption, removeOption, hideOption, unhideOption } = useCustomOptions();
+  const { getByKey, addOption, updateOption, hideOption, unhideOption } = useCustomOptions();
   const customs = customKey ? getByKey(customKey) : [];
 
   const all: EditableOption[] = [
@@ -94,21 +66,58 @@ export default function EditableSelect({
   const current = all.find(o => o.value === value);
   const isOrphan = !!value && !current;
 
-  const resetForm = () => { setEditId(null); setFormName(''); setFormIcon('🔧'); setEmojiOpen(false); };
+  // فیلتر جستجو
+  const q = query.trim().toLowerCase();
+  const filteredOptions = useMemo(
+    () => q ? options.filter(o => o.label.toLowerCase().includes(q)) : options,
+    [options, q],
+  );
+  const filteredCustoms = useMemo(
+    () => q ? customs.filter(c => c.name.toLowerCase().includes(q)) : customs,
+    [customs, q],
+  );
+
+  const totalItems = options.length + customs.length;
+  /** آستانه: ۵ آیتم — کمتر = ساده، بیشتر = کامل */
+  const useEnhancedUI = totalItems > 5;
+  const searchable = useEnhancedUI;
+
+  const resetForm = () => {
+    setEditId(null);
+    setFormName('');
+    setFormIcon('🔧');
+    setEmojiOpen(false);
+  };
+
   const openAdd = () => { resetForm(); setView('form'); };
+
   const openEdit = (id: string) => {
     const c = customs.find(x => x.id === id);
     if (!c) return;
-    setEditId(id); setFormName(c.name); setFormIcon(c.icon); setEmojiOpen(false); setView('form');
+    setEditId(id);
+    setFormName(c.name);
+    setFormIcon(c.icon);
+    setEmojiOpen(false);
+    setView('form');
   };
+
   const backToList = () => { resetForm(); setView('list'); };
-  const closeAll = () => { resetForm(); setView('list'); setOpen(false); };
+
+  const closeAll = () => {
+    resetForm();
+    setView('list');
+    setQuery('');
+    setOpen(false);
+  };
 
   const saveItem = () => {
     const name = formName.trim();
     if (!name) return;
-    if (editId) updateOption(editId, { name, icon: formIcon });
-    else if (customKey) { addOption(customKey, name, formIcon); setHighlight(name); }
+    if (editId) {
+      updateOption(editId, { name, icon: formIcon });
+    } else if (customKey) {
+      addOption(customKey, name, formIcon);
+    }
     resetForm();
     setView('list');
   };
@@ -117,8 +126,8 @@ export default function EditableSelect({
     e.stopPropagation();
     const count = usageCheck ? usageCheck(name) : 0;
     const message = count > 0
-      ? '«' + name + '» در ' + count + ' مورد استفاده شده.\n\nاگه حذف کنی، از لیست انتخاب غیب می‌شه ولی داده‌های قبلی دست‌نخورده می‌مونن.\nاز تنظیمات → گزینه‌های مخفی می‌تونی برگردونی.'
-      : '«' + name + '» جای دیگه‌ای استفاده نشده.\n\nحذف بشه؟';
+      ? `«${name}» در ${count} مورد استفاده شده.\n\nاگه حذف کنی، از لیست غیب می‌شه ولی داده‌های قبلی دست‌نخورده می‌مونن.`
+      : `«${name}» جای دیگه‌ای استفاده نشده.\n\nحذف بشه؟`;
     const ok = await showConfirmAsync('حذف آیتم', message, { danger: true });
     if (!ok) return;
     hideOption(id);
@@ -128,6 +137,7 @@ export default function EditableSelect({
     }, 5000);
   };
 
+  // ═══ Trigger ═══
   const trigger = (
     <button
       type="button"
@@ -135,7 +145,7 @@ export default function EditableSelect({
       style={{
         width: '100%', height: 38, textAlign: 'right', padding: '0 12px',
         background: 'var(--input-bg)',
-        border: '1px solid ' + (isOrphan ? 'rgba(217,119,6,.5)' : 'var(--border)'),
+        border: '1px solid ' + (isOrphan ? 'var(--warn)' : 'var(--border)'),
         borderRadius: 'var(--r-md)',
         color: isOrphan ? 'var(--warn)' : (current ? 'var(--text)' : 'var(--muted)'),
         fontSize: 'var(--fs-base)', cursor: 'pointer', fontFamily: 'inherit',
@@ -144,109 +154,143 @@ export default function EditableSelect({
       }}
     >
       <span style={{ flex: 1, textAlign: 'right', fontWeight: isOrphan ? 700 : 500, display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-        {isOrphan
-          ? <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{'⚠ ' + value + ' (حذف‌شده)'}</span>
-          : current
-            ? (
-                  <>
-                    {current.icon && <span style={{ display: 'inline-flex', flexShrink: 0 }}>{current.icon}</span>}
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{current.label}</span>
-                  </>
-                )
-            : <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{placeholder || '— انتخاب کنید —'}</span>}
+        {isOrphan ? (
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {'⚠ ' + value + ' (حذف‌شده)'}
+          </span>
+        ) : current ? (
+          <>
+            {current.icon && <span style={{ display: 'inline-flex', flexShrink: 0 }}>{current.icon}</span>}
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{current.label}</span>
+          </>
+        ) : (
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {placeholder || '— انتخاب کنید —'}
+          </span>
+        )}
       </span>
-      <span style={{
-        color: 'var(--muted)',
-        fontSize: 11,
-        flexShrink: 0,
-        transition: 'transform 180ms',
-        transform: open ? 'rotate(180deg)' : 'none',
-        display: 'inline-block',
-      }}>
-        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"
-          fill="none" stroke="var(--muted)" strokeWidth="2"
-          strokeLinecap="round" strokeLinejoin="round"
-          style={{ flexShrink: 0 }}>
+      <span style={{ color: 'var(--muted)', flexShrink: 0, display: 'inline-flex' }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="var(--muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="m6 9 6 6 6-6" />
         </svg>
       </span>
     </button>
   );
 
-  const listView = (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {options.length > 0 && (
-        <div style={{
-          fontSize: 11, fontWeight: 700, color: 'var(--muted)',
-          letterSpacing: '.6px', padding: '4px 4px 0',
-        }}>پیش‌فرض‌ها</div>
-      )}
-      {options.map(o => {
-        const selected = value === o.value;
-        return (
-          <button key={o.value} type="button"
-            onClick={() => { onChange(o.value); closeAll(); }}
-            style={{
-              ...ROW,
-              borderColor: selected ? 'var(--accent)' : 'var(--border)',
-              background: selected
-                ? 'linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent) 0%, color-mix(in srgb, var(--accent) 4%, transparent) 100%)'
-                : ROW.background,
-              boxShadow: ROW.boxShadow,
-            }}>
-            <span style={{
-              ...ICON,
-              background: selected
-                ? 'linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent) 0%, color-mix(in srgb, var(--accent) 10%, transparent) 100%)'
-                : ICON.background,
-            }}>{typeof o.icon === 'string' ? o.icon : (o.icon || '•')}</span>
-            <span style={{ flex: 1, fontWeight: selected ? 700 : 600 }}>{o.label}</span>
-          </button>
-        );
-      })}
+  // ═══ List view ═══
+  // حالت ≤ ۵: لیست تخت · حالت > ۵: گروه‌بندی‌شده
+  const renderItems = (
+    opts: EditableOption[],
+    customsList: any[],
+  ) => {
+    if (!useEnhancedUI) {
+      // لیست تخت
+      return (
+        <>
+          {opts.map(o => (
+            <SheetItem
+              key={o.value}
+              icon={typeof o.icon === 'string' ? o.icon : undefined}
+              title={o.label}
+              selected={value === o.value}
+              onClick={() => { onChange(o.value); closeAll(); }}
+            />
+          ))}
+          {customsList.map(c => (
+            <SheetItem
+              key={c.id}
+              icon={c.icon}
+              title={c.name}
+              selected={value === c.name}
+              onClick={() => { onChange(c.name); closeAll(); }}
+              actions={renderActions(c)}
+            />
+          ))}
+        </>
+      );
+    }
+    // گروه‌بندی‌شده
+    return (
+      <>
+        {opts.length > 0 && (
+          <SheetGroup title="پیش‌فرض‌ها" icon="📦" count={opts.length}>
+            {opts.map(o => (
+              <SheetItem
+                key={o.value}
+                icon={typeof o.icon === 'string' ? o.icon : undefined}
+                title={o.label}
+                selected={value === o.value}
+                onClick={() => { onChange(o.value); closeAll(); }}
+              />
+            ))}
+          </SheetGroup>
+        )}
+        {customsList.length > 0 && (
+          <SheetGroup title="سفارشی" icon="✨" count={customsList.length}>
+            {customsList.map(c => (
+              <SheetItem
+                key={c.id}
+                icon={c.icon}
+                title={c.name}
+                selected={value === c.name}
+                onClick={() => { onChange(c.name); closeAll(); }}
+                actions={renderActions(c)}
+              />
+            ))}
+          </SheetGroup>
+        )}
+      </>
+    );
+  };
 
-      {customs.length > 0 && (
-        <div style={{
-          fontSize: 11, fontWeight: 700, color: 'var(--muted)',
-          letterSpacing: '.6px', padding: '10px 4px 0',
-        }}>سفارشی</div>
-      )}
-      {customs.map(c => {
-        const selected = value === c.name;
-        const isHi = highlight === c.name;
-        return (
-          <div key={c.id}
-            role="button"
-            tabIndex={0}
-            onClick={() => { onChange(c.name); closeAll(); }}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(c.name); closeAll(); } }}
-            style={{
-              ...ROW,
-              padding: '10px 12px 10px 10px',
-              gap: 10,
-              borderColor: selected || isHi ? 'var(--accent)' : 'var(--border)',
-              background: selected
-                ? 'linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent) 0%, color-mix(in srgb, var(--accent) 4%, transparent) 100%)'
-                : ROW.background,
-              boxShadow: ROW.boxShadow,
-            }}>
-            <span style={{
-              ...ICON,
-              background: selected
-                ? 'linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent) 0%, color-mix(in srgb, var(--accent) 10%, transparent) 100%)'
-                : ICON.background,
-            }}>{c.icon}</span>
-            <span style={{ flex: 1, fontWeight: selected ? 700 : 600, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-            <button type="button" aria-label="ویرایش" onClick={(e) => { e.stopPropagation(); openEdit(c.id); }} style={MINI}>✏️</button>
-            <button type="button" aria-label="حذف" onClick={(e) => removeItem(e, c.id, c.name)} style={MINI}>🗑️</button>
-          </div>
-        );
-      })}
-    </div>
+  const renderActions = (c: any) => (
+    <>
+      <button type="button" aria-label="حذف"
+        onClick={(e) => removeItem(e, c.id, c.name)}
+        style={ACTION_BTN}
+        onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--danger-soft)'; e.currentTarget.style.color = 'var(--danger)'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--dim)'; }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M3 6h18" /><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6" />
+          <path d="M10 11v6M14 11v6" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
+      </button>
+      <button type="button" aria-label="ویرایش"
+        onClick={(e) => { e.stopPropagation(); openEdit(c.id); }}
+        style={ACTION_BTN}
+        onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--accent-soft)'; e.currentTarget.style.color = 'var(--accent)'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--dim)'; }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+        </svg>
+      </button>
+    </>
   );
 
+  const listView = (
+    <>
+      {filteredOptions.length === 0 && filteredCustoms.length === 0 ? (
+        <div style={{
+          padding: '32px 12px', textAlign: 'center',
+          color: 'var(--muted)', fontSize: 'var(--fs-base)',
+        }}>
+          <div style={{ fontSize: 28, marginBottom: 6, opacity: 0.5 }}>🔍</div>
+          <div>چیزی پیدا نشد</div>
+        </div>
+      ) : (
+        renderItems(filteredOptions, filteredCustoms)
+      )}
+    </>
+  );
+
+  // ═══ Form view ═══
   const formView = (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <Field label="نام">
         <Input
           placeholder="مثلاً — آبخوری نیپل استیل"
@@ -257,8 +301,7 @@ export default function EditableSelect({
       <Field label="آیکن">
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <div style={{
-            width: 54, height: 54,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 54, height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 28, background: 'var(--input-bg)',
             borderRadius: 14, border: '1px solid var(--border)',
           }}>{formIcon}</div>
@@ -269,10 +312,8 @@ export default function EditableSelect({
       </Field>
       {emojiOpen && (
         <div style={{
-          marginTop: 4, padding: 10,
-          background: 'var(--input-bg)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--r-md)',
+          padding: 10, background: 'var(--input-bg)',
+          border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
         }}>
           <EmojiPickerInline value={formIcon} onPick={setFormIcon} />
         </div>
@@ -280,67 +321,58 @@ export default function EditableSelect({
     </div>
   );
 
-  const headerAction = (customKey && view === 'list') ? (
-    <button
-      type="button"
-      onClick={openAdd}
-      aria-label="افزودن مورد جدید"
-      style={{
-        width: 34, height: 34,
-        borderRadius: 'var(--r-md)',
-        background: 'var(--accent)',
-        border: 'none',
-        color: '#fff',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 20,
-        fontWeight: 400,
-        lineHeight: 1,
-        fontFamily: 'inherit',
-        boxShadow: '0 2px 8px color-mix(in srgb, var(--accent) 28%, transparent)',
-      }}
-    >+</button>
-  ) : null;
-
-  const modalTitle = view === 'form'
+  // ═══ عنوان و زیرعنوان ═══
+  const sheetTitle = view === 'form'
     ? (editId ? 'ویرایش مورد' : 'افزودن مورد جدید')
     : (label || 'انتخاب');
 
-  const modalFooter = view === 'form' ? (
-    <div style={{ display: 'flex', gap: 6 }}>
-      <Btn onClick={backToList} style={{ flex: 1 }}>لغو</Btn>
-      <Btn variant="primary" onClick={saveItem} disabled={!formName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
-    </div>
-  ) : undefined;
+  const subtitle = view === 'list' && searchable
+    ? `${toFa(all.length)} مورد`
+    : undefined;
 
   return (
     <>
       {undoData && (
         <UndoBar
-          label={'«' + undoData.name + '» مخفی شد'}
+          label={`«${undoData.name}» مخفی شد`}
           onUndo={() => { unhideOption(undoData.id); setUndoData(null); }}
           onDismiss={() => setUndoData(null)}
         />
       )}
       {label ? <Field label={label} required={required} error={error}>{trigger}</Field> : trigger}
-      <Modal
+      <SelectSheetShell
         open={open}
         onClose={view === 'form' ? backToList : closeAll}
-        title={modalTitle}
-        footer={modalFooter}
-        headerAction={headerAction}
+        title={sheetTitle}
+        subtitle={subtitle}
+        onAdd={customKey && view === 'list' ? openAdd : undefined}
+        searchable={view === 'list' && searchable}
+        searchNode={
+          <Input
+            placeholder="جستجو..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+          />
+        }
+        footer={view === 'form' ? (
+          <>
+            <Btn onClick={backToList} style={{ flex: 1 }}>لغو</Btn>
+            <Btn variant="primary" onClick={saveItem} disabled={!formName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
+          </>
+        ) : undefined}
       >
         {view === 'form' ? formView : listView}
-      </Modal>
+      </SelectSheetShell>
     </>
   );
 }
 
-// ─── ایموجی inline ───
-import { EMOJI_GROUPS } from '../data/emojis';
+// ═══ helper ═══
+function toFa(n: number): string {
+  return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]);
+}
 
+// ═══ Emoji Picker Inline ═══
 function EmojiPickerInline({ onPick, value }: { onPick: (e: string) => void; value?: string }) {
   const [tab, setTab] = useState(EMOJI_GROUPS[0].id);
   const g = EMOJI_GROUPS.find(x => x.id === tab) || EMOJI_GROUPS[0];
