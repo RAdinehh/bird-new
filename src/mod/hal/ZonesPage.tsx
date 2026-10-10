@@ -6,6 +6,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { ZoneSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Zone } from './store';
+import { useBrd } from '../brd/store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -24,6 +25,7 @@ import { logAction } from '../../cor/logger/auditLog';
 
 export default function ZonesPage({ active = true }: { active?: boolean } = {}) {
   const { halls: _hallsRaw, zones: _zonesRaw, addZone, updateZone, deleteZone } = useHal();
+  const { birds, breeds } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
   const draft = useFormDraft('hal-zone', form, (v: any) => setForm(v));
@@ -321,6 +323,34 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
               autoThreshold={6}
             />
         </Field>
+        {form.hallId && (() => {
+          const hall = halls.find((h: any) => h.id === form.hallId);
+          const hallBird = hall?.birdId ? birds.find((b: any) => b.id === hall.birdId) : null;
+          const hallBreed = hall?.breedId ? breeds.find((b: any) => b.id === hall.breedId) : null;
+          if (!hallBird && !hallBreed) return null;
+          return (
+            <div style={{
+              fontSize: 'var(--fs-xs)',
+              color: 'var(--muted)',
+              padding: '6px 10px',
+              background: 'var(--input-bg)',
+              border: '1px dashed var(--border)',
+              borderRadius: 'var(--r-sm)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              lineHeight: 1.6,
+              marginTop: -4,
+            }}>
+              <span style={{ fontSize: 12 }}>📋</span>
+              <span>
+                ارثی از سالن:
+                {hallBird ? ` 🐔 ${hallBird.name}` : ''}
+                {hallBreed ? ` · 🧬 ${hallBreed.name}` : ''}
+              </span>
+            </div>
+          );
+        })()}
         <Grid2>
           <Field label="نام بخش" required><Input placeholder="مثلاً — بخش A" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
           <Field label="ظرفیت">
