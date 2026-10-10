@@ -1,7 +1,8 @@
 /**
  * index.tsx — بخش hal
  */
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useUrlFilter } from '../../shr/hooks/useUrlFilter';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import HallsPage from './HallsPage';
 import ZonesPage from './ZonesPage';
@@ -18,11 +19,16 @@ type TabId = typeof tabs[number]['id'];
 const TAB_IDS = ['halls', 'zones', 'equip'];
 
 export default function Hal() {
-  const [tab, setTab] = useState<TabId>('halls');
+  const [tabParam, setTabParam] = useUrlFilter('tab', 'halls');
+  const tab = (TAB_IDS.includes(tabParam) ? tabParam : 'halls') as TabId;
+
+  useEffect(() => {
+    if (!tabParam || !TAB_IDS.includes(tabParam)) setTabParam('halls');
+  }, [tabParam, setTabParam]);
   const { containerRef, trackRef, setInstant } = useCarousel(
     TAB_IDS,
     tab,
-    (id) => setTab(id as TabId)
+    (id) => setTabParam(id as TabId)
   );
 
   return (
@@ -38,7 +44,7 @@ export default function Hal() {
         {tabs.map(t => (
           <div
             key={t.id}
-            onClick={() => { setInstant(); setTab(t.id); }}
+            onClick={() => { setInstant(); setTabParam(t.id); }}
             style={{
               padding: '11px 14px',
               fontSize: 'var(--fs-base)',
