@@ -106,6 +106,25 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
 
   useFab(active ? { label: 'افزودن بخش', onClick: openNew } : null);
 
+  // ═══ Cross-field Validation ═══
+  const crossWarn = (() => {
+    if (!form.hallId) return null;
+    const cap = int(form.capacity);
+    if (cap <= 0) return null;
+    const hall = halls.find((h: any) => h.id === form.hallId);
+    const hallCap = (hall as any)?.capacity;
+    if (!hallCap) return null;
+    // جمع بخش‌های دیگه همون سالن (بدون بخش فعلی در حالت ویرایش)
+    const othersSum = zones
+      .filter((z: any) => z.hallId === form.hallId && z.id !== form.id)
+      .reduce((s: number, z: any) => s + (z.capacity || 0), 0);
+    const totalAfter = othersSum + cap;
+    if (totalAfter > hallCap) {
+      return `جمع ظرفیت بخش‌ها (${toFa(totalAfter)}) از ظرفیت سالن (${toFa(hallCap)}) بیشتر می‌شود`;
+    }
+    return null;
+  })();
+
   if (halls.length === 0) {
     return (
       <PageContainer>
@@ -302,7 +321,24 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         </Field>
         <Grid2>
           <Field label="نام بخش" required><Input placeholder="مثلاً — بخش A" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
-          <Field label="ظرفیت"><NumField placeholder="۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} /></Field>
+          <Field label="ظرفیت">
+            <NumField placeholder="۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} />
+            {crossWarn && (
+              <div style={{
+                fontSize: 'var(--fs-xs)',
+                color: 'var(--warn)',
+                fontWeight: 700,
+                paddingRight: 4,
+                lineHeight: 1.5,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                marginTop: 4,
+              }}>
+                ⚠️ {crossWarn}
+              </div>
+            )}
+          </Field>
         </Grid2>
         <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
