@@ -1,6 +1,6 @@
 /** filter/configs/hal.tsx */
 import { IconFolder, IconActivity, IconTag, IconChart, IconDollar, IconClock, IconUser, IconCalendar, IconPackage } from '../../icons';
-import { type Zone, type Hall, type Equipment, EQUIP_LABELS, STATUS_LABELS } from '../../../mod/hal/store';
+import { type Zone, type Hall, type Equipment, EQUIP_LABELS, STATUS_LABELS, CATEGORY_LABELS } from '../../../mod/hal/store';
 import { kindForType } from '../../../mod/hal/api/equipmentCalc';
 import type { FilterConfig } from './_types';
 
@@ -127,40 +127,67 @@ export function getHalHallsConfig(ctx: {
 // ═══════════════════════════════════════════════════
 // hal/EquipmentPage — تجهیزات
 // ═══════════════════════════════════════════════════
-export function getHalEquipmentConfig(ctx: { halls: Hall[] }): FilterConfig<Equipment> {
+export function getHalEquipmentConfig(ctx: {
+  halls: Hall[];
+  suppliers?: Array<{ id: string; name: string }>;
+  brands?: string[];
+}): FilterConfig<Equipment> {
   return {
     filterDefs: [
+      // ═══ ۱. مکان ═══
       {
         key: 'hallId', label: 'سالن', kind: 'enum',
         icon: <IconUser size={18} />,
         options: ctx.halls.map(h => ({ value: h.id, label: h.name })),
         getValue: (e: Equipment) => e.hallId || '',
       },
+      // ═══ ۲. دسته‌بندی ═══
+      {
+        key: 'category', label: 'دسته', kind: 'enum',
+        icon: <IconFolder size={18} />,
+        options: Object.entries(CATEGORY_LABELS || {}).map(([k, v]: any) => ({
+          value: k,
+          label: `${v.icon} ${v.name}`,
+        })),
+        getValue: (e: Equipment) => e.category || '',
+        multi: true,
+      },
+      // ═══ ۳. وضعیت ═══
       {
         key: 'status', label: 'وضعیت', kind: 'enum',
         icon: <IconActivity size={18} />,
-        options: Object.entries(STATUS_LABELS).map(([k, v]: any) => ({ value: k, label: `${v.icon} ${v.name}` })),
+        options: Object.entries(STATUS_LABELS).map(([k, v]: any) => ({
+          value: k,
+          label: `${v.icon} ${v.name}`,
+        })),
         getValue: (e: Equipment) => (e as any).status || 'active',
       },
+      // ═══ ۴. نوع (خودکار از زیرنوع) ═══
       {
         key: 'kind', label: 'نوع', kind: 'enum',
-        icon: <IconActivity size={18} />,
+        icon: <IconPackage size={18} />,
         options: [
           { value: 'asset', label: '🏭 دارایی ثابت' },
           { value: 'consumable', label: '📦 مصرفی' },
         ],
         getValue: (e: Equipment) => kindForType(e.type),
       },
-      {
-        key: 'category', label: 'دسته', kind: 'enum',
-        icon: <IconFolder size={18} />,
-        options: Object.entries(EQUIP_LABELS || {}).map(([k, v]: any) => ({
-          value: k,
-          label: v.name || v.label || k,
-        })),
-        getValue: (e: Equipment) => e.category || '',
+      // ═══ ۵. برند (اگه داده شده) ═══
+      ...(ctx.brands && ctx.brands.length > 0 ? [{
+        key: 'brand', label: 'برند', kind: 'enum' as const,
+        icon: <IconTag size={18} />,
+        options: ctx.brands.map(b => ({ value: b, label: b })),
+        getValue: (e: Equipment) => (e as any).brand || '',
         multi: true,
-      },
+      }] : []),
+      // ═══ ۶. تأمین‌کننده ═══
+      ...(ctx.suppliers && ctx.suppliers.length > 0 ? [{
+        key: 'supplierId', label: 'تأمین‌کننده', kind: 'enum' as const,
+        icon: <IconUser size={18} />,
+        options: ctx.suppliers.map(s => ({ value: s.id, label: s.name })),
+        getValue: (e: Equipment) => (e as any).supplierId || '',
+      }] : []),
+      // ═══ ۷. گارانتی ═══
       {
         key: 'hasWarranty', label: 'گارانتی', kind: 'enum',
         icon: <IconClock size={18} />,

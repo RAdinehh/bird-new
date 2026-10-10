@@ -132,7 +132,24 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   );
 
   // فیلتر/مرتب
-  const config = useMemo(() => getHalEquipmentConfig({ halls }), [halls]);
+  // 🆕 برندهای یونیک از تجهیزات
+  const brands = useMemo(() => {
+    const set = new Set<string>();
+    equipment.forEach((e: any) => { if (e.brand) set.add(e.brand); });
+    return Array.from(set).sort();
+  }, [equipment]);
+
+  // 🆕 تأمین‌کننده‌ها از مخاطبین
+  const supplierList = useMemo(() => {
+    return (allContacts || [])
+      .filter((c: any) => (c.roles || []).includes('supplier'))
+      .map((c: any) => ({ id: c.id, name: c.name }));
+  }, [allContacts]);
+
+  const config = useMemo(
+    () => getHalEquipmentConfig({ halls, suppliers: supplierList, brands }),
+    [halls, supplierList, brands],
+  );
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total, count } = useFilterSort<Equipment>({
     items: equipment,
@@ -200,19 +217,22 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   }
 
   const save = async () => {
+    try {
+      console.log('[SAVE] شروع ذخیره', form);
 
-    // 🔒 جلوگیری قاطع از نام تکراری تجهیزات
-    if (!form.id) {
-      const _trimmed = form.name.trim();
-      const _dup = equipment.find((x: any) => x.hallId === form.hallId && x.name.trim() === _trimmed);
-      if (_dup) {
-        showAlert(
-          `تجهیزاتای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
-          '❌ نام تکراری'
-        );
-        return;
+      // 🔒 جلوگیری قاطع از نام تکراری تجهیزات
+      if (!form.id) {
+        const _trimmed = form.name.trim();
+        const _dup = equipment.find((x: any) => x.hallId === form.hallId && x.name.trim() === _trimmed);
+        if (_dup) {
+          console.log('[SAVE] نام تکراری:', _dup);
+          showAlert(
+            `تجهیزاتی با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
+            '❌ نام تکراری'
+          );
+          return;
+        }
       }
-    }
 
     if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
     const data = {
@@ -234,9 +254,14 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       brand: (form.brand || '').trim(),
       supplierId: (form.supplierId || '').trim() || undefined,
     };
-    if (form.id) updateEquip(form.id, data); else addEquip(data);
-    draft.clear();
-    setOpen(false);
+      if (form.id) updateEquip(form.id, data); else addEquip(data);
+      console.log('[SAVE] ذخیره موفق');
+      draft.clear();
+      setOpen(false);
+    } catch (err) {
+      console.error('[SAVE] خطا:', err);
+      showAlert('خطا در ذخیره: ' + String(err), '❌ خطا');
+    }
   };
 
   const saveAndNext = () => {
