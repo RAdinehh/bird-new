@@ -9,6 +9,7 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { createHallSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Hall } from './store';
 import { useBrd } from '../brd/store';
+import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk, getAgeDays } from '../flk/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
@@ -66,6 +67,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const [open, setOpen] = useState(false);
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [form, setForm] = useState<F>(empty);
+  const draft = useFormDraft('hal-hall', form, (v: any) => setForm(v));
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -256,6 +258,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       breedId: form.breedId || undefined,
     };
     if (form.id) updateHall(form.id, data); else addHall(data);
+    draft.clear();
     setOpen(false);
   };
 

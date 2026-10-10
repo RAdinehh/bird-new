@@ -9,6 +9,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Equipment, type EquipmentKind, type EquipmentCategory, type EquipmentUnit, EQUIP_LABELS, EQUIP_CAPACITY_UNIT, EQUIP_EFFICIENCY_UNIT, CATEGORY_LABELS, KIND_LABELS, UNIT_LABELS_EQ } from './store';
+import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
 import DatePicker from '../../shr/components/DatePicker';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -41,6 +42,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const { options: allCustomOpts } = useCustomOptions();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({ id:'', hallId:'', kind:'asset', category:'ventilation', type:'', name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
+  const draft = useFormDraft('hal-equip', form, (v: any) => setForm(v));
   const __selectedHall = halls.find(h => h.id === form.hallId);
   const hallVolume = __selectedHall
     ? (__selectedHall.length || 0) * (__selectedHall.width || 0) * (__selectedHall.height || 0)
@@ -231,6 +233,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       consumeRate: form.consumeRate || undefined,
     };
     if (form.id) updateEquip(form.id, data); else addEquip(data);
+    draft.clear();
     setOpen(false);
   };
 

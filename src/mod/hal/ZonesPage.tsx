@@ -6,6 +6,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { ZoneSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Zone } from './store';
+import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -25,6 +26,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   const { halls: _hallsRaw, zones: _zonesRaw, addZone, updateZone, deleteZone } = useHal();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
+  const draft = useFormDraft('hal-zone', form, (v: any) => setForm(v));
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -163,6 +165,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     const data = { hallId: form.hallId, name: form.name.trim(), capacity: form.capacity ? parseInt(toEn(form.capacity)) || null : null,
        notes: form.notes.trim() };
     if (form.id) updateZone(form.id, data); else addZone(data);
+    draft.clear();
     setOpen(false);
   };
 
