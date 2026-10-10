@@ -124,28 +124,28 @@ export interface HallsFormModalProps {
 
 export default function HallsFormModal(props: HallsFormModalProps) {
   const breedsForBird = (props.breeds || []).filter((b: any) => b.birdId === props.form.birdId);
+  const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save, stdCapacity, stdTemp, stdHumidity } = props;
 
   const capCurrent = form.capacity ? parseInt(toEn(form.capacity)) || null : null;
   const { hint: capHint } = useOverride({
     current: capCurrent, stdValue: stdCapacity ?? null,
-    onReset: () => setForm(f => ({ ...f, capacity: stdCapacity != null ? String(stdCapacity) : '' })),
+    onReset: () => setForm((f: any) => ({ ...f, capacity: stdCapacity != null ? String(stdCapacity) : '' })),
     unit: 'پرنده', decimals: 0,
   });
 
   const tempCurrent = form.targetTemp ? parseFloat(toEn(form.targetTemp)) || null : null;
   const { hint: tempHint } = useOverride({
     current: tempCurrent, stdValue: stdTemp ?? null,
-    onReset: () => setForm(f => ({ ...f, targetTemp: stdTemp != null ? String(stdTemp) : '' })),
+    onReset: () => setForm((f: any) => ({ ...f, targetTemp: stdTemp != null ? String(stdTemp) : '' })),
     unit: '°C', decimals: 1,
   });
 
   const humCurrent = form.targetHumidity ? parseFloat(toEn(form.targetHumidity)) || null : null;
   const { hint: humHint } = useOverride({
     current: humCurrent, stdValue: stdHumidity ?? null,
-    onReset: () => setForm(f => ({ ...f, targetHumidity: stdHumidity != null ? String(stdHumidity) : '' })),
+    onReset: () => setForm((f: any) => ({ ...f, targetHumidity: stdHumidity != null ? String(stdHumidity) : '' })),
     unit: '٪', decimals: 0,
   });
-  const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save, stdCapacity, stdTemp, stdHumidity } = props;
 
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
@@ -176,6 +176,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
             </Field>
             <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined}>
               <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
+              <OverrideHint {...capHint} />
               {(() => {
                 if (!form.breedId) return null;
                 const std = breedStd.byBreedId(form.breedId);
@@ -250,8 +251,14 @@ export default function HallsFormModal(props: HallsFormModalProps) {
 
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>شرایط</div>
           <Grid2>
-          <TempFormField label="دمای هدف" placeholder="۲۲" autoFrom={autoFields.has("targetTemp") ? "استاندارد" : undefined} value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
-          <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? "استاندارد" : undefined}><NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={-10} /></Field>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+            <TempFormField label="دمای هدف" placeholder="۲۲" autoFrom={autoFields.has("targetTemp") ? "استاندارد" : undefined} value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
+            <OverrideHint {...tempHint} />
+          </div>
+          <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? "استاندارد" : undefined}>
+            <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={-10} />
+            <OverrideHint {...humHint} />
+          </Field>
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>زمان‌ها</div>
         <Grid2>
