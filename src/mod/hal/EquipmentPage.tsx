@@ -1,26 +1,26 @@
 /**
  * EquipmentPage — تجهیزات
  */
-import { useState, useRef, useMemo } from 'react';
-import { categoriesForKind, typesForCategory, calcEquipNeed, calcEquipValue, getCapacityHint, getStdDefaultForType, CATEGORIES_BY_KIND, TYPES_BY_CATEGORY } from './api/equipmentCalc';
+import { useState, useMemo } from 'react';
+import { categoriesForKind, typesForCategory, calcEquipNeed, calcEquipValue } from './api/equipmentCalc';
 import EquipmentFormModal from './components/EquipmentFormModal';
 import EquipmentCard from './components/EquipmentCard';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
-import { useHal, type Equipment, type EquipmentKind, type EquipmentCategory, type EquipmentUnit, EQUIP_LABELS, EQUIP_CAPACITY_UNIT, EQUIP_EFFICIENCY_UNIT, CATEGORY_LABELS, KIND_LABELS, UNIT_LABELS_EQ } from './store';
+import { useHal, type Equipment } from './store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox } from '../../shr/components/ui';
-import DatePicker from '../../shr/components/DatePicker';;
+import { Btn, Empty, PageContainer, Select } from '../../shr/components/ui';
+
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useFilterSort, FilterBar, getHalEquipmentConfig } from '../../shr/filter';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert } from '../../cor/store/dialog';
-import { chip } from './helpers';
+
 import EditableSelect from '../../shr/components/EditableSelect';
-import { EquipmentIcon, CATEGORY_COLORS } from '../../shr/icons/equipment';
+
 import { useCustomOptions } from '../../shr/store/customOptions';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
