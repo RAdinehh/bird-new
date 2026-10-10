@@ -28,6 +28,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { IconBadge, EquipmentIcon } from '../icons/equipment';
 
 // ═══ آیکون‌ها ═══
 const IconClose = () => (
@@ -283,7 +284,7 @@ const BTN_ADD: React.CSSProperties = {
 };
 
 // ═══ سرگروه ═══
-interface GroupProps { title: string; icon?: string; count?: number; children: ReactNode; }
+interface GroupProps { title: string; icon?: ReactNode; count?: number; children: ReactNode; }
 export function SheetGroup({ title, icon, count, children }: GroupProps) {
   return (
     <div style={{
@@ -305,7 +306,13 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
           position: 'absolute', right: 0, top: 0, bottom: 0,
           width: 3, background: 'var(--group-text, #6d6d72)', opacity: .35,
         }} />
-        {icon && <span style={{ fontSize: 14, lineHeight: 1, flexShrink: 0 }}>{icon}</span>}
+        {icon && (
+          <span style={{
+            width: 16, height: 16, flexShrink: 0,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 14, lineHeight: 1,
+          }}>{icon}</span>
+        )}
         <span style={{ flex: 1 }}>{title}</span>
         {count != null && (
           <span style={{ fontSize: 10, fontWeight: 600, opacity: .75 }}>
@@ -320,13 +327,33 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
 
 // ═══ آیتم ═══
 interface ItemProps {
-  icon?: string;
+  /** آیکون آماده (ReactNode) */
+  icon?: ReactNode;
+  /** 🆕 نوع تجهیز — اگه داده بشه، آیکون از EquipmentIcon میاد */
+  equipType?: string;
+  /** 🆕 دسته — برای رنگ IconBadge */
+  category?: string;
   title: string;
   selected?: boolean;
   onClick?: () => void;
   actions?: ReactNode;
 }
-export function SheetItem({ icon, title, selected, onClick, actions }: ItemProps) {
+export function SheetItem({ icon, equipType, category, title, selected, onClick, actions }: ItemProps) {
+  // آیکون: اگه equipType داده شده، IconBadge + EquipmentIcon
+  const iconNode = equipType ? (
+    <IconBadge category={category} size="sm">
+      <EquipmentIcon type={equipType} size={16} color="currentColor" />
+    </IconBadge>
+  ) : icon ? (
+    <span style={{
+      width: 28, height: 28, flexShrink: 0,
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: 18, lineHeight: 1,
+    }}>
+      {icon}
+    </span>
+  ) : null;
+
   return (
     <button
       type="button"
@@ -334,7 +361,7 @@ export function SheetItem({ icon, title, selected, onClick, actions }: ItemProps
       aria-selected={selected}
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
-        padding: '10px 12px', minHeight: 48,
+        padding: '10px 12px', minHeight: 52,
         background: 'var(--card-solid)',
         border: 'none',
         borderBottom: '1px solid var(--border)',
@@ -346,7 +373,7 @@ export function SheetItem({ icon, title, selected, onClick, actions }: ItemProps
       }}
     >
       {actions && <span style={{ display: 'flex', gap: 2, flexShrink: 0 }}>{actions}</span>}
-      {icon && <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{icon}</span>}
+      {iconNode}
       <span style={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         {title}
       </span>

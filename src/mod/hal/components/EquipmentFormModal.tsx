@@ -101,11 +101,11 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             }}
             options={typesForCategory(form.category || 'auxiliary').map(k => {
               const v = (EQUIP_LABELS as any)[k] || { name: k };
-              const catColor = CATEGORY_COLORS[form.category || 'auxiliary'] || 'var(--cat-auxiliary)';
               return {
                 value: k,
                 label: v.name,
-                icon: <EquipmentIcon type={k} size={22} weight="duotone" color={catColor} />,
+                equipType: k,
+                category: form.category || 'auxiliary',
               };
             })}
             customKey={'hal.equip.type.' + (form.category || 'auxiliary')}

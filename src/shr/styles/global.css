@@ -56,15 +56,36 @@ body {
   --group-text: #6d6d72;
   --scroll-thumb: rgba(142,142,147,.5);
 
-  /* ═══ رنگ دسته‌بندی تجهیزات (مستقل از تم) ═══ */
+  /* ═══ رنگ دسته‌بندی تجهیزات (مستقل از تم) — نسخه و رنگ main + soft ═══ */
   --cat-ventilation: #2563eb;
+  --cat-ventilation-soft: rgba(37,99,235,.11);
   --cat-feeding:     #d97706;
+  --cat-feeding-soft: rgba(217,119,6,.11);
   --cat-drinking:    #0891b2;
+  --cat-drinking-soft: rgba(8,145,178,.11);
   --cat-heating:     #dc2626;
+  --cat-heating-soft: rgba(220,38,38,.11);
   --cat-lighting:    #ca8a04;
+  --cat-lighting-soft: rgba(202,138,4,.11);
   --cat-litter:      #0d9488;
+  --cat-litter-soft: rgba(13,148,136,.11);
   --cat-power:       #ea580c;
+  --cat-power-soft:  rgba(234,88,12,.11);
   --cat-auxiliary:   #475569;
+  --cat-auxiliary-soft: rgba(71,85,105,.11);
+  /* 🆕 ۶ دسته جدید */
+  --cat-water_treatment: #0284c7;
+  --cat-water_treatment-soft: rgba(2,132,199,.11);
+  --cat-safety:      #dc2626;
+  --cat-safety-soft: rgba(220,38,38,.11);
+  --cat-cleaning:    #7c3aed;
+  --cat-cleaning-soft: rgba(124,58,237,.11);
+  --cat-hand_tools:  #78716c;
+  --cat-hand_tools-soft: rgba(120,113,108,.11);
+  --cat-weighing:    #0d9488;
+  --cat-weighing-soft: rgba(13,148,136,.11);
+  --cat-cooling:     #0ea5e9;
+  --cat-cooling-soft: rgba(14,165,233,.11);
   --header-bg: rgba(241,245,249,.95);
   --btn-bg: rgba(255,255,255,.9);
   --input-bg: rgba(241,245,249,.7);

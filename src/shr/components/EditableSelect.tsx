@@ -16,12 +16,17 @@ import { useCustomOptions } from '../store/customOptions';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import SelectSheetShell, { SheetGroup, SheetItem } from './SelectSheetShell';
+import { Package, Sparkles } from 'lucide-react';
 import { EMOJI_GROUPS } from '../data/emojis';
 
 export interface EditableOption {
   value: string;
   label: string;
   icon?: string | React.ReactNode;
+  /** 🆕 اگه پر شه، آیکون از EquipmentIcon میاد */
+  equipType?: string;
+  /** 🆕 دسته برای رنگ IconBadge */
+  category?: string;
 }
 
 interface Props {
@@ -191,7 +196,9 @@ export default function EditableSelect({
           {opts.map(o => (
             <SheetItem
               key={o.value}
-              icon={typeof o.icon === 'string' ? o.icon : undefined}
+              icon={o.icon}
+              equipType={o.equipType}
+              category={o.category}
               title={o.label}
               selected={value === o.value}
               onClick={() => { onChange(o.value); closeAll(); }}
@@ -214,11 +221,13 @@ export default function EditableSelect({
     return (
       <>
         {opts.length > 0 && (
-          <SheetGroup title="پیش‌فرض‌ها" icon="📦" count={opts.length}>
+          <SheetGroup title="پیش‌فرض‌ها" icon={<Package size={14} />} count={opts.length}>
             {opts.map(o => (
               <SheetItem
                 key={o.value}
-                icon={typeof o.icon === 'string' ? o.icon : undefined}
+                icon={o.icon}
+                equipType={o.equipType}
+                category={o.category}
                 title={o.label}
                 selected={value === o.value}
                 onClick={() => { onChange(o.value); closeAll(); }}
@@ -227,7 +236,7 @@ export default function EditableSelect({
           </SheetGroup>
         )}
         {customsList.length > 0 && (
-          <SheetGroup title="سفارشی" icon="✨" count={customsList.length}>
+          <SheetGroup title="سفارشی" icon={<Sparkles size={14} />} count={customsList.length}>
             {customsList.map(c => (
               <SheetItem
                 key={c.id}
