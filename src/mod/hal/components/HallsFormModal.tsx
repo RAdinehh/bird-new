@@ -178,7 +178,6 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         <Grid2>
               <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined}>
                 <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
-                <OverrideHint {...capHint} />
               </Field>
               {(() => {
                 const std = form.breedId ? breedStd.byBreedId(form.breedId) : null;
@@ -215,6 +214,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 );
               })()}
             </Grid2>
+            <OverrideHint {...capHint} />
           {form.breedId && (
             <button
               type="button"
