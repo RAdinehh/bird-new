@@ -174,7 +174,8 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 modalTitle="انتخاب نژاد"
               />
             </Field>
-            <Grid2>
+        </Grid2>
+        <Grid2>
               <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined}>
                 <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
                 <OverrideHint {...capHint} />
@@ -214,7 +215,6 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 );
               })()}
             </Grid2>
-          </Grid2>
           {form.breedId && (
             <button
               type="button"
