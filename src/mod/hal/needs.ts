@@ -64,28 +64,22 @@ export function needLighting(inp: NeedInput): CategoryNeed | null {
 /** نیاز آبخوری (تعداد) */
 export function needDrinker(inp: NeedInput): CategoryNeed | null {
   if (!inp.standard || inp.birdCount <= 0) return null;
-  const d = inp.standard.equipment?.drinker;
-  if (!d) return null;
-  const ratio = d.nippleBirdsPerUnit || d.cupBirdsPerUnit;
-  if (!ratio) return null;
+  // 🆕 به‌جای تعداد تجهیز، ظرفیت پرنده برمی‌گردونیم تا با calcInstalled هم‌واحد باشه
   return {
-    value: Math.ceil(inp.birdCount / ratio),
-    unit: 'عدد',
-    formula: `${inp.birdCount} ÷ ${ratio}`,
+    value: inp.birdCount,
+    unit: 'پرنده',
+    formula: `${inp.birdCount} پرنده`,
   };
 }
 
 /** نیاز دانخوری (تعداد) */
 export function needFeeder(inp: NeedInput): CategoryNeed | null {
   if (!inp.standard || inp.birdCount <= 0) return null;
-  const f = inp.standard.equipment?.feeder;
-  if (!f) return null;
-  const ratio = f.panBirdsPerUnit;
-  if (!ratio) return null;
+  // 🆕 ظرفیت پرنده
   return {
-    value: Math.ceil(inp.birdCount / ratio),
-    unit: 'عدد',
-    formula: `${inp.birdCount} ÷ ${ratio}`,
+    value: inp.birdCount,
+    unit: 'پرنده',
+    formula: `${inp.birdCount} پرنده`,
   };
 }
 
