@@ -42,7 +42,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               const nextCat = allowedCats.includes(form.category) ? form.category : allowedCats[0];
               const allowedTypes = typesForCategory(nextCat);
               const nextType = allowedTypes.includes(form.type) ? form.type : (allowedTypes[0] || 'other');
-              setForm({ ...form, kind: newKind, category: nextCat, type: nextType });
+              setForm({ ...form, kind: newKind, category: nextCat, type: nextType, capacity: '' });
             }}>
               {Object.entries(KIND_LABELS).map(([k, v]) => (
                 <option key={k} value={k}>{v.icon} {v.name}</option>
@@ -54,7 +54,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               const cat = e.target.value;
               const allowed = typesForCategory(cat);
               const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || 'other');
-              setForm({...form, category: cat, type: nextType});
+              setForm({...form, category: cat, type: nextType, capacity: ''});
             }}>
               {categoriesForKind(form.kind || 'asset').map(k => {
                 const v = (CATEGORY_LABELS as any)[k];
@@ -83,11 +83,15 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             onChange={v => {
               const def = getEquipUnit(v);
               const patch: any = { type: v };
-              if (def.secondary?.defaultValue && !form.capacity) {
+              // 🆕 همیشه capacity رو ریست کن
+              if (def.secondary?.defaultValue) {
                 patch.capacity = String(def.secondary.defaultValue);
+              } else {
+                patch.capacity = '';
               }
               setForm({ ...form, ...patch });
               if (def.secondary?.defaultValue) markAuto('capacity');
+              else clearAuto('capacity');
             }}
             options={typesForCategory(form.category || 'auxiliary').map(k => {
               const v = (EQUIP_LABELS as any)[k] || { name: k };
