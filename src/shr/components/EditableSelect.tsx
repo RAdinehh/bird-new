@@ -162,7 +162,14 @@ export default function EditableSelect({
         transition: 'transform 180ms',
         transform: open ? 'rotate(180deg)' : 'none',
         display: 'inline-block',
-      }}>▼</span>
+      }}>
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="var(--muted)" strokeWidth="2"
+          strokeLinecap="round" strokeLinejoin="round"
+          style={{ flexShrink: 0 }}>
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </span>
     </button>
   );
 

@@ -315,7 +315,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
               options={halls.map(c => ({
                 value: c.id,
                 label: c.name,
-                subtitle: (h => h.name)(c),
               }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب سالن"
