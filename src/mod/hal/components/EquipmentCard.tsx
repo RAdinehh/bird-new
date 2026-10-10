@@ -4,7 +4,7 @@
 import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
-import { EQUIP_LABELS, KIND_LABELS, CATEGORY_LABELS, UNIT_LABELS_EQ } from '../store';
+import { EQUIP_LABELS, KIND_LABELS, CATEGORY_LABELS, UNIT_LABELS_EQ, STATUS_LABELS } from '../store';
 import { calcEquipValue } from '../api/equipmentCalc';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
@@ -39,10 +39,19 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 index={toFa(i + 1)}
                 iconEmoji={meta.icon}
                 title={e.name}
-                subtitle={`${meta.name}${_isDeleted ? ' · حذف‌شده' : ''} · ${hall?.name || '—'}`}
+                subtitle={`${meta.name}${e.brand ? ' · ' + e.brand : ''}${_isDeleted ? ' · حذف‌شده' : ''} · ${hall?.name || '—'}`}
                 isOpen={isOpen}
                 onToggle={onToggle}
-                badge={e.count ? <Tag tone="blue">{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</Tag> : undefined}
+                badge={
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    {e.status && e.status !== 'active' && (() => {
+                      const st = (STATUS_LABELS as any)[e.status];
+                      if (!st) return null;
+                      return <Tag tone={(st.tone || 'gray') as any}>{st.icon} {st.name}</Tag>;
+                    })()}
+                    {e.count ? <Tag tone="blue">{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</Tag> : undefined}
+                  </div>
+                }
                 stats={<>
                   {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</b></span>}
                   {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(value.toLocaleString('fa-IR'))} ت</b></span>}
