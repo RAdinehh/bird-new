@@ -1,7 +1,19 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Modal, Input, Select } from './ui';
+/**
+ * SmartSelect.tsx — انتخاب‌گر ساده با SelectSheetShell
+ *
+ * دو حالت خودکار:
+ *   - options ≤ autoThreshold (پیش‌فرض ۸) → Select بومی
+ *   - options > autoThreshold → SelectSheetShell (لیست بلند)
+ *
+ * API ثابت (سازگاری با ۱۵ ماژول):
+ *   value, onChange, options, placeholder, groupLabels, groupIcons,
+ *   hierarchical, autoThreshold, disabled, modalTitle, required, error, warn, compact
+ */
+
+import { useState, useMemo } from 'react';
+import { Select, Input } from './ui';
 import { toFa } from '../utils/fa';
-import { useSet } from '../../mod/set/store';
+import SelectSheetShell, { SheetGroup, SheetItem } from './SelectSheetShell';
 
 export interface SmartOption {
   value: string;
@@ -9,6 +21,7 @@ export interface SmartOption {
   subtitle?: string;
   group?: string;
   disabled?: boolean;
+  icon?: string;
 }
 
 interface Props {
@@ -18,12 +31,10 @@ interface Props {
   placeholder?: string;
   groupLabels?: Record<string, string>;
   groupIcons?: Record<string, string>;
-  /** 🆕 حالت سلسله‌مراتبی */
   hierarchical?: boolean;
   autoThreshold?: number;
   disabled?: boolean;
   modalTitle?: string;
-  // جدید
   required?: boolean;
   error?: string;
   warn?: string;
@@ -31,80 +42,25 @@ interface Props {
 }
 
 export default function SmartSelect({
-  value,
-  onChange,
-  options,
+  value, onChange, options,
   placeholder = '— انتخاب کنید —',
-  groupLabels = {},
-  groupIcons = {},
+  groupLabels = {}, groupIcons = {},
   hierarchical = false,
   autoThreshold = 8,
   disabled = false,
   modalTitle = 'انتخاب',
   required = false,
-  error,
-  warn,
+  error, warn,
   compact = false,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [activeGroup, setActiveGroup] = useState('');
   const [query, setQuery] = useState('');
 
-  // lowPowerMode + prefers-reduced-motion
-  const lowPower = useSet((st: any) => st.lowPowerMode);
-  const [prefersReduced, setPrefersReduced] = useState(false);
-  useEffect(() => {
-    try {
-      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setPrefersReduced(mq.matches);
-      const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
-      mq.addEventListener('change', handler);
-      return () => mq.removeEventListener('change', handler);
-    } catch {
-      /* silent */
-    }
-  }, []);
-  const noAnim = !!(lowPower || prefersReduced);
-
-  // Groups
-  const groups = useMemo(
-    () => Array.from(new Set(options.map(o => o.group).filter(Boolean))) as string[],
-    [options]
-  );
-
-  const countByGroup = useMemo(() => {
-    const m: Record<string, number> = {};
-    options.forEach(o => {
-      if (o.group) m[o.group] = (m[o.group] || 0) + 1;
-    });
-    return m;
-  }, [options]);
-
-  const filtered = useMemo(() => {
-    let arr = options;
-    if (activeGroup) arr = arr.filter(o => o.group === activeGroup);
-    if (query.trim()) {
-      const q = query.trim().toLowerCase();
-      arr = arr.filter(
-        o =>
-          o.label.toLowerCase().includes(q) ||
-          (o.subtitle?.toLowerCase() || '').includes(q)
-      );
-    }
-    return arr;
-  }, [options, activeGroup, query]);
-
-  // border color
-  const borderColor = error
-    ? 'var(--danger)'
-    : warn
-    ? 'var(--warn)'
-    : 'var(--border)';
-
+  const borderColor = error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)';
   const height = compact ? 32 : 38;
   const fontSize = compact ? 'var(--fs-sm)' : 'var(--fs-base)';
 
-  // ========== لیست کوتاه — Select بومی ==========
+  // ═══ حالت ۱: لیست کوتاه — Select بومی ═══
   if (options.length <= autoThreshold) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
@@ -115,12 +71,7 @@ export default function SmartSelect({
           aria-label={placeholder}
           aria-invalid={!!error}
           aria-required={required}
-          style={{
-            borderColor,
-            height,
-            fontSize,
-            opacity: disabled ? 0.55 : 1,
-          }}
+          style={{ borderColor, height, fontSize, opacity: disabled ? 0.55 : 1 }}
         >
           <option value="">{placeholder}</option>
           {options.map(o => (
@@ -131,12 +82,7 @@ export default function SmartSelect({
           ))}
         </Select>
         {(error || warn) && (
-          <div
-            style={{
-              fontSize: 'var(--fs-xs)',
-              color: error ? 'var(--danger)' : 'var(--warn)',
-            }}
-          >
+          <div style={{ fontSize: 'var(--fs-xs)', color: error ? 'var(--danger)' : 'var(--warn)' }}>
             {error ? `✕ ${error}` : `⚠ ${warn}`}
           </div>
         )}
@@ -144,12 +90,42 @@ export default function SmartSelect({
     );
   }
 
-  // ========== لیست بلند — Modal با جستجو ==========
+  // ═══ حالت ۲: لیست بلند — SelectSheetShell ═══
   const current = options.find(o => o.value === value);
+  const searchable = options.length > 5;
+
+  const groups = useMemo(
+    () => Array.from(new Set(options.map(o => o.group).filter(Boolean))) as string[],
+    [options],
+  );
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return options;
+    const q = query.trim().toLowerCase();
+    return options.filter(o =>
+      o.label.toLowerCase().includes(q) ||
+      (o.subtitle?.toLowerCase() || '').includes(q),
+    );
+  }, [options, query]);
+
+  // گروه‌بندی
+  const grouped = useMemo(() => {
+    const map: Record<string, SmartOption[]> = {};
+    filtered.forEach(o => {
+      const g = o.group || '_flat';
+      if (!map[g]) map[g] = [];
+      map[g].push(o);
+    });
+    return map;
+  }, [filtered]);
+
+  const groupKeys = Object.keys(grouped);
+  const hasGroups = groupKeys.length > 1 || (groupKeys.length === 1 && groupKeys[0] !== '_flat');
 
   const handlePick = (val: string) => {
     onChange(val);
     setOpen(false);
+    setQuery('');
   };
 
   return (
@@ -158,20 +134,14 @@ export default function SmartSelect({
       <button
         type="button"
         disabled={disabled}
-        onClick={() => {
-          if (disabled) return;
-          setOpen(true);
-          setQuery('');
-          setActiveGroup('');
-        }}
+        onClick={() => { if (disabled) return; setOpen(true); setQuery(''); }}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={required ? `${placeholder} (اجباری)` : placeholder}
         aria-invalid={!!error}
         aria-required={required}
         style={{
-          width: '100%',
-          height,
+          width: '100%', height,
           textAlign: 'right',
           padding: compact ? '0 10px' : '0 12px',
           background: 'var(--input-bg)',
@@ -182,269 +152,87 @@ export default function SmartSelect({
           fontSize,
           color: current ? 'var(--text)' : 'var(--dim)',
           opacity: disabled ? 0.55 : 1,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 8,
-          minWidth: 0,
-          outline: 'none',
-          transition: noAnim ? 'none' : 'border-color var(--dur-base)',
-        }}
-        onFocus={e => {
-          if (!disabled) {
-            e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
-          }
-        }}
-        onBlur={e => {
-          e.currentTarget.style.boxShadow = 'none';
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          gap: 8, minWidth: 0, outline: 'none',
         }}
       >
-        <span
-          style={{
-            fontWeight: current ? 600 : 400,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
+        <span style={{
+          fontWeight: current ? 600 : 400,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
           {current ? current.label : placeholder}
           {required && !current ? (
             <span style={{ color: 'var(--danger)', marginRight: 4 }}> *</span>
           ) : null}
         </span>
-        <svg
-          aria-hidden="true"
-          width="16" height="16" viewBox="0 0 24 24"
-          fill="none" stroke="var(--muted)"
-          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          style={{ flexShrink: 0 }}
-        >
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="var(--muted)" strokeWidth="2"
+          strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
           <path d="m6 9 6 6 6-6" />
         </svg>
       </button>
 
       {(error || warn) && (
-        <div
-          style={{
-            fontSize: 'var(--fs-xs)',
-            color: error ? 'var(--danger)' : 'var(--warn)',
-          }}
-        >
+        <div style={{ fontSize: 'var(--fs-xs)', color: error ? 'var(--danger)' : 'var(--warn)' }}>
           {error ? `✕ ${error}` : `⚠ ${warn}`}
         </div>
       )}
 
-      {/* Modal */}
-      <Modal
+      <SelectSheetShell
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => { setOpen(false); setQuery(''); }}
         title={modalTitle}
-        footer={null}
-      >
-        {/* Groups */}
-        {groups.length > 1 && (
-          <div
-            role="tablist"
-            style={{
-              display: 'flex',
-              gap: 6,
-              overflowX: 'auto',
-              paddingBottom: 8,
-              marginBottom: 4,
-              borderBottom: '1px solid var(--border)',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setActiveGroup('')}
-              style={chip(activeGroup === '')}
-              aria-pressed={activeGroup === ''}
-            >
-              همه ({toFa(options.length)})
-            </button>
-            {groups.map(g => (
-              <button
-                key={g}
-                type="button"
-                onClick={() => setActiveGroup(g)}
-                style={chip(activeGroup === g)}
-                aria-pressed={activeGroup === g}
-              >
-                {groupIcons[g] ? groupIcons[g] + ' ' : ''}
-                {groupLabels[g] || g} ({toFa(countByGroup[g] || 0)})
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Search */}
-        <div style={{ marginTop: 6, marginBottom: 6 }}>
+        subtitle={`${toFa(options.length)} مورد`}
+        searchable={searchable}
+        searchNode={
           <Input
-            placeholder="🔍 جستجو..."
+            placeholder="جستجو..."
             value={query}
             onChange={e => setQuery(e.target.value)}
-            aria-label="جستجو در گزینه‌ها"
           />
-        </div>
-
-        {/* List */}
-        <div
-          role="listbox"
-          aria-label={modalTitle}
-          style={{
-            maxHeight: '55vh',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 6,
-          }}
-        >
-          {filtered.length === 0 ? (
-            <div
-              style={{
-                padding: 24,
-                textAlign: 'center',
-                color: 'var(--muted)',
-                fontSize: 'var(--fs-sm)',
-                lineHeight: 1.8,
-              }}
+        }
+      >
+        {filtered.length === 0 ? (
+          <div style={{
+            padding: '32px 12px', textAlign: 'center',
+            color: 'var(--muted)', fontSize: 'var(--fs-base)',
+          }}>
+            <div style={{ fontSize: 28, marginBottom: 6, opacity: 0.5 }}>🔍</div>
+            <div>چیزی پیدا نشد</div>
+          </div>
+        ) : hasGroups ? (
+          groupKeys.map(gKey => (
+            <SheetGroup
+              key={gKey}
+              title={groupLabels[gKey] || gKey}
+              icon={groupIcons[gKey] || undefined}
+              count={grouped[gKey].length}
             >
-              🔍
-              <div style={{ marginTop: 6 }}>چیزی پیدا نشد</div>
-              {query ? (
-                <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4 }}>
-                  «{query}» در گزینه‌ها نیست
-                </div>
-              ) : null}
-            </div>
-          ) : hierarchical && groups.length > 0 ? (
-            /* 🆕 حالت سلسله‌مراتبی — والد با هدر، فرزندان indent */
-            groups.map(g => {
-              const groupOptions = filtered.filter(o => o.group === g);
-              if (groupOptions.length === 0) return null;
-              const headerLabel = groupLabels[g] || g;
-              const headerIcon = groupIcons[g] || '';
-              return (
-                <div key={g} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '8px 10px 4px',
-                    fontSize: 'var(--fs-sm)', fontWeight: 800,
-                    color: 'var(--accent)',
-                    borderBottom: '1px solid var(--border)',
-                  }}>
-                    {headerIcon && <span style={{ fontSize: 16 }}>{headerIcon}</span>}
-                    <span>{headerLabel}</span>
-                    <span style={{
-                      marginInlineStart: 'auto', fontSize: 10,
-                      color: 'var(--muted)', fontWeight: 600,
-                    }}>({toFa(groupOptions.length)})</span>
-                  </div>
-                  {groupOptions.map(o => {
-                    const isSelected = o.value === value;
-                    return (
-                      <button
-                        key={o.value}
-                        type="button"
-                        role="option"
-                        aria-selected={isSelected}
-                        disabled={o.disabled}
-                        onClick={() => handlePick(o.value)}
-                        style={{
-                          width: '100%', textAlign: 'right',
-                          padding: compact ? '6px 10px 6px 28px' : '8px 12px 8px 32px',
-                          background: isSelected ? 'var(--accent-soft)' : 'transparent',
-                          border: '1px solid ' + (isSelected ? 'var(--accent-border)' : 'transparent'),
-                          borderRadius: 'var(--r-sm)',
-                          cursor: o.disabled ? 'not-allowed' : 'pointer',
-                          fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                          display: 'flex', justifyContent: 'space-between',
-                          alignItems: 'center', gap: 8,
-                          color: isSelected ? 'var(--accent)' : 'var(--text)',
-                          opacity: o.disabled ? 0.5 : 1,
-                          outline: 'none',
-                          fontWeight: isSelected ? 700 : 500,
-                        }}
-                      >
-                        <span>{o.label}</span>
-                        {o.subtitle && (
-                          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0 }}>
-                            {o.subtitle}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              );
-            })
-          ) : (
-            filtered.map(o => {
-              const isSelected = o.value === value;
-              return (
-                <button
+              {grouped[gKey].map(o => (
+                <SheetItem
                   key={o.value}
-                  type="button"
-                  role="option"
-                  aria-selected={isSelected}
-                  disabled={o.disabled}
-                  onClick={() => handlePick(o.value)}
-                  style={{
-                    width: '100%',
-                    textAlign: 'right',
-                    padding: compact ? '8px 10px' : '10px 12px',
-                    background: isSelected ? 'var(--accent-soft)' : 'var(--input-bg)',
-                    border: '1px solid ' + (isSelected ? 'var(--accent-border)' : 'var(--border)'),
-                    borderRadius: 'var(--r-md)',
-                    cursor: o.disabled ? 'not-allowed' : 'pointer',
-                    fontFamily: 'inherit',
-                    fontSize: 'var(--fs-base)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 8,
-                    color: isSelected ? 'var(--accent)' : 'var(--text)',
-                    opacity: o.disabled ? 0.5 : 1,
-                    outline: 'none',
-                    transition: noAnim ? 'none' : 'background var(--dur-fast)',
-                  }}
-                  onFocus={e => {
-                    e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)';
-                  }}
-                  onBlur={e => {
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                >
-                  <span style={{ fontWeight: 600 }}>{o.label}</span>
-                  {o.subtitle && (
-                    <span
-                      style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0 }}
-                    >
-                      {o.subtitle}
-                    </span>
-                  )}
-                </button>
-              );
-            })
-          )}
-        </div>
-      </Modal>
+                  icon={o.icon}
+                  title={o.label}
+                  selected={value === o.value}
+                  onClick={() => !o.disabled && handlePick(o.value)}
+                />
+              ))}
+            </SheetGroup>
+          ))
+        ) : (
+          <SheetGroup title="" count={filtered.length}>
+            {filtered.map(o => (
+              <SheetItem
+                key={o.value}
+                icon={o.icon}
+                title={o.label}
+                selected={value === o.value}
+                onClick={() => !o.disabled && handlePick(o.value)}
+              />
+            ))}
+          </SheetGroup>
+        )}
+      </SelectSheetShell>
     </div>
   );
-}
-
-function chip(active: boolean): React.CSSProperties {
-  return {
-    padding: '6px 11px',
-    fontSize: 'var(--fs-sm)',
-    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
-    border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-    borderRadius: 'var(--r-sm)',
-    color: active ? 'var(--accent)' : 'var(--muted)',
-    fontWeight: active ? 600 : 500,
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-    whiteSpace: 'nowrap',
-    outline: 'none',
-  };
 }
