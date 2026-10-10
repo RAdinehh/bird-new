@@ -4,6 +4,8 @@
 import { useState } from 'react';
 import { useTempUnit } from '../../../shr/utils/temp';
 import { Field, Grid2, Grid3, Input, Modal, BtnRow, Btn, NumField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
+import SmartSelect from '../../../shr/components/SmartSelect';
+import DependentSelect from '../../../shr/components/DependentSelect';
 import DatePicker from '../../../shr/components/DatePicker';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
@@ -107,6 +109,7 @@ export interface HallsFormModalProps {
   setForm: any;
   err: string;
   vErrors: Record<string, string>;
+  birds: any[];
   breeds: any[];
   breedStd: any;
   autoFields: Set<string>;
@@ -115,18 +118,35 @@ export interface HallsFormModalProps {
 }
 
 export default function HallsFormModal(props: HallsFormModalProps) {
-  const { open, setOpen, form, setForm, err, vErrors, breeds, breedStd, autoFields, clearAuto, save } = props;
+  const breedsForBird = (props.breeds || []).filter((b: any) => b.birdId === props.form.birdId);
+  const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save } = props;
 
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Field label="نام سالن" required><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
         <Grid2>
+            <Field label="پرنده">
+              <SmartSelect
+                value={form.birdId || ''}
+                onChange={v => setForm({...form, birdId: v, breedId: ''})}
+                options={birds.map((b: any) => ({ value: b.id, label: b.name }))}
+                placeholder="— انتخاب پرنده —"
+                modalTitle="انتخاب پرنده"
+                autoThreshold={6}
+              />
+            </Field>
             <Field label="نژاد پرنده">
-              <Select value={form.breedId} onChange={e => setForm({...form, breedId: e.target.value})}>
-                <option value="">— انتخاب —</option>
-                {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </Select>
+              <DependentSelect
+                value={form.breedId}
+                onChange={v => setForm({...form, breedId: v})}
+                parentValue={form.birdId || ''}
+                parentLabel="پرنده"
+                options={breedsForBird.map((b: any) => ({ value: b.id, label: b.name }))}
+                emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
+                placeholder="— انتخاب نژاد —"
+                modalTitle="انتخاب نژاد"
+              />
             </Field>
             <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined}>
               <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />

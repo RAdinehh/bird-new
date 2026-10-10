@@ -38,7 +38,7 @@ interface F {
   capacity: string; targetTemp: string; targetHumidity: string;
   ventilation: string; light: string;
   ventilationSystem: string; feederType: string; drinkerType: string; litterType: string;
-  address: string; builtAt: string; lastSanitizedAt: string; notes: string; breedId: string;
+  address: string; builtAt: string; lastSanitizedAt: string; notes: string; birdId: string; breedId: string;
 }
 const empty: F = {
   name:'', code:'', length:'', width:'', height:'',
@@ -46,7 +46,7 @@ const empty: F = {
   ventilationSystem:'', feederType:'', drinkerType:'', litterType:'',
  
   
-  address:'', builtAt:'', lastSanitizedAt:'', notes:'', breedId:'',
+  address:'', builtAt:'', lastSanitizedAt:'', notes:'', birdId:'', breedId:'',
 };
 
 
@@ -186,6 +186,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       drinkerType: h.drinkerType || '',
       litterType: h.litterType || '',
       address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, notes: h.notes,
+      birdId: (h as any).birdId || '',
       breedId: (h as any).breedId || ''
       });
     setErr(''); setOpen(true);
@@ -215,7 +216,10 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       builtAt: form.builtAt || '',
       lastSanitizedAt: form.lastSanitizedAt || '',
       notes: form.notes || '',
-      birdId: '',
+      birdId: (() => {
+        const b = breeds.find((x: any) => x.id === (form.breedId || ''));
+        return (b as any)?.birdId || '';
+      })(),
       breedId: form.breedId || '',
     },
   );
@@ -245,6 +249,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       drinkerType: form.drinkerType || '',
       litterType: form.litterType || '',
       address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), notes: form.notes.trim(),
+      birdId: form.birdId || undefined,
       breedId: form.breedId || undefined,
     };
     if (form.id) updateHall(form.id, data); else addHall(data);
@@ -355,6 +360,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         setForm={setForm}
         err={err}
         vErrors={vErrors}
+        birds={birds}
         breeds={breeds}
         breedStd={breedStd}
         autoFields={autoFields}
