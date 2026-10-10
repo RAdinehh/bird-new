@@ -130,72 +130,101 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           </Field>
         )}
 
-        <Grid2>
-          <Field label="تعداد">
-            <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={(UNIT_LABELS_EQ as any)[form.unit || 'pcs'] || 'عدد'} min={0} />
-            {equipNeed ? (
-              <div style={{
-                fontSize: 11,
-                marginTop: 4,
-                lineHeight: 1.6,
-                padding: '6px 8px',
-                borderRadius: 'var(--r-sm)',
-                background: (parseInt(toEn(form.count)) || 0) >= equipNeed.need ? 'var(--accent-soft)' : 'var(--danger-soft)',
-                color: (parseInt(toEn(form.count)) || 0) >= equipNeed.need ? 'var(--accent)' : 'var(--danger)',
-              }}>
-                {(() => {
-                  const have = parseInt(toEn(form.count)) || 0;
-                  if (have >= equipNeed.need) {
-                    return '✓ کافیه — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' (' + equipNeed.desc + ')';
-                  }
-                  const pct = equipNeed.need > 0 ? Math.round((have / equipNeed.need) * 100) : 0;
-                  return '⚠ کم داره — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' · فعلی ' + pct + '٪';
-                })()}
-              </div>
-            ) : null}
-          </Field>
-          <Field label={(() => {
-            const def = getEquipUnit(form.type || 'other');
-            if (def.baseUnit === 'kg') return 'قیمت هر kg';
-            return 'قیمت هر عدد';
-          })()}>
-            <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
-          </Field>
-        </Grid2>
-
         {(() => {
-          const def = getEquipUnit(form.type);
-          if (!def.secondary) return null;
+          const def = getEquipUnit(form.type || 'other');
+          const hasSec = !!def.secondary;
           return (
-            <Field
-              label={def.secondary.label}
-              autoFrom={autoFields.has('capacity') && String(form.capacity) === String(def.secondary.defaultValue) ? 'پیش‌فرض' : undefined}
-              hint={`واحد: ${def.secondary.unit}${def.secondary.defaultValue ? ` — پیش‌فرض ${def.secondary.defaultValue}` : ''}`}
-            >
-              <NumField
-                placeholder={def.secondary.defaultValue ? String(def.secondary.defaultValue) : '۰'}
-                value={form.capacity}
-                onChange={e => {
-                  setForm({ ...form, capacity: e.target.value });
-                  clearAuto('capacity');
-                }}
-                unit={def.secondary.unit}
-                min={0}
-              />
-            </Field>
+            <>
+              <Grid2>
+                <Field label="تعداد">
+                  <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={(UNIT_LABELS_EQ as any)[form.unit || 'pcs'] || 'عدد'} min={0} />
+                </Field>
+                {hasSec ? (
+                  <Field
+                    label={def.secondary!.label}
+                    autoFrom={autoFields.has('capacity') && String(form.capacity) === String(def.secondary!.defaultValue) ? 'پیش‌فرض' : undefined}
+                    hint={def.secondary!.defaultValue ? `پیش‌فرض: ${def.secondary!.defaultValue} ${def.secondary!.unit}` : undefined}
+                  >
+                    <NumField
+                      placeholder={def.secondary!.defaultValue ? String(def.secondary!.defaultValue) : '۰'}
+                      value={form.capacity}
+                      onChange={e => {
+                        setForm({ ...form, capacity: e.target.value });
+                        clearAuto('capacity');
+                      }}
+                      unit={def.secondary!.unit}
+                      min={0}
+                    />
+                  </Field>
+                ) : (
+                  <Field label={(() => {
+                    if (def.baseUnit === 'kg') return 'قیمت هر kg';
+                    return 'قیمت هر عدد';
+                  })()}>
+                    <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
+                  </Field>
+                )}
+              </Grid2>
+
+              {hasSec && (
+                <Grid2>
+                  <Field label={(() => {
+                    if (def.baseUnit === 'kg') return 'قیمت هر kg';
+                    return 'قیمت هر عدد';
+                  })()}>
+                    <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
+                  </Field>
+                  <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
+                </Grid2>
+              )}
+
+              {!hasSec && (
+                <Grid2>
+                  <Field label="وضعیت">
+                    <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
+                      {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                        <option key={k} value={k}>{v.icon} {v.name}</option>
+                      ))}
+                    </Select>
+                  </Field>
+                  <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
+                </Grid2>
+              )}
+
+              {hasSec && (
+                <>
+                  <Field label="وضعیت">
+                    <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
+                      {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                        <option key={k} value={k}>{v.icon} {v.name}</option>
+                      ))}
+                    </Select>
+                  </Field>
+                </>
+              )}
+            </>
           );
         })()}
 
-        <Grid2>
-          <Field label="وضعیت">
-            <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
-              {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>{v.icon} {v.name}</option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
-        </Grid2>
+        {equipNeed ? (
+          <div style={{
+            fontSize: 11,
+            lineHeight: 1.6,
+            padding: '6px 8px',
+            borderRadius: 'var(--r-sm)',
+            background: (parseInt(toEn(form.count)) || 0) >= equipNeed.need ? 'var(--accent-soft)' : 'var(--danger-soft)',
+            color: (parseInt(toEn(form.count)) || 0) >= equipNeed.need ? 'var(--accent)' : 'var(--danger)',
+          }}>
+            {(() => {
+              const have = parseInt(toEn(form.count)) || 0;
+              if (have >= equipNeed.need) {
+                return '✓ کافیه — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' (' + equipNeed.desc + ')';
+              }
+              const pct = equipNeed.need > 0 ? Math.round((have / equipNeed.need) * 100) : 0;
+              return '⚠ کم داره — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' · فعلی ' + pct + '٪';
+            })()}
+          </div>
+        ) : null}
 
         <Field label="تاریخ خرید">
           <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} placeholder="انتخاب تاریخ" />
