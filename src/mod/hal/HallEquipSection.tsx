@@ -1,5 +1,5 @@
-/** HallEquipSection — تجهیزات سالن + نیاز گله */
-import { useState } from 'react';
+/** HallEquipSection — تجهیزات سالن + نیاز گله (بازطراحی فشرده) */
+import { useState, useMemo } from 'react';
 import HallEquipModals from './components/HallEquipModals';
 import { CategoryIcon, CATEGORY_COLORS } from '../../shr/icons/equipment';
 import {
@@ -29,9 +29,31 @@ interface Props {
   };
 }
 
+type Tone = 'ok' | 'low' | 'very-low' | 'over' | 'none';
+
+const TONE_COLOR: Record<Tone, string> = {
+  'ok': 'var(--accent)',
+  'low': 'var(--warn)',
+  'very-low': 'var(--danger)',
+  'over': 'var(--purple)',
+  'none': 'var(--dim)',
+};
+const TONE_LABEL: Record<Tone, string> = {
+  'ok': '🟢 کافی',
+  'low': '🟡 کم',
+  'very-low': '🔴 خیلی کم',
+  'over': '🟠 اضافه',
+  'none': '— ثبت نشده',
+};
+
 export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const { equipment, addEquip, updateEquip, deleteEquip } = useHal();
 
+  // ═══ حالت باز/بسته ═══
+  const [open, setOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+
+  // ═══ Picker state ═══
   const [picker, setPicker] = useState(false);
   const [pickerCat, setPickerCat] = useState<string>('ventilation');
   const [pickerType, setPickerType] = useState<string>('fan_tunnel');
@@ -39,43 +61,80 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const [pickerCap, setPickerCap] = useState<string>('');
   const [pickerName, setPickerName] = useState<string>('');
 
+  // ═══ Edit state ═══
   const [editId, setEditId] = useState<string | null>(null);
   const [editCount, setEditCount] = useState<string>('');
   const [editCap, setEditCap] = useState<string>('');
 
+  // ═══ Detail modal ═══
   const [detailCat, setDetailCat] = useState<string | null>(null);
 
-  const hallEquips = equipment.filter(e => e.hallId === hallId);
+  // ═══ محاسبات ═══
+  const hallEquips = useMemo(
+    () => equipment.filter(e => e.hallId === hallId),
+    [equipment, hallId],
+  );
 
-  // گروه‌بندی
-  const grouped: Record<string, Equipment[]> = {};
-  hallEquips.forEach(e => {
-    const cat = (e as any).category || 'auxiliary';
-    if (!grouped[cat]) grouped[cat] = [];
-    grouped[cat].push(e);
-  });
-
-  // نیاز هر دسته
-  const needByCategory: Record<string, { value: number; unit: string } | null> = {};
-  if (needInput) {
-    Object.entries(NEED_CALCULATORS).forEach(([cat, calc]) => {
-      try { needByCategory[cat] = calc(needInput); } catch { needByCategory[cat] = null; }
+  const grouped = useMemo(() => {
+    const g: Record<string, Equipment[]> = {};
+    hallEquips.forEach(e => {
+      const cat = (e as any).category || 'auxiliary';
+      if (!g[cat]) g[cat] = [];
+      g[cat].push(e);
     });
-  }
+    return g;
+  }, [hallEquips]);
 
-  // محاسبه وضعیت (فقط برای دسته‌های ضروری)
-  function statusFor(cat: string): { pct: number | null; tone: 'ok' | 'warn' | 'danger' | 'over' | 'none' } {
+  const needByCategory = useMemo(() => {
+    const m: Record<string, { value: number; unit: string } | null> = {};
+    if (needInput) {
+      Object.entries(NEED_CALCULATORS).forEach(([cat, calc]) => {
+        try { m[cat] = calc(needInput); } catch { m[cat] = null; }
+      });
+    }
+    return m;
+  }, [needInput]);
+
+  function toneFor(cat: string): Tone {
     const installed = calcInstalled(cat, grouped[cat] || []);
     const need = needByCategory[cat]?.value || 0;
-    if (installed === 0) return { pct: null, tone: 'none' };
-    if (need === 0) return { pct: null, tone: 'ok' };
+    if (installed === 0) return 'none';
+    if (need === 0) return 'ok';
     const pct = (installed / need) * 100;
-    if (pct < 50) return { pct, tone: 'danger' };      // خیلی کم
-    if (pct < 90) return { pct, tone: 'warn' };        // کم
-    if (pct <= 150) return { pct, tone: 'ok' };        // خوب
-    return { pct, tone: 'over' };                       // اضافه
+    if (pct < 50) return 'very-low';
+    if (pct < 90) return 'low';
+    if (pct <= 150) return 'ok';
+    return 'over';
   }
 
+  function pctFor(cat: string): number | null {
+    const installed = calcInstalled(cat, grouped[cat] || []);
+    const need = needByCategory[cat]?.value || 0;
+    if (installed === 0 || need === 0) return null;
+    return (installed / need) * 100;
+  }
+
+  // ═══ دسته‌بندی: ناقص/کامل ═══
+  const { incompleteCats, completeCats, issueCount } = useMemo(() => {
+    const incomplete: string[] = [];
+    const complete: string[] = [];
+    ALL_CATS.forEach(cat => {
+      const list = grouped[cat] || [];
+      const tone = toneFor(cat);
+      if (list.length === 0 && needByCategory[cat]?.value) {
+        incomplete.push(cat);
+      } else if (list.length === 0) {
+        // بدون نصب بدون نیاز — نادیده
+      } else if (tone === 'very-low' || tone === 'low') {
+        incomplete.push(cat);
+      } else {
+        complete.push(cat);
+      }
+    });
+    return { incompleteCats: incomplete, completeCats: complete, issueCount: incomplete.length };
+  }, [grouped, needByCategory]);
+
+  // ═══ Handlers ═══
   const openPicker = (cat: string) => {
     const types = typesForCategory(cat);
     setPickerCat(cat);
@@ -87,219 +146,54 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   };
 
   const saveNewEquip = () => {
-    if (!pickerName.trim()) {
-      toastMsg.error('نام تجهیز اجباری است')
-      return;
-    }
+    if (!pickerName.trim()) { toastMsg.error('نام تجهیز اجباری است'); return; }
     const name = pickerName.trim();
     const dup = hallEquips.find((x: any) => x.type === pickerType && x.name.trim() === name);
-    if (dup) {
-      toastMsg.error('این تجهیز قبلاً در همین سالن ثبت شده')
-      return;
-    }
+    if (dup) { toastMsg.error('این تجهیز قبلاً در همین سالن ثبت شده'); return; }
     const def = getEquipUnit(pickerType);
     const capValue = pickerCap
       ? parseFloat(toEn(pickerCap).replace('٫', '.')) || null
       : (def.secondary?.defaultValue || null);
     addEquip({
-      hallId,
-      kind: 'asset',
-      category: pickerCat as any,
-      type: pickerType,
-      name,
+      hallId, kind: 'asset', category: pickerCat as any,
+      type: pickerType, name,
       count: pickerCount ? parseInt(toEn(pickerCount)) || null : null,
-      unit: 'pcs',
-      unitPrice: null,
-      purchasedAt: '',
-      warranty: null,
-      notes: '',
-      capacity: capValue,
+      unit: 'pcs', unitPrice: null, purchasedAt: '',
+      warranty: null, notes: '',
+      capacity: capValue, efficiency: null,
+      consumeRate: undefined,
+      createdAt: '', updatedAt: '',
     } as any);
+    toastMsg.added(name);
     setPicker(false);
-    toastMsg.added('تجهیز')
   };
 
   const openEdit = (e: Equipment) => {
     setEditId(e.id);
-    setEditCount(e.count ? String(e.count) : '');
-    setEditCap((e as any).capacity ? String((e as any).capacity) : '');
+    setEditCount(e.count ? toFa(e.count) : '');
+    setEditCap((e as any).capacity ? toFa((e as any).capacity) : '');
   };
 
   const saveEdit = () => {
     if (!editId) return;
-    updateEquip(editId, {
-      count: editCount ? parseInt(toEn(editCount)) || null : null,
-      capacity: editCap ? parseFloat(toEn(editCap).replace('٫', '.')) || null : null,
-    } as any);
+    const cur = hallEquips.find(x => x.id === editId);
+    if (!cur) return;
+    const newCount = editCount ? parseInt(toEn(editCount)) || null : null;
+    const newCap = editCap ? parseFloat(toEn(editCap).replace('٫', '.')) || null : null;
+    updateEquip(editId, { count: newCount, capacity: newCap } as any);
+    toastMsg.saved(cur.name);
     setEditId(null);
-    toastMsg.saved(currentEdit?.name || 'تجهیز')
   };
 
   const removeEquip = async (id: string, name: string) => {
     const ok = await showConfirmAsync('حذف تجهیز', '«' + name + '» از این سالن حذف شود؟', { danger: true });
     if (!ok) return;
     deleteEquip(id);
-    toastMsg.deleted(name)
+    toastMsg.deleted(name);
+    setDetailCat(null);
   };
 
-  const currentEdit = editId ? hallEquips.find(e => e.id === editId) : null;
-  const editCategory = currentEdit ? ((currentEdit as any).category || 'auxiliary') : '';
-
-  /** رندر یه گروه */
-  const renderGroup = (cats: string[], isRequired: boolean) => {
-    const totalItems = cats.reduce((a, c) => a + (grouped[c] || []).length, 0);
-
-    return (
-      <div style={{ marginBottom: 12 }}>
-        <div style={{
-          fontSize: 'var(--fs-base)',
-          fontWeight: 700,
-          color: 'var(--text)',
-          letterSpacing: '.3px',
-          paddingTop: 8,
-          paddingBottom: 6,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-        }}>
-          <span style={{ fontSize: '1.05em', lineHeight: 1 }}>
-            {isRequired ? '🐔' : '🔧'}
-          </span>
-          <span>{isRequired ? 'ضروری برای پرورش' : 'اختیاری'}</span>
-          {totalItems > 0 && (
-            <span style={{
-              fontSize: 'var(--fs-xs)',
-              fontWeight: 700,
-              padding: '2px 8px',
-              borderRadius: 6,
-              background: 'var(--accent-soft)',
-              color: 'var(--accent)',
-              letterSpacing: 0,
-              marginRight: 'auto',
-            }}>{toFa(totalItems)} مورد</span>
-          )}
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {cats.map(cat => {
-            const list = grouped[cat] || [];
-            const catColor = CATEGORY_COLORS[cat] || 'var(--cat-auxiliary)';
-            const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
-            const installed = calcInstalled(cat, list);
-            const unit = unitForCategory(cat, list);
-            const need = needByCategory[cat]?.value || 0;
-            const needUnit = needByCategory[cat]?.unit || unit;
-            const st = isRequired ? statusFor(cat) : { pct: null as number | null, tone: 'none' as const };
-            const isEmpty = list.length === 0;
-
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => {
-                  if (isEmpty) {
-                    openPicker(cat);
-                  } else {
-                    setDetailCat(cat);
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  background: isEmpty ? 'transparent' : 'var(--input-bg)',
-                  border: '1px solid ' + (isEmpty ? 'var(--border)' : 'transparent'),
-                  borderStyle: isEmpty ? 'dashed' : 'solid',
-                  borderRadius: 10,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  fontFamily: 'inherit',
-                  textAlign: 'right',
-                  cursor: 'pointer',
-                }}
-              >
-                <span style={{
-                  width: 28, height: 28, borderRadius: 9,
-                  background: 'var(--card-solid)',
-                  border: '1px solid var(--border)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}>
-                  <CategoryIcon category={cat} size={16} weight="duotone" color={catColor} />
-                </span>
-
-                <span style={{
-                  flex: 1,
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  color: isEmpty ? 'var(--muted)' : 'var(--text)',
-                  minWidth: 0,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}>
-                  {label}
-                  {!isEmpty && <span style={{ color: 'var(--muted)', fontWeight: 500, fontSize: 11, marginRight: 4 }}>· {toFa(list.length)}</span>}
-                </span>
-
-                {!isEmpty && (
-                  <>
-                    <span style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      fontVariantNumeric: 'tabular-nums',
-                      color: 'var(--text)',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      {toFa(installed.toLocaleString('fa-IR'))}
-                      <span style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 500, marginRight: 3 }}>{unit}</span>
-                    </span>
-                    {isRequired && need > 0 && st.pct !== null && (
-                      <span style={{
-                        fontSize: 11,
-                        fontWeight: 800,
-                        fontVariantNumeric: 'tabular-nums',
-                        color: st.tone === 'ok' ? 'var(--accent)'
-                             : st.tone === 'warn' ? 'var(--warn)'
-                             : st.tone === 'danger' ? 'var(--danger)'
-                             : st.tone === 'over' ? 'var(--info)'
-                             : 'var(--muted)',
-                        minWidth: 34,
-                        textAlign: 'left',
-                      }}>
-                        {toFa(Math.round(st.pct))}٪
-                      </span>
-                    )}
-                  </>
-                )}
-
-                {isEmpty && isRequired && need > 0 && (
-                  <span style={{
-                    fontSize: 10,
-                    fontWeight: 600,
-                    color: 'var(--muted)',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    نیاز: {toFa(need.toLocaleString('fa-IR'))} {needUnit}
-                  </span>
-                )}
-
-                {isEmpty && !isRequired && (
-                  <span style={{ fontSize: 10, color: 'var(--muted)' }}>— ثبت نشده</span>
-                )}
-
-                {!isEmpty && (
-                  <span style={{ color: 'var(--muted)', fontSize: 14 }}>‹</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  // لیست تجهیزات یه دسته برای نمایش در مودال
+  // ═══ Detail modal data ═══
   const detailList = detailCat ? (grouped[detailCat] || []) : [];
   const detailCatLabel = detailCat ? ((CATEGORY_LABELS as any)[detailCat]?.name || detailCat) : '';
   const detailColor = detailCat ? (CATEGORY_COLORS[detailCat] || 'var(--cat-auxiliary)') : 'var(--cat-auxiliary)';
@@ -307,79 +201,229 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const detailNeed = detailCat ? (needByCategory[detailCat]?.value || 0) : 0;
   const detailNeedUnit = detailCat ? (needByCategory[detailCat]?.unit || unitForCategory(detailCat, detailList)) : '';
   const detailUnit = detailCat ? unitForCategory(detailCat, detailList) : '';
+  const currentEdit = editId ? hallEquips.find(e => e.id === editId) : null;
+
+  // ═══ نمایش دسته‌ها ═══
+  const displayCats = showAll ? [...incompleteCats, ...completeCats] : incompleteCats;
+
+  // ═══ هدر: آیکون‌های وضعیت (۴ تا ۶ تا) ═══
+  const headerCats = ALL_CATS.filter(c => (grouped[c] || []).length > 0 || needByCategory[c]?.value).slice(0, 6);
 
   return (
     <>
       <div style={{
-        marginTop: 6,
-        paddingTop: 8,
-        borderTop: '1px dashed var(--border)',
+        background: 'var(--bg)', borderRadius: 10, overflow: 'hidden',
+        border: issueCount > 0 && !open ? '1px solid rgba(234,88,12,.25)' : '1px solid transparent',
       }}>
-        <div style={{
-          fontSize: 'var(--fs-base)',
-          fontWeight: 700,
-          color: 'var(--text)',
-          letterSpacing: '.3px',
-          marginBottom: 4,
-        }}>
-          ⚙️ تجهیزات سالن
-        </div>
+        {/* ═══ هدر (کلیک‌پذیر) ═══ */}
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          aria-expanded={open}
+          style={{
+            width: '100%', padding: '10px 12px',
+            background: 'transparent', border: 'none',
+            display: 'flex', alignItems: 'center', gap: 8,
+            fontFamily: 'inherit', cursor: 'pointer',
+            textAlign: 'right',
+          }}
+        >
+          <span style={{ fontSize: 14 }}>⚙️</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>تجهیزات سالن</span>
+          <span style={{
+            fontSize: 9.5, fontWeight: 600, padding: '2px 6px',
+            borderRadius: 5, background: 'var(--card-solid)', color: 'var(--dim)',
+          }}>{toFa(hallEquips.length)} مورد</span>
 
-        {renderGroup(REQUIRED_CATS, true)}
-        {grouped['power']?.length || grouped['auxiliary']?.length ? renderGroup(OPTIONAL_CATS, false) : null}
+          <div style={{ display: 'flex', gap: 3, marginRight: 'auto', alignItems: 'center' }}>
+            {headerCats.map(cat => {
+              const tone = toneFor(cat);
+              return (
+                <span key={cat} style={{
+                  width: 22, height: 22, borderRadius: 6,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: (CATEGORY_COLORS as any)[cat + '-soft'] || 'var(--card-solid)',
+                  color: CATEGORY_COLORS[cat] || 'var(--cat-auxiliary)',
+                  position: 'relative',
+                }}>
+                  <span style={{
+                    position: 'absolute', top: -2, left: -2,
+                    width: 8, height: 8, borderRadius: '50%',
+                    background: TONE_COLOR[tone],
+                    border: '1.5px solid var(--bg)',
+                  }} />
+                  <CategoryIcon category={cat} size={12} weight="duotone" color={CATEGORY_COLORS[cat]} />
+                </span>
+              );
+            })}
+          </div>
 
-        {/* legacy pills */}
-        {legacy && (legacy.ventilationSystem || legacy.feederType || legacy.drinkerType || legacy.litterType) && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
-            {legacy.ventilationSystem && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>تهویه پایه: {legacy.ventilationSystem}</span>}
-            {legacy.feederType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>دانخوری پایه: {legacy.feederType}</span>}
-            {legacy.drinkerType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>آبخوری پایه: {legacy.drinkerType}</span>}
-            {legacy.litterType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>بستر پایه: {legacy.litterType}</span>}
+          <span style={{
+            color: 'var(--muted)', fontSize: 12,
+            transform: open ? 'rotate(180deg)' : 'none',
+            transition: 'transform .25s',
+          }}>▾</span>
+        </button>
+
+        {/* ═══ خلاصه هشدار (فقط بسته) ═══ */}
+        {!open && (
+          <div style={{
+            padding: '0 12px 10px',
+            fontSize: 10.5, color: 'var(--muted)',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            {issueCount > 0 ? (
+              <>
+                ⚠️ <span style={{ fontWeight: 700, color: 'var(--danger)' }}>
+                  {toFa(issueCount)} دسته
+                </span>
+                نیاز به توجه داره — لمس کن
+              </>
+            ) : (
+              <span style={{ color: 'var(--accent)', fontWeight: 700 }}>✓ همه تجهیزات کافی هستن</span>
+            )}
           </div>
         )}
 
-        {/* ۸ دکمه افزودن */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr 1fr',
-          gap: 4,
-          marginTop: 12,
-          paddingTop: 12,
-          borderTop: '1px dashed var(--border)',
-        }}>
-          {ALL_CATS.map(cat => {
-            const catColor = CATEGORY_COLORS[cat] || 'var(--cat-auxiliary)';
-            const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
-            return (
+        {/* ═══ محتوای باز ═══ */}
+        {open && (
+          <div style={{ padding: '0 10px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {displayCats.length === 0 ? (
+              <div style={{
+                padding: 16, textAlign: 'center',
+                fontSize: 11, color: 'var(--muted)',
+              }}>
+                <div style={{ fontSize: 22, marginBottom: 4, opacity: .5 }}>✓</div>
+                همه تجهیزات کافی هستن
+              </div>
+            ) : (
+              displayCats.map(cat => {
+                const list = grouped[cat] || [];
+                const tone = toneFor(cat);
+                const pct = pctFor(cat);
+                const installed = calcInstalled(cat, list);
+                const unit = unitForCategory(cat, list);
+                const need = needByCategory[cat]?.value || 0;
+                const needUnit = needByCategory[cat]?.unit || unit;
+                const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
+                const color = CATEGORY_COLORS[cat] || 'var(--cat-auxiliary)';
+                return (
+                  <div key={cat} style={{
+                    background: 'var(--card-solid)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8, padding: '9px 11px',
+                    display: 'flex', flexDirection: 'column', gap: 7,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{
+                        width: 28, height: 28, borderRadius: 7,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'var(--bg)', color,
+                      }}>
+                        <CategoryIcon category={cat} size={14} weight="duotone" color={color} />
+                      </span>
+                      <span style={{ flex: 1, fontSize: 11.5, fontWeight: 700, color: 'var(--text)' }}>{label}</span>
+                      <span style={{
+                        fontSize: 9.5, fontWeight: 700,
+                        padding: '2px 7px', borderRadius: 5,
+                        color: TONE_COLOR[tone],
+                        background: tone === 'ok' ? 'var(--accent-soft)'
+                          : tone === 'low' ? 'var(--warn-soft)'
+                          : tone === 'very-low' ? 'var(--danger-soft)'
+                          : tone === 'over' ? 'rgba(124,58,237,.11)'
+                          : 'var(--bg)',
+                      }}>{TONE_LABEL[tone]}</span>
+                    </div>
+
+                    {pct !== null && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 9.5, color: 'var(--muted)' }}>
+                        <div style={{ flex: 1, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                          <div style={{
+                            width: `${Math.min(pct, 100)}%`, height: '100%',
+                            background: TONE_COLOR[tone], borderRadius: 3,
+                          }} />
+                        </div>
+                        <span>{toFa(Math.round(pct))}٪</span>
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: 8, fontSize: 10, color: 'var(--muted)', flexWrap: 'wrap' }}>
+                      {list.length > 0 && (
+                        <span>نصب: <b style={{ color: 'var(--text)' }}>{toFa(installed.toLocaleString('fa-IR'))} {unit}</b></span>
+                      )}
+                      {need > 0 && (
+                        <span>نیاز: <b style={{ color: 'var(--text)' }}>{toFa(need.toLocaleString('fa-IR'))} {needUnit}</b></span>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
+                      <button
+                        type="button"
+                        onClick={() => openPicker(cat)}
+                        style={{
+                          padding: '3px 9px', minHeight: 26,
+                          borderRadius: 5, border: '1px solid var(--accent-border)',
+                          background: 'var(--accent-soft)', color: 'var(--accent)',
+                          fontFamily: 'inherit', fontSize: 10, fontWeight: 700, cursor: 'pointer',
+                        }}
+                      >+ افزودن</button>
+                      {list.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setDetailCat(cat)}
+                          style={{
+                            padding: '3px 9px', minHeight: 26,
+                            borderRadius: 5, border: '1px solid var(--border)',
+                            background: 'transparent', color: 'var(--muted)',
+                            fontFamily: 'inherit', fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                          }}
+                        >مشاهده</button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+
+            {/* دکمه‌های پایین */}
+            <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+              {completeCats.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAll(v => !v)}
+                  style={{
+                    flex: 1, padding: '8px', minHeight: 34,
+                    borderRadius: 6, border: '1px solid var(--border)',
+                    background: 'transparent', color: 'var(--muted)',
+                    fontFamily: 'inherit', fontSize: 10.5, fontWeight: 600, cursor: 'pointer',
+                  }}
+                >{showAll ? 'فقط ناقص‌ها' : `مشاهده همه (${toFa(completeCats.length)} کافی)`}</button>
+              )}
               <button
-                key={cat}
                 type="button"
-                onClick={() => openPicker(cat)}
+                onClick={() => setDetailCat('__add__')}
                 style={{
-                  padding: '8px 4px',
-                  background: 'var(--input-bg)',
-                  border: '1px dashed var(--border)',
-                  borderRadius: 10,
-                  color: 'var(--muted)',
-                  fontFamily: 'inherit',
-                  fontSize: 10,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 3,
+                  flex: 1, padding: '8px', minHeight: 34,
+                  borderRadius: 6, border: '1px solid var(--border)',
+                  background: 'transparent', color: 'var(--muted)',
+                  fontFamily: 'inherit', fontSize: 10.5, fontWeight: 600, cursor: 'pointer',
                 }}
-              >
-                <CategoryIcon category={cat} size={16} weight="duotone" color={catColor} />
-                <span>+ {label}</span>
-              </button>
-            );
-          })}
-        </div>
+              >+ افزودن دسته‌ی دیگه</button>
+            </div>
+
+            {/* legacy pills */}
+            {legacy && (legacy.ventilationSystem || legacy.feederType || legacy.drinkerType || legacy.litterType) && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                {legacy.ventilationSystem && <span style={{ fontSize: 9.5, color: 'var(--muted)', padding: '2px 6px', background: 'var(--input-bg)', borderRadius: 5 }}>تهویه: {legacy.ventilationSystem}</span>}
+                {legacy.feederType && <span style={{ fontSize: 9.5, color: 'var(--muted)', padding: '2px 6px', background: 'var(--input-bg)', borderRadius: 5 }}>دان: {legacy.feederType}</span>}
+                {legacy.drinkerType && <span style={{ fontSize: 9.5, color: 'var(--muted)', padding: '2px 6px', background: 'var(--input-bg)', borderRadius: 5 }}>آب: {legacy.drinkerType}</span>}
+                {legacy.litterType && <span style={{ fontSize: 9.5, color: 'var(--muted)', padding: '2px 6px', background: 'var(--input-bg)', borderRadius: 5 }}>بستر: {legacy.litterType}</span>}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* مودال جزئیات گروه */}
       <HallEquipModals
         detailCat={detailCat} setDetailCat={setDetailCat}
         detailCatLabel={detailCatLabel} detailInstalled={detailInstalled}
@@ -391,7 +435,8 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
         pickerName={pickerName} setPickerName={setPickerName}
         pickerCount={pickerCount} setPickerCount={setPickerCount}
         pickerCap={pickerCap} setPickerCap={setPickerCap}
-        saveNewEquip={saveNewEquip} typesForCategory={typesForCategory} equipment={equipment}
+        saveNewEquip={saveNewEquip} typesForCategory={typesForCategory}
+        equipment={equipment}
         editId={editId} setEditId={setEditId} currentEdit={currentEdit}
         editCount={editCount} setEditCount={setEditCount}
         editCap={editCap} setEditCap={setEditCap}
