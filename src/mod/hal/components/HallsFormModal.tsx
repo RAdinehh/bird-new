@@ -175,7 +175,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
               />
             </Field>
             <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, alignItems: 'center' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 6, alignItems: 'center' }}>
                 <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
                 {(() => {
                   if (!form.breedId) return null;
