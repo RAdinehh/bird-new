@@ -120,11 +120,12 @@ export interface HallsFormModalProps {
   stdCapacity?: number | null;
   stdTemp?: number | null;
   stdHumidity?: number | null;
+  workers?: any[];
 }
 
 export default function HallsFormModal(props: HallsFormModalProps) {
   const breedsForBird = (props.breeds || []).filter((b: any) => b.birdId === props.form.birdId);
-  const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save, stdCapacity, stdTemp, stdHumidity } = props;
+  const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save, stdCapacity, stdTemp, stdHumidity, workers } = props;
 
   const capCurrent = form.capacity ? parseInt(toEn(form.capacity)) || null : null;
   const { hint: capHint } = useOverride({
@@ -162,6 +163,19 @@ export default function HallsFormModal(props: HallsFormModalProps) {
             </Select>
           </Field>
         </Grid2>
+
+        {(workers && workers.length > 0) && (
+          <Field label="مسئول سالن" hint="کارگر مسئول این سالن">
+            <SmartSelect
+              value={form.responsibleId || ''}
+              onChange={v => setForm({...form, responsibleId: v})}
+              options={workers.map((w: any) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب مسئول"
+              autoThreshold={6}
+            />
+          </Field>
+        )}
         <Grid2>
             <Field label="پرنده">
               <SmartSelect

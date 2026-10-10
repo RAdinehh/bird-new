@@ -9,6 +9,7 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { createHallSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Hall } from './store';
 import { useBrd } from '../brd/store';
+import { useCtc } from '../ctc/store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk, getAgeDays } from '../flk/store';
@@ -39,7 +40,7 @@ interface F {
   capacity: string; targetTemp: string; targetHumidity: string;
   ventilation: string; light: string;
   ventilationSystem: string; feederType: string; drinkerType: string; litterType: string;
-  address: string; builtAt: string; lastSanitizedAt: string; sanitizeNotes: string; status: string; notes: string; birdId: string; breedId: string;
+  address: string; builtAt: string; lastSanitizedAt: string; sanitizeNotes: string; status: string; responsibleId: string; notes: string; birdId: string; breedId: string;
 }
 const empty: F = {
   name:'', code:'', length:'', width:'', height:'',
@@ -47,7 +48,7 @@ const empty: F = {
   ventilationSystem:'', feederType:'', drinkerType:'', litterType:'',
  
   
-  address:'', builtAt:'', lastSanitizedAt:'', sanitizeNotes:'', status:'empty', notes:'', birdId:'', breedId:'',
+  address:'', builtAt:'', lastSanitizedAt:'', sanitizeNotes:'', status:'empty', responsibleId:'', notes:'', birdId:'', breedId:'',
 };
 
 
@@ -64,6 +65,8 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
   const { breeds, birds } = useBrd();
+  const { contacts: allContacts } = useCtc();
+  const workers = allContacts.filter((c: any) => (c.roles || []).includes('worker'));
   const [open, setOpen] = useState(false);
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [form, setForm] = useState<F>(empty);
@@ -190,7 +193,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       feederType: h.feederType || '',
       drinkerType: h.drinkerType || '',
       litterType: h.litterType || '',
-      address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, sanitizeNotes: (h as any).sanitizeNotes || '', status: (h as any).status || 'empty', notes: h.notes,
+      address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, sanitizeNotes: (h as any).sanitizeNotes || '', status: (h as any).status || 'empty', responsibleId: (h as any).responsibleId || '', notes: h.notes,
       birdId: (h as any).birdId || '',
       breedId: (h as any).breedId || ''
       });
@@ -253,7 +256,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       feederType: form.feederType || '',
       drinkerType: form.drinkerType || '',
       litterType: form.litterType || '',
-      address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), sanitizeNotes: form.sanitizeNotes.trim(), status: (form.status || 'empty') as any, notes: form.notes.trim(),
+      address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), sanitizeNotes: form.sanitizeNotes.trim(), status: (form.status || 'empty') as any, responsibleId: (form.responsibleId || '').trim() || undefined, notes: form.notes.trim(),
       birdId: form.birdId || undefined,
       breedId: form.breedId || undefined,
     };
@@ -371,6 +374,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         stdCapacity={__suggestedCap}
         stdTemp={__stdTemp}
         stdHumidity={__stdHumidity}
+        workers={workers}
         breedStd={breedStd}
         autoFields={autoFields}
         clearAuto={clearAuto}

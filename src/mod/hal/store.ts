@@ -40,6 +40,8 @@ export interface Hall {
   sanitizeNotes?: string;
   /** 🆕 وضعیت سالن */
   status?: 'active' | 'empty' | 'sanitizing' | 'maintenance' | 'inactive';
+  /** 🆕 مسئول سالن (FK → ctc، نقش کارگر) */
+  responsibleId?: string;
   // 🆕 منابع توزیع‌شده
   waterSources?: HallSource[];
   feedSources?: HallSource[];
