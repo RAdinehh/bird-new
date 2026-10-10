@@ -12,7 +12,7 @@ import DatePicker from '../../../shr/components/DatePicker';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
 
-function TempFormField({ value, onChange, label, placeholder, autoFrom }: any) {
+function TempFormField({ value, onChange, label, placeholder, autoFrom, error }: any) {
   const tempUnit = useTempUnit();
   const [local, setLocal] = useState<string>('');
   const [editing, setEditing] = useState(false);
@@ -98,6 +98,21 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom }: any) {
         }}>
           <span aria-hidden="true">✨</span>
           <span>از {autoFrom}</span>
+        </div>
+      ) : null}
+      {error ? (
+        <div style={{
+          fontSize: 11,
+          color: 'var(--danger)',
+          fontWeight: 600,
+          paddingRight: 2,
+          lineHeight: 1.5,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+        }}>
+          <span aria-hidden="true">⚠️</span>
+          <span>{error}</span>
         </div>
       ) : null}
     </div>
@@ -286,11 +301,11 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>شرایط</div>
           <Grid2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-            <TempFormField label="دمای هدف" placeholder="۲۲" autoFrom={autoFields.has("targetTemp") ? "استاندارد" : undefined} value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
+            <TempFormField label="دمای هدف" placeholder="۲۲" error={vErrors.targetTemp} autoFrom={autoFields.has("targetTemp") ? "استاندارد" : undefined} value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
             <OverrideHint {...tempHint} />
           </div>
           <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? "استاندارد" : undefined} error={vErrors.targetHumidity}>
-            <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={-10} />
+            <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={0} max={100} autoClamp />
             <OverrideHint {...humHint} />
           </Field>
         </Grid2>
