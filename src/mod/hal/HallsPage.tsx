@@ -94,6 +94,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const config = useMemo(
     () => getHalHallsConfig({
       birdNames: birds.map(b => ({ id: b.id, name: b.name })),
+      breeds: breeds.map((b: any) => ({ id: b.id, name: b.name, birdId: b.birdId })),
       zones,
       equipment,
       flocks: flocks.map(f => ({ id: f.id, hallId: (f as any).hallId, status: f.status })),

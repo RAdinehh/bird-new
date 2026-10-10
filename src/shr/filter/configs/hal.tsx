@@ -49,6 +49,7 @@ export function getHalZonesConfig(ctx: { halls: Hall[] }): FilterConfig<Zone> {
 // ═══════════════════════════════════════════════════
 export function getHalHallsConfig(ctx: {
   birdNames: Array<{ id: string; name: string }>;
+  breeds: Array<{ id: string; name: string; birdId: string }>;
   zones: Zone[];
   equipment: Array<{ id: string; hallId?: string }>;
   flocks: Array<{ id: string; hallId?: string; status: string }>;
@@ -60,6 +61,12 @@ export function getHalHallsConfig(ctx: {
         icon: <IconUser size={18} />,
         options: ctx.birdNames.map(b => ({ value: b.id, label: b.name })),
         getValue: (h: Hall) => h.birdId || '',
+      },
+      {
+        key: 'breedId', label: 'نژاد', kind: 'enum',
+        icon: <IconTag size={18} />,
+        options: ctx.breeds.map(b => ({ value: b.id, label: b.name })),
+        getValue: (h: Hall) => h.breedId || '',
       },
       {
         key: 'hasZone', label: 'بخش', kind: 'enum',
