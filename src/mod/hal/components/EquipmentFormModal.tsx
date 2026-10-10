@@ -54,16 +54,22 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
 
         <Grid2>
           <Field label="دسته" required>
-            <Select value={form.category || 'auxiliary'} onChange={e => {
-              const cat = e.target.value;
-              const allowed = typesForCategory(cat);
-              const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || 'other');
-              setForm({...form, category: cat, type: nextType, capacity: ''});
-            }}>
-              {Object.entries(CATEGORY_LABELS).map(([k, v]: [string, any]) => (
-                <option key={k} value={k}>{v.icon} {v.name}</option>
-              ))}
-            </Select>
+            <SmartSelect
+              value={form.category || 'auxiliary'}
+              onChange={(cat: string) => {
+                const allowed = typesForCategory(cat);
+                const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || 'other');
+                setForm({...form, category: cat, type: nextType, capacity: ''});
+              }}
+              options={Object.entries(CATEGORY_LABELS).map(([k, v]: [string, any]) => ({
+                value: k,
+                label: v.name,
+                icon: v.icon,
+              }))}
+              placeholder="— انتخاب دسته —"
+              modalTitle="انتخاب دسته"
+              autoThreshold={6}
+            />
           </Field>
           <EditableSelect
             label="زیرنوع"
