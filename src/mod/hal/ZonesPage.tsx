@@ -16,6 +16,7 @@ import { useFilterSort, FilterBar, getHalZonesConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
+import EntityLink from '../../shr/components/EntityLink';
 import { showAlert } from '../../cor/store/dialog';
 import { chip } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -252,12 +253,12 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
                 index={toFa(i + 1)}
                 iconEmoji="🗂"
                 title={z.name}
-                subtitle={hall?.name || '—'}
+                subtitle=""
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : z.id)}
                 badge={z.capacity ? <Tag tone="purple">{toFa(z.capacity)} پرنده</Tag> : undefined}
                 stats={<>
-                  <span>سالن: <b style={{ color: 'var(--text)' }}>{hall?.name || '—'}</b></span>
+                  <span>🏠 سالن: {hall ? <b><EntityLink type="hall" id={hall.id} label={hall.name} /></b> : <b style={{ color: 'var(--text)' }}>—</b>}</span>
                   {z.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{toFa(z.capacity)}</b></span>}
                 </>}
               >
@@ -273,7 +274,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>سالن:</span>
-                    <span style={{ fontWeight: 600 }}>{hall?.name || '—'}</span>
+                    <span style={{ fontWeight: 600 }}>{hall ? <EntityLink type="hall" id={hall.id} label={hall.name} /> : '—'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',

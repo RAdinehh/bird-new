@@ -5,6 +5,7 @@ import { useState, useMemo, useEffect } from 'react';
 import HallCard from './components/HallCard';
 import HallsFormModal from './components/HallsFormModal';
 import { useFab } from '../../shr/hooks/useFab';
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createHallSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Hall } from './store';
@@ -74,6 +75,12 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // 🆕 focus از URL → باز کردن کارت
+  const focusId = useFocusParam();
+  useEffect(() => {
+    if (focusId) setExpandedId(focusId);
+  }, [focusId]);
   const tempUnit = useTempUnit();
   const __breedStd = form.breedId ? breedStd.byBreedId(form.breedId) : null;
   const __suggestedCap = calcSuggestedCapacity(
@@ -335,6 +342,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
             return (
               <HallCard
                 key={h.id}
+                data-focus-id={h.id}
                 h={h}
                 i={i}
                 zones={zones}
