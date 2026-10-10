@@ -36,6 +36,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
   const { contacts: allContacts } = useCtc();
+  const supplierNames = useMemo(() => new Map(allContacts.map((c: any) => [c.id, c.name || c.fullName || ''])), [allContacts]);
   const suppliers = allContacts.filter((c: any) => (c.roles || []).includes('supplier'));
   const { options: allCustomOpts } = useCustomOptions();
   const [open, setOpen] = useState(false);
@@ -389,6 +390,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
                   setUndoData({ item });
                   setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
                 }}
+                supplierNames={supplierNames}
               />
             );
           })}

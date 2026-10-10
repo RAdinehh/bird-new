@@ -9,6 +9,7 @@ import { calcEquipValue, kindForType } from '../api/equipmentCalc';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
+import EntityLink from '../../../shr/components/EntityLink';
 
 export interface EquipmentCardProps {
   e: any;
@@ -21,10 +22,11 @@ export interface EquipmentCardProps {
   onEdit: () => void;
   onDelete: (id: string) => void;
   onUndo: (item: any) => void;
+  supplierNames?: Map<string, string>;
 }
 
 export default function EquipmentCard(props: EquipmentCardProps) {
-  const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onUndo } = props;
+  const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onUndo, supplierNames } = props;
   const _cm = (allCustomOpts as any[]).find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
   const _isDeleted = _cm ? _cm.hidden === true : false;
   const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: '🔧' });
@@ -92,8 +94,20 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>سالن:</span>
-                    <span style={{ fontWeight: 600 }}>{hall?.name || '—'}</span>
+                    <span style={{ fontWeight: 600 }}>
+                      {hall ? <EntityLink type="hall" id={hall.id} label={hall.name} /> : '—'}
+                    </span>
                   </div>
+                  {e.supplierId && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between',
+                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>
+                      <span style={{ color: 'var(--muted)' }}>تأمین‌کننده:</span>
+                      <span style={{ fontWeight: 600 }}>
+                        <EntityLink type="party" id={e.supplierId} label={supplierNames?.get(e.supplierId) || '—'} />
+                      </span>
+                    </div>
+                  )}
                   {e.count && (
                     <div style={{ display: 'flex', justifyContent: 'space-between',
                        fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
