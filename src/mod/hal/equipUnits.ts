@@ -257,6 +257,163 @@ export const EQUIP_UNITS: Record<string, EquipUnitDef> = {
     summaryLabel: 'عدد',
   },
 
+  // ═══════ تصفیه آب ═══════
+  water_tank: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'حجم هر مخزن', unit: 'L', defaultValue: 300 },
+    baseUnit: 'L',
+    calc: (p, s) => p * s,
+    summaryLabel: 'L',
+  },
+  water_filter: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'ظرفیت', unit: 'L/h', defaultValue: 500, optional: true },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  water_pipe: {
+    primary: { label: 'طول', unit: 'm', defaultValue: 1 },
+    secondary: { label: 'قطر لوله', unit: 'mm', defaultValue: 25, optional: true },
+    baseUnit: 'm',
+    calc: (p, s) => p,
+    summaryLabel: 'm',
+  },
+
+  // ═══════ ایمنی ═══════
+  fire_extinguisher: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'ظرفیت', unit: 'kg', defaultValue: 6, optional: true },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  smoke_detector: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  emergency_light: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  first_aid: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+
+  // ═══════ شستشو ═══════
+  pressure_washer: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'فشار', unit: 'bar', defaultValue: 100, optional: true },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  sprayer: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'حجم مخزن', unit: 'L', defaultValue: 20, optional: true },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  flame_gun: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+
+  // ═══════ ابزار دستی ═══════
+  shovel: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  wheelbarrow: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  rake: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  feed_scoop: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  broom: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  bucket: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'حجم', unit: 'L', defaultValue: 10, optional: true },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+
+  // ═══════ وزن‌کشی ═══════
+  bird_scale: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'حداکثر وزن', unit: 'kg', defaultValue: 10, optional: true },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  feed_scale: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'حداکثر وزن', unit: 'kg', defaultValue: 50, optional: true },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  platform_scale: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'حداکثر وزن', unit: 'kg', defaultValue: 500, optional: true },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+
+  // ═══════ سردکننده ═══════
+  fogger: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'ظرفیت', unit: 'L/h', defaultValue: 50, optional: true },
+    baseUnit: 'عدد',
+    calc: (p, s) => p,
+    summaryLabel: 'عدد',
+  },
+  misting_system: {
+    primary: { label: 'طول سیستم', unit: 'm', defaultValue: 1 },
+    secondary: { label: 'نازل در متر', unit: 'عدد', defaultValue: 5, optional: true },
+    baseUnit: 'm',
+    calc: (p, s) => p,
+    summaryLabel: 'm',
+  },
+  swamp_cooler: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'ظرفیت', unit: 'm³/h', defaultValue: 4000 },
+    baseUnit: 'm³/h',
+    calc: (p, s) => p * s,
+    summaryLabel: 'm³/h',
+  },
+
   // ═══════ سازگاری با قدیمی ═══════
   lamp: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },

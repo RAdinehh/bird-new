@@ -74,7 +74,13 @@ export type EquipmentCategory =
   | 'lighting'
   | 'litter'
   | 'power'
-  | 'auxiliary';
+  | 'auxiliary'
+  | 'water_treatment'
+  | 'safety'
+  | 'cleaning'
+  | 'hand_tools'
+  | 'weighing'
+  | 'cooling';
 
 export type EquipmentUnit = 'pcs' | 'kg' | 'm2' | 'm' | 'L';
 
@@ -247,6 +253,12 @@ export const CATEGORY_LABELS: Record<EquipmentCategory, { name: string; icon: st
   litter: { name: 'بستر', icon: '🛏' },
   power: { name: 'برق‌رسانی', icon: '⚡' },
   auxiliary: { name: 'جانبی', icon: '🔧' },
+  water_treatment: { name: 'تصفیه آب', icon: '💦' },
+  safety: { name: 'ایمنی', icon: '🚨' },
+  cleaning: { name: 'شستشو', icon: '🧽' },
+  hand_tools: { name: 'ابزار دستی', icon: '🛠' },
+  weighing: { name: 'وزن‌کشی', icon: '⚖️' },
+  cooling: { name: 'سردکننده', icon: '🧊' },
 };
 
 export const KIND_LABELS: Record<EquipmentKind, { name: string; icon: string }> = {
@@ -308,6 +320,34 @@ export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   camera: { name: 'دوربین', icon: '📷' },
   sensor: { name: 'سنسور', icon: '📡' },
   scale:  { name: 'ترازو', icon: '⚖' },
+  // 🆕 تصفیه آب
+  water_tank:   { name: 'مخزن آب', icon: '🛢' },
+  water_filter: { name: 'فیلتر آب', icon: '🔵' },
+  water_pipe:   { name: 'لوله‌کشی آب', icon: '🚰' },
+  // 🆕 ایمنی
+  fire_extinguisher: { name: 'کپسول آتش‌نشانی', icon: '🧯' },
+  smoke_detector:    { name: 'دتکتور دود', icon: '🔔' },
+  emergency_light:   { name: 'چراغ اضطراری', icon: '🔦' },
+  first_aid:         { name: 'جعبه کمک‌های اولیه', icon: '🩹' },
+  // 🆕 شستشو
+  pressure_washer: { name: 'واش‌پرس', icon: '💦' },
+  sprayer:         { name: 'سمپاش', icon: '🧴' },
+  flame_gun:       { name: 'شعله‌افکن', icon: '🔥' },
+  // 🆕 ابزار دستی
+  shovel:     { name: 'بیل', icon: '🧹' },
+  wheelbarrow:{ name: 'فرقان', icon: '🚛' },
+  rake:       { name: 'چنگک', icon: '🪣' },
+  feed_scoop: { name: 'پیمانه دان', icon: '🥄' },
+  broom:      { name: 'جارو', icon: '🧹' },
+  bucket:     { name: 'سطل', icon: '🪣' },
+  // 🆕 وزن‌کشی
+  bird_scale:     { name: 'ترازوی پرنده', icon: '⚖' },
+  feed_scale:     { name: 'ترازوی دان', icon: '🌾' },
+  platform_scale: { name: 'باسکول کفه‌ای', icon: '🏗' },
+  // 🆕 سردکننده
+  fogger:         { name: 'مه‌ساز', icon: '🌫' },
+  misting_system: { name: 'سیستم پاشش', icon: '💧' },
+  swamp_cooler:   { name: 'کولر آبی', icon: '🧊' },
   // سازگاری با داده‌های قدیمی
   lamp:    { name: 'لامپ', icon: '💡' },
   fan:     { name: 'فن', icon: '🌀' },

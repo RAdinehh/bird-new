@@ -5,9 +5,9 @@ import { getEquipUnit } from '../equipUnits';
 import { CATEGORY_LABELS } from '../store';
 
 export const CATEGORIES_BY_KIND: Record<string, string[]> = {
-  asset:      ['ventilation', 'heating', 'lighting', 'drinking', 'feeding', 'power', 'auxiliary'],
-  consumable: ['litter', 'feeding', 'drinking'],
-  system:     ['ventilation', 'heating', 'lighting', 'power', 'auxiliary'],
+  asset:      ['ventilation', 'heating', 'lighting', 'drinking', 'feeding', 'power', 'cooling', 'water_treatment', 'safety', 'weighing', 'auxiliary'],
+  consumable: ['litter', 'feeding', 'drinking', 'cleaning'],
+  system:     ['ventilation', 'heating', 'lighting', 'power', 'water_treatment', 'safety', 'auxiliary'],
 };
 
 export function categoriesForKind(kind: string): string[] {
@@ -15,14 +15,20 @@ export function categoriesForKind(kind: string): string[] {
 }
 
 export const TYPES_BY_CATEGORY: Record<string, string[]> = {
-  ventilation: ['fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad'],
-  feeding:     ['feeder_manual', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket'],
-  drinking:    ['nipple', 'cup', 'trough', 'fountain_drinker'],
-  heating:     ['radiant_brooder', 'jet_heater', 'duct_heater'],
-  lighting:    ['lamp_led', 'lamp_fluorescent', 'dimmer'],
-  litter:      ['litter_wood_shavings', 'litter_roll', 'litter_sand'],
-  power:       ['generator', 'electrical_panel', 'cable'],
-  auxiliary:   ['camera', 'sensor', 'scale'],
+  ventilation:     ['fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad'],
+  feeding:         ['feeder_manual', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket'],
+  drinking:        ['nipple', 'cup', 'trough', 'fountain_drinker'],
+  heating:         ['radiant_brooder', 'jet_heater', 'duct_heater'],
+  lighting:        ['lamp_led', 'lamp_fluorescent', 'dimmer'],
+  litter:          ['litter_wood_shavings', 'litter_roll', 'litter_sand'],
+  power:           ['generator', 'electrical_panel', 'cable'],
+  auxiliary:       ['camera', 'sensor', 'scale'],
+  water_treatment: ['water_tank', 'water_filter', 'water_pipe'],
+  safety:          ['fire_extinguisher', 'smoke_detector', 'emergency_light', 'first_aid'],
+  cleaning:        ['pressure_washer', 'sprayer', 'flame_gun'],
+  hand_tools:      ['shovel', 'wheelbarrow', 'rake', 'feed_scoop', 'broom', 'bucket'],
+  weighing:        ['bird_scale', 'feed_scale', 'platform_scale'],
+  cooling:         ['fogger', 'misting_system', 'swamp_cooler'],
 };
 
 export function typesForCategory(cat: string): string[] {
