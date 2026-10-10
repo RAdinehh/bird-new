@@ -81,7 +81,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     const firstCat = categoriesForKind('asset')[0] || 'ventilation';
     setForm({ id:'', hallId: halls[0].id, kind:'asset', category: firstCat, type:'',
       name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'',
-      warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
+      warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'', status:'active', brand:'' });
     setErr(''); setOpen(true);
   };
   useFab(active ? { label: 'افزودن تجهیز', onClick: openNew } : null);
@@ -102,6 +102,8 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       capacity: (e as any).capacity ? toFa((e as any).capacity) : '',
       efficiency: (e as any).efficiency ? toFa((e as any).efficiency) : '',
       consumeRate: (e as any).consumeRate || '',
+      status: (e as any).status || 'active',
+      brand: (e as any).brand || '',
     });
     setErr(''); setOpen(true);
   };
@@ -231,6 +233,8 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
       efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
       consumeRate: form.consumeRate || undefined,
+      status: form.status || 'active',
+      brand: (form.brand || '').trim(),
     };
     if (form.id) updateEquip(form.id, data); else addEquip(data);
     draft.clear();
@@ -255,6 +259,8 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
       efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
       consumeRate: form.consumeRate || undefined,
+      status: form.status || 'active',
+      brand: (form.brand || '').trim(),
     };
     addEquip(data);
     toastMsg.added(form.name || 'تجهیز')

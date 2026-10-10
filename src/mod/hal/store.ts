@@ -62,6 +62,8 @@ export interface Zone {
 
 export type EquipmentKind = 'asset' | 'consumable' | 'system';
 
+export type EquipmentStatus = 'active' | 'broken' | 'maintenance' | 'repairing' | 'retired';
+
 export type EquipmentCategory =
   | 'ventilation'
   | 'feeding'
@@ -90,6 +92,10 @@ export interface Equipment {
   capacity?: number | null;
   efficiency?: number | null;
   consumeRate?: 'once' | 'per-cycle';
+  /** 🆕 وضعیت تجهیز */
+  status?: EquipmentStatus;
+  /** 🆕 برند سازنده (پارس، ستاره، آکو، ...) */
+  brand?: string;
   sourceInvoiceId?: string;
   warehouseItemId?: string;
   createdAt: string;
@@ -243,6 +249,14 @@ export const KIND_LABELS: Record<EquipmentKind, { name: string; icon: string }> 
   asset: { name: 'دارایی ثابت', icon: '🏭' },
   consumable: { name: 'مصرفی', icon: '📦' },
   system: { name: 'سیستم', icon: '⚙️' },
+};
+
+export const STATUS_LABELS: Record<EquipmentStatus, { name: string; icon: string; tone: string }> = {
+  active:      { name: 'سالم',         icon: '🟢', tone: 'accent' },
+  broken:      { name: 'خراب',          icon: '🔴', tone: 'danger' },
+  maintenance: { name: 'نیاز به سرویس', icon: '🟡', tone: 'warn' },
+  repairing:   { name: 'در حال تعمیر',  icon: '🟠', tone: 'warn' },
+  retired:     { name: 'کنار گذاشته',   icon: '⚫', tone: 'gray' },
 };
 
 export const UNIT_LABELS_EQ: Record<EquipmentUnit, string> = {

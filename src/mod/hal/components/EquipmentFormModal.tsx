@@ -4,6 +4,7 @@
 import { Btn, Field, Grid2, Input, Modal, MoneyField, NumField, Select, ErrorBox } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
+import { STATUS_LABELS, type EquipmentStatus } from '../store';
 import EditableSelect from '../../../shr/components/EditableSelect';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { CATEGORY_LABELS, KIND_LABELS, UNIT_LABELS_EQ, EQUIP_LABELS } from '../store';
@@ -65,6 +66,18 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           </Field>
         </Grid2>
 
+        <Grid2>
+          <Field label="وضعیت">
+            <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
+              {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v.icon} {v.name}</option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="برند" hint="مثلاً — پارس، ستاره، آکو">
+            <Input placeholder="پارس" value={form.brand || ''} onChange={e => setForm({...form, brand: e.target.value})} />
+          </Field>
+        </Grid2>
         <Grid2>
           <Field label="سالن" required>
             <SmartSelect
