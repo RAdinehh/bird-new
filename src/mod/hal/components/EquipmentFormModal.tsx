@@ -36,6 +36,16 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
         footer={<div style={{ display: "flex", gap: 6 }}><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
         <Grid2>
+          <Field label="سالن" required>
+            <SmartSelect
+              value={form.hallId}
+              onChange={v => setForm((f: any) => ({ ...f, hallId: v }))}
+              options={halls.map(c => ({ value: c.id, label: c.name }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب سالن"
+              autoThreshold={6}
+            />
+          </Field>
           <Field label="نوع دارایی" required>
             <Select value={form.kind || 'asset'} onChange={e => {
               const newKind = e.target.value;
@@ -50,6 +60,9 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               ))}
             </Select>
           </Field>
+        </Grid2>
+
+        <Grid2>
           <Field label="دسته" required>
             <Select value={form.category || 'auxiliary'} onChange={e => {
               const cat = e.target.value;
@@ -64,31 +77,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               })}
             </Select>
           </Field>
-        </Grid2>
-
-        <Grid2>
-          <Field label="وضعیت">
-            <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
-              {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>{v.icon} {v.name}</option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="برند" hint="مثلاً — پارس، ستاره، آکو">
-            <Input placeholder="پارس" value={form.brand || ''} onChange={e => setForm({...form, brand: e.target.value})} />
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label="سالن" required>
-            <SmartSelect
-              value={form.hallId}
-              onChange={v => setForm((f: any) => ({ ...f, hallId: v }))}
-              options={halls.map(c => ({ value: c.id, label: c.name }))}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب سالن"
-              autoThreshold={6}
-            />
-          </Field>
           <EditableSelect
             label="زیرنوع"
             required
@@ -96,7 +84,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             onChange={v => {
               const def = getEquipUnit(v);
               const patch: any = { type: v };
-              // 🆕 همیشه capacity رو ریست کن
               if (def.secondary?.defaultValue) {
                 patch.capacity = String(def.secondary.defaultValue);
               } else {
@@ -124,8 +111,8 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           <Field label="نام تجهیز" required>
             <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
           </Field>
-          <Field label="تاریخ خرید">
-            <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} placeholder="انتخاب تاریخ" />
+          <Field label="برند" hint="مثلاً — پارس، ستاره، آکو">
+            <Input placeholder="پارس" value={form.brand || ''} onChange={e => setForm({...form, brand: e.target.value})} />
           </Field>
         </Grid2>
 
@@ -153,10 +140,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               </div>
             ) : null}
           </Field>
-
-        </Grid2>
-
-        <Grid2>
           <Field label={(() => {
             const def = getEquipUnit(form.type || 'other');
             if (def.baseUnit === 'kg') return 'قیمت هر kg';
@@ -164,7 +147,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           })()}>
             <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
           </Field>
-          <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
         </Grid2>
 
         {(() => {
@@ -189,6 +171,21 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             </Field>
           );
         })()}
+
+        <Grid2>
+          <Field label="وضعیت">
+            <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
+              {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v.icon} {v.name}</option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
+        </Grid2>
+
+        <Field label="تاریخ خرید">
+          <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} placeholder="انتخاب تاریخ" />
+        </Field>
 
       </Modal>
   );
