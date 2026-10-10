@@ -1,6 +1,6 @@
 /** filter/configs/hal.tsx */
 import { IconFolder, IconActivity, IconTag, IconChart, IconDollar, IconClock, IconUser, IconCalendar, IconPackage } from '../../icons';
-import { type Zone, type Hall, type Equipment, EQUIP_LABELS } from '../../../mod/hal/store';
+import { type Zone, type Hall, type Equipment, EQUIP_LABELS, STATUS_LABELS } from '../../../mod/hal/store';
 import type { FilterConfig } from './_types';
 
 export function getHalZonesConfig(ctx: { halls: Hall[] }): FilterConfig<Zone> {
@@ -139,6 +139,12 @@ export function getHalEquipmentConfig(ctx: { halls: Hall[] }): FilterConfig<Equi
         icon: <IconUser size={18} />,
         options: ctx.halls.map(h => ({ value: h.id, label: h.name })),
         getValue: (e: Equipment) => e.hallId || '',
+      },
+      {
+        key: 'status', label: 'وضعیت', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: Object.entries(STATUS_LABELS).map(([k, v]: any) => ({ value: k, label: `${v.icon} ${v.name}` })),
+        getValue: (e: Equipment) => (e as any).status || 'active',
       },
       {
         key: 'kind', label: 'نوع', kind: 'enum',
