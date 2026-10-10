@@ -26,6 +26,8 @@ export interface EquipUnitDef {
   calc: (primary: number, secondary: number) => number;
   /** برچسب خلاصه برای نمایش (مثلاً «kg» یا «عدد») */
   summaryLabel: string;
+  /** 🆕 کلید استاندارد نژاد (اگه از EquipmentRatios قابل خوندن باشه) */
+  stdKey?: string;
 }
 
 /** پیش‌فرض‌ها */
@@ -39,6 +41,7 @@ export const EQUIP_UNITS: Record<string, EquipUnitDef> = {
     baseUnit: 'm³/h',
     calc: (p, s) => p * s,
     summaryLabel: 'm³/h',
+    stdKey: 'fanM3PerKg',
   },
   fan_ceiling: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
@@ -92,6 +95,7 @@ export const EQUIP_UNITS: Record<string, EquipUnitDef> = {
     baseUnit: 'W',
     calc: (p, s) => p * s,
     summaryLabel: 'W',
+    stdKey: 'lampWattPerM2',
   },
   lamp_fluorescent: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
@@ -111,68 +115,77 @@ export const EQUIP_UNITS: Record<string, EquipUnitDef> = {
   // ═══════ آبخوری ═══════
   nipple: {
     primary: { label: 'تعداد نیپل', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر نیپل', unit: 'پرنده', defaultValue: 12 },
-    baseUnit: 'پرنده',
+    secondary: { label: 'ظرفیت هر نیپل', unit: 'راس', defaultValue: 12 },
+    baseUnit: 'راس',
     calc: (p, s) => p * s,
-    summaryLabel: 'پرنده',
+    summaryLabel: 'راس',
+    stdKey: 'drinker.nippleBirdsPerUnit',
   },
   cup: {
     primary: { label: 'تعداد کاپ', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر کاپ', unit: 'پرنده', defaultValue: 20 },
-    baseUnit: 'پرنده',
+    secondary: { label: 'ظرفیت هر کاپ', unit: 'راس', defaultValue: 20 },
+    baseUnit: 'راس',
     calc: (p, s) => p * s,
-    summaryLabel: 'پرنده',
+    summaryLabel: 'راس',
+    stdKey: 'drinker.cupBirdsPerUnit',
   },
   trough: {
     primary: { label: 'طول', unit: 'm', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر متر', unit: 'پرنده', defaultValue: 50 },
-    baseUnit: 'پرنده',
+    secondary: { label: 'ظرفیت هر متر', unit: 'راس', defaultValue: 50 },
+    baseUnit: 'راس',
     calc: (p, s) => p * s,
-    summaryLabel: 'پرنده',
+    summaryLabel: 'راس',
+    stdKey: 'drinker.troughCmPerBird',
   },
   fountain_drinker: {
     primary: { label: 'تعداد کله‌قندی', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر واحد', unit: 'پرنده', defaultValue: 60 },
-    baseUnit: 'پرنده',
+    secondary: { label: 'ظرفیت هر واحد', unit: 'راس', defaultValue: 60 },
+    baseUnit: 'راس',
     calc: (p, s) => p * s,
-    summaryLabel: 'پرنده',
+    summaryLabel: 'راس',
+    stdKey: 'drinker.manualCmPerBird',
   },
 
   // ═══════ دانخوری ═══════
   feeder_manual: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر واحد', unit: 'پرنده', defaultValue: 20 },
-    baseUnit: 'پرنده',
+    secondary: { label: 'ظرفیت هر واحد', unit: 'راس', defaultValue: 20 },
+    baseUnit: 'راس',
     calc: (p, s) => p * s,
-    summaryLabel: 'پرنده',
+    summaryLabel: 'راس',
+    stdKey: 'feeder.manualCmPerBird',
   },
   feeder_pan: {
     primary: { label: 'تعداد پن', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر پن', unit: 'پرنده', defaultValue: 12 },
-    baseUnit: 'پرنده',
+    secondary: { label: 'ظرفیت هر پن', unit: 'راس', defaultValue: 12 },
+    baseUnit: 'راس',
     calc: (p, s) => p * s,
-    summaryLabel: 'پرنده',
+    summaryLabel: 'راس',
+    stdKey: 'feeder.panBirdsPerUnit',
   },
   feeder_chain: {
     primary: { label: 'طول کل', unit: 'm', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر متر', unit: 'پرنده', defaultValue: 30 },
-    baseUnit: 'پرنده',
+    secondary: { label: 'ظرفیت هر متر', unit: 'راس', defaultValue: 30 },
+    baseUnit: 'راس',
     calc: (p, s) => p * s,
-    summaryLabel: 'پرنده',
+    summaryLabel: 'راس',
+    stdKey: 'feeder.chainCmPerBird',
   },
   feeder_tube: {
     primary: { label: 'طول کل', unit: 'm', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر متر', unit: 'پرنده', defaultValue: 25 },
-    baseUnit: 'پرنده',
+    secondary: { label: 'ظرفیت هر متر', unit: 'راس', defaultValue: 25 },
+    baseUnit: 'راس',
     calc: (p, s) => p * s,
-    summaryLabel: 'پرنده',
+    summaryLabel: 'راس',
+    stdKey: 'feeder.tubeCmPerBird',
   },
   feeder_bucket: {
-    primary: { label: 'تعداد سطل', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر سطل', unit: 'پرنده', defaultValue: 25 },
-    baseUnit: 'پرنده',
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'ظرفیت هر سطل', unit: 'راس', defaultValue: 25 },
+    baseUnit: 'راس',
     calc: (p, s) => p * s,
-    summaryLabel: 'پرنده',
+    summaryLabel: 'راس',
+    stdKey: 'feeder.manualCmPerBird',
   },
 
   // ═══════ بستر ═══════

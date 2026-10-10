@@ -184,6 +184,27 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               )}
 
               {!hasSec && (
+                <>
+                  <Grid2>
+                    <Field label="وضعیت">
+                      <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
+                        {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                          <option key={k} value={k}>{v.icon} {v.name}</option>
+                        ))}
+                      </Select>
+                    </Field>
+                    <Field label="تاریخ خرید">
+                      <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} placeholder="انتخاب تاریخ" />
+                    </Field>
+                  </Grid2>
+                  <Grid2>
+                    <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
+                    <div />
+                  </Grid2>
+                </>
+              )}
+
+              {hasSec && (
                 <Grid2>
                   <Field label="وضعیت">
                     <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
@@ -192,20 +213,10 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                       ))}
                     </Select>
                   </Field>
-                  <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} /></Field>
-                </Grid2>
-              )}
-
-              {hasSec && (
-                <>
-                  <Field label="وضعیت">
-                    <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
-                      {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                        <option key={k} value={k}>{v.icon} {v.name}</option>
-                      ))}
-                    </Select>
+                  <Field label="تاریخ خرید">
+                    <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} placeholder="انتخاب تاریخ" />
                   </Field>
-                </>
+                </Grid2>
               )}
             </>
           );
@@ -231,9 +242,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           </div>
         ) : null}
 
-        <Field label="تاریخ خرید">
-          <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} placeholder="انتخاب تاریخ" />
-        </Field>
+
 
       </Modal>
   );

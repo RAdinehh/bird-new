@@ -128,24 +128,24 @@ export function calcEquipValue(e: any): number {
 
 
 
-/** 🆕 پیش‌فرض فیلد ثانویه از استاندارد نژاد (اگه موجود) */
+
+
+
+/** 🆕 پیش‌فرض فیلد ثانویه از استاندارد نژاد — با استفاده از stdKey */
 export function getStdDefaultForType(type: string, std: any): number | null {
   if (!std?.equipment) return null;
+  const def = getEquipUnit(type);
+  const key = def.stdKey;
+  if (!key) return null;
+
   const eq = std.equipment;
-
-  // آبخوری
-  if (type === 'nipple') return eq.drinker?.nippleBirdsPerUnit ?? null;
-  if (type === 'cup') return eq.drinker?.cupBirdsPerUnit ?? null;
-
-  // دانخوری
-  if (type === 'feeder_pan') return eq.feeder?.panBirdsPerUnit ?? null;
-  if (type === 'feeder_manual' || type === 'feeder_bucket') return eq.feeder?.manualCmPerBird ?? null;
-
-  // روشنایی (W/m² → تبدیل به W هر لامپ)
-  if (type === 'lamp_led' || type === 'lamp_fluorescent') return eq.lampWattPerM2 ?? null;
-
-  // تهویه (کل m³/h گله — تقریبی)
-  if (type === 'fan_tunnel' || type === 'fan_ceiling') return eq.fanM3PerKg ?? null;
-
-  return null;
+  // path به‌صورت "drinker.nippleBirdsPerUnit"
+  const parts = key.split('.');
+  if (parts.length === 2) {
+    const v = eq[parts[0]]?.[parts[1]];
+    return typeof v === 'number' ? v : null;
+  }
+  // top-level مثل lampWattPerM2 یا fanM3PerKg
+  const v = eq[key];
+  return typeof v === 'number' ? v : null;
 }
