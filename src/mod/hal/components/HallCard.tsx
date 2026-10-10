@@ -10,6 +10,7 @@ import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
 import { HallEquipSection } from '../HallEquipSection';
+import EntityLink from '../../../shr/components/EntityLink';
 
 export interface HallCardProps {
   h: any;
@@ -25,10 +26,14 @@ export interface HallCardProps {
   onEdit: () => void;
   onDelete: (id: string) => void;
   onUndo: (item: any) => void;
+  birdNames?: Map<string, string>;
+  breedNames?: Map<string, string>;
+  workerNames?: Map<string, string>;
 }
 
 export default function HallCard(props: HallCardProps) {
-  const { h, i, zones, equipment, flocks, breedStd, fmt, isOpen, ms, onToggle, onEdit, onDelete, onUndo } = props;
+  const { h, i, zones, equipment, flocks, breedStd, fmt, isOpen, ms, onToggle, onEdit, onDelete, onUndo,
+        birdNames, breedNames, workerNames } = props;
 
   const area = (h.length || 0) * (h.width || 0);
   const volume = area * (h.height || 0);
@@ -94,6 +99,17 @@ export default function HallCard(props: HallCardProps) {
         <Row l="حجم" v={`${toFa(volume.toFixed(1))} م³`} />
         <Row l="ظرفیت" v={h.capacity ? `${fmt.int(h.capacity)} پرنده` : '—'} />
       </div>
+
+      {(h.birdId || h.breedId || h.responsibleId) && (
+        <>
+          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🏷 هویت</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {h.birdId && <Row l="پرنده" v={<EntityLink type="bird" id={h.birdId} label={birdNames?.get(h.birdId) || '—'} />} />}
+            {h.breedId && <Row l="نژاد" v={<EntityLink type="breed" id={h.breedId} label={breedNames?.get(h.breedId) || '—'} badge badgeBg="var(--purple-soft)" />} />}
+            {h.responsibleId && <Row l="مسئول" v={<EntityLink type="party" id={h.responsibleId} label={workerNames?.get(h.responsibleId) || '—'} />} />}
+          </div>
+        </>
+      )}
 
       {hallFlocks.length > 0 && (
         <>

@@ -18,7 +18,7 @@ export function chip(active: boolean): CSSProperties {
   };
 }
 
-export function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
+export function Row({ l, v, accent }: { l: string; v: ReactNode; accent?: boolean }) {
   return (
     <div style={{
       display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',

@@ -68,6 +68,9 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const { breeds, birds } = useBrd();
   const { contacts: allContacts } = useCtc();
   const workers = allContacts.filter((c: any) => (c.roles || []).includes('worker'));
+  const birdNames = useMemo(() => new Map(birds.map((b: any) => [b.id, b.name])), [birds]);
+  const breedNames = useMemo(() => new Map(breeds.map((b: any) => [b.id, b.name])), [breeds]);
+  const workerNames = useMemo(() => new Map(allContacts.map((c: any) => [c.id, c.name || c.fullName || ''])), [allContacts]);
   const [open, setOpen] = useState(false);
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [form, setForm] = useState<F>(empty);
@@ -359,6 +362,9 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
                   setUndoData({ item });
                   setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
                 }}
+                birdNames={birdNames}
+                breedNames={breedNames}
+                workerNames={workerNames}
               />
             );
           })}
