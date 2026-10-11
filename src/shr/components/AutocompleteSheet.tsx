@@ -222,7 +222,7 @@ export default function AutocompleteSheet({
         ) : (
           <>
             {Object.entries(grouped).map(([key, g]) => (
-              <SheetGroup key={key} title={g.label || '—'} icon={g.icon} count={g.items.length}>
+              <SheetGroup key={key} title={g.label || '—'} count={g.items.length}>
                 {g.items.map(opt => (
                   <SheetItem
                     key={opt.value}

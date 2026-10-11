@@ -61,6 +61,16 @@ function breedIcon(category?: string): string {
   return '🧬';
 }
 
+/** ایموجی بر اساس نوع پرنده والد */
+function kindEmoji(kind: string | null | undefined): string {
+  if (kind === 'chicken') return '🐔';
+  if (kind === 'duck') return '🦆';
+  if (kind === 'turkey') return '🦃';
+  if (kind === 'quail') return '🐦';
+  if (kind === 'goose') return '🦢';
+  return '🧬';
+}
+
 export default function BreedNameField({
   value, onChange, onPick, error, excludeNames = [],
   parentBirdName, parentPurpose,
@@ -95,7 +105,8 @@ export default function BreedNameField({
 
       // آیکون + ⭐ برای primary
       const isPrimary = parentPurposeFinal && std.primaryPurpose === parentPurposeFinal;
-      const icon = breedIcon(std.category);
+      const stdKind = nameToKind(std.birdName) || parentKind;
+      const icon = kindEmoji(stdKind);
       const label = isPrimary ? `⭐ ${name}` : name;
 
       opts.push({
@@ -103,7 +114,7 @@ export default function BreedNameField({
         label,
         icon,
         group: std.category === 'native' ? 'native' : 'industrial',
-        groupLabel: std.category === 'native' ? '🌾 بومی' : '🏭 صنعتی',
+        groupLabel: std.category === 'native' ? 'بومی' : 'صنعتی',
       });
     }
 
