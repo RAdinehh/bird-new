@@ -6,7 +6,7 @@ import SourceBadge from '../../shr/components/SourceBadge';
 import OverrideHint from '../../shr/components/OverrideHint';
 import BreedNameField, { type BreedPick } from './BreedNameField';
 import SmartSelect from '../../shr/components/SmartSelect';
-import { Btn, BtnRow, Field, Grid2, Modal, NumField, ErrorBox } from '../../shr/components/ui';
+import { Btn, BtnRow, Field, Modal, NumField, ErrorBox } from '../../shr/components/ui';
 
 export interface BreedFormData {
   id: string;
@@ -46,48 +46,46 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
   return (
     <Modal open={open} onClose={onClose} title={form.id ? 'ویرایش نژاد' : 'افزودن نژاد'}
       footer={<BtnRow><Btn variant="primary" onClick={onSave}>ذخیره</Btn><Btn onClick={onClose}>لغو</Btn></BtnRow>}>
-      <Grid2>
-        <Field label="پرنده" required>
-          <SmartSelect
-            value={form.birdId}
-            onChange={v => {
-              const parent = birds.find(x => x.id === v);
-              setForm(f => ({
-                ...f,
-                birdId: v,
-                fcr: !f.fcr && parent?.fcrStandard ? toFa(parent.fcrStandard) : f.fcr,
-              }));
-            }}
-            options={birds.map(c => ({
-              value: c.id,
-              label: c.name,
-              subtitle: c.fcrStandard ? `FCR ${toFa(c.fcrStandard)}` : undefined,
-            }))}
-            placeholder="— انتخاب کنید —"
-            modalTitle="انتخاب پرنده"
-            autoThreshold={6}
-          />
-        </Field>
-        <Field label="نام نژاد" required hint="انتخاب یا تایپ">
-          <BreedNameField
-            value={form.name}
-            onChange={v => setForm(f => ({ ...f, name: v }))}
-            onPick={(pick: BreedPick) => {
-              setForm(f => ({
-                ...f,
-                name: pick.name,
-                standardKey: pick.standardKey || f.standardKey,
-                fcr: pick.fcr !== null ? toFa(pick.fcr) : f.fcr,
-              }));
-            }}
-            excludeNames={breeds
-              .filter(b => b.id !== form.id && b.birdId === form.birdId)
-              .map(b => b.name)}
-            parentBirdName={parentBird?.name}
-            parentPurpose={(parentBird as any)?.birdKind}
-          />
-        </Field>
-      </Grid2>
+      <Field label="پرنده" required>
+        <SmartSelect
+          value={form.birdId}
+          onChange={v => {
+            const parent = birds.find(x => x.id === v);
+            setForm(f => ({
+              ...f,
+              birdId: v,
+              fcr: !f.fcr && parent?.fcrStandard ? toFa(parent.fcrStandard) : f.fcr,
+            }));
+          }}
+          options={birds.map(c => ({
+            value: c.id,
+            label: c.name,
+            subtitle: c.fcrStandard ? `FCR ${toFa(c.fcrStandard)}` : undefined,
+          }))}
+          placeholder="— انتخاب کنید —"
+          modalTitle="انتخاب پرنده"
+          autoThreshold={6}
+        />
+      </Field>
+      <Field label="نام نژاد" required hint="انتخاب یا تایپ">
+        <BreedNameField
+          value={form.name}
+          onChange={v => setForm(f => ({ ...f, name: v }))}
+          onPick={(pick: BreedPick) => {
+            setForm(f => ({
+              ...f,
+              name: pick.name,
+              standardKey: pick.standardKey || f.standardKey,
+              fcr: pick.fcr !== null ? toFa(pick.fcr) : f.fcr,
+            }));
+          }}
+          excludeNames={breeds
+            .filter(b => b.id !== form.id && b.birdId === form.birdId)
+            .map(b => b.name)}
+          parentBirdName={parentBird?.name}
+          parentPurpose={(parentBird as any)?.birdKind}
+        />
+      </Field>
 
       <Field
         label={
