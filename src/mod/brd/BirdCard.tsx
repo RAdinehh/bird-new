@@ -1,6 +1,7 @@
 import type { Bird, Breed } from './store';
 import { toFa } from '../../shr/utils/fa';
 import { getKindInfo, getPurposeInfo, getCategoryInfo } from './_display';
+import { getBirdDisplayName } from './_display-name';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { getStandardFor } from '../set/standards/resolve';
 import EntityLink from '../../shr/components/EntityLink';
@@ -78,7 +79,7 @@ export default function BirdCard({
       accent="accent"
       index={toFa(index + 1)}
       iconEmoji={kind.emoji}
-      title={b.name}
+      title={getBirdDisplayName(b, customStandards)}
       subtitle=""
       isOpen={isOpen}
       onToggle={onToggle}
@@ -186,8 +187,8 @@ export default function BirdCard({
       )}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <Btn size="sm" onClick={() => onEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش پرنده ${b.name}`}>ویرایش</Btn>
-        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }} aria-label={`حذف پرنده ${b.name}`}>حذف</Btn>
+        <Btn size="sm" onClick={() => onEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش پرنده ${getBirdDisplayName(b, customStandards)}`}>ویرایش</Btn>
+        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }} aria-label={`حذف پرنده ${getBirdDisplayName(b, customStandards)}`}>حذف</Btn>
       </div>
     </ExpandableCard>
   );

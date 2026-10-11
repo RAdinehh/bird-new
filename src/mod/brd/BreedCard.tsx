@@ -1,6 +1,7 @@
 import type { Bird, Breed } from './store';
 import { toFa } from '../../shr/utils/fa';
 import { getPurposeInfo, getCategoryInfo } from './_display';
+import { getBreedDisplayName } from './_display-name';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import EntityLink from '../../shr/components/EntityLink';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -18,6 +19,7 @@ interface Props {
   ms: any;
   onEdit: (b: Breed) => void;
   onDelete: (id: string, item: Breed) => void;
+  customStandards?: Record<string, any>;
 }
 
 /** ردیف استاندارد label/value */
@@ -35,7 +37,7 @@ function StatRow({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 export default function BreedCard({
-  breed: b, index, bird, isOpen, onToggle, ms, onEdit, onDelete,
+  breed: b, index, bird, isOpen, onToggle, ms, onEdit, onDelete, customStandards,
 }: Props) {
   const stdKey = (b as any).standardKey;
   const stdData = stdKey ? (DEFAULT_STANDARDS as any)[stdKey] : null;
@@ -56,7 +58,7 @@ export default function BreedCard({
       accent="purple"
       index={toFa(index + 1)}
       iconEmoji="🧬"
-      title={b.name}
+      title={getBreedDisplayName(b, customStandards)}
       subtitle=""
       isOpen={isOpen}
       onToggle={onToggle}
@@ -75,7 +77,7 @@ export default function BreedCard({
         <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> مشخصات نژاد
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <StatRow label="نام نژاد" value={b.name} />
+        <StatRow label="نام نژاد" value={getBreedDisplayName(b, customStandards)} />
         <StatRow label="پرنده" value={bird ? <EntityLink type="bird" id={bird.id} label={bird.name} /> : '—'} />
         <StatRow label="FCR" value={b.fcr ? toFa(b.fcr) : '—'} />
       </div>
@@ -97,8 +99,8 @@ export default function BreedCard({
       )}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <Btn size="sm" onClick={() => onEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش نژاد ${b.name}`}>ویرایش</Btn>
-        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }} aria-label={`حذف نژاد ${b.name}`}>حذف</Btn>
+        <Btn size="sm" onClick={() => onEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش نژاد ${getBreedDisplayName(b, customStandards)}`}>ویرایش</Btn>
+        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }} aria-label={`حذف نژاد ${getBreedDisplayName(b, customStandards)}`}>حذف</Btn>
       </div>
     </ExpandableCard>
   );

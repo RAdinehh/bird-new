@@ -233,6 +233,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
                 ms={ms}
+                customStandards={customStandards}
                 onEdit={openEdit}
                 onDelete={(id, item) => {
                   setUndoData({ item });
