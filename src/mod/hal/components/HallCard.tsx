@@ -116,7 +116,7 @@ export default function HallCard(props: HallCardProps) {
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های فعال ({fmt.int(hallFlocks.length)})</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {hallFlocks.map((fl: any) => (
-              <Row key={fl.id} l={fl.name} v={`${fmt.int(fl.currentCount || fl.initialCount || 0)} پرنده`} />
+              <Row key={fl.id} l={<EntityLink type="flock" id={fl.id} label={fl.name} />} v={`${fmt.int(fl.currentCount || fl.initialCount || 0)} پرنده`} />
             ))}
             <Row l="جمع کل" v={`${fmt.int(totalBirds)} پرنده`} accent />
           </div>
