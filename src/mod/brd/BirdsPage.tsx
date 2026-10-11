@@ -40,7 +40,7 @@ interface F {
 const empty: F = { name: '', cycleDays: '', fcrStandard: '', standardKey: '' };
 
 export default function BirdsPage({ active = true }: { active?: boolean } = {}) {
-  const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird, dedupeBirds } = useBrd();
+  const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird } = useBrd();
   const customStandards = useSet((st: any) => st.customStandards);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
@@ -65,6 +65,17 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
       return true;
     });
   }, [_birdsRaw]);
+
+  // ─── گروه‌بندی نژادها بر اساس birdId (رفع N+1) ───
+  const breedsByBird = useMemo(() => {
+    const map = new Map<string, typeof breeds>();
+    for (const bd of breeds) {
+      const arr = map.get(bd.birdId) || [];
+      arr.push(bd);
+      map.set(bd.birdId, arr);
+    }
+    return map;
+  }, [breeds]);
 
   // ─── فیلتر/مرتب (از config مرکزی) ───
   const config = useMemo(() => getBrdBirdsConfig({ breeds }), [breeds]);
@@ -219,7 +230,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
       ) : (
         <>
           {list.map((b, i) => {
-            const birdBreeds = breeds.filter(x => x.birdId === b.id);
+            const birdBreeds = breedsByBird.get(b.id) || [];
             const isOpen = !ms.selectionMode && expandedId === b.id;
             const kind = getKindInfo((b as any).birdKind);
             const purpose = getPurposeInfo((b as any).purpose);

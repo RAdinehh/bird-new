@@ -37,7 +37,7 @@ function findStandardKey(name: string): string | undefined {
 }
 
 export default function BreedsPage({ active = true }: { active?: boolean } = {}) {
-  const { birds, breeds: _breedsRaw, dedupeBreeds, addBreed, updateBreed, deleteBreed } = useBrd();
+  const { birds, breeds: _breedsRaw, addBreed, updateBreed, deleteBreed } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', birdId:'', name:'', fcr:'', standardKey:'' });
   const [fcrFromStd, setFcrFromStd] = useState(false);
