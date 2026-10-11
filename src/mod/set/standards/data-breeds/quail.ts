@@ -133,3 +133,74 @@ export const QUAIL_LAYER: BirdStandard = {
   mortalityTotalPct: 4.5,
   notes: 'بلدرچین تخم‌گذار',
 };
+
+
+// ═══════════════════════════════════════════════
+// مادر بلدرچین (Quail Breeder)
+// ═══════════════════════════════════════════════
+export const QUAIL_BREEDER: BirdStandard = {
+  key: 'quail-breeder',
+  source: 'مرکز تحقیقات بلدرچین ایران + Japanese Quail Standards',
+  publishYear: 1403,
+  region: 'iran',
+  birdName: 'بلدرچین',
+  birdKind: 'quail',
+  purposes: ['breeder'],
+  primaryPurpose: 'breeder',
+  nameFa: 'مادر بلدرچین',
+  nameEn: 'Japanese Quail Breeder',
+  category: 'industrial',
+  biology: {
+    sexualMaturityDay: 45, layingStartDay: 50, peakLayingDay: 70,
+    endOfCycleDay: 250, cullDay: 270, incubationDays: 17, maleFemaleRatio: 3,
+  },
+  env: [
+    { dayFrom: 1, dayTo: 7, temp: { min: 34, max: 38, target: 36 }, humidity: { min: 60, max: 70 }, light: { hours: 23 } },
+    { dayFrom: 8, dayTo: 21, temp: { min: 28, max: 32, target: 30 }, humidity: { min: 55, max: 65 }, light: { hours: 14 } },
+    { dayFrom: 22, dayTo: 45, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 12 } },
+    { dayFrom: 46, dayTo: 250, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 16, lux: 20 } },
+    { dayFrom: 251, dayTo: 9999, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 16, lux: 20 } },
+  ],
+  feed: [
+    { dayFrom: 1, dayTo: 14, feedG: 14, waterMl: 28, phaseName: 'استارتر' },
+    { dayFrom: 15, dayTo: 21, feedG: 22, waterMl: 44, phaseName: 'استارتر' },
+    { dayFrom: 22, dayTo: 45, feedG: 26, waterMl: 52, phaseName: 'رشد' },
+    { dayFrom: 46, dayTo: 250, feedG: 30, waterMl: 60, phaseName: 'تولید' },
+    { dayFrom: 251, dayTo: 9999, feedG: 28, waterMl: 56, phaseName: 'پایان' },
+  ],
+  growth: {
+    weightByAge: [
+      { dayFrom: 1, dayTo: 14, weightG: 75, adgG: 5, fcr: 1.12 },
+      { dayFrom: 15, dayTo: 28, weightG: 140, adgG: 5, fcr: 1.54 },
+      { dayFrom: 29, dayTo: 45, weightG: 180, adgG: 2.5, fcr: 1.9 },
+      { dayFrom: 46, dayTo: 250, weightG: 210, adgG: 0.15, fcr: 2.2 },
+      { dayFrom: 251, dayTo: 9999, weightG: 215, adgG: 0.05, fcr: 2.3 },
+    ],
+    finalWeightG: 215,
+  },
+  space: { densityMax: 80, feederSpaceCm: 10, drinkerSpaceCm: 2 },
+  equipment: {
+    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5 },
+    drinker: { nippleBirdsPerUnit: 15, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
+    lampWattPerM2: 4.5, fanM3PerKg: 5,
+  },
+  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70 },
+  litter: { recommended: ['wood_shavings', 'rice_hull'], kgPerM2: 2.0, thicknessCm: 5, lifetimeDays: 42 },
+  production: {
+    layingStartDay: 50,
+    peakLayingPct: 85,
+    eggsPerYear: 280,
+    eggWeightG: 12,
+    cycleDays: 250,
+    fertilityPct: 85,
+    hatchabilityPct: 75,
+  },
+  mortality: [
+    { dayFrom: 1, dayTo: 7, maxPct: 2.5 },
+    { dayFrom: 8, dayTo: 21, maxPct: 3.0 },
+    { dayFrom: 22, dayTo: 60, maxPct: 3.5 },
+    { dayFrom: 61, dayTo: 9999, maxPct: 4.5 },
+  ],
+  mortalityTotalPct: 5.5,
+  notes: 'مادر بلدرچین ژاپنی — تخم نطفه‌دار برای جوجه‌کشی',
+};

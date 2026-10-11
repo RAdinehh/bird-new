@@ -35,7 +35,7 @@ import { BRAHMA } from './ornamental';
 import { SULTAN } from './ornamental';
 import { MINIATURE } from './ornamental';
 import { QUAIL_BROILER } from './quail';
-import { QUAIL_LAYER } from './quail';
+import { QUAIL_LAYER, QUAIL_BREEDER } from './quail';
 import { DUCK_PEKIN } from './ducks';
 import { DUCK_MUSCOVY } from './ducks';
 import { DUCK_UKRAINIAN, DUCK_PEKIN_BREEDER, DUCK_MUSCOVY_BREEDER } from './ducks';
@@ -66,6 +66,7 @@ export const NEW_BREEDS: Record<string, BirdStandard> = {
   'miniature': MINIATURE,
   'quail-broiler': QUAIL_BROILER,
   'quail-layer': QUAIL_LAYER,
+  'quail-breeder': QUAIL_BREEDER,
   'duck-pekin': DUCK_PEKIN,
   'duck-muscovy': DUCK_MUSCOVY,
   'duck-ukrainian': DUCK_UKRAINIAN,
