@@ -1,6 +1,6 @@
 import type { Bird, Breed } from './store';
 import { toFa } from '../../shr/utils/fa';
-import { getKindInfo, getPurposeInfo, getCategoryInfo } from './_display';
+import { getKindInfo, getCategoryInfo } from './_display';
 import { getBirdDisplayName, getBreedDisplayName } from './_display-name';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { getStandardFor } from '../set/standards/resolve';
@@ -41,7 +41,6 @@ export default function BirdCard({
   bird: b, index, birdBreeds, isOpen, onToggle, ms, customStandards, onEdit, onDelete,
 }: Props) {
   const kind = getKindInfo((b as any).birdKind);
-  const purpose = getPurposeInfo((b as any).purpose);
   const stdKey = (b as any).standardKey;
   const stdData = (stdKey && (DEFAULT_STANDARDS as any)[stdKey])
     || getStandardFor(b.name, { customStandards: customStandards || {} })
@@ -86,12 +85,7 @@ export default function BirdCard({
       badge={<Tag tone="blue">{toFa(birdBreeds.length)} نژاد</Tag>}
       stats={
         <>
-          {purpose && <span style={{
-            padding: 'var(--pad-chip)', borderRadius: 'var(--r-md)',
-            background: 'var(--accent-soft)', color: 'var(--accent)',
-            fontSize: 'var(--fs-2xs)', fontWeight: 700,
-          }}>{purpose.emoji} {purpose.label}</span>}
-          {category && <span style={{
+                    {category && <span style={{
             padding: 'var(--pad-chip)', borderRadius: 'var(--r-md)',
             background: 'var(--accent-soft)', color: 'var(--accent)',
             fontSize: 'var(--fs-2xs)', fontWeight: 700,

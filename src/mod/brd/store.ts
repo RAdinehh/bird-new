@@ -5,15 +5,13 @@ import { v4 as uuid } from 'uuid';
 export interface Bird {
   id: string;
   name: string;
+  /** شناسه‌ی گونه (chicken، duck، turkey، یا custom) */
+  birdKind?: string;
   /** کلید استاندارد در DEFAULT_STANDARDS (اختیاری) */
   standardKey?: string;
-  /** 🆕 نوع پرنده (برای فیلتر نژادها) */
-  birdKind?: 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
-  /** 🆕 هدف پرورش */
-  purpose?: 'broiler' | 'layer' | 'breeder' | 'dual' | 'ornamental';
-  /** 🆕 شناسه‌ی دسته (مثلاً 'chicken-broiler') */
-  categoryId?: string;
+  /** چرخه زندگی — دستی (تا وقتی نژاد اضافه شه) */
   cycleDays: number | null;
+  /** FCR — دستی (تا وقتی نژاد اضافه شه) */
   fcrStandard: number | null;
   createdAt: string;
   updatedAt: string;
@@ -96,8 +94,15 @@ export const useBrd = create<State>()(
     }),
     {
       name: 'pm-brd',
-      version: 2,
+      version: 3,
       migrate: (persisted: any, version: number) => {
+        // v3: حذف purpose و categoryId از Bird (مالِ نژاد هستن)
+        if (persisted && Array.isArray(persisted.birds)) {
+          persisted.birds = persisted.birds.map((b: any) => {
+            const { purpose, categoryId, ...rest } = b;
+            return rest;
+          });
+        }
         // پاک کردن تکرارهای پرنده و نژاد
         if (persisted) {
           if (Array.isArray(persisted.birds)) {

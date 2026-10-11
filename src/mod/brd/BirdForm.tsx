@@ -14,8 +14,6 @@ export interface BirdFormData {
   fcrStandard: string;
   standardKey?: string;
   birdKind?: string;
-  purpose?: string;
-  categoryId?: string;
 }
 
 export const EMPTY_BIRD_FORM: BirdFormData = {
@@ -58,8 +56,6 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
               fcrStandard: pick.fcrStandard ? toFa(pick.fcrStandard) : f.fcrStandard,
               standardKey: pick.standardKey || f.standardKey,
               birdKind: pick.birdKind || f.birdKind,
-              purpose: pick.purpose || f.purpose,
-              categoryId: pick.categoryId || f.categoryId,
             }));
           }}
           error={error || undefined}

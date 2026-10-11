@@ -101,7 +101,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
 
   const openNew = () => { if (!draft.hasDraft) setForm(EMPTY_BIRD_FORM); setError(''); setOpen(true);  };
   const openEdit = (b: Bird) => {
-    setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '', standardKey: (b as any).standardKey || '', birdKind: (b as any).birdKind, purpose: (b as any).purpose, categoryId: (b as any).categoryId });
+    setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '', standardKey: (b as any).standardKey || '', birdKind: (b as any).birdKind });
     
     setError(''); setOpen(true);
   };

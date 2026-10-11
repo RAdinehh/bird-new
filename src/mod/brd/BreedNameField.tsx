@@ -28,8 +28,6 @@ interface Props {
   excludeNames?: string[];
   /** نام پرنده والد (مثلاً «مرغ مادر») */
   parentBirdName?: string;
-  /** purpose پرنده والد (broiler/layer/breeder/dual) */
-  parentPurpose?: string;
   /** استانداردهای سفارشی کاربر */
   customStandards?: Record<string, any>;
 }
@@ -43,17 +41,6 @@ function nameToKind(name?: string): string | null {
   if (n.includes('بوقلمون')) return 'turkey';
   if (n.includes('بلدرچین')) return 'quail';
   if (n.includes('غاز')) return 'goose';
-  return null;
-}
-
-/** تبدیل نام پرنده به purpose (نرم) */
-function nameToPurpose(name?: string): string | null {
-  if (!name) return null;
-  const n = name.trim().toLowerCase();
-  if (n.includes('گوشتی')) return 'broiler';
-  if (n.includes('تخم') || n.includes('لِی') || n.includes('لیر')) return 'layer';
-  if (n.includes('مادر')) return 'breeder';
-  if (n.includes('تزئین')) return 'ornamental';
   return null;
 }
 
@@ -75,7 +62,7 @@ function kindEmoji(kind: string | null | undefined): string {
 
 export default function BreedNameField({
   value, onChange, onPick, error, excludeNames = [],
-  parentBirdName, parentPurpose, customStandards = {},
+  parentBirdName, customStandards = {},
 }: Props) {
   const options: AutoOption[] = useMemo(() => {
     const opts: AutoOption[] = [];
@@ -83,7 +70,6 @@ export default function BreedNameField({
 
     // تشخیص نوع پرنده و هدف
     const parentKind = nameToKind(parentBirdName);
-    const parentPurposeFinal = parentPurpose || nameToPurpose(parentBirdName);
 
     const allStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
     for (const [key, std] of Object.entries(allStandards) as [string, any][]) {
@@ -96,21 +82,9 @@ export default function BreedNameField({
       if (parentKind && !std.birdKind) {
         const stdKind = nameToKind(std.birdName);
         if (stdKind && stdKind !== parentKind) continue;
-      }
-
-      // 🆕 فیلتر ۲: purpose
-      if (parentPurposeFinal && std.purposes && Array.isArray(std.purposes)) {
-        const hasMatch = std.purposes.includes(parentPurposeFinal);
-        // dual همیشه مجازه
-        const hasDual = std.purposes.includes('dual');
-        if (!hasMatch && !hasDual) continue;
-      }
-
-      // آیکون + ⭐ برای primary
-      const isPrimary = parentPurposeFinal && std.primaryPurpose === parentPurposeFinal;
-      const stdKind = nameToKind(std.birdName) || parentKind;
+      }      const stdKind = nameToKind(std.birdName) || parentKind;
       const icon = kindEmoji(stdKind);
-      const label = isPrimary ? `⭐ ${name}` : name;
+      const label = name;
 
       opts.push({
         value: key,
@@ -123,7 +97,7 @@ export default function BreedNameField({
     }
 
     return opts;
-  }, [excludeNames, parentBirdName, parentPurpose, customStandards]);
+  }, [excludeNames, parentBirdName, customStandards]);
 
   const handleSelect = (opt: AutoOption) => {
     const key = opt.value;
