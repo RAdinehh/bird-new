@@ -39,6 +39,8 @@ interface Props {
   error?: string;
   warn?: string;
   compact?: boolean;
+  /** 🆕 ارتفاع دلخواه (پیش‌فرض: ۳۸ غیر compact / ۳۲ compact) */
+  height?: number;
 }
 
 export default function SmartSelect({
@@ -52,12 +54,13 @@ export default function SmartSelect({
   required = false,
   error, warn,
   compact = false,
+  height: customHeight,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
 
   const borderColor = error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)';
-  const height = compact ? 32 : 38;
+  const height = customHeight ?? (compact ? 32 : 38);
   const fontSize = compact ? 'var(--fs-sm)' : 'var(--fs-base)';
 
   // ═══ حالت ۱: لیست کوتاه — Select بومی ═══

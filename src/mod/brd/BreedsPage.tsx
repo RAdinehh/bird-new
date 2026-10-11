@@ -326,9 +326,11 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش نژاد' : 'افزودن نژاد'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-        <Field label="پرنده" required hint="نژاد به این پرنده متصل می‌شود">
+        <Grid2>
+        <Field label="پرنده" required>
           <SmartSelect
             value={form.birdId}
+            height={44}
             onChange={v => {
               const parent = birds.find(x => x.id === v);
               // 🔄 Cascade: اگه FCR خالیه، از پرنده والد پر کن
@@ -348,7 +350,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
             autoThreshold={6}
           />
         </Field>
-        <Field label="نام نژاد" required hint="از لیست انتخاب کن یا نژاد دلخواه بنویس">
+        <Field label="نام نژاد" required hint="انتخاب یا تایپ">
           <BreedNameField
             value={form.name}
             onChange={v => setForm(f => ({ ...f, name: v }))}
@@ -367,6 +369,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
             parentPurpose={(birds.find(x => x.id === form.birdId) as any)?.birdType}
           />
         </Field>
+        </Grid2>
 
         <Field
           label={
@@ -381,7 +384,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
               })()}
             </span>
           }
-          hint="ضریب تبدیل غذایی"
+          hint="کیلوگرم دان برای هر کیلوگرم رشد"
         >
           <NumField
             placeholder="۲٫۰"
