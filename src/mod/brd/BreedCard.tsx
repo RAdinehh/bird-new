@@ -42,7 +42,10 @@ export default function BreedCard({
   const stdKey = (b as any).standardKey;
   const stdData = stdKey ? (DEFAULT_STANDARDS as any)[stdKey] : null;
   const category = stdData?.category ? getCategoryInfo(stdData.category) : null;
-  const purpose = stdData?.primaryPurpose ? getPurposeInfo(stdData.primaryPurpose) : null;
+  // 🆕 نمایش همه‌ی هدف‌های نژاد (نه فقط primary)
+  const purposes: string[] = Array.isArray(stdData?.purposes) && stdData.purposes.length > 0
+    ? stdData.purposes
+    : (stdData?.primaryPurpose ? [stdData.primaryPurpose] : []);
 
   const handleDelete = async () => {
     const ok = await showConfirmAsync('تأیید حذف', 'این نژاد حذف شود؟', { danger: true });
@@ -64,7 +67,10 @@ export default function BreedCard({
       onToggle={onToggle}
       badge={
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          {purpose && <Tag tone="green">{purpose.emoji} {purpose.label}</Tag>}
+          {purposes.map((p: string) => {
+            const info = getPurposeInfo(p);
+            return info ? <Tag key={p} tone="green">{info.emoji} {info.label}</Tag> : null;
+          })}
           {category && <Tag tone="blue">{category.emoji} {category.label}</Tag>}
         </div>
       }
