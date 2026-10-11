@@ -111,7 +111,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     setError(''); setOpen(true);
   };
   useFab(active ? { label: 'افزودن پرنده', onClick: openNew } : null);
-  const save = async () => {
+  const save = () => {
 
     // 🔒 جلوگیری قاطع از نام تکراری پرنده
     if (!form.id) {

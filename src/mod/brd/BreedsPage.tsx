@@ -169,7 +169,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     setErr(''); setOpen(true);
   };
 
-  const save = async () => {
+  const save = () => {
 
     // 🔒 جلوگیری قاطع از نام تکراری نژاد
     if (!form.id) {
