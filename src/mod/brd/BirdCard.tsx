@@ -47,6 +47,23 @@ export default function BirdCard({
     || null;
   const category = stdData?.category ? getCategoryInfo(stdData.category) : null;
 
+  // 🆕 اگه پرنده خودش استاندارد نداره، از نژادهاش بگیر
+  const breedStandards = birdBreeds
+    .map(bd => {
+      const k = (bd as any).standardKey;
+      const std = k ? (DEFAULT_STANDARDS as any)[k] : null;
+      return std ? { key: k, std, breedName: bd.name } : null;
+    })
+    .filter(Boolean) as Array<{ key: string; std: any; breedName: string }>;
+  const hasAnyStandard = !!stdData || breedStandards.length > 0;
+  // اگه پرنده استاندارد مستقیم نداره ولی نژاد داره، نمایش از نژاد
+  const displayStd = stdData || (breedStandards[0]?.std || null);
+  const displayLabel = stdData
+    ? (stdData.nameFa || stdData.nameEn || stdKey)
+    : breedStandards.length > 0
+      ? `از نژاد: ${breedStandards.map(x => x.breedName).join('، ')}`
+      : '';
+
   const handleDelete = async () => {
     const ok = await showConfirmAsync('تأیید حذف', 'این پرنده حذف شود؟', { danger: true });
     if (!ok) return;
@@ -113,7 +130,7 @@ export default function BirdCard({
       )}
 
       {/* 📖 کادر استاندارد متصل */}
-      {stdData ? (
+      {hasAnyStandard ? (
         <div style={{
           padding: 'var(--pad-box)',
           background: 'var(--accent-soft)',
@@ -129,7 +146,7 @@ export default function BirdCard({
               fontSize: 'var(--fs-sm)', fontWeight: 800, color: 'var(--accent)',
               display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap',
             }}>
-              {stdData.nameFa || stdData.nameEn || stdKey}
+              {displayLabel}
               <span style={{
                 fontSize: 'var(--fs-2xs)', fontWeight: 600,
                 color: 'var(--muted)',
@@ -138,9 +155,9 @@ export default function BirdCard({
                 textOverflow: 'ellipsis',
                 maxWidth: 160,
               }}>
-                {stdData.source && `📚 ${stdData.source}`}
-                {stdData.source && stdData.publishYear && ' · '}
-                {stdData.publishYear && toFa(stdData.publishYear)}
+                {displayStd?.source && `📚 ${displayStd.source}`}
+                {displayStd?.source && displayStd?.publishYear && ' · '}
+                {displayStd?.publishYear && toFa(displayStd.publishYear)}
               </span>
             </div>
           </div>
