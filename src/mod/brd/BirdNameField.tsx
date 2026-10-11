@@ -15,8 +15,6 @@ import { useSet } from '../set/store';
 
 export interface BirdPresetPick {
   name: string;
-  cycleDays: number | null;
-  fcrStandard: number | null;
   standardKey?: string;
   isCustom: boolean;
   birdKind?: string;
@@ -92,8 +90,6 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
 
     onPick({
       name: sp.nameFa,
-      cycleDays: null,
-      fcrStandard: null,
       standardKey: undefined,
       isCustom: !sp.builtIn,
       birdKind: sp.kind,
@@ -103,8 +99,6 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
   const handleCustomText = (text: string) => {
     onPick({
       name: text,
-      cycleDays: null,
-      fcrStandard: null,
       isCustom: true,
       birdKind: undefined,
     });

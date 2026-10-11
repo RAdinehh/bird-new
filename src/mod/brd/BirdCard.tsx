@@ -90,8 +90,6 @@ export default function BirdCard({
             background: 'var(--accent-soft)', color: 'var(--accent)',
             fontSize: 'var(--fs-2xs)', fontWeight: 700,
           }}>{category.emoji} {category.label}</span>}
-          {b.cycleDays ? <span>چرخه: <b style={{ color: 'var(--text)' }}>{toFa(b.cycleDays)} روز</b></span> : null}
-          {b.fcrStandard ? <span>FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcrStandard)}</b></span> : null}
         </>
       }
     >
@@ -99,8 +97,6 @@ export default function BirdCard({
         <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مشخصات کامل
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <StatRow label="چرخه زندگی" value={b.cycleDays ? `${toFa(b.cycleDays)} روز` : '—'} />
-        <StatRow label="FCR استاندارد" value={b.fcrStandard ? toFa(b.fcrStandard) : '—'} />
       </div>
 
       {birdBreeds.length > 0 && (

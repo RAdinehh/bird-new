@@ -207,7 +207,6 @@ export function detectAllAlerts(): RuleAlert[] {
     const bird = birds.find(b => b.id === flock.birdId);
     const cycleDays =
       (flock.endOfCycleDay && flock.endOfCycleDay > 0) ? flock.endOfCycleDay :
-      (bird?.cycleDays && bird.cycleDays > 0) ? bird.cycleDays :
       null;
 
     if (cycleDays && cycleDays > 0) {

@@ -89,7 +89,7 @@ export default function ArchivePage() {
             const breed = breeds.find(b => b.id === f.breedId);
             const hall = halls.find(h => h.id === f.hallId);
             const ageDays = getAgeDays(f);
-            const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, bird?.cycleDays ?? null);
+            const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, null);
             const costs = calcCosts(f);
             const isOpen = expandedId === f.id;
             const statusLabel = f.status === 'sold' ? 'فروخته‌شده' : 'آرشیو';

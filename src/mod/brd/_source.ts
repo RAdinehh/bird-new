@@ -171,3 +171,25 @@ export function getBreedFcrBaseline(
   }
   return { value: null, label: '', kind: 'none' };
 }
+
+// ═══ 🆕 Breed Defaults (به‌جای bird.cycleDays/fcrStandard) ═══
+/**
+ * مقادیر پیش‌فرض نژاد رو از standardKey استخراج کن
+ * استفاده: جایگزین bird?.cycleDays و bird?.fcrStandard
+ */
+export function getBreedCycleDays(breed: { standardKey?: string } | undefined | null): number | null {
+  if (!breed?.standardKey) return null;
+  const std = (DEFAULT_STANDARDS as any)[breed.standardKey];
+  return std?.biology?.cullDay ?? null;
+}
+
+export function getBreedFcr(breed: { fcr?: number | null; standardKey?: string } | undefined | null): number | null {
+  if (!breed) return null;
+  if (breed.fcr != null) return breed.fcr;
+  if (breed.standardKey) {
+    const std = (DEFAULT_STANDARDS as any)[breed.standardKey];
+    const last = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
+    return last?.fcr ?? null;
+  }
+  return null;
+}

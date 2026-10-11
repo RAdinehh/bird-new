@@ -10,8 +10,6 @@ import {
 // ═══ پرنده ═══
 export const BirdSchema = z.object({
   name: requiredStr('نام پرنده', 1, 100),
-  cycleDays: intRange('چرخه زندگی', 1, 2000).nullable().optional(),
-  fcrStandard: floatRange('FCR استاندارد', 0.5, 5).nullable().optional(),
   standardKey: optionalStr(100),
   birdKind: oneOf('نوع پرنده', ['chicken', 'duck', 'turkey', 'quail', 'goose'] as const).optional(),
   purpose: oneOf('هدف پرورش', ['broiler', 'layer', 'breeder', 'dual', 'ornamental'] as const).optional(),

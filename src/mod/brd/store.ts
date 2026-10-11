@@ -9,10 +9,6 @@ export interface Bird {
   birdKind?: string;
   /** کلید استاندارد در DEFAULT_STANDARDS (اختیاری) */
   standardKey?: string;
-  /** چرخه زندگی — دستی (تا وقتی نژاد اضافه شه) */
-  cycleDays: number | null;
-  /** FCR — دستی (تا وقتی نژاد اضافه شه) */
-  fcrStandard: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -94,12 +90,19 @@ export const useBrd = create<State>()(
     }),
     {
       name: 'pm-brd',
-      version: 4,
+      version: 5,
       migrate: (persisted: any, version: number) => {
         // v3: حذف purpose و categoryId از Bird (مالِ نژاد هستن)
         if (persisted && Array.isArray(persisted.birds)) {
           persisted.birds = persisted.birds.map((b: any) => {
             const { purpose, categoryId, ...rest } = b;
+            return rest;
+          });
+        }
+        // v5: حذف cycleDays و fcrStandard از Bird (مالِ نژاد هستن)
+        if (persisted && Array.isArray(persisted.birds)) {
+          persisted.birds = persisted.birds.map((b: any) => {
+            const { cycleDays, fcrStandard, ...rest } = b;
             return rest;
           });
         }

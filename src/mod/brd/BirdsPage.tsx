@@ -101,7 +101,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
 
   const openNew = () => { if (!draft.hasDraft) setForm(EMPTY_BIRD_FORM); setError(''); setOpen(true);  };
   const openEdit = (b: Bird) => {
-    setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '', standardKey: (b as any).standardKey || '', birdKind: (b as any).birdKind });
+    setForm({ id: b.id, name: b.name, standardKey: (b as any).standardKey || '', birdKind: (b as any).birdKind });
     
     setError(''); setOpen(true);
   };
@@ -121,8 +121,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     // اعتبارسنجی با Zod
     const result = BirdSchema.safeParse({
       ...form,
-      cycleDays: form.cycleDays ? form.cycleDays : undefined,
-      fcrStandard: form.fcrStandard ? form.fcrStandard.replace('٫', '.') : undefined,
+
     });
     if (!result.success) {
       const first = result.error.issues[0];

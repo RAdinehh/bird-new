@@ -34,7 +34,7 @@ interface Props {
 
 export default function BreedForm({ open, onClose, form, setForm, err, birds, breeds, onSave, customStandards = {} }: Props) {
   const parentBird = birds.find(x => x.id === form.birdId);
-  const fcrBaseline = getBreedFcrBaseline(form.standardKey, parentBird?.fcrStandard ?? null);
+  const fcrBaseline = getBreedFcrBaseline(form.standardKey, null);
   const fcrCurrent = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
   const { hint: fcrHint } = useOverride({
     current: fcrCurrent,
@@ -55,13 +55,13 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
             setForm(f => ({
               ...f,
               birdId: v,
-              fcr: !f.fcr && parent?.fcrStandard ? toFa(parent.fcrStandard) : f.fcr,
+              fcr: f.fcr,
             }));
           }}
           options={birds.map(c => ({
             value: c.id,
             label: c.name,
-            subtitle: c.fcrStandard ? `FCR ${toFa(c.fcrStandard)}` : undefined,
+            subtitle: undefined,
           }))}
           placeholder="— انتخاب کنید —"
           modalTitle="انتخاب پرنده"
@@ -95,7 +95,7 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
             FCR
             {(() => {
               const fcr = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
-              const src = detectBreedFcrSource(fcr, form.standardKey, parentBird?.fcrStandard ?? null);
+              const src = detectBreedFcrSource(fcr, form.standardKey, null);
               const source = fcrHint.overridden ? 'manual' : src.source;
               return <SourceBadge source={source} label={src.label} />;
             })()}

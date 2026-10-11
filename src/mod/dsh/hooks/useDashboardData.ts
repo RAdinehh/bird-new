@@ -307,8 +307,8 @@ const [, _setTick] = useState(0);
     const bird = birds.find(b => b.id === flock.birdId);
     const breed = breeds.find(b => b.id === flock.breedId);
 
-    // استاندارد: اول breed.fcr (نژاد)، بعد bird.fcrStandard (پرنده)
-    const fcrStandard = breed?.fcr || bird?.fcrStandard || 0;
+    // استاندارد: FCR فقط از نژاد (Breed)
+    const fcrStandard = breed?.fcr || 0;
 
     // داده‌های این گله
     const flockLogs = logs.filter((l: any) => l.flockId === flock.id);
