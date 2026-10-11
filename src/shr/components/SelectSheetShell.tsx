@@ -291,6 +291,7 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
       background: 'var(--card-solid)',
       border: '1px solid var(--border)',
       borderRadius: 10, overflow: 'hidden',
+      flexShrink: 0,
     }}>
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
@@ -370,6 +371,7 @@ export function SheetItem({ icon, equipType, category, title, selected, onClick,
         width: '100%', textAlign: 'right',
         color: 'var(--text)', fontWeight: 600,
         cursor: 'pointer', position: 'relative',
+        flexShrink: 0,
       }}
     >
       {actions && <span style={{ display: 'flex', gap: 2, flexShrink: 0 }}>{actions}</span>}
