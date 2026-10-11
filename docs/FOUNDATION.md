@@ -361,7 +361,8 @@ Ross · Cobb · Hy-Line · Aviagen · Lohmann (راهنماهای رسمی)
 
 | سند | نقش |
 |---|---|
-| `FOUNDATION.md` (این) | توکن + Contracts + ۱۰ بخش قوانین |
+| `FOUNDATION.md` (این) | توکن + Contracts + ۱۱ بخش قوانین |
+| `FOUNDATION-PATTERNS.md` | ۸ الگوی تفکر سیستمی |
 | `HANDOFF.md` | وضعیت + مشکلات + برنامه |
 | `ARCHITECTURE.md` | نقشه فایل‌ها + وابستگی |
 | `AI-RULES.md` | قوانین کار با کاربر |
