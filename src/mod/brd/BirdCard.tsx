@@ -1,7 +1,7 @@
 import type { Bird, Breed } from './store';
 import { toFa } from '../../shr/utils/fa';
 import { getKindInfo, getPurposeInfo, getCategoryInfo } from './_display';
-import { getBirdDisplayName } from './_display-name';
+import { getBirdDisplayName, getBreedDisplayName } from './_display-name';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { getStandardFor } from '../set/standards/resolve';
 import EntityLink from '../../shr/components/EntityLink';
@@ -120,7 +120,7 @@ export default function BirdCard({
                 key={bd.id}
                 type="breed"
                 id={bd.id}
-                label={`${bd.name}${bd.fcr ? ` · FCR ${toFa(bd.fcr)}` : ''}`}
+                label={`${getBreedDisplayName(bd, customStandards)}${bd.fcr ? ` · FCR ${toFa(bd.fcr)}` : ''}`}
                 badge
                 badgeBg="var(--purple-soft)"
                 badgeColor="var(--purple)"

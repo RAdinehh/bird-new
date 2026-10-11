@@ -1,7 +1,7 @@
 import type { Bird, Breed } from './store';
 import { toFa } from '../../shr/utils/fa';
 import { getPurposeInfo, getCategoryInfo } from './_display';
-import { getBreedDisplayName } from './_display-name';
+import { getBirdDisplayName, getBreedDisplayName } from './_display-name';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import EntityLink from '../../shr/components/EntityLink';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -69,7 +69,7 @@ export default function BreedCard({
         </div>
       }
       stats={<>
-        <span>🐔 پرنده: {bird ? <b><EntityLink type="bird" id={bird.id} label={bird.name} /></b> : <b style={{ color: 'var(--text)' }}>—</b>}</span>
+        <span>🐔 پرنده: {bird ? <b><EntityLink type="bird" id={bird.id} label={getBirdDisplayName(bird, customStandards)} /></b> : <b style={{ color: 'var(--text)' }}>—</b>}</span>
         {b.fcr && <span>📊 FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcr)}</b></span>}
       </>}
     >
@@ -78,7 +78,7 @@ export default function BreedCard({
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <StatRow label="نام نژاد" value={getBreedDisplayName(b, customStandards)} />
-        <StatRow label="پرنده" value={bird ? <EntityLink type="bird" id={bird.id} label={bird.name} /> : '—'} />
+        <StatRow label="پرنده" value={bird ? <EntityLink type="bird" id={bird.id} label={getBirdDisplayName(bird, customStandards)} /> : '—'} />
         <StatRow label="FCR" value={b.fcr ? toFa(b.fcr) : '—'} />
       </div>
 
