@@ -1,24 +1,21 @@
 /**
- * AutocompleteSheet.tsx — فیلد ورودی با Bottom Sheet
+ * AutocompleteSheet.tsx — فیلد ورودی با Bottom Sheet (استاندارد SelectSheetShell)
  *
- * طبق استاندارد (docs/STANDARDS.md بخش ۷.۵):
- *   - Bottom Sheet از پایین
- *   - ۵ مورد اول + دکمه «نمایش N مورد دیگر»
+ * طبق docs/STANDARDS.md بخش ۷.۵:
+ *   - Bottom Sheet از پایین (SelectSheetShell)
+ *   - ۵ مورد اول + «نمایش N مورد دیگر»
  *   - جستجو اختیاری (بدون focus خودکار)
  *   - گروه‌بندی بر اساس category
  *   - حداکثر ۷۰vh
- *   - انیمیشن ۲۲۰ms
  */
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { createPortal } from 'react-dom';
+import SelectSheetShell, { SheetGroup, SheetItem } from './SelectSheetShell';
 
 export interface AutoOption {
   value: string;
   label: string;
   icon?: string;
-  /** برای گروه‌بندی */
   group?: string;
-  /** برچسب گروه برای نمایش */
   groupLabel?: string;
 }
 
@@ -39,30 +36,18 @@ const SEARCH_MAX = 5;
 const STEP = 5;
 
 export default function AutocompleteSheet({
-  value,
-  onChange,
-  onSelect,
-  onSubmit,
-  options,
-  placeholder,
-  customLabel = 'افزودن مورد دلخواه',
-  error,
-  title = 'انتخاب کنید',
+  value, onChange, onSelect, onSubmit,
+  options, placeholder, customLabel = 'افزودن مورد دلخواه',
+  error, title = 'انتخاب کنید',
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [animating, setAnimating] = useState(false);
   const [draft, setDraft] = useState('');
   const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
-  const searchRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const [typedError, setTypedError] = useState<string | null>(null);
-  const matchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const [lockedHeight, setLockedHeight] = useState<number | null>(null);
   const [matched, setMatched] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const matchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // فیلتر بر اساس جستجو
   const query = draft.trim().toLowerCase();
   const isSearching = query.length > 0;
 
@@ -74,22 +59,17 @@ export default function AutocompleteSheet({
     );
   }, [options, query, isSearching]);
 
-  // تعداد قابل نمایش
   const showCount = isSearching
     ? Math.min(SEARCH_MAX, filtered.length)
     : Math.min(visibleCount, filtered.length);
-
   const toShow = filtered.slice(0, showCount);
   const remaining = filtered.length - showCount;
 
-  // گروه‌بندی
   const grouped = useMemo(() => {
-    const groups: Record<string, { label: string; items: AutoOption[] }> = {};
+    const groups: Record<string, { label: string; icon?: string; items: AutoOption[] }> = {};
     toShow.forEach(o => {
       const key = o.group || 'other';
-      if (!groups[key]) {
-        groups[key] = { label: o.groupLabel || '', items: [] };
-      }
+      if (!groups[key]) groups[key] = { label: o.groupLabel || '', icon: o.icon, items: [] };
       groups[key].items.push(o);
     });
     return groups;
@@ -101,51 +81,10 @@ export default function AutocompleteSheet({
 
   const showCustom = isSearching && !hasExactMatch;
 
-  // مدیریت باز/بسته
-  useEffect(() => {
-    if (open) {
-      setMounted(true);
-      setTimeout(() => setAnimating(true), 20);
-    } else {
-      setAnimating(false);
-      const t = setTimeout(() => setMounted(false), 220);
-      return () => clearTimeout(t);
-    }
-  }, [open]);
-
-  // قفل scroll بدنه + Esc
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
   const handleOpen = () => {
     setDraft('');
     setVisibleCount(INITIAL_COUNT);
-    setLockedHeight(null);
     setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    searchRef.current?.blur();
-  };
-
-  const handleShowMore = () => {
-    // قفل ارتفاع در اولین کلیک — جلوگیری از رشد Sheet
-    if (!lockedHeight && sheetRef.current) {
-      setLockedHeight(sheetRef.current.offsetHeight);
-    }
-    setVisibleCount(c => c + STEP);
   };
 
   const handlePick = (opt: AutoOption) => {
@@ -155,22 +94,20 @@ export default function AutocompleteSheet({
   };
 
   const handleCustom = () => {
-    if (!query) return;
+    if (!draft.trim()) return;
     onChange(draft.trim());
     onSubmit(draft.trim());
     setOpen(false);
   };
 
+  const handleShowMore = () => setVisibleCount(c => c + STEP);
+
   return (
     <>
       {/* فیلد اصلی: input + دکمه ▼ */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'stretch',
-        gap: 0,
-        width: '100%',
-      }}>
+      <div style={{ display: 'flex', alignItems: 'stretch', width: '100%' }}>
         <input
+          ref={inputRef}
           type="text"
           value={value}
           onChange={e => {
@@ -178,16 +115,12 @@ export default function AutocompleteSheet({
             onChange(v);
             setTypedError(null);
             setMatched(false);
-            // ⚡ auto-match زنده با debounce ۲۰۰ms
             if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
             matchTimerRef.current = setTimeout(() => {
               const v2 = v.trim().toLowerCase();
               if (!v2) return;
               const exact = options.find(o => o.label.trim().toLowerCase() === v2);
-              if (exact) {
-                setMatched(true);
-                onSelect(exact);
-              }
+              if (exact) { setMatched(true); onSelect(exact); }
             }, 200);
           }}
           onKeyDown={e => {
@@ -209,40 +142,24 @@ export default function AutocompleteSheet({
           placeholder={placeholder || 'تایپ کن یا ▼ بزن'}
           autoComplete="off"
           style={{
-            flex: 1,
-            minHeight: 44,
-            padding: '10px 12px',
+            flex: 1, minHeight: 44, padding: '10px 12px',
             background: 'var(--input-bg)',
-            borderTop: '1px solid ' + (typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'),
-            borderBottom: '1px solid ' + (typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'),
-            borderRight: '1px solid ' + (typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'),
-            borderLeft: 'none',
+            border: `1px solid ${typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'}`,
             borderTopRightRadius: 'var(--r-md, 8px)',
             borderBottomRightRadius: 'var(--r-md, 8px)',
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-            color: 'var(--text)',
-            fontFamily: 'inherit',
-            fontSize: 'var(--fs-base)',
-            textAlign: 'right',
-            direction: 'rtl',
-            outline: 'none',
+            borderTopLeftRadius: 0, borderBottomLeftRadius: 0,
+            color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)',
+            textAlign: 'right', direction: 'rtl', outline: 'none',
             transition: 'border-color .15s ease',
           }}
         />
         {matched && (
           <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minWidth: 32,
-            background: 'var(--input-bg)',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            minWidth: 32, background: 'var(--input-bg)',
             borderTop: '1px solid var(--accent)',
             borderBottom: '1px solid var(--accent)',
-            color: 'var(--accent)',
-            fontWeight: 900,
-            fontSize: 16,
-            flexShrink: 0,
+            color: 'var(--accent)', fontWeight: 900, fontSize: 16, flexShrink: 0,
           }}>✓</span>
         )}
         <button
@@ -250,214 +167,113 @@ export default function AutocompleteSheet({
           onClick={handleOpen}
           aria-label="باز کردن لیست"
           style={{
-            minHeight: 44,
-            minWidth: 44,
-            padding: '0 12px',
+            minHeight: 44, minWidth: 44, padding: '0 12px',
             background: 'var(--input-bg)',
-            borderTop: '1px solid ' + (typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'),
-            borderBottom: '1px solid ' + (typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'),
-            borderLeft: '1px solid ' + (typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'),
-            borderRight: 'none',
+            border: `1px solid ${typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'}`,
             borderTopLeftRadius: 'var(--r-md, 8px)',
             borderBottomLeftRadius: 'var(--r-md, 8px)',
-            borderTopRightRadius: 0,
-            borderBottomRightRadius: 0,
-            color: 'var(--muted)',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            fontSize: 12,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
+            borderTopRightRadius: 0, borderBottomRightRadius: 0,
+            color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}
-        ><svg
-          aria-hidden="true"
-          width="16" height="16" viewBox="0 0 24 24"
-          fill="none" stroke="var(--muted)"
-          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          style={{ flexShrink: 0 }}
         >
-          <path d="m6 9 6 6 6-6" />
-        </svg></button>
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="var(--muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
       </div>
 
       {(error || typedError) && (
-        <div style={{
-          marginTop: 4, fontSize: 11, color: 'var(--warn)',
-          display: 'flex', alignItems: 'center', gap: 4,
-        }}>
+        <div style={{ marginTop: 4, fontSize: 11, color: 'var(--warn)', display: 'flex', alignItems: 'center', gap: 4 }}>
           <span>⚠️</span> {typedError || error}
         </div>
       )}
 
       {/* Sheet */}
-      {mounted && createPortal(
-        <div
-          onClick={e => { if (e.target === e.currentTarget) handleClose(); }}
-          style={{
-            position: 'fixed', inset: 0, zIndex: 10000,
-            background: 'rgba(15,23,42,.5)',
-            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-            opacity: animating ? 1 : 0,
-            transition: 'opacity .2s ease',
-          }}
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            ref={sheetRef}
+      <SelectSheetShell
+        open={open}
+        onClose={() => setOpen(false)}
+        title={title}
+        subtitle={options.length ? `${toFa(options.length)} مورد` : undefined}
+        searchable={options.length > 5}
+        searchNode={
+          <input
+            type="text"
+            value={draft}
+            onChange={e => { setDraft(e.target.value); setVisibleCount(INITIAL_COUNT); }}
+            placeholder="جستجو... (اختیاری)"
+            autoComplete="off"
             style={{
-              width: '100%', maxWidth: 540,
-              background: 'var(--card-solid, #fff)',
-              borderTopLeftRadius: 20, borderTopRightRadius: 20,
-              boxShadow: '0 -10px 40px rgba(0,0,0,.2)',
-              display: 'flex', flexDirection: 'column',
-              maxHeight: '70vh',
-              height: lockedHeight ? lockedHeight : 'auto',
-              transform: animating ? 'translateY(0)' : 'translateY(100%)',
-              transition: 'transform .22s cubic-bezier(.2,.7,.3,1)',
-              overflow: 'hidden',
+              width: '100%', padding: '9px 12px',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border)', borderRadius: 8,
+              color: 'var(--text)', fontFamily: 'inherit',
+              fontSize: 'var(--fs-sm)', outline: 'none',
+              direction: 'rtl', textAlign: 'right',
             }}
-          >
-            {/* دستگیره */}
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px' }}>
-              <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--dim)', opacity: 0.5 }} />
-            </div>
-
-            {/* هدر */}
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '4px 16px 10px',
-            }}>
-              <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--text)' }}>{title}</div>
-              <button
-                type="button"
-                onClick={handleClose}
-                aria-label="بستن"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  width: 32, height: 32,
-                  background: 'var(--btn-bg)', border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-md)', color: 'var(--muted)',
-                  cursor: 'pointer', fontFamily: 'inherit', fontSize: 14,
-                }}
-              >✕</button>
-            </div>
-
-            {/* جستجو */}
-            <div style={{ padding: '4px 16px 8px', borderBottom: '1px solid var(--border)' }}>
-              <input
-                ref={searchRef}
-                type="text"
-                value={draft}
-                onChange={e => { setDraft(e.target.value); setVisibleCount(INITIAL_COUNT); }}
-                placeholder="جستجو... (اختیاری)"
-                autoComplete="off"
-                style={{
-                  width: '100%', padding: '9px 12px',
-                  background: 'var(--input-bg)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 8,
-                  color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                  outline: 'none', direction: 'rtl', textAlign: 'right',
-                }}
-              />
-            </div>
-
-            {/* لیست */}
-            <div style={{
-              flex: 1, overflowY: 'auto',
-              overscrollBehavior: 'contain',
-              WebkitOverflowScrolling: 'touch',
-            }}>
-              {filtered.length === 0 && (
-                <div style={{ padding: 20, textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
-                  موردی یافت نشد
-                </div>
-              )}
-
-              {Object.entries(grouped).map(([key, g]) => (
-                <div key={key}>
-                  {!isSearching && g.label && (
-                    <div style={{
-                      padding: '10px 16px 6px',
-                      fontSize: 13.5, fontWeight: 900,
-                      color: 'var(--accent)',
-                      background: 'var(--input-bg)',
-                      borderBottom: '1px solid var(--border)',
-                      letterSpacing: '.2px',
-                    }}>
-                      {g.label}
-                    </div>
-                  )}
-                  {g.items.map(opt => {
-                    const selected = opt.label.trim().toLowerCase() === value.trim().toLowerCase();
-                    return (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => handlePick(opt)}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 10,
-                          width: '100%', minHeight: 42, padding: '8px 16px 8px 34px',
-                          background: 'transparent', border: 'none',
-                          borderBottom: '1px solid var(--border)',
-                          color: 'var(--text)', fontFamily: 'inherit',
-                          fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
-                          textAlign: 'right', direction: 'rtl',
-                        }}
-                      >
-                        {opt.icon && <span style={{ fontSize: 14, flexShrink: 0 }}>{opt.icon}</span>}
-                        <span style={{ flex: 1, fontWeight: 600 }}>{opt.label}</span>
-                        {selected && <span style={{ color: 'var(--accent)', fontWeight: 900 }}>✓</span>}
-                      </button>
-                    );
-                  })}
-                </div>
-              ))}
-
-              {/* نمایش بیشتر */}
-              {!isSearching && remaining > 0 && (
-                <button
-                  type="button"
-                  onClick={handleShowMore}
-                  style={{
-                    width: '100%', padding: 12,
-                    background: 'var(--input-bg)',
-                    border: 'none', borderTop: '1px solid var(--border)',
-                    color: 'var(--accent)', fontWeight: 700,
-                    fontSize: 'var(--fs-sm)', cursor: 'pointer',
-                    fontFamily: 'inherit', textAlign: 'center',
-                  }}
-                >
-                  ↓ نمایش {remaining} مورد دیگر
-                </button>
-              )}
-
-              {/* افزودن دلخواه */}
-              {showCustom && (
-                <button
-                  type="button"
-                  onClick={handleCustom}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 12,
-                    width: '100%', minHeight: 48, padding: '11px 16px',
-                    background: 'var(--accent-soft)',
-                    border: 'none', borderTop: '2px dashed var(--border)',
-                    color: 'var(--accent)', fontFamily: 'inherit',
-                    fontSize: 'var(--fs-sm)', fontWeight: 700,
-                    cursor: 'pointer', textAlign: 'right', direction: 'rtl',
-                  }}
-                >
-                  <span style={{ fontSize: 16, flexShrink: 0 }}>➕</span>
-                  <span style={{ flex: 1 }}>{customLabel} «{draft.trim()}»</span>
-                </button>
-              )}
-            </div>
+          />
+        }
+      >
+        {filtered.length === 0 ? (
+          <div style={{ padding: 20, textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
+            موردی یافت نشد
           </div>
-        </div>,
-        document.body
-      )}
+        ) : (
+          <>
+            {Object.entries(grouped).map(([key, g]) => (
+              <SheetGroup key={key} title={g.label || '—'} icon={g.icon} count={g.items.length}>
+                {g.items.map(opt => (
+                  <SheetItem
+                    key={opt.value}
+                    icon={opt.icon}
+                    title={opt.label}
+                    selected={opt.label.trim().toLowerCase() === value.trim().toLowerCase()}
+                    onClick={() => handlePick(opt)}
+                  />
+                ))}
+              </SheetGroup>
+            ))}
+
+            {!isSearching && remaining > 0 && (
+              <button type="button" onClick={handleShowMore} style={BTN_MORE}>
+                ↓ نمایش {toFa(remaining)} مورد دیگر
+              </button>
+            )}
+
+            {showCustom && (
+              <button type="button" onClick={handleCustom} style={BTN_CUSTOM}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>➕</span>
+                <span style={{ flex: 1 }}>{customLabel} «{draft.trim()}»</span>
+              </button>
+            )}
+          </>
+        )}
+      </SelectSheetShell>
     </>
   );
+}
+
+const BTN_MORE: React.CSSProperties = {
+  width: '100%', padding: 12,
+  background: 'var(--input-bg)',
+  border: '1px solid var(--border)', borderRadius: 10,
+  color: 'var(--accent)', fontWeight: 700,
+  fontSize: 'var(--fs-sm)', cursor: 'pointer',
+  fontFamily: 'inherit', textAlign: 'center',
+};
+
+const BTN_CUSTOM: React.CSSProperties = {
+  display: 'flex', alignItems: 'center', gap: 12,
+  width: '100%', minHeight: 48, padding: '11px 16px',
+  background: 'var(--accent-soft)',
+  border: '2px dashed var(--accent-border)', borderRadius: 10,
+  color: 'var(--accent)', fontFamily: 'inherit',
+  fontSize: 'var(--fs-sm)', fontWeight: 700,
+  cursor: 'pointer', textAlign: 'right', direction: 'rtl',
+};
+
+// ═══ helper ═══
+function toFa(n: number): string {
+  return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]);
 }

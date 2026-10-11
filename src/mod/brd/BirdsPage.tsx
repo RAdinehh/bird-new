@@ -6,6 +6,8 @@ import { useBrd, type Bird } from './store';
 import { findBirdPreset } from './presets';
 import { getKindInfo, getPurposeInfo, getCategoryInfo } from './_display';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
+import { getStandardFor } from '../set/standards/resolve';
+import { useSet } from '../set/store';
 import SourceBadge, { type SourceType } from '../../shr/components/SourceBadge';
 import { detectCycleDaysSource, detectFcrSource, getOverrideInfo } from './_source';
 import OverrideHint from '../../shr/components/OverrideHint';
@@ -40,6 +42,7 @@ const empty: F = { name: '', cycleDays: '', fcrStandard: '', standardKey: '' };
 
 export default function BirdsPage({ active = true }: { active?: boolean } = {}) {
   const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird, dedupeBirds } = useBrd();
+  const customStandards = useSet((st: any) => st.customStandards);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [error, setError] = useState('');
@@ -226,7 +229,10 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
             const purpose = getPurposeInfo((b as any).purpose);
             const category = getCategoryInfo((b as any).category);
             const stdKey = (b as any).standardKey;
-            const stdData = stdKey ? (DEFAULT_STANDARDS as any)[stdKey] : null;
+            // fallback: اگه standardKey نداشت یا پیدا نشد، از اسم پرنده resolve کن
+            const stdData = (stdKey && (DEFAULT_STANDARDS as any)[stdKey])
+              || getStandardFor(b.name, { customStandards: customStandards || {} })
+              || null;
             return (
               <ExpandableCard
                 key={b.id} id={b.id} ms={ms}
@@ -299,35 +305,28 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 {/* 📖 کادر استاندارد متصل */}
                 {stdData ? (
                   <div style={{
-                    padding: '10px 12px',
+                    padding: '6px 10px',
                     background: 'var(--accent-soft)',
                     border: '1px solid var(--accent-border)',
-                    borderRadius: 12,
+                    borderRadius: 8,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 10,
+                    gap: 8,
                   }}>
-                    <div style={{
-                      width: 38, height: 38, borderRadius: 11,
-                      background: 'var(--card-solid)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 18, flexShrink: 0,
-                      boxShadow: '0 1px 4px rgba(0,0,0,.06)',
-                    }}>📖</div>
+                    <span style={{ fontSize: 14, flexShrink: 0 }}>📖</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
-                        fontSize: 14, fontWeight: 900, color: 'var(--accent)',
-                        display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
+                        fontSize: 12, fontWeight: 800, color: 'var(--accent)',
+                        display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap',
                       }}>
                         {stdData.nameFa || stdData.nameEn || stdKey}
                         <span style={{
-                          fontSize: 8, fontWeight: 600,
-                          color: 'var(--accent)',
-                          opacity: 0.85,
+                          fontSize: 10, fontWeight: 600,
+                          color: 'var(--muted)',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
-                          maxWidth: 140,
+                          maxWidth: 160,
                         }}>
                           {stdData.source && `📚 ${stdData.source}`}
                           {stdData.source && stdData.publishYear && ' · '}
@@ -344,23 +343,18 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                   </div>
                 ) : (
                   <div style={{
-                    padding: '10px 12px',
+                    padding: '6px 10px',
                     background: 'var(--warn-soft)',
                     border: '1px solid var(--warn)',
-                    borderRadius: 12,
+                    borderRadius: 8,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 10,
+                    gap: 8,
                   }}>
-                    <div style={{
-                      width: 38, height: 38, borderRadius: 11,
-                      background: 'var(--card-solid)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 18, flexShrink: 0,
-                    }}>💡</div>
-                    <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 800, color: 'var(--warn)' }}>
+                    <span style={{ fontSize: 14, flexShrink: 0 }}>💡</span>
+                    <span style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 800, color: 'var(--warn)' }}>
                       استاندارد متصل نیست
-                    </div>
+                    </span>
                   </div>
                 )}
 
