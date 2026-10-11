@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Breed } from './store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import BreedForm, { EMPTY_BREED_FORM, type BreedFormData } from './BreedForm';
 import BreedCard from './BreedCard';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
@@ -33,6 +34,11 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  // 🆕 focus از URL → باز کردن کارت
+  const focusId = useFocusParam();
+  useEffect(() => {
+    if (focusId) setExpandedId(focusId);
+  }, [focusId]);
   const draft = useFormDraft('brd-breed', form, (v: any) => setForm(v));
 
   // فیلتر تکرارها تو render (per bird + name)
