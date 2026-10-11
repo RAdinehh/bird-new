@@ -277,3 +277,17 @@ whs    ← tra, egg, fed, dlg, hal
 - src/mod/ctc/store.ts → pm-ctc
 - src/mod/tra/store.ts → pm-tra
 - src/mod/doc/store.ts → ?
+---
+
+## ⚠️ استثناهای معماری (تصمیم آگاهانه)
+
+### ۱. `set → hal` (وابستگی معکوس)
+
+- **فایل:** `src/mod/set/HiddenOptionsTab.tsx`
+- **دلیل:** چک استفاده‌ی آپشن سفارشی قبل از حذف دائمی
+- **تحلیل:** کاربرد منطقیه، ولی جریان معماری معکوس
+- **تصمیم:** رها شد (هزینه‌ی refactor > سود)
+- **تاریخ:** ۱۴۰۴/۰۷/۲۰
+- **اگر بخوایم fix کنیم:** با prop `usageCheck` از parent پاس داده شود
+
+---
