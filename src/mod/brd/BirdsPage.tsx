@@ -4,21 +4,16 @@ import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useBrd, type Bird } from './store';
 import { findBirdPreset } from './presets';
-import { getKindInfo, getPurposeInfo, getCategoryInfo } from './_display';
-import { DEFAULT_STANDARDS } from '../set/standards/data';
-import { getStandardFor } from '../set/standards/resolve';
 import { useSet } from '../set/store';
-import SourceBadge, { type SourceType } from '../../shr/components/SourceBadge';
 import { detectCycleDaysSource, detectFcrSource, getOverrideInfo } from './_source';
 import OverrideHint from '../../shr/components/OverrideHint';
 import BirdForm, { EMPTY_BIRD_FORM, type BirdFormData } from './BirdForm';
-import EntityLink from '../../shr/components/EntityLink';
+import BirdCard from './BirdCard';
 import {
   Btn, BtnRow, Empty, Field,
-  Grid2, Input, Modal, NumField,
-  PageContainer, Tag
-} from '../../shr/components/ui';import ExpandableCard from '../../shr/components/ExpandableCard';
-import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+  Grid2, Input, NumField,
+  PageContainer
+} from '../../shr/components/ui';import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { useFilterSort, FilterBar, getBrdBirdsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
@@ -26,7 +21,6 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
-import { logAction } from '../../cor/logger/auditLog';
 
 
 export default function BirdsPage({ active = true }: { active?: boolean } = {}) {
@@ -211,131 +205,23 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
           {list.map((b, i) => {
             const birdBreeds = breedsByBird.get(b.id) || [];
             const isOpen = !ms.selectionMode && expandedId === b.id;
-            const kind = getKindInfo((b as any).birdKind);
-            const purpose = getPurposeInfo((b as any).purpose);
-            const stdKey = (b as any).standardKey;
-            // fallback: اگه standardKey نداشت یا پیدا نشد، از اسم پرنده resolve کن
-            const stdData = (stdKey && (DEFAULT_STANDARDS as any)[stdKey])
-              || getStandardFor(b.name, { customStandards: customStandards || {} })
-              || null;
-            const category = stdData?.category ? getCategoryInfo(stdData.category) : null;
             return (
-              <ExpandableCard
-                key={b.id} id={b.id} ms={ms}
-                accent="accent"
-                index={toFa(i + 1)}
-                iconEmoji={kind.emoji}
-                title={b.name}
-                subtitle=""
+              <BirdCard
+                key={b.id}
+                bird={b}
+                index={i}
+                birdBreeds={birdBreeds}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
-                badge={<Tag tone="blue">{toFa(birdBreeds.length)} نژاد</Tag>}
-                stats={
-                  <>
-                    {purpose && <span style={{
-                      padding: 'var(--pad-chip)', borderRadius: 'var(--r-md)',
-                      background: 'var(--accent-soft)', color: 'var(--accent)',
-                      fontSize: 'var(--fs-2xs)', fontWeight: 700,
-                    }}>{purpose.emoji} {purpose.label}</span>}
-                    {category && <span style={{
-                      padding: 'var(--pad-chip)', borderRadius: 'var(--r-md)',
-                      background: 'var(--accent-soft)', color: 'var(--accent)',
-                      fontSize: 'var(--fs-2xs)', fontWeight: 700,
-                    }}>{category.emoji} {category.label}</span>}
-                    {b.cycleDays ? <span>چرخه: <b style={{ color: 'var(--text)' }}>{toFa(b.cycleDays)} روز</b></span> : null}
-                    {b.fcrStandard ? <span>FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcrStandard)}</b></span> : null}
-                  </>
-                }
-              >
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مشخصات کامل</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <StatRow label="چرخه زندگی" value={b.cycleDays ? `${toFa(b.cycleDays)} روز` : '—'} />
-                  <StatRow label="FCR استاندارد" value={b.fcrStandard ? toFa(b.fcrStandard) : '—'} />
-                </div>
-
-                {birdBreeds.length > 0 && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> نژادهای این پرنده</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {birdBreeds.map(bd => (
-                        <EntityLink
-                          key={bd.id}
-                          type="breed"
-                          id={bd.id}
-                          label={`${bd.name}${bd.fcr ? ` · FCR ${toFa(bd.fcr)}` : ''}`}
-                          badge
-                          badgeBg="var(--purple-soft)"
-                          badgeColor="var(--purple)"
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
-
-                {/* 📖 کادر استاندارد متصل */}
-                {stdData ? (
-                  <div style={{
-                    padding: 'var(--pad-box)',
-                    background: 'var(--accent-soft)',
-                    border: '1px solid var(--accent-border)',
-                    borderRadius: 'var(--r-sm)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                  }}>
-                    <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>📖</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
-                        fontSize: 'var(--fs-sm)', fontWeight: 800, color: 'var(--accent)',
-                        display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap',
-                      }}>
-                        {stdData.nameFa || stdData.nameEn || stdKey}
-                        <span style={{
-                          fontSize: 'var(--fs-2xs)', fontWeight: 600,
-                          color: 'var(--muted)',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          maxWidth: 160,
-                        }}>
-                          {stdData.source && `📚 ${stdData.source}`}
-                          {stdData.source && stdData.publishYear && ' · '}
-                          {stdData.publishYear && toFa(stdData.publishYear)}
-                        </span>
-                      </div>
-                    </div>
-                    <div style={{
-                      fontSize: 'var(--fs-2xs)', fontWeight: 800,
-                      padding: 'var(--pad-chip-xs)', borderRadius: 'var(--r-sm)',
-                      background: 'var(--accent)', color: 'var(--card-solid)',
-                      flexShrink: 0,
-                    }}>متصل</div>
-                  </div>
-                ) : (
-                  <div style={{
-                    padding: 'var(--pad-box)',
-                    background: 'var(--warn-soft)',
-                    border: '1px solid var(--warn)',
-                    borderRadius: 'var(--r-sm)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                  }}>
-                    <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>💡</span>
-                    <span style={{ flex: 1, minWidth: 0, fontSize: 'var(--fs-sm)', fontWeight: 800, color: 'var(--warn)' }}>
-                      استاندارد متصل نیست
-                    </span>
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش پرنده ${b.name}`}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                    const idToDel = b.id; const ok = await showConfirmAsync('تأیید حذف', 'این پرنده حذف شود؟', { danger: true }); if (!ok) return; const item = birds.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteBird(idToDel);
-                    logAction('delete', 'brd', 'حذف از پرنده و نژاد');  toastMsg.deleted('پرنده')
-                    }} style={{ flex: 1 }} aria-label={`حذف پرنده ${b.name}`}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+                ms={ms}
+                customStandards={customStandards}
+                onEdit={openEdit}
+                onDelete={(id, item) => {
+                  setUndoData({ item });
+                  setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
+                  deleteBird(id);
+                }}
+              />
             );
           })}
           
@@ -356,19 +242,5 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         onSave={save}
       />
     </PageContainer>
-  );
-}
-
-/** ردیف استاندارد نمایش label/value */
-function StatRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{
-      display: 'flex', justifyContent: 'space-between',
-      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
-      background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
-    }}>
-      <span style={{ color: 'var(--muted)' }}>{label}:</span>
-      <span style={{ fontWeight: 600 }}>{value}</span>
-    </div>
   );
 }

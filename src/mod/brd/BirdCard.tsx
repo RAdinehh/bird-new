@@ -1,0 +1,177 @@
+import type { Bird, Breed } from './store';
+import { toFa } from '../../shr/utils/fa';
+import { getKindInfo, getPurposeInfo, getCategoryInfo } from './_display';
+import { DEFAULT_STANDARDS } from '../set/standards/data';
+import { getStandardFor } from '../set/standards/resolve';
+import EntityLink from '../../shr/components/EntityLink';
+import ExpandableCard from '../../shr/components/ExpandableCard';
+import { Btn, Tag } from '../../shr/components/ui';
+import { showConfirmAsync } from '../../cor/store/dialog';
+import { toastMsg } from '../../cor/store/toast';
+import { logAction } from '../../cor/logger/auditLog';
+
+interface Props {
+  bird: Bird;
+  index: number;
+  birdBreeds: Breed[];
+  isOpen: boolean;
+  onToggle: () => void;
+  ms: any;
+  customStandards: Record<string, any> | undefined;
+  onEdit: (b: Bird) => void;
+  onDelete: (id: string, item: Bird) => void;
+}
+
+/** ردیف استاندارد نمایش label/value */
+function StatRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{
+      display: 'flex', justifyContent: 'space-between',
+      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
+      background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
+    }}>
+      <span style={{ color: 'var(--muted)' }}>{label}:</span>
+      <span style={{ fontWeight: 600 }}>{value}</span>
+    </div>
+  );
+}
+
+export default function BirdCard({
+  bird: b, index, birdBreeds, isOpen, onToggle, ms, customStandards, onEdit, onDelete,
+}: Props) {
+  const kind = getKindInfo((b as any).birdKind);
+  const purpose = getPurposeInfo((b as any).purpose);
+  const stdKey = (b as any).standardKey;
+  const stdData = (stdKey && (DEFAULT_STANDARDS as any)[stdKey])
+    || getStandardFor(b.name, { customStandards: customStandards || {} })
+    || null;
+  const category = stdData?.category ? getCategoryInfo(stdData.category) : null;
+
+  const handleDelete = async () => {
+    const ok = await showConfirmAsync('تأیید حذف', 'این پرنده حذف شود؟', { danger: true });
+    if (!ok) return;
+    onDelete(b.id, b);
+    logAction('delete', 'brd', 'حذف از پرنده و نژاد');
+    toastMsg.deleted('پرنده');
+  };
+
+  return (
+    <ExpandableCard
+      id={b.id} ms={ms}
+      accent="accent"
+      index={toFa(index + 1)}
+      iconEmoji={kind.emoji}
+      title={b.name}
+      subtitle=""
+      isOpen={isOpen}
+      onToggle={onToggle}
+      badge={<Tag tone="blue">{toFa(birdBreeds.length)} نژاد</Tag>}
+      stats={
+        <>
+          {purpose && <span style={{
+            padding: 'var(--pad-chip)', borderRadius: 'var(--r-md)',
+            background: 'var(--accent-soft)', color: 'var(--accent)',
+            fontSize: 'var(--fs-2xs)', fontWeight: 700,
+          }}>{purpose.emoji} {purpose.label}</span>}
+          {category && <span style={{
+            padding: 'var(--pad-chip)', borderRadius: 'var(--r-md)',
+            background: 'var(--accent-soft)', color: 'var(--accent)',
+            fontSize: 'var(--fs-2xs)', fontWeight: 700,
+          }}>{category.emoji} {category.label}</span>}
+          {b.cycleDays ? <span>چرخه: <b style={{ color: 'var(--text)' }}>{toFa(b.cycleDays)} روز</b></span> : null}
+          {b.fcrStandard ? <span>FCR: <b style={{ color: 'var(--text)' }}>{toFa(b.fcrStandard)}</b></span> : null}
+        </>
+      }
+    >
+      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
+        <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مشخصات کامل
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <StatRow label="چرخه زندگی" value={b.cycleDays ? `${toFa(b.cycleDays)} روز` : '—'} />
+        <StatRow label="FCR استاندارد" value={b.fcrStandard ? toFa(b.fcrStandard) : '—'} />
+      </div>
+
+      {birdBreeds.length > 0 && (
+        <>
+          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
+            <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> نژادهای این پرنده
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {birdBreeds.map(bd => (
+              <EntityLink
+                key={bd.id}
+                type="breed"
+                id={bd.id}
+                label={`${bd.name}${bd.fcr ? ` · FCR ${toFa(bd.fcr)}` : ''}`}
+                badge
+                badgeBg="var(--purple-soft)"
+                badgeColor="var(--purple)"
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* 📖 کادر استاندارد متصل */}
+      {stdData ? (
+        <div style={{
+          padding: 'var(--pad-box)',
+          background: 'var(--accent-soft)',
+          border: '1px solid var(--accent-border)',
+          borderRadius: 'var(--r-sm)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}>
+          <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>📖</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{
+              fontSize: 'var(--fs-sm)', fontWeight: 800, color: 'var(--accent)',
+              display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap',
+            }}>
+              {stdData.nameFa || stdData.nameEn || stdKey}
+              <span style={{
+                fontSize: 'var(--fs-2xs)', fontWeight: 600,
+                color: 'var(--muted)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: 160,
+              }}>
+                {stdData.source && `📚 ${stdData.source}`}
+                {stdData.source && stdData.publishYear && ' · '}
+                {stdData.publishYear && toFa(stdData.publishYear)}
+              </span>
+            </div>
+          </div>
+          <div style={{
+            fontSize: 'var(--fs-2xs)', fontWeight: 800,
+            padding: 'var(--pad-chip-xs)', borderRadius: 'var(--r-sm)',
+            background: 'var(--accent)', color: 'var(--card-solid)',
+            flexShrink: 0,
+          }}>متصل</div>
+        </div>
+      ) : (
+        <div style={{
+          padding: 'var(--pad-box)',
+          background: 'var(--warn-soft)',
+          border: '1px solid var(--warn)',
+          borderRadius: 'var(--r-sm)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}>
+          <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>💡</span>
+          <span style={{ flex: 1, minWidth: 0, fontSize: 'var(--fs-sm)', fontWeight: 800, color: 'var(--warn)' }}>
+            استاندارد متصل نیست
+          </span>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+        <Btn size="sm" onClick={() => onEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش پرنده ${b.name}`}>ویرایش</Btn>
+        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }} aria-label={`حذف پرنده ${b.name}`}>حذف</Btn>
+      </div>
+    </ExpandableCard>
+  );
+}
