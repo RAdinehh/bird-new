@@ -37,7 +37,7 @@ import { QUAIL_BROILER } from './quail';
 import { QUAIL_LAYER } from './quail';
 import { DUCK_PEKIN } from './ducks';
 import { DUCK_MUSCOVY } from './ducks';
-import { DUCK_UKRAINIAN } from './ducks';
+import { DUCK_UKRAINIAN, DUCK_PEKIN_BREEDER, DUCK_MUSCOVY_BREEDER } from './ducks';
 import { TURKEY } from './turkey_goose';
 import { TURKEY_BRONZE, TURKEY_WHITE, TURKEY_BOURBON, TURKEY_BREEDER } from './turkeys';
 import { GOOSE } from './turkey_goose';
@@ -67,6 +67,8 @@ export const NEW_BREEDS: Record<string, BirdStandard> = {
   'duck-pekin': DUCK_PEKIN,
   'duck-muscovy': DUCK_MUSCOVY,
   'duck-ukrainian': DUCK_UKRAINIAN,
+  'duck-pekin-breeder': DUCK_PEKIN_BREEDER,
+  'duck-muscovy-breeder': DUCK_MUSCOVY_BREEDER,
   'turkey': TURKEY,
   'turkey-bronze': TURKEY_BRONZE,
   'turkey-white': TURKEY_WHITE,

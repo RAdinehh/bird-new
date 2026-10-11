@@ -201,3 +201,140 @@ export const DUCK_UKRAINIAN: BirdStandard = {
   mortalityTotalPct: 4.5,
   notes: 'اردک اوکراینی',
 };
+
+
+// ═══════════════════════════════════════════════
+// مادر اردک پکنی (Pekin Breeder)
+// ═══════════════════════════════════════════════
+export const DUCK_PEKIN_BREEDER: BirdStandard = {
+  key: 'duck-pekin-breeder',
+  source: 'Cherry Valley Pekin Breeder Guide',
+  publishYear: 2022,
+  region: 'international',
+  birdName: 'اردک',
+  birdKind: 'duck',
+  purposes: ['breeder'],
+  primaryPurpose: 'breeder',
+  nameFa: 'مادر اردک پکنی',
+  nameEn: 'Pekin Duck Breeder (Parent Stock)',
+  category: 'industrial',
+  biology: {
+    sexualMaturityDay: 180, layingStartDay: 190, peakLayingDay: 240,
+    endOfCycleDay: 420, cullDay: 440, incubationDays: 28, maleFemaleRatio: 5,
+  },
+  env: [
+    { dayFrom: 1, dayTo: 7, temp: { min: 28, max: 32, target: 30 }, humidity: { min: 60, max: 70 }, light: { hours: 23 } },
+    { dayFrom: 8, dayTo: 28, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 55, max: 65 }, light: { hours: 10 } },
+    { dayFrom: 29, dayTo: 180, temp: { min: 14, max: 20, target: 17 }, humidity: { min: 50, max: 65 }, light: { hours: 10 } },
+    { dayFrom: 181, dayTo: 420, temp: { min: 14, max: 22, target: 18 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 30 } },
+    { dayFrom: 421, dayTo: 9999, temp: { min: 14, max: 22, target: 18 }, humidity: { min: 50, max: 65 }, light: { hours: 15, lux: 30 } },
+  ],
+  feed: [
+    { dayFrom: 1, dayTo: 21, feedG: 55, waterMl: 110, phaseName: 'استارتر' },
+    { dayFrom: 22, dayTo: 180, feedG: 150, waterMl: 300, phaseName: 'رشد محدود' },
+    { dayFrom: 181, dayTo: 420, feedG: 210, waterMl: 420, phaseName: 'تولید' },
+    { dayFrom: 421, dayTo: 9999, feedG: 190, waterMl: 380, phaseName: 'پایان' },
+  ],
+  growth: {
+    weightByAge: [
+      { dayFrom: 1, dayTo: 21, weightG: 500, adgG: 24, fcr: 1.5 },
+      { dayFrom: 22, dayTo: 100, weightG: 2100, adgG: 20, fcr: 2.5 },
+      { dayFrom: 101, dayTo: 180, weightG: 3000, adgG: 11, fcr: 3.0 },
+      { dayFrom: 181, dayTo: 420, weightG: 3600, adgG: 2.5, fcr: 3.3 },
+      { dayFrom: 421, dayTo: 9999, weightG: 3700, adgG: 1, fcr: 3.2 },
+    ],
+    finalWeightG: 3700,
+  },
+  space: { densityMax: 4, feederSpaceCm: 15, drinkerSpaceCm: 3 },
+  equipment: {
+    feeder: { chainCmPerBird: 12, panBirdsPerUnit: 25, tubeCmPerBird: 12, manualCmPerBird: 15 },
+    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 18, troughCmPerBird: 3, manualCmPerBird: 3 },
+    lampWattPerM2: 3, fanM3PerKg: 5,
+  },
+  incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70 },
+  production: {
+    layingStartDay: 190,
+    peakLayingPct: 85,
+    eggsPerYear: 220,
+    eggWeightG: 85,
+    cycleDays: 420,
+    fertilityPct: 90,
+    hatchabilityPct: 80,
+  },
+  mortality: [
+    { dayFrom: 1, dayTo: 7, maxPct: 2.0 },
+    { dayFrom: 8, dayTo: 21, maxPct: 2.5 },
+    { dayFrom: 22, dayTo: 180, maxPct: 3.0 },
+    { dayFrom: 181, dayTo: 9999, maxPct: 5.0 },
+  ],
+  mortalityTotalPct: 10,
+  notes: 'مادر اردک پکنی — تخم نطفه‌دار برای جوجه‌کشی اردک گوشتی',
+};
+
+// ═══════════════════════════════════════════════
+// مادر اردک موسیقا (Muscovy Breeder)
+// ═══════════════════════════════════════════════
+export const DUCK_MUSCOVY_BREEDER: BirdStandard = {
+  key: 'duck-muscovy-breeder',
+  source: 'منابع پرورش اردک موسیقا ایران',
+  publishYear: 1403,
+  region: 'iran',
+  birdName: 'اردک',
+  birdKind: 'duck',
+  purposes: ['breeder'],
+  primaryPurpose: 'breeder',
+  nameFa: 'مادر اردک موسیقا',
+  nameEn: 'Muscovy Duck Breeder',
+  category: 'industrial',
+  biology: {
+    sexualMaturityDay: 200, layingStartDay: 210, peakLayingDay: 260,
+    endOfCycleDay: 480, cullDay: 500, incubationDays: 35, maleFemaleRatio: 5,
+  },
+  env: [
+    { dayFrom: 1, dayTo: 7, temp: { min: 28, max: 32, target: 30 }, humidity: { min: 60, max: 70 }, light: { hours: 23 } },
+    { dayFrom: 8, dayTo: 28, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 55, max: 65 }, light: { hours: 10 } },
+    { dayFrom: 29, dayTo: 200, temp: { min: 14, max: 20, target: 17 }, humidity: { min: 50, max: 65 }, light: { hours: 10 } },
+    { dayFrom: 201, dayTo: 480, temp: { min: 14, max: 22, target: 18 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 30 } },
+    { dayFrom: 481, dayTo: 9999, temp: { min: 14, max: 22, target: 18 }, humidity: { min: 50, max: 65 }, light: { hours: 15, lux: 30 } },
+  ],
+  feed: [
+    { dayFrom: 1, dayTo: 21, feedG: 50, waterMl: 100, phaseName: 'استارتر' },
+    { dayFrom: 22, dayTo: 200, feedG: 130, waterMl: 260, phaseName: 'رشد محدود' },
+    { dayFrom: 201, dayTo: 480, feedG: 180, waterMl: 360, phaseName: 'تولید' },
+    { dayFrom: 481, dayTo: 9999, feedG: 170, waterMl: 340, phaseName: 'پایان' },
+  ],
+  growth: {
+    weightByAge: [
+      { dayFrom: 1, dayTo: 21, weightG: 450, adgG: 22, fcr: 1.5 },
+      { dayFrom: 22, dayTo: 100, weightG: 1800, adgG: 17, fcr: 2.5 },
+      { dayFrom: 101, dayTo: 200, weightG: 2600, adgG: 8, fcr: 3.0 },
+      { dayFrom: 201, dayTo: 480, weightG: 3100, adgG: 2, fcr: 3.2 },
+      { dayFrom: 481, dayTo: 9999, weightG: 3200, adgG: 1, fcr: 3.1 },
+    ],
+    finalWeightG: 3200,
+  },
+  space: { densityMax: 4, feederSpaceCm: 15, drinkerSpaceCm: 3 },
+  equipment: {
+    feeder: { chainCmPerBird: 12, panBirdsPerUnit: 25, tubeCmPerBird: 12, manualCmPerBird: 15 },
+    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 18, troughCmPerBird: 3, manualCmPerBird: 3 },
+    lampWattPerM2: 3, fanM3PerKg: 5,
+  },
+  incubation: { totalDays: 35, lockdownDay: 31, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 75 },
+  production: {
+    layingStartDay: 210,
+    peakLayingPct: 70,
+    eggsPerYear: 180,
+    eggWeightG: 75,
+    cycleDays: 480,
+    fertilityPct: 88,
+    hatchabilityPct: 78,
+  },
+  mortality: [
+    { dayFrom: 1, dayTo: 7, maxPct: 2.0 },
+    { dayFrom: 8, dayTo: 21, maxPct: 2.5 },
+    { dayFrom: 22, dayTo: 200, maxPct: 3.0 },
+    { dayFrom: 201, dayTo: 9999, maxPct: 5.0 },
+  ],
+  mortalityTotalPct: 10,
+  notes: 'مادر اردک موسیقا — تخم نطفه‌دار',
+};
