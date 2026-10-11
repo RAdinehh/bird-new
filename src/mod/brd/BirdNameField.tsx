@@ -1,14 +1,13 @@
 /**
  * BirdNameField.tsx — فیلد نام پرنده با Bottom Sheet
  *
- * طبق استاندارد docs/STANDARDS.md بخش ۷.۵:
- *   - Bottom Sheet (نه Dropdown)
- *   - ۵ مورد اول + «نمایش N مورد دیگر»
- *   - جستجو اختیاری (بدون focus)
+ * مدل سه‌سطحی (طبق FOUNDATION بخش ۵):
+ *   Species → Purpose → Breed/Standard
+ *   بجای «مرغ» خالی، مستقیم استاندارد خاص پیشنهاد می‌شه.
  */
 import { useMemo } from 'react';
 import AutocompleteSheet, { type AutoOption } from '../../shr/components/AutocompleteSheet';
-import { BIRD_PRESETS } from './presets';
+import { DEFAULT_STANDARDS } from '../set/standards/data';
 
 export interface BirdPresetPick {
   name: string;
@@ -16,9 +15,7 @@ export interface BirdPresetPick {
   fcrStandard: number | null;
   standardKey?: string;
   isCustom: boolean;
-  /** 🆕 نوع پرنده */
   birdKind?: 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
-  /** 🆕 هدف پرورش */
   purpose?: 'broiler' | 'layer' | 'breeder' | 'dual' | 'ornamental';
 }
 
@@ -30,60 +27,65 @@ interface Props {
   excludeNames?: string[];
 }
 
-function birdIcon(name: string): string {
-  const n = name.toLowerCase();
-  if (n.includes('اردک')) return '🦆';
-  if (n.includes('بوقلمون')) return '🦃';
-  if (n.includes('بلدرچین')) return '🐦';
-  if (n.includes('غاز')) return '🦢';
-  if (n.includes('مرغ') || n.includes('جوجه')) return '🐔';
-  return '🥚';
-}
+// ═══ گروه‌بندی بر اساس هدف پرورش ═══
+const PURPOSE_GROUPS: Record<string, { label: string; icon: string; order: number }> = {
+  broiler:    { label: 'گوشتی',    icon: '🍗', order: 1 },
+  layer:      { label: 'تخم‌گذار', icon: '🥚', order: 2 },
+  breeder:    { label: 'مادر',     icon: '🐣', order: 3 },
+  dual:       { label: 'دوگانه',   icon: '🔄', order: 4 },
+  ornamental: { label: 'تزئینی',   icon: '🎨', order: 5 },
+};
 
-function birdGroup(name: string): { group: string; groupLabel: string } {
-  const n = name.toLowerCase();
-  if (n.includes('اردک')) return { group: 'duck', groupLabel: 'اردک' };
-  if (n.includes('بوقلمون')) return { group: 'turkey', groupLabel: 'بوقلمون' };
-  if (n.includes('بلدرچین')) return { group: 'quail', groupLabel: 'بلدرچین' };
-  if (n.includes('غاز')) return { group: 'goose', groupLabel: 'غاز' };
-  if (n.includes('مرغ') || n.includes('جوجه')) return { group: 'chicken', groupLabel: 'مرغ' };
-  return { group: 'other', groupLabel: 'سایر' };
-}
+const KIND_ICONS: Record<string, string> = {
+  chicken: '🐔', duck: '🦆', turkey: '🦃', quail: '🐦', goose: '🦢',
+};
 
 export default function BirdNameField({ value, onChange, onPick, error, excludeNames = [] }: Props) {
   const options: AutoOption[] = useMemo(() => {
     const opts: AutoOption[] = [];
     const exclude = new Set(excludeNames.map(n => n.trim().toLowerCase()));
 
-    for (const [name, preset] of Object.entries(BIRD_PRESETS)) {
-      if (exclude.has(name.toLowerCase())) continue;
-      const g = birdGroup(name);
+    for (const [key, std] of Object.entries(DEFAULT_STANDARDS)) {
+      if (exclude.has(std.nameFa.toLowerCase())) continue;
+
+      const purpose = std.primaryPurpose || 'broiler';
+      const group = PURPOSE_GROUPS[purpose] || PURPOSE_GROUPS.broiler;
+      const kindIcon = KIND_ICONS[std.birdKind || 'chicken'] || '🥚';
+
       opts.push({
-        value: 'preset:' + name,
-        label: name,
-        icon: birdIcon(name),
-        group: g.group,
-        groupLabel: g.groupLabel,
-        groupIcon: birdIcon(name),
+        value: 'standard:' + key,
+        label: std.nameFa,
+        icon: kindIcon,
+        group: purpose,
+        groupLabel: `${group.icon} ${group.label}`,
+        groupIcon: group.icon,
       });
     }
 
-    return opts;
+    // مرتب‌سازی بر اساس ترتیب گروه
+    return opts.sort((a, b) => {
+      const oa = PURPOSE_GROUPS[a.group || '']?.order || 99;
+      const ob = PURPOSE_GROUPS[b.group || '']?.order || 99;
+      return oa - ob;
+    });
   }, [excludeNames]);
 
   const handleSelect = (opt: AutoOption) => {
-    const presetName = opt.value.replace('preset:', '');
-    const preset = BIRD_PRESETS[presetName];
-    if (preset) {
-      onPick({
-        name: preset.name,
-        cycleDays: preset.cycleDays,
-        fcrStandard: preset.fcrStandard,
-        isCustom: false,
-        birdKind: preset.birdKind,
-        purpose: preset.purpose,
-      });
-    }
+    const key = opt.value.replace('standard:', '');
+    const std = (DEFAULT_STANDARDS as any)[key];
+    if (!std) return;
+
+    const lastGrowth = std.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
+
+    onPick({
+      name: std.nameFa,
+      cycleDays: std.biology?.cullDay ?? null,
+      fcrStandard: lastGrowth?.fcr ?? null,
+      standardKey: key,
+      isCustom: false,
+      birdKind: std.birdKind,
+      purpose: std.primaryPurpose,
+    });
   };
 
   const handleCustom = (text: string) => {
@@ -102,9 +104,9 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
       onSelect={handleSelect}
       onSubmit={handleCustom}
       options={options}
-      placeholder="مثلاً — مرغ یا شترمرغ"
+      placeholder="مثلاً — راس ۳۰۸ یا مرندی"
       customLabel="افزودن پرنده دلخواه"
-      title="انتخاب پرنده"
+      title="انتخاب پرنده / نژاد"
       error={error}
     />
   );
