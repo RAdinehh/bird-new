@@ -11,6 +11,8 @@ export interface Bird {
   birdKind?: 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
   /** 🆕 هدف پرورش */
   purpose?: 'broiler' | 'layer' | 'breeder' | 'dual' | 'ornamental';
+  /** 🆕 شناسه‌ی دسته (مثلاً 'chicken-broiler') */
+  categoryId?: string;
   cycleDays: number | null;
   fcrStandard: number | null;
   createdAt: string;

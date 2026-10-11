@@ -83,7 +83,7 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
             .filter(b => b.id !== form.id && b.birdId === form.birdId)
             .map(b => b.name)}
           parentBirdName={parentBird?.name}
-          parentPurpose={(parentBird as any)?.birdKind}
+          parentPurpose={(parentBird as any)?.purpose}
         />
       </Field>
 

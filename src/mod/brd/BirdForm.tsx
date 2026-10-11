@@ -15,6 +15,7 @@ export interface BirdFormData {
   standardKey?: string;
   birdKind?: 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
   purpose?: 'broiler' | 'layer' | 'breeder' | 'dual' | 'ornamental';
+  categoryId?: string;
 }
 
 export const EMPTY_BIRD_FORM: BirdFormData = {
@@ -58,6 +59,7 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
               standardKey: pick.standardKey || f.standardKey,
               birdKind: pick.birdKind || f.birdKind,
               purpose: pick.purpose || f.purpose,
+              categoryId: pick.categoryId || f.categoryId,
             }));
           }}
           error={error || undefined}
