@@ -14,6 +14,7 @@ export * from './ornamental';
 export * from './quail';
 export * from './ducks';
 export * from './turkey_goose';
+export * from './turkeys';
 
 import { COBB_500 } from './broilers';
 import { ROSS_308_BREEDER, COBB_500_BREEDER, HY_LINE_BROWN_BREEDER } from './breeders';
@@ -38,6 +39,7 @@ import { DUCK_PEKIN } from './ducks';
 import { DUCK_MUSCOVY } from './ducks';
 import { DUCK_UKRAINIAN } from './ducks';
 import { TURKEY } from './turkey_goose';
+import { TURKEY_BRONZE, TURKEY_WHITE, TURKEY_BOURBON, TURKEY_BREEDER } from './turkeys';
 import { GOOSE } from './turkey_goose';
 
 export const NEW_BREEDS: Record<string, BirdStandard> = {
@@ -66,5 +68,9 @@ export const NEW_BREEDS: Record<string, BirdStandard> = {
   'duck-muscovy': DUCK_MUSCOVY,
   'duck-ukrainian': DUCK_UKRAINIAN,
   'turkey': TURKEY,
+  'turkey-bronze': TURKEY_BRONZE,
+  'turkey-white': TURKEY_WHITE,
+  'turkey-bourbon': TURKEY_BOURBON,
+  'turkey-breeder': TURKEY_BREEDER,
   'goose': GOOSE,
 };
