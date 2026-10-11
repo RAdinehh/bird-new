@@ -94,7 +94,7 @@ export const useBrd = create<State>()(
     }),
     {
       name: 'pm-brd',
-      version: 3,
+      version: 4,
       migrate: (persisted: any, version: number) => {
         // v3: حذف purpose و categoryId از Bird (مالِ نژاد هستن)
         if (persisted && Array.isArray(persisted.birds)) {
