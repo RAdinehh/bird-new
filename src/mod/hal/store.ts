@@ -4,6 +4,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
+import { ensureWhsItem, syncWhsItem, removeWhsItem } from './api/equipmentWhs';
 
 export interface HallSource {
   id: string;
@@ -122,7 +123,7 @@ interface State {
   addZone: (z: Omit<Zone, 'id'|'createdAt'|'updatedAt'>) => void;
   updateZone: (id: string, patch: Partial<Zone>) => void;
   deleteZone: (id: string) => void;
-  addEquip: (e: Omit<Equipment, 'id'|'createdAt'|'updatedAt'>) => void;
+  addEquip: (e: Omit<Equipment, 'id'|'createdAt'|'updatedAt'>) => string;
   updateEquip: (id: string, patch: Partial<Equipment>) => void;
   deleteEquip: (id: string) => void;
 }
@@ -139,9 +140,27 @@ export const useHal = create<State>()(
       addZone: (z) => set({ zones: [...get().zones, {...z, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       updateZone: (id, patch) => set({ zones: get().zones.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       deleteZone: (id) => set({ zones: get().zones.filter(x => x.id !== id) }),
-      addEquip: (e) => set({ equipment: [...get().equipment, {...e, id: uuid(), createdAt: now(), updatedAt: now()}] }),
-      updateEquip: (id, patch) => set({ equipment: get().equipment.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
-      deleteEquip: (id) => set({ equipment: get().equipment.filter(x => x.id !== id) })
+      addEquip: (e) => {
+        const id = uuid();
+        const eq = { ...e, id, createdAt: now(), updatedAt: now() } as Equipment;
+        set({ equipment: [...get().equipment, eq] });
+        // 🆕 سینک با انبار
+        try {
+          const whsId = ensureWhsItem(eq);
+          if (whsId) set({ equipment: get().equipment.map(x => x.id === id ? { ...x, warehouseItemId: whsId } : x) });
+        } catch (err) { console.error('[HAL] whs sync:', err); }
+        return id;
+      },
+      updateEquip: (id, patch) => {
+        set({ equipment: get().equipment.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) });
+        const eq = get().equipment.find(x => x.id === id);
+        if (eq) try { syncWhsItem(eq); } catch {}
+      },
+      deleteEquip: (id) => {
+        const eq = get().equipment.find(x => x.id === id);
+        if (eq) try { removeWhsItem(eq); } catch {}
+        set({ equipment: get().equipment.filter(x => x.id !== id) });
+      }
     }),
     {
       name: 'pm-hal',

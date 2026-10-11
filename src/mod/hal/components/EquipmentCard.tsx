@@ -23,10 +23,13 @@ export interface EquipmentCardProps {
   onDelete: (id: string) => void;
   onUndo: (item: any) => void;
   supplierNames?: Map<string, string>;
+  invoiceNumbers?: Map<string, string>;
+  whsItemNames?: Map<string, string>;
 }
 
 export default function EquipmentCard(props: EquipmentCardProps) {
-  const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onUndo, supplierNames } = props;
+  const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onUndo, supplierNames,
+        invoiceNumbers, whsItemNames } = props;
   const _cm = (allCustomOpts as any[]).find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
   const _isDeleted = _cm ? _cm.hidden === true : false;
   const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: '🔧' });
@@ -105,6 +108,26 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       <span style={{ color: 'var(--muted)' }}>تأمین‌کننده:</span>
                       <span style={{ fontWeight: 600 }}>
                         <EntityLink type="party" id={e.supplierId} label={supplierNames?.get(e.supplierId) || '—'} />
+                      </span>
+                    </div>
+                  )}
+                  {e.sourceInvoiceId && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between',
+                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>
+                      <span style={{ color: 'var(--muted)' }}>فاکتور خرید:</span>
+                      <span style={{ fontWeight: 600 }}>
+                        <EntityLink type="invoice" id={e.sourceInvoiceId} label={invoiceNumbers?.get(e.sourceInvoiceId) || '—'} />
+                      </span>
+                    </div>
+                  )}
+                  {e.warehouseItemId && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between',
+                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>
+                      <span style={{ color: 'var(--muted)' }}>کالای انبار:</span>
+                      <span style={{ fontWeight: 600 }}>
+                        <EntityLink type="item" id={e.warehouseItemId} label={whsItemNames?.get(e.warehouseItemId) || '—'} />
                       </span>
                     </div>
                   )}

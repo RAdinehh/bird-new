@@ -22,6 +22,8 @@ import { useCustomOptions } from '../../shr/store/customOptions';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
+import { useTra } from '../tra/store';
+import { useWhs } from '../whs/store';
 import UndoBar from '../../cor/ui/UndoBar';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -37,6 +39,10 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const { flocks } = useFlk();
   const { contacts: allContacts } = useCtc();
   const supplierNames = useMemo(() => new Map(allContacts.map((c: any) => [c.id, c.name || c.fullName || ''])), [allContacts]);
+  const { invoices } = useTra();
+  const { items: whsItems } = useWhs();
+  const invoiceNumbers = useMemo(() => new Map(invoices.map((i: any) => [i.id, i.number || '—'])), [invoices]);
+  const whsItemNames = useMemo(() => new Map(whsItems.map((i: any) => [i.id, i.name || ''])), [whsItems]);
   const suppliers = allContacts.filter((c: any) => (c.roles || []).includes('supplier'));
   const { options: allCustomOpts } = useCustomOptions();
   const [open, setOpen] = useState(false);
@@ -391,6 +397,8 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
                   setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
                 }}
                 supplierNames={supplierNames}
+                invoiceNumbers={invoiceNumbers}
+                whsItemNames={whsItemNames}
               />
             );
           })}
