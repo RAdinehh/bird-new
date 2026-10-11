@@ -221,7 +221,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
             <button type="button"
               onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
-              style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-2xs)', fontWeight: 600, cursor: 'pointer' }}>
+              style={{ padding: 'var(--pad-btn-sm)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-2xs)', fontWeight: 600, cursor: 'pointer' }}>
               {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
             </button>
           </div>
@@ -400,7 +400,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
 function chip(active: boolean): React.CSSProperties {
   return {
-    padding: '6px 11px', fontSize: 'var(--fs-sm)',
+    padding: 'var(--pad-box)', fontSize: 'var(--fs-sm)',
     background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
     border: `1px solid ${active ? 'var(--accent-border)' : 'var(--border)'}`,
     borderRadius: 'var(--r-sm)',

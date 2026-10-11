@@ -214,7 +214,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
           <button type="button"
             onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
-            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-2xs)', fontWeight: 600, cursor: 'pointer' }}>
+            style={{ padding: 'var(--pad-btn-sm)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-2xs)', fontWeight: 600, cursor: 'pointer' }}>
             {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
           </button>
         </div>
@@ -254,12 +254,12 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 stats={
                   <>
                     {purpose && <span style={{
-                      padding: '2px 8px', borderRadius: 'var(--r-md)',
+                      padding: 'var(--pad-chip)', borderRadius: 'var(--r-md)',
                       background: 'var(--accent-soft)', color: 'var(--accent)',
                       fontSize: 'var(--fs-2xs)', fontWeight: 700,
                     }}>{purpose.emoji} {purpose.label}</span>}
                     {category && <span style={{
-                      padding: '2px 8px', borderRadius: 'var(--r-md)',
+                      padding: 'var(--pad-chip)', borderRadius: 'var(--r-md)',
                       background: 'var(--accent-soft)', color: 'var(--accent)',
                       fontSize: 'var(--fs-2xs)', fontWeight: 700,
                     }}>{category.emoji} {category.label}</span>}
@@ -296,7 +296,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 {/* 📖 کادر استاندارد متصل */}
                 {stdData ? (
                   <div style={{
-                    padding: '6px 10px',
+                    padding: 'var(--pad-box)',
                     background: 'var(--accent-soft)',
                     border: '1px solid var(--accent-border)',
                     borderRadius: 'var(--r-sm)',
@@ -327,14 +327,14 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                     </div>
                     <div style={{
                       fontSize: 'var(--fs-2xs)', fontWeight: 800,
-                      padding: '2px 7px', borderRadius: 'var(--r-sm)',
+                      padding: 'var(--pad-chip-xs)', borderRadius: 'var(--r-sm)',
                       background: 'var(--accent)', color: 'var(--card-solid)',
                       flexShrink: 0,
                     }}>متصل</div>
                   </div>
                 ) : (
                   <div style={{
-                    padding: '6px 10px',
+                    padding: 'var(--pad-box)',
                     background: 'var(--warn-soft)',
                     border: '1px solid var(--warn)',
                     borderRadius: 'var(--r-sm)',
