@@ -29,9 +29,10 @@ interface Props {
   birds: Bird[];
   breeds: Breed[];
   onSave: () => void;
+  customStandards?: Record<string, any>;
 }
 
-export default function BreedForm({ open, onClose, form, setForm, err, birds, breeds, onSave }: Props) {
+export default function BreedForm({ open, onClose, form, setForm, err, birds, breeds, onSave, customStandards = {} }: Props) {
   const parentBird = birds.find(x => x.id === form.birdId);
   const fcrBaseline = getBreedFcrBaseline(form.standardKey, parentBird?.fcrStandard ?? null);
   const fcrCurrent = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
@@ -84,6 +85,7 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
             .map(b => b.name)}
           parentBirdName={parentBird?.name}
           parentPurpose={(parentBird as any)?.purpose}
+            customStandards={customStandards}
         />
       </Field>
 

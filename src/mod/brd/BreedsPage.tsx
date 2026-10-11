@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Breed } from './store';
+import { useSet } from '../set/store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import BreedForm, { EMPTY_BREED_FORM, type BreedFormData } from './BreedForm';
@@ -31,6 +32,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const { birds, breeds: _breedsRaw, addBreed, updateBreed, deleteBreed } = useBrd();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<BreedFormData>(EMPTY_BREED_FORM);
+  const customStandards = useSet((st: any) => st.customStandards);
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -251,6 +253,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       <BreedForm
         open={open}
         onClose={() => setOpen(false)}
+        customStandards={customStandards}
         form={form}
         setForm={setForm}
         err={err}

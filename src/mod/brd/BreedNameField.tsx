@@ -30,6 +30,8 @@ interface Props {
   parentBirdName?: string;
   /** purpose پرنده والد (broiler/layer/breeder/dual) */
   parentPurpose?: string;
+  /** استانداردهای سفارشی کاربر */
+  customStandards?: Record<string, any>;
 }
 
 /** تبدیل نام پرنده به birdKind */
@@ -73,7 +75,7 @@ function kindEmoji(kind: string | null | undefined): string {
 
 export default function BreedNameField({
   value, onChange, onPick, error, excludeNames = [],
-  parentBirdName, parentPurpose,
+  parentBirdName, parentPurpose, customStandards = {},
 }: Props) {
   const options: AutoOption[] = useMemo(() => {
     const opts: AutoOption[] = [];
@@ -83,7 +85,8 @@ export default function BreedNameField({
     const parentKind = nameToKind(parentBirdName);
     const parentPurposeFinal = parentPurpose || nameToPurpose(parentBirdName);
 
-    for (const [key, std] of Object.entries(DEFAULT_STANDARDS as any) as [string, any][]) {
+    const allStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+    for (const [key, std] of Object.entries(allStandards) as [string, any][]) {
       const name = std.nameFa;
       if (!name || exclude.has(name.toLowerCase())) continue;
 
@@ -120,11 +123,11 @@ export default function BreedNameField({
     }
 
     return opts;
-  }, [excludeNames, parentBirdName, parentPurpose]);
+  }, [excludeNames, parentBirdName, parentPurpose, customStandards]);
 
   const handleSelect = (opt: AutoOption) => {
     const key = opt.value;
-    const std = (DEFAULT_STANDARDS as any)[key];
+    const std = (DEFAULT_STANDARDS as any)[key] || customStandards[key];
     const lastGrowth = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
     // اسم اصلی رو از std بگیر (نه label چون ممکنه ⭐ داشته باشه)
     onPick({
