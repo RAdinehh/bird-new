@@ -116,56 +116,61 @@ auto_fast.py خودش: tsc → build → commit → push (با rollback در ص�
 
 ---
 
-## 📊 بخش ۵ — مشکلات کشف‌شده (از اسکن‌های خودکار)
+## 📊 بخش ۵ — مشکلات کشف‌شده (بازبینی‌شده ۱۴۰۴/۰۷/۲۰)
 
-### بحرانی
+> ⚠️ **بازبینی مهم:** هر ۵ مشکل گزارش‌شده با فایل واقعی مقایسه شد.
+> نتیجه: **۳ مورد از ۵ مورد false positive** بودن (گزارش خودکار قدیمی/نادرست).
+> فقط ۲ مورد واقعی موند که اونا هم **باگ نیستن، فقط عدم یکدستی سبک‌ان**.
 
-**۱. دو Store بدون نام:**
-- src/mod/cal/store.ts — بدون name: در persist
-- src/mod/doc/store.ts — بدون name: در persist
-- نتیجه: persist کار نمی‌کنه → داده بعد از reload گم می‌شه
-- راه‌حل: اضافه کردن name: 'pm-cal' و name: 'pm-doc'
+### ❌ False Positive ها (قبلاً حل شده یا اصلاً مشکل نبوده)
 
-### مهم
+**۱. Store بدون نام (cal و doc) — FALSE POSITIVE**
+- `src/mod/cal/store.ts` اصلاً Zustand store نیست — یه ماژول aggregate است که از storeهای دیگه داده می‌گیره. داده‌ی خودش رو نداره که persist کنه.
+- `src/mod/doc/store.ts` از **IndexedDB** استفاده می‌کنه، نه Zustand persist. خودش دائمی و مستقل است.
+- **نتیجه:** داده‌ی تقویم و اسناد درست ذخیره می‌شه. هیچ باگی نیست.
 
-**۲. رنگ‌های hex در ۲۰ فایل ماژول (۷۰ مورد):**
-- مقصر اصلی: #fff در ۴۳ فایل
-- #16a34a, #0f172a, #dc2626 هم پخش شدن
-- فایل‌های مجاز (skip): applyTheme.ts, export.ts, InvoicePrint.tsx, DebugPanel.tsx
-- راه‌حل: هر فایل → var(--*) معادلش
+**۲. فایل‌های .bak — قبلاً پاک شده**
+- سه فایل گزارش‌شده اصلاً وجود ندارن. در جلسه‌ی قبلی پاک شدن. `.gitignore` هم درست تنظیم است.
 
-**۳. padding هاردکد:**
-- ۵۱۹ مورد padding: <number> vs ۱۱ مورد var(--sp-*)
-- توکن‌ها تعریف شدن ولی استفاده نمی‌شن
-- راه‌حل: هر فایل تکی، مضرب ۸ بشه توکن
+**۳. dsh ناقص — FALSE POSITIVE**
+- `dsh` ماژول تک‌صفحه‌ایه (فقط داشبورد). به `index.tsx` نیازی نداره چون tab wrapper نیست.
+- داده رو از storeهای دیگه از طریق `hooks/useDashboardData.ts` می‌گیره. پس `store.ts` جدا لازم نداره.
+- **مقایسه:** `brd` چون ۲ تب داره، `index.tsx` داره.
 
-**۴. فایل‌های بزرگ > ۴۲۰ خط (۱۰ فایل):**
-- Charts.tsx (488)
-- BirdsPage.tsx (467)
-- DevicesPage.tsx (449)
-- ReceivablesPage.tsx (440)
-- InvoicePage.tsx (440)
-- EquipmentPage.tsx (437)
-- ItemsPage.tsx (436)
-- useDashboardData.ts (433) ← hook، عجیبه
-- EditableSelect.tsx (429) ← قفل‌شده، دست نزن
-- StatsPage.tsx (427)
+### 🟡 مشکلات واقعی (فقط عدم یکدستی — نه باگ)
 
-**۵. آبشار ناقص:**
-- فقط ۲ جا DependentSelect استفاده شده: FlocksModal, HallsFormModal
-- باید بیشتر بشه (ولی کجا؟ نیاز به تحلیل)
+**۴. رنگ‌های hex هاردکد — ۳۱ مورد واقعی (نه ۷۰)**
+- اکثرشون `color: '#fff'` برای متن دکمه‌ها — در حالی که `--avatar-text: #ffffff` تعریف شده.
+- چند مورد خاص مثل `#3b82f6` در `ExpandableCard.tsx` که توکن معادل نداره.
+- فایل‌های مجاز (skip): applyTheme.ts, DebugPanel.tsx, export.ts, InvoicePrint.tsx
+- **راه‌حل:** جایگزینی با توکن‌های موجود، فایل به فایل.
 
-### کم‌اهمیت
+**۵. padding هاردکد — ۸۱ مورد واقعی (نه ۵۱۹)**
+- بعضی مخصوص SVG چارت‌هاست (padding: 30, 40 در Charts).
+- `padding: 0` ها از شمارش حذف شدن (reset طبیعی).
+- توکن‌ها کاملن: `--sp-1..8`, `--pad-tight/normal/comfy/loose`, `--gap-xs/sm/md/lg`
+- **راه‌حل:** جایگزینی با توکن‌های موجود، فایل به فایل.
 
-**۶. کامپوننت‌های unused:**
-- EmojiPicker, Skeleton, useVisualViewport — تصمیم: حذف یا استفاده؟
+### 🟢 موارد قبلی (بدون تغییر)
 
-**۷. TODO/FIXME:**
-- فقط LockScreen.tsx (۲ مورد)
+**۶. فایل‌های بزرگ > ۴۲۰ خط (۱۰ فایل):**
+Charts.tsx (488)، BirdsPage.tsx (467)، DevicesPage.tsx (449)، ReceivablesPage.tsx (440)، InvoicePage.tsx (440)، EquipmentPage.tsx (437)، ItemsPage.tsx (436)، useDashboardData.ts (433)، EditableSelect.tsx (429 — 🔒 قفل)، StatsPage.tsx (427)
 
-**۸. فایل‌های orphan:**
-- اسکنر ۱۱۵ فایل گزارش داد ولی ۹۹٪ تست هستن → نویز
+**۷. آبشار ناقص:**
+فقط ۲ جا DependentSelect استفاده شده: FlocksModal, HallsFormModal
 
+**۸. کامپوننت‌های unused:**
+EmojiPicker, Skeleton, useVisualViewport — تصمیم: حذف یا استفاده؟
+
+**۹. TODO/FIXME:**
+فقط LockScreen.tsx (۲ مورد)
+
+### 📌 نتیجه‌ی مهم برای AI بعدی
+
+**گزارش‌های خودکار `~/full_audit.md` و `~/deep_scan.md` قدیمی و نویزدارن.**
+نباید کورکورانه بهشون اعتماد کرد. هر گزارش باید با فایل واقعی verify شه.
+
+---
 
 ---
 
