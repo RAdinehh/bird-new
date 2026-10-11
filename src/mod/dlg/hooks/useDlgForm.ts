@@ -7,6 +7,7 @@ import type { F } from '../types';
 import type { Flock } from '../../flk/store';
 import type { Hall } from '../../hal/store';
 import { isLayingReady } from '../../flk/store';
+import { useFed } from '../../fed/store';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { feedSystemFromHall, waterSystemFromHall } from '../../../shr/utils/systemType';
 import { showAlert } from '../../../cor/store/dialog';
@@ -35,6 +36,7 @@ export interface UseDlgFormParams {
 }
 
 export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) {
+  const { formulas } = useFed();
   const [form, setForm] = useState<F>(newLog());
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -61,7 +63,13 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
     if (activeFlocks.length === 0) { showAlert('اول یک گله بسازید'); return; }
     const flock = activeFlocks[0];
     const sys = detectSystems(flock.id);
-    setForm({ ...newLog(flock.id), date: todayStr, entryTime: currentTime(), ...sys });
+    // 🆕 اگر فقط یک فرمول active هست، خودکار انتخاب شه
+    const activeFormulas = formulas.filter((f: any) => f.status === 'active');
+    const autoFormula = activeFormulas.length === 1 ? activeFormulas[0] : null;
+    const feedDefault = autoFormula
+      ? { feedSourceType: 'formula' as const, feedSourceId: autoFormula.id, feedType: autoFormula.name || '' }
+      : {};
+    setForm({ ...newLog(flock.id), date: todayStr, entryTime: currentTime(), ...sys, ...feedDefault });
     setErr(''); setOpen(true);
   };
 
