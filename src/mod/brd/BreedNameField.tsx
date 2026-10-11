@@ -1,12 +1,10 @@
 /**
  * BreedNameField.tsx — فیلد نام نژاد با Bottom Sheet
  *
- * طبق استاندارد (docs/STANDARDS.md بخش ۷.۵):
- *   - Bottom Sheet + گروه‌بندی
- *   - 🆕 فیلتر دو مرحله‌ای:
- *       ۱) birdKind (مرغ/اردک/بوقلمون/...)
- *       ۲) purpose (گوشتی/تخم‌گذار/مادر/دوگانه)
- *   - ⭐ برای هدف اصلی
+ * گروه‌بندی بر اساس هدف (primaryPurpose):
+ *   🍗 گوشتی · 🥚 تخم‌گذار · 🐣 مادر · 🔄 دوگانه · 🎨 تزئینی
+ *
+ * Cascade: فقط نژادهای matching با kind پرنده والد
  */
 import { useMemo } from 'react';
 import AutocompleteSheet, { type AutoOption } from '../../shr/components/AutocompleteSheet';
@@ -26,86 +24,77 @@ interface Props {
   onPick: (pick: BreedPick) => void;
   error?: string;
   excludeNames?: string[];
-  /** نام پرنده والد (مثلاً «مرغ مادر») */
+  /** نام پرنده والد — برای placeholder */
   parentBirdName?: string;
+  /** شناسه‌ی گونه‌ی پرنده والد — برای cascade */
+  parentKind?: string;
   /** استانداردهای سفارشی کاربر */
   customStandards?: Record<string, any>;
 }
 
-/** تبدیل نام پرنده به birdKind */
-function nameToKind(name?: string): string | null {
-  if (!name) return null;
-  const n = name.trim().toLowerCase();
-  if (n.includes('مرغ') || n.includes('جوجه')) return 'chicken';
-  if (n.includes('اردک')) return 'duck';
-  if (n.includes('بوقلمون')) return 'turkey';
-  if (n.includes('بلدرچین')) return 'quail';
-  if (n.includes('غاز')) return 'goose';
-  return null;
-}
+// ═══ گروه‌بندی بر اساس هدف پرورش ═══
+const PURPOSE_GROUPS: Record<string, { label: string; icon: string; order: number }> = {
+  broiler:    { label: 'گوشتی',    icon: '🍗', order: 1 },
+  layer:      { label: 'تخم‌گذار', icon: '🥚', order: 2 },
+  breeder:    { label: 'مادر',     icon: '🐣', order: 3 },
+  dual:       { label: 'دوگانه',   icon: '🔄', order: 4 },
+  ornamental: { label: 'تزئینی',   icon: '🎨', order: 5 },
+};
 
-function breedIcon(category?: string): string {
-  if (category === 'native') return '🌾';
-  if (category === 'industrial') return '🏭';
-  return '🧬';
-}
-
-/** ایموجی بر اساس نوع پرنده والد */
-function kindEmoji(kind: string | null | undefined): string {
-  if (kind === 'chicken') return '🐔';
-  if (kind === 'duck') return '🦆';
-  if (kind === 'turkey') return '🦃';
-  if (kind === 'quail') return '🐦';
-  if (kind === 'goose') return '🦢';
-  return '🧬';
-}
+const KIND_EMOJI: Record<string, string> = {
+  chicken: '🐔', duck: '🦆', turkey: '🦃', quail: '🐦', goose: '🦢',
+};
 
 export default function BreedNameField({
   value, onChange, onPick, error, excludeNames = [],
-  parentBirdName, customStandards = {},
+  parentBirdName, parentKind, customStandards = {},
 }: Props) {
   const options: AutoOption[] = useMemo(() => {
     const opts: AutoOption[] = [];
     const exclude = new Set(excludeNames.map(n => n.trim().toLowerCase()));
 
-    // تشخیص نوع پرنده و هدف
-    const parentKind = nameToKind(parentBirdName);
-
     const allStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+
     for (const [key, std] of Object.entries(allStandards) as [string, any][]) {
       const name = std.nameFa;
       if (!name || exclude.has(name.toLowerCase())) continue;
 
-      // 🆕 فیلتر ۱: birdKind
+      // 🆕 فیلتر cascade: فقط نژادهای matching با گونه‌ی والد
       if (parentKind && std.birdKind && std.birdKind !== parentKind) continue;
-      // اگه std.birdKind نیست، از birdName fallback استفاده کن
-      if (parentKind && !std.birdKind) {
-        const stdKind = nameToKind(std.birdName);
-        if (stdKind && stdKind !== parentKind) continue;
-      }      const stdKind = nameToKind(std.birdName) || parentKind;
-      const icon = kindEmoji(stdKind);
-      const label = name;
+
+      // گروه بر اساس هدف
+      const purpose = std.primaryPurpose || 'broiler';
+      const group = PURPOSE_GROUPS[purpose] || PURPOSE_GROUPS.broiler;
+
+      // آیکن بر اساس گونه
+      const stdKind = std.birdKind || parentKind || 'chicken';
+      const icon = KIND_EMOJI[stdKind] || '🧬';
 
       opts.push({
         value: key,
-        label,
+        label: name,
         icon,
-        group: std.category === 'native' ? 'native' : 'industrial',
-        groupLabel: std.category === 'native' ? 'بومی' : 'صنعتی',
-        groupIcon: std.category === 'native' ? '🌾' : '🏭',
+        group: purpose,
+        groupLabel: `${group.icon} ${group.label}`,
+        groupIcon: group.icon,
       });
     }
 
-    return opts;
-  }, [excludeNames, parentBirdName, customStandards]);
+    // مرتب‌سازی بر اساس ترتیب گروه
+    return opts.sort((a, b) => {
+      const oa = PURPOSE_GROUPS[a.group || '']?.order || 99;
+      const ob = PURPOSE_GROUPS[b.group || '']?.order || 99;
+      return oa - ob;
+    });
+  }, [excludeNames, parentKind, customStandards]);
 
   const handleSelect = (opt: AutoOption) => {
     const key = opt.value;
     const std = (DEFAULT_STANDARDS as any)[key] || customStandards[key];
     const lastGrowth = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
-    // اسم اصلی رو از std بگیر (نه label چون ممکنه ⭐ داشته باشه)
+
     onPick({
-      name: std?.nameFa || opt.label.replace('⭐ ', ''),
+      name: std?.nameFa || opt.label,
       standardKey: key,
       fcr: lastGrowth?.fcr ?? null,
       isCustom: false,
