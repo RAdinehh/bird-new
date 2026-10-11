@@ -27,30 +27,34 @@
 | mod/xxx/ | هر ماژول: store.ts + index.tsx + *Page.tsx |
 | docs/ | مستندات + قوانین |
 
-## 🔴 مشکلات شناسایی‌شده
+## 🔴 مشکلات شناسایی‌شده (بازبینی‌شده ۱۴۰۴/۰۷/۲۰)
 
-### 🔴 بحرانی
-1. **۳ فایل .bak** — باید پاک شن:
-   - HallEquipSection.tsx.bak
-   - EditableSelect.tsx.bak
-   - SmartSelect.tsx.bak
-2. **dsh ناقص** — بدون index.tsx و store.ts
-3. **set → hal** — وابستگی معکوس (باید چک شه)
+> ⚠️ این بخش بازبینی شد. **۳ مورد از ۵ مورد اول false positive بودن.**
+> گزارش‌های خودکار قدیمی و نویزدار بودن — هر مورد باید با فایل واقعی verify شه.
 
-### 🟡 مهم
-4. **۵ فایل > ۴۲۰ خط:**
-   - Charts.tsx (488)
-   - BirdsPage.tsx (467)
-   - DevicesPage.tsx (449)
-   - ReceivablesPage.tsx (440)
-   - InvoicePage.tsx (440)
-5. **set بدون AUDIT** — ۴۲۳KB، ۴۶ فایل
-6. **cal و doc بدون نام store**
+### ❌ False Positive ها
+
+1. **فایل‌های .bak** — قبلاً پاک شدن. `.gitignore` درست تنظیم است. ✅
+2. **dsh ناقص** — false positive. dsh ماژول تک‌صفحه‌ایه و به index.tsx/store.ts نیازی نداره. ✅
+3. **cal و doc بدون نام store** — false positive. cal اصلاً Zustand store نیست (aggregate است)، doc از IndexedDB استفاده می‌کنه. ✅
+
+### 🟡 مشکلات واقعی (فقط عدم یکدستی — نه باگ)
+
+4. **رنگ‌های hex هاردکد** — ۳۱ مورد واقعی (نه ۷۰).
+   - فایل‌های مجاز (skip): applyTheme.ts, DebugPanel.tsx, export.ts, InvoicePrint.tsx
+   - راه‌حل: جایگزینی با توکن‌های موجود، فایل به فایل.
+
+5. **padding هاردکد** — ۸۱ مورد واقعی (نه ۵۱۹).
+   - `padding: 0` ها از شمارش حذف شدن (reset طبیعی).
+   - توکن‌ها کاملن: `--sp-1..8`, `--pad-*`, `--gap-*`
+   - راه‌حل: جایگزینی با توکن‌های موجود، فایل به فایل.
 
 ### 🟢 قابل بهبود
-7. EditableSelect = ۴۲۹ خط
-8. BreedsPage = ۴۱۶ خط
-9. ZonesPage = ۴۱۴ خط
+
+6. **۱۰ فایل > ۴۲۰ خط:** Charts(488)، BirdsPage(467)، DevicesPage(449)، ReceivablesPage(440)، InvoicePage(440)، EquipmentPage(437)، ItemsPage(436)، useDashboardData(433)، EditableSelect(429 — 🔒 قفل)، StatsPage(427)
+7. **آبشار ناقص:** فقط ۲ جا DependentSelect استفاده شده (FlocksModal, HallsFormModal)
+8. **کامپوننت‌های unused:** EmojiPicker, Skeleton, useVisualViewport
+9. **set بدون AUDIT** — ۴۲۳KB، ۴۶ فایل (طبق گزارش خودکار — تأیید نشده)
 
 ## 🔗 نقشه وابستگی بین ماژول‌ها
 
@@ -218,12 +222,6 @@ whs    ← tra, egg, fed, dlg, hal
 - cor/store/ — 4 فایل
 - cor/theme/ — 1 فایل
 - cor/ui/ — 8 فایل
-
-## فایل‌های مشکوک
-
-- src/mod/hal/HallEquipSection.tsx.bak
-- src/shr/components/EditableSelect.tsx.bak
-- src/shr/components/SmartSelect.tsx.bak
 
 ## فایل‌های بزرگ
 
