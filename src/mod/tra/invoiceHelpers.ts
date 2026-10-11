@@ -5,6 +5,7 @@ import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ, addD
 import { useWhs } from '../whs/store';
 import { useFlk } from '../flk/store';
 import { useBrd } from '../brd/store';
+import { useHal } from '../hal/store';
 import type { Invoice, InvoiceItem, InvoiceType } from './types';
 
 export function applyInvoiceMovements(inv: Invoice, prevItems?: InvoiceItem[]): InvoiceItem[] {
@@ -55,6 +56,24 @@ function computeHatchDate(invDate: string, ageDays: number | null | undefined): 
 }
 
 export const BIRD_CATS = ['chick', 'adult', 'fertile_egg'];
+
+/* EQUIP_LINK */
+/** اتصال فاکتور تجهیزات → Equipment.sourceInvoiceId (خرید) */
+export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
+  const hal = useHal.getState();
+  return inv.items.map(it => {
+    const eqId = (it as any).equipmentId;
+    if (!eqId) return it;
+    const eq = hal.equipment.find(e => e.id === eqId);
+    if (!eq) return it;
+    // فقط خرید → لینک به فاکتور
+    if (inv.type === 'purchase' && !eq.sourceInvoiceId) {
+      try { hal.updateEquip(eqId, { sourceInvoiceId: inv.id } as any); } catch {}
+    }
+    return it;
+  });
+}
+
 
 /* ITEMS_RETURNED */
 export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] {
