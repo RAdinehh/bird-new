@@ -9,7 +9,7 @@ import { useFlk } from '../flk/store';
 import { useBrd } from '../brd/store';
 
 import type { Invoice, InvoiceItem, Deal, State } from './types';
-import { applyInvoiceMovements, applyInvoiceFlocks, applyInvoiceEquipment, BIRD_CATS } from './invoiceHelpers';
+import { applyInvoiceMovements, applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { generateInvoiceNumber } from './calc';
 
 const now = () => new Date().toISOString();
@@ -35,6 +35,8 @@ export const useTra = create<State>()(
         try { items = applyInvoiceFlocks({ ...newInv, items }); } catch(e) {}
         // 🎯 ۳. اتصال تجهیزات به فاکتور
         try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) {}
+        // 🎯 ۴. اتصال فروش تخم به ماژول egg
+        try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) {}
         const final = { ...newInv, items };
         set({ invoices: [...get().invoices, final] });
         return id;
@@ -48,6 +50,7 @@ export const useTra = create<State>()(
         let itemsFinal: InvoiceItem[] = itemsMoved;
         try { itemsFinal = applyInvoiceFlocks(mergedWithItems, prev); } catch(e) {}
         try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
+        try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
         const final = { ...mergedWithItems, items: itemsFinal };
         set({ invoices: get().invoices.map(x => x.id === id ? final : x) });
       },

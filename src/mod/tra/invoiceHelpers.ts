@@ -6,6 +6,7 @@ import { useWhs } from '../whs/store';
 import { useFlk } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { useHal } from '../hal/store';
+import { useEgg } from '../egg/store';
 import type { Invoice, InvoiceItem, InvoiceType } from './types';
 
 export function applyInvoiceMovements(inv: Invoice, prevItems?: InvoiceItem[]): InvoiceItem[] {
@@ -56,6 +57,37 @@ function computeHatchDate(invDate: string, ageDays: number | null | undefined): 
 }
 
 export const BIRD_CATS = ['chick', 'adult', 'fertile_egg'];
+
+/* EGG_LINK */
+/** اتصال فاکتور فروش تخم → EggSale خودکار */
+export function applyInvoiceEgg(inv: Invoice): InvoiceItem[] {
+  if (inv.category !== 'egg' || inv.type !== 'sale') return inv.items;
+  const egg = useEgg.getState();
+  return inv.items.map(it => {
+    if (!it.quantity || it.quantity <= 0) return it;
+    // نوع تخم از فیلد eggTypes
+    const rawType = ((it as any).eggTypes || [])[0] || 'eating';
+    const type = rawType === 'fertile' ? 'fertile' : rawType === 'broken' ? 'broken' : 'eating';
+    // جلوگیری از تکراری
+    const exists = egg.sales.find((x: any) => x.sourceInvoiceId === inv.id && x.date === inv.date);
+    if (exists) return it;
+    try {
+      egg.addSale({
+        date: inv.date,
+        type,
+        count: it.quantity,
+        unit: 'piece',
+        unitPrice: it.unitPrice || 0,
+        totalPrice: it.total || (it.quantity * (it.unitPrice || 0)),
+        customerId: inv.partyId || '',
+        paymentType: 'cash',
+        notes: `فاکتور ${inv.number || ''}`,
+        sourceInvoiceId: inv.id,
+      } as any);
+    } catch (e) { console.error('[TRA→EGG]', e); }
+    return it;
+  });
+}
 
 /* EQUIP_LINK */
 /** اتصال فاکتور تجهیزات → Equipment.sourceInvoiceId (خرید) */

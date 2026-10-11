@@ -44,6 +44,8 @@ export interface EggSale {
   customerId: string;
   paymentType: 'cash' | 'card' | 'debt';
   notes: string;
+  /** 🆕 شناسه فاکتور مبدأ (tra) */
+  sourceInvoiceId?: string;
   createdAt: string;
 }
 
