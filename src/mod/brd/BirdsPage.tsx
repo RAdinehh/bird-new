@@ -8,6 +8,7 @@ import { useSet } from '../set/store';
 import { detectCycleDaysSource, detectFcrSource, getOverrideInfo } from './_source';
 import OverrideHint from '../../shr/components/OverrideHint';
 import BirdForm, { EMPTY_BIRD_FORM, type BirdFormData } from './BirdForm';
+import { BirdSchema } from '../../shr/validation/rules/brd';
 import BirdCard from './BirdCard';
 import {
   Btn, BtnRow, Empty, Field,
@@ -118,15 +119,18 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
       }
     }
 
-    if (!form.name.trim()) { setError('نام پرنده اجباری است'); return; }
-    const payload = {
-      name: form.name.trim(),
-      cycleDays: form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null,
-      fcrStandard: form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null,
-      standardKey: form.standardKey,
-      birdKind: form.birdKind,
-      purpose: form.purpose,
-    } as any;
+    // اعتبارسنجی با Zod
+    const result = BirdSchema.safeParse({
+      ...form,
+      cycleDays: form.cycleDays ? form.cycleDays : undefined,
+      fcrStandard: form.fcrStandard ? form.fcrStandard.replace('٫', '.') : undefined,
+    });
+    if (!result.success) {
+      const first = result.error.issues[0];
+      setError(first?.message || 'خطا در اعتبارسنجی');
+      return;
+    }
+    const payload = result.data as any;
     if (form.id) updateBird(form.id, payload); else addBird(payload);
     draft.clear();
     setForm(EMPTY_BIRD_FORM);
