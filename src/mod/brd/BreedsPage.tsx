@@ -107,7 +107,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });
-        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 6000);
       }
       toastMsg.deletedBulk(backups.length, 'مورد')
     },

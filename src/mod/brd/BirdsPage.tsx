@@ -104,7 +104,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });
-        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 6000);
       }
       toastMsg.deletedBulk(backups.length, 'پرنده')
     },
@@ -270,24 +270,8 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
               >
                 <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مشخصات کامل</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>نام انگلیسی:</span>
-                    <span style={{ fontWeight: 600 }}>—</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>چرخه زندگی:</span>
-                    <span style={{ fontWeight: 600 }}>{b.cycleDays ? `${toFa(b.cycleDays)} روز` : '—'}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>FCR استاندارد:</span>
-                    <span style={{ fontWeight: 600 }}>{b.fcrStandard ? toFa(b.fcrStandard) : '—'}</span>
-                  </div>
+                  <StatRow label="چرخه زندگی" value={b.cycleDays ? `${toFa(b.cycleDays)} روز` : '—'} />
+                  <StatRow label="FCR استاندارد" value={b.fcrStandard ? toFa(b.fcrStandard) : '—'} />
                 </div>
 
                 {birdBreeds.length > 0 && (
@@ -469,5 +453,19 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         </div>
       </Modal>
     </PageContainer>
+  );
+}
+
+/** ردیف استاندارد نمایش label/value */
+function StatRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{
+      display: 'flex', justifyContent: 'space-between',
+      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
+      background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
+    }}>
+      <span style={{ color: 'var(--muted)' }}>{label}:</span>
+      <span style={{ fontWeight: 600 }}>{value}</span>
+    </div>
   );
 }
