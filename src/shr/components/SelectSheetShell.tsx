@@ -372,6 +372,7 @@ export function SheetItem({ icon, equipType, category, title, selected, onClick,
         cursor: 'pointer', position: 'relative',
       }}
     >
+      {actions && <span style={{ display: 'flex', gap: 2, flexShrink: 0 }}>{actions}</span>}
       {iconNode}
       <span style={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         {title}
@@ -379,7 +380,6 @@ export function SheetItem({ icon, equipType, category, title, selected, onClick,
       {selected && (
         <span style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 900, flexShrink: 0 }}>✓</span>
       )}
-      {actions && <span style={{ display: 'flex', gap: 2, flexShrink: 0 }}>{actions}</span>}
     </button>
   );
 }
