@@ -115,6 +115,7 @@ export default function BreedNameField({
         icon,
         group: std.category === 'native' ? 'native' : 'industrial',
         groupLabel: std.category === 'native' ? 'بومی' : 'صنعتی',
+        groupIcon: std.category === 'native' ? '🌾' : '🏭',
       });
     }
 

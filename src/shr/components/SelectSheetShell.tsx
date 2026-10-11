@@ -242,9 +242,11 @@ export default function SelectSheetShell({
         <div style={{ position: 'relative', flex: 1, display: 'flex', minHeight: 0 }}>
           <ScrollIndicator visible={showIndicator} />
           <div ref={bodyRef} onScroll={checkScroll} style={{
-            padding: 10, overflowY: 'auto', flex: 1,
+            padding: 10, overflowY: 'auto', flex: 1, minHeight: 0,
             display: 'flex', flexDirection: 'column', gap: 10,
             overscrollBehavior: 'contain',
+            touchAction: 'pan-y',
+            WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'thin',
             scrollbarColor: 'var(--scroll-thumb, rgba(142,142,147,.5)) transparent',
           }}>

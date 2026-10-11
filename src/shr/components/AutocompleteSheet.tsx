@@ -17,6 +17,7 @@ export interface AutoOption {
   icon?: string;
   group?: string;
   groupLabel?: string;
+  groupIcon?: string;
 }
 
 interface Props {
@@ -69,7 +70,7 @@ export default function AutocompleteSheet({
     const groups: Record<string, { label: string; icon?: string; items: AutoOption[] }> = {};
     toShow.forEach(o => {
       const key = o.group || 'other';
-      if (!groups[key]) groups[key] = { label: o.groupLabel || '', icon: o.icon, items: [] };
+      if (!groups[key]) groups[key] = { label: o.groupLabel || '', icon: o.groupIcon, items: [] };
       groups[key].items.push(o);
     });
     return groups;
@@ -222,7 +223,7 @@ export default function AutocompleteSheet({
         ) : (
           <>
             {Object.entries(grouped).map(([key, g]) => (
-              <SheetGroup key={key} title={g.label || '—'} count={g.items.length}>
+              <SheetGroup key={key} title={g.label || '—'} icon={g.icon} count={g.items.length}>
                 {g.items.map(opt => (
                   <SheetItem
                     key={opt.value}

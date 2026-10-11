@@ -42,11 +42,11 @@ function birdIcon(name: string): string {
 
 function birdGroup(name: string): { group: string; groupLabel: string } {
   const n = name.toLowerCase();
-  if (n.includes('اردک')) return { group: 'duck', groupLabel: '🦆 اردک' };
-  if (n.includes('بوقلمون')) return { group: 'turkey', groupLabel: '🦃 بوقلمون' };
-  if (n.includes('بلدرچین')) return { group: 'quail', groupLabel: '🐦 بلدرچین' };
-  if (n.includes('غاز')) return { group: 'goose', groupLabel: '🦢 غاز' };
-  if (n.includes('مرغ') || n.includes('جوجه')) return { group: 'chicken', groupLabel: '🐔 مرغ' };
+  if (n.includes('اردک')) return { group: 'duck', groupLabel: 'اردک' };
+  if (n.includes('بوقلمون')) return { group: 'turkey', groupLabel: 'بوقلمون' };
+  if (n.includes('بلدرچین')) return { group: 'quail', groupLabel: 'بلدرچین' };
+  if (n.includes('غاز')) return { group: 'goose', groupLabel: 'غاز' };
+  if (n.includes('مرغ') || n.includes('جوجه')) return { group: 'chicken', groupLabel: 'مرغ' };
   return { group: 'other', groupLabel: 'سایر' };
 }
 
@@ -64,6 +64,7 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
         icon: birdIcon(name),
         group: g.group,
         groupLabel: g.groupLabel,
+        groupIcon: birdIcon(name),
       });
     }
 
