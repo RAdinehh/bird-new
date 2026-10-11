@@ -19,7 +19,6 @@ import { useFilterSort, FilterBar, getBrdBreedsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import SmartSelect from '../../shr/components/SmartSelect';
-import { showAlert } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -177,10 +176,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       const _trimmed = form.name.trim();
       const _dup = breeds.find((x: any) => x.birdId === form.birdId && x.name.trim() === _trimmed);
       if (_dup) {
-        showAlert(
-          `نژادای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
-          '❌ نام تکراری'
-        );
+        setErr(`نام «${_dup.name}» تکراریه — یا ویرایشش کن یا اسم دیگه بذار`);
         return;
       }
     }
