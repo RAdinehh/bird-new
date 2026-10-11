@@ -1,7 +1,8 @@
 /** HallEquipSection — تجهیزات سالن (بازطراحی تک‌خطی) */
 import { useState, useMemo, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import HallEquipModals from './components/HallEquipModals';
+import CategoryPicker from './components/CategoryPicker';
+import HallEquipCatRow from './components/HallEquipCatRow';
 import { CategoryIcon, CATEGORY_COLORS } from '../../shr/icons/equipment';
 import {
   useHal,
@@ -321,59 +322,16 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
                 تجهیزی ثبت نشده — با دکمه پایین اضافه کن
               </div>
             ) : (
-              displayCats.map(cat => {
-                const list = grouped[cat] || [];
-                const tone = toneFor(cat);
-                const pct = pctFor(cat);
-                const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
-                const color = CATEGORY_COLORS[cat] || 'var(--cat-auxiliary)';
-                const soft = (CATEGORY_COLORS as any)[cat + '-soft'] || 'var(--input-bg)';
-                return (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setDetailCat(cat)}
-                    style={{
-                      width: '100%', padding: '10px 12px', minHeight: 46,
-                      background: 'var(--card-solid)',
-                      border: 'none', borderBottom: '1px solid var(--border)',
-                      display: 'flex', alignItems: 'center', gap: 10,
-                      fontFamily: 'inherit', cursor: 'pointer', textAlign: 'right',
-                    }}
-                  >
-                    <span style={{
-                      width: 30, height: 30, borderRadius: 8,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: soft, color, flexShrink: 0,
-                    }}>
-                      <CategoryIcon category={cat} size={16} weight="duotone" color={color} />
-                    </span>
-                    <span style={{
-                      fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)',
-                      flexShrink: 0, minWidth: 62,
-                    }}>{label}</span>
-                    <div style={{
-                      flex: 1, height: 5, borderRadius: 3,
-                      background: 'var(--border)', overflow: 'hidden',
-                      minWidth: 40,
-                    }}>
-                      <div style={{
-                        width: `${Math.min(pct || 0, 100)}%`, height: '100%',
-                        background: TONE_COLOR[tone], borderRadius: 3,
-                      }} />
-                    </div>
-                    <span style={{
-                      fontSize: 11, fontWeight: 700,
-                      fontVariantNumeric: 'tabular-nums',
-                      color: TONE_COLOR[tone],
-                      minWidth: 40, textAlign: 'left', flexShrink: 0,
-                    }}>
-                      {pct !== null ? `${toFa(Math.round(pct))}٪` : '—'}
-                    </span>
-                    <span style={{ fontSize: 14, flexShrink: 0 }}>{TONE_EMOJI[tone]}</span>
-                  </button>
-                );
-              })
+              displayCats.map(cat => (
+                <HallEquipCatRow
+                  key={cat}
+                  cat={cat}
+                  count={(grouped[cat] || []).length}
+                  tone={toneFor(cat)}
+                  pct={pctFor(cat)}
+                  onClick={() => setDetailCat(cat)}
+                />
+              ))
             )}
 
             <div style={{ padding: 10, background: 'var(--card-solid)' }}>
@@ -407,113 +365,12 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
         )}
       </div>
 
-      {/* ═══ Category Picker (Portal) ═══ */}
-      {catPicker && createPortal(
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="افزودن دسته تجهیز"
-          data-sheet-open="true"
-          onClick={() => setCatPicker(false)}
-          onPointerDownCapture={e => e.stopPropagation()}
-          onPointerDown={e => e.stopPropagation()}
-          onPointerUp={e => e.stopPropagation()}
-          onTouchStartCapture={e => e.stopPropagation()}
-          onTouchStart={e => e.stopPropagation()}
-          onTouchMoveCapture={e => e.stopPropagation()}
-          onTouchMove={e => e.stopPropagation()}
-          onTouchEnd={e => e.stopPropagation()}
-          style={{
-            position: 'fixed', inset: 0, zIndex: 100000,
-            background: 'var(--overlay)',
-            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-            touchAction: 'none',
-            overscrollBehavior: 'contain',
-          }}
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              background: 'var(--card-solid)',
-              borderTopLeftRadius: 20, borderTopRightRadius: 20,
-              width: '100%', maxWidth: 540, maxHeight: '70vh',
-              display: 'flex', flexDirection: 'column', overflow: 'hidden',
-            }}
-          >
-            <div style={{ padding: '10px 0 6px', display: 'flex', justifyContent: 'center' }}>
-              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--border)' }} />
-            </div>
-            <div style={{
-              padding: '8px 14px', borderBottom: '1px solid var(--border)',
-              display: 'flex', alignItems: 'center', gap: 8,
-            }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>افزودن دسته تجهیز</div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                  کدام دسته؟
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setCatPicker(false)}
-                aria-label="بستن"
-                style={{
-                  width: 40, height: 40, borderRadius: 10,
-                  border: '1px solid var(--border)', background: 'transparent',
-                  color: 'var(--muted)', fontSize: 14, cursor: 'pointer',
-                }}
-              >✕</button>
-            </div>
-            <div
-              onPointerDownCapture={e => e.stopPropagation()}
-              onPointerDown={e => e.stopPropagation()}
-              onTouchStartCapture={e => e.stopPropagation()}
-              onTouchStart={e => e.stopPropagation()}
-              onTouchMoveCapture={e => e.stopPropagation()}
-              onTouchMove={e => e.stopPropagation()}
-              style={{
-                padding: 10, overflowY: 'auto', flex: 1,
-                overscrollBehavior: 'contain',
-                WebkitOverflowScrolling: 'touch',
-                touchAction: 'pan-y',
-              }}>
-              {ALL_CATS.map(cat => {
-                const color = (CATEGORY_COLORS as any)[cat] || 'var(--cat-auxiliary)';
-                const soft = (CATEGORY_COLORS as any)[cat + '-soft'] || 'var(--input-bg)';
-                const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
-                const count = (grouped[cat] || []).length;
-                return (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => openPicker(cat)}
-                    style={{
-                      width: '100%', padding: '10px 12px', minHeight: 52,
-                      background: 'transparent', border: 'none',
-                      borderBottom: '1px solid var(--border)',
-                      display: 'flex', alignItems: 'center', gap: 12,
-                      fontFamily: 'inherit', cursor: 'pointer', textAlign: 'right',
-                    }}
-                  >
-                    <span style={{
-                      width: 34, height: 34, borderRadius: 9,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: soft, color,
-                    }}>
-                      <CategoryIcon category={cat} size={18} weight="duotone" color={color} />
-                    </span>
-                    <span style={{ flex: 1, fontSize: 'var(--fs-base)', fontWeight: 600, color: 'var(--text)' }}>{label}</span>
-                    {count > 0 && (
-                      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>{toFa(count)} مورد</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      <CategoryPicker
+        open={catPicker}
+        onClose={() => setCatPicker(false)}
+        onPick={openPicker}
+        grouped={grouped}
+      />
 
       <HallEquipModals
         detailCat={detailCat} setDetailCat={setDetailCat}
