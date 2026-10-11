@@ -324,3 +324,48 @@ git log --oneline -10
 ---
 
 *ساخته‌شده در جلسه‌ی ۱۴۰۴/۰۷/۲۰*
+
+---
+
+## 🆕 به‌روزرسانی جلسه‌ی بعدی (۱۴۰۴/۰۷/۲۰)
+
+### کارهای انجام‌شده در این جلسه
+
+**۱. کشف ۳ false positive در گزارش‌های خودکار:**
+- store بدون name در cal/doc → false (نه store هستن، نه persist دارن)
+- ۳ فایل .bak → قبلاً پاک شده بودن
+- dsh ناقص → false (طراحی متفاوت، تک‌صفحه‌ایه)
+
+**۲. مستندات جدید:**
+- `docs/FOUNDATION.md` — توکن‌ها + Contracts + قوانین آهنین (پایه‌ی معماری)
+- `docs/AUDIT-BRD.md` — ممیزی کامل `brd` (محور ۱)
+
+**۳. ممیزی + بهبود brd (۱۱ fix):**
+- 🐛 رفع باگ `category` ghost
+- 🔄 تبدیل `showAlert` → inline error
+- 🧹 حذف catch خالی
+- ⚡ رفع N+1 (Map گروه‌بندی)
+- 🎨 توکنی کردن همه fontSize/borderRadius/padding
+- 🏗 استخراج `BirdForm.tsx` و `BirdCard.tsx`
+- ✅ افزودن Zod validation (`rules/brd.ts`)
+
+**۴. آمار قبل/بعد:**
+| فایل | قبل | بعد |
+|---|---|---|
+| `BirdsPage.tsx` | ۴۶۶ | ۲۶۶ |
+| `BirdForm.tsx` | — | ۱۳۲ |
+| `BirdCard.tsx` | — | ۱۷۷ |
+
+### کارهای باقی‌مونده برای جلسه‌ی بعد
+
+1. **`BreedsPage` refactor** (مثل BirdsPage: BreedForm + BreedCard + Zod)
+2. **ادامه‌ی ممیزی brd:** محور ۴ (Accessibility) + محور ۶ (Integration)
+3. **ماژول بعدی در زنجیره:** `hal` (سالن)
+
+### نکات مهم برای AI بعدی
+
+- **قبل از fix، همیشه با فایل واقعی verify کن** — گزارش‌های خودکار نویزدارن
+- **FOUNDATION.md رو بخون** قبل از هر تغییر
+- **هر fix، یه commit** — طبق دستور، نه چند تا با هم
+- **توکن‌های جدید اضافه شدن:** `--fs-2xs`, `--pad-chip`, `--pad-chip-xs`, `--pad-btn-sm`, `--pad-box`
+

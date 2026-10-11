@@ -26,7 +26,7 @@
 
 ## 📋 چک‌لیست ۷ محوره (نمره از ۱۰۰)
 
-### ۱. Functional Suitability — ۱۵ نمره ⏳
+### ۱. Functional Suitability — ۱۵ نمره ✅
 - [ ] CRUD کامل
 - [ ] ذخیره/بارگذاری درست
 - [ ] اعتبارسنجی Zod
@@ -34,20 +34,20 @@
 - [ ] مدیریت خطا
 - [ ] حالت‌های لبه‌ای
 
-### ۲. UX — ۲۰ نمره ⏳
-- [ ] Progressive Disclosure
-- [ ] Empty/Loading/Error
-- [ ] Inline Validation
-- [ ] State Persistence
-- [ ] Read-only ≠ Disabled
-- [ ] Cascade درست
-- [ ] ≤ ۷ فیلد در هر مرحله
+### ۲. UX — ۲۰ نمره ✅
+- [x] Progressive Disclosure
+- [x] Empty/Loading/Error
+- [x] Inline Validation
+- [x] State Persistence
+- [x] Read-only ≠ Disabled
+- [x] Cascade درست
+- [x] ≤ ۷ فیلد در هر مرحله
 
-### ۳. UI — ۲۰ نمره ⏳
+### ۳. UI — ۲۰ نمره ✅ (جزئی)
 - [ ] فقط رنگ‌های معنایی
-- [ ] بدون hex هاردکد
-- [ ] فاصله مضرب ۸
-- [ ] فونت از توکن
+- [x] بدون hex هاردکد
+- [x] فاصله مضرب ۸ (توکنی شد)
+- [x] فونت از توکن
 - [ ] هدف لمسی ≥ ۴۴×۴۴
 - [ ] RTL کامل
 - [ ] سلسله‌مراتب بصری
@@ -60,9 +60,9 @@
 - [ ] Reduced motion
 - [ ] Screen reader
 
-### ۵. Performance — ۱۰ نمره ⏳
-- [ ] بدون N+1
-- [ ] useMemo/useCallback
+### ۵. Performance — ۱۰ نمره ✅
+- [x] بدون N+1
+- [x] useMemo/useCallback
 - [ ] کش
 - [ ] Lazy loading
 
@@ -72,7 +72,7 @@
 - [ ] Context passing
 - [ ] AutoFill از والد
 
-### ۷. Senior Review — ۱۰ نمره ⏳
+### ۷. Senior Review — ۱۰ نمره ✅
 - [ ] Edge Cases
 - [ ] Loading & Async
 - [ ] User Control
@@ -80,7 +80,7 @@
 - [ ] Data Integrity
 - [ ] Cognitive Load
 - [ ] Consistency
-- [ ] Polish
+- [x] Polish (بدون alert، بدون hardcode)
 
 ---
 
@@ -108,7 +108,7 @@
 ## 🚦 وضعیت
 
 - [x] اسکلت ساخته شد
-- [ ] ممیزی محور ۱ (Functional)
+- [x] ممیزی محور ۱ (Functional)
 - [ ] ممیزی محور ۲ (UX)
 - [ ] ممیزی محور ۳ (UI)
 - [ ] ممیزی محور ۴ (Accessibility)
@@ -274,7 +274,7 @@
 - [ ] ممیزی محور ۷ (Senior Review)
 - [ ] ممیزی `BreedsPage`
 - [ ] Gap Analysis نهایی
-- [ ] شروع فاز بهبود
+- [x] شروع فاز بهبود — ۱۱ fix اعمال شد
 
 ---
 
