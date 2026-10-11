@@ -13,7 +13,6 @@ import { useWhs, stockWarning, expiryWarning } from '../../whs/store';
 import { useAlt, activeAlerts, countByLevel } from '../../alt/store';
 import { runRules } from '../../alt/rules';
 import { useBrd } from '../../brd/store';
-import { findBirdPreset } from '../../brd/presets';
 import { useDlg } from '../../dlg/store';
 import { monthKey, currentMonth, todayJalali, dateDiffDays } from '../utils';
 
@@ -308,9 +307,8 @@ const [, _setTick] = useState(0);
     const bird = birds.find(b => b.id === flock.birdId);
     const breed = breeds.find(b => b.id === flock.breedId);
 
-    // استاندارد: اول breed.fcr، بعد preset نژاد پرنده
-    const preset = bird ? findBirdPreset(bird.name) : undefined;
-    const fcrStandard = breed?.fcr || preset?.fcrStandard || 0;
+    // استاندارد: اول breed.fcr (نژاد)، بعد bird.fcrStandard (پرنده)
+    const fcrStandard = breed?.fcr || bird?.fcrStandard || 0;
 
     // داده‌های این گله
     const flockLogs = logs.filter((l: any) => l.flockId === flock.id);

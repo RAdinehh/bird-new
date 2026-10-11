@@ -3,7 +3,6 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useBrd, type Bird } from './store';
-import { findBirdPreset } from './presets';
 import { useSet } from '../set/store';
 import { detectCycleDaysSource, detectFcrSource, getOverrideInfo } from './_source';
 import OverrideHint from '../../shr/components/OverrideHint';
