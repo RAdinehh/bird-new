@@ -378,7 +378,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
 
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش پرنده' : 'افزودن پرنده'} contentGap={14}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-        <Field label="نام پرنده" required hint="از لیست انتخاب کن یا پرنده دلخواه بنویس">
+        <Field label="نام پرنده" required hint="انتخاب یا تایپ">
           <BirdNameField
             value={form.name}
             onChange={v => setForm(f => ({ ...f, name: v }))}

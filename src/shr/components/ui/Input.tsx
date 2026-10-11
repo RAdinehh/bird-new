@@ -12,7 +12,7 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   integer?: boolean; // فقط عدد صحیح (بدون اعشار)
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
-export function Input({ unit, error, warn, mode = 'text', showWords, min, max, autoClamp, style, value, onChange, onBlur, ...rest }: InputProps) {
+export function Input({ unit, error, warn, mode = 'text', showWords, min, max, autoClamp, height: customHeight, style, value, onChange, onBlur, ...rest }: InputProps) {
   // اگر inputMode عددی بود، خودکار حالت number فعال شود
   const effectiveMode = mode === 'text' && rest.inputMode === 'numeric' ? 'number' : mode;
 
@@ -106,7 +106,7 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
       <div style={{
-        width: '100%', minWidth: 0, height: 38,
+        width: '100%', minWidth: 0, height: customHeight ?? 38,
         background: 'var(--input-bg)',
         border: `1px solid ${error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)'}`,
         borderRadius: 'var(--r-md)', padding: '0 12px',

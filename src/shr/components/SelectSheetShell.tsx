@@ -239,14 +239,12 @@ export default function SelectSheetShell({
         )}
 
         {/* Body + Indicator */}
-        <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <div style={{ position: 'relative', flex: 1, display: 'flex', minHeight: 0 }}>
           <ScrollIndicator visible={showIndicator} />
           <div ref={bodyRef} onScroll={checkScroll} style={{
-            padding: 10, overflowY: 'auto', flex: 1, minHeight: 0,
+            padding: 10, overflowY: 'auto', flex: 1,
             display: 'flex', flexDirection: 'column', gap: 10,
             overscrollBehavior: 'contain',
-            touchAction: 'pan-y',
-            WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'thin',
             scrollbarColor: 'var(--scroll-thumb, rgba(142,142,147,.5)) transparent',
           }}>
@@ -296,29 +294,30 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
     }}>
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
-        padding: '10px 14px',
+        padding: '9px 14px',
         background: 'var(--group-bg, #f2f2f7)',
-        fontSize: 12.5, fontWeight: 800,
-        color: 'var(--text)',
-        letterSpacing: '.2px',
+        fontSize: 'var(--fs-sm, 11px)', fontWeight: 700,
+        color: 'var(--group-text, #6d6d72)',
+        letterSpacing: '.3px',
         borderBottom: '1px solid var(--border)',
+        position: 'relative',
       }}>
+        <span aria-hidden="true" style={{
+          position: 'absolute', right: 0, top: 0, bottom: 0,
+          width: 3, background: 'var(--group-text, #6d6d72)', opacity: .35,
+        }} />
         {icon && (
           <span style={{
-            fontSize: 15, flexShrink: 0, lineHeight: 1,
-            display: 'inline-flex', alignItems: 'center',
+            width: 16, height: 16, flexShrink: 0,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 14, lineHeight: 1,
           }}>{icon}</span>
         )}
-        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
+        <span style={{ flex: 1 }}>{title}</span>
         {count != null && (
-          <span style={{
-            fontSize: 10.5, fontWeight: 700,
-            padding: '2px 8px', borderRadius: 10,
-            background: 'var(--card-solid)',
-            color: 'var(--muted)',
-            minWidth: 22, textAlign: 'center',
-            flexShrink: 0,
-          }}>{toFa(count)}</span>
+          <span style={{ fontSize: 10, fontWeight: 600, opacity: .75 }}>
+            {toFa(count)} مورد
+          </span>
         )}
       </div>
       {children}

@@ -60,44 +60,23 @@ export default function DependentSelect({
       <div
         role="status"
         aria-live="polite"
+        title={emptyListMessage || `موردی برای «${parentLabel}» انتخاب‌شده وجود ندارد`}
         style={{
-          height,
-          padding: compact ? '0 10px' : '0 12px',
-          background: 'var(--input-bg)',
-          border: '1px dashed var(--border)',
-          borderRadius: 'var(--r-md)',
-          fontSize,
-          color: 'var(--muted)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          opacity: disabled ? 0.55 : 1,
-        }}
-      >
-        <span aria-hidden="true">🔒</span>
-        <span>ابتدا «{parentLabel}» را انتخاب کنید</span>
-      </div>
-    );
-  }
-
-  // حالت ۲: لیست خالی
-  if (options.length === 0) {
-    return (
-      <div
-        role="status"
-        aria-live="polite"
-        style={{
-          height: 'auto',
-          padding: '10px 12px',
+          height: 38, boxSizing: 'border-box',
+          padding: '0 12px',
           background: 'var(--warn-soft)',
           border: '1px dashed var(--warn)',
           borderRadius: 'var(--r-md)',
-          fontSize,
+          fontSize: 11,
           color: 'var(--warn)',
           fontWeight: 600,
+          display: 'flex', alignItems: 'center',
+          overflow: 'hidden',
         }}
       >
-        ⚠️ {emptyListMessage || `موردی برای «${parentLabel}» انتخاب‌شده وجود ندارد`}
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          ⚠️ {emptyListMessage || `موردی برای «${parentLabel}» انتخاب‌شده وجود ندارد`}
+        </span>
       </div>
     );
   }

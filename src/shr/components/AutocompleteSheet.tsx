@@ -106,7 +106,7 @@ export default function AutocompleteSheet({
   return (
     <>
       {/* فیلد اصلی: input + دکمه ▼ */}
-      <div style={{ display: 'flex', alignItems: 'stretch', width: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'stretch', width: '100%', minWidth: 0, maxWidth: '100%' }}>
         <input
           ref={inputRef}
           type="text"
@@ -143,7 +143,7 @@ export default function AutocompleteSheet({
           placeholder={placeholder || 'تایپ کن یا ▼ بزن'}
           autoComplete="off"
           style={{
-            flex: 1, minHeight: 44, padding: '10px 12px',
+            flex: '1 1 0%', minWidth: 0, height: 38, padding: '0 12px',
             background: 'var(--input-bg)',
             border: `1px solid ${typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'}`,
             borderTopRightRadius: 'var(--r-md, 8px)',
@@ -168,7 +168,7 @@ export default function AutocompleteSheet({
           onClick={handleOpen}
           aria-label="باز کردن لیست"
           style={{
-            minHeight: 44, minWidth: 44, padding: '0 12px',
+            height: 38, minWidth: 38, padding: '0 12px',
             background: 'var(--input-bg)',
             border: `1px solid ${typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'}`,
             borderTopLeftRadius: 'var(--r-md, 8px)',

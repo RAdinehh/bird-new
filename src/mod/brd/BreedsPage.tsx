@@ -330,7 +330,6 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
         <Field label="پرنده" required>
           <SmartSelect
             value={form.birdId}
-            height={44}
             onChange={v => {
               const parent = birds.find(x => x.id === v);
               // 🔄 Cascade: اگه FCR خالیه، از پرنده والد پر کن
