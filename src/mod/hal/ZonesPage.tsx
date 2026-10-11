@@ -7,6 +7,7 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { ZoneSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Zone } from './store';
 import { useBrd } from '../brd/store';
+import { useFlk } from '../flk/store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -27,6 +28,7 @@ import { logAction } from '../../cor/logger/auditLog';
 export default function ZonesPage({ active = true }: { active?: boolean } = {}) {
   const { halls: _hallsRaw, zones: _zonesRaw, addZone, updateZone, deleteZone } = useHal();
   const { birds, breeds } = useBrd();
+  const { flocks } = useFlk();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
   const draft = useFormDraft('hal-zone', form, (v: any) => setForm(v));
@@ -183,6 +185,18 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     setOpen(false);
   };
 
+  // 🆕 گله‌های هر بخش
+  const flocksByZone = useMemo(() => {
+    const m = new Map<string, any[]>();
+    for (const f of flocks as any[]) {
+      if (!f.zoneId) continue;
+      const arr = m.get(f.zoneId) || [];
+      arr.push(f);
+      m.set(f.zoneId, arr);
+    }
+    return m;
+  }, [flocks]);
+
   return (
     <PageContainer>
       <HelpBanner
@@ -283,6 +297,23 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
                     <span style={{ fontWeight: 600 }}>{z.capacity ? `${toFa(z.capacity)} پرنده` : '—'}</span>
                   </div>
                 </div>
+                {(flocksByZone.get(z.id) || []).length > 0 && (
+                  <>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های این بخش ({(flocksByZone.get(z.id) || []).length})</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      {(flocksByZone.get(z.id) || []).map((fl: any) => (
+                        <div key={fl.id} style={{ display: 'flex', justifyContent: 'space-between',
+                           fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+                           borderRadius: 'var(--r-sm)' }}>
+                          <span style={{ fontWeight: 600 }}>
+                            <EntityLink type="flock" id={fl.id} label={fl.name} />
+                          </span>
+                          <span style={{ color: 'var(--muted)' }}>{toFa(fl.currentCount || fl.initialCount || 0)} پرنده</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
                 {z.notes && (
                   <>
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
