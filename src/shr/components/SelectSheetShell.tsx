@@ -239,13 +239,13 @@ export default function SelectSheetShell({
         )}
 
         {/* Body + Indicator */}
-        <div style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <ScrollIndicator visible={showIndicator} />
           <div ref={bodyRef} onScroll={checkScroll} style={{
-            position: 'absolute', inset: 0,
-            padding: 10, overflowY: 'auto',
+            padding: 10, overflowY: 'auto', flex: 1, minHeight: 0,
             display: 'flex', flexDirection: 'column', gap: 10,
             overscrollBehavior: 'contain',
+            touchAction: 'pan-y',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'thin',
             scrollbarColor: 'var(--scroll-thumb, rgba(142,142,147,.5)) transparent',
@@ -302,30 +302,22 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
         color: 'var(--text)',
         letterSpacing: '.2px',
         borderBottom: '1px solid var(--border)',
-        position: 'relative',
       }}>
-        {/* خط لهجه سبز نازک سمت راست */}
-        <span aria-hidden="true" style={{
-          position: 'absolute', right: 0, top: 4, bottom: 4,
-          width: 3, borderRadius: 2,
-          background: 'var(--accent)', opacity: .7,
-        }} />
         {icon && (
           <span style={{
             fontSize: 15, flexShrink: 0, lineHeight: 1,
             display: 'inline-flex', alignItems: 'center',
           }}>{icon}</span>
         )}
-        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 4 }}>{title}</span>
+        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
         {count != null && (
           <span style={{
-            fontSize: 11, fontWeight: 800,
-            padding: '3px 9px', borderRadius: 9,
+            fontSize: 10.5, fontWeight: 700,
+            padding: '2px 8px', borderRadius: 10,
             background: 'var(--card-solid)',
-            color: 'var(--accent)',
-            minWidth: 24, textAlign: 'center',
+            color: 'var(--muted)',
+            minWidth: 22, textAlign: 'center',
             flexShrink: 0,
-            border: '1px solid var(--accent-border)',
           }}>{toFa(count)}</span>
         )}
       </div>
