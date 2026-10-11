@@ -7,6 +7,7 @@ import type { BirdStandard } from '../types';
 
 
 export * from './broilers';
+export * from './breeders';
 export * from './layers';
 export * from './native';
 export * from './ornamental';
@@ -15,6 +16,7 @@ export * from './ducks';
 export * from './turkey_goose';
 
 import { COBB_500 } from './broilers';
+import { ROSS_308_BREEDER, COBB_500_BREEDER, HY_LINE_BROWN_BREEDER } from './breeders';
 import { ROSS_308 } from './broilers';
 import { IRAN_BROILER } from './broilers';
 import { HY_LINE_W36 } from './layers';
@@ -41,6 +43,9 @@ import { GOOSE } from './turkey_goose';
 export const NEW_BREEDS: Record<string, BirdStandard> = {
   'cobb-500': COBB_500,
   'ross-308': ROSS_308,
+  'ross-308-breeder': ROSS_308_BREEDER,
+  'cobb-500-breeder': COBB_500_BREEDER,
+  'hy-line-brown-breeder': HY_LINE_BROWN_BREEDER,
   'iran-broiler': IRAN_BROILER,
   'hy-line-w36': HY_LINE_W36,
   'iran-layer': IRAN_LAYER,
