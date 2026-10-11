@@ -1,8 +1,8 @@
 /**
  * BreedNameField.tsx — فیلد نام نژاد با Bottom Sheet
  *
- * گروه‌بندی بر اساس هدف (primaryPurpose):
- *   🍗 گوشتی · 🥚 تخم‌گذار · 🐣 مادر · 🔄 دوگانه · 🎨 تزئینی
+ * گروه‌بندی بر اساس دسته‌بندی (native/industrial/ornamental)
+ * هر نژاد یه بار نشون داده می‌شه — هدف توی BreedForm انتخاب می‌شه.
  *
  * Cascade: فقط نژادهای matching با kind پرنده والد
  */
@@ -32,13 +32,11 @@ interface Props {
   customStandards?: Record<string, any>;
 }
 
-// ═══ گروه‌بندی بر اساس هدف پرورش ═══
-const PURPOSE_GROUPS: Record<string, { label: string; icon: string; order: number }> = {
-  broiler:    { label: 'گوشتی',    icon: '🍗', order: 1 },
-  layer:      { label: 'تخم‌گذار', icon: '🥚', order: 2 },
-  breeder:    { label: 'مادر',     icon: '🐣', order: 3 },
-  dual:       { label: 'دوگانه',   icon: '🔄', order: 4 },
-  ornamental: { label: 'تزئینی',   icon: '🎨', order: 5 },
+// ═══ گروه‌بندی بر اساس دسته‌بندی ═══
+const CATEGORY_GROUPS: Record<string, { label: string; icon: string; order: number }> = {
+  native:     { label: 'بومی',    icon: '🌾', order: 1 },
+  industrial: { label: 'صنعتی',   icon: '🏭', order: 2 },
+  fancy:      { label: 'تزئینی',  icon: '🎨', order: 3 },
 };
 
 const KIND_EMOJI: Record<string, string> = {
@@ -66,36 +64,30 @@ export default function BreedNameField({
       const stdKind = std.birdKind || parentKind || 'chicken';
       const icon = KIND_EMOJI[stdKind] || '🧬';
 
-      // 🆕 نژاد رو توی همه‌ی purpose های خودش نشون بده
-      const purposes: string[] = Array.isArray(std.purposes) && std.purposes.length > 0
-        ? std.purposes
-        : [std.primaryPurpose || 'broiler'];
+      // گروه بر اساس دسته‌بندی (نه هدف)
+      const cat = std.category || 'industrial';
+      const group = CATEGORY_GROUPS[cat] || CATEGORY_GROUPS.industrial;
 
-      for (const purpose of purposes) {
-        const group = PURPOSE_GROUPS[purpose];
-        if (!group) continue;
-
-        opts.push({
-          value: key + '::' + purpose,  // یکتا برای هر purpose
-          label: name,
-          icon,
-          group: purpose,
-          groupLabel: group.label,
-          groupIcon: group.icon,
-        });
-      }
+      opts.push({
+        value: key,
+        label: name,
+        icon,
+        group: cat,
+        groupLabel: group.label,
+        groupIcon: group.icon,
+      });
     }
 
-    // مرتب‌سازی بر اساس ترتیب گروه
+    // مرتب‌سازی: اول بومی، بعد صنعتی، بعد تزئینی
     return opts.sort((a, b) => {
-      const oa = PURPOSE_GROUPS[a.group || '']?.order || 99;
-      const ob = PURPOSE_GROUPS[b.group || '']?.order || 99;
+      const oa = CATEGORY_GROUPS[a.group || '']?.order || 99;
+      const ob = CATEGORY_GROUPS[b.group || '']?.order || 99;
       return oa - ob;
     });
   }, [excludeNames, parentKind, customStandards]);
 
   const handleSelect = (opt: AutoOption) => {
-    const key = opt.value.split('::')[0];
+    const key = opt.value;
     const std = (DEFAULT_STANDARDS as any)[key] || customStandards[key];
     const lastGrowth = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
 
