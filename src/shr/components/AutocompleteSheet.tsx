@@ -143,7 +143,7 @@ export default function AutocompleteSheet({
           placeholder={placeholder || 'تایپ کن یا ▼ بزن'}
           autoComplete="off"
           style={{
-            flex: '1 1 0%', minWidth: 0, height: 38, padding: matched ? '0 36px 0 12px' : '0 12px',
+            flex: '1 1 0%', minWidth: 0, height: 38, padding: matched ? '0 12px 0 38px' : '0 12px',
             background: 'var(--input-bg)',
             border: `1px solid ${typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'}`,
             borderTopRightRadius: 'var(--r-md, 8px)',
@@ -157,7 +157,7 @@ export default function AutocompleteSheet({
         {matched && (
           <span style={{
             position: 'absolute',
-            left: 50,
+            left: 44,
             top: '50%',
             transform: 'translateY(-50%)',
             color: 'var(--accent)',

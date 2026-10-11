@@ -62,22 +62,28 @@ export default function BreedNameField({
       // 🆕 فیلتر cascade: فقط نژادهای matching با گونه‌ی والد
       if (parentKind && std.birdKind && std.birdKind !== parentKind) continue;
 
-      // گروه بر اساس هدف
-      const purpose = std.primaryPurpose || 'broiler';
-      const group = PURPOSE_GROUPS[purpose] || PURPOSE_GROUPS.broiler;
-
       // آیکن بر اساس گونه
       const stdKind = std.birdKind || parentKind || 'chicken';
       const icon = KIND_EMOJI[stdKind] || '🧬';
 
-      opts.push({
-        value: key,
-        label: name,
-        icon,
-        group: purpose,
-        groupLabel: `${group.icon} ${group.label}`,
-        groupIcon: group.icon,
-      });
+      // 🆕 نژاد رو توی همه‌ی purpose های خودش نشون بده
+      const purposes: string[] = Array.isArray(std.purposes) && std.purposes.length > 0
+        ? std.purposes
+        : [std.primaryPurpose || 'broiler'];
+
+      for (const purpose of purposes) {
+        const group = PURPOSE_GROUPS[purpose];
+        if (!group) continue;
+
+        opts.push({
+          value: key + '::' + purpose,  // یکتا برای هر purpose
+          label: name,
+          icon,
+          group: purpose,
+          groupLabel: group.label,
+          groupIcon: group.icon,
+        });
+      }
     }
 
     // مرتب‌سازی بر اساس ترتیب گروه
@@ -89,7 +95,7 @@ export default function BreedNameField({
   }, [excludeNames, parentKind, customStandards]);
 
   const handleSelect = (opt: AutoOption) => {
-    const key = opt.value;
+    const key = opt.value.split('::')[0];
     const std = (DEFAULT_STANDARDS as any)[key] || customStandards[key];
     const lastGrowth = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
 

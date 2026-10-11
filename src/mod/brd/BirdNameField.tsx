@@ -5,7 +5,7 @@
  *   Species → Bird → Breed
  *
  * این فیلد فقط «گونه» رو انتخاب می‌کنه (مرغ، اردک، بوقلمون، ...)
- * کاربر می‌تونه گونه‌ی جدید هم اضافه کنه (کبک، شترمرغ، ...).
+ * کاربر می‌تونه گونه‌ی جدید اضافه/ویرایش/حذف کنه.
  */
 import { useMemo, useState } from 'react';
 import AutocompleteSheet, { type AutoOption } from '../../shr/components/AutocompleteSheet';
@@ -19,9 +19,7 @@ export interface BirdPresetPick {
   fcrStandard: number | null;
   standardKey?: string;
   isCustom: boolean;
-  birdKind?: string;         // 'chicken' یا custom مثل 'pheasant'
-  purpose?: string;          // اختیاری — الان کاربر انتخاب نمی‌کنه
-  categoryId?: string;       // legacy
+  birdKind?: string;
 }
 
 interface Props {
@@ -37,8 +35,10 @@ const ADD_NEW_VALUE = '__ADD_NEW_SPECIES__';
 export default function BirdNameField({ value, onChange, onPick, error, excludeNames = [] }: Props) {
   const customSpecies = useSet((st: any) => st.customSpecies || []);
   const addSpecies = useSet((st: any) => st.addSpecies);
+  const removeSpecies = useSet((st: any) => st.removeSpecies);
 
-  const [showAdd, setShowAdd] = useState(false);
+  const [showManage, setShowManage] = useState(false);
+  const [editingKind, setEditingKind] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newIcon, setNewIcon] = useState('🐦');
   const [newErr, setNewErr] = useState('');
@@ -59,19 +59,18 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
         label: sp.nameFa,
         icon: sp.icon,
         group: sp.builtIn ? 'builtin' : 'custom',
-        groupLabel: sp.builtIn ? '🐔 پرنده‌های اصلی' : '⭐ پرنده‌های سفارشی',
+        groupLabel: sp.builtIn ? 'پرنده‌های اصلی' : 'پرنده‌های سفارشی',
         groupIcon: sp.builtIn ? '🐔' : '⭐',
       });
     }
 
-    // گزینه «افزودن گونه جدید»
     opts.push({
       value: ADD_NEW_VALUE,
-      label: '+ افزودن پرنده‌ی جدید',
-      icon: '➕',
+      label: 'مدیریت پرنده‌ها',
+      icon: '⚙️',
       group: 'action',
-      groupLabel: '➕ افزودن',
-      groupIcon: '➕',
+      groupLabel: 'تنظیمات',
+      groupIcon: '⚙️',
     });
 
     return opts;
@@ -79,10 +78,11 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
 
   const handleSelect = (opt: AutoOption) => {
     if (opt.value === ADD_NEW_VALUE) {
+      setEditingKind(null);
       setNewName('');
       setNewIcon('🐦');
       setNewErr('');
-      setShowAdd(true);
+      setShowManage(true);
       return;
     }
 
@@ -97,12 +97,10 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
       standardKey: undefined,
       isCustom: !sp.builtIn,
       birdKind: sp.kind,
-      // purpose: undefined — کاربر توی نژاد انتخاب می‌کنه
     });
   };
 
   const handleCustomText = (text: string) => {
-    // کاربر تایپ کرد ولی انتخاب نکرد
     onPick({
       name: text,
       cycleDays: null,
@@ -112,29 +110,46 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
     });
   };
 
-  const handleAddSpecies = () => {
+  const startEdit = (sp: Species) => {
+    setEditingKind(sp.kind);
+    setNewName(sp.nameFa);
+    setNewIcon(sp.icon);
+    setNewErr('');
+  };
+
+  const cancelEdit = () => {
+    setEditingKind(null);
+    setNewName('');
+    setNewIcon('🐦');
+    setNewErr('');
+  };
+
+  const handleSave = () => {
     const trimmed = newName.trim();
     if (!trimmed) { setNewErr('نام پرنده اجباری است'); return; }
 
-    // چک تکراری
-    const dup = allSpecies.find(s => s.nameFa.toLowerCase() === trimmed.toLowerCase());
+    // چک تکراری (به‌جز خودش در حالت ویرایش)
+    const dup = allSpecies.find(s =>
+      s.nameFa.toLowerCase() === trimmed.toLowerCase() && s.kind !== editingKind
+    );
     if (dup) { setNewErr('این نام قبلاً هست'); return; }
 
-    // شناسه یکتا برای custom
-    const kind = 'custom-' + trimmed.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || ('custom-' + Date.now());
+    if (editingKind) {
+      // ویرایش: حذف قدیمی + افزودن جدید (با حفظ kind)
+      removeSpecies(editingKind);
+      addSpecies({ kind: editingKind, nameFa: trimmed, icon: newIcon });
+    } else {
+      // افزودن جدید
+      const kind = 'custom-' + trimmed.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || ('custom-' + Date.now());
+      addSpecies({ kind, nameFa: trimmed, icon: newIcon });
+    }
 
-    addSpecies({ kind, nameFa: trimmed, icon: newIcon });
-    setShowAdd(false);
+    cancelEdit();
+    setShowManage(false);
+  };
 
-    // auto-pick بعد از افزودن
-    onPick({
-      name: trimmed,
-      cycleDays: null,
-      fcrStandard: null,
-      standardKey: undefined,
-      isCustom: true,
-      birdKind: kind,
-    });
+  const handleDelete = (kind: string) => {
+    removeSpecies(kind);
   };
 
   return (
@@ -151,35 +166,92 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
         error={error}
       />
 
-      {/* مودال افزودن گونه‌ی جدید */}
       <Modal
-        open={showAdd}
-        onClose={() => setShowAdd(false)}
-        title="افزودن پرنده‌ی جدید"
+        open={showManage}
+        onClose={() => { cancelEdit(); setShowManage(false); }}
+        title="مدیریت پرنده‌ها"
         footer={
           <BtnRow>
-            <Btn variant="primary" onClick={handleAddSpecies}>افزودن</Btn>
-            <Btn onClick={() => setShowAdd(false)}>لغو</Btn>
+            <Btn variant="primary" onClick={handleSave}>
+              {editingKind ? 'ذخیره ویرایش' : 'افزودن'}
+            </Btn>
+            <Btn onClick={() => { cancelEdit(); setShowManage(false); }}>بستن</Btn>
           </BtnRow>
         }
       >
-        <Field label="نام پرنده" required hint="مثلاً — کبک، شترمرغ، قرقاول">
-          <Input
-            value={newName}
-            onChange={(e: any) => { setNewName(e.target.value); setNewErr(''); }}
-            placeholder="نام پرنده..."
-            autoFocus
-          />
-        </Field>
-        <Field label="ایموجی" hint="نماد این پرنده">
-          <Input
-            value={newIcon}
-            onChange={(e: any) => setNewIcon(e.target.value)}
-            placeholder="🐦"
-            maxLength={2}
-          />
-        </Field>
-        {newErr && <ErrorBox>{newErr}</ErrorBox>}
+        {/* فرم افزودن/ویرایش */}
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 8, color: 'var(--text)' }}>
+            {editingKind ? '✏️ ویرایش پرنده' : '➕ افزودن پرنده‌ی جدید'}
+          </div>
+          <Field label="نام پرنده" required hint="مثلاً — کبک، شترمرغ، قرقاول">
+            <Input
+              value={newName}
+              onChange={(e: any) => { setNewName(e.target.value); setNewErr(''); }}
+              placeholder="نام پرنده..."
+              autoFocus
+            />
+          </Field>
+          <Field label="ایموجی" hint="نماد این پرنده">
+            <Input
+              value={newIcon}
+              onChange={(e: any) => setNewIcon(e.target.value)}
+              placeholder="🐦"
+              maxLength={2}
+            />
+          </Field>
+          {newErr && <ErrorBox>{newErr}</ErrorBox>}
+          {editingKind && (
+            <Btn size="sm" onClick={cancelEdit} style={{ marginTop: 8 }}>انصراف از ویرایش</Btn>
+          )}
+        </div>
+
+        {/* لیست گونه‌های سفارشی */}
+        {customSpecies.length > 0 && (
+          <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+            <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 8, color: 'var(--text)' }}>
+              پرنده‌های سفارشی ({customSpecies.length})
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {customSpecies.map((sp: Species) => (
+                <div key={sp.kind} style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '8px 10px', background: 'var(--input-bg)',
+                  borderRadius: 'var(--r-sm)',
+                }}>
+                  <span style={{ fontSize: 18 }}>{sp.icon}</span>
+                  <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{sp.nameFa}</span>
+                  <button
+                    type="button"
+                    onClick={() => startEdit(sp)}
+                    aria-label={`ویرایش ${sp.nameFa}`}
+                    style={{
+                      background: 'transparent', border: 'none', cursor: 'pointer',
+                      padding: 4, fontSize: 16,
+                    }}>✏️</button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(sp.kind)}
+                    aria-label={`حذف ${sp.nameFa}`}
+                    style={{
+                      background: 'transparent', border: 'none', cursor: 'pointer',
+                      padding: 4, fontSize: 16,
+                    }}>🗑️</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {customSpecies.length === 0 && (
+          <div style={{
+            marginTop: 16, padding: 12, textAlign: 'center',
+            fontSize: 'var(--fs-sm)', color: 'var(--muted)',
+            background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
+          }}>
+            هنوز پرنده‌ی سفارشی نساخته‌ای
+          </div>
+        )}
       </Modal>
     </>
   );
