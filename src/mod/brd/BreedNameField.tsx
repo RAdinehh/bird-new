@@ -114,6 +114,14 @@ export default function BreedNameField({
     ? `نژاد ${parentBirdName}`
     : 'انتخاب نژاد';
 
+  const emptyMessage = options.length === 0
+    ? (parentBirdName ? `${parentBirdName} نژادی نداره` : 'نژادی برای انتخاب نیست')
+    : undefined;
+
+  const emptyHint = options.length === 0
+    ? 'برو به تب تنظیمات → استانداردها و اولین نژاد رو بساز، بعد اینجا انتخابش کن.'
+    : undefined;
+
   return (
     <AutocompleteSheet
       value={value}
@@ -125,6 +133,8 @@ export default function BreedNameField({
       customLabel="افزودن نژاد دلخواه"
       title={title}
       error={error}
+      emptyMessage={emptyMessage}
+      emptyHint={emptyHint}
     />
   );
 }

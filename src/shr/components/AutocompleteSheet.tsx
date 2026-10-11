@@ -30,6 +30,8 @@ interface Props {
   customLabel?: string;
   error?: string;
   title?: string;
+  emptyMessage?: string;
+  emptyHint?: string;
 }
 
 const INITIAL_COUNT = 5;
@@ -39,7 +41,7 @@ const STEP = 5;
 export default function AutocompleteSheet({
   value, onChange, onSelect, onSubmit,
   options, placeholder, customLabel = 'افزودن مورد دلخواه',
-  error, title = 'انتخاب کنید',
+  error, title = 'انتخاب کنید', emptyMessage, emptyHint,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');
@@ -228,8 +230,16 @@ export default function AutocompleteSheet({
         }
       >
         {filtered.length === 0 ? (
-          <div style={{ padding: 20, textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
-            موردی یافت نشد
+          <div style={{ padding: '30px 20px', textAlign: 'center' }}>
+            <div style={{ fontSize: '2em', marginBottom: 8 }}>🔍</div>
+            <div style={{ color: 'var(--text)', fontWeight: 700, fontSize: 'var(--fs-sm)', marginBottom: 4 }}>
+              {emptyMessage || 'موردی یافت نشد'}
+            </div>
+            {emptyHint && (
+              <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', lineHeight: 1.7 }}>
+                {emptyHint}
+              </div>
+            )}
           </div>
         ) : (
           <>
