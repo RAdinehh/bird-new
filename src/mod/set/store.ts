@@ -58,6 +58,8 @@ export interface Settings {
 
   /** استانداردهای سفارشی (ویرایش‌شده توسط کاربر) — legacy */
   customStandards?: Record<string, BirdStandard>;
+  /** 🆕 گونه‌های سفارشی (کبک، شترمرغ، ...) */
+  customSpecies?: Array<{ kind: string; nameFa: string; nameEn?: string; icon: string; builtIn: boolean }>;
 
   /** 🆕 تغییرات کاربر بر پایه Diff — سبک‌تر */
   customOverrides?: Record<string, StandardOverrides>;
@@ -95,6 +97,7 @@ const defaultSettings: Settings = {
   modules: {},
   features: { vaccine: true, medicine: true },
   customStandards: {},
+  customSpecies: [],
   customOverrides: {},
 
   autoBackup: { enabled: true, intervalHours: 24, maxVersions: 5 },
@@ -107,6 +110,8 @@ interface State extends Settings {
   updateSection: <K extends keyof Settings>(key: K, patch: Partial<Settings[K]>) => void;
   reset: () => void;
   updateStandard: (key: string, std: BirdStandard) => void;
+  addSpecies: (species: { kind: string; nameFa: string; nameEn?: string; icon: string }) => void;
+  removeSpecies: (kind: string) => void;
   resetStandard: (key: string) => void;
   /** 🆕 ذخیره یک override فیلد خاص */
   setOverride: (key: string, path: string, value: any) => void;
@@ -124,6 +129,15 @@ export const useSet = create<State>()(
       update: (patch) => set((state: any) => ({ ...state, ...patch })),
       updateSection: (key, patch) => set((state: any) => ({ ...state, [key]: { ...state[key], ...patch } })),
       reset: () => set(defaultSettings as any),
+      addSpecies: (species) => set((state: any) => {
+        const existing = state.customSpecies || [];
+        if (existing.some((s: any) => s.kind === species.kind)) return state;
+        return { ...state, customSpecies: [...existing, { ...species, builtIn: false }] };
+      }),
+      removeSpecies: (kind) => set((state: any) => ({
+        ...state,
+        customSpecies: (state.customSpecies || []).filter((s: any) => s.kind !== kind),
+      })),
       updateStandard: (key: string, std: BirdStandard) => set((state: any) => ({
         ...state,
         customStandards: { ...(state.customStandards || {}), [key]: std }
