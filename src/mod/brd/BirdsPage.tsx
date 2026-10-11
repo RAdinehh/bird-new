@@ -11,7 +11,7 @@ import { useSet } from '../set/store';
 import SourceBadge, { type SourceType } from '../../shr/components/SourceBadge';
 import { detectCycleDaysSource, detectFcrSource, getOverrideInfo } from './_source';
 import OverrideHint from '../../shr/components/OverrideHint';
-import BirdNameField, { type BirdPresetPick } from './BirdNameField';
+import BirdForm, { EMPTY_BIRD_FORM, type BirdFormData } from './BirdForm';
 import EntityLink from '../../shr/components/EntityLink';
 import {
   Btn, BtnRow, Empty, Field,
@@ -28,22 +28,12 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
-interface F {
-  id?: string;
-  name: string;
-  cycleDays: string;
-  fcrStandard: string;
-  standardKey?: string;
-  birdKind?: 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
-  purpose?: 'broiler' | 'layer' | 'breeder' | 'dual' | 'ornamental';
-}
-const empty: F = { name: '', cycleDays: '', fcrStandard: '', standardKey: '' };
 
 export default function BirdsPage({ active = true }: { active?: boolean } = {}) {
   const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird } = useBrd();
   const customStandards = useSet((st: any) => st.customStandards);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<F>(empty);
+  const [form, setForm] = useState<BirdFormData>(EMPTY_BIRD_FORM);
   const [error, setError] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -115,7 +105,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   }, [ms.selectionMode]);
 
 
-  const openNew = () => { if (!draft.hasDraft) setForm(empty); setError(''); setOpen(true);  };
+  const openNew = () => { if (!draft.hasDraft) setForm(EMPTY_BIRD_FORM); setError(''); setOpen(true);  };
   const openEdit = (b: Bird) => {
     setForm({ id: b.id, name: b.name, cycleDays: b.cycleDays ? toFa(b.cycleDays) : '', fcrStandard: b.fcrStandard ? toFa(b.fcrStandard) : '', standardKey: (b as any).standardKey || '', birdKind: (b as any).birdKind, purpose: (b as any).purpose });
     
@@ -145,7 +135,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     } as any;
     if (form.id) updateBird(form.id, payload); else addBird(payload);
     draft.clear();
-    setForm(empty);
+    setForm(EMPTY_BIRD_FORM);
     setOpen(false);
   };
 
@@ -160,17 +150,6 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     }
     setUndoData(null);
   };
-
-  // 🆕 Override Info
-  const overrideCycle = useMemo(() => {
-    const cd = form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null;
-    return getOverrideInfo(cd, form.standardKey, 'cycleDays', form.name);
-  }, [form.cycleDays, form.standardKey, form.name]);
-
-  const overrideFcr = useMemo(() => {
-    const fcr = form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null;
-    return getOverrideInfo(fcr, form.standardKey, 'fcr', form.name);
-  }, [form.fcrStandard, form.standardKey, form.name]);
 
   return (
     <PageContainer>
@@ -367,91 +346,15 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
 
       {ms.selectionMode && <div style={{ height: 90 }} />}
 
-      <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش پرنده' : 'افزودن پرنده'} contentGap={14}
-        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-        <Field label="نام پرنده" required hint="انتخاب یا تایپ">
-          <BirdNameField
-            value={form.name}
-            onChange={v => setForm(f => ({ ...f, name: v }))}
-            onPick={(pick: BirdPresetPick) => {
-              setForm(f => ({
-                ...f,
-                name: pick.name,
-                cycleDays: pick.cycleDays ? toFa(pick.cycleDays) : f.cycleDays,
-                fcrStandard: pick.fcrStandard ? toFa(pick.fcrStandard) : f.fcrStandard,
-                standardKey: pick.standardKey || f.standardKey,
-                birdKind: pick.birdKind || f.birdKind,
-                purpose: pick.purpose || f.purpose,
-              }));
-            }}
-            error={error || undefined}
-            excludeNames={birds.filter(b => b.id !== form.id).map(b => b.name)}
-          />
-        </Field>
-
-        <Grid2>
-          <Field
-            label={
-              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-                چرخه زندگی (روز)
-                {(() => {
-                  const cd = form.cycleDays ? parseInt(toEn(form.cycleDays)) || null : null;
-                  const src = detectCycleDaysSource(cd, form.standardKey, form.name);
-                  const source = overrideCycle.overridden ? 'manual' : src.source;
-                  return <SourceBadge source={source} label={src.label} />;
-                })()}
-              </span>
-            }
-            hint="از شروع تا پایان دوره"
-          >
-            <NumField
-              placeholder="۰"
-              value={form.cycleDays}
-              onChange={e => setForm({ ...form, cycleDays: e.target.value })}
-              min={1} max={2000} unit="روز" autoClamp />
-              <OverrideHint
-                overridden={overrideCycle.overridden}
-                stdValue={overrideCycle.stdValue}
-                unit="روز"
-                decimals={0}
-                onReset={() => setForm(f => ({ ...f, cycleDays: overrideCycle.stdValue != null ? toFa(overrideCycle.stdValue) : '' }))}
-              />
-          </Field>
-          <Field
-            label={
-              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-                FCR استاندارد
-                {(() => {
-                  const fcr = form.fcrStandard ? parseFloat(toEn(form.fcrStandard).replace('٫', '.')) || null : null;
-                  const src = detectFcrSource(fcr, form.standardKey, form.name);
-                  const source = overrideFcr.overridden ? 'manual' : src.source;
-                  return <SourceBadge source={source} label={src.label} />;
-                })()}
-              </span>
-            }
-            hint="ضریب تبدیل غذایی مرجع"
-          >
-            <NumField
-              placeholder="۲٫۰"
-              value={form.fcrStandard}
-              onChange={e => setForm({ ...form, fcrStandard: e.target.value })}
-              min={0.5} max={5} unit="FCR" autoClamp />
-              <OverrideHint
-                overridden={overrideFcr.overridden}
-                stdValue={overrideFcr.stdValue}
-                unit="FCR"
-                decimals={1}
-                onReset={() => setForm(f => ({ ...f, fcrStandard: overrideFcr.stdValue != null ? toFa(overrideFcr.stdValue) : '' }))}
-              />
-          </Field>
-        </Grid2>
-
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7,
-           padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
-           marginBottom: 8 }}>
-          💡 <b>چرخه زندگی</b> = چند روز طول می‌کشد تا دوره این پرنده کامل شود (گوشتی ۴۲، تخم‌گذار ۵۰۰). <b>FCR</b> = چند کیلو دان برای ۱ کیلو وزن (۱.۶ عالی، ۱.۸ متوسط، ۲.۰+ ضعیف).
-        </div>
-      </Modal>
+      <BirdForm
+        open={open}
+        onClose={() => setOpen(false)}
+        form={form}
+        setForm={setForm}
+        error={error}
+        birds={birds}
+        onSave={save}
+      />
     </PageContainer>
   );
 }
