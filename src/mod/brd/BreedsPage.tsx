@@ -104,7 +104,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
         const item = _breedsRaw.find((x: any) => x.id === id);
         if (!item) continue;
         backups.push(item);
-        try { deleteBreed(id); } catch {}
+        deleteBreed(id);
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });

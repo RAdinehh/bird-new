@@ -90,7 +90,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         const item = birds.find(b => b.id === id);
         if (!item) continue;
         backups.push(item);
-        try { deleteBird(id); } catch {}
+        deleteBird(id);
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });
