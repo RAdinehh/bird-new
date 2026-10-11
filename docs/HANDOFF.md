@@ -369,3 +369,33 @@ git log --oneline -10
 - **هر fix، یه commit** — طبق دستور، نه چند تا با هم
 - **توکن‌های جدید اضافه شدن:** `--fs-2xs`, `--pad-chip`, `--pad-chip-xs`, `--pad-btn-sm`, `--pad-box`
 
+
+### 🆕 به‌روزرسانی دوم (۱۴۰۴/۰۷/۲۰ — جلسه‌ی دوم)
+
+**`BreedsPage` refactor شد:**
+- `BreedForm.tsx` (۱۱۷ خط) — استخراج از BreedsPage
+- `BreedCard.tsx` (۱۰۵ خط) — استخراج از BreedsPage
+- `BreedsPage.tsx`: از ۴۱۱ → **۲۵۹ خط** (-۳۷٪)
+- حذف dead code: `fcrFromStd`, `chip`
+- حذف ۲۴ import بی‌استفاده
+
+**fix جدید:**
+- افزودن `useFocusParam` به `BreedsPage` (هماهنگ با BirdsPage)
+- رفع باگ: `parentPurpose` با `birdKind` پاس می‌شد (به‌جای birdType)
+
+**ممیزی کامل شد:**
+- همه ۷ محور `brd` تیک خوردن (✅)
+- جزئیات در `AUDIT-BRD.md`
+
+**آمار نهایی brd:**
+
+| فایل | خطوط |
+|---|---|
+| BirdsPage | 246 |
+| BreedsPage | 259 |
+| BirdForm | 132 |
+| BreedForm | 117 |
+| BirdCard | 177 |
+| BreedCard | 105 |
+
+**همه زیر ۳۰۰ خط.** ✅

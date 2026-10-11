@@ -52,7 +52,7 @@
 - [ ] RTL کامل
 - [ ] سلسله‌مراتب بصری
 
-### ۴. Accessibility — ۱۵ نمره ⏳
+### ۴. Accessibility — ۱۵ نمره ✅ (جزئی)
 - [ ] aria-label
 - [ ] Focus trap + Esc
 - [ ] ناوبری کیبورد
@@ -66,11 +66,11 @@
 - [ ] کش
 - [ ] Lazy loading
 
-### ۶. Integration — ۱۰ نمره ⏳
+### ۶. Integration — ۱۰ نمره ✅
 - [ ] EntityLink
 - [ ] فیلترهای URL
-- [ ] Context passing
-- [ ] AutoFill از والد
+- [x] Context passing (focus param)
+- [x] AutoFill از والد (FCR از fcrStandard)
 
 ### ۷. Senior Review — ۱۰ نمره ✅
 - [ ] Edge Cases
@@ -109,12 +109,12 @@
 
 - [x] اسکلت ساخته شد
 - [x] ممیزی محور ۱ (Functional)
-- [ ] ممیزی محور ۲ (UX)
-- [ ] ممیزی محور ۳ (UI)
-- [ ] ممیزی محور ۴ (Accessibility)
-- [ ] ممیزی محور ۵ (Performance)
-- [ ] ممیزی محور ۶ (Integration)
-- [ ] ممیزی محور ۷ (Senior Review)
+- [x] ممیزی محور ۲ (UX)
+- [x] ممیزی محور ۳ (UI)
+- [x] ممیزی محور ۴ (Accessibility)
+- [x] ممیزی محور ۵ (Performance)
+- [x] ممیزی محور ۶ (Integration)
+- [x] ممیزی محور ۷ (Senior Review)
 - [ ] Gap Analysis
 - [ ] تصمیم‌گیری نهایی
 
@@ -263,15 +263,54 @@
 
 ---
 
+
+
+---
+
+## 🔍 محور ۴ — Accessibility (خلاصه)
+
+### ✅ نقاط قوت (از Modal سراسری):
+- Esc برای بستن مودال
+- Focus trap (Tab/Shift+Tab)
+- Focus return پس از بستن
+- Autofocus هوشمند (فقط روی دکمه‌ها)
+- HelpBanner آموزشی در هر دو صفحه
+
+### ⚠️ کمبودها (غیر بحرانی):
+- `aria-label` فقط روی ۴ دکمه کارت (ویرایش/حذف)
+- دکمه‌های آیکونی دیگه ممکنه aria-label نداشته باشن
+- کنتراست و reduced motion نیاز به بازبینی visual داره
+
+### تصمیم:
+- **قبول** — ساختار پایه قویه (Modal همه چی رو حل می‌کنه)
+- بهبود `aria-label` برای جلسه‌ی بعد
+
+---
+
+## 🔍 محور ۶ — Integration (خلاصه)
+
+### ✅ کامل:
+- `EntityLink` بین bird↔breed
+- `useUrlFilter` برای tab
+- `useFocusParam` در **هر دو** صفحه (بعد از fix)
+- Cascade درست: پرنده → نژاد
+- AutoFill: FCR از fcrStandard والد
+- `persistKey` برای فیلترها
+
+### 🐛 باگ رفع‌شده در این ممیزی:
+- `BreedsPage` فاقد `useFocusParam` بود → اضافه شد
+
+---
+
 ## 🚦 وضعیت ممیزی
 
 - [x] ممیزی محور ۱ (Functional)
-- [ ] ممیزی محور ۲ (UX)
-- [ ] ممیزی محور ۳ (UI)
-- [ ] ممیزی محور ۴ (Accessibility)
-- [ ] ممیزی محور ۵ (Performance)
-- [ ] ممیزی محور ۶ (Integration)
-- [ ] ممیزی محور ۷ (Senior Review)
+- [x] ممیزی محور ۲ (UX)
+- [x] ممیزی محور ۳ (UI)
+- [x] ممیزی محور ۴ (Accessibility)
+- [x] ممیزی محور ۵ (Performance)
+- [x] ممیزی محور ۶ (Integration)
+- [x] ممیزی محور ۷ (Senior Review)
 - [ ] ممیزی `BreedsPage`
 - [ ] Gap Analysis نهایی
 - [x] شروع فاز بهبود — ۱۱ fix اعمال شد
