@@ -20,6 +20,8 @@ export interface Breed {
   fcr: number | null;
   /** کلید استاندارد در DEFAULT_STANDARDS (اختیاری) */
   standardKey?: string;
+  /** 🆕 هدف‌های انتخاب‌شده توسط کاربر (broiler/layer/breeder/ornamental) */
+  purposes?: string[];
   createdAt: string;
   updatedAt: string;
 }

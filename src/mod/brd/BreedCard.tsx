@@ -42,10 +42,12 @@ export default function BreedCard({
   const stdKey = (b as any).standardKey;
   const stdData = stdKey ? (DEFAULT_STANDARDS as any)[stdKey] : null;
   const category = stdData?.category ? getCategoryInfo(stdData.category) : null;
-  // 🆕 نمایش همه‌ی هدف‌های نژاد (نه فقط primary)
-  const purposes: string[] = Array.isArray(stdData?.purposes) && stdData.purposes.length > 0
-    ? stdData.purposes
-    : (stdData?.primaryPurpose ? [stdData.primaryPurpose] : []);
+  // 🆕 اول purposes کاربر، بعد از استاندارد
+  const breedPurposes: string[] = Array.isArray((b as any).purposes) && (b as any).purposes.length > 0
+    ? (b as any).purposes
+    : (Array.isArray(stdData?.purposes) && stdData.purposes.length > 0
+      ? stdData.purposes.filter((p: string) => p !== 'dual')
+      : (stdData?.primaryPurpose && stdData.primaryPurpose !== 'dual' ? [stdData.primaryPurpose] : []));
 
   const handleDelete = async () => {
     const ok = await showConfirmAsync('تأیید حذف', 'این نژاد حذف شود؟', { danger: true });
@@ -67,7 +69,7 @@ export default function BreedCard({
       onToggle={onToggle}
       badge={
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          {purposes.map((p: string) => {
+          {breedPurposes.map((p: string) => {
             const info = getPurposeInfo(p);
             return info ? <Tag key={p} tone="green">{info.emoji} {info.label}</Tag> : null;
           })}
