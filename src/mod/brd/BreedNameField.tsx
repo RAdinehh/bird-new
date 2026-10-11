@@ -58,6 +58,9 @@ export default function BreedNameField({
       const name = std.nameFa;
       if (!name || exclude.has(name.toLowerCase())) continue;
 
+      // 🆕 حذف breeder-only (فقط از چک‌باکس هدف انتخاب می‌شن)
+      if (key.endsWith('-breeder')) continue;
+
       // 🆕 فیلتر cascade سخت‌گیرانه
       if (parentKind) {
         // ۱. custom bird → هیچ استانداردی نشون نده

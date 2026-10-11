@@ -244,6 +244,8 @@ export interface BirdStandard {
   birdKind?: BirdKind;
   purposes?: BirdPurpose[];
   primaryPurpose?: BirdPurpose;
+  /** 🆕 کلید استاندارد مادر (اگه کاربر هدف مادر رو تیک بزنه) */
+  breederStandardKey?: string;
   nameFa: string;
   nameEn: string;
   category: BirdCategory;

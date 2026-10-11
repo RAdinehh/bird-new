@@ -86,7 +86,15 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
         <SmartSelect
           value={form.birdId}
           onChange={v => {
-            setForm(f => ({ ...f, birdId: v }));
+            // وقتی پرنده عوض می‌شه، نژاد + هدف + FCR ریست شن
+            setForm(f => ({
+              ...f,
+              birdId: v,
+              name: '',
+              standardKey: '',
+              fcr: '',
+              purposes: [],
+            }));
           }}
           options={birds.map(c => ({
             value: c.id,
