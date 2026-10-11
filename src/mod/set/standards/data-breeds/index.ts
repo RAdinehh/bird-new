@@ -15,6 +15,7 @@ export * from './quail';
 export * from './ducks';
 export * from './turkey_goose';
 export * from './turkeys';
+export * from './geese';
 
 import { COBB_500 } from './broilers';
 import { ROSS_308_BREEDER, COBB_500_BREEDER, HY_LINE_BROWN_BREEDER } from './breeders';
@@ -41,6 +42,7 @@ import { DUCK_UKRAINIAN, DUCK_PEKIN_BREEDER, DUCK_MUSCOVY_BREEDER } from './duck
 import { TURKEY } from './turkey_goose';
 import { TURKEY_BRONZE, TURKEY_WHITE, TURKEY_BOURBON, TURKEY_BREEDER } from './turkeys';
 import { GOOSE } from './turkey_goose';
+import { GOOSE_EMDEN, GOOSE_CHINESE, GOOSE_TOULOUSE, GOOSE_AFRICAN, GOOSE_UKRAINIAN } from './geese';
 
 export const NEW_BREEDS: Record<string, BirdStandard> = {
   'cobb-500': COBB_500,
@@ -75,4 +77,9 @@ export const NEW_BREEDS: Record<string, BirdStandard> = {
   'turkey-bourbon': TURKEY_BOURBON,
   'turkey-breeder': TURKEY_BREEDER,
   'goose': GOOSE,
+  'goose-emden': GOOSE_EMDEN,
+  'goose-chinese': GOOSE_CHINESE,
+  'goose-toulouse': GOOSE_TOULOUSE,
+  'goose-african': GOOSE_AFRICAN,
+  'goose-ukrainian': GOOSE_UKRAINIAN,
 };
