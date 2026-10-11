@@ -24,9 +24,9 @@ export const EMPTY_BREED_FORM: BreedFormData = {
 
 // ═══ چک‌باکس‌های هدف ═══
 const PURPOSE_OPTIONS = [
-  { key: 'broiler',    label: 'گوشتی',    icon: '🍗' },
   { key: 'layer',      label: 'تخم‌گذار', icon: '🥚' },
   { key: 'breeder',    label: 'مادر',     icon: '🐣' },
+  { key: 'broiler',    label: 'گوشتی',    icon: '🍗' },
   { key: 'ornamental', label: 'تزئینی',   icon: '🎨' },
 ];
 
@@ -61,12 +61,13 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
 
   const togglePurpose = (key: string) => {
     setForm(f => {
-      const has = f.purposes.includes(key);
+      const current = f.purposes || [];
+      const has = current.includes(key);
       return {
         ...f,
         purposes: has
-          ? f.purposes.filter(p => p !== key)
-          : [...f.purposes, key],
+          ? current.filter(p => p !== key)
+          : [...current, key],
       };
     });
   };
@@ -74,6 +75,7 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
   return (
     <Modal open={open} onClose={onClose} title={form.id ? 'ویرایش نژاد' : 'افزودن نژاد'}
       footer={<BtnRow><Btn variant="primary" onClick={onSave}>ذخیره</Btn><Btn onClick={onClose}>لغو</Btn></BtnRow>}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
       <Field label="پرنده" required>
         <SmartSelect
           value={form.birdId}
@@ -96,20 +98,12 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
           value={form.name}
           onChange={v => setForm(f => ({ ...f, name: v }))}
           onPick={(pick: BreedPick) => {
-            // 🆕 auto-fill purposes از استاندارد (بدون dual)
-            const stdData = pick.standardKey
-              ? ((DEFAULT_STANDARDS as any)[pick.standardKey] || customStandards[pick.standardKey])
-              : null;
-            const autoPurposes: string[] = Array.isArray(stdData?.purposes)
-              ? stdData.purposes.filter((p: string) => p !== 'dual')
-              : [];
-
+            // کاربر خودش هدف رو انتخاب می‌کنه — بدون auto-fill
             setForm(f => ({
               ...f,
               name: pick.name,
               standardKey: pick.standardKey || f.standardKey,
               fcr: pick.fcr !== null ? toFa(pick.fcr) : f.fcr,
-              purposes: autoPurposes.length > 0 ? autoPurposes : f.purposes,
             }));
           }}
           excludeNames={breeds
@@ -120,12 +114,13 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
           customStandards={customStandards}
         />
       </Field>
+      </div>
 
       {/* 🆕 هدف پرورش */}
       <Field label="هدف پرورش" hint="می‌تونی چند تا انتخاب کنی">
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
           {PURPOSE_OPTIONS.map(opt => {
-            const active = form.purposes.includes(opt.key);
+            const active = (form.purposes || []).includes(opt.key);
             return (
               <button
                 key={opt.key}
@@ -154,23 +149,29 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
       {/* اطلاعات استاندارد (نمایش) */}
       {std && (
         <div style={{
-          padding: 'var(--pad-box)',
+          padding: 'var(--pad-normal)',
           background: 'var(--accent-soft)',
           border: '1px solid var(--accent-border)',
           borderRadius: 'var(--r-sm)',
           fontSize: 'var(--fs-xs)',
           color: 'var(--muted)',
-          lineHeight: 1.8,
+          lineHeight: 1.5,
         }}>
-          <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 4 }}>
+          <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 2, fontSize: 'var(--fs-sm)' }}>
             📚 {std.nameFa}
           </div>
-          {std.source && <div>منبع: {std.source}{std.publishYear ? ` · ${std.publishYear}` : ''}</div>}
-          {std.production?.eggsPerYear && <div>🥚 تخم در سال: {toFa(std.production.eggsPerYear)}</div>}
-          {std.biology?.layingStartDay && <div>📅 شروع تخم‌گذاری: روز {toFa(std.biology.layingStartDay)}</div>}
-          {std.production?.peakLayingPct && <div>📊 اوج تخم‌گذاری: {toFa(std.production.peakLayingPct)}٪</div>}
-          {std.production?.fertilityPct && <div>🐣 نرخ باروری: {toFa(std.production.fertilityPct)}٪</div>}
-          {std.production?.hatchabilityPct && <div>🐣 نرخ هچ: {toFa(std.production.hatchabilityPct)}٪</div>}
+          {(std.source || std.publishYear) && (
+            <div style={{ fontSize: 'var(--fs-2xs)', opacity: 0.85, marginBottom: 3 }}>
+              {std.source}{std.publishYear && ` · ${std.publishYear}`}
+            </div>
+          )}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 8px' }}>
+            {std.production?.eggsPerYear && <div>🥚 {toFa(std.production.eggsPerYear)} تخم/سال</div>}
+            {std.biology?.layingStartDay && <div>📅 روز {toFa(std.biology.layingStartDay)}</div>}
+            {std.production?.peakLayingPct && <div>📊 اوج {toFa(std.production.peakLayingPct)}٪</div>}
+            {std.production?.fertilityPct && <div>🐣 باروری {toFa(std.production.fertilityPct)}٪</div>}
+            {std.production?.hatchabilityPct && <div>🐣 هچ {toFa(std.production.hatchabilityPct)}٪</div>}
+          </div>
         </div>
       )}
 

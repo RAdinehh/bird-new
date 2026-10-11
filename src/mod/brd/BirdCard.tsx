@@ -159,22 +159,7 @@ export default function BirdCard({
             flexShrink: 0,
           }}>متصل</div>
         </div>
-      ) : (
-        <div style={{
-          padding: 'var(--pad-box)',
-          background: 'var(--warn-soft)',
-          border: '1px solid var(--warn)',
-          borderRadius: 'var(--r-sm)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-        }}>
-          <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>💡</span>
-          <span style={{ flex: 1, minWidth: 0, fontSize: 'var(--fs-sm)', fontWeight: 800, color: 'var(--warn)' }}>
-            استاندارد متصل نیست
-          </span>
-        </div>
-      )}
+      ) : null}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
         <Btn size="sm" onClick={() => onEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش پرنده ${getBirdDisplayName(b, customStandards)}`}>ویرایش</Btn>

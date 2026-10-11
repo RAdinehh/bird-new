@@ -106,7 +106,14 @@ export default function AutocompleteSheet({
   return (
     <>
       {/* فیلد اصلی: input + دکمه ▼ */}
-      <div style={{ display: 'flex', alignItems: 'stretch', width: '100%', minWidth: 0, maxWidth: '100%', position: 'relative' }}>
+      <div style={{
+        display: 'flex', alignItems: 'stretch', width: '100%', minWidth: 0, maxWidth: '100%',
+        position: 'relative',
+        background: 'var(--input-bg)',
+        border: `1px solid ${typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'}`,
+        borderRadius: 'var(--r-md, 8px)',
+        transition: 'border-color .15s ease',
+      }}>
         <input
           ref={inputRef}
           type="text"
@@ -143,26 +150,29 @@ export default function AutocompleteSheet({
           placeholder={placeholder || 'تایپ کن یا ▼ بزن'}
           autoComplete="off"
           style={{
-            flex: '1 1 0%', minWidth: 0, height: 38, padding: matched ? '0 12px 0 38px' : '0 12px',
-            background: 'var(--input-bg)',
-            border: `1px solid ${typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'}`,
-            borderTopRightRadius: 'var(--r-md, 8px)',
-            borderBottomRightRadius: 'var(--r-md, 8px)',
-            borderTopLeftRadius: 0, borderBottomLeftRadius: 0,
+            flex: '1 1 0%', minWidth: 0, height: 36, padding: matched ? '0 12px 0 28px' : '0 12px',
+            background: 'transparent',
+            border: 'none',
             color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)',
             textAlign: 'right', direction: 'rtl', outline: 'none',
-            transition: 'border-color .15s ease',
           }}
         />
         {matched && (
           <span style={{
             position: 'absolute',
-            left: 44,
+            left: 8,
             top: '50%',
             transform: 'translateY(-50%)',
-            color: 'var(--accent)',
+            width: 18,
+            height: 18,
+            borderRadius: '50%',
+            background: 'var(--accent)',
+            color: '#fff',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 11,
             fontWeight: 900,
-            fontSize: 16,
             pointerEvents: 'none',
             lineHeight: 1,
           }}>✓</span>
@@ -172,12 +182,9 @@ export default function AutocompleteSheet({
           onClick={handleOpen}
           aria-label="باز کردن لیست"
           style={{
-            height: 38, minWidth: 38, padding: '0 12px',
-            background: 'var(--input-bg)',
-            border: `1px solid ${typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'}`,
-            borderTopLeftRadius: 'var(--r-md, 8px)',
-            borderBottomLeftRadius: 'var(--r-md, 8px)',
-            borderTopRightRadius: 0, borderBottomRightRadius: 0,
+            height: 36, minWidth: 38, padding: '0 12px',
+            background: 'transparent',
+            border: 'none',
             color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12,
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}

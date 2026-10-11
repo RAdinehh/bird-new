@@ -225,7 +225,7 @@ export const GOLIN: BirdStandard = {
   birdKind: 'chicken',
   purposes: ['layer', 'breeder', 'dual'],
   primaryPurpose: 'layer',
-  nameFa: 'گلین (بومی)',
+  nameFa: 'گلین',
   nameEn: 'Golin',
   category: 'native',
   biology: {

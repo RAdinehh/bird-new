@@ -172,6 +172,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       name: form.name.trim(),
       fcr: form.fcr ? parseFloat(toEn(form.fcr).replace('٫','.')) || null : null,
       standardKey: form.standardKey || undefined,
+      purposes: form.purposes || [],
     };
     if (form.id) updateBreed(form.id, payload); else addBreed(payload);
     draft.clear();
