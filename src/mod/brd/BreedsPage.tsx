@@ -167,6 +167,10 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     }
 
     if (!form.name.trim()) { setErr('نام نژاد اجباری است'); return; }
+    if (!form.purposes || form.purposes.length === 0) {
+      setErr('حداقل یک هدف پرورش انتخاب کن');
+      return;
+    }
     const payload = {
       birdId: form.birdId,
       name: form.name.trim(),

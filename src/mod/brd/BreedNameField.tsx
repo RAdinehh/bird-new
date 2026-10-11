@@ -9,6 +9,7 @@
 import { useMemo } from 'react';
 import AutocompleteSheet, { type AutoOption } from '../../shr/components/AutocompleteSheet';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
+import { toastMsg } from '../../cor/store/toast';
 
 export interface BreedPick {
   name: string;
@@ -108,8 +109,46 @@ export default function BreedNameField({
   };
 
   const handleCustom = (text: string) => {
+    const typed = text.trim();
+    if (!typed) return;
+
+    // چک کن که این نام توی استانداردها هست یا نه
+    const allStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+    const match = Object.entries(allStandards).find(
+      ([_, std]: [string, any]) =>
+        std?.nameFa?.trim().toLowerCase() === typed.toLowerCase()
+    ) as [string, any] | undefined;
+
+    if (match) {
+      const [key, std] = match;
+
+      // اگه پرنده‌ی سفارشیه → هیچ استانداردی مجاز نیست
+      if (parentKind?.startsWith('custom-')) {
+        toastMsg.error(`«${typed}» یه نژاد ثبت‌شده‌ست. برای ${parentBirdName} نمی‌تونی ازش استفاده کنی.`);
+        return;
+      }
+
+      // اگه گونه‌ی نژاد با پرنده فرق می‌کنه → بلاک
+      if (parentKind && std.birdKind && std.birdKind !== parentKind) {
+        toastMsg.error(`«${typed}» مخصوص ${std.birdKind} ئه، نه ${parentBirdName}.`);
+        return;
+      }
+
+      // استاندارد معتبر → انتخاب به‌جای custom
+      const lastGrowth = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
+      onPick({
+        name: std.nameFa,
+        standardKey: key,
+        fcr: lastGrowth?.fcr ?? null,
+        isCustom: false,
+        linked: true,
+      });
+      return;
+    }
+
+    // نژاد واقعاً جدید
     onPick({
-      name: text,
+      name: typed,
       standardKey: undefined,
       fcr: null,
       isCustom: true,
