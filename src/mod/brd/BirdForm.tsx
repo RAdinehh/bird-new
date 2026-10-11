@@ -13,8 +13,8 @@ export interface BirdFormData {
   cycleDays: string;
   fcrStandard: string;
   standardKey?: string;
-  birdKind?: 'chicken' | 'duck' | 'turkey' | 'quail' | 'goose';
-  purpose?: 'broiler' | 'layer' | 'breeder' | 'dual' | 'ornamental';
+  birdKind?: string;
+  purpose?: string;
   categoryId?: string;
 }
 
