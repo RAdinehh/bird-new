@@ -55,6 +55,7 @@ const CHICKEN_INCUBATION: IncubationStandard = {
 const BROILER: BirdStandard = {
   key: 'broiler',
   birdName: 'مرغ',
+  birdKind: 'chicken',
   nameFa: 'مرغ گوشتی',
   nameEn: 'Broiler (Ross 308)',
   category: 'industrial',
@@ -140,6 +141,7 @@ const BROILER: BirdStandard = {
 const LAYER: BirdStandard = {
   key: 'layer',
   birdName: 'مرغ',
+  birdKind: 'chicken',
   nameFa: 'مرغ تخمگذار',
   nameEn: 'Layer (Hy-Line Brown)',
   category: 'industrial',
@@ -232,10 +234,7 @@ const LAYER: BirdStandard = {
 // Export
 // ═══════════════════════════════════════════════
 export const DEFAULT_STANDARDS: Record<string, BirdStandard> = {
-  // ─── نژادهای قدیمی (سازگاری) ───
-  broiler: BROILER,
-  layer: LAYER,
-  // ─── نژادهای جدید ───
+  // فقط نژادهای جدید (legacy حذف شدن)
   ...NEW_BREEDS,
 };
 

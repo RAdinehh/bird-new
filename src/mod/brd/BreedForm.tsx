@@ -61,20 +61,21 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
     : null;
 
   const togglePurpose = (key: string) => {
-    setForm(f => {
-      const current = f.purposes || [];
-      const has = current.includes(key);
-      if (!has && current.length >= 2) {
-        toastMsg.info('حداکثر ۲ هدف می‌تونی انتخاب کنی — یکی رو بردار');
-        return f;
-      }
-      return {
-        ...f,
-        purposes: has
-          ? current.filter(p => p !== key)
-          : [...current, key],
-      };
-    });
+    const current = form.purposes || [];
+    const has = current.includes(key);
+
+    // اعتبارسنجی بیرون از setForm (چون StrictMode دوبار صدا می‌زنه)
+    if (!has && current.length >= 2) {
+      toastMsg.info('حداکثر ۲ هدف می‌تونی انتخاب کنی — یکی رو بردار');
+      return;
+    }
+
+    setForm(f => ({
+      ...f,
+      purposes: has
+        ? (f.purposes || []).filter(p => p !== key)
+        : [...(f.purposes || []), key],
+    }));
   };
 
   return (

@@ -32,6 +32,8 @@ interface Props {
   title?: string;
   emptyMessage?: string;
   emptyHint?: string;
+  /** 🆕 مقادیری که انتخاب می‌شن ولی value رو ست نمی‌کنن (اکشن) */
+  actionValues?: string[];
 }
 
 const INITIAL_COUNT = 5;
@@ -41,7 +43,7 @@ const STEP = 5;
 export default function AutocompleteSheet({
   value, onChange, onSelect, onSubmit,
   options, placeholder, customLabel = 'افزودن مورد دلخواه',
-  error, title = 'انتخاب کنید', emptyMessage, emptyHint,
+  error, title = 'انتخاب کنید', emptyMessage, emptyHint, actionValues = [],
 }: Props) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');
@@ -91,6 +93,11 @@ export default function AutocompleteSheet({
   };
 
   const handlePick = (opt: AutoOption) => {
+    if (actionValues.includes(opt.value)) {
+      onSelect(opt);
+      setOpen(false);
+      return;
+    }
     onChange(opt.label);
     onSelect(opt);
     setOpen(false);

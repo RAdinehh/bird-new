@@ -134,7 +134,9 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
       addSpecies({ kind: editingKind, nameFa: trimmed, icon: newIcon });
     } else {
       // افزودن جدید
-      const kind = 'custom-' + trimmed.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || ('custom-' + Date.now());
+      // ساخت kind یکتا (فارسی نگه می‌داره، فقط فاصله‌ها رو خط می‌کنه)
+      const slug = trimmed.toLowerCase().replace(/\s+/g, '-');
+      const kind = 'custom-' + slug + '-' + Date.now().toString(36);
       addSpecies({ kind, nameFa: trimmed, icon: newIcon });
     }
 
@@ -158,6 +160,7 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
         customLabel="افزودن پرنده دلخواه"
         title="انتخاب پرنده"
         error={error}
+        actionValues={[ADD_NEW_VALUE]}
       />
 
       <Modal
