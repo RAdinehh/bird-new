@@ -8,6 +8,7 @@ import BreedNameField, { type BreedPick } from './BreedNameField';
 import SmartSelect from '../../shr/components/SmartSelect';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { Btn, BtnRow, Field, Modal, NumField, ErrorBox } from '../../shr/components/ui';
+import { toastMsg } from '../../cor/store/toast';
 
 export interface BreedFormData {
   id: string;
@@ -63,6 +64,10 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
     setForm(f => {
       const current = f.purposes || [];
       const has = current.includes(key);
+      if (!has && current.length >= 2) {
+        toastMsg.info('حداکثر ۲ هدف می‌تونی انتخاب کنی — یکی رو بردار');
+        return f;
+      }
       return {
         ...f,
         purposes: has
@@ -127,7 +132,7 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
                 type="button"
                 onClick={() => togglePurpose(opt.key)}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5,
                   padding: '7px 12px',
                   background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
                   border: `1px solid ${active ? 'var(--accent)' : 'var(--border)'}`,
