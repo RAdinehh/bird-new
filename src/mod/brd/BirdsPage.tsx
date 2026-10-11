@@ -227,12 +227,12 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
             const isOpen = !ms.selectionMode && expandedId === b.id;
             const kind = getKindInfo((b as any).birdKind);
             const purpose = getPurposeInfo((b as any).purpose);
-            const category = getCategoryInfo((b as any).category);
             const stdKey = (b as any).standardKey;
             // fallback: اگه standardKey نداشت یا پیدا نشد، از اسم پرنده resolve کن
             const stdData = (stdKey && (DEFAULT_STANDARDS as any)[stdKey])
               || getStandardFor(b.name, { customStandards: customStandards || {} })
               || null;
+            const category = stdData?.category ? getCategoryInfo(stdData.category) : null;
             return (
               <ExpandableCard
                 key={b.id} id={b.id} ms={ms}
