@@ -57,6 +57,8 @@ export const ZoneSchema = z.object({
 
 export const EquipmentSchema = z.object({
   hallId: requiredId('سالن'),
+  /** 🆕 بخش اختیاری */
+  zoneId: optionalStr(50),
   // 🆕 نوع دارایی اختیاری — از type خودکار محاسبه می‌شه
   kind: z.enum(['asset', 'consumable']).optional(),
   // 🆕 ۱۴ دسته جدید

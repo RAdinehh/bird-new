@@ -34,7 +34,7 @@ import { getEquipUnit } from './equipUnits';
 
 /** دسته‌های مجاز برای هر نوع دارایی */
 export default function EquipmentPage({ active = true }: { active?: boolean } = {}) {
-  const { halls, equipment, addEquip, updateEquip, deleteEquip } = useHal();
+  const { halls, zones, equipment, addEquip, updateEquip, deleteEquip } = useHal();
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
   const { contacts: allContacts } = useCtc();
@@ -420,6 +420,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         err={err}
         vErrors={vErrors}
         halls={halls}
+        zones={zones}
         equipment={equipment}
         autoFields={autoFields}
         clearAuto={clearAuto}

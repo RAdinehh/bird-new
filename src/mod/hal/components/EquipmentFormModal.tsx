@@ -20,6 +20,7 @@ export interface EquipmentFormModalProps {
   err: string;
   vErrors: Record<string, string>;
   halls: any[];
+  zones: any[];
   equipment: any[];
   autoFields: Set<string>;
   clearAuto: (k: string) => void;
@@ -33,7 +34,7 @@ export interface EquipmentFormModalProps {
 }
 
 export default function EquipmentFormModal(props: EquipmentFormModalProps) {
-  const { open, setOpen, form, setForm, vErrors, halls, equipment, autoFields, clearAuto, markAuto, typesForCategory, equipNeed, save, suppliers, stdForDefaults } = props;
+  const { open, setOpen, form, setForm, vErrors, halls, zones, equipment, autoFields, clearAuto, markAuto, typesForCategory, equipNeed, save, suppliers, stdForDefaults } = props;
 
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
@@ -42,13 +43,25 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           <Field label="سالن" required>
             <SmartSelect
               value={form.hallId}
-              onChange={v => setForm((f: any) => ({ ...f, hallId: v }))}
+              onChange={v => setForm((f: any) => ({ ...f, hallId: v, zoneId: '' }))}
               options={halls.map(c => ({ value: c.id, label: c.name }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب سالن"
               autoThreshold={6}
             />
           </Field>
+          {form.hallId && zones.filter((z: any) => z.hallId === form.hallId).length > 0 && (
+            <Field label="بخش (اختیاری)">
+              <SmartSelect
+                value={form.zoneId || ''}
+                onChange={v => setForm((f: any) => ({ ...f, zoneId: v }))}
+                options={zones.filter((z: any) => z.hallId === form.hallId).map((z: any) => ({ value: z.id, label: z.name }))}
+                placeholder="— بدون بخش —"
+                modalTitle="انتخاب بخش"
+                autoThreshold={6}
+              />
+            </Field>
+          )}
 
         </Grid2>
 

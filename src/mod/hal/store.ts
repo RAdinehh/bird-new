@@ -88,6 +88,8 @@ export type EquipmentUnit = 'pcs' | 'kg' | 'm2' | 'm' | 'L';
 export interface Equipment {
   id: string;
   hallId: string;
+  /** 🆕 بخش (FK → Zone) */
+  zoneId?: string;
   kind?: EquipmentKind;  // 🆕 optional — از type خودکار محاسبه می‌شه
   category: EquipmentCategory;
   type: string;

@@ -25,11 +25,12 @@ export interface EquipmentCardProps {
   supplierNames?: Map<string, string>;
   invoiceNumbers?: Map<string, string>;
   whsItemNames?: Map<string, string>;
+  zoneNames?: Map<string, string>;
 }
 
 export default function EquipmentCard(props: EquipmentCardProps) {
   const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onUndo, supplierNames,
-        invoiceNumbers, whsItemNames } = props;
+        invoiceNumbers, whsItemNames, zoneNames } = props;
   const _cm = (allCustomOpts as any[]).find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
   const _isDeleted = _cm ? _cm.hidden === true : false;
   const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: '🔧' });
@@ -101,6 +102,16 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       {hall ? <EntityLink type="hall" id={hall.id} label={hall.name} /> : '—'}
                     </span>
                   </div>
+                  {e.zoneId && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between',
+                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+                       borderRadius: 'var(--r-sm)' }}>
+                      <span style={{ color: 'var(--muted)' }}>بخش:</span>
+                      <span style={{ fontWeight: 600 }}>
+                        {zoneNames?.get(e.zoneId) || '—'}
+                      </span>
+                    </div>
+                  )}
                   {e.supplierId && (
                     <div style={{ display: 'flex', justifyContent: 'space-between',
                        fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
