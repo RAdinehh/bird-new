@@ -76,21 +76,21 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
             <div style={{
               padding: '10px 12px',
               background: 'var(--input-bg)',
-              borderRadius: 10,
+              borderRadius: 'var(--r-md)',
               marginBottom: 10,
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
               gap: 8,
             }}>
-              <span style={{ fontSize: 12, color: 'var(--muted)' }}>نصب‌شده:</span>
-              <span style={{ fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>نصب‌شده:</span>
+              <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                 {toFa(detailInstalled.toLocaleString('fa-IR'))} {detailUnit}
               </span>
               {detailNeed > 0 && (
                 <>
-                  <span style={{ fontSize: 12, color: 'var(--muted)' }}>نیاز:</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>نیاز:</span>
+                  <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                     {toFa(detailNeed.toLocaleString('fa-IR'))} {detailNeedUnit}
                   </span>
                 </>
@@ -107,10 +107,10 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
                   padding: '10px 12px',
                   background: 'var(--card-solid)',
                   border: '1.5px solid var(--border)',
-                  borderRadius: 12,
+                  borderRadius: 'var(--r-lg)',
                 }}>
                   <span style={{
-                    width: 36, height: 36, borderRadius: 11,
+                    width: 36, height: 36, borderRadius: 'var(--r-md)',
                     background: 'var(--input-bg)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
@@ -119,21 +119,21 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1, display: 'flex', gap: 8 }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1, display: 'flex', gap: 8 }}>
                       {e.count != null && <span>× {toFa(e.count)}</span>}
                       {(e as any).capacity != null && <span>{toFa((e as any).capacity)}{detailUnit === 'm³/h' ? ' m³/h' : detailUnit === 'W' ? ' W' : ''}</span>}
                     </div>
                   </div>
                   <button type="button" onClick={() => openEdit(e)} aria-label="ویرایش" style={{
-                    width: 32, height: 32, borderRadius: 8,
+                    width: 32, height: 32, borderRadius: 'var(--r-sm)',
                     background: 'var(--input-bg)', border: '1px solid var(--border)',
-                    cursor: 'pointer', fontSize: 13, padding: 0,
+                    cursor: 'pointer', fontSize: 'var(--fs-base)', padding: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>✏️</button>
                   <button type="button" onClick={() => removeEquip(e.id, e.name)} aria-label="حذف" style={{
-                    width: 32, height: 32, borderRadius: 8,
+                    width: 32, height: 32, borderRadius: 'var(--r-sm)',
                     background: 'var(--input-bg)', border: '1px solid var(--border)',
-                    cursor: 'pointer', fontSize: 13, padding: 0,
+                    cursor: 'pointer', fontSize: 'var(--fs-base)', padding: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>🗑️</button>
                 </div>

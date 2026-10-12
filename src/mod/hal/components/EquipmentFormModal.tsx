@@ -231,7 +231,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
 
         {equipNeed ? (
           <div style={{
-            fontSize: 11,
+            fontSize: 'var(--fs-xs)',
             lineHeight: 1.6,
             padding: '6px 8px',
             borderRadius: 'var(--r-sm)',

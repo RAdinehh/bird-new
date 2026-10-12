@@ -38,7 +38,7 @@ export default function HallEquipCatRow({ cat, count, tone, pct, onClick }: Prop
       fontFamily: 'inherit', cursor: 'pointer', textAlign: 'right',
     }}>
       <span style={{
-        width: 30, height: 30, borderRadius: 8,
+        width: 30, height: 30, borderRadius: 'var(--r-sm)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: soft, color, flexShrink: 0,
       }}>
@@ -49,23 +49,23 @@ export default function HallEquipCatRow({ cat, count, tone, pct, onClick }: Prop
         flexShrink: 0, minWidth: 62,
       }}>{label}</span>
       <div style={{
-        flex: 1, height: 5, borderRadius: 3,
+        flex: 1, height: 5, borderRadius: 'var(--r-sm)',
         background: 'var(--border)', overflow: 'hidden', minWidth: 40,
       }}>
         <div style={{
           width: `${Math.min(pct || 0, 100)}%`, height: '100%',
-          background: TONE_COLOR[tone], borderRadius: 3,
+          background: TONE_COLOR[tone], borderRadius: 'var(--r-sm)',
         }} />
       </div>
       <span style={{
-        fontSize: 11, fontWeight: 700,
+        fontSize: 'var(--fs-xs)', fontWeight: 700,
         fontVariantNumeric: 'tabular-nums',
         color: TONE_COLOR[tone],
         minWidth: 40, textAlign: 'left', flexShrink: 0,
       }}>
         {pct !== null ? `${toFa(Math.round(pct))}٪` : '—'}
       </span>
-      <span style={{ fontSize: 14, flexShrink: 0 }}>{TONE_EMOJI[tone]}</span>
+      <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>{TONE_EMOJI[tone]}</span>
     </button>
   );
 }

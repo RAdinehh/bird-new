@@ -88,11 +88,11 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom, error, n
           display: 'inline-flex',
           alignItems: 'center',
           gap: 4,
-          fontSize: 11,
+          fontSize: 'var(--fs-xs)',
           color: 'var(--accent)',
           background: 'var(--accent-soft)',
           border: '1px solid var(--accent-border)',
-          borderRadius: 8,
+          borderRadius: 'var(--r-sm)',
           padding: '2px 8px',
           fontWeight: 700,
           alignSelf: 'flex-start',
@@ -104,7 +104,7 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom, error, n
       ) : null}
       {error ? (
         <div style={{
-          fontSize: 11,
+          fontSize: 'var(--fs-xs)',
           color: 'var(--danger)',
           fontWeight: 600,
           paddingRight: 2,
@@ -249,7 +249,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                         background: 'var(--input-bg)',
                         border: '1px dashed var(--border)',
                         borderRadius: 'var(--r-md)',
-                        fontSize: 11,
+                        fontSize: 'var(--fs-xs)',
                         color: 'var(--muted)',
                         fontVariantNumeric: 'tabular-nums',
                         fontWeight: 600,
@@ -290,7 +290,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 color: 'var(--accent)',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
-                fontSize: 12,
+                fontSize: 'var(--fs-sm)',
                 fontWeight: 700,
                 textAlign: 'center',
               }}

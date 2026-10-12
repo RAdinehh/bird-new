@@ -45,7 +45,7 @@ export default function CategoryPicker({ open, onClose, onPick, grouped }: Props
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
         <div style={{ padding: '10px 0 6px', display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--border)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 'var(--r-sm)', background: 'var(--border)' }} />
         </div>
         <div style={{
           padding: '8px 14px', borderBottom: '1px solid var(--border)',
@@ -56,9 +56,9 @@ export default function CategoryPicker({ open, onClose, onPick, grouped }: Props
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>کدام دسته؟</div>
           </div>
           <button type="button" onClick={onClose} aria-label="بستن" style={{
-            width: 40, height: 40, borderRadius: 10,
+            width: 40, height: 40, borderRadius: 'var(--r-md)',
             border: '1px solid var(--border)', background: 'transparent',
-            color: 'var(--muted)', fontSize: 14, cursor: 'pointer',
+            color: 'var(--muted)', fontSize: 'var(--fs-md)', cursor: 'pointer',
           }}>✕</button>
         </div>
         <div
@@ -69,7 +69,7 @@ export default function CategoryPicker({ open, onClose, onPick, grouped }: Props
           onTouchMoveCapture={e => e.stopPropagation()}
           onTouchMove={e => e.stopPropagation()}
           style={{
-            padding: 10, overflowY: 'auto', flex: 1,
+            padding: 'var(--sp-3)', overflowY: 'auto', flex: 1,
             overscrollBehavior: 'contain',
             WebkitOverflowScrolling: 'touch',
             touchAction: 'pan-y',
@@ -88,7 +88,7 @@ export default function CategoryPicker({ open, onClose, onPick, grouped }: Props
                 fontFamily: 'inherit', cursor: 'pointer', textAlign: 'right',
               }}>
                 <span style={{
-                  width: 34, height: 34, borderRadius: 9,
+                  width: 34, height: 34, borderRadius: 'var(--r-md)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: soft, color,
                 }}>

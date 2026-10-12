@@ -74,8 +74,8 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       {meta.name}
                       {_isDeleted && (
                         <span style={{
-                          fontSize: 10, fontWeight: 700,
-                          padding: '2px 7px', borderRadius: 6,
+                          fontSize: 'var(--fs-2xs)', fontWeight: 700,
+                          padding: 'var(--pad-chip-xs)', borderRadius: 'var(--r-sm)',
                           background: 'rgba(217,119,6,.14)', color: 'var(--warn)',
                           letterSpacing: '.3px',
                         }}>حذف‌شده</span>
