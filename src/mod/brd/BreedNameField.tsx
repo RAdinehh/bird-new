@@ -6,8 +6,10 @@
  *
  * Cascade: فقط نژادهای matching با kind پرنده والد
  */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AutocompleteSheet, { type AutoOption } from '../../shr/components/AutocompleteSheet';
+import { Btn, BtnRow, Modal } from '../../shr/components/ui';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { resolveStandard } from './_display-values';
 import { toastMsg } from '../../cor/store/toast';
@@ -51,6 +53,8 @@ export default function BreedNameField({
   value, onChange, onPick, error, excludeNames = [],
   parentBirdName, parentKind, customStandards = {}, customOverrides = {},
 }: Props) {
+  const navigate = useNavigate();
+  const [notFound, setNotFound] = useState<string | null>(null);
   const options: AutoOption[] = useMemo(() => {
     const opts: AutoOption[] = [];
     const exclude = new Set(excludeNames.map(n => n.trim().toLowerCase()));
@@ -147,7 +151,7 @@ export default function BreedNameField({
 
       // اگه پرنده‌ی سفارشیه → هیچ استانداردی مجاز نیست
       if (parentKind?.startsWith('custom-')) {
-        toastMsg.error(`«${typed}» یه نژاد ثبت‌شده‌ست. برای ${parentBirdName} نمی‌تونی ازش استفاده کنی.`);
+        setNotFound(typed);
         return;
       }
 
@@ -187,7 +191,27 @@ export default function BreedNameField({
     : undefined;
 
   return (
-    <AutocompleteSheet
+    <>
+      <Modal
+        open={!!notFound}
+        onClose={() => setNotFound(null)}
+        title="نژاد پیدا نشد"
+        footer={
+          <BtnRow>
+            <Btn variant="primary" onClick={() => { navigate('/set?tab=standards'); setNotFound(null); }}>رفتن به تنظیمات</Btn>
+            <Btn onClick={() => setNotFound(null)}>بستن</Btn>
+          </BtnRow>
+        }
+      >
+        <div style={{ padding: 'var(--pad-normal)', lineHeight: 1.8, textAlign: 'center' }}>
+          <div style={{ fontSize: '2em', marginBottom: 8 }}>⚠️</div>
+          <div style={{ fontWeight: 700, marginBottom: 8 }}>«{notFound}» توی استانداردها نیست</div>
+          <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
+            برای ساختنش برو تنظیمات → استانداردها → افزودن نژاد جدید
+          </div>
+        </div>
+      </Modal>
+      <AutocompleteSheet
       value={value}
       onChange={onChange}
       onSelect={handleSelect}
@@ -200,5 +224,6 @@ export default function BreedNameField({
       emptyMessage={emptyMessage}
       emptyHint={emptyHint}
     />
+    </>
   );
 }
