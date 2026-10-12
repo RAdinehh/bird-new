@@ -118,10 +118,9 @@ export function detectBreedFcrSource(
 
 
 // ═══ Override Detection ═══
-export function getStandardValue(
+function getStandardValue(
   standardKey: string | undefined,
   field: 'cycleDays' | 'fcr',
-  _birdName?: string,
 ): { value: number | null; label: string } {
   if (standardKey) {
     const std = (DEFAULT_STANDARDS as any)[standardKey];
@@ -143,7 +142,7 @@ export function getOverrideInfo(
   field: 'cycleDays' | 'fcr',
   birdName?: string,
 ): { overridden: boolean; stdValue: number | null; stdLabel: string } {
-  const { value: stdValue, label: stdLabel } = getStandardValue(standardKey, field, birdName);
+  const { value: stdValue, label: stdLabel } = getStandardValue(standardKey, field);
   if (stdValue == null || current == null) {
     return { overridden: false, stdValue: null, stdLabel: '' };
   }
@@ -170,26 +169,4 @@ export function getBreedFcrBaseline(
     return { value: parentFcr, label: 'والد', kind: 'parent' };
   }
   return { value: null, label: '', kind: 'none' };
-}
-
-// ═══ 🆕 Breed Defaults (به‌جای bird.cycleDays/fcrStandard) ═══
-/**
- * مقادیر پیش‌فرض نژاد رو از standardKey استخراج کن
- * استفاده: جایگزین bird?.cycleDays و bird?.fcrStandard
- */
-export function getBreedCycleDays(breed: { standardKey?: string } | undefined | null): number | null {
-  if (!breed?.standardKey) return null;
-  const std = (DEFAULT_STANDARDS as any)[breed.standardKey];
-  return std?.biology?.cullDay ?? null;
-}
-
-export function getBreedFcr(breed: { fcr?: number | null; standardKey?: string } | undefined | null): number | null {
-  if (!breed) return null;
-  if (breed.fcr != null) return breed.fcr;
-  if (breed.standardKey) {
-    const std = (DEFAULT_STANDARDS as any)[breed.standardKey];
-    const last = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
-    return last?.fcr ?? null;
-  }
-  return null;
 }
