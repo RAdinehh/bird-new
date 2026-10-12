@@ -57,6 +57,8 @@ export default function BreedNameField({
   const navigate = useNavigate();
   const [notFound, setNotFound] = useState<string | null>(null);
   const options: AutoOption[] = useMemo(() => {
+    // 🆕 اگه پرنده انتخاب نشده → هیچ نژادی نشون نده
+    if (!parentKind) return [];
     const opts: AutoOption[] = [];
     const exclude = new Set(excludeNames.map(n => n.trim().toLowerCase()));
 
@@ -156,6 +158,12 @@ export default function BreedNameField({
     const typed = text.trim();
     if (!typed) return;
 
+    // 🆕 اگه پرنده انتخاب نشده → اجازه نده
+    if (!parentKind) {
+      toastMsg.info('اول پرنده رو انتخاب کن');
+      return;
+    }
+
     // چک کن که این نام توی استانداردها هست یا نه (با resolveStandard)
     const allKeys = new Set([
       ...Object.keys(DEFAULT_STANDARDS),
@@ -207,11 +215,15 @@ export default function BreedNameField({
     : 'انتخاب نژاد';
 
   const emptyMessage = options.length === 0
-    ? (parentBirdName ? `${parentBirdName} نژادی نداره` : 'نژادی برای انتخاب نیست')
+    ? (!parentKind
+        ? 'اول پرنده رو انتخاب کن'
+        : (parentBirdName ? `${parentBirdName} نژادی نداره` : 'نژادی برای انتخاب نیست'))
     : undefined;
 
   const emptyHint = options.length === 0
-    ? 'برو به تب تنظیمات → استانداردها و اولین نژاد رو بساز، بعد اینجا انتخابش کن.'
+    ? (!parentKind
+        ? 'بالا، فیلد «پرنده» رو انتخاب کن تا نژادهای مربوطش بیان.'
+        : 'برو به تب تنظیمات → استانداردها و اولین نژاد رو بساز، بعد اینجا انتخابش کن.')
     : undefined;
 
   return (

@@ -141,7 +141,12 @@ export const useHal = create<State>()(
       deleteHall: (id) => set({ halls: get().halls.filter(x => x.id !== id), zones: get().zones.filter(x => x.hallId !== id), equipment: get().equipment.filter(x => x.hallId !== id) }),
       addZone: (z) => set({ zones: [...get().zones, {...z, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       updateZone: (id, patch) => set({ zones: get().zones.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
-      deleteZone: (id) => set({ zones: get().zones.filter(x => x.id !== id) }),
+      deleteZone: (id) => set({
+        zones: get().zones.filter(x => x.id !== id),
+        equipment: get().equipment.map(e =>
+          e.zoneId === id ? { ...e, zoneId: '' } : e
+        )
+      }),
       addEquip: (e) => {
         const id = uuid();
         const eq = { ...e, id, createdAt: now(), updatedAt: now() } as Equipment;
