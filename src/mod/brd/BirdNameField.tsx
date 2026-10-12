@@ -128,20 +128,32 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
     );
     if (dup) { setNewErr('این نام قبلاً هست'); return; }
 
+    let finalKind = editingKind;
+
     if (editingKind) {
       // ویرایش: حذف قدیمی + افزودن جدید (با حفظ kind)
       removeSpecies(editingKind);
       addSpecies({ kind: editingKind, nameFa: trimmed, icon: newIcon });
     } else {
       // افزودن جدید
-      // ساخت kind یکتا (فارسی نگه می‌داره، فقط فاصله‌ها رو خط می‌کنه)
       const slug = trimmed.toLowerCase().replace(/\s+/g, '-');
       const kind = 'custom-' + slug + '-' + Date.now().toString(36);
+      finalKind = kind;
       addSpecies({ kind, nameFa: trimmed, icon: newIcon });
     }
 
     cancelEdit();
     setShowManage(false);
+
+    // 🆕 auto-pick: بعد از افزودن/ویرایش، خودکار انتخابش کن
+    if (finalKind) {
+      onPick({
+        name: trimmed,
+        standardKey: undefined,
+        isCustom: true,
+        birdKind: finalKind,
+      });
+    }
   };
 
   const handleDelete = (kind: string) => {
