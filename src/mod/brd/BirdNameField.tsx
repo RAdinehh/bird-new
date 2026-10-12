@@ -97,10 +97,33 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
   };
 
   const handleCustomText = (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    // چک کن که قبلاً توی گونه‌ها هست یا نه (case-insensitive)
+    const existing = allSpecies.find(
+      s => s.nameFa.trim().toLowerCase() === trimmed.toLowerCase()
+    );
+
+    if (existing) {
+      // اگه هست → مستقیم انتخابش کن
+      onPick({
+        name: existing.nameFa,
+        isCustom: !existing.builtIn,
+        birdKind: existing.kind,
+      });
+      return;
+    }
+
+    // اگه نیست → خودکار به‌عنوان گونه سفارشی اضافه کن
+    const slug = trimmed.toLowerCase().replace(/\s+/g, '-');
+    const kind = 'custom-' + slug + '-' + Date.now().toString(36);
+    addSpecies({ kind, nameFa: trimmed, icon: '🐦' });
+
     onPick({
-      name: text,
+      name: trimmed,
       isCustom: true,
-      birdKind: undefined,
+      birdKind: kind,
     });
   };
 

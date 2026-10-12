@@ -3,6 +3,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useBrd, type Bird } from './store';
+import { DEFAULT_SPECIES } from './species';
 import { useSet } from '../set/store';
 import { detectCycleDaysSource, detectFcrSource, getOverrideInfo } from './_source';
 import OverrideHint from '../../shr/components/OverrideHint';
@@ -26,6 +27,8 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 export default function BirdsPage({ active = true }: { active?: boolean } = {}) {
   const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird } = useBrd();
   const customStandards = useSet((st: any) => st.customStandards);
+  const customSpecies = useSet((st: any) => st.customSpecies || []);
+  const addSpecies = useSet((st: any) => st.addSpecies);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<BirdFormData>(EMPTY_BIRD_FORM);
   const [error, setError] = useState('');
@@ -118,10 +121,26 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
       }
     }
 
+    // 🆕 lookup species — فقط اگه توی لیست باشه (5 پیش‌فرض یا سفارشی)
+    let birdKind = form.birdKind;
+    if (!birdKind) {
+      const allSpecies = [...DEFAULT_SPECIES, ...customSpecies];
+      const trimmed = form.name.trim();
+      const existing = allSpecies.find(
+        (s: any) => s.nameFa.trim().toLowerCase() === trimmed.toLowerCase()
+      );
+
+      if (!existing) {
+        setError(`«${trimmed}» توی لیست پرنده‌ها نیست. از دکمه‌ی «مدیریت پرنده‌ها» اضافه‌اش کن.`);
+        return;
+      }
+      birdKind = existing.kind;
+    }
+
     // اعتبارسنجی با Zod
     const result = BirdSchema.safeParse({
       ...form,
-
+      birdKind,
     });
     if (!result.success) {
       const first = result.error.issues[0];
@@ -240,6 +259,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         form={form}
         setForm={setForm}
         error={error}
+        onErrorClear={() => setError('')}
         birds={birds}
         onSave={save}
       />

@@ -34,6 +34,8 @@ interface Props {
   emptyHint?: string;
   /** 🆕 مقادیری که انتخاب می‌شن ولی value رو ست نمی‌کنن (اکشن) */
   actionValues?: string[];
+  /** 🆕 مخفی کردن بخش «افزودن دلخواه» */
+  hideCustom?: boolean;
 }
 
 const INITIAL_COUNT = 5;
@@ -43,7 +45,7 @@ const STEP = 5;
 export default function AutocompleteSheet({
   value, onChange, onSelect, onSubmit,
   options, placeholder, customLabel = 'افزودن مورد دلخواه',
-  error, title = 'انتخاب کنید', emptyMessage, emptyHint, actionValues = [],
+  error, title = 'انتخاب کنید', emptyMessage, emptyHint, actionValues = [], hideCustom = false,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');
@@ -151,7 +153,7 @@ export default function AutocompleteSheet({
                 setTypedError(null);
                 inputRef.current?.blur();
               } else {
-                setTypedError('در لیست نیست — از ▼ بزن یا «افزودن دلخواه»');
+                setTypedError(hideCustom ? 'در لیست نیست — از ▼ انتخاب کن' : 'در لیست نیست — از ▼ بزن یا «افزودن دلخواه»');
                 setTimeout(() => setTypedError(null), 3000);
               }
             }
@@ -270,7 +272,7 @@ export default function AutocompleteSheet({
               </button>
             )}
 
-            {showCustom && (
+            {showCustom && !hideCustom && (
               <button type="button" onClick={handleCustom} style={BTN_CUSTOM}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>➕</span>
                 <span style={{ flex: 1 }}>{customLabel} «{draft.trim()}»</span>

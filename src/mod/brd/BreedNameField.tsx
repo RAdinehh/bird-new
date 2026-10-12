@@ -149,14 +149,9 @@ export default function BreedNameField({
       return;
     }
 
-    // نژاد واقعاً جدید
-    onPick({
-      name: typed,
-      standardKey: undefined,
-      fcr: null,
-      isCustom: true,
-      linked: false,
-    });
+    // نژاد واقعاً جدید — ولی اجازه نمی‌دیم که از استاندارد ساخته شه
+    // طبق طراحی: کاربر باید نژاد رو توی تنظیمات → استانداردها بسازه
+    toastMsg.error(`«${typed}» توی استانداردها نیست. اول توی تنظیمات → استانداردها بسازش.`);
   };
 
   const title = parentBirdName
@@ -177,9 +172,9 @@ export default function BreedNameField({
       onChange={onChange}
       onSelect={handleSelect}
       onSubmit={handleCustom}
+      hideCustom
       options={options}
       placeholder={parentBirdName ? `نژاد ${parentBirdName}...` : 'مثلاً — لوهمن یا مرندی'}
-      customLabel="افزودن نژاد دلخواه"
       title={title}
       error={error}
       emptyMessage={emptyMessage}

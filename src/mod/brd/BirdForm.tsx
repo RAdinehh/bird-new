@@ -23,6 +23,7 @@ interface Props {
   error: string;
   birds: Bird[];
   onSave: () => void;
+  onErrorClear?: () => void;
 }
 
 // ═══ کارت اطلاعات (2 ستونه) ═══
@@ -49,7 +50,7 @@ function StatBox({ icon, label, value }: { icon: string; label: string; value: s
   );
 }
 
-export default function BirdForm({ open, onClose, form, setForm, error, birds, onSave }: Props) {
+export default function BirdForm({ open, onClose, form, setForm, error, birds, onSave, onErrorClear }: Props) {
   // آمار runtime بر اساس birdKind انتخاب‌شده
   const stats = useMemo(() => {
     if (!form.birdKind) return null;
@@ -88,8 +89,12 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
       <Field label="نام پرنده" required hint="انتخاب یا تایپ">
         <BirdNameField
           value={form.name}
-          onChange={v => setForm(f => ({ ...f, name: v }))}
+          onChange={v => {
+            onErrorClear?.();
+            setForm(f => ({ ...f, name: v }));
+          }}
           onPick={(pick: BirdPresetPick) => {
+            onErrorClear?.();
             setForm(f => ({
               ...f,
               name: pick.name,
