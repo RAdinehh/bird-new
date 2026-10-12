@@ -3,6 +3,7 @@ import type { Bird } from './store';
 import BirdNameField, { type BirdPresetPick } from './BirdNameField';
 import { Btn, BtnRow, Field, Modal } from '../../shr/components/ui';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
+import { resolveStandard } from './_display-values';
 import { DEFAULT_SPECIES } from './species';
 import { useSet } from '../set/store';
 
@@ -54,6 +55,8 @@ function StatBox({ icon, label, value }: { icon: string; label: string; value: s
 
 export default function BirdForm({ open, onClose, form, setForm, error, birds, onSave, onErrorClear }: Props) {
   const customSpecies = useSet((st: any) => st.customSpecies || []);
+  const customStandards = useSet((st: any) => st.customStandards || {});
+  const customOverrides = useSet((st: any) => st.customOverrides || {});
 
   // آمار runtime — بر اساس نام فعلی (نه birdKind قدیمی)
   const stats = useMemo(() => {
@@ -67,9 +70,10 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
     );
     if (!matched) return null;
 
-    const matching = Object.values(DEFAULT_STANDARDS).filter(
-      (s: any) => s.birdKind === matched.kind
-    );
+    const allKeys = Object.keys(DEFAULT_STANDARDS);
+    const matching = allKeys
+      .map(k => resolveStandard(k, customStandards, customOverrides))
+      .filter((s: any) => s?.birdKind === matched.kind);
 
     if (matching.length === 0) return null;
 

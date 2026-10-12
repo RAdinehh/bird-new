@@ -27,6 +27,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 export default function BirdsPage({ active = true }: { active?: boolean } = {}) {
   const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird } = useBrd();
   const customStandards = useSet((st: any) => st.customStandards);
+  const customOverrides = useSet((st: any) => st.customOverrides || {});
   const customSpecies = useSet((st: any) => st.customSpecies || []);
   const addSpecies = useSet((st: any) => st.addSpecies);
   const [open, setOpen] = useState(false);
@@ -248,6 +249,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
                 ms={ms}
                 customStandards={customStandards}
+                customOverrides={customOverrides}
                 onEdit={openEdit}
                 onDelete={(id, item) => {
                   setUndoData({ item });

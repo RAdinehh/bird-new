@@ -9,6 +9,7 @@
 import { useMemo } from 'react';
 import AutocompleteSheet, { type AutoOption } from '../../shr/components/AutocompleteSheet';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
+import { resolveStandard } from './_display-values';
 import { toastMsg } from '../../cor/store/toast';
 
 export interface BreedPick {
@@ -109,7 +110,7 @@ export default function BreedNameField({
     const key = opt.value;
 
     // 🆕 merge با overrides (همون منطق useMemo)
-    const base = (DEFAULT_STANDARDS as any)[key] || customStandards[key] || {};
+    const base = resolveStandard(key, customStandards, customOverrides) || {};
     const ov = customOverrides[key];
     const std = ov?.nameFa ? { ...base, nameFa: ov.nameFa } : base;
 

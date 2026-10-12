@@ -3,6 +3,7 @@ import { toFa } from '../../shr/utils/fa';
 import { getKindInfo, getCategoryInfo } from './_display';
 import { getBirdDisplayName, getBreedDisplayName } from './_display-name';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
+import { resolveStandard } from './_display-values';
 import { getStandardFor } from '../set/standards/resolve';
 import EntityLink from '../../shr/components/EntityLink';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -19,6 +20,7 @@ interface Props {
   onToggle: () => void;
   ms: any;
   customStandards: Record<string, any> | undefined;
+  customOverrides?: Record<string, any>;
   onEdit: (b: Bird) => void;
   onDelete: (id: string, item: Bird) => void;
 }
@@ -38,11 +40,11 @@ function StatRow({ label, value }: { label: string; value: string }) {
 }
 
 export default function BirdCard({
-  bird: b, index, birdBreeds, isOpen, onToggle, ms, customStandards, onEdit, onDelete,
+  bird: b, index, birdBreeds, isOpen, onToggle, ms, customStandards, customOverrides, onEdit, onDelete,
 }: Props) {
   const kind = getKindInfo((b as any).birdKind);
   const stdKey = (b as any).standardKey;
-  const stdData = (stdKey && (DEFAULT_STANDARDS as any)[stdKey])
+  const stdData = (stdKey && resolveStandard(stdKey, customStandards, customOverrides))
     || getStandardFor(b.name, { customStandards: customStandards || {} })
     || null;
   const category = stdData?.category ? getCategoryInfo(stdData.category) : null;
@@ -51,7 +53,7 @@ export default function BirdCard({
   const breedStandards = birdBreeds
     .map(bd => {
       const k = (bd as any).standardKey;
-      const std = k ? (DEFAULT_STANDARDS as any)[k] : null;
+      const std = k ? resolveStandard(k, customStandards, customOverrides) : null;
       return std ? { key: k, std, breedName: bd.name } : null;
     })
     .filter(Boolean) as Array<{ key: string; std: any; breedName: string }>;
