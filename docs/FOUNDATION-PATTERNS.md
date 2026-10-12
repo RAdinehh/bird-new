@@ -306,13 +306,65 @@ grep -rn "fieldName" src/ --include="*.ts" --include="*.tsx"
 
 **اشتباه:** «موردی یافت نشد»
 **درست:** «کبوتر نژادی نداره — برو تنظیمات → استانداردها بسازش»
+---
+
+## ۱۵ — Single Resolver Pattern
+
+### ۱۵.۱ اصل
+
+هر مفهوم با منبع واحد (مثل Standard) باید فقط از طریق یه helper خونده شه.
+
+**اشتباه:**
+
+DEFAULT_STANDARDS[k].nameFa
+DEFAULT_STANDARDS[k].source
+customOverrides[k]?.nameFa   (فراموش می‌شه)
+
+**درست:**
+
+const std = resolveStandard(k, customStandards, customOverrides);
+std.nameFa
+std.source
+std.growth.weightByAge
+
+### ۱۵.۲ چرا؟
+
+| قبل | بعد |
+|---|---|
+| ۱۰+ جای مختلف merge دستی | یه helper واحد |
+| هر جای جدید → باگ جدید | فقط از helper استفاده کن |
+| تغییر ساختار → همه‌جا fix | فقط یه فایل |
+
+### ۱۵.۳ الگو در Bird-new
+
+- `resolveStandard(key, customStandards, customOverrides)` — در `_display-values.ts`
+- `getBreedDisplayName(b, { customStandards, customOverrides })` — نمایش نام
+- `getBreedFcr(b, customStandards, customOverrides)` — FCR نهایی
+
+### ۱۵.۴ چک‌لیست
+
+اگه فیلد جدید از standard خونده می‌شه:
+
+- از `resolveStandard` استفاده کن، نه `DEFAULT_STANDARDS[key]` مستقیم
+- `customOverrides` رو حتماً پاس بده
+- helper اختصاصی بساز (مثل `getBreedFcr`) اگه منطق پیچیده‌ست
+
+### ۱۵.۵ درس واقعی
+
+این الگو از باگ‌های زیر کشف شد:
+
+- کاربر نام استاندارد رو عوض کرد → کارت آپدیت نشد
+- کاربر FCR رو عوض کرد → داشبورد آپدیت نشد
+- کاربر منبع رو عوض کرد → BreedForm آپدیت نشد
+
+**راه‌حل ریشه‌ای:** Single Resolver.
 
 ---
 
 ## 📚 مرجع
 
 - FOUNDATION.md — قوانین اصلی (۱۳ بخش)
-- FOUNDATION-PATTERNS.md (این) — الگوهای تفکر (۱۴ بخش)
+- FOUNDATION-PATTERNS.md (این) — الگوهای تفکر (۱۵ بخش)
 - AUDIT.md — چک‌لیست ممیزی
 - HANDOFF.md — وضعیت و برنامه
 
