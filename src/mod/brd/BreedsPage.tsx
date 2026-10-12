@@ -60,7 +60,9 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const breeds = useMemo(() => {
     const seen = new Set<string>();
     return _breedsRaw.filter(b => {
-      const k = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase();
+      // 🆕 کلید شامل purposes ئه — چند نژاد با هدف متفاوت مجاز
+      const purposesKey = ((b as any).purposes || []).slice().sort().join(',');
+      const k = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase() + '|' + purposesKey;
       if (seen.has(k)) return false;
       seen.add(k);
       return true;
@@ -167,12 +169,18 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
   const save = () => {
 
-    // 🔒 جلوگیری قاطع از نام تکراری نژاد
+    // 🔒 جلوگیری از نژاد تکراری (نام + هدف یکسان)
     if (!form.id) {
       const _trimmed = form.name.trim();
-      const _dup = breeds.find((x: any) => x.birdId === form.birdId && x.name.trim() === _trimmed);
+      const _newPurposes = (form.purposes || []).slice().sort().join(',');
+      const _dup = breeds.find((x: any) => {
+        if (x.birdId !== form.birdId) return false;
+        if (x.name.trim() !== _trimmed) return false;
+        const _xPurposes = (x.purposes || []).slice().sort().join(',');
+        return _xPurposes === _newPurposes;
+      });
       if (_dup) {
-        setErr(`نام «${_dup.name}» تکراریه — یا ویرایشش کن یا اسم دیگه بذار`);
+        setErr(`نژاد «${_dup.name}» با همین هدف‌ها قبلاً ثبت شده — هدف‌ها رو تغییر بده یا نژاد جدید بساز`);
         return;
       }
     }

@@ -119,7 +119,6 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
             }));
           }}
           error={error || undefined}
-          excludeNames={birds.filter(b => b.id !== form.id).map(b => b.name)}
         />
       </Field>
 

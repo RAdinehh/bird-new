@@ -67,7 +67,8 @@ export const useBrd = create<State>()(
       dedupeBreeds: () => {
         const seen = new Set<string>();
         const cleaned = get().breeds.filter(b => {
-          const key = b.birdId + '|' + b.name.trim().toLowerCase();
+          const purposesKey = ((b as any).purposes || []).slice().sort().join(',');
+          const key = b.birdId + '|' + b.name.trim().toLowerCase() + '|' + purposesKey;
           if (seen.has(key)) return false;
           seen.add(key);
           return true;
@@ -122,7 +123,8 @@ export const useBrd = create<State>()(
           if (Array.isArray(persisted.breeds)) {
             const seen = new Set<string>();
             persisted.breeds = persisted.breeds.filter((b: any) => {
-              const key = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase();
+              const purposesKey = ((b as any).purposes || []).slice().sort().join(',');
+              const key = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase() + '|' + purposesKey;
               if (seen.has(key)) return false;
               seen.add(key);
               return true;

@@ -152,9 +152,6 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
               fcr: pick.fcr !== null ? toFa(pick.fcr) : f.fcr,
             }));
           }}
-          excludeNames={breeds
-            .filter(b => b.id !== form.id && b.birdId === form.birdId)
-            .map(b => b.name)}
           parentBirdName={parentBird?.name}
           parentKind={(parentBird as any)?.birdKind}
           customStandards={customStandards}

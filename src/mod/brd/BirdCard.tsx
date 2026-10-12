@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { Bird, Breed } from './store';
 import { toFa } from '../../shr/utils/fa';
 import { getKindInfo, getCategoryInfo } from './_display';
@@ -66,6 +67,41 @@ export default function BirdCard({
       ? `از نژاد: ${breedStandards.map(x => x.breedName).join('، ')}`
       : '';
 
+  // 🆕 aggregate نژادها
+  const aggregate = useMemo(() => {
+    const total = birdBreeds.length;
+    if (total === 0) return null;
+
+    let nativeCount = 0;
+    let industrialCount = 0;
+    let fancyCount = 0;
+    const purposesCount: Record<string, number> = {};
+    let fcrMin: number | null = null;
+    let fcrMax: number | null = null;
+
+    for (const bd of birdBreeds) {
+      const std = resolveStandard((bd as any).standardKey, customStandards, customOverrides);
+      const cat = std?.category;
+      if (cat === 'native') nativeCount++;
+      else if (cat === 'fancy') fancyCount++;
+      else industrialCount++;
+
+      const ps: string[] = (bd as any).purposes || std?.purposes || [];
+      for (const pr of ps) {
+        if (pr === 'dual') continue;
+        purposesCount[pr] = (purposesCount[pr] || 0) + 1;
+      }
+
+      const fcr = getBreedFcr(bd, customStandards, customOverrides);
+      if (fcr != null) {
+        if (fcrMin === null || fcr < fcrMin) fcrMin = fcr;
+        if (fcrMax === null || fcr > fcrMax) fcrMax = fcr;
+      }
+    }
+
+    return { total, nativeCount, industrialCount, fancyCount, purposesCount, fcrMin, fcrMax };
+  }, [birdBreeds, customStandards, customOverrides]);
+
   const handleDelete = async () => {
     const ok = await showConfirmAsync('تأیید حذف', 'این پرنده حذف شود؟', { danger: true });
     if (!ok) return;
@@ -95,11 +131,33 @@ export default function BirdCard({
         </>
       }
     >
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-        <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مشخصات کامل
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      </div>
+      {aggregate && (
+        <>
+          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
+            <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> خلاصه
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+            <StatRow label="🧬 کل نژاد" value={toFa(aggregate.total)} />
+            {aggregate.nativeCount > 0 && (
+              <StatRow label="🌾 بومی" value={toFa(aggregate.nativeCount)} />
+            )}
+            {aggregate.industrialCount > 0 && (
+              <StatRow label="🏭 صنعتی" value={toFa(aggregate.industrialCount)} />
+            )}
+            {aggregate.fancyCount > 0 && (
+              <StatRow label="🎨 تزئینی" value={toFa(aggregate.fancyCount)} />
+            )}
+            {aggregate.fcrMin != null && aggregate.fcrMax != null && (
+              <StatRow
+                label="📊 FCR"
+                value={aggregate.fcrMin === aggregate.fcrMax
+                  ? toFa(aggregate.fcrMin)
+                  : `${toFa(aggregate.fcrMin)} - ${toFa(aggregate.fcrMax)}`}
+              />
+            )}
+          </div>
+        </>
+      )}
 
       {birdBreeds.length > 0 && (
         <>

@@ -38,6 +38,50 @@ function StatRow({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+// ═══ انتخاب فیلدهای مرتبط با هدف ═══
+function getRelevantFields(stdData: any, purposes: string[]): Array<{ icon: string; label: string; value: string }> {
+  if (!stdData) return [];
+  const fields: Array<{ icon: string; label: string; value: string }> = [];
+
+  const hasLayer = purposes.includes('layer') || purposes.includes('breeder');
+  const hasBroiler = purposes.includes('broiler');
+
+  // 🥚 layer/breeder
+  if (hasLayer) {
+    if (stdData.biology?.cullDay) {
+      fields.push({ icon: '⏱', label: 'چرخه', value: `${toFa(stdData.biology.cullDay)} روز` });
+    }
+    if (stdData.biology?.layingStartDay) {
+      fields.push({ icon: '📅', label: 'شروع تخم', value: `روز ${toFa(stdData.biology.layingStartDay)}` });
+    }
+    if (stdData.production?.eggsPerYear) {
+      fields.push({ icon: '🥚', label: 'تخم/سال', value: toFa(stdData.production.eggsPerYear) });
+    }
+    if (stdData.production?.fertilityPct) {
+      fields.push({ icon: '🐣', label: 'باروری', value: `${toFa(stdData.production.fertilityPct)}٪` });
+    }
+  }
+
+  // 🍗 broiler
+  if (hasBroiler) {
+    if (stdData.biology?.cullDay && !hasLayer) {
+      fields.push({ icon: '⏱', label: 'چرخه', value: `${toFa(stdData.biology.cullDay)} روز` });
+    }
+    if (stdData.growth?.finalWeightG) {
+      fields.push({ icon: '⚖️', label: 'وزن بلوغ', value: `${toFa(Math.round(stdData.growth.finalWeightG / 100) / 10)} کیلو` });
+    }
+    if (stdData.growth?.weightByAge?.length) {
+      const last = stdData.growth.weightByAge[stdData.growth.weightByAge.length - 1];
+      if (last?.adgG) fields.push({ icon: '📈', label: 'ADG', value: `${toFa(last.adgG)} گرم` });
+    }
+    if (stdData.mortalityTotalPct) {
+      fields.push({ icon: '💀', label: 'تلفات', value: `${toFa(stdData.mortalityTotalPct)}٪` });
+    }
+  }
+
+  return fields.slice(0, 4);
+}
+
 export default function BreedCard({
   breed: b, index, bird, isOpen, onToggle, ms, onEdit, onDelete, customStandards, customOverrides,
 }: Props) {
@@ -51,6 +95,8 @@ export default function BreedCard({
     : (Array.isArray(stdData?.purposes) && stdData.purposes.length > 0
       ? stdData.purposes.filter((p: string) => p !== 'dual')
       : (stdData?.primaryPurpose && stdData.primaryPurpose !== 'dual' ? [stdData.primaryPurpose] : []));
+
+  const relevantFields = getRelevantFields(stdData, breedPurposes);
 
   const handleDelete = async () => {
     const ok = await showConfirmAsync('تأیید حذف', 'این نژاد حذف شود؟', { danger: true });
@@ -84,14 +130,18 @@ export default function BreedCard({
         {fcrValue != null && <span>📊 FCR: <b style={{ color: 'var(--text)' }}>{toFa(fcrValue)}</b></span>}
       </>}
     >
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-        <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> مشخصات نژاد
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <StatRow label="نام نژاد" value={getBreedDisplayName(b, { customStandards, customOverrides })} />
-        <StatRow label="پرنده" value={bird ? <EntityLink type="bird" id={bird.id} label={getBirdDisplayName(bird, { customStandards, customOverrides })} /> : '—'} />
-        <StatRow label="FCR" value={fcrValue != null ? toFa(fcrValue) : '—'} />
-      </div>
+      {relevantFields.length > 0 && (
+        <>
+          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
+            <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مشخصات
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+            {relevantFields.map((f, i) => (
+              <StatRow key={i} label={`${f.icon} ${f.label}`} value={f.value} />
+            ))}
+          </div>
+        </>
+      )}
 
       {/* 📚 منبع استاندارد */}
       {stdData?.source && (
