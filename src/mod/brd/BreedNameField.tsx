@@ -83,12 +83,17 @@ export default function BreedNameField({
 
       // 🆕 فیلتر cascade سخت‌گیرانه
       if (parentKind) {
-        // ۱. custom bird → هیچ استانداردی نشون نده
-        if (parentKind.startsWith('custom-')) continue;
-        // ۲. std.birdKind داره → فقط matching
-        if (std.birdKind && std.birdKind !== parentKind) continue;
-        // ۳. std.birdKind نداره → فقط اگه chicken باشه مجاز (fallback)
-        if (!std.birdKind && parentKind !== 'chicken') continue;
+        // 🆕 اگه استاندارد برای همین پرنده ساخته شده → اجازه بده
+        if (std.birdKind === parentKind) {
+          // OK
+        } else if (parentKind.startsWith('custom-')) {
+          // پرنده سفارشی با استاندارد مطابق → هیچ استاندارد دیگه‌ای
+          continue;
+        } else if (std.birdKind && std.birdKind !== parentKind) {
+          continue;
+        } else if (!std.birdKind && parentKind !== 'chicken') {
+          continue;
+        }
       }
 
       // آیکن بر اساس گونه

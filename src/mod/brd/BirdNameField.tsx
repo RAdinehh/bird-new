@@ -128,9 +128,9 @@ export default function BirdNameField({ value, onChange, onPick, error, openMana
         onChange={onChange}
         onSelect={handleSelect}
         onSubmit={handleCustomText}
+        hideCustom
         options={options}
         placeholder="مثلاً — مرغ یا بوقلمون"
-        customLabel="افزودن پرنده دلخواه"
         title="انتخاب پرنده"
         error={error}
       />

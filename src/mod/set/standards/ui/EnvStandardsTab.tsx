@@ -166,17 +166,18 @@ export default function EnvStandardsTab() {
       (s: any) => s.nameFa.trim().toLowerCase() === birdName.trim().toLowerCase()
     );
 
-    if (!existingSpecies && detectedKind === 'custom') {
-      // species جدید
-      const slug = birdName.trim().toLowerCase().replace(/\s+/g, '-');
-      const kind = 'custom-' + slug + '-' + Date.now().toString(36);
-      addSpecies({ kind, nameFa: birdName.trim(), icon: '🐦' });
-      console.log('OK — species جدید:', kind);
-    }
+    let finalKind: string;
 
-    const finalKind = existingSpecies?.kind || (detectedKind === 'custom'
-      ? 'custom-' + birdName.trim().toLowerCase().replace(/\s+/g, '-')
-      : detectedKind);
+    if (existingSpecies) {
+      finalKind = existingSpecies.kind;
+    } else if (detectedKind === 'custom') {
+      // species جدید — با kind یکتا
+      const slug = birdName.trim().toLowerCase().replace(/\s+/g, '-');
+      finalKind = 'custom-' + slug + '-' + Date.now().toString(36);
+      addSpecies({ kind: finalKind, nameFa: birdName.trim(), icon: '🐦' });
+    } else {
+      finalKind = detectedKind;
+    }
 
     const newStd: BirdStandard = {
       ...template,
