@@ -45,6 +45,7 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
     return [...DEFAULT_SPECIES, ...customSpecies];
   }, [customSpecies]);
 
+  const [notFound, setNotFound] = useState<string | null>(null);
   const options: AutoOption[] = useMemo(() => {
     const opts: AutoOption[] = [];
     const exclude = new Set(excludeNames.map(n => n.trim().toLowerCase()));
@@ -115,16 +116,7 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
       return;
     }
 
-    // اگه نیست → خودکار به‌عنوان گونه سفارشی اضافه کن
-    const slug = trimmed.toLowerCase().replace(/\s+/g, '-');
-    const kind = 'custom-' + slug + '-' + Date.now().toString(36);
-    addSpecies({ kind, nameFa: trimmed, icon: '🐦' });
-
-    onPick({
-      name: trimmed,
-      isCustom: true,
-      birdKind: kind,
-    });
+    setNotFound(trimmed);
   };
 
   const startEdit = (sp: Species) => {
