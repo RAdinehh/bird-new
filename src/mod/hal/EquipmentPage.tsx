@@ -4,6 +4,7 @@
 import { useState, useMemo } from 'react';
 import { categoriesForKind, typesForCategory, calcEquipNeed, calcEquipValue } from './api/equipmentCalc';
 import EquipmentFormModal from './components/EquipmentFormModal';
+import { useEquipmentForm } from './useEquipmentForm';
 import EquipmentCard from './components/EquipmentCard';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
@@ -45,9 +46,11 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const whsItemNames = useMemo(() => new Map(whsItems.map((i: any) => [i.id, i.name || ''])), [whsItems]);
   const suppliers = allContacts.filter((c: any) => (c.roles || []).includes('supplier'));
   const { options: allCustomOpts } = useCustomOptions();
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<any>({ id:'', hallId:'', category:'ventilation', type:'', name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'', warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'' });
-  const draft = useFormDraft('hal-equip', form, (v: any) => setForm(v));
+  const {
+    open, setOpen, form, setForm, draft, err, setErr,
+    autoFields, markAuto, clearAuto,
+    buildPayload, openNew, openEdit, save: saveForm,
+  } = useEquipmentForm();
   const __selectedHall = halls.find(h => h.id === form.hallId);
   const hallVolume = __selectedHall
     ? (__selectedHall.length || 0) * (__selectedHall.width || 0) * (__selectedHall.height || 0)
@@ -58,60 +61,11 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const equipNeed = calcEquipNeed(form.type, form.hallId, flocks || [], breedStd, hallArea);
   // 🆕 استاندارد نژاد سالن انتخاب‌شده
   const selectedBreedStd = __selectedHall?.breedId ? breedStd.byBreedId(__selectedHall.breedId) : null;
-  const [err, setErr] = useState('');
-  const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const markAuto = (field: string) => {
-    setAutoFields(prev => {
-      const next = new Set(prev);
-      next.add(field);
-      return next;
-    });
-  };
-
-  const clearAuto = (field: string) => {
-    if (autoFields.has(field)) {
-      setAutoFields(prev => {
-        const next = new Set(prev);
-        next.delete(field);
-        return next;
-      });
-    }
-  };
-
-  const openNew = () => {
-    const firstCat = categoriesForKind('asset')[0] || 'ventilation';
-    setForm({ id:'', hallId: halls[0].id, category: firstCat, type:'',
-      name:'', count:'', unit:'pcs', unitPrice:'', purchasedAt:'',
-      warranty:'', notes:'', capacity:'', efficiency:'', consumeRate:'', status:'active', brand:'', supplierId:'' });
-    setErr(''); setOpen(true);
-  };
   useFab(active ? { label: 'افزودن تجهیز', onClick: openNew } : null);
 
-  const openEdit = (e: Equipment) => {
-    setAutoFields(new Set());
-    setForm({
-      id: e.id, hallId: e.hallId,
-      // kind حذف شد — از type خودکار
-      category: e.category || 'lighting',
-      unit: e.unit || 'pcs',
-      type: e.type, name: e.name,
-      count: e.count ? toFa(e.count) : '',
-      unitPrice: e.unitPrice ? toFa(e.unitPrice) : '',
-      purchasedAt: e.purchasedAt,
-      warranty: e.warranty ? toFa(e.warranty) : '',
-      notes: e.notes,
-      capacity: e.capacity ? toFa(e.capacity) : '',
-      efficiency: e.efficiency ? toFa(e.efficiency) : '',
-      consumeRate: e.consumeRate || '',
-      status: e.status || 'active',
-      brand: e.brand || '',
-      supplierId: e.supplierId || '',
-    });
-    setErr(''); setOpen(true);
-  };
 
   // ═══ اعتبارسنجی زنده ═══
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
@@ -223,58 +177,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     );
   }
 
-  // helper مشترک ساخت payload
-  const buildPayload = () => ({
-    hallId: form.hallId,
-    category: form.category || 'auxiliary',
-    type: form.type,
-    name: form.name.trim(),
-    count: form.count ? parseInt(toEn(form.count)) || null : null,
-    unit: form.unit || 'pcs',
-    unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || null : null,
-    purchasedAt: form.purchasedAt.trim(),
-    warranty: form.warranty ? parseInt(toEn(form.warranty)) || null : null,
-    notes: form.notes.trim(),
-    capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
-    efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
-    consumeRate: form.consumeRate || undefined,
-    status: form.status || 'active',
-    brand: (form.brand || '').trim(),
-    supplierId: (form.supplierId || '').trim() || undefined,
-  });
 
-  const save = () => {
-    // جلوگیری از نام تکراری
-    if (!form.id) {
-      const _trimmed = form.name.trim();
-      const _dup = equipment.find((x: any) => x.hallId === form.hallId && x.name.trim() === _trimmed);
-      if (_dup) {
-        setErr(`تجهیزی با نام «${_dup.name}» توی این سالن هست`);
-        return;
-      }
-    }
-
-    if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
-
-    const data = buildPayload();
-    if (form.id) updateEquip(form.id, data); else addEquip(data);
-    draft.clear();
-    setOpen(false);
-  };
-
-  const saveAndNext = () => {
-    if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
-    const data = buildPayload();
-    addEquip(data);
-    toastMsg.added(form.name || 'تجهیز')
-    // نگه‌داشتن سالن و نوع
-    setForm((f: any) => ({
-      ...f,
-      id: '', name: '', count: '', unitPrice: '', purchasedAt: '',
-      warranty: '', notes: '', capacity: '', efficiency: '',
-    }));
-    draft.clear();
-  };
   return (
     <PageContainer>
       <HelpBanner
@@ -401,7 +304,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         typesForCategory={typesForCategory}
         equipNeed={equipNeed}
         stdForDefaults={selectedBreedStd}
-        save={save}
+        save={() => saveForm(equipment, addEquip, updateEquip)}
       />
     </PageContainer>
   );

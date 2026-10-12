@@ -16,7 +16,7 @@ import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { useFilterSort, FilterBar, getHalZonesConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
-import SmartSelect from '../../shr/components/SmartSelect';
+import ZoneFormModal from './components/ZoneFormModal';
 import EntityLink from '../../shr/components/EntityLink';
 import { showAlert } from '../../cor/store/dialog';
 import { chip } from './helpers';
@@ -340,75 +340,19 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
 
       {ms.selectionMode && <div style={{ height: 90 }} />}
 
-      <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش بخش' : 'افزودن بخش'}
-        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-        <Field label="سالن" required>
-<SmartSelect
-              value={form.hallId}
-              onChange={v => setForm(f => ({ ...f, hallId: v }))}
-              options={halls.map(c => ({
-                value: c.id,
-                label: c.name,
-              }))}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب سالن"
-              autoThreshold={6}
-            />
-        </Field>
-        {form.hallId && (() => {
-          const hall = halls.find((h: any) => h.id === form.hallId);
-          const hallBird = hall?.birdId ? birds.find((b: any) => b.id === hall.birdId) : null;
-          const hallBreed = hall?.breedId ? breeds.find((b: any) => b.id === hall.breedId) : null;
-          if (!hallBird && !hallBreed) return null;
-          return (
-            <div style={{
-              fontSize: 'var(--fs-xs)',
-              color: 'var(--muted)',
-              padding: '6px 10px',
-              background: 'var(--input-bg)',
-              border: '1px dashed var(--border)',
-              borderRadius: 'var(--r-sm)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              lineHeight: 1.6,
-              marginTop: -4,
-            }}>
-              <span style={{ fontSize: 'var(--fs-sm)' }}>📋</span>
-              <span>
-                ارثی از سالن:
-                {hallBird ? ` 🐔 ${hallBird.name}` : ''}
-                {hallBreed ? ` · 🧬 ${hallBreed.name}` : ''}
-              </span>
-            </div>
-          );
-        })()}
-        <Grid2>
-          <Field label="نام بخش" required><Input placeholder="مثلاً — بخش A" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
-          <Field label="ظرفیت">
-            <NumField placeholder="۰" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} unit="پرنده" min={0} max={100000} autoClamp />
-            {crossWarn && (
-              <div style={{
-                fontSize: 'var(--fs-xs)',
-                color: 'var(--warn)',
-                fontWeight: 700,
-                paddingRight: 4,
-                lineHeight: 1.5,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-                marginTop: 4,
-              }}>
-                ⚠️ {crossWarn}
-              </div>
-            )}
-          </Field>
-        </Grid2>
-        <Field label="یادداشت">
-            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
-          </Field>
-        <ErrorBox>{err}</ErrorBox>
-      </Modal>
+      <ZoneFormModal
+        open={open}
+        onClose={() => setOpen(false)}
+        form={form}
+        setForm={setForm}
+        err={err}
+        vErrors={vErrors}
+        crossWarn={crossWarn}
+        halls={halls}
+        birds={birds}
+        breeds={breeds}
+        save={save}
+      />
     </PageContainer>
   );
 }
