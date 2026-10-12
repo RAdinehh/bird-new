@@ -223,85 +223,57 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     );
   }
 
-  const save = async () => {
-    try {
-      console.log('[SAVE] شروع ذخیره', form);
+  // helper مشترک ساخت payload
+  const buildPayload = () => ({
+    hallId: form.hallId,
+    category: form.category || 'auxiliary',
+    type: form.type,
+    name: form.name.trim(),
+    count: form.count ? parseInt(toEn(form.count)) || null : null,
+    unit: form.unit || 'pcs',
+    unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || null : null,
+    purchasedAt: form.purchasedAt.trim(),
+    warranty: form.warranty ? parseInt(toEn(form.warranty)) || null : null,
+    notes: form.notes.trim(),
+    capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
+    efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
+    consumeRate: form.consumeRate || undefined,
+    status: form.status || 'active',
+    brand: (form.brand || '').trim(),
+    supplierId: (form.supplierId || '').trim() || undefined,
+  });
 
-      // 🔒 جلوگیری قاطع از نام تکراری تجهیزات
-      if (!form.id) {
-        const _trimmed = form.name.trim();
-        const _dup = equipment.find((x: any) => x.hallId === form.hallId && x.name.trim() === _trimmed);
-        if (_dup) {
-          console.log('[SAVE] نام تکراری:', _dup);
-          showAlert(
-            `تجهیزاتی با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
-            '❌ نام تکراری'
-          );
-          return;
-        }
+  const save = () => {
+    // جلوگیری از نام تکراری
+    if (!form.id) {
+      const _trimmed = form.name.trim();
+      const _dup = equipment.find((x: any) => x.hallId === form.hallId && x.name.trim() === _trimmed);
+      if (_dup) {
+        setErr(`تجهیزی با نام «${_dup.name}» توی این سالن هست`);
+        return;
       }
+    }
 
     if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
-    const data = {
-      hallId: form.hallId,
-      // kind حذف
-      category: form.category || 'auxiliary',
-      type: form.type,
-      name: form.name.trim(),
-      count: form.count ? parseInt(toEn(form.count)) || null : null,
-      unit: form.unit || 'pcs',
-      unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || null : null,
-      purchasedAt: form.purchasedAt.trim(),
-      warranty: form.warranty ? parseInt(toEn(form.warranty)) || null : null,
-      notes: form.notes.trim(),
-      capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
-      efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
-      consumeRate: form.consumeRate || undefined,
-      status: form.status || 'active',
-      brand: (form.brand || '').trim(),
-      supplierId: (form.supplierId || '').trim() || undefined,
-    };
-      if (form.id) updateEquip(form.id, data); else addEquip(data);
-      console.log('[SAVE] ذخیره موفق');
-      draft.clear();
-      setOpen(false);
-    } catch (err) {
-      console.error('[SAVE] خطا:', err);
-      showAlert('خطا در ذخیره: ' + String(err), '❌ خطا');
-    }
+
+    const data = buildPayload();
+    if (form.id) updateEquip(form.id, data); else addEquip(data);
+    draft.clear();
+    setOpen(false);
   };
 
   const saveAndNext = () => {
-    // بدون چک تکراری
     if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
-    const data = {
-      hallId: form.hallId,
-      // kind حذف
-      category: form.category || 'auxiliary',
-      type: form.type,
-      name: form.name.trim(),
-      count: form.count ? parseInt(toEn(form.count)) || null : null,
-      unit: form.unit || 'pcs',
-      unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || null : null,
-      purchasedAt: form.purchasedAt.trim(),
-      warranty: form.warranty ? parseInt(toEn(form.warranty)) || null : null,
-      notes: form.notes.trim(),
-      capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
-      efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
-      consumeRate: form.consumeRate || undefined,
-      status: form.status || 'active',
-      brand: (form.brand || '').trim(),
-      supplierId: (form.supplierId || '').trim() || undefined,
-    };
+    const data = buildPayload();
     addEquip(data);
     toastMsg.added(form.name || 'تجهیز')
-    // پاک کردن فقط نام و مشخصات، نگه‌داشتن سالن و نوع
+    // نگه‌داشتن سالن و نوع
     setForm((f: any) => ({
       ...f,
       id: '', name: '', count: '', unitPrice: '', purchasedAt: '',
       warranty: '', notes: '', capacity: '', efficiency: '',
     }));
-    setErr('');
+    draft.clear();
   };
   return (
     <PageContainer>
