@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Breed } from './store';
+import { getBreedDisplayName } from './_display-name';
 import { useSet } from '../set/store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useFocusParam } from '../../shr/hooks/useFocusParam';
@@ -149,7 +150,15 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   }
 
   const openEdit = (b: Breed) => {
-    setForm({ id: b.id, birdId: b.birdId, name: b.name, fcr: b.fcr ? toFa(b.fcr) : '', standardKey: (b as any).standardKey || '', purposes: (b as any).purposes || [] });
+    setForm({
+      id: b.id,
+      birdId: b.birdId,
+      // 🆕 نام پویا از استاندارد (اگه standardKey داره)
+      name: getBreedDisplayName(b, customStandards),
+      fcr: b.fcr ? toFa(b.fcr) : '',
+      standardKey: (b as any).standardKey || '',
+      purposes: (b as any).purposes || [],
+    });
     
     setErr(''); setOpen(true);
   };

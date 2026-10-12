@@ -110,12 +110,30 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
       <Field label="نام نژاد" required hint="انتخاب یا تایپ">
         <BreedNameField
           value={form.name}
-          onChange={v => setForm(f => ({
-            ...f,
-            name: v,
-            // 🆕 وقتی کاربر دستی تایپ می‌کنه، standardKey پاک شه
-            standardKey: '',
-          }))}
+          onChange={v => setForm(f => {
+            const allStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+            const trimmed = v.trim().toLowerCase();
+            if (!trimmed) return { ...f, name: v, standardKey: '' };
+
+            // 🆕 تلاش برای match با استانداردها
+            const match = Object.entries(allStandards).find(
+              ([_, std]: [string, any]) =>
+                std?.nameFa?.trim().toLowerCase() === trimmed
+            ) as [string, any] | undefined;
+
+            if (match) {
+              const [key, std] = match;
+              const last = std?.growth?.weightByAge?.slice(-1)?.[0];
+              return {
+                ...f,
+                name: v,
+                standardKey: key,
+                fcr: last?.fcr != null ? toFa(last.fcr) : f.fcr,
+              };
+            }
+
+            return { ...f, name: v, standardKey: '' };
+          })}
           onPick={(pick: BreedPick) => {
             // کاربر خودش هدف رو انتخاب می‌کنه — بدون auto-fill
             setForm(f => ({
