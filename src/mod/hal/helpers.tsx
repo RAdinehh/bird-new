@@ -36,7 +36,7 @@ export function Row({ l, v, accent }: { l: ReactNode; v: ReactNode; accent?: boo
 
 export function Pill({ label, value }: { label: string; value: string }) {
   return (
-    <span style={{ padding: '4px 10px', background: 'var(--input-bg)', borderRadius: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+    <span style={{ padding: 'var(--pad-btn-sm)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
       {label}: <b style={{ color: 'var(--text)' }}>{value}</b>
     </span>
   );
@@ -102,13 +102,13 @@ export function EnvCard({ icon, label, value, tone }: { icon: string; label: str
       gap: 8,
       padding: '8px 10px',
       background: 'var(--input-bg)',
-      borderRadius: 10,
+      borderRadius: 'var(--r-md)',
       minWidth: 0,
     }}>
-      <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
+      <span style={{ fontSize: 'var(--fs-lg)', flexShrink: 0 }}>{icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
-        <div style={{ fontSize: 13, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
+        <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+        <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
       </div>
     </div>
   );
@@ -150,7 +150,7 @@ export function RowWithStatus({
         fontVariantNumeric: 'tabular-nums',
         minWidth: 0,
       }}>
-        {showIcon && <span style={{ fontSize: 14, flexShrink: 0 }}>{showIcon}</span>}
+        {showIcon && <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>{showIcon}</span>}
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {v}{hint && <span style={{ color: 'var(--muted)', fontWeight: 500, marginRight: 4 }}> · {hint}</span>}
         </span>

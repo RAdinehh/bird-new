@@ -374,7 +374,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
               lineHeight: 1.6,
               marginTop: -4,
             }}>
-              <span style={{ fontSize: 12 }}>📋</span>
+              <span style={{ fontSize: 'var(--fs-sm)' }}>📋</span>
               <span>
                 ارثی از سالن:
                 {hallBird ? ` 🐔 ${hallBird.name}` : ''}

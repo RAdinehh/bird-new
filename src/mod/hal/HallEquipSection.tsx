@@ -253,7 +253,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
 
   return (
     <>
-      <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border)' }}>
+      <div style={{ borderRadius: 'var(--r-md)', overflow: 'hidden', border: '1px solid var(--border)' }}>
         {/* ═══ هدر ═══ */}
         <button
           type="button"
@@ -266,13 +266,13 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
             fontFamily: 'inherit', cursor: 'pointer', textAlign: 'right',
           }}
         >
-          <span style={{ fontSize: 14 }}>⚙️</span>
+          <span style={{ fontSize: 'var(--fs-md)' }}>⚙️</span>
           <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
             تجهیزات سالن
           </span>
           <span style={{
-            fontSize: 10, fontWeight: 600, padding: '2px 7px',
-            borderRadius: 6, background: 'var(--card-solid)', color: 'var(--muted)',
+            fontSize: 'var(--fs-2xs)', fontWeight: 600, padding: 'var(--pad-chip-xs)',
+            borderRadius: 'var(--r-sm)', background: 'var(--card-solid)', color: 'var(--muted)',
           }}>{toFa(hallEquips.length)} مورد</span>
           <div style={{ display: 'flex', gap: 4, marginRight: 'auto' }}>
             {headerDots.map((t, i) => (
@@ -283,7 +283,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
             ))}
           </div>
           <span style={{
-            color: 'var(--muted)', fontSize: 12,
+            color: 'var(--muted)', fontSize: 'var(--fs-sm)',
             transform: open ? 'rotate(180deg)' : 'none',
             transition: 'transform .25s',
           }}>▾</span>
@@ -315,7 +315,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
           <div>
             {displayCats.length === 0 ? (
               <div style={{
-                padding: 20, textAlign: 'center',
+                padding: 'var(--sp-6)', textAlign: 'center',
                 fontSize: 'var(--fs-sm)', color: 'var(--muted)',
                 background: 'var(--card-solid)',
               }}>
@@ -334,13 +334,13 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
               ))
             )}
 
-            <div style={{ padding: 10, background: 'var(--card-solid)' }}>
+            <div style={{ padding: 'var(--sp-3)', background: 'var(--card-solid)' }}>
               <button
                 type="button"
                 onClick={() => setCatPicker(true)}
                 style={{
-                  width: '100%', padding: 10, minHeight: 40,
-                  borderRadius: 8, border: '1px dashed var(--accent-border)',
+                  width: '100%', padding: 'var(--sp-3)', minHeight: 40,
+                  borderRadius: 'var(--r-sm)', border: '1px dashed var(--accent-border)',
                   background: 'var(--accent-soft)', color: 'var(--accent)',
                   fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
                   fontWeight: 700, cursor: 'pointer',
@@ -355,10 +355,10 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
                 background: 'var(--card-solid)',
                 display: 'flex', flexWrap: 'wrap', gap: 4,
               }}>
-                {legacy.ventilationSystem && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>تهویه: {legacy.ventilationSystem}</span>}
-                {legacy.feederType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>دان: {legacy.feederType}</span>}
-                {legacy.drinkerType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>آب: {legacy.drinkerType}</span>}
-                {legacy.litterType && <span style={{ fontSize: 10, color: 'var(--muted)', padding: '2px 8px', background: 'var(--input-bg)', borderRadius: 6 }}>بستر: {legacy.litterType}</span>}
+                {legacy.ventilationSystem && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>تهویه: {legacy.ventilationSystem}</span>}
+                {legacy.feederType && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>دان: {legacy.feederType}</span>}
+                {legacy.drinkerType && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>آب: {legacy.drinkerType}</span>}
+                {legacy.litterType && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>بستر: {legacy.litterType}</span>}
               </div>
             )}
           </div>
