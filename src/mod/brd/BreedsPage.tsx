@@ -178,16 +178,32 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
     if (!form.name.trim()) { setErr('نام نژاد اجباری است'); return; }
 
-    // 🆕 چک: نام باید با یک استاندارد match کنه
-    const allStandards = { ...(DEFAULT_STANDARDS as any) };
+    // 🆕 چک: نام باید با یک استاندارد match کنه (با احتساب overrides)
+    const baseStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+    const allStandards: Record<string, any> = {};
+    for (const [k, v] of Object.entries(baseStandards)) {
+      const ov = customOverrides[k];
+      allStandards[k] = ov?.nameFa ? { ...(v as any), nameFa: ov.nameFa } : v;
+    }
+
     const trimmedName = form.name.trim().toLowerCase();
     const matchedByKey = form.standardKey ? allStandards[form.standardKey] : null;
 
     if (matchedByKey) {
-      // اگه standardKey داریم، نام باید با nameFa همون یکی باشه
-      if (matchedByKey.nameFa?.trim().toLowerCase() !== trimmedName) {
-        setErr(`نام نژاد با استاندارد «${matchedByKey.nameFa}» هماهنگ نیست — یا نام رو درست کن یا نژاد رو دوباره از لیست انتخاب کن`);
-        return;
+      // اگه standardKey داریم، نام باید با nameFa (با override) هماهنگ باشه
+      const stdName = matchedByKey.nameFa?.trim() || '';
+      if (stdName.toLowerCase() !== trimmedName) {
+        // 🆕 اگه نام فعلی فقط snapshot قدیمیه (از قبل ذخیره شده)، خودکار آپدیت کن
+        // چک: آیا نام فعلی با *base* استاندارد (بدون override) یکی ئه؟
+        const baseStd = (DEFAULT_STANDARDS as any)[form.standardKey];
+        const baseName = baseStd?.nameFa?.trim().toLowerCase();
+        if (baseName === trimmedName) {
+          // snapshot قدیمی → خودکار نام رو با override نهایی جایگزین کن
+          (form as any).name = stdName;
+        } else {
+          setErr(`نام نژاد با استاندارد «${stdName}» هماهنگ نیست — یا نام رو درست کن یا نژاد رو دوباره از لیست انتخاب کن`);
+          return;
+        }
       }
     } else {
       // اگه standardKey نداریم، نام باید با یکی از استانداردها یکی باشه
@@ -200,7 +216,6 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
         return;
       }
       // خودکار standardKey رو ست کن
-      // در واقع user می‌تونه ادامه بده — payload پایین از standardKey استفاده می‌کنه
       (form as any).standardKey = matchedByName[0];
     }
 

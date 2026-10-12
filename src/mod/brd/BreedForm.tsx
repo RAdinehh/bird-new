@@ -166,6 +166,7 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
           parentBirdName={parentBird?.name}
           parentKind={(parentBird as any)?.birdKind}
           customStandards={customStandards}
+          customOverrides={customOverrides}
         />
       </Field>
       </div>

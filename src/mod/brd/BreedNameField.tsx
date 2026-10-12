@@ -107,7 +107,12 @@ export default function BreedNameField({
 
   const handleSelect = (opt: AutoOption) => {
     const key = opt.value;
-    const std = (DEFAULT_STANDARDS as any)[key] || customStandards[key];
+
+    // 🆕 merge با overrides (همون منطق useMemo)
+    const base = (DEFAULT_STANDARDS as any)[key] || customStandards[key] || {};
+    const ov = customOverrides[key];
+    const std = ov?.nameFa ? { ...base, nameFa: ov.nameFa } : base;
+
     const lastGrowth = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
 
     onPick({
