@@ -53,6 +53,7 @@ export const GOOSE_EMDEN: BirdStandard = {
   birdName: 'غاز',
   purposes: ['broiler'],
   primaryPurpose: 'broiler',
+  breederStandardKey: 'goose-toulouse',
   nameFa: 'غاز امبدن',
   nameEn: 'Emden Goose',
   growth: {
@@ -77,6 +78,7 @@ export const GOOSE_CHINESE: BirdStandard = {
   birdName: 'غاز',
   purposes: ['layer'],
   primaryPurpose: 'layer',
+  breederStandardKey: 'goose-toulouse',
   nameFa: 'غاز چینی',
   nameEn: 'Chinese Goose',
   biology: {
@@ -164,6 +166,7 @@ export const GOOSE_AFRICAN: BirdStandard = {
   birdName: 'غاز',
   purposes: ['broiler'],
   primaryPurpose: 'broiler',
+  breederStandardKey: 'goose-toulouse',
   nameFa: 'غاز آفریقایی',
   nameEn: 'African Goose',
   growth: {
@@ -191,6 +194,7 @@ export const GOOSE_UKRAINIAN: BirdStandard = {
   birdName: 'غاز',
   purposes: ['dual', 'layer'],
   primaryPurpose: 'dual',
+  breederStandardKey: 'goose-toulouse',
   nameFa: 'غاز اوکراینی (خاکستری)',
   nameEn: 'Ukrainian Grey Goose',
   biology: {

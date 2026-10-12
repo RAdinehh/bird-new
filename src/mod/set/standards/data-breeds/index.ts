@@ -40,7 +40,6 @@ import { DUCK_PEKIN } from './ducks';
 import { DUCK_MUSCOVY } from './ducks';
 import { DUCK_UKRAINIAN, DUCK_PEKIN_BREEDER, DUCK_MUSCOVY_BREEDER } from './ducks';
 import { TURKEY_BRONZE, TURKEY_WHITE, TURKEY_BOURBON, TURKEY_BREEDER } from './turkeys';
-import { GOOSE } from './turkey_goose';
 import { GOOSE_EMDEN, GOOSE_CHINESE, GOOSE_TOULOUSE, GOOSE_AFRICAN, GOOSE_UKRAINIAN } from './geese';
 
 export const NEW_BREEDS: Record<string, BirdStandard> = {
@@ -75,7 +74,6 @@ export const NEW_BREEDS: Record<string, BirdStandard> = {
   'turkey-white': TURKEY_WHITE,
   'turkey-bourbon': TURKEY_BOURBON,
   'turkey-breeder': TURKEY_BREEDER,
-  'goose': GOOSE,
   'goose-emden': GOOSE_EMDEN,
   'goose-chinese': GOOSE_CHINESE,
   'goose-toulouse': GOOSE_TOULOUSE,

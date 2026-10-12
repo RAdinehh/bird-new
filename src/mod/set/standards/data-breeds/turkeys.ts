@@ -52,6 +52,7 @@ export const TURKEY_BRONZE: BirdStandard = {
   birdName: 'بوقلمون',
   purposes: ['broiler'],
   primaryPurpose: 'broiler',
+  breederStandardKey: 'turkey-breeder',
   nameFa: 'بوقلمون برنز',
   nameEn: 'Bronze Turkey',
   growth: {
@@ -76,6 +77,7 @@ export const TURKEY_WHITE: BirdStandard = {
   birdName: 'بوقلمون',
   purposes: ['broiler'],
   primaryPurpose: 'broiler',
+  breederStandardKey: 'turkey-breeder',
   nameFa: 'بیوتی سفید',
   nameEn: 'BUT 6 White Turkey',
   growth: {
@@ -100,6 +102,7 @@ export const TURKEY_BOURBON: BirdStandard = {
   birdName: 'بوقلمون',
   purposes: ['broiler'],
   primaryPurpose: 'broiler',
+  breederStandardKey: 'turkey-breeder',
   nameFa: 'بوقلمون بوربون',
   nameEn: 'Bourbon Turkey',
   growth: {
