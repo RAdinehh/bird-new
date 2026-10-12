@@ -347,6 +347,7 @@ export default function EnvStandardsTab() {
         open={showAddModal}
         onClose={() => setShowAddModal(false)}
         existingCustom={custom}
+        customSpecies={customSpecies}
         onAdd={handleAddBreed}
       />
     </PageContainer>

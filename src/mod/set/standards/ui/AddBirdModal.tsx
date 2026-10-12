@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Btn, Field, Input, Modal, ErrorBox } from '../../../../shr/components/ui';
 import { DEFAULT_STANDARDS, type BirdStandard } from '../index';
+import { DEFAULT_SPECIES } from '../../../brd/species';
 
 export function AddBirdModal({
-  open, onClose, existingCustom, onAdd,
+  open, onClose, existingCustom, customSpecies = [], onAdd,
 }: {
   open: boolean;
   onClose: () => void;
   existingCustom: Record<string, BirdStandard>;
+  customSpecies?: Array<{ kind: string; nameFa: string; icon: string; builtIn?: boolean }>;
   onAdd: (key: string, nameFa: string, nameEn: string, birdName: string, template: BirdStandard) => void;
 }) {
   const [customNameFa, setCustomNameFa] = useState('');
@@ -37,8 +39,9 @@ export function AddBirdModal({
     }
     const template = existingCustom[templateKey] || DEFAULT_STANDARDS[templateKey];
     onAdd(key, customNameFa.trim(), customNameEn.trim() || customNameFa.trim(), customBirdName.trim(), template);
+    // 🆕 reset فقط — modal باز بمونه برای ویرایش
     reset();
-    onClose();
+    // onClose(); — حذف شد تا کاربر بتونه ادامه بده
   };
 
   return (
@@ -53,8 +56,18 @@ export function AddBirdModal({
         </div>
       }
     >
-      <Field label="پرنده مادر" required hint="مرغ، بوقلمون، اردک، ...">
-        <Input value={customBirdName} onChange={e => setCustomBirdName(e.target.value)} placeholder="مرغ" />
+      <Field label="پرنده مادر" required hint="انتخاب یا تایپ">
+        <Input
+          value={customBirdName}
+          onChange={e => setCustomBirdName(e.target.value)}
+          placeholder="مثلاً — مرغ یا طوطی"
+          list="bird-species-list"
+        />
+        <datalist id="bird-species-list">
+          {[...DEFAULT_SPECIES, ...customSpecies].map((sp: any) => (
+            <option key={sp.kind} value={sp.nameFa} />
+          ))}
+        </datalist>
       </Field>
       <Field label="نام نژاد (فارسی)" required>
         <Input value={customNameFa} onChange={e => setCustomNameFa(e.target.value)} placeholder="مثلاً — لاری" />

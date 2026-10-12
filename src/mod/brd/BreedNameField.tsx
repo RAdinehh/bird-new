@@ -60,9 +60,13 @@ export default function BreedNameField({
     const opts: AutoOption[] = [];
     const exclude = new Set(excludeNames.map(n => n.trim().toLowerCase()));
 
-    // merge با overrides
+    // merge با overrides — شامل customStandards هم
     const baseStandards: Record<string, any> = {};
-    for (const k of Object.keys(DEFAULT_STANDARDS)) {
+    const allKeys = new Set([
+      ...Object.keys(DEFAULT_STANDARDS),
+      ...Object.keys(customStandards || {}),
+    ]);
+    for (const k of allKeys) {
       const s = resolveStandard(k, customStandards, customOverrides);
       if (s) baseStandards[k] = s;
     }
@@ -83,11 +87,18 @@ export default function BreedNameField({
 
       // 🆕 فیلتر cascade سخت‌گیرانه
       if (parentKind) {
-        // 🆕 اگه استاندارد برای همین پرنده ساخته شده → اجازه بده
-        if (std.birdKind === parentKind) {
-          // OK
+        // ۱. match دقیق birdKind
+        const exactKindMatch = std.birdKind === parentKind;
+        // ۲. match با birdName (برای custom و legacy)
+        const nameMatch = parentBirdName &&
+          (std.birdName || '').trim() === parentBirdName.trim();
+        // ۳. legacy custom
+        const legacyCustom = std.birdKind === 'custom' &&
+          parentKind.startsWith('custom-');
+
+        if (exactKindMatch || nameMatch || legacyCustom) {
+          // OK — نشون بده
         } else if (parentKind.startsWith('custom-')) {
-          // پرنده سفارشی با استاندارد مطابق → هیچ استاندارد دیگه‌ای
           continue;
         } else if (std.birdKind && std.birdKind !== parentKind) {
           continue;
