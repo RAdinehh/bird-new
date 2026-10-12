@@ -5,6 +5,7 @@ import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useBrd, type Bird } from './store';
 import { DEFAULT_SPECIES } from './species';
 import { useSet } from '../set/store';
+import { useMasterRedirect } from '../../shr/hooks/useMasterRedirect';
 import { detectCycleDaysSource, detectFcrSource, getOverrideInfo } from './_source';
 import OverrideHint from '../../shr/components/OverrideHint';
 import BirdForm, { EMPTY_BIRD_FORM, type BirdFormData } from './BirdForm';
@@ -30,6 +31,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   const customOverrides = useSet((st: any) => st.customOverrides || {});
   const customSpecies = useSet((st: any) => st.customSpecies || []);
   const addSpecies = useSet((st: any) => st.addSpecies);
+  const { redirect: masterRedirect, MasterRedirectModal } = useMasterRedirect();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<BirdFormData>(EMPTY_BIRD_FORM);
   const [error, setError] = useState('');
@@ -144,7 +146,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
       );
 
       if (!existing) {
-        setError(`«${trimmed}» توی لیست پرنده‌ها نیست. از دکمه‌ی «مدیریت پرنده‌ها» اضافه‌اش کن.`);
+        masterRedirect('species', trimmed);
         return;
       }
       birdKind = existing.kind;
@@ -181,6 +183,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
 
   return (
     <PageContainer>
+      <MasterRedirectModal />
       {undoData && (
         <UndoBar
           label="حذف شد"
