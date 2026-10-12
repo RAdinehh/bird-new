@@ -76,10 +76,12 @@
 
 ## 🔴 بخش ۴ — کارهای باقی‌مونده
 
-### 🔴 بحرانی
-- [ ] **ErrorBoundary ریشه‌ای** — crash کنه، کل اپ سفید می‌شه
-- [ ] **Export/Import JSON** — بدون backup، localStorage از دست می‌ره
-- [ ] **Decimal.js** — محاسبه دقیق اعشاری
+### ✅ قبلاً حل شده (تأیید ۱۴۰۴/۰۷/۲۰)
+- [x] **ErrorBoundary ریشه‌ای** — `main.tsx:48` + `ErrorFallback` + `logError` + تست
+- [x] **Export/Import JSON** — `BackupTab.tsx` + `backup.ts` (۷ تابع) + `AutoBackup` فعال در `App.tsx`
+
+### 🔴 بحرانی باقی‌مونده
+- [ ] **Decimal.js** — بررسی عمیق‌تر (فعلاً `parseFloat` ساده در `fa.ts`)
 
 ### 🟡 مهم
 - [ ] **اتصالات باقی‌مونده:**
