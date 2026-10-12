@@ -67,26 +67,3 @@ export function getCategoryInfo(category?: string): CategoryInfo | null {
 }
 
 // ═══ خواندن اطلاعات از استاندارد ═══
-export interface StandardRef {
-  name: string;         // نام استاندارد (اسم نژاد)
-  source?: string;      // منبع علمی
-  year?: number;        // سال
-  connected: boolean;   // آیا وصل هست
-}
-
-export function getStandardRef(bird: Bird, standardFromRegistry?: any): StandardRef | null {
-  const key = (bird as any).standardKey;
-  if (!key || !standardFromRegistry) {
-    return {
-      name: bird.name,
-      connected: false,
-    };
-  }
-  const std = standardFromRegistry;
-  return {
-    name: std.nameFa || std.nameEn || key,
-    source: std.source,
-    year: std.publishYear,
-    connected: true,
-  };
-}
