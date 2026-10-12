@@ -2,7 +2,8 @@
  * تست integration: افزودن نژاد جدید باید در store ثبت بشه
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { renderWithRouter } from './helpers';
 import { useSet } from '../mod/set/store';
 
 vi.mock('../cor/store/toast', () => ({
@@ -37,7 +38,7 @@ describe('EnvStandardsTab — افزودن نژاد جدید', () => {
   });
 
   it('بعد از افزودن، نژاد جدید در store هست', async () => {
-    render(<EnvStandardsTab />);
+    renderWithRouter(<EnvStandardsTab />);
 
     // کلیک روی دکمه‌ی پایین (نه عنوان modal)
     const addBtn = screen.getByRole('button', { name: /➕ افزودن نژاد جدید/ });

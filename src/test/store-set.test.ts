@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { useSet, MODULE_LABELS } from '../mod/set/store';
 
 beforeEach(() => {
-  // reset
   useSet.getState().reset();
 });
 
@@ -14,7 +13,7 @@ describe('useSet — تنظیمات پیش‌فرض', () => {
   it('accentColor تعریف شده', () => {
     expect(useSet.getState().accentColor).toBeTruthy();
   });
-
+});
 
 describe('useSet — update', () => {
   it('update یک فیلد ساده', () => {
@@ -27,17 +26,16 @@ describe('useSet — update', () => {
     expect(useSet.getState().theme).toBe('dark');
     expect(useSet.getState().accentColor).toBe('blue');
   });
-
 });
 
 describe('useSet — reset', () => {
-  it('reset همه چیز رو برمیگردونه به پیش‌فرض', () => {
+  it('reset همه چیز رو برمی‌گردونه به پیش‌فرض', () => {
     useSet.getState().update({ theme: 'dark' });
     expect(useSet.getState().theme).toBe('dark');
     useSet.getState().reset();
     expect(useSet.getState().theme).not.toBe('dark');
   });
-
+});
 
 describe('MODULE_LABELS', () => {
   it('شامل ماژول‌های اصلی', () => {

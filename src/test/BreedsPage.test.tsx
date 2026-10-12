@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { renderWithRouter } from './helpers';
 import BreedsPage from '../mod/brd/BreedsPage';
 import { useBrd } from '../mod/brd/store';
 
@@ -28,16 +29,16 @@ beforeEach(() => {
 
 describe('BreedsPage', () => {
   it('رندر بدون خطا', () => {
-    const { container } = render(<BreedsPage />);
+    const { container } = renderWithRouter(<BreedsPage />);
     expect(container).toBeTruthy();
   });
 
   it('با نژاد → رندر بدون خطا', () => {
     useBrd.setState({
-      birds: [{ id: 'b1', name: 'مرغ', nameEn: 'Chicken', cycleDays: 21, fcrStandard: 1.6, createdAt: '', updatedAt: '' }] as any,
-      breeds: [{ id: 'br1', birdId: 'b1', name: 'لگهورن', fcr: 1.5, createdAt: '', updatedAt: '' }] as any,
+      birds: [{ id: 'b1', name: 'مرغ', createdAt: '', updatedAt: '' }] as any,
+      breeds: [{ id: 'br1', birdId: 'b1', name: 'مرندی', fcr: 1.79, createdAt: '', updatedAt: '' }] as any,
     });
-    const { container } = render(<BreedsPage />);
+    const { container } = renderWithRouter(<BreedsPage />);
     expect(container).toBeTruthy();
   });
 });

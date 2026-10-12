@@ -180,7 +180,11 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     if (!form.name.trim()) { setErr('نام نژاد اجباری است'); return; }
 
     // 🆕 چک: نام باید با یک استاندارد match کنه (با احتساب overrides)
-    const baseStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+    const baseStandards: Record<string, any> = {};
+    for (const k of Object.keys(DEFAULT_STANDARDS)) {
+      const s = resolveStandard(k, customStandards, customOverrides);
+      if (s) baseStandards[k] = s;
+    }
     const allStandards: Record<string, any> = {};
     for (const [k, v] of Object.entries(baseStandards)) {
       const ov = customOverrides[k];
@@ -196,7 +200,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       if (stdName.toLowerCase() !== trimmedName) {
         // 🆕 اگه نام فعلی فقط snapshot قدیمیه (از قبل ذخیره شده)، خودکار آپدیت کن
         // چک: آیا نام فعلی با *base* استاندارد (بدون override) یکی ئه؟
-        const baseStd = (DEFAULT_STANDARDS as any)[form.standardKey];
+        const baseStd = resolveStandard(form.standardKey, customStandards, customOverrides);
         const baseName = baseStd?.nameFa?.trim().toLowerCase();
         if (baseName === trimmedName) {
           // snapshot قدیمی → خودکار نام رو با override نهایی جایگزین کن

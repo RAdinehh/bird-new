@@ -29,7 +29,7 @@ export const MARANDI: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 23, max: 27, target: 25 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 500, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 9999, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 30, waterMl: 60, phaseName: 'استارتر', lysinePct: 0.95, methioninePct: 0.42, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
@@ -107,7 +107,7 @@ export const GOLPAYGANI: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 500, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 9999, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 30, waterMl: 60, phaseName: 'استارتر', lysinePct: 1.0, methioninePct: 0.4, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا'] },
@@ -173,7 +173,7 @@ export const LARI: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 500, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 60 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 9999, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 60 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 35, waterMl: 70, phaseName: 'استارتر', lysinePct: 0.95, methioninePct: 0.42, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },
@@ -239,7 +239,7 @@ export const GOLIN: BirdStandard = {
   { dayFrom: 15, dayTo: 21, temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 42, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   { dayFrom: 43, dayTo: 84, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 85, dayTo: 500, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 85, dayTo: 9999, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 30, feedG: 30, waterMl: 60, phaseName: 'استارتر', lysinePct: 0.95, methioninePct: 0.42, calciumPct: 1.0, availablePhosphorusPct: 0.45, saltPct: 0.2, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم'] },

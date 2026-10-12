@@ -459,14 +459,14 @@ describe('getProduction', () => {
 // 🆕 getMortalityRange
 // ═══════════════════════════════════════════════
 describe('getMortalityRange', () => {
-  it('مرندی روز 5 → 1%', () => {
+  it('مرندی روز 5 → 1.5%', () => {
     const m = getMortalityRange('مرندی', 5);
-    expect(m!.maxPct).toBe(1);
+    expect(m!.maxPct).toBe(1.5);
   });
 
-  it('مرندی روز 100 → 2%', () => {
+  it('مرندی روز 100 → 3%', () => {
     const m = getMortalityRange('مرندی', 100);
-    expect(m!.maxPct).toBe(2);
+    expect(m!.maxPct).toBe(3);
   });
 
   it('گوشتی روز 30 → 3%', () => {

@@ -25,7 +25,7 @@ vi.mock('../cor/logger/auditLog', () => ({ logAction: vi.fn() }));
 // helper: با id معتبر
 const makeBird = (o: any = {}) => ({
   id: 'b-' + Math.random().toString(36).slice(2, 9),
-  name: 'مرغ', cycleDays: 21, fcrStandard: 1.6,
+  name: 'مرغ',
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   ...o,
 });
@@ -78,17 +78,7 @@ describe('BirdsPage — نمایش لیست', () => {
     expect(screen.getByText(/۲ نژاد/)).toBeInTheDocument();
   });
 
-  it('cycleDays نمایش', () => {
-    useBrd.setState({ birds: [makeBird({ cycleDays: 42 })] as any });
-    renderWithRouter(<BirdsPage />);
-    expect(screen.getAllByText(/۴۲/).length).toBeGreaterThan(0);
-  });
 
-  it('fcr نمایش', () => {
-    useBrd.setState({ birds: [makeBird({ fcrStandard: 1.8 })] as any });
-    renderWithRouter(<BirdsPage />);
-    expect(screen.getAllByText(/۱[\.٫]۸/).length).toBeGreaterThan(0);
-  });
 });
 
 describe('BirdsPage — افزودن', () => {
@@ -96,13 +86,13 @@ describe('BirdsPage — افزودن', () => {
     renderWithRouter(<BirdsPage />);
     fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
     expect(screen.getByText('افزودن پرنده')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('مثلاً — مرغ یا شترمرغ')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('مثلاً — مرغ یا بوقلمون')).toBeInTheDocument();
   });
 
   it('پر کردن + ذخیره → اضافه میشه', async () => {
     renderWithRouter(<BirdsPage />);
     fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
-    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا شترمرغ'), { target: { value: 'اردک' } });
+    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا بوقلمون'), { target: { value: 'اردک' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
     await waitFor(() => {
@@ -128,16 +118,16 @@ describe('BirdsPage — افزودن', () => {
     });
   });
 
-  it('نام تکراری → showAlert', async () => {
-    const { showAlert } = await import('../cor/store/dialog');
+  it('نام تکراری → خطای inline', async () => {
     useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
 
     renderWithRouter(<BirdsPage />);
     fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
-    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا شترمرغ'), { target: { value: 'مرغ' } });
+    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا بوقلمون'), { target: { value: 'مرغ' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
-    await waitFor(() => expect(showAlert).toHaveBeenCalled());
+    // حالا inline error نشون داده می‌شه
+    await waitFor(() => expect(screen.getByText(/تکراریه/)).toBeInTheDocument());
   });
 
   it('نام جدید → ذخیره بدون هشدار', async () => {
@@ -146,7 +136,7 @@ describe('BirdsPage — افزودن', () => {
 
     renderWithRouter(<BirdsPage />);
     fireEvent.click(screen.getAllByLabelText(/افزودن پرنده/)[0]);
-    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا شترمرغ'), { target: { value: 'اردک' } });
+    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا بوقلمون'), { target: { value: 'بوقلمون' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
     await waitFor(() => expect(useBrd.getState().birds).toHaveLength(2));
@@ -161,7 +151,6 @@ describe('BirdsPage — Expand / ویرایش / حذف', () => {
     expandCard('مرغ');
 
     await waitFor(() => expect(screen.getByText(/مشخصات کامل/)).toBeInTheDocument());
-    expect(screen.getByText('نام انگلیسی:')).toBeInTheDocument();
   });
 
   it('expand → دکمه‌ها', async () => {
@@ -204,10 +193,10 @@ describe('BirdsPage — Expand / ویرایش / حذف', () => {
 
     await waitFor(() => expect(screen.getByText('ویرایش پرنده')).toBeInTheDocument());
 
-    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا شترمرغ'), { target: { value: 'جدید' } });
+    fireEvent.change(screen.getByPlaceholderText('مثلاً — مرغ یا بوقلمون'), { target: { value: 'بوقلمون' } });
     fireEvent.click(screen.getByText('ذخیره'));
 
-    await waitFor(() => expect(useBrd.getState().birds[0].name).toBe('جدید'));
+    await waitFor(() => expect(useBrd.getState().birds[0].name).toBe('بوقلمون'));
   });
 
   it('کلیک حذف → showConfirmAsync صدا زده میشه', async () => {

@@ -56,7 +56,11 @@ export default function BreedNameField({
     const exclude = new Set(excludeNames.map(n => n.trim().toLowerCase()));
 
     // merge با overrides
-    const baseStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+    const baseStandards: Record<string, any> = {};
+    for (const k of Object.keys(DEFAULT_STANDARDS)) {
+      const s = resolveStandard(k, customStandards, customOverrides);
+      if (s) baseStandards[k] = s;
+    }
     const allStandards: Record<string, any> = {};
     for (const [k, v] of Object.entries(baseStandards)) {
       const ov = customOverrides[k];
@@ -69,6 +73,8 @@ export default function BreedNameField({
 
       // 🆕 حذف breeder-only (فقط از چک‌باکس هدف انتخاب می‌شن)
       if (key.endsWith('-breeder')) continue;
+      // 🆕 حذف legacy keys (broiler/layer/turkey/goose) — جایگزین‌های جدید داریم
+      if (['broiler', 'layer', 'turkey', 'goose'].includes(key)) continue;
 
       // 🆕 فیلتر cascade سخت‌گیرانه
       if (parentKind) {

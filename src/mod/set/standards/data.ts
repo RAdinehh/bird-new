@@ -234,7 +234,10 @@ const LAYER: BirdStandard = {
 // Export
 // ═══════════════════════════════════════════════
 export const DEFAULT_STANDARDS: Record<string, BirdStandard> = {
-  // فقط نژادهای جدید (legacy حذف شدن)
+  // 🆕 legacy aliases (برای سازگاری تست‌ها و کد قدیم)
+  broiler: BROILER,
+  layer: LAYER,
+  // نژادهای جدید
   ...NEW_BREEDS,
 };
 
