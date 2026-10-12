@@ -63,7 +63,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     const seen = new Set<string>();
     return _breedsRaw.filter(b => {
       // 🆕 کلید شامل purposes ئه — چند نژاد با هدف متفاوت مجاز
-      const purposesKey = ((b as any).purposes || []).slice().sort().join(',');
+      const purposesKey = (b.purposes || []).slice().sort().join(',');
       const k = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase() + '|' + purposesKey;
       if (seen.has(k)) return false;
       seen.add(k);
@@ -163,8 +163,8 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       // 🆕 نام پویا از استاندارد (اگه standardKey داره)
       name: getBreedDisplayName(b, { customStandards, customOverrides }),
       fcr: b.fcr ? toFa(b.fcr) : '',
-      standardKey: (b as any).standardKey || '',
-      purposes: (b as any).purposes || [],
+      standardKey: b.standardKey || '',
+      purposes: b.purposes || [],
     });
     
     setErr(''); setOpen(true);
