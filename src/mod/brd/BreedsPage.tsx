@@ -167,6 +167,19 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     }
 
     if (!form.name.trim()) { setErr('نام نژاد اجباری است'); return; }
+
+    // 🆕 چک: اگه standardKey داره، نام باید با nameFa استاندارد یکی باشه
+    if (form.standardKey) {
+      const allStandards = { ...(DEFAULT_STANDARDS as any) };
+      const std = allStandards[form.standardKey];
+      const stdName = std?.nameFa?.trim().toLowerCase();
+      const formName = form.name.trim().toLowerCase();
+      if (stdName && stdName !== formName) {
+        setErr(`نام نژاد با استاندارد «${std?.nameFa}» هماهنگ نیست — یا نام رو درست کن یا نژاد رو دوباره انتخاب کن`);
+        return;
+      }
+    }
+
     if (!form.purposes || form.purposes.length === 0) {
       setErr('حداقل یک هدف پرورش انتخاب کن');
       return;

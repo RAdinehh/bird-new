@@ -225,10 +225,94 @@ grep -rn "fieldName" src/ --include="*.ts" --include="*.tsx"
 
 ---
 
+## ۱۴ — Input Integrity (یکپارچگی ورودی)
+
+### ۱۴.۱ Stale Value Bug
+
+**اصل:** اگه فیلد A با فیلد B وابسته‌ست، تغییر A باید B رو ریست کنه.
+
+**مثال:** نام نژاد ↔ standardKey
+- کاربر «مرندی» انتخاب می‌کنه → standardKey = 'marandi'
+- کاربر نام رو عوض می‌کنه → standardKey باید پاک شه
+
+**راه‌حل:** onChange(A) → clear B
+
+### ۱۴.۲ No Match Verification
+
+**اصل:** قبل از save، چک کن فیلدهای همبسته با هم match هستن.
+
+**مثال:** name ≠ standardKey.nameFa → خطا
+
+### ۱۴.۳ Stale Derived State
+
+**اصل:** محاسبات useMemo از منبع فعلی بخونن، نه از کش قدیمی.
+
+**مثال:** آمار پرنده باید از form.name بخونه، نه از form.birdKind قدیمی.
+
+### ۱۴.۴ Validation Layer Leak
+
+**اصل:** Zod فقط شکل داده رو چک کنه، نه مقادیر محدود.
+
+**اشتباه:** birdKind: oneOf(['chicken', 'duck', ...])
+**درست:** birdKind: optionalStr(100)
+
+**چرا؟** چون custom species (کبک، شترمرغ) رد می‌شن.
+
+### ۱۴.۵ Side-Effect in setState
+
+**اصل:** toast/console/navigation بیرون از setForm/setState.
+
+**چرا؟** React StrictMode در dev دو بار setForm رو صدا می‌زنه → toast دوبار ظاهر می‌شه.
+
+**راه‌حل:** اعتبارسنجی رو اول چک کن، بعد setForm:
+
+- if (badCondition) { toastMsg.error(...); return; }
+- setForm(f => ({ ...f, ... }));
+
+### ۱۴.۶ Unique ID Generation
+
+**اصل:** ID باید شامل: slug + timestamp + random باشه.
+
+**اشتباه:** 'کبک'.replace(/[^a-z0-9-]/g, '') → خالی می‌شه (فارسی پاک می‌شه)
+
+**درست:** 'custom-' + slug + '-' + Date.now().toString(36)
+
+**چرا؟** چون دو species فارسی ممکنه ID یکسان بگیرن.
+
+### ۱۴.۷ Action vs Value
+
+**اصل:** گزینه‌های اکشن (مثل «مدیریت پرنده‌ها») نباید value رو ست کنن.
+
+**اشتباه:** کاربر «مدیریت پرنده‌ها» کلیک → input = «مدیریت پرنده‌ها»
+
+**درست:** actionValues={[ADD_NEW_VALUE]} → فقط onSelect صدا زده شه، value ست نشه.
+
+### ۱۴.۸ Border on Wrapper
+
+**اصل:** مرز روی container، نه روی عناصر داخلی.
+
+**اشتباه:** input + button هر کدوم border جدا → خط عمودی بینشون
+**درست:** border روی wrapper، داخل بدون border.
+
+### ۱۴.۹ Clear Error on Input Change
+
+**اصل:** وقتی کاربر ورودی رو تغییر می‌ده، خطای قبلی باید پاک شه.
+
+**راه‌حل:** onChange و onPick هر دو onErrorClear?.() صدا بزنن.
+
+### ۱۴.۱۰ Empty State with Guidance
+
+**اصل:** Empty state باید بگه «چیکار کنی»، نه فقط «چیزی نیست».
+
+**اشتباه:** «موردی یافت نشد»
+**درست:** «کبوتر نژادی نداره — برو تنظیمات → استانداردها بسازش»
+
+---
+
 ## 📚 مرجع
 
 - FOUNDATION.md — قوانین اصلی (۱۳ بخش)
-- FOUNDATION-PATTERNS.md (این) — الگوهای تفکر (۱۳ بخش)
+- FOUNDATION-PATTERNS.md (این) — الگوهای تفکر (۱۴ بخش)
 - AUDIT.md — چک‌لیست ممیزی
 - HANDOFF.md — وضعیت و برنامه
 

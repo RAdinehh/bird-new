@@ -110,7 +110,12 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
       <Field label="نام نژاد" required hint="انتخاب یا تایپ">
         <BreedNameField
           value={form.name}
-          onChange={v => setForm(f => ({ ...f, name: v }))}
+          onChange={v => setForm(f => ({
+            ...f,
+            name: v,
+            // 🆕 وقتی کاربر دستی تایپ می‌کنه، standardKey پاک شه
+            standardKey: '',
+          }))}
           onPick={(pick: BreedPick) => {
             // کاربر خودش هدف رو انتخاب می‌کنه — بدون auto-fill
             setForm(f => ({
