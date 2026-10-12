@@ -192,7 +192,11 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
     // 🆕 چک: نام باید با یک استاندارد match کنه (با احتساب overrides)
     const baseStandards: Record<string, any> = {};
-    for (const k of Object.keys(DEFAULT_STANDARDS)) {
+    const allStandardKeys = new Set([
+      ...Object.keys(DEFAULT_STANDARDS),
+      ...Object.keys(customStandards || {}),
+    ]);
+    for (const k of allStandardKeys) {
       const s = resolveStandard(k, customStandards, customOverrides);
       if (s) baseStandards[k] = s;
     }

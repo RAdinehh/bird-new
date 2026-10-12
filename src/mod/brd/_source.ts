@@ -53,7 +53,11 @@ export function detectCycleDaysSource(
   }
 
   // ۲. چک همه استانداردها (اگه standardKey نبود)
-  for (const [k, _] of Object.entries(DEFAULT_STANDARDS)) {
+  const allKeys = new Set([
+    ...Object.keys(DEFAULT_STANDARDS),
+    ...Object.keys(customStandards || {}),
+  ]);
+  for (const k of allKeys) {
     const std = resolveStandard(k, customStandards, customOverrides);
     if (std?.biology?.cullDay === cycleDays) {
       return { source: 'standard', label: getStdLabel(std) };
@@ -82,7 +86,11 @@ export function detectFcrSource(
   }
 
   // ۲. همه
-  for (const [k, _] of Object.entries(DEFAULT_STANDARDS)) {
+  const allKeys = new Set([
+    ...Object.keys(DEFAULT_STANDARDS),
+    ...Object.keys(customStandards || {}),
+  ]);
+  for (const k of allKeys) {
     const std = resolveStandard(k, customStandards, customOverrides);
     const last = std?.growth?.weightByAge?.slice(-1)?.[0];
     if (last?.fcr === fcr) {
@@ -111,7 +119,11 @@ export function detectBreedFcrSource(
     }
   }
 
-  for (const [k, _] of Object.entries(DEFAULT_STANDARDS)) {
+  const allKeys = new Set([
+    ...Object.keys(DEFAULT_STANDARDS),
+    ...Object.keys(customStandards || {}),
+  ]);
+  for (const k of allKeys) {
     const std = resolveStandard(k, customStandards, customOverrides);
     const last = std?.growth?.weightByAge?.slice(-1)?.[0];
     if (last?.fcr === fcr) {

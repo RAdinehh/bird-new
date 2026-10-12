@@ -71,7 +71,10 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
     );
     if (!matched) return null;
 
-    const allKeys = Object.keys(DEFAULT_STANDARDS);
+    const allKeys = [
+      ...Object.keys(DEFAULT_STANDARDS),
+      ...Object.keys(customStandards),
+    ];
     const matching = allKeys
       .map(k => resolveStandard(k, customStandards, customOverrides))
       .filter((s: any) => s?.birdKind === matched.kind);
