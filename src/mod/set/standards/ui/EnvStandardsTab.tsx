@@ -10,6 +10,17 @@ import { toFa } from '../../../../shr/utils/fa';
 import { getStandardsGroupedByBird, type BirdStandard } from '../index';
 import { useSet } from '../../store';
 import { AddBirdModal } from './AddBirdModal';
+
+// تشخیص birdKind از نام پرنده
+function detectKind(name: string): string {
+  const n = name.trim().toLowerCase();
+  if (n.includes('مرغ') || n.includes('جوجه')) return 'chicken';
+  if (n.includes('اردک')) return 'duck';
+  if (n.includes('بوقلمون')) return 'turkey';
+  if (n.includes('بلدرچین')) return 'quail';
+  if (n.includes('غاز')) return 'goose';
+  return 'custom';
+}
 import { useFormat } from '../../../../shr/units/useFormat';
 import ImportExportPanel from './ImportExportPanel';
 
@@ -145,9 +156,25 @@ export default function EnvStandardsTab() {
   const handleAddBreed = (
     key: string, nameFa: string, nameEn: string, birdName: string, template: BirdStandard,
   ) => {
-    const newStd: BirdStandard = { ...template, key, nameFa, nameEn, birdName };
+    const newStd: BirdStandard = {
+      ...template,
+      key,
+      nameFa,
+      nameEn,
+      birdName,
+      // 🆕 پاک‌سازی متادیتای template
+      source: undefined,
+      publishYear: undefined,
+      version: 1,
+      lastUpdated: undefined,
+      // 🆕 تشخیص birdKind از نام پرنده
+      birdKind: detectKind(birdName) as any,
+      // 🆕 purposes خالی (کاربر توی /brd انتخاب می‌کنه)
+      purposes: [],
+      primaryPurpose: undefined,
+    };
     updateStandard(key, newStd);
-    toastMsg.added(nameFa)
+    toastMsg.added(nameFa + ' — توی بخش نژادها قابل انتخابه');
     setOnlyActive(false);
   };
 
