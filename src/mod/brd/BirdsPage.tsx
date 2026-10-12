@@ -146,7 +146,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
       );
 
       if (!existing) {
-        masterRedirect('species', trimmed);
+        setError(`«${trimmed}» توی لیست پرنده‌ها نیست. از دکمه‌ی «مدیریت پرنده‌ها» توی فیلد نام اضافه‌اش کن.`);
         return;
       }
       birdKind = existing.kind;
