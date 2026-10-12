@@ -108,7 +108,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const grouped = useMemo(() => {
     const g: Record<string, Equipment[]> = {};
     hallEquips.forEach(e => {
-      const cat = (e as any).category || 'auxiliary';
+      const cat = e.category || 'auxiliary';
       if (!g[cat]) g[cat] = [];
       g[cat].push(e);
     });
@@ -211,7 +211,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const openEdit = (e: Equipment) => {
     setEditId(e.id);
     setEditCount(e.count ? toFa(e.count) : '');
-    setEditCap((e as any).capacity ? toFa((e as any).capacity) : '');
+    setEditCap((e as any).capacity ? toFa(e.capacity) : '');
   };
 
   const saveEdit = () => {

@@ -95,20 +95,20 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     setForm({
       id: e.id, hallId: e.hallId,
       // kind حذف شد — از type خودکار
-      category: (e as any).category || 'lighting',
-      unit: (e as any).unit || 'pcs',
+      category: e.category || 'lighting',
+      unit: e.unit || 'pcs',
       type: e.type, name: e.name,
       count: e.count ? toFa(e.count) : '',
       unitPrice: e.unitPrice ? toFa(e.unitPrice) : '',
       purchasedAt: e.purchasedAt,
       warranty: e.warranty ? toFa(e.warranty) : '',
       notes: e.notes,
-      capacity: (e as any).capacity ? toFa((e as any).capacity) : '',
-      efficiency: (e as any).efficiency ? toFa((e as any).efficiency) : '',
-      consumeRate: (e as any).consumeRate || '',
-      status: (e as any).status || 'active',
-      brand: (e as any).brand || '',
-      supplierId: (e as any).supplierId || '',
+      capacity: e.capacity ? toFa(e.capacity) : '',
+      efficiency: e.efficiency ? toFa(e.efficiency) : '',
+      consumeRate: e.consumeRate || '',
+      status: e.status || 'active',
+      brand: e.brand || '',
+      supplierId: e.supplierId || '',
     });
     setErr(''); setOpen(true);
   };

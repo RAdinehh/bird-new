@@ -203,9 +203,9 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       feederType: h.feederType || '',
       drinkerType: h.drinkerType || '',
       litterType: h.litterType || '',
-      address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, sanitizeNotes: (h as any).sanitizeNotes || '', status: (h as any).status || 'empty', responsibleId: (h as any).responsibleId || '', notes: h.notes,
-      birdId: (h as any).birdId || '',
-      breedId: (h as any).breedId || ''
+      address: h.address, builtAt: h.builtAt, lastSanitizedAt: h.lastSanitizedAt, sanitizeNotes: h.sanitizeNotes || '', status: h.status || 'empty', responsibleId: h.responsibleId || '', notes: h.notes,
+      birdId: h.birdId || '',
+      breedId: h.breedId || ''
       });
     setErr(''); setOpen(true);
   };
