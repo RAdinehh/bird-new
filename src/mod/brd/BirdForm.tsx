@@ -41,7 +41,7 @@ function StatBox({ icon, label, value }: { icon: string; label: string; value: s
       alignItems: 'center',
       gap: 6,
     }}>
-      <span style={{ fontSize: 16 }}>{icon}</span>
+      <span style={{ fontSize: 'var(--fs-md)' }}>{icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', fontWeight: 600 }}>
           {label}

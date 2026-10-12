@@ -282,6 +282,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
         {ms.selectionMode && list.length > 1 && (
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
             <button type="button"
+              aria-label={ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
               onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
               style={{ padding: 'var(--pad-btn-sm)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-2xs)', fontWeight: 600, cursor: 'pointer' }}>
               {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}

@@ -168,6 +168,7 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
             return (
               <button
                 key={opt.key}
+                aria-label={`هدف ${opt.label}`}
                 type="button"
                 onClick={() => togglePurpose(opt.key)}
                 style={{
