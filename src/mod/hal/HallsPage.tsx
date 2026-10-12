@@ -26,7 +26,6 @@ import { HallEquipSection } from './HallEquipSection';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { useTempUnit, toUserTemp, tempLabel } from '../../shr/utils/temp';
 import { useFormat } from '../../shr/units';
-import { showAlert } from '../../cor/store/dialog';
 import { Row, RowWithStatus } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast, toastMsg } from '../../cor/store/toast';
@@ -160,7 +159,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         const item = halls.find(h => h.id === id);
         if (!item) continue;
         backups.push(item);
-        try { deleteHall(id); } catch {}
+        deleteHall(id);
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });
@@ -247,10 +246,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       const _trimmed = form.name.trim();
       const _dup = halls.find((x: any) => x.name.trim() === _trimmed);
       if (_dup) {
-        showAlert(
-          `سالنای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
-          '❌ نام تکراری'
-        );
+        setErr(`سالنی با نام «${_dup.name}» تکراریه`);
         return;
       }
     }
