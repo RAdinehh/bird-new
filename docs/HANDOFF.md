@@ -399,3 +399,64 @@ git log --oneline -10
 | BreedCard | 105 |
 
 **همه زیر ۳۰۰ خط.** ✅
+
+---
+
+## 🆕 به‌روزرسانی جلسه‌ی سوم (۱۴۰۴/۰۷/۲۰ — بعد)
+
+### ماژول‌هایی که کامل شدن:
+
+| ماژول | وضعیت | جزئیات |
+|---|---|---|
+| `set` (تنظیمات) | ✅ | - |
+| `brd` (پرنده و نژاد) | ✅ قفل | ممیزی کامل در `AUDIT-BRD.md` |
+| `hal` (سالن) | ✅ تمیز | ممیزی کامل در `AUDIT-HAL.md` |
+
+### کارهای این جلسه:
+
+**۱. ممیزی کامل brd طبق ۷ محور:**
+- همه فایل‌ها ≤ ۴۰۰ خط
+- صفر hex هاردکد
+- صفر DEFAULT_STANDARDS مستقیم (Single Resolver کامل)
+- صفر Master Data نقض
+- aria-label برای همه دکمه‌ها
+
+**۲. ممیزی hal:**
+- `EquipmentPage`: ۴۳۷ → ۳۱۱ خط
+- `ZonesPage`: ۴۱۴ → ۳۵۷ خط
+- توکنی‌سازی ۷۰+ مورد UI
+- استخراج `useEquipmentForm` و `ZoneFormModal`
+- `_typedLabels.ts` helper
+
+**۳. قوانین جدید FOUNDATION-PATTERNS:**
+- بخش ۱۴: Input Integrity (۱۰ الگو)
+- بخش ۱۵: Single Resolver Pattern
+- بخش ۱۶: Master Data vs Operations
+
+**۴. فایل‌های جدید:**
+- `docs/FOUNDATION-PATTERNS.md` (۴۳۰ خط)
+- `docs/AUDIT-HAL.md` (۱۲۰ خط)
+
+### آمار کلی:
+
+| مورد | مقدار |
+|---|---|
+| فایل‌های brd | ۱۵ |
+| فایل‌های hal | ۲۰+ |
+| tsc | ✅ ۰ خطا |
+| تست‌ها | ✅ ۱۰۶۴/۱۰۶۴ |
+| مجموع commits این جلسه | ۶۰+ |
+
+### کارهای باقی‌مانده:
+
+- 🔴 `HallsPage.tsx` (۳۹۹) — نزدیک ۴۰۰
+- 🔴 `HallEquipSection.tsx` (۳۹۶) — نزدیک ۴۰۰
+- 🟡 ادامه‌ی hal (چی کاربر می‌گه)
+- 🟡 ماژول بعدی: `ctc` (مخاطبین) یا `flk` (گله)
+
+### نکات مهم برای AI بعدی:
+
+- **قبل از هر تغییر:** `docs/FOUNDATION.md` + `FOUNDATION-PATTERNS.md` رو بخون
+- **قانون Single Resolver (۱۵):** هر خوانش standard از `resolveStandard`
+- **قانون Master Data (۱۶):** create فقط توی ماژول Master
+- **Proactive Sweep (۱۰.۳):** بعد از هر fix، همه‌ی موارد مشابه رو grep کن
