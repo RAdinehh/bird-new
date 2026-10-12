@@ -177,16 +177,30 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
     if (!form.name.trim()) { setErr('نام نژاد اجباری است'); return; }
 
-    // 🆕 چک: اگه standardKey داره، نام باید با nameFa استاندارد یکی باشه
-    if (form.standardKey) {
-      const allStandards = { ...(DEFAULT_STANDARDS as any) };
-      const std = allStandards[form.standardKey];
-      const stdName = std?.nameFa?.trim().toLowerCase();
-      const formName = form.name.trim().toLowerCase();
-      if (stdName && stdName !== formName) {
-        setErr(`نام نژاد با استاندارد «${std?.nameFa}» هماهنگ نیست — یا نام رو درست کن یا نژاد رو دوباره انتخاب کن`);
+    // 🆕 چک: نام باید با یک استاندارد match کنه
+    const allStandards = { ...(DEFAULT_STANDARDS as any) };
+    const trimmedName = form.name.trim().toLowerCase();
+    const matchedByKey = form.standardKey ? allStandards[form.standardKey] : null;
+
+    if (matchedByKey) {
+      // اگه standardKey داریم، نام باید با nameFa همون یکی باشه
+      if (matchedByKey.nameFa?.trim().toLowerCase() !== trimmedName) {
+        setErr(`نام نژاد با استاندارد «${matchedByKey.nameFa}» هماهنگ نیست — یا نام رو درست کن یا نژاد رو دوباره از لیست انتخاب کن`);
         return;
       }
+    } else {
+      // اگه standardKey نداریم، نام باید با یکی از استانداردها یکی باشه
+      const matchedByName = Object.entries(allStandards).find(
+        ([_, std]: [string, any]) =>
+          std?.nameFa?.trim().toLowerCase() === trimmedName
+      );
+      if (!matchedByName) {
+        setErr(`«${form.name.trim()}» توی استانداردها نیست — لطفاً از لیست انتخاب کن`);
+        return;
+      }
+      // خودکار standardKey رو ست کن
+      // در واقع user می‌تونه ادامه بده — payload پایین از standardKey استفاده می‌کنه
+      (form as any).standardKey = matchedByName[0];
     }
 
     if (!form.purposes || form.purposes.length === 0) {
