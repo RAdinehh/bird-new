@@ -2,6 +2,7 @@
  * useDashboardData — state و محاسبات Dashboard
  */
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { getBreedFcr } from '../../brd/_display-values';
 import { useNavigate } from 'react-router-dom';
 import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ } from 'date-fns-jalali';
 import { useTra, remaining } from '../../tra/store';
@@ -307,8 +308,8 @@ const [, _setTick] = useState(0);
     const bird = birds.find(b => b.id === flock.birdId);
     const breed = breeds.find(b => b.id === flock.breedId);
 
-    // استاندارد: FCR فقط از نژاد (Breed)
-    const fcrStandard = breed?.fcr || 0;
+    // استاندارد: FCR پویا (override > standard)
+    const fcrStandard = getBreedFcr(breed) || 0;
 
     // داده‌های این گله
     const flockLogs = logs.filter((l: any) => l.flockId === flock.id);
