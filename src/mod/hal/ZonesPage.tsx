@@ -1,7 +1,7 @@
 /**
  * ZonesPage — بخش‌های سالن
  */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { ZoneSchema } from '../../shr/validation/rules/hal';
@@ -28,7 +28,7 @@ import { logAction } from '../../cor/logger/auditLog';
 export default function ZonesPage({ active = true }: { active?: boolean } = {}) {
   const { halls: _hallsRaw, zones: _zonesRaw, addZone, updateZone, deleteZone } = useHal();
   const { birds, breeds } = useBrd();
-  const { flocks } = useFlk();
+  const { flocks, update: updateFlock } = useFlk();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
   const draft = useFormDraft('hal-zone', form, (v: any) => setForm(v));
@@ -55,6 +55,28 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
       return true;
     });
   }, [_zonesRaw]);
+
+  /** 🆕 وقتی بخشی حذف می‌شه، گله‌های یتیم رو آزاد کن */
+  const prevZoneIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const currentIds = new Set(zones.map((z: any) => z.id));
+    const prevIds = prevZoneIdsRef.current;
+
+    if (prevIds.size > 0) {
+      const removedIds: string[] = [];
+      prevIds.forEach(id => { if (!currentIds.has(id)) removedIds.push(id); });
+
+      if (removedIds.length > 0) {
+        removedIds.forEach(zoneId => {
+          flocks.filter((f: any) => f.zoneId === zoneId).forEach((f: any) => {
+            try { updateFlock(f.id, { zoneId: '' }); } catch {}
+          });
+        });
+      }
+    }
+
+    prevZoneIdsRef.current = currentIds;
+  }, [zones, flocks, updateFlock]);
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
