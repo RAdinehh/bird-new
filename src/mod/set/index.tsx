@@ -84,7 +84,7 @@ const TAB_COMPONENTS: Record<TabId, TabComponent[]> = {
   account:       [ProfileTab],
   appearance:    [AppearanceTab],
   config: [
-    { comp: EnvStandardsTab, icon: '📏', title: 'استانداردهای نژادها', subtitle: 'دما، رطوبت، دان، وزن، تلفات', tone: 'accent' },
+    { comp: EnvStandardsTab, icon: '📏', title: 'استانداردها', subtitle: 'دما، رطوبت، دان، وزن، تلفات', tone: 'accent' },
     { comp: UnitsTab,        icon: '📐', title: 'واحدها و اندازه‌گیری', subtitle: 'ارز، دما، وزن، حجم، طول، مساحت', tone: 'info' },
     { comp: ModulesTab,       icon: '🧩', title: 'ماژول‌ها',           subtitle: 'فعال / غیرفعال کردن بخش‌های نرم‌افزار', tone: 'purple' },
     { comp: HiddenOptionsTab, icon: '🗂', title: 'گزینه‌های مخفی',   subtitle: 'آیتم‌های حذف‌شده — بازگردانی یا حذف کامل', tone: 'info' },
