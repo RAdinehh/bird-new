@@ -4,7 +4,8 @@
 import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
-import { EQUIP_LABELS, KIND_LABELS, CATEGORY_LABELS, UNIT_LABELS_EQ, STATUS_LABELS } from '../store';
+import { EQUIP_LABELS } from '../store';
+import { getKindLabel, getCategoryLabel, getStatusLabel, getUnitLabel } from '../_typedLabels';
 import { calcEquipValue, kindForType } from '../api/equipmentCalc';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
@@ -51,15 +52,15 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 badge={
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                     {e.status && e.status !== 'active' && (() => {
-                      const st = (STATUS_LABELS as any)[e.status];
+                      const st = getStatusLabel(e.status);
                       if (!st) return null;
                       return <Tag tone={(st.tone || 'gray') as any}>{st.icon} {st.name}</Tag>;
                     })()}
-                    {e.count ? <Tag tone="blue">{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</Tag> : undefined}
+                    {e.count ? <Tag tone="blue">{toFa(e.count)} {getUnitLabel(e.unit)}</Tag> : undefined}
                   </div>
                 }
                 stats={<>
-                  {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</b></span>}
+                  {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)} {getUnitLabel(e.unit)}</b></span>}
                   {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(value.toLocaleString('fa-IR'))} ت</b></span>}
                   {e.warranty && <span>گارانتی: <b style={{ color: 'var(--text)' }}>{toFa(e.warranty)} ماه</b></span>}
                 </>}
@@ -86,13 +87,13 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>نوع دارایی:</span>
-                    <span style={{ fontWeight: 600 }}>{(KIND_LABELS as any)[kindForType(e.type) || 'asset']?.icon} {(KIND_LABELS as any)[kindForType(e.type) || 'asset']?.name}</span>
+                    <span style={{ fontWeight: 600 }}>{getKindLabel(kindForType(e.type))?.icon} {getKindLabel(kindForType(e.type))?.name}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                      borderRadius: 'var(--r-sm)' }}>
                     <span style={{ color: 'var(--muted)' }}>دسته:</span>
-                    <span style={{ fontWeight: 600 }}>{(CATEGORY_LABELS as any)[(e as any).category || 'auxiliary']?.icon} {(CATEGORY_LABELS as any)[(e as any).category || 'auxiliary']?.name}</span>
+                    <span style={{ fontWeight: 600 }}>{getCategoryLabel(e.category)?.icon} {getCategoryLabel(e.category)?.name}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between',
                      fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
@@ -147,7 +148,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                        fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>
                       <span style={{ color: 'var(--muted)' }}>تعداد:</span>
-                      <span style={{ fontWeight: 600 }}>{toFa(e.count)} {(UNIT_LABELS_EQ as any)[(e as any).unit || 'pcs'] || 'عدد'}</span>
+                      <span style={{ fontWeight: 600 }}>{toFa(e.count)} {getUnitLabel(e.unit)}</span>
                     </div>
                   )}
                 </div>
