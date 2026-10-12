@@ -358,13 +358,70 @@ std.growth.weightByAge
 - کاربر منبع رو عوض کرد → BreedForm آپدیت نشد
 
 **راه‌حل ریشه‌ای:** Single Resolver.
+---
+
+## ۱۶ — Master Data vs Operations
+
+### ۱۶.۱ اصل
+
+**Master Data** (استانداردها، تنظیمات) فقط از **ماژول خودش** ساخته/ویرایش می‌شه.
+
+**Operations** (پرنده، نژاد، گله، معامله) فقط **مصرف‌کننده**ی Master ئه.
+
+### ۱۶.۲ مثال در Bird-new
+
+- Master: /set?tab=standards — استانداردها
+- Operations: /brd?tab=breeds — نژادها (مصرف‌کننده)
+
+### ۱۶.۳ قاعده
+
+- کاربر توی Operations چیزی خواست که نیست → راهنمایی به Master
+- پیام واضح + دکمه‌ی «رفتن به Master»
+- نه auto-create توی Operations
+
+### ۱۶.۴ چرا؟
+
+| قبل (شلوغ) | بعد (Master جدا) |
+|---|---|
+| هر ماژول خودش می‌سازه | فقط Master Module |
+| تکرار داده | یه منبع |
+| Audit پراکنده | Audit متمرکز |
+| دسترسی سخت | Access Control ساده |
+
+### ۱۶.۵ استاندارد صنعت
+
+- Big Dutchman: Setup جدا از Operations
+- Odoo Poultry: Master Data جدا
+- MTech: Standards Setup جدا
+- Pas Reform: Hatchery Standards جدا
+- فارم‌چک / نوین‌فارم (ایران): همون الگو
+
+### ۱۶.۶ پیاده‌سازی
+
+```
+کاربر توی /brd چیزی می‌خواد که نیست
+  ↓
+پیام واضح + دکمه «رفتن به تنظیمات»
+  ↓
+کاربر می‌ره /set → می‌سازه
+  ↓
+برمی‌گرده /brd → حالا موجوده
+```
+
+### ۱۶.۷ استثناها
+
+- Data Cache (مثل _display-name): OK — فقط نمایش
+- Override (کاربر تنظیمات رو تغییر می‌ده): OK
+- Auto-fill (پر کردن از استاندارد): OK
+
+**ممنوع:** create-everything توی Operations.
 
 ---
 
 ## 📚 مرجع
 
 - FOUNDATION.md — قوانین اصلی (۱۳ بخش)
-- FOUNDATION-PATTERNS.md (این) — الگوهای تفکر (۱۵ بخش)
+- FOUNDATION-PATTERNS.md (این) — الگوهای تفکر (۱۶ بخش)
 - AUDIT.md — چک‌لیست ممیزی
 - HANDOFF.md — وضعیت و برنامه
 
