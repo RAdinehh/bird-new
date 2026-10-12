@@ -13,6 +13,7 @@ import { Btn, BtnRow, Modal } from '../../shr/components/ui';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { resolveStandard } from './_display-values';
 import { toastMsg } from '../../cor/store/toast';
+import { getMasterPath } from './data-ownership';
 
 export interface BreedPick {
   name: string;
@@ -198,7 +199,7 @@ export default function BreedNameField({
         title="نژاد پیدا نشد"
         footer={
           <BtnRow>
-            <Btn variant="primary" onClick={() => { navigate('/set?tab=standards'); setNotFound(null); }}>رفتن به تنظیمات</Btn>
+            <Btn variant="primary" onClick={() => { navigate(getMasterPath('breedStandard')); setNotFound(null); }}>رفتن به تنظیمات</Btn>
             <Btn onClick={() => setNotFound(null)}>بستن</Btn>
           </BtnRow>
         }
