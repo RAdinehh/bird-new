@@ -7,7 +7,7 @@
  * این فیلد فقط «گونه» رو انتخاب می‌کنه (مرغ، اردک، بوقلمون، ...)
  * کاربر می‌تونه گونه‌ی جدید اضافه/ویرایش/حذف کنه.
  */
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import AutocompleteSheet, { type AutoOption } from '../../shr/components/AutocompleteSheet';
 import { Btn, BtnRow, ErrorBox, Field, Input, Modal } from '../../shr/components/ui';
 import { DEFAULT_SPECIES, type Species } from './species';
@@ -26,16 +26,24 @@ interface Props {
   onPick: (pick: BirdPresetPick) => void;
   error?: string;
   excludeNames?: string[];
+  openManageSignal?: number;
 }
 
 const ADD_NEW_VALUE = '__ADD_NEW_SPECIES__';
 
-export default function BirdNameField({ value, onChange, onPick, error, excludeNames = [] }: Props) {
+export default function BirdNameField({ value, onChange, onPick, error, excludeNames = [], openManageSignal }: Props) {
   const customSpecies = useSet((st: any) => st.customSpecies || []);
   const addSpecies = useSet((st: any) => st.addSpecies);
   const removeSpecies = useSet((st: any) => st.removeSpecies);
 
   const [showManage, setShowManage] = useState(false);
+
+  // 🆕 signal از parent برای باز کردن modal مدیریت
+  useEffect(() => {
+    if (openManageSignal && openManageSignal > 0) {
+      setShowManage(true);
+    }
+  }, [openManageSignal]);
   const [editingKind, setEditingKind] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newIcon, setNewIcon] = useState('🐦');

@@ -27,6 +27,7 @@ interface Props {
   birds: Bird[];
   onSave: () => void;
   onErrorClear?: () => void;
+  openManageSignal?: number;
 }
 
 // ═══ کارت اطلاعات (2 ستونه) ═══
@@ -53,7 +54,7 @@ function StatBox({ icon, label, value }: { icon: string; label: string; value: s
   );
 }
 
-export default function BirdForm({ open, onClose, form, setForm, error, birds, onSave, onErrorClear }: Props) {
+export default function BirdForm({ open, onClose, form, setForm, error, birds, onSave, onErrorClear, openManageSignal }: Props) {
   const customSpecies = useSet((st: any) => st.customSpecies || []);
   const customStandards = useSet((st: any) => st.customStandards || {});
   const customOverrides = useSet((st: any) => st.customOverrides || {});
@@ -119,6 +120,7 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
             }));
           }}
           error={error || undefined}
+          openManageSignal={openManageSignal}
         />
       </Field>
 

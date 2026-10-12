@@ -35,6 +35,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<BirdFormData>(EMPTY_BIRD_FORM);
   const [error, setError] = useState('');
+  const [openManageSignal, setOpenManageSignal] = useState(0);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const draft = useFormDraft('brd-bird', form, (v: any) => setForm(v));
@@ -146,7 +147,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
       );
 
       if (!existing) {
-        setError(`«${trimmed}» توی لیست پرنده‌ها نیست. از دکمه‌ی «مدیریت پرنده‌ها» توی فیلد نام اضافه‌اش کن.`);
+        setOpenManageSignal(Date.now());
         return;
       }
       birdKind = existing.kind;
@@ -277,6 +278,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         setForm={setForm}
         error={error}
         onErrorClear={() => setError('')}
+        openManageSignal={openManageSignal}
         birds={birds}
         onSave={save}
       />
