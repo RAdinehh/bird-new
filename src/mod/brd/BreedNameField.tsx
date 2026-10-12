@@ -156,12 +156,19 @@ export default function BreedNameField({
     const typed = text.trim();
     if (!typed) return;
 
-    // چک کن که این نام توی استانداردها هست یا نه
-    const allStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
-    const match = Object.entries(allStandards).find(
-      ([_, std]: [string, any]) =>
-        std?.nameFa?.trim().toLowerCase() === typed.toLowerCase()
-    ) as [string, any] | undefined;
+    // چک کن که این نام توی استانداردها هست یا نه (با resolveStandard)
+    const allKeys = new Set([
+      ...Object.keys(DEFAULT_STANDARDS),
+      ...Object.keys(customStandards || {}),
+    ]);
+    let match: [string, any] | undefined;
+    for (const k of allKeys) {
+      const std = resolveStandard(k, customStandards, customOverrides);
+      if (std?.nameFa?.trim().toLowerCase() === typed.toLowerCase()) {
+        match = [k, std];
+        break;
+      }
+    }
 
     if (match) {
       const [key, std] = match;

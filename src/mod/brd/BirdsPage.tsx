@@ -30,7 +30,6 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   const customStandards = useSet((st: any) => st.customStandards);
   const customOverrides = useSet((st: any) => st.customOverrides || {});
   const customSpecies = useSet((st: any) => st.customSpecies || []);
-  const addSpecies = useSet((st: any) => st.addSpecies);
   const { redirect: masterRedirect, MasterRedirectModal } = useMasterRedirect();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<BirdFormData>(EMPTY_BIRD_FORM);
