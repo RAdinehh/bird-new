@@ -9,7 +9,7 @@
  */
 import { useMemo, useState } from 'react';
 import AutocompleteSheet, { type AutoOption } from '../../shr/components/AutocompleteSheet';
-import { Btn, Field, Input, Modal, ErrorBox, BtnRow } from '../../shr/components/ui';
+import { Btn, BtnRow, ErrorBox, Field, Input, Modal } from '../../shr/components/ui';
 import { DEFAULT_SPECIES, type Species } from './species';
 import { useSet } from '../set/store';
 
@@ -177,6 +177,25 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
 
   return (
     <>
+      <Modal
+        open={!!notFound}
+        onClose={() => setNotFound(null)}
+        title="پرنده پیدا نشد"
+        footer={
+          <BtnRow>
+            <Btn variant="primary" onClick={() => { setNotFound(null); setShowManage(true); }}>مدیریت پرنده‌ها</Btn>
+            <Btn onClick={() => setNotFound(null)}>بستن</Btn>
+          </BtnRow>
+        }
+      >
+        <div style={{ padding: 'var(--pad-normal)', lineHeight: 1.8, textAlign: 'center' }}>
+          <div style={{ fontSize: '2em', marginBottom: 8 }}>⚠️</div>
+          <div style={{ fontWeight: 700, marginBottom: 8 }}>«{notFound}» توی پرنده‌ها نیست</div>
+          <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
+            برای ساختنش از «مدیریت پرنده‌ها» استفاده کن
+          </div>
+        </div>
+      </Modal>
       <AutocompleteSheet
         value={value}
         onChange={onChange}
