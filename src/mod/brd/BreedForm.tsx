@@ -1,6 +1,7 @@
 import type { Bird, Breed } from './store';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { detectBreedFcrSource, getBreedFcrBaseline } from './_source';
+import { resolveStandard } from './_display-values';
 import { useOverride } from '../../shr/hooks/useOverride';
 import SourceBadge from '../../shr/components/SourceBadge';
 import OverrideHint from '../../shr/components/OverrideHint';
@@ -57,19 +58,7 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
   });
 
   // اطلاعات استاندارد برای نمایش
-  const std = form.standardKey
-    ? ((() => {
-        const k = form.standardKey!;
-        const base = (DEFAULT_STANDARDS as any)[k];
-        const custom = customStandards[k];
-        const ov = customOverrides[k];
-        let merged: any = { ...(base || {}), ...(custom || {}) };
-        if (ov?.nameFa) merged.nameFa = ov.nameFa;
-        if (ov?.source) merged.source = ov.source;
-        if (ov?.publishYear) merged.publishYear = ov.publishYear;
-        return merged;
-      })())
-    : null;
+  const std = resolveStandard(form.standardKey, customStandards, customOverrides);
 
   const togglePurpose = (key: string) => {
     const current = form.purposes || [];
@@ -122,12 +111,15 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
         <BreedNameField
           value={form.name}
           onChange={v => setForm(f => {
-            // 🆕 merge با overrides برای nameFa
-            const baseStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+            // 🆕 همه‌ی استانداردها با overrides
             const allStandards: Record<string, any> = {};
-            for (const [k, v] of Object.entries(baseStandards)) {
-              const ov = customOverrides[k];
-              allStandards[k] = ov?.nameFa ? { ...(v as any), nameFa: ov.nameFa } : v;
+            const allKeys = new Set([
+              ...Object.keys(DEFAULT_STANDARDS),
+              ...Object.keys(customStandards),
+            ]);
+            for (const k of allKeys) {
+              const s = resolveStandard(k, customStandards, customOverrides);
+              if (s) allStandards[k] = s;
             }
             const trimmed = v.trim().toLowerCase();
             if (!trimmed) return { ...f, name: v, standardKey: '' };

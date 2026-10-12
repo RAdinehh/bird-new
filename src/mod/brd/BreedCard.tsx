@@ -2,7 +2,7 @@ import type { Bird, Breed } from './store';
 import { toFa } from '../../shr/utils/fa';
 import { getPurposeInfo, getCategoryInfo } from './_display';
 import { getBirdDisplayName, getBreedDisplayName } from './_display-name';
-import { getBreedFcr } from './_display-values';
+import { getBreedFcr, resolveStandard } from './_display-values';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import EntityLink from '../../shr/components/EntityLink';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -42,7 +42,7 @@ export default function BreedCard({
   breed: b, index, bird, isOpen, onToggle, ms, onEdit, onDelete, customStandards, customOverrides,
 }: Props) {
   const stdKey = (b as any).standardKey;
-  const stdData = stdKey ? (DEFAULT_STANDARDS as any)[stdKey] : null;
+  const stdData = resolveStandard(stdKey, customStandards, customOverrides);
   const fcrValue = getBreedFcr(b, customStandards, customOverrides);
   const category = stdData?.category ? getCategoryInfo(stdData.category) : null;
   // 🆕 اول purposes کاربر، بعد از استاندارد

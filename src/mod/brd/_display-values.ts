@@ -10,6 +10,7 @@
  *   ۳. null
  */
 import { DEFAULT_STANDARDS } from '../set/standards/data';
+import { getEffectiveStandard } from '../set/standards/_override';
 
 interface BreedLike {
   fcr?: number | null;
@@ -56,4 +57,20 @@ export function getBreedCycleDays(
   const std = customStandards?.[breed.standardKey]
     || (DEFAULT_STANDARDS as any)[breed.standardKey];
   return std?.biology?.cullDay ?? null;
+}
+
+/**
+ * 🆕 resolve استاندارد نهایی با همه‌ی overrides
+ * اولویت: customOverrides (Diff) > customStandards (Legacy) > DEFAULT
+ */
+export function resolveStandard(
+  key: string | undefined,
+  customStandards?: Record<string, any>,
+  customOverrides?: Record<string, any>
+): any {
+  if (!key) return null;
+  const base = (DEFAULT_STANDARDS as any)[key];
+  const custom = customStandards?.[key];
+  const ov = customOverrides?.[key];
+  return getEffectiveStandard(key, ov, custom) || base;
 }
