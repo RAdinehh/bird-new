@@ -183,7 +183,10 @@ export default function BirdNameField({ value, onChange, onPick, error, excludeN
         title="پرنده پیدا نشد"
         footer={
           <BtnRow>
-            <Btn variant="primary" onClick={() => { setNotFound(null); setShowManage(true); }}>مدیریت پرنده‌ها</Btn>
+            <Btn variant="primary" onClick={() => {
+            setNotFound(null);
+            setTimeout(() => setShowManage(true), 100);
+          }}>مدیریت پرنده‌ها</Btn>
             <Btn onClick={() => setNotFound(null)}>بستن</Btn>
           </BtnRow>
         }
