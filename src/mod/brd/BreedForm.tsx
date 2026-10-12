@@ -41,9 +41,10 @@ interface Props {
   breeds: Breed[];
   onSave: () => void;
   customStandards?: Record<string, any>;
+  customOverrides?: Record<string, any>;
 }
 
-export default function BreedForm({ open, onClose, form, setForm, err, birds, breeds, onSave, customStandards = {} }: Props) {
+export default function BreedForm({ open, onClose, form, setForm, err, birds, breeds, onSave, customStandards = {}, customOverrides = {} }: Props) {
   const parentBird = birds.find(x => x.id === form.birdId);
   const fcrBaseline = getBreedFcrBaseline(form.standardKey, null);
   const fcrCurrent = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
@@ -57,7 +58,17 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
 
   // اطلاعات استاندارد برای نمایش
   const std = form.standardKey
-    ? ((DEFAULT_STANDARDS as any)[form.standardKey] || customStandards[form.standardKey])
+    ? ((() => {
+        const k = form.standardKey!;
+        const base = (DEFAULT_STANDARDS as any)[k];
+        const custom = customStandards[k];
+        const ov = customOverrides[k];
+        let merged: any = { ...(base || {}), ...(custom || {}) };
+        if (ov?.nameFa) merged.nameFa = ov.nameFa;
+        if (ov?.source) merged.source = ov.source;
+        if (ov?.publishYear) merged.publishYear = ov.publishYear;
+        return merged;
+      })())
     : null;
 
   const togglePurpose = (key: string) => {
@@ -111,7 +122,13 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
         <BreedNameField
           value={form.name}
           onChange={v => setForm(f => {
-            const allStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+            // 🆕 merge با overrides برای nameFa
+            const baseStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+            const allStandards: Record<string, any> = {};
+            for (const [k, v] of Object.entries(baseStandards)) {
+              const ov = customOverrides[k];
+              allStandards[k] = ov?.nameFa ? { ...(v as any), nameFa: ov.nameFa } : v;
+            }
             const trimmed = v.trim().toLowerCase();
             if (!trimmed) return { ...f, name: v, standardKey: '' };
 

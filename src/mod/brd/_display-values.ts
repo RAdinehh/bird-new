@@ -19,21 +19,28 @@ interface BreedLike {
 /** FCR نهایی نژاد */
 export function getBreedFcr(
   breed: BreedLike | undefined | null,
-  customStandards?: Record<string, any>
+  customStandards?: Record<string, any>,
+  customOverrides?: Record<string, any>
 ): number | null {
   if (!breed) return null;
 
-  // ۱. override کاربر
+  // ۱. override کاربر روی breed.fcr
   if (breed.fcr != null) return breed.fcr;
 
-  // ۲. از استاندارد
+  // ۲. از استاندارد (با احتساب overrides)
   if (breed.standardKey) {
-    const std = customStandards?.[breed.standardKey]
-      || (DEFAULT_STANDARDS as any)[breed.standardKey];
-    if (std) {
-      const last = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1];
-      if (last?.fcr != null) return last.fcr;
+    const base = (DEFAULT_STANDARDS as any)[breed.standardKey];
+    const custom = customStandards?.[breed.standardKey];
+    const ov = customOverrides?.[breed.standardKey];
+
+    // deepMerge ساده: base + custom + overrides.growth
+    let effective: any = custom ? { ...base, ...custom } : base;
+    if (ov?.growth?.weightByAge) {
+      effective = { ...effective, growth: { ...(effective?.growth || {}), weightByAge: ov.growth.weightByAge } };
     }
+
+    const last = effective?.growth?.weightByAge?.[effective.growth.weightByAge.length - 1];
+    if (last?.fcr != null) return last.fcr;
   }
 
   return null;

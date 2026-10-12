@@ -34,6 +34,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<BreedFormData>(EMPTY_BREED_FORM);
   const customStandards = useSet((st: any) => st.customStandards);
+  const customOverrides = useSet((st: any) => st.customOverrides);
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -154,7 +155,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       id: b.id,
       birdId: b.birdId,
       // 🆕 نام پویا از استاندارد (اگه standardKey داره)
-      name: getBreedDisplayName(b, customStandards),
+      name: getBreedDisplayName(b, { customStandards, customOverrides }),
       fcr: b.fcr ? toFa(b.fcr) : '',
       standardKey: (b as any).standardKey || '',
       purposes: (b as any).purposes || [],
@@ -275,6 +276,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
                 ms={ms}
                 customStandards={customStandards}
+        customOverrides={customOverrides}
                 onEdit={openEdit}
                 onDelete={(id, item) => {
                   setUndoData({ item });
@@ -296,6 +298,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
         open={open}
         onClose={() => setOpen(false)}
         customStandards={customStandards}
+        customOverrides={customOverrides}
         form={form}
         setForm={setForm}
         err={err}

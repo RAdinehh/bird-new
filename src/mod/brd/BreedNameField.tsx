@@ -31,6 +31,8 @@ interface Props {
   parentKind?: string;
   /** استانداردهای سفارشی کاربر */
   customStandards?: Record<string, any>;
+  /** 🆕 ویرایش‌های Diff-based */
+  customOverrides?: Record<string, any>;
 }
 
 // ═══ گروه‌بندی بر اساس دسته‌بندی ═══
@@ -46,13 +48,19 @@ const KIND_EMOJI: Record<string, string> = {
 
 export default function BreedNameField({
   value, onChange, onPick, error, excludeNames = [],
-  parentBirdName, parentKind, customStandards = {},
+  parentBirdName, parentKind, customStandards = {}, customOverrides = {},
 }: Props) {
   const options: AutoOption[] = useMemo(() => {
     const opts: AutoOption[] = [];
     const exclude = new Set(excludeNames.map(n => n.trim().toLowerCase()));
 
-    const allStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+    // merge با overrides
+    const baseStandards = { ...(DEFAULT_STANDARDS as any), ...customStandards };
+    const allStandards: Record<string, any> = {};
+    for (const [k, v] of Object.entries(baseStandards)) {
+      const ov = customOverrides[k];
+      allStandards[k] = ov?.nameFa ? { ...(v as any), nameFa: ov.nameFa } : v;
+    }
 
     for (const [key, std] of Object.entries(allStandards) as [string, any][]) {
       const name = std.nameFa;

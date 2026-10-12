@@ -21,6 +21,7 @@ interface Props {
   onEdit: (b: Breed) => void;
   onDelete: (id: string, item: Breed) => void;
   customStandards?: Record<string, any>;
+  customOverrides?: Record<string, any>;
 }
 
 /** ردیف استاندارد label/value */
@@ -38,11 +39,11 @@ function StatRow({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 export default function BreedCard({
-  breed: b, index, bird, isOpen, onToggle, ms, onEdit, onDelete, customStandards,
+  breed: b, index, bird, isOpen, onToggle, ms, onEdit, onDelete, customStandards, customOverrides,
 }: Props) {
   const stdKey = (b as any).standardKey;
   const stdData = stdKey ? (DEFAULT_STANDARDS as any)[stdKey] : null;
-  const fcrValue = getBreedFcr(b, customStandards);
+  const fcrValue = getBreedFcr(b, customStandards, customOverrides);
   const category = stdData?.category ? getCategoryInfo(stdData.category) : null;
   // 🆕 اول purposes کاربر، بعد از استاندارد
   const breedPurposes: string[] = Array.isArray((b as any).purposes) && (b as any).purposes.length > 0
@@ -65,7 +66,7 @@ export default function BreedCard({
       accent="purple"
       index={toFa(index + 1)}
       iconEmoji="🧬"
-      title={getBreedDisplayName(b, customStandards)}
+      title={getBreedDisplayName(b, { customStandards, customOverrides })}
       subtitle=""
       isOpen={isOpen}
       onToggle={onToggle}
@@ -79,7 +80,7 @@ export default function BreedCard({
         </div>
       }
       stats={<>
-        <span>🐔 پرنده: {bird ? <b><EntityLink type="bird" id={bird.id} label={getBirdDisplayName(bird, customStandards)} /></b> : <b style={{ color: 'var(--text)' }}>—</b>}</span>
+        <span>🐔 پرنده: {bird ? <b><EntityLink type="bird" id={bird.id} label={getBirdDisplayName(bird, { customStandards, customOverrides })} /></b> : <b style={{ color: 'var(--text)' }}>—</b>}</span>
         {fcrValue != null && <span>📊 FCR: <b style={{ color: 'var(--text)' }}>{toFa(fcrValue)}</b></span>}
       </>}
     >
@@ -87,8 +88,8 @@ export default function BreedCard({
         <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> مشخصات نژاد
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <StatRow label="نام نژاد" value={getBreedDisplayName(b, customStandards)} />
-        <StatRow label="پرنده" value={bird ? <EntityLink type="bird" id={bird.id} label={getBirdDisplayName(bird, customStandards)} /> : '—'} />
+        <StatRow label="نام نژاد" value={getBreedDisplayName(b, { customStandards, customOverrides })} />
+        <StatRow label="پرنده" value={bird ? <EntityLink type="bird" id={bird.id} label={getBirdDisplayName(bird, { customStandards, customOverrides })} /> : '—'} />
         <StatRow label="FCR" value={fcrValue != null ? toFa(fcrValue) : '—'} />
       </div>
 
@@ -109,8 +110,8 @@ export default function BreedCard({
       )}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <Btn size="sm" onClick={() => onEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش نژاد ${getBreedDisplayName(b, customStandards)}`}>ویرایش</Btn>
-        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }} aria-label={`حذف نژاد ${getBreedDisplayName(b, customStandards)}`}>حذف</Btn>
+        <Btn size="sm" onClick={() => onEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش نژاد ${getBreedDisplayName(b, { customStandards, customOverrides })}`}>ویرایش</Btn>
+        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }} aria-label={`حذف نژاد ${getBreedDisplayName(b, { customStandards, customOverrides })}`}>حذف</Btn>
       </div>
     </ExpandableCard>
   );
