@@ -2,7 +2,7 @@
  * index.tsx — تنظیمات (۵ تب اصلی)
  */
 import EnvStandardsTab from './EnvStandardsTab';
-import type React from 'react';
+import type React from 'react'; import { useSearchParams } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import ProfileTab from './ProfileTab';
@@ -99,7 +99,10 @@ const TAB_COMPONENTS: Record<TabId, TabComponent[]> = {
 };
 
 export default function Set() {
-  const [tab, setTab] = useState<TabId>(getLastTab);
+  const [searchParams] = useSearchParams();
+  const urlTab = searchParams.get('tab');
+  const initialTab = (urlTab && TAB_IDS.includes(urlTab) ? urlTab : getLastTab()) as TabId;
+  const [tab, setTab] = useState<TabId>(initialTab);
   const tabsBarRef = useRef<HTMLDivElement>(null);
 
   const changeTab = (id: TabId) => {

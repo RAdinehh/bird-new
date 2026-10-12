@@ -3,6 +3,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Breed } from './store';
 import { getBreedDisplayName } from './_display-name';
 import { useSet } from '../set/store';
+import { useMasterRedirect } from '../../shr/hooks/useMasterRedirect';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import BreedForm, { EMPTY_BREED_FORM, type BreedFormData } from './BreedForm';
@@ -36,6 +37,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const [form, setForm] = useState<BreedFormData>(EMPTY_BREED_FORM);
   const customStandards = useSet((st: any) => st.customStandards);
   const customOverrides = useSet((st: any) => st.customOverrides);
+  const { redirect: masterRedirect, MasterRedirectModal } = useMasterRedirect();
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -130,6 +132,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   if (birds.length === 0) {
     return (
       <PageContainer>
+      <MasterRedirectModal />
       <HelpBanner
         id="brd-breeds-intro"
         icon="🧬"
@@ -225,7 +228,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
           std?.nameFa?.trim().toLowerCase() === trimmedName
       );
       if (!matchedByName) {
-        setErr(`«${form.name.trim()}» توی استانداردها نیست — لطفاً از لیست انتخاب کن`);
+        masterRedirect('breedStandard', form.name.trim());
         return;
       }
       // خودکار standardKey رو ست کن

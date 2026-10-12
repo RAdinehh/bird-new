@@ -30,7 +30,7 @@ export function getMasterPath(entity: DataEntity): string {
   switch (entity) {
     case 'species':
     case 'breedStandard':
-      return '/set?tab=standards';
+      return '/set?tab=config';
     case 'bird':
     case 'breed':
       return '/brd';
