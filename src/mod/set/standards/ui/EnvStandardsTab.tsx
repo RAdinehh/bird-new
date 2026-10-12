@@ -106,6 +106,8 @@ export default function EnvStandardsTab() {
   const custom = useSet(state => state.customStandards) || {};
   const updateStandard = useSet(state => state.updateStandard);
   const resetStandard = useSet(state => state.resetStandard);
+  const customSpecies = useSet((state: any) => state.customSpecies || []);
+  const addSpecies = useSet((state: any) => state.addSpecies);
 
   const { flocks } = useFlk();
   const { birds: brdBirds, breeds: brdBreeds } = useBrd();
@@ -156,20 +158,37 @@ export default function EnvStandardsTab() {
   const handleAddBreed = (
     key: string, nameFa: string, nameEn: string, birdName: string, template: BirdStandard,
   ) => {
+    const detectedKind = detectKind(birdName);
+
+    // 🆕 اگه species جدید ئه، خودکار ساخته شه
+    const allSpecies = [...(customSpecies || [])];
+    const existingSpecies = allSpecies.find(
+      (s: any) => s.nameFa.trim().toLowerCase() === birdName.trim().toLowerCase()
+    );
+
+    if (!existingSpecies && detectedKind === 'custom') {
+      // species جدید
+      const slug = birdName.trim().toLowerCase().replace(/\s+/g, '-');
+      const kind = 'custom-' + slug + '-' + Date.now().toString(36);
+      addSpecies({ kind, nameFa: birdName.trim(), icon: '🐦' });
+      console.log('OK — species جدید:', kind);
+    }
+
+    const finalKind = existingSpecies?.kind || (detectedKind === 'custom'
+      ? 'custom-' + birdName.trim().toLowerCase().replace(/\s+/g, '-')
+      : detectedKind);
+
     const newStd: BirdStandard = {
       ...template,
       key,
       nameFa,
       nameEn,
       birdName,
-      // 🆕 پاک‌سازی متادیتای template
       source: undefined,
       publishYear: undefined,
       version: 1,
       lastUpdated: undefined,
-      // 🆕 تشخیص birdKind از نام پرنده
-      birdKind: detectKind(birdName) as any,
-      // 🆕 purposes خالی (کاربر توی /brd انتخاب می‌کنه)
+      birdKind: finalKind as any,
       purposes: [],
       primaryPurpose: undefined,
     };
