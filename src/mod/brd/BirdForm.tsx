@@ -3,6 +3,8 @@ import type { Bird } from './store';
 import BirdNameField, { type BirdPresetPick } from './BirdNameField';
 import { Btn, BtnRow, Field, Modal } from '../../shr/components/ui';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
+import { DEFAULT_SPECIES } from './species';
+import { useSet } from '../set/store';
 
 export interface BirdFormData {
   id?: string;
@@ -51,12 +53,22 @@ function StatBox({ icon, label, value }: { icon: string; label: string; value: s
 }
 
 export default function BirdForm({ open, onClose, form, setForm, error, birds, onSave, onErrorClear }: Props) {
-  // آمار runtime بر اساس birdKind انتخاب‌شده
+  const customSpecies = useSet((st: any) => st.customSpecies || []);
+
+  // آمار runtime — بر اساس نام فعلی (نه birdKind قدیمی)
   const stats = useMemo(() => {
-    if (!form.birdKind) return null;
+    const trimmed = form.name.trim();
+    if (!trimmed) return null;
+
+    // نام فعلی رو با species ها match کن
+    const allSpecies = [...DEFAULT_SPECIES, ...customSpecies];
+    const matched = allSpecies.find(
+      (s: any) => s.nameFa.trim().toLowerCase() === trimmed.toLowerCase()
+    );
+    if (!matched) return null;
 
     const matching = Object.values(DEFAULT_STANDARDS).filter(
-      (s: any) => s.birdKind === form.birdKind
+      (s: any) => s.birdKind === matched.kind
     );
 
     if (matching.length === 0) return null;
@@ -81,7 +93,7 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
       minAge,
       maxAge,
     };
-  }, [form.birdKind]);
+  }, [form.name, customSpecies]);
 
   return (
     <Modal open={open} onClose={onClose} title={form.id ? 'ویرایش پرنده' : 'افزودن پرنده'} contentGap={14}

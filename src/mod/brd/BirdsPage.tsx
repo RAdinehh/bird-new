@@ -121,11 +121,23 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
       }
     }
 
-    // 🆕 lookup species — فقط اگه توی لیست باشه (5 پیش‌فرض یا سفارشی)
-    let birdKind = form.birdKind;
-    if (!birdKind) {
-      const allSpecies = [...DEFAULT_SPECIES, ...customSpecies];
-      const trimmed = form.name.trim();
+    // 🆕 lookup species — همیشه بر اساس نام فعلی
+    const trimmed = form.name.trim();
+    const allSpecies = [...DEFAULT_SPECIES, ...customSpecies];
+
+    // آیا نام فعلی با species قبلی match می‌کنه؟
+    const currentKindSpecies = form.birdKind
+      ? allSpecies.find((s: any) => s.kind === form.birdKind)
+      : null;
+    const nameMatchesCurrentKind = currentKindSpecies &&
+      currentKindSpecies.nameFa.trim().toLowerCase() === trimmed.toLowerCase();
+
+    let birdKind: string;
+    if (nameMatchesCurrentKind) {
+      // نام و birdKind هر دو درستن → قبول
+      birdKind = form.birdKind!;
+    } else {
+      // نام عوض شده — از نو lookup کن
       const existing = allSpecies.find(
         (s: any) => s.nameFa.trim().toLowerCase() === trimmed.toLowerCase()
       );
