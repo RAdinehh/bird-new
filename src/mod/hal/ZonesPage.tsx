@@ -26,7 +26,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
 export default function ZonesPage({ active = true }: { active?: boolean } = {}) {
-  const { halls: _hallsRaw, zones: _zonesRaw, addZone, updateZone, deleteZone } = useHal();
+  const { halls: _hallsRaw, zones: _zonesRaw, equipment, addZone, updateZone, deleteZone } = useHal();
   const { birds, breeds } = useBrd();
   const { flocks, update: updateFlock } = useFlk();
   const [open, setOpen] = useState(false);
@@ -83,7 +83,19 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     items: zones,
     getId: (z: any) => z.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' بخش حذف شوند؟', { danger: true });
+      let totalFlocks = 0, totalEquip = 0;
+      for (const id of ids) {
+        totalFlocks += flocks.filter((f: any) => f.zoneId === id).length;
+        totalEquip += equipment.filter((e: any) => e.zoneId === id).length;
+      }
+      let delMsg = toFa(ids.length) + ' بخش حذف شوند؟';
+      if (totalFlocks > 0 || totalEquip > 0) {
+        delMsg += '\n\n';
+        if (totalFlocks > 0) delMsg += '• ' + toFa(totalFlocks) + ' گله\n';
+        if (totalEquip > 0) delMsg += '• ' + toFa(totalEquip) + ' تجهیز\n';
+        delMsg += 'اتصال‌شون به این بخش‌ها قطع می‌شه.';
+      }
+      const ok = await showConfirmAsync('حذف گروهی', delMsg, { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {
@@ -347,7 +359,17 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(z)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
-                    const idToDel = z.id; const ok = await showConfirmAsync('تأیید حذف', 'این منطقه حذف شود؟', { danger: true }); if (!ok) return; const item = zones.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteZone(idToDel);
+                    const idToDel = z.id;
+                    const flockCount = flocks.filter((f: any) => f.zoneId === idToDel).length;
+                    const equipCount = equipment.filter((e: any) => e.zoneId === idToDel).length;
+                    let delMsg = 'این منطقه حذف شود؟';
+                    if (flockCount > 0 || equipCount > 0) {
+                      delMsg += '\n\n';
+                      if (flockCount > 0) delMsg += '• ' + toFa(flockCount) + ' گله\n';
+                      if (equipCount > 0) delMsg += '• ' + toFa(equipCount) + ' تجهیز\n';
+                      delMsg += 'اتصال‌شون قطع می‌شه.';
+                    }
+                    const ok = await showConfirmAsync('تأیید حذف', delMsg, { danger: true }); if (!ok) return; const item = zones.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteZone(idToDel);
                     logAction('delete', 'hal', 'حذف از سالن‌ها');  toastMsg.deleted('منطقه')
                     }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
