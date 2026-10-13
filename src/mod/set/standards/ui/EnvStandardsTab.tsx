@@ -120,23 +120,23 @@ export default function EnvStandardsTab() {
   const activeBirdNames = new Set<string>();
   // ۱. از گله‌های فعال
   (flocks || [])
-    .filter((f: any) => f.status === 'active')
-    .forEach((f: any) => {
-      const brd = (brdBirds || []).find((b: any) => b.id === f.birdId);
+    .filter((f) => f.status === 'active')
+    .forEach((f) => {
+      const brd = (brdBirds || []).find((b) => b.id === f.birdId);
       if (brd?.name) activeBirdNames.add(brd.name.trim());
     });
   // ۲. از پرنده‌های تعریف‌شده در brd
-  (brdBirds || []).forEach((b: any) => {
+  (brdBirds || []).forEach((b) => {
     if (b?.name) activeBirdNames.add(b.name.trim());
   });
 
   const customBirdNames = new Set<string>();
   // فقط نژادهایی که از brd انتخاب شدن
   const brdBirdIdsWithBreed = new Set<string>();
-  (brdBreeds || []).forEach((b: any) => {
+  (brdBreeds || []).forEach((b) => {
     if (b.standardKey) brdBirdIdsWithBreed.add(b.birdId);
   });
-  (brdBirds || []).forEach((b: any) => {
+  (brdBirds || []).forEach((b) => {
     if (brdBirdIdsWithBreed.has(b.id) && b.name) {
       customBirdNames.add(b.name.trim());
     }
@@ -145,7 +145,7 @@ export default function EnvStandardsTab() {
 
   // نژادهایی که کاربر در بخش «پرنده‌ها و نژادها» انتخاب کرده (standardKey)
   const selectedBreedKeys = new Set<string>();
-  (brdBreeds || []).forEach((b: any) => {
+  (brdBreeds || []).forEach((b) => {
     if (b.standardKey) selectedBreedKeys.add(b.standardKey);
   });
 
@@ -283,7 +283,7 @@ export default function EnvStandardsTab() {
         </div>
       ) : (
         visibleGroups.map(([birdName, breedsRaw]) => {
-          const breeds = selectedBreedKeys.size > 0 ? breedsRaw.filter((std: any) => selectedBreedKeys.has(std.key)) : breedsRaw;
+          const breeds = selectedBreedKeys.size > 0 ? breedsRaw.filter((std) => selectedBreedKeys.has(std.key)) : breedsRaw;
           if (breeds.length === 0) return null;
           return (
           <SettingsGroup
@@ -301,9 +301,9 @@ export default function EnvStandardsTab() {
               {breeds.map((std) => {
                 const isCustom = !!custom[std.key];
                 const isNative = std.category === 'native';
-                const flockCount = (flocks || []).filter((f: any) => {
+                const flockCount = (flocks || []).filter((f) => {
                   if (f.status !== 'active') return false;
-                  const brd = (brdBirds || []).find((b: any) => b.id === f.birdId);
+                  const brd = (brdBirds || []).find((b) => b.id === f.birdId);
                   return brd?.name?.trim() === birdName;
                 }).length;
 

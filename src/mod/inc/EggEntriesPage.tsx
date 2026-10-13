@@ -45,19 +45,19 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
   const _profiles = useSet((s: any) => s.incubationProfiles) || [];
   const _birdsById = useMemo(() => {
     const m: Record<string, any> = {};
-    (birds || []).forEach((b: any) => { m[b.id] = b; });
+    (birds || []).forEach((b) => { m[b.id] = b; });
     return m;
   }, [birds]);
 
   const _contactsById = useMemo(() => {
     const m: Record<string, any> = {};
-    (contacts || []).forEach((cc: any) => { m[cc.id] = cc; });
+    (contacts || []).forEach((cc) => { m[cc.id] = cc; });
     return m;
   }, [contacts]);
 
   const daysByName = useMemo(() => {
     const map = new Map<string, number>();
-    birds.forEach((b: any) => map.set(b.name, daysFromProfiles(b.name, _profiles)));
+    birds.forEach((b) => map.set(b.name, daysFromProfiles(b.name, _profiles)));
     return map;
   }, [birds, _profiles]);
   const _daysLookup = (name: string | undefined): number => {
@@ -86,7 +86,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
   });
 
 
-  const suppliers = useMemo(() => (contacts || []).filter((p: any) => (p.roles || []).includes('supplier')), [contacts]);
+  const suppliers = useMemo(() => (contacts || []).filter((p) => (p.roles || []).includes('supplier')), [contacts]);
   const allPersons = contacts || [];
 
 
@@ -101,12 +101,12 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
     if (!device) return { used: 0, total: 0, percent: 0 };
     const allEntries = eggEntries.map(x => ({ ...x, __birdName: (birds.find(b => b.id === x.birdId)?.name) || '' }));
     let used = 0;
-    const refCap = Math.max(...(device.capacityByBird || []).map((c: any) => c.capacity || 0));
+    const refCap = Math.max(...(device.capacityByBird || []).map((c) => c.capacity || 0));
     if (refCap === 0) return { used: 0, total: 0, percent: 0 };
     // فعلی
     allEntries.forEach(e => {
       if (e.status === 'failed') return;
-      const cap = (device.capacityByBird || []).find((c: any) => c.birdName === e.__birdName);
+      const cap = (device.capacityByBird || []).find((c) => c.birdName === e.__birdName);
       if (!cap?.capacity) return;
       used += (e.count || 0) * (refCap / cap.capacity);
     });
@@ -114,7 +114,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
     draftRows.forEach(r => {
       const bird = birds.find(b => b.id === r.birdId);
       if (!bird) return;
-      const cap = (device.capacityByBird || []).find((c: any) => c.birdName === bird.name);
+      const cap = (device.capacityByBird || []).find((c) => c.birdName === bird.name);
       if (!cap?.capacity) return;
       used += (parseInt(toEn(r.count)) || 0) * (refCap / cap.capacity);
     });
@@ -129,7 +129,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
   const liveUsage = useMemo(() => {
     const device = devices.find(d => d.id === multiDeviceId);
     if (!device) return null;
-    const refCap = Math.max(...(device.capacityByBird || []).map((c: any) => c.capacity || 0));
+    const refCap = Math.max(...(device.capacityByBird || []).map((c) => c.capacity || 0));
     if (refCap === 0) return null;
 
     let used = 0;
@@ -137,7 +137,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
     eggEntries.forEach(e => {
       if (e.status === 'failed') return;
       const birdName = (birds.find(b => b.id === e.birdId)?.name) || '';
-      const cap = (device.capacityByBird || []).find((c: any) => c.birdName === birdName);
+      const cap = (device.capacityByBird || []).find((c) => c.birdName === birdName);
       if (!cap?.capacity) return;
       used += (e.count || 0) * (refCap / cap.capacity);
     });
@@ -146,7 +146,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
       if (editingRowId && r._id === editingRowId) return;
       const b = birds.find(x => x.id === r.birdId);
       if (!b) return;
-      const cap = (device.capacityByBird || []).find((c: any) => c.birdName === b.name);
+      const cap = (device.capacityByBird || []).find((c) => c.birdName === b.name);
       if (!cap?.capacity) return;
       used += (parseInt(toEn(r.count)) || 0) * (refCap / cap.capacity);
     });
@@ -154,7 +154,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
     const curCnt = parseInt(toEn(currentRow.count)) || 0;
     const curBird = birds.find(b => b.id === currentRow.birdId);
     if (curBird && curCnt > 0) {
-      const cap = (device.capacityByBird || []).find((c: any) => c.birdName === curBird.name);
+      const cap = (device.capacityByBird || []).find((c) => c.birdName === curBird.name);
       if (cap?.capacity) {
         used += curCnt * (refCap / cap.capacity);
       }
@@ -189,11 +189,11 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
 
   const renderRowSummary = (row: DraftRow, idx: number) => {
     const bird = birds.find(b => b.id === row.birdId);
-    const sellerName = (row.dealData.sellerId && (contacts.find((c: any) => c.id === row.dealData.sellerId) as any)?.name) || '';
-    const partnerName = (row.dealData.partnerId && (contacts.find((c: any) => c.id === row.dealData.partnerId) as any)?.name) || '';
-    const flockName = row.flockId ? flocks.find((f: any) => f.id === row.flockId)?.name : '';
-    const consigneeName = (row.dealData.consigneeId && (contacts.find((c: any) => c.id === row.dealData.consigneeId) as any)?.name) || '';
-    const lessorName = (row.dealData.lessorId && (contacts.find((c: any) => c.id === row.dealData.lessorId) as any)?.name) || '';
+    const sellerName = (row.dealData.sellerId && (contacts.find((c) => c.id === row.dealData.sellerId) as any)?.name) || '';
+    const partnerName = (row.dealData.partnerId && (contacts.find((c) => c.id === row.dealData.partnerId) as any)?.name) || '';
+    const flockName = row.flockId ? flocks.find((f) => f.id === row.flockId)?.name : '';
+    const consigneeName = (row.dealData.consigneeId && (contacts.find((c) => c.id === row.dealData.consigneeId) as any)?.name) || '';
+    const lessorName = (row.dealData.lessorId && (contacts.find((c) => c.id === row.dealData.lessorId) as any)?.name) || '';
     const party = sellerName || partnerName || flockName || consigneeName || lessorName || '—';
 
     return (

@@ -111,11 +111,11 @@ export default function EggEntryModal(props: EggEntryModalProps) {
           </div>
           {draftRows.map((r, i) => {
             const bird = birds.find(b => b.id === r.birdId);
-            const sellerName = (r.dealData.sellerId && (contacts.find((c: any) => c.id === r.dealData.sellerId) as any)?.name) || '';
-            const partnerName = (r.dealData.partnerId && (contacts.find((c: any) => c.id === r.dealData.partnerId) as any)?.name) || '';
-            const flockName = r.flockId ? flocks.find((f: any) => f.id === r.flockId)?.name : '';
-            const consigneeName = (r.dealData.consigneeId && (contacts.find((c: any) => c.id === r.dealData.consigneeId) as any)?.name) || '';
-            const lessorName = (r.dealData.lessorId && (contacts.find((c: any) => c.id === r.dealData.lessorId) as any)?.name) || '';
+            const sellerName = (r.dealData.sellerId && (contacts.find((c) => c.id === r.dealData.sellerId) as any)?.name) || '';
+            const partnerName = (r.dealData.partnerId && (contacts.find((c) => c.id === r.dealData.partnerId) as any)?.name) || '';
+            const flockName = r.flockId ? flocks.find((f) => f.id === r.flockId)?.name : '';
+            const consigneeName = (r.dealData.consigneeId && (contacts.find((c) => c.id === r.dealData.consigneeId) as any)?.name) || '';
+            const lessorName = (r.dealData.lessorId && (contacts.find((c) => c.id === r.dealData.lessorId) as any)?.name) || '';
             const party = sellerName || partnerName || flockName || consigneeName || lessorName || '—';
             const accentColor = r.dealType === 'own' ? 'accent' : r.dealType === 'purchase' ? 'info' : r.dealType === 'partnership' ? 'purple' : r.dealType === 'rent' ? 'warn' : 'dim';
             return (
@@ -190,8 +190,8 @@ export default function EggEntryModal(props: EggEntryModalProps) {
         {currentRow.dealType === 'own' && (
           <Field label="انتخاب گله" required>
             {(() => {
-              const activeFlocks = flocks.filter((fl: any) => fl.status === 'active' && !fl.paused);
-              const readyFlocks = activeFlocks.filter((fl: any) => {
+              const activeFlocks = flocks.filter((fl) => fl.status === 'active' && !fl.paused);
+              const readyFlocks = activeFlocks.filter((fl) => {
                 const brd = birds.find(b => b.id === fl.birdId);
                 const r = flockReadyForEggs(fl, brd);
                 return r.ready;
@@ -201,11 +201,11 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               return (
                 <Select value={currentRow.flockId} onChange={e => {
                   const fid = e.target.value;
-                  const fl = flocks.find((x: any) => x.id === fid);
+                  const fl = flocks.find((x) => x.id === fid);
                   setCurrentRow(f => ({ ...f, flockId: fid, birdId: fl?.birdId || f.birdId, breedId: fl?.breedId || f.breedId }));
                 }}>
                   <option value="">— انتخاب گله —</option>
-                  {readyFlocks.map((fl: any) => {
+                  {readyFlocks.map((fl) => {
                     const brd = birds.find(b => b.id === fl.birdId);
                     const r = flockReadyForEggs(fl, brd);
                     return <option key={fl.id} value={fl.id}>{fl.name} ({toFa(r.ageDays)} روز)</option>;
@@ -223,7 +223,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
             ) : (
               <Select value={currentRow.dealData.sellerId || ''} onChange={e => setD('sellerId', e.target.value)}>
                 <option value="">— انتخاب —</option>
-                {suppliers.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                {suppliers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </Select>
             )}
           </Field>
@@ -233,7 +233,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
           <Field label="شریک" required>
             <Select value={currentRow.dealData.partnerId || ''} onChange={e => setD('partnerId', e.target.value)}>
               <option value="">— انتخاب —</option>
-              {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              {allPersons.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             </Select>
           </Field>
         )}
@@ -242,7 +242,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
           <Field label="اجاره‌دهنده" required>
             <Select value={currentRow.dealData.lessorId || ''} onChange={e => setD('lessorId', e.target.value)}>
               <option value="">— انتخاب —</option>
-              {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              {allPersons.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             </Select>
           </Field>
         )}
@@ -251,7 +251,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
           <Field label="امانت‌دار" required>
             <Select value={currentRow.dealData.consigneeId || ''} onChange={e => setD('consigneeId', e.target.value)}>
               <option value="">— انتخاب —</option>
-              {allPersons.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              {allPersons.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             </Select>
           </Field>
         )}

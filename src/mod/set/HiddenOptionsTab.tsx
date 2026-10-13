@@ -27,7 +27,7 @@ function keyLabel(key: string) {
 export default function HiddenOptionsTab() {
   const { getHidden, unhideOption, deleteOption } = useCustomOptions();
   const { equipment } = useHal();
-  const usageCheck = (name: string) => equipment.filter((x: any) => x.type === name).length;
+  const usageCheck = (name: string) => equipment.filter((x) => x.type === name).length;
   const hidden = getHidden();
 
   if (hidden.length === 0) {

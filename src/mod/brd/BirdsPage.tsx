@@ -117,7 +117,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     // 🔒 جلوگیری قاطع از نام تکراری پرنده
     if (!form.id) {
       const _trimmed = form.name.trim();
-      const _dup = birds.find((x: any) => x.name.trim() === _trimmed);
+      const _dup = birds.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
         setError(`نام «${_dup.name}» تکراریه — یا ویرایشش کن یا اسم دیگه بذار`);
         return;
@@ -130,7 +130,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
 
     // آیا نام فعلی با species قبلی match می‌کنه؟
     const currentKindSpecies = form.birdKind
-      ? allSpecies.find((s: any) => s.kind === form.birdKind)
+      ? allSpecies.find((s) => s.kind === form.birdKind)
       : null;
     const nameMatchesCurrentKind = currentKindSpecies &&
       currentKindSpecies.nameFa.trim().toLowerCase() === trimmed.toLowerCase();

@@ -51,10 +51,10 @@ export default function EggEntryCard(props: EggEntryCardProps) {
   else if (remain === 0) { statusLabel = '🎯 امروز هچ'; statusTone = 'purple'; }
   else { statusLabel = '⚠️ گذشته از موعد هچ'; statusTone = 'amber'; }
 
-  const partnerName = (e.dealData?.partnerId && (contacts.find((c: any) => c.id === e.dealData.partnerId) as any)?.name) || e.dealData?.partnerName || '';
-  const sellerName = (e.dealData?.sellerId && (contacts.find((c: any) => c.id === e.dealData.sellerId) as any)?.name) || e.dealData?.sellerName || '';
-  const consigneeName = (e.dealData?.consigneeId && (contacts.find((c: any) => c.id === e.dealData.consigneeId) as any)?.name) || e.dealData?.consigneeName || '';
-  const lessorName = (e.dealData?.lessorId && (contacts.find((c: any) => c.id === e.dealData.lessorId) as any)?.name) || '';
+  const partnerName = (e.dealData?.partnerId && (contacts.find((c) => c.id === e.dealData.partnerId) as any)?.name) || e.dealData?.partnerName || '';
+  const sellerName = (e.dealData?.sellerId && (contacts.find((c) => c.id === e.dealData.sellerId) as any)?.name) || e.dealData?.sellerName || '';
+  const consigneeName = (e.dealData?.consigneeId && (contacts.find((c) => c.id === e.dealData.consigneeId) as any)?.name) || e.dealData?.consigneeName || '';
+  const lessorName = (e.dealData?.lessorId && (contacts.find((c) => c.id === e.dealData.lessorId) as any)?.name) || '';
 
   return (
     <ExpandableCard
@@ -91,7 +91,7 @@ export default function EggEntryCard(props: EggEntryCardProps) {
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🤝 منبع</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <Row l="نوع" v={(DEAL_LABEL as any)[e.dealType]} />
-        {e.dealType === 'own' && (e as any).flockId && <Row l="گله" v={(flocks.find((f: any) => f.id === (e as any).flockId)?.name) || '—'} />}
+        {e.dealType === 'own' && (e as any).flockId && <Row l="گله" v={(flocks.find((f) => f.id === (e as any).flockId)?.name) || '—'} />}
         {e.dealType === 'purchase' && sellerName && <Row l="فروشنده" v={String(sellerName)} />}
         {e.dealType === 'partnership' && partnerName && <Row l="شریک" v={String(partnerName)} />}
         {e.dealType === 'partnership' && e.dealData.partnerPercent && <Row l="درصد شریک" v={toFa(e.dealData.partnerPercent) + '٪'} />}

@@ -24,11 +24,11 @@ export function useInvoiceForm(params: {
 
   // محاسبه‌ی parties بر اساس form.category
   const parties = (() => {
-    if (!isPurchase) return contacts.filter((c: any) => c.roles.includes('customer'));
-    const allSuppliers = contacts.filter((c: any) => c.roles.includes('supplier'));
+    if (!isPurchase) return contacts.filter((c) => c.roles.includes('customer'));
+    const allSuppliers = contacts.filter((c) => c.roles.includes('supplier'));
     const cat = form?.category || '';
     if (!cat || cat === 'other') return allSuppliers;
-    const matching = allSuppliers.filter((c: any) =>
+    const matching = allSuppliers.filter((c) =>
       Array.isArray(c.supplierTypes) && c.supplierTypes.includes(cat)
     );
     return matching.length > 0 ? matching : allSuppliers;

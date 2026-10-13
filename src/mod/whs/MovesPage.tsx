@@ -333,7 +333,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(m)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
-                    const idToDel = m.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel);
+                    const idToDel = m.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel);
                     logAction('delete', 'whs', 'حذف از انبار');
                     const itemName = item ? (items.find(x => x.id === (item as any).itemId)?.name || 'گردش') : 'گردش';
                     toastMsg.deleted(itemName)

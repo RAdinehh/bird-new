@@ -184,7 +184,7 @@ export default function IngredientsPage() {
     // 🔒 جلوگیری قاطع از نام تکراری ماده اولیه
     if (!form.id) {
       const _trimmed = form.name.trim();
-      const _dup = ingredients.find((x: any) => x.name.trim() === _trimmed);
+      const _dup = ingredients.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
         showAlert(
           `ماده اولیهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,

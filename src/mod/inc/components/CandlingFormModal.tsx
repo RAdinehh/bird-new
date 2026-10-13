@@ -164,7 +164,7 @@ export default function CandlingFormModal(props: CandlingFormModalProps) {
 
             // محاسبه‌ی مبنا از داخل — بدون import مجدد
             const myCandlings = candlings
-              .filter((c: any) => c.eggEntryId === e.id)
+              .filter((c) => c.eggEntryId === e.id)
               .sort((a, b) => a.stage - b.stage);
             const prevs = myCandlings.filter(c => c.stage < dayNum);
             const baseInfo: AvailableBase = prevs.length === 0

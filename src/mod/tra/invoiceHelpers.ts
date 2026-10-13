@@ -69,7 +69,7 @@ export function applyInvoiceEgg(inv: Invoice): InvoiceItem[] {
     const rawType = ((it as any).eggTypes || [])[0] || 'eating';
     const type = rawType === 'fertile' ? 'fertile' : rawType === 'broken' ? 'broken' : 'eating';
     // جلوگیری از تکراری
-    const exists = egg.sales.find((x: any) => x.sourceInvoiceId === inv.id && x.date === inv.date);
+    const exists = egg.sales.find((x) => x.sourceInvoiceId === inv.id && x.date === inv.date);
     if (exists) return it;
     try {
       egg.addSale({

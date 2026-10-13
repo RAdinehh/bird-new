@@ -66,7 +66,7 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
   const save = async () => {
     if (!form.id) {
       const _trimmed = form.name.trim();
-      const _dup = flocks.find((x: any) => x.name.trim() === _trimmed);
+      const _dup = flocks.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
         showAlert(
           `گله‌ای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,

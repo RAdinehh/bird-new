@@ -64,7 +64,7 @@ export function AddBirdModal({
           list="bird-species-list"
         />
         <datalist id="bird-species-list">
-          {[...DEFAULT_SPECIES, ...customSpecies].map((sp: any) => (
+          {[...DEFAULT_SPECIES, ...customSpecies].map((sp) => (
             <option key={sp.kind} value={sp.nameFa} />
           ))}
         </datalist>

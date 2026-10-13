@@ -104,7 +104,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {
-        const item = _breedsRaw.find((x: any) => x.id === id);
+        const item = _breedsRaw.find((x) => x.id === id);
         if (!item) continue;
         backups.push(item);
         deleteBreed(id);
@@ -176,7 +176,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     if (!form.id) {
       const _trimmed = form.name.trim();
       const _newPurposes = (form.purposes || []).slice().sort().join(',');
-      const _dup = breeds.find((x: any) => {
+      const _dup = breeds.find((x) => {
         if (x.birdId !== form.birdId) return false;
         if (x.name.trim() !== _trimmed) return false;
         const _xPurposes = (x.purposes || []).slice().sort().join(',');

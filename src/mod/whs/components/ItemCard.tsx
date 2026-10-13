@@ -121,7 +121,7 @@ export default function ItemCard(props: ItemCardProps) {
       {myMovements.length > 0 ? (
         <>
           <SectionTitle>📋 آخرین گردش‌ها ({toFa(myMovements.length)})</SectionTitle>
-          {myMovements.slice(-3).reverse().map((m: any) => (
+          {myMovements.slice(-3).reverse().map((m) => (
             <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between' }}>
               <span>{m.type === 'in' ? '📥' : '📤'} {toFa(m.quantity)} {(UNIT_LABEL as any)[it.unit]}</span>
               <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{toFa(m.date)}</span>

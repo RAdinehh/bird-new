@@ -157,7 +157,7 @@ export default function FormulasPage() {
     // 🔒 جلوگیری قاطع از نام تکراری جیره
     if (!form.id) {
       const _trimmed = form.name.trim();
-      const _dup = formulas.find((x: any) => x.name.trim() === _trimmed);
+      const _dup = formulas.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
         showAlert(
           `جیرهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,

@@ -64,7 +64,7 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
     const flock = activeFlocks[0];
     const sys = detectSystems(flock.id);
     // 🆕 اگر فقط یک فرمول active هست، خودکار انتخاب شه
-    const activeFormulas = formulas.filter((f: any) => f.status === 'active');
+    const activeFormulas = formulas.filter((f) => f.status === 'active');
     const autoFormula = activeFormulas.length === 1 ? activeFormulas[0] : null;
     const feedDefault = autoFormula
       ? { feedSourceType: 'formula' as const, feedSourceId: autoFormula.id, feedType: autoFormula.name || '' }

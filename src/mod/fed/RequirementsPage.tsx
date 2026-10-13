@@ -148,7 +148,7 @@ export default function RequirementsPage() {
     // 🔒 جلوگیری قاطع از نام تکراری نیاز
     if (!form.id) {
       const _trimmed = form.name.trim();
-      const _dup = requirements.find((x: any) => x.name.trim() === _trimmed);
+      const _dup = requirements.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
         showAlert(
           `نیازای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,

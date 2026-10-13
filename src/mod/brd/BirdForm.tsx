@@ -77,18 +77,18 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
     ];
     const matching = allKeys
       .map(k => resolveStandard(k, customStandards, customOverrides))
-      .filter((s: any) => s?.birdKind === matched.kind);
+      .filter((s) => s?.birdKind === matched.kind);
 
     if (matching.length === 0) return null;
 
-    const native = matching.filter((s: any) => s.category === 'native').length;
-    const industrial = matching.filter((s: any) => s.category === 'industrial').length;
-    const fancy = matching.filter((s: any) => s.category === 'fancy').length;
+    const native = matching.filter((s) => s.category === 'native').length;
+    const industrial = matching.filter((s) => s.category === 'industrial').length;
+    const fancy = matching.filter((s) => s.category === 'fancy').length;
 
     // بازه سن (cullDay)
     const culls = matching
-      .map((s: any) => s.biology?.cullDay)
-      .filter((c: any) => typeof c === 'number' && c > 0) as number[];
+      .map((s) => s.biology?.cullDay)
+      .filter((c) => typeof c === 'number' && c > 0) as number[];
 
     const minAge = culls.length > 0 ? Math.min(...culls) : null;
     const maxAge = culls.length > 0 ? Math.max(...culls) : null;

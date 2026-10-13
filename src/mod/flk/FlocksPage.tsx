@@ -94,7 +94,7 @@ export default function FlocksPage() {
     if (undoData == null) return;
     const list = Array.isArray(undoData.flock) ? undoData.flock : [undoData.flock];
     try {
-      list.forEach((f: any) => add(f));
+      list.forEach((f) => add(f));
       toastMsg.restoredBulk(list.length, 'گله');
     } catch (err) {
       toastMsg.error('بازگردانی ناموفق');

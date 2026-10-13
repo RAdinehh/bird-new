@@ -26,7 +26,7 @@ function buildNameToKey(): Record<string, string> {
   map['مرغ تخمگذار'] = 'layer';
   map['گلین'] = 'golin';
   // از DEFAULT_STANDARDS
-  Object.values(DEFAULT_STANDARDS).forEach((std: any) => {
+  Object.values(DEFAULT_STANDARDS).forEach((std) => {
     if (!std) return;
     if (std.nameFa) map[std.nameFa.trim()] = std.key;
     if (std.nameEn) map[std.nameEn.trim()] = std.key;
@@ -247,7 +247,7 @@ export function getStandardsGroupedByBird(
 ): Record<string, BirdStandard[]> {
   const all: Record<string, BirdStandard> = { ...DEFAULT_STANDARDS, ...(customStandards || {}) };
   const groups: Record<string, BirdStandard[]> = {};
-  Object.values(all).forEach((std: any) => {
+  Object.values(all).forEach((std) => {
     const bird = std.birdName || 'سایر';
     if (!groups[bird]) groups[bird] = [];
     groups[bird].push(std);

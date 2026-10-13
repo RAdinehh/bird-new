@@ -104,7 +104,7 @@ const [, _setTick] = useState(0);
   const pendingChecks = useMemo(() => {
     const list: { inv: any; pay: any }[] = [];
     invoices.filter(i => remaining(i) > 0).forEach(inv => {
-      (inv.payments || []).forEach((p: any) => {
+      (inv.payments || []).forEach((p) => {
         if (p.method === 'check' && (!p.status || p.status === 'pending')) {
           list.push({ inv, pay: p });
         }
@@ -312,8 +312,8 @@ const [, _setTick] = useState(0);
     const fcrStandard = getBreedFcr(breed) || 0;
 
     // داده‌های این گله
-    const flockLogs = logs.filter((l: any) => l.flockId === flock.id);
-    const flockProd = productions.filter((p: any) => p.flockId === flock.id);
+    const flockLogs = logs.filter((l) => l.flockId === flock.id);
+    const flockProd = productions.filter((p) => p.flockId === flock.id);
 
     const totalFeed = flockLogs.reduce((a, l) => a + (l.feedAmount || 0), 0);
     const totalEggs = flockProd.reduce((a, p) => a + (p.totalCount || 0), 0);
@@ -324,7 +324,7 @@ const [, _setTick] = useState(0);
     // Hen-Day این گله
     const aliveCount = flock.currentCount || flock.initialCount || 0;
     const flockHenDay = (() => {
-      const last7 = flockProd.filter((p: any) => dateDiffDays(p.date) <= 7);
+      const last7 = flockProd.filter((p) => dateDiffDays(p.date) <= 7);
       if (last7.length === 0 || aliveCount === 0) return 0;
       const sum = last7.reduce((a, p) => a + (p.totalCount || 0), 0);
       const days = 7;

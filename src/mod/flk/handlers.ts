@@ -44,7 +44,7 @@ export function registerFlkHandlers(): () => void {
           unknown: 'نامشخص',
         };
         const causes = (deaths || [])
-          .map((d: any) => causeMap[d.cause] || d.cause)
+          .map((d) => causeMap[d.cause] || d.cause)
           .filter((x: string) => x && x !== '—')
           .join('، ');
 

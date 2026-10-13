@@ -83,7 +83,7 @@ export default function TopAlerts({
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {upcomingDues.map(({ inv, days }) => {
-                    const party = contacts.find((c: any) => c.id === inv.partyId);
+                    const party = contacts.find((c) => c.id === inv.partyId);
                     const tone = (days ?? 0) < 0 ? 'danger' : (days ?? 0) <= 2 ? 'warn' : 'amber';
                     return (
                       <div
@@ -125,7 +125,7 @@ export default function TopAlerts({
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {pendingChecks.map(({ inv, pay }) => {
-                    const party = contacts.find((c: any) => c.id === inv.partyId);
+                    const party = contacts.find((c) => c.id === inv.partyId);
                     return (
                       <div
                         key={pay.id}

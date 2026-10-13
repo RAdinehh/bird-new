@@ -22,7 +22,7 @@ export function getDlgLogsConfig(ctx: {
           { value: 'yes', label: 'دارد' },
           { value: 'no', label: 'ندارد' },
         ],
-        getValue: (l: DailyLog) => (l.deaths && l.deaths.length > 0 && l.deaths.some((d: any) => (d.count || 0) > 0)) ? 'yes' : 'no',
+        getValue: (l: DailyLog) => (l.deaths && l.deaths.length > 0 && l.deaths.some((d) => (d.count || 0) > 0)) ? 'yes' : 'no',
       },
       {
         key: 'hasVaccine', label: 'واکسن', kind: 'enum',

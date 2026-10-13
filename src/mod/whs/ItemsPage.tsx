@@ -248,7 +248,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
     // 🔒 جلوگیری قاطع از نام تکراری کالا
     if (!form.id) {
       const _trimmed = form.name.trim();
-      const _dup = items.find((x: any) => x.name.trim() === _trimmed);
+      const _dup = items.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
         showAlert(
           `کالاای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,

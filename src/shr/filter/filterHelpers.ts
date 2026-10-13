@@ -3,7 +3,7 @@ import type { FilterDef } from './types';
 
 export function summarizeChip<T>(def: FilterDef<T>, v: any): { text: string; icon?: ReactNode } | null {
   if (v === undefined || v === null || v === '') return null;
-  if (Array.isArray(v) && (v.length === 0 || v.every((x: any) => x === ''))) return null;
+  if (Array.isArray(v) && (v.length === 0 || v.every((x) => x === ''))) return null;
   if (def.kind === 'enum') {
     const arr = Array.isArray(v) ? (v as string[]) : [String(v)];
     const opts = arr.map(x => def.options?.find(o => o.value === x));
@@ -26,6 +26,6 @@ export function summarizeChip<T>(def: FilterDef<T>, v: any): { text: string; ico
 
 export function isEmptyVal(v: any): boolean {
   if (v === undefined || v === null || v === '') return true;
-  if (Array.isArray(v)) return v.length === 0 || v.every((x: any) => x === '');
+  if (Array.isArray(v)) return v.length === 0 || v.every((x) => x === '');
   return false;
 }

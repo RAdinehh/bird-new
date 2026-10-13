@@ -27,7 +27,7 @@ export default function ProductionFormModal(props: Props) {
   const int = (s: any) => { const v = parseInt(toEn(String(s || ''))); return isNaN(v) ? 0 : v; };
   const healthy = int(form.eatingCount) + int(form.fertileCount);
   const totalEggs = healthy + int(form.brokenCount) + int(form.softCount) + int(form.dirtyCount);
-  const selectedFlock = activeFlocks.find((f: any) => f.id === form.flockId);
+  const selectedFlock = activeFlocks.find((f) => f.id === form.flockId);
   const liveRate = flockCount > 0 ? Math.round((healthy / flockCount) * 100) : 0;
   const liveErrors = (() => {
     const errs: { field: string; msg: string }[] = [];
