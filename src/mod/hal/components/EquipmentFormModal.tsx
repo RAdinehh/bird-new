@@ -2,6 +2,8 @@
  * EquipmentFormModal — فرم افزودن/ویرایش تجهیز
  */
 import { Btn, Field, Grid2, Input, Modal, MoneyField, NumField, Select, ErrorBox } from '../../../shr/components/ui';
+import type { Hall, Zone, Equipment } from '../store';
+import type { Person } from '../../ctc/store';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { STATUS_LABELS, type EquipmentStatus } from '../store';
@@ -15,13 +17,13 @@ import { EquipmentIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
 export interface EquipmentFormModalProps {
   open: boolean;
   setOpen: (v: boolean) => void;
-  form: any;
-  setForm: any;
+  form: any;  // TODO: type from useEquipmentForm
+  setForm: React.Dispatch<React.SetStateAction<any>>;
   err: string;
   vErrors: Record<string, string>;
-  halls: any[];
-  zones: any[];
-  equipment: any[];
+  halls: Hall[];
+  zones: Zone[];
+  equipment: Equipment[];
   autoFields: Set<string>;
   clearAuto: (k: string) => void;
   markAuto: (k: string) => void;
@@ -29,7 +31,7 @@ export interface EquipmentFormModalProps {
   typesForCategory: (c: string) => string[];
   equipNeed: any;
   save: () => void;
-  suppliers?: any[];
+  suppliers?: Person[];
   stdForDefaults?: any;
 }
 
@@ -50,12 +52,12 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               autoThreshold={6}
             />
           </Field>
-          {form.hallId && zones.filter((z: any) => z.hallId === form.hallId).length > 0 && (
+          {form.hallId && zones.filter((z: Zone) => z.hallId === form.hallId).length > 0 && (
             <Field label="بخش (اختیاری)">
               <SmartSelect
                 value={form.zoneId || ''}
                 onChange={v => setForm((f: any) => ({ ...f, zoneId: v }))}
-                options={zones.filter((z: any) => z.hallId === form.hallId).map((z: any) => ({ value: z.id, label: z.name }))}
+                options={zones.filter((z: Zone) => z.hallId === form.hallId).map((z: Zone) => ({ value: z.id, label: z.name }))}
                 placeholder="— بدون بخش —"
                 modalTitle="انتخاب بخش"
                 autoThreshold={6}
@@ -90,7 +92,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             value={form.type}
             onChange={v => {
               const def = getEquipUnit(v);
-              const patch: any = { type: v };
+              const patch: Record<string, string | undefined> = { type: v };
               // 🆕 اول از std نژاد، بعد از defaultValue
               const stdVal = stdForDefaults ? getStdDefaultForType(v, stdForDefaults) : null;
               const finalVal = stdVal ?? def.secondary?.defaultValue ?? null;
@@ -113,7 +115,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               };
             })}
             customKey={'hal.equip.type.' + (form.category || 'auxiliary')}
-            usageCheck={(name) => equipment.filter((x: any) => x.type === name).length}
+            usageCheck={(name) => equipment.filter((x: Equipment) => x.type === name).length}
           />
         </Grid2>
 
@@ -131,7 +133,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <SmartSelect
               value={form.supplierId || ''}
               onChange={v => setForm({...form, supplierId: v})}
-              options={suppliers.map((s: any) => ({ value: s.id, label: s.name, subtitle: s.phone }))}
+              options={suppliers.map((s: Person) => ({ value: s.id, label: s.name, subtitle: s.phone }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب تأمین‌کننده"
               autoThreshold={6}
