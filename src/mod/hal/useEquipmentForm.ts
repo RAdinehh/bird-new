@@ -16,7 +16,7 @@ export const EQUIP_FORM_DEFAULTS = {
 export function useEquipmentForm() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({ ...EQUIP_FORM_DEFAULTS });
-  const draft = useFormDraft('hal-equip', form, (v: any) => setForm(v));
+  const draft = useFormDraft('hal-equip', form, (v) => setForm(v));
   const [err, setErr] = useState('');
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
 
@@ -71,9 +71,9 @@ export function useEquipmentForm() {
     setOpen(true);
   };
 
-  const save = (equipment: Equipment[], addEquip: any, updateEquip: any) => {
+  const save = (equipment: Equipment[], addEquip: (e: Omit<Equipment, 'id' | 'createdAt' | 'updatedAt'>) => string, updateEquip: (id: string, patch: Partial<Equipment>) => void) => {
     if (!form.id) {
-      const _dup = equipment.find((x: any) =>
+      const _dup = equipment.find((x) =>
         x.hallId === form.hallId && x.name.trim() === form.name.trim()
       );
       if (_dup) {
@@ -89,7 +89,7 @@ export function useEquipmentForm() {
     setOpen(false);
   };
 
-  const saveAndNext = (addEquip: any) => {
+  const saveAndNext = (addEquip: (e: Omit<Equipment, 'id' | 'createdAt' | 'updatedAt'>) => string) => {
     if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
     addEquip(buildPayload());
     toastMsg.added(form.name || 'تجهیز');
