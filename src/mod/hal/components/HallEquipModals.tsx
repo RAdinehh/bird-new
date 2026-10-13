@@ -2,6 +2,7 @@
  * HallEquipModals — سه Modal (جزئیات، افزودن، ویرایش)
  */
 import { Btn, Field, Grid2, Input, Modal, NumField } from '../../../shr/components/ui';
+import type { Equipment } from '../store';
 import EditableSelect from '../../../shr/components/EditableSelect';
 import { toFa } from '../../../shr/utils/fa';
 import { CATEGORY_LABELS, EQUIP_LABELS } from '../store';
@@ -16,10 +17,10 @@ export interface HallEquipModalsProps {
   detailNeed: number;
   detailUnit: string;
   detailNeedUnit: string;
-  detailList: any[];
+  detailList: Equipment[];
   detailColor: string;
   openPicker: (c: string) => void;
-  openEdit: (e: any) => void;
+  openEdit: (e: Equipment) => void;
   removeEquip: (id: string, name: string) => void;
   picker: boolean;
   setPicker: (v: boolean) => void;
@@ -34,10 +35,10 @@ export interface HallEquipModalsProps {
   setPickerCap: (v: string) => void;
   saveNewEquip: () => void;
   typesForCategory: (c: string) => string[];
-  equipment: any[];
+  equipment: Equipment[];
   editId: string | null;
   setEditId: (v: string | null) => void;
-  currentEdit: any;
+  currentEdit: Equipment | null | undefined;
   editCount: string;
   setEditCount: (v: string) => void;
   editCap: string;
@@ -166,7 +167,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
               };
             })}
             customKey={'hal.equip.type.' + pickerCat}
-            usageCheck={(name) => equipment.filter((x: any) => x.type === name).length}
+            usageCheck={(name) => equipment.filter((x: Equipment) => x.type === name).length}
           />
         </Field>
 
