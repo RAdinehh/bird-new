@@ -24,7 +24,8 @@ export default [
       'unused-imports/no-unused-vars': ['warn', {
         argsIgnorePattern: '^_|^s$',
         varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_|^err$',
+        ignoreRestSiblings: true,
       }],
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',

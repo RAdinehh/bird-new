@@ -2,6 +2,7 @@
  * api/equipmentCalc.ts — توابع کمکی EquipmentPage
  */
 import { getEquipUnit } from '../equipUnits';
+import type { BirdStandard } from '../../set/standards/types';
 import type { Flock } from '../../flk/store';
 import { CATEGORY_LABELS } from '../store';
 
@@ -70,14 +71,14 @@ export function calcEquipNeed(
   type: string,
   hallId: string,
   flocks: Flock[],
-  breedStd: any, // ReturnType of useBreedStandard
+  breedStd: { byBreedId: (breedId: string | null | undefined) => BirdStandard | null } | null | undefined,
   hallArea: number,
 ): { need: number; unit: string; desc: string } | null {
   // گله فعال این سالن
   const flock = flocks.find((f: Flock) => f.hallId === hallId && f.status === 'active' && !f.paused);
   if (!flock) return null;
 
-  const std = breedStd.byBreedId(flock.breedId);
+  const std = breedStd?.byBreedId(flock.breedId);
   if (!std || !std.equipment) return null;
 
   const count = flock.currentCount || 0;
@@ -143,18 +144,21 @@ export function calcEquipValue(e: { type?: string; count?: number | null; unitPr
 
 
 /** 🆕 پیش‌فرض فیلد ثانویه از استاندارد نژاد — با استفاده از stdKey */
-// std شکل پویا داره — تایپ دقیق نداریم
-export function getStdDefaultForType(type: string, std: any): number | null {
+export function getStdDefaultForType(
+  type: string,
+  std: BirdStandard | null | undefined
+): number | null {
   if (!std?.equipment) return null;
   const def = getEquipUnit(type);
   const key = def.stdKey;
   if (!key) return null;
 
-  const eq = std.equipment;
+  const eq = std.equipment as unknown as Record<string, unknown>;
   // path به‌صورت "drinker.nippleBirdsPerUnit"
   const parts = key.split('.');
   if (parts.length === 2) {
-    const v = eq[parts[0]]?.[parts[1]];
+    const nested = eq[parts[0]] as Record<string, unknown> | undefined;
+    const v = nested?.[parts[1]];
     return typeof v === 'number' ? v : null;
   }
   // top-level مثل lampWattPerM2 یا fanM3PerKg

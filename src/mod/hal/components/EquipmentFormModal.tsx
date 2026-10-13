@@ -2,6 +2,7 @@
  * EquipmentFormModal — فرم افزودن/ویرایش تجهیز
  */
 import { Btn, Field, Grid2, Input, Modal, MoneyField, NumField, Select } from '../../../shr/components/ui';
+import type { BirdStandard } from '../../set/standards/types';
 import type { EquipmentFormData } from '../useEquipmentForm';
 import type { Hall, Zone, Equipment, EquipmentCategory } from '../store';
 import type { Person } from '../../ctc/store';
@@ -29,10 +30,10 @@ export interface EquipmentFormModalProps {
   markAuto: (k: string) => void;
   categoriesForKind?: (k: string) => string[];  // اختیاری — سازگاری
   typesForCategory: (c: string) => string[];
-  equipNeed: any; // ← return of useEquipmentForm
+  equipNeed: { need: number; unit?: string; desc?: string } | null | undefined;
   save: () => void;
   suppliers?: Person[];
-  stdForDefaults?: any; // ← standard shape (dynamic)
+  stdForDefaults?: BirdStandard | null;
 }
 
 export default function EquipmentFormModal(props: EquipmentFormModalProps) {
