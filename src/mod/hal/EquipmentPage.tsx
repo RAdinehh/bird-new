@@ -2,6 +2,9 @@
  * EquipmentPage — تجهیزات
  */
 import { useState, useMemo } from 'react';
+import type { Person } from '../ctc/store';
+import type { Invoice } from '../tra/store';
+import type { Item } from '../whs/store';
 import { categoriesForKind, typesForCategory, calcEquipNeed, calcEquipValue } from './api/equipmentCalc';
 import EquipmentFormModal from './components/EquipmentFormModal';
 import { useEquipmentForm } from './useEquipmentForm';
@@ -39,12 +42,12 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
   const { contacts: allContacts } = useCtc();
-  const supplierNames = useMemo(() => new Map(allContacts.map((c: any) => [c.id, c.name || c.fullName || ''])), [allContacts]);
+  const supplierNames = useMemo(() => new Map(allContacts.map((c: Person) => [c.id, c.name || ''])), [allContacts]);
   const { invoices } = useTra();
   const { items: whsItems } = useWhs();
-  const invoiceNumbers = useMemo(() => new Map(invoices.map((i: any) => [i.id, i.number || '—'])), [invoices]);
-  const whsItemNames = useMemo(() => new Map(whsItems.map((i: any) => [i.id, i.name || ''])), [whsItems]);
-  const suppliers = allContacts.filter((c: any) => (c.roles || []).includes('supplier'));
+  const invoiceNumbers = useMemo(() => new Map(invoices.map((i: Invoice) => [i.id, i.number || '—'])), [invoices]);
+  const whsItemNames = useMemo(() => new Map(whsItems.map((i: Item) => [i.id, i.name || ''])), [whsItems]);
+  const suppliers = allContacts.filter((c: Person) => (c.roles || []).includes('supplier'));
   const { options: allCustomOpts } = useCustomOptions();
   const {
     open, setOpen, form, setForm, draft, err, setErr,
@@ -61,7 +64,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const equipNeed = calcEquipNeed(form.type, form.hallId, flocks || [], breedStd, hallArea);
   // 🆕 استاندارد نژاد سالن انتخاب‌شده
   const selectedBreedStd = __selectedHall?.breedId ? breedStd.byBreedId(__selectedHall.breedId) : null;
-  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ item: Equipment | Equipment[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useFab(active ? { label: 'افزودن تجهیز', onClick: openNew } : null);
@@ -96,15 +99,15 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   // 🆕 برندهای یونیک از تجهیزات
   const brands = useMemo(() => {
     const set = new Set<string>();
-    equipment.forEach((e: any) => { if (e.brand) set.add(e.brand); });
+    equipment.forEach((e: Equipment) => { if (e.brand) set.add(e.brand); });
     return Array.from(set).sort();
   }, [equipment]);
 
   // 🆕 تأمین‌کننده‌ها از مخاطبین
   const supplierList = useMemo(() => {
     return (allContacts || [])
-      .filter((c: any) => (c.roles || []).includes('supplier'))
-      .map((c: any) => ({ id: c.id, name: c.name }));
+      .filter((c: Person) => (c.roles || []).includes('supplier'))
+      .map((c: Person) => ({ id: c.id, name: c.name }));
   }, [allContacts]);
 
   const config = useMemo(
@@ -123,11 +126,11 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
     items: list,
-    getId: (e: any) => e.id,
+    getId: (e: Equipment) => e.id,
     onDelete: async (ids) => {
       const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' تجهیز حذف شوند؟', { danger: true });
       if (!ok) return;
-      const backups: any[] = [];
+      const backups: Equipment[] = [];
       for (const id of ids) {
         const item = equipment.find(x => x.id === id);
         if (!item) continue;
@@ -136,7 +139,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });
-        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+        setTimeout(() => setUndoData((cur) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
       toastMsg.deletedBulk(backups.length, 'تجهیز')
       logAction('delete', 'hal', 'حذف گروهی تجهیزات: ' + backups.length);
@@ -152,10 +155,14 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     const item = undoData;
     if (!item) return;
     try {
-      addEquip(item.item);
-      toastMsg.restored('تجهیز')
+      const items = Array.isArray(item.item) ? item.item : [item.item];
+      items.forEach(e => {
+        const { id, createdAt, updatedAt, ...rest } = e as any;
+        addEquip(rest);
+      });
+      toastMsg.restored(items.length > 1 ? 'تجهیزات' : 'تجهیز');
     } catch (err) {
-      toastMsg.error('بازگردانی ناموفق')
+      toastMsg.error('بازگردانی ناموفق');
     }
     setUndoData(null);
   };
@@ -269,7 +276,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
                 onDelete={deleteEquip}
                 onUndo={(item) => {
                   setUndoData({ item });
-                  setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
+                  setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.item) && cur.item.id === item.id ? null : cur), 6000);
                 }}
                 supplierNames={supplierNames}
                 invoiceNumbers={invoiceNumbers}
