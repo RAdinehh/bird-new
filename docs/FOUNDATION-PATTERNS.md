@@ -418,6 +418,75 @@ std.growth.weightByAge
 
 ---
 
+## ۱۷ — ESLint Safety Pattern
+
+### ۱۷.۱ اصل
+ESLint --fix ابزار قدرتمندیه ولی می‌تونه فایل رو خراب کنه.
+
+### ۱۷.۲ قوانین
+- قبل از --fix: git tag بزن
+- فقط یه ماژول — نه کل پروژه
+- بعد از fix: git diff رو بخون
+- اگه مشکوک: git checkout برگردون
+
+### ۱۷.۳ چرا؟
+ESLint نمی‌فهمه:
+- side-effect import ها
+- re-export ها
+- dynamic imports
+
+### ۱۷.۴ درس واقعی (جلسه ۵)
+ESLint --fix روی set/standards/data-breeds/turkey_goose.ts فایل ۳۰۰+ خط رو ۸ خط کرد.
+راه‌حل: git checkout HEAD -- src/mod/set/
+
+---
+
+## ۱۸ — Type Naming Convention
+
+### ۱۸.۱ اصل
+دو تایپ متفاوت با یه اسم → ممنوع.
+
+### ۱۸.۲ الگو
+| تایپ | نقش | منبع |
+|---|---|---|
+| *Payload | Zod (number) | validation/rules/ |
+| *FormData | Form (string) | useXxxForm.ts |
+
+### ۱۸.۳ چرا؟
+- Form: کاربر تایپ می‌کنه → string
+- Zod: بعد از اعتبارسنجی → number
+- اگه اسم یکسان باشه → تضاد
+
+### ۱۸.۴ مثال
+- export type HallPayload = z.infer<typeof HallSchema>  ✅
+- export interface HallFormData { length: string }  ✅
+- export type HallFormData = z.infer<...>  ❌ تضاد
+
+---
+
+## ۱۹ — DependentSelect Pattern
+
+### ۱۹.۱ اصل
+فیلد آبشاری باید DependentSelect باشه، نه SmartSelect manual.
+
+### ۱۹.۲ چرا؟
+DependentSelect:
+- والد انتخاب نشده → پیام واضح
+- لیست خالیه → پیام راهنما
+- استاندارد Apple HIG / Material 3
+
+### ۱۹.۳ الگو
+<DependentSelect
+  parentValue={form.hallId}
+  parentLabel="سالن"
+  emptyListMessage="این سالن بخشی ندارد"
+/>
+
+### ۱۹.۴ مثال
+EquipmentFormModal: فیلد بخش → DependentSelect (به جای manual)
+
+---
+
 ## 📚 مرجع
 
 - FOUNDATION.md — قوانین اصلی (۱۳ بخش)
