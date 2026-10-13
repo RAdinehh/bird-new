@@ -13,7 +13,7 @@ import { useBrd, type Bird, type Breed } from '../brd/store';
 import { useCtc, type Person } from '../ctc/store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
-import { useFlk, getAgeDays } from '../flk/store';
+import { useFlk, getAgeDays , type Flock} from '../flk/store';
 import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import DatePicker from '../../shr/components/DatePicker';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -49,9 +49,9 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const [open, setOpen] = useState(false);
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [form, setForm] = useState<F>(empty);
-  const draft = useFormDraft('hal-hall', form, (v: any) => setForm(v));
+  const draft = useFormDraft('hal-hall', form, (v: F) => setForm(v));
   const [err, setErr] = useState('');
-  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ item: Hall | Hall[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // 🆕 focus از URL → باز کردن کارت
@@ -107,7 +107,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
     items: halls,
-    getId: (h: any) => h.id,
+    getId: (h: Hall) => h.id,
     onDelete: async (ids: string[]) => {
       let totalZones = 0;
       let totalEquip = 0;
@@ -118,7 +118,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         try {
           const flk = JSON.parse(localStorage.getItem('pm-flk') || '{}');
           const flocks = flk.state?.flocks || flk.flocks || [];
-          if (flocks.some((f: any) => f.hallId === id && f.status === 'active')) hasFlocks++;
+          if (flocks.some((f: Flock) => f.hallId === id && f.status === 'active')) hasFlocks++;
         } catch { /* silent */ }
       }
       let msg = toFa(ids.length) + ' سالن حذف شوند؟';
@@ -133,7 +133,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       }
       const ok = await showConfirmAsync('حذف گروهی', msg, { danger: true });
       if (!ok) return;
-      const backups: any[] = [];
+      const backups: Hall[] = [];
       for (const id of ids) {
         const item = halls.find(h => h.id === id);
         if (!item) continue;
@@ -142,7 +142,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });
-        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+        setTimeout(() => setUndoData((cur) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
       toastMsg.deletedBulk(backups.length, 'سالن')
     },
@@ -154,7 +154,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
 
 
   const setFromStd = (fields: Record<string, string>) => {
-    setForm((f: any) => ({ ...f, ...fields }));
+    setForm((f) => ({ ...f, ...fields }));
     setAutoFields(new Set(Object.keys(fields)));
   };
 
@@ -254,10 +254,14 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     const item = undoData;
     if (!item) return;
     try {
-      addHall(item.item);
-      toastMsg.restored('سالن')
+      const items = Array.isArray(item.item) ? item.item : [item.item];
+      items.forEach(h => {
+        const { id, createdAt, updatedAt, ...rest } = h as any;
+        addHall(rest as any);
+      });
+      toastMsg.restored(items.length > 1 ? 'سالن‌ها' : 'سالن');
     } catch (err) {
-      toastMsg.error('بازگردانی ناموفق')
+      toastMsg.error('بازگردانی ناموفق');
     }
     setUndoData(null);
   };
@@ -333,9 +337,9 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
                 onToggle={() => setExpandedId(isOpen ? null : h.id)}
                 onEdit={() => openEdit(h)}
                 onDelete={deleteHall}
-                onUndo={(item: any) => {
+                onUndo={(item: Hall | Hall[]) => {
                   setUndoData({ item });
-                  setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
+                  setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.item) && !Array.isArray(item) && cur.item.id === item.id ? null : cur), 6000);
                 }}
                 birdNames={birdNames}
                 breedNames={breedNames}
