@@ -99,6 +99,7 @@ export default function HallCard(props: HallCardProps) {
         <Row l="مساحت" v={`${toFa(area.toFixed(1))} م²`} />
         <Row l="حجم" v={`${toFa(volume.toFixed(1))} م³`} />
         <Row l="ظرفیت" v={h.capacity ? `${fmt.int(h.capacity)} پرنده` : '—'} />
+        {litterNeed > 0 && <Row l="بستر مورد نیاز" v={`${fmt.int(Math.round(litterNeed))} کیلوگرم`} />}
       </div>
 
       {(h.birdId || h.breedId || h.responsibleId) && (
