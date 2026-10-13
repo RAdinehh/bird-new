@@ -56,6 +56,7 @@
 
 **قانون:** هیچ `padding: 16` هاردکد. → `padding: var(--sp-5)`.
 **نکته:** media query مقدار `--sp-unit` رو ریسپانسیو می‌کنه.
+**استثنا:** `padding: 0` مجاز ئه — برای دکمه‌های مربعی آیکونی و reset ها.
 
 ### ۱.۳ Radius
 
@@ -145,6 +146,22 @@
 **انواع مجاز:** flock، bird، breed، hall، party، invoice، item، device، log
 **اضافه کردن نوع جدید:** فقط با تأیید کاربر + آپدیت MAP در `EntityLink.tsx`
 
+### ۲.۶ Type Naming Convention 🆕
+
+**قانون:** تایپ‌های Zod با تایپ‌های فرم اشتباه نشن.
+
+| تایپ | نقش | مثال |
+|---|---|---|
+| `*Payload` | داده‌ی Zod (نهایی، `number`) | `HallPayload`, `ZonePayload` |
+| `*FormData` | حالت فرم (ورودی، `string`) | `HallFormData`, `ZoneFormData` |
+
+**مثال:**
+- ✅ `export type HallPayload = z.infer<typeof HallSchema>` (Zod — number)
+- ✅ `export interface HallFormData { length: string }` (Form — string)
+- ❌ `export type HallFormData = z.infer<...>` (تضاد!)
+
+**قانون:** هیچ‌وقت دو تایپ متفاوت با یه اسم نباشن.
+
 ---
 
 ## بخش ۳ — قوانین آهنین
@@ -172,6 +189,9 @@
 - هیچ hook بعد از `return` شرطی
 - `useEffect` بدون dep کامل → ممنوع
 - `any` فقط با comment توضیحی
+- **hint که placeholder رو تکرار می‌کنه → ممنوع**
+- **فرم > ۷ فیلد → تقسیم به بخش‌های تاشو**
+- **Proactive Sweep برای `as any` — نه فقط `: any`**
 
 ### ۳.۴ قوانین Git
 - `.bak`, `.save*` هرگز commit نشن
@@ -183,6 +203,30 @@
 - هر تغییر مهم → `docs/STATUS.md`
 - false positive گزارش خودکار → علامت‌گذاری در `HANDOFF.md`
 - استثنا معماری → `ARCHITECTURE.md` با دلیل و تاریخ
+
+### ۳.۶ ESLint + ابزارها 🆕
+
+**قبل از `eslint --fix`:**
+1. **`git tag before-eslint-fix-YYYYMMDD`** ← همیشه
+2. **فقط یه ماژول** — نه کل پروژه
+3. **بعد از fix:** `git diff` رو بخون
+4. **اگه مشکوک:** `git checkout` برگردون
+
+**قوانین ESLint پروژه (`eslint.config.js`):**
+- `unused-imports/no-unused-imports: error` (auto-fix)
+- `unused-imports/no-unused-vars: warn` (بدون auto-fix)
+- `@typescript-eslint/no-explicit-any: warn`
+- `prefer-const: error`
+
+**⚠️ هشدار:** ESLint `--fix` روی فایل‌های بزرگ خطرناکه (مثال: `set/store.ts` رو خالی کرد → rollback).
+
+**ابزارهای پروژه:**
+| ابزار | کار |
+|---|---|
+| `scripts/check-any.py` | چک `any` قبل از commit |
+| `docs/TYPE-REGISTRY.md` | جدول تایپ‌ها |
+| `.github/workflows/ci.yml` | CI خودکار (tsc + test + build) |
+| `chk` (alias) | چک سریع any |
 
 ---
 ---
