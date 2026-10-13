@@ -4,7 +4,7 @@
 import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
-import { Row, RowWithStatus, isFanLike, isLampLike, LITTER_KG_PER_M2 } from '../helpers';
+import { Row, RowWithStatus, isFanLike, isLampLike } from '../helpers';
 import { getAgeDays, type Flock } from '../../flk/store';
 import type { Hall, Zone, Equipment } from '../store';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -60,8 +60,6 @@ export default function HallCard(props: HallCardProps) {
   const lightIcon = lux === 0 ? '—' : lux >= 30 ? '☀️' : lux >= 20 ? '🥚' : lux >= 10 ? '🐣' : '🌙';
 
   const realCapacity = area > 0 && h.breedId ? Math.floor(area * 9) : null;
-  const litterKey = h.litterType && h.litterType !== 'none' ? h.litterType : null;
-  const litterNeed = area > 0 && litterKey ? area * (LITTER_KG_PER_M2[litterKey] || 0) : 0;
   const hallFlocks = (flocks || []).filter((f: Flock) => f.hallId === h.id && f.status === 'active');
   const totalBirds = hallFlocks.reduce((sum: number, f: Flock) => sum + (f.currentCount || f.initialCount || 0), 0);
   const activeFlock = hallFlocks[0];
