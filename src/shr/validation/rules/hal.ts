@@ -83,6 +83,6 @@ export const EquipmentSchema = z.object({
   notes: optionalStr(500),
 });
 
-export type HallFormData = z.infer<ReturnType<typeof createHallSchema>>;
-export type ZoneFormData = z.infer<typeof ZoneSchema>;
-export type EquipmentFormData = z.infer<typeof EquipmentSchema>;
+export type HallPayload = z.infer<ReturnType<typeof createHallSchema>>;
+export type ZonePayload = z.infer<typeof ZoneSchema>;
+export type EquipmentPayload = z.infer<typeof EquipmentSchema>;

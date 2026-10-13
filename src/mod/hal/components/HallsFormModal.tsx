@@ -2,7 +2,7 @@
  * HallsFormModal — فرم افزودن/ویرایش سالن
  */
 import { useState } from 'react';
-import { type F } from '../_hallsHelpers';
+import { type HallFormData } from '../_hallsHelpers';
 import type { Bird, Breed } from '../../brd/store';
 import type { Person } from '../../ctc/store';
 import { useTempUnit } from '../../../shr/utils/temp';
@@ -136,8 +136,8 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom, error, n
 export interface HallsFormModalProps {
   open: boolean;
   setOpen: (v: boolean) => void;
-  form: F;
-  setForm: React.Dispatch<React.SetStateAction<F>>;
+  form: HallFormData;
+  setForm: React.Dispatch<React.SetStateAction<HallFormData>>;
   err: string;
   vErrors: Record<string, string>;
   birds: Bird[];
@@ -285,7 +285,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 const density = std.space?.densityMax;
                 const cap = area > 0 && density ? Math.floor(area * density) : null;
                 const env = std.env?.[0];
-                const patch: Partial<F> = {};
+                const patch: Partial<HallFormData> = {};
                 if (cap) patch.capacity = String(cap);
                 if (env?.temp?.target != null) patch.targetTemp = String(env.temp.target);
                 if (env?.humidity?.min != null) patch.targetHumidity = String(env.humidity.min);

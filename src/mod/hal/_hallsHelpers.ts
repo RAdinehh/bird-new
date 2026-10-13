@@ -2,7 +2,7 @@
  * _hallsHelpers.ts — تایپ‌ها و توابع کمکی HallsPage
  */
 
-export interface F {
+export interface HallFormData {
   id?: string;
   name: string; code: string;
   length: string; width: string; height: string;
@@ -14,7 +14,7 @@ export interface F {
   birdId: string; breedId: string;
 }
 
-export const empty: F = {
+export const empty: HallFormData = {
   name:'', code:'', length:'', width:'', height:'',
   capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'',
   ventilationSystem:'', feederType:'', drinkerType:'', litterType:'',
