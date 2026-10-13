@@ -2,6 +2,7 @@
  * ZonesPage — بخش‌های سالن
  */
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { useUrlFilter } from '../../shr/hooks/useUrlFilter';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { ZoneSchema } from '../../shr/validation/rules/hal';
@@ -175,6 +176,17 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     persistKey: config.persistKey,
     initialSort: config.initialSort,
   });
+
+  // 🆕 URL filter برای سالن (?hall=xxx)
+  const [urlHall, setUrlHall] = useUrlFilter('hall', '');
+  useEffect(() => {
+    if (urlHall) setFilter('hallId', urlHall);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlHall]);
+  useEffect(() => {
+    setUrlHall(typeof filters.hallId === 'string' ? filters.hallId : '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.hallId]);
 
   // 🆕 گله‌های هر بخش
   const flocksByZone = useMemo(() => {

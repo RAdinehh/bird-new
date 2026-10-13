@@ -44,7 +44,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
         footer={<div style={{ display: "flex", gap: 6 }}><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
         <Grid2>
-          <Field label="سالن" required>
+          <Field label="سالن" required hint="سالنی که تجهیز در آن نصب می‌شود">
             <SmartSelect
               value={form.hallId}
               onChange={v => setForm((f) => ({ ...f, hallId: v, zoneId: '' }))}
@@ -55,7 +55,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             />
           </Field>
           {form.hallId && zones.filter((z: Zone) => z.hallId === form.hallId).length > 0 && (
-            <Field label="بخش (اختیاری)">
+            <Field label="بخش (اختیاری)" hint="بخش خاص داخل سالن">
               <SmartSelect
                 value={form.zoneId || ''}
                 onChange={v => setForm((f) => ({ ...f, zoneId: v }))}
@@ -70,7 +70,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
         </Grid2>
 
         <Grid2>
-          <Field label="دسته" required>
+          <Field label="دسته" required hint="دسته‌بندی تجهیز — تهویه، گرمایش، ...">
             <SmartSelect
               value={form.category || 'auxiliary'}
               onChange={(cat: string) => {
@@ -123,7 +123,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
         </Grid2>
 
         <Grid2>
-          <Field label="نام تجهیز" required>
+          <Field label="نام تجهیز" required hint="مثلاً — فن سقفی، هیتر">
             <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
           </Field>
           <Field label="برند" hint="مثلاً — پارس، ستاره، آکو">
@@ -150,7 +150,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           return (
             <>
               <Grid2>
-                <Field label="تعداد">
+                <Field label="تعداد" hint="تعداد این تجهیز در سالن">
                   <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={0} max={100000} autoClamp />
                   {vErrors.count && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 3 }}>⚠ {vErrors.count}</div>}
                 </Field>
