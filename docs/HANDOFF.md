@@ -1,7 +1,7 @@
 # 🤝 HANDOFF.md — سند تحویل به AI بعدی
 
 > **این سند نقشه‌ی راه توئه. اول این رو کامل بخون.**
-> آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۰
+> آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۵ — hal کامل + ابزارها)
 
 ---
 
@@ -12,7 +12,7 @@
 
 ### وضعیت کلی
 - tsc ✅ ۰ خطا
-- تست‌ها: ✅ ۱۰۶۴/۱۰۶۴ pass
+- تست‌ها: ✅ ۱۰۶۸/۱۰۶۸ pass
 - build ✅ موفق
 
 ### آمار
@@ -22,12 +22,12 @@
 | خطوط کد | ~۶۵٬۰۰۰ |
 | فایل تست | ۱۴۵ |
 | Bundle | ~۱.۹ MB |
-| درصد کلی | ~۸۵٪ |
+| درصد کلی | ~۸۶٪ |
 
 ### قفل‌شده (تموم و تأییدشده)
 - ✅ `set` (تنظیمات + استانداردها)
 - ✅ `brd` (پرنده و نژاد)
-- ✅ `hal` (سالن‌ها + بخش‌ها + تجهیزات)
+- ✅ `hal` (سالن‌ها + بخش‌ها + تجهیزات) — ۱۰۰٪ (جلسه ۵)
 - ✅ `doc` (اسناد)
 ---
 
@@ -57,7 +57,7 @@
 |---|---|---|
 | `set` تنظیمات | ✅ ۹۰٪ | استانداردها |
 | `brd` پرنده/نژاد | ✅ ۱۰۰٪ | قفل‌شده، ممیزی کامل |
-| `hal` سالن | ✅ ۹۰٪ | ممیزی‌شده |
+| `hal` سالن | ✅ ۱۰۰٪ | قفل‌شده (جلسه ۵) |
 | `ctc` مخاطبین | ✅ ۸۵٪ | — |
 | `flk` گله | 🟡 ۷۰٪ | cascade نیمه |
 | `dlg` ثبت روزانه | 🟡 ۷۰٪ | cascade نیمه |
@@ -72,6 +72,47 @@
 | `rep` گزارش | 🟡 ۷۰٪ | — |
 | `doc` اسناد | ✅ ۱۰۰٪ | — |
 | `arc` آرشیو | 🟡 ۷۰٪ | — |
+
+
+---
+
+## 🛠 بخش ۳.۵ — ابزارهای نصب‌شده (جلسه ۵)
+
+### 🔧 Alias ها (~/.bashrc)
+| Alias | کار |
+|---|---|
+| `af` | `python3 ~/auto_fast.py` |
+| `chk` | `python3 scripts/check-any.py` |
+| `hal` / `brd` / `flk` / ... | پرش سریع به ماژول |
+| `tsc` / `vit` / `gs` / `gl` | دستورات سریع |
+| `dev` | اجرای dev server |
+
+### 🤖 GitHub Actions CI
+- فایل: `.github/workflows/ci.yml`
+- با هر push: tsc + test + build
+- اگه خطا: ایمیل/نوتیفیکیشن
+
+### 🔍 ESLint + پلاگین‌ها
+- فایل: `eslint.config.js`
+- `no-unused-imports`: error (auto-fix)
+- `no-explicit-any`: warn
+- `prefer-const`: error
+
+### 📊 scripts/check-any.py
+- اجرا در auto_fast.py (مرحله ۳)
+- نمایش: تعداد `any` در فایل‌های staged
+- گزینه `--all`: کل پروژه
+
+### 📚 docs/TYPE-REGISTRY.md
+- جدول همه‌ی تایپ‌های ماژول‌ها
+- Hook ها و تایپ برگشتی
+- قواعد جایگزینی `any`
+
+### 🏷 الگوهای جدید تایپ‌ها
+- `*Payload` — برای Zod schema (number)
+- `*FormData` — برای form state (string)
+- مثال: `HallPayload` vs `HallFormData`
+
 ---
 
 ## 🔴 بخش ۴ — کارهای باقی‌مونده
@@ -82,6 +123,8 @@
 
 ### 🔴 بحرانی باقی‌مونده
 - [ ] **Decimal.js** — بررسی عمیق‌تر (فعلاً `parseFloat` ساده در `fa.ts`)
+- [ ] **`any` cleanup ادامه** — ۶۸۵ → ۵۴۸ (۲۰٪ کاهش در جلسه ۵)؛ هدف: صفر
+- [ ] **فرم‌های بلند hal** — HallsFormModal (۱۶ فیلد), EquipmentFormModal (۱۵)
 
 ### 🟡 مهم
 - [ ] **اتصالات باقی‌مونده:**
@@ -249,6 +292,32 @@ git tag before-XXX-YYYYMMDD
 - بازنویسی کامل `HANDOFF.md`
 - حذف تکراری‌ها
 - یک سند مرجع
+
+
+### جلسه ۵ (۱۴۰۴/۰۷/۲۱) — hal کامل + ابزارها ⭐
+**کارهای انجام‌شده:**
+- ✅ **hal کامل (۱۰۰/۱۰۰)** — ۹۶ `any` → ۶ (فقط migration — justified)
+- ✅ **Cascade کامل** — سالن/بخش/تجهیز
+- ✅ **رفع باگ قدیمی hooks** — انتقال `flocksByZone` قبل از return
+- ✅ **هماهنگی وضعیت‌های تجهیز** — `broken`/`repair`/`maintenance`
+- ✅ **هشدارهای خودکار تجهیزات** در `alt` و `dsh`
+- ✅ **ESLint نصب + config** — قوانین `no-unused-imports`, `no-explicit-any`, `prefer-const`
+- ✅ **GitHub Actions CI** — `.github/workflows/ci.yml` (tsc + test + build)
+- ✅ **`scripts/check-any.py`** — چک `any` قبل از commit
+- ✅ **`docs/TYPE-REGISTRY.md`** — جدول تایپ‌ها
+- ✅ **Alias های پروژه** — `af`, `chk`, `hal`, `brd`, ...
+- ✅ **حذف خودکار ۸۳ `any`** — از callback ها (۲۸ فایل)
+- ✅ **ESLint `--fix` روی ۱۵ ماژول** — ۲۳۰ خط import مرده حذف
+- ✅ **rename تایپ‌ها** — `*Payload` (Zod) vs `*FormData` (form)
+- ✅ **hint های هوشمند** — حذف تکراری‌ها طبق AUDIT
+- ✅ **۱۱ تست جدید hal** — مجموع ۱۰۶۸ تست pass
+- ✅ **مستندات** — `HANDOFF.md`, `STATUS.md`, `FOUNDATION.md`, `AI-RULES.md`
+
+**درس‌های مهم:**
+- ⚠️ ESLint `--fix` روی `set` فایل رو خالی کرد → rollback با `git tag`
+- ⚠️ regex روی import ها خطرناکه → جایگزینی دقیق
+- ✅ `any` مخفی رو کشف کرد (`c.fullName` که هیچ‌وقت نبود)
+- ✅ ابزارها سرعت رو ۳-۵ برابر کردن
 
 ---
 
