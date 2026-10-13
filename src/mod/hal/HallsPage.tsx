@@ -1,7 +1,7 @@
 /**
  * HallsPage — سالن‌ها
  */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import HallCard from './components/HallCard';
 import HallsFormModal from './components/HallsFormModal';
 import { useFab } from '../../shr/hooks/useFab';
@@ -63,7 +63,7 @@ function calcSuggestedCapacity(length: number | null, width: number | null, dens
 export default function HallsPage({ active = true }: { active?: boolean } = {}) {
   const { halls: _hallsRaw, zones, equipment, addHall, updateHall, deleteHall } = useHal();
   const breedStd = useBreedStandard();
-  const { flocks } = useFlk();
+  const { flocks, update: updateFlock } = useFlk();
   const { breeds, birds } = useBrd();
   const { contacts: allContacts } = useCtc();
   const workers = allContacts.filter((c: any) => (c.roles || []).includes('worker'));
@@ -83,6 +83,28 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   useEffect(() => {
     if (focusId) setExpandedId(focusId);
   }, [focusId]);
+
+  /** 🆕 وقتی سالنی حذف می‌شه، گله‌های یتیم رو آزاد کن */
+  const prevHallIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const currentIds = new Set(_hallsRaw.map((h: any) => h.id));
+    const prevIds = prevHallIdsRef.current;
+
+    if (prevIds.size > 0) {
+      const removedIds: string[] = [];
+      prevIds.forEach(id => { if (!currentIds.has(id)) removedIds.push(id); });
+
+      if (removedIds.length > 0) {
+        removedIds.forEach(hallId => {
+          flocks.filter((f: any) => f.hallId === hallId).forEach((f: any) => {
+            try { updateFlock(f.id, { hallId: '', zoneId: '' }); } catch {}
+          });
+        });
+      }
+    }
+
+    prevHallIdsRef.current = currentIds;
+  }, [_hallsRaw, flocks, updateFlock]);
   const tempUnit = useTempUnit();
   const __breedStd = form.breedId ? breedStd.byBreedId(form.breedId) : null;
   const __suggestedCap = calcSuggestedCapacity(

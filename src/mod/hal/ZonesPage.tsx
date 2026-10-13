@@ -177,6 +177,18 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     initialSort: config.initialSort,
   });
 
+  // 🆕 گله‌های هر بخش
+  const flocksByZone = useMemo(() => {
+    const m = new Map<string, any[]>();
+    for (const f of flocks as any[]) {
+      if (!f.zoneId) continue;
+      const arr = m.get(f.zoneId) || [];
+      arr.push(f);
+      m.set(f.zoneId, arr);
+    }
+    return m;
+  }, [flocks]);
+
   if (halls.length === 0) {
     return (
       <PageContainer>
@@ -218,18 +230,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     draft.clear();
     setOpen(false);
   };
-
-  // 🆕 گله‌های هر بخش
-  const flocksByZone = useMemo(() => {
-    const m = new Map<string, any[]>();
-    for (const f of flocks as any[]) {
-      if (!f.zoneId) continue;
-      const arr = m.get(f.zoneId) || [];
-      arr.push(f);
-      m.set(f.zoneId, arr);
-    }
-    return m;
-  }, [flocks]);
 
   return (
     <PageContainer>
