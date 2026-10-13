@@ -11,7 +11,13 @@
 
 ## 🤖 بخش ۲ — قوانین طلایی AI
 
-### ✅ باید بکنه
+### ✅ باید بکنه (آپدیت جلسه ۵)
+- قبل از eslint --fix: git tag بزن
+- Proactive Sweep: نه فقط any — as any هم چک شه
+- تایپ‌ها: *Payload (Zod) vs *FormData (form)
+- فرم > ۷ فیلد → تقسیم به بخش تاشو
+
+### ✅ باید بکنه (اصلی)
 1. **قبل از هر تغییر، فایل واقعی رو ببینه** (نه حدس)
 2. **قبل از هر کاری، استانداردها رو مرور کنه** و به کاربر بگه داره چیکار می‌کنه
 3. **یه تغییر در هر مرحله**
@@ -43,6 +49,18 @@
 - قبل از هر تغییر بگو «طبق کدوم استاندارد داری چیکار می‌کنی»
 
 ## 🛠️ بخش ۳ — دستورات مهم
+
+### Alias های پروژه (~/.bashrc)
+
+| Alias | کار |
+|---|---|
+| af | کامیت + push |
+| chk | چک any |
+| hal / brd / flk | پرش به ماژول |
+| tsc / vit | tsc / vitest |
+| gs / gl / gd | git |
+| dev | dev server |
+
 
 cd ~/Bird-new
 
@@ -185,6 +203,34 @@ cor/
 **هدف نهایی:** نرم‌افزار جامع مدیریت مرغداری در سطح استورهای اپل و گوگل.
 
 **موفق باشی! 🚀**
+
+---
+
+## بخش ۱۰ — پروتکل ESLint fix
+
+قبل از eslint --fix:
+1. git tag before-eslint-fix-YYYYMMDD
+2. فقط یه ماژول: npx eslint src/mod/xxx/ --fix
+3. git diff رو بخون
+4. npx tsc --noEmit
+5. اگه OK → کامیت
+6. اگه مشکوک → git checkout HEAD -- src/mod/xxx/
+
+هشدار: فایل‌های بزرگ (set/store.ts) → ممکنه خالی کنه. مثال واقعی: turkey_goose.ts ۳۰۰ خط → ۸ خط.
+
+## بخش ۱۱ — Type Naming Convention
+
+دو تایپ متفاوت با یه اسم → ممنوع!
+
+| تایپ | نقش | مثال |
+|---|---|---|
+| *Payload | Zod (number) | HallPayload |
+| *FormData | Form (string) | HallFormData |
+
+قانون:
+- export type HallPayload = z.infer<...>  ✅
+- export interface HallFormData { length: string }  ✅
+- export type HallFormData = z.infer<...>  ❌ تضاد
 
 ---
 
