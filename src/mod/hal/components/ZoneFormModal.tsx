@@ -45,7 +45,7 @@ export default function ZoneFormModal({
         </BtnRow>
       }
     >
-      <Field label="سالن" required hint="بخشی که داخل این سالن تعریف می‌شود">
+      <Field label="سالن" required hint="سالنی که این بخش داخلش تعریف می‌شود">
         <SmartSelect
           value={form.hallId}
           onChange={v => setForm((f) => ({ ...f, hallId: v }))}
@@ -80,7 +80,7 @@ export default function ZoneFormModal({
       })()}
 
       <Grid2>
-        <Field label="نام بخش" required hint="مثلاً بخش شمالی، بخش A">
+        <Field label="نام بخش" required>
           <Input
             placeholder="مثلاً — بخش A"
             value={form.name}
@@ -109,7 +109,7 @@ export default function ZoneFormModal({
         </Field>
       </Grid2>
 
-      <Field label="یادداشت" hint="توضیحات اختیاری">
+      <Field label="یادداشت">
         <Textarea
           placeholder="..."
           value={form.notes}

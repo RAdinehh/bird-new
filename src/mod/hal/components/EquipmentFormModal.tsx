@@ -125,16 +125,16 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
         </Grid2>
 
         <Grid2>
-          <Field label="نام تجهیز" required hint="مثلاً — فن سقفی، هیتر">
+          <Field label="نام تجهیز" required>
             <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
           </Field>
-          <Field label="برند" hint="مثلاً — پارس، ستاره، آکو">
+          <Field label="برند">
             <Input placeholder="پارس" value={form.brand || ''} onChange={e => setForm({...form, brand: e.target.value})} />
           </Field>
         </Grid2>
 
         {(suppliers && suppliers.length > 0) && (
-          <Field label="تأمین‌کننده" hint="فروشنده‌ی این تجهیز">
+          <Field label="تأمین‌کننده">
             <SmartSelect
               value={form.supplierId || ''}
               onChange={v => setForm({...form, supplierId: v})}
@@ -152,7 +152,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           return (
             <>
               <Grid2>
-                <Field label="تعداد" hint="تعداد این تجهیز در سالن">
+                <Field label="تعداد">
                   <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={0} max={100000} autoClamp />
                   {vErrors.count && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 3 }}>⚠ {vErrors.count}</div>}
                 </Field>
