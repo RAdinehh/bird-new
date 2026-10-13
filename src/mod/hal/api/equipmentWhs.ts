@@ -4,6 +4,20 @@
 import { useWhs } from '../../whs/store';
 import type { Equipment } from '../store';
 
+/**
+ * نگاشت وضعیت hal → whs
+ */
+function mapEquipmentStatus(halStatus?: string): string {
+  switch (halStatus) {
+    case 'broken':      return 'broken';
+    case 'maintenance': return 'maintenance';
+    case 'repairing':   return 'repair';
+    case 'retired':     return 'scrapped';
+    case 'active':      return 'active';
+    default:            return 'active';
+  }
+}
+
 /** نگاشت واحد تجهیز → واحد انبار */
 function mapUnit(u: string): 'pcs' | 'kg' | 'L' {
   if (u === 'kg') return 'kg';
@@ -50,7 +64,7 @@ export function ensureWhsItem(eq: Equipment): string {
       purchaseDate: eq.purchasedAt || '',
       purchasePrice: (eq.count || 0) * (eq.unitPrice || 0),
       hallId: eq.hallId,
-      equipmentStatus: eq.status || 'active',
+      equipmentStatus: mapEquipmentStatus(eq.status),
       warrantyUntil: warrantyUntil(eq.purchasedAt, eq.warranty),
     });
     return id;
@@ -70,7 +84,7 @@ export function syncWhsItem(eq: Equipment): void {
     whs.updateItem(eq.warehouseItemId, {
       name: eq.name,
       supplierId: eq.supplierId || '',
-      equipmentStatus: eq.status || 'active',
+      equipmentStatus: mapEquipmentStatus(eq.status),
       hallId: eq.hallId,
     });
   } catch (err) {

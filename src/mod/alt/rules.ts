@@ -124,8 +124,20 @@ export function detectAllAlerts(): RuleAlert[] {
           });
         }
       }
-      // ─── تجهیز در حال تعمیر ───
-      if (eq.equipmentStatus === 'repair') {
+      // ─── تجهیز خراب (بحرانی) ───
+      if (eq.equipmentStatus === 'broken') {
+        alerts.push({
+          level: 'critical',
+          category: 'other',
+          title: 'تجهیز خراب: ' + item.name,
+          message: 'این تجهیز خراب است — هرچه سریع‌تر بررسی کنید.',
+          source: 'whs',
+          sourceId: item.id + ':equip-broken',
+          date: today(), notes: ''
+        });
+      }
+      // ─── تجهیز در حال تعمیر (شامل هر دو مقدار) ───
+      if (eq.equipmentStatus === 'repair' || eq.equipmentStatus === 'repairing') {
         alerts.push({
           level: 'important',
           category: 'other',
@@ -133,6 +145,18 @@ export function detectAllAlerts(): RuleAlert[] {
           message: 'این تجهیز در حال تعمیر است — پیگیری کنید.',
           source: 'whs',
           sourceId: item.id + ':equip-repair',
+          date: today(), notes: ''
+        });
+      }
+      // ─── نیاز به سرویس ───
+      if (eq.equipmentStatus === 'maintenance') {
+        alerts.push({
+          level: 'important',
+          category: 'other',
+          title: 'نیاز به سرویس: ' + item.name,
+          message: 'این تجهیز نیاز به سرویس دارد.',
+          source: 'whs',
+          sourceId: item.id + ':equip-maintenance',
           date: today(), notes: ''
         });
       }

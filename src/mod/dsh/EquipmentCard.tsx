@@ -20,7 +20,7 @@ export default function EquipmentCard({ nav }: Props) {
 
   const stats = useMemo(() => {
     let totalValue = 0;
-    let active = 0, repair = 0, scrapped = 0;
+    let active = 0, repair = 0, scrapped = 0, broken = 0;
     let warrantySoon = 0;
     const byHall: Record<string, { count: number; value: number }> = {};
 
@@ -29,8 +29,9 @@ export default function EquipmentCard({ nav }: Props) {
       const v = (eq.purchasePrice || 0);
       totalValue += v;
       const st = eq.equipmentStatus || 'active';
-      if (st === 'repair') repair++;
-      else if (st === 'scrapped') scrapped++;
+      if (st === 'broken') broken++;
+      else if (st === 'repair' || st === 'repairing' || st === 'maintenance') repair++;
+      else if (st === 'scrapped' || st === 'retired') scrapped++;
       else active++;
 
       if (eq.warrantyUntil) {
@@ -51,7 +52,7 @@ export default function EquipmentCard({ nav }: Props) {
       byHall[hallId].value += v;
     });
 
-    return { totalValue, active, repair, scrapped, warrantySoon, byHall, total: equipment.length };
+    return { totalValue, active, repair, scrapped, broken, warrantySoon, byHall, total: equipment.length };
   }, [equipment]);
 
   if (equipment.length === 0) {
@@ -95,6 +96,16 @@ export default function EquipmentCard({ nav }: Props) {
         <MiniStat label="🔧 تعمیر" value={stats.repair} suffix="" color="warn" />
         <MiniStat label="❌ اسقاط" value={stats.scrapped} suffix="" color="danger" />
       </div>
+
+      {stats.broken > 0 && (
+        <div style={{
+          marginTop: 8, padding: '8px 12px', background: 'var(--danger-soft)',
+          color: 'var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)',
+          fontWeight: 700, textAlign: 'center',
+        }}>
+          🔴 {toFa(stats.broken)} تجهیز خراب — بررسی کنید
+        </div>
+      )}
 
       {stats.warrantySoon > 0 && (
         <div style={{
