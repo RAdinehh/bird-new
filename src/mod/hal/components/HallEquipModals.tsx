@@ -122,7 +122,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
                     <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</div>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1, display: 'flex', gap: 8 }}>
                       {e.count != null && <span>× {toFa(e.count)}</span>}
-                      {(e as any).capacity != null && <span>{toFa((e as any).capacity)}{detailUnit === 'm³/h' ? ' m³/h' : detailUnit === 'W' ? ' W' : ''}</span>}
+                      {e.capacity != null && <span>{toFa(e.capacity)}{detailUnit === 'm³/h' ? ' m³/h' : detailUnit === 'W' ? ' W' : ''}</span>}
                     </div>
                   </div>
                   <button type="button" onClick={() => openEdit(e)} aria-label="ویرایش" style={{

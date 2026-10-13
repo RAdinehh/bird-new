@@ -126,13 +126,13 @@ export function calcEquipNeed(
   return null;
 }
 
-export function calcEquipValue(e: { type?: string; count?: number | null; unitPrice?: number | null; purchasePrice?: number | null }): number {
+export function calcEquipValue(e: { type?: string; count?: number | null; unitPrice?: number | null; purchasePrice?: number | null; capacity?: number | null }): number {
   const count = e.count || 0;
   const price = e.unitPrice || 0;
   if (!count || !price) return 0;
   const def = getEquipUnit(e.type || 'other');
   if (def.baseUnit === 'kg') {
-    const base = def.calc(count, (e as any).capacity || 0);
+    const base = def.calc(count, e.capacity || 0);
     return Math.round(base * price);
   }
   return count * price;

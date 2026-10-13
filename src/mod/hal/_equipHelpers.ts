@@ -43,8 +43,8 @@ export function calcInstalled(cat: string, list: Equipment[]): number {
   return list.reduce((a, e) => {
     const def = getEquipUnit(e.type);
     const primary = e.count || 0;
-    const secondary = (e as any).capacity != null
-      ? (e as any).capacity
+    const secondary = e.capacity != null
+      ? e.capacity
       : (def.secondary?.defaultValue || 0);
     return a + def.calc(primary, secondary);
   }, 0);

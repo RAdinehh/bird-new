@@ -42,8 +42,8 @@ export default function HallCard(props: HallCardProps) {
   const equipCount = equipment.filter(e => e.hallId === h.id).length;
   const equipValue = equipment.filter(e => e.hallId === h.id).reduce((a, e) => a + ((e.count || 0) * (e.unitPrice || 0)), 0);
   const hallEquips = equipment.filter(e => e.hallId === h.id);
-  const totalAirflow = hallEquips.filter(e => isFanLike(e.type)).reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
-  const totalLightW = hallEquips.filter(e => isLampLike(e.type)).reduce((a, e) => a + ((e.count || 0) * ((e as any).capacity || 0)), 0);
+  const totalAirflow = hallEquips.filter(e => isFanLike(e.type)).reduce((a, e) => a + ((e.count || 0) * (e.capacity || 0)), 0);
+  const totalLightW = hallEquips.filter(e => isLampLike(e.type)).reduce((a, e) => a + ((e.count || 0) * (e.capacity || 0)), 0);
 
   const airChanges = volume > 0 && totalAirflow > 0 ? totalAirflow / volume : 0;
   const airAdvice = airChanges === 0 ? 'فنی ثبت نشده'

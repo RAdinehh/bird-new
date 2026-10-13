@@ -3,7 +3,6 @@
  */
 import { useState } from 'react';
 import { type F } from '../_hallsHelpers';
-import { AccordionSection } from '../../../shr/components/AccordionSection';
 import type { Bird, Breed } from '../../brd/store';
 import type { Person } from '../../ctc/store';
 import { useTempUnit } from '../../../shr/utils/temp';
@@ -181,37 +180,32 @@ export default function HallsFormModal(props: HallsFormModalProps) {
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
-        <AccordionSection icon="📍" title="اطلاعات پایه">
-          <Grid2>
-            <Field label="نام سالن" required error={vErrors.name}>
-              <Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
-            </Field>
-            <Field label="وضعیت سالن">
-              <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
-                <option value="active">🟢 فعال</option>
-                <option value="empty">⚪ خالی</option>
-                <option value="sanitizing">🟡 ضدعفونی</option>
-                <option value="maintenance">🔴 تعمیر</option>
-                <option value="inactive">⚫ غیرفعال</option>
-              </Select>
-            </Field>
-          </Grid2>
-          {(workers && workers.length > 0) && (
-            <Field label="مسئول سالن" hint="کارگر مسئول این سالن">
-              <SmartSelect
-                value={form.responsibleId || ''}
-                onChange={v => setForm({...form, responsibleId: v})}
-                options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
-                placeholder="— انتخاب کنید —"
-                modalTitle="انتخاب مسئول"
-                autoThreshold={6}
-              />
-            </Field>
-          )}
-        </AccordionSection>
+        <Grid2>
+          <Field label="نام سالن" required error={vErrors.name}><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
+          <Field label="وضعیت سالن">
+            <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
+              <option value="active">🟢 فعال</option>
+              <option value="empty">⚪ خالی</option>
+              <option value="sanitizing">🟡 ضدعفونی</option>
+              <option value="maintenance">🔴 تعمیر</option>
+              <option value="inactive">⚫ غیرفعال</option>
+            </Select>
+          </Field>
+        </Grid2>
 
-        <AccordionSection icon="🐔" title="پرنده و نژاد" summary={form.birdId ? (birds.find(b => b.id === form.birdId)?.name || 'انتخاب شده') : 'انتخاب نشده'}>
-          <Grid2>
+        {(workers && workers.length > 0) && (
+          <Field label="مسئول سالن" hint="کارگر مسئول این سالن">
+            <SmartSelect
+              value={form.responsibleId || ''}
+              onChange={v => setForm({...form, responsibleId: v})}
+              options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب مسئول"
+              autoThreshold={6}
+            />
+          </Field>
+        )}
+        <Grid2>
             <Field label="پرنده">
               <SmartSelect
                 value={form.birdId || ''}
@@ -234,49 +228,53 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 modalTitle="انتخاب نژاد"
               />
             </Field>
-          </Grid2>
-        </AccordionSection>
-
-        <AccordionSection
-          icon="📐"
-          title="ابعاد و ظرفیت"
-          defaultOpen={false}
-          summary={form.length && form.width ? `${toFa(form.length)}×${toFa(form.width)} متر` : 'تعریف نشده'}
-        >
-          <Grid3>
-            <Field label="طول" error={vErrors.length}><NumField placeholder="۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} autoClamp /></Field>
-            <Field label="عرض" error={vErrors.width}><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} autoClamp /></Field>
-            <Field label="ارتفاع" error={vErrors.height}><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} autoClamp /></Field>
-          </Grid3>
-          <Grid2>
-            <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity}>
-              <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
-            </Field>
-            {(() => {
-              const std = form.breedId ? breedStd.byBreedId(form.breedId) : null;
-              const density = std?.space?.densityMax;
-              const L = parseFloat(toEn(form.length)) || 0;
-              const W = parseFloat(toEn(form.width)) || 0;
-              const area = L * W;
-              if (!(area > 0 && density)) return <div />;
-              const cap = Math.floor(area * density);
-              return (
-                <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                  <div dir="ltr" style={{
-                    width: '100%', padding: '0 10px', height: 38,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'var(--input-bg)', border: '1px dashed var(--border)',
-                    borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)',
-                    color: 'var(--muted)', fontVariantNumeric: 'tabular-nums',
-                    fontWeight: 600, whiteSpace: 'nowrap',
-                  }}>
-                    {toFa(area)} × {toFa(density)} = {toFa(cap)}
+        </Grid2>
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
+        <Grid3>
+          <Field label="طول" error={vErrors.length}><NumField placeholder="۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} autoClamp /></Field>
+          <Field label="عرض" error={vErrors.width}><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} autoClamp /></Field>
+          <Field label="ارتفاع" error={vErrors.height}><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} autoClamp /></Field>
+        </Grid3>
+        <Grid2>
+              <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity}>
+                <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
+              </Field>
+              {(() => {
+                const std = form.breedId ? breedStd.byBreedId(form.breedId) : null;
+                const density = std?.space?.densityMax;
+                const L = parseFloat(toEn(form.length)) || 0;
+                const W = parseFloat(toEn(form.width)) || 0;
+                const area = L * W;
+                if (!(area > 0 && density)) return <div />;
+                const cap = Math.floor(area * density);
+                return (
+                  <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                    <div
+                      dir="ltr"
+                      style={{
+                        width: '100%',
+                        padding: '0 10px',
+                        height: 38,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'var(--input-bg)',
+                        border: '1px dashed var(--border)',
+                        borderRadius: 'var(--r-md)',
+                        fontSize: 'var(--fs-xs)',
+                        color: 'var(--muted)',
+                        fontVariantNumeric: 'tabular-nums',
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {toFa(area)} × {toFa(density)} = {toFa(cap)}
+                    </div>
                   </div>
-                </div>
-              );
-            })()}
-          </Grid2>
-          <OverrideHint {...capHint} />
+                );
+              })()}
+            </Grid2>
+            <OverrideHint {...capHint} />
           {form.breedId && (
             <button
               type="button"
@@ -295,56 +293,48 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 toastMsg.info('مقادیر از استاندارد پر شد')
               }}
               style={{
-                marginTop: 6, width: '100%', padding: '8px',
-                background: 'var(--accent-soft)', border: '1px solid var(--accent-border)',
-                borderRadius: 'var(--r-md)', color: 'var(--accent)', cursor: 'pointer', fontFamily: 'inherit',
-                fontSize: 'var(--fs-sm)', fontWeight: 700, textAlign: 'center',
+                marginTop: 6,
+                width: '100%',
+                padding: '8px',
+                background: 'var(--accent-soft)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: 'var(--r-md)',
+                color: 'var(--accent)',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                fontSize: 'var(--fs-sm)',
+                fontWeight: 700,
+                textAlign: 'center',
               }}
             >
               ✨ پر کردن خودکار از استاندارد
             </button>
           )}
-        </AccordionSection>
+        
 
-        <AccordionSection
-          icon="🌡️"
-          title="شرایط محیطی"
-          defaultOpen={false}
-          summary={form.targetTemp || form.targetHumidity ? `${form.targetTemp ? `${toFa(form.targetTemp)}°C` : ''} ${form.targetHumidity ? `${toFa(form.targetHumidity)}%` : ''}`.trim() : 'تعریف نشده'}
-        >
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>شرایط</div>
           <Grid2>
-            <Field label="دمای هدف" autoFrom={autoFields.has("targetTemp") ? "استاندارد" : undefined} error={vErrors.targetTemp}>
-              <TempFormField noLabel placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
-              <OverrideHint {...tempHint} />
-            </Field>
-            <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? "استاندارد" : undefined} error={vErrors.targetHumidity}>
-              <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={0} max={100} autoClamp />
-              <OverrideHint {...humHint} />
-            </Field>
-          </Grid2>
-        </AccordionSection>
-
-        <AccordionSection
-          icon="📅"
-          title="زمان‌ها و یادداشت"
-          defaultOpen={false}
-          summary={form.builtAt ? `ساخت: ${form.builtAt}` : 'تعریف نشده'}
-        >
-          <Grid2>
-            <Field label="تاریخ ساخت"><DatePicker value={form.builtAt} onChange={v => setForm({...form, builtAt: v})} placeholder="انتخاب تاریخ" /></Field>
-            <Field label="آخرین ضدعفونی"><DatePicker value={form.lastSanitizedAt} onChange={v => setForm({...form, lastSanitizedAt: v})} placeholder="انتخاب تاریخ" /></Field>
-          </Grid2>
-          <Field label="یادداشت ضدعفونی" hint="روش یا ماده‌ی ضدعفونی (دستی)">
-            <Input placeholder="مثلاً — سرکه سیب ۵٪، همه دیوارها" value={form.sanitizeNotes || ''} onChange={e => setForm({...form, sanitizeNotes: e.target.value})} />
+          <Field label="دمای هدف" autoFrom={autoFields.has("targetTemp") ? "استاندارد" : undefined} error={vErrors.targetTemp}>
+            <TempFormField noLabel placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
+            <OverrideHint {...tempHint} />
           </Field>
-          <Field label="آدرس سالن">
-            <Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
+          <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? "استاندارد" : undefined} error={vErrors.targetHumidity}>
+            <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={0} max={100} autoClamp />
+            <OverrideHint {...humHint} />
           </Field>
-          <Field label="یادداشت">
+        </Grid2>
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>زمان‌ها</div>
+        <Grid2>
+          <Field label="تاریخ ساخت"><DatePicker value={form.builtAt} onChange={v => setForm({...form, builtAt: v})} placeholder="انتخاب تاریخ" /></Field>
+          <Field label="آخرین ضدعفونی"><DatePicker value={form.lastSanitizedAt} onChange={v => setForm({...form, lastSanitizedAt: v})} placeholder="انتخاب تاریخ" /></Field>
+        </Grid2>
+        <Field label="یادداشت ضدعفونی" hint="روش یا ماده‌ی ضدعفونی (دستی)">
+          <Input placeholder="مثلاً — سرکه سیب ۵٪، همه دیوارها" value={form.sanitizeNotes || ''} onChange={e => setForm({...form, sanitizeNotes: e.target.value})} />
+        </Field>
+        <Field label="آدرس سالن"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
+        <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
-        </AccordionSection>
-
         <ErrorBox>{err}</ErrorBox>
       </Modal>
   );

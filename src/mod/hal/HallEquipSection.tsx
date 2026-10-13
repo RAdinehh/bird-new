@@ -211,7 +211,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const openEdit = (e: Equipment) => {
     setEditId(e.id);
     setEditCount(e.count ? toFa(e.count) : '');
-    setEditCap((e as any).capacity ? toFa(e.capacity) : '');
+    setEditCap(e.capacity ? toFa(e.capacity) : '');
   };
 
   const saveEdit = () => {
