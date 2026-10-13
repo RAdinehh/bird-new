@@ -2,6 +2,9 @@
  * HallsFormModal — فرم افزودن/ویرایش سالن
  */
 import { useState } from 'react';
+import { type F } from '../_hallsHelpers';
+import type { Bird, Breed } from '../../brd/store';
+import type { Person } from '../../ctc/store';
 import { useTempUnit } from '../../../shr/utils/temp';
 import { Field, Grid2, Grid3, Input, Modal, BtnRow, Btn, NumField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
@@ -12,7 +15,16 @@ import DatePicker from '../../../shr/components/DatePicker';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
 
-function TempFormField({ value, onChange, label, placeholder, autoFrom, error, noLabel }: any) {
+interface TempFormFieldProps {
+  value: string;
+  onChange: (v: string) => void;
+  label?: string;
+  placeholder?: string;
+  autoFrom?: string;
+  error?: string;
+  noLabel?: boolean;
+}
+function TempFormField({ value, onChange, label, placeholder, autoFrom, error, noLabel }: TempFormFieldProps) {
   const tempUnit = useTempUnit();
   const [local, setLocal] = useState<string>('');
   const [editing, setEditing] = useState(false);
@@ -124,44 +136,44 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom, error, n
 export interface HallsFormModalProps {
   open: boolean;
   setOpen: (v: boolean) => void;
-  form: any;
-  setForm: any;
+  form: F;
+  setForm: React.Dispatch<React.SetStateAction<F>>;
   err: string;
   vErrors: Record<string, string>;
-  birds: any[];
-  breeds: any[];
-  breedStd: any;
+  birds: Bird[];
+  breeds: Breed[];
+  breedStd: ReturnType<typeof import('../../../shr/hooks/useBreedStandard').useBreedStandard>;
   autoFields: Set<string>;
   clearAuto: (k: string) => void;
   save: () => void;
   stdCapacity?: number | null;
   stdTemp?: number | null;
   stdHumidity?: number | null;
-  workers?: any[];
+  workers?: Person[];
 }
 
 export default function HallsFormModal(props: HallsFormModalProps) {
-  const breedsForBird = (props.breeds || []).filter((b: any) => b.birdId === props.form.birdId);
+  const breedsForBird = (props.breeds || []).filter((b: Breed) => b.birdId === props.form.birdId);
   const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save, stdCapacity, stdTemp, stdHumidity, workers } = props;
 
   const capCurrent = form.capacity ? parseInt(toEn(form.capacity)) || null : null;
   const { hint: capHint } = useOverride({
     current: capCurrent, stdValue: stdCapacity ?? null,
-    onReset: () => setForm((f: any) => ({ ...f, capacity: stdCapacity != null ? String(stdCapacity) : '' })),
+    onReset: () => setForm((f) => ({ ...f, capacity: stdCapacity != null ? String(stdCapacity) : '' })),
     unit: 'پرنده', decimals: 0,
   });
 
   const tempCurrent = form.targetTemp ? parseFloat(toEn(form.targetTemp)) || null : null;
   const { hint: tempHint } = useOverride({
     current: tempCurrent, stdValue: stdTemp ?? null,
-    onReset: () => setForm((f: any) => ({ ...f, targetTemp: stdTemp != null ? String(stdTemp) : '' })),
+    onReset: () => setForm((f) => ({ ...f, targetTemp: stdTemp != null ? String(stdTemp) : '' })),
     unit: '°C', decimals: 1,
   });
 
   const humCurrent = form.targetHumidity ? parseFloat(toEn(form.targetHumidity)) || null : null;
   const { hint: humHint } = useOverride({
     current: humCurrent, stdValue: stdHumidity ?? null,
-    onReset: () => setForm((f: any) => ({ ...f, targetHumidity: stdHumidity != null ? String(stdHumidity) : '' })),
+    onReset: () => setForm((f) => ({ ...f, targetHumidity: stdHumidity != null ? String(stdHumidity) : '' })),
     unit: '٪', decimals: 0,
   });
 
@@ -186,7 +198,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
             <SmartSelect
               value={form.responsibleId || ''}
               onChange={v => setForm({...form, responsibleId: v})}
-              options={workers.map((w: any) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
+              options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب مسئول"
               autoThreshold={6}
@@ -198,7 +210,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
               <SmartSelect
                 value={form.birdId || ''}
                 onChange={v => setForm({...form, birdId: v, breedId: ''})}
-                options={birds.map((b: any) => ({ value: b.id, label: b.name }))}
+                options={birds.map((b: Bird) => ({ value: b.id, label: b.name }))}
                 placeholder="— انتخاب پرنده —"
                 modalTitle="انتخاب پرنده"
                 autoThreshold={6}
@@ -210,7 +222,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 onChange={v => setForm({...form, breedId: v})}
                 parentValue={form.birdId || ''}
                 parentLabel="پرنده"
-                options={breedsForBird.map((b: any) => ({ value: b.id, label: b.name }))}
+                options={breedsForBird.map((b: Breed) => ({ value: b.id, label: b.name }))}
                 emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
                 placeholder="— انتخاب نژاد —"
                 modalTitle="انتخاب نژاد"
@@ -273,11 +285,11 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 const density = std.space?.densityMax;
                 const cap = area > 0 && density ? Math.floor(area * density) : null;
                 const env = std.env?.[0];
-                const patch: any = {};
+                const patch: Partial<F> = {};
                 if (cap) patch.capacity = String(cap);
                 if (env?.temp?.target != null) patch.targetTemp = String(env.temp.target);
                 if (env?.humidity?.min != null) patch.targetHumidity = String(env.humidity.min);
-                setForm((f: any) => ({ ...f, ...patch }));
+                setForm((f) => ({ ...f, ...patch }));
                 toastMsg.info('مقادیر از استاندارد پر شد')
               }}
               style={{
