@@ -7,11 +7,19 @@ import type { Bird, Breed } from '../../brd/store';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import type { Hall, Zone } from '../store';
 
+interface ZoneFormData {
+  id: string;
+  hallId: string;
+  name: string;
+  capacity: string;
+  notes: string;
+}
+
 interface Props {
   open: boolean;
   onClose: () => void;
-  form: any;  // TODO: type ZoneFormData (بخش B)
-  setForm: React.Dispatch<React.SetStateAction<any>>;
+  form: ZoneFormData;
+  setForm: React.Dispatch<React.SetStateAction<ZoneFormData>>;
   err: string;
   vErrors: Record<string, any>;
   crossWarn?: string | null;
@@ -41,7 +49,7 @@ export default function ZoneFormModal({
       <Field label="سالن" required>
         <SmartSelect
           value={form.hallId}
-          onChange={v => setForm((f: any) => ({ ...f, hallId: v }))}
+          onChange={v => setForm((f) => ({ ...f, hallId: v }))}
           options={halls.map(c => ({ value: c.id, label: c.name }))}
           placeholder="— انتخاب کنید —"
           modalTitle="انتخاب سالن"

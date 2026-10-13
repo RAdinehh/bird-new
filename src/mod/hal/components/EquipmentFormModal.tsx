@@ -2,7 +2,8 @@
  * EquipmentFormModal — فرم افزودن/ویرایش تجهیز
  */
 import { Btn, Field, Grid2, Input, Modal, MoneyField, NumField, Select, ErrorBox } from '../../../shr/components/ui';
-import type { Hall, Zone, Equipment } from '../store';
+import type { EquipmentFormData } from '../useEquipmentForm';
+import type { Hall, Zone, Equipment, EquipmentCategory } from '../store';
 import type { Person } from '../../ctc/store';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
@@ -17,8 +18,8 @@ import { EquipmentIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
 export interface EquipmentFormModalProps {
   open: boolean;
   setOpen: (v: boolean) => void;
-  form: any;  // TODO: type EquipmentFormData (بخش B)
-  setForm: React.Dispatch<React.SetStateAction<any>>;
+  form: EquipmentFormData;
+  setForm: React.Dispatch<React.SetStateAction<EquipmentFormData>>;
   err: string;
   vErrors: Record<string, string>;
   halls: Hall[];
@@ -45,7 +46,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           <Field label="سالن" required>
             <SmartSelect
               value={form.hallId}
-              onChange={v => setForm((f: any) => ({ ...f, hallId: v, zoneId: '' }))}
+              onChange={v => setForm((f) => ({ ...f, hallId: v, zoneId: '' }))}
               options={halls.map(c => ({ value: c.id, label: c.name }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب سالن"
@@ -56,7 +57,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <Field label="بخش (اختیاری)">
               <SmartSelect
                 value={form.zoneId || ''}
-                onChange={v => setForm((f: any) => ({ ...f, zoneId: v }))}
+                onChange={v => setForm((f) => ({ ...f, zoneId: v }))}
                 options={zones.filter((z: Zone) => z.hallId === form.hallId).map((z: Zone) => ({ value: z.id, label: z.name }))}
                 placeholder="— بدون بخش —"
                 modalTitle="انتخاب بخش"
@@ -72,9 +73,10 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <SmartSelect
               value={form.category || 'auxiliary'}
               onChange={(cat: string) => {
+                const catEnum = cat as EquipmentCategory;
                 const allowed = typesForCategory(cat);
                 const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || 'other');
-                setForm({...form, category: cat, type: nextType, capacity: ''});
+                setForm({...form, category: catEnum, type: nextType, capacity: ''});
               }}
               options={Object.entries(CATEGORY_LABELS).map(([k, v]: [string, any]) => ({
                 value: k,
@@ -196,7 +198,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                 <>
                   <Grid2>
                     <Field label="وضعیت">
-                      <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
+                      <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value as EquipmentStatus })}>
                         {Object.entries(STATUS_LABELS).map(([k, v]) => (
                           <option key={k} value={k}>{v.icon} {v.name}</option>
                         ))}
@@ -216,7 +218,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               {hasSec && (
                 <Grid2>
                   <Field label="وضعیت">
-                    <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value})}>
+                    <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value as EquipmentStatus })}>
                       {Object.entries(STATUS_LABELS).map(([k, v]) => (
                         <option key={k} value={k}>{v.icon} {v.name}</option>
                       ))}

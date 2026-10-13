@@ -5,18 +5,42 @@ import { useState } from 'react';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { toEn } from '../../shr/utils/fa';
 import { toastMsg } from '../../cor/store/toast';
-import type { Equipment } from './store';
+import type { Equipment, EquipmentCategory, EquipmentStatus, EquipmentUnit } from './store';
 
-export const EQUIP_FORM_DEFAULTS = {
-  id: '', hallId: '', category: 'ventilation', type: '', name: '',
+
+/** 🆕 تایپ دقیق فرم تجهیزات (همه چیز string بجز enum ها) */
+export interface EquipmentFormData {
+  id: string;
+  hallId: string;
+  zoneId: string;
+  category: EquipmentCategory;
+  type: string;
+  name: string;
+  count: string;
+  unit: EquipmentUnit;
+  unitPrice: string;
+  purchasedAt: string;
+  warranty: string;
+  notes: string;
+  capacity: string;
+  efficiency: string;
+  consumeRate: '' | 'once' | 'per-cycle';
+  status: EquipmentStatus;
+  brand: string;
+  supplierId: string;
+}
+
+export const EQUIP_FORM_DEFAULTS: EquipmentFormData = {
+  id: '', hallId: '', zoneId: '', category: 'ventilation', type: '', name: '',
   count: '', unit: 'pcs', unitPrice: '', purchasedAt: '',
   warranty: '', notes: '', capacity: '', efficiency: '', consumeRate: '',
+  status: 'active', brand: '', supplierId: '',
 };
 
 export function useEquipmentForm() {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<any>({ ...EQUIP_FORM_DEFAULTS });
-  const draft = useFormDraft('hal-equip', form, (v) => setForm(v));
+  const [form, setForm] = useState<EquipmentFormData>(EQUIP_FORM_DEFAULTS);
+  const draft = useFormDraft<EquipmentFormData>('hal-equip', form, setForm);
   const [err, setErr] = useState('');
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
 
@@ -36,7 +60,7 @@ export function useEquipmentForm() {
     notes: form.notes.trim(),
     capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || null : null,
     efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || null : null,
-    consumeRate: form.consumeRate || undefined,
+    consumeRate: (form.consumeRate === 'once' || form.consumeRate === 'per-cycle') ? form.consumeRate : undefined,
     status: form.status || 'active',
     brand: (form.brand || '').trim(),
     supplierId: (form.supplierId || '').trim() || undefined,
@@ -50,7 +74,7 @@ export function useEquipmentForm() {
 
   const openEdit = (e: Equipment) => {
     setForm({
-      id: e.id, hallId: e.hallId,
+      id: e.id, hallId: e.hallId, zoneId: (e as any).zoneId || '',
       category: e.category || 'lighting',
       type: e.type || '',
       name: e.name,
@@ -62,7 +86,7 @@ export function useEquipmentForm() {
       notes: e.notes || '',
       capacity: e.capacity ? String(e.capacity) : '',
       efficiency: e.efficiency ? String(e.efficiency) : '',
-      consumeRate: e.consumeRate || '',
+      consumeRate: (e.consumeRate === 'once' || e.consumeRate === 'per-cycle') ? e.consumeRate : '',
       status: e.status || 'active',
       brand: e.brand || '',
       supplierId: e.supplierId || '',
@@ -93,7 +117,7 @@ export function useEquipmentForm() {
     if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
     addEquip(buildPayload());
     toastMsg.added(form.name || 'تجهیز');
-    setForm((f: any) => ({
+    setForm((f) => ({
       ...f,
       id: '', name: '', count: '', unitPrice: '', purchasedAt: '',
       warranty: '', notes: '', capacity: '', efficiency: '',
