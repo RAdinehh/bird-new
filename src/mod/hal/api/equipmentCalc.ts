@@ -2,6 +2,7 @@
  * api/equipmentCalc.ts — توابع کمکی EquipmentPage
  */
 import { getEquipUnit } from '../equipUnits';
+import type { Flock } from '../../flk/store';
 import { CATEGORY_LABELS } from '../store';
 
 export const CATEGORIES_BY_KIND: Record<string, string[]> = {
@@ -68,12 +69,12 @@ export function getCapacityHint(type: string, cap: number | null, hallVol: numbe
 export function calcEquipNeed(
   type: string,
   hallId: string,
-  flocks: any[],
-  breedStd: any,
+  flocks: Flock[],
+  breedStd: any, // ReturnType of useBreedStandard
   hallArea: number,
 ): { need: number; unit: string; desc: string } | null {
   // گله فعال این سالن
-  const flock = flocks.find((f: any) => f.hallId === hallId && f.status === 'active' && !f.paused);
+  const flock = flocks.find((f: Flock) => f.hallId === hallId && f.status === 'active' && !f.paused);
   if (!flock) return null;
 
   const std = breedStd.byBreedId(flock.breedId);
@@ -124,7 +125,7 @@ export function calcEquipNeed(
   return null;
 }
 
-export function calcEquipValue(e: any): number {
+export function calcEquipValue(e: { type?: string; count?: number | null; unitPrice?: number | null; purchasePrice?: number | null }): number {
   const count = e.count || 0;
   const price = e.unitPrice || 0;
   if (!count || !price) return 0;
@@ -142,6 +143,7 @@ export function calcEquipValue(e: any): number {
 
 
 /** 🆕 پیش‌فرض فیلد ثانویه از استاندارد نژاد — با استفاده از stdKey */
+// std شکل پویا داره — تایپ دقیق نداریم
 export function getStdDefaultForType(type: string, std: any): number | null {
   if (!std?.equipment) return null;
   const def = getEquipUnit(type);
