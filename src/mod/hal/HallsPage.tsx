@@ -235,7 +235,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       feederType: form.feederType || '',
       drinkerType: form.drinkerType || '',
       litterType: form.litterType || '',
-      address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), sanitizeNotes: form.sanitizeNotes.trim(), status: (form.status || 'empty') as any, responsibleId: (form.responsibleId || '').trim() || undefined, notes: form.notes.trim(),
+      address: form.address.trim(), builtAt: form.builtAt.trim(), lastSanitizedAt: form.lastSanitizedAt.trim(), sanitizeNotes: form.sanitizeNotes.trim(), status: (form.status || 'empty') as Hall['status'], responsibleId: (form.responsibleId || '').trim() || undefined, notes: form.notes.trim(),
       birdId: form.birdId || undefined,
       breedId: form.breedId || undefined,
     };
@@ -250,8 +250,8 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     try {
       const items = Array.isArray(item.item) ? item.item : [item.item];
       items.forEach(h => {
-        const { id, createdAt, updatedAt, ...rest } = h as any;
-        addHall(rest as any);
+        const { id, createdAt, updatedAt, ...rest } = h;
+        addHall(rest);
       });
       toastMsg.restored(items.length > 1 ? 'سالن‌ها' : 'سالن');
     } catch (err) {

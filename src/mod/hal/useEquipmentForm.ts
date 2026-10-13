@@ -74,7 +74,7 @@ export function useEquipmentForm() {
 
   const openEdit = (e: Equipment) => {
     setForm({
-      id: e.id, hallId: e.hallId, zoneId: (e as any).zoneId || '',
+      id: e.id, hallId: e.hallId, zoneId: e.zoneId || '',
       category: e.category || 'lighting',
       type: e.type || '',
       name: e.name,

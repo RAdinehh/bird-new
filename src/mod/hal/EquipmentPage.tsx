@@ -151,7 +151,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     try {
       const items = Array.isArray(item.item) ? item.item : [item.item];
       items.forEach(e => {
-        const { id, createdAt, updatedAt, ...rest } = e as any;
+        const { id, createdAt, updatedAt, ...rest } = e;
         addEquip(rest);
       });
       toastMsg.restored(items.length > 1 ? 'تجهیزات' : 'تجهیز');
