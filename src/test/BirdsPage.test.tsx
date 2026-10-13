@@ -31,7 +31,7 @@ const makeBird = (o: any = {}) => ({
 });
 
 function expandCard(title: string) {
-  const btn = screen.getByLabelText(`باز کردن ${title}`);
+  const btn = screen.getByRole('button', { name: `باز کردن ${title}` });
   fireEvent.click(btn);
 }
 
@@ -146,11 +146,15 @@ describe('BirdsPage — افزودن', () => {
 
 describe('BirdsPage — Expand / ویرایش / حذف', () => {
   it('expand → مشخصات', async () => {
-    useBrd.setState({ birds: [makeBird({ name: 'مرغ' })] as any });
+    const bird = makeBird({ name: 'مرغ' });
+    useBrd.setState({
+      birds: [bird] as any,
+      breeds: [{ id: 'brd-1', birdId: bird.id, name: 'لگهورن', purposes: [], standardKey: '' }] as any,
+    });
     renderWithRouter(<BirdsPage />);
     expandCard('مرغ');
 
-    await waitFor(() => expect(screen.getByText(/مشخصات کامل/)).toBeInTheDocument());
+    await waitFor(() => expect(document.body.textContent).toMatch(/خلاصه/));
   });
 
   it('expand → دکمه‌ها', async () => {

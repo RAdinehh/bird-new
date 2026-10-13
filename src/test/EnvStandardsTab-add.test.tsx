@@ -41,7 +41,7 @@ describe('EnvStandardsTab — افزودن نژاد جدید', () => {
     renderWithRouter(<EnvStandardsTab />);
 
     // کلیک روی دکمه‌ی پایین (نه عنوان modal)
-    const addBtn = screen.getByRole('button', { name: /➕ افزودن نژاد جدید/ });
+    const addBtn = screen.getByRole('button', { name: /افزودن نژاد جدید/ });
     fireEvent.click(addBtn);
 
     // منتظر باز شدن modal
@@ -50,7 +50,7 @@ describe('EnvStandardsTab — افزودن نژاد جدید', () => {
     });
 
     // پر کردن فرم
-    const birdInput = screen.getByPlaceholderText(/^مرغ$/);
+    const birdInput = screen.getByPlaceholderText(/مرغ یا طوطی/);
     const faInput = screen.getByPlaceholderText(/لاری/);
     const enInput = screen.getByPlaceholderText(/Lari/);
 
