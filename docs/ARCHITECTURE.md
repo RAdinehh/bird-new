@@ -27,6 +27,36 @@
 | mod/xxx/ | هر ماژول: store.ts + index.tsx + *Page.tsx |
 | docs/ | مستندات + قوانین |
 
+## 🛠 فایل‌های ابزار (اضافه‌شده جلسه ۵)
+
+### ریشه پروژه
+- .github/workflows/ci.yml — CI خودکار (tsc + test + build)
+- .github/workflows/build-apk.yml — ساخت APK
+- eslint.config.js — config ESLint (flat)
+- docs/TYPE-REGISTRY.md — جدول تایپ‌های همه ماژول‌ها
+- scripts/check-any.py — چک any در فایل‌های staged
+
+### hal — ساختار فعلی (بعد از جلسه ۵)
+- HallsPage.tsx (۳۷۳ خط — از ۴۱۷)
+- HallsFormModal.tsx (۳۴۸ خط)
+- ZonesPage.tsx (۴۰۰ خط)
+- ZoneFormModal.tsx (۱۲۳ خط)
+- EquipmentPage.tsx (۳۱۲ خط)
+- EquipmentFormModal.tsx (۲۶۱ خط)
+- EquipmentCard.tsx (۲۳۷ خط)
+- HallCard.tsx
+- HallEquipSection.tsx
+- _hallsHelpers.ts — تایپ F + emptyForm + calcSuggestedCapacity
+- _typedLabels.ts — getKindLabel, getCategoryLabel, getStatusLabel, getUnitLabel, getEquipLabel, getCategoryColor, getCategorySoft
+- hooks/useHallsCascade.ts — cascade گله‌ها هنگام حذف سالن
+- useEquipmentForm.ts — state + logic فرم تجهیزات
+- store.ts — Zustand (۵ migration)
+- api/equipmentCalc.ts — محاسبات
+- api/equipmentWhs.ts — اتصال انبار
+- components/ — کارت‌ها و مودال‌ها
+
+---
+
 ## 🔴 مشکلات شناسایی‌شده (بازبینی‌شده ۱۴۰۴/۰۷/۲۰)
 
 > ⚠️ این بخش بازبینی شد. **۳ مورد از ۵ مورد اول false positive بودن.**
