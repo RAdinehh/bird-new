@@ -4,14 +4,14 @@
 import { useEffect, useRef } from 'react';
 
 export function useHallsCascade(
-  hallsRaw: any[],
-  flocks: any[],
-  updateFlock: (id: string, patch: any) => void,
+  hallsRaw: { id: string }[],
+  flocks: { id: string; hallId: string }[],
+  updateFlock: (id: string, patch: { hallId: string; zoneId: string }) => void,
 ) {
   const prevHallIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    const currentIds = new Set(hallsRaw.map((h: any) => h.id));
+    const currentIds = new Set(hallsRaw.map((h) => h.id));
     const prevIds = prevHallIdsRef.current;
 
     if (prevIds.size > 0) {
@@ -20,7 +20,7 @@ export function useHallsCascade(
 
       if (removedIds.length > 0) {
         removedIds.forEach(hallId => {
-          flocks.filter((f: any) => f.hallId === hallId).forEach((f: any) => {
+          flocks.filter((f) => f.hallId === hallId).forEach((f) => {
             try { updateFlock(f.id, { hallId: '', zoneId: '' }); } catch {}
           });
         });

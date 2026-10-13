@@ -27,7 +27,7 @@ export const ALL_CATS: string[] = [...REQUIRED_CATS, ...OPTIONAL_CATS];
 /**
  * واحد هر دسته بر اساس زیرنوع‌های داخلش
  */
-export function unitForCategory(cat: string, list: any[]): string {
+export function unitForCategory(cat: string, list: { unit?: string; type?: string }[]): string {
   if (list.length === 0) {
     if (cat === 'ventilation') return 'm³/h';
     if (cat === 'lighting') return 'W';
@@ -35,7 +35,7 @@ export function unitForCategory(cat: string, list: any[]): string {
     if (cat === 'heating') return 'kW';
     return 'عدد';
   }
-  return getEquipUnit(list[0].type).baseUnit;
+  return getEquipUnit(list[0].type || '').baseUnit;
 }
 
 /** محاسبه مقدار نصب‌شده برای یک دسته */

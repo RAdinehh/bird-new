@@ -163,7 +163,7 @@ export function RowWithStatus({
 // ═══ مقادیر استاندارد سالن (برای OverrideHint) ═══
 /** محاسبه‌ی مقادیر مرجع از استاندارد نژاد */
 export function getHallStdValues(
-  breedStd: any,
+  breedStd: any, // ← ReturnType of useBreedStandard
   length: number | null,
   width: number | null,
 ): { capacity: number | null; targetTemp: number | null; targetHumidity: number | null } {

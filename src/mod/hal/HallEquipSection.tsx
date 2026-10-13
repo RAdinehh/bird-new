@@ -181,7 +181,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const saveNewEquip = () => {
     if (!pickerName.trim()) { toastMsg.error('نام تجهیز اجباری است'); return; }
     const name = pickerName.trim();
-    const dup = hallEquips.find((x: any) => x.type === pickerType && x.name.trim() === name);
+    const dup = hallEquips.find((x) => x.type === pickerType && x.name.trim() === name);
     if (dup) { toastMsg.error('این تجهیز قبلاً در همین سالن ثبت شده'); return; }
     const def = getEquipUnit(pickerType);
     const capValue = pickerCap
