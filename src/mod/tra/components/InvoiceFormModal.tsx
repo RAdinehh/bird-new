@@ -10,8 +10,8 @@ import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { AccordionSection } from '../../../shr/components/AccordionSection';
 import ItemDetailsForm from '../../../shr/components/ItemDetailsForm';
-import { checkTone, type CheckStatus } from '../store';
-import { CATEGORIES, calcItemTotal, type InvoiceItem, type Payment } from '../store';
+import { type CheckStatus } from '../store';
+import { CATEGORIES, type InvoiceItem, type Payment } from '../store';
 import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
 

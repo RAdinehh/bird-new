@@ -3,7 +3,6 @@
  */
 import { Field, Grid2, Input, Modal, MoneyField, NumField, Select, Textarea, ErrorBox, BtnRow, Btn } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import { toFa } from '../../../shr/utils/fa';
 import { CATEGORY_LABEL, CATEGORY_ICON, type IngredientCategory } from '../store';
 import { INGREDIENT_STANDARDS } from '../standards';
 import { SectionTitle } from '../helpers';

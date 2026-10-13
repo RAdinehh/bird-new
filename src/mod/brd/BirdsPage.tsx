@@ -6,22 +6,19 @@ import { useBrd, type Bird } from './store';
 import { DEFAULT_SPECIES } from './species';
 import { useSet } from '../set/store';
 import { useMasterRedirect } from '../../shr/hooks/useMasterRedirect';
-import { detectCycleDaysSource, detectFcrSource, getOverrideInfo } from './_source';
-import OverrideHint from '../../shr/components/OverrideHint';
 import BirdForm, { EMPTY_BIRD_FORM, type BirdFormData } from './BirdForm';
 import { BirdSchema } from '../../shr/validation/rules/brd';
 import BirdCard from './BirdCard';
 import {
-  Btn, BtnRow, Empty, Field,
-  Grid2, Input, NumField,
+  Btn, Empty,
   PageContainer
 } from '../../shr/components/ui';import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { useFilterSort, FilterBar, getBrdBirdsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
-import { toFa, toEn } from '../../shr/utils/fa';
+import { toFa } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast, toastMsg } from '../../cor/store/toast';
+import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 
 

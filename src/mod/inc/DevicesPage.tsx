@@ -1,34 +1,27 @@
 /**
  * DevicesPage — دستگاه‌های انکوباسیون (ظرفیت، تعمیرات، گارانتی)
  */
-import { useTempUnit, toUserTemp, toCelsius, round1 } from '../../shr/utils/temp';
 import { useFab } from '../../shr/hooks/useFab';
 import { useState, useMemo, useEffect } from 'react';
-import { useInc, type Device, type DeviceMode, type DeviceStatus } from './store';
+import { useInc, type Device, type DeviceStatus } from './store';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createDeviceSchema } from '../../shr/validation/rules/inc';
 import { useSet } from '../set/store';
 import { useBrd } from '../brd/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, SectionTitle, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
+import { Btn, Empty, PageContainer, Tag } from '../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import { useFilterSort, FilterBar, getIncDevicesConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
-import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showToast, toastMsg } from '../../cor/store/toast';
+import { toastMsg } from '../../cor/store/toast';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
-import { parse as parseJ, addMonths, format as formatJ } from 'date-fns-jalali';
 import { Row } from './helpers';
-import OvNumField from './components/OvNumField';
 import MaintenanceModal from './components/MaintenanceModal';
 import DeviceFormModal from './components/DeviceFormModal';
-import CapacityEditor from './components/CapacityEditor';
 import { STATUS_FA, MODE_FA, emptyForm as empty, type F } from './types-devices';
 import { warrantyInfo } from './api/warranty';
-import { useIncubationProfile } from './hooks';
-import { logAction } from '../../cor/logger/auditLog';
 
 
 export default function DevicesPage({ active = true }: { active?: boolean } = {}) {

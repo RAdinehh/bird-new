@@ -4,16 +4,13 @@
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
   Btn, BtnRow, ErrorBox, Field, Grid2, Input, MoneyField, Modal,
-  NumField, SectionTitle, Select, ErrorBox as _E,
+  NumField, SectionTitle, Select,
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
-import SmartSelect from '../../../shr/components/SmartSelect';
-import DependentSelect from '../../../shr/components/DependentSelect';
 import type { DeviceMode, DeviceStatus } from '../store';
 import type { F } from '../types-devices';
 import { warrantyInfo } from '../api/warranty';
 import CapacityEditor from './CapacityEditor';
-import { toEn as _toEn } from '../../../shr/utils/fa';
 
 export interface DeviceFormModalProps {
   open: boolean;

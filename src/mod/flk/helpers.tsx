@@ -1,8 +1,7 @@
 /**
  * helpers.tsx — helperهای مشترک ماژول flk
  */
-import type { ReactNode, CSSProperties } from 'react';
-import { toFa } from '../../shr/utils/fa';
+import type { ReactNode } from 'react';
 
 export function Row({ l, v, autoFrom }: { l: string; v: string; autoFrom?: string }) {
   return (

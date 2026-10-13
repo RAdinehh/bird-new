@@ -1,32 +1,24 @@
 /**
  * EggEntriesPage — ورودی تخم به دستگاه‌های انکوباسیون (Multi-row + Draft Auto-Save)
  */
-import ProgressTracker from '../../shr/components/ProgressTracker';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
-  useInc, DEAL_LABEL, ENTRY_STATUS_LABEL, addDaysJalali,
-  daysAgo, daysToHatch, isLockdown, isHatchWindow,
-  incubationDays, daysFromProfiles, jalaliToDate, type EggEntry, type DealType
+  useInc, DEAL_LABEL, addDaysJalali,
+  daysAgo, daysToHatch, daysFromProfiles, type EggEntry
 } from './store';
 import { useBrd } from '../brd/store';
 import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
 import { useTra } from '../tra/store';
 import { useEgg } from '../egg/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, SectionTitle, Select, Tag , Textarea } from '../../shr/components/ui';
-import TimePicker from '../../shr/components/TimePicker';
-import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
-import DatePicker from '../../shr/components/DatePicker';
+import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { clampPercent, complement } from '../../shr/utils/smart';
-import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
-import { showToast, toastMsg } from '../../cor/store/toast';
-import SmartSelect from '../../shr/components/SmartSelect';
+import { showConfirmAsync } from '../../cor/store/dialog';
 import { useFilterSort, FilterBar, getIncEntriesConfig } from '../../shr/filter';
-import { todayJalali, Row, chip } from './helpers';
+import { todayJalali } from './helpers';
 import EggEntryModal from './components/EggEntryModal';
 import { makeRow, type DraftRow } from './types-eggentries';
-import { nowTime, flockReadyForEggs, calcEntryDateForSyncHatch, DRAFT_KEY, calcDeviceUsage } from './api/eggEntriesCalc';
+import { nowTime } from './api/eggEntriesCalc';
 import EggEntryCard from './components/EggEntryCard';
 import { useEggEntriesForm } from './hooks/useEggEntriesForm';
 import { useSet } from '../set/store';

@@ -1,7 +1,6 @@
 /**
  * helpers.tsx — helperهای مشترک ماژول inc
  */
-import type { ReactNode, CSSProperties } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 
 export function todayJalali(): string {

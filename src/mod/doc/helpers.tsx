@@ -2,10 +2,7 @@
  * helpers.tsx — ماژول doc
  */
 import type { CSSProperties } from 'react';
-import { Dot, StatBox } from '../../shr/components/ExpandableCard';
-import { Btn, BtnRow, Empty, Field, Input, Modal, PageContainer, Select } from '../../shr/components/ui';
-import { toFa } from '../../shr/utils/fa';
-import { CATEGORY_ICON, CATEGORY_LABEL, LINKED_TYPE_LABEL, addFile, deleteFile, downloadFile, fileCategory, formatSize, listFiles, openFile, totalSize, type DocCategory, type DocFile } from './store';
+import { CATEGORY_ICON, CATEGORY_LABEL, formatSize, type DocFile } from './store';
 
 export function GridCard({ file, onPreview, onDelete }: { file: DocFile; onPreview: () => void; onDelete: () => void }) {
   const isImg = file.category === 'image';

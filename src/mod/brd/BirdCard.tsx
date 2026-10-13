@@ -4,7 +4,6 @@ import { toFa } from '../../shr/utils/fa';
 import { getKindInfo, getCategoryInfo } from './_display';
 import { getBirdDisplayName, getBreedDisplayName } from './_display-name';
 import { getBreedFcr, resolveStandard } from './_display-values';
-import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { getStandardFor } from '../set/standards/resolve';
 import EntityLink from '../../shr/components/EntityLink';
 import ExpandableCard from '../../shr/components/ExpandableCard';

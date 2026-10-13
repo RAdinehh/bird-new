@@ -14,7 +14,7 @@ import TimePicker from '../../../shr/components/TimePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { DEAL_LABEL, type DealType } from '../store';
 import type { DraftRow } from '../types-eggentries';
-import { nowTime, flockReadyForEggs } from '../api/eggEntriesCalc';
+import { flockReadyForEggs } from '../api/eggEntriesCalc';
 
 export interface EggEntryModalProps {
   open: boolean;

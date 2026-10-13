@@ -1,10 +1,10 @@
 /**
  * MoveFormModal — فرم افزودن/ویرایش حرکت انبار
  */
-import { Btn, BtnRow, Field, Grid2, Input, Modal, MoneyField, NumField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
+import { Btn, BtnRow, Field, Grid2, Modal, MoneyField, NumField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import { toFa, toEn } from '../../../shr/utils/fa';
+import { toFa } from '../../../shr/utils/fa';
 import { MOVEMENT_REASON, UNIT_LABEL, CATEGORY_ICON, CATEGORY_LABEL, type MovementType, type MovementReason } from '../store';
 
 const REASONS_BY_TYPE: Record<MovementType, MovementReason[]> = {

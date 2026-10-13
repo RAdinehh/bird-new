@@ -3,32 +3,25 @@ import ItemCard from './components/ItemCard';
 import ItemsFormModal from './components/ItemsFormModal';
 import { useFab } from '../../shr/hooks/useFab';
 import {
-  useWhs, getAvgPrice, CATEGORY_LABEL, CATEGORY_ICON, CATEGORY_DEFAULTS,
-  UNIT_LABEL, STORAGE_LABEL, stockWarning, expiryWarning,
-  daysToExpiry, type Item, type ItemCategory, type ItemUnit
+  useWhs, CATEGORY_DEFAULTS,
+  UNIT_LABEL, type Item, type ItemCategory, type ItemUnit
 } from './store';
 import { useCtc } from '../ctc/store';
 import { useHal } from '../hal/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
-import ExpandableCard from '../../shr/components/ExpandableCard';
+import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
-import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { format as formatJ } from 'date-fns-jalali';
 const todayJalali = () => formatJ(new Date(), 'yyyy/MM/dd');
-import SmartSelect from '../../shr/components/SmartSelect';
 import { showAlert, showConfirmAsync, showPromptAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast, toastMsg } from '../../cor/store/toast';
+import { toastMsg } from '../../cor/store/toast';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useNavigate } from 'react-router-dom';
-import { Row, SectionTitle } from './helpers';
 import { useFilterSort, FilterBar, getWhsItemsConfig } from '../../shr/filter';
 import {
-  IconPackage, IconChart, IconTag, IconDollar,
   IconEgg, IconWheat, IconPill, IconSyringe, IconLeaf, IconTool, IconBox,
-  IconFolder, IconActivity, IconClock,
 } from '../../shr/icons';
 
 // map دسته به SVG
@@ -41,7 +34,6 @@ const CATEGORY_SVG: Record<string, (props: { size?: number }) => React.ReactElem
   equipment: IconTool,
   consumable: IconBox,
 };
-import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createItemSchema } from '../../shr/validation/rules/whs';
 

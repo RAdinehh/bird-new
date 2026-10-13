@@ -1,11 +1,7 @@
 /**
  * helpers.tsx — ماژول cal
  */
-import type { ReactNode, CSSProperties } from 'react';
-import { Btn, BtnRow, Field, Grid2, Input, Modal, Select } from '../../shr/components/ui';
-import { toFa } from '../../shr/utils/fa';
-import { TYPE_OPTIONS, type ManualEvent, useManual } from './manual';
-import { TYPE_COLORS, TYPE_LABELS, collectEvents, eventsOfDay, statusOf, todayJalali, type CalEvent, type EventType } from './store';
+import { TYPE_COLORS, TYPE_LABELS, type CalEvent } from './store';
 
 export function AutoEventCard({ event }: { event: CalEvent }) {
   const colors = TYPE_COLORS[event.type];

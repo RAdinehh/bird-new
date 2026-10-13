@@ -6,12 +6,11 @@ import { daysUntilDue, dueTone, dueLabel } from './helpers';
 import DeferModal from './components/DeferModal';
 import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSum, WORKFLOW_LABEL, type Invoice, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field, Input, Modal, PageContainer } from '../../shr/components/ui';
+import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
-import DatePicker from '../../shr/components/DatePicker';
 import { toFa } from '../../shr/utils/fa';
 import { showSuccess } from '../../cor/store/dialog';
-import { Line, tab, filterChip } from './helpers';
+import { Line, tab } from './helpers';
 import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/filter';
 
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';

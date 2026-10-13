@@ -1,14 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
-import { useValidation } from '../../shr/validation/useValidation';
-import { createContactSchema } from '../../shr/validation/rules/ctc';
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import ContactFormModal from './components/ContactFormModal';
 import { useCtc, type Person, type Role, ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES, SALARY_TYPES, avatarLetter } from './store';
-import { Btn, BtnRow, DigitField, Empty,
-  Field, Grid2, Grid3, Input,
-  Modal, NumField, PageContainer, PhoneField,
-  Select, Tag, ErrorBox , MoneyField , Textarea } from '../../shr/components/ui';
+import { Btn, Empty, PageContainer, Tag  } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -16,7 +11,7 @@ import { useFilterSort, FilterBar, getCtcContactsConfig } from '../../shr/filter
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast, toastMsg } from '../../cor/store/toast';
+import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 

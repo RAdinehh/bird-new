@@ -1,7 +1,6 @@
 /**
  * HatchCard.tsx — کارت نتیجه‌ی یک هچ
  */
-import { format as formatJ } from 'date-fns-jalali';
 import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../../shr/components/ExpandableCard';

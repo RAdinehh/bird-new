@@ -2,7 +2,7 @@
  * FeedSection — تغذیه و آب
  */
 import { useMemo } from 'react';
-import { Field, Grid2, NumField, Select } from '../../../shr/components/ui';
+import { Field, Grid2, NumField } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
 import { toFa, toEn } from '../../../shr/utils/fa';

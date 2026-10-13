@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useTra } from '../tra/store';
-import { useEgg, healthyCount } from '../egg/store';
+import { useEgg } from '../egg/store';
 import { lastMonths, monthLabel, salesInMonth, purchasesInMonth, eggsInMonth, feedInMonth } from './analytics';
 import { DualBarChart, BarChart } from '../../shr/components/Charts';
-import { PageContainer, Select } from '../../shr/components/ui';
+import { PageContainer } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import { Section } from './helpers';
 

@@ -6,7 +6,7 @@
 import type { CandlingLike } from '../api/calc';
 import { toFa } from '../../../shr/utils/fa';
 import { showConfirmAsync } from '../../../cor/store/dialog';
-import { Btn, Tag } from '../../../shr/components/ui';
+import { Tag } from '../../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../../shr/components/ExpandableCard';
 
 export interface CandlingCardProps {

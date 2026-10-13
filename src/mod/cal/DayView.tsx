@@ -1,4 +1,4 @@
-import { eventsOfDay, TYPE_COLORS, TYPE_LABELS, statusOf, type CalEvent } from './store';
+import { eventsOfDay, type CalEvent } from './store';
 import { useManual } from './manual';
 import ManualEventCard from './ManualEventCard';
 import { toFa } from '../../shr/utils/fa';

@@ -6,9 +6,8 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { useWhs } from '../whs/store';
 import { useFlk } from '../flk/store';
-import { useBrd } from '../brd/store';
 
-import type { Invoice, InvoiceItem, Deal, State } from './types';
+import type { Invoice, InvoiceItem, State } from './types';
 import { applyInvoiceMovements, applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { generateInvoiceNumber } from './calc';
 

@@ -7,7 +7,6 @@
  *   - برچسب فارسی برای category
  *   - تبدیل اطلاعات به بج‌های UI
  */
-import type { Bird, Breed } from './store';
 
 // ═══ birdKind ═══
 export interface KindInfo {

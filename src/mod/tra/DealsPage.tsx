@@ -6,10 +6,9 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field,
-  Grid2, Input, Modal, NumField,
+  Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
-import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import { useFilterSort, FilterBar, getTraDealsConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -17,7 +16,7 @@ import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast, toastMsg } from '../../cor/store/toast';
+import { toastMsg } from '../../cor/store/toast';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 

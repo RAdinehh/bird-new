@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import {
   listFiles, deleteFile, downloadFile, openFile, totalSize,
   CATEGORY_LABEL, CATEGORY_ICON, LINKED_TYPE_LABEL, formatSize,
-  type DocFile, type DocCategory
+  type DocFile
 } from './store';
 import UploadModal from './UploadModal';
 import { Btn, BtnRow, Empty, Modal, PageContainer } from '../../shr/components/ui';
@@ -10,8 +10,8 @@ import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 import { useFab } from '../../shr/hooks/useFab';
 import { showConfirmAsync } from '../../cor/store/dialog';
-import { showToast, toastMsg } from '../../cor/store/toast';
-import { ListCard, fabStyle, GridCard, chip } from './helpers';
+import { toastMsg } from '../../cor/store/toast';
+import { ListCard, GridCard } from './helpers';
 import { useFilterSort, FilterBar, getDocFilesConfig } from '../../shr/filter';
 
 type ViewMode = 'grid' | 'list';

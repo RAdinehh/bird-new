@@ -5,46 +5,29 @@ import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import { useFab } from '../../shr/hooks/useFab';
 import { useState, useMemo, useEffect } from 'react';
 import {
-  useDlg, type DailyLog, type Death, type Vaccine,
-  type Medication, type Activity, VENTILATION_LABEL, LITTER_LABEL,
-  BEHAVIOR_LABEL, DISTRIBUTION_LABEL, SOUND_LABEL, DEATH_CAUSES,
-  causeLabel, tempWarning, humidityWarning, waterFeedRatio,
-  mortalityRate, avgWeight, sumWeight, cvWeight,
-  totalWater
+  useDlg, type DailyLog
 } from './store';
-import { useFlk , isLayingReady, getAgeDays } from '../flk/store';
+import { useFlk  } from '../flk/store';
 import { useSet } from '../set/store';
 import { useFormat } from '../../shr/units';
-import { useWhs, UNIT_LABEL } from '../whs/store';
+import { useWhs } from '../whs/store';
 import { useBrd } from '../brd/store';
 import { useFed } from '../fed/store';
 import { useHal } from '../hal/store';
 import { useEgg } from '../egg/store';
-import { feedSystemFromHall, waterSystemFromHall, FEED_SYSTEM_LABEL, WATER_SYSTEM_LABEL } from '../../shr/utils/systemType';
-import SmartSelect from '../../shr/components/SmartSelect';
-import { Btn, BtnRow, Empty, Field,
-  Grid2, Grid3, Input, Modal,
-  NumField, PageContainer, PercentField, Select,
-  Textarea, ErrorBox } from '../../shr/components/ui';
+import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import { useFilterSort, FilterBar, getDlgLogsConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
-import DatePicker from '../../shr/components/DatePicker';
-import TimePicker from '../../shr/components/TimePicker';
-import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
-import { showToast, toastMsg } from '../../cor/store/toast';
+import { toFa } from '../../shr/utils/fa';
+import { showConfirmAsync } from '../../cor/store/dialog';
+import { toastMsg } from '../../cor/store/toast';
 import UndoBar from '../../cor/ui/UndoBar';
-import { checkStock } from './api/checkStock';
-import { buildLogData } from './api/buildData';
-import { decideEggAction } from './api/toEgg';
 import FormModal from './components/FormModal';
 import { useDlgForm } from './hooks/useDlgForm';
 import { useDlgSave } from './hooks/useDlgSave';
 import LogCard from './components/LogCard';
-import type { F } from './types';
-import { buildFeedMovements, buildVaccineMovement, buildMedicationMovement } from './api/toWhs';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 import { bus } from '../../cor/events';

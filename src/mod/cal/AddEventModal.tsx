@@ -4,7 +4,6 @@ import { todayJalali, type EventType } from './store';
 import { Btn, BtnRow, Field, Grid2, Input, Modal, Select, ErrorBox , Textarea } from '../../shr/components/ui';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
-import { toFa } from '../../shr/utils/fa';
 
 interface Props {
   open: boolean;

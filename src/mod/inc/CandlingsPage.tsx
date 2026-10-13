@@ -6,18 +6,15 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useInc, type Candling } from './store';
 import { useBrd } from '../brd/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
-import ExpandableCard, { InfoItem, StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
-import { showToast, toastMsg } from '../../cor/store/toast';
+import { showAlert } from '../../cor/store/dialog';
 import { useFilterSort, FilterBar, getIncCandlingsConfig } from '../../shr/filter';
 import { todayJalali } from './helpers';
 import { useIncubationProfile } from './hooks';
-import { calcAvailableBase, aggregateCandlings, calcSummary } from './api/calc';
+import { aggregateCandlings, calcSummary } from './api/calc';
 import { useCandlingForm, type EntryData, emptyData } from './hooks/useCandlingForm';
 import CandlingCard from './components/CandlingCard';
 import CandlingFormModal from './components/CandlingFormModal';
-import { logAction } from '../../cor/logger/auditLog';
 import { useMemo as _useMemoV } from 'react';
 
 const INFERTILE_REASONS: [string, string][] = [

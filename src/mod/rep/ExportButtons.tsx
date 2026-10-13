@@ -1,6 +1,6 @@
 import { Btn } from '../../shr/components/ui';
 import { exportTableToCSV, printHTML, printTemplate } from '../../shr/utils/export';
-import { useTra, remaining, paidSum, invoiceStatus, STATUS_LABEL, PAYMENT_LABEL } from '../tra/store';
+import { useTra, remaining, paidSum, invoiceStatus, STATUS_LABEL } from '../tra/store';
 import { useEgg, healthyCount } from '../egg/store';
 import { useFlk, getAgeDays } from '../flk/store';
 import { useCtc } from '../ctc/store';

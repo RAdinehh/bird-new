@@ -1,7 +1,7 @@
-import { useInc, daysToHatch, isLockdown, isHatchWindow } from '../inc/store';
+import { useInc, daysToHatch } from '../inc/store';
 import { useDlg } from '../dlg/store';
 import { useTra, remaining } from '../tra/store';
-import { useWhs, expiryWarning, daysToExpiry } from '../whs/store';
+import { useWhs, daysToExpiry } from '../whs/store';
 import { useBrd } from '../brd/store';
 import { useFlk, getEffectiveStartDate } from '../flk/store';
 import { getSchedule } from './vaccineSchedules';

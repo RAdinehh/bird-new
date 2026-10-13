@@ -1,42 +1,30 @@
-import { useState, useMemo, useRef , useEffect} from 'react';
+import { useState, useMemo,  useEffect} from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import {
-  useFlk, type Flock, type FlockType, type FlockStatus,
-  SOURCE_LABEL, getAgeDays, getLifecycle, formatAge,
-  sexRatio, daysUntilLaying, isLayingReady, calcCosts,
-  DEFAULT_LAYING_START, getLayingStartDay
+  useFlk,
+  DEFAULT_LAYING_START
 } from './store';
 import { useBrd } from '../brd/store';
 import { useSet } from '../set/store';
 import { useTra } from '../tra/store';
-import { format, addDays, subMonths } from 'date-fns-jalali';
-import { schedulesByType, getSchedule } from '../cal/vaccineSchedules';
 import { useHal } from '../hal/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag, Textarea, ErrorBox } from '../../shr/components/ui';
+import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';;
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
-import ExpandableCard from '../../shr/components/ExpandableCard';
-import { MiniProgress } from '../../shr/components/ProgressTracker';
 import UndoBar from '../../cor/ui/UndoBar';
-import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { useFormat } from '../../shr/units';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
-import { showAlert } from '../../cor/store/dialog';
-import SmartSelect from '../../shr/components/SmartSelect';
-import DependentSelect from '../../shr/components/DependentSelect';
-import { showConfirmAsync, showPromptAsync } from '../../cor/store/dialog';
+import { showConfirmAsync } from '../../cor/store/dialog';
 import { showToast, toastMsg } from '../../cor/store/toast';
-import { Row, DepBox } from './helpers';
 import FlockCard from './components/FlockCard';
 import FlocksModal from './components/FlocksModal';
 import UpcomingFlocks from './components/UpcomingFlocks';
 import { useFlocksForm } from './hooks/useFlocksForm';
-import { checkHallCapacity } from './api/hallCapacity';
-import { todayJ, jalaliBounds, checkDateBounds, hasRefs, getFlockRevenue } from './api/flocksCalc';
-import { emptyForm as empty, type F, type TabId } from './types-flocks';
+import { hasRefs, getFlockRevenue } from './api/flocksCalc';
+import { type TabId } from './types-flocks';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createFlkSchema } from '../../shr/validation/rules/flk';

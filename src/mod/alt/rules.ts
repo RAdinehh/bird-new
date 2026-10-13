@@ -5,7 +5,7 @@ import { useFlk, getAgeDays } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { useDlg } from '../dlg/store';
 import { useEgg, henDayRate } from '../egg/store';
-import { useInc, daysToHatch, isLockdown, isHatchWindow } from '../inc/store';
+import { useInc, daysToHatch, isHatchWindow } from '../inc/store';
 import { toFa } from '../../shr/utils/fa';
 import { format as formatJ, startOfDay, differenceInCalendarDays as diffCalDays, parse as parseJ} from 'date-fns-jalali';
 import { useSet } from '../set/store';

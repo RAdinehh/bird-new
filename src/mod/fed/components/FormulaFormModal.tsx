@@ -1,12 +1,12 @@
 /**
  * FormulaFormModal — فرم ساخت/ویرایش جیره
  */
-import { Field, Grid2, Grid3, Input, Modal, NumField, Select, Textarea, ErrorBox, BtnRow, Btn } from '../../../shr/components/ui';
+import { Field, Grid2, Input, Modal, NumField, Select, Textarea, ErrorBox, BtnRow, Btn } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { NutrientRow, SectionTitle } from '../helpers';
-import { formulaTotal, calcNutrients, formulaValid, type FormulaLine } from '../store';
+import { type FormulaLine } from '../store';
 import type { F } from '../types-formulas';
 
 interface Props {

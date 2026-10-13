@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, parse } from 'date-fns-jalali';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from 'date-fns-jalali';
 import { eventsOfDay, TYPE_COLORS, type CalEvent, type EventType } from './store';
 import { toFa } from '../../shr/utils/fa';
 

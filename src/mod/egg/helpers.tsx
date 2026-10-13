@@ -2,7 +2,6 @@
  * helpers.tsx — helperهای مشترک ماژول egg
  */
 import type { ReactNode, CSSProperties } from 'react';
-import { toFa } from '../../shr/utils/fa';
 
 export function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
   return (

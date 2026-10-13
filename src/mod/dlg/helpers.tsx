@@ -1,8 +1,7 @@
 /**
  * helpers.tsx — helperهای مشترک ماژول dlg
  */
-import type { ReactNode, CSSProperties } from 'react';
-import { toFa } from '../../shr/utils/fa';
+import type { ReactNode } from 'react';
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -33,7 +32,6 @@ export function Row({ l, v, warn }: { l: string; v: string; warn?: boolean }) {
 // Form Components — گروه‌بندی جدید
 // ═══════════════════════════════════════════════════════════════
 
-import { useState } from 'react';
 
 interface FormGroupProps {
   id: string;

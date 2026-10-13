@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useFilterSort, FilterBar, getWhsWarningsConfig } from '../../shr/filter';
-import { useWhs, CATEGORY_ICON, UNIT_LABEL, stockWarning, expiryWarning, daysToExpiry, type Item } from './store';
-import { Empty, PageContainer, Tag } from '../../shr/components/ui';
+import { useWhs, UNIT_LABEL, stockWarning, expiryWarning, daysToExpiry, type Item } from './store';
+import { Empty, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 import { WarningGroup } from './helpers';

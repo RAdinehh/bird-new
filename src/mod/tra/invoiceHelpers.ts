@@ -1,7 +1,7 @@
 /**
  * tra/invoiceHelpers.ts — اعمال اثر فاکتور روی انبار و گله
  */
-import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ, addDays } from 'date-fns-jalali';
+import { parse as parseJ, format as formatJ, addDays } from 'date-fns-jalali';
 import { useWhs } from '../whs/store';
 import { useFlk } from '../flk/store';
 import { useBrd } from '../brd/store';

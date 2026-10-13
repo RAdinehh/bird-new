@@ -4,7 +4,7 @@
 import { Btn, BtnRow, ErrorBox, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, SectionTitle, Select, Textarea } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import { toFa, toEn } from '../../../shr/utils/fa';
+import { toFa } from '../../../shr/utils/fa';
 import { CATEGORY_DEFAULTS, UNIT_LABEL, CATEGORY_ICON, CATEGORY_LABEL, type ItemUnit, type ItemCategory } from '../store';
 
 export interface ItemsFormModalProps {

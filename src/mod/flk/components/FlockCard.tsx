@@ -11,10 +11,7 @@ import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Row } from '../helpers';
-import { getFlockRevenue } from '../api/flocksCalc';
-import { toastMsg } from '../../../cor/store/toast';
 import { showPromptAsync } from '../../../cor/store/dialog';
-import { logAction } from '../../../cor/logger/auditLog';
 
 export interface FlockCardProps {
   flock: Flock;

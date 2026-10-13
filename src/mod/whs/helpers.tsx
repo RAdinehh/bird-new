@@ -2,12 +2,9 @@
  * helpers.tsx — ماژول whs
  */
 import type { ReactNode, CSSProperties } from 'react';
-import { showAlert } from '../../cor/store/dialog';
-import { Dot, StatBox } from '../../shr/components/ExpandableCard';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, PageContainer, Select, Tag } from '../../shr/components/ui';
-import { toEn, toFa } from '../../shr/utils/fa';
-import { useCtc } from '../ctc/store';
-import { CATEGORY_ICON, CATEGORY_LABEL, MOVEMENT_REASON, UNIT_LABEL, daysToExpiry, expiryWarning, stockWarning, type Item, type Movement, type MovementReason, type MovementType, useWhs } from './store';
+import { Tag } from '../../shr/components/ui';
+import { toFa } from '../../shr/utils/fa';
+import { CATEGORY_ICON, type Item } from './store';
 
 export function Row({ l, v }: { l: string; v: string }) {
   return (

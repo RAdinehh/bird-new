@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 import { addFile, fileCategory, CATEGORY_LABEL, LINKED_TYPE_LABEL, formatSize, type DocCategory } from './store';
 import { Btn, BtnRow, Field, Input, Modal, Select, ErrorBox , Textarea } from '../../shr/components/ui';
-import { toFa } from '../../shr/utils/fa';
 
 interface Props {
   open: boolean;

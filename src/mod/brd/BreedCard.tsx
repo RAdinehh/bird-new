@@ -3,7 +3,6 @@ import { toFa } from '../../shr/utils/fa';
 import { getPurposeInfo, getCategoryInfo } from './_display';
 import { getBirdDisplayName, getBreedDisplayName } from './_display-name';
 import { getBreedFcr, resolveStandard } from './_display-values';
-import { DEFAULT_STANDARDS } from '../set/standards/data';
 import EntityLink from '../../shr/components/EntityLink';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { Btn, Tag } from '../../shr/components/ui';

@@ -3,7 +3,7 @@ import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { useEgg, healthyCount, henDayRate, brokenRate } from '../egg/store';
 import { useDlg } from '../dlg/store';
-import { BarChart, LineChart } from '../../shr/components/Charts';
+import { BarChart } from '../../shr/components/Charts';
 import { PageContainer, Tag } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import { StatCard, Section } from './helpers';

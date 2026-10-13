@@ -2,7 +2,6 @@
  * TopAlerts — 3 کارت بالای داشبورد: هشدارهای تجمیعی + سرسیدهای نزدیک + چک‌های در جریان
  */
 import { useState } from 'react';
-import { Tag } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import { remaining } from '../tra/store';
 

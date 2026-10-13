@@ -1,7 +1,5 @@
-import { useTra, remaining, paidSum } from '../tra/store';
-import { useEgg, healthyCount, henDayRate } from '../egg/store';
-import { useFlk, getAgeDays } from '../flk/store';
-import { useDlg } from '../dlg/store';
+import { remaining } from '../tra/store';
+import { healthyCount } from '../egg/store';
 import { toEn } from '../../shr/utils/fa';
 import { format as formatJ } from 'date-fns-jalali';
 

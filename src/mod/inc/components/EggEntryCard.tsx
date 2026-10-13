@@ -6,7 +6,7 @@ import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../../shr/components/ExpandableCard';
 import { Row } from '../helpers';
 import ProgressTracker from '../../../shr/components/ProgressTracker';
-import { DEAL_LABEL, ENTRY_STATUS_LABEL, addDaysJalali, daysToHatch, isLockdown, isHatchWindow } from '../store';
+import { DEAL_LABEL, ENTRY_STATUS_LABEL, isLockdown, isHatchWindow } from '../store';
 
 export interface EggEntryCardProps {
   entry: any;

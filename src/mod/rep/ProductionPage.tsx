@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useEgg, healthyCount } from '../egg/store';
+import { useEgg } from '../egg/store';
 import { useDlg } from '../dlg/store';
 import { useFlk } from '../flk/store';
 import { eggsInMonth, feedInMonth, deathsInMonth, lastMonths, monthLabel } from './analytics';

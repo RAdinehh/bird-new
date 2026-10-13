@@ -4,7 +4,6 @@
 import { Btn, BtnRow, Field, Grid2, Modal, NumField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import { SectionTitle } from '../helpers';
 import DatePicker from '../../../shr/components/DatePicker';
-import SmartSelect from '../../../shr/components/SmartSelect';
 import { toFa, toEn } from '../../../shr/utils/fa';
 
 interface Props {
