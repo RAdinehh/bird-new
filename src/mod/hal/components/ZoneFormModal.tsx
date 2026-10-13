@@ -3,14 +3,15 @@
  * استخراج‌شده از ZonesPage طبق FOUNDATION ۳.۳ (فایل ≤ ۴۰۰ خط)
  */
 import { Btn, BtnRow, ErrorBox, Field, Grid2, Input, Modal, NumField, Textarea } from '../../../shr/components/ui';
+import type { Bird, Breed } from '../../brd/store';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import type { Hall, Zone } from '../store';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  form: any;
-  setForm: (f: any | ((prev: any) => any)) => void;
+  form: any;  // TODO: type ZoneFormData (بخش B)
+  setForm: React.Dispatch<React.SetStateAction<any>>;
   err: string;
   vErrors: Record<string, any>;
   crossWarn?: string | null;
@@ -49,9 +50,9 @@ export default function ZoneFormModal({
       </Field>
 
       {form.hallId && (() => {
-        const hall = halls.find((h: any) => h.id === form.hallId);
-        const hallBird = hall?.birdId ? birds.find((b: any) => b.id === hall.birdId) : null;
-        const hallBreed = hall?.breedId ? breeds.find((b: any) => b.id === hall.breedId) : null;
+        const hall = halls.find((h: Hall) => h.id === form.hallId);
+        const hallBird = hall?.birdId ? birds.find((b) => b.id === hall.birdId) : null;
+        const hallBreed = hall?.breedId ? breeds.find((b) => b.id === hall.breedId) : null;
         if (!hallBird && !hallBreed) return null;
         return (
           <div style={{
