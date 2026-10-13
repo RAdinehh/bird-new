@@ -2,6 +2,8 @@
  * EquipmentCard — کارت تجهیز
  */
 import { toFa } from '../../../shr/utils/fa';
+import type { CustomOption } from '../../../shr/store/customOptions';
+import type { Equipment, Hall } from '../store';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { EQUIP_LABELS } from '../store';
@@ -13,16 +15,16 @@ import { logAction } from '../../../cor/logger/auditLog';
 import EntityLink from '../../../shr/components/EntityLink';
 
 export interface EquipmentCardProps {
-  e: any;
+  e: Equipment;
   i: number;
-  hall: any;
-  allCustomOpts: any[];
+  hall: Hall | null | undefined;
+  allCustomOpts: CustomOption[];
   isOpen: boolean;
-  ms: any;
+  ms: any; // MultiSelectState<Equipment>
   onToggle: () => void;
   onEdit: () => void;
   onDelete: (id: string) => void;
-  onUndo: (item: any) => void;
+  onUndo: (item: Equipment) => void;
   supplierNames?: Map<string, string>;
   invoiceNumbers?: Map<string, string>;
   whsItemNames?: Map<string, string>;
