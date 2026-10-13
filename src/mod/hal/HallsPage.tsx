@@ -1,7 +1,7 @@
 /**
  * HallsPage — سالن‌ها
  */
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import HallCard from './components/HallCard';
 import HallsFormModal from './components/HallsFormModal';
 import { useFab } from '../../shr/hooks/useFab';
@@ -27,38 +27,14 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { useTempUnit, toUserTemp, tempLabel } from '../../shr/utils/temp';
 import { useFormat } from '../../shr/units';
 import { Row, RowWithStatus } from './helpers';
+import { type F, empty, calcSuggestedCapacity } from './_hallsHelpers';
+import { useHallsCascade } from './hooks/useHallsCascade';
 import UndoBar from '../../cor/ui/UndoBar';
 import { showToast, toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
 
-interface F {
-  id?: string;
-  name: string; code: string;
-  length: string; width: string; height: string;
-  capacity: string; targetTemp: string; targetHumidity: string;
-  ventilation: string; light: string;
-  ventilationSystem: string; feederType: string; drinkerType: string; litterType: string;
-  address: string; builtAt: string; lastSanitizedAt: string; sanitizeNotes: string; status: string; responsibleId: string; notes: string; birdId: string; breedId: string;
-}
-const empty: F = {
-  name:'', code:'', length:'', width:'', height:'',
-  capacity:'', targetTemp:'', targetHumidity:'', ventilation:'', light:'',
-  ventilationSystem:'', feederType:'', drinkerType:'', litterType:'',
- 
-  
-  address:'', builtAt:'', lastSanitizedAt:'', sanitizeNotes:'', status:'empty', responsibleId:'', notes:'', birdId:'', breedId:'',
-};
-
-
-
-/** محاسبه ظرفیت پیشنهادی بر اساس مساحت و نژاد */
-function calcSuggestedCapacity(length: number | null, width: number | null, densityMax: number | null): number | null {
-  if (!length || !width || !densityMax) return null;
-  const area = length * width;
-  return Math.floor(area * densityMax);
-}
 
 export default function HallsPage({ active = true }: { active?: boolean } = {}) {
   const { halls: _hallsRaw, zones, equipment, addHall, updateHall, deleteHall } = useHal();
@@ -85,26 +61,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   }, [focusId]);
 
   /** 🆕 وقتی سالنی حذف می‌شه، گله‌های یتیم رو آزاد کن */
-  const prevHallIdsRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    const currentIds = new Set(_hallsRaw.map((h: any) => h.id));
-    const prevIds = prevHallIdsRef.current;
-
-    if (prevIds.size > 0) {
-      const removedIds: string[] = [];
-      prevIds.forEach(id => { if (!currentIds.has(id)) removedIds.push(id); });
-
-      if (removedIds.length > 0) {
-        removedIds.forEach(hallId => {
-          flocks.filter((f: any) => f.hallId === hallId).forEach((f: any) => {
-            try { updateFlock(f.id, { hallId: '', zoneId: '' }); } catch {}
-          });
-        });
-      }
-    }
-
-    prevHallIdsRef.current = currentIds;
-  }, [_hallsRaw, flocks, updateFlock]);
+  useHallsCascade(_hallsRaw, flocks, updateFlock);
   const tempUnit = useTempUnit();
   const __breedStd = form.breedId ? breedStd.byBreedId(form.breedId) : null;
   const __suggestedCap = calcSuggestedCapacity(
