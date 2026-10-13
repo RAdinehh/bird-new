@@ -182,7 +182,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <Grid2>
           <Field label="نام سالن" required error={vErrors.name} hint="نامی که سالن رو با اون می‌شناسی"><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
-          <Field label="وضعیت سالن" hint="وضعیت فعلی سالن">
+          <Field label="وضعیت سالن">
             <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
               <option value="active">🟢 فعال</option>
               <option value="empty">⚪ خالی</option>
@@ -231,9 +231,9 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>ابعاد</div>
         <Grid3>
-          <Field label="طول" error={vErrors.length} hint="طول سالن به متر"><NumField placeholder="۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} autoClamp /></Field>
-          <Field label="عرض" error={vErrors.width} hint="عرض سالن به متر"><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} autoClamp /></Field>
-          <Field label="ارتفاع" error={vErrors.height} hint="ارتفاع سالن به متر"><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} autoClamp /></Field>
+          <Field label="طول" error={vErrors.length}><NumField placeholder="۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} autoClamp /></Field>
+          <Field label="عرض" error={vErrors.width}><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} autoClamp /></Field>
+          <Field label="ارتفاع" error={vErrors.height}><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} autoClamp /></Field>
         </Grid3>
         <Grid2>
               <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity}>
@@ -325,8 +325,8 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>زمان‌ها</div>
         <Grid2>
-          <Field label="تاریخ ساخت" hint="تاریخ ساخت یا بهره‌برداری"><DatePicker value={form.builtAt} onChange={v => setForm({...form, builtAt: v})} placeholder="انتخاب تاریخ" /></Field>
-          <Field label="آخرین ضدعفونی" hint="تاریخ آخرین ضدعفونی سالن"><DatePicker value={form.lastSanitizedAt} onChange={v => setForm({...form, lastSanitizedAt: v})} placeholder="انتخاب تاریخ" /></Field>
+          <Field label="تاریخ ساخت"><DatePicker value={form.builtAt} onChange={v => setForm({...form, builtAt: v})} placeholder="انتخاب تاریخ" /></Field>
+          <Field label="آخرین ضدعفونی"><DatePicker value={form.lastSanitizedAt} onChange={v => setForm({...form, lastSanitizedAt: v})} placeholder="انتخاب تاریخ" /></Field>
         </Grid2>
         <Field label="یادداشت ضدعفونی" hint="روش یا ماده‌ی ضدعفونی (دستی)">
           <Input placeholder="مثلاً — سرکه سیب ۵٪، همه دیوارها" value={form.sanitizeNotes || ''} onChange={e => setForm({...form, sanitizeNotes: e.target.value})} />

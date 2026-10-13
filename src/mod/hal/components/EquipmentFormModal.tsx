@@ -9,6 +9,7 @@ import type { Hall, Zone, Equipment, EquipmentCategory } from '../store';
 import type { Person } from '../../ctc/store';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
+import DependentSelect from '../../../shr/components/DependentSelect';
 import { STATUS_LABELS, type EquipmentStatus } from '../store';
 import EditableSelect from '../../../shr/components/EditableSelect';
 import { toEn } from '../../../shr/utils/fa';
@@ -54,18 +55,19 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               autoThreshold={6}
             />
           </Field>
-          {form.hallId && zones.filter((z: Zone) => z.hallId === form.hallId).length > 0 && (
-            <Field label="بخش (اختیاری)" hint="بخش خاص داخل سالن">
-              <SmartSelect
-                value={form.zoneId || ''}
-                onChange={v => setForm((f) => ({ ...f, zoneId: v }))}
-                options={zones.filter((z: Zone) => z.hallId === form.hallId).map((z: Zone) => ({ value: z.id, label: z.name }))}
-                placeholder="— بدون بخش —"
-                modalTitle="انتخاب بخش"
-                autoThreshold={6}
-              />
-            </Field>
-          )}
+          <Field label="بخش (اختیاری)" hint="بخش خاص داخل سالن">
+            <DependentSelect
+              value={form.zoneId || ''}
+              onChange={v => setForm((f) => ({ ...f, zoneId: v }))}
+              parentValue={form.hallId}
+              parentLabel="سالن"
+              options={zones.filter((z: Zone) => z.hallId === form.hallId).map((z: Zone) => ({ value: z.id, label: z.name }))}
+              emptyListMessage="این سالن هنوز بخشی ندارد — از تب «بخش‌ها» اضافه کنید"
+              placeholder="— بدون بخش —"
+              modalTitle="انتخاب بخش"
+              autoThreshold={6}
+            />
+          </Field>
 
         </Grid2>
 
