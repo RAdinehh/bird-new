@@ -3,8 +3,6 @@ import React from 'react';
  * helpers.tsx — ماژول hal
  */
 import type { ReactNode, CSSProperties } from 'react';
-import { toFa } from '../../shr/utils/fa';
-import { Field, Input, NumField, Select } from '../../shr/components/ui';
 
 export function chip(active: boolean): CSSProperties {
   return {

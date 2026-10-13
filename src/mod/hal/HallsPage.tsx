@@ -13,26 +13,20 @@ import { useBrd, type Bird, type Breed } from '../brd/store';
 import { useCtc, type Person } from '../ctc/store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
-import { useFlk, getAgeDays , type Flock} from '../flk/store';
-import { Btn, BtnRow, Empty, Field, Grid2, Grid3, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
-import DatePicker from '../../shr/components/DatePicker';
-import ExpandableCard from '../../shr/components/ExpandableCard';
+import { useFlk,  type Flock} from '../flk/store';
+import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { useFilterSort, FilterBar, getHalHallsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
-import { isFanLike, isLampLike, LITTER_KG_PER_M2 } from './helpers';
-import { HallEquipSection } from './HallEquipSection';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { useTempUnit, toUserTemp, tempLabel } from '../../shr/utils/temp';
+import { useTempUnit } from '../../shr/utils/temp';
 import { useFormat } from '../../shr/units';
-import { Row, RowWithStatus } from './helpers';
 import { type F, empty, calcSuggestedCapacity } from './_hallsHelpers';
 import { useHallsCascade } from './hooks/useHallsCascade';
 import UndoBar from '../../cor/ui/UndoBar';
-import { showToast, toastMsg } from '../../cor/store/toast';
+import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
-import { logAction } from '../../cor/logger/auditLog';
 
 
 

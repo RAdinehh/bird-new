@@ -1,7 +1,7 @@
 /**
  * HallEquipModals — سه Modal (جزئیات، افزودن، ویرایش)
  */
-import { Btn, Field, Grid2, Input, Modal, NumField } from '../../../shr/components/ui';
+import { Btn, Field, Input, Modal, NumField } from '../../../shr/components/ui';
 import type { Equipment } from '../store';
 import EditableSelect from '../../../shr/components/EditableSelect';
 import { toFa } from '../../../shr/utils/fa';

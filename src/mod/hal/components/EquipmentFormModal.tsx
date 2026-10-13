@@ -1,7 +1,7 @@
 /**
  * EquipmentFormModal — فرم افزودن/ویرایش تجهیز
  */
-import { Btn, Field, Grid2, Input, Modal, MoneyField, NumField, Select, ErrorBox } from '../../../shr/components/ui';
+import { Btn, Field, Grid2, Input, Modal, MoneyField, NumField, Select } from '../../../shr/components/ui';
 import type { EquipmentFormData } from '../useEquipmentForm';
 import type { Hall, Zone, Equipment, EquipmentCategory } from '../store';
 import type { Person } from '../../ctc/store';
@@ -9,11 +9,10 @@ import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { STATUS_LABELS, type EquipmentStatus } from '../store';
 import EditableSelect from '../../../shr/components/EditableSelect';
-import { toFa, toEn } from '../../../shr/utils/fa';
-import { CATEGORY_LABELS, KIND_LABELS, UNIT_LABELS_EQ, EQUIP_LABELS } from '../store';
+import { toEn } from '../../../shr/utils/fa';
+import { CATEGORY_LABELS, UNIT_LABELS_EQ, EQUIP_LABELS } from '../store';
 import { getEquipUnit } from '../equipUnits';
 import { getStdDefaultForType } from '../api/equipmentCalc';
-import { EquipmentIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
 
 export interface EquipmentFormModalProps {
   open: boolean;

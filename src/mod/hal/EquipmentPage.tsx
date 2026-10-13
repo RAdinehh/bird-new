@@ -13,15 +13,10 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Equipment } from './store';
-import { useFormDraft } from '../../shr/hooks/useFormDraft';
-import { Btn, Empty, PageContainer, Select } from '../../shr/components/ui';
-import ExpandableCard from '../../shr/components/ExpandableCard';
+import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useFilterSort, FilterBar, getHalEquipmentConfig } from '../../shr/filter';
 import { toFa, toEn } from '../../shr/utils/fa';
-import SmartSelect from '../../shr/components/SmartSelect';
-import { showAlert } from '../../cor/store/dialog';
-import EditableSelect from '../../shr/components/EditableSelect';
 import { useCustomOptions } from '../../shr/store/customOptions';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
@@ -31,10 +26,9 @@ import { useWhs } from '../whs/store';
 import UndoBar from '../../cor/ui/UndoBar';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
-import { showToast, toastMsg } from '../../cor/store/toast';
+import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
-import { getEquipUnit } from './equipUnits';
 
 /** دسته‌های مجاز برای هر نوع دارایی */
 export default function EquipmentPage({ active = true }: { active?: boolean } = {}) {

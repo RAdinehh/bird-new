@@ -3,9 +3,8 @@
  * استخراج‌شده از ZonesPage طبق FOUNDATION ۳.۳ (فایل ≤ ۴۰۰ خط)
  */
 import { Btn, BtnRow, ErrorBox, Field, Grid2, Input, Modal, NumField, Textarea } from '../../../shr/components/ui';
-import type { Bird, Breed } from '../../brd/store';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import type { Hall, Zone } from '../store';
+import type { Hall } from '../store';
 
 interface ZoneFormData {
   id: string;

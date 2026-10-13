@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 import HallEquipModals from './components/HallEquipModals';
 import CategoryPicker from './components/CategoryPicker';
 import HallEquipCatRow from './components/HallEquipCatRow';
-import { CategoryIcon, CATEGORY_COLORS } from '../../shr/icons/equipment';
+import { CATEGORY_COLORS } from '../../shr/icons/equipment';
 import {
   useHal,
   CATEGORY_LABELS,
