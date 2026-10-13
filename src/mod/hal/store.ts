@@ -172,10 +172,18 @@ export const useHal = create<State>()(
     {
       name: 'pm-hal',
       version: 5,
-      migrate: (persisted: any, version: number) => {
+      // ═══ Migration: داده‌های نسخه‌های قدیمی ═══
+      // FOUNDATION استثنا — اینجا any مجاز ئه چون:
+      //   ۱. داده از localStorage نسخه‌های قبلی میاد (ساختار ناشناخته)
+      //   ۲. مشابه JSON.parse — نمی‌تونیم دقیق تایپ کنیم
+      //   ۳. بعد از migration، داده به تایپ دقیق تبدیل می‌شه
+      // forEach داخلی: هر رکورد legacy، شکل متفاوتی داره
+      migrate: (persistedData: unknown, version: number) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const persisted = persistedData as any;
       // 🆕 migration: kind 'system' → 'asset'
-      if (Array.isArray((persisted as any).equipment)) {
-        (persisted as any).equipment.forEach((e: any) => {
+      if (Array.isArray(persisted.equipment)) {
+        persisted.equipment.forEach((e: any) => {
           if (e.kind === 'system') e.kind = 'asset';
         });
       }
