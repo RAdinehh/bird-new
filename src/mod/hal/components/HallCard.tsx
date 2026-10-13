@@ -19,10 +19,10 @@ export interface HallCardProps {
   zones: Zone[];
   equipment: Equipment[];
   flocks: Flock[];
-  breedStd: any;    // ← type از hook useBreedStandard
-  fmt: any;         // ← type از hook useFormat
+  breedStd: ReturnType<typeof import('../../../shr/hooks/useBreedStandard').useBreedStandard>;
+  fmt: ReturnType<typeof import('../../../shr/units/useFormat').useFormat>;
   isOpen: boolean;
-  ms: any;          // ← MultiSelectState<Hall>
+  ms: import('../../../shr/multiSelect/useMultiSelect').MultiSelectState<Hall>;
   onToggle: () => void;
   onEdit: () => void;
   onDelete: (id: string) => void;
