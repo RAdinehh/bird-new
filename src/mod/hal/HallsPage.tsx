@@ -84,7 +84,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       breeds: breeds.map((b: Breed) => ({ id: b.id, name: b.name, birdId: b.birdId })),
       zones,
       equipment,
-      flocks: flocks.map(f => ({ id: f.id, hallId: (f as any).hallId, status: f.status })),
+      flocks: flocks.map(f => ({ id: f.id, hallId: f.hallId, status: f.status })),
     }),
     [birds, zones, equipment, flocks]
   );
@@ -208,7 +208,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       notes: form.notes || '',
       birdId: (() => {
         const b = breeds.find((x: Breed) => x.id === (form.breedId || ''));
-        return (b as any)?.birdId || '';
+        return b?.birdId || '';
       })(),
       breedId: form.breedId || '',
     },

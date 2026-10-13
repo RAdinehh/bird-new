@@ -152,7 +152,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     const cap = int(form.capacity);
     if (cap <= 0) return null;
     const hall = halls.find((h: Hall) => h.id === form.hallId);
-    const hallCap = (hall as any)?.capacity;
+    const hallCap = hall?.capacity;
     if (!hallCap) return null;
     // جمع بخش‌های دیگه همون سالن (بدون بخش فعلی در حالت ویرایش)
     const othersSum = zones
@@ -179,7 +179,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   // 🆕 گله‌های هر بخش
   const flocksByZone = useMemo(() => {
     const m = new Map<string, any[]>();
-    for (const f of flocks as any[]) {
+    for (const f of flocks) {
       if (!f.zoneId) continue;
       const arr = m.get(f.zoneId) || [];
       arr.push(f);
