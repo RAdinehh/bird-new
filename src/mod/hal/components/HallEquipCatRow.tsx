@@ -2,6 +2,7 @@
  * HallEquipCatRow — یک ردیف دسته‌ی تجهیز (تک‌خطی با نوار پیشرفت)
  */
 import { CategoryIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
+import { getCategoryLabel, getCategorySoft } from '../_typedLabels';
 import { CATEGORY_LABELS } from '../store';
 import { toFa } from '../../../shr/utils/fa';
 
@@ -26,9 +27,9 @@ interface Props {
 }
 
 export default function HallEquipCatRow({ cat, count, tone, pct, onClick }: Props) {
-  const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
+  const label = getCategoryLabel(cat)?.name || cat;
   const color = CATEGORY_COLORS[cat] || 'var(--cat-auxiliary)';
-  const soft = (CATEGORY_COLORS as any)[cat + '-soft'] || 'var(--input-bg)';
+  const soft = getCategorySoft(cat);
   return (
     <button type="button" onClick={onClick} style={{
       width: '100%', padding: '10px 12px', minHeight: 46,

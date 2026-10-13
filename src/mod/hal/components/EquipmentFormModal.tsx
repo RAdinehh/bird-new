@@ -2,6 +2,7 @@
  * EquipmentFormModal — فرم افزودن/ویرایش تجهیز
  */
 import { Btn, Field, Grid2, Input, Modal, MoneyField, NumField, Select } from '../../../shr/components/ui';
+import { getUnitLabel, getEquipLabel } from '../_typedLabels';
 import type { BirdStandard } from '../../set/standards/types';
 import type { EquipmentFormData } from '../useEquipmentForm';
 import type { Hall, Zone, Equipment, EquipmentCategory } from '../store';
@@ -108,7 +109,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               setForm({ ...form, ...patch });
             }}
             options={typesForCategory(form.category || 'auxiliary').map(k => {
-              const v = (EQUIP_LABELS as any)[k] || { name: k };
+              const v = getEquipLabel(k) || { name: k };
               return {
                 value: k,
                 label: v.name,
@@ -150,7 +151,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <>
               <Grid2>
                 <Field label="تعداد">
-                  <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={(UNIT_LABELS_EQ as any)[form.unit || 'pcs'] || 'عدد'} min={0} max={100000} autoClamp />
+                  <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={0} max={100000} autoClamp />
                   {vErrors.count && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 3 }}>⚠ {vErrors.count}</div>}
                 </Field>
                 {hasSec ? (

@@ -1,5 +1,6 @@
 /** HallEquipSection — تجهیزات سالن (بازطراحی تک‌خطی) */
 import { useState, useMemo, useEffect } from 'react';
+import { getCategoryLabel } from './_typedLabels';
 import HallEquipModals from './components/HallEquipModals';
 import CategoryPicker from './components/CategoryPicker';
 import HallEquipCatRow from './components/HallEquipCatRow';
@@ -243,7 +244,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
 
   // ═══ Detail modal data ═══
   const detailList = detailCat ? (grouped[detailCat] || []) : [];
-  const detailCatLabel = detailCat ? ((CATEGORY_LABELS as any)[detailCat]?.name || detailCat) : '';
+  const detailCatLabel = detailCat ? (getCategoryLabel(detailCat)?.name || detailCat) : '';
   const detailColor = detailCat ? (CATEGORY_COLORS[detailCat] || 'var(--cat-auxiliary)') : 'var(--cat-auxiliary)';
   const detailInstalled = detailCat ? calcInstalled(detailCat, detailList) : 0;
   const detailNeed = detailCat ? (needByCategory[detailCat]?.value || 0) : 0;

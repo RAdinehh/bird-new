@@ -2,6 +2,7 @@
  * HallEquipModals — سه Modal (جزئیات، افزودن، ویرایش)
  */
 import { Btn, Field, Input, Modal, NumField } from '../../../shr/components/ui';
+import { getCategoryLabel, getEquipLabel, getCategoryColor } from '../_typedLabels';
 import type { Equipment } from '../store';
 import EditableSelect from '../../../shr/components/EditableSelect';
 import { toFa } from '../../../shr/utils/fa';
@@ -146,7 +147,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
       <Modal
         open={picker}
         onClose={() => setPicker(false)}
-        title={`افزودن ${(CATEGORY_LABELS as any)[pickerCat]?.name || pickerCat}`}
+        title={`افزودن ${getCategoryLabel(pickerCat)?.name || pickerCat}`}
         footer={
           <div style={{ display: 'flex', gap: 6 }}>
             <Btn variant="primary" onClick={saveNewEquip} disabled={!pickerName.trim()} style={{ flex: 1 }}>ذخیره</Btn>
@@ -159,11 +160,11 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
             value={pickerType}
             onChange={setPickerType}
             options={typesForCategory(pickerCat).map(k => {
-              const v = (EQUIP_LABELS as any)[k] || { name: k };
+              const v = getEquipLabel(k) || { name: k };
               return {
                 value: k,
                 label: v.name,
-                icon: <EquipmentIcon type={k} size={22} weight="duotone" color={(CATEGORY_COLORS as any)[pickerCat]} />,
+                icon: <EquipmentIcon type={k} size={22} weight="duotone" color={getCategoryColor(pickerCat)} />,
               };
             })}
             customKey={'hal.equip.type.' + pickerCat}

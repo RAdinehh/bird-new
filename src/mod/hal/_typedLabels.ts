@@ -3,8 +3,9 @@
  * طبق FOUNDATION قانون ۳.۳ (کاهش as any)
  */
 import {
-  KIND_LABELS, CATEGORY_LABELS, UNIT_LABELS_EQ, STATUS_LABELS,
+  KIND_LABELS, CATEGORY_LABELS, UNIT_LABELS_EQ, STATUS_LABELS, EQUIP_LABELS,
 } from './store';
+import { CATEGORY_COLORS } from '../../shr/icons/equipment';
 
 // ═══ انواع ═══
 export interface LabelInfo {
@@ -32,4 +33,19 @@ export function getStatusLabel(status: string | undefined): LabelInfo | undefine
 export function getUnitLabel(unit: string | undefined): string {
   const m = UNIT_LABELS_EQ as unknown as Record<string, string | undefined>;
   return m[unit || 'pcs'] || 'عدد';
+}
+
+export function getEquipLabel(key: string | undefined): LabelInfo | undefined {
+  if (!key) return undefined;
+  return (EQUIP_LABELS as unknown as LabelsMap)[key];
+}
+
+export function getCategoryColor(cat: string | undefined): string {
+  const m = CATEGORY_COLORS as unknown as Record<string, string | undefined>;
+  return m[cat || 'auxiliary'] || 'var(--cat-auxiliary)';
+}
+
+export function getCategorySoft(cat: string | undefined): string {
+  const m = CATEGORY_COLORS as unknown as Record<string, string | undefined>;
+  return m[(cat || 'auxiliary') + '-soft'] || 'var(--input-bg)';
 }

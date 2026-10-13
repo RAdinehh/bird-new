@@ -2,6 +2,7 @@
  * CategoryPicker — انتخاب دسته‌ی تجهیز (Bottom Sheet + Portal)
  */
 import { createPortal } from 'react-dom';
+import { getCategoryLabel, getCategorySoft, getCategoryColor } from '../_typedLabels';
 import { CategoryIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
 import { CATEGORY_LABELS } from '../store';
 import { ALL_CATS } from '../_equipHelpers';
@@ -75,9 +76,9 @@ export default function CategoryPicker({ open, onClose, onPick, grouped }: Props
             touchAction: 'pan-y',
           }}>
           {ALL_CATS.map(cat => {
-            const color = (CATEGORY_COLORS as any)[cat] || 'var(--cat-auxiliary)';
-            const soft = (CATEGORY_COLORS as any)[cat + '-soft'] || 'var(--input-bg)';
-            const label = (CATEGORY_LABELS as any)[cat]?.name || cat;
+            const color = getCategoryColor(cat);
+            const soft = getCategorySoft(cat);
+            const label = getCategoryLabel(cat)?.name || cat;
             const count = (grouped[cat] || []).length;
             return (
               <button key={cat} type="button" onClick={() => onPick(cat)} style={{
