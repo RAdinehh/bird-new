@@ -20,7 +20,7 @@ export interface EquipmentCardProps {
   hall: Hall | null | undefined;
   allCustomOpts: CustomOption[];
   isOpen: boolean;
-  ms: any; // MultiSelectState<Equipment>
+  ms: import('../../../shr/multiSelect/useMultiSelect').MultiSelectState<Equipment>;
   onToggle: () => void;
   onEdit: () => void;
   onDelete: (id: string) => void;

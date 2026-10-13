@@ -17,7 +17,7 @@ import { EquipmentIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
 export interface EquipmentFormModalProps {
   open: boolean;
   setOpen: (v: boolean) => void;
-  form: any;  // TODO: type from useEquipmentForm
+  form: any;  // TODO: type EquipmentFormData (بخش B)
   setForm: React.Dispatch<React.SetStateAction<any>>;
   err: string;
   vErrors: Record<string, string>;
@@ -29,10 +29,10 @@ export interface EquipmentFormModalProps {
   markAuto: (k: string) => void;
   categoriesForKind?: (k: string) => string[];  // اختیاری — سازگاری
   typesForCategory: (c: string) => string[];
-  equipNeed: any;
+  equipNeed: any; // ← return of useEquipmentForm
   save: () => void;
   suppliers?: Person[];
-  stdForDefaults?: any;
+  stdForDefaults?: any; // ← standard shape (dynamic)
 }
 
 export default function EquipmentFormModal(props: EquipmentFormModalProps) {

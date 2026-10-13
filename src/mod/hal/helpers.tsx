@@ -160,19 +160,3 @@ export function RowWithStatus({
 }
 
 
-// ═══ مقادیر استاندارد سالن (برای OverrideHint) ═══
-/** محاسبه‌ی مقادیر مرجع از استاندارد نژاد */
-export function getHallStdValues(
-  breedStd: any, // ← ReturnType of useBreedStandard
-  length: number | null,
-  width: number | null,
-): { capacity: number | null; targetTemp: number | null; targetHumidity: number | null } {
-  if (!breedStd) return { capacity: null, targetTemp: null, targetHumidity: null };
-  const density = breedStd?.space?.densityMax;
-  const area = (length || 0) * (width || 0);
-  const capacity = area > 0 && density ? Math.floor(area * density) : null;
-  const env = breedStd.env?.[0];
-  const targetTemp = env?.temp?.target ?? null;
-  const targetHumidity = env?.humidity?.min ?? null;
-  return { capacity, targetTemp, targetHumidity };
-}
