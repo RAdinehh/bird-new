@@ -9,7 +9,7 @@ import {
   useHal,
   CATEGORY_LABELS,
   type Equipment,
-} from './store';
+  type EquipmentCategory } from './store';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -190,7 +190,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
       : (def.secondary?.defaultValue || null);
     addEquip({
       hallId,
-      category: pickerCat as any,
+      category: pickerCat as EquipmentCategory,
       type: pickerType,
       name,
       count: pickerCount ? parseInt(toEn(pickerCount)) || null : null,
@@ -221,7 +221,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
     if (!cur) return;
     const newCount = editCount ? parseInt(toEn(editCount)) || null : null;
     const newCap = editCap ? parseFloat(toEn(editCap).replace('٫', '.')) || null : null;
-    updateEquip(editId, { count: newCount, capacity: newCap } as any);
+    updateEquip(editId, { count: newCount, capacity: newCap } as Partial<Equipment>);
     toastMsg.saved(cur.name);
     setEditId(null);
   };

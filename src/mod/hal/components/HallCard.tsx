@@ -136,10 +136,10 @@ export default function HallCard(props: HallCardProps) {
           v={totalLightW > 0 ? `${fmt.int(lux)} لوکس` : 'ثبت نشده'}
           icon={totalLightW > 0 ? lightIcon : undefined}
           hint={totalLightW > 0 ? lightAdvice : undefined} />
-        {(h as any).systemNotes && (
+        {h.systemNotes && (
           <>
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>📝 یادداشت سیستم‌ها</div>
-            <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{(h as any).systemNotes}</div>
+            <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.systemNotes}</div>
           </>
         )}
         {realCapacity && !h.capacity && (
