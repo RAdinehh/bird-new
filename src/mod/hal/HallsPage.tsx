@@ -9,8 +9,8 @@ import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createHallSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Hall } from './store';
-import { useBrd } from '../brd/store';
-import { useCtc } from '../ctc/store';
+import { useBrd, type Bird, type Breed } from '../brd/store';
+import { useCtc, type Person } from '../ctc/store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk, getAgeDays } from '../flk/store';
@@ -42,10 +42,10 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const { flocks, update: updateFlock } = useFlk();
   const { breeds, birds } = useBrd();
   const { contacts: allContacts } = useCtc();
-  const workers = allContacts.filter((c: any) => (c.roles || []).includes('worker'));
-  const birdNames = useMemo(() => new Map(birds.map((b: any) => [b.id, b.name])), [birds]);
-  const breedNames = useMemo(() => new Map(breeds.map((b: any) => [b.id, b.name])), [breeds]);
-  const workerNames = useMemo(() => new Map(allContacts.map((c: any) => [c.id, c.name || c.fullName || ''])), [allContacts]);
+  const workers = allContacts.filter((c: Person) => (c.roles || []).includes('worker'));
+  const birdNames = useMemo(() => new Map(birds.map((b: Bird) => [b.id, b.name])), [birds]);
+  const breedNames = useMemo(() => new Map(breeds.map((b: Breed) => [b.id, b.name])), [breeds]);
+  const workerNames = useMemo(() => new Map(allContacts.map((c: Person) => [c.id, c.name || ''])), [allContacts]);
   const [open, setOpen] = useState(false);
   const [autoFields, setAutoFields] = useState<Set<string>>(new Set());
   const [form, setForm] = useState<F>(empty);
@@ -87,7 +87,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const config = useMemo(
     () => getHalHallsConfig({
       birdNames: birds.map(b => ({ id: b.id, name: b.name })),
-      breeds: breeds.map((b: any) => ({ id: b.id, name: b.name, birdId: b.birdId })),
+      breeds: breeds.map((b: Breed) => ({ id: b.id, name: b.name, birdId: b.birdId })),
       zones,
       equipment,
       flocks: flocks.map(f => ({ id: f.id, hallId: (f as any).hallId, status: f.status })),
@@ -213,7 +213,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       lastSanitizedAt: form.lastSanitizedAt || '',
       notes: form.notes || '',
       birdId: (() => {
-        const b = breeds.find((x: any) => x.id === (form.breedId || ''));
+        const b = breeds.find((x: Breed) => x.id === (form.breedId || ''));
         return (b as any)?.birdId || '';
       })(),
       breedId: form.breedId || '',
@@ -223,7 +223,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     // 🔒 جلوگیری قاطع از نام تکراری سالن
     if (!form.id) {
       const _trimmed = form.name.trim();
-      const _dup = halls.find((x: any) => x.name.trim() === _trimmed);
+      const _dup = halls.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
         setErr(`سالنی با نام «${_dup.name}» تکراریه`);
         return;
