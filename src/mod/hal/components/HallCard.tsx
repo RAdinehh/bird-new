@@ -5,7 +5,8 @@ import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Row, RowWithStatus, isFanLike, isLampLike, LITTER_KG_PER_M2 } from '../helpers';
-import { getAgeDays } from '../../flk/store';
+import { getAgeDays, type Flock } from '../../flk/store';
+import type { Hall, Zone, Equipment } from '../store';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
@@ -13,19 +14,19 @@ import { HallEquipSection } from '../HallEquipSection';
 import EntityLink from '../../../shr/components/EntityLink';
 
 export interface HallCardProps {
-  h: any;
+  h: Hall;
   i: number;
-  zones: any[];
-  equipment: any[];
-  flocks: any[];
-  breedStd: any;
-  fmt: any;
+  zones: Zone[];
+  equipment: Equipment[];
+  flocks: Flock[];
+  breedStd: any;    // ← type از hook useBreedStandard
+  fmt: any;         // ← type از hook useFormat
   isOpen: boolean;
-  ms: any;
+  ms: any;          // ← MultiSelectState<Hall>
   onToggle: () => void;
   onEdit: () => void;
   onDelete: (id: string) => void;
-  onUndo: (item: any) => void;
+  onUndo: (item: Hall) => void;
   birdNames?: Map<string, string>;
   breedNames?: Map<string, string>;
   workerNames?: Map<string, string>;
@@ -61,8 +62,8 @@ export default function HallCard(props: HallCardProps) {
   const realCapacity = area > 0 && h.breedId ? Math.floor(area * 9) : null;
   const litterKey = h.litterType && h.litterType !== 'none' ? h.litterType : null;
   const litterNeed = area > 0 && litterKey ? area * (LITTER_KG_PER_M2[litterKey] || 0) : 0;
-  const hallFlocks = (flocks || []).filter((f: any) => f.hallId === h.id && f.status === 'active');
-  const totalBirds = hallFlocks.reduce((sum: number, f: any) => sum + (f.currentCount || f.initialCount || 0), 0);
+  const hallFlocks = (flocks || []).filter((f: Flock) => f.hallId === h.id && f.status === 'active');
+  const totalBirds = hallFlocks.reduce((sum: number, f: Flock) => sum + (f.currentCount || f.initialCount || 0), 0);
   const activeFlock = hallFlocks[0];
   const flockAgeDays = activeFlock ? getAgeDays(activeFlock) : 0;
   const flockBreedId = activeFlock?.breedId || h.breedId || null;
@@ -115,7 +116,7 @@ export default function HallCard(props: HallCardProps) {
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های فعال ({fmt.int(hallFlocks.length)})</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {hallFlocks.map((fl: any) => (
+            {hallFlocks.map((fl: Flock) => (
               <Row key={fl.id} l={<EntityLink type="flock" id={fl.id} label={fl.name} />} v={`${fmt.int(fl.currentCount || fl.initialCount || 0)} پرنده`} />
             ))}
             <Row l="جمع کل" v={`${fmt.int(totalBirds)} پرنده`} accent />

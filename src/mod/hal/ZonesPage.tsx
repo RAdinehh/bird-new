@@ -5,9 +5,9 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { ZoneSchema } from '../../shr/validation/rules/hal';
-import { useHal, type Zone } from './store';
+import { useHal, type Zone, type Equipment, type Hall } from './store';
 import { useBrd } from '../brd/store';
-import { useFlk } from '../flk/store';
+import { useFlk, type Flock } from '../flk/store';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { Btn, BtnRow, Empty, Field, Grid2, Input, Modal, NumField, PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -31,9 +31,9 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   const { flocks, update: updateFlock } = useFlk();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
-  const draft = useFormDraft('hal-zone', form, (v: any) => setForm(v));
+  const draft = useFormDraft('hal-zone', form, (v: typeof form) => setForm(v));
   const [err, setErr] = useState('');
-  const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
+  const [undoData, setUndoData] = useState<{ item: Zone | Zone[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const halls = useMemo(() => {
@@ -59,7 +59,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   /** 🆕 وقتی بخشی حذف می‌شه، گله‌های یتیم رو آزاد کن */
   const prevZoneIdsRef = useRef<Set<string>>(new Set());
   useEffect(() => {
-    const currentIds = new Set(zones.map((z: any) => z.id));
+    const currentIds = new Set(zones.map((z: Zone) => z.id));
     const prevIds = prevZoneIdsRef.current;
 
     if (prevIds.size > 0) {
@@ -68,7 +68,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
 
       if (removedIds.length > 0) {
         removedIds.forEach(zoneId => {
-          flocks.filter((f: any) => f.zoneId === zoneId).forEach((f: any) => {
+          flocks.filter((f: Flock) => f.zoneId === zoneId).forEach((f: Flock) => {
             try { updateFlock(f.id, { zoneId: '' }); } catch {}
           });
         });
@@ -81,12 +81,12 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
     items: zones,
-    getId: (z: any) => z.id,
+    getId: (z: Zone) => z.id,
     onDelete: async (ids: string[]) => {
       let totalFlocks = 0, totalEquip = 0;
       for (const id of ids) {
-        totalFlocks += flocks.filter((f: any) => f.zoneId === id).length;
-        totalEquip += equipment.filter((e: any) => e.zoneId === id).length;
+        totalFlocks += flocks.filter((f: Flock) => f.zoneId === id).length;
+        totalEquip += equipment.filter((e: Equipment) => e.zoneId === id).length;
       }
       let delMsg = toFa(ids.length) + ' بخش حذف شوند؟';
       if (totalFlocks > 0 || totalEquip > 0) {
@@ -97,7 +97,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
       }
       const ok = await showConfirmAsync('حذف گروهی', delMsg, { danger: true });
       if (!ok) return;
-      const backups: any[] = [];
+      const backups: Zone[] = [];
       for (const id of ids) {
         const it = zones.find(z => z.id === id);
         if (!it) continue;
@@ -106,7 +106,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });
-        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+        setTimeout(() => setUndoData((cur) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
       toastMsg.deletedBulk(backups.length, 'بخش')
     },
@@ -152,13 +152,13 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     if (!form.hallId) return null;
     const cap = int(form.capacity);
     if (cap <= 0) return null;
-    const hall = halls.find((h: any) => h.id === form.hallId);
+    const hall = halls.find((h: Hall) => h.id === form.hallId);
     const hallCap = (hall as any)?.capacity;
     if (!hallCap) return null;
     // جمع بخش‌های دیگه همون سالن (بدون بخش فعلی در حالت ویرایش)
     const othersSum = zones
-      .filter((z: any) => z.hallId === form.hallId && z.id !== form.id)
-      .reduce((s: number, z: any) => s + (z.capacity || 0), 0);
+      .filter((z: Zone) => z.hallId === form.hallId && z.id !== form.id)
+      .reduce((s: number, z: Zone) => s + (z.capacity || 0), 0);
     const totalAfter = othersSum + cap;
     if (totalAfter > hallCap) {
       return `جمع ظرفیت بخش‌ها (${toFa(totalAfter)}) از ظرفیت سالن (${toFa(hallCap)}) بیشتر می‌شود`;
@@ -213,7 +213,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     // 🔒 جلوگیری قاطع از نام تکراری بخش
     if (!form.id) {
       const _trimmed = form.name.trim();
-      const _dup = zones.find((x: any) => x.hallId === form.hallId && x.name.trim() === _trimmed);
+      const _dup = zones.find((x: Zone) => x.hallId === form.hallId && x.name.trim() === _trimmed);
       if (_dup) {
         showAlert(
           `بخشای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
@@ -335,7 +335,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
                   <>
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های این بخش ({(flocksByZone.get(z.id) || []).length})</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {(flocksByZone.get(z.id) || []).map((fl: any) => (
+                      {(flocksByZone.get(z.id) || []).map((fl: Flock) => (
                         <div key={fl.id} style={{ display: 'flex', justifyContent: 'space-between',
                            fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                            borderRadius: 'var(--r-sm)' }}>
@@ -360,8 +360,8 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
                   <Btn size="sm" onClick={() => openEdit(z)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const idToDel = z.id;
-                    const flockCount = flocks.filter((f: any) => f.zoneId === idToDel).length;
-                    const equipCount = equipment.filter((e: any) => e.zoneId === idToDel).length;
+                    const flockCount = flocks.filter((f: Flock) => f.zoneId === idToDel).length;
+                    const equipCount = equipment.filter((e: Equipment) => e.zoneId === idToDel).length;
                     let delMsg = 'این منطقه حذف شود؟';
                     if (flockCount > 0 || equipCount > 0) {
                       delMsg += '\n\n';
@@ -369,7 +369,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
                       if (equipCount > 0) delMsg += '• ' + toFa(equipCount) + ' تجهیز\n';
                       delMsg += 'اتصال‌شون قطع می‌شه.';
                     }
-                    const ok = await showConfirmAsync('تأیید حذف', delMsg, { danger: true }); if (!ok) return; const item = zones.find((x: any) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteZone(idToDel);
+                    const ok = await showConfirmAsync('تأیید حذف', delMsg, { danger: true }); if (!ok) return; const item = zones.find((x: Zone) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.item) && cur.item.id === item.id ? null : cur), 6000); } deleteZone(idToDel);
                     logAction('delete', 'hal', 'حذف از سالن‌ها');  toastMsg.deleted('منطقه')
                     }} style={{ flex: 1 }}>حذف</Btn>
                 </div>
