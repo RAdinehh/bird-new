@@ -301,6 +301,10 @@ git tag before-XXX-YYYYMMDD
 - ✅ **`IncubationProfileEditor`** + اتصال به `ProductionSection`
 - ✅ **نمایش «🌡 هدف امروز»** در کارت ورودی تخم
 - ✅ **Extensibility تأیید شد** — نژاد جدید با template، پروفایل کپی می‌شه
+- ✅ **EST + CO₂/O₂ + چرخش** (۵ فیلد استاندارد + پایش زنده Device)
+- ✅ **هشدار alt** — EST/CO₂/O₂ (دستگاه‌های فعال)
+- ✅ **`inc/needs.ts`** — ۶ تابع pure (تهویه، چرخش، ذخیره، هچ، chick yield)
+- ✅ **نمایش ذخیره‌سازی تخم** در EggEntryCard + **Chick Yield** در HatchCard
 - ✅ **مستندسازی** به‌روز
 
 ### جلسه ۵ (۱۴۰۴/۰۷/۲۱) — hal کامل + ابزارها ⭐

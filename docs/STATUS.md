@@ -73,6 +73,11 @@
 - ✅ **`IncubationProfileEditor`** (UI ویرایشگر با پروفایل پیش‌فرض)
 - ✅ **اتصال به `ProductionSection`** (تب 🥚 تولید)
 - ✅ **Extensibility تأیید شد** — نژاد جدید از Master Data با پروفایل کپی می‌شه
+- ✅ **EST + چرخش + CO₂/O₂** — ۵ فیلد استاندارد + پایش زنده در `DeviceFormModal`
+- ✅ **هشدار alt** — EST خارج بازه + CO₂/O₂ (دستگاه‌های فعال)
+- ✅ **`inc/needs.ts`** — ۶ تابع pure (تهویه، چرخش، ذخیره، هچ، chick yield)
+- ✅ **نمایش ذخیره‌سازی تخم** در `EggEntryCard`
+- ✅ **نمایش Chick Yield** در `HatchCard`
 
 ### فاز ۸ — ابزارها + hal نهایی (تموم — جلسه ۵)
 - ✅ **ESLint** نصب + config (no-unused-imports, no-explicit-any, prefer-const)
