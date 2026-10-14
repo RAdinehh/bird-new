@@ -99,6 +99,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
       estCurrent: d.estCurrent ? toFa(d.estCurrent) : '',
       co2Current: d.co2Current ? toFa(d.co2Current) : '',
       o2Current: d.o2Current ? toFa(d.o2Current) : '',
+      turningCurrent: d.turningCurrent || 'auto',
     });
     setErr(''); setOpen(true);
   };
@@ -135,6 +136,10 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
       humiditySensors: int(form.humiditySensors),
       motorPower: num(form.motorPower),
       extraCost: num(form.extraCost),
+      estCurrent: num(form.estCurrent),
+      co2Current: num(form.co2Current),
+      o2Current: num(form.o2Current),
+      turningCurrent: (form.turningCurrent as 'on' | 'off' | 'auto') || 'auto',
       maintenanceLogs: [],
       equipmentId: '',
       notes: form.notes.trim(),
@@ -356,6 +361,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
                     {d.estCurrent != null && <Row l="EST (پوسته تخم)" v={toFa(d.estCurrent) + '°C'} />}
                     {d.co2Current != null && <Row l="CO₂" v={toFa(d.co2Current) + '٪'} />}
                     {d.o2Current != null && <Row l="O₂" v={toFa(d.o2Current) + '٪'} />}
+                    {d.turningCurrent && <Row l="چرخش" v={d.turningCurrent === 'on' ? '🔄 روشن' : d.turningCurrent === 'off' ? '⏸ قطع' : '🤖 خودکار'} />}
                   </div>
                 </>
               )}

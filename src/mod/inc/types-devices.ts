@@ -39,6 +39,7 @@ export interface F {
   estCurrent: string;
   co2Current: string;
   o2Current: string;
+  turningCurrent: string;
 }
 
 export const emptyForm: F = {
@@ -62,4 +63,5 @@ export const emptyForm: F = {
   estCurrent: '',
   co2Current: '',
   o2Current: '',
+  turningCurrent: 'auto',
 };

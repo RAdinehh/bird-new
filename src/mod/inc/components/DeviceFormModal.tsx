@@ -114,6 +114,18 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
             <NumField placeholder="۳۷.۵" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={30} max={45} />
           </Field>
         </Grid2>
+        <Grid2>
+          <Field label="وضعیت چرخش">
+            <Select value={form.turningCurrent} onChange={e => setForm({...form, turningCurrent: e.target.value})}>
+              <option value="auto">🤖 خودکار</option>
+              <option value="on">🔄 روشن</option>
+              <option value="off">⏸ قطع</option>
+            </Select>
+          </Field>
+          <Field label="رطوبت فعلی">
+            <NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={30} max={90} />
+          </Field>
+        </Grid2>
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
         <Grid2>

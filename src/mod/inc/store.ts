@@ -58,6 +58,8 @@ export interface Device {
   co2Current?: number | null;
   /** 🆕 O₂ فعلی — ٪ */
   o2Current?: number | null;
+  /** 🆕 وضعیت چرخش فعلی — on/off/auto */
+  turningCurrent?: 'on' | 'off' | 'auto';
   extraCost: number | null;
   maintenanceLogs: MaintenanceLog[];
   equipmentId: string;

@@ -452,6 +452,39 @@ export function detectAllAlerts(): RuleAlert[] {
       });
     }
 
+    // 🆕 وضعیت چرخش (روز ۱۸ باید قطع شه)
+    const entryDevice = devices.find(dev => dev.id === entry.deviceId);
+    const turningState = entryDevice?.turningCurrent;
+    if (turningState && turningState !== 'auto' && entry.breedId) {
+      const tBreed = breedsForInc.find(b => b.id === entry.breedId);
+      const tStdKey = (tBreed as { standardKey?: string } | undefined)?.standardKey || tBreed?.name;
+      const tStd = tStdKey ? (getStandardFor(tStdKey, { customStandards: customStandardsForInc }) as any) : null;
+      const lockDay = tStd?.incubation?.lockdownDay ?? 18;
+      const beforeLock = age > 0 && age < lockDay;
+      const inLock = age >= lockDay;
+      if (beforeLock && turningState === 'off') {
+        alerts.push({
+          level: 'important',
+          category: 'reproduction',
+          title: '⏸ چرخش قطع — قبل از روز ' + toFa(lockDay),
+          message: toFa(entry.count || 0) + ' تخم — روز ' + toFa(age) + '، چرخش باید روشن باشه',
+          source: 'inc',
+          sourceId: entry.id + ':turning-off-early',
+          date: today(), notes: ''
+        });
+      } else if (inLock && turningState === 'on') {
+        alerts.push({
+          level: 'critical',
+          category: 'reproduction',
+          title: '🔄 چرخش روشن — باید قطع باشه',
+          message: toFa(entry.count || 0) + ' تخم — روز ' + toFa(age) + ' (بعد از lock-down)، فوراً چرخش رو قطع کن',
+          source: 'inc',
+          sourceId: entry.id + ':turning-on-late',
+          date: today(), notes: ''
+        });
+      }
+    }
+
     // 🆕 کاهش وزن تخم (استاندارد Ross: ۱۱-۱۳٪ تا روز ۱۸)
     const wInit = entry.sampleWeightInitial;
     const wCur = entry.sampleWeightCurrent;
