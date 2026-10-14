@@ -186,16 +186,20 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', marginBottom: 8 }}>🏷 هویت و مدیریت</div>
         <Grid2>
           <Field label="نام سالن" required error={vErrors.name} hint="نامی که سالن رو با اون می‌شناسی"><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} /></Field>
-          <Field label="وضعیت سالن">
-            <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
-              <option value="active">🟢 فعال</option>
-              <option value="empty">⚪ خالی</option>
-              <option value="sanitizing">🟡 ضدعفونی</option>
-              <option value="maintenance">🔴 تعمیر</option>
-              <option value="inactive">⚫ غیرفعال</option>
-            </Select>
+          <Field label="کد سالن" hint="شناسه داخلی — اگه خالی بمونه، خودکار از نام ساخته می‌شه">
+            <Input placeholder="مثلاً — hall-north" dir="ltr" value={form.code} onChange={e => setForm({...form, code: e.target.value})} />
           </Field>
         </Grid2>
+
+        <Field label="وضعیت سالن">
+          <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
+            <option value="active">🟢 فعال</option>
+            <option value="empty">⚪ خالی</option>
+            <option value="sanitizing">🟡 در حال ضدعفونی</option>
+            <option value="maintenance">🔴 تعمیر</option>
+            <option value="inactive">⚫ غیرفعال</option>
+          </Select>
+        </Field>
 
         {(workers && workers.length > 0) && (
           <Field label="مسئول سالن" hint="کارگر مسئول این سالن">

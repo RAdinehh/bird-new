@@ -51,15 +51,25 @@ export default function HallCard(props: HallCardProps) {
     : airChanges >= 8 ? 'ضعیف — احتمال گرمی' : 'بسیار ضعیف — خطر';
   const airIcon = airChanges === 0 ? '—' : airChanges >= 30 ? '❄️' : airChanges >= 15 ? '✅' : airChanges >= 8 ? '⚠️' : '🔥';
 
-  const lampEfficiency = 100;
-  const totalLumens = totalLightW * lampEfficiency;
+  // 🆕 بازده لامپ بر اساس نوع: LED=۱۰۰ lm/W, فلورسنت=۶۰, قدیمی=۱۵
+  const lampLumensPerW = (type: string) => {
+    if (type === 'lamp_led') return 100;
+    if (type === 'lamp_fluorescent') return 60;
+    return 15;
+  };
+  const totalLumens = hallEquips
+    .filter(e => isLampLike(e.type))
+    .reduce((a, e) => a + ((e.count || 0) * (e.capacity || 0) * lampLumensPerW(e.type)), 0);
   const lux = area > 0 && totalLumens > 0 ? totalLumens / area : 0;
   const lightAdvice = lux === 0 ? 'لامپی ثبت نشده'
     : lux >= 30 ? 'روشنایی قوی' : lux >= 20 ? 'مناسب تخم‌گذار'
     : lux >= 10 ? 'مناسب پرورش' : 'کم — احتمال افت تولید';
   const lightIcon = lux === 0 ? '—' : lux >= 30 ? '☀️' : lux >= 20 ? '🥚' : lux >= 10 ? '🐣' : '🌙';
 
-  const realCapacity = area > 0 && h.breedId ? Math.floor(area * 9) : null;
+  // 🆕 تراکم از استاندارد نژاد سالن (fallback: ۹)
+  const hallStd = h.breedId ? breedStd.byBreedId(h.breedId) : null;
+  const hallDensity = hallStd?.space?.densityMax ?? 9;
+  const realCapacity = area > 0 && h.breedId ? Math.floor(area * hallDensity) : null;
   const hallFlocks = (flocks || []).filter((f: Flock) => f.hallId === h.id && f.status === 'active');
   const totalBirds = hallFlocks.reduce((sum: number, f: Flock) => sum + (f.currentCount || f.initialCount || 0), 0);
   const activeFlock = hallFlocks[0];
