@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { getCategoryLabel } from './_typedLabels';
 import HallEquipModals from './components/HallEquipModals';
 import CategoryPicker from './components/CategoryPicker';
-import HallEquipCatRow from './components/HallEquipCatRow';
+import HallEquipCatCard from './components/HallEquipCatCard';
 import { CATEGORY_COLORS } from '../../shr/icons/equipment';
 import {
   useHal,
@@ -321,16 +321,24 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
                 تجهیزی ثبت نشده — با دکمه پایین اضافه کن
               </div>
             ) : (
-              displayCats.map(cat => (
-                <HallEquipCatRow
-                  key={cat}
-                  cat={cat}
-                  count={(grouped[cat] || []).length}
-                  tone={toneFor(cat)}
-                  pct={pctFor(cat)}
-                  onClick={() => setDetailCat(cat)}
-                />
-              ))
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 'var(--sp-2)',
+                padding: 'var(--sp-3)',
+                background: 'var(--card-solid)',
+              }}>
+                {displayCats.map(cat => (
+                  <HallEquipCatCard
+                    key={cat}
+                    cat={cat}
+                    count={(grouped[cat] || []).length}
+                    tone={toneFor(cat)}
+                    pct={pctFor(cat)}
+                    onClick={() => setDetailCat(cat)}
+                  />
+                ))}
+              </div>
             )}
 
             <div style={{ padding: 'var(--sp-3)', background: 'var(--card-solid)' }}>
