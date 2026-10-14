@@ -165,7 +165,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   <Field
                     label={def.secondary!.label}
                     autoFrom={autoFields.has('capacity') && String(form.capacity) === String(def.secondary!.defaultValue) ? 'پیش‌فرض' : undefined}
-                    hint={def.secondary!.defaultValue ? `پیش‌فرض: ${def.secondary!.defaultValue} ${def.secondary!.unit}` : undefined}
+                    hint={def.secondary!.hint ? `${def.secondary!.hint} — واحد: ${def.secondary!.unit}` : (def.secondary!.defaultValue ? `پیش‌فرض: ${def.secondary!.defaultValue} ${def.secondary!.unit}` : undefined)}
                   >
                     <NumField
                       placeholder={def.secondary!.defaultValue ? String(def.secondary!.defaultValue) : '۰'}

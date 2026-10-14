@@ -211,7 +211,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
             return (
               <Field
                 label={def.secondary.label}
-                hint={`واحد: ${def.secondary.unit}${def.secondary.defaultValue ? ` — پیش‌فرض ${def.secondary.defaultValue}` : ''}`}
+                hint={def.secondary.hint ? `${def.secondary.hint} — واحد: ${def.secondary.unit}` : `واحد: ${def.secondary.unit}${def.secondary.defaultValue ? ` — پیش‌فرض ${def.secondary.defaultValue}` : ''}`}
               >
                 <NumField
                   placeholder={def.secondary.defaultValue ? String(def.secondary.defaultValue) : '۰'}
@@ -246,7 +246,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
             return (
               <Field
                 label={def.secondary.label}
-                hint={`واحد: ${def.secondary.unit}`}
+                hint={def.secondary.hint ? `${def.secondary.hint} — واحد: ${def.secondary.unit}` : `واحد: ${def.secondary.unit}`}
               >
                 <NumField
                   placeholder="۰"
