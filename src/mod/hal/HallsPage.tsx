@@ -355,6 +355,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         form={form}
         setForm={setForm}
         err={err}
+        onErrorClear={() => setErr('')}
         vErrors={vErrors}
         birds={birds}
         breeds={breeds}
