@@ -44,6 +44,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
         footer={<div style={{ display: "flex", gap: 6 }}><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
+        <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', marginBottom: 8 }}>📍 محل نصب</div>
         <Grid2>
           <Field label="سالن" required hint="سالنی که تجهیز در آن نصب می‌شود">
             <SmartSelect
@@ -71,6 +72,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
 
         </Grid2>
 
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginBottom: 8, marginTop: 8 }}>🏷 هویت</div>
         <Grid2>
           <Field label="دسته" required hint="دسته‌بندی تجهیز — تهویه، گرمایش، ...">
             <SmartSelect
@@ -146,6 +148,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           </Field>
         )}
 
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginBottom: 8, marginTop: 8 }}>📊 مشخصات فنی</div>
         {(() => {
           const def = getEquipUnit(form.type || 'other');
           const hasSec = !!def.secondary;
@@ -197,6 +200,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                 </Grid2>
               )}
 
+              <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginBottom: 8, marginTop: 8 }}>💰 مالی و وضعیت</div>
               {!hasSec && (
                 <>
                   <Grid2>
