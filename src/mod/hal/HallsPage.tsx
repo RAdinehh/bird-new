@@ -207,10 +207,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       builtAt: form.builtAt || '',
       lastSanitizedAt: form.lastSanitizedAt || '',
       notes: form.notes || '',
-      birdId: (() => {
-        const b = breeds.find((x: Breed) => x.id === (form.breedId || ''));
-        return b?.birdId || '';
-      })(),
+      birdId: form.birdId || '',
       breedId: form.breedId || '',
     },
   );

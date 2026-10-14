@@ -77,7 +77,6 @@ export function Field({ label, required, hint, autoFrom, error, warning, childre
           textAlign: 'right',
           width: '100%',
         }} dir="rtl">
-          <span aria-hidden="true">⚠️</span>
           <span>{error}</span>
         </div>
       )}

@@ -126,7 +126,6 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom, error, n
           alignItems: 'center',
           gap: 4,
         }}>
-          <span aria-hidden="true">⚠️</span>
           <span>{error}</span>
         </div>
       ) : null}
@@ -239,60 +238,33 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           <Field label="عرض" required error={vErrors.width}><NumField placeholder="۵" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} autoClamp /></Field>
           <Field label="ارتفاع" required error={vErrors.height}><NumField placeholder="۳" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} autoClamp /></Field>
         </Grid3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-2)', alignItems: 'start' }}>
-              <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity}>
+        {(() => {
+          const cap = parseFloat(toEn(form.capacity)) || 0;
+          const stdW = form.breedId ? breedStd.byBreedId(form.breedId) : null;
+          const density = stdW?.space?.densityMax;
+          const L = parseFloat(toEn(form.length)) || 0;
+          const W = parseFloat(toEn(form.width)) || 0;
+          const area = L * W;
+          const suggested = area > 0 && density ? Math.floor(area * density) : null;
+          const warnMsg = cap && suggested && cap > suggested
+            ? `ظرفیت ${toFa(cap)} بیشتر از پیشنهاد ${toFa(suggested)} است`
+            : undefined;
+          const calcCap = suggested;
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-2)', alignItems: 'start' }}>
+              <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity} warning={warnMsg}>
                 <NumField placeholder="۵۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
-            {(() => {
-              const cap = parseFloat(toEn(form.capacity)) || 0;
-              const stdW = form.breedId ? breedStd.byBreedId(form.breedId) : null;
-              const density = stdW?.space?.densityMax;
-              const L = parseFloat(toEn(form.length)) || 0;
-              const W = parseFloat(toEn(form.width)) || 0;
-              const area = L * W;
-              const suggested = area > 0 && density ? Math.floor(area * density) : null;
-              if (!cap || !suggested || cap <= suggested) return null;
-              return (
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600, padding: '2px 4px', lineHeight: 1.5, display: 'flex', alignItems: 'center', gap: 4, textAlign: 'right', marginTop: 4 }} dir="rtl">
-                  ⚠️ ظرفیت {toFa(cap)} بیشتر از پیشنهاد {toFa(suggested)} است
-                </div>
-              );
-            })()}
               </Field>
-              {(() => {
-                const std = form.breedId ? breedStd.byBreedId(form.breedId) : null;
-                const density = std?.space?.densityMax;
-                const L = parseFloat(toEn(form.length)) || 0;
-                const W = parseFloat(toEn(form.width)) || 0;
-                const area = L * W;
-                if (!(area > 0 && density)) return <div />;
-                const cap = Math.floor(area * density);
-                return (
-                  <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                    <div
-                      dir="ltr"
-                      style={{
-                        width: '100%',
-                        padding: '0 10px',
-                        height: 38,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'var(--input-bg)',
-                        border: '1px dashed var(--border)',
-                        borderRadius: 'var(--r-md)',
-                        fontSize: 'var(--fs-xs)',
-                        color: 'var(--muted)',
-                        fontVariantNumeric: 'tabular-nums',
-                        fontWeight: 600,
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {toFa(area)} × {toFa(density)} = {toFa(cap)}
-                    </div>
+              <Field label={<span style={{ visibility: 'hidden' }}>محاسبه</span>}>
+                {calcCap != null ? (
+                  <div dir="ltr" style={{ width: '100%', padding: '0 10px', height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {toFa(area)} × {toFa(density)} = {toFa(calcCap)}
                   </div>
-                );
-              })()}
-        </div>
+                ) : <div style={{ height: 38 }} />}
+              </Field>
+            </div>
+          );
+        })()}
             <OverrideHint {...capHint} />
           {form.breedId && (
             <button

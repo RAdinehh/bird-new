@@ -62,7 +62,6 @@ export function ErrorBox({ children }: { children: React.ReactNode }) {
       gap: 8,
     }}>
       <span style={{ flex: 1, textAlign: 'right', lineHeight: 1.6 }}>{children}</span>
-      <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
     </div>
   );
 }
