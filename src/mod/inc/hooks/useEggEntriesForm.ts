@@ -316,6 +316,8 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
       dealStatus: (e as any).dealStatus || 'active',
       dealWithdrawnAt: (e as any).dealWithdrawnAt || '',
       dealWithdrawnReason: (e as any).dealWithdrawnReason || '',
+      sampleWeightInitial: (e as any).sampleWeightInitial ? String((e as any).sampleWeightInitial) : '',
+      sampleWeightCurrent: (e as any).sampleWeightCurrent ? String((e as any).sampleWeightCurrent) : '',
     };
     setMultiDeviceId(e.deviceId);
     setDraftRows([row]);

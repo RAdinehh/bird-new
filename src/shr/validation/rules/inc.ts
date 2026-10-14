@@ -24,6 +24,8 @@ export const EggEntrySchema = z.object({
   unitPrice: floatNonNeg('قیمت واحد', 1_000_000_000).nullable().optional(),
   totalPrice: floatNonNeg('قیمت کل', 100_000_000_000).nullable().optional(),
   shippingCost: floatNonNeg('هزینه حمل', 1_000_000_000).nullable().optional(),
+  sampleWeightInitial: floatRange('وزن نمونه اولیه (گرم)', 20, 100).nullable().optional(),
+  sampleWeightCurrent: floatRange('وزن نمونه فعلی (گرم)', 20, 100).nullable().optional(),
   notes: optionalStr(1000),
 });
 

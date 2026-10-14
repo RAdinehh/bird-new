@@ -144,6 +144,10 @@ export interface IncubationStandard {
   candlingDays?: number[];
   chickYieldPct?: number;
   airExchangePer1000Eggs?: number;
+  /** 🆕 حداقل کاهش وزن تخم تا روز ۱۸ (٪) — استاندارد Ross: ۱۱ */
+  weightLossMinPct?: number;
+  /** 🆕 حداکثر کاهش وزن تخم تا روز ۱۸ (٪) — استاندارد Ross: ۱۳ */
+  weightLossMaxPct?: number;
 }
 
 // ═══ 🆕 بستر ═══

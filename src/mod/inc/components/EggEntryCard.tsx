@@ -7,6 +7,7 @@ import ExpandableCard, { StatBox, Dot } from '../../../shr/components/Expandable
 import { Row } from '../helpers';
 import ProgressTracker from '../../../shr/components/ProgressTracker';
 import { DEAL_LABEL, ENTRY_STATUS_LABEL, isLockdown, isHatchWindow } from '../store';
+import { calcWeightLossPct } from '../api/hatchCalc';
 
 export interface EggEntryCardProps {
   entry: any;
@@ -82,6 +83,12 @@ export default function EggEntryCard(props: EggEntryCardProps) {
         <Row l="دستگاه" v={dev?.name || '—'} />
         <Row l="پرنده" v={(bird?.name || '—') + (breed ? ' · ' + breed.name : '')} />
         <Row l="تعداد" v={toFa(e.count || 0) + ' تخم'} />
+        {e.sampleWeightInitial && e.sampleWeightCurrent && (() => {
+          const pct = calcWeightLossPct(e.sampleWeightInitial, e.sampleWeightCurrent);
+          if (pct === null) return null;
+          const inRange = pct >= 11 && pct <= 13;
+          return <Row l="کاهش وزن نمونه" v={(inRange ? '✅ ' : '⚠️ ') + toFa(pct) + '٪'} />;
+        })()}
         <Row l="تاریخ ورود" v={toFa(e.entryDate)} />
         <Row l="هچ پیش‌بینی" v={toFa(expectedHatch)} />
         {e.trayNumbers && <Row l="طبقات" v={e.trayNumbers} />}

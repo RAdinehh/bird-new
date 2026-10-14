@@ -56,7 +56,7 @@ export const HY_LINE_W36: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13},
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
     kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
@@ -125,7 +125,7 @@ export const IRAN_LAYER: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13},
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
     kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
@@ -194,7 +194,7 @@ export const LOHMANN: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13},
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
     kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
@@ -263,7 +263,7 @@ export const LEGHORN: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13},
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
     kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },

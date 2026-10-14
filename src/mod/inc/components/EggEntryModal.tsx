@@ -331,6 +331,26 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               <Input placeholder="۱-۲-۳" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
             </Field>
           </Grid2>
+          <Grid2>
+            <Field label="وزن نمونه اولیه" hint="گرم">
+              <NumField placeholder="۶۵" value={currentRow.sampleWeightInitial} onChange={e => setCurrentRow(f => ({ ...f, sampleWeightInitial: e.target.value }))} unit="گرم" min={20} max={100} />
+            </Field>
+            <Field label="وزن نمونه فعلی" hint="گرم">
+              <NumField placeholder="۵۷" value={currentRow.sampleWeightCurrent} onChange={e => setCurrentRow(f => ({ ...f, sampleWeightCurrent: e.target.value }))} unit="گرم" min={20} max={100} />
+            </Field>
+          </Grid2>
+          {(() => {
+            const init = parseFloat(toEn(currentRow.sampleWeightInitial).replace('٫', '.')) || 0;
+            const cur = parseFloat(toEn(currentRow.sampleWeightCurrent).replace('٫', '.')) || 0;
+            if (init <= 0 || cur <= 0) return null;
+            const pct = Math.round(((init - cur) / init) * 1000) / 10;
+            const inRange = pct >= 11 && pct <= 13;
+            return (
+              <div style={{ padding: 'var(--pad-tight)', background: inRange ? 'var(--input-bg)' : 'var(--warn-soft)', border: '1px solid ' + (inRange ? 'var(--border)' : 'var(--warn)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', fontWeight: 700, color: inRange ? 'var(--text)' : 'var(--warn)' }}>
+                {inRange ? '✅' : '⚠️'} کاهش وزن: {toFa(pct)}٪ (هدف استاندارد: ۱۱-۱۳٪)
+              </div>
+            );
+          })()}
           {(() => {
             if (!currentRow.count.trim()) return null;
             const cnt = parseInt(toEn(currentRow.count)) || 0;

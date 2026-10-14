@@ -80,3 +80,23 @@ export function estimateHatched(
   const lossesSum = losses.ds + losses.pp + losses.uh + losses.ot;
   return Math.max(0, fromAlive - lossesSum);
 }
+
+/** 🆕 محاسبه درصد کاهش وزن تخم (استاندارد Ross: ۱۱-۱۳٪ تا روز ۱۸) */
+export function calcWeightLossPct(
+  initial: number | null | undefined,
+  current: number | null | undefined,
+): number | null {
+  if (!initial || initial <= 0 || !current || current <= 0) return null;
+  const pct = ((initial - current) / initial) * 100;
+  return Math.round(pct * 10) / 10;
+}
+
+/** 🆕 چک در بازه بودن کاهش وزن */
+export function isWeightLossInRange(
+  pct: number | null,
+  min = 11,
+  max = 13,
+): boolean {
+  if (pct === null) return true;
+  return pct >= min && pct <= max;
+}

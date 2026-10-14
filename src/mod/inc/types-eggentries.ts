@@ -20,6 +20,8 @@ export interface DraftRow {
   dealStatus: 'active' | 'withdrawn';
   dealWithdrawnAt: string;
   dealWithdrawnReason: string;
+  sampleWeightInitial: string;
+  sampleWeightCurrent: string;
 }
 
 export const makeRow = (): DraftRow => ({
@@ -39,4 +41,6 @@ export const makeRow = (): DraftRow => ({
   dealStatus: 'active',
   dealWithdrawnAt: '',
   dealWithdrawnReason: '',
+  sampleWeightInitial: '',
+  sampleWeightCurrent: '',
 });

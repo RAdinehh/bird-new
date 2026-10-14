@@ -88,6 +88,10 @@ export interface EggEntry {
   generatedInvoiceId: string;
   generatedProductionId: string;
   notes: string;
+  /** 🆕 وزن نمونه اولیه تخم (گرم) — برای محاسبه کاهش وزن */
+  sampleWeightInitial?: number | null;
+  /** 🆕 وزن نمونه فعلی تخم (گرم) */
+  sampleWeightCurrent?: number | null;
   createdAt: string; updatedAt: string;
 }
 

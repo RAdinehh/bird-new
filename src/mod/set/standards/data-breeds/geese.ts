@@ -32,7 +32,7 @@ const GOOSE_BASE = {
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 30, lockdownDay: 27, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 75 },
+  incubation: { totalDays: 30, lockdownDay: 27, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 75, weightLossMinPct: 11, weightLossMaxPct: 13},
   litter: { recommended: ['straw' as const, 'wood_shavings' as const], kgPerM2ByMaterial: { wood_shavings: 5.5, rice_hull: 5.5, straw: 9.2, sand: 45.8, sawdust: 7.3, peat: 9.2, paper_roll: 0.55, none: 0 }, thicknessCm: 10, lifetimeDays: 30 },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 2.0 },
