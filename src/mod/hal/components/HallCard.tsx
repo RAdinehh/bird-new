@@ -107,6 +107,9 @@ export default function HallCard(props: HallCardProps) {
         <Row l="مساحت" v={`${toFa(area.toFixed(1))} م²`} />
         <Row l="حجم" v={`${toFa(volume.toFixed(1))} م³`} />
         <Row l="ظرفیت" v={h.capacity ? `${fmt.int(h.capacity)} پرنده` : '—'} />
+        {realCapacity && !h.capacity && (
+          <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)} پرنده (از مساحت)`} accent />
+        )}
       </div>
 
       {(h.birdId || h.breedId || h.responsibleId) && (
@@ -125,7 +128,7 @@ export default function HallCard(props: HallCardProps) {
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های فعال ({fmt.int(hallFlocks.length)})</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {hallFlocks.map((fl: Flock) => (
-              <Row key={fl.id} l={<EntityLink type="flock" id={fl.id} label={fl.name} />} v={`${fmt.int(fl.currentCount || fl.initialCount || 0)} پرنده`} />
+              <Row key={fl.id} l={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{fl.paused ? '⏸ ' : ''}<EntityLink type="flock" id={fl.id} label={fl.name} /></span>} v={`${fmt.int(fl.currentCount || fl.initialCount || 0)} پرنده`} />
             ))}
             <Row l="جمع کل" v={`${fmt.int(totalBirds)} پرنده`} accent />
           </div>
@@ -137,11 +140,23 @@ export default function HallCard(props: HallCardProps) {
         <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
         <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
         <RowWithStatus l="تهویه"
-          v={totalAirflow > 0 ? `${fmt.int(airChanges)} بار تعویض هوا در ساعت` : 'ثبت نشده'}
+          v={
+            totalAirflow > 0
+              ? `${fmt.int(airChanges)} بار تعویض هوا در ساعت`
+              : (h.ventilation && h.ventilation > 0)
+                ? `${fmt.int(h.ventilation)} m³/h (دستی)`
+                : 'ثبت نشده'
+          }
           icon={totalAirflow > 0 ? airIcon : undefined}
           hint={totalAirflow > 0 ? airAdvice : undefined} />
         <RowWithStatus l="روشنایی"
-          v={totalLightW > 0 ? `${fmt.int(lux)} لوکس` : 'ثبت نشده'}
+          v={
+            totalLightW > 0
+              ? `${fmt.int(lux)} لوکس`
+              : (h.light && h.light > 0)
+                ? `${fmt.int(h.light)} لوکس (دستی)`
+                : 'ثبت نشده'
+          }
           icon={totalLightW > 0 ? lightIcon : undefined}
           hint={totalLightW > 0 ? lightAdvice : undefined} />
         {h.systemNotes && (
@@ -149,9 +164,6 @@ export default function HallCard(props: HallCardProps) {
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>📝 یادداشت سیستم‌ها</div>
             <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.systemNotes}</div>
           </>
-        )}
-        {realCapacity && !h.capacity && (
-          <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)} پرنده (از مساحت)`} accent />
         )}
       </div>
 
