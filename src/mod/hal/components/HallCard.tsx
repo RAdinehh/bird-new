@@ -4,7 +4,7 @@
 import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
-import { Row, RowWithStatus, isFanLike, isLampLike } from '../helpers';
+import { Row, RowGrid, RowWithStatus, isFanLike, isLampLike } from '../helpers';
 import { getAgeDays, type Flock } from '../../flk/store';
 import type { Hall, Zone, Equipment } from '../store';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -103,23 +103,23 @@ export default function HallCard(props: HallCardProps) {
       </>}
     >
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📐 ابعاد و ظرفیت</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <RowGrid>
         <Row l="مساحت" v={`${toFa(area.toFixed(1))} م²`} />
         <Row l="حجم" v={`${toFa(volume.toFixed(1))} م³`} />
         <Row l="ظرفیت" v={h.capacity ? `${fmt.int(h.capacity)} پرنده` : '—'} />
         {realCapacity && !h.capacity && (
-          <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)} پرنده (از مساحت)`} accent />
+          <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)}`} accent />
         )}
-      </div>
+      </RowGrid>
 
       {(h.birdId || h.breedId || h.responsibleId) && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🏷 هویت</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <RowGrid>
             {h.birdId && <Row l="پرنده" v={<EntityLink type="bird" id={h.birdId} label={birdNames?.get(h.birdId) || '—'} />} />}
             {h.breedId && <Row l="نژاد" v={<EntityLink type="breed" id={h.breedId} label={breedNames?.get(h.breedId) || '—'} badge badgeBg="var(--purple-soft)" />} />}
-            {h.responsibleId && <Row l="مسئول" v={<EntityLink type="party" id={h.responsibleId} label={workerNames?.get(h.responsibleId) || '—'} />} />}
-          </div>
+          </RowGrid>
+          {h.responsibleId && <Row l="مسئول" v={<EntityLink type="party" id={h.responsibleId} label={workerNames?.get(h.responsibleId) || '—'} />} />}
         </>
       )}
 
@@ -136,9 +136,11 @@ export default function HallCard(props: HallCardProps) {
       )}
 
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 شرایط محیطی</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <RowGrid>
         <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
         <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
+      </RowGrid>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
         <RowWithStatus l="تهویه"
           v={
             totalAirflow > 0
@@ -174,12 +176,12 @@ export default function HallCard(props: HallCardProps) {
       {(h.builtAt || h.lastSanitizedAt || equipValue > 0) && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📅 زمان‌ها و ارزش</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <RowGrid>
             {h.builtAt && <Row l="تاریخ ساخت" v={toFa(h.builtAt)} />}
             {h.lastSanitizedAt && <Row l="آخرین ضدعفونی" v={toFa(h.lastSanitizedAt)} />}
-            {h.sanitizeNotes && <Row l="روش ضدعفونی" v={h.sanitizeNotes} />}
-            {equipValue > 0 && <Row l="ارزش تجهیزات" v={fmt.money(equipValue)} accent />}
-          </div>
+          </RowGrid>
+          {h.sanitizeNotes && <Row l="روش ضدعفونی" v={h.sanitizeNotes} />}
+          {equipValue > 0 && <Row l="ارزش تجهیزات" v={fmt.money(equipValue)} accent />}
         </>
       )}
 

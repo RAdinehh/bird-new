@@ -98,6 +98,19 @@ export function EnvCard({ icon, label, value, tone }: { icon: string; label: str
 
 
 
+/** 🆕 گرید دو ستونه برای Row های کوتاه (عدد، تاریخ) */
+export function RowGrid({ children }: { children: ReactNode }) {
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: 'var(--sp-1)',
+    }}>
+      {children}
+    </div>
+  );
+}
+
 export function RowWithStatus({
   l, v, tone, icon, hint,
 }: {
