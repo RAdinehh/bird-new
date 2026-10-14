@@ -85,6 +85,7 @@ export function LitterEditor({
           {MATERIALS_LIST.map((m) => (
             <CompactField
               key={m}
+              decimals={2}
               label={MATERIAL_LABELS[m]}
               value={litter.kgPerM2ByMaterial?.[m] ?? 0}
               onChange={(v) => updateMaterialKg(m, v)}
