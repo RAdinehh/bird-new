@@ -45,6 +45,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const [form, setForm] = useState<HallFormData>(empty);
   const draft = useFormDraft('hal-hall', form, (v: HallFormData) => setForm(v));
   const [err, setErr] = useState('');
+  const [saveAttempted, setSaveAttempted] = useState(false);
   const [undoData, setUndoData] = useState<{ item: Hall | Hall[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -161,7 +162,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   };
 
   const openNew = () => {
-    setAutoFields(new Set()); setForm(empty); setErr(''); setOpen(true); };
+    setAutoFields(new Set()); setForm(empty); setErr(''); setSaveAttempted(false); setOpen(true); };
   const openEdit = (h: Hall) => {
     setAutoFields(new Set());
     setForm({
@@ -214,6 +215,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     },
   );
   const save = () => {
+    setSaveAttempted(true);
     // 🆕 اگه خطای اعتبارسنجی هست، نشون بده
     if (Object.keys(vErrors).length > 0) {
       const errs = Object.values(vErrors).slice(0, 3).join(' · ');
@@ -362,7 +364,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         setForm={setForm}
         err={err}
         onErrorClear={() => setErr('')}
-        vErrors={vErrors}
+        vErrors={saveAttempted ? vErrors : {}}
         birds={birds}
         breeds={breeds}
         stdCapacity={__suggestedCap}

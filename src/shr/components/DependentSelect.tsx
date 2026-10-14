@@ -26,6 +26,7 @@ interface Props {
   compact?: boolean;
   groupLabels?: Record<string, string>;
   groupIcons?: Record<string, string>;
+  emptyMode?: 'warning' | 'select';
 }
 
 export default function DependentSelect({
@@ -45,6 +46,7 @@ export default function DependentSelect({
   compact = false,
   groupLabels = {},
   groupIcons = {},
+  emptyMode = 'warning',
 }: Props) {
   const height = compact ? 32 : 38;
   const fontSize = compact ? 'var(--fs-sm)' : 'var(--fs-base)';

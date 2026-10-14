@@ -4,7 +4,7 @@
 import { z } from 'zod';
 import {
   requiredStr, optionalStr, optionalId, requiredId,
-  floatNonNeg, floatPos, floatRange, intPos, intNonNeg, persianDateOpt,
+  floatNonNeg, floatPos, floatRange, requiredFloatRange, intPos, intNonNeg, persianDateOpt,
 } from '../helpers';
 import { HALL, TEMP, HUMIDITY } from '../biological';
 import type { ValidationContext } from '../types';
@@ -12,10 +12,10 @@ import type { ValidationContext } from '../types';
 export function createHallSchema(_ctx: ValidationContext = {}) {
   return z.object({
     name: requiredStr('نام سالن', 2, 50),
-    code: requiredStr('کد سالن', 1, 20),
-    length: floatRange('طول', 0.5, 500).nullable().optional(),
-    width: floatRange('عرض', 0.5, 200).nullable().optional(),
-    height: floatRange('ارتفاع', 1, 20).nullable().optional(),
+    code: optionalStr(20),  // 🆕 خودکار از نام ساخته می‌شه
+    length: requiredFloatRange('طول', 0.5, 500),
+    width: requiredFloatRange('عرض', 0.5, 200),
+    height: requiredFloatRange('ارتفاع', 1, 20),
     capacity: floatRange('ظرفیت', HALL.capacityBirds.min, HALL.capacityBirds.max).nullable().optional(),
     targetTemp: floatRange('دمای هدف', TEMP.minRoom, TEMP.maxRoom).nullable().optional(),
     targetHumidity: floatRange('رطوبت هدف', HUMIDITY.min, HUMIDITY.max).nullable().optional(),
@@ -29,8 +29,8 @@ export function createHallSchema(_ctx: ValidationContext = {}) {
     builtAt: persianDateOpt('تاریخ ساخت'),
     lastSanitizedAt: persianDateOpt('آخرین ضدعفونی'),
     notes: optionalStr(1000),
-    birdId: optionalId(),
-    breedId: optionalId(),
+    birdId: requiredId('پرنده'),
+    breedId: requiredId('نژاد'),
   }).superRefine((data, ctx) => {
     const d = data as any;
     // اگه length × width داریم، capacity نمی‌تونه بیشتر از حداکثر تراکم باشه

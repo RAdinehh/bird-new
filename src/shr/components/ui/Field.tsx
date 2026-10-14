@@ -72,8 +72,11 @@ export function Field({ label, required, hint, autoFrom, error, warning, childre
           lineHeight: 1.5,
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'flex-start',
           gap: 4,
-        }}>
+          textAlign: 'right',
+          width: '100%',
+        }} dir="rtl">
           <span aria-hidden="true">⚠️</span>
           <span>{error}</span>
         </div>
@@ -87,8 +90,11 @@ export function Field({ label, required, hint, autoFrom, error, warning, childre
           lineHeight: 1.5,
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'flex-start',
           gap: 4,
-        }}>
+          textAlign: 'right',
+          width: '100%',
+        }} dir="rtl">
           <span aria-hidden="true">💡</span>
           <span>{warning}</span>
         </div>

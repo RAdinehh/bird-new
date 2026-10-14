@@ -184,12 +184,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', marginBottom: 8 }}>🏷 هویت و مدیریت</div>
-        <Grid2>
-          <Field label="نام سالن" required error={vErrors.name}><Input placeholder="نامی که سالن رو با اون می‌شناسی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} /></Field>
-          <Field label="کد سالن">
-            <Input placeholder="شناسه داخلی (خودکار از نام)" dir="ltr" value={form.code} onChange={e => setForm({...form, code: e.target.value})} />
-          </Field>
-        </Grid2>
+          <Field label="نام سالن" required error={vErrors.name}><Input placeholder="شمالی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} /></Field>
 
         <Grid2>
           <Field label="وضعیت سالن">
@@ -215,7 +210,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           ) : <div />}
         </Grid2>
         <Grid2>
-            <Field label="پرنده" hint="پرنده‌ای که در این سالن نگهداری می‌شه">
+            <Field label="پرنده" required>
               <SmartSelect
                 value={form.birdId || ''}
                 onChange={v => setForm({...form, birdId: v, breedId: ''})}
@@ -225,14 +220,14 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 autoThreshold={6}
               />
             </Field>
-            <Field label="نژاد پرنده" hint="نژاد پرنده (از سالن یا والد)">
+            <Field label="نژاد پرنده" required>
               <DependentSelect
                 value={form.breedId}
                 onChange={v => setForm({...form, breedId: v})}
                 parentValue={form.birdId || ''}
                 parentLabel="پرنده"
                 options={breedsForBird.map((b: Breed) => ({ value: b.id, label: b.name }))}
-                emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
+                emptyMode="select"
                 placeholder="— انتخاب نژاد —"
                 modalTitle="انتخاب نژاد"
               />
@@ -240,13 +235,12 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📐 ابعاد و ظرفیت</div>
         <Grid3>
-          <Field label="طول" error={vErrors.length}><NumField placeholder="۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} autoClamp /></Field>
-          <Field label="عرض" error={vErrors.width}><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} autoClamp /></Field>
-          <Field label="ارتفاع" error={vErrors.height}><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} autoClamp /></Field>
+          <Field label="طول" required error={vErrors.length}><NumField placeholder="۱۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} autoClamp /></Field>
+          <Field label="عرض" required error={vErrors.width}><NumField placeholder="۵" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} autoClamp /></Field>
+          <Field label="ارتفاع" required error={vErrors.height}><NumField placeholder="۳" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} autoClamp /></Field>
         </Grid3>
-        <Grid2>
               <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity}>
-                <NumField placeholder="۱۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
+                <NumField placeholder="۵۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
               </Field>
               {(() => {
                 const std = form.breedId ? breedStd.byBreedId(form.breedId) : null;
@@ -282,7 +276,6 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                   </div>
                 );
               })()}
-            </Grid2>
             <OverrideHint {...capHint} />
           {form.breedId && (
             <button
@@ -326,10 +319,10 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>⚙️ سیستم‌ها</div>
         <Grid2>
           <Field label="تهویه">
-            <NumField placeholder="۰" value={form.ventilation} onChange={e => setForm({...form, ventilation: e.target.value})} unit="m³/h" min={0} max={100000} autoClamp />
+            <NumField placeholder="۱۵۰۰۰" value={form.ventilation} onChange={e => setForm({...form, ventilation: e.target.value})} unit="m³/h" min={0} max={100000} autoClamp />
           </Field>
           <Field label="روشنایی">
-            <NumField placeholder="۰" value={form.light} onChange={e => setForm({...form, light: e.target.value})} unit="lux" min={0} max={500} autoClamp />
+            <NumField placeholder="۳۰" value={form.light} onChange={e => setForm({...form, light: e.target.value})} unit="lux" min={0} max={500} autoClamp />
           </Field>
         </Grid2>
         <Grid2>
@@ -386,12 +379,12 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           <Field label="آخرین ضدعفونی"><DatePicker value={form.lastSanitizedAt} onChange={v => setForm({...form, lastSanitizedAt: v})} placeholder="انتخاب تاریخ" /></Field>
         </Grid2>
         <Field label="یادداشت ضدعفونی">
-          <Input placeholder="مثلاً — سرکه سیب ۵٪، همه دیوارها" value={form.sanitizeNotes || ''} onChange={e => setForm({...form, sanitizeNotes: e.target.value})} />
+          <Input placeholder="سرکه سیب ۵٪" value={form.sanitizeNotes || ''} onChange={e => setForm({...form, sanitizeNotes: e.target.value})} />
         </Field>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginTop: 4 }}>📝 یادداشت و آدرس</div>
-        <Field label="آدرس سالن"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
+        <Field label="آدرس سالن"><Input placeholder="شهرک صنعتی، خیابان، پلاک" value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
         <Field label="یادداشت">
-            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+            <Textarea placeholder="توضیحات اختیاری، نکات مهم" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
         <ErrorBox>{err}</ErrorBox>
       </Modal>
