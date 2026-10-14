@@ -246,6 +246,8 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const detailColor = detailCat ? (CATEGORY_COLORS[detailCat] || 'var(--cat-auxiliary)') : 'var(--cat-auxiliary)';
   const detailInstalled = detailCat ? calcInstalled(detailCat, detailList) : 0;
   const detailNeed = detailCat ? (needByCategory[detailCat]?.value || 0) : 0;
+  const detailTone = detailCat ? toneFor(detailCat) : 'none';
+  const detailPct = detailCat ? pctFor(detailCat) : null;
   const detailNeedUnit = detailCat ? (needByCategory[detailCat]?.unit || unitForCategory(detailCat, detailList)) : '';
   const detailUnit = detailCat ? unitForCategory(detailCat, detailList) : '';
   const currentEdit = editId ? hallEquips.find(e => e.id === editId) : null;
@@ -382,6 +384,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
       <HallEquipModals
         detailCat={detailCat} setDetailCat={setDetailCat}
         detailCatLabel={detailCatLabel} detailInstalled={detailInstalled}
+        detailTone={detailTone} detailPct={detailPct}
         detailNeed={detailNeed} detailUnit={detailUnit} detailNeedUnit={detailNeedUnit}
         detailList={detailList} detailColor={detailColor}
         openPicker={openPicker} openEdit={openEdit} removeEquip={removeEquip}

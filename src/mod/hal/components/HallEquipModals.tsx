@@ -20,6 +20,10 @@ export interface HallEquipModalsProps {
   detailNeedUnit: string;
   detailList: Equipment[];
   detailColor: string;
+  /** 🆕 وضعیت: ok | low | very-low | over | none */
+  detailTone: string;
+  /** 🆕 درصد نصب/نیاز */
+  detailPct: number | null;
   openPicker: (c: string) => void;
   openEdit: (e: Equipment) => void;
   removeEquip: (id: string, name: string) => void;
@@ -49,7 +53,7 @@ export interface HallEquipModalsProps {
 
 export default function HallEquipModals(props: HallEquipModalsProps) {
   const {
-    detailCat, setDetailCat, detailCatLabel, detailInstalled, detailNeed,
+    detailCat, setDetailCat, detailCatLabel, detailInstalled, detailNeed, detailTone, detailPct,
     detailUnit, detailNeedUnit, detailList, detailColor,
     openPicker, openEdit, removeEquip,
     picker, setPicker, pickerCat, pickerType, setPickerType,
@@ -63,7 +67,24 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
       <Modal
         open={!!detailCat}
         onClose={() => setDetailCat(null)}
-        title={detailCatLabel}
+        title={
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <span style={{
+              width: 30, height: 30, borderRadius: 'var(--r-sm)',
+              background: 'var(--input-bg)',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <EquipmentIcon type={detailList[0]?.type || 'default'} size={18} weight="duotone" color={detailColor} />
+            </span>
+            <span>{detailCatLabel}</span>
+            {detailTone !== 'none' && (
+              <span style={{ fontSize: 14 }}>
+                {detailTone === 'ok' ? '🟢' : detailTone === 'low' ? '🟡' : detailTone === 'very-low' ? '🔴' : detailTone === 'over' ? '🟣' : '⚪'}
+              </span>
+            )}
+          </span>
+        }
         footer={
           detailCat && (
             <Btn variant="primary" full onClick={() => { const c = detailCat; setDetailCat(null); openPicker(c); }}>
