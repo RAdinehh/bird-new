@@ -297,6 +297,10 @@ git tag before-XXX-YYYYMMDD
 ### جلسه ۶ (۱۴۰۴/۰۷/۲۱ — بعد) — انکوباسیون + استاندارد بستر
 - ✅ **استاندارد بستر per-material** (`kgPerM2ByMaterial` + migration)
 - ✅ **کاهش وزن تخم** (فیلد + محاسبه + نمایش + هشدار alt)
+- ✅ **پروفایل دما/رطوبت روز‌به‌روز** (`IncubationPhase` + ۸ نژاد Ross 308)
+- ✅ **`IncubationProfileEditor`** + اتصال به `ProductionSection`
+- ✅ **نمایش «🌡 هدف امروز»** در کارت ورودی تخم
+- ✅ **Extensibility تأیید شد** — نژاد جدید با template، پروفایل کپی می‌شه
 - ✅ **مستندسازی** به‌روز
 
 ### جلسه ۵ (۱۴۰۴/۰۷/۲۱) — hal کامل + ابزارها ⭐

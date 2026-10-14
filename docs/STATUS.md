@@ -67,6 +67,12 @@
 - ✅ **کاهش وزن تخم** — ۲ فیلد + `calcWeightLossPct` + محاسبه زنده + نمایش
 - ✅ **`weightLossMinPct/MaxPct`** در `IncubationStandard` (۱۱-۱۳)
 - ✅ **هشدار alt** — کاهش وزن خارج بازه (روز ۷-۱۸)
+- ✅ **پروفایل دما/رطوبت روز‌به‌روز** (`IncubationPhase` + ۸ پروفایل Ross 308)
+- ✅ **`getIncubationPhase` + `getExpectedTempHumidity`** (pure)
+- ✅ **نمایش «🌡 هدف امروز»** در `EggEntryCard`
+- ✅ **`IncubationProfileEditor`** (UI ویرایشگر با پروفایل پیش‌فرض)
+- ✅ **اتصال به `ProductionSection`** (تب 🥚 تولید)
+- ✅ **Extensibility تأیید شد** — نژاد جدید از Master Data با پروفایل کپی می‌شه
 
 ### فاز ۸ — ابزارها + hal نهایی (تموم — جلسه ۵)
 - ✅ **ESLint** نصب + config (no-unused-imports, no-explicit-any, prefer-const)
