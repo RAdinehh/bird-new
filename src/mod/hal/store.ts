@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { ensureWhsItem, syncWhsItem, removeWhsItem } from './api/equipmentWhs';
+import { isFanLike, isLampLike } from './helpers';
 
 export interface HallSource {
   id: string;
@@ -138,15 +139,36 @@ const HALL_FIELD_BY_CAT: Record<string, keyof Hall | null> = {
  * محاسبه patch برای Hall بر اساس Equipment های موجود
  * آخرین تجهیز هر دسته = مقدار Hall (اولویت آخری که اضافه/ویرایش شده)
  */
-function computeHallPatch(hallId: string, equipment: Equipment[]): Partial<Hall> {
+function computeHallPatch(hallId: string, equipment: Equipment[], hall: Hall | null): Partial<Hall> {
   const hallEquip = equipment.filter(e => e.hallId === hallId);
   const patch: Partial<Hall> = {};
+  // ── فیلدهای string (نوع تجهیز) ──
   Object.entries(HALL_FIELD_BY_CAT).forEach(([cat, field]) => {
     if (!field) return;
     const items = hallEquip.filter(e => e.category === cat);
     const last = items.length > 0 ? items[items.length - 1] : null;
     (patch as Record<string, string>)[field as string] = last?.type || '';
   });
+  // ── 🆕 تهویه (m³/h) — مجموع ظرفیت فن‌ها ──
+  const totalAirflow = hallEquip
+    .filter(e => isFanLike(e.type))
+    .reduce((a, e) => a + ((e.count || 0) * (e.capacity || 0)), 0);
+  patch.ventilation = totalAirflow > 0 ? totalAirflow : null;
+  // ── 🆕 روشنایی (lux) — مجموع لومن / مساحت ──
+  if (hall) {
+    const area = (hall.length || 0) * (hall.width || 0);
+    if (area > 0) {
+      const lampLumensPerW = (type: string) => {
+        if (type === 'lamp_led') return 100;
+        if (type === 'lamp_fluorescent') return 60;
+        return 15;
+      };
+      const totalLumens = hallEquip
+        .filter(e => isLampLike(e.type))
+        .reduce((a, e) => a + ((e.count || 0) * (e.capacity || 0) * lampLumensPerW(e.type)), 0);
+      patch.light = totalLumens > 0 ? Math.round(totalLumens / area) : null;
+    }
+  }
   return patch;
 }
 
@@ -186,7 +208,8 @@ export const useHal = create<State>()(
         const id = uuid();
         const eq = { ...e, id, createdAt: now(), updatedAt: now() } as Equipment;
         const nextEquipment = [...get().equipment, eq];
-        const hallPatch = computeHallPatch(eq.hallId, nextEquipment);
+        const hall = get().halls.find(h => h.id === eq.hallId) || null;
+        const hallPatch = computeHallPatch(eq.hallId, nextEquipment, hall);
         set({
           equipment: nextEquipment,
           halls: get().halls.map(h => h.id === eq.hallId ? { ...h, ...hallPatch, updatedAt: now() } : h),
@@ -207,7 +230,10 @@ export const useHal = create<State>()(
         if (prev?.hallId) affected.add(prev.hallId);
         if (updated?.hallId) affected.add(updated.hallId);
         const patches: Record<string, Partial<Hall>> = {};
-        affected.forEach(hid => { patches[hid] = computeHallPatch(hid, nextEquipment); });
+        affected.forEach(hid => {
+          const hall = get().halls.find(h => h.id === hid) || null;
+          patches[hid] = computeHallPatch(hid, nextEquipment, hall);
+        });
         set({
           equipment: nextEquipment,
           halls: get().halls.map(h => patches[h.id] ? { ...h, ...patches[h.id], updatedAt: now() } : h),
@@ -223,7 +249,8 @@ export const useHal = create<State>()(
           set({ equipment: nextEquipment });
           return;
         }
-        const hallPatch = computeHallPatch(eq.hallId, nextEquipment);
+        const hall = get().halls.find(h => h.id === eq.hallId) || null;
+        const hallPatch = computeHallPatch(eq.hallId, nextEquipment, hall);
         set({
           equipment: nextEquipment,
           halls: get().halls.map(h => h.id === eq.hallId ? { ...h, ...hallPatch, updatedAt: now() } : h),
