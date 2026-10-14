@@ -294,6 +294,20 @@ git tag before-XXX-YYYYMMDD
 - یک سند مرجع
 
 
+### جلسه ۷ (۱۴۰۴/۰۷/۲۱ — جلسه سوم) — hal نهایی
+- ✅ **۱۷ fix روی hal** (Halls + Zones + Equipment)
+- ✅ **۶ باگ پنهان** کشف و fix شد:
+  - `zoneId` در `buildPayload` نبود → بخش از دست می‌رفت
+  - `ErrorBox` در `EquipmentFormModal` نداشت
+  - **`litter_roll ≠ paper_roll`** → ۱۰ برابر خطا در محاسبه بستر
+  - `ventilation`/`light` از تجهیزات sync نمی‌شد
+  - `realCapacity = area × 9` hardcode
+  - `lampEfficiency = 100` hardcode
+- ✅ **گروه‌بندی بصری** HallsFormModal (۵ گروه) + EquipmentFormModal (۴ گروه)
+- ✅ **sync کامل** Hall ↔ Equipment
+- ✅ **onErrorClear** در ۳ فرم + `ErrorBox` در Equipment
+- ✅ **کد سالن** + ۵ ماده litter جدید
+
 ### جلسه ۶ (۱۴۰۴/۰۷/۲۱ — بعد) — انکوباسیون + استاندارد بستر
 - ✅ **استاندارد بستر per-material** (`kgPerM2ByMaterial` + migration)
 - ✅ **کاهش وزن تخم** (فیلد + محاسبه + نمایش + هشدار alt)

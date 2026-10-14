@@ -60,6 +60,17 @@
 - FOUNDATION-PATTERNS.md (۱۶ بخش)
 - ۳۰+ الگوی تفکر
 
+### فاز ۱۰ — hal نهایی (تموم — جلسه ۷)
+- ✅ **۱۷ fix** روی hal (Halls + Zones + Equipment)
+- ✅ **۶ باگ پنهان کشف و fix** (zoneId، ErrorBox، litter_roll، ventilation/light، ...)
+- ✅ **گروه‌بندی بصری** HallsFormModal (۵ گروه) + EquipmentFormModal (۴ گروه)
+- ✅ **sync کامل** Hall ↔ Equipment (شامل `ventilation`/`light`)
+- ✅ **auto-fill** روشنایی از استاندارد
+- ✅ **onErrorClear** در ۳ فرم
+- ✅ **کد سالن** + ۵ ماده litter جدید
+- ✅ **نمایش ×N** به جای درصد > ۱۰۰
+- ✅ **fallback** نمایش دستی ventilation/light
+
 ### فاز ۹ — انکوباسیون + استاندارد بستر (تموم — جلسه ۶)
 - ✅ **استاندارد بستر per-material** — `kgPerM2ByMaterial` (رول کاغذی ۰.۳، ماسه ۲۵، کاه ۵، ...)
 - ✅ **migration** برای override قدیمی (`set/store.ts` merge)
