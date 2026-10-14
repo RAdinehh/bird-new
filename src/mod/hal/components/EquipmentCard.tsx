@@ -34,7 +34,7 @@ export interface EquipmentCardProps {
 export default function EquipmentCard(props: EquipmentCardProps) {
   const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onUndo, supplierNames,
         invoiceNumbers, whsItemNames, zoneNames } = props;
-  const _cm = (allCustomOpts as any[]).find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
+  const _cm = allCustomOpts.find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
   const _isDeleted = _cm ? _cm.hidden === true : false;
   const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: '🔧' });
   const value = calcEquipValue(e);
@@ -56,7 +56,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     {e.status && e.status !== 'active' && (() => {
                       const st = getStatusLabel(e.status);
                       if (!st) return null;
-                      return <Tag tone={(st.tone || 'gray') as any}>{st.icon} {st.name}</Tag>;
+                      return <Tag tone={st.tone || 'gray'}>{st.icon} {st.name}</Tag>;
                     })()}
                     {e.count ? <Tag tone="blue">{toFa(e.count)} {getUnitLabel(e.unit)}</Tag> : undefined}
                   </div>

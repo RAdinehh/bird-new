@@ -8,10 +8,12 @@ import {
 import { CATEGORY_COLORS } from '../../shr/icons/equipment';
 
 // ═══ انواع ═══
+export type TagTone = 'green' | 'amber' | 'red' | 'blue' | 'gray' | 'purple' | 'accent' | 'warn' | 'danger' | 'info' | 'dim';
+
 export interface LabelInfo {
   name: string;
   icon: string;
-  tone?: string;
+  tone?: TagTone;
 }
 
 type LabelsMap = Record<string, LabelInfo | undefined>;

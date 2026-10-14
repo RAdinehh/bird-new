@@ -202,9 +202,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
       capacity: capValue,
       efficiency: null,
       consumeRate: undefined,
-      createdAt: '',
-      updatedAt: '',
-    } as any);
+    });
     toastMsg.added(name);
     setPicker(false);
   };
