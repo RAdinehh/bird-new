@@ -26,10 +26,12 @@ interface Props {
   birds: Array<{ id: string; name: string }>;
   breeds: Array<{ id: string; name: string }>;
   save: () => void;
+  /** 🆕 پاک کردن خطا هنگام تایپ */
+  onErrorClear?: () => void;
 }
 
 export default function ZoneFormModal({
-  open, onClose, form, setForm, err, vErrors, crossWarn, halls, birds, breeds, save,
+  open, onClose, form, setForm, err, vErrors, crossWarn, halls, birds, breeds, save, onErrorClear,
 }: Props) {
   const isEdit = !!form.id;
 
@@ -84,7 +86,7 @@ export default function ZoneFormModal({
           <Input
             placeholder="مثلاً — بخش A"
             value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })}
+            onChange={e => { onErrorClear?.(); setForm({ ...form, name: e.target.value }); }}
           />
         </Field>
         <Field label="ظرفیت" hint="حداکثر تعداد پرنده در این بخش (اختیاری)">

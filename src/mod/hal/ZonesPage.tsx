@@ -401,6 +401,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         form={form}
         setForm={setForm}
         err={err}
+        onErrorClear={() => setErr('')}
         vErrors={vErrors}
         crossWarn={crossWarn}
         halls={halls}
