@@ -118,8 +118,9 @@ export default function HallCard(props: HallCardProps) {
           <RowGrid>
             {h.birdId && <Row l="پرنده" v={<EntityLink type="bird" id={h.birdId} label={birdNames?.get(h.birdId) || '—'} />} />}
             {h.breedId && <Row l="نژاد" v={<EntityLink type="breed" id={h.breedId} label={breedNames?.get(h.breedId) || '—'} badge badgeBg="var(--purple-soft)" />} />}
+            {h.responsibleId && <Row l="مسئول" v={<EntityLink type="party" id={h.responsibleId} label={workerNames?.get(h.responsibleId) || '—'} />} />}
+            {h.responsibleId && <div />}
           </RowGrid>
-          {h.responsibleId && <Row l="مسئول" v={<EntityLink type="party" id={h.responsibleId} label={workerNames?.get(h.responsibleId) || '—'} />} />}
         </>
       )}
 
