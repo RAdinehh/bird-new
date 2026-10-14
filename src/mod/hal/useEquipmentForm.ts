@@ -49,6 +49,7 @@ export function useEquipmentForm() {
 
   const buildPayload = () => ({
     hallId: form.hallId,
+    zoneId: form.zoneId || undefined,
     category: form.category || 'auxiliary',
     type: form.type,
     name: form.name.trim(),
