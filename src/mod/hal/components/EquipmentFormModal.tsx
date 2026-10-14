@@ -1,7 +1,7 @@
 /**
  * EquipmentFormModal — فرم افزودن/ویرایش تجهیز
  */
-import { Btn, Field, Grid2, Input, Modal, MoneyField, NumField, Select } from '../../../shr/components/ui';
+import { Btn, ErrorBox, Field, Grid2, Input, Modal, MoneyField, NumField, Select } from '../../../shr/components/ui';
 import { getUnitLabel, getEquipLabel } from '../_typedLabels';
 import type { BirdStandard } from '../../set/standards/types';
 import type { EquipmentFormData } from '../useEquipmentForm';
@@ -36,10 +36,12 @@ export interface EquipmentFormModalProps {
   save: () => void;
   suppliers?: Person[];
   stdForDefaults?: BirdStandard | null;
+  /** 🆕 پاک کردن خطا هنگام تایپ */
+  onErrorClear?: () => void;
 }
 
 export default function EquipmentFormModal(props: EquipmentFormModalProps) {
-  const { open, setOpen, form, setForm, vErrors, halls, zones, equipment, autoFields, clearAuto, markAuto, typesForCategory, equipNeed, save, suppliers, stdForDefaults } = props;
+  const { open, setOpen, form, setForm, err, vErrors, halls, zones, equipment, autoFields, clearAuto, markAuto, typesForCategory, equipNeed, save, suppliers, stdForDefaults, onErrorClear } = props;
 
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
@@ -128,7 +130,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
 
         <Grid2>
           <Field label="نام تجهیز" required>
-            <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+            <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} />
           </Field>
           <Field label="برند">
             <Input placeholder="پارس" value={form.brand || ''} onChange={e => setForm({...form, brand: e.target.value})} />
@@ -262,6 +264,8 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
 
 
 
+
+      <ErrorBox>{err}</ErrorBox>
       </Modal>
   );
 }

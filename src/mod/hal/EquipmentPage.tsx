@@ -294,6 +294,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         form={form}
         setForm={setForm}
         err={err}
+        onErrorClear={() => setErr('')}
         vErrors={vErrors}
         halls={halls}
         zones={zones}
