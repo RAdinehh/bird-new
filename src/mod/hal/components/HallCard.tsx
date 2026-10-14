@@ -139,14 +139,12 @@ export default function HallCard(props: HallCardProps) {
       <RowGrid>
         <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
         <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
-      </RowGrid>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
         <RowWithStatus l="تهویه"
           v={
             totalAirflow > 0
-              ? `${fmt.int(airChanges)} بار تعویض هوا در ساعت`
+              ? `${fmt.int(airChanges)} بار/ساعت`
               : (h.ventilation && h.ventilation > 0)
-                ? `${fmt.int(h.ventilation)} m³/h (دستی)`
+                ? `${fmt.int(h.ventilation)} m³/h`
                 : 'ثبت نشده'
           }
           icon={totalAirflow > 0 ? airIcon : undefined}
@@ -156,18 +154,18 @@ export default function HallCard(props: HallCardProps) {
             totalLightW > 0
               ? `${fmt.int(lux)} لوکس`
               : (h.light && h.light > 0)
-                ? `${fmt.int(h.light)} لوکس (دستی)`
+                ? `${fmt.int(h.light)} لوکس`
                 : 'ثبت نشده'
           }
           icon={totalLightW > 0 ? lightIcon : undefined}
           hint={totalLightW > 0 ? lightAdvice : undefined} />
-        {h.systemNotes && (
-          <>
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>📝 یادداشت سیستم‌ها</div>
-            <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.systemNotes}</div>
-          </>
-        )}
-      </div>
+      </RowGrid>
+      {h.systemNotes && (
+        <>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>📝 یادداشت سیستم‌ها</div>
+          <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.systemNotes}</div>
+        </>
+      )}
 
       <HallEquipSection hallId={h.id}
         needInput={{ birdCount: totalBirds, ageDays: flockAgeDays, areaM2: area, volumeM3: volume, standard: flockStandard, litterType: h.litterType }}
