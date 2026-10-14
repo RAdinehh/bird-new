@@ -121,12 +121,20 @@ export interface EquipmentRatios {
     panBirdsPerUnit: number | null;
     tubeCmPerBird: number | null;
     manualCmPerBird: number | null;
+    /** 🆕 دانخوری سطلی لبه‌دار (۱۰ kg) — ۵۰-۷۰ پرنده */
+    bucketBirdsPerUnit?: number | null;
+    /** 🆕 دانخوری جوجه یکروزه — ۵۰ جوجه */
+    chickFeederBirdsPerUnit?: number | null;
+    /** 🆕 سینی جوجه یکروزه — ۸۰-۱۰۰ جوجه */
+    chickTrayBirdsPerUnit?: number | null;
   };
   drinker: {
     nippleBirdsPerUnit: number | null;
     cupBirdsPerUnit: number | null;
     troughCmPerBird: number | null;
     manualCmPerBird: number | null;
+    /** 🆕 آبخوری کله‌قندی ۳ لیتری — ۵۰-۷۰ پرنده */
+    fountainBirdsPerUnit?: number | null;
   };
   lampWattPerM2: number;
   fanM3PerKg: number;

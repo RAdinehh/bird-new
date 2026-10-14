@@ -5,6 +5,7 @@ import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Row, RowGrid, RowWithStatus, isFanLike, isLampLike } from '../helpers';
+import { calcInstalled } from '../_equipHelpers';
 import { getAgeDays, type Flock } from '../../flk/store';
 import type { Hall, Zone, Equipment } from '../store';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -42,8 +43,12 @@ export default function HallCard(props: HallCardProps) {
   const equipCount = equipment.filter(e => e.hallId === h.id).length;
   const equipValue = equipment.filter(e => e.hallId === h.id).reduce((a, e) => a + ((e.count || 0) * (e.unitPrice || 0)), 0);
   const hallEquips = equipment.filter(e => e.hallId === h.id);
-  const totalAirflow = hallEquips.filter(e => isFanLike(e.type)).reduce((a, e) => a + ((e.count || 0) * (e.capacity || 0)), 0);
-  const totalLightW = hallEquips.filter(e => isLampLike(e.type)).reduce((a, e) => a + ((e.count || 0) * (e.capacity || 0)), 0);
+  // 🆕 تهویه: filter توسط type OR category + محاسبه با calcInstalled
+  const ventilationEquips = hallEquips.filter(e => isFanLike(e.type) || e.category === 'ventilation');
+  const totalAirflow = calcInstalled('ventilation', ventilationEquips);
+  // 🆕 روشنایی: filter توسط type OR category + محاسبه با calcInstalled
+  const lightingEquips = hallEquips.filter(e => isLampLike(e.type) || e.category === 'lighting');
+  const totalLightW = calcInstalled('lighting', lightingEquips);
 
   const airChanges = volume > 0 && totalAirflow > 0 ? totalAirflow / volume : 0;
   const airAdvice = airChanges === 0 ? 'فنی ثبت نشده'

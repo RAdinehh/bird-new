@@ -6,7 +6,7 @@ import type { Equipment } from './store';
 
 export const TYPES_BY_CATEGORY: Record<string, string[]> = {
   ventilation: ['fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad'],
-  feeding:     ['feeder_manual', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket'],
+  feeding:     ['feeder_manual', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket'],  // 🆕 chick_feeder + chick_tray اضافه شدن
   drinking:    ['nipple', 'cup', 'trough', 'fountain_drinker'],
   heating:     ['radiant_brooder', 'jet_heater', 'duct_heater'],
   lighting:    ['lamp_led', 'lamp_fluorescent', 'dimmer'],

@@ -115,7 +115,7 @@ export const DUCK_MUSCOVY: BirdStandard = {
   },
   space: { densityMax: 5, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5 },
+    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 50, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
     drinker: { nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },

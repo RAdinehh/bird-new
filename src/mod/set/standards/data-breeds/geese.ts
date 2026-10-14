@@ -28,8 +28,8 @@ const GOOSE_BASE = {
   ],
   space: { densityMax: 4, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5 },
-    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
+    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 40, chickFeederBirdsPerUnit: 40, chickTrayBirdsPerUnit: 80 },
+    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 40 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 30, lockdownDay: 27, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 75, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 26, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 27, dayTo: 30, temp: 37.0, humidity: 75.0, label: 'هچر' }]},

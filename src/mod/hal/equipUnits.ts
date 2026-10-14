@@ -18,6 +18,8 @@ export interface FieldDef {
   unit: string;
   defaultValue?: number;
   optional?: boolean;
+  /** 🆕 راهنمای نمایش (مثل «۳ لیتری — ۵۰-۷۰ پرنده») */
+  hint?: string;
 }
 
 export interface EquipUnitDef {

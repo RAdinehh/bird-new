@@ -52,8 +52,8 @@ export const HY_LINE_W36: BirdStandard = {
   },
   space: { densityMax: 7.5, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5 },
-    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
+    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 70, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 70 },
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
@@ -121,8 +121,8 @@ export const IRAN_LAYER: BirdStandard = {
   },
   space: { densityMax: 7, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 22, tubeCmPerBird: 50, manualCmPerBird: 5 },
-    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
+    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 22, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 70, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 70 },
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
@@ -190,8 +190,8 @@ export const LOHMANN: BirdStandard = {
   },
   space: { densityMax: 7.5, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5 },
-    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
+    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 70, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 70 },
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
@@ -259,8 +259,8 @@ export const LEGHORN: BirdStandard = {
   },
   space: { densityMax: 8, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 22, tubeCmPerBird: 50, manualCmPerBird: 5 },
-    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
+    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 22, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 70, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 70 },
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
