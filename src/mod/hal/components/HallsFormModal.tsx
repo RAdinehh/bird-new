@@ -277,7 +277,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 const cap = area > 0 && density ? Math.floor(area * density) : null;
                 const env = std.env?.[0];
                 const patch: Partial<HallFormData> = {};
-                if (cap) patch.capacity = String(cap);
+                if (cap) patch.capacity = toFa(cap);
                 if (env?.temp?.target != null) patch.targetTemp = String(env.temp.target);
                 if (env?.humidity?.min != null) patch.targetHumidity = String(env.humidity.min);
                 // 🆕 شدت نور (lux) از استاندارد نژاد
