@@ -294,19 +294,32 @@ git tag before-XXX-YYYYMMDD
 - یک سند مرجع
 
 
-### جلسه ۷ (۱۴۰۴/۰۷/۲۱ — جلسه سوم) — hal نهایی
-- ✅ **۱۷ fix روی hal** (Halls + Zones + Equipment)
-- ✅ **۶ باگ پنهان** کشف و fix شد:
+### جلسه ۷ (۱۴۰۴/۰۷/۲۱ — جلسه سوم) — hal نهایی + UX فرم
+- ✅ **۲۵+ fix روی hal** (Halls + Zones + Equipment)
+- ✅ **۹ باگ پنهان** کشف و fix شد:
   - `zoneId` در `buildPayload` نبود → بخش از دست می‌رفت
   - `ErrorBox` در `EquipmentFormModal` نداشت
   - **`litter_roll ≠ paper_roll`** → ۱۰ برابر خطا در محاسبه بستر
   - `ventilation`/`light` از تجهیزات sync نمی‌شد
   - `realCapacity = area × 9` hardcode
   - `lampEfficiency = 100` hardcode
+  - **`birdId` از `breedId` مشتق می‌شد** (خطای منطقی)
+  - **`fan_tunnel stdKey = fanM3PerKg`** (ظرفیت ۴.۵ به جای ۴۰۰۰)
+  - **`lamp_led stdKey = lampWattPerM2`** (ظرفیت ۳ به جای ۱۰)
 - ✅ **گروه‌بندی بصری** HallsFormModal (۵ گروه) + EquipmentFormModal (۴ گروه)
-- ✅ **sync کامل** Hall ↔ Equipment
-- ✅ **onErrorClear** در ۳ فرم + `ErrorBox` در Equipment
+- ✅ **حذف گروه ⚙️ سیستم‌ها** از فرم سالن (Single Source)
+- ✅ **sync کامل** Hall ↔ Equipment (شامل `ventilation`/`light`)
+- ✅ **onErrorClear** در ۳ فرم + خطا فقط بعد از ذخیره (saveAttempted)
 - ✅ **کد سالن** + ۵ ماده litter جدید
+- ✅ **auto-fill کامل** + اعداد فارسی (capacity/temp/humidity/light/litter/feeder/drinker)
+- ✅ **کارت‌های KPI دو ستونه** تجهیزات (Big Dutchman style)
+- ✅ **مدال تجهیزات** با نوار پیشرفت + وضعیت رنگی + آیکون در هدر
+- ✅ **Placeholder های فارسی** مختصر برای همه فیلدها
+- ✅ **کارت سالن** Grid2 (ابعاد + هویت + شرایط + زمان‌ها)
+- ✅ **استاندارد دانخوری/آبخوری** ۸ نژاد (bucket/pan/chick + fountain)
+- ✅ **۲۲ hint استاندارد** برای همه تجهیزات
+- ✅ **حذف `turkey_goose.ts`** legacy
+- ✅ **جدید در FOUNDATION ب۳.۷** — قوانین UX فرم
 
 ### جلسه ۶ (۱۴۰۴/۰۷/۲۱ — بعد) — انکوباسیون + استاندارد بستر
 - ✅ **استاندارد بستر per-material** (`kgPerM2ByMaterial` + migration)

@@ -61,15 +61,29 @@
 - ۳۰+ الگوی تفکر
 
 ### فاز ۱۰ — hal نهایی (تموم — جلسه ۷)
-- ✅ **۱۷ fix** روی hal (Halls + Zones + Equipment)
-- ✅ **۶ باگ پنهان کشف و fix** (zoneId، ErrorBox، litter_roll، ventilation/light، ...)
+- ✅ **۲۵+ fix** روی hal (Halls + Zones + Equipment)
+- ✅ **۹ باگ پنهان کشف و fix:**
+  - `zoneId` در buildPayload نبود → بخش از دست می‌رفت
+  - `ErrorBox` در EquipmentFormModal نداشت
+  - **`litter_roll ≠ paper_roll`** → ۱۰ برابر خطا در محاسبه بستر
+  - `ventilation`/`light` از تجهیزات sync نمی‌شد
+  - `realCapacity = area × 9` hardcode
+  - `lampEfficiency = 100` hardcode
+  - **`birdId` از `breedId` مشتق می‌شد** (خطای منطقی)
+  - **`fan_tunnel stdKey = fanM3PerKg`** (ظرفیت ۴.۵ به جای ۴۰۰۰)
+  - **`lamp_led stdKey = lampWattPerM2`** (ظرفیت ۳ به جای ۱۰)
 - ✅ **گروه‌بندی بصری** HallsFormModal (۵ گروه) + EquipmentFormModal (۴ گروه)
+- ✅ **حذف گروه ⚙️ سیستم‌ها** از فرم سالن (Single Source)
 - ✅ **sync کامل** Hall ↔ Equipment (شامل `ventilation`/`light`)
-- ✅ **auto-fill** روشنایی از استاندارد
-- ✅ **onErrorClear** در ۳ فرم
+- ✅ **auto-fill** کامل + اعداد فارسی
+- ✅ **onErrorClear** در ۳ فرم + خطا فقط بعد از ذخیره
 - ✅ **کد سالن** + ۵ ماده litter جدید
 - ✅ **نمایش ×N** به جای درصد > ۱۰۰
-- ✅ **fallback** نمایش دستی ventilation/light
+- ✅ **کارت‌های KPI دو ستونه** تجهیزات (Big Dutchman style)
+- ✅ **مدال تجهیزات** با نوار پیشرفت + وضعیت رنگی
+- ✅ **استاندارد دانخوری/آبخوری** ۸ نژاد (bucket/pan/chick + fountain)
+- ✅ **۲۲ hint استاندارد** برای همه تجهیزات
+- ✅ **حذف `turkey_goose.ts`** legacy (۸ خط بدون نژاد)
 
 ### فاز ۹ — انکوباسیون + استاندارد بستر (تموم — جلسه ۶)
 - ✅ **استاندارد بستر per-material** — `kgPerM2ByMaterial` (رول کاغذی ۰.۳، ماسه ۲۵، کاه ۵، ...)

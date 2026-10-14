@@ -231,6 +231,60 @@
 ---
 ---
 
+### ۳.۷ قوانین UX فرم 🆕 (استخراج‌شده جلسه ۷)
+
+#### ۳.۷.۱ — Placeholder Rules
+- **همیشه فارسی** (بدون لغات لاتین)
+- **کوتاه** — بدون overflow توی کادر
+- **بدون تکرار label** (مثلاً «نام سالن» → placeholder «شمالی»)
+- **بدون «مثلاً:»** — خود placeholder نمونه‌ست
+- **محو با تایپ** (رفتار پیش‌فرض HTML)
+- **فیلد عددی** → نمونه عددی («۱۰»، «۵»، «۳»)
+- **فیلد کد فنی** → `dir="ltr"` مجاز
+
+#### ۳.۷.۲ — Required Rules
+- **ستاره قرمز ضخیم** (`*` + `fontWeight: 700`, `fontSize: 1.2em`)
+- فقط فیلدهای **حیاتی** اجباری:
+  - سالن: نام، طول، عرض، ارتفاع، پرنده، نژاد
+  - بخش: نام، سالن
+  - تجهیز: سالن، دسته، زیرنوع، نام
+- دما و رطوبت **آزاد** (auto-fill می‌شن)
+
+#### ۳.۷.۳ — Error Display Rules
+- **خطا فقط بعد از `save`** ظاهر شه (نه دائمی)
+- **با تایپ پاک شه** (`onErrorClear`)
+- **چینش راست‌چین** یکنواخت (`dir="rtl"` + `textAlign: 'right'`)
+- **`saveAttempted` state** برای کنترل نمایش
+- **بدون آیکون ایموجی** (⚠️/💡 حذف شدن) — فقط متن رنگی
+
+#### ۳.۷.۴ — Auto-fill Rules
+- دکمه «✨ پر کردن خودکار» **فقط بعد از انتخاب نژاد** فعال شه
+- پر کنه: `capacity`, `targetTemp`, `targetHumidity`, `light`, `litterType`, `feederType`, `drinkerType`
+- **آخرین منبع درست:**
+  - `capacity` = `area × densityMax`
+  - `temp/humidity/light` = `env[0]`
+  - `litterType` = `litter.recommended[0]` → map به equipment type
+  - `feederType` = `equipment.feeder` (chain/pan/tube/manual)
+  - `drinkerType` = `equipment.drinker` (nipple/cup/trough/manual)
+- **تمام اعداد فارسی** (`toFa`)
+- **Override کاربر** اولویت داره (`autoFields`)
+
+#### ۳.۷.۵ — Layout Rules
+- **RTL برای همه** (فارسی)
+- **LTR فقط برای کد فنی** (`code`)
+- **Grid2/RowGrid برای فیلدهای کوتاه** (عدد، تاریخ، لینک)
+- **تک‌ستونه (Row) برای فیلدهای بلند** (متن، لیست، آدرس، یادداشت)
+- **`alignItems: 'start'`** برای Grid2 (هم‌ترازی از بالا)
+- **`RowGrid`** (کامپوننت جدید در `helpers.tsx`) — گرید ۲ ستونه برای `Row`
+- **label مخفی** (`visibility: 'hidden'`) برای هم‌ترازی کادر محاسبه با فیلد
+
+#### ۳.۷.۶ — Single Source of Truth (فرم سالن)
+- **گروه ⚙️ سیستم‌ها از فرم سالن حذف شد** — فقط از تب تجهیزات
+- `ventilationSystem`, `feederType`, `drinkerType`, `litterType`, `ventilation`, `light` **خودکار** از Equipment sync می‌شن (در `store.ts` — `computeHallPatch`)
+- فرم سالن فقط: **هویت، ابعاد، شرایط، زمان‌ها، یادداشت**
+
+---
+
 ## بخش ۴ — قوانین بصری (Visual Stability)
 
 | # | قانون |
@@ -404,6 +458,9 @@ Ross · Cobb · Hy-Line · Aviagen · Lohmann (راهنماهای رسمی)
 | تاریخ | کامپوننت | تغییر | تأیید کاربر | وضعیت |
 |---|---|---|---|---|
 | ۱۴۰۴/۰۷/۲۱ | `ui/Field.tsx` | ستاره قرمز `*` برجسته‌تر (اندازه + وزن + aria-label) | ✅ صریح | ✅ دوباره قفل شد |
+| ۱۴۰۴/۰۷/۲۱ | `ui/Field.tsx` | حذف آیکون ⚠️ از error (فقط متن قرمز) + `dir="rtl"` + `textAlign: right` | ✅ صریح | ✅ دوباره قفل شد |
+| ۱۴۰۴/۰۷/۲۱ | `ui/Form.tsx` (ErrorBox) | حذف آیکون ⚠️ (فقط متن قرمز) | ✅ صریح | ✅ دوباره قفل شد |
+| ۱۴۰۴/۰۷/۲۱ | `DependentSelect.tsx` | prop `emptyMode: 'warning' \| 'select'` — Select غیرفعال به جای warning | ✅ صریح | ✅ دوباره قفل شد |
 
 ---
 
