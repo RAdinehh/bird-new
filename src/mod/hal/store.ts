@@ -115,6 +115,41 @@ export interface Equipment {
   updatedAt: string;
 }
 
+// ═══ Sync بین Equipment و Hall (Single Source of Truth) ═══
+/** نگاشت دسته تجهیز → فیلد Hall */
+const HALL_FIELD_BY_CAT: Record<string, keyof Hall | null> = {
+  ventilation: 'ventilationSystem',
+  feeding: 'feederType',
+  drinking: 'drinkerType',
+  litter: 'litterType',
+  lighting: null,
+  heating: null,
+  power: null,
+  auxiliary: null,
+  water_treatment: null,
+  safety: null,
+  cleaning: null,
+  hand_tools: null,
+  weighing: null,
+  cooling: null,
+};
+
+/**
+ * محاسبه patch برای Hall بر اساس Equipment های موجود
+ * آخرین تجهیز هر دسته = مقدار Hall (اولویت آخری که اضافه/ویرایش شده)
+ */
+function computeHallPatch(hallId: string, equipment: Equipment[]): Partial<Hall> {
+  const hallEquip = equipment.filter(e => e.hallId === hallId);
+  const patch: Partial<Hall> = {};
+  Object.entries(HALL_FIELD_BY_CAT).forEach(([cat, field]) => {
+    if (!field) return;
+    const items = hallEquip.filter(e => e.category === cat);
+    const last = items.length > 0 ? items[items.length - 1] : null;
+    (patch as Record<string, string>)[field as string] = last?.type || '';
+  });
+  return patch;
+}
+
 interface State {
   halls: Hall[];
   zones: Zone[];
@@ -150,7 +185,12 @@ export const useHal = create<State>()(
       addEquip: (e) => {
         const id = uuid();
         const eq = { ...e, id, createdAt: now(), updatedAt: now() } as Equipment;
-        set({ equipment: [...get().equipment, eq] });
+        const nextEquipment = [...get().equipment, eq];
+        const hallPatch = computeHallPatch(eq.hallId, nextEquipment);
+        set({
+          equipment: nextEquipment,
+          halls: get().halls.map(h => h.id === eq.hallId ? { ...h, ...hallPatch, updatedAt: now() } : h),
+        });
         // 🆕 سینک با انبار
         try {
           const whsId = ensureWhsItem(eq);
@@ -159,14 +199,35 @@ export const useHal = create<State>()(
         return id;
       },
       updateEquip: (id, patch) => {
-        set({ equipment: get().equipment.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) });
+        const prev = get().equipment.find(x => x.id === id);
+        const nextEquipment = get().equipment.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x);
+        const updated = nextEquipment.find(x => x.id === id);
+        // halls تحت تأثیر: قبلی + جدید
+        const affected = new Set<string>();
+        if (prev?.hallId) affected.add(prev.hallId);
+        if (updated?.hallId) affected.add(updated.hallId);
+        const patches: Record<string, Partial<Hall>> = {};
+        affected.forEach(hid => { patches[hid] = computeHallPatch(hid, nextEquipment); });
+        set({
+          equipment: nextEquipment,
+          halls: get().halls.map(h => patches[h.id] ? { ...h, ...patches[h.id], updatedAt: now() } : h),
+        });
         const eq = get().equipment.find(x => x.id === id);
         if (eq) try { syncWhsItem(eq); } catch {}
       },
       deleteEquip: (id) => {
         const eq = get().equipment.find(x => x.id === id);
         if (eq) try { removeWhsItem(eq); } catch {}
-        set({ equipment: get().equipment.filter(x => x.id !== id) });
+        const nextEquipment = get().equipment.filter(x => x.id !== id);
+        if (!eq?.hallId) {
+          set({ equipment: nextEquipment });
+          return;
+        }
+        const hallPatch = computeHallPatch(eq.hallId, nextEquipment);
+        set({
+          equipment: nextEquipment,
+          halls: get().halls.map(h => h.id === eq.hallId ? { ...h, ...hallPatch, updatedAt: now() } : h),
+        });
       }
     }),
     {
