@@ -12,7 +12,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
     baseUnit: 'm³/h',
     calc: (p, s) => p * s,
     summaryLabel: 'm³/h',
-    stdKey: 'fanM3PerKg',
+    // 🆕 stdKey حذف شد — fanM3PerKg نسبت کل به وزن پرنده‌ست، نه ظرفیت یک فن
   },
   fan_ceiling: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
@@ -62,7 +62,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
     baseUnit: 'W',
     calc: (p, s) => p * s,
     summaryLabel: 'W',
-    stdKey: 'lampWattPerM2',
+    // 🆕 stdKey حذف شد — lampWattPerM2 نسبت کل به متر مربع ئه، نه توان یک لامپ
   },
   lamp_fluorescent: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
