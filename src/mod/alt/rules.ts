@@ -6,7 +6,7 @@ import { useBrd } from '../brd/store';
 import { useDlg } from '../dlg/store';
 import { useEgg, henDayRate } from '../egg/store';
 import { useInc, daysToHatch, isHatchWindow } from '../inc/store';
-import { calcWeightLossPct } from '../inc/api/hatchCalc';
+import { calcWeightLossPct, isEstInRange, isCo2InRange, isO2InRange } from '../inc/api/hatchCalc';
 import { toFa } from '../../shr/utils/fa';
 import { format as formatJ, startOfDay, differenceInCalendarDays as diffCalDays, parse as parseJ} from 'date-fns-jalali';
 import { useSet } from '../set/store';
@@ -477,6 +477,65 @@ export function detectAllAlerts(): RuleAlert[] {
           });
         }
       }
+    }
+  });
+
+  // 🆕 ============ ۶.۵. پایش زنده دستگاه‌های انکوباسیون ============
+  const devices = useInc.getState().devices;
+  const breedsForDev = useBrd.getState().breeds;
+
+  devices.forEach(device => {
+    if (device.status !== 'active' && device.status !== 'idle') return;
+
+    // پیدا کردن نژاد مرجع دستگاه (اولین capacityByBird یا default)
+    const refBirdName = device.capacityByBird?.[0]?.birdName;
+    const refBreed = refBirdName ? breedsForDev.find(b => b.name === refBirdName || b.standardKey === refBirdName) : null;
+    const stdKey = (refBreed as { standardKey?: string } | undefined)?.standardKey || refBreed?.name;
+    const std = stdKey ? (getStandardFor(stdKey, { customStandards: customStandardsForInc }) as any) : null;
+
+    // EST — دمای پوسته تخم
+    const est = (device as any).estCurrent;
+    if (est != null && !isEstInRange(est, std)) {
+      const range = std?.incubation?.estMinTemp && std?.incubation?.estMaxTemp
+        ? `${std.incubation.estMinTemp}-${std.incubation.estMaxTemp}`
+        : '37.5-38.0';
+      alerts.push({
+        level: 'critical',
+        category: 'temp',
+        title: '🌡 EST خارج بازه — ' + device.name,
+        message: 'دمای پوسته تخم: ' + toFa(est) + '°C (هدف: ' + range + '°C) — تنظیم فوری دما',
+        source: 'inc',
+        sourceId: device.id + ':est-out',
+        date: today(), notes: ''
+      });
+    }
+
+    // CO₂
+    const co2 = (device as any).co2Current;
+    if (co2 != null && !isCo2InRange(co2, std)) {
+      alerts.push({
+        level: 'critical',
+        category: 'temp',
+        title: '💨 CO₂ بالا — ' + device.name,
+        message: 'CO₂: ' + toFa(co2) + '٪ (حد مجاز: ' + toFa(std?.incubation?.co2MaxPct ?? 0.5) + '٪) — افزایش تهویه',
+        source: 'inc',
+        sourceId: device.id + ':co2-high',
+        date: today(), notes: ''
+      });
+    }
+
+    // O₂
+    const o2 = (device as any).o2Current;
+    if (o2 != null && !isO2InRange(o2, std)) {
+      alerts.push({
+        level: 'critical',
+        category: 'temp',
+        title: '💨 O₂ پایین — ' + device.name,
+        message: 'O₂: ' + toFa(o2) + '٪ (حد مجاز: ' + toFa(std?.incubation?.o2MinPct ?? 20) + '٪) — افزایش تهویه',
+        source: 'inc',
+        sourceId: device.id + ':o2-low',
+        date: today(), notes: ''
+      });
     }
   });
 
