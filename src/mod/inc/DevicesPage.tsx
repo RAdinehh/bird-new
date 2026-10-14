@@ -8,7 +8,7 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { createDeviceSchema } from '../../shr/validation/rules/inc';
 import { useSet } from '../set/store';
 import { useBrd } from '../brd/store';
-import { Btn, Empty, PageContainer, Tag } from '../../shr/components/ui';
+import { Btn, Empty, PageContainer, Select, Tag } from '../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -22,6 +22,8 @@ import MaintenanceModal from './components/MaintenanceModal';
 import DeviceFormModal from './components/DeviceFormModal';
 import { STATUS_FA, MODE_FA, emptyForm as empty, type F } from './types-devices';
 import { warrantyInfo } from './api/warranty';
+import { LineChart } from '../../shr/components/Charts';
+import { todayJalali } from './helpers';
 
 
 export default function DevicesPage({ active = true }: { active?: boolean } = {}) {
@@ -53,6 +55,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
 
   // ═══ اعتبارسنجی زنده ═══
+  const [chartMetric, setChartMetric] = useState<'temp' | 'humidity' | 'est' | 'co2' | 'o2'>('temp');
   const { errors: vErrors } = useValidation(
     createDeviceSchema(),
     {
@@ -103,6 +106,22 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
     });
     setErr(''); setOpen(true);
   };
+  const recordReading = (d: Device) => {
+    const reading = {
+      id: 'r-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+      date: todayJalali(),
+      temp: d.temp,
+      humidity: d.humidity,
+      est: d.estCurrent ?? null,
+      co2: d.co2Current ?? null,
+      o2: d.o2Current ?? null,
+    };
+    const currentReadings = d.readings || [];
+    const next = [...currentReadings, reading].slice(-200);
+    updateDevice(d.id, { readings: next } as any);
+    toastMsg.saved('قرائت');
+  };
+
   useFab(active ? { label: 'افزودن دستگاه', onClick: openNew } : null);
 
 
@@ -363,6 +382,30 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
                     {d.o2Current != null && <Row l="O₂" v={toFa(d.o2Current) + '٪'} />}
                     {d.turningCurrent && <Row l="چرخش" v={d.turningCurrent === 'on' ? '🔄 روشن' : d.turningCurrent === 'off' ? '⏸ قطع' : '🤖 خودکار'} />}
                   </div>
+                  <Btn size="sm" full onClick={() => recordReading(d)}>📊 ثبت قرائت</Btn>
+
+                  {(d.readings || []).length > 0 && (
+                    <>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>
+                        📈 روند ({(d.readings || []).length} قرائت)
+                      </div>
+                      <Select value={chartMetric} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setChartMetric(e.target.value as 'temp' | 'humidity' | 'est' | 'co2' | 'o2')}>
+                        <option value="temp">دما محیط (°C)</option>
+                        <option value="humidity">رطوبت (٪)</option>
+                        <option value="est">EST (°C)</option>
+                        <option value="co2">CO₂ (٪)</option>
+                        <option value="o2">O₂ (٪)</option>
+                      </Select>
+                      <LineChart
+                        data={(d.readings || []).slice(-30).map((r: { date: string; temp?: number | null; humidity?: number | null; est?: number | null; co2?: number | null; o2?: number | null }) => ({
+                          label: r.date.slice(5),
+                          value: r[chartMetric] ?? 0,
+                        }))}
+                        color="var(--accent)"
+                        height={140}
+                      />
+                    </>
+                  )}
                 </>
               )}
 

@@ -35,6 +35,17 @@ export interface DeviceCapacity {
   lockdownDay?: number;
 }
 
+export interface DeviceReading {
+  id: string;
+  /** تاریخ شمسی */
+  date: string;
+  temp?: number | null;
+  humidity?: number | null;
+  est?: number | null;
+  co2?: number | null;
+  o2?: number | null;
+}
+
 export interface Device {
   id: string; name: string;
   code: string;                    // deprecated
@@ -60,6 +71,8 @@ export interface Device {
   o2Current?: number | null;
   /** 🆕 وضعیت چرخش فعلی — on/off/auto */
   turningCurrent?: 'on' | 'off' | 'auto';
+  /** 🆕 سری زمانی قرائت‌ها (برای نمودار روند) */
+  readings?: DeviceReading[];
   extraCost: number | null;
   maintenanceLogs: MaintenanceLog[];
   equipmentId: string;
