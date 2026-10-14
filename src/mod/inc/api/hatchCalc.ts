@@ -100,3 +100,26 @@ export function isWeightLossInRange(
   if (pct === null) return true;
   return pct >= min && pct <= max;
 }
+
+/** 🆕 پیدا کردن فاز انکوباسیون برای سن خاص (روز) */
+export function getIncubationPhase(
+  std: { incubation?: { tempProfile?: Array<{ dayFrom: number; dayTo: number; temp: number; humidity: number; label?: string }> } } | null | undefined,
+  ageDays: number,
+): { dayFrom: number; dayTo: number; temp: number; humidity: number; label?: string } | null {
+  const profile = std?.incubation?.tempProfile;
+  if (!profile || profile.length === 0) return null;
+  for (const phase of profile) {
+    if (ageDays >= phase.dayFrom && ageDays <= phase.dayTo) return phase;
+  }
+  return profile[profile.length - 1] ?? null;
+}
+
+/** 🆕 دما و رطوبت مورد انتظار برای سن خاص */
+export function getExpectedTempHumidity(
+  std: { incubation?: { tempProfile?: Array<{ dayFrom: number; dayTo: number; temp: number; humidity: number }> } } | null | undefined,
+  ageDays: number,
+): { temp: number; humidity: number } | null {
+  const phase = getIncubationPhase(std, ageDays);
+  if (!phase) return null;
+  return { temp: phase.temp, humidity: phase.humidity };
+}

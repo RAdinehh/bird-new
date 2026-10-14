@@ -5,7 +5,7 @@
  * همه فیلدها با OverridableField
  */
 import SettingsGroup from '../../../SettingsGroup';
-import { HatchingEditor } from '../editors';
+import { HatchingEditor, IncubationProfileEditor } from '../editors';
 import type { SectionProps } from './types';
 import { isChanged } from './types';
 import OverridableField from './OverridableField';
@@ -305,6 +305,21 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
             {std.incubation.candlingDays.join(' · ')}
           </div>
         )}
+      </div>
+
+      {/* پروفایل دما/رطوبت روز‌به‌روز */}
+      <div style={{ paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
+        <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700, marginBottom: 6 }}>
+          🌡 پروفایل دما/رطوبت روز‌به‌روز
+        </div>
+        <IncubationProfileEditor
+          profile={std.incubation.tempProfile || []}
+          onChange={(tempProfile) => updateBird({ incubation: { ...std.incubation, tempProfile } })}
+          setterTemp={std.incubation.setterTemp}
+          setterHumidity={std.incubation.setterHumidity}
+          hatcherTemp={std.incubation.hatcherTemp}
+          hatcherHumidity={std.incubation.hatcherHumidity}
+        />
       </div>
 
       {/* پارامترهای جوجه‌کشی (اختیاری) */}

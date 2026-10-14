@@ -7,7 +7,7 @@ import ExpandableCard, { StatBox, Dot } from '../../../shr/components/Expandable
 import { Row } from '../helpers';
 import ProgressTracker from '../../../shr/components/ProgressTracker';
 import { DEAL_LABEL, ENTRY_STATUS_LABEL, isLockdown, isHatchWindow } from '../store';
-import { calcWeightLossPct } from '../api/hatchCalc';
+import { calcWeightLossPct, getExpectedTempHumidity } from '../api/hatchCalc';
 
 export interface EggEntryCardProps {
   entry: any;
@@ -26,13 +26,14 @@ export interface EggEntryCardProps {
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  standard?: Parameters<typeof getExpectedTempHumidity>[0];
 }
 
 export default function EggEntryCard(props: EggEntryCardProps) {
   const {
     entry: e, index: i, device: dev, bird, breed,
     flocks, contacts, hatches, age, expectedHatch, remain, totalDays,
-    isOpen, onToggle, onEdit, onDelete,
+    isOpen, onToggle, onEdit, onDelete, standard,
   } = props;
 
   const locked = isLockdown({ ...e, expectedHatchDate: expectedHatch });
@@ -91,6 +92,12 @@ export default function EggEntryCard(props: EggEntryCardProps) {
         })()}
         <Row l="تاریخ ورود" v={toFa(e.entryDate)} />
         <Row l="هچ پیش‌بینی" v={toFa(expectedHatch)} />
+        {(() => {
+          const std = standard;
+          const exp = std ? getExpectedTempHumidity(std, age) : null;
+          if (!exp) return null;
+          return <Row l={`🌡 هدف امروز (روز ${toFa(age)})`} v={`${toFa(exp.temp)}°C / ${toFa(exp.humidity)}٪`} />;
+        })()}
         {e.trayNumbers && <Row l="طبقات" v={e.trayNumbers} />}
         <Row l="وضعیت" v={(ENTRY_STATUS_LABEL as any)[e.status]} />
       </div>

@@ -7,6 +7,7 @@ import {
   daysAgo, daysToHatch, daysFromProfiles, type EggEntry
 } from './store';
 import { useBrd } from '../brd/store';
+import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
 import { useTra } from '../tra/store';
@@ -27,6 +28,7 @@ import { useSet } from '../set/store';
 export default function EggEntriesPage({ initialDevice = '', onGoTo, active = true }: { initialDevice?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void; active?: boolean } = {}) {
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
   const { birds, breeds } = useBrd();
+  const breedStd = useBreedStandard();
   const { flocks } = useFlk();
   const { contacts } = useCtc();
   const { addInvoice, deleteInvoice } = useTra();
@@ -248,6 +250,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
             const bird = birds.find(b => b.id === e.birdId);
             const breed = breeds.find(b => b.id === e.breedId);
             const age = daysAgo(e.entryDate);
+            const std = breedStd.byBreedId(e.breedId || null);
             const totalDays = (_daysLookup(bird?.name) || 21);
             const expHatch = addDaysJalali(e.entryDate, totalDays);
             const remain = daysToHatch(expHatch);
@@ -263,6 +266,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
                 flocks={flocks}
                 contacts={contacts}
                 hatches={hatches}
+                standard={std}
                 age={age}
                 expectedHatch={expHatch}
                 remain={remain}

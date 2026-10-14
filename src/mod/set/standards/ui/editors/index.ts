@@ -9,3 +9,4 @@ export { default as WaterQualityEditor } from './WaterQualityEditor';
 export { default as TargetsEditor } from './TargetsEditor';
 export { default as MilestonesEditor } from './MilestonesEditor';
 export { default as HatchingEditor } from './HatchingEditor';
+export { IncubationProfileEditor } from './IncubationProfileEditor';

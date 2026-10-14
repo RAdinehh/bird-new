@@ -53,7 +53,7 @@ export const DUCK_PEKIN: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13},
+  incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 70.0, label: 'هچر' }]},
   litter: {
     recommended: ['straw', 'wood_shavings'],
     kgPerM2ByMaterial: { wood_shavings: 5.0, rice_hull: 5.0, straw: 8.3, sand: 41.7, sawdust: 6.7, peat: 8.3, paper_roll: 0.5, none: 0 },
@@ -119,7 +119,7 @@ export const DUCK_MUSCOVY: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 35, lockdownDay: 32, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13},
+  incubation: { totalDays: 35, lockdownDay: 32, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 70.0, label: 'هچر' }]},
   litter: {
     recommended: ['straw', 'wood_shavings'],
     kgPerM2ByMaterial: { wood_shavings: 5.0, rice_hull: 5.0, straw: 8.3, sand: 41.7, sawdust: 6.7, peat: 8.3, paper_roll: 0.5, none: 0 },
@@ -185,7 +185,7 @@ export const DUCK_UKRAINIAN: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13},
+  incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 70.0, label: 'هچر' }]},
   litter: {
     recommended: ['straw', 'wood_shavings'],
     kgPerM2ByMaterial: { wood_shavings: 5.0, rice_hull: 5.0, straw: 8.3, sand: 41.7, sawdust: 6.7, peat: 8.3, paper_roll: 0.5, none: 0 },
@@ -253,7 +253,7 @@ export const DUCK_PEKIN_BREEDER: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 18, troughCmPerBird: 3, manualCmPerBird: 3 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13},
+  incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 70.0, label: 'هچر' }]},
   production: {
     layingStartDay: 190,
     peakLayingPct: 85,
@@ -321,7 +321,7 @@ export const DUCK_MUSCOVY_BREEDER: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 18, troughCmPerBird: 3, manualCmPerBird: 3 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 35, lockdownDay: 31, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 75, weightLossMinPct: 11, weightLossMaxPct: 13},
+  incubation: { totalDays: 35, lockdownDay: 31, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 75, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 75.0, label: 'هچر' }]},
   production: {
     layingStartDay: 210,
     peakLayingPct: 70,

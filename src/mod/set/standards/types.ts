@@ -148,6 +148,20 @@ export interface IncubationStandard {
   weightLossMinPct?: number;
   /** 🆕 حداکثر کاهش وزن تخم تا روز ۱۸ (٪) — استاندارد Ross: ۱۳ */
   weightLossMaxPct?: number;
+  /** 🆕 پروفایل دما/رطوبت روز‌به‌روز (Ross 308 / Cobb / Aviagen) */
+  tempProfile?: IncubationPhase[];
+}
+
+/** 🆕 فاز پروفایل انکوباسیون — طبق Ross 308 و Aviagen */
+export interface IncubationPhase {
+  dayFrom: number;
+  dayTo: number;
+  /** دمای هدف (°C) — در DB همیشه سلسیوس */
+  temp: number;
+  /** رطوبت هدف (٪) */
+  humidity: number;
+  /** برچسب فاز (اختیاری) — مثل «استقرار» */
+  label?: string;
 }
 
 // ═══ 🆕 بستر ═══
