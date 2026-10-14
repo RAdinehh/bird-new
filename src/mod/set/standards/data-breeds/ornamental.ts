@@ -55,7 +55,7 @@ export const AUSTRALORP: BirdStandard = {
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
-    kgPerM2: 3.0,
+    kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
     thicknessCm: 6,
     lifetimeDays: 45,
   },
@@ -119,7 +119,7 @@ export const COCHIN: BirdStandard = {
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
-    kgPerM2: 3.0,
+    kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
     thicknessCm: 6,
     lifetimeDays: 45,
   },
@@ -183,7 +183,7 @@ export const BRAHMA: BirdStandard = {
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
-    kgPerM2: 3.0,
+    kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
     thicknessCm: 6,
     lifetimeDays: 45,
   },
@@ -247,7 +247,7 @@ export const SULTAN: BirdStandard = {
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
-    kgPerM2: 3.0,
+    kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
     thicknessCm: 6,
     lifetimeDays: 45,
   },
@@ -308,7 +308,7 @@ export const MINIATURE: BirdStandard = {
   incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65 },
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
-    kgPerM2: 3.0,
+    kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
     thicknessCm: 6,
     lifetimeDays: 45,
   },

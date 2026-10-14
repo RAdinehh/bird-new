@@ -12,8 +12,13 @@ const MATERIAL_LABELS: Record<LitterMaterial, string> = {
   none: '—',
 };
 
+const MATERIALS_LIST: LitterMaterial[] = [
+  'wood_shavings', 'rice_hull', 'straw', 'sand', 'sawdust', 'peat', 'paper_roll',
+];
+
 export function LitterEditor({
-  litter, onChange,
+  litter,
+  onChange,
 }: {
   litter: LitterStandard;
   onChange: (n: LitterStandard) => void;
@@ -22,9 +27,14 @@ export function LitterEditor({
 
   const toggleMaterial = (m: LitterMaterial) => {
     const rec = litter.recommended.includes(m)
-      ? litter.recommended.filter(x => x !== m)
+      ? litter.recommended.filter((x) => x !== m)
       : [...litter.recommended, m];
     update({ recommended: rec });
+  };
+
+  const updateMaterialKg = (m: LitterMaterial, v: number | null) => {
+    const next = { ...litter.kgPerM2ByMaterial, [m]: v ?? 0 };
+    update({ kgPerM2ByMaterial: next });
   };
 
   return (
@@ -42,8 +52,8 @@ export function LitterEditor({
         }}>مواد پیشنهادی</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {(Object.keys(MATERIAL_LABELS) as LitterMaterial[])
-            .filter(m => m !== 'none')
-            .map(m => {
+            .filter((m) => m !== 'none')
+            .map((m) => {
               const selected = litter.recommended.includes(m);
               return (
                 <button
@@ -70,30 +80,38 @@ export function LitterEditor({
         </div>
       </div>
 
+      <RangeCard title="مصرف به ازای هر ماده (kg/m²)">
+        <FieldsGrid>
+          {MATERIALS_LIST.map((m) => (
+            <CompactField
+              key={m}
+              label={MATERIAL_LABELS[m]}
+              value={litter.kgPerM2ByMaterial?.[m] ?? 0}
+              onChange={(v) => updateMaterialKg(m, v)}
+              unit="kg/m²"
+            />
+          ))}
+        </FieldsGrid>
+      </RangeCard>
+
       <RangeCard title="مشخصات بستر">
         <FieldsGrid>
           <CompactField
-            label="مقدار مصرف"
-            value={litter.kgPerM2}
-            onChange={v => update({ kgPerM2: v ?? 0 })}
-            unit="kg/m²"
-          />
-          <CompactField
             label="ضخامت"
             value={litter.thicknessCm}
-            onChange={v => update({ thicknessCm: v ?? 0 })}
+            onChange={(v) => update({ thicknessCm: v ?? 0 })}
             unit="cm"
           />
           <CompactField
             label="عمر مفید"
             value={litter.lifetimeDays}
-            onChange={v => update({ lifetimeDays: v ?? 0 })}
+            onChange={(v) => update({ lifetimeDays: v ?? 0 })}
             unit="روز"
           />
           <CompactField
             label="تعویض در دوره"
             value={litter.replacementsPerCycle ?? null}
-            onChange={v => update({ replacementsPerCycle: v ?? undefined })}
+            onChange={(v) => update({ replacementsPerCycle: v ?? undefined })}
             unit="بار"
           />
         </FieldsGrid>

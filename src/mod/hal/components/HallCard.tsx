@@ -146,7 +146,7 @@ export default function HallCard(props: HallCardProps) {
       </div>
 
       <HallEquipSection hallId={h.id}
-        needInput={{ birdCount: totalBirds, ageDays: flockAgeDays, areaM2: area, volumeM3: volume, standard: flockStandard }}
+        needInput={{ birdCount: totalBirds, ageDays: flockAgeDays, areaM2: area, volumeM3: volume, standard: flockStandard, litterType: h.litterType }}
         legacy={{ ventilationSystem: h.ventilationSystem, feederType: h.feederType, drinkerType: h.drinkerType, litterType: h.litterType }} />
 
       {(h.builtAt || h.lastSanitizedAt || equipValue > 0) && (

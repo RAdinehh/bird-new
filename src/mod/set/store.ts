@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { BirdStandard } from './standards';
-import type { StandardOverrides, DeepPartial } from './standards/_override';
+import type { StandardOverrides } from './standards/_override';
 import { setByPath, unsetByPath } from './standards/_override';
 import { persist } from 'zustand/middleware';
 import { DEFAULT_UNITS, type Units } from '../../shr/units';
@@ -174,6 +174,27 @@ export const useSet = create<State>()(
       name: 'pm-settings',
       merge: (persisted, current) => {
         const p: any = persisted || {};
+
+        // 🆕 Migration (۱۴۰۴/۰۷/۲۱): حذف litter.kgPerM2 قدیمی (ساختار جدید: kgPerM2ByMaterial)
+        const migrateLitter = (obj: any): any => {
+          if (!obj?.litter || obj.litter.kgPerM2 === undefined) return obj;
+          const { kgPerM2: _old, ...litterRest } = obj.litter;
+          if (Object.keys(litterRest).length === 0) {
+            const { litter: _l, ...objRest } = obj;
+            return objRest;
+          }
+          return { ...obj, litter: litterRest };
+        };
+
+        const cleanedOverrides: Record<string, any> = {};
+        for (const [k, v] of Object.entries(p.customOverrides || {})) {
+          cleanedOverrides[k] = migrateLitter(v);
+        }
+        const cleanedStandards: Record<string, any> = {};
+        for (const [k, v] of Object.entries(p.customStandards || {})) {
+          cleanedStandards[k] = migrateLitter(v);
+        }
+
         return {
           ...current,
           ...p,
@@ -185,7 +206,9 @@ export const useSet = create<State>()(
           channels: { ...current.channels, ...(p.channels || {}) },
           alerts: { ...current.alerts, ...(p.alerts || {}) },
           quietHours: { ...current.quietHours, ...(p.quietHours || {}) },
-          features: { ...current.features, ...(p.features || {}) }
+          features: { ...current.features, ...(p.features || {}) },
+          customOverrides: cleanedOverrides,
+          customStandards: cleanedStandards,
         };
       }
     }

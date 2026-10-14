@@ -56,7 +56,7 @@ export const DUCK_PEKIN: BirdStandard = {
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70 },
   litter: {
     recommended: ['straw', 'wood_shavings'],
-    kgPerM2: 5.0,
+    kgPerM2ByMaterial: { wood_shavings: 5.0, rice_hull: 5.0, straw: 8.3, sand: 41.7, sawdust: 6.7, peat: 8.3, paper_roll: 0.5, none: 0 },
     thicknessCm: 10,
     lifetimeDays: 30,
     replacementsPerCycle: 4,
@@ -122,7 +122,7 @@ export const DUCK_MUSCOVY: BirdStandard = {
   incubation: { totalDays: 35, lockdownDay: 32, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70 },
   litter: {
     recommended: ['straw', 'wood_shavings'],
-    kgPerM2: 5.0,
+    kgPerM2ByMaterial: { wood_shavings: 5.0, rice_hull: 5.0, straw: 8.3, sand: 41.7, sawdust: 6.7, peat: 8.3, paper_roll: 0.5, none: 0 },
     thicknessCm: 10,
     lifetimeDays: 30,
     replacementsPerCycle: 4,
@@ -188,7 +188,7 @@ export const DUCK_UKRAINIAN: BirdStandard = {
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70 },
   litter: {
     recommended: ['straw', 'wood_shavings'],
-    kgPerM2: 5.0,
+    kgPerM2ByMaterial: { wood_shavings: 5.0, rice_hull: 5.0, straw: 8.3, sand: 41.7, sawdust: 6.7, peat: 8.3, paper_roll: 0.5, none: 0 },
     thicknessCm: 10,
     lifetimeDays: 30,
     replacementsPerCycle: 4,

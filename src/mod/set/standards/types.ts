@@ -153,12 +153,25 @@ export type LitterMaterial =
 
 export interface LitterStandard {
   recommended: LitterMaterial[];
-  kgPerM2: number;
+  /** 🆕 مقدار kg به ازای هر متر مربع، بر اساس ماده بستر */
+  kgPerM2ByMaterial: Record<LitterMaterial, number>;
   thicknessCm: number;
   lifetimeDays: number;
   replacementsPerCycle?: number;
   notes?: string;
 }
+
+/** 🆕 مقادیر پیش‌فرض kg/m² برای هر ماده بستر (طبق Ross 308 + Big Dutchman + فارم چک ایران) */
+export const DEFAULT_LITTER_KG_PER_M2: Record<LitterMaterial, number> = {
+  wood_shavings: 3.0,
+  rice_hull: 3.0,
+  straw: 5.0,
+  sand: 25.0,
+  sawdust: 4.0,
+  peat: 5.0,
+  paper_roll: 0.3,
+  none: 0,
+};
 
 
 // ═══ 🆕 برنامه نوری ═══

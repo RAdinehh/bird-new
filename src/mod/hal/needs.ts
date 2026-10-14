@@ -28,6 +28,8 @@ export interface NeedInput {
   areaM2: number;
   volumeM3: number;
   standard: BirdStandard | null;
+  /** 🆕 نوع بستر انتخاب‌شده سالن */
+  litterType?: string | null;
 }
 
 export interface CategoryNeed {
@@ -83,14 +85,29 @@ export function needFeeder(inp: NeedInput): CategoryNeed | null {
   };
 }
 
-/** نیاز بستر (kg) — بر اساس مساحت × kg/m² */
+/** نیاز بستر (kg) — بر اساس مساحت × kg/m² (بسته به ماده) */
 export function needLitter(inp: NeedInput): CategoryNeed | null {
   if (inp.areaM2 <= 0) return null;
-  const kgPerM2 = inp.standard?.litter?.kgPerM2 || 4.5;
+  const std = inp.standard?.litter;
+  const litterType = inp.litterType;
+  const kgMap = std?.kgPerM2ByMaterial;
+
+  let kgPerM2 = 0;
+  let materialName = '—';
+  if (kgMap && litterType && (kgMap as Record<string, number>)[litterType] !== undefined) {
+    kgPerM2 = (kgMap as Record<string, number>)[litterType];
+    materialName = litterType;
+  } else if (kgMap && std?.recommended?.[0]) {
+    kgPerM2 = (kgMap as Record<string, number>)[std.recommended[0]] || 0;
+    materialName = std.recommended[0];
+  }
+
+  if (kgPerM2 <= 0) return null;
+
   return {
-    value: Math.ceil(inp.areaM2 * kgPerM2),
+    value: Math.ceil(inp.areaM2 * kgPerM2 * 10) / 10,
     unit: 'kg',
-    formula: `${inp.areaM2} m² × ${kgPerM2} kg/m²`,
+    formula: `${inp.areaM2} m² × ${kgPerM2} kg/m² (${materialName})`,
   };
 }
 

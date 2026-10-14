@@ -33,7 +33,7 @@ const TURKEY_BASE = {
     lampWattPerM2: 3, fanM3PerKg: 7.5,
   },
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.0, hatcherHumidity: 70 },
-  litter: { recommended: ['wood_shavings' as const, 'straw' as const], kgPerM2: 4.5, thicknessCm: 8, lifetimeDays: 60 },
+  litter: { recommended: ['wood_shavings' as const, 'straw' as const], kgPerM2ByMaterial: { wood_shavings: 4.5, rice_hull: 4.5, straw: 7.5, sand: 37.5, sawdust: 6.0, peat: 7.5, paper_roll: 0.45, none: 0 }, thicknessCm: 8, lifetimeDays: 60 },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 2.0 },
     { dayFrom: 8, dayTo: 28, maxPct: 2.5 },

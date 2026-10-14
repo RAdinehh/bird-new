@@ -59,7 +59,7 @@ export const QUAIL_BROILER: BirdStandard = {
   incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70 },
   litter: {
     recommended: ['wood_shavings', 'rice_hull'],
-    kgPerM2: 2.0,
+    kgPerM2ByMaterial: { wood_shavings: 2.0, rice_hull: 2.0, straw: 3.3, sand: 16.7, sawdust: 2.7, peat: 3.3, paper_roll: 0.2, none: 0 },
     thicknessCm: 5,
     lifetimeDays: 42,
   },
@@ -122,7 +122,7 @@ export const QUAIL_LAYER: BirdStandard = {
   incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70 },
   litter: {
     recommended: ['wood_shavings', 'rice_hull'],
-    kgPerM2: 2.0,
+    kgPerM2ByMaterial: { wood_shavings: 2.0, rice_hull: 2.0, straw: 3.3, sand: 16.7, sawdust: 2.7, peat: 3.3, paper_roll: 0.2, none: 0 },
     thicknessCm: 5,
     lifetimeDays: 42,
   },
@@ -187,7 +187,7 @@ export const QUAIL_BREEDER: BirdStandard = {
     lampWattPerM2: 4.5, fanM3PerKg: 5,
   },
   incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70 },
-  litter: { recommended: ['wood_shavings', 'rice_hull'], kgPerM2: 2.0, thicknessCm: 5, lifetimeDays: 42 },
+  litter: { recommended: ['wood_shavings', 'rice_hull'], kgPerM2ByMaterial: { wood_shavings: 2.0, rice_hull: 2.0, straw: 3.3, sand: 16.7, sawdust: 2.7, peat: 3.3, paper_roll: 0.2, none: 0 }, thicknessCm: 5, lifetimeDays: 42 },
   production: {
     layingStartDay: 50,
     peakLayingPct: 85,
