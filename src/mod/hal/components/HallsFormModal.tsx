@@ -14,6 +14,7 @@ import DependentSelect from '../../../shr/components/DependentSelect';
 import DatePicker from '../../../shr/components/DatePicker';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
+import { VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS } from '../_labels';
 
 interface TempFormFieldProps {
   value: string;
@@ -314,6 +315,52 @@ export default function HallsFormModal(props: HallsFormModalProps) {
             </button>
           )}
         
+
+        <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>⚙️ سیستم‌ها</div>
+        <Grid2>
+          <Field label="تهویه" hint="حجم تبادل هوا در ساعت">
+            <NumField placeholder="۰" value={form.ventilation} onChange={e => setForm({...form, ventilation: e.target.value})} unit="m³/h" min={0} max={100000} autoClamp />
+          </Field>
+          <Field label="روشنایی" hint="شدت نور">
+            <NumField placeholder="۰" value={form.light} onChange={e => setForm({...form, light: e.target.value})} unit="lux" min={0} max={500} autoClamp />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="سیستم تهویه">
+            <Select value={form.ventilationSystem || ''} onChange={e => setForm({...form, ventilationSystem: e.target.value})}>
+              <option value="">—</option>
+              {Object.entries(VENT_SYS_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="نوع بستر">
+            <Select value={form.litterType || ''} onChange={e => setForm({...form, litterType: e.target.value})}>
+              <option value="">—</option>
+              {Object.entries(LITTER_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </Select>
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="نوع دانخوری">
+            <Select value={form.feederType || ''} onChange={e => setForm({...form, feederType: e.target.value})}>
+              <option value="">—</option>
+              {Object.entries(FEEDER_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="نوع آبخوری">
+            <Select value={form.drinkerType || ''} onChange={e => setForm({...form, drinkerType: e.target.value})}>
+              <option value="">—</option>
+              {Object.entries(DRINKER_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </Select>
+          </Field>
+        </Grid2>
 
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🌡 شرایط محیطی</div>
           <Grid2>
