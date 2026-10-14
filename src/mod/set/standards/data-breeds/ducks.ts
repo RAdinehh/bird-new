@@ -49,8 +49,8 @@ export const DUCK_PEKIN: BirdStandard = {
   },
   space: { densityMax: 6, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5 },
-    drinker: { nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
+    feeder: {  chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 50, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: {  nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 50 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 70.0, label: 'هچر' }]},
@@ -116,7 +116,7 @@ export const DUCK_MUSCOVY: BirdStandard = {
   space: { densityMax: 5, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
     feeder: { chainCmPerBird: 10, panBirdsPerUnit: 25, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 50, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
-    drinker: { nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
+    drinker: {  nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 50 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 35, lockdownDay: 32, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 70.0, label: 'هچر' }]},
@@ -181,8 +181,8 @@ export const DUCK_UKRAINIAN: BirdStandard = {
   },
   space: { densityMax: 5.5, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 28, tubeCmPerBird: 50, manualCmPerBird: 5 },
-    drinker: { nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
+    feeder: {  chainCmPerBird: 10, panBirdsPerUnit: 28, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 50, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: {  nippleBirdsPerUnit: 6, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 50 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 70.0, label: 'هچر' }]},
@@ -249,8 +249,8 @@ export const DUCK_PEKIN_BREEDER: BirdStandard = {
   },
   space: { densityMax: 4, feederSpaceCm: 15, drinkerSpaceCm: 3 },
   equipment: {
-    feeder: { chainCmPerBird: 12, panBirdsPerUnit: 25, tubeCmPerBird: 12, manualCmPerBird: 15 },
-    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 18, troughCmPerBird: 3, manualCmPerBird: 3 },
+    feeder: {  chainCmPerBird: 12, panBirdsPerUnit: 25, tubeCmPerBird: 12, manualCmPerBird: 15, bucketBirdsPerUnit: 50, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: {  nippleBirdsPerUnit: 8, cupBirdsPerUnit: 18, troughCmPerBird: 3, manualCmPerBird: 3, fountainBirdsPerUnit: 50 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 70.0, label: 'هچر' }]},
@@ -317,8 +317,8 @@ export const DUCK_MUSCOVY_BREEDER: BirdStandard = {
   },
   space: { densityMax: 4, feederSpaceCm: 15, drinkerSpaceCm: 3 },
   equipment: {
-    feeder: { chainCmPerBird: 12, panBirdsPerUnit: 25, tubeCmPerBird: 12, manualCmPerBird: 15 },
-    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 18, troughCmPerBird: 3, manualCmPerBird: 3 },
+    feeder: {  chainCmPerBird: 12, panBirdsPerUnit: 25, tubeCmPerBird: 12, manualCmPerBird: 15, bucketBirdsPerUnit: 50, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: {  nippleBirdsPerUnit: 8, cupBirdsPerUnit: 18, troughCmPerBird: 3, manualCmPerBird: 3, fountainBirdsPerUnit: 50 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   incubation: { totalDays: 35, lockdownDay: 31, setterTemp: 37.5, setterHumidity: 60, hatcherTemp: 37.0, hatcherHumidity: 75, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 60.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 58.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 55.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 75.0, label: 'هچر' }]},

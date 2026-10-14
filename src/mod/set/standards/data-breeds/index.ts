@@ -13,7 +13,6 @@ export * from './native';
 export * from './ornamental';
 export * from './quail';
 export * from './ducks';
-export * from './turkey_goose';
 export * from './turkeys';
 export * from './geese';
 

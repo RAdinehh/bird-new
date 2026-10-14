@@ -64,8 +64,8 @@ export const ROSS_308_BREEDER: BirdStandard = {
   },
   space: { densityMax: 6, feederSpaceCm: 15, drinkerSpaceCm: 3 },
   equipment: {
-    feeder: { chainCmPerBird: 15, panBirdsPerUnit: 20, tubeCmPerBird: 12, manualCmPerBird: 18 },
-    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 15, troughCmPerBird: 3, manualCmPerBird: 3.5 },
+    feeder: {  chainCmPerBird: 15, panBirdsPerUnit: 20, tubeCmPerBird: 12, manualCmPerBird: 18, bucketBirdsPerUnit: 60, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: {  nippleBirdsPerUnit: 8, cupBirdsPerUnit: 15, troughCmPerBird: 3, manualCmPerBird: 3.5, fountainBirdsPerUnit: 60 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   production: {
@@ -138,8 +138,8 @@ export const COBB_500_BREEDER: BirdStandard = {
   },
   space: { densityMax: 6, feederSpaceCm: 15, drinkerSpaceCm: 3 },
   equipment: {
-    feeder: { chainCmPerBird: 15, panBirdsPerUnit: 20, tubeCmPerBird: 12, manualCmPerBird: 18 },
-    drinker: { nippleBirdsPerUnit: 8, cupBirdsPerUnit: 15, troughCmPerBird: 3, manualCmPerBird: 3.5 },
+    feeder: {  chainCmPerBird: 15, panBirdsPerUnit: 20, tubeCmPerBird: 12, manualCmPerBird: 18, bucketBirdsPerUnit: 60, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: {  nippleBirdsPerUnit: 8, cupBirdsPerUnit: 15, troughCmPerBird: 3, manualCmPerBird: 3.5, fountainBirdsPerUnit: 60 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
   production: {
@@ -212,8 +212,8 @@ export const HY_LINE_BROWN_BREEDER: BirdStandard = {
   },
   space: { densityMax: 7, feederSpaceCm: 12, drinkerSpaceCm: 2.5 },
   equipment: {
-    feeder: { chainCmPerBird: 12, panBirdsPerUnit: 25, tubeCmPerBird: 10, manualCmPerBird: 15 },
-    drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 18, troughCmPerBird: 2.5, manualCmPerBird: 3 },
+    feeder: {  chainCmPerBird: 12, panBirdsPerUnit: 25, tubeCmPerBird: 10, manualCmPerBird: 15, bucketBirdsPerUnit: 60, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
+    drinker: {  nippleBirdsPerUnit: 10, cupBirdsPerUnit: 18, troughCmPerBird: 2.5, manualCmPerBird: 3, fountainBirdsPerUnit: 60 },
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
   production: {

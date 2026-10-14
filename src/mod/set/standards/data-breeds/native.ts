@@ -50,7 +50,7 @@ export const MARANDI: BirdStandard = {
   },
   space: { densityMax: 10, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 40, tubeCmPerBird: 50, manualCmPerBird: 5 },
+    feeder: {  chainCmPerBird: 10, panBirdsPerUnit: 40, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 70, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 70 },
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
@@ -128,7 +128,7 @@ export const GOLPAYGANI: BirdStandard = {
   },
   space: { densityMax: 10, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 35, tubeCmPerBird: 50, manualCmPerBird: 5 },
+    feeder: {  chainCmPerBird: 10, panBirdsPerUnit: 35, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 70, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 70 },
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
@@ -194,7 +194,7 @@ export const LARI: BirdStandard = {
   },
   space: { densityMax: 8, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5 },
+    feeder: {  chainCmPerBird: 10, panBirdsPerUnit: 30, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 70, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 70 },
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
@@ -260,7 +260,7 @@ export const GOLIN: BirdStandard = {
   },
   space: { densityMax: 10, feederSpaceCm: 10, drinkerSpaceCm: 2 },
   equipment: {
-    feeder: { chainCmPerBird: 10, panBirdsPerUnit: 35, tubeCmPerBird: 50, manualCmPerBird: 5 },
+    feeder: {  chainCmPerBird: 10, panBirdsPerUnit: 35, tubeCmPerBird: 50, manualCmPerBird: 5, bucketBirdsPerUnit: 70, chickFeederBirdsPerUnit: 50, chickTrayBirdsPerUnit: 100 },
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2, fountainBirdsPerUnit: 70 },
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
