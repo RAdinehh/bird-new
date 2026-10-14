@@ -64,7 +64,11 @@ export default function HallEquipCatRow({ cat, count, tone, pct, onClick }: Prop
         color: TONE_COLOR[tone],
         minWidth: 40, textAlign: 'left', flexShrink: 0,
       }}>
-        {pct !== null ? `${toFa(Math.round(pct))}٪` : '—'}
+        {pct !== null ? (
+          pct <= 100
+            ? `${toFa(Math.round(pct))}٪`
+            : `${toFa(Math.round((pct / 100) * 10) / 10)}×`
+        ) : '—'}
       </span>
       <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>{TONE_EMOJI[tone]}</span>
     </button>
