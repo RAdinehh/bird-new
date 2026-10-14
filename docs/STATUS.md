@@ -78,6 +78,10 @@
 - ✅ **`inc/needs.ts`** — ۶ تابع pure (تهویه، چرخش، ذخیره، هچ، chick yield)
 - ✅ **نمایش ذخیره‌سازی تخم** در `EggEntryCard`
 - ✅ **نمایش Chick Yield** در `HatchCard`
+- ✅ **پایش زنده در کارت دستگاه** — ۵ فیلد (دما/رطوبت/EST/CO₂/O₂)
+- ✅ **وضعیت چرخش** (`turningCurrent`) + هشدار قبل/بعد lockdown
+- ✅ **fix باگ save** — پایش زنده (estCurrent/co2Current/o2Current) قبلاً ذخیره نمی‌شد
+- ✅ **نمودار روند** — `DeviceReading` + LineChart + ۵ metric
 
 ### فاز ۸ — ابزارها + hal نهایی (تموم — جلسه ۵)
 - ✅ **ESLint** نصب + config (no-unused-imports, no-explicit-any, prefer-const)

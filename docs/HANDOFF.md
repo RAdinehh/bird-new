@@ -305,6 +305,10 @@ git tag before-XXX-YYYYMMDD
 - ✅ **هشدار alt** — EST/CO₂/O₂ (دستگاه‌های فعال)
 - ✅ **`inc/needs.ts`** — ۶ تابع pure (تهویه، چرخش، ذخیره، هچ، chick yield)
 - ✅ **نمایش ذخیره‌سازی تخم** در EggEntryCard + **Chick Yield** در HatchCard
+- ✅ **پایش زنده در کارت دستگاه** (دما/رطوبت/EST/CO₂/O₂)
+- ✅ **وضعیت چرخش** + هشدار قبل/بعد lockdown
+- ✅ **fix باگ save** — پایش زنده
+- ✅ **نمودار روند** — `DeviceReading` + LineChart
 - ✅ **مستندسازی** به‌روز
 
 ### جلسه ۵ (۱۴۰۴/۰۷/۲۱) — hal کامل + ابزارها ⭐
