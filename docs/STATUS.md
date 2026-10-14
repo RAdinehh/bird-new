@@ -1,6 +1,6 @@
 # 🐔 STATUS.md — تاریخچه و نقشه راه
 
-> آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۵ — hal کامل + ابزارها)
+> آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۶ — انکوباسیون + استاندارد بستر)
 > این سند فقط **تاریخچه** و **Roadmap** رو نگه می‌داره.
 > وضعیت فعلی و کارهای جاری → `HANDOFF.md`
 
@@ -59,6 +59,14 @@
 - FOUNDATION.md (۱۳ بخش)
 - FOUNDATION-PATTERNS.md (۱۶ بخش)
 - ۳۰+ الگوی تفکر
+
+### فاز ۹ — انکوباسیون + استاندارد بستر (تموم — جلسه ۶)
+- ✅ **استاندارد بستر per-material** — `kgPerM2ByMaterial` (رول کاغذی ۰.۳، ماسه ۲۵، کاه ۵، ...)
+- ✅ **migration** برای override قدیمی (`set/store.ts` merge)
+- ✅ **نمایش اعشار صحیح** در LitterEditor (`decimals={2}`)
+- ✅ **کاهش وزن تخم** — ۲ فیلد + `calcWeightLossPct` + محاسبه زنده + نمایش
+- ✅ **`weightLossMinPct/MaxPct`** در `IncubationStandard` (۱۱-۱۳)
+- ✅ **هشدار alt** — کاهش وزن خارج بازه (روز ۷-۱۸)
 
 ### فاز ۸ — ابزارها + hal نهایی (تموم — جلسه ۵)
 - ✅ **ESLint** نصب + config (no-unused-imports, no-explicit-any, prefer-const)
