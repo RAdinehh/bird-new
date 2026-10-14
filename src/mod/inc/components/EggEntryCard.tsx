@@ -8,6 +8,7 @@ import { Row } from '../helpers';
 import ProgressTracker from '../../../shr/components/ProgressTracker';
 import { DEAL_LABEL, ENTRY_STATUS_LABEL, isLockdown, isHatchWindow } from '../store';
 import { calcWeightLossPct, getExpectedTempHumidity } from '../api/hatchCalc';
+import { needEggStorageDays } from '../api/needs';
 
 export interface EggEntryCardProps {
   entry: any;
@@ -91,6 +92,12 @@ export default function EggEntryCard(props: EggEntryCardProps) {
           return <Row l="کاهش وزن نمونه" v={(inRange ? '✅ ' : '⚠️ ') + toFa(pct) + '٪'} />;
         })()}
         <Row l="تاریخ ورود" v={toFa(e.entryDate)} />
+        {(() => {
+          const st = needEggStorageDays(age);
+          if (!st) return null;
+          const icon = st.level === 'ok' ? '✅' : st.level === 'warn' ? '⚠️' : '🔴';
+          return <Row l="ذخیره در انبار" v={`${icon} ${toFa(st.value)} روز`} />;
+        })()}
         <Row l="هچ پیش‌بینی" v={toFa(expectedHatch)} />
         {(() => {
           const std = standard;

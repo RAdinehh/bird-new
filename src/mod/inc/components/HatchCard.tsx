@@ -6,6 +6,7 @@ import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../../shr/components/ExpandableCard';
 import { Row } from '../helpers';
 import { costPerChick, type HatchResult } from '../store';
+import { calcChickYield } from '../api/needs';
 
 export interface HatchCardProps {
   hatch: HatchResult;
@@ -93,6 +94,12 @@ export default function HatchCard(props: HatchCardProps) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="نرخ هچ کل" v={toFa(hr.toFixed(1)) + '٪'} />
                   {aliveAfter !== total && <Row l="نرخ از نطفه‌دار" v={toFa(realRate.toFixed(1)) + '٪'} />}
+                  {entry?.sampleWeightInitial && h.avgWeight && (() => {
+                    const cy = calcChickYield(h.avgWeight, entry.sampleWeightInitial);
+                    if (!cy) return null;
+                    const icon = cy.level === 'ok' ? '✅' : cy.level === 'warn' ? '⚠️' : '🔴';
+                    return <Row l="Chick Yield" v={`${icon} ${toFa(cy.value)}٪`} />;
+                  })()}
                 </div>
 
                 {entry?.totalPrice && h.hatched ? (

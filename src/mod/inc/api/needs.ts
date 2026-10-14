@@ -8,12 +8,6 @@ import type { IncubationStandard, BirdStandard } from '../../set/standards/types
 
 // ═══ Input Types ═══
 
-export interface EggStorageInput {
-  eggCount: number;
-  entryDate: string;      // تاریخ ورود به انبار
-  currentDate?: string;   // پیش‌فرض: امروز
-}
-
 export interface AirExchangeInput {
   eggCount: number;
   standard: BirdStandard | null;
@@ -35,18 +29,6 @@ export interface NeedResult {
 }
 
 // ═══ Helpers ═══
-
-/** محاسبه روزهای اختلاف بین دو تاریخ شمسی/میلادی */
-function daysBetween(from: string, to: string): number {
-  try {
-    const d1 = new Date(from).getTime();
-    const d2 = new Date(to).getTime();
-    if (isNaN(d1) || isNaN(d2)) return 0;
-    return Math.max(0, Math.floor((d2 - d1) / (1000 * 60 * 60 * 24)));
-  } catch {
-    return 0;
-  }
-}
 
 // ═══ ۱. نیاز تهویه (m³/h) ═══
 
@@ -91,18 +73,13 @@ export function needTurningCount(inp: TurningInput): NeedResult | null {
  * تعداد روزهای ذخیره‌سازی تخم قبل از انکوباسیون
  * استاندارد: حداکثر ۷ روز (کاهش نرخ هچ بعد از ۷ روز)
  */
-export function needEggStorageDays(
-  inp: EggStorageInput,
-  maxDays = 7,
-): NeedResult | null {
-  if (inp.eggCount <= 0) return null;
-  const current = inp.currentDate || new Date().toISOString().slice(0, 10);
-  const days = daysBetween(inp.entryDate, current);
+export function needEggStorageDays(ageDays: number, maxDays = 7): NeedResult | null {
+  if (ageDays < 0) return null;
   return {
-    value: days,
+    value: ageDays,
     unit: 'روز',
-    formula: `${inp.entryDate} → ${current}`,
-    level: days <= maxDays ? 'ok' : days <= maxDays + 2 ? 'warn' : 'critical',
+    formula: `${ageDays} روز از ورود`,
+    level: ageDays <= maxDays ? 'ok' : ageDays <= maxDays + 2 ? 'warn' : 'critical',
   };
 }
 
