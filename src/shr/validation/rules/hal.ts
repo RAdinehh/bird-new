@@ -31,20 +31,6 @@ export function createHallSchema(_ctx: ValidationContext = {}) {
     notes: optionalStr(1000),
     birdId: requiredId('پرنده'),
     breedId: requiredId('نژاد'),
-  }).superRefine((data, ctx) => {
-    const d = data as any;
-    // اگه length × width داریم، capacity نمی‌تونه بیشتر از حداکثر تراکم باشه
-    if (d.length && d.width && d.capacity) {
-      const area = d.length * d.width;
-      const maxBirds = area * HALL.densityBirdsPerSqM.max;
-      if (d.capacity > maxBirds) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `ظرفیت (${d.capacity}) برای مساحت ${area.toFixed(0)} متر مربع زیاد است`,
-          path: ['capacity'],
-        });
-      }
-    }
   });
 }
 

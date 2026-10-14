@@ -210,7 +210,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           ) : <div />}
         </Grid2>
         <Grid2>
-            <Field label="پرنده" required>
+            <Field label="پرنده" required error={vErrors.birdId}>
               <SmartSelect
                 value={form.birdId || ''}
                 onChange={v => setForm({...form, birdId: v, breedId: ''})}
@@ -220,7 +220,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 autoThreshold={6}
               />
             </Field>
-            <Field label="نژاد پرنده" required>
+            <Field label="نژاد پرنده" required error={vErrors.breedId}>
               <DependentSelect
                 value={form.breedId}
                 onChange={v => setForm({...form, breedId: v})}
@@ -239,8 +239,24 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           <Field label="عرض" required error={vErrors.width}><NumField placeholder="۵" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} autoClamp /></Field>
           <Field label="ارتفاع" required error={vErrors.height}><NumField placeholder="۳" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} autoClamp /></Field>
         </Grid3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-2)', alignItems: 'start' }}>
               <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity}>
                 <NumField placeholder="۵۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
+            {(() => {
+              const cap = parseFloat(toEn(form.capacity)) || 0;
+              const stdW = form.breedId ? breedStd.byBreedId(form.breedId) : null;
+              const density = stdW?.space?.densityMax;
+              const L = parseFloat(toEn(form.length)) || 0;
+              const W = parseFloat(toEn(form.width)) || 0;
+              const area = L * W;
+              const suggested = area > 0 && density ? Math.floor(area * density) : null;
+              if (!cap || !suggested || cap <= suggested) return null;
+              return (
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600, padding: '2px 4px', lineHeight: 1.5, display: 'flex', alignItems: 'center', gap: 4, textAlign: 'right', marginTop: 4 }} dir="rtl">
+                  ⚠️ ظرفیت {toFa(cap)} بیشتر از پیشنهاد {toFa(suggested)} است
+                </div>
+              );
+            })()}
               </Field>
               {(() => {
                 const std = form.breedId ? breedStd.byBreedId(form.breedId) : null;
@@ -276,6 +292,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                   </div>
                 );
               })()}
+        </div>
             <OverrideHint {...capHint} />
           {form.breedId && (
             <button

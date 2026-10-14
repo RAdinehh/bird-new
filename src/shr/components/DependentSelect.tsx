@@ -58,6 +58,26 @@ export default function DependentSelect({
 
   // حالت ۱: والد انتخاب نشده
   if (!parentValue) {
+    // 🆕 حالت select: یه Select غیرفعال ساده
+    if (emptyMode === 'select') {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+          <Select
+            value=""
+            onChange={() => {}}
+            disabled
+            style={{ height, fontSize, opacity: 0.6, borderColor }}
+          >
+            <option value="">— ابتدا {parentLabel} را انتخاب کنید —</option>
+          </Select>
+          {error && (
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 600, textAlign: 'right', paddingRight: 2 }} dir="rtl">
+              ⚠️ {error}
+            </div>
+          )}
+        </div>
+      );
+    }
     return (
       <div
         role="status"
