@@ -6,6 +6,7 @@ import { useBrd } from '../brd/store';
 import { useDlg } from '../dlg/store';
 import { useEgg, henDayRate } from '../egg/store';
 import { useInc, daysToHatch, isHatchWindow } from '../inc/store';
+import { calcWeightLossPct } from '../inc/api/hatchCalc';
 import { toFa } from '../../shr/utils/fa';
 import { format as formatJ, startOfDay, differenceInCalendarDays as diffCalDays, parse as parseJ} from 'date-fns-jalali';
 import { useSet } from '../set/store';
@@ -405,6 +406,8 @@ export function detectAllAlerts(): RuleAlert[] {
 
   // ============ ۶. جوجه‌کشی ============
   const entries = useInc.getState().eggEntries;
+  const breedsForInc = useBrd.getState().breeds;
+  const customStandardsForInc = _s.customStandards || {};
 
   entries.forEach(entry => {
     if (entry.status === 'done' || entry.status === 'hatched') return;
@@ -447,6 +450,33 @@ export function detectAllAlerts(): RuleAlert[] {
         sourceId: entry.id + ':hatch-near',
         date: today(), notes: ''
       });
+    }
+
+    // 🆕 کاهش وزن تخم (استاندارد Ross: ۱۱-۱۳٪ تا روز ۱۸)
+    const wInit = entry.sampleWeightInitial;
+    const wCur = entry.sampleWeightCurrent;
+    if (wInit && wCur && age >= 7 && age <= 18) {
+      const pct = calcWeightLossPct(wInit, wCur);
+      if (pct !== null) {
+        const breed = breedsForInc.find(b => b.id === entry.breedId);
+        const stdKey = (breed as { standardKey?: string } | undefined)?.standardKey || breed?.name;
+        const std = stdKey ? (getStandardFor(stdKey, { customStandards: customStandardsForInc }) as any) : null;
+        const minPct = std?.incubation?.weightLossMinPct ?? 11;
+        const maxPct = std?.incubation?.weightLossMaxPct ?? 13;
+        if (pct < minPct || pct > maxPct) {
+          const tooFast = pct > maxPct;
+          const far = (pct > maxPct + 3) || (pct < minPct - 3);
+          alerts.push({
+            level: far ? 'critical' : 'important',
+            category: 'reproduction',
+            title: (tooFast ? '🔴 کاهش وزن تخم سریع' : '🟡 کاهش وزن تخم کند') + ' — ' + toFa(entry.count || 0) + ' تخم',
+            message: 'کاهش وزن: ' + toFa(pct) + '٪ (هدف: ' + toFa(minPct) + '-' + toFa(maxPct) + '٪) — روز ' + toFa(age) + (tooFast ? ' رطوبت کم است' : ' رطوبت زیاد است'),
+            source: 'inc',
+            sourceId: entry.id + ':weight-loss',
+            date: today(), notes: ''
+          });
+        }
+      }
     }
   });
 
