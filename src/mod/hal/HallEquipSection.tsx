@@ -5,6 +5,7 @@ import HallEquipModals from './components/HallEquipModals';
 import CategoryPicker from './components/CategoryPicker';
 import HallEquipCatCard from './components/HallEquipCatCard';
 import { CATEGORY_COLORS } from '../../shr/icons/equipment';
+import { LITTER_LABELS, VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS } from './_labels';
 import {
   useHal,
   CATEGORY_LABELS,
@@ -364,10 +365,10 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
                 background: 'var(--card-solid)',
                 display: 'flex', flexWrap: 'wrap', gap: 4,
               }}>
-                {legacy.ventilationSystem && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>تهویه: {legacy.ventilationSystem}</span>}
-                {legacy.feederType && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>دان: {legacy.feederType}</span>}
-                {legacy.drinkerType && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>آب: {legacy.drinkerType}</span>}
-                {legacy.litterType && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>بستر: {legacy.litterType}</span>}
+                {legacy.ventilationSystem && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>تهویه: {VENT_SYS_LABELS[legacy.ventilationSystem] || legacy.ventilationSystem}</span>}
+                {legacy.feederType && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>دان: {FEEDER_LABELS[legacy.feederType] || legacy.feederType}</span>}
+                {legacy.drinkerType && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>آب: {DRINKER_LABELS[legacy.drinkerType] || legacy.drinkerType}</span>}
+                {legacy.litterType && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: 'var(--pad-chip)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>بستر: {LITTER_LABELS[legacy.litterType] || legacy.litterType}</span>}
               </div>
             )}
           </div>

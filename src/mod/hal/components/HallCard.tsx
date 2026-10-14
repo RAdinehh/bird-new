@@ -140,8 +140,6 @@ export default function HallCard(props: HallCardProps) {
       <RowGrid>
         <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
         <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
-      </RowGrid>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
         <RowWithStatus l="تهویه"
           v={
             totalAirflow > 0
@@ -162,7 +160,7 @@ export default function HallCard(props: HallCardProps) {
           }
           icon={totalLightW > 0 ? lightIcon : undefined}
           hint={totalLightW > 0 ? lightAdvice : undefined} />
-      </div>
+      </RowGrid>
       {h.systemNotes && (
         <>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>📝 یادداشت سیستم‌ها</div>
