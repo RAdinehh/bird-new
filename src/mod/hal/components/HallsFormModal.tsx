@@ -297,6 +297,8 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 if (cap) patch.capacity = String(cap);
                 if (env?.temp?.target != null) patch.targetTemp = String(env.temp.target);
                 if (env?.humidity?.min != null) patch.targetHumidity = String(env.humidity.min);
+                // 🆕 شدت نور (lux) از استاندارد نژاد
+                if (env?.light?.lux != null) patch.light = String(env.light.lux);
                 setForm((f) => ({ ...f, ...patch }));
                 toastMsg.info('مقادیر از استاندارد پر شد')
               }}
