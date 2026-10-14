@@ -150,6 +150,16 @@ export interface IncubationStandard {
   weightLossMaxPct?: number;
   /** 🆕 پروفایل دما/رطوبت روز‌به‌روز (Ross 308 / Cobb / Aviagen) */
   tempProfile?: IncubationPhase[];
+  /** 🆕 حداقل دمای پوسته تخم (EST) — Ross 308: 37.5 */
+  estMinTemp?: number;
+  /** 🆕 حداکثر دمای پوسته تخم (EST) — Ross 308: 38.0 */
+  estMaxTemp?: number;
+  /** 🆕 زاویه چرخش (درجه) — استاندارد: 38-45 */
+  turningAngleDeg?: number;
+  /** 🆕 حداکثر CO₂ (٪) — استاندارد: 0.5 */
+  co2MaxPct?: number;
+  /** 🆕 حداقل O₂ (٪) — استاندارد: 20 */
+  o2MinPct?: number;
 }
 
 /** 🆕 فاز پروفایل انکوباسیون — طبق Ross 308 و Aviagen */

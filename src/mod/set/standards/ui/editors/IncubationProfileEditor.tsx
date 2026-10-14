@@ -12,6 +12,12 @@ interface Props {
   setterHumidity?: number;
   hatcherTemp?: number;
   hatcherHumidity?: number;
+  estMinTemp?: number;
+  estMaxTemp?: number;
+  turningAngleDeg?: number;
+  co2MaxPct?: number;
+  o2MinPct?: number;
+  onPatch?: (patch: { estMinTemp?: number; estMaxTemp?: number; turningAngleDeg?: number; co2MaxPct?: number; o2MinPct?: number }) => void;
 }
 
 export function IncubationProfileEditor({
@@ -21,6 +27,12 @@ export function IncubationProfileEditor({
   setterHumidity,
   hatcherTemp,
   hatcherHumidity,
+  estMinTemp,
+  estMaxTemp,
+  turningAngleDeg,
+  co2MaxPct,
+  o2MinPct,
+  onPatch,
 }: Props) {
   const update = (i: number, patch: Partial<IncubationPhase>) => {
     onChange(profile.map((p, idx) => (idx === i ? { ...p, ...patch } : p)));
@@ -42,6 +54,17 @@ export function IncubationProfileEditor({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {onPatch && (
+        <RangeCard title="🎯 اهداف استاندارد (Ross 308)">
+          <FieldsGrid>
+            <CompactField label="حداقل EST" value={estMinTemp ?? null} onChange={(v) => onPatch({ estMinTemp: v ?? undefined })} unit="°C" isTemp={true} decimals={1} />
+            <CompactField label="حداکثر EST" value={estMaxTemp ?? null} onChange={(v) => onPatch({ estMaxTemp: v ?? undefined })} unit="°C" isTemp={true} decimals={1} />
+            <CompactField label="زاویه چرخش" value={turningAngleDeg ?? null} onChange={(v) => onPatch({ turningAngleDeg: v ?? undefined })} unit="°" />
+            <CompactField label="حداکثر CO₂" value={co2MaxPct ?? null} onChange={(v) => onPatch({ co2MaxPct: v ?? undefined })} unit="٪" decimals={2} />
+            <CompactField label="حداقل O₂" value={o2MinPct ?? null} onChange={(v) => onPatch({ o2MinPct: v ?? undefined })} unit="٪" decimals={1} />
+          </FieldsGrid>
+        </RangeCard>
+      )}
       {profile.length === 0 ? (
         <div style={{
           padding: '10px 12px',

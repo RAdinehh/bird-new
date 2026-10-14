@@ -123,3 +123,45 @@ export function getExpectedTempHumidity(
   if (!phase) return null;
   return { temp: phase.temp, humidity: phase.humidity };
 }
+
+/** 🆕 محدوده EST (دمای پوسته تخم) */
+export function getEstRange(
+  std: { incubation?: { estMinTemp?: number; estMaxTemp?: number } } | null | undefined,
+): { min: number; max: number } | null {
+  const inc = std?.incubation;
+  if (!inc?.estMinTemp || !inc?.estMaxTemp) return null;
+  return { min: inc.estMinTemp, max: inc.estMaxTemp };
+}
+
+/** 🆕 چک EST در محدوده */
+export function isEstInRange(
+  value: number | null | undefined,
+  std: Parameters<typeof getEstRange>[0],
+): boolean {
+  if (value == null) return true;
+  const range = getEstRange(std);
+  if (!range) return true;
+  return value >= range.min && value <= range.max;
+}
+
+/** 🆕 چک CO₂ زیر حد */
+export function isCo2InRange(
+  value: number | null | undefined,
+  std: { incubation?: { co2MaxPct?: number } } | null | undefined,
+): boolean {
+  if (value == null) return true;
+  const max = std?.incubation?.co2MaxPct;
+  if (max == null) return true;
+  return value <= max;
+}
+
+/** 🆕 چک O₂ بالای حد */
+export function isO2InRange(
+  value: number | null | undefined,
+  std: { incubation?: { o2MinPct?: number } } | null | undefined,
+): boolean {
+  if (value == null) return true;
+  const min = std?.incubation?.o2MinPct;
+  if (min == null) return true;
+  return value >= min;
+}

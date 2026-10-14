@@ -52,6 +52,12 @@ export interface Device {
   tempSensors: number | null;
   humiditySensors: number | null;
   motorPower: number | null;
+  /** 🆕 دمای پوسته تخم (EST) فعلی — °C */
+  estCurrent?: number | null;
+  /** 🆕 CO₂ فعلی — ٪ */
+  co2Current?: number | null;
+  /** 🆕 O₂ فعلی — ٪ */
+  o2Current?: number | null;
   extraCost: number | null;
   maintenanceLogs: MaintenanceLog[];
   equipmentId: string;

@@ -319,6 +319,12 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
           setterHumidity={std.incubation.setterHumidity}
           hatcherTemp={std.incubation.hatcherTemp}
           hatcherHumidity={std.incubation.hatcherHumidity}
+          estMinTemp={std.incubation.estMinTemp}
+          estMaxTemp={std.incubation.estMaxTemp}
+          turningAngleDeg={std.incubation.turningAngleDeg}
+          co2MaxPct={std.incubation.co2MaxPct}
+          o2MinPct={std.incubation.o2MinPct}
+          onPatch={(patch) => updateBird({ incubation: { ...std.incubation, ...patch } })}
         />
       </div>
 

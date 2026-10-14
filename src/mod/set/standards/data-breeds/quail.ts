@@ -56,7 +56,7 @@ export const QUAIL_BROILER: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 15, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 4, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 6, temp: 37.6, humidity: 55.0, label: 'استقرار' }, { dayFrom: 7, dayTo: 11, temp: 37.4, humidity: 53.0, label: 'رشد' }, { dayFrom: 12, dayTo: 13, temp: 37.2, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 14, dayTo: 17, temp: 37.2, humidity: 70.0, label: 'هچر' }]},
+  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 6, temp: 37.6, humidity: 55.0, label: 'استقرار' }, { dayFrom: 7, dayTo: 11, temp: 37.4, humidity: 53.0, label: 'رشد' }, { dayFrom: 12, dayTo: 13, temp: 37.2, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 14, dayTo: 17, temp: 37.2, humidity: 70.0, label: 'هچر' }]},
   litter: {
     recommended: ['wood_shavings', 'rice_hull'],
     kgPerM2ByMaterial: { wood_shavings: 2.0, rice_hull: 2.0, straw: 3.3, sand: 16.7, sawdust: 2.7, peat: 3.3, paper_roll: 0.2, none: 0 },
@@ -119,7 +119,7 @@ export const QUAIL_LAYER: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 15, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 4.5, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 6, temp: 37.6, humidity: 55.0, label: 'استقرار' }, { dayFrom: 7, dayTo: 11, temp: 37.4, humidity: 53.0, label: 'رشد' }, { dayFrom: 12, dayTo: 13, temp: 37.2, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 14, dayTo: 17, temp: 37.2, humidity: 70.0, label: 'هچر' }]},
+  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 6, temp: 37.6, humidity: 55.0, label: 'استقرار' }, { dayFrom: 7, dayTo: 11, temp: 37.4, humidity: 53.0, label: 'رشد' }, { dayFrom: 12, dayTo: 13, temp: 37.2, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 14, dayTo: 17, temp: 37.2, humidity: 70.0, label: 'هچر' }]},
   litter: {
     recommended: ['wood_shavings', 'rice_hull'],
     kgPerM2ByMaterial: { wood_shavings: 2.0, rice_hull: 2.0, straw: 3.3, sand: 16.7, sawdust: 2.7, peat: 3.3, paper_roll: 0.2, none: 0 },
@@ -186,7 +186,7 @@ export const QUAIL_BREEDER: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 15, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 4.5, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 6, temp: 37.6, humidity: 55.0, label: 'استقرار' }, { dayFrom: 7, dayTo: 11, temp: 37.4, humidity: 53.0, label: 'رشد' }, { dayFrom: 12, dayTo: 13, temp: 37.2, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 14, dayTo: 17, temp: 37.2, humidity: 70.0, label: 'هچر' }]},
+  incubation: { totalDays: 17, lockdownDay: 14, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 6, temp: 37.6, humidity: 55.0, label: 'استقرار' }, { dayFrom: 7, dayTo: 11, temp: 37.4, humidity: 53.0, label: 'رشد' }, { dayFrom: 12, dayTo: 13, temp: 37.2, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 14, dayTo: 17, temp: 37.2, humidity: 70.0, label: 'هچر' }]},
   litter: { recommended: ['wood_shavings', 'rice_hull'], kgPerM2ByMaterial: { wood_shavings: 2.0, rice_hull: 2.0, straw: 3.3, sand: 16.7, sawdust: 2.7, peat: 3.3, paper_roll: 0.2, none: 0 }, thicknessCm: 5, lifetimeDays: 42 },
   production: {
     layingStartDay: 50,

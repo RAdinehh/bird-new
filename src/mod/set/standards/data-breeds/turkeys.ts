@@ -32,7 +32,7 @@ const TURKEY_BASE = {
     drinker: { nippleBirdsPerUnit: 12, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3, fanM3PerKg: 7.5,
   },
-  incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 70.0, label: 'هچر' }]},
+  incubation: { totalDays: 28, lockdownDay: 25, setterTemp: 37.5, setterHumidity: 55, hatcherTemp: 37.0, hatcherHumidity: 70, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.6, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.4, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 24, temp: 37.2, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 25, dayTo: 28, temp: 37.0, humidity: 70.0, label: 'هچر' }]},
   litter: { recommended: ['wood_shavings' as const, 'straw' as const], kgPerM2ByMaterial: { wood_shavings: 4.5, rice_hull: 4.5, straw: 7.5, sand: 37.5, sawdust: 6.0, peat: 7.5, paper_roll: 0.45, none: 0 }, thicknessCm: 8, lifetimeDays: 60 },
   mortality: [
     { dayFrom: 1, dayTo: 7, maxPct: 2.0 },

@@ -52,7 +52,7 @@ export const AUSTRALORP: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3.5, fanM3PerKg: 4.5,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
     kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
@@ -116,7 +116,7 @@ export const COCHIN: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 12, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
     kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
@@ -180,7 +180,7 @@ export const BRAHMA: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 12, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
     kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
@@ -244,7 +244,7 @@ export const SULTAN: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 10, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3, fanM3PerKg: 4.5,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
     kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },
@@ -305,7 +305,7 @@ export const MINIATURE: BirdStandard = {
     drinker: { nippleBirdsPerUnit: 12, cupBirdsPerUnit: 20, troughCmPerBird: 3, manualCmPerBird: 2 },
     lampWattPerM2: 3.5, fanM3PerKg: 5,
   },
-  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
+  incubation: { totalDays: 21, lockdownDay: 18, setterTemp: 37.7, setterHumidity: 55, hatcherTemp: 37.2, hatcherHumidity: 65, weightLossMinPct: 11, weightLossMaxPct: 13, estMinTemp: 37.5, estMaxTemp: 38.0, turningAngleDeg: 45, co2MaxPct: 0.5, o2MinPct: 20, tempProfile: [{ dayFrom: 1, dayTo: 7, temp: 37.8, humidity: 55.0, label: 'استقرار' }, { dayFrom: 8, dayTo: 14, temp: 37.6, humidity: 53.0, label: 'رشد' }, { dayFrom: 15, dayTo: 17, temp: 37.4, humidity: 50.0, label: 'بلوغ' }, { dayFrom: 18, dayTo: 21, temp: 37.2, humidity: 65.0, label: 'هچر' }]},
   litter: {
     recommended: ['wood_shavings', 'rice_hull', 'straw'],
     kgPerM2ByMaterial: { wood_shavings: 3.0, rice_hull: 3.0, straw: 5.0, sand: 25.0, sawdust: 4.0, peat: 5.0, paper_roll: 0.3, none: 0 },

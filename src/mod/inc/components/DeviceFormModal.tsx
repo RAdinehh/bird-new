@@ -97,6 +97,24 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
           </Field>
         </Grid2>
 
+        <SectionTitle>🌡 پایش زنده</SectionTitle>
+        <Grid2>
+          <Field label="EST فعلی" hint="دمای پوسته تخم">
+            <NumField placeholder="۳۷.۸" value={(form as any).estCurrent ?? ''} onChange={e => setForm({...form, estCurrent: e.target.value} as any)} unit="°C" min={30} max={45} />
+          </Field>
+          <Field label="زاویه چرخش فعلی">
+            <NumField placeholder="۴۵" value={(form as any).turningAngleDeg ?? ''} onChange={e => setForm({...form, turningAngleDeg: e.target.value} as any)} unit="°" min={0} max={90} />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="CO₂ فعلی">
+            <NumField placeholder="۰.۴" value={(form as any).co2Current ?? ''} onChange={e => setForm({...form, co2Current: e.target.value} as any)} unit="٪" min={0} max={5} />
+          </Field>
+          <Field label="O₂ فعلی">
+            <NumField placeholder="۲۰.۹" value={(form as any).o2Current ?? ''} onChange={e => setForm({...form, o2Current: e.target.value} as any)} unit="٪" min={15} max={25} />
+          </Field>
+        </Grid2>
+
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
         <Grid2>
           <Field label="قیمت خرید">
