@@ -96,6 +96,9 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
       motorPower: d.motorPower ? String(d.motorPower) : '',
       extraCost: d.extraCost ? toFa(d.extraCost) : '',
       notes: d.notes,
+      estCurrent: d.estCurrent ? toFa(d.estCurrent) : '',
+      co2Current: d.co2Current ? toFa(d.co2Current) : '',
+      o2Current: d.o2Current ? toFa(d.o2Current) : '',
     });
     setErr(''); setOpen(true);
   };
@@ -344,7 +347,20 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
                   </>
                 )}
 
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🛠 تعمیرات</div>
+                {(d.temp != null || d.humidity != null || d.estCurrent != null || d.co2Current != null || d.o2Current != null) && (
+                <>
+                  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 پایش زنده</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {d.temp != null && <Row l="دما محیط" v={toFa(d.temp) + '°C'} />}
+                    {d.humidity != null && <Row l="رطوبت" v={toFa(d.humidity) + '٪'} />}
+                    {d.estCurrent != null && <Row l="EST (پوسته تخم)" v={toFa(d.estCurrent) + '°C'} />}
+                    {d.co2Current != null && <Row l="CO₂" v={toFa(d.co2Current) + '٪'} />}
+                    {d.o2Current != null && <Row l="O₂" v={toFa(d.o2Current) + '٪'} />}
+                  </div>
+                </>
+              )}
+
+              <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🛠 تعمیرات</div>
                 {logs.length === 0 ? (
                   <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 8, textAlign: 'center' }}>تعمیری ثبت نشده</div>
                 ) : (

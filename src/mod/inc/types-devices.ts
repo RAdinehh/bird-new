@@ -35,6 +35,10 @@ export interface F {
   motorPower: string;
   extraCost: string;
   notes: string;
+  /** 🆕 پایش زنده */
+  estCurrent: string;
+  co2Current: string;
+  o2Current: string;
 }
 
 export const emptyForm: F = {
@@ -55,4 +59,7 @@ export const emptyForm: F = {
   motorPower: '',
   extraCost: '',
   notes: '',
+  estCurrent: '',
+  co2Current: '',
+  o2Current: '',
 };

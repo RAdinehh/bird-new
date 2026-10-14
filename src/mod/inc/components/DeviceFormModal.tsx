@@ -100,18 +100,18 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
         <SectionTitle>🌡 پایش زنده</SectionTitle>
         <Grid2>
           <Field label="EST فعلی" hint="دمای پوسته تخم">
-            <NumField placeholder="۳۷.۸" value={(form as any).estCurrent ?? ''} onChange={e => setForm({...form, estCurrent: e.target.value} as any)} unit="°C" min={30} max={45} />
+            <NumField placeholder="۳۷.۸" value={form.estCurrent} onChange={e => setForm({...form, estCurrent: e.target.value})} unit="°C" min={30} max={45} />
           </Field>
-          <Field label="زاویه چرخش فعلی">
-            <NumField placeholder="۴۵" value={(form as any).turningAngleDeg ?? ''} onChange={e => setForm({...form, turningAngleDeg: e.target.value} as any)} unit="°" min={0} max={90} />
+          <Field label="CO₂ فعلی">
+            <NumField placeholder="۰.۴" value={form.co2Current} onChange={e => setForm({...form, co2Current: e.target.value})} unit="٪" min={0} max={5} />
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="CO₂ فعلی">
-            <NumField placeholder="۰.۴" value={(form as any).co2Current ?? ''} onChange={e => setForm({...form, co2Current: e.target.value} as any)} unit="٪" min={0} max={5} />
-          </Field>
           <Field label="O₂ فعلی">
-            <NumField placeholder="۲۰.۹" value={(form as any).o2Current ?? ''} onChange={e => setForm({...form, o2Current: e.target.value} as any)} unit="٪" min={15} max={25} />
+            <NumField placeholder="۲۰.۹" value={form.o2Current} onChange={e => setForm({...form, o2Current: e.target.value})} unit="٪" min={15} max={25} />
+          </Field>
+          <Field label="دما محیط">
+            <NumField placeholder="۳۷.۵" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={30} max={45} />
           </Field>
         </Grid2>
 
