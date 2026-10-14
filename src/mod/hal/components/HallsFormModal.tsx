@@ -182,37 +182,38 @@ export default function HallsFormModal(props: HallsFormModalProps) {
 
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
-        footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
+        footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', marginBottom: 8 }}>🏷 هویت و مدیریت</div>
         <Grid2>
-          <Field label="نام سالن" required error={vErrors.name} hint="نامی که سالن رو با اون می‌شناسی"><Input placeholder="مثلاً — سالن شمالی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} /></Field>
-          <Field label="کد سالن" hint="شناسه داخلی — اگه خالی بمونه، خودکار از نام ساخته می‌شه">
-            <Input placeholder="مثلاً — hall-north" dir="ltr" value={form.code} onChange={e => setForm({...form, code: e.target.value})} />
+          <Field label="نام سالن" required error={vErrors.name}><Input placeholder="نامی که سالن رو با اون می‌شناسی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} /></Field>
+          <Field label="کد سالن">
+            <Input placeholder="شناسه داخلی (خودکار از نام)" dir="ltr" value={form.code} onChange={e => setForm({...form, code: e.target.value})} />
           </Field>
         </Grid2>
 
-        <Field label="وضعیت سالن">
-          <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
-            <option value="active">🟢 فعال</option>
-            <option value="empty">⚪ خالی</option>
-            <option value="sanitizing">🟡 در حال ضدعفونی</option>
-            <option value="maintenance">🔴 تعمیر</option>
-            <option value="inactive">⚫ غیرفعال</option>
-          </Select>
-        </Field>
-
-        {(workers && workers.length > 0) && (
-          <Field label="مسئول سالن" hint="کارگر مسئول این سالن">
-            <SmartSelect
-              value={form.responsibleId || ''}
-              onChange={v => setForm({...form, responsibleId: v})}
-              options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
-              placeholder="— انتخاب کنید —"
-              modalTitle="انتخاب مسئول"
-              autoThreshold={6}
-            />
+        <Grid2>
+          <Field label="وضعیت سالن">
+            <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
+              <option value="active">🟢 فعال</option>
+              <option value="empty">⚪ خالی</option>
+              <option value="sanitizing">🟡 در حال ضدعفونی</option>
+              <option value="maintenance">🔴 تعمیر</option>
+              <option value="inactive">⚫ غیرفعال</option>
+            </Select>
           </Field>
-        )}
+          {(workers && workers.length > 0) ? (
+            <Field label="مسئول سالن">
+              <SmartSelect
+                value={form.responsibleId || ''}
+                onChange={v => setForm({...form, responsibleId: v})}
+                options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
+                placeholder="— انتخاب کنید —"
+                modalTitle="انتخاب مسئول"
+                autoThreshold={6}
+              />
+            </Field>
+          ) : <div />}
+        </Grid2>
         <Grid2>
             <Field label="پرنده" hint="پرنده‌ای که در این سالن نگهداری می‌شه">
               <SmartSelect
@@ -324,10 +325,10 @@ export default function HallsFormModal(props: HallsFormModalProps) {
 
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>⚙️ سیستم‌ها</div>
         <Grid2>
-          <Field label="تهویه" hint="حجم تبادل هوا در ساعت">
+          <Field label="تهویه">
             <NumField placeholder="۰" value={form.ventilation} onChange={e => setForm({...form, ventilation: e.target.value})} unit="m³/h" min={0} max={100000} autoClamp />
           </Field>
-          <Field label="روشنایی" hint="شدت نور">
+          <Field label="روشنایی">
             <NumField placeholder="۰" value={form.light} onChange={e => setForm({...form, light: e.target.value})} unit="lux" min={0} max={500} autoClamp />
           </Field>
         </Grid2>
@@ -384,12 +385,12 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           <Field label="تاریخ ساخت"><DatePicker value={form.builtAt} onChange={v => setForm({...form, builtAt: v})} placeholder="انتخاب تاریخ" /></Field>
           <Field label="آخرین ضدعفونی"><DatePicker value={form.lastSanitizedAt} onChange={v => setForm({...form, lastSanitizedAt: v})} placeholder="انتخاب تاریخ" /></Field>
         </Grid2>
-        <Field label="یادداشت ضدعفونی" hint="روش یا ماده‌ی ضدعفونی (دستی)">
+        <Field label="یادداشت ضدعفونی">
           <Input placeholder="مثلاً — سرکه سیب ۵٪، همه دیوارها" value={form.sanitizeNotes || ''} onChange={e => setForm({...form, sanitizeNotes: e.target.value})} />
         </Field>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginTop: 4 }}>📝 یادداشت و آدرس</div>
-        <Field label="آدرس سالن" hint="آدرس یا موقعیت مکانی"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
-        <Field label="یادداشت" hint="توضیحات اختیاری">
+        <Field label="آدرس سالن"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
+        <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
         <ErrorBox>{err}</ErrorBox>

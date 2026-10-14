@@ -25,7 +25,7 @@ export function Field({ label, required, hint, autoFrom, error, warning, childre
         gap: 4,
         paddingRight: 2,
       }}>
-        {label}{required && <span style={{ color: 'var(--danger)' }}>*</span>}
+        {label}{required && <span style={{ color: 'var(--danger)', fontSize: '1.2em', fontWeight: 700, lineHeight: 1 }} aria-label="اجباری">*</span>}
         {autoFrom ? (
           <span style={{
             width: 6, height: 6, borderRadius: '50%',
