@@ -10,7 +10,7 @@ export const TYPES_BY_CATEGORY: Record<string, string[]> = {
   drinking:    ['nipple', 'cup', 'trough', 'fountain_drinker'],
   heating:     ['radiant_brooder', 'jet_heater', 'duct_heater'],
   lighting:    ['lamp_led', 'lamp_fluorescent', 'dimmer'],
-  litter:      ['litter_wood_shavings', 'litter_roll', 'litter_sand'],
+  litter:      ['litter_wood_shavings', 'litter_roll', 'litter_sand', 'litter_rice_hull', 'litter_straw', 'litter_sawdust', 'litter_peat'],
   power:       ['generator', 'electrical_panel', 'cable'],
   auxiliary:   ['camera', 'sensor', 'scale'],
 };

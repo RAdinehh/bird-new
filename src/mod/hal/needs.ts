@@ -89,8 +89,27 @@ export function needFeeder(inp: NeedInput): CategoryNeed | null {
 export function needLitter(inp: NeedInput): CategoryNeed | null {
   if (inp.areaM2 <= 0) return null;
   const std = inp.standard?.litter;
-  const litterType = inp.litterType;
   const kgMap = std?.kgPerM2ByMaterial;
+
+  // 🆕 نگاشت Equipment type → Standard key
+  const LITTER_KEY_MAP: Record<string, string> = {
+    'litter_wood_shavings': 'wood_shavings',
+    'wood_shavings': 'wood_shavings',
+    'litter_roll': 'paper_roll',
+    'paper_roll': 'paper_roll',
+    'litter_sand': 'sand',
+    'sand': 'sand',
+    'litter_rice_hull': 'rice_hull',
+    'rice_hull': 'rice_hull',
+    'litter_straw': 'straw',
+    'straw': 'straw',
+    'litter_sawdust': 'sawdust',
+    'sawdust': 'sawdust',
+    'litter_peat': 'peat',
+    'peat': 'peat',
+  };
+  const rawType = inp.litterType;
+  const litterType = rawType ? (LITTER_KEY_MAP[rawType] || rawType) : null;
 
   let kgPerM2 = 0;
   let materialName = '—';

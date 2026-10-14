@@ -171,4 +171,32 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
     calc: (p, s) => Math.ceil(p * 30),
     summaryLabel: 'kg',
   },
+  litter_rice_hull: {
+    primary: { label: 'مساحت پوشش', unit: 'm²', defaultValue: 1 },
+    secondary: { label: 'ضخامت', unit: 'cm', defaultValue: 6, optional: true },
+    baseUnit: 'kg',
+    calc: (p, s) => Math.ceil(p * 3),
+    summaryLabel: 'kg',
+  },
+  litter_straw: {
+    primary: { label: 'مساحت پوشش', unit: 'm²', defaultValue: 1 },
+    secondary: { label: 'ضخامت', unit: 'cm', defaultValue: 10, optional: true },
+    baseUnit: 'kg',
+    calc: (p, s) => Math.ceil(p * 5),
+    summaryLabel: 'kg',
+  },
+  litter_sawdust: {
+    primary: { label: 'مساحت پوشش', unit: 'm²', defaultValue: 1 },
+    secondary: { label: 'ضخامت', unit: 'cm', defaultValue: 6, optional: true },
+    baseUnit: 'kg',
+    calc: (p, s) => Math.ceil(p * 4),
+    summaryLabel: 'kg',
+  },
+  litter_peat: {
+    primary: { label: 'مساحت پوشش', unit: 'm²', defaultValue: 1 },
+    secondary: { label: 'ضخامت', unit: 'cm', defaultValue: 10, optional: true },
+    baseUnit: 'kg',
+    calc: (p, s) => Math.ceil(p * 5),
+    summaryLabel: 'kg',
+  },
 };

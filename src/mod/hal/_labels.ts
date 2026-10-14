@@ -166,6 +166,10 @@ export const LITTER_LABELS: Record<string, string> = {
   litter_wood_shavings: 'پوشال چوب',
   litter_roll: 'رول کاغذی',
   litter_sand: 'ماسه',
+  litter_rice_hull: 'پوسته برنج',
+  litter_straw: 'کاه',
+  litter_sawdust: 'خاک‌اره',
+  litter_peat: 'پیت ماس',
 };
 
 
