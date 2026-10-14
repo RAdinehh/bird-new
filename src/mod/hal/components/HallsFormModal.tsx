@@ -282,6 +282,40 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 if (env?.humidity?.min != null) patch.targetHumidity = String(env.humidity.min);
                 // 🆕 شدت نور (lux) از استاندارد نژاد
                 if (env?.light?.lux != null) patch.light = String(env.light.lux);
+
+                // 🆕 نوع بستر (از recommended[0] → equipment type)
+                const LITTER_KEY_MAP: Record<string, string> = {
+                  'wood_shavings': 'litter_wood_shavings',
+                  'rice_hull': 'litter_rice_hull',
+                  'straw': 'litter_straw',
+                  'sand': 'litter_sand',
+                  'sawdust': 'litter_sawdust',
+                  'peat': 'litter_peat',
+                  'paper_roll': 'litter_roll',
+                };
+                const litterRec = std.litter?.recommended?.[0];
+                if (litterRec && LITTER_KEY_MAP[litterRec]) {
+                  patch.litterType = LITTER_KEY_MAP[litterRec];
+                }
+
+                // 🆕 نوع دانخوری (از equipment.feeder)
+                const feederEq = std.equipment?.feeder;
+                if (feederEq) {
+                  if (feederEq.chainCmPerBird) patch.feederType = 'feeder_chain';
+                  else if (feederEq.panBirdsPerUnit) patch.feederType = 'feeder_pan';
+                  else if (feederEq.tubeCmPerBird) patch.feederType = 'feeder_tube';
+                  else if (feederEq.manualCmPerBird) patch.feederType = 'feeder_manual';
+                }
+
+                // 🆕 نوع آبخوری (از equipment.drinker)
+                const drinkerEq = std.equipment?.drinker;
+                if (drinkerEq) {
+                  if (drinkerEq.nippleBirdsPerUnit) patch.drinkerType = 'nipple';
+                  else if (drinkerEq.cupBirdsPerUnit) patch.drinkerType = 'cup';
+                  else if (drinkerEq.troughCmPerBird) patch.drinkerType = 'trough';
+                  else if (drinkerEq.manualCmPerBird) patch.drinkerType = 'fountain_drinker';
+                }
+
                 setForm((f) => ({ ...f, ...patch }));
                 toastMsg.info('مقادیر از استاندارد پر شد')
               }}
