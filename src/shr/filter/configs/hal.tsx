@@ -134,7 +134,17 @@ export function getHalEquipmentConfig(ctx: {
 }): FilterConfig<Equipment> {
   return {
     filterDefs: [
-      // ═══ ۱. مکان ═══
+      // ═══ ۱. وضعیت ═══
+      {
+        key: 'status', label: 'وضعیت', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: Object.entries(STATUS_LABELS).map(([k, v]: any) => ({
+          value: k,
+          label: `${v.icon} ${v.name}`,
+        })),
+        getValue: (e: Equipment) => e.status || 'active',
+      },
+      // ═══ ۲. مکان ═══
       {
         key: 'hallId', label: 'سالن', kind: 'enum',
         icon: <IconUser size={18} />,
@@ -152,16 +162,6 @@ export function getHalEquipmentConfig(ctx: {
         getValue: (e: Equipment) => e.category || '',
         multi: true,
       },
-      // ═══ ۳. وضعیت ═══
-      {
-        key: 'status', label: 'وضعیت', kind: 'enum',
-        icon: <IconActivity size={18} />,
-        options: Object.entries(STATUS_LABELS).map(([k, v]: any) => ({
-          value: k,
-          label: `${v.icon} ${v.name}`,
-        })),
-        getValue: (e: Equipment) => (e as any).status || 'active',
-      },
       // ═══ ۴. نوع (خودکار از زیرنوع) ═══
       {
         key: 'kind', label: 'نوع', kind: 'enum',
@@ -177,7 +177,7 @@ export function getHalEquipmentConfig(ctx: {
         key: 'brand', label: 'برند', kind: 'enum' as const,
         icon: <IconTag size={18} />,
         options: ctx.brands.map(b => ({ value: b, label: b })),
-        getValue: (e: Equipment) => (e as any).brand || '',
+        getValue: (e: Equipment) => e.brand || '',
         multi: true,
       }] : []),
       // ═══ ۶. تأمین‌کننده ═══
@@ -185,7 +185,7 @@ export function getHalEquipmentConfig(ctx: {
         key: 'supplierId', label: 'تأمین‌کننده', kind: 'enum' as const,
         icon: <IconUser size={18} />,
         options: ctx.suppliers.map(s => ({ value: s.id, label: s.name })),
-        getValue: (e: Equipment) => (e as any).supplierId || '',
+        getValue: (e: Equipment) => e.supplierId || '',
       }] : []),
       // ═══ ۷. گارانتی ═══
       {

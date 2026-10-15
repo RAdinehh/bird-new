@@ -10,8 +10,8 @@ export function RowItem({
   }) {
     return (
     <button type="button" onClick={onClick} style={{
-      display: 'flex', alignItems: 'center', gap: 8,
-      padding: '8px 10px', minHeight: 42, width: '100%',
+      display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
+      padding: 'var(--pad-tight)', minHeight: 44, width: '100%',
       background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
       border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
       borderRadius: 'var(--r-lg)',
@@ -21,7 +21,7 @@ export function RowItem({
     }}>
       {icon && (
         <span style={{
-          width: 26, height: 26, borderRadius: 12,
+          width: 26, height: 26, borderRadius: 'var(--r-md)',
           background: active ? 'var(--accent)' : 'var(--input-bg)',
           color: active ? 'var(--avatar-text)' : 'var(--muted)',
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -36,11 +36,11 @@ export function RowItem({
       }}>{label}</span>
       {cnt !== undefined && (
         <span style={{
-          fontSize: 10.5, fontWeight: 700,
+          fontSize: 'var(--fs-2xs)', fontWeight: 700,
           color: active ? 'var(--accent)' : 'var(--muted)',
           background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
           border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-          padding: '2px 8px', borderRadius: 12,
+          padding: 'var(--pad-chip-xs)', borderRadius: 'var(--r-md)',
           fontVariantNumeric: 'tabular-nums',
           flexShrink: 0,
         }}>{cnt}</span>

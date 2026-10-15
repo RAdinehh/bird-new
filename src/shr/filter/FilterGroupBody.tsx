@@ -82,7 +82,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter }: {
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       flexShrink: 0,
-                      fontSize: typeof o.icon === 'string' ? 15 : undefined,
+                      fontSize: typeof o.icon === 'string' ? 'var(--fs-md)' : undefined,
                     }}>{o.icon}</span>
                   )}
                   <span style={{
@@ -152,7 +152,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter }: {
                 style={chipIn(active)}>
                 {o.icon && <span style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: typeof o.icon === 'string' ? 14 : undefined,
+                  fontSize: typeof o.icon === 'string' ? 'var(--fs-base)' : undefined,
                 }}>{o.icon}</span>}
                 <span>{o.label}</span>
               </button>
