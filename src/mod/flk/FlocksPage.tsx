@@ -70,6 +70,7 @@ export default function FlocksPage() {
   // ⭐ hook فرم گله
   const {
     open, setOpen, form, setForm, layingFromStd, setLayingFromStd, err, setErr,
+    saveAttempted,
     openNew, openEdit, save,
   } = useFlocksForm({ birds, halls, flocks, breedStd, add, update });
 
@@ -362,7 +363,7 @@ export default function FlocksPage() {
         layingFromStd={layingFromStd}
         setLayingFromStd={setLayingFromStd}
         err={err}
-        vErrors={vErrors}
+        vErrors={saveAttempted ? vErrors : {}}
         birds={birds}
         breedsForBird={breedsForBird}
         halls={halls}

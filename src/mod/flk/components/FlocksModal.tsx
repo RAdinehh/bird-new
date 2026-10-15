@@ -69,6 +69,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         </BtnRow>
       }
     >
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🏷 هویت</div>
       <Field label="نام گله" required error={vErrors.name}>
         <Input placeholder="مثلاً — گله بهار ۱۴۰۵" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
       </Field>
@@ -100,6 +101,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         </Field>
       </Grid2>
 
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🐔 پرنده و نژاد</div>
       <Grid2>
         <Field label="پرنده" required>
           <SmartSelect
@@ -130,6 +132,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         </Field>
       </Grid2>
 
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📍 مکان</div>
       <Grid2>
         <Field label="سالن" required>
           <SmartSelect
@@ -141,33 +144,23 @@ export default function FlocksModal(props: FlocksModalProps) {
             autoThreshold={6}
           />
         </Field>
-        <Field
-          label="بخش"
-          hint={
-            form.hallId && zonesForHall.length === 0
-              ? 'این سالن بخشی ندارد — از ماژول «سالن‌ها» بخش اضافه کنید'
-              : form.hallId && zonesForHall.length > 0
-              ? toFa(zonesForHall.length) + ' بخش در این سالن'
-              : undefined
-          }
-        >
-          {!form.hallId ? (
-            <div style={{ width: '100%', height: 38, padding: '0 12px', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>
-              ابتدا سالن را انتخاب کنید
-            </div>
-          ) : zonesForHall.length === 0 ? (
-            <div style={{ width: '100%', height: 38, padding: '0 12px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, boxSizing: 'border-box' }}>
-              ⚠️ بدون بخش
-            </div>
-          ) : (
-            <Select value={form.zoneId} onChange={e => setForm({ ...form, zoneId: e.target.value })}>
-              <option value="">— بدون بخش —</option>
-              {zonesForHall.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
-            </Select>
-          )}
+        <Field label="بخش">
+          <DependentSelect
+            value={form.zoneId || ''}
+            onChange={v => setForm(f => ({ ...f, zoneId: v }))}
+            parentValue={form.hallId}
+            parentLabel="سالن"
+            options={zonesForHall.map(z => ({ value: z.id, label: z.name }))}
+            emptyListMessage="این سالن هنوز بخشی ندارد — از تب «بخش‌ها» اضافه کنید"
+            emptyMode="select"
+            placeholder="— بدون بخش —"
+            modalTitle="انتخاب بخش"
+            autoThreshold={6}
+          />
         </Field>
       </Grid2>
 
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>💉 برنامه واکسن</div>
       {vaccineEnabled && (
         <Field
           label="برنامه واکسن"
@@ -186,6 +179,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         </Field>
       )}
 
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📊 تعداد و سن</div>
       <Grid2>
         <Field label="تعداد اولیه" required error={vErrors.initialCount}>
           <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
@@ -230,7 +224,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         </Field>
       ) : null}
 
-      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>تاریخ‌ها</div>
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📅 تاریخ‌ها</div>
 
       {form.source === 'hatch' && (
         <Field label="تاریخ هچ" hint="تاریخ خروج جوجه از دستگاه" error={vErrors.hatchDate}>
@@ -253,7 +247,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
       </Field>
 
-      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>هزینه‌ها</div>
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>💰 هزینه‌ها</div>
 
       <Grid2>
         <Field label="قیمت هر پرنده">
@@ -298,6 +292,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         </div>
       )}
 
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📝 یادداشت</div>
       <Field label="یادداشت">
         <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
       </Field>
