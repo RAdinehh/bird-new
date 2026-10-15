@@ -9,6 +9,7 @@ import { categoriesForKind, typesForCategory, calcEquipNeed, calcEquipValue } fr
 import EquipmentFormModal from './components/EquipmentFormModal';
 import { useEquipmentForm } from './useEquipmentForm';
 import EquipmentCard from './components/EquipmentCard';
+import EquipmentKpiCards from './components/EquipmentKpiCards';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
@@ -114,7 +115,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     () => getHalEquipmentConfig({ halls, suppliers: supplierList, brands }),
     [halls, supplierList, brands],
   );
-  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+  const { filtered: _listRaw, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total, count } = useFilterSort<Equipment>({
     items: equipment,
     filters: config.filterDefs,
@@ -122,6 +123,31 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     persistKey: config.persistKey,
     initialSort: config.initialSort,
   });
+
+  // ─── فیلتر آرشیو هوشمند ───
+  //   - اگه کاربر «آرشیو» رو فیلتر کرد → فقط آرشیوها
+  //   - در غیر این صورت → آرشیوها مخفی
+  const list = useMemo(() => {
+    const sf = filters.status as string | string[] | undefined;
+    const wantsArchived = Array.isArray(sf)
+      ? sf.includes('archived')
+      : sf === 'archived';
+    if (wantsArchived) return _listRaw;
+    return _listRaw.filter(e => e.status !== 'archived');
+  }, [_listRaw, filters.status]);
+
+  // ─── KPI Cards ───
+  const kpiData = useMemo(() => {
+    const cats = new Set<string>();
+    let value = 0;
+    let repair = 0;
+    for (const e of equipment) {
+      if (e.category) cats.add(e.category);
+      value += calcEquipValue(e);
+      if (e.status === 'maintenance' || e.status === 'broken') repair++;
+    }
+    return { total: equipment.length, categories: cats.size, totalValue: value, needRepair: repair };
+  }, [equipment]);
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -145,7 +171,11 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       logAction('delete', 'hal', 'حذف گروهی تجهیزات: ' + backups.length);
     },
     onArchive: async (ids) => {
-      toastMsg.archivedBulk(ids.length, 'تجهیز')
+      for (const id of ids) {
+        try { updateEquip(id, { status: 'archived' }); } catch {}
+      }
+      toastMsg.archivedBulk(ids.length, 'تجهیز');
+      logAction('update', 'hal', 'آرشیو گروهی تجهیزات: ' + ids.length);
     },
   });
   const totalValue = list.reduce((acc, e) => acc + calcEquipValue(e), 0);
@@ -195,6 +225,13 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         tone="info"
       />
 
+      <EquipmentKpiCards
+        total={kpiData.total}
+        categories={kpiData.categories}
+        totalValue={kpiData.totalValue}
+        needRepair={kpiData.needRepair}
+      />
+
       <FilterBar
         filterDefs={config.filterDefs}
         sortDefs={config.sortDefs}
@@ -235,18 +272,6 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
           >
             {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
           </button>
-        </div>
-      )}
-
-      {list.length > 0 && (
-        <div style={{
-          padding: 'var(--pad-comfy)', background: 'var(--accent-soft)',
-          border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)',
-          fontSize: 'var(--fs-base)', color: 'var(--accent)', fontWeight: 600,
-          display: 'flex', justifyContent: 'space-between'
-        }}>
-          <span>ارزش کل تجهیزات:</span>
-          <span>{toFa(totalValue.toLocaleString('fa-IR'))} تومان</span>
         </div>
       )}
 

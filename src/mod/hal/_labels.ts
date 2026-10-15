@@ -37,6 +37,7 @@ export const STATUS_LABELS: Record<EquipmentStatus, { name: string; icon: string
   maintenance: { name: 'نیاز به سرویس', icon: '🟡', tone: 'warn' },
   repairing:   { name: 'در حال تعمیر',  icon: '🟠', tone: 'warn' },
   retired:     { name: 'کنار گذاشته',   icon: '⚫', tone: 'gray' },
+  archived:    { name: 'آرشیو',         icon: '📦', tone: 'gray' },
 };
 
 export const UNIT_LABELS_EQ: Record<EquipmentUnit, string> = {

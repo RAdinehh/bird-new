@@ -42,6 +42,8 @@ export interface Hall {
   sanitizeNotes?: string;
   /** 🆕 وضعیت سالن */
   status?: 'active' | 'empty' | 'sanitizing' | 'maintenance' | 'inactive';
+  /** 🆕 آرشیو */
+  archived?: boolean;
   /** 🆕 مسئول سالن (FK → ctc، نقش کارگر) */
   responsibleId?: string;
   // 🆕 منابع توزیع‌شده
@@ -60,13 +62,15 @@ export interface Zone {
   name: string;
   capacity: number | null;
   notes: string;
+  /** 🆕 آرشیو */
+  archived?: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 export type EquipmentKind = 'asset' | 'consumable';
 
-export type EquipmentStatus = 'active' | 'broken' | 'maintenance' | 'repairing' | 'retired';
+export type EquipmentStatus = 'active' | 'broken' | 'maintenance' | 'repairing' | 'retired' | 'archived';
 
 export type EquipmentCategory =
   | 'ventilation'

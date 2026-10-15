@@ -111,6 +111,15 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
       }
       toastMsg.deletedBulk(backups.length, 'بخش')
     },
+    onArchive: async (ids) => {
+      const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' بخش آرشیو شوند؟', { danger: false });
+      if (!ok) return;
+      for (const id of ids) {
+        try { updateZone(id, { archived: true }); } catch {}
+      }
+      toastMsg.archivedBulk(ids.length, 'بخش');
+      logAction('update', 'hal', 'آرشیو گروهی بخش‌ها: ' + ids.length);
+    },
   });
 
   useEffect(() => {
@@ -182,7 +191,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
 
   // فیلتر/مرتب (قبل از return شرطی)
   const config = useMemo(() => getHalZonesConfig({ halls }), [halls]);
-  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+  const { filtered: _listRaw, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total, count } = useFilterSort<Zone>({
     items: zones,
     filters: config.filterDefs,
@@ -190,6 +199,8 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     persistKey: config.persistKey,
     initialSort: config.initialSort,
   });
+
+  const list = useMemo(() => _listRaw.filter((z: Zone) => !z.archived), [_listRaw]);
 
   // 🆕 URL filter برای سالن (?hall=xxx)
   const [urlHall, setUrlHall] = useUrlFilter('hall', '');
@@ -296,22 +307,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         tone="info"
       />
 
-      {!ms.selectionMode && zones.length > 1 && (
-        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
-          برای انتخاب چندتایی، روی یک کارت نگه دارید
-        </div>
-      )}
-
-      {ms.selectionMode && zones.length > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
-          <button type="button"
-            onClick={ms.selectedIds.size === zones.length ? ms.clearSelection : ms.selectAll}
-            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
-            {ms.selectedIds.size === zones.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
-          </button>
-        </div>
-      )}
-
       {undoData && (
         <UndoBar
           label="حذف شد"
@@ -334,6 +329,22 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         total={total}
         count={count}
       />
+
+      {!ms.selectionMode && zones.length > 1 && (
+        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
+
+      {ms.selectionMode && zones.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            onClick={ms.selectedIds.size === zones.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === zones.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
 
       {list.length === 0 ? (
         <Empty

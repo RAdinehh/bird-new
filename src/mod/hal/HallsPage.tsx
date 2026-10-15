@@ -89,7 +89,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     }),
     [birds, zones, equipment, flocks]
   );
-  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+  const { filtered: _listRaw, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total, count } = useFilterSort<Hall>({
     items: halls,
     filters: config.filterDefs,
@@ -97,6 +97,8 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     persistKey: config.persistKey,
     initialSort: config.initialSort,
   });
+
+  const list = useMemo(() => _listRaw.filter((h: Hall) => !h.archived), [_listRaw]);
 
 
   // ─── Multi-Select ───
@@ -140,6 +142,14 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         setTimeout(() => setUndoData((cur) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
       toastMsg.deletedBulk(backups.length, 'سالن')
+    },
+    onArchive: async (ids) => {
+      const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' سالن آرشیو شوند؟', { danger: false });
+      if (!ok) return;
+      for (const id of ids) {
+        try { updateHall(id, { archived: true }); } catch {}
+      }
+      toastMsg.archivedBulk(ids.length, 'سالن');
     },
   });
 

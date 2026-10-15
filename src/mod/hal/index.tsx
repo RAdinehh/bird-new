@@ -1,30 +1,48 @@
 /**
  * index.tsx — بخش hal
  */
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useUrlFilter } from '../../shr/hooks/useUrlFilter';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import HallsPage from './HallsPage';
 import ZonesPage from './ZonesPage';
 import EquipmentPage from './EquipmentPage';
+import ArchivePage from './components/ArchivePage';
+import { useHal } from './store';
 
-const tabs = [
+const BASE_TABS = [
   { id: 'halls', label: 'سالن‌ها' },
   { id: 'zones', label: 'بخش‌ها' },
   { id: 'equip', label: 'تجهیزات' },
-] as const;
+];
 
-type TabId = typeof tabs[number]['id'];
+type TabId = 'halls' | 'zones' | 'equip' | 'archive';
 
-const TAB_IDS = ['halls', 'zones', 'equip'];
+const TAB_IDS = ['halls', 'zones', 'equip', 'archive'];
 
 export default function Hal() {
+  const { halls, zones, equipment } = useHal();
+  const archivedCount = useMemo(() => {
+    return (
+      halls.filter(h => h.archived).length +
+      zones.filter(z => z.archived).length +
+      equipment.filter(e => e.status === 'archived').length
+    );
+  }, [halls, zones, equipment]);
+
   const [tabParam, setTabParam] = useUrlFilter('tab', 'halls');
   const tab = (TAB_IDS.includes(tabParam) ? tabParam : 'halls') as TabId;
 
   useEffect(() => {
     if (!tabParam || !TAB_IDS.includes(tabParam)) setTabParam('halls');
   }, [tabParam, setTabParam]);
+  const visibleTabs = useMemo(() => {
+    if (archivedCount > 0) {
+      return [...BASE_TABS, { id: 'archive', label: `📦 آرشیو (${archivedCount})` }];
+    }
+    return BASE_TABS;
+  }, [archivedCount]);
+
   const { containerRef, trackRef, setInstant } = useCarousel(
     TAB_IDS,
     tab,
@@ -41,7 +59,7 @@ export default function Hal() {
         position: 'sticky', top: 52, zIndex: 11,
         overflowX: 'auto', scrollbarWidth: 'none',
       }}>
-        {tabs.map(t => (
+        {visibleTabs.map((t: { id: string; label: string }) => (
           <div
             key={t.id}
             onClick={() => { setInstant(); setTabParam(t.id); }}
@@ -97,6 +115,9 @@ export default function Hal() {
           </div>
           <div key="equip" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <EquipmentPage active={tab === 'equip'} />
+          </div>
+          <div key="archive" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
+            <ArchivePage active={tab === 'archive'} />
           </div>
         </div>
       </div>
