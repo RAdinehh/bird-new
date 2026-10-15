@@ -19,6 +19,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { Row, RowGrid } from './helpers';
 import ZoneFormModal from './components/ZoneFormModal';
+import ZoneCard from './components/ZoneCard';
 import EntityLink from '../../shr/components/EntityLink';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
@@ -79,7 +80,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     prevZoneIdsRef.current = currentIds;
   }, [zones, flocks, updateFlock]);
 
-  // ─── Multi-Select ───
   const ms = useMultiSelect({
     items: zones,
     getId: (z: Zone) => z.id,
@@ -134,7 +134,6 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId,
      name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setSaveAttempted(false); setOpen(true); };
 
-  // ═══ اعتبارسنجی زنده ═══
   const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
   const { errors: vErrors } = useValidation(
     ZoneSchema,
@@ -148,8 +147,22 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
 
   useFab(active ? { label: 'افزودن بخش', onClick: openNew } : null);
 
-  // ═══ Cross-field Validation ═══
-  const crossWarn = (() => {
+  /** 🆕 محاسبه hint ظرفیت */
+  const hallCapForForm = (() => {
+    if (!form.hallId) return null;
+    const h = halls.find((x: Hall) => x.id === form.hallId);
+    return h?.capacity ?? null;
+  })();
+
+  const hallRemainingForForm = (() => {
+    if (!form.hallId || hallCapForForm == null) return null;
+    const othersSum = zones
+      .filter((z: Zone) => z.hallId === form.hallId && z.id !== form.id)
+      .reduce((s: number, z: Zone) => s + (z.capacity || 0), 0);
+    return hallCapForForm - othersSum;
+  })();
+
+  const crossError = (() => {
     if (!form.hallId) return null;
     const cap = int(form.capacity);
     if (cap <= 0) return null;
@@ -191,7 +204,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
 
   // 🆕 گله‌های هر بخش
   const flocksByZone = useMemo(() => {
-    const m = new Map<string, any[]>();
+    const m = new Map<string, Flock[]>();
     for (const f of flocks) {
       if (!f.zoneId) continue;
       const arr = m.get(f.zoneId) || [];
@@ -220,6 +233,29 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     );
   }
 
+  const handleDelete = async (z: Zone) => {
+    const idToDel = z.id;
+    const flockCount = flocks.filter((f: Flock) => f.zoneId === idToDel).length;
+    const equipCount = equipment.filter((e: Equipment) => e.zoneId === idToDel).length;
+    let delMsg = 'این منطقه حذف شود؟';
+    if (flockCount > 0 || equipCount > 0) {
+      delMsg += '\n\n';
+      if (flockCount > 0) delMsg += '• ' + toFa(flockCount) + ' گله\n';
+      if (equipCount > 0) delMsg += '• ' + toFa(equipCount) + ' تجهیز\n';
+      delMsg += 'اتصال‌شون قطع می‌شه.';
+    }
+    const ok = await showConfirmAsync('تأیید حذف', delMsg, { danger: true });
+    if (!ok) return;
+    const item = zones.find((x: Zone) => x.id === idToDel);
+    if (item) {
+      setUndoData({ item });
+      setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.item) && cur.item.id === item.id ? null : cur), 6000);
+    }
+    deleteZone(idToDel);
+    logAction('delete', 'hal', 'حذف از بخش‌ها');
+    toastMsg.deleted('بخش');
+  };
+
   const save = async () => {
     setSaveAttempted(true);
 
@@ -239,6 +275,8 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         return;
       }
     }
+
+    if (crossError) { setErr(crossError); return; }
 
     if (!form.name.trim()) { setErr('نام بخش اجباری است'); return; }
     const data = { hallId: form.hallId, name: form.name.trim(), capacity: form.capacity ? parseInt(toEn(form.capacity)) || null : null,
@@ -310,71 +348,18 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
             const hall = halls.find(h => h.id === z.hallId);
             const isOpen = !ms.selectionMode && expandedId === z.id;
             return (
-              <ExpandableCard
+              <ZoneCard
                 key={z.id}
-                id={z.id}
-                ms={ms}
-                accent="purple"
-                index={toFa(i + 1)}
-                iconEmoji="🗂"
-                title={z.name}
-                subtitle=""
+                zone={z}
+                index={i}
+                hall={hall}
+                flocks={flocksByZone.get(z.id) || []}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : z.id)}
-                badge={z.capacity ? <Tag tone="purple">{toFa(z.capacity)} پرنده</Tag> : undefined}
-                stats={<>
-                  <span>🏠 سالن: {hall ? <b><EntityLink type="hall" id={hall.id} label={hall.name} /></b> : <b style={{ color: 'var(--text)' }}>—</b>}</span>
-                  {z.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{toFa(z.capacity)}</b></span>}
-                </>}
-              >
-                  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🗂 مشخصات بخش</div>
-                  <RowGrid>
-                    <Row l="سالن" v={hall ? <EntityLink type="hall" id={hall.id} label={hall.name} /> : '—'} />
-                    <Row l="ظرفیت" v={z.capacity ? `${toFa(z.capacity)} پرنده` : '—'} />
-                  </RowGrid>
-                {(flocksByZone.get(z.id) || []).length > 0 && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های این بخش ({(flocksByZone.get(z.id) || []).length})</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {(flocksByZone.get(z.id) || []).map((fl: Flock) => (
-                        <div key={fl.id} style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                           borderRadius: 'var(--r-sm)' }}>
-                          <span style={{ fontWeight: 600 }}>
-                            <EntityLink type="flock" id={fl.id} label={fl.name} />
-                          </span>
-                          <span style={{ color: 'var(--muted)' }}>{toFa(fl.currentCount || fl.initialCount || 0)} پرنده</span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-                {z.notes && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{z.notes}</div>
-                  </>
-                )}
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(z)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                    const idToDel = z.id;
-                    const flockCount = flocks.filter((f: Flock) => f.zoneId === idToDel).length;
-                    const equipCount = equipment.filter((e: Equipment) => e.zoneId === idToDel).length;
-                    let delMsg = 'این منطقه حذف شود؟';
-                    if (flockCount > 0 || equipCount > 0) {
-                      delMsg += '\n\n';
-                      if (flockCount > 0) delMsg += '• ' + toFa(flockCount) + ' گله\n';
-                      if (equipCount > 0) delMsg += '• ' + toFa(equipCount) + ' تجهیز\n';
-                      delMsg += 'اتصال‌شون قطع می‌شه.';
-                    }
-                    const ok = await showConfirmAsync('تأیید حذف', delMsg, { danger: true }); if (!ok) return; const item = zones.find((x: Zone) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.item) && cur.item.id === item.id ? null : cur), 6000); } deleteZone(idToDel);
-                    logAction('delete', 'hal', 'حذف از سالن‌ها');  toastMsg.deleted('منطقه')
-                    }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+                ms={ms}
+                onEdit={() => openEdit(z)}
+                onDelete={() => handleDelete(z)}
+              />
             );
           })}
           
@@ -393,7 +378,9 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         err={err}
         onErrorClear={() => setErr('')}
         vErrors={saveAttempted ? vErrors : {}}
-        crossWarn={crossWarn}
+        crossError={crossError}
+        hallCap={hallCapForForm}
+        hallRemaining={hallRemainingForForm}
         halls={halls}
         birds={birds}
         breeds={breeds}

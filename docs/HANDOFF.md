@@ -294,6 +294,23 @@ git tag before-XXX-YYYYMMDD
 - یک سند مرجع
 
 
+### جلسه ۸ (۱۴۰۴/۰۷/۲۱ — جلسه چهارم) — Zones بهبود ✅
+- ✅ **crossError** — بلاک قاطع save اگه مجموع ظرفیت بخش‌ها > ظرفیت سالن
+  - `crossWarn` → `crossError` (معنای دقیق‌تر)
+- ✅ **توکنی‌سازی** کارت «ارثی از سالن»:
+  - `padding: '6px 10px'` → `var(--pad-tight)`
+  - `gap: 6` → `var(--sp-2)`
+  - `lineHeight: 1.6` → `1.7`
+  - `marginTop: -4` → `calc(-1 * var(--sp-1))`
+- ✅ **حذف تکرار «پرنده»** از hint ظرفیت (دو خطی بود)
+- ✅ **استخراج `ZoneCard.tsx`** (۸۱ خط):
+  - `ZonesPage.tsx`: ۴۱۹ → **۳۹۰ خط** ✅ (زیر ۴۰۰)
+  - بلوک `list.map` (۷۱ خط) → `<ZoneCard />` (۱۸ خط)
+- ✅ **رفع باگ `new Map<string, any[]>`** → `new Map<string, Flock[]>`
+- ✅ **حذف ایموجی ⚠️** از error (طبق UX-FORM-RULES ب۱۶)
+- ✅ **رنگ `--warn` → `--danger`** برای crossError
+- ✅ **استخراج `handleDelete`** (منطق تأیید + Undo + Toast)
+
 ### جلسه ۷ (۱۴۰۴/۰۷/۲۱ — جلسه سوم) — hal نهایی + UX فرم
 - ✅ **۲۵+ fix روی hal** (Halls + Zones + Equipment)
 - ✅ **۹ باگ پنهان** کشف و fix شد:

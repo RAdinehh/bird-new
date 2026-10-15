@@ -5,6 +5,7 @@
 import { Btn, BtnRow, ErrorBox, Field, Grid2, Input, Modal, NumField, Textarea } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import type { Hall } from '../store';
+import { toFa } from '../../../shr/utils/fa';
 
 interface ZoneFormData {
   id: string;
@@ -21,17 +22,21 @@ interface Props {
   setForm: React.Dispatch<React.SetStateAction<ZoneFormData>>;
   err: string;
   vErrors: Record<string, string>;
-  crossWarn?: string | null;
+  crossError?: string | null;
   halls: Hall[];
   birds: Array<{ id: string; name: string }>;
   breeds: Array<{ id: string; name: string }>;
   save: () => void;
   /** 🆕 پاک کردن خطا هنگام تایپ */
   onErrorClear?: () => void;
+  /** 🆕 ظرفیت سالن انتخاب‌شده */
+  hallCap?: number | null;
+  /** 🆕 ظرفیت باقی‌مونده سالن */
+  hallRemaining?: number | null;
 }
 
 export default function ZoneFormModal({
-  open, onClose, form, setForm, err, vErrors, crossWarn, halls, birds, breeds, save, onErrorClear,
+  open, onClose, form, setForm, err, vErrors, crossError, halls, birds, breeds, save, onErrorClear, hallCap, hallRemaining,
 }: Props) {
   const isEdit = !!form.id;
 
@@ -66,10 +71,10 @@ export default function ZoneFormModal({
         return (
           <div style={{
             fontSize: 'var(--fs-xs)', color: 'var(--muted)',
-            padding: '6px 10px', background: 'var(--input-bg)',
+            padding: 'var(--pad-tight)', background: 'var(--input-bg)',
             border: '1px dashed var(--border)', borderRadius: 'var(--r-sm)',
-            display: 'flex', alignItems: 'center', gap: 6,
-            lineHeight: 1.6, marginTop: -4,
+            display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
+            lineHeight: 1.7, marginTop: 'calc(-1 * var(--sp-1))',
           }}>
             <span style={{ fontSize: 'var(--fs-sm)' }}>📋</span>
             <span>
@@ -89,7 +94,16 @@ export default function ZoneFormModal({
             onChange={e => { onErrorClear?.(); setForm({ ...form, name: e.target.value }); }}
           />
         </Field>
-        <Field label="ظرفیت">
+        <Field
+          label="ظرفیت"
+          hint={
+            hallCap != null
+              ? hallRemaining != null && hallRemaining > 0
+                ? `ظرفیت سالن: ${toFa(hallCap)} — باقی‌مونده: ${toFa(hallRemaining)}`
+                : `ظرفیت سالن: ${toFa(hallCap)} — اشغال کامل`
+              : 'ظرفیت سالن تنظیم نشده — از تب سالن‌ها تنظیم کن'
+          }
+        >
           <NumField
             placeholder="۱۰۰۰"
             value={form.capacity}
@@ -99,13 +113,13 @@ export default function ZoneFormModal({
             max={100000}
             autoClamp
           />
-          {crossWarn && (
+          {crossError && (
             <div style={{
-              fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700,
+              fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700,
               paddingRight: 4, lineHeight: 1.5, display: 'flex',
               alignItems: 'center', gap: 4, marginTop: 4,
             }}>
-              ⚠️ {crossWarn}
+              {crossError}
             </div>
           )}
         </Field>

@@ -36,7 +36,7 @@ export function createHallSchema(_ctx: ValidationContext = {}) {
 
 export const ZoneSchema = z.object({
   hallId: requiredId('سالن'),
-  name: requiredStr('نام بخش', 1, 50),
+  name: requiredStr('نام بخش', 2, 50),
   capacity: optionalFloatRange('ظرفیت', 0, 100000),
   notes: optionalStr(500),
 });

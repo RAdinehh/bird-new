@@ -60,6 +60,14 @@
 - FOUNDATION-PATTERNS.md (۱۶ بخش)
 - ۳۰+ الگوی تفکر
 
+### فاز ۱۱ — Zones بهبود (تموم — جلسه ۸)
+- ✅ **crossError** — اعتبارسنجی cross-field + بلاک save
+- ✅ **توکنی‌سازی** کارت «ارثی از سالن»
+- ✅ **استخراج `ZoneCard.tsx`** — ZonesPage زیر ۴۰۰ (۳۹۰ خط)
+- ✅ **صفر `any`** در Zone* (hidden bug fix)
+- ✅ **حذف ایموجی ⚠️** طبق UX-FORM-RULES ب۱۶
+- ✅ **رنگ `--warn` → `--danger`** برای crossError
+
 ### فاز ۱۰ — hal نهایی (تموم — جلسه ۷)
 - ✅ **۲۵+ fix** روی hal (Halls + Zones + Equipment)
 - ✅ **۹ باگ پنهان کشف و fix:**
