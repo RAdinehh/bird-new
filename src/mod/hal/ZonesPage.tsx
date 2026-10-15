@@ -33,6 +33,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   const [form, setForm] = useState({ id:'', hallId:'', name:'', capacity:'', notes:'' });
   const draft = useFormDraft('hal-zone', form, (v: typeof form) => setForm(v));
   const [err, setErr] = useState('');
+  const [saveAttempted, setSaveAttempted] = useState(false);
   const [undoData, setUndoData] = useState<{ item: Zone | Zone[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -129,9 +130,9 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     setUndoData(null);
   };
 
-  const openNew = () => { setForm({ id:'', hallId: halls[0].id, name:'', capacity:'', notes:'' }); setErr(''); setOpen(true); };
+  const openNew = () => { setForm({ id:'', hallId: halls[0]?.id || '', name:'', capacity:'', notes:'' }); setErr(''); setSaveAttempted(false); setOpen(true); };
   const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId,
-     name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setOpen(true); };
+     name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setSaveAttempted(false); setOpen(true); };
 
   // ═══ اعتبارسنجی زنده ═══
   const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
@@ -220,6 +221,14 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   }
 
   const save = async () => {
+    setSaveAttempted(true);
+
+    // 🆕 چک vErrors
+    if (Object.keys(vErrors).length > 0) {
+      const errs = Object.values(vErrors).slice(0, 3).join(' · ');
+      setErr(`لطفاً خطاها را برطرف کنید: ${errs}`);
+      return;
+    }
 
     // 🔒 جلوگیری قاطع از نام تکراری بخش
     if (!form.id) {
@@ -402,7 +411,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         setForm={setForm}
         err={err}
         onErrorClear={() => setErr('')}
-        vErrors={vErrors}
+        vErrors={saveAttempted ? vErrors : {}}
         crossWarn={crossWarn}
         halls={halls}
         birds={birds}

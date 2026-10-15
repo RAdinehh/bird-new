@@ -20,7 +20,7 @@ interface Props {
   form: ZoneFormData;
   setForm: React.Dispatch<React.SetStateAction<ZoneFormData>>;
   err: string;
-  vErrors: Record<string, any>;
+  vErrors: Record<string, string>;
   crossWarn?: string | null;
   halls: Hall[];
   birds: Array<{ id: string; name: string }>;
@@ -42,12 +42,12 @@ export default function ZoneFormModal({
       title={isEdit ? 'ویرایش بخش' : 'افزودن بخش'}
       footer={
         <BtnRow>
-          <Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn>
+          <Btn variant="primary" onClick={save}>ذخیره</Btn>
           <Btn onClick={onClose}>لغو</Btn>
         </BtnRow>
       }
     >
-      <Field label="سالن" required hint="سالنی که این بخش داخلش تعریف می‌شود">
+      <Field label="سالن" required>
         <SmartSelect
           value={form.hallId}
           onChange={v => setForm((f) => ({ ...f, hallId: v }))}
@@ -84,16 +84,16 @@ export default function ZoneFormModal({
       <Grid2>
         <Field label="نام بخش" required>
           <Input
-            placeholder="مثلاً — بخش A"
+            placeholder="الف"
             value={form.name}
             onChange={e => { onErrorClear?.(); setForm({ ...form, name: e.target.value }); }}
           />
         </Field>
-        <Field label="ظرفیت" hint="حداکثر تعداد پرنده در این بخش (اختیاری)">
+        <Field label="ظرفیت">
           <NumField
-            placeholder="۰"
+            placeholder="۱۰۰۰"
             value={form.capacity}
-            onChange={e => setForm({ ...form, capacity: e.target.value })}
+            onChange={e => { onErrorClear?.(); setForm({ ...form, capacity: e.target.value }); }}
             unit="پرنده"
             min={0}
             max={100000}
@@ -113,7 +113,7 @@ export default function ZoneFormModal({
 
       <Field label="یادداشت">
         <Textarea
-          placeholder="..."
+          placeholder="توضیحات اختیاری"
           value={form.notes}
           onChange={e => setForm({ ...form, notes: e.target.value })}
         />
