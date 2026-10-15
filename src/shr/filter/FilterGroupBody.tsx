@@ -20,7 +20,7 @@ function chipIn(active: boolean): CSSProperties {
 
 export function FilterGroupBody<T>({ def, value, setFilter, clearFilter }: {
   def: FilterDef<T>;
-  value: any;
+  value: string | string[] | [string, string] | [number, number] | boolean | null | undefined;
   setFilter: (key: string, value: any) => void;
   clearFilter: (key: string) => void;
 }): ReactNode {

@@ -59,7 +59,7 @@ export function FilterBar<T>({
       return 1;
     }
     if (def.kind === 'dateRange' || def.kind === 'numberRange') {
-      const [a, b] = v as any[];
+      const [a, b] = v as [unknown, unknown];
       return (a != null && a !== '') || (b != null && b !== '') ? 1 : 0;
     }
     if (def.kind === 'boolean') return 1;

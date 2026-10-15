@@ -138,7 +138,7 @@ export function getHalEquipmentConfig(ctx: {
       {
         key: 'status', label: 'وضعیت', kind: 'enum',
         icon: <IconActivity size={18} />,
-        options: Object.entries(STATUS_LABELS).map(([k, v]: any) => ({
+        options: Object.entries(STATUS_LABELS as Record<string, { icon: string; name: string }>).map(([k, v]) => ({
           value: k,
           label: `${v.icon} ${v.name}`,
         })),
@@ -155,7 +155,7 @@ export function getHalEquipmentConfig(ctx: {
       {
         key: 'category', label: 'دسته', kind: 'enum',
         icon: <IconFolder size={18} />,
-        options: Object.entries(CATEGORY_LABELS || {}).map(([k, v]: any) => ({
+        options: Object.entries((CATEGORY_LABELS || {}) as Record<string, { icon: string; name: string }>).map(([k, v]) => ({
           value: k,
           label: `${v.icon} ${v.name}`,
         })),
