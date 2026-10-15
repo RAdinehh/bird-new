@@ -4,7 +4,7 @@
 import { z } from 'zod';
 import {
   requiredStr, optionalStr, optionalId, requiredId,
-  floatNonNeg, floatPos, floatRange, requiredFloatRange, intPos, intNonNeg, persianDateOpt,
+  floatNonNeg, floatPos, floatRange, requiredFloatRange, optionalFloatRange, intPos, intNonNeg, persianDateOpt,
 } from '../helpers';
 import { HALL, TEMP, HUMIDITY } from '../biological';
 import type { ValidationContext } from '../types';
@@ -37,7 +37,7 @@ export function createHallSchema(_ctx: ValidationContext = {}) {
 export const ZoneSchema = z.object({
   hallId: requiredId('سالن'),
   name: requiredStr('نام بخش', 1, 50),
-  capacity: floatNonNeg('ظرفیت', 100000).nullable().optional(),
+  capacity: optionalFloatRange('ظرفیت', 0, 100000),
   notes: optionalStr(500),
 });
 

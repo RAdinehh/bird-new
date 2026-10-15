@@ -73,6 +73,18 @@ export const requiredFloatRange = (label: string, min: number, max: number) =>
       .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`),
   );
 
+/** 🆕 فیلد اختیاری عددی — پیام پویا */
+export const optionalFloatRange = (label: string, min: number, max: number) =>
+  z.preprocess(
+    sanitizeNumber,
+    z.number({
+      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+    })
+      .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
+      .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`)
+      .optional(),
+  );
+
 export const intOpt = (label: string, max = 1_000_000) =>
   z.union([
     z.literal(''),
