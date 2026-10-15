@@ -99,15 +99,16 @@ export default function HallCard(props: HallCardProps) {
       badge={<>
         {(() => {
           const st = h.status || (hallFlocks.length > 0 ? 'active' : 'empty');
-          const map: Record<string, { label: string; tone: string }> = {
+          type Tone = 'green' | 'gray' | 'blue' | 'warn' | 'red' | 'purple' | 'accent' | 'dim' | 'amber' | 'info' | 'danger';
+          const map: Record<string, { label: string; tone: Tone }> = {
             active:     { label: 'فعال',      tone: 'green' },
-            empty:      { label: 'خالی',      tone: 'muted' },
+            empty:      { label: 'خالی',      tone: 'gray' },
             sanitizing: { label: 'ضدعفونی',   tone: 'blue' },
             maintenance:{ label: 'تعمیر',     tone: 'warn' },
             inactive:   { label: 'غیرفعال',   tone: 'red' },
           };
           const it = map[st] || map.empty;
-          return <Tag tone={it.tone as any}>{it.label}</Tag>;
+          return <Tag tone={it.tone}>{it.label}</Tag>;
         })()}
         {zoneCount > 0 ? <Tag tone="blue">{fmt.int(zoneCount)} بخش</Tag> : null}
         {hallFlocks.length > 0 ? <Tag tone="green">{fmt.int(hallFlocks.length)} گله</Tag> : null}
