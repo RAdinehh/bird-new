@@ -294,6 +294,24 @@ git tag before-XXX-YYYYMMDD
 - یک سند مرجع
 
 
+### جلسه ۱۰ (۱۴۰۴/۰۷/۲۱ — جلسه ششم) — hal قفل نهایی 🎉
+**hal ۱۰۰٪ کامل شد.**
+
+#### تازه‌های این جلسه
+- ✅ **تب آرشیو** — ۳ بخش (سالن/بخش/تجهیز) با Segmented Control
+- ✅ `onArchive` واقعی برای هر سه
+- ✅ دکمه «بازگردانی» + «حذف دائمی» با چک گله‌های فعال
+- ✅ تب آرشیو conditional (فقط اگه > ۰)
+- ✅ **KPI Cards** تجهیزات (۳ ستونه)
+- ✅ **۶ دسته گم‌شده** (water_treatment, safety, cleaning, hand_tools, weighing, cooling)
+- ✅ **۳ زیرنوع جدید**: feeder_chick_tray, drinker_capsule, drinker_auto_hanging
+- ✅ **placeholder داینامیک** (بر اساس زیرنوع)
+- ✅ **Zod limits** واقع‌بینانه (تعداد ۵K، قیمت ۱۰K-۳B، ظرفیت ۱۰۰K، گارانتی ۶۰)
+- ✅ **autoClamp در blur** (نه در تایپ)
+- ✅ **EquipmentCard refactor** ۲۳۷ → ۱۵۹ خط
+- ✅ **useBodyScrollLock** ساده (بدون position:fixed)
+- ✅ **Badge** «🏭 دارایی» / «📦 مصرفی»
+
 ### جلسه ۹ (۱۴۰۴/۰۷/۲۱ — جلسه پنجم) — تجهیزات (hal) ✅
 - ✅ **حذف کد تکراری** EquipmentFormModal — بلوک «وضعیت+تاریخ خرید» ۲ بار بود → ۱ بار
 - ✅ **hook جدید** `useBodyScrollLock` در `shr/hooks/` — قفل اسکرول بدن

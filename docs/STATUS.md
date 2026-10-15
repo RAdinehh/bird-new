@@ -60,6 +60,19 @@
 - FOUNDATION-PATTERNS.md (۱۶ بخش)
 - ۳۰+ الگوی تفکر
 
+### فاز ۱۳ — hal قفل نهایی (تموم — جلسه ۱۰) 🎉
+- ✅ **hal ۱۰۰٪** — صفر any واقعی، همه فایل‌ها < ۴۰۰
+- ✅ **تب آرشیو** (Segmented Control + conditional)
+- ✅ **۲ زیرنوع جدید** feeder + ۱ drinker
+- ✅ **۶ دسته گم‌شده** اضافه شد
+- ✅ **KPI Cards** تجهیزات
+- ✅ **Zod limits** واقع‌بینانه صنعت مرغداری
+- ✅ **autoClamp در blur** (نه تایپ)
+- ✅ **placeholder داینامیک** (۵۰+ زیرنوع)
+- ✅ **EquipmentCard refactor** ۲۳۷ → ۱۵۹ خط
+- ✅ **useBodyScrollLock** ساده (بدون position:fixed)
+- ✅ **رفع باگ محاسبه بستر** (۲ ماده)
+
 ### فاز ۱۲ — تجهیزات hal (تموم — جلسه ۹)
 - ✅ **حذف کد تکراری** در EquipmentFormModal
 - ✅ **hook جدید** `useBodyScrollLock` در shr/hooks
