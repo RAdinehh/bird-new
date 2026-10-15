@@ -57,7 +57,7 @@ export const EquipmentSchema = z.object({
   // محدوده‌های واقعی صنعت مرغداری
   count: intRange('تعداد', 1, 5_000).nullable().optional(),
   unit: z.enum(['pcs', 'kg', 'm2', 'm', 'L']),
-  unitPrice: floatRange('قیمت واحد', 50_000, 3_000_000_000).nullable().optional(),
+  unitPrice: floatRange('قیمت واحد', 10_000, 3_000_000_000).nullable().optional(),
   purchasedAt: persianDateOpt('تاریخ خرید'),
   warranty: floatRange('گارانتی (ماه)', 0, 60).nullable().optional(),
   // ظرفیت — حداکثر ۱۰ میلیون (برای فن بزرگ یا مخزن)

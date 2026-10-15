@@ -33,13 +33,6 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
       v = formatNumWhileTyping(v);
     }
     setLocalValue(v);
-    if (autoClamp && (min !== undefined || max !== undefined) && v) {
-      const n = parseFaNum(v);
-      let cn = n;
-      if (min !== undefined) cn = Math.max(min, cn);
-      if (max !== undefined) cn = Math.min(max, cn);
-      if (cn !== n) { v = formatNumWhileTyping(String(cn)); setLocalValue(v); }
-    }
     if (onChange) {
       const fake = { ...e, target: { ...e.target, value: v } } as React.ChangeEvent<HTMLInputElement>;
       onChange(fake);
@@ -88,7 +81,7 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
       if (min !== undefined) cn = Math.max(min, cn);
       if (max !== undefined) cn = Math.min(max, cn);
       if (cn !== n && onChange) {
-        const fake = { ...e, target: { ...e.target, value: formatNumWhileTyping(String(cn)) } } as any;
+        const fake = { ...e, target: { ...e.target, value: formatNumWhileTyping(String(cn)) } } as React.ChangeEvent<HTMLInputElement>;
         onChange(fake);
       }
     }

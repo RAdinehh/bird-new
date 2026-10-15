@@ -187,8 +187,8 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   <Field label={(() => {
                     if (def.baseUnit === 'kg') return 'قیمت هر kg';
                     return 'قیمت هر عدد';
-                  })()} hint="۵۰٬۰۰۰ تا ۳ میلیارد تومان">
-                    <MoneyField placeholder="۵۰٬۰۰۰" min={50000} max={3000000000} value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
+                  })()} hint="۱۰٬۰۰۰ تا ۳ میلیارد تومان">
+                    <MoneyField placeholder="۱۰٬۰۰۰" min={10000} max={3000000000} value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
                   </Field>
                 )}
               </Grid2>
@@ -198,8 +198,8 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   <Field label={(() => {
                     if (def.baseUnit === 'kg') return 'قیمت هر kg';
                     return 'قیمت هر عدد';
-                  })()} hint="۵۰٬۰۰۰ تا ۳ میلیارد تومان">
-                    <MoneyField placeholder="۵۰٬۰۰۰" min={50000} max={3000000000} value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
+                  })()} hint="۱۰٬۰۰۰ تا ۳ میلیارد تومان">
+                    <MoneyField placeholder="۱۰٬۰۰۰" min={10000} max={3000000000} value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
                   </Field>
                   <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={60} autoClamp /></Field>
                 </Grid2>

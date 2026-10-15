@@ -13,6 +13,7 @@ import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
 import EntityLink from '../../../shr/components/EntityLink';
+import { Row, RowGrid } from '../helpers';
 
 export interface EquipmentCardProps {
   e: Equipment;
@@ -48,11 +49,17 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 index={toFa(i + 1)}
                 iconEmoji={meta.icon}
                 title={e.name}
-                subtitle={`${meta.name}${e.brand ? ' · ' + e.brand : ''}${_isDeleted ? ' · حذف‌شده' : ''} · ${hall?.name || '—'}`}
+                subtitle={[meta.name, e.brand, _isDeleted ? 'حذف‌شده' : null, hall?.name].filter(Boolean).join(' · ')}
                 isOpen={isOpen}
                 onToggle={onToggle}
                 badge={
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    {(() => {
+                      const kind = kindForType(e.type);
+                      if (kind === 'asset') return <Tag tone="purple">🏭 دارایی</Tag>;
+                      if (kind === 'consumable') return <Tag tone="gray">📦 مصرفی</Tag>;
+                      return null;
+                    })()}
                     {e.status && e.status !== 'active' && (() => {
                       const st = getStatusLabel(e.status);
                       if (!st) return null;
@@ -62,150 +69,74 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                   </div>
                 }
                 stats={<>
-                  {e.count && <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(e.count)} {getUnitLabel(e.unit)}</b></span>}
                   {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(value.toLocaleString('fa-IR'))} ت</b></span>}
                   {e.warranty && <span>گارانتی: <b style={{ color: 'var(--text)' }}>{toFa(e.warranty)} ماه</b></span>}
                 </>}
               >
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🔧</span> مشخصات</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>نوع:</span>
-                    <span style={{ fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                      {meta.name}
-                      {_isDeleted && (
-                        <span style={{
-                          fontSize: 'var(--fs-2xs)', fontWeight: 700,
-                          padding: 'var(--pad-chip-xs)', borderRadius: 'var(--r-sm)',
-                          background: 'rgba(217,119,6,.14)', color: 'var(--warn)',
-                          letterSpacing: '.3px',
-                        }}>حذف‌شده</span>
-                      )}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>نوع دارایی:</span>
-                    <span style={{ fontWeight: 600 }}>{getKindLabel(kindForType(e.type))?.icon} {getKindLabel(kindForType(e.type))?.name}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>دسته:</span>
-                    <span style={{ fontWeight: 600 }}>{getCategoryLabel(e.category)?.icon} {getCategoryLabel(e.category)?.name}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>سالن:</span>
-                    <span style={{ fontWeight: 600 }}>
-                      {hall ? <EntityLink type="hall" id={hall.id} label={hall.name} /> : '—'}
-                    </span>
-                  </div>
-                  {e.zoneId && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>
-                      <span style={{ color: 'var(--muted)' }}>بخش:</span>
-                      <span style={{ fontWeight: 600 }}>
-                        {zoneNames?.get(e.zoneId) || '—'}
-                      </span>
-                    </div>
-                  )}
-                  {e.supplierId && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>
-                      <span style={{ color: 'var(--muted)' }}>تأمین‌کننده:</span>
-                      <span style={{ fontWeight: 600 }}>
-                        <EntityLink type="party" id={e.supplierId} label={supplierNames?.get(e.supplierId) || '—'} />
-                      </span>
-                    </div>
-                  )}
-                  {e.sourceInvoiceId && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>
-                      <span style={{ color: 'var(--muted)' }}>فاکتور خرید:</span>
-                      <span style={{ fontWeight: 600 }}>
-                        <EntityLink type="invoice" id={e.sourceInvoiceId} label={invoiceNumbers?.get(e.sourceInvoiceId) || '—'} />
-                      </span>
-                    </div>
-                  )}
-                  {e.warehouseItemId && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>
-                      <span style={{ color: 'var(--muted)' }}>کالای انبار:</span>
-                      <span style={{ fontWeight: 600 }}>
-                        <EntityLink type="item" id={e.warehouseItemId} label={whsItemNames?.get(e.warehouseItemId) || '—'} />
-                      </span>
-                    </div>
-                  )}
-                  {e.count && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>
-                      <span style={{ color: 'var(--muted)' }}>تعداد:</span>
-                      <span style={{ fontWeight: 600 }}>{toFa(e.count)} {getUnitLabel(e.unit)}</span>
-                    </div>
-                  )}
-                </div>
+                                {/* 🏷 طبقه‌بندی */}
+                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🏷 طبقه‌بندی</div>
+                <RowGrid>
+                  <Row l="نوع" v={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>{meta.name}{_isDeleted && (<span style={{ fontSize: 'var(--fs-2xs)', fontWeight: 700, padding: 'var(--pad-chip-xs)', borderRadius: 'var(--r-sm)', background: 'rgba(217,119,6,.14)', color: 'var(--warn)', letterSpacing: '.3px' }}>حذف‌شده</span>)}</span>} />
+                  <Row l="دسته" v={`${getCategoryLabel(e.category)?.icon || ''} ${getCategoryLabel(e.category)?.name || ''}`} />
+                  <Row l="نوع دارایی" v={`${getKindLabel(kindForType(e.type))?.icon || ''} ${getKindLabel(kindForType(e.type))?.name || ''}`} />
+                </RowGrid>
 
+                {/* 📍 مکان */}
+                {(hall || e.zoneId) && (
+                  <>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📍 مکان</div>
+                    <RowGrid>
+                      {hall && <Row l="سالن" v={<EntityLink type="hall" id={hall.id} label={hall.name} />} />}
+                      {e.zoneId && <Row l="بخش" v={zoneNames?.get(e.zoneId) || '—'} />}
+                    </RowGrid>
+                  </>
+                )}
+
+                {/* 📊 مشخصات */}
+                {(e.count || (e.capacity != null && e.capacity > 0)) && (
+                  <>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات</div>
+                    <RowGrid>
+                      {e.count && <Row l="تعداد" v={`${toFa(e.count)} ${getUnitLabel(e.unit)}`} />}
+                      {e.capacity != null && e.capacity > 0 && <Row l="ظرفیت" v={toFa(e.capacity)} />}
+                    </RowGrid>
+                  </>
+                )}
+
+                {/* 💰 مالی */}
                 {(e.unitPrice || value > 0 || e.purchasedAt || e.warranty) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {e.unitPrice && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
-                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                          <span style={{ color: 'var(--muted)' }}>قیمت واحد:</span>
-                          <span style={{ fontWeight: 600 }}>{toFa(e.unitPrice.toLocaleString('fa-IR'))} ت</span>
-                        </div>
-                      )}
-                      {value > 0 && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
-                           background: 'var(--accent-soft)', color: 'var(--accent)',
-                           borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                          <span>ارزش کل:</span>
-                          <span>{toFa(value.toLocaleString('fa-IR'))} ت</span>
-                        </div>
-                      )}
-                      {e.purchasedAt && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
-                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                          <span style={{ color: 'var(--muted)' }}>تاریخ خرید:</span>
-                          <span style={{ fontWeight: 600 }}>{toFa(e.purchasedAt)}</span>
-                        </div>
-                      )}
-                      {e.warranty && (
-                        <div style={{ display: 'flex', justifyContent: 'space-between',
-                           fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)',
-                           background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                          <span style={{ color: 'var(--muted)' }}>گارانتی:</span>
-                          <span style={{ fontWeight: 600 }}>{toFa(e.warranty)} ماه</span>
-                        </div>
-                      )}
-                    </div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
+                    <RowGrid>
+                      {e.unitPrice && <Row l="قیمت واحد" v={`${toFa(e.unitPrice.toLocaleString('fa-IR'))} ت`} />}
+                      {e.purchasedAt && <Row l="تاریخ خرید" v={toFa(e.purchasedAt)} />}
+                      {e.warranty && <Row l="گارانتی" v={`${toFa(e.warranty)} ماه`} />}
+                      {value > 0 && <Row l="ارزش کل" v={`${toFa(value.toLocaleString('fa-IR'))} ت`} accent />}
+                    </RowGrid>
                   </>
                 )}
 
+                {/* 🤝 طرف تجاری */}
+                {(e.supplierId || e.sourceInvoiceId || e.warehouseItemId) && (
+                  <>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🤝 طرف تجاری</div>
+                    <RowGrid>
+                      {e.supplierId && <Row l="تأمین‌کننده" v={<EntityLink type="party" id={e.supplierId} label={supplierNames?.get(e.supplierId) || '—'} />} />}
+                      {e.sourceInvoiceId && <Row l="فاکتور خرید" v={<EntityLink type="invoice" id={e.sourceInvoiceId} label={invoiceNumbers?.get(e.sourceInvoiceId) || '—'} />} />}
+                      {e.warehouseItemId && <Row l="کالای انبار" v={<EntityLink type="item" id={e.warehouseItemId} label={whsItemNames?.get(e.warehouseItemId) || '—'} />} />}
+                    </RowGrid>
+                  </>
+                )}
+
+                {/* 📝 یادداشت */}
                 {e.notes && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
+                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
                   </>
                 )}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+                <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
                   {e.unitPrice && e.unitPrice > 0 && (
                     <Btn
                       size="sm"
