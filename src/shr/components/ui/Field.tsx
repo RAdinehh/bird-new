@@ -35,37 +35,46 @@ export function Field({ label, required, hint, autoFrom, error, warning, childre
         ) : null}
       </label>
       {children}
-      {hint && (
+      {(hint || autoFrom) && (
         <div style={{
-          fontSize: 'var(--fs-xs)',
-          color: 'var(--dim)',
-          lineHeight: 1.5,
-          paddingRight: 2,
-        }}>{hint}</div>
-      )}
-      {autoFrom && (
-        <div style={{
-          display: 'inline-flex',
+          display: 'flex',
           alignItems: 'center',
-          gap: 4,
-          fontSize: 11,
-          color: 'var(--accent)',
-          background: 'var(--accent-soft)',
-          border: '1px solid var(--accent-border)',
-          borderRadius: 8,
-          padding: '2px 8px',
-          fontWeight: 700,
-          alignSelf: 'flex-start',
-          marginRight: 2,
-          lineHeight: 1.6,
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          gap: 'var(--sp-2)',
+          paddingRight: 2,
         }}>
-          <span aria-hidden="true">✨</span>
-          <span>از {autoFrom}</span>
+          {autoFrom && (
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 'var(--fs-xs)',
+              color: 'var(--accent)',
+              background: 'var(--accent-soft)',
+              border: '1px solid var(--accent-border)',
+              borderRadius: 'var(--r-sm)',
+              padding: '2px 8px',
+              fontWeight: 700,
+              lineHeight: 1.6,
+              flexShrink: 0,
+            }}>
+              <span aria-hidden="true">✨</span>
+              <span>از {autoFrom}</span>
+            </span>
+          )}
+          {hint && (
+            <span style={{
+              fontSize: 'var(--fs-xs)',
+              color: 'var(--dim)',
+              lineHeight: 1.5,
+            }}>{hint}</span>
+          )}
         </div>
       )}
       {error && (
         <div style={{
-          fontSize: 11,
+          fontSize: 'var(--fs-xs)',
           color: 'var(--danger)',
           fontWeight: 600,
           paddingRight: 2,
@@ -82,7 +91,7 @@ export function Field({ label, required, hint, autoFrom, error, warning, childre
       )}
       {!error && warning && (
         <div style={{
-          fontSize: 11,
+          fontSize: 'var(--fs-xs)',
           color: 'var(--warn)',
           fontWeight: 600,
           paddingRight: 2,

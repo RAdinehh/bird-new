@@ -48,7 +48,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
         footer={<div style={{ display: "flex", gap: 'var(--sp-2)' }}><Btn variant="primary" onClick={save} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', marginBottom: 8 }}>📍 محل نصب</div>
         <Grid2>
-          <Field label="سالن" required hint="سالنی که تجهیز در آن نصب می‌شود">
+          <Field label="سالن" required error={vErrors.hallId}>
             <SmartSelect
               value={form.hallId}
               onChange={v => setForm((f) => ({ ...f, hallId: v, zoneId: '' }))}
@@ -58,7 +58,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               autoThreshold={6}
             />
           </Field>
-          <Field label="بخش (اختیاری)" hint="بخش خاص داخل سالن">
+          <Field label="بخش (اختیاری)">
             <DependentSelect
               value={form.zoneId || ''}
               onChange={v => setForm((f) => ({ ...f, zoneId: v }))}
@@ -66,6 +66,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               parentLabel="سالن"
               options={zones.filter((z: Zone) => z.hallId === form.hallId).map((z: Zone) => ({ value: z.id, label: z.name }))}
               emptyListMessage="این سالن هنوز بخشی ندارد — از تب «بخش‌ها» اضافه کنید"
+              emptyMode="select"
               placeholder="— بدون بخش —"
               modalTitle="انتخاب بخش"
               autoThreshold={6}
@@ -76,14 +77,14 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
 
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginBottom: 8, marginTop: 8 }}>🏷 هویت</div>
         <Grid2>
-          <Field label="دسته" required hint="دسته‌بندی تجهیز — تهویه، گرمایش، ...">
+          <Field label="دسته" required error={vErrors.category}>
             <SmartSelect
               value={form.category || 'auxiliary'}
               onChange={(cat: string) => {
                 const catEnum = cat as EquipmentCategory;
                 const allowed = typesForCategory(cat);
                 const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || 'other');
-                setForm({...form, category: catEnum, type: nextType, capacity: ''});
+                setForm({...form, category: catEnum, type: nextType, capacity: '', name: ''});
               }}
               options={Object.entries(CATEGORY_LABELS).map(([k, v]: [string, any]) => ({
                 value: k,
@@ -97,6 +98,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           </Field>
           <EditableSelect
             label="زیرنوع"
+            error={vErrors.type}
             required
             value={form.type}
             onChange={v => {
@@ -129,8 +131,8 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
         </Grid2>
 
         <Grid2>
-          <Field label="نام تجهیز" required>
-            <Input placeholder="مثلاً — لامپ LED سقفی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} />
+          <Field label="نام تجهیز" required error={vErrors.name}>
+            <Input placeholder="لامپ LED سقفی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} />
           </Field>
           <Field label="برند">
             <Input placeholder="پارس" value={form.brand || ''} onChange={e => setForm({...form, brand: e.target.value})} />
@@ -158,18 +160,18 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <>
               <Grid2>
                 <Field label="تعداد">
-                  <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={0} max={100000} autoClamp />
+                  <NumField placeholder="مثلاً ۵" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={1} max={5000} autoClamp />
                   {vErrors.count && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 3 }}>{vErrors.count}</div>}
                 </Field>
                 {hasSec ? (
                   <Field
                     label={def.secondary!.label}
-                    autoFrom={autoFields.has('capacity') && String(form.capacity) === String(def.secondary!.defaultValue) ? 'پیش‌فرض' : undefined}
-                    hint={def.secondary!.hint ? `${def.secondary!.hint} — واحد: ${def.secondary!.unit}` : (def.secondary!.defaultValue ? `پیش‌فرض: ${def.secondary!.defaultValue} ${def.secondary!.unit}` : undefined)}
+                    autoFrom={autoFields.has('capacity') && String(form.capacity) === String(def.secondary!.defaultValue) ? 'استاندارد' : undefined}
+                    hint={def.secondary!.hint || undefined}
                   >
                     <NumField
                       placeholder={def.secondary!.defaultValue ? String(def.secondary!.defaultValue) : '۰'}
-                      max={10000000}
+                      max={100000}
                       autoClamp
                       value={form.capacity}
                       onChange={e => {
@@ -177,15 +179,15 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                         clearAuto('capacity');
                       }}
                       unit={def.secondary!.unit}
-                      min={0}
+                      min={1}
                     />
                   </Field>
                 ) : (
                   <Field label={(() => {
                     if (def.baseUnit === 'kg') return 'قیمت هر kg';
                     return 'قیمت هر عدد';
-                  })()}>
-                    <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
+                  })()} hint="حداقل ۵۰٬۰۰۰ — حداکثر ۳ میلیارد تومان">
+                    <MoneyField placeholder="۵۰٬۰۰۰" min={50000} max={3000000000} value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
                   </Field>
                 )}
               </Grid2>
@@ -195,10 +197,10 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   <Field label={(() => {
                     if (def.baseUnit === 'kg') return 'قیمت هر kg';
                     return 'قیمت هر عدد';
-                  })()}>
-                    <MoneyField placeholder="۰" value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
+                  })()} hint="حداقل ۵۰٬۰۰۰ — حداکثر ۳ میلیارد تومان">
+                    <MoneyField placeholder="۵۰٬۰۰۰" min={50000} max={3000000000} value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
                   </Field>
-                  <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} autoClamp /></Field>
+                  <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={60} autoClamp /></Field>
                 </Grid2>
               )}
 
@@ -217,7 +219,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               </Grid2>
               {!hasSec && (
                 <Grid2>
-                  <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} autoClamp /></Field>
+                  <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={60} autoClamp /></Field>
                   <div />
                 </Grid2>
               )}

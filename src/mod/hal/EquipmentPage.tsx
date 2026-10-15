@@ -64,7 +64,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const [saveAttempted, setSaveAttempted] = useState(false);
   const handleOpenNew = () => { setSaveAttempted(false); openNew(); };
   const handleOpenEdit = (e: Equipment) => { setSaveAttempted(false); openEdit(e); };
-  const handleSave = () => { setSaveAttempted(true); saveForm(equipment, addEquip, updateEquip); };
+  const handleSave = () => { setSaveAttempted(true); if (Object.keys(vErrors).length > 0) { setErr(Object.values(vErrors).slice(0, 2).join(' · ')); return; } saveForm(equipment, addEquip, updateEquip); };
 
   useFab(active ? { label: 'افزودن تجهیز', onClick: handleOpenNew } : null);
 
@@ -81,13 +81,13 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
       category: form.category || 'auxiliary',
       type: form.type || '',
       name: form.name || '',
-      count: form.count ? parseInt(toEn(form.count)) || 0 : 0,
+      count: form.count ? parseInt(toEn(form.count)) || undefined : undefined,
       unit: form.unit || 'pcs',
-      unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || 0 : 0,
+      unitPrice: form.unitPrice ? parseFloat(toEn(form.unitPrice).replace('٫','.')) || undefined : undefined,
       purchasedAt: form.purchasedAt || '',
-      warranty: form.warranty ? parseInt(toEn(form.warranty)) || 0 : 0,
-      capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || 0 : 0,
-      efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || 0 : 0,
+      warranty: form.warranty ? parseInt(toEn(form.warranty)) || undefined : undefined,
+      capacity: form.capacity ? parseFloat(toEn(form.capacity).replace('٫','.')) || undefined : undefined,
+      efficiency: form.efficiency ? parseFloat(toEn(form.efficiency).replace('٫','.')) || undefined : undefined,
       consumeRate: form.consumeRate || undefined,
       sourceInvoiceId: '',
       warehouseItemId: '',

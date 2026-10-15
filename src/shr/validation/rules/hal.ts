@@ -4,7 +4,7 @@
 import { z } from 'zod';
 import {
   requiredStr, optionalStr, optionalId, requiredId,
-  floatNonNeg, floatPos, floatRange, requiredFloatRange, optionalFloatRange, intPos, intNonNeg, persianDateOpt,
+  floatNonNeg, floatPos, floatRange, requiredFloatRange, optionalFloatRange, intPos, intNonNeg, intRange, persianDateOpt,
 } from '../helpers';
 import { HALL, TEMP, HUMIDITY } from '../biological';
 import type { ValidationContext } from '../types';
@@ -52,16 +52,16 @@ export const EquipmentSchema = z.object({
     'ventilation', 'feeding', 'drinking', 'heating', 'lighting', 'litter', 'power', 'auxiliary',
     'water_treatment', 'safety', 'cleaning', 'hand_tools', 'weighing', 'cooling',
   ]),
-  type: requiredStr('نوع تجهیز', 1, 50),
-  name: requiredStr('نام تجهیز', 1, 50),
+  type: requiredId('نوع تجهیز'),
+  name: requiredStr('نام تجهیز', 2, 50),
   // محدوده‌های واقعی صنعت مرغداری
-  count: intNonNeg('تعداد', 100_000).nullable().optional(),
+  count: intRange('تعداد', 1, 5_000).nullable().optional(),
   unit: z.enum(['pcs', 'kg', 'm2', 'm', 'L']),
-  unitPrice: floatNonNeg('قیمت واحد', 100_000_000_000).nullable().optional(),
+  unitPrice: floatRange('قیمت واحد', 50_000, 3_000_000_000).nullable().optional(),
   purchasedAt: persianDateOpt('تاریخ خرید'),
-  warranty: floatNonNeg('گارانتی (ماه)', 120).nullable().optional(),
+  warranty: floatRange('گارانتی (ماه)', 0, 60).nullable().optional(),
   // ظرفیت — حداکثر ۱۰ میلیون (برای فن بزرگ یا مخزن)
-  capacity: floatNonNeg('ظرفیت', 10_000_000).nullable().optional(),
+  capacity: floatRange('ظرفیت', 1, 100_000).nullable().optional(),
   efficiency: floatNonNeg('بازدهی', 10_000).nullable().optional(),
   consumeRate: z.enum(['once', 'per-cycle']).optional(),
   sourceInvoiceId: optionalStr(50),

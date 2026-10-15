@@ -144,7 +144,7 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
     </div>
   );
 }
-export function MoneyField({ value, ...props }: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'showWords'>) {
+export function MoneyField({ value, ...props }: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'showWords'>) {
   const displayValue = value !== undefined && value !== null && String(value) !== ''
     ? formatNumWhileTyping(String(value))
     : '';

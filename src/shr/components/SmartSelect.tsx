@@ -160,7 +160,7 @@ export default function SmartSelect({
         }}
       >
         <span style={{
-          fontWeight: current ? 600 : 400,
+          fontWeight: 400,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {current ? current.label : placeholder}

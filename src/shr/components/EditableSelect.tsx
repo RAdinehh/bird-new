@@ -159,7 +159,7 @@ export default function EditableSelect({
         boxSizing: 'border-box',
       }}
     >
-      <span style={{ flex: 1, textAlign: 'right', fontWeight: isOrphan ? 700 : 500, display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+      <span style={{ flex: 1, textAlign: 'right', fontWeight: isOrphan ? 700 : 400, display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
         {isOrphan ? (
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {'⚠ ' + value + ' (حذف‌شده)'}
