@@ -23,6 +23,7 @@ import FlockCard from './components/FlockCard';
 import FlocksModal from './components/FlocksModal';
 import UpcomingFlocks from './components/UpcomingFlocks';
 import FlocksKpiCards from './components/FlocksKpiCards';
+import FlocksTabs from './components/FlocksTabs';
 import { useFlocksKpi } from './hooks/useFlocksKpi';
 import { useFlocksForm } from './hooks/useFlocksForm';
 import { hasRefs, getFlockRevenue } from './api/flocksCalc';
@@ -47,7 +48,34 @@ export default function FlocksPage() {
   const [undoData, setUndoData] = useState<{ flock: Flock | Flock[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
-  const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'hidden', 'archived'], tab, (id) => setTab(id as TabId));
+  const [newTabBadge, setNewTabBadge] = useState<TabId | null>(null);
+  const hiddenCount = flocks.filter(f => f.hidden && f.status === 'active').length;
+  const archivedCount = flocks.filter(f => f.status === 'archived' || f.status === 'sold').length;
+
+  const tabs: { id: TabId; label: string }[] = [
+    { id: 'all', label: 'فعال' },
+    { id: 'breeder', label: 'مادر' },
+    { id: 'layer', label: 'تخم‌گذار' },
+    { id: 'broiler', label: 'گوشتی' },
+    ...(hiddenCount > 0 ? [{ id: 'hidden' as TabId, label: 'پنهان' }] : []),
+    ...(archivedCount > 0 ? [{ id: 'archived' as TabId, label: 'آرشیو' }] : []),
+  ];
+
+  // اگه کاربر توی تب پنهان/آرشیو باشه و خالی شه، برگرد به «فعال»
+  if (tab === 'archived' && archivedCount === 0) {
+    setTimeout(() => setTab('all'), 0);
+  }
+  if (tab === 'hidden' && hiddenCount === 0) {
+    setTimeout(() => setTab('all'), 0);
+  }
+
+  const swipeIds = tabs.map(t => t.id);
+  const swipeRef = useSwipeTabs(swipeIds, tab, (id) => setTab(id as TabId));
+
+  // ═══ اسکرول به بالا وقتی تب عوض می‌شه ═══
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }, [tab]);
 
   // فیلتر تکرارها تو render
   const birds = useMemo(() => {
@@ -219,37 +247,22 @@ export default function FlocksPage() {
 
   const kpiData = useFlocksKpi(flocks);
 
-  const hiddenCount = flocks.filter(f => f.hidden && f.status === 'active').length;
 
-  const tabs: { id: TabId; label: string }[] = [
-    { id: 'all', label: 'فعال' },
-    { id: 'layer', label: 'تخم‌گذار' },
-    { id: 'broiler', label: 'گوشتی' },
-    { id: 'breeder', label: 'مادر' },
-    { id: 'hidden', label: 'پنهان' },
-    { id: 'archived', label: 'آرشیو' }
-  ];
+
+  // ═══ نشانگر «آیتم جدید» روی Tab (۵ ثانیه) ═══
+  const triggerBadge = (tabId: TabId) => {
+    setNewTabBadge(tabId);
+    setTimeout(() => setNewTabBadge(null), 5000);
+  };
 
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y', minHeight: 'calc(100vh - 120px)' }}>
-      <div style={{
-        display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
-        padding: '0 12px', background: 'var(--header-bg)',
-        position: 'sticky', top: 52, zIndex: 11, overflowX: 'auto', scrollbarWidth: 'none'
-      }}>
-        {tabs.map(t => (
-          <div key={t.id} onClick={() => setTab(t.id)} style={{
-            padding: '11px 12px', fontSize: 'var(--fs-base)', fontWeight: 600,
-            color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
-            cursor: 'pointer', position: 'relative', whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}>
-            {t.label}
-            {tab === t.id && <div style={{ position: 'absolute', bottom: 0, right: 12, left: 12, height: 3, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />}
-          </div>
-        ))}
-      </div>
+    <div ref={swipeRef} style={{ touchAction: 'pan-y', minHeight: 'auto' }}>
+      <FlocksTabs
+        tabs={tabs}
+        activeTab={tab}
+        onTabChange={setTab}
+        newTabBadge={newTabBadge}
+      />
 
       <PageContainer>
       {undoData && (
@@ -267,13 +280,17 @@ export default function FlocksPage() {
           tone="info"
         />
         {/* گله‌های نزدیک به تخم‌گذاری */}
-        <FlocksKpiCards
-          totalFlocks={kpiData.totalFlocks}
-          totalBirds={kpiData.totalBirds}
-          totalValue={kpiData.totalValue}
-        />
+        {(['all', 'layer', 'breeder'] as TabId[]).includes(tab) && (
+          <>
+            <FlocksKpiCards
+              totalFlocks={kpiData.totalFlocks}
+              totalBirds={kpiData.totalBirds}
+              totalValue={kpiData.totalValue}
+            />
 
-        <UpcomingFlocks flocks={flocks} breedStd={breedStd} fmt={fmt} />
+            <UpcomingFlocks flocks={flocks} breedStd={breedStd} fmt={fmt} />
+          </>
+        )}
 
 
         {!ms.selectionMode && list.length > 1 && (
@@ -327,6 +344,7 @@ export default function FlocksPage() {
                     archive(f.id, reason);
                     toastMsg.archived(f.name);
                     logAction('update', 'flk', 'آرشیو گله: ' + f.name);
+                    triggerBadge('archived');
                   }}
                   onRestore={() => restore(f.id)}
                   onDelete={() => {
@@ -339,7 +357,12 @@ export default function FlocksPage() {
                     logAction('delete', 'flk', 'حذف از گله‌ها');
                     toastMsg.deleted(f.name);
                   }}
-                  onToggleHidden={() => { toggleHidden(f.id); f.hidden ? toastMsg.visible(f.name) : toastMsg.hidden(f.name); }}
+                  onToggleHidden={() => {
+                    const willHide = !f.hidden;
+                    toggleHidden(f.id);
+                    if (willHide) { toastMsg.hidden(f.name); triggerBadge('hidden'); }
+                    else { toastMsg.visible(f.name); }
+                  }}
                   onTogglePaused={() => { togglePaused(f.id); f.paused ? toastMsg.activated(f.name) : toastMsg.paused(f.name); }}
                 />
               );
