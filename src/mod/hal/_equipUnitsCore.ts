@@ -102,6 +102,20 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
     summaryLabel: 'راس',
     stdKey: 'drinker.troughCmPerBird',
   },
+  drinker_capsule: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'ظرفیت', unit: 'راس', defaultValue: 35, hint: '۱-۲ لیتری — ۳۰-۴۰ پرنده' },
+    baseUnit: 'راس',
+    calc: (p, s) => p * s,
+    summaryLabel: 'راس',
+  },
+  drinker_auto_hanging: {
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'ظرفیت', unit: 'راس', defaultValue: 90, hint: 'جامیکو — مکانیزم سیفونی ۸۰-۱۰۰ پرنده' },
+    baseUnit: 'راس',
+    calc: (p, s) => p * s,
+    summaryLabel: 'راس',
+  },
   fountain_drinker: {
     primary: { label: 'تعداد کله‌قندی', unit: 'عدد', defaultValue: 1 },
     secondary: { label: 'ظرفیت هر واحد', unit: 'راس', defaultValue: 60, hint: '۳ لیتری — ۵۰-۷۰ پرنده' },
@@ -109,6 +123,13 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
     stdKey: 'drinker.fountainBirdsPerUnit',
+  },
+  feeder_chick_tray: {
+    primary: { label: 'تعداد سینی', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'ظرفیت هر سینی', unit: 'راس', defaultValue: 80, hint: '۷۰-۱۰۰ جوجه' },
+    baseUnit: 'راس',
+    calc: (p, s) => p * s,
+    summaryLabel: 'راس',
   },
   feeder_manual: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
@@ -161,14 +182,14 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
     primary: { label: 'مساحت پوشش', unit: 'm²', defaultValue: 1 },
     secondary: { label: 'ضخامت', unit: 'cm', defaultValue: 6, optional: true , hint: '۳ kg/m²' },
     baseUnit: 'kg',
-    calc: (p, s) => Math.ceil(p * 4.5),
+    calc: (p, s) => Math.ceil(p * 3),
     summaryLabel: 'kg',
   },
   litter_sand: {
     primary: { label: 'مساحت پوشش', unit: 'm²', defaultValue: 1 },
     secondary: { label: 'ضخامت', unit: 'cm', defaultValue: 5, optional: true , hint: '۲۵ kg/m²' },
     baseUnit: 'kg',
-    calc: (p, s) => Math.ceil(p * 30),
+    calc: (p, s) => Math.ceil(p * 25),
     summaryLabel: 'kg',
   },
   litter_rice_hull: {

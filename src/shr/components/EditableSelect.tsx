@@ -12,7 +12,7 @@
 
 import { useState, useMemo } from 'react';
 import { Btn, Field, Input } from './ui';
-import { useCustomOptions } from '../store/customOptions';
+import { useCustomOptions, type CustomOption } from '../store/customOptions';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import SelectSheetShell, { SheetGroup, SheetItem } from './SelectSheetShell';
@@ -188,7 +188,7 @@ export default function EditableSelect({
   // حالت ≤ ۵: لیست تخت · حالت > ۵: گروه‌بندی‌شده
   const renderItems = (
     opts: EditableOption[],
-    customsList: any[],
+    customsList: CustomOption[],
   ) => {
     if (!useEnhancedUI) {
       // لیست تخت
@@ -254,7 +254,7 @@ export default function EditableSelect({
     );
   };
 
-  const renderActions = (c: any) => (
+  const renderActions = (c: CustomOption) => (
     <>
       <button type="button" aria-label="حذف" title="حذف"
         onClick={(e) => removeItem(e, c.id, c.name)}

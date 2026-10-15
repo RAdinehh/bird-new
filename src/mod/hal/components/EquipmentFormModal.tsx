@@ -3,6 +3,7 @@
  */
 import { Btn, ErrorBox, Field, Grid2, Input, Modal, MoneyField, NumField, Select } from '../../../shr/components/ui';
 import { getUnitLabel, getEquipLabel } from '../_typedLabels';
+import { getPlaceholderForType } from '../_equipHelpers';
 import type { BirdStandard } from '../../set/standards/types';
 import type { EquipmentFormData } from '../useEquipmentForm';
 import type { Hall, Zone, Equipment, EquipmentCategory } from '../store';
@@ -132,7 +133,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
 
         <Grid2>
           <Field label="نام تجهیز" required error={vErrors.name}>
-            <Input placeholder="لامپ LED سقفی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} />
+            <Input placeholder={getPlaceholderForType(form.type)} value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} />
           </Field>
           <Field label="برند">
             <Input placeholder="پارس" value={form.brand || ''} onChange={e => setForm({...form, brand: e.target.value})} />
@@ -160,7 +161,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <>
               <Grid2>
                 <Field label="تعداد">
-                  <NumField placeholder="مثلاً ۵" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={1} max={5000} autoClamp />
+                  <NumField placeholder="۵" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={1} max={5000} autoClamp />
                   {vErrors.count && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 3 }}>{vErrors.count}</div>}
                 </Field>
                 {hasSec ? (
@@ -186,7 +187,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   <Field label={(() => {
                     if (def.baseUnit === 'kg') return 'قیمت هر kg';
                     return 'قیمت هر عدد';
-                  })()} hint="حداقل ۵۰٬۰۰۰ — حداکثر ۳ میلیارد تومان">
+                  })()} hint="۵۰٬۰۰۰ تا ۳ میلیارد تومان">
                     <MoneyField placeholder="۵۰٬۰۰۰" min={50000} max={3000000000} value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
                   </Field>
                 )}
@@ -197,7 +198,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   <Field label={(() => {
                     if (def.baseUnit === 'kg') return 'قیمت هر kg';
                     return 'قیمت هر عدد';
-                  })()} hint="حداقل ۵۰٬۰۰۰ — حداکثر ۳ میلیارد تومان">
+                  })()} hint="۵۰٬۰۰۰ تا ۳ میلیارد تومان">
                     <MoneyField placeholder="۵۰٬۰۰۰" min={50000} max={3000000000} value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
                   </Field>
                   <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={60} autoClamp /></Field>

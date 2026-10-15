@@ -148,7 +148,8 @@ export const VENT_SYS_LABELS: Record<string, string> = {
 };
 
 export const FEEDER_LABELS: Record<string, string> = {
-  feeder_manual: 'دانخوری دستی',
+  feeder_chick_tray: 'سینی دانخوری جوجه',
+  feeder_manual: 'کله‌قندی/قفلی',
   feeder_pan: 'دانخوری بشقابی',
   feeder_chain: 'دانخوری زنجیری',
   feeder_tube: 'دانخوری لوله‌ای',
