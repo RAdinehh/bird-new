@@ -17,6 +17,7 @@ import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { useFilterSort, FilterBar, getHalZonesConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { Row, RowGrid } from './helpers';
 import ZoneFormModal from './components/ZoneFormModal';
 import EntityLink from '../../shr/components/EntityLink';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -326,27 +327,11 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
                   {z.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{toFa(z.capacity)}</b></span>}
                 </>}
               >
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🗂 مشخصات بخش</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>نام بخش:</span>
-                    <span style={{ fontWeight: 600 }}>{z.name}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>سالن:</span>
-                    <span style={{ fontWeight: 600 }}>{hall ? <EntityLink type="hall" id={hall.id} label={hall.name} /> : '—'}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between',
-                     fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ color: 'var(--muted)' }}>ظرفیت:</span>
-                    <span style={{ fontWeight: 600 }}>{z.capacity ? `${toFa(z.capacity)} پرنده` : '—'}</span>
-                  </div>
-                </div>
+                  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🗂 مشخصات بخش</div>
+                  <RowGrid>
+                    <Row l="سالن" v={hall ? <EntityLink type="hall" id={hall.id} label={hall.name} /> : '—'} />
+                    <Row l="ظرفیت" v={z.capacity ? `${toFa(z.capacity)} پرنده` : '—'} />
+                  </RowGrid>
                 {(flocksByZone.get(z.id) || []).length > 0 && (
                   <>
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های این بخش ({(flocksByZone.get(z.id) || []).length})</div>
