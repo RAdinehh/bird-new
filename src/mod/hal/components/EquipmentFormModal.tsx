@@ -45,7 +45,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
 
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
-        footer={<div style={{ display: "flex", gap: 6 }}><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
+        footer={<div style={{ display: "flex", gap: 'var(--sp-2)' }}><Btn variant="primary" onClick={save} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', marginBottom: 8 }}>📍 محل نصب</div>
         <Grid2>
           <Field label="سالن" required hint="سالنی که تجهیز در آن نصب می‌شود">
@@ -159,7 +159,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               <Grid2>
                 <Field label="تعداد">
                   <NumField placeholder="۰" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={0} max={100000} autoClamp />
-                  {vErrors.count && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 3 }}>⚠ {vErrors.count}</div>}
+                  {vErrors.count && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginTop: 3 }}>{vErrors.count}</div>}
                 </Field>
                 {hasSec ? (
                   <Field

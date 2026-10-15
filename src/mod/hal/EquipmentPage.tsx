@@ -61,12 +61,18 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const [undoData, setUndoData] = useState<{ item: Equipment | Equipment[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  useFab(active ? { label: 'افزودن تجهیز', onClick: openNew } : null);
+  const [saveAttempted, setSaveAttempted] = useState(false);
+  const handleOpenNew = () => { setSaveAttempted(false); openNew(); };
+  const handleOpenEdit = (e: Equipment) => { setSaveAttempted(false); openEdit(e); };
+  const handleSave = () => { setSaveAttempted(true); saveForm(equipment, addEquip, updateEquip); };
+
+  useFab(active ? { label: 'افزودن تجهیز', onClick: handleOpenNew } : null);
 
 
   // ═══ اعتبارسنجی زنده ═══
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
   const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
+
   const { errors: vErrors } = useValidation(
     EquipmentSchema,
     {
@@ -249,7 +255,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>}
           title="تجهیزی ثبت نشده"
           desc="لامپ، فن، هیتر، آبخوری، دانخوری، دوربین و سنسور را اضافه کنید."
-          action={<Btn variant="primary" onClick={openNew}>+ افزودن تجهیز</Btn>}
+          action={<Btn variant="primary" onClick={handleOpenNew}>+ افزودن تجهیز</Btn>}
         />
       ) : (
         <>
@@ -266,7 +272,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
                 isOpen={isOpen}
                 ms={ms}
                 onToggle={() => setExpandedId(isOpen ? null : e.id)}
-                onEdit={() => openEdit(e)}
+                onEdit={() => handleOpenEdit(e)}
                 onDelete={deleteEquip}
                 onUndo={(item) => {
                   setUndoData({ item });
@@ -295,7 +301,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         setForm={setForm}
         err={err}
         onErrorClear={() => setErr('')}
-        vErrors={vErrors}
+        vErrors={saveAttempted ? vErrors : {}}
         halls={halls}
         zones={zones}
         equipment={equipment}
@@ -306,7 +312,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         typesForCategory={typesForCategory}
         equipNeed={equipNeed}
         stdForDefaults={selectedBreedStd}
-        save={() => saveForm(equipment, addEquip, updateEquip)}
+        save={handleSave}
       />
     </PageContainer>
   );
