@@ -1,5 +1,6 @@
 /** HallEquipSection — تجهیزات سالن (بازطراحی تک‌خطی) */
 import { useState, useMemo, useEffect } from 'react';
+import { useBodyScrollLock } from '../../shr/hooks/useBodyScrollLock';
 import { getCategoryLabel } from './_typedLabels';
 import HallEquipModals from './components/HallEquipModals';
 import CategoryPicker from './components/CategoryPicker';
@@ -77,29 +78,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const [editCap, setEditCap] = useState<string>('');
 
   // 🆕 قفل کامل scroll بدن وقتی هر modal بازه
-  useEffect(() => {
-    const anyOpen = catPicker || picker || detailCat !== null || editId !== null;
-    if (!anyOpen) return;
-    const body = document.body;
-    const prevOverflow = body.style.overflow;
-    const prevTouch = body.style.touchAction;
-    const prevPos = body.style.position;
-    const prevTop = body.style.top;
-    const scrollY = window.scrollY;
-    body.style.overflow = 'hidden';
-    body.style.touchAction = 'none';
-    body.style.position = 'fixed';
-    body.style.top = `-${scrollY}px`;
-    body.style.width = '100%';
-    return () => {
-      body.style.overflow = prevOverflow;
-      body.style.touchAction = prevTouch;
-      body.style.position = prevPos;
-      body.style.top = prevTop;
-      body.style.width = '';
-      window.scrollTo(0, scrollY);
-    };
-  }, [catPicker, picker, detailCat, editId]);
+  useBodyScrollLock(catPicker || picker || detailCat !== null || editId !== null);
 
   // ═══ محاسبات ═══
   const hallEquips = useMemo(

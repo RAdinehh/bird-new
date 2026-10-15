@@ -294,6 +294,12 @@ git tag before-XXX-YYYYMMDD
 - یک سند مرجع
 
 
+### جلسه ۹ (۱۴۰۴/۰۷/۲۱ — جلسه پنجم) — تجهیزات (hal) ✅
+- ✅ **حذف کد تکراری** EquipmentFormModal — بلوک «وضعیت+تاریخ خرید» ۲ بار بود → ۱ بار
+- ✅ **hook جدید** `useBodyScrollLock` در `shr/hooks/` — قفل اسکرول بدن
+- ✅ **HallEquipSection** از ۴۰۶ → **۳۸۵ خط** (زیر ۴۰۰) با استفاده از hook
+- ✅ **EquipmentFormModal** از ۲۷۱ → **۲۵۶ خط**
+
 ### جلسه ۸ (۱۴۰۴/۰۷/۲۱ — جلسه چهارم) — Zones بهبود ✅
 - ✅ **crossError** — بلاک قاطع save اگه مجموع ظرفیت بخش‌ها > ظرفیت سالن
   - `crossWarn` → `crossError` (معنای دقیق‌تر)

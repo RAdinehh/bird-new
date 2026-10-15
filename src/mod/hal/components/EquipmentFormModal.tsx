@@ -203,41 +203,26 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               )}
 
               <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginBottom: 8, marginTop: 8 }}>💰 مالی و وضعیت</div>
+              <Grid2>
+                <Field label="وضعیت">
+                  <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value as EquipmentStatus })}>
+                    {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                      <option key={k} value={k}>{v.icon} {v.name}</option>
+                    ))}
+                  </Select>
+                </Field>
+                <Field label="تاریخ خرید">
+                  <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} placeholder="انتخاب تاریخ" />
+                </Field>
+              </Grid2>
               {!hasSec && (
-                <>
-                  <Grid2>
-                    <Field label="وضعیت">
-                      <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value as EquipmentStatus })}>
-                        {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                          <option key={k} value={k}>{v.icon} {v.name}</option>
-                        ))}
-                      </Select>
-                    </Field>
-                    <Field label="تاریخ خرید">
-                      <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} placeholder="انتخاب تاریخ" />
-                    </Field>
-                  </Grid2>
-                  <Grid2>
-                    <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} autoClamp /></Field>
-                    <div />
-                  </Grid2>
-                </>
-              )}
-
-              {hasSec && (
                 <Grid2>
-                  <Field label="وضعیت">
-                    <Select value={form.status || 'active'} onChange={e => setForm({...form, status: e.target.value as EquipmentStatus })}>
-                      {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                        <option key={k} value={k}>{v.icon} {v.name}</option>
-                      ))}
-                    </Select>
-                  </Field>
-                  <Field label="تاریخ خرید">
-                    <DatePicker value={form.purchasedAt} onChange={v => setForm({...form, purchasedAt: v})} placeholder="انتخاب تاریخ" />
-                  </Field>
+                  <Field label="گارانتی"><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} autoClamp /></Field>
+                  <div />
                 </Grid2>
               )}
+
+
             </>
           );
         })()}

@@ -60,6 +60,11 @@
 - FOUNDATION-PATTERNS.md (۱۶ بخش)
 - ۳۰+ الگوی تفکر
 
+### فاز ۱۲ — تجهیزات hal (تموم — جلسه ۹)
+- ✅ **حذف کد تکراری** در EquipmentFormModal
+- ✅ **hook جدید** `useBodyScrollLock` در shr/hooks
+- ✅ **HallEquipSection** زیر ۴۰۰ (۳۸۵ خط)
+
 ### فاز ۱۱ — Zones بهبود (تموم — جلسه ۸)
 - ✅ **crossError** — اعتبارسنجی cross-field + بلاک save
 - ✅ **توکنی‌سازی** کارت «ارثی از سالن»
