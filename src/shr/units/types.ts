@@ -88,7 +88,7 @@ export const UNIT_LABELS: Record<string, Record<string, string>> = {
 // ═══ برچسب کوتاه (برای کنار عدد) ═══
 export const UNIT_SHORT: Record<string, Record<string, string>> = {
   currency: { rial: 'ریال', toman: 'تومان', usd: '$' },
-  temperature: { c: '°C', f: '°F' },
+  temperature: { c: '°', f: '°' },
   weight: { mg: 'mg', g: 'g', kg: 'kg', ton: 't' },
   volume: { cc: 'cc', ml: 'ml', L: 'L', gal: 'gal' },
   length: { mm: 'mm', cm: 'cm', m: 'm', km: 'km' },

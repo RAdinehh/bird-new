@@ -110,7 +110,7 @@ export default function ZoneFormModal({
             onChange={e => { onErrorClear?.(); setForm({ ...form, capacity: e.target.value }); }}
             unit="پرنده"
             min={0}
-            max={100000}
+            max={hallRemaining != null && hallRemaining > 0 ? hallRemaining : 100000}
             autoClamp
           />
           {crossError && (

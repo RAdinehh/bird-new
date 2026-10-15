@@ -97,6 +97,18 @@ export default function HallCard(props: HallCardProps) {
       subtitle={h.length ? `${toFa(h.length)}×${toFa(h.width || 0)}×${toFa(h.height || 0)} متر` : 'ابعاد وارد نشده'}
       isOpen={isOpen} onToggle={onToggle}
       badge={<>
+        {(() => {
+          const st = h.status || (hallFlocks.length > 0 ? 'active' : 'empty');
+          const map: Record<string, { label: string; tone: string }> = {
+            active:     { label: 'فعال',      tone: 'green' },
+            empty:      { label: 'خالی',      tone: 'muted' },
+            sanitizing: { label: 'ضدعفونی',   tone: 'blue' },
+            maintenance:{ label: 'تعمیر',     tone: 'warn' },
+            inactive:   { label: 'غیرفعال',   tone: 'red' },
+          };
+          const it = map[st] || map.empty;
+          return <Tag tone={it.tone as any}>{it.label}</Tag>;
+        })()}
         {zoneCount > 0 ? <Tag tone="blue">{fmt.int(zoneCount)} بخش</Tag> : null}
         {hallFlocks.length > 0 ? <Tag tone="green">{fmt.int(hallFlocks.length)} گله</Tag> : null}
       </>}
@@ -145,7 +157,8 @@ export default function HallCard(props: HallCardProps) {
       <RowGrid>
         <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
         <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
-        <RowWithStatus l="تهویه"
+      </RowGrid>
+      <RowWithStatus l="تهویه"
           v={
             totalAirflow > 0
               ? `${fmt.int(airChanges)} بار/ساعت`
@@ -165,17 +178,12 @@ export default function HallCard(props: HallCardProps) {
           }
           icon={totalLightW > 0 ? lightIcon : undefined}
           hint={totalLightW > 0 ? lightAdvice : undefined} />
-      </RowGrid>
       {h.systemNotes && (
         <>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>📝 یادداشت سیستم‌ها</div>
           <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.systemNotes}</div>
         </>
       )}
-
-      <HallEquipSection hallId={h.id}
-        needInput={{ birdCount: totalBirds, ageDays: flockAgeDays, areaM2: area, volumeM3: volume, standard: flockStandard, litterType: h.litterType }}
-        legacy={{ ventilationSystem: h.ventilationSystem, feederType: h.feederType, drinkerType: h.drinkerType, litterType: h.litterType }} />
 
       {(h.builtAt || h.lastSanitizedAt || equipValue > 0) && (
         <>
@@ -203,7 +211,11 @@ export default function HallCard(props: HallCardProps) {
         </>
       )}
 
-      <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+      <HallEquipSection hallId={h.id}
+        needInput={{ birdCount: totalBirds, ageDays: flockAgeDays, areaM2: area, volumeM3: volume, standard: flockStandard, litterType: h.litterType }}
+        legacy={{ ventilationSystem: h.ventilationSystem, feederType: h.feederType, drinkerType: h.drinkerType, litterType: h.litterType }} />
+
+      <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
         <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
         <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }}>حذف</Btn>
       </div>

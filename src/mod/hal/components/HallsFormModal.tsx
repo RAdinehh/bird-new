@@ -185,7 +185,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           <Field label="نام سالن" required error={vErrors.name}><Input placeholder="شمالی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} /></Field>
 
         <Grid2>
-          <Field label="وضعیت سالن">
+          <Field label="وضعیت سالن" hint="تعمیر/ضدعفونی: ثبت گله ممنوع">
             <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
               <option value="active">🟢 فعال</option>
               <option value="empty">⚪ خالی</option>

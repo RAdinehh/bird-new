@@ -211,7 +211,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       breedId: form.breedId || '',
     },
   );
-  const save = () => {
+  const save = async () => {
     setSaveAttempted(true);
     // 🆕 اگه خطای اعتبارسنجی هست، نشون بده
     if (Object.keys(vErrors).length > 0) {
@@ -230,6 +230,19 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     }
 
     if (!form.name.trim()) { setErr('نام سالن اجباری است'); return; }
+
+    // 🆕 چک تناقض: سالن در تعمیر/ضدعفونی نباید گله فعال داشته باشد
+    if (form.id && (form.status === 'maintenance' || form.status === 'sanitizing')) {
+      const hasActive = flocks.some((f: Flock) => f.hallId === form.id && f.status === 'active');
+      if (hasActive) {
+        const stLabel = form.status === 'maintenance' ? 'تعمیر' : 'ضدعفونی';
+        const ok = await showConfirmAsync('هشدار تناقض',
+          `این سالن گله فعال دارد ولی وضعیت را روی «${stLabel}» می‌گذاری. ادامه؟`,
+          { danger: true });
+        if (!ok) return;
+      }
+    }
+
     const data = {
       name: form.name.trim(), code: form.code.trim(),
       length: num(form.length), width: num(form.width), height: num(form.height),

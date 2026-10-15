@@ -81,13 +81,13 @@ export function EnvCard({ icon, label, value, tone }: { icon: string; label: str
     <div style={{
       display: 'flex',
       alignItems: 'center',
-      gap: 8,
-      padding: '8px 10px',
+      gap: 'var(--sp-2)',
+      padding: 'var(--pad-tight)',
       background: 'var(--input-bg)',
       borderRadius: 'var(--r-md)',
       minWidth: 0,
     }}>
-      <span style={{ fontSize: 'var(--fs-lg)', flexShrink: 0 }}>{icon}</span>
+      <span style={{ fontSize: 'var(--fs-base)', flexShrink: 0 }}>{icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
@@ -134,18 +134,18 @@ export function RowWithStatus({
       padding: 'var(--pad-tight)',
       background: 'var(--input-bg)',
       borderRadius: 'var(--r-sm)',
-      gap: 8,
+      gap: 'var(--sp-2)',
     }}>
       <span style={{ color: 'var(--muted)', flexShrink: 0 }}>{l}:</span>
       <span style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 6,
+        gap: 'var(--sp-1)',
         fontWeight: 600,
         fontVariantNumeric: 'tabular-nums',
         minWidth: 0,
       }}>
-        {showIcon && <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>{showIcon}</span>}
+        {showIcon && <span style={{ fontSize: 'var(--fs-sm)', flexShrink: 0 }}>{showIcon}</span>}
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {v}{hint && <span style={{ color: 'var(--muted)', fontWeight: 500, marginRight: 4 }}> · {hint}</span>}
         </span>
