@@ -6,17 +6,22 @@ import { toFa, toEn } from '../../../shr/utils/fa';
 import { showAlert, showConfirmAsync } from '../../../cor/store/dialog';
 import { DEFAULT_LAYING_START } from '../store';
 import type { Flock } from '../store';
+import type { Bird, Breed } from '../../brd/store';
+import type { Hall } from '../../hal/store';
+import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
+
+type BreedStd = ReturnType<typeof useBreedStandard>;
 import type { F } from '../types-flocks';
 import { emptyForm } from '../types-flocks';
 import { checkHallCapacity } from '../api/hallCapacity';
 
 export interface UseFlocksFormParams {
-  birds: any[];
-  halls: any[];
-  flocks: any[];
-  breedStd: any;
-  add: (f: any) => void;
-  update: (id: string, patch: any) => void;
+  birds: Bird[];
+  halls: Hall[];
+  flocks: Flock[];
+  breedStd: BreedStd;
+  add: (f: Omit<Flock, 'id' | 'createdAt' | 'updatedAt'>) => string;
+  update: (id: string, patch: Partial<Flock>) => void;
 }
 
 export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: UseFlocksFormParams) {
@@ -52,6 +57,7 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       maleCount: f.maleCount ? toFa(f.maleCount) : '',
       femaleCount: f.femaleCount ? toFa(f.femaleCount) : '',
       layingStartDay: f.layingStartDay ? toFa(f.layingStartDay) : '',
+      endOfCycleDay: f.endOfCycleDay ? toFa(f.endOfCycleDay) : '',
       vaccineScheduleId: f.vaccineScheduleId || '',
       hatchDate: f.hatchDate || '', purchaseDate: f.purchaseDate || '', startDate: f.startDate || '',
       source: f.source,

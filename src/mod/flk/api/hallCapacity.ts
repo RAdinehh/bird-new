@@ -1,6 +1,12 @@
 /**
  * api/hallCapacity.ts — چک ظرفیت سالن برای گله
  */
+import type { Flock } from '../store';
+import type { Hall } from '../../hal/store';
+import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
+
+type BreedStd = ReturnType<typeof useBreedStandard>;
+
 export interface HallCapacityResult {
   ok: boolean;
   capacity: number;
@@ -14,9 +20,9 @@ export interface HallCapacityResult {
 export function checkHallCapacity(
   hallId: string,
   newCount: number,
-  flocks: any[],
-  halls: any[],
-  breedStd: any,
+  flocks: Flock[],
+  halls: Hall[],
+  breedStd: BreedStd,
   excludeFlockId?: string,
   newBreedId?: string,
 ): HallCapacityResult | null {

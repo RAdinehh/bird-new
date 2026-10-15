@@ -4,12 +4,19 @@
 import { toFa } from '../../../shr/utils/fa';
 import { MiniProgress } from '../../../shr/components/ProgressTracker';
 import { DEFAULT_LAYING_START, getAgeDays, getLayingStartDay } from '../store';
+import type { Flock } from '../store';
+import type { Bird } from '../../brd/store';
+import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
+import type { useFormat } from '../../../shr/units';
+
+type BreedStd = ReturnType<typeof useBreedStandard>;
+type Fmt = ReturnType<typeof useFormat>;
 
 export interface UpcomingFlocksProps {
-  flocks: any[];
-  birds: any[];
-  breedStd: any;
-  fmt: any;
+  flocks: Flock[];
+  birds: Bird[];
+  breedStd: BreedStd;
+  fmt: Fmt;
 }
 
 export default function UpcomingFlocks(props: UpcomingFlocksProps) {

@@ -12,19 +12,25 @@ import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Row } from '../helpers';
 import { showPromptAsync } from '../../../cor/store/dialog';
+import type { Bird, Breed } from '../../brd/store';
+import type { Hall, Zone } from '../../hal/store';
+import type { useFormat } from '../../../shr/units';
+import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
+
+type Fmt = ReturnType<typeof useFormat>;
 
 export interface FlockCardProps {
   flock: Flock;
   index: number;
-  bird: any;
-  breed: any;
-  hall: any;
-  zone: any;
+  bird: Bird | null | undefined;
+  breed: Breed | null | undefined;
+  hall: Hall | null | undefined;
+  zone: Zone | null | undefined;
   invoiceRevenue: number;
   vaccineEnabled: boolean;
   isOpen: boolean;
-  ms: any;
-  fmt: any;
+  ms: MultiSelectState<Flock>;
+  fmt: Fmt;
   onToggle: () => void;
   onEdit: () => void;
   onArchive: (reason: string) => void;
@@ -43,12 +49,12 @@ export default function FlockCard(props: FlockCardProps) {
   } = props;
 
   const ageDays = getAgeDays(f);
-  const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, bird?.cycleDays ?? null);
+  const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, null);
   const isArchived = f.status === 'archived' || f.status === 'sold';
   const ready = isLayingReady(f);
   const untilLay = daysUntilLaying(f);
   const costs = calcCosts(f);
-  const accentColor: any = isArchived ? 'dim' : lc.color;
+  const accentColor: 'accent' | 'dim' = isArchived ? 'dim' : 'accent';
 
   const handleArchive = async () => {
     const reason = await showPromptAsync(

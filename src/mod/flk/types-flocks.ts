@@ -10,6 +10,7 @@ export interface F {
   initialCount: string; currentCount: string;
   maleCount: string; femaleCount: string;
   layingStartDay: string;
+  endOfCycleDay: string;
   vaccineScheduleId: string;
   hatchDate: string; purchaseDate: string; startDate: string;
   source: string;
@@ -21,6 +22,7 @@ export const emptyForm = (): F => ({
   name: '', type: 'layer', birdId: '', breedId: '', hallId: '', zoneId: '',
   initialCount: '', currentCount: '', maleCount: '', femaleCount: '',
   layingStartDay: '',
+  endOfCycleDay: '',
   vaccineScheduleId: '',
   hatchDate: '', purchaseDate: '', startDate: '',
   source: 'purchase', purchasePrice: '', deliveryCost: '', otherCosts: '',

@@ -14,6 +14,13 @@ import { SOURCE_LABEL, DEFAULT_LAYING_START, sexRatio } from '../store';
 import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
 import { todayJ, jalaliBounds, checkDateBounds } from '../api/flocksCalc';
 import type { F } from '../types-flocks';
+import type { Bird, Breed } from '../../brd/store';
+import type { Hall, Zone } from '../../hal/store';
+import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
+import type { useFormat } from '../../../shr/units';
+
+type BreedStd = ReturnType<typeof useBreedStandard>;
+type Fmt = ReturnType<typeof useFormat>;
 
 export interface FlocksModalProps {
   open: boolean;
@@ -25,13 +32,13 @@ export interface FlocksModalProps {
   err: string;
   vErrors: Record<string, string>;
   // داده
-  birds: any[];
-  breedsForBird: any[];
-  halls: any[];
-  zonesForHall: any[];
-  breedStd: any;
+  birds: Bird[];
+  breedsForBird: Breed[];
+  halls: Hall[];
+  zonesForHall: Zone[];
+  breedStd: BreedStd;
   vaccineEnabled: boolean;
-  fmt: any;
+  fmt: Fmt;
   // actions
   onSave: () => void;
 }
@@ -76,7 +83,7 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       <Grid2>
         <Field label="نوع گله" required>
-          <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as any })}>
+          <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as 'layer' | 'broiler' | 'breeder' })}>
             <option value="layer">تخم‌گذار</option>
             <option value="broiler">گوشتی</option>
             <option value="breeder">مادر (تخم نطفه‌دار)</option>

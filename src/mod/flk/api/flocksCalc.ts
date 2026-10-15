@@ -3,6 +3,16 @@
  */
 import { format, addDays, subMonths } from 'date-fns-jalali';
 
+/** 🆕 shape تایپ‌های localStorage — فقط فیلدهای لازم */
+interface DlgLogRef { flockId?: string }
+interface EggProdRef { flockId?: string }
+interface EggSaleRef { flockId?: string }
+interface TraInvRef { type?: string; relatedFlockId?: string; total?: number }
+interface PersistedShape<T> {
+  state?: Record<string, T[]>;
+  [key: string]: T[] | Record<string, T[]> | undefined;
+}
+
 export function todayJ(): string {
   try { return format(new Date(), 'yyyy/MM/dd'); } catch { return ''; }
 }
@@ -31,27 +41,28 @@ export function checkDateBounds(date: string, bounds: { min: string; max: string
 /** چک ارجاع — آیا گله در ماژول‌های دیگه استفاده شده؟ */
 export function hasRefs(flockId: string): boolean {
   try {
-    const safeRead = (k: string) => {
-      try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch { return {}; }
+    const safeRead = <T,>(k: string): PersistedShape<T> => {
+      try { return JSON.parse(localStorage.getItem(k) || '{}') as PersistedShape<T>; } catch { return {}; }
     };
-    const dlg = safeRead('pm-dlg');
-    const dlgLogs = dlg.state?.logs || dlg.logs || [];
-    if (dlgLogs.some((l: any) => l.flockId === flockId)) return true;
-    const egg = safeRead('pm-egg');
-    const prods = egg.state?.productions || egg.productions || [];
-    if (prods.some((p: any) => p.flockId === flockId)) return true;
-    const sales = egg.state?.sales || egg.sales || [];
-    if (sales.some((s: any) => s.flockId === flockId)) return true;
-    const tra = safeRead('pm-tra');
-    const invs = tra.state?.invoices || tra.invoices || [];
-    if (invs.some((i: any) => i.relatedFlockId === flockId)) return true;
+    const dlg = safeRead<DlgLogRef>('pm-dlg');
+    const dlgLogs = (dlg.state?.logs || (dlg.logs as DlgLogRef[] | undefined) || []);
+    if (dlgLogs.some((l) => l.flockId === flockId)) return true;
+    const egg = safeRead<EggProdRef>('pm-egg');
+    const prods = (egg.state?.productions || (egg.productions as EggProdRef[] | undefined) || []);
+    if (prods.some((p) => p.flockId === flockId)) return true;
+    const egg2 = safeRead<EggSaleRef>('pm-egg');
+    const sales = (egg2.state?.sales || (egg2.sales as EggSaleRef[] | undefined) || []);
+    if (sales.some((s) => s.flockId === flockId)) return true;
+    const tra = safeRead<TraInvRef>('pm-tra');
+    const invs = (tra.state?.invoices || (tra.invoices as TraInvRef[] | undefined) || []);
+    if (invs.some((i) => i.relatedFlockId === flockId)) return true;
   } catch {}
   return false;
 }
 
 /** محاسبه درآمد گله از فاکتورهای فروش */
-export function getFlockRevenue(flockId: string, invoices: any[]): number {
+export function getFlockRevenue(flockId: string, invoices: TraInvRef[]): number {
   return (invoices || [])
-    .filter((inv: any) => inv.type === 'sale' && inv.relatedFlockId === flockId)
-    .reduce((sum: number, inv: any) => sum + (inv.total || 0), 0);
+    .filter((inv) => inv.type === 'sale' && inv.relatedFlockId === flockId)
+    .reduce((sum, inv) => sum + (inv.total || 0), 0);
 }

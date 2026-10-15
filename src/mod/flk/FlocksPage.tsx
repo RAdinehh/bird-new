@@ -25,6 +25,7 @@ import UpcomingFlocks from './components/UpcomingFlocks';
 import { useFlocksForm } from './hooks/useFlocksForm';
 import { hasRefs, getFlockRevenue } from './api/flocksCalc';
 import { type TabId } from './types-flocks';
+import type { Flock } from './store';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createFlkSchema } from '../../shr/validation/rules/flk';
@@ -34,14 +35,14 @@ export default function FlocksPage() {
   const fmt = useFormat();
   const breedStd = useBreedStandard();
   const { flocks, add, update, remove, archive, restore, toggleHidden, togglePaused } = useFlk();
-  const vaccineEnabled = useSet(s => (s as any).features?.vaccine !== false);
+  const vaccineEnabled = useSet(s => s.features?.vaccine !== false);
   const { birds: _birdsRaw, breeds } = useBrd();
   const { halls: _hallsRaw, zones } = useHal();
   const { invoices } = useTra();
 
   const [tab, setTab] = useState<TabId>('all');
   const [q, setQ] = useState('');
-  const [undoData, setUndoData] = useState<{ flock: any } | null>(null);
+  const [undoData, setUndoData] = useState<{ flock: Flock | Flock[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
   const swipeRef = useSwipeTabs(['all', 'layer', 'broiler', 'breeder', 'hidden', 'archived'], tab, (id) => setTab(id as TabId));
@@ -112,7 +113,7 @@ export default function FlocksPage() {
       maleCount: int(form.maleCount) ?? 0,
       femaleCount: int(form.femaleCount) ?? 0,
       layingStartDay: int(form.layingStartDay) || 150,
-      endOfCycleDay: (form as any).endOfCycleDay ? int((form as any).endOfCycleDay) : 0,
+      endOfCycleDay: form.endOfCycleDay ? int(form.endOfCycleDay) : 0,
       vaccineScheduleId: form.vaccineScheduleId || '',
       hatchDate: form.hatchDate || '',
       purchaseDate: form.purchaseDate || '',
@@ -152,7 +153,7 @@ export default function FlocksPage() {
   // ─── Multi-Select ───
   const ms = useMultiSelect({
     items: list,
-    getId: (f: any) => f.id,
+    getId: (f: Flock) => f.id,
     onDelete: async (ids: string[]) => {
       const withRefs = ids.filter(id => hasRefs(id));
       const withoutRefs = ids.filter(id => !hasRefs(id));
@@ -163,7 +164,7 @@ export default function FlocksPage() {
       const ok = await showConfirmAsync('حذف گروهی', msg, { danger: true });
       if (!ok) return;
       let arch = 0, del = 0;
-      const backups: any[] = [];
+      const backups: Flock[] = [];
       for (const id of ids) {
         const fl = flocks.find(f => f.id === id);
         if (!fl) continue;
@@ -176,7 +177,7 @@ export default function FlocksPage() {
       }
       if (backups.length > 0) {
         setUndoData({ flock: backups });
-        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.flock) && cur.flock.length === backups.length ? null : cur), 8000);
+        setTimeout(() => setUndoData((cur) => cur && Array.isArray(cur.flock) && cur.flock.length === backups.length ? null : cur), 8000);
       }
       let toast = '';
       if (arch > 0) toast += toFa(arch) + ' آرشیو';
@@ -337,7 +338,7 @@ export default function FlocksPage() {
                     const item = flocks.find(fl => fl.id === f.id);
                     if (item) {
                       setUndoData({ flock: item });
-                      setTimeout(() => setUndoData((cur: any) => cur && cur.flock.id === item.id ? null : cur), 6000);
+                      setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.flock) && cur.flock.id === item.id ? null : cur), 6000);
                     }
                     remove(f.id);
                     logAction('delete', 'flk', 'حذف از گله‌ها');
