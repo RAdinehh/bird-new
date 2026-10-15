@@ -6,6 +6,7 @@
 import { toFa } from '../../../shr/utils/fa';
 import { DEFAULT_LAYING_START, getAgeDays, getLayingStartDay } from '../store';
 import type { Flock } from '../store';
+import type { TabId } from '../types-flocks';
 import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
 import type { useFormat } from '../../../shr/units';
 
@@ -16,6 +17,7 @@ export interface UpcomingFlocksProps {
   flocks: Flock[];
   breedStd: BreedStd;
   fmt: Fmt;
+  tab?: TabId;
 }
 
 interface RingProps {
@@ -46,11 +48,14 @@ function Ring({ pct, color, size = 40 }: RingProps) {
   );
 }
 
-export default function UpcomingFlocks({ flocks, breedStd, fmt }: UpcomingFlocksProps) {
+export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingFlocksProps) {
   const upcoming = flocks
     .filter(f => {
       if (f.status !== 'active') return false;
       if (f.type !== 'layer' && f.type !== 'breeder') return false;
+      // 🆕 فیلتر بر اساس tab
+      if (tab === 'layer' && f.type !== 'layer') return false;
+      if (tab === 'breeder' && f.type !== 'breeder') return false;
       const std = breedStd.byBreedId(f.breedId);
       const startDay = getLayingStartDay(f, std?.biology?.layingStartDay ?? DEFAULT_LAYING_START);
       const age = getAgeDays(f);

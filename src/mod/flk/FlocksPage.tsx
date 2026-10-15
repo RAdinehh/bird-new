@@ -1,4 +1,4 @@
-import { useState, useMemo,  useEffect} from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
 import {
@@ -24,6 +24,8 @@ import FlocksModal from './components/FlocksModal';
 import UpcomingFlocks from './components/UpcomingFlocks';
 import FlocksKpiCards from './components/FlocksKpiCards';
 import FlocksTabs from './components/FlocksTabs';
+import { filterFlocksByTab } from './_flkList';
+import { useTabBadge } from './hooks/useTabBadge';
 import { useFlocksKpi } from './hooks/useFlocksKpi';
 import { useFlocksForm } from './hooks/useFlocksForm';
 import { hasRefs, getFlockRevenue } from './api/flocksCalc';
@@ -48,7 +50,7 @@ export default function FlocksPage() {
   const [undoData, setUndoData] = useState<{ flock: Flock | Flock[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
-  const [newTabBadge, setNewTabBadge] = useState<TabId | null>(null);
+  const { badge: newTabBadge, trigger: triggerBadge } = useTabBadge();
   const hiddenCount = flocks.filter(f => f.hidden && f.status === 'active').length;
   const archivedCount = flocks.filter(f => f.status === 'archived' || f.status === 'sold').length;
 
@@ -163,22 +165,10 @@ export default function FlocksPage() {
 
   const addEvent = useFlk(s => s.addEvent);
 
-  const list = useMemo(() => {
-    let arr = flocks;
-    if (tab === 'archived') arr = arr.filter(f => f.status === 'archived' || f.status === 'sold');
-    else if (tab === 'hidden') arr = arr.filter(f => f.status === 'active' && f.hidden);
-    else if (tab === 'all') arr = arr.filter(f => f.status === 'active' && !f.hidden);
-    else arr = arr.filter(f => f.status === 'active' && f.type === tab && !f.hidden);
-    if (q.trim()) {
-      const t = q.trim();
-      arr = arr.filter(f => {
-        const bird = birds.find(b => b.id === f.birdId);
-        const breed = breeds.find(b => b.id === f.breedId);
-        return f.name.includes(t) || bird?.name.includes(t) || breed?.name.includes(t);
-      });
-    }
-    return arr;
-  }, [flocks, tab, q, birds, breeds]);
+  const list = useMemo(
+    () => filterFlocksByTab(flocks, tab, q, birds, breeds),
+    [flocks, tab, q, birds, breeds],
+  );
 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
@@ -249,14 +239,12 @@ export default function FlocksPage() {
 
 
 
-  // ═══ نشانگر «آیتم جدید» روی Tab (۵ ثانیه) ═══
-  const triggerBadge = (tabId: TabId) => {
-    setNewTabBadge(tabId);
-    setTimeout(() => setNewTabBadge(null), 5000);
-  };
-
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y', minHeight: 'auto' }}>
+    <div ref={swipeRef} style={{
+      touchAction: 'pan-y',
+      width: '100%',
+      boxSizing: 'border-box',
+    }}>
       <FlocksTabs
         tabs={tabs}
         activeTab={tab}
@@ -288,7 +276,7 @@ export default function FlocksPage() {
               totalValue={kpiData.totalValue}
             />
 
-            <UpcomingFlocks flocks={flocks} breedStd={breedStd} fmt={fmt} />
+            <UpcomingFlocks flocks={flocks} breedStd={breedStd} fmt={fmt} tab={tab} />
           </>
         )}
 
@@ -390,7 +378,13 @@ export default function FlocksPage() {
         breedStd={breedStd}
         vaccineEnabled={vaccineEnabled}
         fmt={fmt}
-        onSave={save}
+        onSave={async () => {
+          const t = form.type as TabId | undefined;
+          await save();
+          if (t === 'layer' || t === 'breeder' || t === 'broiler') {
+            setTimeout(() => setTab(t), 120);
+          }
+        }}
       />
 
       </PageContainer>

@@ -20,14 +20,6 @@ export default function FlocksTabs({ tabs, activeTab, onTabChange, newTabBadge }
   return (
     <>
       <style>{`
-        @keyframes flkTabPulse {
-          0%, 100% { background: transparent; color: var(--muted); }
-          50% { background: var(--accent-soft); color: var(--accent); }
-        }
-        .flk-pulse {
-          animation: flkTabPulse 0.9s ease-in-out 3;
-          border-radius: 8px;
-        }
         @keyframes flkDotPulse {
           0%, 100% { transform: scale(1); opacity: 1; }
           50% { transform: scale(1.25); opacity: 0.75; }
@@ -43,7 +35,7 @@ export default function FlocksTabs({ tabs, activeTab, onTabChange, newTabBadge }
           <div
             key={t.id}
             onClick={() => onTabChange(t.id)}
-            className={newTabBadge === t.id ? 'flk-pulse' : ''}
+            
             style={{
               padding: '11px 12px',
               fontSize: 'var(--fs-base)',
@@ -61,8 +53,8 @@ export default function FlocksTabs({ tabs, activeTab, onTabChange, newTabBadge }
               <span
                 aria-label="آیتم جدید"
                 style={{
-                  position: 'absolute', top: 6, left: 6,
-                  width: 8, height: 8, borderRadius: '50%',
+                  position: 'absolute', top: 4, left: 4,
+                  width: 9, height: 9, borderRadius: '50%',
                   background: 'var(--danger)',
                   boxShadow: '0 0 0 2px var(--bg)',
                   animation: 'flkDotPulse 1s ease-in-out infinite',
