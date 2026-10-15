@@ -22,6 +22,8 @@ import { showToast, toastMsg } from '../../cor/store/toast';
 import FlockCard from './components/FlockCard';
 import FlocksModal from './components/FlocksModal';
 import UpcomingFlocks from './components/UpcomingFlocks';
+import FlocksKpiCards from './components/FlocksKpiCards';
+import { useFlocksKpi } from './hooks/useFlocksKpi';
 import { useFlocksForm } from './hooks/useFlocksForm';
 import { hasRefs, getFlockRevenue } from './api/flocksCalc';
 import { type TabId } from './types-flocks';
@@ -215,11 +217,7 @@ export default function FlocksPage() {
     return { bird, del, oth, total, per };
   }, [form]);
 
-  const tabCount = (t: TabId) => {
-    if (t === 'all') return flocks.filter(f => f.status === 'active').length;
-    if (t === 'archived') return flocks.filter(f => f.status === 'archived' || f.status === 'sold').length;
-    return flocks.filter(f => f.status === 'active' && f.type === t).length;
-  };
+  const kpiData = useFlocksKpi(flocks);
 
   const hiddenCount = flocks.filter(f => f.hidden && f.status === 'active').length;
 
@@ -246,10 +244,8 @@ export default function FlocksPage() {
             cursor: 'pointer', position: 'relative', whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            display: 'flex', alignItems: 'center', gap: 5
           }}>
             {t.label}
-            <span style={{ fontSize: 12, background: tab === t.id ? 'var(--accent-soft)' : 'var(--input-bg)', color: tab === t.id ? 'var(--accent)' : 'var(--muted)', padding: '1px 5px', borderRadius: 8, fontWeight: 700 }}>{toFa(tabCount(t.id))}</span>
             {tab === t.id && <div style={{ position: 'absolute', bottom: 0, right: 12, left: 12, height: 3, background: 'var(--accent)', borderRadius: '3px 3px 0 0' }} />}
           </div>
         ))}
@@ -271,15 +267,14 @@ export default function FlocksPage() {
           tone="info"
         />
         {/* گله‌های نزدیک به تخم‌گذاری */}
-        <UpcomingFlocks flocks={flocks} birds={birds} breedStd={breedStd} fmt={fmt} />
+        <FlocksKpiCards
+          totalFlocks={kpiData.totalFlocks}
+          totalBirds={kpiData.totalBirds}
+          totalValue={kpiData.totalValue}
+        />
 
-        <div style={{
-          height: 38, background: 'var(--input-bg)', border: '1px solid var(--border)',
-          borderRadius: 'var(--r-md)', padding: '0 12px', display: 'flex', alignItems: 'center', gap: 8
-        }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="جستجوی نام، پرنده، نژاد..." style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)', minWidth: 0 }} />
-        </div>
+        <UpcomingFlocks flocks={flocks} breedStd={breedStd} fmt={fmt} />
+
 
         {!ms.selectionMode && list.length > 1 && (
           <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
