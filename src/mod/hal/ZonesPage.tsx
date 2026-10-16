@@ -330,6 +330,49 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         count={count}
       />
 
+      {/* 🆕 هشدار مجموع بخش‌ها > سالن */}
+      {(() => {
+        // جمع ظرفیت بخش‌ها per سالن
+        const sumByHall: Record<string, number> = {};
+        for (const z of zones) {
+          if (z.archived) continue;
+          sumByHall[z.hallId] = (sumByHall[z.hallId] || 0) + (z.capacity || 0);
+        }
+        const offenders = Object.entries(sumByHall)
+          .map(([hallId, sum]) => {
+            const h = halls.find(x => x.id === hallId);
+            if (!h || !h.capacity) return null;
+            if (sum <= h.capacity) return null;
+            return { hall: h, sum };
+          })
+          .filter(Boolean) as { hall: { name: string; capacity: number | null }; sum: number }[];
+
+        if (offenders.length === 0) return null;
+
+        return (
+          <div style={{
+            padding: 'var(--pad-normal)',
+            background: 'var(--warn-soft)',
+            border: '1px solid var(--warn)',
+            borderRadius: 'var(--r-md)',
+            fontSize: 'var(--fs-xs)',
+            color: 'var(--warn)',
+            fontWeight: 600,
+            lineHeight: 1.7,
+          }}>
+            <div style={{ marginBottom: 4, fontWeight: 700 }}>⚠️ مجموع بخش‌ها بیشتر از ظرفیت سالن ئه</div>
+            {offenders.map(o => (
+              <div key={o.hall.name}>
+                · سالن <b>{o.hall.name}</b>: ظرفیت {toFa(o.hall.capacity || 0)} — بخش‌ها {toFa(o.sum)}
+              </div>
+            ))}
+            <div style={{ marginTop: 4, fontStyle: 'italic', opacity: 0.9 }}>
+              ظرفیت سالن یا بخش‌ها رو اصلاح کن (اگه عمدی ئه، ادامه بده — فقط یادآوری ئه)
+            </div>
+          </div>
+        );
+      })()}
+
       {!ms.selectionMode && zones.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید

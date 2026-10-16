@@ -32,7 +32,8 @@ export function createFlkSchema(context: ValidationContext = {}) {
     zoneId: optionalId(),
 
     initialCount: intPos('تعداد اولیه', 100000),
-    currentCount: intPos('تعداد فعلی', 100000),
+    // 🆕 تعداد فعلی اختیاری ئه — اگه خالی باشه، = تعداد اولیه فرض می‌شه
+    currentCount: z.number().optional().nullable(),
     maleCount: intNonNeg('تعداد نر', 100000),
     femaleCount: intNonNeg('تعداد ماده', 100000),
 
@@ -47,9 +48,9 @@ export function createFlkSchema(context: ValidationContext = {}) {
 
     source: z.enum(['purchase', 'hatch']).default('purchase'),
 
-    purchasePrice: floatRange('قیمت هر پرنده', 1_000, 5_000_000),
-    deliveryCost: floatNonNeg('هزینه حمل', 500_000_000),
-    otherCosts: floatNonNeg('سایر هزینه‌ها', 500_000_000),
+    purchasePrice: z.number().min(1_000, 'قیمت هر پرنده باید حداقل ۱۰۰۰ باشد').max(5_000_000, 'قیمت هر پرنده بیش از حد بزرگ است').optional().nullable(),
+    deliveryCost: z.number().min(0).max(500_000_000).optional().nullable(),
+    otherCosts: z.number().min(0).max(500_000_000).optional().nullable(),
 
     status: z.enum(['active', 'archived', 'sold', 'merged']).default('active'),
     notes: optionalStr(1000),
@@ -67,8 +68,8 @@ export function createFlkSchema(context: ValidationContext = {}) {
       }
     }
 
-    // تعداد فعلی ≤ تعداد اولیه
-    if (d.currentCount > d.initialCount) {
+    // تعداد فعلی ≤ تعداد اولیه (فقط اگه currentCount پر شده باشه)
+    if (d.currentCount != null && d.currentCount > 0 && d.currentCount > d.initialCount) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `تعداد فعلی (${d.currentCount.toLocaleString('fa-IR')}) نمی‌تواند از تعداد اولیه بیشتر باشد`,
@@ -78,16 +79,16 @@ export function createFlkSchema(context: ValidationContext = {}) {
 
     // 🆕 چک‌های مربوط به layer/breeder فقط
     if (d.type === 'layer' || d.type === 'breeder') {
-      // layingStartDay: 100-250
-      if (d.layingStartDay != null && (d.layingStartDay < 100 || d.layingStartDay > 250)) {
+      // layingStartDay: 100-250 (فقط اگه پر باشه)
+      if (d.layingStartDay != null && d.layingStartDay > 0 && (d.layingStartDay < 100 || d.layingStartDay > 250)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `سن تخم‌گذاری باید بین ۱۰۰ و ۲۵۰ روز باشد`,
           path: ['layingStartDay'],
         });
       }
-      // endOfCycleDay: 35-700
-      if (d.endOfCycleDay != null && (d.endOfCycleDay < 35 || d.endOfCycleDay > 700)) {
+      // endOfCycleDay: 35-700 (فقط اگه کاربر مقدار داده)
+      if (d.endOfCycleDay != null && d.endOfCycleDay > 0 && (d.endOfCycleDay < 35 || d.endOfCycleDay > 700)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `سن پایان چرخه باید بین ۳۵ و ۷۰۰ روز باشد`,

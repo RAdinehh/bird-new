@@ -16,6 +16,8 @@ export interface UseFormErrorsResult {
   reset: () => void;
   /** گرفتن پیام خطای فیلد (اگه باید نشون داده شه) */
   showError: (field: string) => string | undefined;
+  /** آیا فیلد معتبر ئه؟ (لمس شده + بدون خطا) */
+  isValid: (field: string) => boolean;
   /** علامت‌گذاری ذخیره‌ی ناموفق */
   attemptSave: () => void;
   /** آیا ذخیره زده شده؟ */
@@ -54,7 +56,13 @@ export function useFormErrors(
     return err;
   }, [vErrors, touched, saveAttempted]);
 
-  return { markTouched, reset, showError, attemptSave, saveAttempted };
+  const isValid = useCallback((field: string): boolean => {
+    // فیلد خالی → نه (چون چیز معتبری نداره)
+    if (!touched.has(field) && !saveAttempted) return false;
+    return !vErrors[field];
+  }, [vErrors, touched, saveAttempted]);
+
+  return { markTouched, reset, showError, attemptSave, saveAttempted, isValid };
 }
 
 /** 🆕 تشخیص خطاهای «فیلد خالی» (اجباری) vs «محتوایی» */

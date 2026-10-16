@@ -26,7 +26,9 @@ function hasHorizontalScroller(el: HTMLElement | null, container: HTMLElement): 
 export function useCarousel(
   ids: string[],
   active: string,
-  onChange: (id: string) => void
+  onChange: (id: string) => void,
+  /** 🆕 deps اضافی برای re-measure (مثلاً تعداد کارت‌ها) */
+  extraDeps: unknown[] = []
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -111,6 +113,9 @@ export function useCarousel(
     const apply = () => {
       const h = panel.getBoundingClientRect().height;
       if (h > 0) {
+        // ارتفاع واقعی محتوا (بدون minHeight اجباری)
+        // اگر محتوا کوتاه باشه، فضای خالی می‌مونه (طبیعی ئه)
+        // اگر بلند باشه، scroll عادی کار می‌کنه
         c.style.transition = 'none';
         c.style.height = h + 'px';
       }
@@ -120,16 +125,24 @@ export function useCarousel(
     requestAnimationFrame(apply);
     const t1 = window.setTimeout(apply, 60);
     const t2 = window.setTimeout(apply, 300);
+    const t3 = window.setTimeout(apply, 600);  // 🆕 برای موارد پیچیده
 
     const ro = new ResizeObserver(apply);
     ro.observe(panel);
 
+    // 🆕 MutationObserver برای تغییرات DOM (اضافه/حذف کارت)
+    const mo = new MutationObserver(apply);
+    mo.observe(panel, { childList: true, subtree: true });
+
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
       ro.disconnect();
+      mo.disconnect();
     };
-  }, [active]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, ...extraDeps]);
 
   // listeners — یک بار bind روی document.body
   // اینطوری مستقل از ارتفاع containerRef، swipe روی کل ویوپورت کار میکنه

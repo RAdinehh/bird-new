@@ -3,7 +3,7 @@
  */
 import { useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
-import { showAlert, showConfirmAsync } from '../../../cor/store/dialog';
+import { showAlert } from '../../../cor/store/dialog';
 import { DEFAULT_LAYING_START } from '../store';
 import type { Flock } from '../store';
 import type { Bird, Breed } from '../../brd/store';
@@ -13,7 +13,6 @@ import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
 type BreedStd = ReturnType<typeof useBreedStandard>;
 import type { F } from '../types-flocks';
 import { emptyForm } from '../types-flocks';
-import { checkHallCapacity } from '../api/hallCapacity';
 
 export interface UseFlocksFormParams {
   birds: Bird[];
@@ -110,20 +109,8 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       status: form.status, notes: form.notes.trim()
     };
 
-    const newCount = data.currentCount || data.initialCount || 0;
-    const cap = checkHallCapacity(form.hallId, newCount, flocks, halls, breedStd, form.id || undefined, form.breedId);
-    if (cap && !cap.ok) {
-      const ok = await showConfirmAsync(
-        '⚠️ ظرفیت سالن پر می‌شود',
-        (cap.mode === 'area'
-          ? `فضای سالن: ${cap.capacity} m²\nفعلی: ${cap.current} m²\nبعد از این گله: ${cap.total} m²\nاضافه‌بار: ${cap.over} m²\n`
-          : `ظرفیت سالن: ${cap.capacity} پرنده\nفعلی: ${cap.current} پرنده\nبعد از این گله: ${cap.total} پرنده\nاضافه‌بار: ${cap.over} پرنده\n`) +
-        (cap.note ? `\n⚠️ ${cap.note}\n` : '') + '\n' +
-        `آیا می‌خواهید ادامه دهید؟`,
-        { danger: true, confirmText: 'بله، ادامه' }
-      );
-      if (!ok) return;
-    }
+    // 🆕 حذف شده — warning به صورت inline در Modal نمایش داده می‌شه
+    // (کاربر آزاده بیش از ظرفیت ثبت کنه)
 
     if (form.id) update(form.id, data); else add(data);
     setOpen(false);

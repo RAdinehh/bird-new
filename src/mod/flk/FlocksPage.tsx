@@ -8,6 +8,7 @@ import { useHal, type Hall, type Zone } from '../hal/store';
 import { useTra, type Invoice } from '../tra/store';
 import { useSet } from '../set/store';
 import { useFlocksForm } from './hooks/useFlocksForm';
+import { checkHallCapacity } from './api/hallCapacity';
 import { useFlocksKpi } from './hooks/useFlocksKpi';
 import { useTabBadge } from './hooks/useTabBadge';
 import { useCarousel } from '../../shr/hooks/useCarousel';
@@ -94,26 +95,47 @@ export default function FlocksPage() {
       breedId: form.breedId || '',
       hallId: form.hallId || '',
       zoneId: form.zoneId || '',
-      initialCount: int(form.initialCount) ?? 0,
-      currentCount: int(form.currentCount) ?? 0,
+      initialCount: form.initialCount ? int(form.initialCount) : undefined,
+      currentCount: form.currentCount ? int(form.currentCount) : undefined,
       maleCount: int(form.maleCount) ?? 0,
       femaleCount: int(form.femaleCount) ?? 0,
-      layingStartDay: int(form.layingStartDay) ?? 0,
-      endOfCycleDay: int(form.endOfCycleDay) ?? 0,
+      layingStartDay: form.layingStartDay ? int(form.layingStartDay) : undefined,
+      endOfCycleDay: form.endOfCycleDay ? int(form.endOfCycleDay) : undefined,
       vaccineScheduleId: form.vaccineScheduleId || '',
       hatchDate: form.hatchDate || '',
       purchaseDate: form.purchaseDate || '',
       startDate: form.startDate || '',
       source: form.source,
-      purchasePrice: num(form.purchasePrice) ?? 0,
-      deliveryCost: num(form.deliveryCost) ?? 0,
-      otherCosts: num(form.otherCosts) ?? 0,
+      purchasePrice: form.purchasePrice ? num(form.purchasePrice) : undefined,
+      deliveryCost: form.deliveryCost ? num(form.deliveryCost) : undefined,
+      otherCosts: form.otherCosts ? num(form.otherCosts) : undefined,
       status: form.status,
       notes: form.notes || '',
     },
   );
 
-  const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
+  const { showError, markTouched, isValid, attemptSave } = useFormErrors(vErrors);
+
+  // 🆕 محاسبه ظرفیت سالن/بخش — فقط وقتی سالن + تعداد داده شده
+  const hallCapacity = useMemo(() => {
+    if (!form.hallId) return null;
+    // تبدیل اعداد فارسی + حذف جداکننده
+    const toNum = (v: string) => {
+      if (!v) return 0;
+      const en = toEn(v).replace(/[,،]/g, '');
+      return parseInt(en) || 0;
+    };
+    const init = form.initialCount ? toNum(form.initialCount) : 0;
+    const curr = form.currentCount ? toNum(form.currentCount) : 0;
+    const newCount = curr || init;
+    if (!newCount) return null;
+    const cap = checkHallCapacity(
+      form.hallId, form.zoneId, newCount,
+      flocks, halls, zones, breedStd,
+      form.id || undefined, form.breedId,
+    );
+    return cap;
+  }, [form.hallId, form.zoneId, form.initialCount, form.currentCount, form.breedId, form.id, flocks, halls, zones, breedStd]);
 
   // ─── شمارش برای تب‌های conditional ───
   const hiddenCount = flocks.filter(f => f.hidden && f.status === 'active').length;
@@ -143,6 +165,8 @@ export default function FlocksPage() {
     tabIds,
     tab,
     (id) => setTab(id as TabId),
+    // 🆕 re-measure وقتی تعداد گله‌ها عوض می‌شه (archive/delete/add)
+    [flocks.length],
   );
 
   return (
@@ -222,6 +246,8 @@ export default function FlocksPage() {
         vErrors={vErrors}
         showError={showError}
         markTouched={markTouched}
+        isValid={isValid}
+        hallCapacity={hallCapacity}
         birds={birds}
         breedsForBird={breedsForBird}
         halls={halls}

@@ -1,6 +1,7 @@
 /**
  * FlocksModal.tsx — فرم افزودن/ویرایش گله
  */
+import { useEffect, useRef } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
   Btn, BtnRow, ErrorBox, Field, Grid2, Input, Modal, MoneyField,
@@ -35,6 +36,10 @@ export interface FlocksModalProps {
   showError: (field: string) => string | undefined;
   /** 🆕 علامت‌گذاری لمس فیلد */
   markTouched: (field: string) => void;
+  /** 🆕 آیا فیلد معتبر ئه؟ */
+  isValid: (field: string) => boolean;
+  /** 🆕 ظرفیت سالن/بخش (inline) */
+  hallCapacity?: import('../api/hallCapacity').HallCapacityResult | null;
   // داده
   birds: Bird[];
   breedsForBird: Breed[];
@@ -47,10 +52,25 @@ export interface FlocksModalProps {
   onSave: () => void;
 }
 
+function ValidIcon({ show }: { show: boolean }) {
+  if (!show) return null;
+  return (
+    <span
+      aria-label="معتبر"
+      style={{
+        color: 'var(--accent)',
+        fontSize: '1em',
+        fontWeight: 700,
+        marginRight: 2,
+      }}
+    >✓</span>
+  );
+}
+
 export default function FlocksModal(props: FlocksModalProps) {
   const {
     open, onClose, form, setForm, layingFromStd, setLayingFromStd,
-    err, vErrors, showError, markTouched, birds, breedsForBird, halls, zonesForHall,
+    err, vErrors, showError, markTouched, isValid, hallCapacity, birds, breedsForBird, halls, zonesForHall,
     breedStd, vaccineEnabled, fmt, onSave,
   } = props;
 
@@ -130,8 +150,13 @@ export default function FlocksModal(props: FlocksModalProps) {
             onChange={v => {
               const std = breedStd.byBreedId(v);
               const layStart = std?.biology?.layingStartDay;
-              setForm(f => ({ ...f, breedId: v, layingStartDay: layStart ? String(layStart) : f.layingStartDay }));
-              setLayingFromStd(!!layStart);
+              if (layStart != null) {
+                setForm(f => ({ ...f, breedId: v, layingStartDay: String(layStart) }));
+                setLayingFromStd(true);
+              } else {
+                setForm(f => ({ ...f, breedId: v }));
+                setLayingFromStd(false);
+              }
             }}
             parentValue={form.birdId}
             parentLabel="پرنده"
@@ -176,12 +201,10 @@ export default function FlocksModal(props: FlocksModalProps) {
       {(form.type === 'layer' || form.type === 'breeder') && (
         <Field
           label="سن شروع تخم‌گذاری (روز)"
-          hint={layingFromStd ? 'عدد را تغییر بده اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)}
           autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
-          error={showError('layingStartDay')} onTouch={() => markTouched('layingStartDay')}
         >
           <NumField
-            value={form.layingStartDay}
+            value={form.layingStartDay || (formLaying ? String(formLaying) : '')}
             onChange={e => { setForm({ ...form, layingStartDay: e.target.value }); setLayingFromStd(false); }}
             placeholder={fmt.int(formLaying)}
             unit="روز"
@@ -192,13 +215,97 @@ export default function FlocksModal(props: FlocksModalProps) {
       )}
 
       <Grid2>
-        <Field label="تعداد اولیه" required error={showError('initialCount')} onTouch={() => markTouched('initialCount')}>
+        <Field label={<span>تعداد اولیه <ValidIcon show={isValid('initialCount')} /></span>} required error={showError('initialCount')} onTouch={() => markTouched('initialCount')}>
           <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
-        <Field label="تعداد فعلی" error={showError('currentCount')} onTouch={() => markTouched('currentCount')}>
+        <Field label={<span>تعداد فعلی <ValidIcon show={isValid('currentCount')} /></span>} hint="اگه خالی بمونه = تعداد اولیه" onTouch={() => markTouched('currentCount')}>
           <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
       </Grid2>
+
+      {/* 🆕 ظرفیت سالن + breakdown بخش‌ها */}
+      {hallCapacity && (
+        <div style={{
+          padding: 'var(--pad-normal)',
+          background: hallCapacity.ok ? 'var(--accent-soft)' : 'var(--warn-soft)',
+          border: '1px solid ' + (hallCapacity.ok ? 'var(--accent-border)' : 'var(--warn)'),
+          borderRadius: 'var(--r-md)',
+          fontSize: 'var(--fs-xs)',
+          color: hallCapacity.ok ? 'var(--accent)' : 'var(--warn)',
+          fontWeight: 600,
+          lineHeight: 1.7,
+        }}>
+          {/* خط اول: خلاصه وضعیت فعلی + تیک */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', flexWrap: 'wrap', marginBottom: 4 }}>
+            <span style={{
+              fontSize: 'var(--fs-base)',
+              fontWeight: 700,
+            }}>{hallCapacity.ok ? '✅' : '⚠️'}</span>
+            <span style={{ fontWeight: 700 }}>
+              {hallCapacity.scope === 'zone' ? 'بخش' : 'سالن'}:
+            </span>
+            <span>ظرفیت {toFa(hallCapacity.capacity)}</span>
+          </div>
+
+          {/* 🆕 خط دوم: این گله · بعد از ذخیره */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', flexWrap: 'wrap', marginBottom: hallCapacity.breakdown ? 6 : 0 }}>
+            <span>فعلی: {toFa(hallCapacity.current)}</span>
+            <span>·</span>
+            <span>این گله: {toFa(hallCapacity.total - hallCapacity.current)}</span>
+            <span>·</span>
+            <span style={{ fontWeight: 700 }}>بعد از ذخیره: {toFa(hallCapacity.total)}</span>
+            <span>·</span>
+            {hallCapacity.over > 0 ? (
+              <span style={{ fontWeight: 700, color: 'var(--danger)' }}>⚠️ اضافه‌بار {toFa(hallCapacity.over)}</span>
+            ) : (
+              <span style={{ fontWeight: 700 }}>باقی {toFa(hallCapacity.remaining)}</span>
+            )}
+          </div>
+
+          {/* خط دوم: breakdown بخش‌ها */}
+          {hallCapacity.breakdown && (
+            <div style={{
+              paddingTop: 6,
+              borderTop: '1px dashed currentColor',
+              opacity: 0.9,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3,
+            }}>
+              {/* گله‌های بدون بخش */}
+              <div style={{
+                display: 'flex',
+                gap: 'var(--sp-2)',
+                alignItems: 'center',
+                fontWeight: hallCapacity.breakdown.noZone.isCurrent ? 700 : 500,
+              }}>
+                <span>{hallCapacity.breakdown.noZone.isCurrent ? '👉' : '·'}</span>
+                <span style={{ flex: 1 }}>بدون بخش</span>
+                <span>{toFa(hallCapacity.breakdown.noZone.used)}/{toFa(hallCapacity.breakdown.noZone.capacity)}</span>
+                <span style={{ opacity: 0.75 }}>(باقی {toFa(hallCapacity.breakdown.noZone.remaining)})</span>
+              </div>
+
+              {/* بخش‌ها */}
+              {hallCapacity.breakdown.zones.map(z => (
+                <div
+                  key={z.id}
+                  style={{
+                    display: 'flex',
+                    gap: 'var(--sp-2)',
+                    alignItems: 'center',
+                    fontWeight: z.isCurrent ? 700 : 500,
+                  }}
+                >
+                  <span>{z.isCurrent ? '👉' : '·'}</span>
+                  <span style={{ flex: 1 }}>📦 {z.name}</span>
+                  <span>{toFa(z.used)}/{toFa(z.capacity)}</span>
+                  <span style={{ opacity: 0.75 }}>(باقی {toFa(z.remaining)})</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {form.type === 'breeder' && (
         <DepBox title="اطلاعات گله مادر" tone="purple">
