@@ -12,7 +12,7 @@ import type { useFormat } from '../../../shr/units';
 import type { TabId } from '../types-flocks';
 import type { FlocksKpi } from '../hooks/useFlocksKpi';
 import { filterFlocksByTab } from '../_flkList';
-import { getFlockRevenue } from '../api/flocksCalc';
+import { getFlockRevenue, hasRefs } from '../api/flocksCalc';
 import { useMultiSelect } from '../../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../../shr/multiSelect/MultiSelectBar';
 import UndoBar from '../../../cor/ui/UndoBar';
@@ -91,7 +91,21 @@ export default function FlockTabPanel({
     items: list,
     getId: (f: Flock) => f.id,
     onDelete: async (ids) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' گله حذف شوند؟', { danger: true });
+      // 🆕 چک ارجاع — کدوم گله‌ها توی dlg/egg/tra استفاده شدن؟
+      const withRefs = ids.filter(id => hasRefs(id));
+      const withoutRefs = ids.filter(id => !hasRefs(id));
+
+      let msg = toFa(ids.length) + ' گله حذف شوند؟';
+      if (withRefs.length > 0) {
+        msg = '';
+        if (withoutRefs.length > 0) {
+          msg += '• ' + toFa(withoutRefs.length) + ' گله بدون ارجاع → حذف می‌شن\n';
+        }
+        msg += '• ' + toFa(withRefs.length) + ' گله ارجاع دارن (dlg/egg/tra) → حذف با هشدار\n';
+        msg += '\n⚠️ اگه ارجاع‌ها باقی بمونن، آمار اشتباه می‌شه.';
+      }
+
+      const ok = await showConfirmAsync('حذف گروهی', msg, { danger: true });
       if (!ok) return;
       const backups: Flock[] = [];
       for (const id of ids) {
@@ -245,8 +259,20 @@ export default function FlockTabPanel({
                   triggerBadge('archived');
                 }}
                 onRestore={() => restore(f.id)}
-                onDelete={() => {
+                onDelete={async () => {
                   const item = flocks.find(fl => fl.id === f.id);
+                  const refs = hasRefs(f.id);
+                  const msg = refs
+                    ? '«' + f.name + '» توی بخش‌های دیگه (dlg/egg/tra) ارجاع داره.\n\n' +
+                      '⚠️ حذف این گله باعث می‌شه داده‌های ارجاعی یتیم بشن.\n\n' +
+                      'پیشنهاد: آرشیو کن (به‌جای حذف).'
+                    : 'این گله حذف شود؟';
+                  const ok = await showConfirmAsync(
+                    refs ? 'هشدار ارجاع' : 'تأیید حذف',
+                    msg,
+                    { danger: true },
+                  );
+                  if (!ok) return;
                   if (item) {
                     setUndoData({ flock: item });
                     setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.flock) && cur.flock.id === item.id ? null : cur), 6000);
