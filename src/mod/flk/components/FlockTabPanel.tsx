@@ -68,9 +68,11 @@ export default function FlockTabPanel({
   const config = useMemo(
     () => getFlkFlocksConfig({
       birds: birds.map(b => ({ id: b.id, name: b.name })),
+      breeds: breeds.map(b => ({ id: b.id, name: b.name, birdId: b.birdId })),
       halls: halls.map(h => ({ id: h.id, name: h.name })),
+      zones: zones.map(z => ({ id: z.id, name: z.name, hallId: z.hallId })),
     }),
-    [birds, halls],
+    [birds, breeds, halls, zones],
   );
 
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
