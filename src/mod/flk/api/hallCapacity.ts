@@ -99,7 +99,7 @@ export function checkHallCapacity(
     // 🆕 بخش‌های اشغال‌شده ظرفیتشون رزرو شده
     //    بخش‌های خالی رزرو نمی‌شن (Smart Capacity)
     const occupiedZonesCap = hallZones
-      .filter(z => activeFlocks.some(f => f.zoneId === z.id))
+      .filter(z => activeFlocks.some(f => f.zoneId === z.id) || z.id === zoneId)
       .reduce((sum, z) => sum + (z.capacity || 0), 0);
     const availableForNoZone = Math.max(0, hallCap - occupiedZonesCap);
 
@@ -197,7 +197,9 @@ function buildBreakdown(
 
   // 🆕 فقط بخش‌های اشغال‌شده رزرو می‌شن
   const occupiedZonesCap = hallZones
-    .filter(z => (z.capacity || 0) > 0 && activeFlocks.some(f => f.zoneId === z.id))
+    .filter(z => (z.capacity || 0) > 0 && (
+      activeFlocks.some(f => f.zoneId === z.id) || z.id === currentZoneId
+    ))
     .reduce((sum, z) => sum + (z.capacity || 0), 0);
   const noZoneCap = Math.max(0, hallCap - occupiedZonesCap);
   const noZoneUsed = activeFlocks
