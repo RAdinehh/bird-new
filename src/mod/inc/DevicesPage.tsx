@@ -202,7 +202,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
     updateDevice(deviceId, { maintenanceLogs: logs } as any);
     setMaintForm({ date: '', type: '', cost: '', description: '' });
     setMaintDeviceId(null);
-    showAlert('تعمیر ثبت شد', '✅');
+    toastMsg.success('تعمیر ثبت شد');
   };
 
   const removeMaintenance = async (deviceId: string, logId: string) => {

@@ -69,9 +69,24 @@ export default function FlocksPage() {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
+  // ─── existingNames برای چک تکراری ───
+  const existingNames = useMemo(
+    () => flocks
+      .filter(f => f.id !== form.id)
+      .map(f => f.name.trim().toLowerCase())
+      .filter(Boolean),
+    [flocks, form.id],
+  );
+
+  // ─── schema memo ───
+  const flkSchema = useMemo(
+    () => createFlkSchema({ existingNames }),
+    [existingNames],
+  );
+
   // ─── validation ───
   const { errors: vErrors } = useValidation(
-    createFlkSchema(),
+    flkSchema,
     {
       name: form.name || '',
       type: form.type,

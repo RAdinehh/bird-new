@@ -109,6 +109,8 @@ export const toastMsg = {
     showToast(`«${name}» فعال شد`, 'success'),
 
   // ─── عمومی ───
+  success: (msg: string) =>
+    showToast(msg, 'success'),
   error: (msg: string) =>
     showToast(msg, 'error'),
 

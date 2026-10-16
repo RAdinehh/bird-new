@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { showAlert } from '../../../cor/store/dialog';
+import { toastMsg } from '../../../cor/store/toast';
 import { calcCurrentFertile } from '../api/hatchCalc';
 import type { HatchResult } from '../store';
 
@@ -154,7 +155,7 @@ export function useHatchForm(p: UseHatchFormParams) {
       saved++;
     });
     setOpen(false);
-    showAlert(toFa(saved) + ' نتیجه هچ ثبت شد', '✅ موفق');
+    toastMsg.success(toFa(saved) + ' نتیجه هچ ثبت شد');
   };
 
   return {

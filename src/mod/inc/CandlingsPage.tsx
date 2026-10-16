@@ -8,6 +8,7 @@ import { useBrd } from '../brd/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showAlert } from '../../cor/store/dialog';
+import { toastMsg } from '../../cor/store/toast';
 import { useFilterSort, FilterBar, getIncCandlingsConfig } from '../../shr/filter';
 import { todayJalali } from './helpers';
 import { useIncubationProfile } from './hooks';
@@ -64,7 +65,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
   const handleSave = () => {
     const result = save(_entriesById);
     if (result.ok && result.savedCount > 0 && !editingId) {
-      showAlert(toFa(result.savedCount) + ' کندلینگ ثبت شد', '✅ موفق');
+      toastMsg.success(toFa(result.savedCount) + ' کندلینگ ثبت شد');
     }
   };
 

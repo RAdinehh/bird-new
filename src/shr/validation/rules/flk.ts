@@ -21,7 +21,8 @@ import {
 import { EGG, GROWTH } from '../biological';
 import type { ValidationContext } from '../types';
 
-export function createFlkSchema(_context: ValidationContext = {}) {
+export function createFlkSchema(context: ValidationContext = {}) {
+  const existingNames = context.existingNames;
   return z.object({
     name: requiredStr('نام گله', 2, 50),
     type: z.enum(['layer', 'broiler', 'breeder']),
@@ -81,6 +82,18 @@ export function createFlkSchema(_context: ValidationContext = {}) {
         message: `سن پایان چرخه (${d.endOfCycleDay}) باید بیشتر از سن تخم‌گذاری (${d.layingStartDay}) باشد`,
         path: ['endOfCycleDay'],
       });
+    }
+
+    // ═══ چک نام تکراری ═══
+    if (existingNames && existingNames.length > 0) {
+      const trimmed = d.name.trim().toLowerCase();
+      if (existingNames.includes(trimmed)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `گله‌ای با نام «${d.name.trim()}» قبلاً ثبت شده`,
+          path: ['name'],
+        });
+      }
     }
 
     // ═══ تاریخ‌ها ترتیب منطقی ═══

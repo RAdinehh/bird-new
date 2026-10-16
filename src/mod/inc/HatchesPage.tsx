@@ -141,7 +141,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
       try { updateHatch(h.id, { generatedFlockId: newFlockId } as any); } catch {}
     }
     setFlockModal(null);
-    showAlert('گله ساخته شد', '✅ موفق');
+    toastMsg.success('گله ساخته شد');
     setTimeout(() => nav('/flk'), 500);
   };
 
@@ -163,7 +163,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
     const invId = addInvoice(data as any);
     if (invId) updateHatch(h.id, { generatedInvoiceId: invId } as any);
     setSellModal(null);
-    showAlert('فاکتور ثبت شد', '✅ موفق');
+    toastMsg.success('فاکتور ثبت شد');
   };
 
   // فیلتر/مرتب

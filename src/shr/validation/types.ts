@@ -30,6 +30,8 @@ export interface ValidationContext {
   stockItemName?: string;
   /** آیا ویرایش است؟ (id داره) */
   isEdit?: boolean;
+  /** 🆕 نام‌های موجود (lowercase، بدون گله فعلی در حالت ویرایش) */
+  existingNames?: string[];
   /** کلیدهای اضافی */
   [key: string]: any;
 }
