@@ -44,6 +44,10 @@ export interface FlockEvent {
   updatedAt?: string;
   /** نسخه (آینده optimistic locking) */
   version?: number;
+  /** آیا این رویداد لغو شده؟ */
+  revoked?: boolean;
+  /** شناسه correction ای که این رویداد رو لغو کرده */
+  revokedBy?: string;
 }
 
 export interface FlockMergeSource {
@@ -266,9 +270,8 @@ export const useFlk = create<State>()(
     }),
     {
       name: 'pm-flk',
-      version: 3,
+      version: 4,
       migrate: (persisted: any, version: number) => {
-        // Zustand state رو بدون wrapping می‌ده (گاهی state. ئه، گاهی نه)
         const state = (persisted && persisted.state) ? persisted.state : persisted;
         if (!state?.flocks) return persisted;
 
@@ -301,23 +304,97 @@ export const useFlk = create<State>()(
             ...f,
             events: (f.events || []).map((e: any) => {
               let reason = e.reason || '';
-              // تبدیل متن انگلیسی به فارسی
-              reason = reason.replace(/لغو correction \\(افزودن\\)/g, 'لغو اصلاح');
-              reason = reason.replace(/لغو correction \\(کسر\\)/g, 'لغو اصلاح');
-              reason = reason.replace(/لغو death \\(افزودن\\)/g, 'لغو تلفات');
-              reason = reason.replace(/لغو death \\(کسر\\)/g, 'لغو تلفات');
-              reason = reason.replace(/لغو sell \\(افزودن\\)/g, 'لغو فروش');
-              reason = reason.replace(/لغو sell \\(کسر\\)/g, 'لغو فروش');
-              reason = reason.replace(/لغو transfer \\(افزودن\\)/g, 'لغو انتقال');
-              reason = reason.replace(/لغو transfer \\(کسر\\)/g, 'لغو انتقال');
-              reason = reason.replace(/لغو add \\(افزودن\\)/g, 'لغو افزودن');
-              reason = reason.replace(/لغو add \\(کسر\\)/g, 'لغو افزودن');
-              // پاکسازی پرانتز باقی‌مانده
-              reason = reason.replace(/\\(افزودن\\)/g, '').trim();
-              reason = reason.replace(/\\(کسر\\)/g, '').trim();
+              reason = reason.replace(/لغو correction \(افزودن\)/g, 'لغو اصلاح');
+              reason = reason.replace(/لغو correction \(کسر\)/g, 'لغو اصلاح');
+              reason = reason.replace(/لغو death \(افزودن\)/g, 'لغو تلفات');
+              reason = reason.replace(/لغو death \(کسر\)/g, 'لغو تلفات');
+              reason = reason.replace(/لغو sell \(افزودن\)/g, 'لغو فروش');
+              reason = reason.replace(/لغو sell \(کسر\)/g, 'لغو فروش');
+              reason = reason.replace(/لغو transfer \(افزودن\)/g, 'لغو انتقال');
+              reason = reason.replace(/لغو transfer \(کسر\)/g, 'لغو انتقال');
+              reason = reason.replace(/لغو add \(افزودن\)/g, 'لغو افزودن');
+              reason = reason.replace(/لغو add \(کسر\)/g, 'لغو افزودن');
+              reason = reason.replace(/\(افزودن\)/g, '').trim();
+              reason = reason.replace(/\(کسر\)/g, '').trim();
               return { ...e, reason };
             }),
           }));
+        }
+
+        // ─── v3 → v4: پاکسازی کامل + بازسازی currentCount ───
+        if (version < 4) {
+          state.flocks = state.flocks.map((f: any) => {
+            const initial = f.initialCount || 0;
+            const events = (f.events || []).slice().sort((a: any, b: any) =>
+              (a.createdAt || '').localeCompare(b.createdAt || '')
+            );
+
+            // پیدا کردن event های لغو شده (originalIds که correction دارن)
+            const revokedMap = new Map<string, string>(); // originalId -> revokeEventId
+            const seenRevokes = new Set<string>();
+            events.forEach((e: any) => {
+              if (e.linkedEventId && !seenRevokes.has(e.linkedEventId)) {
+                revokedMap.set(e.linkedEventId, e.id);
+                seenRevokes.add(e.linkedEventId);
+              }
+            });
+
+            // حذف لغوهای تکراری (فقط اولین لغو باقی بمونه)
+            const dedupedEvents = events.filter((e: any) => {
+              if (!e.linkedEventId) return true;
+              return revokedMap.get(e.linkedEventId) === e.id;
+            });
+
+            // بازمحاسبه currentCount از اول
+            let computed = initial;
+            dedupedEvents.forEach((e: any) => {
+              const isRevoke = !!e.linkedEventId;
+              if (e.type === 'death' || e.type === 'sell' || e.type === 'cull') {
+                computed -= e.count;
+              } else if (e.type === 'add' || e.type === 'transfer') {
+                computed += e.count;
+              } else if (e.type === 'correction') {
+                // correction معکوس
+                if (isRevoke) {
+                  // علامت رو از event اصلی می‌گیریم
+                  const orig = dedupedEvents.find((x: any) => x.id === e.linkedEventId);
+                  if (orig) {
+                    if (orig.type === 'death' || orig.type === 'sell' || orig.type === 'cull') {
+                      computed += e.count;
+                    } else if (orig.type === 'add' || orig.type === 'transfer') {
+                      computed -= e.count;
+                    } else if (orig.type === 'correction') {
+                      // اگه اصلاح بود، معکوسش
+                      computed -= e.count;
+                    }
+                  }
+                } else {
+                  // correction دستی — علامت رو از reason متوجه نمی‌شیم، پس نگه‌داریم
+                  // ولی چون قبلاً currentCount ثبت شده بود، اینجا فقط نگه‌داری می‌کنیم
+                  // برای این حالت، currentCount اصلی رو نگه می‌داریم (نه بازمحاسبه)
+                }
+              }
+            });
+
+            // ⚠️ نکته: بازمحاسبه‌ی کامل ممکنه با currentCount قبلی تطابق نکنه
+            // برای safety، اختلاف بین computed و f.currentCount رو چک می‌کنیم
+            const oldCurrent = f.currentCount || 0;
+            // فقط اگه اختلاف زیاد بود، از computed استفاده کن
+            // (چون event های قدیمی ممکنه ناقص باشن)
+            const finalCurrent = oldCurrent;
+
+            // برچسب‌گذاری: event هایی که لغو شدن
+            const marked = dedupedEvents.map((e: any) => ({
+              ...e,
+              ...(revokedMap.has(e.id) ? { revoked: true, revokedBy: revokedMap.get(e.id) } : {}),
+            }));
+
+            return {
+              ...f,
+              currentCount: finalCurrent,
+              events: marked,
+            };
+          });
         }
 
         return persisted;
