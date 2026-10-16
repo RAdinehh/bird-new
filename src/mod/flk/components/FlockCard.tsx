@@ -14,7 +14,6 @@ import ExpandableCard from '../../../shr/components/ExpandableCard';
 import EntityLink from '../../../shr/components/EntityLink';
 import { Row, RowGrid } from '../helpers';
 import LifecycleBar from './LifecycleBar';
-import { showPromptAsync } from '../../../cor/store/dialog';
 import { useState } from 'react';
 import FlockHistoryModal from './FlockHistoryModal';
 import type { Bird, Breed } from '../../brd/store';
@@ -61,23 +60,6 @@ export default function FlockCard(props: FlockCardProps) {
   const untilLay = daysUntilLaying(f);
   const costs = calcCosts(f);
   const accentColor: 'accent' | 'dim' = isArchived ? 'dim' : 'accent';
-
-  const handleArchive = async () => {
-    const reason = await showPromptAsync(
-      'آرشیو گله',
-      'آرشیو «' + f.name + '»؟ این گله به بخش آرشیو منتقل می‌شود.',
-      {
-        label: 'دلیل آرشیو',
-        placeholder: 'مثلاً: فروش، پایان چرخه، تلفات کامل...',
-        required: true,
-        multiline: true,
-        rows: 2,
-        confirmText: 'آرشیو کن',
-      },
-    );
-    if (reason === null || !reason.trim()) return;
-    onArchive(reason.trim());
-  };
 
   return (
     <ExpandableCard
@@ -253,7 +235,7 @@ export default function FlockCard(props: FlockCardProps) {
         <>
           <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
             <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-            <Btn size="sm" onClick={handleArchive} style={{ flex: 1 }}>آرشیو</Btn>
+            <Btn size="sm" onClick={() => setHistoryOpen(true)} style={{ flex: 1 }}>📜 تاریخچه</Btn>
           </div>
           <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
             <Btn size="sm" onClick={onToggleHidden} style={{ flex: 1 }}>
@@ -261,11 +243,6 @@ export default function FlockCard(props: FlockCardProps) {
             </Btn>
             <Btn size="sm" onClick={onTogglePaused} style={{ flex: 1 }}>
               {f.paused ? '▶️ فعال' : '⏸ غیرفعال'}
-            </Btn>
-          </div>
-          <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
-            <Btn size="sm" onClick={() => setHistoryOpen(true)} style={{ flex: 1 }}>
-              📜 تاریخچه
             </Btn>
           </div>
         </>
