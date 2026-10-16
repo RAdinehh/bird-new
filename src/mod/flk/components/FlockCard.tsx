@@ -15,6 +15,8 @@ import EntityLink from '../../../shr/components/EntityLink';
 import { Row, RowGrid } from '../helpers';
 import LifecycleBar from './LifecycleBar';
 import { showPromptAsync } from '../../../cor/store/dialog';
+import { useState } from 'react';
+import FlockHistoryModal from './FlockHistoryModal';
 import type { Bird, Breed } from '../../brd/store';
 import type { Hall, Zone } from '../../hal/store';
 import type { useFormat } from '../../../shr/units';
@@ -51,6 +53,7 @@ export default function FlockCard(props: FlockCardProps) {
     onToggleHidden, onTogglePaused,
   } = props;
 
+  const [historyOpen, setHistoryOpen] = useState(false);
   const ageDays = getAgeDays(f);
   const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, null);
   const isArchived = f.status === 'archived' || f.status === 'sold';
@@ -260,8 +263,19 @@ export default function FlockCard(props: FlockCardProps) {
               {f.paused ? '▶️ فعال' : '⏸ غیرفعال'}
             </Btn>
           </div>
+          <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
+            <Btn size="sm" onClick={() => setHistoryOpen(true)} style={{ flex: 1 }}>
+              📜 تاریخچه
+            </Btn>
+          </div>
         </>
       )}
+
+      <FlockHistoryModal
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        flock={f}
+      />
     </ExpandableCard>
   );
 }
