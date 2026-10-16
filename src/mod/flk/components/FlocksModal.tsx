@@ -82,7 +82,7 @@ export default function FlocksModal(props: FlocksModalProps) {
       </Field>
 
       <Grid2>
-        <Field label="نوع گله" required>
+        <Field label="نوع گله" required error={vErrors.type}>
           <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as 'layer' | 'broiler' | 'breeder' })}>
             <option value="layer">تخم‌گذار</option>
             <option value="broiler">گوشتی</option>
@@ -110,7 +110,7 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🐔 پرنده و نژاد</div>
       <Grid2>
-        <Field label="پرنده" required>
+        <Field label="پرنده" required error={vErrors.birdId}>
           <SmartSelect
             value={form.birdId}
             onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))}
@@ -120,7 +120,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             autoThreshold={6}
           />
         </Field>
-        <Field label="نژاد">
+        <Field label="نژاد" error={vErrors.breedId}>
           <DependentSelect
             value={form.breedId}
             onChange={v => {
@@ -141,7 +141,7 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📍 مکان</div>
       <Grid2>
-        <Field label="سالن" required>
+        <Field label="سالن" required error={vErrors.hallId}>
           <SmartSelect
             value={form.hallId}
             onChange={v => setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
@@ -219,6 +219,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           label="سن شروع تخم‌گذاری (روز)"
           hint={layingFromStd ? 'عدد را تغییر بده اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)}
           autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
+          error={vErrors.layingStartDay}
         >
           <NumField
             value={form.layingStartDay}
@@ -257,14 +258,14 @@ export default function FlocksModal(props: FlocksModalProps) {
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>💰 هزینه‌ها</div>
 
       <Grid2>
-        <Field label="قیمت هر پرنده">
+        <Field label="قیمت هر پرنده" error={vErrors.purchasePrice}>
           <MoneyField placeholder="۰" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
         </Field>
-        <Field label="هزینه حمل">
+        <Field label="هزینه حمل" error={vErrors.deliveryCost}>
           <MoneyField placeholder="۰" value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
         </Field>
       </Grid2>
-      <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه">
+      <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه" error={vErrors.otherCosts}>
         <MoneyField placeholder="۰" value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} />
       </Field>
 

@@ -27,7 +27,7 @@ export function createFlkSchema(_context: ValidationContext = {}) {
     type: z.enum(['layer', 'broiler', 'breeder']),
     birdId: requiredId('پرنده'),
     breedId: requiredId('نژاد'),
-    hallId: optionalId(),
+    hallId: requiredId('سالن'),
     zoneId: optionalId(),
 
     initialCount: intPos('تعداد اولیه', 100000),
