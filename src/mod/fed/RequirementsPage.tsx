@@ -262,7 +262,7 @@ export default function RequirementsPage() {
                 index={toFa(i + 1)}
                 iconEmoji="📊"
                 title={r.name}
-                subtitle={`${r.birdType} · ${stageLabel}`}
+                subtitle={`${r.birdType} • ${stageLabel}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : r.id)}
                 badge={<Tag tone="blue">{toFa(r.protein)}٪ پروتئین</Tag>}

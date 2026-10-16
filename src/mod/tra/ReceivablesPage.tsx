@@ -310,7 +310,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                   <div style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
                     {label}
                     <span style={{ color: 'var(--muted)', fontWeight: 400, marginRight: 6 }}>
-                      · {toFa(items.length)}
+                      • {toFa(items.length)}
                     </span>
                   </div>
                   <div style={{
@@ -368,8 +368,8 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                                   fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1,
                                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
                                 }}>
-                                  {toFa(days)} روز · {inv.number || ''}
-                                  {dUntil !== null ? ` · ${dueLabel(dUntil)}` : ''}
+                                  {toFa(days)} روز • {inv.number || ''}
+                                  {dUntil !== null ? ` • ${dueLabel(dUntil)}` : ''}
                                 </div>
                               </div>
                               <div style={{

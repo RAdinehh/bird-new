@@ -131,7 +131,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
                 <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: 'var(--' + accentColor + ')' }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                    {toFa(i + 1)}. {DEAL_LABEL[r.dealType]} · {bird?.name || '—'}
+                    {toFa(i + 1)}. {DEAL_LABEL[r.dealType]} • {bird?.name || '—'}
                   </span>
                   <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--' + accentColor + ')', direction: 'ltr' }}>
                     {toFa(r.count || 0)} تخم
@@ -139,7 +139,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
                   <span>{party}</span>
-                  <span>{toFa(r.entryDate)}{r.entryTime ? ' · ' + toFa(r.entryTime) : ''}</span>
+                  <span>{toFa(r.entryDate)}{r.entryTime ? ' • ' + toFa(r.entryTime) : ''}</span>
                 </div>
                 <div style={{ position: 'absolute', top: 6, right: 6, display: 'flex', gap: 2 }}>
                   <button type="button" onClick={() => editRow(r)} style={{ background: 'none', border: 'none', color: 'var(--text)', cursor: 'pointer', fontSize: 'var(--fs-xs)', padding: 3 }}>✏️</button>

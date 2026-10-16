@@ -75,7 +75,7 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
           }}
         />
         <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
-          {birdName || '—'} · {toFa(count)} تخم
+          {birdName || '—'} • {toFa(count)} تخم
         </span>
         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(entryDate)}</span>
       </label>
@@ -85,7 +85,7 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
           fontSize: 'var(--fs-xs)', color: 'var(--muted)',
           padding: '4px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
         }}>
-          تجمیع قبلی: سالم {toFa(alreadyAgg.alive)} · بی‌نطفه {toFa(alreadyAgg.infertile)} · مرده {toFa(alreadyAgg.dead)}
+          تجمیع قبلی: سالم {toFa(alreadyAgg.alive)} • بی‌نطفه {toFa(alreadyAgg.infertile)} • مرده {toFa(alreadyAgg.dead)}
         </div>
       )}
 
@@ -156,7 +156,7 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
             textAlign: 'center',
           }}>
             مجموع تلفات: {toFa(sum)} از {toFa(baseInfo.base)}
-            {remaining > 0 && ' · باقی — ' + toFa(remaining)}
+            {remaining > 0 && ' • باقی — ' + toFa(remaining)}
             {remaining < 0 && ' — بیشتر از مبنای مرحله قبل!'}
             {remaining === 0 && ' ✅ کامل'}
           </div>

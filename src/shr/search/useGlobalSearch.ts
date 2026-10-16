@@ -65,7 +65,7 @@ export function useGlobalSearch(query: string): GroupedResult[] {
     const buckets: Record<string, InternalHit[]> = {
       flk: (flocks || []).filter(f => f.status !== 'archived' && f.status !== 'sold')
         .map(f => mk(f.id, 'flk', f.name,
-          [birdMap.get(f.birdId), breedMap.get(f.breedId), hallMap.get(f.hallId)].filter(Boolean).join(' · '),
+          [birdMap.get(f.birdId), breedMap.get(f.breedId), hallMap.get(f.hallId)].filter(Boolean).join(' • '),
           [f.name, f.notes, f.source, birdMap.get(f.birdId), breedMap.get(f.breedId), hallMap.get(f.hallId),
            f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر',
            f.initialCount, f.currentCount, f.hatchDate, f.purchaseDate, f.startDate,
@@ -81,7 +81,7 @@ export function useGlobalSearch(query: string): GroupedResult[] {
          h.builtAt, h.lastSanitizedAt])),
 
       ctc: (contacts || []).map(p => mk(p.id, 'ctc', p.name,
-        [p.phone, p.city].filter(Boolean).join(' · '),
+        [p.phone, p.city].filter(Boolean).join(' • '),
         [p.name, p.phone, p.phone2, p.city, p.nationalId, p.email, p.notes,
          p.position, p.address, ...(p.roles || []),
          p.roles?.includes('customer') ? 'مشتری' : '',
@@ -90,7 +90,7 @@ export function useGlobalSearch(query: string): GroupedResult[] {
          ...(p.customerTypes || []), ...(p.supplierTypes || [])])),
 
       whs: (items || []).map(it => mk(it.id, 'whs', it.name,
-        [it.batchNo, it.storage].filter(Boolean).join(' · '),
+        [it.batchNo, it.storage].filter(Boolean).join(' • '),
         [it.name, it.notes, it.batchNo, it.storage, it.category, it.unit,
          partyMap.get(it.supplierId), it.currentStock, it.lastPrice, it.minStock,
          it.expireDate, it.productionDate, it.purchaseDate, it.hallId])),
@@ -98,7 +98,7 @@ export function useGlobalSearch(query: string): GroupedResult[] {
       tra: [
         ...(invoices || []).map(inv => mk(inv.id, 'tra',
           'فاکتور \u200F' + (inv.number || '—') + '\u200F',
-          [partyMap.get(inv.partyId), inv.category].filter(Boolean).join(' · '),
+          [partyMap.get(inv.partyId), inv.category].filter(Boolean).join(' • '),
           [inv.number, inv.notes, inv.category, partyMap.get(inv.partyId),
            inv.total, inv.date, inv.dueDate, inv.workflowStatus,
            ...(inv.items || []).map((x: any) => itemMap.get(x.itemId) || x.name || '')])),
@@ -119,7 +119,7 @@ export function useGlobalSearch(query: string): GroupedResult[] {
 
       dlg: (logs || []).map(l => mk(l.id, 'dlg', 'ثبت ' + l.date,
         [hallMap.get((flocks || []).find(f => f.id === l.flockId)?.hallId || ''),
-         l.notes].filter(Boolean).join(' · '),
+         l.notes].filter(Boolean).join(' • '),
         [l.notes, l.feedType, l.ventilation, l.behavior, l.sound,
          ...(l.vaccines || []).map(v => v.name),
          ...(l.medications || []).map(m => m.name),

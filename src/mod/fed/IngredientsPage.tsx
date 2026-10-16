@@ -311,7 +311,7 @@ export default function IngredientsPage() {
                 index={toFa(i + 1)}
                 iconEmoji={CATEGORY_ICON[it.category]}
                 title={it.name}
-                subtitle={`${CATEGORY_LABEL[it.category]} · پروتئین ${toFa(it.protein)}٪`}
+                subtitle={`${CATEGORY_LABEL[it.category]} • پروتئین ${toFa(it.protein)}٪`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : it.id)}
                 badge={

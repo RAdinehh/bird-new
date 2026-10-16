@@ -272,7 +272,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
 
     // 🆕 چک vErrors
     if (Object.keys(vErrors).length > 0) {
-      const errs = Object.values(vErrors).slice(0, 3).join(' · ');
+      const errs = Object.values(vErrors).slice(0, 3).join(' • ');
       setErr(`لطفاً خطاها را برطرف کنید: ${errs}`);
       return;
     }

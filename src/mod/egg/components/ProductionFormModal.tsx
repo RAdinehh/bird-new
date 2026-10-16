@@ -81,7 +81,7 @@ export default function ProductionFormModal(props: Props) {
 
         {(int(form.eatingCount) > 0 || int(form.fertileCount) > 0) && (
           <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, lineHeight: 1.7, textAlign: 'center' }}>
-            📊 ترکیب سالم: <b>{toFa(eatingPercent)}٪ خوراکی</b> · <b>{toFa(fertilePercent)}٪ نطفه‌دار</b>
+            📊 ترکیب سالم: <b>{toFa(eatingPercent)}٪ خوراکی</b> • <b>{toFa(fertilePercent)}٪ نطفه‌دار</b>
           </div>
         )}
 

@@ -34,8 +34,8 @@ export default function HatchCard(props: HatchCardProps) {
 
             return (
               <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={toFa(i + 1)} iconEmoji="🐣"
-                title={toFa(h.hatched || 0) + ' جوجه · ' + (bird?.name || '—')}
-                subtitle={(dev?.name || '—') + ' · ' + toFa(h.date)}
+                title={toFa(h.hatched || 0) + ' جوجه • ' + (bird?.name || '—')}
+                subtitle={(dev?.name || '—') + ' • ' + toFa(h.date)}
                 isOpen={isOpen} onToggle={() => onToggle()}
                 badge={<Tag tone={tone}>{toFa(hr.toFixed(1))}٪</Tag>}
                 stats={<>

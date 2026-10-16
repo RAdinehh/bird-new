@@ -129,7 +129,7 @@ export function recalcAvgPrice(
 function assertItem(data: any): void {
   const r = validate(createItemSchema({}), data);
   if (!r.ok) {
-    const msgs = Object.values(r.errors).join(' · ');
+    const msgs = Object.values(r.errors).join(' • ');
     throw new Error('اعتبارسنجی کالا: ' + msgs);
   }
 }
@@ -138,7 +138,7 @@ function assertItem(data: any): void {
 function assertMovement(data: any): void {
   const r = validate(createMovementSchema({}), data);
   if (!r.ok) {
-    const msgs = Object.values(r.errors).join(' · ');
+    const msgs = Object.values(r.errors).join(' • ');
     throw new Error('اعتبارسنجی گردش: ' + msgs);
   }
 }

@@ -184,7 +184,7 @@ export default function LogsTab() {
                     index={toFa(i + 1)}
                     iconEmoji="📝"
                     title={entry.summary}
-                    subtitle={entry.module + ' · ' + timeStr}
+                    subtitle={entry.module + ' • ' + timeStr}
                     isOpen={isOpen}
                     onToggle={() => setExpandedId(isOpen ? null : entry.id)}
                     stats={<><span style={{ color: 'var(--' + tone + ')', fontWeight: 700 }}>{label}</span></>}

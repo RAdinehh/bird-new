@@ -185,7 +185,7 @@ export default function EditableSelect({
   );
 
   // ═══ List view ═══
-  // حالت ≤ ۵: لیست تخت · حالت > ۵: گروه‌بندی‌شده
+  // حالت ≤ ۵: لیست تخت • حالت > ۵: گروه‌بندی‌شده
   const renderItems = (
     opts: EditableOption[],
     customsList: CustomOption[],

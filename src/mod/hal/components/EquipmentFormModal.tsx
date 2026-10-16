@@ -245,7 +245,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                 return '✓ کافیه — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' (' + equipNeed.desc + ')';
               }
               const pct = equipNeed.need > 0 ? Math.round((have / equipNeed.need) * 100) : 0;
-              return '⚠ کم داره — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' · فعلی ' + pct + '٪';
+              return '⚠ کم داره — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' • فعلی ' + pct + '٪';
             })()}
           </div>
         ) : null}

@@ -24,7 +24,7 @@ export default function IdentitySection({ std, def, updateBird, overrides, setOv
     <SettingsGroup
       icon="📝"
       title="شناسه نژاد"
-      subtitle={changed ? '🔸 تغییر یافته' : `${std.nameFa} · ${std.birdName}`}
+      subtitle={changed ? '🔸 تغییر یافته' : `${std.nameFa} • ${std.birdName}`}
       exclusiveGroup="std-sections"
       persist={false}
       tone="info"

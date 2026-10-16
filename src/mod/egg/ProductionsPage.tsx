@@ -296,7 +296,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
                 index={toFa(i + 1)}
                 iconEmoji="🥚"
                 title={toFa(healthy2) + ' تخم سالم — ' + (flock?.name || '—')}
-                subtitle={toFa(p.date) + (bird ? ' · ' + bird.name : '') + (ageDays > 0 ? ' · ' + toFa(ageDays) + ' روز' : '')}
+                subtitle={toFa(p.date) + (bird ? ' • ' + bird.name : '') + (ageDays > 0 ? ' • ' + toFa(ageDays) + ' روز' : '')}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : p.id)}
                 badge={rate > 0 ? <Tag tone={tone}>{toFa(rate.toFixed(1))}٪</Tag> : undefined}

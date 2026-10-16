@@ -93,7 +93,7 @@ function BreedCard({
           whiteSpace: 'nowrap',
         }}>
           {isNative ? 'بومی' : 'صنعتی'}
-          {flockCount > 0 ? ` · ${fmt.int(flockCount)} گله` : ''}
+          {flockCount > 0 ? ` • ${fmt.int(flockCount)} گله` : ''}
         </div>
       </div>
     </button>

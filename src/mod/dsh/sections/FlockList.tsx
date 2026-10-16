@@ -147,7 +147,7 @@ export default function FlockList({ activeFlocks, birds, productions, nav }: Pro
                                   return (
                                     <div
                                       key={idx}
-                                      title={mk.label + ' · روز ' + toFa(mk.day)}
+                                      title={mk.label + ' • روز ' + toFa(mk.day)}
                                       style={{
                                         position: 'absolute',
                                         top: 29,

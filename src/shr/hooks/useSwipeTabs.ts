@@ -79,7 +79,7 @@ export function useSwipeTabs(
       const idsArr = idsRef.current;
       const idx = idsArr.indexOf(activeRef.current);
       if (idx < 0) return;
-      // RTL: swipe چپ (dx<0) = tab بعدی · swipe راست (dx>0) = tab قبلی
+      // RTL: swipe چپ (dx<0) = tab بعدی • swipe راست (dx>0) = tab قبلی
       const nextIdx = dx < 0 ? idx + 1 : idx - 1;
       if (nextIdx < 0 || nextIdx >= idsArr.length) return;
       onChangeRef.current(idsArr[nextIdx]);

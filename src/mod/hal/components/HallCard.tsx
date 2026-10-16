@@ -93,7 +93,7 @@ export default function HallCard(props: HallCardProps) {
 
   return (
     <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={fmt.int(i + 1)} iconEmoji="🏭"
-      title={h.name + (h.code ? ` · ${h.code}` : '')}
+      title={h.name + (h.code ? ` • ${h.code}` : '')}
       subtitle={h.length ? `${toFa(h.length)}×${toFa(h.width || 0)}×${toFa(h.height || 0)} متر` : 'ابعاد وارد نشده'}
       isOpen={isOpen} onToggle={onToggle}
       badge={<>

@@ -145,7 +145,7 @@ export default function AlertTabPanel({ tab, active: isActive }: Props) {
                 index={toFa(i + 1)}
                 iconEmoji={LEVEL_ICON[a.level]}
                 title={a.title}
-                subtitle={CATEGORY_LABEL[a.category] + ' · ' + toFa(a.date)}
+                subtitle={CATEGORY_LABEL[a.category] + ' • ' + toFa(a.date)}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : a.id)}
                 badge={<Tag tone={a.level === 'critical' ? 'red' : a.level === 'important' ? 'amber' : 'blue'}>{LEVEL_LABEL[a.level]}</Tag>}

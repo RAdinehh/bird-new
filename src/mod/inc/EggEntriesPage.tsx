@@ -194,10 +194,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
       <div key={row._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 4 }}>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
           <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {toFa(idx + 1)}. {DEAL_LABEL[row.dealType]} · {bird?.name || '—'} · {toFa(row.count || 0)} تخم
+            {toFa(idx + 1)}. {DEAL_LABEL[row.dealType]} • {bird?.name || '—'} • {toFa(row.count || 0)} تخم
           </span>
           <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {party} · {toFa(row.entryDate)}
+            {party} • {toFa(row.entryDate)}
           </span>
         </div>
         <button type="button" onClick={() => editRow(row)} aria-label="ویرایش ردیف" style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--text)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', padding: '6px 10px', minWidth: 36, minHeight: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>✏️</button>

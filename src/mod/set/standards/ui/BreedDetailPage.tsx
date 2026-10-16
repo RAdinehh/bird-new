@@ -124,8 +124,8 @@ export default function BreedDetailPage() {
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>{std.nameFa}</div>
             <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1 }}>
-              {std.birdName} · {std.category === 'native' ? 'بومی' : std.category === 'fancy' ? 'تزئینی' : 'صنعتی'}
-              {isCustom ? ' · ویرایش شده' : ''}
+              {std.birdName} • {std.category === 'native' ? 'بومی' : std.category === 'fancy' ? 'تزئینی' : 'صنعتی'}
+              {isCustom ? ' • ویرایش شده' : ''}
             </div>
           </div>
         </div>

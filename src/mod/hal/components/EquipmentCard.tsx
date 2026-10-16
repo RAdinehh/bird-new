@@ -49,7 +49,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 index={toFa(i + 1)}
                 iconEmoji={meta.icon}
                 title={e.name}
-                subtitle={[meta.name, e.brand, _isDeleted ? 'حذف‌شده' : null, hall?.name].filter(Boolean).join(' · ')}
+                subtitle={[meta.name, e.brand, _isDeleted ? 'حذف‌شده' : null, hall?.name].filter(Boolean).join(' • ')}
                 isOpen={isOpen}
                 onToggle={onToggle}
                 badge={

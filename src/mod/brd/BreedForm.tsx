@@ -207,7 +207,7 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
           </div>
           {(std.source || std.publishYear) && (
             <div style={{ fontSize: 'var(--fs-2xs)', opacity: 0.85, marginBottom: 3 }}>
-              {std.source}{std.publishYear && ` · ${std.publishYear}`}
+              {std.source}{std.publishYear && ` • ${std.publishYear}`}
             </div>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 8px' }}>

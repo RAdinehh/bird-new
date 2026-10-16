@@ -132,7 +132,7 @@ export default function EquipmentCard({ nav }: Props) {
               }}>
                 <span style={{ color: 'var(--text)' }}>{label}</span>
                 <span style={{ color: 'var(--muted)' }}>
-                  {toFa(row.count)} قلم · {toFa(row.value.toLocaleString('fa-IR'))} ت
+                  {toFa(row.count)} قلم • {toFa(row.value.toLocaleString('fa-IR'))} ت
                 </span>
               </div>
             );

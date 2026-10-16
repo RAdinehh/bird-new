@@ -17,7 +17,7 @@ export default function NutritionSection({ std, def, updateBird }: SectionProps)
 
   const subtitle = changed
     ? '🔸 تغییر یافته'
-    : `${fmt.int(std.feed.length)} مرحله دان · ${fmt.int(std.growth.weightByAge.length)} نقطه رشد`;
+    : `${fmt.int(std.feed.length)} مرحله دان • ${fmt.int(std.growth.weightByAge.length)} نقطه رشد`;
 
   return (
     <SettingsGroup

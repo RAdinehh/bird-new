@@ -1,6 +1,6 @@
 /**
  * UpcomingFlocks — گله‌های نزدیک به شروع تخم‌گذاری
- * طراحی: رینگ دایره‌ای + responsive (۱-۳ تک‌ستونه · ۴+ دو‌ستونه)
+ * طراحی: رینگ دایره‌ای + responsive (۱-۳ تک‌ستونه • ۴+ دو‌ستونه)
  * الگو: FOUNDATION-PATTERNS ب۲۲ (KPI Cards)
  */
 import { toFa } from '../../../shr/utils/fa';

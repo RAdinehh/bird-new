@@ -104,7 +104,7 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
           style={{ width: 20, height: 20, accentColor: 'var(--accent)', cursor: 'pointer', flexShrink: 0 }}
         />
         <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
-          {birdName || '—'} · {toFa(e.count || 0)} تخم
+          {birdName || '—'} • {toFa(e.count || 0)} تخم
         </span>
         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{deviceName || ''}</span>
         <span style={{
@@ -125,7 +125,7 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
           {calc.byStage.map((st, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>کندلینگ روز {toFa(st.stage)}:</span>
-              <span>بی‌نطفه {toFa(st.infertile)} · مرده {toFa(st.dead)} · شکسته {toFa(st.broken)}</span>
+              <span>بی‌نطفه {toFa(st.infertile)} • مرده {toFa(st.dead)} • شکسته {toFa(st.broken)}</span>
             </div>
           ))}
           <div style={{
@@ -321,7 +321,7 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
             fontWeight: 700, textAlign: 'center',
           }}>
             این هچ: {toFa(sumE)} از {toFa(e.count || 0)}
-            {rem > 0 && ' · باقی — ' + toFa(rem)}
+            {rem > 0 && ' • باقی — ' + toFa(rem)}
             {rem < 0 && ' — بیشتر!'}
             {rem === 0 && ' ✅'}
           </div>
@@ -365,7 +365,7 @@ function ProgressBar({ label, remaining, ok }: { label: string; remaining: numbe
       color,
       fontWeight: 700, textAlign: 'center',
     }}>
-      {label}{!ok ? ' 🔴 ' + toFa(Math.abs(remaining)) + ' اضافی' : remaining === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(remaining) + ' باقی'}
+      {label}{!ok ? ' 🔴 ' + toFa(Math.abs(remaining)) + ' اضافی' : remaining === 0 ? ' ✅ کامل' : ' • ⏳ ' + toFa(remaining) + ' باقی'}
     </div>
   );
 }

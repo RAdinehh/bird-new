@@ -81,7 +81,7 @@ export default function HatchFormModal(props: HatchFormModalProps) {
               const dev = devicesById[e.deviceId];
               return (
                 <option key={e.id} value={e.id}>
-                  {bird?.name || '—'} · {toFa(e.entryDate)} · {toFa(e.count || 0)} تخم · {dev?.name || ''}
+                  {bird?.name || '—'} • {toFa(e.entryDate)} • {toFa(e.count || 0)} تخم • {dev?.name || ''}
                 </option>
               );
             })}
@@ -287,7 +287,7 @@ function StatusBar({ label, remaining, ok }: { label: string; remaining: number;
       fontSize: 'var(--fs-xs)', color,
       fontWeight: 700, textAlign: 'center',
     }}>
-      {label}{!ok ? ' 🔴 اضافی' : remaining === 0 ? ' ✅ کامل' : ' · ⏳ ' + toFa(remaining) + ' باقی'}
+      {label}{!ok ? ' 🔴 اضافی' : remaining === 0 ? ' ✅ کامل' : ' • ⏳ ' + toFa(remaining) + ' باقی'}
     </div>
   );
 }

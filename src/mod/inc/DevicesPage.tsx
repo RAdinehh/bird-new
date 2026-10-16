@@ -332,7 +332,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
             const w = warrantyInfo(d.purchasedAt, d.warranty);
             return (
               <ExpandableCard key={d.id} id={d.id} ms={ms} accent={accentFor(d.status)} index={toFa(i + 1)} iconEmoji="🥚"
-                title={d.name} subtitle={MODE_FA[d.mode] + ' · ' + STATUS_FA[d.status]}
+                title={d.name} subtitle={MODE_FA[d.mode] + ' • ' + STATUS_FA[d.status]}
                 isOpen={isOpen} onToggle={() => setExpandedId(isOpen ? null : d.id)}
                 badge={activeEntries > 0 ? <Tag tone="green">{toFa(activeEntries)} ورودی فعال</Tag> : undefined}
                 stats={<>

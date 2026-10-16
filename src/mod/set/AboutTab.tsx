@@ -55,7 +55,7 @@ export default function AboutTab() {
               مدیریت مرغداری
             </div>
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-              نسخه ۰.۹.۱ · PWA آفلاین
+              نسخه ۰.۹.۱ • PWA آفلاین
             </div>
           </div>
           <Tag tone="green">آخرین</Tag>

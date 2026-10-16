@@ -233,7 +233,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                 index={toFa(i + 1)}
                 iconEmoji="🤝"
                 title={`${DEAL_LABEL[d.type]} — ${d.description}`}
-                subtitle={`${party?.name || '—'} · ${toFa(d.date)}`}
+                subtitle={`${party?.name || '—'} • ${toFa(d.date)}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : d.id)}
                 badge={<Tag tone={d.status === 'settled' ? 'green' : d.status === 'cancelled' ? 'gray' : 'amber'}>{STATUS_LABEL[d.status]}</Tag>}

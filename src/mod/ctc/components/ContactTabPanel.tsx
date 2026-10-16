@@ -168,7 +168,7 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
                 index={toFa(i + 1)}
                 iconEmoji={avatarLetter(p.name)}
                 title={p.name}
-                subtitle={`${p.phone || '—'}${p.city ? ` · ${p.city}` : ''}`}
+                subtitle={`${p.phone || '—'}${p.city ? ` • ${p.city}` : ''}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : p.id)}
                 badge={

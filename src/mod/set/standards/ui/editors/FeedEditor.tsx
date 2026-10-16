@@ -19,7 +19,7 @@ export function FeedEditor({
           key={i}
           title={
             r.phaseName
-              ? `${r.phaseName} · روز ${fmt.int(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : fmt.int(r.dayTo)}`
+              ? `${r.phaseName} • روز ${fmt.int(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : fmt.int(r.dayTo)}`
               : `روز ${fmt.int(r.dayFrom)} تا ${r.dayTo === 9999 ? 'پایان' : fmt.int(r.dayTo)}`
           }
         >
@@ -93,7 +93,7 @@ export function FeedEditor({
               lineHeight: 1.8,
             }}>
               <b style={{ color: 'var(--text)' }}>مواد اصلی:</b>{' '}
-              {r.mainIngredients.join(' · ')}
+              {r.mainIngredients.join(' • ')}
             </div>
           )}
         </RangeCard>

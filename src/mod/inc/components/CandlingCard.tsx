@@ -53,7 +53,7 @@ export default function CandlingCard(props: CandlingCardProps) {
       accent="accent"
       iconEmoji="🔍"
       title={birdName || '—'}
-      subtitle={`${deviceName || '—'} · ${toFa(entryTotal)} تخم · ${toFa(entryDate || '—')}`}
+      subtitle={`${deviceName || '—'} • ${toFa(entryTotal)} تخم • ${toFa(entryDate || '—')}`}
       isOpen={isOpen}
       onToggle={onToggle}
       badge={<Tag tone={lossTone}>تلفات {toFa(lossPercent.toFixed(0))}٪</Tag>}

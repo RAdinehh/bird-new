@@ -302,7 +302,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
             fontSize: 11, color: 'var(--muted)', lineHeight: 1.8,
           }}>
             🔍 <b style={{ color: 'var(--text)' }}>روزهای تخم‌نما:</b>{' '}
-            {std.incubation.candlingDays.join(' · ')}
+            {std.incubation.candlingDays.join(' • ')}
           </div>
         )}
       </div>

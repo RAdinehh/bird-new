@@ -120,7 +120,7 @@ export default function DebugPanel() {
         padding: '6px 12px', borderTop: '1px solid rgba(255,255,255,0.15)',
         opacity: 0.6, fontSize: 10,
       }}>
-        💡 activate: ?debug=bus · click 🐛 button to reopen
+        💡 activate: ?debug=bus • click 🐛 button to reopen
       </div>
     </div>
   );

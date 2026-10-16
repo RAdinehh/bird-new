@@ -147,7 +147,7 @@ export function RowWithStatus({
       }}>
         {showIcon && <span style={{ fontSize: 'var(--fs-sm)', flexShrink: 0 }}>{showIcon}</span>}
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {v}{hint && <span style={{ color: 'var(--muted)', fontWeight: 500, marginRight: 4 }}> · {hint}</span>}
+          {v}{hint && <span style={{ color: 'var(--muted)', fontWeight: 500, marginRight: 4 }}> • {hint}</span>}
         </span>
       </span>
     </div>

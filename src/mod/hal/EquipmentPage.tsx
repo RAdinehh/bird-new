@@ -65,7 +65,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const [saveAttempted, setSaveAttempted] = useState(false);
   const handleOpenNew = () => { setSaveAttempted(false); openNew(); };
   const handleOpenEdit = (e: Equipment) => { setSaveAttempted(false); openEdit(e); };
-  const handleSave = () => { setSaveAttempted(true); if (Object.keys(vErrors).length > 0) { setErr(Object.values(vErrors).slice(0, 2).join(' · ')); return; } saveForm(equipment, addEquip, updateEquip); };
+  const handleSave = () => { setSaveAttempted(true); if (Object.keys(vErrors).length > 0) { setErr(Object.values(vErrors).slice(0, 2).join(' • ')); return; } saveForm(equipment, addEquip, updateEquip); };
 
   useFab(active ? { label: 'افزودن تجهیز', onClick: handleOpenNew } : null);
 

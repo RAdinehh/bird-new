@@ -183,7 +183,7 @@ export default function AnalyticsCards({
                     icon="📥"
                     label={`فروش ماه ${momComparison.salesChange !== 0 ? (momComparison.salesChange > 0 ? '📈' : '📉') : ''}`}
                     value={salesThisMonth}
-                    unit={`تومان${momComparison.salesChange !== 0 ? ` · ${momComparison.salesChange > 0 ? '+' : ''}${toFa(momComparison.salesChange)}٪` : ''}`}
+                    unit={`تومان${momComparison.salesChange !== 0 ? ` • ${momComparison.salesChange > 0 ? '+' : ''}${toFa(momComparison.salesChange)}٪` : ''}`}
                     color="accent"
                     onClick={() => nav('/tra')}
                   />
@@ -191,7 +191,7 @@ export default function AnalyticsCards({
                     icon="📤"
                     label={`خرید ماه ${momComparison.purchaseChange !== 0 ? (momComparison.purchaseChange > 0 ? '📈' : '📉') : ''}`}
                     value={purchasesThisMonth}
-                    unit={`تومان${momComparison.purchaseChange !== 0 ? ` · ${momComparison.purchaseChange > 0 ? '+' : ''}${toFa(momComparison.purchaseChange)}٪` : ''}`}
+                    unit={`تومان${momComparison.purchaseChange !== 0 ? ` • ${momComparison.purchaseChange > 0 ? '+' : ''}${toFa(momComparison.purchaseChange)}٪` : ''}`}
                     color="warn"
                     onClick={() => nav('/tra')}
                   />

@@ -109,7 +109,7 @@ export function ListCard({ file, onPreview, onDelete }: { file: DocFile; onPrevi
           textOverflow: 'ellipsis'
         }}>{file.name}</div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-          {formatSize(file.size)} · {CATEGORY_LABEL[file.category]}
+          {formatSize(file.size)} • {CATEGORY_LABEL[file.category]}
         </div>
       </div>
       <button type="button" onClick={onDelete} style={iconBtn}>🗑</button>

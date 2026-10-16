@@ -64,7 +64,7 @@ export default function EggEntryCard(props: EggEntryCardProps) {
       accent={accent}
       index={toFa(i + 1)}
       iconEmoji="🥚"
-      title={toFa(e.count || 0) + ' تخم · ' + (bird?.name || '—') + (breed ? ' (' + breed.name + ')' : '')}
+      title={toFa(e.count || 0) + ' تخم • ' + (bird?.name || '—') + (breed ? ' (' + breed.name + ')' : '')}
       subtitle={dev?.name || '—'}
       isOpen={isOpen}
       onToggle={onToggle}
@@ -83,7 +83,7 @@ export default function EggEntryCard(props: EggEntryCardProps) {
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📋 مشخصات</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <Row l="دستگاه" v={dev?.name || '—'} />
-        <Row l="پرنده" v={(bird?.name || '—') + (breed ? ' · ' + breed.name : '')} />
+        <Row l="پرنده" v={(bird?.name || '—') + (breed ? ' • ' + breed.name : '')} />
         <Row l="تعداد" v={toFa(e.count || 0) + ' تخم'} />
         {e.sampleWeightInitial && e.sampleWeightCurrent && (() => {
           const pct = calcWeightLossPct(e.sampleWeightInitial, e.sampleWeightCurrent);

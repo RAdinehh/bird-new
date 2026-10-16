@@ -174,7 +174,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           hint={form.vaccineScheduleId ? undefined : 'برای افزودن خودکار واکسن‌ها به تقویم'}
           autoFrom={form.vaccineScheduleId ? (() => {
             const sch = getSchedule(form.vaccineScheduleId);
-            return sch ? `تقویم · ${sch.items.length} مرحله` : 'تقویم';
+            return sch ? `تقویم • ${sch.items.length} مرحله` : 'تقویم';
           })() : undefined}
         >
           <Select value={form.vaccineScheduleId} onChange={e => setForm({ ...form, vaccineScheduleId: e.target.value })}>

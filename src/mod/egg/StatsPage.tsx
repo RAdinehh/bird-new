@@ -289,7 +289,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
                       </div>
                       <div style={{ textAlign: 'left' }}>
                         <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(r.healthy.toLocaleString('fa-IR'))}</div>
-                        <div style={{ fontSize: '10px', color: 'var(--muted)' }}>سالم{brokenPct > 0 ? ` · ${toFa(brokenPct)}٪ شکسته` : ''}</div>
+                        <div style={{ fontSize: '10px', color: 'var(--muted)' }}>سالم{brokenPct > 0 ? ` • ${toFa(brokenPct)}٪ شکسته` : ''}</div>
                       </div>
                     </div>
                   );

@@ -298,7 +298,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
                 index={toFa(i + 1)}
                 iconEmoji="🛒"
                 title={party?.name || '—'}
-                subtitle={`${toFa(inv.date)}${inv.number ? ` · ${inv.number}` : ''}`}
+                subtitle={`${toFa(inv.date)}${inv.number ? ` • ${inv.number}` : ''}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : inv.id)}
                 badge={
@@ -344,12 +344,12 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
                     {inv.payments.map(p => (
                       <div key={p.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span>{p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} · {toFa(p.date)}</span>
+                          <span>{p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • {toFa(p.date)}</span>
                           <span style={{ fontWeight: 600 }}>{toFa(p.amount.toLocaleString('fa-IR'))} ت</span>
                         </div>
                         {p.method === 'check' && (
                           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                            چک {p.checkNo} · {p.bank} · {CHECK_STATUS_LABEL[p.status || 'pending']}
+                            چک {p.checkNo} • {p.bank} • {CHECK_STATUS_LABEL[p.status || 'pending']}
                           </div>
                         )}
                       </div>

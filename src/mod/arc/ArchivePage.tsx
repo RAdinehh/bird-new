@@ -101,7 +101,7 @@ export default function ArchivePage() {
                 index={toFa(i + 1)}
                 iconEmoji="🗄"
                 title={f.name}
-                subtitle={(bird?.name || '—') + (breed ? ' · ' + breed.name : '') + (hall ? ' · ' + hall.name : '')}
+                subtitle={(bird?.name || '—') + (breed ? ' • ' + breed.name : '') + (hall ? ' • ' + hall.name : '')}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : f.id)}
                 badge={<Tag tone={f.status === 'sold' ? 'green' : 'gray'}>{statusLabel}</Tag>}

@@ -56,7 +56,7 @@ export default function ItemCard(props: ItemCardProps) {
   return (
     <ExpandableCard key={it.id} id={it.id} ms={ms} accent={accent} index={toFa(i + 1)}
       iconEmoji={(CATEGORY_ICON as any)[it.category]} title={it.name}
-      subtitle={`${(CATEGORY_LABEL as any)[it.category]} · ${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit]}`}
+      subtitle={`${(CATEGORY_LABEL as any)[it.category]} • ${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit]}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={
         it.currentStock < 0 ? <Tag tone="red">⚠️ منفی</Tag> :

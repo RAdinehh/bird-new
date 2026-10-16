@@ -104,7 +104,7 @@ export default function CandlingFormModal(props: CandlingFormModalProps) {
           display: 'flex', justifyContent: 'space-between',
         }}>
           <span>🐣 {firstSelectedBirdName}</span>
-          <span>مدت {toFa(profile.totalDays)} روز · قفل {toFa(profile.lockdownDay)}</span>
+          <span>مدت {toFa(profile.totalDays)} روز • قفل {toFa(profile.lockdownDay)}</span>
         </div>
       ) : null}
 

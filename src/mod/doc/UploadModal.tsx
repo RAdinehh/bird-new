@@ -130,7 +130,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
               {file.name}
             </div>
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-              {formatSize(file.size)} · {CATEGORY_LABEL[category]}
+              {formatSize(file.size)} • {CATEGORY_LABEL[category]}
             </div>
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: 4 }}>
               برای تغییر، دوباره بزنید

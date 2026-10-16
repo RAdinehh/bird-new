@@ -216,7 +216,7 @@ export function getLifecycle(
   const cycle =
     (endOfCycleDay && endOfCycleDay > 0) ? endOfCycleDay :
     (birdCycleDays && birdCycleDays > 0) ? birdCycleDays :
-    (type === 'broiler' ? 42 : 500);
+    (type === 'broiler' ? 42 : 700);
   const p = (ageDays / cycle) * 100;
 
   if (type === 'broiler') {

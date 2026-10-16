@@ -80,7 +80,7 @@ export default function ZoneFormModal({
             <span>
               ارثی از سالن:
               {hallBird ? ` 🐔 ${hallBird.name}` : ''}
-              {hallBreed ? ` · 🧬 ${hallBreed.name}` : ''}
+              {hallBreed ? ` • 🧬 ${hallBreed.name}` : ''}
             </span>
           </div>
         );

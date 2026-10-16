@@ -19,7 +19,7 @@ export default function HealthSection({ std, def, updateBird, overrides, setOver
 
   const subtitle = changed
     ? '🔸 تغییر یافته'
-    : `${fmt.int(std.mortality.length)} مرحله · کل ${fmt.num(std.mortalityTotalPct)}٪`;
+    : `${fmt.int(std.mortality.length)} مرحله • کل ${fmt.num(std.mortalityTotalPct)}٪`;
 
   const onOver = (path: string) => (v: any) => setOverride?.(path, v);
   const onReset = (path: string) => () => clearOverride?.(path);

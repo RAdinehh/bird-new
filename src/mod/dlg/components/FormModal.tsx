@@ -78,8 +78,8 @@ export default function FormModal(props: FormModalProps) {
       {flockAliveCount > 0 && (
         <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, textAlign: 'center' }}>
           تعداد زنده گله: {toFa(flockAliveCount)} پرنده
-          {form.feedMethod && ` · دانخوری — ${FEED_SYSTEM_LABEL[form.feedMethod as 'manual' | 'auto'] || '—'}`}
-          {form.waterMethod && ` · آبخوری — ${WATER_SYSTEM_LABEL[form.waterMethod as 'manual' | 'nipple' | 'trough' | 'tank'] || '—'}`}
+          {form.feedMethod && ` • دانخوری — ${FEED_SYSTEM_LABEL[form.feedMethod as 'manual' | 'auto'] || '—'}`}
+          {form.waterMethod && ` • آبخوری — ${WATER_SYSTEM_LABEL[form.waterMethod as 'manual' | 'nipple' | 'trough' | 'tank'] || '—'}`}
         </div>
       )}
 

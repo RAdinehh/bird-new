@@ -3,21 +3,47 @@
  */
 import type { ReactNode } from 'react';
 
-export function Row({ l, v, autoFrom }: { l: string; v: string; autoFrom?: string }) {
+/** ردیف‌های کوتاه (مقدار، تاریخ) — با autoFrom */
+export function Row({
+  l, v, accent, autoFrom,
+}: {
+  l: ReactNode;
+  v: ReactNode;
+  accent?: boolean;
+  autoFrom?: string;
+}) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+    <div style={{
+      display: 'flex', flexDirection: 'column', gap: 2,
+      padding: 'var(--pad-tight)',
+      background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
+      borderRadius: 'var(--r-sm)',
+    }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-        <span style={{ color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+        <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
           {l}:
           {autoFrom && <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block', flexShrink: 0 }} />}
         </span>
-        <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
+        <span style={{ fontWeight: 600, color: accent ? 'var(--accent)' : 'var(--text)' }}>{v}</span>
       </div>
       {autoFrom && (
         <div style={{ fontSize: 10, color: 'var(--accent)', fontWeight: 600, opacity: 0.85, textAlign: 'left' }}>
           {'✨ از ' + autoFrom}
         </div>
       )}
+    </div>
+  );
+}
+
+/** 🆕 گرید دو ستونه برای Row های کوتاه */
+export function RowGrid({ children }: { children: ReactNode }) {
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: 'var(--sp-1)',
+    }}>
+      {children}
     </div>
   );
 }

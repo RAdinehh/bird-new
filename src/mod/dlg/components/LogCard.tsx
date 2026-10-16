@@ -73,7 +73,7 @@ export default function LogCard(props: LogCardProps) {
       id={l.id} ms={ms} accent={accent}
       index={toFa(i + 1)} iconEmoji="📋"
       title={flock?.name || '—'}
-      subtitle={`${toFa(l.date)}${l.entryTime ? ` · ${toFa(l.entryTime)}` : ''}${birdName ? ` · ${birdName}` : ''}`}
+      subtitle={`${toFa(l.date)}${l.entryTime ? ` • ${toFa(l.entryTime)}` : ''}${birdName ? ` • ${birdName}` : ''}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={l.deathsCount > 0 ? <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag> : undefined}
       stats={<>
@@ -86,7 +86,7 @@ export default function LogCard(props: LogCardProps) {
       {(tWarn !== 'ok' || hWarn !== 'ok') && (
         <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>
           ⚠ {tWarn !== 'ok' ? `دما ${tWarn === 'danger' ? 'خطرناک' : 'نامناسب'}` : ''}
-          {tWarn !== 'ok' && hWarn !== 'ok' ? ' · ' : ''}
+          {tWarn !== 'ok' && hWarn !== 'ok' ? ' • ' : ''}
           {hWarn !== 'ok' ? `رطوبت ${hWarn === 'danger' ? 'خطرناک' : 'نامناسب'}` : ''}
         </div>
       )}
@@ -167,7 +167,7 @@ export default function LogCard(props: LogCardProps) {
         <Section title="💉 واکسن">
           {l.vaccines.map(v => (
             <div key={v.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', color: 'var(--accent)' }}>
-              <b>{v.name}</b>{v.dose ? ` — دوز ${v.dose}` : ''}{v.method ? ` · ${v.method}` : ''}
+              <b>{v.name}</b>{v.dose ? ` — دوز ${v.dose}` : ''}{v.method ? ` • ${v.method}` : ''}
             </div>
           ))}
         </Section>
@@ -177,7 +177,7 @@ export default function LogCard(props: LogCardProps) {
         <Section title="💊 دارو">
           {l.medications.map(m => (
             <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: 'var(--text)' }}>
-              <b>{m.name}</b>{m.dose ? ` — ${m.dose}` : ''}{m.withdrawalDays ? ` · منع مصرف ${toFa(m.withdrawalDays)} روز` : ''}
+              <b>{m.name}</b>{m.dose ? ` — ${m.dose}` : ''}{m.withdrawalDays ? ` • منع مصرف ${toFa(m.withdrawalDays)} روز` : ''}
             </div>
           ))}
         </Section>

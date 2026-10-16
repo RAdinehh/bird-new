@@ -263,7 +263,7 @@ export default function FormulasPage() {
                 index={toFa(i + 1)}
                 iconEmoji="🌾"
                 title={f.name}
-                subtitle={`${req ? req.name : '—'} · ${toFa(f.date)}`}
+                subtitle={`${req ? req.name : '—'} • ${toFa(f.date)}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : f.id)}
                 badge={<Tag tone={statusTone}>{statusLabel}</Tag>}

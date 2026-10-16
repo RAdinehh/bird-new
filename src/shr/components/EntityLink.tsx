@@ -1,13 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { toFa } from '../utils/fa';
 
-type EntityType = 'flock' | 'bird' | 'breed' | 'hall' | 'party' | 'invoice' | 'item' | 'device' | 'log';
+type EntityType = 'flock' | 'bird' | 'breed' | 'hall' | 'zone' | 'party' | 'invoice' | 'item' | 'device' | 'log';
 
 const MAP: Record<EntityType, { path: string; icon: string; color: string; tab?: string }> = {
   flock:   { path: '/flk', icon: '🐔', color: 'var(--accent)' },
   bird:    { path: '/brd', icon: '🐣', color: 'var(--purple)', tab: 'birds' },
   breed:   { path: '/brd', icon: '🧬', color: 'var(--purple)', tab: 'breeds' },
   hall:    { path: '/hal', icon: '🏠', color: 'var(--info)' },
+  zone:    { path: '/hal', icon: '📦', color: 'var(--purple)', tab: 'zones' },
   party:   { path: '/ctc', icon: '👤', color: 'var(--warn)' },
   invoice: { path: '/tra', icon: '📄', color: 'var(--info)' },
   item:    { path: '/whs', icon: '📦', color: 'var(--accent)' },

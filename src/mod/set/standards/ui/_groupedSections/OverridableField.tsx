@@ -278,7 +278,7 @@ export default function OverridableField({
           paddingRight: 4,
           lineHeight: 1.4,
         }}>
-          تغییر یافته · استاندارد: {displayDefault}{unit ? ' ' + unit : ''}
+          تغییر یافته • استاندارد: {displayDefault}{unit ? ' ' + unit : ''}
         </div>
       )}
     </div>

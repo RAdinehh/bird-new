@@ -225,7 +225,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     setSaveAttempted(true);
     // 🆕 اگه خطای اعتبارسنجی هست، نشون بده
     if (Object.keys(vErrors).length > 0) {
-      const errs = Object.values(vErrors).slice(0, 3).join(' · ');
+      const errs = Object.values(vErrors).slice(0, 3).join(' • ');
       setErr(`لطفاً خطاها را برطرف کنید: ${errs}`);
       return;
     }

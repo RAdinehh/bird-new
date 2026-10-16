@@ -105,7 +105,7 @@ export default function FeedSection({ form, setForm, vErrors }: Props) {
         return (
           <div style={{ padding: 'var(--pad-normal)', background: warn ? 'var(--warn-soft)' : 'var(--accent-soft)', border: `1px solid ${warn ? 'var(--warn)' : 'var(--accent-border)'}`, borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: warn ? 'var(--warn)' : 'var(--accent)', fontWeight: 600 }}>
             موجودی فعلی: {toFa(it.currentStock)} {UNIT_LABEL[it.unit]}
-            {used > 0 && ` · بعد از مصرف — ${toFa(after)} ${UNIT_LABEL[it.unit]}`}
+            {used > 0 && ` • بعد از مصرف — ${toFa(after)} ${UNIT_LABEL[it.unit]}`}
             {warn && ' ⚠️ زیر حد هشدار'}
           </div>
         );

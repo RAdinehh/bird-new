@@ -150,7 +150,7 @@ export const INGREDIENT_STANDARDS: StandardIngredient[] = [
     protein: 0, energy: 0, fat: 0, fiber: 0,
     calcium: 0, phosphorus: 0, methionine: 0, lysine: 0,
     minPercent: 0, maxPercent: 1,
-    notes: 'سدیم ۳۹٪ · کلر ۶۱٪',
+    notes: 'سدیم ۳۹٪ • کلر ۶۱٪',
   },
   {
     key: 'rock_salt',

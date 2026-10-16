@@ -143,7 +143,7 @@ export default function TopAlerts({
                       >
                         <span style={{ fontWeight: 600 }}>{party?.name || '—'}</span>
                         <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>
-                          چک {pay.checkNo || '—'} · {pay.bank || '—'}
+                          چک {pay.checkNo || '—'} • {pay.bank || '—'}
                         </span>
                         <span style={{ fontWeight: 700, color: 'var(--amber)' }}>
                           {toFa(pay.amount.toLocaleString('fa-IR'))} ت

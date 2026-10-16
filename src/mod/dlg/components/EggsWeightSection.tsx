@@ -47,7 +47,7 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
           <Field label="خلاصه">
             <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
               {form.weightSamples.length >= 2
-                ? <>میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))} kg · CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))}٪</>
+                ? <>میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))} kg • CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))}٪</>
                 : <>💡 حداقل ۲ نمونه اضافه کن تا میانگین محاسبه شود</>}
             </div>
           </Field>

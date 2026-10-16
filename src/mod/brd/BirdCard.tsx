@@ -169,7 +169,7 @@ export default function BirdCard({
                 key={bd.id}
                 type="breed"
                 id={bd.id}
-                label={`${getBreedDisplayName(bd, customStandards)}${bd.fcr ? ` · FCR ${toFa(bd.fcr)}` : ''}`}
+                label={`${getBreedDisplayName(bd, customStandards)}${bd.fcr ? ` • FCR ${toFa(bd.fcr)}` : ''}`}
                 badge
                 badgeBg="var(--purple-soft)"
                 badgeColor="var(--purple)"
@@ -206,7 +206,7 @@ export default function BirdCard({
                 maxWidth: 160,
               }}>
                 {displayStd?.source && `📚 ${displayStd.source}`}
-                {displayStd?.source && displayStd?.publishYear && ' · '}
+                {displayStd?.source && displayStd?.publishYear && ' • '}
                 {displayStd?.publishYear && toFa(displayStd.publishYear)}
               </span>
             </div>

@@ -136,7 +136,7 @@ export default function FlockReportPage() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700 }}>{d.flock.name}</div>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                {d.bird?.name || '—'} · {toFa(d.ageDays)} روز · {d.lifecycle.label}
+                {d.bird?.name || '—'} • {toFa(d.ageDays)} روز • {d.lifecycle.label}
               </div>
             </div>
             <Tag tone={d.lifecycle.color === 'green' ? 'green' : d.lifecycle.color === 'amber' ? 'amber' : 'blue'}>

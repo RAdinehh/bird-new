@@ -26,7 +26,7 @@ function fcrBorder(diff: number): string {
 function moneyUnit(change: number): string {
   if (change === 0) return 'تومان';
   const sign = change > 0 ? '+' : '';
-  return `تومان · ${sign}${change}٪`;
+  return `تومان • ${sign}${change}٪`;
 }
 
 export function useDashboardData() {
