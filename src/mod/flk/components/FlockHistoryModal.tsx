@@ -2,10 +2,10 @@
  * FlockHistoryModal.tsx — تاریخچه رویدادهای گله
  */
 import { useState, type ReactNode } from 'react';
-import { Modal, Btn, BtnRow, Field, Grid2, Input, Select } from '../../../shr/components/ui';
+import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
 import type { Flock, FlockEventType, FlockEventReasonCode } from '../store';
 import { useFlk } from '../store';
-import { toFa } from '../../../shr/utils/fa';
+import { toFa, toEn } from '../../../shr/utils/fa';
 
 const REASON_OPTIONS: { value: FlockEventReasonCode; label: string }[] = [
   { value: 'data_entry_error', label: 'خطای ثبت' },
@@ -41,7 +41,9 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const filtered = filter === 'all' ? events : events.filter(e => e.type === filter);
 
   const handleSaveCorrection = () => {
-    const d = parseInt(delta.replace(/[^0-9-]/g, '')) || 0;
+    const en = toEn(delta).trim();
+    const cleaned = en.replace(/[^0-9+\-]/g, '');
+    const d = parseInt(cleaned.replace('+', '')) || 0;
     if (d === 0) return;
     const label = REASON_OPTIONS.find(r => r.value === reasonCode)?.label || reasonCode;
     addCorrection(flock.id, d, reasonCode, label, notes.trim());
@@ -102,13 +104,17 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           </div>
           <Grid2>
             <Field label="تغییر تعداد" required>
-              <Input
-                value={delta}
-                onChange={e => setDelta(e.target.value)}
-                placeholder="مثلاً +۵ یا -۳"
-                inputMode="numeric"
-                unit="پرنده"
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', height: 38 }}>
+                <input
+                  type="text"
+                  value={delta}
+                  onChange={e => setDelta(e.target.value)}
+                  placeholder="مثلاً +۵ یا -۳"
+                  dir="ltr"
+                  style={{ flex: 1, width: '100%', minWidth: 0, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)', textAlign: 'center' }}
+                />
+                <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--dim)', flexShrink: 0 }}>پرنده</span>
+              </div>
             </Field>
             <Field label="دلیل" required>
               <Select value={reasonCode} onChange={e => setReasonCode(e.target.value as FlockEventReasonCode)}>
@@ -117,11 +123,15 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             </Field>
           </Grid2>
           <Field label="توضیح (اختیاری)">
-            <Input
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              placeholder="مثلاً خطای شمارش دیروز"
-            />
+            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', height: 38 }}>
+              <input
+                type="text"
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                placeholder="مثلاً خطای شمارش دیروز"
+                style={{ flex: 1, width: '100%', minWidth: 0, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}
+              />
+            </div>
           </Field>
           <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
             <Btn size="sm" variant="primary" onClick={handleSaveCorrection} style={{ flex: 1 }}>ثبت</Btn>
