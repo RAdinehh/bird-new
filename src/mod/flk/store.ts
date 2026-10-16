@@ -104,6 +104,7 @@ interface State {
   flocks: Flock[];
   addEvent: (flockId: string, ev: Omit<FlockEvent, 'id'|'flockId'|'createdAt'>) => void;
   addCorrection: (flockId: string, delta: number, reasonCode: FlockEventReasonCode, reasonLabel: string, notes: string) => void;
+  revokeEvent: (flockId: string, eventId: string) => void;
   removeEvent: (flockId: string, eventId: string) => void;
   mergeFlocks: (targetId: string, sourceId: string, opts: { targetAgeDays: number; sourceAgeDays: number; hatchDate?: string }) => void;
   add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => string;
@@ -165,6 +166,50 @@ export const useFlk = create<State>()(
             ...f,
             currentCount: newCount,
             events: [...(f.events || []), newEvent],
+            updatedAt: now(),
+          };
+        }),
+      }),
+      revokeEvent: (flockId, eventId) => set({
+        flocks: get().flocks.map(f => {
+          if (f.id !== flockId) return f;
+          const ev = (f.events || []).find(e => e.id === eventId);
+          if (!ev) return f;
+          if (ev.type === 'correction' && ev.linkedEventId === 'revoked') return f;
+          // محاسبه‌ی معکوس
+          let sign = 0;
+          if (ev.type === 'correction') {
+            const r = (ev.reason || '').includes('افزودن') ? 1 : -1;
+            sign = -r;
+          } else if (ev.type === 'death' || ev.type === 'cull' || ev.type === 'sell') {
+            sign = 1; // برگشت به تعداد
+          } else if (ev.type === 'add' || ev.type === 'transfer') {
+            sign = -1;
+          } else {
+            return f;
+          }
+          const cur = f.currentCount || 0;
+          const newCount = Math.max(0, cur + sign * ev.count);
+          if (newCount === cur) return f;
+          const revokeEv: FlockEvent = {
+            id: uuid(),
+            flockId,
+            date: todayJ(),
+            type: 'correction',
+            count: Math.abs(sign * ev.count),
+            sex: 'mixed',
+            reasonCode: 'data_entry_error',
+            reason: 'لغو ' + (TYPE_LABEL[ev.type as keyof typeof TYPE_LABEL] || ev.type) + (sign > 0 ? ' (افزودن)' : ' (کسر)'),
+            notes: 'لغو رویداد ' + ev.id.slice(0, 8),
+            linkedEventId: eventId,
+            createdAt: now(),
+            updatedAt: now(),
+            version: 1,
+          };
+          return {
+            ...f,
+            currentCount: newCount,
+            events: [...(f.events || []), revokeEv],
             updatedAt: now(),
           };
         }),

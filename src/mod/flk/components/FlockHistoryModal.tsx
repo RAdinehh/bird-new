@@ -38,6 +38,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const [reasonCode, setReasonCode] = useState<FlockEventReasonCode>('data_entry_error');
   const [notes, setNotes] = useState('');
   const addCorrection = useFlk(st => st.addCorrection);
+  const revokeEvent = useFlk(st => st.revokeEvent);
   const [validationError, setValidationError] = useState('');
   const events = (flock.events || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   const filtered = filter === 'all' ? events : events.filter(e => e.type === filter);
@@ -83,6 +84,15 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
     setDelta('');
     setNotes('');
     setValidationError('');
+  };
+
+  const handleRevoke = async (eventId: string, eventLabel: string) => {
+    const ok = await showConfirmAsync(
+      'لغو رویداد',
+      'رویداد «' + eventLabel + '» لغو شود؟ یک رویداد اصلاح معکوس ثبت می‌شود (audit trail حفظ می‌شود).',
+    );
+    if (!ok) return;
+    revokeEvent(flock.id, eventId);
   };
 
   const initial = flock.initialCount || 0;
@@ -243,6 +253,32 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                 )}
                 {e.notes && (
                   <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--dim)' }}>{e.notes}</div>
+                )}
+                {e.type !== 'add' && !e.linkedEventId && (
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+                    <button
+                      type="button"
+                      onClick={() => handleRevoke(e.id, info.label + ' ' + toFa(e.count) + ' پرنده')}
+                      style={{
+                        padding: '3px 10px',
+                        fontSize: 'var(--fs-xs)',
+                        fontWeight: 600,
+                        background: 'transparent',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--r-sm)',
+                        color: 'var(--muted)',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      ↩️ لغو
+                    </button>
+                  </div>
+                )}
+                {e.linkedEventId && (
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontStyle: 'italic', marginTop: 2 }}>
+                    ↩️ لغو رویداد {e.linkedEventId.slice(0, 6)}
+                  </div>
                 )}
               </div>
             );
