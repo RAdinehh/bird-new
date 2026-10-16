@@ -1,6 +1,5 @@
 /**
- * FlockTabPanel — محتوای یک تب از گله‌ها (برای carousel)
- * الگو: hal/index.tsx
+ * FlockTabPanel — محتوای یک تب از گله‌ها (carousel)
  */
 import { useState, useMemo, useEffect } from 'react';
 import { useFlk, type Flock } from '../store';
@@ -19,6 +18,7 @@ import MultiSelectBar from '../../../shr/multiSelect/MultiSelectBar';
 import UndoBar from '../../../cor/ui/UndoBar';
 import { Btn, Empty, PageContainer } from '../../../shr/components/ui';
 import HelpBanner from '../../../shr/components/HelpBanner';
+import { useFilterSort, FilterBar, getFlkFlocksConfig } from '../../../shr/filter';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
@@ -58,10 +58,30 @@ export default function FlockTabPanel({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ flock: Flock | Flock[] } | null>(null);
 
-  const list = useMemo(
+  // ─── مرحله ۱: tab filter ───
+  const tabFiltered = useMemo(
     () => filterFlocksByTab(flocks, tab, '', birds, breeds),
     [flocks, tab, birds, breeds],
   );
+
+  // ─── مرحله ۲: FilterBar ───
+  const config = useMemo(
+    () => getFlkFlocksConfig({
+      birds: birds.map(b => ({ id: b.id, name: b.name })),
+      halls: halls.map(h => ({ id: h.id, name: h.name })),
+    }),
+    [birds, halls],
+  );
+
+  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
+          resetAll, hasActiveFilters, total, count } = useFilterSort<Flock>({
+    items: tabFiltered,
+    filters: config.filterDefs,
+    sorts: config.sortDefs,
+    // 🆕 per-tab persist key
+    persistKey: `flk-flocks-${tab}`,
+    initialSort: config.initialSort,
+  });
 
   useFab(active ? { label: 'افزودن گله', onClick: onAdd } : null);
 
@@ -115,6 +135,8 @@ export default function FlockTabPanel({
 
   const showKpi = tab === 'all' || tab === 'layer' || tab === 'breeder';
 
+  if (!active) return null;
+
   return (
     <PageContainer>
       {undoData && (
@@ -137,6 +159,22 @@ export default function FlockTabPanel({
           <UpcomingFlocks flocks={flocks} breedStd={breedStd} fmt={fmt} tab={tab} />
         </>
       )}
+
+      {/* 🆕 FilterBar */}
+      <FilterBar
+        filterDefs={config.filterDefs}
+        sortDefs={config.sortDefs}
+        filterState={filters}
+        sortState={sort}
+        setFilter={setFilter}
+        clearFilter={clearFilter}
+        setSort={setSort}
+        toggleSort={toggleSort}
+        resetAll={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        total={total}
+        count={count}
+      />
 
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
@@ -169,9 +207,9 @@ export default function FlockTabPanel({
       {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>}
-          title={tab === 'archived' ? 'آرشیو خالی است' : 'هنوز گله‌ای نساخته‌اید'}
-          desc="اولین گله‌ی خود را بسازید — گله‌ها به پرنده، نژاد و سالن متصل می‌شوند."
-          action={tab !== 'archived' ? <Btn variant="primary" onClick={onAdd}>+ افزودن گله</Btn> : undefined}
+          title={hasActiveFilters ? 'نتیجه‌ای یافت نشد' : tab === 'archived' ? 'آرشیو خالی است' : 'هنوز گله‌ای نساخته‌اید'}
+          desc={hasActiveFilters ? 'فیلترها را تغییر دهید یا پاک کنید.' : 'اولین گله‌ی خود را بسازید — گله‌ها به پرنده، نژاد و سالن متصل می‌شوند.'}
+          action={!hasActiveFilters && tab !== 'archived' ? <Btn variant="primary" onClick={onAdd}>+ افزودن گله</Btn> : undefined}
         />
       ) : (
         <>
