@@ -208,7 +208,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         </Field>
       </Grid2>
 
-      {/* 🆕 ظرفیت سالن + breakdown بخش‌ها */}
+      {/* capacity card + breakdown */}
       {hallCapacity && (
         <div style={{
           padding: 'var(--pad-normal)',
@@ -219,78 +219,76 @@ export default function FlocksModal(props: FlocksModalProps) {
           color: hallCapacity.ok ? 'var(--accent)' : 'var(--warn)',
           fontWeight: 600,
           lineHeight: 1.7,
+          direction: 'rtl',
         }}>
-          {/* خط اول: خلاصه وضعیت فعلی + تیک */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', flexWrap: 'wrap', marginBottom: 4 }}>
-            <span style={{
-              fontSize: 'var(--fs-base)',
-              fontWeight: 700,
-            }}>{hallCapacity.ok ? '✅' : '⚠️'}</span>
-            <span style={{ fontWeight: 700 }}>
-              {hallCapacity.scope === 'zone' ? 'بخش' : 'سالن'}:
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)', marginBottom: 6, flexWrap: 'wrap' }}>
+            <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>
+              {hallCapacity.ok ? '✅ ظرفیت کافیه' : '⚠️ اضافه‌بار ' + toFa(hallCapacity.over) + ' پرنده'}
             </span>
-            <span>ظرفیت {toFa(hallCapacity.capacity)}</span>
+            <span style={{ opacity: 0.85 }}>سالن {hallCapacity.scopeName} · {toFa(hallCapacity.capacity)} ظرفیت</span>
           </div>
 
-          {/* 🆕 خط دوم: این گله · بعد از ذخیره */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', flexWrap: 'wrap', marginBottom: hallCapacity.breakdown ? 6 : 0 }}>
-            <span>فعلی: {toFa(hallCapacity.current)}</span>
-            <span>·</span>
-            <span>این گله: {toFa(hallCapacity.total - hallCapacity.current)}</span>
-            <span>·</span>
-            <span style={{ fontWeight: 700 }}>بعد از ذخیره: {toFa(hallCapacity.total)}</span>
-            <span>·</span>
-            {hallCapacity.over > 0 ? (
-              <span style={{ fontWeight: 700, color: 'var(--danger)' }}>⚠️ اضافه‌بار {toFa(hallCapacity.over)}</span>
-            ) : (
-              <span style={{ fontWeight: 700 }}>باقی {toFa(hallCapacity.remaining)}</span>
-            )}
-          </div>
-
-          {/* خط دوم: breakdown بخش‌ها */}
           {hallCapacity.breakdown && (
-            <div style={{
-              paddingTop: 6,
-              borderTop: '1px dashed currentColor',
-              opacity: 0.9,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 3,
-            }}>
-              {/* گله‌های بدون بخش */}
-              <div style={{
-                display: 'flex',
-                gap: 'var(--sp-2)',
-                alignItems: 'center',
-                fontWeight: hallCapacity.breakdown.noZone.isCurrent ? 700 : 500,
-              }}>
-                <span>{hallCapacity.breakdown.noZone.isCurrent ? '👉' : '·'}</span>
-                <span style={{ flex: 1 }}>بدون بخش</span>
-                <span>{toFa(hallCapacity.breakdown.noZone.used)}/{toFa(hallCapacity.breakdown.noZone.capacity)}</span>
-                <span style={{ opacity: 0.75 }}>(باقی {toFa(hallCapacity.breakdown.noZone.remaining)})</span>
+            <div style={{ paddingTop: 6, borderTop: '1px dashed currentColor', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)', fontWeight: hallCapacity.breakdown.noZone.isCurrent ? 700 : 500 }}>
+                <span>{hallCapacity.breakdown.noZone.isCurrent ? '👉 بدون بخش' : 'بدون بخش'}</span>
+                <span style={{ display: 'flex', gap: 'var(--sp-3)', flexShrink: 0 }}>
+                  {hallCapacity.breakdown.noZone.used > 0 ? (
+                    <>
+                      <span>{toFa(hallCapacity.breakdown.noZone.used)} پرنده</span>
+                      <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({toFa(hallCapacity.breakdown.noZone.remaining)} خالی)</span>
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ opacity: 0.6 }}>خالی</span>
+                      <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({toFa(hallCapacity.breakdown.noZone.capacity)} ظرفیت)</span>
+                    </>
+                  )}
+                </span>
               </div>
 
-              {/* بخش‌ها */}
-              {hallCapacity.breakdown.zones.map(z => (
-                <div
-                  key={z.id}
-                  style={{
-                    display: 'flex',
-                    gap: 'var(--sp-2)',
-                    alignItems: 'center',
-                    fontWeight: z.isCurrent ? 700 : 500,
-                  }}
-                >
-                  <span>{z.isCurrent ? '👉' : '·'}</span>
-                  <span style={{ flex: 1 }}>📦 {z.name}</span>
-                  <span>{toFa(z.used)}/{toFa(z.capacity)}</span>
-                  <span style={{ opacity: 0.75 }}>(باقی {toFa(z.remaining)})</span>
-                </div>
-              ))}
+              {hallCapacity.breakdown.zones.map(z => {
+                const isOccupied = z.used > 0 || z.isCurrent;
+                return (
+                  <div key={z.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)', fontWeight: z.isCurrent ? 700 : 500 }}>
+                    <span>{'📦'} {z.name}{isOccupied ? ' 🔒' : ''}</span>
+                    <span style={{ display: 'flex', gap: 'var(--sp-3)', flexShrink: 0 }}>
+                      {z.used > 0 ? (
+                        <>
+                          <span>{toFa(z.used)} از {toFa(z.capacity)}</span>
+                          <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({toFa(z.remaining)} خالی)</span>
+                        </>
+                      ) : z.isCurrent ? (
+                        <>
+                          <span>این گله اینجا</span>
+                          <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({toFa(z.capacity)} ظرفیت)</span>
+                        </>
+                      ) : (
+                        <>
+                          <span style={{ opacity: 0.6 }}>خالی</span>
+                          <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({toFa(z.capacity)} ظرفیت)</span>
+                        </>
+                      )}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           )}
+
+          <div style={{ paddingTop: 6, marginTop: 6, borderTop: '1px dashed currentColor', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
+            <span>این گله: <b>{toFa(hallCapacity.total - hallCapacity.current)}</b> پرنده</span>
+            <span style={{ fontWeight: 700 }}>
+              مجموع {toFa(hallCapacity.total)} از {toFa(hallCapacity.capacity)}
+              {' · '}
+              {hallCapacity.over > 0
+                ? <span style={{ color: 'var(--danger)' }}>اضافه {toFa(hallCapacity.over)}</span>
+                : <span>{toFa(hallCapacity.remaining)} خالی</span>}
+            </span>
+          </div>
         </div>
       )}
+
 
       {form.type === 'breeder' && (
         <DepBox title="اطلاعات گله مادر" tone="purple">
