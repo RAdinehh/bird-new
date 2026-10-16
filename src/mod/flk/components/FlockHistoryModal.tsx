@@ -5,6 +5,7 @@ import { useState, type ReactNode } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
 import type { Flock, FlockEventType, FlockEventReasonCode } from '../store';
 import { useFlk } from '../store';
+import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toFa, toEn } from '../../../shr/utils/fa';
 
 const REASON_OPTIONS: { value: FlockEventReasonCode; label: string }[] = [
@@ -37,19 +38,51 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const [reasonCode, setReasonCode] = useState<FlockEventReasonCode>('data_entry_error');
   const [notes, setNotes] = useState('');
   const addCorrection = useFlk(st => st.addCorrection);
+  const [validationError, setValidationError] = useState('');
   const events = (flock.events || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   const filtered = filter === 'all' ? events : events.filter(e => e.type === filter);
 
-  const handleSaveCorrection = () => {
+  const handleSaveCorrection = async () => {
+    setValidationError('');
     const en = toEn(delta).trim();
     const cleaned = en.replace(/[^0-9+\-]/g, '');
     const d = parseInt(cleaned.replace('+', '')) || 0;
-    if (d === 0) return;
+
+    // ─── Smart Validation ───
+    const cur = flock.currentCount || 0;
+    const init = flock.initialCount || 0;
+    const newCount = cur + d;
+
+    if (d === 0) {
+      setValidationError('تغییر نمی‌تواند صفر باشد');
+      return;
+    }
+    if (newCount < 0) {
+      setValidationError('موجودی کافی نیست — موجودی فعلی ' + toFa(cur) + ' پرنده');
+      return;
+    }
+    if (d > 0 && newCount > init) {
+      const ok = await showConfirmAsync(
+        'بیشتر از تعداد اولیه',
+        'تعداد جدید (' + toFa(newCount) + ') از تعداد اولیه (' + toFa(init) + ') بیشتر می‌شود. ادامه؟',
+      );
+      if (!ok) return;
+    }
+    if (d < 0 && init > 0 && newCount < init * 0.1) {
+      const pct = Math.round((newCount / init) * 100);
+      const ok = await showConfirmAsync(
+        'هشدار موجودی کم',
+        'موجودی زیر ۱۰٪ می‌رود (' + toFa(pct) + '٪ از اولیه). ادامه؟',
+      );
+      if (!ok) return;
+    }
+
     const label = REASON_OPTIONS.find(r => r.value === reasonCode)?.label || reasonCode;
     addCorrection(flock.id, d, reasonCode, label, notes.trim());
     setCorrectionOpen(false);
     setDelta('');
     setNotes('');
+    setValidationError('');
   };
 
   const initial = flock.initialCount || 0;
@@ -133,9 +166,22 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               />
             </div>
           </Field>
+          {validationError && (
+            <div style={{
+              padding: 'var(--pad-tight)',
+              background: 'var(--danger-soft)',
+              border: '1px solid var(--danger)',
+              borderRadius: 'var(--r-sm)',
+              color: 'var(--danger)',
+              fontSize: 'var(--fs-xs)',
+              fontWeight: 600,
+            }}>
+              ⚠️ {validationError}
+            </div>
+          )}
           <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
             <Btn size="sm" variant="primary" onClick={handleSaveCorrection} style={{ flex: 1 }}>ثبت</Btn>
-            <Btn size="sm" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); }} style={{ flex: 1 }}>لغو</Btn>
+            <Btn size="sm" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setValidationError(''); }} style={{ flex: 1 }}>لغو</Btn>
           </div>
         </div>
       )}

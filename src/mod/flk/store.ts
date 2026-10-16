@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { parse, differenceInDays } from 'date-fns-jalali';
 import { toEn } from '../../shr/utils/fa';
+import { todayJ } from './api/flocksCalc';
 
 export type FlockType = 'layer' | 'broiler' | 'breeder';
 export type FlockStatus = 'active' | 'archived' | 'sold' | 'merged';
@@ -149,7 +150,7 @@ export const useFlk = create<State>()(
           const newEvent: FlockEvent = {
             id: uuid(),
             flockId,
-            date: new Date().toISOString().slice(0, 10),
+            date: todayJ(),
             type: 'correction',
             count: Math.abs(actualDelta),
             sex: 'mixed',
