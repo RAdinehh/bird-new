@@ -7,7 +7,16 @@ import { toEn } from '../../shr/utils/fa';
 export type FlockType = 'layer' | 'broiler' | 'breeder';
 export type FlockStatus = 'active' | 'archived' | 'sold' | 'merged';
 
-export type FlockEventType = 'add' | 'sell' | 'death' | 'transfer';
+export type FlockEventType = 'add' | 'sell' | 'death' | 'transfer' | 'correction' | 'cull';
+
+export type FlockEventReasonCode =
+  | 'data_entry_error'
+  | 'found_stock'
+  | 'disease'
+  | 'predator'
+  | 'heat_stress'
+  | 'equipment_failure'
+  | 'unknown';
 export type FlockEventSex = 'male' | 'female' | 'mixed';
 
 export interface FlockEvent {
@@ -26,6 +35,14 @@ export interface FlockEvent {
   hatchId?: string;
   notes: string;
   createdAt: string;
+  /** کد دلیل استاندارد (برای correction/recount) */
+  reasonCode?: FlockEventReasonCode;
+  /** اگر این رویداد اصلاح یه رویداد دیگه‌ست */
+  linkedEventId?: string;
+  /** آخرین ویرایش */
+  updatedAt?: string;
+  /** نسخه (آینده optimistic locking) */
+  version?: number;
 }
 
 export interface FlockMergeSource {
@@ -169,7 +186,23 @@ export const useFlk = create<State>()(
         }),
       })
     }),
-    { name: 'pm-flk' }
+    {
+      name: 'pm-flk',
+      version: 1,
+      migrate: (persisted: any, version: number) => {
+        if (version < 1 && persisted?.state?.flocks) {
+          persisted.state.flocks = persisted.state.flocks.map((f: any) => ({
+            ...f,
+            events: (f.events || []).map((e: any) => ({
+              ...e,
+              version: 1,
+              updatedAt: e.updatedAt || e.createdAt,
+            })),
+          }));
+        }
+        return persisted;
+      },
+    }
   )
 );
 
