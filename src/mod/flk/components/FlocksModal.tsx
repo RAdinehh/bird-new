@@ -52,21 +52,6 @@ export interface FlocksModalProps {
   onSave: () => void;
 }
 
-function ValidIcon({ show }: { show: boolean }) {
-  if (!show) return null;
-  return (
-    <span
-      aria-label="معتبر"
-      style={{
-        color: 'var(--accent)',
-        fontSize: '1em',
-        fontWeight: 700,
-        marginRight: 2,
-      }}
-    >✓</span>
-  );
-}
-
 export default function FlocksModal(props: FlocksModalProps) {
   const {
     open, onClose, form, setForm, layingFromStd, setLayingFromStd,
@@ -215,10 +200,10 @@ export default function FlocksModal(props: FlocksModalProps) {
       )}
 
       <Grid2>
-        <Field label={<span>تعداد اولیه <ValidIcon show={isValid('initialCount')} /></span>} required error={showError('initialCount')} onTouch={() => markTouched('initialCount')}>
+        <Field label="تعداد اولیه" required error={showError('initialCount')} onTouch={() => markTouched('initialCount')}>
           <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
-        <Field label={<span>تعداد فعلی <ValidIcon show={isValid('currentCount')} /></span>} hint="اگه خالی بمونه = تعداد اولیه" onTouch={() => markTouched('currentCount')}>
+        <Field label="تعداد فعلی" hint="اگه خالی بمونه = تعداد اولیه" onTouch={() => markTouched('currentCount')}>
           <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
       </Grid2>
