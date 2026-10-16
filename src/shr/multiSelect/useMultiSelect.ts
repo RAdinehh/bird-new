@@ -69,7 +69,7 @@ export interface MultiSelectState<T> {
 export function useMultiSelect<T>(config: MultiSelectConfig<T>): MultiSelectState<T> {
   const {
     items, getId, onDelete, onArchive, onCustomAction,
-    longPressMs = 350,
+    longPressMs = 800,
   } = config;
 
   const [selectionMode, setSelectionMode] = useState(false);
