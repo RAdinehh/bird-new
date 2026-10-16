@@ -156,7 +156,7 @@ export const useFlk = create<State>()(
             count: Math.abs(actualDelta),
             sex: 'mixed',
             reasonCode,
-            reason: reasonLabel + (actualDelta > 0 ? ' (افزودن)' : ' (کسر)'),
+            reason: reasonLabel,
             notes,
             createdAt: now(),
             updatedAt: now(),
@@ -175,7 +175,9 @@ export const useFlk = create<State>()(
           if (f.id !== flockId) return f;
           const ev = (f.events || []).find(e => e.id === eventId);
           if (!ev) return f;
-          if (ev.type === 'correction' && ev.linkedEventId === 'revoked') return f;
+          // اگه این event قبلاً توسط یه correction لغو شده → دوباره لغو نکن
+          const alreadyRevoked = (f.events || []).some(x => x.linkedEventId === eventId);
+          if (alreadyRevoked) return f;
           // محاسبه‌ی معکوس
           let sign = 0;
           if (ev.type === 'correction') {
@@ -199,7 +201,7 @@ export const useFlk = create<State>()(
             count: Math.abs(sign * ev.count),
             sex: 'mixed',
             reasonCode: 'data_entry_error',
-            reason: 'لغو ' + (TYPE_LABEL[ev.type as keyof typeof TYPE_LABEL] || ev.type) + (sign > 0 ? ' (افزودن)' : ' (کسر)'),
+            reason: 'لغو ' + (EVENT_LABEL[ev.type] || ev.type),
             notes: 'لغو رویداد ' + ev.id.slice(0, 8),
             linkedEventId: eventId,
             createdAt: now(),
@@ -264,7 +266,7 @@ export const useFlk = create<State>()(
     }),
     {
       name: 'pm-flk',
-      version: 1,
+      version: 2,
       migrate: (persisted: any, version: number) => {
         if (version < 1 && persisted?.state?.flocks) {
           persisted.state.flocks = persisted.state.flocks.map((f: any) => ({
@@ -273,6 +275,15 @@ export const useFlk = create<State>()(
               ...e,
               version: 1,
               updatedAt: e.updatedAt || e.createdAt,
+            })),
+          }));
+        }
+        if (version < 2 && persisted?.state?.flocks) {
+          persisted.state.flocks = persisted.state.flocks.map((f: any) => ({
+            ...f,
+            events: (f.events || []).map((e: any) => ({
+              ...e,
+              date: toJalali(e.date),
             })),
           }));
         }
@@ -285,6 +296,24 @@ export const useFlk = create<State>()(
 export const TYPE_LABEL: Record<FlockType, string> = { layer: 'تخم‌گذار', broiler: 'گوشتی', breeder: 'مادر' };
 export const STATUS_LABEL: Record<FlockStatus, string> = { active: 'فعال', archived: 'آرشیو', sold: 'فروخته‌شده', merged: 'ادغام‌شده' };
 export const SOURCE_LABEL: Record<string, string> = { purchase: 'خریداری', hatch: 'جوجه‌کشی خودم' };
+
+const EVENT_LABEL: Record<string, string> = {
+  add: 'افزودن', sell: 'فروش', death: 'تلفات',
+  transfer: 'انتقال', correction: 'اصلاح', cull: 'حذف',
+};
+
+function toJalali(iso: string): string {
+  if (!iso) return '';
+  if (/^\d{4}\/\d{2}\/\d{2}/.test(iso)) return iso;
+  try {
+    const d = new Date(iso);
+    const parts = new Intl.DateTimeFormat('en-u-ca-persian-nu-latn', { year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(d);
+    const y = parts.find(p => p.type === 'year')?.value || '';
+    const m = parts.find(p => p.type === 'month')?.value || '';
+    const dd = parts.find(p => p.type === 'day')?.value || '';
+    return y + '/' + m + '/' + dd;
+  } catch { return iso; }
+}
 
 export function jalaliToDate(s: string): Date | null {
   if (!s) return null;

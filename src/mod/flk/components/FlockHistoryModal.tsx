@@ -219,21 +219,21 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div>هنوز رویدادی ثبت نشده</div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {filtered.map(e => {
             const info = TYPE_INFO[e.type] || { icon: '•', label: e.type, tone: 'var(--muted)' };
             return (
               <div key={e.id} style={{
-                padding: '6px 10px',
+                padding: '4px 8px',
                 background: 'var(--input-bg)',
                 borderRight: '3px solid ' + info.tone,
                 borderRadius: 'var(--r-sm)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 2,
+                gap: 1,
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)' }}>
-                  <span style={{ fontWeight: 700, color: info.tone, fontSize: 'var(--fs-sm)' }}>
+                  <span style={{ fontWeight: 700, color: info.tone, fontSize: 12 }}>
                     {info.icon} {info.label}
                   </span>
                   <span style={{ fontFamily: 'monospace', opacity: 0.8, fontSize: 10 }}>
