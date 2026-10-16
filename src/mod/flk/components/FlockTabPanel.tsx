@@ -88,6 +88,7 @@ export default function FlockTabPanel({
   useFab(active ? { label: 'افزودن گله', onClick: onAdd } : null);
 
   const ms = useMultiSelect({
+    longPressMs: 700,
     items: list,
     getId: (f: Flock) => f.id,
     onDelete: async (ids) => {
