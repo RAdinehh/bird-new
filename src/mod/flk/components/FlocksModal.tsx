@@ -329,25 +329,31 @@ export default function FlocksModal(props: FlocksModalProps) {
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📅 تاریخ‌ها</div>
 
       {form.source === 'hatch' && (
-        <Field label="تاریخ هچ" hint="تاریخ خروج جوجه از دستگاه" error={showError('hatchDate')} onTouch={() => markTouched('hatchDate')}>
-          <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} />
-        </Field>
-      )}
-
-      {form.source === 'purchase' && (
         <Grid2>
-          <Field label="تاریخ خرید / تحویل" hint="روزی که گله به دستت رسید" error={showError('purchaseDate')} onTouch={() => markTouched('purchaseDate')}>
-            <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} />
+          <Field label="تاریخ هچ" hint="خروج جوجه از دستگاه" error={showError('hatchDate')} onTouch={() => markTouched('hatchDate')}>
+            <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} />
           </Field>
-          <Field label="تاریخ هچ" hint="اگر فروشنده گفته (اختیاری)">
-            <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="اختیاری" />
+          <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
+            <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
           </Field>
         </Grid2>
       )}
 
-      <Field label="تاریخ شروع نگهداری" hint="اگه تاریخ دقیق خرید یا هچ رو نمی‌دونی، این رو پر کن" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
-        <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
-      </Field>
+      {form.source === 'purchase' && (
+        <>
+          <Grid2>
+            <Field label="تاریخ خرید" hint="روزی که گله رسید" error={showError('purchaseDate')} onTouch={() => markTouched('purchaseDate')}>
+              <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} />
+            </Field>
+            <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
+              <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
+            </Field>
+          </Grid2>
+          <Field label="تاریخ هچ (اختیاری)" hint="اگر فروشنده گفته">
+            <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="اختیاری" />
+          </Field>
+        </>
+      )}
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>💰 هزینه‌ها</div>
 
