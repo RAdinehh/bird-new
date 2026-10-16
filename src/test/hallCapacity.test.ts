@@ -79,39 +79,38 @@ describe('checkHallCapacity', () => {
   });
 
   // ═══ ۳. بدون بخش + بخش‌های رزرو ═══
-  it('سالن ۵۰۰، بخش‌ها ۵۰+۱۰۰ → بدون بخش ۳۵۰', () => {
+  it('سالن ۵۰۰، بخش‌ها خالی ۵۰+۱۰۰ → بدون بخش کل ۵۰۰', () => {
     const zones = [
       mockZone({ id: 'z1', name: 'شمالی', capacity: 50 }),
       mockZone({ id: 'z2', name: 'جنوبی', capacity: 100 }),
     ];
     const r = checkHallCapacity('h1', undefined, 200, [], [mockHall()], zones, mockBreedStd);
     expect(r!.ok).toBe(true);
-    expect(r!.capacity).toBe(350); // 500 - 150 (بخش‌ها)
+    expect(r!.capacity).toBe(500); // 🆕 بخش‌های خالی رزرو نمی‌شن
     expect(r!.scope).toBe('hall');
   });
 
-  it('سالن ۵۰۰، بخش‌ها ۱۵۰، بدون بخش ۴۰۰ → overflow ۵۰', () => {
+  it('سالن ۵۰۰، بخش‌ها خالی، بدون بخش ۶۰۰ → overflow ۱۰۰', () => {
     const zones = [
       mockZone({ id: 'z1', name: 'شمالی', capacity: 50 }),
       mockZone({ id: 'z2', name: 'جنوبی', capacity: 100 }),
     ];
-    const r = checkHallCapacity('h1', undefined, 400, [], [mockHall()], zones, mockBreedStd);
+    const r = checkHallCapacity('h1', undefined, 600, [], [mockHall()], zones, mockBreedStd);
     expect(r!.ok).toBe(false);
-    expect(r!.over).toBe(50); // 400 - 350
+    expect(r!.over).toBe(100); // 600 - 500 (کل سالن)
   });
 
   // ═══ ۴. سالن بدون ظرفیت ولی بخش‌ها دارن ═══
-  it('سالن بدون capacity، بخش ۵۰+۱۰۰ → noZoneCap = 0', () => {
-    const hall = mockHall({ capacity: null });
+  it('سالن بدون capacity → area mode', () => {
+    const hall = mockHall({ capacity: null, length: 10, width: 5 });
     const zones = [
       mockZone({ id: 'z1', capacity: 50 }),
       mockZone({ id: 'z2', capacity: 100 }),
     ];
     const r = checkHallCapacity('h1', undefined, 100, [], [hall], zones, mockBreedStd);
-    // 🆕 بخش‌ها ظرفیت سالن رو پر کردن → بدون بخش صفر
-    expect(r!.capacity).toBe(0);
-    expect(r!.ok).toBe(false); // 100 > 0
-    expect(r!.over).toBe(100);
+    // 🆕 بدون capacity → area mode (10×5=50)
+    expect(r!.mode).toBe('area');
+    expect(r!.capacity).toBe(50);
   });
 
   // ═══ ۵. گله‌های موجود ═══
@@ -141,6 +140,23 @@ describe('checkHallCapacity', () => {
     expect(r!.current).toBe(50); // فقط f2
     expect(r!.total).toBe(250);
     expect(r!.ok).toBe(true);
+  });
+
+  // ═══ ۶.۵ بخش خالی رزرو نمی‌کنه ═══
+  it('سالن ۵۰۰، بخش شمالی ۱۰۰ (خالی) → گله بدون بخش کل ۵۰۰ در دسترس', () => {
+    const zones = [mockZone({ id: 'z1', name: 'شمالی', capacity: 100 })];
+    const r = checkHallCapacity('h1', undefined, 400, [], [mockHall()], zones, mockBreedStd);
+    expect(r!.ok).toBe(true);
+    expect(r!.capacity).toBe(500); // 🆕 کل سالن (بخش خالی رزرو نمی‌شه)
+  });
+
+  it('سالن ۵۰۰، بخش شمالی ۱۰۰ با گله ۸۰ → گله بدون بخش کل ۵۰۰', () => {
+    const zones = [mockZone({ id: 'z1', name: 'شمالی', capacity: 100 })];
+    const flocks = [mockFlock({ id: 'f1', zoneId: 'z1', currentCount: 80 })];
+    const r = checkHallCapacity('h1', undefined, 300, flocks, [mockHall()], zones, mockBreedStd);
+    expect(r!.ok).toBe(true);
+    expect(r!.capacity).toBe(500); // کل سالن
+    expect(r!.current).toBe(0); // گله بدون بخش نداریم
   });
 
   // ═══ ۷. breakdown ═══

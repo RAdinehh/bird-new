@@ -223,6 +223,36 @@ export default function FlocksModal(props: FlocksModalProps) {
         </Field>
       </Grid2>
 
+      {/* 🔍 DEBUG — بعد از تست حذف شه */}
+      {hallCapacity && typeof window !== 'undefined' && (window as unknown as { __dbg?: { totalFlocks: number; sameHall: Array<{ n: string; s: string; z: string; c: number | null; i: number | null }> } }).__dbg && (
+        <div style={{
+          padding: 8,
+          background: 'var(--purple-soft)',
+          border: '1px dashed var(--purple)',
+          borderRadius: 6,
+          fontSize: 10,
+          color: 'var(--purple)',
+          fontFamily: 'monospace',
+          direction: 'ltr',
+          textAlign: 'left',
+        }}>
+          {(() => {
+            const dbg = (window as unknown as { __dbg: { totalFlocks: number; sameHall: Array<{ n: string; s: string; z: string; c: number | null; i: number | null }> } }).__dbg;
+            return (
+              <>
+                <div>total flocks: {dbg.totalFlocks}</div>
+                <div>same hall: {dbg.sameHall.length}</div>
+                {dbg.sameHall.map((f, i) => (
+                  <div key={i}>
+                    · {f.n} · status={f.s} · zone={f.z || '—'} · cur={f.c ?? '—'} · init={f.i ?? '—'}
+                  </div>
+                ))}
+              </>
+            );
+          })()}
+        </div>
+      )}
+
       {/* 🆕 ظرفیت سالن + breakdown بخش‌ها */}
       {hallCapacity && (
         <div style={{

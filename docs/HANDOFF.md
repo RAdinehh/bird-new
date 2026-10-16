@@ -294,6 +294,38 @@ git tag before-XXX-YYYYMMDD
 - یک سند مرجع
 
 
+### جلسه ۱۱ (۱۴۰۴/۰۷/۲۱ — هفتم) — flk + carousel + smart capacity
+
+#### ماژول flk
+- ✅ DependentSelect سالن→بخش · ۸ header گروه‌بندی · saveAttempted
+- ✅ ۴۱ any → صفر · تایپ F (endOfCycleDay)
+- ✅ KPI Cards · UpcomingFlocks بازنویسی (رینگ زمردی)
+- ✅ Tab counts حذف · ترتیب: فعال · مادر · تخم‌گذار · گوشتی
+- ✅ پنهان/آرشیو conditional · Swipe fix · دات قرمز روی Tab
+- ✅ FlocksTabs جدا · jump به tab بعد save
+- ✅ filterFlocksByTab helper · FilterBar اضافه (نبود!)
+- ✅ فیلتر جدید: بخش + نژاد + آماده ۳ حالت + per-tab persist
+- ✅ vErrors همه ۱۴ فیلد · hallId اجباری
+- ✅ Cross-field تاریخ‌ها (هچ ≤ خرید ≤ شروع)
+- ✅ Min/Max واقعی (۵K / ۱۰K-۵M / ...)
+- ✅ نام تکراری زنده · حذف showAlert تکراری · Success → toast
+- ✅ EntityLink zone · Grid2 در FlockCard
+- ✅ LifecycleBar (Progress Fill) · Cascade delete warning
+- ✅ separator `·` → `•` در ۱۱۱ مورد / ۶۹ فایل
+
+#### دیگه
+- ✅ ctc / dlg / alt → Carousel (مثل hal) · TabPanel جدا
+- ✅ hal — Tab آرشیو conditional + هشدار مجموع بخش‌ها
+- ✅ useCarousel v4 (deps + MutationObserver + transition نرم)
+- ✅ useFormErrors hook (touched/saveAttempted)
+- ✅ Field onTouch · useTabBadge
+- ✅ hallCapacity: گله بدون بخش = کل سالن · ۱۱ تست پاس
+
+#### نیمه‌کاره
+- 🔴 Debug box در FlocksModal (حذف)
+- 🔴 FlocksModal ۴۲۴ خط · ZonesPage ۴۴۵ خط (refactor)
+- 🔴 باگ: ظرفیت وقتی گله قدیم توی همون سالن
+
 ### جلسه ۱۰ (۱۴۰۴/۰۷/۲۱ — جلسه ششم) — hal قفل نهایی 🎉
 **hal ۱۰۰٪ کامل شد.**
 

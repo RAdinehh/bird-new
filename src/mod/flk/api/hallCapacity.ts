@@ -90,35 +90,29 @@ export function checkHallCapacity(
     };
   }
 
-  // ═══════════ ۲. گله بدون بخش → ظرفیت باقی‌مونده سالن ═══════════
-  // 🆕 hallCap = max(hall.capacity, مجموع بخش‌ها)
-  const zonesSum = hallZones.reduce((sum, z) => sum + (z.capacity || 0), 0);
-  const hallCap = Math.max(hall.capacity || 0, zonesSum);
+  // ═══════════ ۲. گله بدون بخش → کل ظرفیت سالن ═══════════
+  // 🆕 منطق hal: بخش‌های خالی از سالن کم نمی‌کنن
+  //    → کل hall.capacity در دسترس ئه (فقط گله‌های بدون بخش)
+  const hallCap = hall.capacity || 0;
 
   if (hallCap > 0) {
-    // 🆕 بدون بخش → فقط گله‌های بدون بخش
+    // 🆕 فقط گله‌های بدون بخش
     const withoutZone = activeFlocks.filter(f => !f.zoneId);
     const current = withoutZone.reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);
     const total = current + newCount;
-
-    // 🆕 ظرفیت باقی‌مونده برای گله‌های بدون بخش
-    const noZoneCap = Math.max(0, hallCap - zonesSum);
-    const over = total - noZoneCap;
+    const over = total - hallCap;
 
     return {
       ok: over <= 0,
-      capacity: noZoneCap,
+      capacity: hallCap,
       current,
       total,
       over: over > 0 ? over : 0,
-      remaining: Math.max(0, noZoneCap - total),
+      remaining: Math.max(0, hallCap - total),
       mode: 'count',
       scope: 'hall',
       scopeName: hall.name,
       breakdown: buildBreakdown(hall, hallZones, activeFlocks, undefined),
-      note: noZoneCap === 0 && zonesSum > 0
-        ? 'ظرفیت سالن به‌طور کامل به بخش‌ها اختصاص یافته — برای گله بدون بخش، ابتدا بخش‌ها رو کوچک‌تر کن'
-        : undefined,
     };
   }
 

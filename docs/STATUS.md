@@ -60,6 +60,15 @@
 - FOUNDATION-PATTERNS.md (۱۶ بخش)
 - ۳۰+ الگوی تفکر
 
+### فاز ۱۴ — flk + Carousel سراسری + Smart Capacity (تموم — جلسه ۱۱)
+- ✅ flk قفل ۹۵٪ — FilterBar + smart capacity + KPI + touched errors
+- ✅ Carousel در alt/ctc/dlg (مثل hal)
+- ✅ useFormErrors hook (الگوی Reward Early/Punish Late)
+- ✅ useCarousel v4 (deps + MutationObserver)
+- ✅ hallCapacity با منطق کامل + ۱۱ تست
+- ✅ separator `•` در ۶۹ فایل
+- 🔴 باقی‌مونده: FlocksModal ۴۲۴ · ZonesPage ۴۴۵ · debug box
+
 ### فاز ۱۳ — hal قفل نهایی (تموم — جلسه ۱۰) 🎉
 - ✅ **hal ۱۰۰٪** — صفر any واقعی، همه فایل‌ها < ۴۰۰
 - ✅ **تب آرشیو** (Segmented Control + conditional)
