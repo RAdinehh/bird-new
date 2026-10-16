@@ -219,24 +219,24 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div>هنوز رویدادی ثبت نشده</div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           {filtered.map(e => {
             const info = TYPE_INFO[e.type] || { icon: '•', label: e.type, tone: 'var(--muted)' };
             return (
               <div key={e.id} style={{
-                padding: '4px 8px',
+                padding: '6px 10px',
                 background: 'var(--input-bg)',
                 borderRight: '3px solid ' + info.tone,
                 borderRadius: 'var(--r-sm)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 1,
+                gap: 3,
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)' }}>
-                  <span style={{ fontWeight: 700, color: info.tone, fontSize: 12 }}>
+                  <span style={{ fontWeight: 700, color: info.tone, fontSize: 13 }}>
                     {info.icon} {info.label}
                   </span>
-                  <span style={{ fontFamily: 'monospace', opacity: 0.8, fontSize: 10 }}>
+                  <span style={{ fontFamily: 'monospace', opacity: 0.8, fontSize: 11 }}>
                     {toFa(e.date)}
                   </span>
                 </div>
@@ -249,7 +249,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                   )}
                 </div>
                 {e.reason && (
-                  <div style={{ fontSize: 10, color: 'var(--muted)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--muted)' }}>
                     {e.reason}
                   </div>
                 )}
@@ -261,8 +261,8 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                     type="button"
                     onClick={() => handleRevoke(e.id, info.label + ' ' + toFa(e.count) + ' پرنده')}
                     style={{
-                      padding: '2px 8px',
-                      fontSize: 10,
+                      padding: '3px 10px',
+                      fontSize: 11,
                       fontWeight: 600,
                       background: 'transparent',
                       border: '1px solid var(--border)',
@@ -277,7 +277,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                   </button>
                 )}
                 {e.linkedEventId && (
-                  <div style={{ fontSize: 10, color: 'var(--muted)', fontStyle: 'italic' }}>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic' }}>
                     ↩️ لغو رویداد
                   </div>
                 )}
