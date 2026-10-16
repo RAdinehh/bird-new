@@ -42,6 +42,8 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const [validationError, setValidationError] = useState('');
   const events = (flock.events || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   const filtered = filter === 'all' ? events : events.filter(e => e.type === filter);
+  // 🆕 event هایی که لغو شدن (توسط یه correction با linkedEventId)
+  const revokedIds = new Set(events.filter(e => e.linkedEventId).map(e => e.linkedEventId));
 
   const handleSaveCorrection = async () => {
     setValidationError('');
@@ -217,67 +219,66 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div>هنوز رویدادی ثبت نشده</div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {filtered.map(e => {
             const info = TYPE_INFO[e.type] || { icon: '•', label: e.type, tone: 'var(--muted)' };
             return (
               <div key={e.id} style={{
-                padding: 'var(--pad-normal)',
+                padding: '6px 10px',
                 background: 'var(--input-bg)',
                 borderRight: '3px solid ' + info.tone,
                 borderRadius: 'var(--r-sm)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 4,
+                gap: 2,
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)' }}>
-                  <span style={{ fontWeight: 700, color: info.tone }}>
+                  <span style={{ fontWeight: 700, color: info.tone, fontSize: 'var(--fs-sm)' }}>
                     {info.icon} {info.label}
                   </span>
-                  <span style={{ fontFamily: 'monospace', opacity: 0.8, fontSize: 'var(--fs-xs)' }}>
+                  <span style={{ fontFamily: 'monospace', opacity: 0.8, fontSize: 10 }}>
                     {toFa(e.date)}
                   </span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--sp-2)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--sp-2)', fontSize: 'var(--fs-xs)' }}>
                   <span><b>{toFa(e.count)}</b> پرنده</span>
                   {e.sex !== 'mixed' && (
-                    <span style={{ opacity: 0.7, fontSize: 'var(--fs-xs)' }}>
+                    <span style={{ opacity: 0.7 }}>
                       {e.sex === 'male' ? 'نر' : 'ماده'}
                     </span>
                   )}
                 </div>
                 {e.reason && (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                    <b>دلیل:</b> {e.reason}
+                  <div style={{ fontSize: 10, color: 'var(--muted)' }}>
+                    {e.reason}
                   </div>
                 )}
                 {e.notes && (
                   <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--dim)' }}>{e.notes}</div>
                 )}
-                {e.type !== 'add' && !e.linkedEventId && (
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
-                    <button
-                      type="button"
-                      onClick={() => handleRevoke(e.id, info.label + ' ' + toFa(e.count) + ' پرنده')}
-                      style={{
-                        padding: '3px 10px',
-                        fontSize: 'var(--fs-xs)',
-                        fontWeight: 600,
-                        background: 'transparent',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--r-sm)',
-                        color: 'var(--muted)',
-                        cursor: 'pointer',
-                        fontFamily: 'inherit',
-                      }}
-                    >
-                      ↩️ لغو
-                    </button>
-                  </div>
+                {e.type !== 'add' && !e.linkedEventId && !revokedIds.has(e.id) && (
+                  <button
+                    type="button"
+                    onClick={() => handleRevoke(e.id, info.label + ' ' + toFa(e.count) + ' پرنده')}
+                    style={{
+                      padding: '2px 8px',
+                      fontSize: 10,
+                      fontWeight: 600,
+                      background: 'transparent',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--r-sm)',
+                      color: 'var(--muted)',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      alignSelf: 'flex-start',
+                    }}
+                  >
+                    ↩️ لغو
+                  </button>
                 )}
                 {e.linkedEventId && (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontStyle: 'italic', marginTop: 2 }}>
-                    ↩️ لغو رویداد {e.linkedEventId.slice(0, 6)}
+                  <div style={{ fontSize: 10, color: 'var(--muted)', fontStyle: 'italic' }}>
+                    ↩️ لغو رویداد
                   </div>
                 )}
               </div>
