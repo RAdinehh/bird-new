@@ -17,8 +17,7 @@ export function useSwipeTabs(
   optsRef.current = opts;
 
   useEffect(() => {
-    const root = ref.current;
-    if (!root) return;
+    // (root دیگه استفاده نمی‌شه — swipe سراسری ئه)
 
     let startX = 0, startY = 0, startT = 0;
     let activeTouch = false;
@@ -27,9 +26,16 @@ export function useSwipeTabs(
     const onStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const tgt = e.target as HTMLElement;
+      // ═══ فیلترهای هوشمند (به جای root.contains) ═══
+      // ۱. dialogs/modal ها
       if (tgt.closest('[role="dialog"]')) { activeTouch = false; return; }
-      // اگه داخل swipe root نبود، ignore
-      if (!root.contains(tgt)) { activeTouch = false; return; }
+      // ۲. دکمه‌ها (FAB, BottomNav, tab buttons, Btn)
+      if (tgt.closest('button')) { activeTouch = false; return; }
+      // ۳. input/textarea/select
+      if (tgt.closest('input, textarea, select')) { activeTouch = false; return; }
+      // ۴. عناصر با data-no-swipe (اختیاری)
+      if (tgt.closest('[data-no-swipe]')) { activeTouch = false; return; }
+
       const t = e.touches[0];
       startX = t.clientX;
       startY = t.clientY;
@@ -59,9 +65,9 @@ export function useSwipeTabs(
       if (!wasH) return;
 
       const o = optsRef.current || {};
-      const threshold = o.threshold ?? 45;
+      const threshold = o.threshold ?? 35;
       const velocity = o.velocity ?? 0.3;
-      const edgeGuard = o.edgeGuard ?? 20;
+      const edgeGuard = o.edgeGuard ?? 10;
 
       const t = e.changedTouches[0];
       const dx = t.clientX - startX;
@@ -73,8 +79,8 @@ export function useSwipeTabs(
       const idsArr = idsRef.current;
       const idx = idsArr.indexOf(activeRef.current);
       if (idx < 0) return;
-      // RTL: swipe راست (dx>0) = tab بعدی
-      const nextIdx = dx > 0 ? idx + 1 : idx - 1;
+      // RTL: swipe چپ (dx<0) = tab بعدی · swipe راست (dx>0) = tab قبلی
+      const nextIdx = dx < 0 ? idx + 1 : idx - 1;
       if (nextIdx < 0 || nextIdx >= idsArr.length) return;
       onChangeRef.current(idsArr[nextIdx]);
     };

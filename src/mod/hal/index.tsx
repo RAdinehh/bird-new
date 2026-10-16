@@ -18,7 +18,7 @@ const BASE_TABS = [
 
 type TabId = 'halls' | 'zones' | 'equip' | 'archive';
 
-const TAB_IDS = ['halls', 'zones', 'equip', 'archive'];
+const BASE_TAB_IDS = ['halls', 'zones', 'equip'] as const;
 
 export default function Hal() {
   const { halls, zones, equipment } = useHal();
@@ -31,10 +31,10 @@ export default function Hal() {
   }, [halls, zones, equipment]);
 
   const [tabParam, setTabParam] = useUrlFilter('tab', 'halls');
-  const tab = (TAB_IDS.includes(tabParam) ? tabParam : 'halls') as TabId;
+  const tab = (['halls', 'zones', 'equip', 'archive'].includes(tabParam) ? tabParam : 'halls') as TabId;
 
   useEffect(() => {
-    if (!tabParam || !TAB_IDS.includes(tabParam)) setTabParam('halls');
+    if (!tabParam || !['halls', 'zones', 'equip', 'archive'].includes(tabParam)) setTabParam('halls');
   }, [tabParam, setTabParam]);
   const visibleTabs = useMemo(() => {
     if (archivedCount > 0) {
@@ -43,8 +43,9 @@ export default function Hal() {
     return BASE_TABS;
   }, [archivedCount]);
 
+  const visibleTabIds = visibleTabs.map(t => t.id);
   const { containerRef, trackRef, setInstant } = useCarousel(
-    TAB_IDS,
+    visibleTabIds,
     tab,
     (id) => setTabParam(id as TabId)
   );

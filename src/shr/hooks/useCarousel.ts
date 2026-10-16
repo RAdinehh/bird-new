@@ -42,13 +42,18 @@ export function useCarousel(
   const txRef = useRef(0);
   const clickToRef = useRef(false);
 
-  const apply = useCallback((tx: number, _animate?: boolean) => {
+  const apply = useCallback((tx: number, animate?: boolean) => {
     const tr = trackRef.current;
     if (!tr) return;
-    // بدون انیمیشن — کاربر گفت نمی‌خواد. فوری جابجا شو.
-    tr.style.transition = 'none';
+    if (animate) {
+      // انیمیشن نرم (snap-back بعد از drag یا tab change)
+      tr.style.transition = 'transform 280ms cubic-bezier(0.22, 0.61, 0.36, 1)';
+    } else {
+      // بی‌انیمیشن (رزرو / اندازه‌گیری)
+      tr.style.transition = 'none';
+    }
     tr.style.transform = `translate3d(${tx}px, 0, 0)`;
-    void tr.offsetWidth;
+    if (!animate) void tr.offsetWidth;
     txRef.current = tx;
   }, []);
 
@@ -76,17 +81,16 @@ export function useCarousel(
     return () => { clearTimeout(t1); clearTimeout(t2); ro.disconnect(); };
   }, [apply]);
 
-  // sync on active change
+  // sync on active change — همیشه animate
   useEffect(() => {
     const i = idsRef.current.indexOf(active);
     if (i < 0) return;
     const w = wRef.current;
     if (w <= 0) return;
     const target = -i * w;
-    const isClick = clickToRef.current;
     clickToRef.current = false;
-    if (Math.abs(txRef.current - target) < 1 && !isClick) return;
-    apply(target, !isClick);
+    if (Math.abs(txRef.current - target) < 1) return;
+    apply(target, true); // ✅ همیشه با انیمیشن
   }, [active, apply]);
 
   // ═══ تنظیم ارتفاع container به اندازه تب فعال (نه بلندترین تب) ═══
