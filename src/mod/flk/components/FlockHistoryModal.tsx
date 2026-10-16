@@ -2,9 +2,16 @@
  * FlockHistoryModal.tsx — تاریخچه رویدادهای گله
  */
 import { useState, type ReactNode } from 'react';
-import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
-import type { Flock, FlockEventType } from '../store';
+import { Modal, Btn, BtnRow, Field, Grid2, Input, Select } from '../../../shr/components/ui';
+import type { Flock, FlockEventType, FlockEventReasonCode } from '../store';
+import { useFlk } from '../store';
 import { toFa } from '../../../shr/utils/fa';
+
+const REASON_OPTIONS: { value: FlockEventReasonCode; label: string }[] = [
+  { value: 'data_entry_error', label: 'خطای ثبت' },
+  { value: 'found_stock', label: 'موجودی پیدا شده' },
+  { value: 'unknown', label: 'نامشخص' },
+];
 
 const TYPE_INFO: Record<FlockEventType, { icon: string; label: string; tone: string }> = {
   add:        { icon: '➕', label: 'افزودن',  tone: 'var(--accent)' },
@@ -25,8 +32,23 @@ interface Props {
 
 export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
+  const [correctionOpen, setCorrectionOpen] = useState(false);
+  const [delta, setDelta] = useState('');
+  const [reasonCode, setReasonCode] = useState<FlockEventReasonCode>('data_entry_error');
+  const [notes, setNotes] = useState('');
+  const addCorrection = useFlk(st => st.addCorrection);
   const events = (flock.events || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   const filtered = filter === 'all' ? events : events.filter(e => e.type === filter);
+
+  const handleSaveCorrection = () => {
+    const d = parseInt(delta.replace(/[^0-9-]/g, '')) || 0;
+    if (d === 0) return;
+    const label = REASON_OPTIONS.find(r => r.value === reasonCode)?.label || reasonCode;
+    addCorrection(flock.id, d, reasonCode, label, notes.trim());
+    setCorrectionOpen(false);
+    setDelta('');
+    setNotes('');
+  };
 
   const initial = flock.initialCount || 0;
   const current = flock.currentCount || 0;
@@ -54,6 +76,59 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           </span>
         )}
       </div>
+
+      {!correctionOpen ? (
+        <div style={{ marginBottom: 'var(--sp-3)' }}>
+          <Btn size="sm" onClick={() => setCorrectionOpen(true)} style={{ width: '100%' }}>
+            ✏️ ثبت اصلاح
+          </Btn>
+        </div>
+      ) : (
+        <div style={{
+          marginBottom: 'var(--sp-3)',
+          padding: 'var(--pad-normal)',
+          background: 'var(--warn-soft)',
+          border: '1px solid var(--warn)',
+          borderRadius: 'var(--r-md)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--sp-2)',
+        }}>
+          <div style={{ fontWeight: 700, color: 'var(--warn)', fontSize: 'var(--fs-sm)' }}>
+            ✏️ ثبت اصلاح
+          </div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.6 }}>
+            عدد مثبت = افزودن، عدد منفی = کسر
+          </div>
+          <Grid2>
+            <Field label="تغییر تعداد" required>
+              <Input
+                value={delta}
+                onChange={e => setDelta(e.target.value)}
+                placeholder="مثلاً +۵ یا -۳"
+                inputMode="numeric"
+                unit="پرنده"
+              />
+            </Field>
+            <Field label="دلیل" required>
+              <Select value={reasonCode} onChange={e => setReasonCode(e.target.value as FlockEventReasonCode)}>
+                {REASON_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </Select>
+            </Field>
+          </Grid2>
+          <Field label="توضیح (اختیاری)">
+            <Input
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="مثلاً خطای شمارش دیروز"
+            />
+          </Field>
+          <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
+            <Btn size="sm" variant="primary" onClick={handleSaveCorrection} style={{ flex: 1 }}>ثبت</Btn>
+            <Btn size="sm" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); }} style={{ flex: 1 }}>لغو</Btn>
+          </div>
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: 'var(--sp-1)', marginBottom: 'var(--sp-3)', flexWrap: 'wrap' }}>
         <FilterBtn active={filter === 'all'} onClick={() => setFilter('all')}>

@@ -102,6 +102,7 @@ export interface Flock {
 interface State {
   flocks: Flock[];
   addEvent: (flockId: string, ev: Omit<FlockEvent, 'id'|'flockId'|'createdAt'>) => void;
+  addCorrection: (flockId: string, delta: number, reasonCode: FlockEventReasonCode, reasonLabel: string, notes: string) => void;
   removeEvent: (flockId: string, eventId: string) => void;
   mergeFlocks: (targetId: string, sourceId: string, opts: { targetAgeDays: number; sourceAgeDays: number; hatchDate?: string }) => void;
   add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => string;
@@ -137,6 +138,35 @@ export const useFlk = create<State>()(
           const newEvent: FlockEvent = { ...ev, id: uuid(), flockId, createdAt: now() };
           return { ...f, events: [...(f.events || []), newEvent], updatedAt: now() };
         })
+      }),
+      addCorrection: (flockId, delta, reasonCode, reasonLabel, notes) => set({
+        flocks: get().flocks.map(f => {
+          if (f.id !== flockId) return f;
+          const oldCount = f.currentCount || 0;
+          const newCount = Math.max(0, oldCount + delta);
+          const actualDelta = newCount - oldCount;
+          if (actualDelta === 0) return f;
+          const newEvent: FlockEvent = {
+            id: uuid(),
+            flockId,
+            date: new Date().toISOString().slice(0, 10),
+            type: 'correction',
+            count: Math.abs(actualDelta),
+            sex: 'mixed',
+            reasonCode,
+            reason: reasonLabel + (actualDelta > 0 ? ' (افزودن)' : ' (کسر)'),
+            notes,
+            createdAt: now(),
+            updatedAt: now(),
+            version: 1,
+          };
+          return {
+            ...f,
+            currentCount: newCount,
+            events: [...(f.events || []), newEvent],
+            updatedAt: now(),
+          };
+        }),
       }),
       removeEvent: (flockId, eventId) => set({
         flocks: get().flocks.map(f =>
