@@ -96,15 +96,21 @@ export function checkHallCapacity(
   const hallCap = hall.capacity || 0;
 
   if (hallCap > 0) {
-    // 🆕 فقط گله‌های بدون بخش
+    // 🆕 بخش‌های اشغال‌شده ظرفیتشون رزرو شده
+    //    بخش‌های خالی رزرو نمی‌شن (Smart Capacity)
+    const occupiedZonesCap = hallZones
+      .filter(z => activeFlocks.some(f => f.zoneId === z.id))
+      .reduce((sum, z) => sum + (z.capacity || 0), 0);
+    const availableForNoZone = Math.max(0, hallCap - occupiedZonesCap);
+
     const withoutZone = activeFlocks.filter(f => !f.zoneId);
     const current = withoutZone.reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);
     const total = current + newCount;
-    const over = total - hallCap;
+    const over = total - availableForNoZone;
 
     return {
       ok: over <= 0,
-      capacity: hallCap,
+      capacity: availableForNoZone,
       current,
       total,
       over: over > 0 ? over : 0,
@@ -189,8 +195,11 @@ function buildBreakdown(
       };
     });
 
-  const reservedByZones = zonesBreakdown.reduce((sum, z) => sum + z.capacity, 0);
-  const noZoneCap = Math.max(0, hallCap - reservedByZones);
+  // 🆕 فقط بخش‌های اشغال‌شده رزرو می‌شن
+  const occupiedZonesCap = hallZones
+    .filter(z => (z.capacity || 0) > 0 && activeFlocks.some(f => f.zoneId === z.id))
+    .reduce((sum, z) => sum + (z.capacity || 0), 0);
+  const noZoneCap = Math.max(0, hallCap - occupiedZonesCap);
   const noZoneUsed = activeFlocks
     .filter(f => !f.zoneId)
     .reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);

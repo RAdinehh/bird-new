@@ -150,13 +150,32 @@ describe('checkHallCapacity', () => {
     expect(r!.capacity).toBe(500); // 🆕 کل سالن (بخش خالی رزرو نمی‌شه)
   });
 
-  it('سالن ۵۰۰، بخش شمالی ۱۰۰ با گله ۸۰ → گله بدون بخش کل ۵۰۰', () => {
+  it('سالن ۵۰۰، بخش شمالی ۱۰۰ (با گله ۸۰) → گله بدون بخش ۴۰۰', () => {
     const zones = [mockZone({ id: 'z1', name: 'شمالی', capacity: 100 })];
     const flocks = [mockFlock({ id: 'f1', zoneId: 'z1', currentCount: 80 })];
     const r = checkHallCapacity('h1', undefined, 300, flocks, [mockHall()], zones, mockBreedStd);
     expect(r!.ok).toBe(true);
-    expect(r!.capacity).toBe(500); // کل سالن
-    expect(r!.current).toBe(0); // گله بدون بخش نداریم
+    expect(r!.capacity).toBe(400);
+    expect(r!.current).toBe(0);
+  });
+
+  it('🆕 سالن ۵۰۰، Z1 اشغال (۱۰۰)، Z2 خالی (۱۵۰) → no-zone ۴۰۰', () => {
+    const zones = [
+      mockZone({ id: 'z1', name: 'شمالی', capacity: 100 }),
+      mockZone({ id: 'z2', name: 'جنوبی', capacity: 150 }),
+    ];
+    const flocks = [mockFlock({ id: 'f1', zoneId: 'z1', currentCount: 80 })];
+    const r = checkHallCapacity('h1', undefined, 400, flocks, [mockHall()], zones, mockBreedStd);
+    expect(r!.ok).toBe(true);
+    expect(r!.capacity).toBe(400);
+  });
+
+  it('🆕 سالن ۵۰۰، Z1 اشغال → no-zone ۴۵۰ → overflow ۵۰', () => {
+    const zones = [mockZone({ id: 'z1', name: 'شمالی', capacity: 100 })];
+    const flocks = [mockFlock({ id: 'f1', zoneId: 'z1', currentCount: 80 })];
+    const r = checkHallCapacity('h1', undefined, 450, flocks, [mockHall()], zones, mockBreedStd);
+    expect(r!.ok).toBe(false);
+    expect(r!.over).toBe(50);
   });
 
   // ═══ ۷. breakdown ═══
@@ -168,6 +187,6 @@ describe('checkHallCapacity', () => {
     const r = checkHallCapacity('h1', undefined, 100, [], [mockHall()], zones, mockBreedStd);
     expect(r!.breakdown).toBeDefined();
     expect(r!.breakdown!.zones).toHaveLength(2);
-    expect(r!.breakdown!.noZone.capacity).toBe(350);
+    expect(r!.breakdown!.noZone.capacity).toBe(500); // 🆕 بخش‌های خالی رزرو نمی‌شن
   });
 });

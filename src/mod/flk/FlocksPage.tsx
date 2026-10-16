@@ -135,20 +135,6 @@ export default function FlocksPage() {
       form.id || undefined, form.breedId,
     );
 
-    // 🔍 DEBUG
-    if (typeof window !== 'undefined') {
-      (window as unknown as { __dbg?: unknown }).__dbg = {
-        hallId: form.hallId,
-        zoneId: form.zoneId,
-        newCount,
-        totalFlocks: flocks.length,
-        sameHall: flocks.filter(f => f.hallId === form.hallId).map(f => ({
-          n: f.name, s: f.status, z: f.zoneId, c: f.currentCount, i: f.initialCount,
-        })),
-        cap,
-      };
-    }
-
     return cap;
   }, [form.hallId, form.zoneId, form.initialCount, form.currentCount, form.breedId, form.id, flocks, halls, zones, breedStd]);
 
