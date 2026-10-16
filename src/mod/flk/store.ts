@@ -266,10 +266,15 @@ export const useFlk = create<State>()(
     }),
     {
       name: 'pm-flk',
-      version: 2,
+      version: 3,
       migrate: (persisted: any, version: number) => {
-        if (version < 1 && persisted?.state?.flocks) {
-          persisted.state.flocks = persisted.state.flocks.map((f: any) => ({
+        // Zustand state رو بدون wrapping می‌ده (گاهی state. ئه، گاهی نه)
+        const state = (persisted && persisted.state) ? persisted.state : persisted;
+        if (!state?.flocks) return persisted;
+
+        // ─── v0 → v1: نسخه‌گذاری رویدادها ───
+        if (version < 1) {
+          state.flocks = state.flocks.map((f: any) => ({
             ...f,
             events: (f.events || []).map((e: any) => ({
               ...e,
@@ -278,8 +283,10 @@ export const useFlk = create<State>()(
             })),
           }));
         }
-        if (version < 2 && persisted?.state?.flocks) {
-          persisted.state.flocks = persisted.state.flocks.map((f: any) => ({
+
+        // ─── v1 → v2: تبدیل تاریخ ISO به شمسی ───
+        if (version < 2) {
+          state.flocks = state.flocks.map((f: any) => ({
             ...f,
             events: (f.events || []).map((e: any) => ({
               ...e,
@@ -287,6 +294,32 @@ export const useFlk = create<State>()(
             })),
           }));
         }
+
+        // ─── v2 → v3: پاکسازی متن رویدادها ───
+        if (version < 3) {
+          state.flocks = state.flocks.map((f: any) => ({
+            ...f,
+            events: (f.events || []).map((e: any) => {
+              let reason = e.reason || '';
+              // تبدیل متن انگلیسی به فارسی
+              reason = reason.replace(/لغو correction \\(افزودن\\)/g, 'لغو اصلاح');
+              reason = reason.replace(/لغو correction \\(کسر\\)/g, 'لغو اصلاح');
+              reason = reason.replace(/لغو death \\(افزودن\\)/g, 'لغو تلفات');
+              reason = reason.replace(/لغو death \\(کسر\\)/g, 'لغو تلفات');
+              reason = reason.replace(/لغو sell \\(افزودن\\)/g, 'لغو فروش');
+              reason = reason.replace(/لغو sell \\(کسر\\)/g, 'لغو فروش');
+              reason = reason.replace(/لغو transfer \\(افزودن\\)/g, 'لغو انتقال');
+              reason = reason.replace(/لغو transfer \\(کسر\\)/g, 'لغو انتقال');
+              reason = reason.replace(/لغو add \\(افزودن\\)/g, 'لغو افزودن');
+              reason = reason.replace(/لغو add \\(کسر\\)/g, 'لغو افزودن');
+              // پاکسازی پرانتز باقی‌مانده
+              reason = reason.replace(/\\(افزودن\\)/g, '').trim();
+              reason = reason.replace(/\\(کسر\\)/g, '').trim();
+              return { ...e, reason };
+            }),
+          }));
+        }
+
         return persisted;
       },
     }
