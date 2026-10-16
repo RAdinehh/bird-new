@@ -223,8 +223,22 @@ export default function FlockTabPanel({
       {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>}
-          title={hasActiveFilters ? 'نتیجه‌ای یافت نشد' : tab === 'archived' ? 'آرشیو خالی است' : 'هنوز گله‌ای نساخته‌اید'}
-          desc={hasActiveFilters ? 'فیلترها را تغییر دهید یا پاک کنید.' : 'اولین گله‌ی خود را بسازید — گله‌ها به پرنده، نژاد و سالن متصل می‌شوند.'}
+          title={
+            hasActiveFilters ? 'نتیجه‌ای یافت نشد' :
+            tab === 'archived' ? 'آرشیو خالی است' :
+            tab === 'hidden' ? 'گله‌ای پنهان نیست' :
+            tab === 'layer' ? 'گله تخم‌گذار ندارید' :
+            tab === 'breeder' ? 'گله مادر ندارید' :
+            tab === 'broiler' ? 'گله گوشتی ندارید' :
+            'هنوز گله‌ای نساخته‌اید'
+          }
+          desc={
+            hasActiveFilters ? 'فیلترها را تغییر دهید یا پاک کنید.' :
+            tab === 'archived' ? 'گله‌های آرشیو‌شده اینجا نمایش داده می‌شوند.' :
+            tab === 'hidden' ? 'گله‌های پنهان اینجا نمایش داده می‌شوند.' :
+            tab !== 'all' ? 'اولین گله‌ی این نوع را بسازید یا فیلتر را پاک کنید.' :
+            'اولین گله‌ی خود را بسازید — گله‌ها به پرنده، نژاد و سالن متصل می‌شوند.'
+          }
           action={!hasActiveFilters && tab !== 'archived' ? <Btn variant="primary" onClick={onAdd}>+ افزودن گله</Btn> : undefined}
         />
       ) : (

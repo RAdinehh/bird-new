@@ -31,6 +31,10 @@ export interface FlocksModalProps {
   setLayingFromStd: (v: boolean) => void;
   err: string;
   vErrors: Record<string, string>;
+  /** 🆕 تابع نمایش خطا (بر اساس touched/saveAttempted) */
+  showError: (field: string) => string | undefined;
+  /** 🆕 علامت‌گذاری لمس فیلد */
+  markTouched: (field: string) => void;
   // داده
   birds: Bird[];
   breedsForBird: Breed[];
@@ -46,7 +50,7 @@ export interface FlocksModalProps {
 export default function FlocksModal(props: FlocksModalProps) {
   const {
     open, onClose, form, setForm, layingFromStd, setLayingFromStd,
-    err, vErrors, birds, breedsForBird, halls, zonesForHall,
+    err, vErrors, showError, markTouched, birds, breedsForBird, halls, zonesForHall,
     breedStd, vaccineEnabled, fmt, onSave,
   } = props;
 
@@ -77,12 +81,12 @@ export default function FlocksModal(props: FlocksModalProps) {
       }
     >
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🏷 هویت</div>
-      <Field label="نام گله" required error={vErrors.name}>
+      <Field label="نام گله" required error={showError('name')} onTouch={() => markTouched('name')}>
         <Input placeholder="مثلاً — گله بهار ۱۴۰۵" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
       </Field>
 
       <Grid2>
-        <Field label="نوع گله" required error={vErrors.type}>
+        <Field label="نوع گله" required error={showError('type')} onTouch={() => markTouched('type')}>
           <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as 'layer' | 'broiler' | 'breeder' })}>
             <option value="layer">تخم‌گذار</option>
             <option value="broiler">گوشتی</option>
@@ -110,7 +114,7 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🐔 پرنده و نژاد</div>
       <Grid2>
-        <Field label="پرنده" required error={vErrors.birdId}>
+        <Field label="پرنده" required error={showError('birdId')} onTouch={() => markTouched('birdId')}>
           <SmartSelect
             value={form.birdId}
             onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))}
@@ -120,7 +124,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             autoThreshold={6}
           />
         </Field>
-        <Field label="نژاد" error={vErrors.breedId}>
+        <Field label="نژاد" error={showError('breedId')} onTouch={() => markTouched('breedId')}>
           <DependentSelect
             value={form.breedId}
             onChange={v => {
@@ -141,7 +145,7 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📍 مکان</div>
       <Grid2>
-        <Field label="سالن" required error={vErrors.hallId}>
+        <Field label="سالن" required error={showError('hallId')} onTouch={() => markTouched('hallId')}>
           <SmartSelect
             value={form.hallId}
             onChange={v => setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
@@ -167,31 +171,31 @@ export default function FlocksModal(props: FlocksModalProps) {
         </Field>
       </Grid2>
 
-      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>💉 برنامه واکسن</div>
-      {vaccineEnabled && (
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📊 تعداد</div>
+
+      {(form.type === 'layer' || form.type === 'breeder') && (
         <Field
-          label="برنامه واکسن"
-          hint={form.vaccineScheduleId ? undefined : 'برای افزودن خودکار واکسن‌ها به تقویم'}
-          autoFrom={form.vaccineScheduleId ? (() => {
-            const sch = getSchedule(form.vaccineScheduleId);
-            return sch ? `تقویم • ${sch.items.length} مرحله` : 'تقویم';
-          })() : undefined}
+          label="سن شروع تخم‌گذاری (روز)"
+          hint={layingFromStd ? 'عدد را تغییر بده اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)}
+          autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
+          error={showError('layingStartDay')} onTouch={() => markTouched('layingStartDay')}
         >
-          <Select value={form.vaccineScheduleId} onChange={e => setForm({ ...form, vaccineScheduleId: e.target.value })}>
-            <option value="">— بدون برنامه —</option>
-            {schedulesByType(form.type as 'layer' | 'broiler' | 'breeder').map(sch => (
-              <option key={sch.id} value={sch.id}>{sch.label}</option>
-            ))}
-          </Select>
+          <NumField
+            value={form.layingStartDay}
+            onChange={e => { setForm({ ...form, layingStartDay: e.target.value }); setLayingFromStd(false); }}
+            placeholder={fmt.int(formLaying)}
+            unit="روز"
+            max={250}
+            min={100}
+          />
         </Field>
       )}
 
-      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📊 تعداد و سن</div>
       <Grid2>
-        <Field label="تعداد اولیه" required error={vErrors.initialCount}>
+        <Field label="تعداد اولیه" required error={showError('initialCount')} onTouch={() => markTouched('initialCount')}>
           <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
-        <Field label="تعداد فعلی" error={vErrors.currentCount}>
+        <Field label="تعداد فعلی" error={showError('currentCount')} onTouch={() => markTouched('currentCount')}>
           <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
       </Grid2>
@@ -214,35 +218,18 @@ export default function FlocksModal(props: FlocksModalProps) {
         </DepBox>
       )}
 
-      {(form.type === 'layer' || form.type === 'breeder') ? (
-        <Field
-          label="سن شروع تخم‌گذاری (روز)"
-          hint={layingFromStd ? 'عدد را تغییر بده اگر نژاد شما فرق دارد' : 'پیش‌فرض ' + toFa(DEFAULT_LAYING_START)}
-          autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
-          error={vErrors.layingStartDay}
-        >
-          <NumField
-            value={form.layingStartDay}
-            onChange={e => { setForm({ ...form, layingStartDay: e.target.value }); setLayingFromStd(false); }}
-            placeholder={fmt.int(formLaying)}
-            unit="روز"
-            max={250}
-            min={100}
-          />
-        </Field>
-      ) : null}
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📅 تاریخ‌ها</div>
 
       {form.source === 'hatch' && (
-        <Field label="تاریخ هچ" hint="تاریخ خروج جوجه از دستگاه" error={vErrors.hatchDate}>
+        <Field label="تاریخ هچ" hint="تاریخ خروج جوجه از دستگاه" error={showError('hatchDate')} onTouch={() => markTouched('hatchDate')}>
           <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ هچ" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} />
         </Field>
       )}
 
       {form.source === 'purchase' && (
         <Grid2>
-          <Field label="تاریخ خرید / تحویل" hint="روزی که گله به دستت رسید" error={vErrors.purchaseDate}>
+          <Field label="تاریخ خرید / تحویل" hint="روزی که گله به دستت رسید" error={showError('purchaseDate')} onTouch={() => markTouched('purchaseDate')}>
             <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ خرید" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} />
           </Field>
           <Field label="تاریخ هچ" hint="اگر فروشنده گفته (اختیاری)">
@@ -251,21 +238,21 @@ export default function FlocksModal(props: FlocksModalProps) {
         </Grid2>
       )}
 
-      <Field label="تاریخ شروع نگهداری" hint="اگه تاریخ دقیق خرید یا هچ رو نمی‌دونی، این رو پر کن" error={vErrors.startDate}>
+      <Field label="تاریخ شروع نگهداری" hint="اگه تاریخ دقیق خرید یا هچ رو نمی‌دونی، این رو پر کن" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
         <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
       </Field>
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>💰 هزینه‌ها</div>
 
       <Grid2>
-        <Field label="قیمت هر پرنده" error={vErrors.purchasePrice}>
+        <Field label="قیمت هر پرنده" error={showError('purchasePrice')} onTouch={() => markTouched('purchasePrice')}>
           <MoneyField placeholder="۰" min={1000} max={5000000} value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
         </Field>
-        <Field label="هزینه حمل" error={vErrors.deliveryCost}>
+        <Field label="هزینه حمل" error={showError('deliveryCost')} onTouch={() => markTouched('deliveryCost')}>
           <MoneyField placeholder="۰" max={500000000} value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
         </Field>
       </Grid2>
-      <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه" error={vErrors.otherCosts}>
+      <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه" error={showError('otherCosts')} onTouch={() => markTouched('otherCosts')}>
         <MoneyField placeholder="۰" max={500000000} value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} />
       </Field>
 
@@ -300,12 +287,31 @@ export default function FlocksModal(props: FlocksModalProps) {
         </div>
       )}
 
+      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>💉 برنامه واکسن</div>
+      {vaccineEnabled && (
+        <Field
+          label="برنامه واکسن"
+          hint={form.vaccineScheduleId ? undefined : 'اگه انتخاب کنی، واکسن‌ها خودکار به تقویم اضافه می‌شن'}
+          autoFrom={form.vaccineScheduleId ? (() => {
+            const sch = getSchedule(form.vaccineScheduleId);
+            return sch ? `تقویم • ${sch.items.length} مرحله` : 'تقویم';
+          })() : undefined}
+        >
+          <Select value={form.vaccineScheduleId} onChange={e => setForm({ ...form, vaccineScheduleId: e.target.value })}>
+            <option value="">— بدون برنامه —</option>
+            {schedulesByType(form.type as 'layer' | 'broiler' | 'breeder').map(sch => (
+              <option key={sch.id} value={sch.id}>{sch.label}</option>
+            ))}
+          </Select>
+        </Field>
+      )}
+
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📝 یادداشت</div>
       <Field label="یادداشت">
         <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
       </Field>
 
-      <ErrorBox>{err}</ErrorBox>
+      {err && <ErrorBox>{err}</ErrorBox>}
     </Modal>
   );
 }

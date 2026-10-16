@@ -29,7 +29,6 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
   const [form, setForm] = useState<F>(emptyForm());
   const [layingFromStd, setLayingFromStd] = useState(false);
   const [err, setErr] = useState('');
-  const [saveAttempted, setSaveAttempted] = useState(false);
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
@@ -45,7 +44,7 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       ...(lastF?.breedId ? { breedId: lastF.breedId } : {}),
     });
     setLayingFromStd(false);
-    setErr(''); setSaveAttempted(false); setOpen(true);
+    setErr(''); setOpen(true);
   };
 
   const openEdit = (f: Flock) => {
@@ -67,11 +66,10 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       status: f.status, notes: f.notes
     });
     setLayingFromStd(false);
-    setErr(''); setSaveAttempted(false); setOpen(true);
+    setErr(''); setOpen(true);
   };
 
   const save = async () => {
-    setSaveAttempted(true);
     if (!form.name.trim()) { setErr('نام گله اجباری است'); return; }
 
     const _init = int(form.initialCount) || 0;
@@ -133,7 +131,6 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
 
   return {
     open, setOpen, form, setForm, layingFromStd, setLayingFromStd, err, setErr,
-    saveAttempted, setSaveAttempted,
     num, int, openNew, openEdit, save,
   };
 }

@@ -11,11 +11,16 @@ interface FieldProps {
   error?: string;
   /** 🆕 پیام هشدار — زرد */
   warning?: string;
+  /** 🆕 وقتی کاربر از فیلد خارج شد (blur) */
+  onTouch?: () => void;
   children: React.ReactNode;
 }
-export function Field({ label, required, hint, autoFrom, error, warning, children }: FieldProps) {
+export function Field({ label, required, hint, autoFrom, error, warning, onTouch, children }: FieldProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
+    <div
+      style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}
+      onBlurCapture={onTouch}
+    >
       <label style={{
         fontSize: 'var(--fs-sm)',
         color: 'var(--muted)',

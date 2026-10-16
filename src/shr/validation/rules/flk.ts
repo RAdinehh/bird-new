@@ -36,8 +36,9 @@ export function createFlkSchema(context: ValidationContext = {}) {
     maleCount: intNonNeg('تعداد نر', 100000),
     femaleCount: intNonNeg('تعداد ماده', 100000),
 
-    layingStartDay: intRange('سن تخم‌گذاری', 100, 250),
-    endOfCycleDay: intRange('پایان چرخه', 35, 700),
+    // 🆕 این دو فیلد فقط برای layer/breeder معنی دارن — برای broiler skip می‌شن
+    layingStartDay: z.number().optional().nullable(),
+    endOfCycleDay: z.number().optional().nullable(),
     vaccineScheduleId: optionalId(),
 
     hatchDate: persianDateOpt('تاریخ هچ'),
@@ -75,13 +76,33 @@ export function createFlkSchema(context: ValidationContext = {}) {
       });
     }
 
-    // endOfCycleDay > layingStartDay
-    if (d.endOfCycleDay > 0 && d.endOfCycleDay <= d.layingStartDay) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `سن پایان چرخه (${d.endOfCycleDay}) باید بیشتر از سن تخم‌گذاری (${d.layingStartDay}) باشد`,
-        path: ['endOfCycleDay'],
-      });
+    // 🆕 چک‌های مربوط به layer/breeder فقط
+    if (d.type === 'layer' || d.type === 'breeder') {
+      // layingStartDay: 100-250
+      if (d.layingStartDay != null && (d.layingStartDay < 100 || d.layingStartDay > 250)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `سن تخم‌گذاری باید بین ۱۰۰ و ۲۵۰ روز باشد`,
+          path: ['layingStartDay'],
+        });
+      }
+      // endOfCycleDay: 35-700
+      if (d.endOfCycleDay != null && (d.endOfCycleDay < 35 || d.endOfCycleDay > 700)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `سن پایان چرخه باید بین ۳۵ و ۷۰۰ روز باشد`,
+          path: ['endOfCycleDay'],
+        });
+      }
+      // endOfCycleDay > layingStartDay
+      if (d.endOfCycleDay != null && d.endOfCycleDay > 0 &&
+          d.layingStartDay != null && d.endOfCycleDay <= d.layingStartDay) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `سن پایان چرخه (${d.endOfCycleDay}) باید بیشتر از سن تخم‌گذاری (${d.layingStartDay}) باشد`,
+          path: ['endOfCycleDay'],
+        });
+      }
     }
 
     // ═══ چک نام تکراری ═══

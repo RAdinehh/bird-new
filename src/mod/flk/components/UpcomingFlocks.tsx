@@ -85,7 +85,7 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
       padding: 'var(--pad-comfy)',
     }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}>
         <span style={{ fontSize: 'var(--fs-md)' }} aria-hidden>⏳</span>
         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)', flex: 1 }}>
           نزدیک به شروع تخم‌گذاری
@@ -102,7 +102,7 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
         display: isMulti ? 'grid' : 'flex',
         gridTemplateColumns: isMulti ? '1fr 1fr' : undefined,
         flexDirection: isMulti ? undefined : 'column',
-        gap: 6,
+        gap: 'var(--sp-2)',
       }}>
         {items.map(({ f, age, startDay, remain, pct }) => {
           const isWarn = remain <= 14;
@@ -114,11 +114,11 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
                 background: 'var(--card)',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--r-md)',
-                padding: 10,
+                padding: 'var(--pad-tight)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 6,
+                gap: 'var(--sp-2)',
                 minWidth: 0,
                 textAlign: 'center',
               }}>
@@ -144,7 +144,7 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
               padding: '10px 12px',
               display: 'flex',
               alignItems: 'center',
-              gap: 12,
+              gap: 'var(--sp-3)',
               minWidth: 0,
             }}>
               <Ring pct={pct} color={color} size={40} />
@@ -154,7 +154,7 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
                   fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 4,
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                 }}>{f.name}</div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
                   <span>سن: <b style={{ color: 'var(--text)' }}>{toFa(age)}</b> روز</span>
                   <span aria-hidden>·</span>
                   <span>شروع: <b style={{ color: 'var(--text)' }}>{toFa(startDay)}</b> روز</span>
@@ -163,7 +163,7 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
               <div style={{
                 flexShrink: 0, textAlign: 'center', lineHeight: 1.1, color,
               }}>
-                <div style={{ fontSize: 20, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{fmt.int(remain)}</div>
+                <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{fmt.int(remain)}</div>
                 <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', marginTop: 2 }}>روز مانده</div>
               </div>
             </div>

@@ -14,20 +14,20 @@ export function Row({
 }) {
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', gap: 2,
+      display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)',
       padding: 'var(--pad-tight)',
       background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
       borderRadius: 'var(--r-sm)',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-        <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+        <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)', display: 'flex', alignItems: 'center', gap: 'var(--sp-1)' }}>
           {l}:
           {autoFrom && <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block', flexShrink: 0 }} />}
         </span>
         <span style={{ fontWeight: 600, color: accent ? 'var(--accent)' : 'var(--text)' }}>{v}</span>
       </div>
       {autoFrom && (
-        <div style={{ fontSize: 10, color: 'var(--accent)', fontWeight: 600, opacity: 0.85, textAlign: 'left' }}>
+        <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)', fontWeight: 600, opacity: 0.85, textAlign: 'left' }}>
           {'✨ از ' + autoFrom}
         </div>
       )}
@@ -54,7 +54,7 @@ export function DepBox({ title, children, tone = 'accent' }: { title: string; ch
   const b = tone === 'purple' ? 'var(--purple)' : 'var(--accent-border)';
   return (
     <div style={{ background: s, border: `1px dashed ${b}`, borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 4 }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: c, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+      <div style={{ fontSize: 'var(--fs-xs)', color: c, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', paddingBottom: 'var(--sp-2)', borderBottom: '1px solid var(--border)' }}>
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: c }} />
         {title}
       </div>

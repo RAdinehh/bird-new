@@ -14,6 +14,7 @@ import { useCarousel } from '../../shr/hooks/useCarousel';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFormat } from '../../shr/units';
 import { useValidation } from '../../shr/validation/useValidation';
+import { useFormErrors } from '../../shr/hooks/useFormErrors';
 import { createFlkSchema } from '../../shr/validation/rules/flk';
 import { toEn } from '../../shr/utils/fa';
 import type { TabId } from './types-flocks';
@@ -57,7 +58,6 @@ export default function FlocksPage() {
   // ─── hook فرم ───
   const {
     open, setOpen, form, setForm, layingFromStd, setLayingFromStd, err, setErr,
-    saveAttempted,
     openNew, openEdit, save,
   } = useFlocksForm({ birds, halls, flocks, breedStd, add, update });
 
@@ -112,6 +112,8 @@ export default function FlocksPage() {
       notes: form.notes || '',
     },
   );
+
+  const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
 
   // ─── شمارش برای تب‌های conditional ───
   const hiddenCount = flocks.filter(f => f.hidden && f.status === 'active').length;
@@ -217,7 +219,9 @@ export default function FlocksPage() {
         layingFromStd={layingFromStd}
         setLayingFromStd={setLayingFromStd}
         err={err}
-        vErrors={saveAttempted ? vErrors : {}}
+        vErrors={vErrors}
+        showError={showError}
+        markTouched={markTouched}
         birds={birds}
         breedsForBird={breedsForBird}
         halls={halls}
@@ -226,6 +230,16 @@ export default function FlocksPage() {
         vaccineEnabled={vaccineEnabled}
         fmt={fmt}
         onSave={async () => {
+          attemptSave();
+
+          // 🆕 بلاک قاطع: اگه vErrors داشت، ذخیره نکن
+          const errorKeys = Object.keys(vErrors);
+          if (errorKeys.length > 0) {
+            const firstErrors = errorKeys.slice(0, 2).map(k => vErrors[k]).join(' · ');
+            setErr(`لطفاً خطاها را برطرف کنید: ${firstErrors}`);
+            return;
+          }
+
           const t = form.type as TabId | undefined;
           await save();
           if (t === 'layer' || t === 'breeder' || t === 'broiler') {
