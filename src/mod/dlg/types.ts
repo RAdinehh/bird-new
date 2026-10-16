@@ -18,6 +18,8 @@ export interface F {
   waterAmount: string; waterFillCount: string; waterFillVolume: string;
   weightSamples: { id: string; weight: string }[];
   eatingEggs: string; fertileEggs: string; brokenEggs: string; otherEggs: string;
+  brokenTarget?: 'consumption' | 'eating';
+  otherTarget?: 'consumption' | 'eating';
   weightGender: '' | 'male' | 'female' | 'mixed';
   deaths: Death[];
   vaccines: Vaccine[]; medications: Medication[]; activities: Activity[];

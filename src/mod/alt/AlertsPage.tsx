@@ -1,95 +1,65 @@
+/**
+ * AlertsPage — هشدارها (carousel tabs مثل hal)
+ */
 import { useState, useEffect, useMemo } from 'react';
-import { useSwipeTabs } from '../../shr/hooks/useSwipeTabs';
-import { useAlt, LEVEL_LABEL, LEVEL_ICON, CATEGORY_LABEL, activeAlerts, countByLevel, type Alert, type AlertLevel } from './store';
+import { useAlt, countByLevel } from './store';
 import { runRules } from './rules';
-import { useFilterSort, FilterBar, getAltAlertsConfig } from '../../shr/filter';
-import { Btn, BtnRow, Empty, Modal, PageContainer, Tag } from '../../shr/components/ui';
-import ExpandableCard from '../../shr/components/ExpandableCard';
-import DatePicker from '../../shr/components/DatePicker';
+import { useCarousel } from '../../shr/hooks/useCarousel';
 import { toFa } from '../../shr/utils/fa';
-import UndoBar from '../../cor/ui/UndoBar';
-import { toastMsg } from '../../cor/store/toast';
-import { showConfirmAsync } from '../../cor/store/dialog';
-import { logAction } from '../../cor/logger/auditLog';
+import AlertTabPanel from './components/AlertTabPanel';
 
 type TabId = 'active' | 'history';
-type FilterLevel = AlertLevel | '';
 
 export default function AlertsPage() {
-  const { alerts, dismiss, snooze, restore, remove, clearAll } = useAlt();
-
+  const { alerts } = useAlt();
   const [tab, setTab] = useState<TabId>('active');
-  const swipeRef = useSwipeTabs(['active', 'history'], tab, (id) => setTab(id as TabId));
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [snoozeId, setSnoozeId] = useState<string | null>(null);
-  const [snoozeDate, setSnoozeDate] = useState('');
-  const [undoData, setUndoData] = useState<{ item: any } | null>(null);
 
   // اجرای خودکار قواعد در بار اول
   useEffect(() => {
     runRules();
   }, []);
 
-  const active = useMemo(() => {
-    return activeAlerts(alerts).sort((a, b) => {
-      const order: Record<AlertLevel, number> = { critical: 0, important: 1, info: 2 };
-      return order[a.level] - order[b.level];
-    });
-  }, [alerts]);
+  const counts = useMemo(() => countByLevel(alerts), [alerts]);
+  const historyCount = useMemo(
+    () => alerts.filter(a => a.status === 'dismissed').length,
+    [alerts],
+  );
 
-  const history = useMemo(() => {
-    return alerts.filter(a => a.status === 'dismissed').sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }, [alerts]);
+  const tabIds: TabId[] = ['active', 'history'];
+  const { containerRef, trackRef, setInstant } = useCarousel(
+    tabIds,
+    tab,
+    (id) => setTab(id as TabId),
+  );
 
-  const counts = countByLevel(alerts);
-  // مرحله ۱: tab
-  const tabFiltered = tab === 'active' ? active : history;
-
-  // مرحله ۲: FilterBar
-  const config = useMemo(() => getAltAlertsConfig(), []);
-  const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
-          resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<Alert>({
-    items: tabFiltered,
-    filters: config.filterDefs,
-    sorts: config.sortDefs,
-    persistKey: config.persistKey,
-    initialSort: config.initialSort,
+  const tabStyle = (active: boolean): React.CSSProperties => ({
+    padding: '11px 14px',
+    fontSize: 'var(--fs-base)',
+    fontWeight: 600,
+    color: active ? 'var(--accent)' : 'var(--muted)',
+    cursor: 'pointer',
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 5,
+    borderBottom: active ? '2.5px solid var(--accent)' : '2.5px solid transparent',
   });
 
-  const handleRefresh = () => {
-    runRules();
-  };
-
-  const confirmSnooze = () => {
-    if (snoozeId && snoozeDate) {
-      snooze(snoozeId, snoozeDate);
-      setSnoozeId(null);
-      setSnoozeDate('');
-    }
-  };
-
-  const undoDelete = () => {
-    const item = undoData;
-    if (!item) return;
-    try {
-      restore(item.item.id);
-      toastMsg.restored('هشدار')
-    } catch (err) {
-      toastMsg.error('بازگردانی ناموفق')
-    }
-    setUndoData(null);
-  };
-
   return (
-    <div ref={swipeRef} style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', minHeight: 'calc(100vh - 120px)' }}>
+    <div>
+      {/* Tab Bar */}
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',
         padding: '0 12px',
         background: 'var(--header-bg)',
-        position: 'sticky', top: 52, zIndex: 11
+        position: 'sticky', top: 52, zIndex: 11,
       }}>
-        <div role="button" tabIndex={0} onClick={() => setTab('active')} style={tabStyle(tab === 'active')}>
+        <div
+          role="button" tabIndex={0}
+          onClick={() => { setInstant(); setTab('active'); }}
+          style={tabStyle(tab === 'active')}
+        >
           فعال
           {counts.total > 0 ? (
             <span style={{
@@ -98,221 +68,60 @@ export default function AlertsPage() {
               color: '#fff',
               padding: '1px 6px',
               borderRadius: 8,
-              fontWeight: 700
+              fontWeight: 700,
             }}>{toFa(counts.total)}</span>
           ) : null}
         </div>
-        <div role="button" tabIndex={0} onClick={() => setTab('history')} style={tabStyle(tab === 'history')}>
-          تاریخچه ({toFa(alerts.filter(a => a.status === 'dismissed').length)})
-        </div>
-      </div>
-
-      <PageContainer>
-      {undoData && (
-        <UndoBar
-          label="هشدار حذف شد"
-          onUndo={undoDelete}
-          onDismiss={() => setUndoData(null)}
-        />
-      )}
-        {/* خلاصه */}
-        {counts.total > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
-            <CountBox label="بحرانی" count={counts.critical} color="danger" icon="🔴" />
-            <CountBox label="مهم" count={counts.important} color="warn" icon="🟡" />
-            <CountBox label="اطلاعی" count={counts.info} color="info" icon="🔵" />
-          </div>
-        ) : null}
-
-      {/* FilterBar */}
-      <FilterBar
-        filterDefs={config.filterDefs}
-        sortDefs={config.sortDefs}
-        filterState={filters}
-        sortState={sort}
-        setFilter={setFilter}
-        clearFilter={clearFilter}
-        setSort={setSort}
-        toggleSort={toggleSort}
-        resetAll={resetAll}
-        hasActiveFilters={hasActiveFilters}
-        total={totalFiltered}
-        count={count}
-      />
-
-        {/* دکمه‌ی refresh */}
-        <div style={{ display: 'flex', gap: 6 }}>
-          <Btn full onClick={handleRefresh}>🔄 بررسی مجدد</Btn>
-          {tab === 'history' && alerts.length > 0 ? (
-            <Btn variant="danger" onClick={async () => {
-              const ok = await showConfirmAsync('پاک‌سازی همه‌ی تاریخچه', 'تمام هشدارهای بسته‌شده حذف می‌شوند.\nاین عمل قابل بازگشت نیست.', { danger: true, confirmText: 'همه را پاک کن' });
-              if (!ok) return;
-              clearAll();
-              toastMsg.info('تاریخچه پاک شد')
-            }}>🗑 پاک‌سازی</Btn>
-          ) : null}
-        </div>
-
-        {list.length === 0 ? (
-          <Empty
-            icon={tab === 'active' ? (
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
-                <path d="M20 6 9 17l-5-5" />
-              </svg>
-            ) : (
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 6v6l4 2" />
-              </svg>
-            )}
-            title={tab === 'active' ? 'هیچ هشدار فعالی نیست' : 'تاریخچه خالی است'}
-            desc={tab === 'active' ? 'همه‌چیز مرتب است. سیستم به‌طور خودکار بررسی می‌کند.' : 'هشدارهای بسته‌شده اینجا نمایش داده می‌شوند.'}
-          />
-        ) : (
-          <>
-            {list.map((a, i) => {
-              const isOpen = expandedId === a.id;
-              const accent = a.level === 'critical' ? 'warn' : a.level === 'important' ? 'warn' : 'info';
-
-              return (
-                <ExpandableCard
-                  key={a.id}
-                  accent={accent}
-                  index={toFa(i + 1)}
-                  iconEmoji={LEVEL_ICON[a.level]}
-                  title={a.title}
-                  subtitle={CATEGORY_LABEL[a.category] + ' · ' + toFa(a.date)}
-                  isOpen={isOpen}
-                  onToggle={() => setExpandedId(isOpen ? null : a.id)}
-                  badge={<Tag tone={a.level === 'critical' ? 'red' : a.level === 'important' ? 'amber' : 'blue'}>{LEVEL_LABEL[a.level]}</Tag>}
-                  stats={
-                    <>
-                      <span>{a.message}</span>
-                    </>
-                  }
-                >
-                  <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> جزئیات</SectionTitle>
-                  <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                     padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    {a.message}
-                  </div>
-
-                  <SectionTitle>🔍 اطلاعات</SectionTitle>
-                  <Row l="سطح" v={LEVEL_LABEL[a.level]} />
-                  <Row l="دسته" v={CATEGORY_LABEL[a.category]} />
-                  <Row l="منبع" v={a.source} />
-                  <Row l="تاریخ هشدار" v={toFa(a.date)} />
-                  {a.status === 'snoozed' && a.snoozeUntil ? (
-                    <Row l="به تعویق تا" v={toFa(a.snoozeUntil)} />
-                  ) : null}
-
-                  <div style={{ display: 'flex', gap: 6, paddingTop: 4, flexWrap: 'wrap' }}>
-                    {a.status === 'active' ? (
-                      <>
-                        <Btn size="sm" onClick={() => { dismiss(a.id); setExpandedId(null); }} style={{ flex: 1 }}>✓ بستن</Btn>
-                        <Btn size="sm" onClick={() => setSnoozeId(a.id)} style={{ flex: 1 }}>⏰ تعویق</Btn>
-                      </>
-                    ) : a.status === 'snoozed' ? (
-                      <>
-                        <Btn size="sm" onClick={() => { dismiss(a.id); setExpandedId(null); }} style={{ flex: 1 }}>✓ بستن</Btn>
-                        <Btn size="sm" onClick={() => restore(a.id)} style={{ flex: 1 }}>🔄 فعال</Btn>
-                      </>
-                    ) : (
-                      <>
-                        <Btn size="sm" onClick={() => restore(a.id)} style={{ flex: 1 }}>🔄 بازیابی</Btn>
-                        <Btn size="sm" onClick={async () => {
-                          const ok = await showConfirmAsync('تأیید حذف', 'این هشدار حذف شود؟', { danger: true });
-                          if (!ok) return;
-                          setUndoData({ item: a });
-                          setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === a.id ? null : cur), 6000);
-                          remove(a.id);
-                          logAction('delete', 'alt', 'حذف از هشدارها');
-                          toastMsg.deleted('هشدار')
-                        }} style={{ flex: 1 }}>🗑 حذف</Btn>
-                      </>
-                    )}
-                  </div>
-                </ExpandableCard>
-              );
-            })}
-          </>
-        )}
-
-        {/* مودال تعویق */}
-        <Modal
-          open={snoozeId !== null}
-          onClose={() => { setSnoozeId(null); setSnoozeDate(''); }}
-          title="تعویق هشدار"
-          footer={<BtnRow><Btn variant="primary" onClick={confirmSnooze}>ذخیره</Btn><Btn onClick={() => { setSnoozeId(null); setSnoozeDate(''); }}>لغو</Btn></BtnRow>}
+        <div
+          role="button" tabIndex={0}
+          onClick={() => { setInstant(); setTab('history'); }}
+          style={tabStyle(tab === 'history')}
         >
-          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', textAlign: 'center' }}>
-            این هشدار تا تاریخ انتخاب‌شده پنهان می‌شود
-          </div>
-          <DatePicker value={snoozeDate} onChange={setSnoozeDate} placeholder="انتخاب تاریخ"  autoToday />
-        </Modal>
-      </PageContainer>
-    </div>
-  );
-}
-
-function CountBox({ label, count, color, icon }: { label: string; count: number; color: 'danger' | 'warn' | 'info'; icon: string }) {
-  return (
-    <div style={{
-      padding: '12px 10px', textAlign: 'center',
-      background: 'var(--' + color + '-soft)',
-      border: '1px solid var(--' + color + ')',
-      borderRadius: 'var(--r-md)',
-      opacity: count === 0 ? 0.4 : 1
-    }}>
-      <div style={{ fontSize: 'var(--fs-lg)' }}>{icon}</div>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--' + color + ')', fontWeight: 700, marginTop: 4 }}>
-        {label}
+          تاریخچه ({toFa(historyCount)})
+        </div>
       </div>
-      <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--' + color + ')', marginTop: 2 }}>
-        {toFa(count)}
+
+      {/* Carousel */}
+      <div
+        ref={containerRef}
+        style={{
+          overflow: 'hidden',
+          overflowX: 'hidden',
+          width: '100%',
+          isolation: 'isolate',
+          touchAction: 'pan-y',
+        }}
+      >
+        <div
+          ref={trackRef}
+          style={{
+            display: 'flex',
+            direction: 'ltr',
+            willChange: 'transform',
+            touchAction: 'pan-y',
+            width: '100%',
+            minWidth: 0,
+          }}
+        >
+          {tabIds.map(id => (
+            <div
+              key={id}
+              style={{
+                flex: '0 0 100%',
+                width: '100%',
+                minWidth: 0,
+                maxWidth: '100%',
+                direction: 'rtl',
+                overflow: 'hidden',
+                boxSizing: 'border-box',
+                isolation: 'isolate',
+              }}
+            >
+              <AlertTabPanel tab={id} active={tab === id} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
-}
-
-function Row({ l, v }: { l: string; v: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-      <span style={{ color: 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
-    </div>
-  );
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>{children}</div>
-  );
-}
-
-function tabStyle(active: boolean): React.CSSProperties {
-  return {
-    padding: '11px 14px',
-    fontSize: 'var(--fs-base)',
-    fontWeight: 600,
-    color: active ? 'var(--accent)' : 'var(--muted)',
-    cursor: 'pointer',
-    position: 'relative',
-    display: 'flex', alignItems: 'center', gap: 5,
-    borderBottom: active ? '2.5px solid var(--accent)' : '2.5px solid transparent'
-  };
-}
-
-function chip(active: boolean): React.CSSProperties {
-  return {
-    padding: '6px 11px', fontSize: 'var(--fs-sm)',
-    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
-    border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-    borderRadius: 'var(--r-sm)',
-    color: active ? 'var(--accent)' : 'var(--muted)',
-    fontWeight: active ? 600 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap'
-  };
 }
