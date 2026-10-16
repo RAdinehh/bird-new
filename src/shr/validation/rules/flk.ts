@@ -36,7 +36,7 @@ export function createFlkSchema(_context: ValidationContext = {}) {
     femaleCount: intNonNeg('تعداد ماده', 100000),
 
     layingStartDay: intRange('سن تخم‌گذاری', 100, 250),
-    endOfCycleDay: intNonNeg('پایان چرخه', 1000),
+    endOfCycleDay: intRange('پایان چرخه', 35, 700),
     vaccineScheduleId: optionalId(),
 
     hatchDate: persianDateOpt('تاریخ هچ'),
@@ -45,9 +45,9 @@ export function createFlkSchema(_context: ValidationContext = {}) {
 
     source: z.enum(['purchase', 'hatch']).default('purchase'),
 
-    purchasePrice: floatNonNeg('قیمت هر پرنده', 100_000_000),
-    deliveryCost: floatNonNeg('هزینه حمل', 1_000_000_000),
-    otherCosts: floatNonNeg('سایر هزینه‌ها', 1_000_000_000),
+    purchasePrice: floatRange('قیمت هر پرنده', 1_000, 5_000_000),
+    deliveryCost: floatNonNeg('هزینه حمل', 500_000_000),
+    otherCosts: floatNonNeg('سایر هزینه‌ها', 500_000_000),
 
     status: z.enum(['active', 'archived', 'sold', 'merged']).default('active'),
     notes: optionalStr(1000),
@@ -80,6 +80,32 @@ export function createFlkSchema(_context: ValidationContext = {}) {
         code: z.ZodIssueCode.custom,
         message: `سن پایان چرخه (${d.endOfCycleDay}) باید بیشتر از سن تخم‌گذاری (${d.layingStartDay}) باشد`,
         path: ['endOfCycleDay'],
+      });
+    }
+
+    // ═══ تاریخ‌ها ترتیب منطقی ═══
+    // هچ ≤ خرید
+    if (d.hatchDate && d.purchaseDate && d.hatchDate > d.purchaseDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'تاریخ هچ باید قبل از تاریخ خرید باشد',
+        path: ['purchaseDate'],
+      });
+    }
+    // هچ ≤ شروع نگهداری
+    if (d.hatchDate && d.startDate && d.hatchDate > d.startDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'تاریخ هچ باید قبل از شروع نگهداری باشد',
+        path: ['startDate'],
+      });
+    }
+    // خرید ≤ شروع نگهداری
+    if (d.purchaseDate && d.startDate && d.purchaseDate > d.startDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'تاریخ خرید باید قبل از شروع نگهداری باشد',
+        path: ['startDate'],
       });
     }
 

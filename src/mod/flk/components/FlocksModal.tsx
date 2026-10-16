@@ -192,7 +192,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
         <Field label="تعداد فعلی" error={vErrors.currentCount}>
-          <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={0} max={100000} autoClamp />
+          <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
       </Grid2>
 
@@ -226,8 +226,8 @@ export default function FlocksModal(props: FlocksModalProps) {
             onChange={e => { setForm({ ...form, layingStartDay: e.target.value }); setLayingFromStd(false); }}
             placeholder={fmt.int(formLaying)}
             unit="روز"
-            max={400}
-            min={80}
+            max={250}
+            min={100}
           />
         </Field>
       ) : null}
@@ -259,14 +259,14 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       <Grid2>
         <Field label="قیمت هر پرنده" error={vErrors.purchasePrice}>
-          <MoneyField placeholder="۰" value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
+          <MoneyField placeholder="۰" min={1000} max={5000000} value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
         </Field>
         <Field label="هزینه حمل" error={vErrors.deliveryCost}>
-          <MoneyField placeholder="۰" value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
+          <MoneyField placeholder="۰" max={500000000} value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
         </Field>
       </Grid2>
       <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه" error={vErrors.otherCosts}>
-        <MoneyField placeholder="۰" value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} />
+        <MoneyField placeholder="۰" max={500000000} value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} />
       </Field>
 
       {liveCosts.total > 0 && (
