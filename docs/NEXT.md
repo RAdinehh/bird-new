@@ -1,54 +1,60 @@
-# 🎯 NEXT — کار جلسه ۱۳
+# 🎯 NEXT — جلسه ۱۴ (تصحیح‌شده با واقعیت کد)
 
-> این فایل هر جلسه بازنویسی می‌شه (۳۰ خط).
-> AI از این خارج نشه بدون تأیید.
-
----
-
-## 📍 کار فعلی: فعال‌سازی Event Bus (tra→whs)
-
-**چرا:** ۱۶/۱۸ ایونت غیرفعالن. سرمایه‌گذاری روی معماری موجود.
-
-**هدف:** فاکتور فروش در `tra` → آپدیت موجودی در `whs`
+> این فایل با **واقعیت کد** نوشته شده، نه ادعا.
+> آخرین بازنویسی: بعد جلسه ۱۳ (مهاجرت tra→whs و egg→whs).
 
 ---
 
-## قدم‌ها (۳ قدم)
+## ✅ انجام‌شده در جلسه ۱۳
 
-### قدم ۱/۳ — ساخت `mod/whs/handlers.ts`
-- [ ] فایل بساز
-- [ ] `registerWhsHandlers()` بنویس
-- [ ] شنونده `tra:invoice:created/updated/deleted`
-- [ ] `tsc` چک
-
-### قدم ۲/۳ — ثبت در `main.tsx`
-- [ ] import کن
-- [ ] صدا بزن
-- [ ] `tsc` چک
-
-### قدم ۳/۳ — تست + commit
-- [ ] تست `whs/handlers.test.ts` بساز
-- [ ] `npm test -- --run`
-- [ ] `python3 ~/auto_fast.py "feat(whs): فعال‌سازی event bus tra→whs"`
+- مهاجرت tra:invoice:* → whs به bus (۶ تست)
+- مهاجرت egg:production:* → whs به bus
+- تصحیح EVENT-BUS.md (بخش وضعیت)
+- **درس:** inc, dlg, flk مسیرهای غیرمستقیم دارن — قبل از هر activation، grep بزن
 
 ---
 
-## 🟢 بعد از این (صف)
+## 🎯 هدف واقعی جلسه ۱۴
 
-به ترتیب اولویت:
-1. `catch` خالی `hal` (۷ مورد)
-2. `showAlert → Toast` (۱۵ مورد)
-3. `any` در `inc` (۱۵۵)
-4. `any` در `set` (۱۲۲)
+**کاهش any در inc یا brd** — اول باید عدد واقعی رو دربیاریم.
+
+### قدم ۱ — اسکن واقعی
+grep -c ': any\|<any>\|as any' src/mod/inc/store.ts src/mod/brd/store.ts
+
+### قدم ۲ — لیست دقیق
+grep -n ': any\|<any>\|as any' src/mod/inc/store.ts | head -30
+
+### قدم ۳ — تصمیم بر اساس حجم واقعی (نه ادعای AI-BOOT.md)
+
+---
+
+## 🟢 صف بعدی (بر اساس واقعیت)
+
+1. any-کاهی از کم‌حجم‌ترین ماژول (inc یا brd)
+2. dlg:vaccine:given → cal (بعد از تأیید واقعی مرده بودن)
+3. showAlert → showToast (بعد از grep واقعی)
+4. catch خالی hal (بعد از grep واقعی)
 
 ---
 
 ## ⚠️ کارهایی که الان نکن
 
-- ❌ refactor فایل‌های بزرگ (`flk/store`, `alt/rules`)
-- ❌ قابلیت جدید
-- ❌ دست زدن به ماژول‌های قفل‌شده (`hal`, `doc`)
+- refactor فایل‌های بزرگ (flk/store, alt/rules) — بدون برنامه
+- فعال‌سازی مرده بر اساس EVENT-BUS.md قدیمی — همیشه اول grep
+- مهاجرت چیزهایی که از مسیر غیرمستقیم کار می‌کنن (inc→whs که از طریق tra/egg فعاله)
 
 ---
 
-*آخرین آپدیت: ۱۴۰۴/۰۷/۲۱ (جلسه ۱۳ — شروع)*
+## 🔴 قانون جلسه ۱۴
+
+قبل از هر تغییر بزرگ:
+
+grep -rn 'bus\.emit\|bus\.on' src/ --include='*.ts' --include='*.tsx'
+grep -rn 'useWhs\|useFlk\|useEgg\|useTra' src/mod/<module>/ --include='*.ts' --include='*.tsx'
+git status --short
+
+**هیچ‌وقت به این فایل، EVENT-BUS.md یا AI-BOOT.md بدون تأیید grep اعتماد نکن.**
+
+---
+
+*آخرین به‌روزرسانی: بعد جلسه ۱۳*

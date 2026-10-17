@@ -3,17 +3,35 @@
 > قرارداد رسمی Event Bus. هر event جدید باید اینجا ثبت شه.
 > آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۱۲)
 
-## ⚠️ وضعیت واقعی (اسکن جلسه ۱۲)
+## ⚠️ وضعیت واقعی (اسکن دستی — تأیید شده روی کد)
+
+> این بخش با grep واقعی روی `src/` نوشته شده، نه ادعا.
+> آخرین به‌روزرسانی: جلسه ۱۳
 
 | مورد | مقدار |
 |---|---|
 | ایونت‌های تعریف‌شده | ۱۸ |
-| **فعال (ناشر + شنونده)** | **۲** ✅ |
-| غیرفعال | ۱۶ 🔴 |
-| فایل‌های `handlers.ts` | فقط `flk` |
-| فایل‌های ناشر (`bus.emit`) | فقط `dlg` (۲ محل) |
+| **فعال (emit + handler هر دو)** | **۴** |
+| emit فقط (بدون handler) | ۰ |
+| handler فقط (بدون emit) | ۰ |
+| کاملاً مرده (نه emit نه handler) | ۱۴ |
+| فایل‌های `handlers.ts` | ۲ (`flk`, `whs`) |
+| ماژول‌های ناشر فعال | ۳ (`dlg`, `tra`, `egg`) |
 
-**فقط یک مسیر کار می‌کنه: `dlg → flk`**
+### ✅ مسیرهای فعال و تأیید‌شده
+
+| ایونت | emit | handler |
+|---|---|---|
+| `dlg:deaths:recorded` | `dlg/hooks/useDlgSave.ts:176` + `dlg/components/DlgTabPanel.tsx:102` | `flk/handlers.ts:5` |
+| `dlg:log:deleted` | `dlg/hooks/useDlgSave.ts:210` | `flk/handlers.ts:69` |
+| `tra:invoice:created/updated/deleted` | `tra/store.ts` (جلسه ۱۳) | `whs/handlers.ts` (جلسه ۱۳) |
+| `egg:production:created/updated/deleted` | `egg/store.ts` (جلسه ۱۳) | `whs/handlers.ts` (جلسه ۱۳) |
+
+### ❌ مسیرهای مرده (نه emit، نه handler)
+
+`dlg:feed:consumed`, `dlg:vaccine:given`, `dlg:medication:given`, `dlg:egg:recorded`, `flk:flock:created/updated/archived`, `inc:hatch:created/deleted`, `whs:movement:created`
+
+**⚠️ نکته مهم:** بعضی از این‌ها ممکنه از مسیر مستقیم (بدون bus) کار کنن — قبل از هر «فعال‌سازی»، `grep` بزن که مطمئن شی واقعاً مرده‌ست.
 
 ## بخش ۱ — چرا Event Bus؟
 
