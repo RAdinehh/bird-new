@@ -269,10 +269,10 @@ export default function FlocksPage() {
           }
 
           // 🆕 duplicate check
-          const invId = (form as any).sourceInvoiceId;
+          const invId = form.sourceInvoiceId;
           if (invId && !form.id) {
             const flocksList = (await import('./store')).useFlk.getState().flocks;
-            const existing = flocksList.find((f: any) => f.sourceInvoiceId === invId);
+            const existing = flocksList.find((f) => f.sourceInvoiceId === invId);
             if (existing) {
               const ok = await showConfirmAsync(
                 'فاکتور تکراری',
