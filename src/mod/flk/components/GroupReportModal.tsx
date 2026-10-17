@@ -1,10 +1,11 @@
 /**
  * GroupReportModal.tsx — گزارش جزئیات گروه گله
  */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
 import { useFlk, type FlockGroupType } from '../store';
 import { useGroupKpi } from '../hooks/useGroupKpi';
+import GroupTimeline from './GroupTimeline';
 import { toFa } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
 
@@ -40,6 +41,7 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
   const groups = useFlk(s => s.groups);
   const group = useMemo(() => groups.find(g => g.id === groupId), [groups, groupId]);
   const kpi = useGroupKpi(groupId || '');
+  const [showTimeline, setShowTimeline] = useState(false);
 
   if (!open || !group) return null;
 
@@ -113,6 +115,37 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
       </div>
 
       {/* Flocks Table */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+        <button
+          type="button"
+          onClick={() => setShowTimeline(false)}
+          style={{
+            flex: 1, padding: '6px 12px', fontSize: 11, fontWeight: 600,
+            background: !showTimeline ? 'var(--accent-soft)' : 'transparent',
+            border: '1px solid ' + (!showTimeline ? 'var(--accent)' : 'var(--border)'),
+            borderRadius: 'var(--r-sm)',
+            color: !showTimeline ? 'var(--accent)' : 'var(--muted)',
+            cursor: 'pointer', fontFamily: 'inherit',
+          }}
+        >📋 لیست</button>
+        <button
+          type="button"
+          onClick={() => setShowTimeline(true)}
+          style={{
+            flex: 1, padding: '6px 12px', fontSize: 11, fontWeight: 600,
+            background: showTimeline ? 'var(--accent-soft)' : 'transparent',
+            border: '1px solid ' + (showTimeline ? 'var(--accent)' : 'var(--border)'),
+            borderRadius: 'var(--r-sm)',
+            color: showTimeline ? 'var(--accent)' : 'var(--muted)',
+            cursor: 'pointer', fontFamily: 'inherit',
+          }}
+        >📅 Timeline</button>
+      </div>
+
+      {showTimeline ? (
+        group ? <GroupTimeline groupId={group.id} /> : null
+      ) : (
+        <>
       <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 6 }}>📋 گله‌های گروه</div>
 
       {kpi.byFlock.length === 0 ? (
@@ -161,6 +194,9 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
             );
           })}
         </div>
+      )}
+
+        </>
       )}
 
       <BtnRow>
