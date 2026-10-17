@@ -64,7 +64,15 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       purchasePrice: f.purchasePrice ? toFa(f.purchasePrice) : '',
       deliveryCost: f.deliveryCost ? toFa(f.deliveryCost) : '',
       otherCosts: f.otherCosts ? toFa(f.otherCosts) : '',
-      status: f.status, notes: f.notes
+      status: f.status, notes: f.notes,
+      dealType: f.dealType || 'own',
+      partnerId: f.dealData?.partnerId || '',
+      partnerShare: f.dealData?.partnerShare ? toFa(f.dealData.partnerShare) : '',
+      consignorId: f.dealData?.consignorId || '',
+      lessorId: f.dealData?.lessorId || '',
+      rentAmount: f.dealData?.rentAmount ? toFa(f.dealData.rentAmount) : '',
+      rentPeriod: f.dealData?.rentPeriod || 'monthly',
+      dealId: f.dealData?.dealId || ''
     });
     setLayingFromStd(false);
     setErr(''); setOpen(true);
@@ -178,7 +186,17 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       deliveryCost: num(form.deliveryCost),
       otherCosts: num(form.otherCosts),
       vaccineScheduleId: form.vaccineScheduleId,
-      status: form.status, notes: form.notes.trim()
+      status: form.status, notes: form.notes.trim(),
+      dealType: (form.dealType || 'own') as 'own' | 'partnership' | 'consignment' | 'rent',
+      dealData: (form.dealType || 'own') === 'own' ? undefined : {
+        partnerId: form.dealType === 'partnership' ? form.partnerId : undefined,
+        partnerShare: form.dealType === 'partnership' ? (int(form.partnerShare) || undefined) : undefined,
+        consignorId: form.dealType === 'consignment' ? form.consignorId : undefined,
+        lessorId: form.dealType === 'rent' ? form.lessorId : undefined,
+        rentAmount: form.dealType === 'rent' ? (num(form.rentAmount) || undefined) : undefined,
+        rentPeriod: form.dealType === 'rent' ? ((form.rentPeriod || 'monthly') as 'monthly' | 'season' | 'total') : undefined,
+        dealId: form.dealId || undefined,
+      },
     };
 
     // 🆕 حذف شده — warning به صورت inline در Modal نمایش داده می‌شه

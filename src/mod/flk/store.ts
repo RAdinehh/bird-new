@@ -63,6 +63,18 @@ export interface FlockMergeInfo {
   mergedAt: string;
 }
 
+export type FlockDealType = 'own' | 'partnership' | 'consignment' | 'rent';
+
+export interface FlockDealData {
+  partnerId?: string;
+  partnerShare?: number;
+  consignorId?: string;
+  lessorId?: string;
+  rentAmount?: number;
+  rentPeriod?: 'monthly' | 'season' | 'total';
+  dealId?: string;
+}
+
 export interface Flock {
   id: string;
   name: string;
@@ -102,6 +114,9 @@ export interface Flock {
   sourceCategory?: string;
   createdAt: string;
   updatedAt: string;
+  // 💼 مدل بهره‌برداری
+  dealType?: FlockDealType;
+  dealData?: FlockDealData;
 }
 
 interface State {
@@ -164,7 +179,7 @@ export const useFlk = create<State>()(
             notes,
             createdAt: now(),
             updatedAt: now(),
-            version: 5,
+            version: 6,
           };
           return {
             ...f,
@@ -406,6 +421,15 @@ export const useFlk = create<State>()(
             endOfCycleDay: (f.type === 'layer' || f.type === 'breeder') ? (f.endOfCycleDay ?? null) : null,
             maleCount: f.type === 'breeder' ? (f.maleCount ?? null) : null,
             femaleCount: f.type === 'breeder' ? (f.femaleCount ?? null) : null,
+          }));
+        }
+
+        // ─── v5 → v6: default dealType ───
+        if (version < 6) {
+          state.flocks = state.flocks.map((f: any) => ({
+            ...f,
+            dealType: f.dealType || 'own',
+            dealData: f.dealData || {},
           }));
         }
 

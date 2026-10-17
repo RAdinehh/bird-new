@@ -20,6 +20,15 @@ export interface F {
   sourceInvoiceId?: string;
   /** 🆕 شناسه هچ (اگه منبع hatch) */
   hatchId?: string;
+  // 💼 مدل بهره‌برداری
+  dealType: string;
+  partnerId: string;
+  partnerShare: string;
+  consignorId: string;
+  lessorId: string;
+  rentAmount: string;
+  rentPeriod: string;
+  dealId: string;
 }
 
 export const emptyForm = (): F => ({
@@ -30,7 +39,10 @@ export const emptyForm = (): F => ({
   vaccineScheduleId: '',
   hatchDate: '', purchaseDate: '', startDate: '',
   source: 'purchase', purchasePrice: '', deliveryCost: '', otherCosts: '',
-  status: 'active', notes: ''
+  status: 'active', notes: '',
+  dealType: 'own',
+  partnerId: '', partnerShare: '',
+  consignorId: '', lessorId: '', rentAmount: '', rentPeriod: 'monthly', dealId: '',
 });
 
 export type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'hidden' | 'archived';
