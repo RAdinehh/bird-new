@@ -64,36 +64,7 @@ export default function FlocksModal(props: FlocksModalProps) {
   // 🆕 Picker modals
   const [invoicePickerOpen, setInvoicePickerOpen] = useState(false);
   const [hatchPickerOpen, setHatchPickerOpen] = useState(false);
-  const allFlocks = useFlk(st => st.flocks);
-  const nameSuggestions = useMemo(() => {
-    const out: string[] = [];
-    const today = todayJ();
-    const parts = today.split('/');
-    const year = parts[0];
-    const jMonth = parseInt(parts[1]);
-    const season = jMonth <= 3 ? 'بهار' : jMonth <= 6 ? 'تابستان' : jMonth <= 9 ? 'پاییز' : 'زمستان';
-    const base = 'گله ' + season + ' ' + year;
-    const seasonExists = allFlocks.some(f => f.name.trim() === base);
-    out.push(seasonExists ? base + ' - ۲' : base);
-    if (form.hallId) {
-      const hallName = halls.find(h => h.id === form.hallId)?.name || 'سالن';
-      const prefix = 'گله ' + hallName + ' - ';
-      const nums = allFlocks.filter(f => f.hallId === form.hallId && f.name.startsWith(prefix))
-        .map(f => parseInt(f.name.slice(prefix.length)) || 0);
-      out.push(prefix + toFa(Math.max(0, ...nums) + 1));
-    }
-    if (form.breedId) {
-      const std = breedStd.byBreedId(form.breedId);
-      const breedName = (std as { nameFa?: string } | null)?.nameFa || '';
-      if (breedName) {
-        const prefix = 'گله ' + breedName + ' - ';
-        const nums = allFlocks.filter(f => f.name.startsWith(prefix))
-          .map(f => parseInt(f.name.slice(prefix.length)) || 0);
-        out.push(prefix + toFa(Math.max(0, ...nums) + 1));
-      }
-    }
-    return out.filter(sg => sg !== form.name.trim());
-  }, [allFlocks, form.hallId, form.breedId, form.name, halls, breedStd]);
+
 
   const handleInvoiceSelect = (inv: Invoice) => {
     const birdItems = (inv.items || []).filter((it: InvoiceItem) => it.birdId);
@@ -131,6 +102,37 @@ export default function FlocksModal(props: FlocksModalProps) {
     err, vErrors, showError, markTouched, isValid, hallCapacity, birds, breedsForBird, halls, zonesForHall,
     breedStd, vaccineEnabled, fmt, onSave,
   } = props;
+
+  const allFlocks = useFlk(st => st.flocks);
+  const nameSuggestions = useMemo(() => {
+    const out: string[] = [];
+    const today = todayJ();
+    const parts = today.split('/');
+    const year = parts[0];
+    const jMonth = parseInt(parts[1]);
+    const season = jMonth <= 3 ? 'بهار' : jMonth <= 6 ? 'تابستان' : jMonth <= 9 ? 'پاییز' : 'زمستان';
+    const base = 'گله ' + season + ' ' + year;
+    const seasonExists = allFlocks.some(f => f.name.trim() === base);
+    out.push(seasonExists ? base + ' - ۲' : base);
+    if (form.hallId) {
+      const hallName = halls.find(h => h.id === form.hallId)?.name || 'سالن';
+      const prefix = 'گله ' + hallName + ' - ';
+      const nums = allFlocks.filter(f => f.hallId === form.hallId && f.name.startsWith(prefix))
+        .map(f => parseInt(f.name.slice(prefix.length)) || 0);
+      out.push(prefix + toFa(Math.max(0, ...nums) + 1));
+    }
+    if (form.breedId) {
+      const std = breedStd.byBreedId(form.breedId);
+      const breedName = (std as { nameFa?: string } | null)?.nameFa || '';
+      if (breedName) {
+        const prefix = 'گله ' + breedName + ' - ';
+        const nums = allFlocks.filter(f => f.name.startsWith(prefix))
+          .map(f => parseInt(f.name.slice(prefix.length)) || 0);
+        out.push(prefix + toFa(Math.max(0, ...nums) + 1));
+      }
+    }
+    return out.filter(sg => sg !== form.name.trim());
+  }, [allFlocks, form.hallId, form.breedId, form.name, halls, breedStd]);
 
   const formStd = breedStd.byBreedId(form.breedId);
   const formLaying = formStd?.biology?.layingStartDay ?? DEFAULT_LAYING_START;
