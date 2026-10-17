@@ -39,6 +39,7 @@ const makeFlock = (o: any = {}) => ({
 });
 
 beforeEach(() => {
+  localStorage.clear();
   useFlk.setState({ flocks: [] });
   useBrd.setState({ birds: [], breeds: [] });
   useHal.setState({ halls: [], zones: [], equipment: [] } as any);
@@ -78,8 +79,8 @@ describe('FlocksPage — نمایش لیست', () => {
 });
 
 describe('FlocksPage — افزودن', () => {
-  it('دکمه افزودن دیده میشه وقتی خالیه', () => {
+  it('دکمه افزودن دیده میشه وقتی خالیه', async () => {
     renderWithRouter(<FlocksPage />);
-    expect(screen.getByText(/افزودن گله/)).toBeInTheDocument();
+    expect(await screen.findByText(/افزودن گله/)).toBeInTheDocument();
   });
 });

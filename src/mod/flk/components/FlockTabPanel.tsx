@@ -123,6 +123,18 @@ export default function FlockTabPanel({
       logAction('delete', 'flk', 'حذف گروهی: ' + backups.length);
     },
     onArchive: async (ids) => {
+      if (tab === 'archived') {
+        // بازگردانی از آرشیو
+        const ok = await showConfirmAsync('بازگردانی گروهی', toFa(ids.length) + ' گله بازگردانی شوند؟');
+        if (!ok) return;
+        for (const id of ids) {
+          try { restore(id); } catch { /* silent */ }
+        }
+        toastMsg.restoredBulk(ids.length, 'گله');
+        logAction('update', 'flk', 'بازگردانی گروهی ' + ids.length);
+        return;
+      }
+      // آرشیو معمولی
       const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' گله آرشیو شوند؟');
       if (!ok) return;
       for (const id of ids) {
@@ -312,7 +324,7 @@ export default function FlockTabPanel({
         </>
       )}
 
-      <MultiSelectBar ms={ms} deleteLabel="حذف" archiveLabel="آرشیو" />
+      <MultiSelectBar ms={ms} deleteLabel="حذف" archiveLabel={tab === 'archived' ? 'بازگردانی' : 'آرشیو'} />
     </PageContainer>
   );
 }
