@@ -13,6 +13,8 @@ import DependentSelect from '../../../shr/components/DependentSelect';
 import PickInvoiceModal from './PickInvoiceModal';
 import PickHatchModal from './PickHatchModal';
 import { DepBox } from '../helpers';
+import FlockSourcePickers from './FlockSourcePickers';
+import FlockDetailsSection from './FlockDetailsSection';
 import { SOURCE_LABEL, DEFAULT_LAYING_START, sexRatio } from '../store';
 import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
 import { todayJ, jalaliBounds, checkDateBounds } from '../api/flocksCalc';
@@ -157,131 +159,12 @@ export default function FlocksModal(props: FlocksModalProps) {
         </Field>
       </Grid2>
 
-      {form.source === 'purchase' && (
-        <Field label="فاکتور خرید" hint="برای پر کردن خودکار، یک فاکتور انتخاب کنید">
-          <div style={{ position: 'relative' }}>
-            <button
-              type="button"
-              onClick={() => setInvoicePickerOpen(true)}
-              style={{
-                width: '100%',
-                height: 38,
-                background: 'var(--input-bg)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--r-md)',
-                padding: '0 12px',
-                paddingLeft: form.sourceInvoiceId ? 34 : 12,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                fontSize: 'var(--fs-base)',
-                color: form.sourceInvoiceId ? 'var(--text)' : 'var(--dim)',
-                textAlign: 'right',
-              }}
-            >
-              <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {form.sourceInvoiceId
-                  ? '📄 فاکتور ' + form.sourceInvoiceId.slice(0, 8)
-                  : '— انتخاب از فاکتور —'}
-              </span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2.5">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </button>
-            {form.sourceInvoiceId && (
-              <button
-                type="button"
-                onClick={() => setForm((f) => ({ ...f, sourceInvoiceId: '', initialCount: '', currentCount: '', purchaseDate: '', purchasePrice: '' }))}
-                style={{
-                  position: 'absolute',
-                  left: 6,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 22,
-                  height: 22,
-                  background: 'var(--danger-soft)',
-                  border: '1px solid rgba(239,68,68,.3)',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  fontSize: 11,
-                  color: 'var(--danger)',
-                  fontFamily: 'inherit',
-                  padding: 0,
-                }}
-                title="پاک کردن"
-              >✕</button>
-            )}
-          </div>
-        </Field>
-      )}
-
-      {form.source === 'hatch' && (
-        <Field label="هچ (جوجه‌کشی)" hint="برای پر کردن خودکار، یک هچ انتخاب کنید">
-          <div style={{ position: 'relative' }}>
-            <button
-              type="button"
-              onClick={() => setHatchPickerOpen(true)}
-              style={{
-                width: '100%',
-                height: 38,
-                background: 'var(--input-bg)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--r-md)',
-                padding: '0 12px',
-                paddingLeft: form.hatchId ? 34 : 12,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                fontSize: 'var(--fs-base)',
-                color: form.hatchId ? 'var(--text)' : 'var(--dim)',
-                textAlign: 'right',
-              }}
-            >
-              <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {form.hatchId
-                  ? '🐣 هچ ' + toFa(form.hatchDate || '')
-                  : '— انتخاب از هچ —'}
-              </span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2.5">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </button>
-            {form.hatchId && (
-              <button
-                type="button"
-                onClick={() => setForm((f) => ({ ...f, hatchId: '', initialCount: '', currentCount: '', hatchDate: '' }))}
-                style={{
-                  position: 'absolute',
-                  left: 6,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 22,
-                  height: 22,
-                  background: 'var(--danger-soft)',
-                  border: '1px solid rgba(239,68,68,.3)',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  fontSize: 11,
-                  color: 'var(--danger)',
-                  fontFamily: 'inherit',
-                  padding: 0,
-                }}
-                title="پاک کردن"
-              >✕</button>
-            )}
-          </div>
-        </Field>
-      )}
+      <FlockSourcePickers
+        form={form}
+        setForm={setForm}
+        onOpenInvoicePicker={() => setInvoicePickerOpen(true)}
+        onOpenHatchPicker={() => setHatchPickerOpen(true)}
+      />
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🐔 پرنده و نژاد</div>
       <Grid2>
@@ -508,103 +391,14 @@ export default function FlocksModal(props: FlocksModalProps) {
       )}
 
 
-      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📅 تاریخ‌ها</div>
-
-      {form.source === 'hatch' && (
-        <Grid2>
-          <Field label="تاریخ هچ" hint="خروج جوجه از دستگاه" error={showError('hatchDate')} onTouch={() => markTouched('hatchDate')}>
-            <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} />
-          </Field>
-          <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
-            <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
-          </Field>
-        </Grid2>
-      )}
-
-      {form.source === 'purchase' && (
-        <>
-          <Grid2>
-            <Field label="تاریخ خرید" hint="روزی که گله رسید" error={showError('purchaseDate')} onTouch={() => markTouched('purchaseDate')}>
-              <DatePicker value={form.purchaseDate} onChange={v => setForm({ ...form, purchaseDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} />
-            </Field>
-            <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
-              <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
-            </Field>
-          </Grid2>
-          <Field label="تاریخ هچ (اختیاری)" hint="اگر فروشنده گفته">
-            <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="اختیاری" />
-          </Field>
-        </>
-      )}
-
-      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>💰 هزینه‌ها</div>
-
-      <Grid2>
-        <Field label="قیمت هر پرنده" error={showError('purchasePrice')} onTouch={() => markTouched('purchasePrice')}>
-          <MoneyField placeholder="۰" min={1000} max={5000000} value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
-        </Field>
-        <Field label="هزینه حمل" error={showError('deliveryCost')} onTouch={() => markTouched('deliveryCost')}>
-          <MoneyField placeholder="۰" max={500000000} value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
-        </Field>
-      </Grid2>
-      <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه" error={showError('otherCosts')} onTouch={() => markTouched('otherCosts')}>
-        <MoneyField placeholder="۰" max={500000000} value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} />
-      </Field>
-
-      {liveCosts.total > 0 && (
-        <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 'var(--fs-sm)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
-            <span>قیمت پرنده‌ها:</span>
-            <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.bird.toLocaleString('fa-IR'))} ت</span>
-          </div>
-          {liveCosts.del > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
-              <span>هزینه حمل:</span>
-              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.del.toLocaleString('fa-IR'))} ت</span>
-            </div>
-          )}
-          {liveCosts.oth > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
-              <span>سایر:</span>
-              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.oth.toLocaleString('fa-IR'))} ت</span>
-            </div>
-          )}
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 6, marginTop: 2 }}>
-            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>جمع کل:</span>
-            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{toFa(liveCosts.total.toLocaleString('fa-IR'))} ت</span>
-          </div>
-          {liveCosts.per > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--accent)', fontWeight: 700 }}>💰 هر پرنده:</span>
-              <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{toFa(Math.round(liveCosts.per).toLocaleString('fa-IR'))} ت</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>💉 برنامه واکسن</div>
-      {vaccineEnabled && (
-        <Field
-          label="برنامه واکسن"
-          hint={form.vaccineScheduleId ? undefined : 'اگه انتخاب کنی، واکسن‌ها خودکار به تقویم اضافه می‌شن'}
-          autoFrom={form.vaccineScheduleId ? (() => {
-            const sch = getSchedule(form.vaccineScheduleId);
-            return sch ? `تقویم • ${sch.items.length} مرحله` : 'تقویم';
-          })() : undefined}
-        >
-          <Select value={form.vaccineScheduleId} onChange={e => setForm({ ...form, vaccineScheduleId: e.target.value })}>
-            <option value="">— بدون برنامه —</option>
-            {schedulesByType(form.type as 'layer' | 'broiler' | 'breeder').map(sch => (
-              <option key={sch.id} value={sch.id}>{sch.label}</option>
-            ))}
-          </Select>
-        </Field>
-      )}
-
-      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📝 یادداشت</div>
-      <Field label="یادداشت">
-        <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-      </Field>
+      <FlockDetailsSection
+        form={form}
+        setForm={setForm}
+        showError={showError}
+        markTouched={markTouched}
+        liveCosts={liveCosts}
+        vaccineEnabled={vaccineEnabled}
+      />
 
       {err && <ErrorBox>{err}</ErrorBox>}
     
