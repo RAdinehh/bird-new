@@ -11,6 +11,14 @@
  */
 import { useState, useRef, useCallback, useMemo } from 'react';
 
+export interface CustomAction<T> {
+  key: string;
+  label: string;
+  icon?: string;
+  danger?: boolean;
+  action: (ids: string[]) => void | Promise<void>;
+}
+
 export interface MultiSelectConfig<T> {
   items: T[];
   getId: (item: T) => string;
@@ -22,6 +30,8 @@ export interface MultiSelectConfig<T> {
     danger?: boolean;
     action: (ids: string[]) => void | Promise<void>;
   };
+  /** 🆕 چند اکشن سفارشی */
+  onCustomActions?: CustomAction<T>[];
   /** زمان نگه‌داشتن (میلی‌ثانیه) — پیش‌فرض ۵۰۰ */
   longPressMs?: number;
 }
@@ -51,6 +61,7 @@ export interface MultiSelectState<T> {
   doArchive: () => Promise<void>;
   /** اکشن سفارشی */
   doCustom: () => Promise<void>;
+  doCustomByKey: (key: string) => Promise<void>;
   /** دستگیره‌های Long-Press */
   startLongPress: (id: string) => void;
   cancelLongPress: () => void;
@@ -64,11 +75,12 @@ export interface MultiSelectState<T> {
   hasDelete: boolean;
   /** اکشن سفارشی */
   customAction?: MultiSelectConfig<T>['onCustomAction'];
+  customActions?: CustomAction<T>[];
 }
 
 export function useMultiSelect<T>(config: MultiSelectConfig<T>): MultiSelectState<T> {
   const {
-    items, getId, onDelete, onArchive, onCustomAction,
+    items, getId, onDelete, onArchive, onCustomAction, onCustomActions,
     longPressMs = 800,
   } = config;
 
@@ -147,6 +159,17 @@ export function useMultiSelect<T>(config: MultiSelectConfig<T>): MultiSelectStat
     exitSelection();
   }, [onCustomAction, selectedIds, exitSelection]);
 
+  const doCustomByKey = useCallback(async (key: string) => {
+    if (!onCustomActions) return;
+    const action = onCustomActions.find(a => a.key === key);
+    if (!action) return;
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    await action.action(ids);
+    // فقط اگه action خودش exitSelection رو صدا نزده
+    exitSelection();
+  }, [onCustomActions, selectedIds, exitSelection]);
+
   const isSelected = useCallback((id: string) => selectedIds.has(id), [selectedIds]);
   const didLongPressFire = useCallback(() => longPressFiredRef.current, []);
   const resetLongPressFire = useCallback(() => { longPressFiredRef.current = false; }, []);
@@ -164,6 +187,7 @@ export function useMultiSelect<T>(config: MultiSelectConfig<T>): MultiSelectStat
     doDelete,
     doArchive,
     doCustom,
+    doCustomByKey,
     startLongPress,
     cancelLongPress,
     didLongPressFire,
@@ -171,5 +195,6 @@ export function useMultiSelect<T>(config: MultiSelectConfig<T>): MultiSelectStat
     hasArchive: !!onArchive,
     hasDelete: !!onDelete,
     customAction: onCustomAction,
+    customActions: onCustomActions,
   };
 }

@@ -97,6 +97,23 @@ export default function MultiSelectBar<T>({
         </button>
       )}
 
+      {ms.customActions && ms.customActions.map(a => (
+        <button
+          key={a.key}
+          type="button"
+          onClick={() => ms.doCustomByKey(a.key)}
+          style={{
+            ...btnBase,
+            color: a.danger ? 'var(--danger)' : 'var(--text)',
+            background: a.danger ? 'rgba(220,38,38,0.1)' : 'var(--input-bg)',
+            border: '1px solid ' + (a.danger ? 'var(--danger)' : 'var(--border)'),
+          }}
+        >
+          {a.icon && <span>{a.icon}</span>}
+          <span>{a.label}</span>
+        </button>
+      ))}
+
       {ms.hasArchive && (
         <button type="button" onClick={ms.doArchive} style={btnBase}>
           📦 {archiveLabel}
