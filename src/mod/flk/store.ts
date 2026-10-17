@@ -164,7 +164,7 @@ export const useFlk = create<State>()(
             notes,
             createdAt: now(),
             updatedAt: now(),
-            version: 1,
+            version: 5,
           };
           return {
             ...f,
@@ -397,6 +397,18 @@ export const useFlk = create<State>()(
           });
         }
 
+
+        // ─── v4 → v5: clean-up فیلدهای یتیم ───
+        if (version < 5) {
+          state.flocks = state.flocks.map((f: any) => ({
+            ...f,
+            layingStartDay: (f.type === 'layer' || f.type === 'breeder') ? (f.layingStartDay ?? 0) : 0,
+            endOfCycleDay: (f.type === 'layer' || f.type === 'breeder') ? (f.endOfCycleDay ?? null) : null,
+            maleCount: f.type === 'breeder' ? (f.maleCount ?? null) : null,
+            femaleCount: f.type === 'breeder' ? (f.femaleCount ?? null) : null,
+          }));
+        }
+
         return persisted;
       },
     }
@@ -460,6 +472,11 @@ export function getLifecycle(
   endOfCycleDay?: number | null,
   birdCycleDays?: number | null,
 ): Lifecycle {
+  // 🆕 fallback برای type نامعتبر (legacy/import)
+  if (type !== 'layer' && type !== 'broiler' && type !== 'breeder') {
+    type = 'layer';
+  }
+
   // اولویت: endOfCycleDay گله > cycleDays پرنده > پیش‌فرض صنعتی
   const cycle =
     (endOfCycleDay && endOfCycleDay > 0) ? endOfCycleDay :
