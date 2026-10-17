@@ -52,6 +52,7 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
   const upcoming = flocks
     .filter(f => {
       if (f.status !== 'active') return false;
+      if (f.paused) return false;
       if (f.type !== 'layer' && f.type !== 'breeder') return false;
       // 🆕 فیلتر بر اساس tab
       if (tab === 'layer' && f.type !== 'layer') return false;
