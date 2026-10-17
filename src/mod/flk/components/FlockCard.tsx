@@ -28,6 +28,20 @@ const GROUP_ICON: Record<FlockGroupType, string> = {
   season: '🗓', breed: '🧬', cohort: '👥', farm: '🏭', owner: '👤', custom: '📁', smart: '🤖',
 };
 
+const GROUP_COLORS: Record<FlockGroupType, { bg: string; fg: string; border: string }> = {
+  breed:   { bg: 'var(--purple-soft)', fg: 'var(--purple)', border: 'var(--purple)' },
+  cohort:  { bg: 'var(--accent-soft)', fg: 'var(--accent)', border: 'var(--accent-border)' },
+  smart:   { bg: 'var(--info-soft)',   fg: 'var(--info)',   border: 'var(--info)' },
+  farm:    { bg: 'var(--warn-soft)',   fg: 'var(--warn)',   border: 'var(--warn)' },
+  owner:   { bg: 'var(--purple-soft)', fg: 'var(--purple)', border: 'var(--purple)' },
+  season:  { bg: 'var(--info-soft)',   fg: 'var(--info)',   border: 'var(--info)' },
+  custom:  { bg: 'var(--input-bg)',    fg: 'var(--muted)',  border: 'var(--border)' },
+};
+
+const GROUP_PRIORITY: Record<FlockGroupType, number> = {
+  breed: 1, cohort: 2, smart: 3, farm: 4, owner: 5, season: 6, custom: 7,
+};
+
 const DEAL_BADGE: Record<string, { label: string; emoji: string }> = {
   partnership: { label: 'شراکتی', emoji: '🤝' },
   consignment: { label: 'امانی', emoji: '📦' },
@@ -67,7 +81,9 @@ export default function FlockCard(props: FlockCardProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
 
   const getGroupsForFlock = useFlk(s => s.getGroupsForFlock);
-  const flockGroups = getGroupsForFlock(f.id);
+  const flockGroups = getGroupsForFlock(f.id).slice().sort(
+    (a, b) => (GROUP_PRIORITY[a.type] || 99) - (GROUP_PRIORITY[b.type] || 99)
+  );
   // 🆕 emoji بر اساس گونه پرنده
   const speciesEmoji = bird?.birdKind === 'duck' ? '🦆' :
                        bird?.birdKind === 'turkey' ? '🦃' :
