@@ -322,6 +322,26 @@ export const useFlk = create<State>()(
       }),
       getFlocksInGroup: (groupId, includeDescendants) => {
         const state = get();
+        const group = state.groups.find(g => g.id === groupId);
+        
+        // 🆕 Smart groups — همیشه live computed
+        if (group?.type === 'smart' && group.rule) {
+          const matched = state.flocks.filter(f => matchesGroupRule(f, group.rule!));
+          if (!includeDescendants) return matched;
+          const children = state.groups.filter(g => g.parentGroupId === groupId && !g.archived);
+          const all = [...matched];
+          for (const child of children) {
+            all.push(...state.getFlocksInGroup(child.id, true));
+          }
+          const seen = new Set<string>();
+          return all.filter(f => {
+            if (seen.has(f.id)) return false;
+            seen.add(f.id);
+            return true;
+          });
+        }
+        
+        // Manual groups — از groupMembers
         const directIds = state.groupMembers
           .filter(m => m.groupId === groupId && !m.leftAt)
           .map(m => m.flockId);
@@ -337,10 +357,16 @@ export const useFlk = create<State>()(
       },
       getGroupsForFlock: (flockId) => {
         const state = get();
+        const flock = state.flocks.find(f => f.id === flockId);
+        if (!flock) return [];
         const gids = state.groupMembers
           .filter(m => m.flockId === flockId && !m.leftAt)
           .map(m => m.groupId);
-        return state.groups.filter(g => gids.includes(g.id) && !g.archived);
+        return state.groups.filter(g => {
+          if (g.archived) return false;
+          if (g.type === 'smart' && g.rule) return matchesGroupRule(flock, g.rule);
+          return gids.includes(g.id);
+        });
       },
       getGroupPath: (groupId) => {
         const path: FlockGroup[] = [];
@@ -693,6 +719,22 @@ export function getAgeDays(f: Flock): number {
   const d = jalaliToDate(getEffectiveStartDate(f));
   if (!d) return 0;
   return Math.max(0, differenceInDays(new Date(), d));
+}
+
+function matchesGroupRule(flock: Flock, rule: FlockGroupRule): boolean {
+  if (rule.type && flock.type !== rule.type) return false;
+  if (rule.status && flock.status !== rule.status) return false;
+  if (rule.hallId && flock.hallId !== rule.hallId) return false;
+  if (rule.breedId && flock.breedId !== rule.breedId) return false;
+  if (rule.birdId && flock.birdId !== rule.birdId) return false;
+  if (rule.source && flock.source !== rule.source) return false;
+  if (rule.dealType && flock.dealType !== rule.dealType) return false;
+  if (rule.minAge !== undefined || rule.maxAge !== undefined) {
+    const age = getAgeDays(flock);
+    if (rule.minAge !== undefined && age < rule.minAge) return false;
+    if (rule.maxAge !== undefined && age > rule.maxAge) return false;
+  }
+  return true;
 }
 
 export interface Lifecycle {

@@ -101,8 +101,14 @@ export function useFilterSort<T>(opts: UseFilterSortOptions<T>): UseFilterSortRe
       result = result.filter(item => {
         const v = def.getValue(item);
         if (def.kind === 'enum') {
-          if (Array.isArray(val)) return (val as string[]).includes(String(v ?? ''));
-          return String(v ?? '') === String(val);
+          // 🆕 پشتیبانی از multi-membership
+          const values = def.getValues
+            ? def.getValues(item).map(x => String(x))
+            : [String(v ?? '')];
+          if (Array.isArray(val)) {
+            return (val as string[]).some(selected => values.includes(selected));
+          }
+          return values.includes(String(val));
         }
         if (def.kind === 'boolean') {
           return Boolean(v) === Boolean(val);

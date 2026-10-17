@@ -71,6 +71,7 @@ export default function FlockGroupsModal({ open, onClose, flock }: Props) {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {availableGroups.map(g => {
+            const isSmart = g.type === 'smart';
             const checked = localSelected.has(g.id);
             return (
               <label
@@ -80,26 +81,48 @@ export default function FlockGroupsModal({ open, onClose, flock }: Props) {
                   alignItems: 'center',
                   gap: 'var(--sp-2)',
                   padding: 'var(--pad-normal)',
-                  background: checked ? 'var(--accent-soft)' : 'var(--input-bg)',
-                  border: '1px solid ' + (checked ? 'var(--accent)' : 'var(--border)'),
+                  background: isSmart
+                    ? 'var(--purple-soft)'
+                    : (checked ? 'var(--accent-soft)' : 'var(--input-bg)'),
+                  border: '1px solid ' + (
+                    isSmart
+                      ? 'var(--purple)'
+                      : (checked ? 'var(--accent)' : 'var(--border)')
+                  ),
                   borderRadius: 'var(--r-md)',
-                  cursor: 'pointer',
+                  cursor: isSmart ? 'default' : 'pointer',
+                  opacity: isSmart ? 0.9 : 1,
                 }}
               >
                 <input
                   type="checkbox"
                   checked={checked}
-                  onChange={() => toggle(g.id)}
-                  style={{ accentColor: 'var(--accent)' }}
+                  onChange={() => !isSmart && toggle(g.id)}
+                  disabled={isSmart}
+                  style={{ accentColor: isSmart ? 'var(--purple)' : 'var(--accent)' }}
                 />
                 <span style={{ fontSize: 14 }}>{TYPE_ICON[g.type]}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: 'var(--fs-sm)' }}>{g.name}</div>
+                  <div style={{ fontWeight: 600, fontSize: 'var(--fs-sm)' }}>
+                    {g.name}
+                    {isSmart && (
+                      <span style={{
+                        marginRight: 6, fontSize: 9, fontWeight: 700,
+                        color: 'var(--purple)', background: 'rgba(168,85,247,.15)',
+                        padding: '1px 6px', borderRadius: 4,
+                      }}>🤖 خودکار</span>
+                    )}
+                  </div>
                   {g.description && (
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{g.description}</div>
                   )}
+                  {isSmart && (
+                    <div style={{ fontSize: 10, color: 'var(--purple)', fontStyle: 'italic', marginTop: 2 }}>
+                      بر اساس قوانین گروه به‌صورت خودکار
+                    </div>
+                  )}
                 </div>
-                {checked && <span style={{ fontSize: 11, color: 'var(--accent)', fontWeight: 700 }}>✓</span>}
+                {checked && !isSmart && <span style={{ fontSize: 11, color: 'var(--accent)', fontWeight: 700 }}>✓</span>}
               </label>
             );
           })}

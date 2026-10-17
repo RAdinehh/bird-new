@@ -22,6 +22,8 @@ export interface FilterDef<T> {
   options?: FilterOption[];
   /** تابع استخراج مقدار از آیتم */
   getValue: (item: T) => string | number | boolean | null | undefined;
+  /** 🆕 برای فیلدهایی که یه آیتم می‌تونه چند مقدار داشته باشه (مثل گروه‌ها) */
+  getValues?: (item: T) => (string | number | boolean)[];
   /** آیا فیلتر چند انتخابی؟ (پیش‌فرض: تکی) */
   multi?: boolean;
   /**

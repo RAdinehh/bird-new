@@ -8,6 +8,8 @@ export function getFlkFlocksConfig(ctx: {
   breeds: Array<{ id: string; name: string; birdId: string }>;
   halls: Array<{ id: string; name: string }>;
   zones: Array<{ id: string; name: string; hallId: string }>;
+  groups?: Array<{ id: string; name: string; type: string }>;
+  getGroupsForFlock?: (flockId: string) => Array<{ id: string }>;
 }): FilterConfig<Flock> {
   return {
     filterDefs: [
@@ -28,6 +30,20 @@ export function getFlkFlocksConfig(ctx: {
         },
         multi: true,
       },
+      // 🆕 گروه‌ها
+      ...(ctx.groups && ctx.groups.length > 0 && ctx.getGroupsForFlock ? [{
+        key: 'group',
+        label: 'گروه',
+        kind: 'enum' as const,
+        icon: <IconFolder size={18} />,
+        options: ctx.groups.map(g => ({ value: g.id, label: g.name })),
+        getValue: (f: Flock) => {
+          const gs = ctx.getGroupsForFlock!(f.id);
+          return gs[0]?.id || '';
+        },
+        getValues: (f: Flock) => ctx.getGroupsForFlock!(f.id).map(g => g.id),
+        multi: true,
+      }] : []),
       // ═══ ۲. آماده تخم‌گذاری (۳ حالت) ═══
       {
         key: 'ready', label: 'آماده تخم‌گذاری', kind: 'enum',

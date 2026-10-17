@@ -56,7 +56,7 @@ export default function FlockTabPanel({
   breedStd, fmt, vaccineEnabled, kpiData,
   onEdit, onAdd, triggerBadge,
 }: Props) {
-  const { add, remove, archive, restore, toggleHidden, togglePaused } = useFlk();
+  const { add, remove, archive, restore, toggleHidden, togglePaused, groups, getGroupsForFlock } = useFlk();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ flock: Flock | Flock[] } | null>(null);
 
@@ -73,8 +73,10 @@ export default function FlockTabPanel({
       breeds: breeds.map(b => ({ id: b.id, name: b.name, birdId: b.birdId })),
       halls: halls.map(h => ({ id: h.id, name: h.name })),
       zones: zones.map(z => ({ id: z.id, name: z.name, hallId: z.hallId })),
+      groups: groups.map(g => ({ id: g.id, name: g.name, type: g.type })),
+      getGroupsForFlock: (id) => getGroupsForFlock(id),
     }),
-    [birds, breeds, halls, zones],
+    [birds, breeds, halls, zones, groups],
   );
 
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
