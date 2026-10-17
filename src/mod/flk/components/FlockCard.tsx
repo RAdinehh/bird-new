@@ -23,6 +23,12 @@ import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 
 type Fmt = ReturnType<typeof useFormat>;
 
+const DEAL_BADGE: Record<string, { label: string; emoji: string }> = {
+  partnership: { label: 'شراکتی', emoji: '🤝' },
+  consignment: { label: 'امانی', emoji: '📦' },
+  rent: { label: 'اجاره', emoji: '📋' },
+};
+
 export interface FlockCardProps {
   flock: Flock;
   index: number;
@@ -73,6 +79,9 @@ export default function FlockCard(props: FlockCardProps) {
       isOpen={isOpen}
       onToggle={onToggle}
       badge={<>
+        {DEAL_BADGE[f.dealType || 'own'] && (
+          <Tag tone="purple">{DEAL_BADGE[f.dealType || 'own'].emoji} {DEAL_BADGE[f.dealType || 'own'].label}</Tag>
+        )}
         {isArchived ? (
           <Tag tone="gray">📦 آرشیو</Tag>
         ) : (

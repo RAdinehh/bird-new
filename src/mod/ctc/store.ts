@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
+import { useFlk } from '../flk/store';
+import { showToast } from '../../cor/store/toast';
 
 export type Role = 'customer' | 'supplier' | 'worker';
 
@@ -51,7 +53,20 @@ export const useCtc = create<State>()(
       contacts: [],
       add: (c) => set({ contacts: [...get().contacts, {...c, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       update: (id, patch) => set({ contacts: get().contacts.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
-      remove: (id) => set({ contacts: get().contacts.filter(x => x.id !== id) })
+      remove: (id) => {
+        // 🆕 guard: چک استفاده در گله‌ها (شریک، امانت‌دهنده، موجر)
+        const flkState = useFlk.getState();
+        const linked = flkState.flocks.filter((f: any) =>
+          f.dealData?.partnerId === id ||
+          f.dealData?.consignorId === id ||
+          f.dealData?.lessorId === id
+        );
+        if (linked.length > 0) {
+          showToast('این مخاطب ' + linked.length + ' گله دارد — ابتدا گله را ویرایش کنید', 'error');
+          return;
+        }
+        set({ contacts: get().contacts.filter(x => x.id !== id) });
+      }
     }),
     {
       name: 'pm-ctc',
