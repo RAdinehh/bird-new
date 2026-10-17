@@ -16,9 +16,10 @@ import { DepBox } from '../helpers';
 import FlockSourcePickers from './FlockSourcePickers';
 import FlockDetailsSection from './FlockDetailsSection';
 import FlockCapacityCard from './FlockCapacityCard';
-import { SOURCE_LABEL, DEFAULT_LAYING_START, sexRatio } from '../store';
+import { SOURCE_LABEL, DEFAULT_LAYING_START, sexRatio, useFlk } from '../store';
 import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
 import { todayJ, jalaliBounds, checkDateBounds } from '../api/flocksCalc';
+import { showConfirmAsync } from '../../../cor/store/dialog';
 import type { F } from '../types-flocks';
 import type { Bird, Breed } from '../../brd/store';
 import type { Invoice, InvoiceItem } from '../../tra/types';
@@ -102,6 +103,7 @@ export default function FlocksModal(props: FlocksModalProps) {
     err, vErrors, showError, markTouched, isValid, hallCapacity, birds, breedsForBird, halls, zonesForHall,
     breedStd, vaccineEnabled, fmt, onSave,
   } = props;
+  const allFlocks = useFlk(st => st.flocks);
 
 
   const formStd = breedStd.byBreedId(form.breedId);
@@ -137,7 +139,22 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       <Grid2>
         <Field label="نوع گله" required error={showError('type')} onTouch={() => markTouched('type')}>
-          <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as 'layer' | 'broiler' | 'breeder' })}>
+          <Select value={form.type} onChange={async e => {
+            const newType = e.target.value as 'layer' | 'broiler' | 'breeder';
+            if (form.id) {
+              const original = allFlocks.find(f => f.id === form.id);
+              const hasEvents = (original?.events?.length || 0) > 0;
+              const hasCountChange = original ? (original.currentCount !== original.initialCount) : false;
+              if ((hasEvents || hasCountChange) && newType !== original?.type) {
+                const ok = await showConfirmAsync(
+                  '⚠️ تغییر نوع گله',
+                  'این گله داده دارد (رویدادها یا تغییر موجودی). تغییر نوع ممکنه گزارش‌های گذشته رو مختل کنه. ادامه؟'
+                );
+                if (!ok) return;
+              }
+            }
+            setForm({ ...form, type: newType });
+          }}>
             <option value="layer">تخم‌گذار</option>
             <option value="broiler">گوشتی</option>
             <option value="breeder">مادر (تخم نطفه‌دار)</option>
