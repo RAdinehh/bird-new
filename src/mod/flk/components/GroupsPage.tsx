@@ -400,7 +400,7 @@ export default function GroupsPage({ open, onClose }: Props) {
           </Field>
 
           <Field label="رنگ (اختیاری)">
-            <Input value={form.color} onChange={e => setForm({ ...form, color: e.target.value })} placeholder="#3b82f6 یا خالی" />
+            <Input value={form.color} onChange={e => setForm({ ...form, color: e.target.value })} placeholder="مثلاً: قرمز، آبی، ..." />
           </Field>
 
           <Field label="توضیحات (اختیاری)">
