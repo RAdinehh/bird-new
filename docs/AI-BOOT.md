@@ -23,6 +23,36 @@ bash scripts/check.sh
 
 ---
 
+## 🚨 ۱۰ قانون حیاتی UX فرم (بخوان، حفظ کن، اجرا کن)
+
+**این ۱۰ قانون از ۷۰ دستور `UX-FORM-RULES.md` استخراج شده — قبل از هر تغییر UI، چک کن:**
+
+| # | قانون | چک سریع |
+|---|---|---|
+| ۱ | Error فقط بعد از `saveAttempted` | `grep -n "saveAttempted\|setSaveAttempted"` |
+| ۲ | Error با تایپ پاک شود | `grep -n "onErrorClear\|setErr('')"` |
+| ۳ | Error blame-free، کنار فیلد، پیام مخصوص هر فیلد | `grep -n "Field.*error"` |
+| ۴ | بدون emoji در error (⚠️/💡 ممنوع) | `grep -rn "⚠️\|💡" src/mod/*/components/*Modal.tsx` |
+| ۵ | دکمه ذخیره فعال بماند (نه disabled) | `grep -n "disabled.*save\|disabled.*ذخیره"` |
+| ۶ | Placeholder = مثال، نه تکرار label | ذهنی |
+| ۷ | Auto-fill فارسی (`toFa`) + Override کاربر | `grep -n "toFa\|autoFields"` |
+| ۸ | Grid2 برای کوتاه، Row برای بلند | ذهنی |
+| ۹ | Single Source of Truth (مثلاً تجهیزات فقط از تجهیزات) | `grep -n "ventilationSystem\|feederType"` |
+| ۱۰ | قبل از fix، grep. tsc خطا → rollback نه fix | فرایند |
+
+**قوانین کامل (۷۰ دستور):** `docs/UX-FORM-RULES.md` — قبل از هر ماژول جدید مرور کن.
+
+**اولویت‌بندی کاربردی:**
+۱. **۶۵-۷۰** (روش کار) — همیشه
+۲. **۱۲-۲۲** (Error + پیام پویا) — مهم‌ترین UX
+۳. **۳۱-۳۵** (Sync + Single Source) — جلوگیری از باگ
+۴. **۳۶-۴۱** (Layout) — یکدستی بصری
+۵. **۱-۱۱** (Placeholder + Required) — ظاهر
+۶. **۴۲-۶۱** (KPI + مدال + تجهیزات)
+۷. **۶۲-۶۴** (Legacy)
+
+---
+
 ## 🎯 اصل اول — کد مرجع است، سند نیست
 
 اسناد قدیمی (`EVENT-BUS.md` قدیمی، `NEXT.md` قدیمی، `AI-BOOT.md` قدیمی) **اثبات شده که اشتباه بودند**:

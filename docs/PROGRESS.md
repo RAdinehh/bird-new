@@ -33,3 +33,5 @@
 [2026/10/18 01:10] docs: پایه‌سازی استاندارد — CONSTITUTION + UI-PATTERNS + DECISIONS + PARADIGM + COMPLEX-SCENARIOS + check.sh + AI-BOOT + NEXT
 
 [2026/10/18 01:24] docs: پاک‌سازی — حذف STANDARDS (تکراری)، حفظ FOUNDATION + FOUNDATION-PATTERNS + UX-FORM-RULES
+
+[2026/10/18 01:28] feat(scripts): session-start.sh + ۱۰ قانون UX در AI-BOOT + ۳ چک UX در check.sh (ratchet)
