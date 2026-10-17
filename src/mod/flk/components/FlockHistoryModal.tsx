@@ -41,11 +41,14 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const [reasonCode, setReasonCode] = useState<FlockEventReasonCode>('data_entry_error');
   const [notes, setNotes] = useState('');
   const [validationError, setValidationError] = useState('');
+  const [sign, setSign] = useState<1 | -1>(1);
   const addCorrection = useFlk(st => st.addCorrection);
   const revokeEvent = useFlk(st => st.revokeEvent);
 
   const initial = flock.initialCount || 0;
   const current = flock.currentCount || 0;
+  const num = parseInt(toEn(delta).replace(/[^0-9]/g, '')) || 0;
+  const newCount = current + sign * num;
   const losses = Math.max(0, initial - current);
   const lossesPct = initial > 0 ? (losses / initial) * 100 : 0;
 
@@ -80,11 +83,12 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const handleSaveCorrection = async () => {
     setValidationError('');
     const en = toEn(delta).trim();
-    const cleaned = en.replace(/[^0-9+\-]/g, '');
-    const d = parseInt(cleaned.replace('+', '')) || 0;
+    const cleaned = en.replace(/[^0-9]/g, '');
+    const num = parseInt(cleaned) || 0;
+    const d = sign * num;
     const newCount = current + d;
 
-    if (d === 0) { setValidationError('تغییر نمی‌تواند صفر باشد'); return; }
+    if (num === 0) { setValidationError('عدد را وارد کنید'); return; }
     if (newCount < 0) { setValidationError('موجودی کافی نیست — موجودی فعلی ' + toFa(current) + ' پرنده'); return; }
     if (d > 0 && newCount > initial) {
       const ok = await showConfirmAsync('بیشتر از تعداد اولیه', 'تعداد جدید (' + toFa(newCount) + ') از تعداد اولیه (' + toFa(initial) + ') بیشتر می‌شود. ادامه؟');
@@ -101,6 +105,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
     setCorrectionOpen(false);
     setDelta('');
     setNotes('');
+    setSign(1);
   };
 
   const handleRevoke = async (e: FlockEvent) => {
@@ -145,55 +150,64 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       ) : (
         <div style={{
           marginBottom: 12,
-          padding: 12,
-          background: 'var(--warn-soft)',
-          border: '1px solid var(--warn)',
+          background: 'var(--card)',
+          border: '1px solid var(--border)',
           borderRadius: 'var(--r-md)',
+          padding: 12,
           display: 'flex',
           flexDirection: 'column',
           gap: 8,
         }}>
-          <div style={{ fontWeight: 700, color: 'var(--warn)', fontSize: 13 }}>✏️ ثبت اصلاح</div>
-          <div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.6 }}>عدد مثبت = افزودن، عدد منفی = کسر</div>
-          <Grid2>
-            <Field label="تغییر تعداد" required>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', height: 38 }}>
-                <input
-                  type="text"
-                  value={delta}
-                  onChange={e => setDelta(e.target.value)}
-                  placeholder="مثلاً +۵ یا -۳"
-                  dir="ltr"
-                  style={{ flex: 1, width: '100%', minWidth: 0, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontFamily: 'inherit', fontSize: 14, textAlign: 'center' }}
-                />
-                <span style={{ fontSize: 12, color: 'var(--dim)', flexShrink: 0 }}>پرنده</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed var(--border)', paddingBottom: 8 }}>
+            <span style={{ fontWeight: 700, color: 'var(--warn)', fontSize: 'var(--fs-sm)' }}>✏️ ثبت اصلاح موجودی</span>
+            <button type="button" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setSign(1); setValidationError(''); }} style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: 16, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>✕</button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid ' + (validationError ? 'var(--danger)' : (num > 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--border)')), borderRadius: 'var(--r-md)', height: 38, overflow: 'hidden' }}>
+              <button type="button" onClick={() => setSign(1)} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: sign === 1 ? 700 : 400, color: sign === 1 ? 'var(--text)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderLeft: '1px solid var(--border)', flexShrink: 0 }}>+</button>
+              <input type="text" value={delta} onChange={e => { setDelta(e.target.value); setValidationError(''); }} placeholder="عدد" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', textAlign: 'center', padding: '0 4px' }} />
+              <button type="button" onClick={() => setSign(-1)} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: sign === -1 ? 700 : 400, color: sign === -1 ? 'var(--text)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0 }}>−</button>
+            </div>
+
+            <div style={{ background: 'var(--input-bg)', border: '1px solid ' + (num > 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--border)'), borderRadius: 'var(--r-md)', height: 38, padding: '0 8px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+              <span style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.2 }}>موجودی بعد</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>{toFa(current)}</span>
+                <span style={{ color: 'var(--dim)', fontSize: 10 }}>→</span>
+                {num === 0 ? (
+                  <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 400, color: 'var(--dim)' }}>؟</span>
+                ) : newCount < 0 ? (
+                  <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--danger)' }}>منفی</span>
+                ) : (
+                  <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 700, color: newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(newCount)}</span>
+                )}
               </div>
-            </Field>
-            <Field label="دلیل" required>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 600, paddingRight: 2 }}>دلیل</span>
               <Select value={reasonCode} onChange={e => setReasonCode(e.target.value as FlockEventReasonCode)}>
                 {REASON_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </Select>
-            </Field>
-          </Grid2>
-          <Field label="توضیح (اختیاری)">
-            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', height: 38 }}>
-              <input
-                type="text"
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-                placeholder="مثلاً خطای شمارش دیروز"
-                style={{ flex: 1, width: '100%', minWidth: 0, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontFamily: 'inherit', fontSize: 13 }}
-              />
             </div>
-          </Field>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 600, paddingRight: 2 }}>توضیح (اختیاری)</span>
+              <input type="text" value={notes} onChange={e => setNotes(e.target.value)} placeholder="مثلاً شمارش اشتباه" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', height: 38, padding: '0 10px', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', outline: 'none', width: '100%' }} />
+            </div>
+          </div>
+
           {validationError && (
-            <div style={{ padding: 8, background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', color: 'var(--danger)', fontSize: 12, fontWeight: 600 }}>
+            <div style={{ padding: '8px 12px', background: 'var(--danger-soft)', border: '1px solid rgba(239,68,68,.3)', borderRadius: 'var(--r-md)', color: 'var(--danger)', fontSize: 'var(--fs-xs)', fontWeight: 600 }}>
               ⚠️ {validationError}
             </div>
           )}
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Btn size="sm" variant="primary" onClick={handleSaveCorrection} style={{ flex: 1 }}>ثبت</Btn>
-            <Btn size="sm" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setValidationError(''); }} style={{ flex: 1 }}>لغو</Btn>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <button type="button" onClick={handleSaveCorrection} disabled={num === 0 || newCount < 0} style={{ height: 38, background: (num === 0 || newCount < 0) ? 'var(--dim)' : 'var(--accent)', color: 'white', border: 'none', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: (num === 0 || newCount < 0) ? 'not-allowed' : 'pointer' }}>ثبت اصلاح</button>
+            <button type="button" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setSign(1); setValidationError(''); }} style={{ height: 38, background: 'var(--input-bg)', color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer' }}>لغو</button>
           </div>
         </div>
       )}
