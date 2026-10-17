@@ -22,6 +22,7 @@ import type { TabId } from './types-flocks';
 import FlocksTabs from './components/FlocksTabs';
 import FlockTabPanel from './components/FlockTabPanel';
 import FlocksModal from './components/FlocksModal';
+import GroupsPage from './components/GroupsPage';
 import { showConfirmAsync } from '../../cor/store/dialog';
 
 export default function FlocksPage() {
@@ -34,6 +35,7 @@ export default function FlocksPage() {
   const { invoices } = useTra();
 
   const [tab, setTab] = useState<TabId>('all');
+  const [groupsOpen, setGroupsOpen] = useState(false);
   const { badge: newTabBadge, trigger: triggerBadge } = useTabBadge();
 
   // ─── dedupe پرنده‌ها و سالن‌ها ───
@@ -181,6 +183,24 @@ export default function FlocksPage() {
         activeTab={tab}
         onTabChange={(id) => { setInstant(); setTab(id); }}
         newTabBadge={newTabBadge}
+        rightAction={
+          <button
+            type="button"
+            onClick={() => setGroupsOpen(true)}
+            aria-label="گروه‌ها"
+            title="مدیریت گروه‌ها"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--muted)',
+              fontSize: 18,
+              cursor: 'pointer',
+              padding: '6px 8px',
+              borderRadius: 'var(--r-sm)',
+              fontFamily: 'inherit',
+            }}
+          >📁</button>
+        }
       />
 
       <div
@@ -292,6 +312,9 @@ export default function FlocksPage() {
           }
         }}
       />
-    </div>
+    
+
+      <GroupsPage open={groupsOpen} onClose={() => setGroupsOpen(false)} />
+      </div>
   );
 }
