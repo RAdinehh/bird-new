@@ -1,7 +1,7 @@
 /**
  * FlocksModal.tsx — فرم افزودن/ویرایش گله
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
   Btn, BtnRow, ErrorBox, Field, Grid2, Input, Modal, MoneyField,
@@ -10,6 +10,8 @@ import {
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import DependentSelect from '../../../shr/components/DependentSelect';
+import PickInvoiceModal from './PickInvoiceModal';
+import PickHatchModal from './PickHatchModal';
 import { DepBox } from '../helpers';
 import { SOURCE_LABEL, DEFAULT_LAYING_START, sexRatio } from '../store';
 import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
@@ -53,6 +55,42 @@ export interface FlocksModalProps {
 }
 
 export default function FlocksModal(props: FlocksModalProps) {
+
+  // 🆕 Picker modals
+  const [invoicePickerOpen, setInvoicePickerOpen] = useState(false);
+  const [hatchPickerOpen, setHatchPickerOpen] = useState(false);
+
+  const handleInvoiceSelect = (inv: any) => {
+    const birdItems = (inv.items || []).filter((it: any) => it.birdId);
+    if (!birdItems.length) return;
+    const totalQty = birdItems.reduce((s: number, it: any) => s + (it.quantity || 0), 0);
+    const firstBird = birdItems[0];
+    const updates: any = {
+      initialCount: toFa(totalQty),
+      currentCount: toFa(totalQty),
+      purchaseDate: inv.date || '',
+      birdId: firstBird.birdId || '',
+      breedId: firstBird.breedId || '',
+      sourceInvoiceId: inv.id,
+    };
+    if (firstBird.unitPrice) updates.purchasePrice = toFa(firstBird.unitPrice);
+    if (firstBird.maleCount) updates.maleCount = toFa(firstBird.maleCount);
+    if (firstBird.femaleCount) updates.femaleCount = toFa(firstBird.femaleCount);
+    setForm((f: any) => ({ ...f, ...updates }));
+  };
+
+  const handleHatchSelect = (h: any, entry: any | null) => {
+    const updates: any = {
+      initialCount: toFa(h.hatched || 0),
+      currentCount: toFa(h.hatched || 0),
+      hatchDate: h.date || '',
+      hatchId: h.id,
+    };
+    if (entry?.birdId) updates.birdId = entry.birdId;
+    if (entry?.breedId) updates.breedId = entry.breedId;
+    setForm((f: any) => ({ ...f, ...updates }));
+  };
+
   const {
     open, onClose, form, setForm, layingFromStd, setLayingFromStd,
     err, vErrors, showError, markTouched, isValid, hallCapacity, birds, breedsForBird, halls, zonesForHall,
@@ -114,6 +152,44 @@ export default function FlocksModal(props: FlocksModalProps) {
           }}>
             {Object.entries(SOURCE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </Select>
+          {form.source === 'purchase' && (
+            <button
+              type="button"
+              onClick={() => setInvoicePickerOpen(true)}
+              style={{
+                marginTop: 6,
+                width: '100%',
+                height: 32,
+                background: 'var(--accent-soft)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: 'var(--r-md)',
+                color: 'var(--accent)',
+                fontFamily: 'inherit',
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >📄 انتخاب از فاکتور خرید</button>
+          )}
+          {form.source === 'hatch' && (
+            <button
+              type="button"
+              onClick={() => setHatchPickerOpen(true)}
+              style={{
+                marginTop: 6,
+                width: '100%',
+                height: 32,
+                background: 'var(--accent-soft)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: 'var(--r-md)',
+                color: 'var(--accent)',
+                fontFamily: 'inherit',
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >🐣 انتخاب از هچ</button>
+          )}
         </Field>
       </Grid2>
 
@@ -441,6 +517,17 @@ export default function FlocksModal(props: FlocksModalProps) {
       </Field>
 
       {err && <ErrorBox>{err}</ErrorBox>}
-    </Modal>
+    
+      <PickInvoiceModal
+        open={invoicePickerOpen}
+        onClose={() => setInvoicePickerOpen(false)}
+        onSelect={handleInvoiceSelect}
+      />
+      <PickHatchModal
+        open={hatchPickerOpen}
+        onClose={() => setHatchPickerOpen(false)}
+        onSelect={handleHatchSelect}
+      />
+      </Modal>
   );
 }
