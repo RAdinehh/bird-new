@@ -1,23 +1,32 @@
 # 📮 EVENT-BUS.md — سیستم رویداد محور Bird-new
 
-> این سند قرارداد رسمی Event Bus است. هر event جدید باید اینجا ثبت شه.
-> آخرین به‌روزرسانی: جلسه ۱۲
+> قرارداد رسمی Event Bus. هر event جدید باید اینجا ثبت شه.
+> آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۱۲)
 
----
+## ⚠️ وضعیت واقعی (اسکن جلسه ۱۲)
+
+| مورد | مقدار |
+|---|---|
+| ایونت‌های تعریف‌شده | ۱۸ |
+| **فعال (ناشر + شنونده)** | **۲** ✅ |
+| غیرفعال | ۱۶ 🔴 |
+| فایل‌های `handlers.ts` | فقط `flk` |
+| فایل‌های ناشر (`bus.emit`) | فقط `dlg` (۲ محل) |
+
+**فقط یک مسیر کار می‌کنه: `dlg → flk`**
 
 ## بخش ۱ — چرا Event Bus؟
 
-**مسئله:** ماژول‌های زیاد (۲۰+) → وابستگی مستقیم = circular dependency
+**مسئله:** ماژول‌های زیاد (۱۸+) → وابستگی مستقیم = circular dependency
 
-**راه‌حل:** ناشر یه پیام می‌ذاره، مشترک‌ها گوش می‌دن — بدون دونستن از هم.
-
+**راه‌حل:** ناشر پیام می‌ذاره، مشترک‌ها گوش می‌دن — بدون دونستن از هم.
 
 ~~~
 ❌ روش سنتی:     dlg ─import─► flk     (اگه flk عوض شه، dlg می‌شکنه)
 ✅ Event Bus:    dlg ─emit─► 📮 bus ─on─► flk     (بی‌خبر از هم)
 ~~~
 
-### ۶ مزیت کلیدی
+### ۶ مزیت
 | مزیت | توضیح |
 |---|---|
 | Decoupling | dlg نمی‌دونه flk وجود داره |
@@ -27,21 +36,21 @@
 | قابلیت ردیابی | هر رویداد traceId داره |
 | History | ۲۰۰ رویداد اخیر برای دیباگ |
 
----
-
 ## بخش ۲ — معماری
 
-### فایل‌ها (src/cor/events/)
+### فایل‌ها (`src/cor/events/`)
+
 | فایل | نقش |
 |---|---|
-| bus.ts | کلاس EventBus + singleton |
-| events.ts | تعریف type-safe همه event ها |
-| types.ts | EventMeta، BusHistoryEntry، EmitOptions |
-| index.ts | re-export |
-| DebugPanel.tsx | UI دیباگ (dev mode) |
+| `bus.ts` | کلاس EventBus + singleton |
+| `events.ts` | تعریف type-safe همه event ها |
+| `types.ts` | `EventMeta`، `BusHistoryEntry`، `EmitOptions` |
+| `index.ts` | re-export |
+| `DebugPanel.tsx` | UI دیباگ (dev mode) |
 
-### Active handlers (src/mod/*/handlers.ts)
-هر ماژول یه register*Handlers() داره که توی main.tsx صدا زده می‌شه:
+### Handlers (`src/mod/*/handlers.ts`)
+
+هر ماژول یه `register*Handlers()` داره که در `main.tsx` صدا زده می‌شه:
 
 ~~~
 // main.tsx
@@ -49,294 +58,203 @@ import { registerFlkHandlers } from './mod/flk/handlers';
 registerFlkHandlers();
 ~~~
 
-
----
+**⚠️ فعلاً فقط `flk` ثبت شده.**
 
 ## بخش ۳ — API کامل
 
 | متد | امضا | کار |
 |---|---|---|
-| bus.on | (event, handler, opts?) => off | اشتراک (return تابع لغو) |
-| bus.off | (event, handler) => void | لغو دستی |
-| bus.once | (event, handler) => off | یک‌بار مصرف |
-| bus.emit | async (event, data, meta?) => result | انتشار (async) |
-| bus.getHistory | () => BusHistoryEntry[] | ۲۰۰ رویداد اخیر |
-| bus.clearHistory | () => void | پاک کردن history |
-| bus.getListeners | (event?) => any[] | لیست listenerها |
-| bus.setDevMode | (on: boolean) => void | فعال دیباگ |
-| bus.reset | () => void | تست |
+| `bus.on` | `(event, handler, opts?) => off` | اشتراک (return تابع لغو) |
+| `bus.off` | `(event, handler) => void` | لغو دستی |
+| `bus.emit` | `(event, payload, opts?) => void` | انتشار |
+| `bus.history` | `(limit?) => BusHistoryEntry[]` | تاریخچه |
+| `bus.clear` | `() => void` | پاک کردن تاریخچه |
 
-### خروجی emit
+### `EmitOptions`
+- `traceId?` — برای ردیابی
+- `source?` — نام ماژول ناشر
+- `silent?` — بدون لاگ
+
+## بخش ۴ — جدول کامل ۱۸ ایونت
+
+### dlg — ثبت روزانه (۶ ایونت)
+
+| ایونت | ناشر | emit? | handler? | مشترک هدف |
+|---|---|---|---|---|
+| `dlg:deaths:recorded` | `useDlgSave` | ✅ | ❌ | flk (کاهش تعداد)، alt، rep |
+| `dlg:feed:consumed` | `useDlgSave` | ✅ | ❌ | whs (کاهش دان)، fed |
+| `dlg:vaccine:given` | `DlgTabPanel` | ❌ | ❌ | cal، alt |
+| `dlg:medication:given` | `DlgTabPanel` | ❌ | ❌ | cal، alt |
+| `dlg:egg:recorded` | — | ❌ | ❌ | egg، flk |
+| `dlg:log:deleted` | — | ❌ | ❌ | flk، whs |
+
+### flk — گله (۳ ایونت)
+
+| ایونت | ناشر | emit? | handler? | مشترک هدف |
+|---|---|---|---|---|
+| `flk:flock:created` | flk/store | ❌ | ✅ | dsh، rep |
+| `flk:flock:updated` | flk/store | ❌ | ✅ | dsh، rep، hal |
+| `flk:flock:archived` | flk/store | ❌ | ❌ | hal (آزادسازی ظرفیت) |
+
+### tra — معاملات (۳ ایونت)
+
+| ایونت | ناشر | emit? | handler? | مشترک هدف |
+|---|---|---|---|---|
+| `tra:invoice:created` | tra/store | ❌ | ❌ | whs (موجودی)، egg، dsh |
+| `tra:invoice:updated` | tra/store | ❌ | ❌ | whs، dsh |
+| `tra:invoice:deleted` | tra/store | ❌ | ❌ | whs (rollback)، dsh |
+
+### egg — تولید تخم (۳ ایونت)
+
+| ایونت | ناشر | emit? | handler? | مشترک هدف |
+|---|---|---|---|---|
+| `egg:production:created` | egg/store | ❌ | ❌ | dsh، rep، whs |
+| `egg:production:updated` | egg/store | ❌ | ❌ | dsh، rep |
+| `egg:production:deleted` | egg/store | ❌ | ❌ | dsh، rep، whs |
+
+### inc — جوجه‌کشی (۲ ایونت)
+
+| ایونت | ناشر | emit? | handler? | مشترک هدف |
+|---|---|---|---|---|
+| `inc:hatch:created` | inc/store | ❌ | ❌ | flk (گله جدید)، whs |
+| `inc:hatch:deleted` | inc/store | ❌ | ❌ | flk، whs |
+
+### whs — انبار (۱ ایونت)
+
+| ایونت | ناشر | emit? | handler? | مشترک هدف |
+|---|---|---|---|---|
+| `whs:movement:created` | whs/store | ❌ | ❌ | hal، alt، dsh |
+
+## بخش ۵ — الگوی فعال‌سازی
+
+### گام ۱ — ناشر (emit)
+
+در store یا hook ماژول ناشر:
+
 ~~~
-{
-  traceId: string;      // شناسه زنجیره علیت
-  duration: number;     // میلی‌ثانیه
-  handlerCount: number; // چند listener
-  errors: any[];        // خطاهای handler ها
+import { bus } from '@cor/events';
+
+// بعد از commit موفق:
+bus.emit('tra:invoice:created', {
+  invoiceId: inv.id,
+  partyId: inv.partyId,
+  total: inv.total,
+  date: inv.date,
+}, { source: 'tra' });
+~~~
+
+### گام ۲ — شنونده (`handlers.ts`)
+
+فایل جدید `src/mod/<module>/handlers.ts`:
+
+~~~
+import { bus } from '@cor/events';
+import { useXxx } from './store';
+
+export function registerXxxHandlers() {
+  return bus.on('tra:invoice:created', (payload) => {
+    // آپدیت موجودی انبار
+    useWhs.getState().applyInvoiceImpact(payload);
+  }, { source: 'xxx' });
 }
 ~~~
 
-### Options برای on
-~~~
-bus.on('event', handler, {
-  once: true,      // یک‌بار مصرف
-  id: 'custom-id'  // شناسه دلخواه (پیش‌فرض auto)
-})
-~~~
-
----
-
-## بخش ۴ — Type Safety
-
-همه event ها توی events.ts به صورت interface تعریف می‌شن:
-
-~~~
-export interface AppEvents {
-  'dlg:deaths:recorded': DlgDeathsRecorded;
-  'dlg:log:deleted': DlgLogDeleted;
-}
-
-export type AppEventName = keyof AppEvents;
-export type AppEventData<K extends AppEventName> = AppEvents[K];
-~~~
-
-**نتیجه:** TypeScript خودش چک می‌کنه که data با event match ئه.
-
----
-
-## بخش ۵ — الگوی نام‌گذاری
-
-~~~
-{module}:{entity}:{action}
-
-مثال‌ها:
-  dlg:deaths:recorded
-  dlg:log:deleted
-  tra:invoice:created
-  flk:flock:archived
-~~~
-
-**قواعد:**
-- اسم ماژول: از mod/ (dlg, flk, tra, ...)
-- entity: مفرد، snake_case
-- action: گذشته ساده (created, recorded, deleted)
-
-
----
-
-## بخش ۶ — Events فعلی
-
-### فعال (۲ event)
-
-| event | emitter | listener | کار |
-|---|---|---|---|
-| dlg:deaths:recorded | useDlgSave.ts:176 · DlgTabPanel.tsx:102 | flk/handlers.ts:5 | کاهش currentCount + ثبت death event |
-| dlg:log:deleted | useDlgSave.ts:210 | flk/handlers.ts:69 | برگرداندن currentCount |
-
-### تعریف‌شده ولی متصل‌نشده (۱۶ event)
-
-| event | ماژول | roadmap |
-|---|---|---|
-| dlg:feed:consumed | dlg | کاهش موجودی انبار |
-| dlg:vaccine:given | dlg | هشدار cal |
-| dlg:medication:given | dlg | هشدار cal |
-| dlg:egg:recorded | dlg | به‌روز egg stock |
-| tra:invoice:created | tra | به‌روز whs + egg |
-| tra:invoice:updated | tra | بازگشت موجودی قبلی |
-| tra:invoice:deleted | tra | حذف اثرات |
-| flk:flock:created | flk | به‌روز dsh |
-| flk:flock:updated | flk | رفرش KPI |
-| flk:flock:archived | flk | حذف از alt + dsh |
-| egg:production:created | egg | به‌روز dsh |
-| egg:production:updated | egg | رفرش KPI |
-| egg:production:deleted | egg | بازگشت stock |
-| inc:hatch:created | inc | ساخت گله خودکار |
-| inc:hatch:deleted | inc | حذف اثرات |
-| whs:movement:created | whs | هشدار کم‌موجودی |
-
----
-
-## بخش ۷ — Events پیشنهادی (roadmap)
-
-| event | ناشر | مشترک‌ها | کار |
-|---|---|---|---|
-| hal:hall:deleted | hal | flk, dsh, alt | هشدار گله بدون سالن |
-| hal:zone:deleted | hal | flk | پاک کردن zoneId گله‌ها |
-| brd:breed:updated | brd | flk, hal, egg | رفرش استانداردها |
-| set:standards:changed | set | همه | رفرش Single Resolver |
-| whs:item:low-stock | whs | alt, dsh | هشدار سفارش |
-| cal:event:approaching | cal | alt, dsh | هشدار واکسن |
-| inc:hatch:completed | inc | flk | پیشنهاد ساخت گله |
-
-
----
-
-## بخش ۸ — قوانین (کِی event بسازیم؟)
-
-### event بساز وقتی:
-- ۲+ ماژول باید از یه رویداد باخبر شن
-- ناشر و شنونده نباید مستقیم هم رو بشناسن
-- عملیات async ئه و می‌شه decouple کرد
-- می‌خوای traceability داشته باشی
-
-### event نساز وقتی:
-- فقط ۱ listener داری (مستقیم import کن)
-- داده‌ی sync لازمه (event async ئه)
-- عملیات خیلی ساده‌ست (over-engineering)
-
-### نکات مهم:
-۱. async ئه — نمی‌تونی منتظر نتیجه باشی
-۲. ترتیب تضمین نمی‌شه — اگه order مهمه، صریح باش
-۳. خطاها collect می‌شن ولی emit متوقف نمی‌شه
-۴. memory leak: همیشه unsubscribe کن (return on)
-
----
-
-## بخش ۹ — مثال Publisher / Subscriber
-
-### Publisher (dlg — ثبت تلفات)
-
-~~~
-// useDlgSave.ts
-import { bus } from '../../../cor/events';
-
-await bus.emit('dlg:deaths:recorded', {
-  logId: log.id,
-  flockId: log.flockId,
-  date: log.date,
-  count: totalDeaths,
-  deaths: log.deaths,
-  isEdit,
-  prevCount,
-  prevFlockId,
-}, { source: 'dlg' });
-~~~
-
-### Subscriber (flk — گوش می‌ده)
-
-~~~
-// flk/handlers.ts
-import { bus } from '../../cor/events';
-import { useFlk } from './store';
-
-export function registerFlkHandlers(): () => void {
-  const off = bus.on('dlg:deaths:recorded', (data, meta) => {
-    const flk = useFlk.getState();
-    // کاهش currentCount
-    // ثبت event
-  });
-  return off;  // لغو در unmount
-}
-~~~
-
-### ثبت در main.tsx
+### گام ۳ — ثبت در `main.tsx`
 
 ~~~
 import { registerFlkHandlers } from './mod/flk/handlers';
-
-registerFlkHandlers();  // یک‌بار در startup
+import { registerWhsHandlers } from './mod/whs/handlers';
+// ...
+registerFlkHandlers();
+registerWhsHandlers();
 ~~~
 
+### گام ۴ — تست
+
+هر handler باید تست جدای داشته باشه (`src/test/events.test.ts`).
+
+## بخش ۶ — قواعد آهنین
+
+| # | قاعده |
+|---|---|
+| ۱ | ایونت جدید → اول در `events.ts` تایپ شه، بعد در همین سند |
+| ۲ | هر emit → `source` مشخص (نام ماژول) |
+| ۳ | handler حتماً `traceId` رو log کنه (در dev) |
+| ۴ | handler نباید throw کنه (catch + log) |
+| ۵ | ترتیب اجرا guarantee نداره → handlerها مستقل باشن |
+| ۶ | ایونت حذف‌شده → از `events.ts` هم پاک شه |
+| ۷ | در prod → `silent: false` فقط برای ایونت‌های حیاتی |
+
+## بخش ۷ — DebugPanel
+
+**مسیر:** `src/cor/events/DebugPanel.tsx`
+**فعال:** فقط در `import.meta.env.DEV` یا `?debug=1`
+**نمایش:**
+- ۲۰۰ رویداد اخیر
+- فیلتر بر اساس event name
+- traceId + source + timestamp
+- payload کامل (JSON)
+
+**دسترسی:** DevTools → زبانه `📮 Events`
+
+## بخش ۸ — نقشه راه فعال‌سازی
+
+### 🔴 اولویت ۱ — مالی و انبار
+
+| ناشر | ایونت | مشترک هدف | ارزش |
+|---|---|---|---|
+| `tra` | `invoice:created/updated/deleted` | `whs` (موجودی) | 🔴 حیاتی |
+| `dlg` | `feed:consumed` | `whs` (کاهش دان) | 🔴 حیاتی |
+| `inc` | `hatch:created` | `whs`، `flk` | 🔴 حیاتی |
+
+### 🟡 اولویت ۲ — تولید و آمار
+
+| ناشر | ایونت | مشترک هدف | ارزش |
+|---|---|---|---|
+| `egg` | `production:created/updated` | `dsh`، `rep` | 🟡 |
+| `dlg` | `deaths:recorded` | `flk`، `alt` | 🟡 |
+| `whs` | `movement:created` | `alt` (کم‌موجودی) | 🟡 |
+
+### 🟢 اولویت ۳ — سلامت و تقویم
+
+| ناشر | ایونت | مشترک هدف | ارزش |
+|---|---|---|---|
+| `dlg` | `vaccine:given`، `medication:given` | `cal`، `alt` | 🟢 |
+| `dlg` | `log:deleted` | `flk`، `whs` (rollback) | 🟢 |
+| `flk` | `flock:created/updated/archived` | `dsh`، `hal`، `rep` | 🟢 |
+
+## بخش ۹ — چک‌لیست فعال‌سازی هر ایونت
+
+قبل از فعال‌سازی:
+
+- [ ] تایپ payload در `events.ts` دقیق ئه؟
+- [ ] ناشر در `store` بعد از commit موفق emit می‌کنه؟
+- [ ] handler در `handlers.ts` جدید ساخته شد؟
+- [ ] `register*Handlers()` در `main.tsx` صدا زده شد؟
+- [ ] تست handler نوشته شد؟
+- [ ] این سند به‌روز شد؟
+
+## بخش ۱۰ — آنتی‌پترن‌ها
+
+| ❌ ممنوع | ✅ جایگزین |
+|---|---|
+| handler که throw می‌کنه | try/catch + log |
+| emit بدون `source` | `{ source: 'tra' }` |
+| ایونت با payload بزرگ (>۵۰KB) | `id` بفرست، نه کل آبجکت |
+| سینک بین ۲ ماژول بدون bus | از bus استفاده کن |
+| handler با side-effect نامشخص | مستقل و idempotent |
+
+## بخش ۱۱ — آمار پیشرفت
+
+| مورد | مقدار |
+|---|---|
+| ایونت‌های تعریف‌شده | ۱۸ |
+| ایونت‌های فعال | ۲ (۱۱٪) |
+| handlers موجود | ۱ (`flk`) |
+| ماژول‌های ناشر فعال | ۱ (`dlg`) |
+| هدف جلسه ۱۳ | ۶ فعال (۳۳٪) |
+| هدف جلسه ۱۵ | ۱۸ فعال (۱۰۰٪) |
 
 ---
 
-## بخش ۱۰ — نکات مهم
-
-### async بودن
-~~~
-// غلط
-const result = bus.emit('event', data);
-console.log(result.handlerCount); // Promise!
-
-// درست
-const result = await bus.emit('event', data);
-console.log(result.handlerCount);
-~~~
-
-### Memory Leak
-~~~
-// غلط (در useEffect)
-useEffect(() => {
-  bus.on('event', handler); // unsubscribe نمی‌شه
-}, []);
-
-// درست
-useEffect(() => {
-  const off = bus.on('event', handler);
-  return off; // cleanup
-}, []);
-~~~
-
-### ترتیب مشترک‌ها
-listenerها به ترتیب ثبت صدا زده می‌شن. اگه order مهمه، با id صریح ذخیره کن.
-
-### traceId
-هر emit یه traceId می‌گیره که به همه listenerها پاس داده می‌شه — برای دیباگ زنجیره علیت.
-
----
-
-## بخش ۱۱ — تست
-
-~~~
-import { bus } from './bus';
-
-beforeEach(() => bus.reset());
-
-it('event رو می‌فرسته', async () => {
-  const handler = vi.fn();
-  bus.on('dlg:deaths:recorded', handler);
-
-  await bus.emit('dlg:deaths:recorded', { /* data */ });
-
-  expect(handler).toHaveBeenCalledOnce();
-});
-
-it('once فقط یک‌بار', async () => {
-  const handler = vi.fn();
-  bus.once('event', handler);
-  await bus.emit('event', {});
-  await bus.emit('event', {});
-  expect(handler).toHaveBeenCalledOnce();
-});
-~~~
-
-bus.reset() برای پاک کردن همه listenerها و history.
-
-
----
-
-## بخش ۱۲ — Dev Mode + DebugPanel
-
-~~~
-bus.setDevMode(true);  // فعال دیباگ
-bus.getHistory();      // ۲۰۰ رویداد اخیر
-~~~
-
-DebugPanel.tsx یه UI برای مشاهده زنده history ئه (فقط dev).
-
----
-
-## بخش ۱۳ — چک‌لیست event جدید
-
-قبل افزودن event جدید:
-
-- توی events.ts interface تعریف شد؟
-- توی AppEvents map اضافه شد؟
-- توی سند (بخش ۶) ثبت شد؟
-- حداقل ۱ listener داره؟ (اگه نه، dead code)
-- unsubscribe در unmount رعایت شد؟
-- داده‌ها JSON-serializable هستن؟
-
----
-
-## مرجع
-
-- src/cor/events/bus.ts — پیاده‌سازی
-- src/cor/events/events.ts — تعریف events
-- src/cor/events/types.ts — تایپ‌ها
-- src/mod/flk/handlers.ts — مثال subscriber
-- src/mod/dlg/hooks/useDlgSave.ts — مثال publisher
-
----
-
-*سند زنده — با هر event جدید تکمیل می‌شه.*
+*آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۱۲) — کشف: فقط ۲/۱۸ فعال*
