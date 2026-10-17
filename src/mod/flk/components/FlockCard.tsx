@@ -123,6 +123,52 @@ export default function FlockCard(props: FlockCardProps) {
         )}
         {f.hidden && <Tag tone="gray">👁</Tag>}
         {f.paused && <Tag tone="amber">⏸</Tag>}
+        {flockGroups.slice(0, 2).map(g => {
+          const c = GROUP_COLORS[g.type] || GROUP_COLORS.custom;
+          return (
+            <span
+              key={g.id}
+              onClick={(e) => { e.stopPropagation(); onOpenGroups(); }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 2,
+                padding: '2px 6px',
+                background: c.bg,
+                border: '1px solid ' + c.border,
+                borderRadius: 'var(--r-sm)',
+                fontSize: 10,
+                fontWeight: 700,
+                color: c.fg,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+              title={g.description || g.name}
+            >
+              {GROUP_ICON[g.type]} {g.name}
+            </span>
+          );
+        })}
+        {flockGroups.length > 2 && (
+          <span
+            onClick={(e) => { e.stopPropagation(); onOpenGroups(); }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '2px 6px',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-sm)',
+              fontSize: 10,
+              fontWeight: 700,
+              color: 'var(--muted)',
+              cursor: 'pointer',
+            }}
+            title={flockGroups.slice(2).map(g => g.name).join('، ')}
+          >
+            +{toFa(flockGroups.length - 2)}
+          </span>
+        )}
       </>}
       stats={<>
         {ageDays > 0 && <span>🎂 <b style={{ color: 'var(--text)' }}>{fmt.int(ageDays)} روز</b></span>}
@@ -141,32 +187,6 @@ export default function FlockCard(props: FlockCardProps) {
       </>}
     >
       {/* 🆕 گروه‌ها */}
-      {flockGroups.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 'var(--sp-2)' }}>
-          {flockGroups.map(g => (
-            <span
-              key={g.id}
-              onClick={onOpenGroups}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
-                padding: '2px 8px',
-                background: 'var(--accent-soft)',
-                border: '1px solid var(--accent-border)',
-                borderRadius: 'var(--r-sm)',
-                fontSize: 'var(--fs-xs)',
-                fontWeight: 600,
-                color: 'var(--accent)',
-                cursor: 'pointer',
-              }}
-              title={g.description || ''}
-            >
-              {GROUP_ICON[g.type]} {g.name}
-            </span>
-          ))}
-        </div>
-      )}
 
       {/* نوار چرخه زندگی — ۳ مرحله + نشانگر موقعیت */}
       {!isArchived && (
