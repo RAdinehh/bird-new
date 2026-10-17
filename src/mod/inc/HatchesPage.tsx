@@ -121,12 +121,12 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
 
   const createFlock = () => {
     if (!flockModal) return;
-    if (!flockForm.name.trim()) { showAlert('نام گله اجباری است'); return; }
+    if (!flockForm.name.trim()) { toastMsg.error('نام گله اجباری است'); return; }
     const h = hatches.find(x => x.id === flockModal.hatchId);
     if (!h) return;
     const entry = _entriesById[h.eggEntryId];
     const bird = entry ? _birdsById[entry.birdId] : null;
-    if (!bird) { showAlert('پرنده پیدا نشد'); return; }
+    if (!bird) { toastMsg.error('پرنده پیدا نشد'); return; }
     const data = buildFlockFromHatch({
       formName: flockForm.name.trim(),
       formType: flockForm.type,
@@ -147,10 +147,10 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
 
   const doSell = () => {
     if (!sellModal) return;
-    if (!sellForm.buyerId) { showAlert('خریدار اجباری است'); return; }
+    if (!sellForm.buyerId) { toastMsg.error('خریدار اجباری است'); return; }
     const count = parseInt(toEn(sellForm.count)) || 0;
     const unitPrice = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;
-    if (count <= 0 || unitPrice <= 0) { showAlert('مقادیر باید بیشتر از صفر'); return; }
+    if (count <= 0 || unitPrice <= 0) { toastMsg.error('مقادیر باید بیشتر از صفر'); return; }
     const h = hatches.find(x => x.id === sellModal.hatchId);
     if (!h) return;
     const data = buildSaleInvoiceFromHatch({

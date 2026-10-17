@@ -149,10 +149,7 @@ export default function RequirementsPage() {
       const _trimmed = form.name.trim();
       const _dup = requirements.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
-        showAlert(
-          `نیازای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
-          '❌ نام تکراری'
-        );
+        toastMsg.error(`نیازای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`);
         return;
       }
     }

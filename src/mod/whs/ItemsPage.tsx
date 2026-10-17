@@ -186,7 +186,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       });
       if (newId) toastMsg.saved('اصلاح موجودی');
     } catch (e: any) {
-      showAlert(e.message || 'خطا در اصلاح موجودی');
+      toastMsg.error(e.message || 'خطا در اصلاح موجودی');
     }
   };
 
@@ -242,10 +242,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       const _trimmed = form.name.trim();
       const _dup = items.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
-        showAlert(
-          `کالاای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
-          '❌ نام تکراری'
-        );
+        toastMsg.error(`کالاای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`);
         return;
       }
     }

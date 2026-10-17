@@ -53,7 +53,7 @@ export function useCandlingForm({
   };
 
   const openNew = (preEntryId?: string, entriesById?: Record<string, any>) => {
-    if (eggEntries.length === 0) { showAlert('اول یک ورودی تخم ثبت کنید'); return; }
+    if (eggEntries.length === 0) { toastMsg.error('اول یک ورودی تخم ثبت کنید'); return; }
     const initialDev = preEntryId && entriesById
       ? entriesById[preEntryId]?.deviceId || devices[0]?.id || ''
       : devices[0]?.id || '';

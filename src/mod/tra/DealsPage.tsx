@@ -114,7 +114,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     const defaultX = lastRec?.partyId || '';
     const today = formatJ(new Date(), 'yyyy/MM/dd');
 
-    if (contacts.length === 0) { showAlert('اول یک مخاطب بسازید'); return; }
+    if (contacts.length === 0) { toastMsg.error('اول یک مخاطب بسازید'); return; }
     setForm({ ...empty(), partyId: contacts[0].id });
     setErr(''); setOpen(true);
   };

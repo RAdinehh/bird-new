@@ -7,6 +7,7 @@ import { toFa, toEn } from '../../../shr/utils/fa';
 import { showAlert } from '../../../cor/store/dialog';
 import { paidSum, calcItemTotal, type Invoice, type InvoiceItem, type Payment } from '../store';
 import { emptyForm as empty, type F } from '../types-invoice';
+import { toastMsg } from '../../../cor/store/toast';
 
 export function useInvoiceForm(params: {
   kind: 'purchase' | 'sale';
@@ -78,7 +79,7 @@ export function useInvoiceForm(params: {
 
   // باز کردن فرم جدید
   const openNew = () => {
-    if (parties.length === 0) { showAlert(isPurchase ? 'اول یک فروشنده بسازید' : 'اول یک مشتری بسازید'); return; }
+    if (parties.length === 0) { toastMsg.error(isPurchase ? 'اول یک فروشنده بسازید' : 'اول یک مشتری بسازید'); return; }
     const today = formatJ(new Date(), 'yyyy/MM/dd');
     const lastInv = invoices.filter(i => i.type === kind && i.partyId).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
     const defaultParty = lastInv?.partyId || parties[0].id;

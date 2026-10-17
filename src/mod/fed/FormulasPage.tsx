@@ -71,7 +71,7 @@ export default function FormulasPage() {
   }, [ms.selectionMode]);
 
   const openNew = () => {
-    if (ingredients.length === 0) { showAlert('اول مواد اولیه بسازید'); return; }
+    if (ingredients.length === 0) { toastMsg.error('اول مواد اولیه بسازید'); return; }
     const lastF = formulas
       .filter(x => x.requirementId)
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
@@ -102,7 +102,7 @@ export default function FormulasPage() {
   const addLine = () => {
     const usedIds = form.lines.map(l => l.ingredientId);
     const available = ingredients.find(i => !usedIds.includes(i.id));
-    if (available === undefined) { showAlert('همه مواد اضافه شده‌اند'); return; }
+    if (available === undefined) { toastMsg.error('همه مواد اضافه شده‌اند'); return; }
     setForm(f => ({
       ...f,
       lines: [...f.lines, { id: crypto.randomUUID(), ingredientId: available.id, percent: 0 }]
@@ -156,10 +156,7 @@ export default function FormulasPage() {
       const _trimmed = form.name.trim();
       const _dup = formulas.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
-        showAlert(
-          `جیرهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`,
-          '❌ نام تکراری'
-        );
+        toastMsg.error(`جیرهای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`);
         return;
       }
     }

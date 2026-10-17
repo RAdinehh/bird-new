@@ -68,7 +68,7 @@ export function useHatchForm(p: UseHatchFormParams) {
   };
 
   const openNew = (preId?: string) => {
-    if (eggEntries.length === 0) { showAlert('اول یک ورودی تخم بسازید'); return; }
+    if (eggEntries.length === 0) { toastMsg.error('اول یک ورودی تخم بسازید'); return; }
     setEditingId(null);
     setFormDate(todayJ());
     setFormEntryId(preId || eggEntries[0].id);

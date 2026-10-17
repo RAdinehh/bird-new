@@ -190,7 +190,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
   const addMaintenance = (deviceId: string) => {
     const dev = devices.find(d => d.id === deviceId);
     if (!dev) return;
-    if (!maintForm.date || !maintForm.type) { showAlert('تاریخ و نوع تعمیر اجباری است'); return; }
+    if (!maintForm.date || !maintForm.type) { toastMsg.error('تاریخ و نوع تعمیر اجباری است'); return; }
     const log = {
       id: Date.now().toString(),
       date: maintForm.date,

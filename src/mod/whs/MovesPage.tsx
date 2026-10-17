@@ -107,7 +107,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
   };
 
   const openNew = () => {
-    if (items.length === 0) { showAlert('اول یک قلم در انبار بسازید'); return; }
+    if (items.length === 0) { toastMsg.error('اول یک قلم در انبار بسازید'); return; }
     setForm({
       itemId: items[0].id, type: 'in', quantity: '', unitPrice: '',
       reason: 'purchase', date: '', partyId: '', notes: ''

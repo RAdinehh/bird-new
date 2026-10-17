@@ -79,8 +79,8 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
   const openMulti = () => {
-    if (devices.length === 0) { showAlert('اول یک دستگاه بسازید'); return; }
-    if (birds.length === 0) { showAlert('اول پرنده بسازید'); return; }
+    if (devices.length === 0) { toastMsg.error('اول یک دستگاه بسازید'); return; }
+    if (birds.length === 0) { toastMsg.error('اول پرنده بسازید'); return; }
     setMultiDeviceId(initialDevice || devices[0].id);
     setDraftRows([]);
     setCurrentRow({ ...makeRow(), birdId: birds[0].id, entryDate: todayJalali(), entryTime: nowTime() });
@@ -90,12 +90,12 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
 
   const addRowToList = async () => {
     const cnt = parseInt(toEn(currentRow.count)) || 0;
-    if (!currentRow.count.trim()) { showAlert('تعداد تخم اجباری است'); return; }
-    if (cnt <= 0) { showAlert('تعداد باید بزرگتر از صفر باشد', '❌ خطا'); return; }
-    if (!currentRow.entryDate.trim()) { showAlert('تاریخ ورود اجباری است'); return; }
-    if (currentRow.dealType === 'purchase' && !currentRow.dealData.sellerId) { showAlert('فروشنده اجباری است'); return; }
-    if (currentRow.dealType === 'partnership' && !currentRow.dealData.partnerId) { showAlert('شریک اجباری است'); return; }
-    if (currentRow.dealType === 'own' && !currentRow.flockId) { showAlert('گله اجباری است'); return; }
+    if (!currentRow.count.trim()) { toastMsg.error('تعداد تخم اجباری است'); return; }
+    if (cnt <= 0) { toastMsg.error('تعداد باید بزرگتر از صفر باشد'); return; }
+    if (!currentRow.entryDate.trim()) { toastMsg.error('تاریخ ورود اجباری است'); return; }
+    if (currentRow.dealType === 'purchase' && !currentRow.dealData.sellerId) { toastMsg.error('فروشنده اجباری است'); return; }
+    if (currentRow.dealType === 'partnership' && !currentRow.dealData.partnerId) { toastMsg.error('شریک اجباری است'); return; }
+    if (currentRow.dealType === 'own' && !currentRow.flockId) { toastMsg.error('گله اجباری است'); return; }
 
     // چک آماده بودن گله
     if (currentRow.dealType === 'own' && currentRow.flockId) {
@@ -204,7 +204,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
   };
 
   const saveAll = async () => {
-    if (draftRows.length === 0) { showAlert('حداقل یک ردیف اضافه کنید'); return; }
+    if (draftRows.length === 0) { toastMsg.error('حداقل یک ردیف اضافه کنید'); return; }
     const device = devices.find(d => d.id === multiDeviceId);
     if (!device) return;
 
