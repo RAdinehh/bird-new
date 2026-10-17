@@ -2,7 +2,7 @@
  * FlockTabPanel — محتوای یک تب از گله‌ها (carousel)
  */
 import { useState, useMemo, useEffect } from 'react';
-import { useFlk, type Flock } from '../store';
+import { useFlk, getAgeDays, type Flock } from '../store';
 import { useFab } from '../../../shr/hooks/useFab';
 import type { Bird, Breed } from '../../brd/store';
 import type { Hall, Zone } from '../../hal/store';
@@ -26,6 +26,7 @@ import { toFa } from '../../../shr/utils/fa';
 import FlocksKpiCards from './FlocksKpiCards';
 import UpcomingFlocks from './UpcomingFlocks';
 import FlockCard from './FlockCard';
+import MergeFlocksModal from './MergeFlocksModal';
 
 type BreedStd = ReturnType<typeof useBreedStandard>;
 type Fmt = ReturnType<typeof useFormat>;
@@ -87,6 +88,10 @@ export default function FlockTabPanel({
 
   useFab(active ? { label: 'افزودن گله', onClick: onAdd } : null);
 
+  const [mergeIds, setMergeIds] = useState<string[]>([]);
+  const [mergeModalOpen, setMergeModalOpen] = useState(false);
+  const mergeFlocks = useFlk(s => s.mergeFlocks);
+
   const ms = useMultiSelect({
     longPressMs: 700,
     items: list,
@@ -144,7 +149,43 @@ export default function FlockTabPanel({
       logAction('update', 'flk', 'آرشیو گروهی ' + ids.length);
       triggerBadge('archived');
     },
+    onCustomAction: {
+      label: 'ادغام',
+      icon: '🔗',
+      action: (ids) => {
+        const active = ids.filter(id => {
+          const f = flocks.find(x => x.id === id);
+          return f?.status === 'active' && !f?.paused && !f?.hidden;
+        });
+        if (active.length < 2) {
+          toastMsg.error('حداقل ۲ گله فعال برای ادغام لازم است');
+          return;
+        }
+        setMergeIds(active);
+        setMergeModalOpen(true);
+      },
+    },
   });
+
+  const handleMergeConfirm = (targetId: string) => {
+    const target = flocks.find(f => f.id === targetId);
+    if (!target) return;
+    const targetAgeDays = getAgeDays(target);
+    const sources = mergeIds.filter(id => id !== targetId);
+    for (const sourceId of sources) {
+      const source = flocks.find(f => f.id === sourceId);
+      if (!source) continue;
+      mergeFlocks(targetId, sourceId, {
+        targetAgeDays,
+        sourceAgeDays: getAgeDays(source),
+        hatchDate: source.hatchDate || target.hatchDate,
+      });
+    }
+    toastMsg.success(`${sources.length + 1} گله ادغام شد`);
+    setMergeModalOpen(false);
+    setMergeIds([]);
+    ms.exitSelection();
+  };
 
   useEffect(() => {
     if (ms.selectionMode) setExpandedId(null);
@@ -327,6 +368,12 @@ export default function FlockTabPanel({
       )}
 
       <MultiSelectBar ms={ms} deleteLabel="حذف" archiveLabel={tab === 'archived' ? 'بازگردانی' : 'آرشیو'} />
+      <MergeFlocksModal
+        open={mergeModalOpen}
+        onClose={() => { setMergeModalOpen(false); setMergeIds([]); }}
+        flockIds={mergeIds}
+        onConfirm={handleMergeConfirm}
+      />
     </PageContainer>
   );
 }
