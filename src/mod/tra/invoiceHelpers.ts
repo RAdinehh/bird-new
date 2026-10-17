@@ -2,47 +2,11 @@
  * tra/invoiceHelpers.ts — اعمال اثر فاکتور روی انبار و گله
  */
 import { parse as parseJ, format as formatJ, addDays } from 'date-fns-jalali';
-import { useWhs } from '../whs/store';
 import { useFlk } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { useHal } from '../hal/store';
 import { useEgg } from '../egg/store';
 import type { Invoice, InvoiceItem, InvoiceType } from './types';
-
-export function applyInvoiceMovements(inv: Invoice, prevItems?: InvoiceItem[]): InvoiceItem[] {
-  const whs = useWhs.getState();
-
-  // ۱. حذف movementهای قبلی (در حالت ویرایش)
-  if (prevItems) {
-    prevItems.forEach(it => {
-      if (it.movementId) {
-        try { whs.deleteMovement(it.movementId); } catch (e) {}
-      }
-    });
-  }
-
-  // ۲. ساخت movementهای جدید
-  return inv.items.map(it => {
-    if (!it.itemId || !it.quantity || it.quantity <= 0) {
-      return { ...it, movementId: '' };
-    }
-    try {
-      const mid = whs.addMovement({
-        itemId: it.itemId,
-        type: inv.type === 'purchase' ? 'in' : 'out',
-        quantity: it.quantity,
-        unitPrice: it.unitPrice,
-        reason: inv.type === 'purchase' ? 'purchase' : 'sale',
-        date: inv.date,
-        partyId: inv.partyId,
-        notes: `فاکتور ${inv.number || ''} — ${it.description}`,
-      });
-      return { ...it, movementId: mid };
-    } catch (e) {
-      return { ...it, movementId: '' };
-    }
-  });
-}
 
 /** اعمال اثر فاکتور روی گله‌ها — خرید جوجه/پرنده → افزودن، فروش → کاهش */
 /** محاسبه تاریخ هچ از تاریخ فاکتور منهای سن */

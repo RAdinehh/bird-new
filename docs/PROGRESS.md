@@ -17,3 +17,5 @@
 [2026/10/17 22:37] docs: AI-BOOT + NEXT + PROGRESS + auto_fast append
 
 [2026/10/17 22:42] docs: تمیزکاری README
+
+[2026/10/17 23:33] feat(whs): فعال‌سازی event bus tra→whs (invoice created/updated/deleted)

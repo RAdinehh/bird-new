@@ -4,11 +4,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
-import { useWhs } from '../whs/store';
 import { useFlk } from '../flk/store';
+import { bus } from '../../cor/events';
 
 import type { Invoice, InvoiceItem, State } from './types';
-import { applyInvoiceMovements, applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
+import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { generateInvoiceNumber } from './calc';
 import { showToast } from '../../cor/store/toast';
 
@@ -29,14 +29,14 @@ export const useTra = create<State>()(
         const num = generateInvoiceNumber(i.type, i.date, get().invoices);
         const newInv = { ...i, id, number: i.number || num, createdAt: now(), updatedAt: now() } as any;
         let items: InvoiceItem[] = newInv.items || [];
-        // 🎯 ۱. اتصال به انبار (اگه قلم‌ها به whs وصل باشن)
-        try { items = applyInvoiceMovements({ ...newInv, items }); } catch(e) {}
-        // 🎯 ۲. اعمال روی گله‌ها (خرید/فروش پرنده)
+        // 🎯 ۱. اعمال روی گله‌ها (خرید/فروش پرنده)
         try { items = applyInvoiceFlocks({ ...newInv, items }); } catch(e) {}
-        // 🎯 ۳. اتصال تجهیزات به فاکتور
+        // 🎯 ۲. اتصال تجهیزات به فاکتور
         try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) {}
-        // 🎯 ۴. اتصال فروش تخم به ماژول egg
+        // 🎯 ۳. اتصال فروش تخم به ماژول egg
         try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) {}
+        // 🎯 ۴. اتصال به انبار از طریق Event Bus (حرکت‌ها + movementId)
+        try { void bus.emit('tra:invoice:created', { invoiceId: newInv.id, invoice: newInv, items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
         const final = { ...newInv, items };
         set({ invoices: [...get().invoices, final] });
         return id;
@@ -45,12 +45,19 @@ export const useTra = create<State>()(
         const prev = get().invoices.find(x => x.id === id);
         if (!prev) return;
         const merged = { ...prev, ...patch, updatedAt: now() } as Invoice;
-        const itemsMoved = applyInvoiceMovements(merged, prev.items);
-        const mergedWithItems = { ...merged, items: itemsMoved };
-        let itemsFinal: InvoiceItem[] = itemsMoved;
+        let itemsFinal: InvoiceItem[] = merged.items || [];
+        const mergedWithItems = { ...merged, items: itemsFinal };
         try { itemsFinal = applyInvoiceFlocks(mergedWithItems, prev); } catch(e) {}
         try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
         try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
+        // 🎯 اتصال به انبار از طریق Event Bus (rollback قبلی‌ها + حرکت‌های جدید)
+        try { void bus.emit('tra:invoice:updated', {
+          invoiceId: id,
+          invoice: merged,
+          prevInvoice: prev,
+          items: itemsFinal,
+          prevItems: prev.items,
+        }, { source: 'tra' }).catch(() => {}); } catch(e) {}
         const final = { ...mergedWithItems, items: itemsFinal };
         set({ invoices: get().invoices.map(x => x.id === id ? final : x) });
       },
@@ -79,12 +86,8 @@ export const useTra = create<State>()(
             if (inv.type === 'purchase') flk.update(it.flockId, { currentCount: Math.max(0, cur - qty) });
             else if (inv.type === 'sale') flk.update(it.flockId, { currentCount: cur + qty });
           }
-          const whs = useWhs.getState();
-          inv.items.forEach(it => {
-            if (it.movementId) {
-              try { whs.deleteMovement(it.movementId); } catch (e) {}
-            }
-          });
+          // 🎯 rollback حرکات انبار از طریق Event Bus
+          try { void bus.emit('tra:invoice:deleted', { invoiceId: inv.id, invoice: inv, items: inv.items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
         }
         set({ invoices: get().invoices.filter(x => x.id !== id) });
       },

@@ -67,20 +67,34 @@ export interface DlgLogDeleted {
 }
 
 // ─── tra (معاملات) ───
+/** رفرنس سبک به InvoiceItem — فقط فیلدهای لازم برای هم‌ترازی whs */
+export interface TraInvoiceItemRef {
+  itemId?: string;
+  quantity?: number;
+  unitPrice?: number;
+  description?: string;
+  movementId?: string;
+}
+
 export interface TraInvoiceCreated {
   invoiceId: string;
   invoice: any;
+  /** ارجاع mutable به آیتم‌های فاکتور — handler می‌تواند movementId را ست کند */
+  items?: TraInvoiceItemRef[];
 }
 
 export interface TraInvoiceUpdated {
   invoiceId: string;
   invoice: any;
   prevInvoice: any;
+  items?: TraInvoiceItemRef[];
+  prevItems?: TraInvoiceItemRef[];
 }
 
 export interface TraInvoiceDeleted {
   invoiceId: string;
   invoice: any;
+  items?: TraInvoiceItemRef[];
 }
 
 // ─── flk (گله) ───
