@@ -26,6 +26,7 @@ import { toFa } from '../../../shr/utils/fa';
 import FlocksKpiCards from './FlocksKpiCards';
 import UpcomingFlocks from './UpcomingFlocks';
 import FlockCard from './FlockCard';
+import FlockGroupsModal from './FlockGroupsModal';
 import MergeFlocksModal from './MergeFlocksModal';
 
 type BreedStd = ReturnType<typeof useBreedStandard>;
@@ -89,6 +90,7 @@ export default function FlockTabPanel({
   useFab(active ? { label: 'افزودن گله', onClick: onAdd } : null);
 
   const [mergeIds, setMergeIds] = useState<string[]>([]);
+  const [groupFlockId, setGroupFlockId] = useState<string | null>(null);
   const [mergeModalOpen, setMergeModalOpen] = useState(false);
   const mergeFlocks = useFlk(s => s.mergeFlocks);
 
@@ -320,6 +322,7 @@ export default function FlockTabPanel({
                 fmt={fmt}
                 onToggle={() => setExpandedId(isOpen ? null : f.id)}
                 onEdit={() => onEdit(f)}
+                onOpenGroups={() => setGroupFlockId(f.id)}
                 onArchive={(reason) => {
                   archive(f.id, reason);
                   toastMsg.archived(f.name);
@@ -374,6 +377,16 @@ export default function FlockTabPanel({
         flockIds={mergeIds}
         onConfirm={handleMergeConfirm}
       />
+      {groupFlockId && (() => {
+        const target = flocks.find(f => f.id === groupFlockId);
+        return target ? (
+          <FlockGroupsModal
+            open={true}
+            onClose={() => setGroupFlockId(null)}
+            flock={target}
+          />
+        ) : null;
+      })()}
     </PageContainer>
   );
 }

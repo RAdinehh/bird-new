@@ -13,6 +13,7 @@ import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import EntityLink from '../../../shr/components/EntityLink';
 import { Row, RowGrid } from '../helpers';
+import { useFlk, type FlockGroupType } from '../store';
 import LifecycleBar from './LifecycleBar';
 import { useState } from 'react';
 import FlockHistoryModal from './FlockHistoryModal';
@@ -22,6 +23,10 @@ import type { useFormat } from '../../../shr/units';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 
 type Fmt = ReturnType<typeof useFormat>;
+
+const GROUP_ICON: Record<FlockGroupType, string> = {
+  season: '🗓', breed: '🧬', cohort: '👥', farm: '🏭', owner: '👤', custom: '📁', smart: '🤖',
+};
 
 const DEAL_BADGE: Record<string, { label: string; emoji: string }> = {
   partnership: { label: 'شراکتی', emoji: '🤝' },
@@ -48,6 +53,7 @@ export interface FlockCardProps {
   onDelete: () => void;
   onToggleHidden: () => void;
   onTogglePaused: () => void;
+  onOpenGroups: () => void;
 }
 
 export default function FlockCard(props: FlockCardProps) {
@@ -55,10 +61,13 @@ export default function FlockCard(props: FlockCardProps) {
     flock: f, index: i, bird, breed, hall, zone,
     invoiceRevenue, vaccineEnabled, isOpen, ms, fmt,
     onToggle, onEdit, onArchive, onRestore, onDelete,
-    onToggleHidden, onTogglePaused,
+    onToggleHidden, onTogglePaused, onOpenGroups,
   } = props;
 
   const [historyOpen, setHistoryOpen] = useState(false);
+
+  const getGroupsForFlock = useFlk(s => s.getGroupsForFlock);
+  const flockGroups = getGroupsForFlock(f.id);
   // 🆕 emoji بر اساس گونه پرنده
   const speciesEmoji = bird?.birdKind === 'duck' ? '🦆' :
                        bird?.birdKind === 'turkey' ? '🦃' :
@@ -115,6 +124,34 @@ export default function FlockCard(props: FlockCardProps) {
         {costs.perBird > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{fmt.money(Math.round(costs.perBird))}</b></span>}
       </>}
     >
+      {/* 🆕 گروه‌ها */}
+      {flockGroups.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 'var(--sp-2)' }}>
+          {flockGroups.map(g => (
+            <span
+              key={g.id}
+              onClick={onOpenGroups}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+                padding: '2px 8px',
+                background: 'var(--accent-soft)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: 'var(--r-sm)',
+                fontSize: 'var(--fs-xs)',
+                fontWeight: 600,
+                color: 'var(--accent)',
+                cursor: 'pointer',
+              }}
+              title={g.description || ''}
+            >
+              {GROUP_ICON[g.type]} {g.name}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* نوار چرخه زندگی — ۳ مرحله + نشانگر موقعیت */}
       {!isArchived && (
         <LifecycleBar
@@ -252,6 +289,7 @@ export default function FlockCard(props: FlockCardProps) {
           <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
             <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
             <Btn size="sm" onClick={() => setHistoryOpen(true)} style={{ flex: 1 }}>📜 تاریخچه</Btn>
+            <Btn size="sm" onClick={onOpenGroups} style={{ flex: 1 }}>📁 گروه‌ها</Btn>
           </div>
           <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
             <Btn size="sm" onClick={onToggleHidden} style={{ flex: 1 }}>
