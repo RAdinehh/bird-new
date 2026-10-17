@@ -2,6 +2,7 @@
  * FlockCapacityCard.tsx — کارت ظرفیت سالن + breakdown بخش‌ها
  */
 import { toFa } from '../../../shr/utils/fa';
+import type { HallCapacityResult, ZoneBreakdown } from '../api/hallCapacity';
 
 interface Props {
   hallCapacity: any;
@@ -48,7 +49,7 @@ export default function FlockCapacityCard({ hallCapacity }: Props) {
             </span>
           </div>
 
-          {hallCapacity.breakdown.zones.map((z: any) => {
+          {hallCapacity.breakdown.zones.map((z: ZoneBreakdown) => {
             const isOccupied = z.used > 0 || z.isCurrent;
             return (
               <div key={z.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)', fontWeight: z.isCurrent ? 700 : 500 }}>

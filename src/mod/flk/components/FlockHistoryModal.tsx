@@ -111,7 +111,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
 
   return (
     <Modal open={open} onClose={onClose} title={'📜 تاریخچه • ' + flock.name}>
-      <div style={{ padding: '10px 14px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, fontSize: 13 }}>
+      <div style={{ padding: 'var(--sp-3) var(--sp-4)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, fontSize: 13 }}>
         <span>موجودی: <b>{toFa(current)}</b> از {toFa(initial)}</span>
         {losses > 0 && (
           <span style={{ color: lossesPct > 5 ? 'var(--danger)' : 'var(--warn)', fontWeight: 700 }}>
@@ -140,11 +140,11 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                 const digits = raw.replace(/[^0-9]/g, '');
                 if (digits) { setDelta(toFa(isNegative ? '-' + digits : digits)); } else { setDelta(isNegative ? '−' : ''); }
                 setValidationError('');
-              }} placeholder="۰" inputMode="text" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 700, color: num > 0 ? 'var(--accent)' : num < 0 ? 'var(--danger)' : 'var(--text)', textAlign: 'center', padding: '0 4px', direction: 'ltr' }} />
+              }} placeholder="۰" inputMode="text" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 700, color: num > 0 ? 'var(--accent)' : num < 0 ? 'var(--danger)' : 'var(--text)', textAlign: 'center', padding: '0 var(--sp-1)', direction: 'ltr' }} />
               <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n - 1))); }} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: num < 0 ? 700 : 400, color: num < 0 ? 'var(--danger)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0 }}>−</button>
             </div>
 
-            <div style={{ background: 'var(--input-bg)', border: '1px solid ' + (num !== 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--border)'), borderRadius: 'var(--r-md)', height: 38, padding: '0 8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ background: 'var(--input-bg)', border: '1px solid ' + (num !== 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--border)'), borderRadius: 'var(--r-md)', height: 38, padding: '0 var(--sp-2)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <div dir="ltr" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 600, color: 'var(--muted)' }}>{toFa(current)}</span>
                 <span style={{ color: 'var(--dim)', fontSize: 11 }}>→</span>
@@ -162,12 +162,12 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <span style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 600, paddingRight: 2 }}>توضیح (اختیاری)</span>
-              <input type="text" value={notes} onChange={e => setNotes(e.target.value)} placeholder="مثلاً شمارش اشتباه" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', height: 38, padding: '0 10px', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', outline: 'none', width: '100%' }} />
+              <input type="text" value={notes} onChange={e => setNotes(e.target.value)} placeholder="مثلاً شمارش اشتباه" style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', height: 38, padding: '0 var(--sp-3)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', outline: 'none', width: '100%' }} />
             </div>
           </div>
 
           {validationError && (
-            <div style={{ padding: '8px 12px', background: 'var(--danger-soft)', border: '1px solid rgba(239,68,68,.3)', borderRadius: 'var(--r-md)', color: 'var(--danger)', fontSize: 'var(--fs-xs)', fontWeight: 600 }}>⚠️ {validationError}</div>
+            <div style={{ padding: 'var(--sp-2) var(--sp-3)', background: 'var(--danger-soft)', border: '1px solid rgba(239,68,68,.3)', borderRadius: 'var(--r-md)', color: 'var(--danger)', fontSize: 'var(--fs-xs)', fontWeight: 600 }}>⚠️ {validationError}</div>
           )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -189,7 +189,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       )}
 
       {groups.length === 0 ? (
-        <div style={{ padding: 32, textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
+        <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
           <div style={{ fontSize: 40, marginBottom: 8 }}>📜</div>
           <div>هنوز رویدادی ثبت نشده</div>
         </div>
@@ -232,7 +232,7 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
       background: isRevoked ? 'var(--danger-soft)' : 'var(--card)',
       border: '1px solid ' + (isRevoked ? 'rgba(239, 68, 68, 0.25)' : 'var(--border)'),
       borderRadius: 14,
-      padding: '14px 16px',
+      padding: 'var(--sp-4) var(--sp-5)',
       display: 'flex',
       alignItems: 'center',
       gap: 14,
@@ -293,7 +293,7 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
             fontSize: 10,
             fontWeight: 700,
             color: 'var(--danger)',
-            padding: '2px 6px',
+            padding: '2px var(--sp-2)',
             background: 'rgba(239, 68, 68, 0.1)',
             borderRadius: 4,
             whiteSpace: 'nowrap',
@@ -325,7 +325,7 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return (
     <button type="button" onClick={onClick} style={{
-      padding: '5px 12px',
+      padding: '5px var(--sp-3)',
       fontSize: 12,
       fontWeight: 600,
       borderRadius: 'var(--r-sm)',

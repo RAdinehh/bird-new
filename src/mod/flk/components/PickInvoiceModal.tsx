@@ -33,7 +33,7 @@ export default function PickInvoiceModal({ open, onClose, onSelect }: Props) {
   return (
     <Modal open={open} onClose={onClose} title="📄 انتخاب فاکتور خرید پرنده">
       {birdInvoices.length === 0 ? (
-        <div style={{ padding: 32, textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
+        <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
           <div style={{ fontSize: 40, marginBottom: 8 }}>📄</div>
           <div>هیچ فاکتور خرید پرنده‌ای پیدا نشد</div>
           <div style={{ fontSize: 11, marginTop: 4, opacity: 0.7 }}>ابتدا از بخش معاملات، فاکتور خرید پرنده ثبت کنید</div>
@@ -50,7 +50,7 @@ export default function PickInvoiceModal({ open, onClose, onSelect }: Props) {
                 type="button"
                 onClick={() => handlePick(inv)}
                 style={{
-                  padding: '10px 12px',
+                  padding: 'var(--sp-3)',
                   background: 'var(--card)',
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--r-md)',
