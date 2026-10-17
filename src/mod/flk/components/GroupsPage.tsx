@@ -4,6 +4,7 @@
 import { useState, useMemo } from 'react';
 import { Modal, Btn, BtnRow, Field, Input, Select, Textarea } from '../../../shr/components/ui';
 import { useFlk, type FlockGroup, type FlockGroupType } from '../store';
+import { useGroupKpi } from '../hooks/useGroupKpi';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { toFa } from '../../../shr/utils/fa';
@@ -52,6 +53,40 @@ const NAME_PLACEHOLDER: Record<FlockGroupType, string> = {
   custom: 'مثلاً: گله‌های ممتاز',
   smart: 'مثلاً: همه لایه‌های فعال',
 };
+
+interface GroupKpiRowProps {
+  group: FlockGroup;
+}
+
+function GroupKpiRow({ group }: GroupKpiRowProps) {
+  const kpi = useGroupKpi(group.id);
+  if (kpi.flockCount === 0) return null;
+
+  const profitTone = kpi.totalProfit > 0 ? 'var(--accent)' : kpi.totalProfit < 0 ? 'var(--danger)' : 'var(--muted)';
+  const mortalityTone = kpi.mortalityRate > 5 ? 'var(--danger)' : kpi.mortalityRate > 3 ? 'var(--warn)' : 'var(--accent)';
+
+  return (
+    <div style={{
+      marginTop: 6,
+      padding: 'var(--pad-tight)',
+      background: 'var(--card-solid)',
+      border: '1px solid var(--border)',
+      borderRadius: 'var(--r-sm)',
+      display: 'flex',
+      gap: 8,
+      flexWrap: 'wrap',
+      fontSize: 10,
+      color: 'var(--muted)',
+    }}>
+      <span>🐔 <b style={{ color: 'var(--text)' }}>{toFa(kpi.totalCurrent)}</b></span>
+      {kpi.totalDeaths > 0 && (
+        <span>💀 <b style={{ color: mortalityTone }}>{toFa(kpi.totalDeaths)}</b> ({toFa(kpi.mortalityRate.toFixed(1))}٪)</span>
+      )}
+      {kpi.totalCost > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{toFa(Math.round(kpi.totalCost / 1_000_000))}M</b></span>}
+      {kpi.totalRevenue > 0 && <span>📈 <b style={{ color: profitTone }}>{toFa(Math.round(kpi.totalProfit / 1_000_000))}M</b></span>}
+    </div>
+  );
+}
 
 interface FormState {
   name: string;
@@ -154,24 +189,28 @@ export default function GroupsPage({ open, onClose }: Props) {
   const renderNode = (node: Node, depth: number = 0) => (
     <div key={node.id} style={{ marginRight: depth * 20 }}>
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
+        display: 'flex', flexDirection: 'column',
         padding: 'var(--pad-normal)', background: 'var(--card)',
         border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
-        marginBottom: 4, borderRight: node.color ? '3px solid ' + node.color : undefined,
+        marginBottom: 4,
+        borderRight: node.color ? '3px solid ' + node.color : undefined,
       }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{node.name}</span>
-            <span style={{ fontSize: 10, color: 'var(--muted)', background: 'var(--input-bg)', padding: '1px 6px', borderRadius: 4 }}>
-              {TYPE_LABEL[node.type]}
-            </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{node.name}</span>
+              <span style={{ fontSize: 10, color: 'var(--muted)', background: 'var(--input-bg)', padding: '1px 6px', borderRadius: 4 }}>
+                {TYPE_LABEL[node.type]}
+              </span>
+            </div>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
+              {toFa(node.memberCount)} گله{node.description ? ' · ' + node.description : ''}
+            </div>
           </div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-            {toFa(node.memberCount)} گله{node.description ? ' · ' + node.description : ''}
-          </div>
+          <Btn size="sm" onClick={() => handleEdit(node)}>ویرایش</Btn>
+          <Btn size="sm" onClick={() => handleDelete(node)} style={{ color: 'var(--danger)' }}>حذف</Btn>
         </div>
-        <Btn size="sm" onClick={() => handleEdit(node)}>ویرایش</Btn>
-        <Btn size="sm" onClick={() => handleDelete(node)} style={{ color: 'var(--danger)' }}>حذف</Btn>
+        <GroupKpiRow group={node} />
       </div>
       {node.children.map(child => renderNode(child, depth + 1))}
     </div>
