@@ -248,67 +248,78 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
   const info = TYPE_INFO[e.type] || { icon: '•', label: e.type, tone: 'var(--muted)' };
   const isRevoked = e.revoked === true;
   const isRevokeAction = !!e.linkedEventId;
-  const canRevoke = !isRevoked && !isRevokeAction && e.type !== 'add';
+  const canRevoke = !isRevoked && !isRevokeAction && e.type !== 'add' && e.type !== 'correction';
 
   return (
     <div style={{
-      padding: '8px 12px',
+      padding: '8px 10px 8px 12px',
       background: isRevoked ? 'transparent' : 'var(--input-bg)',
       border: isRevoked ? '1px dashed var(--border)' : 'none',
       borderRight: '3px solid ' + (isRevoked ? 'var(--dim)' : info.tone),
       borderRadius: 'var(--r-sm)',
       display: 'flex',
-      flexDirection: 'column',
-      gap: 3,
-      opacity: isRevoked ? 0.6 : 1,
+      alignItems: 'center',
+      gap: 10,
+      opacity: isRevoked ? 0.55 : 1,
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+      {/* ستون راست: نوع + تعداد */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 85 }}>
         <span style={{
           fontWeight: 700,
           color: isRevoked ? 'var(--muted)' : info.tone,
           fontSize: 13,
           textDecoration: isRevoked ? 'line-through' : 'none',
+          whiteSpace: 'nowrap',
         }}>
           {info.icon} {info.label}
         </span>
-        <span style={{ fontFamily: 'monospace', opacity: 0.75, fontSize: 11, color: 'var(--muted)' }}>
-          {toFa(e.date)}
+        <span style={{
+          fontSize: 13,
+          fontWeight: 700,
+          textDecoration: isRevoked ? 'line-through' : 'none',
+        }}>
+          {toFa(e.count)} <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--muted)' }}>پرنده</span>
         </span>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 13 }}>
-        <span><b style={{ textDecoration: isRevoked ? 'line-through' : 'none' }}>{toFa(e.count)}</b> پرنده</span>
-        {e.sex !== 'mixed' && <span style={{ opacity: 0.7, fontSize: 12 }}>{e.sex === 'male' ? 'نر' : 'ماده'}</span>}
+      {/* ستون وسط: دلیل + توضیح */}
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        {isRevokeAction ? (
+          <span style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>↩️ این یک لغو است</span>
+        ) : (
+          <>
+            {e.reason && <span style={{ fontSize: 12, color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.reason}</span>}
+            {e.notes && <span style={{ fontSize: 11, color: 'var(--dim)', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.notes}</span>}
+            {!e.reason && !e.notes && e.sex !== 'mixed' && <span style={{ fontSize: 11, color: 'var(--dim)' }}>{e.sex === 'male' ? 'نر' : 'ماده'}</span>}
+          </>
+        )}
       </div>
 
-      {e.reason && <div style={{ fontSize: 12, color: 'var(--muted)' }}>{e.reason}</div>}
-      {e.notes && <div style={{ fontSize: 12, color: 'var(--dim)', fontStyle: 'italic' }}>{e.notes}</div>}
-
-      {(isRevoked || isRevokeAction) && (
-        <div style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic' }}>
-          {isRevoked ? '↩️ لغو شده' : '↩️ این یک لغو است'}
-        </div>
-      )}
-
-      {canRevoke && (
-        <button
-          type="button"
-          onClick={onRevoke}
-          style={{
-            alignSelf: 'flex-start',
-            marginTop: 2,
-            padding: '3px 10px',
-            fontSize: 11,
-            fontWeight: 600,
-            background: 'transparent',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--r-sm)',
-            color: 'var(--muted)',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-          }}
-        >↩️ لغو</button>
-      )}
+      {/* ستون چپ: تاریخ + دکمه لغو */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 3, flexShrink: 0 }}>
+        <span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap' }}>
+          {toFa(e.date)}
+        </span>
+        {isRevoked && <span style={{ fontSize: 10, color: 'var(--muted)', fontStyle: 'italic', whiteSpace: 'nowrap' }}>لغو شده</span>}
+        {canRevoke && (
+          <button
+            type="button"
+            onClick={onRevoke}
+            style={{
+              padding: '2px 8px',
+              fontSize: 11,
+              fontWeight: 600,
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-sm)',
+              color: 'var(--muted)',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              whiteSpace: 'nowrap',
+            }}
+          >↩️ لغو</button>
+        )}
+      </div>
     </div>
   );
 }
