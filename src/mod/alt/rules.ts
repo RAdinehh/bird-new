@@ -406,6 +406,7 @@ export function detectAllAlerts(): RuleAlert[] {
 
   // ============ ۶. جوجه‌کشی ============
   const entries = useInc.getState().eggEntries;
+  const devices = useInc.getState().devices;
   const breedsForInc = useBrd.getState().breeds;
   const customStandardsForInc = _s.customStandards || {};
 
@@ -514,7 +515,6 @@ export function detectAllAlerts(): RuleAlert[] {
   });
 
   // 🆕 ============ ۶.۵. پایش زنده دستگاه‌های انکوباسیون ============
-  const devices = useInc.getState().devices;
   const breedsForDev = useBrd.getState().breeds;
 
   devices.forEach(device => {
