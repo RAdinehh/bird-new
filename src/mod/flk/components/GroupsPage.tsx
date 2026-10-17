@@ -10,6 +10,7 @@ import { useGroupKpi } from '../hooks/useGroupKpi';
 import GroupReportModal from './GroupReportModal';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
+import { logAction } from '../../../cor/logger/auditLog';
 import { toFa } from '../../../shr/utils/fa';
 
 interface Props {
@@ -287,9 +288,11 @@ export default function GroupsPage({ open, onClose }: Props) {
     if (editingId) {
       updateGroup(editingId, data);
       toastMsg.saved(form.name);
+      logAction('update', 'flk', 'ویرایش گروه: ' + data.name);
     } else {
       addGroup(data);
       toastMsg.added(form.name, 'گروه');
+      logAction('add', 'flk', 'افزودن گروه: ' + data.name + ' (' + data.type + ')');
     }
     setShowForm(false);
     setForm(EMPTY_FORM);
@@ -305,6 +308,7 @@ export default function GroupsPage({ open, onClose }: Props) {
     if (!ok) return;
     deleteGroup(g.id);
     toastMsg.deleted(g.name);
+    logAction('delete', 'flk', 'حذف گروه: ' + g.name);
   };
 
   const renderNode = (node: Node, depth: number = 0) => (
