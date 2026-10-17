@@ -16,6 +16,10 @@ export interface F {
   source: string;
   purchasePrice: string; deliveryCost: string; otherCosts: string;
   status: FlockStatus; notes: string;
+  /** 🆕 شناسه فاکتور خرید (اگه منبع purchase) */
+  sourceInvoiceId?: string;
+  /** 🆕 شناسه هچ (اگه منبع hatch) */
+  hatchId?: string;
 }
 
 export const emptyForm = (): F => ({
