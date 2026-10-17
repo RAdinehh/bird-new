@@ -1,60 +1,104 @@
-# 🎯 NEXT — جلسه ۱۴ (تصحیح‌شده با واقعیت کد)
+# 🎯 NEXT — جلسه ۱۵ (پس از پایه‌سازی)
 
-> این فایل با **واقعیت کد** نوشته شده، نه ادعا.
-> آخرین بازنویسی: بعد جلسه ۱۳ (مهاجرت tra→whs و egg→whs).
-
----
-
-## ✅ انجام‌شده در جلسه ۱۳
-
-- مهاجرت tra:invoice:* → whs به bus (۶ تست)
-- مهاجرت egg:production:* → whs به bus
-- تصحیح EVENT-BUS.md (بخش وضعیت)
-- **درس:** inc, dlg, flk مسیرهای غیرمستقیم دارن — قبل از هر activation، grep بزن
+> **نوشته‌شده بر اساس واقعیت کد، نه ادعا.**
+> AI از این خارج نشود بدون تأیید صریح کاربر.
 
 ---
 
-## 🎯 هدف واقعی جلسه ۱۴
+## ✅ جلسه ۱۴ — انجام‌شده
 
-**کاهش any در inc یا brd** — اول باید عدد واقعی رو دربیاریم.
+- مهاجرت `tra→whs` و `egg→whs` به Event Bus
+- فیکس `hasActiveFilters` (sort ≠ filter)
+- فیکس catch خالی در `hasRefs`
+- حذف ۲ any در `flk/store.ts`
+- تست گروه‌های گله (۷/۷ پاس)
+- **پایه‌سازی استاندارد:**
+  - `CONSTITUTION.md` (۱۳ قانون)
+  - `UI-PATTERNS.md` (۱۳ بخش)
+  - `DECISIONS.md` (۱۱ تصمیم)
+  - `PARADIGM.md` (طراحی)
+  - `COMPLEX-SCENARIOS.md` (طراحی)
+  - `scripts/check.sh` (اجرایی)
+  - `AI-BOOT.md` بازنویسی
 
-### قدم ۱ — اسکن واقعی
-grep -c ': any\|<any>\|as any' src/mod/inc/store.ts src/mod/brd/store.ts
+---
 
-### قدم ۲ — لیست دقیق
-grep -n ': any\|<any>\|as any' src/mod/inc/store.ts | head -30
+## 🎯 جلسه ۱۵ — هدف
 
-### قدم ۳ — تصمیم بر اساس حجم واقعی (نه ادعای AI-BOOT.md)
+**اولین پیاده‌سازی از پایه‌های جدید: `FlockBreed` چندریختی**
+
+### چرا این اولین
+
+- کوچک، قابل تست
+- پایه‌ی سناریوهای پیچیده (گله مختلط، نژاد محلی)
+- بدون شکستن چیزی (migration v7→v8)
+
+### قدم‌ها (۴ قدم)
+
+#### قدم ۱ — مدل داده
+- [ ] `types-flocks.ts`: `FlockBreed` تعریف شود
+- [ ] `Flock.breedId: string` → `Flock.breedKind` + `Flock.breedId?`
+- [ ] migrate در `flk/store.ts` (v7→v8)
+- [ ] `tsc` پاس
+
+#### قدم ۲ — UI
+- [ ] `FlocksModal`: حالت مختلط (دکمه «نژاد مناسب پیدا نکردم»)
+- [ ] حالت استاندارد: بدون تغییر ظاهری
+- [ ] `tsc` پاس
+
+#### قدم ۳ — گزارش
+- [ ] `useGroupKpi` و `FlocksKpi` — گله‌های مختلط در دسته جدا
+- [ ] `tsc` پاس
+
+#### قدم ۴ — تست + commit
+- [ ] تست `flk-breed.test.ts` (۳ سناریو)
+- [ ] `npx vitest run` پاس
+- [ ] `bash scripts/check.sh` پاس
+- [ ] `auto_fast.py "feat(flk): FlockBreed چندریختی — پشتیبانی گله مختلط"`
 
 ---
 
 ## 🟢 صف بعدی (بر اساس واقعیت)
 
-1. any-کاهی از کم‌حجم‌ترین ماژول (inc یا brd)
-2. dlg:vaccine:given → cal (بعد از تأیید واقعی مرده بودن)
-3. showAlert → showToast (بعد از grep واقعی)
-4. catch خالی hal (بعد از grep واقعی)
+۱. `ParadigmProfile` + `registry` (قدم ۱ در PARADIGM.md)
+۲. `StandardHint` کامپوننت (قدم ۳)
+۳. اتصال به `DlgTabPanel` (قدم ۴)
+۴. کاهش `any` در `flk/store.ts` → صفر (الان ۰ ✅)
+۵. کاهش `any` در `whs` (۶۹ → کمتر)
+۶. کاهش `showAlert` در ماژول‌های فعال
 
 ---
 
 ## ⚠️ کارهایی که الان نکن
 
-- refactor فایل‌های بزرگ (flk/store, alt/rules) — بدون برنامه
-- فعال‌سازی مرده بر اساس EVENT-BUS.md قدیمی — همیشه اول grep
-- مهاجرت چیزهایی که از مسیر غیرمستقیم کار می‌کنن (inc→whs که از طریق tra/egg فعاله)
+- ❌ refactor `flk/store.ts` (۸۲۰ خط) — بعد از `FlockBreed`
+- ❌ `alt/rules.ts` (۵۸۹ خط) — خارج scope
+- ❌ فعال‌سازی مرده‌ای که از مسیر غیرمستقیم کار می‌کند — اول grep
+- ❌ مهاجرت مستقیم → bus بدون grep
 
 ---
 
-## 🔴 قانون جلسه ۱۴
+## 🔴 قانون جلسه ۱۵
 
-قبل از هر تغییر بزرگ:
+**قبل از هر تغییر، سه چک:**
 
-grep -rn 'bus\.emit\|bus\.on' src/ --include='*.ts' --include='*.tsx'
-grep -rn 'useWhs\|useFlk\|useEgg\|useTra' src/mod/<module>/ --include='*.ts' --include='*.tsx'
+~~~bash
+bash scripts/check.sh
+grep -rn "breedId" src/mod/flk/ --include="*.ts" --include="*.tsx"
 git status --short
+~~~
 
-**هیچ‌وقت به این فایل، EVENT-BUS.md یا AI-BOOT.md بدون تأیید grep اعتماد نکن.**
+**بدون این سه، تغییر ممنوع.**
 
 ---
 
-*آخرین به‌روزرسانی: بعد جلسه ۱۳*
+## 📌 یادآوری — اسناد قدیمی معتبر نیستند
+
+- `docs/EVENT-BUS.md` — بخش وضعیت تصحیح شده، ولی مرجع نهایی نیست
+- `docs/PROGRESS.md` — فقط تاریخچه commit
+- `docs/STATUS.md` — بازبینی نشده
+- **مرجع واقعی: `docs/CONSTITUTION.md` + `docs/UI-PATTERNS.md` + `docs/DECISIONS.md`**
+
+---
+
+*آخرین به‌روزرسانی: پایان جلسه ۱۴ — 1404/07/28*

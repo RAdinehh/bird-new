@@ -12,6 +12,7 @@ import SmartSelect from '../../../shr/components/SmartSelect';
 import DependentSelect from '../../../shr/components/DependentSelect';
 import PickInvoiceModal from './PickInvoiceModal';
 import PickHatchModal from './PickHatchModal';
+import { applyInvoiceToForm, applyHatchToForm } from '../api/pickHandlers';
 import { DepBox } from '../helpers';
 import FlockSourcePickers from './FlockSourcePickers';
 import FlockDealSection from './FlockDealSection';
@@ -69,43 +70,13 @@ export default function FlocksModal(props: FlocksModalProps) {
 
 
   const handleInvoiceSelect = (inv: Invoice) => {
-    const birdItems = (inv.items || []).filter((it: InvoiceItem) => it.birdId);
-    if (!birdItems.length) return;
-    const totalQty = birdItems.reduce((s: number, it: InvoiceItem) => s + (it.quantity || 0), 0);
-    const firstBird = birdItems[0];
-    const updates: Partial<F> = {
-      initialCount: toFa(totalQty),
-      currentCount: toFa(totalQty),
-      purchaseDate: inv.date || '',
-      birdId: firstBird.birdId || '',
-      breedId: firstBird.breedId || '',
-      sourceInvoiceId: inv.id,
-    };
-    if (firstBird.unitPrice) updates.purchasePrice = toFa(firstBird.unitPrice);
-    if (firstBird.maleCount) updates.maleCount = toFa(firstBird.maleCount);
-    if (firstBird.femaleCount) updates.femaleCount = toFa(firstBird.femaleCount);
+    const updates = applyInvoiceToForm(form, inv);
+    if (!updates) return;
     setForm((f) => ({ ...f, ...updates }));
   };
 
   const handleHatchSelect = (h: HatchResult, entry: EggEntry | null) => {
-    const updates: Partial<F> = {
-      initialCount: toFa(h.hatched || 0),
-      currentCount: toFa(h.hatched || 0),
-      hatchDate: h.date || '',
-      hatchId: h.id,
-    };
-    if (entry?.birdId) updates.birdId = entry.birdId;
-    if (entry?.breedId) updates.breedId = entry.breedId;
-    
-    // 🆕 انتقال نر/ماده از هچ (برای breeder)
-    if (h.maleCount && h.maleCount > 0) updates.maleCount = toFa(h.maleCount);
-    if (h.femaleCount && h.femaleCount > 0) updates.femaleCount = toFa(h.femaleCount);
-    
-    // 🆕 انتقال قیمت (اگه تخم خریداری شده)
-    if (entry?.unitPrice && entry.unitPrice > 0) {
-      updates.purchasePrice = toFa(entry.unitPrice);
-    }
-    
+    const updates = applyHatchToForm(form, h, entry);
     setForm((f) => ({ ...f, ...updates }));
   };
 
