@@ -47,6 +47,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
 
   const initial = flock.initialCount || 0;
   const current = flock.currentCount || 0;
+  // 🆕 تبدیل اعداد فارسی به انگلیسی + فیلتر
   const num = parseInt(toEn(delta).replace(/[^0-9]/g, '')) || 0;
   const newCount = current + sign * num;
   const losses = Math.max(0, initial - current);
@@ -165,9 +166,14 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid ' + (validationError ? 'var(--danger)' : (num > 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--border)')), borderRadius: 'var(--r-md)', height: 38, overflow: 'hidden' }}>
-              <button type="button" onClick={() => { setSign(1); setDelta(String(num + 1)); }} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: sign === 1 ? 700 : 400, color: sign === 1 ? 'var(--text)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderLeft: '1px solid var(--border)', flexShrink: 0 }}>+</button>
-              <input type="text" value={delta} onChange={e => { setDelta(e.target.value); setValidationError(''); }} placeholder="عدد" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', textAlign: 'center', padding: '0 4px' }} />
-              <button type="button" onClick={() => { setSign(-1); setDelta(num === 0 ? '1' : String(num - 1)); }} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: sign === -1 ? 700 : 400, color: sign === -1 ? 'var(--text)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0 }}>−</button>
+              <button type="button" onClick={() => { setSign(1); setDelta(toFa(String(num + 1))); }} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: sign === 1 ? 700 : 400, color: sign === 1 ? 'var(--text)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderLeft: '1px solid var(--border)', flexShrink: 0 }}>+</button>
+              <input type="text" value={delta} onChange={e => {
+  const v = e.target.value;
+  const en = toEn(v).replace(/[^0-9]/g, '');
+  setDelta(en ? toFa(en) : '');
+  setValidationError('');
+}} placeholder="۰" inputMode="numeric" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', textAlign: 'center', padding: '0 4px', direction: 'rtl' }} />
+              <button type="button" onClick={() => { setSign(-1); setDelta(toFa(String(num + 1))); }} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: sign === -1 ? 700 : 400, color: sign === -1 ? 'var(--text)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0 }}>−</button>
             </div>
 
             <div style={{ background: 'var(--input-bg)', border: '1px solid ' + (num > 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--border)'), borderRadius: 'var(--r-md)', height: 38, padding: '0 10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
