@@ -8,6 +8,7 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { parse as parseJ, addDays as addDaysJ, format as formatJ, differenceInDays as diffDaysJ, startOfDay } from 'date-fns-jalali';
 import { toEn } from '../../shr/utils/fa';
+import { showToast } from '../../cor/store/toast';
 
 /* ============ انواع ============ */
 export type DeviceMode = 'setter' | 'hatcher' | 'setter+hatcher';
@@ -220,7 +221,14 @@ export const useInc = create<State>()(
 
       addHatch: (h) => set({ hatches: [...get().hatches, {...h, id: uuid(), createdAt: now()}] }),
       updateHatch: (id, patch) => set({ hatches: get().hatches.map(x => x.id === id ? {...x, ...patch} : x) }),
-      deleteHatch: (id) => set({ hatches: get().hatches.filter(x => x.id !== id) })
+      deleteHatch: (id) => {
+        const h = get().hatches.find(x => x.id === id);
+        if (h?.generatedFlockId) {
+          showToast('این هچ قبلاً گله ساخته — ابتدا گله را حذف کنید', 'error');
+          return;
+        }
+        set({ hatches: get().hatches.filter(x => x.id !== id) });
+      }
     }),
     { name: 'pm-inc' }
   )

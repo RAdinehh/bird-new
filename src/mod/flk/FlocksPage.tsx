@@ -22,6 +22,7 @@ import type { TabId } from './types-flocks';
 import FlocksTabs from './components/FlocksTabs';
 import FlockTabPanel from './components/FlockTabPanel';
 import FlocksModal from './components/FlocksModal';
+import { showConfirmAsync } from '../../cor/store/dialog';
 
 export default function FlocksPage() {
   const fmt = useFormat();
@@ -265,6 +266,20 @@ export default function FlocksPage() {
             const firstErrors = errorKeys.slice(0, 2).map(k => vErrors[k]).join(' · ');
             setErr(`لطفاً خطاها را برطرف کنید: ${firstErrors}`);
             return;
+          }
+
+          // 🆕 duplicate check
+          const invId = (form as any).sourceInvoiceId;
+          if (invId && !form.id) {
+            const flocksList = (await import('./store')).useFlk.getState().flocks;
+            const existing = flocksList.find((f: any) => f.sourceInvoiceId === invId);
+            if (existing) {
+              const ok = await showConfirmAsync(
+                'فاکتور تکراری',
+                'این فاکتور قبلاً گله «' + existing.name + '» ساخته. بازم ادامه؟',
+              );
+              if (!ok) return;
+            }
           }
 
           const t = form.type as TabId | undefined;

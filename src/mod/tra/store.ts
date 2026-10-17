@@ -10,6 +10,7 @@ import { useFlk } from '../flk/store';
 import type { Invoice, InvoiceItem, State } from './types';
 import { applyInvoiceMovements, applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { generateInvoiceNumber } from './calc';
+import { showToast } from '../../cor/store/toast';
 
 const now = () => new Date().toISOString();
 
@@ -55,6 +56,15 @@ export const useTra = create<State>()(
       },
       deleteInvoice: (id) => {
         const inv = get().invoices.find(x => x.id === id);
+        // 🆕 guard: چک گله‌های متصل
+        if (inv) {
+          const flkState = useFlk.getState();
+          const linked = flkState.flocks.filter((f: any) => f.sourceInvoiceId === id);
+          if (linked.length > 0) {
+            showToast('این فاکتور ' + linked.length + ' گله دارد — ابتدا گله را حذف کنید', 'error');
+            return;
+          }
+        }
         if (inv) {
           // revert flock effect
           const flk = useFlk.getState();
