@@ -137,6 +137,44 @@ interface State {
 
 const now = () => new Date().toISOString();
 
+// 🆕 types برای migrate (داده legacy — تایپ دقیق معلوم نیست)
+type LegacyEvent = {
+  id: string;
+  type: string;
+  date: string;
+  count: number;
+  reason?: string;
+  linkedEventId?: string;
+  createdAt: string;
+  updatedAt?: string;
+  version?: number;
+  revoked?: boolean;
+  revokedBy?: string;
+  [key: string]: unknown;
+};
+
+type LegacyFlock = {
+  id: string;
+  type: string;
+  initialCount: number | null;
+  currentCount: number | null;
+  events?: LegacyEvent[];
+  layingStartDay?: number | null;
+  endOfCycleDay?: number | null;
+  maleCount?: number | null;
+  femaleCount?: number | null;
+  dealType?: string;
+  dealData?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: unknown;
+};
+
+type PersistedFlk = {
+  state?: { flocks?: LegacyFlock[] };
+  flocks?: LegacyFlock[];
+};
+
 export const useFlk = create<State>()(
   persist(
     (set, get) => ({
@@ -286,15 +324,16 @@ export const useFlk = create<State>()(
     {
       name: 'pm-flk',
       version: 4,
-      migrate: (persisted: any, version: number) => {
-        const state = (persisted && persisted.state) ? persisted.state : persisted;
-        if (!state?.flocks) return persisted;
+      migrate: (persistedInput: unknown, version: number) => {
+        const persisted = persistedInput as PersistedFlk;
+        const state: { flocks?: LegacyFlock[] } = (persisted && persisted.state ? persisted.state : persisted) as { flocks?: LegacyFlock[] };
+        if (!state || !state.flocks) return persistedInput as State;
 
         // ─── v0 → v1: نسخه‌گذاری رویدادها ───
         if (version < 1) {
-          state.flocks = state.flocks.map((f: any) => ({
+          state.flocks = state.flocks.map((f: LegacyFlock) => ({
             ...f,
-            events: (f.events || []).map((e: any) => ({
+            events: (f.events || []).map((e: LegacyEvent) => ({
               ...e,
               version: 1,
               updatedAt: e.updatedAt || e.createdAt,
@@ -304,9 +343,9 @@ export const useFlk = create<State>()(
 
         // ─── v1 → v2: تبدیل تاریخ ISO به شمسی ───
         if (version < 2) {
-          state.flocks = state.flocks.map((f: any) => ({
+          state.flocks = state.flocks.map((f: LegacyFlock) => ({
             ...f,
-            events: (f.events || []).map((e: any) => ({
+            events: (f.events || []).map((e: LegacyEvent) => ({
               ...e,
               date: toJalali(e.date),
             })),
@@ -315,9 +354,9 @@ export const useFlk = create<State>()(
 
         // ─── v2 → v3: پاکسازی متن رویدادها ───
         if (version < 3) {
-          state.flocks = state.flocks.map((f: any) => ({
+          state.flocks = state.flocks.map((f: LegacyFlock) => ({
             ...f,
-            events: (f.events || []).map((e: any) => {
+            events: (f.events || []).map((e: LegacyEvent) => {
               let reason = e.reason || '';
               reason = reason.replace(/لغو correction \(افزودن\)/g, 'لغو اصلاح');
               reason = reason.replace(/لغو correction \(کسر\)/g, 'لغو اصلاح');
@@ -338,16 +377,16 @@ export const useFlk = create<State>()(
 
         // ─── v3 → v4: پاکسازی کامل + بازسازی currentCount ───
         if (version < 4) {
-          state.flocks = state.flocks.map((f: any) => {
+          state.flocks = state.flocks.map((f: LegacyFlock) => {
             const initial = f.initialCount || 0;
-            const events = (f.events || []).slice().sort((a: any, b: any) =>
+            const events = (f.events || []).slice().sort((a: LegacyEvent, b: LegacyEvent) =>
               (a.createdAt || '').localeCompare(b.createdAt || '')
             );
 
             // پیدا کردن event های لغو شده (originalIds که correction دارن)
             const revokedMap = new Map<string, string>(); // originalId -> revokeEventId
             const seenRevokes = new Set<string>();
-            events.forEach((e: any) => {
+            events.forEach((e: LegacyEvent) => {
               if (e.linkedEventId && !seenRevokes.has(e.linkedEventId)) {
                 revokedMap.set(e.linkedEventId, e.id);
                 seenRevokes.add(e.linkedEventId);
@@ -355,14 +394,14 @@ export const useFlk = create<State>()(
             });
 
             // حذف لغوهای تکراری (فقط اولین لغو باقی بمونه)
-            const dedupedEvents = events.filter((e: any) => {
+            const dedupedEvents = events.filter((e: LegacyEvent) => {
               if (!e.linkedEventId) return true;
               return revokedMap.get(e.linkedEventId) === e.id;
             });
 
             // بازمحاسبه currentCount از اول
             let computed = initial;
-            dedupedEvents.forEach((e: any) => {
+            dedupedEvents.forEach((e: LegacyEvent) => {
               const isRevoke = !!e.linkedEventId;
               if (e.type === 'death' || e.type === 'sell' || e.type === 'cull') {
                 computed -= e.count;
@@ -372,7 +411,7 @@ export const useFlk = create<State>()(
                 // correction معکوس
                 if (isRevoke) {
                   // علامت رو از event اصلی می‌گیریم
-                  const orig = dedupedEvents.find((x: any) => x.id === e.linkedEventId);
+                  const orig = dedupedEvents.find((x: LegacyEvent) => x.id === e.linkedEventId);
                   if (orig) {
                     if (orig.type === 'death' || orig.type === 'sell' || orig.type === 'cull') {
                       computed += e.count;
@@ -399,7 +438,7 @@ export const useFlk = create<State>()(
             const finalCurrent = oldCurrent;
 
             // برچسب‌گذاری: event هایی که لغو شدن
-            const marked = dedupedEvents.map((e: any) => ({
+            const marked = dedupedEvents.map((e: LegacyEvent) => ({
               ...e,
               ...(revokedMap.has(e.id) ? { revoked: true, revokedBy: revokedMap.get(e.id) } : {}),
             }));
@@ -415,7 +454,7 @@ export const useFlk = create<State>()(
 
         // ─── v4 → v5: clean-up فیلدهای یتیم ───
         if (version < 5) {
-          state.flocks = state.flocks.map((f: any) => ({
+          state.flocks = state.flocks.map((f: LegacyFlock) => ({
             ...f,
             layingStartDay: (f.type === 'layer' || f.type === 'breeder') ? (f.layingStartDay ?? 0) : 0,
             endOfCycleDay: (f.type === 'layer' || f.type === 'breeder') ? (f.endOfCycleDay ?? null) : null,
@@ -426,14 +465,14 @@ export const useFlk = create<State>()(
 
         // ─── v5 → v6: default dealType ───
         if (version < 6) {
-          state.flocks = state.flocks.map((f: any) => ({
+          state.flocks = state.flocks.map((f: LegacyFlock) => ({
             ...f,
             dealType: f.dealType || 'own',
             dealData: f.dealData || {},
           }));
         }
 
-        return persisted;
+        return persistedInput as State;
       },
     }
   )
