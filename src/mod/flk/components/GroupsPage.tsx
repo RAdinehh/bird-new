@@ -8,6 +8,7 @@ import { useBrd } from '../../brd/store';
 import { useHal } from '../../hal/store';
 import { useGroupKpi } from '../hooks/useGroupKpi';
 import GroupReportModal from './GroupReportModal';
+import GroupComparisonModal from './GroupComparisonModal';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
@@ -236,6 +237,7 @@ export default function GroupsPage({ open, onClose }: Props) {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [showForm, setShowForm] = useState(false);
   const [reportGroupId, setReportGroupId] = useState<string | null>(null);
+  const [comparisonOpen, setComparisonOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
@@ -435,6 +437,7 @@ export default function GroupsPage({ open, onClose }: Props) {
             <Btn variant="primary" onClick={handleNew} style={{ flex: 1 }}>+ گروه جدید</Btn>
             <Btn onClick={handleExport} disabled={groups.length === 0} style={{ flexShrink: 0 }} title="Export JSON">📥</Btn>
             <Btn onClick={() => fileInputRef.current?.click()} style={{ flexShrink: 0 }} title="Import JSON">📤</Btn>
+            <Btn onClick={() => setComparisonOpen(true)} disabled={groups.length < 2} style={{ flexShrink: 0 }} title="مقایسه">🔍</Btn>
           </div>
           <input
             ref={fileInputRef}
@@ -517,6 +520,11 @@ export default function GroupsPage({ open, onClose }: Props) {
         open={reportGroupId !== null}
         onClose={() => setReportGroupId(null)}
         groupId={reportGroupId}
+      />
+    
+      <GroupComparisonModal
+        open={comparisonOpen}
+        onClose={() => setComparisonOpen(false)}
       />
     </Modal>
   );
