@@ -252,18 +252,19 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
 
   return (
     <div style={{
-      padding: '8px 10px 8px 12px',
+      padding: '8px 12px',
       background: isRevoked ? 'transparent' : 'var(--input-bg)',
       border: isRevoked ? '1px dashed var(--border)' : 'none',
       borderRight: '3px solid ' + (isRevoked ? 'var(--dim)' : info.tone),
       borderRadius: 'var(--r-sm)',
-      display: 'flex',
+      display: 'grid',
+      gridTemplateColumns: '1fr 1.3fr 1fr',
       alignItems: 'center',
-      gap: 10,
+      gap: 12,
       opacity: isRevoked ? 0.55 : 1,
     }}>
-      {/* ستون راست: نوع + تعداد */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 85 }}>
+      {/* ستون راست (RTL): نوع + تعداد */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, minWidth: 0 }}>
         <span style={{
           fontWeight: 700,
           color: isRevoked ? 'var(--muted)' : info.tone,
@@ -282,34 +283,52 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
         </span>
       </div>
 
-      {/* ستون وسط: دلیل + توضیح */}
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
+      {/* ستون وسط: دلیل/توضیح — راست‌چین */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        minWidth: 0,
+        alignItems: 'flex-start',
+        paddingRight: 4,
+        borderRight: '1px solid var(--border)',
+      }}>
         {isRevokeAction ? (
           <span style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>↩️ این یک لغو است</span>
         ) : (
           <>
-            {e.reason && <span style={{ fontSize: 12, color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.reason}</span>}
-            {e.notes && <span style={{ fontSize: 11, color: 'var(--dim)', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.notes}</span>}
+            {e.reason && <span style={{ fontSize: 12, color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{e.reason}</span>}
+            {e.notes && <span style={{ fontSize: 11, color: 'var(--dim)', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{e.notes}</span>}
             {!e.reason && !e.notes && e.sex !== 'mixed' && <span style={{ fontSize: 11, color: 'var(--dim)' }}>{e.sex === 'male' ? 'نر' : 'ماده'}</span>}
+            {!e.reason && !e.notes && e.sex === 'mixed' && <span style={{ fontSize: 11, color: 'var(--dim)' }}>—</span>}
           </>
         )}
       </div>
 
-      {/* ستون چپ: تاریخ + دکمه لغو */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 3, flexShrink: 0 }}>
-        <span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap' }}>
+      {/* ستون چپ: تاریخ + لغو */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 3, minWidth: 0 }}>
+        <span style={{
+          fontFamily: 'monospace',
+          fontSize: 13,
+          fontWeight: 600,
+          color: 'var(--text)',
+          whiteSpace: 'nowrap',
+          letterSpacing: '.3px',
+        }}>
           {toFa(e.date)}
         </span>
-        {isRevoked && <span style={{ fontSize: 10, color: 'var(--muted)', fontStyle: 'italic', whiteSpace: 'nowrap' }}>لغو شده</span>}
+        {isRevoked && (
+          <span style={{ fontSize: 10, color: 'var(--muted)', fontStyle: 'italic', whiteSpace: 'nowrap' }}>لغو شده</span>
+        )}
         {canRevoke && (
           <button
             type="button"
             onClick={onRevoke}
             style={{
-              padding: '2px 8px',
+              padding: '3px 10px',
               fontSize: 11,
               fontWeight: 600,
-              background: 'transparent',
+              background: 'var(--btn-bg)',
               border: '1px solid var(--border)',
               borderRadius: 'var(--r-sm)',
               color: 'var(--muted)',
