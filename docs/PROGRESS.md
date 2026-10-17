@@ -31,3 +31,5 @@
 [2026/10/18 00:20] refactor(flk): حذف ۲ any در migrate v6→v7 + تکمیل flk
 
 [2026/10/18 01:10] docs: پایه‌سازی استاندارد — CONSTITUTION + UI-PATTERNS + DECISIONS + PARADIGM + COMPLEX-SCENARIOS + check.sh + AI-BOOT + NEXT
+
+[2026/10/18 01:24] docs: پاک‌سازی — حذف STANDARDS (تکراری)، حفظ FOUNDATION + FOUNDATION-PATTERNS + UX-FORM-RULES
