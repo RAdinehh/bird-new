@@ -167,19 +167,19 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <div style={{ display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid ' + (validationError ? 'var(--danger)' : (num > 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--border)')), borderRadius: 'var(--r-md)', height: 38, overflow: 'hidden' }}>
               <button type="button" onClick={() => { setSign(1); setDelta(String(num + 1)); }} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: sign === 1 ? 700 : 400, color: sign === 1 ? 'var(--text)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderLeft: '1px solid var(--border)', flexShrink: 0 }}>+</button>
               <input type="text" value={delta} onChange={e => { setDelta(e.target.value); setValidationError(''); }} placeholder="عدد" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', textAlign: 'center', padding: '0 4px' }} />
-              <button type="button" onClick={() => { setSign(-1); setDelta(String(Math.max(0, num - 1))); }} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: sign === -1 ? 700 : 400, color: sign === -1 ? 'var(--text)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0 }}>−</button>
+              <button type="button" onClick={() => { setSign(-1); setDelta(num === 0 ? '1' : String(num - 1)); }} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: sign === -1 ? 700 : 400, color: sign === -1 ? 'var(--text)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0 }}>−</button>
             </div>
 
-            <div style={{ background: 'var(--input-bg)', border: '1px solid ' + (num > 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--border)'), borderRadius: 'var(--r-md)', height: 38, padding: '0 8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ background: 'var(--input-bg)', border: '1px solid ' + (num > 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--border)'), borderRadius: 'var(--r-md)', height: 38, padding: '0 10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>{toFa(current)}</span>
-                <span style={{ color: 'var(--dim)', fontSize: 10 }}>→</span>
+                <span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 600, color: 'var(--muted)' }}>{toFa(current)}</span>
+                <span style={{ color: 'var(--dim)', fontSize: 11 }}>→</span>
                 {num === 0 ? (
-                  <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 400, color: 'var(--dim)' }}>؟</span>
+                  <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 400, color: 'var(--dim)' }}>؟</span>
                 ) : newCount < 0 ? (
-                  <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--danger)' }}>منفی</span>
+                  <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--danger)' }}>منفی</span>
                 ) : (
-                  <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 700, color: newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(newCount)}</span>
+                  <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(newCount)}</span>
                 )}
               </div>
             </div>
