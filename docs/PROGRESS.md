@@ -23,3 +23,5 @@
 [2026/10/17 23:41] feat(whs): فعال‌سازی event bus egg→whs (production created/updated/deleted)
 
 [2026/10/17 23:48] docs: تصحیح EVENT-BUS و NEXT بر اساس واقعیت کد (جلسه ۱۳)
+
+[2026/10/18 00:03] fix(filter): hasActiveFilters — حذف sortState (sort ≠ filter)

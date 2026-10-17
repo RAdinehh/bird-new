@@ -145,10 +145,10 @@ export function useFilterSort<T>(opts: UseFilterSortOptions<T>): UseFilterSortRe
     return result;
   }, [items, search, filterState, sortState, filters, sorts, getSearchText]);
 
+  // ⚠️ sort ≠ filter — sortState به‌عنوان active filter حساب نمی‌شود
   const hasActiveFilters = !!search ||
     Object.values(filterState).some(v => v !== undefined && v !== null && v !== '' &&
-      (!Array.isArray(v) || v.length > 0)) ||
-    !!sortState;
+      (!Array.isArray(v) || v.length > 0));
 
   return {
     filtered,
