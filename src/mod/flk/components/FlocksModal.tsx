@@ -131,6 +131,9 @@ export default function FlocksModal(props: FlocksModalProps) {
     return { bird, del, oth, total, per };
   })();
 
+  // 🆕 اگه فاکتور یا هچ لینک شده، فیلدهای منبع قفل می‌شن
+  const isSourceLinked = !!(form.sourceInvoiceId || form.hatchId);
+
   return (
     <Modal
       open={open}
@@ -282,13 +285,19 @@ export default function FlocksModal(props: FlocksModalProps) {
       )}
 
       <Grid2>
-        <Field label="تعداد اولیه" required error={showError('initialCount')} onTouch={() => markTouched('initialCount')}>
-          <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => {
+        <Field
+          label={isSourceLinked ? <span>تعداد اولیه <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تعداد اولیه'}
+          required
+          hint={isSourceLinked ? '🔒 از فاکتور/هچ — برای تغییر، لینک را پاک کنید' : undefined}
+          error={showError('initialCount')}
+          onTouch={() => markTouched('initialCount')}
+        >
+          <NumField placeholder="۸۵۰" disabled={isSourceLinked} value={form.initialCount} onChange={e => {
+            if (isSourceLinked) return;
             const v = e.target.value;
             setForm(f => ({
               ...f,
               initialCount: v,
-              // 🆕 اگه currentCount خالی بود یا با initialCount قبلی برابر بود، sync کن
               currentCount: (!f.currentCount || f.currentCount === f.initialCount) ? v : f.currentCount,
             }));
           }} unit="پرنده" min={1} max={100000} autoClamp />
@@ -351,6 +360,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         markTouched={markTouched}
         liveCosts={liveCosts}
         vaccineEnabled={vaccineEnabled}
+        isSourceLinked={isSourceLinked}
       />
 
       {err && <ErrorBox>{err}</ErrorBox>}
