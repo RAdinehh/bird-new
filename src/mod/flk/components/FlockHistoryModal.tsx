@@ -179,7 +179,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   else if (sign === 'plus') { setSign(1); setDelta(en ? toFa(en) : ''); }
   else { setDelta(en ? toFa(en) : ''); }
   setValidationError('');
-}} placeholder="۰" inputMode="numeric" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 700, color: num === 0 ? 'var(--text)' : (sign === 1 ? 'var(--accent)' : 'var(--danger)'), textAlign: 'center', padding: '0 4px', direction: 'rtl' }} />
+}} placeholder="۰" inputMode="numeric" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', textAlign: 'center', padding: '0 4px', direction: 'rtl' }} />
               <button type="button" onClick={() => { setSign(-1); setDelta(toFa(String(num + 1))); }} style={{ width: 34, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: sign === -1 ? 700 : 400, color: sign === -1 ? 'var(--danger)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0 }}>−</button>
             </div>
 
@@ -191,8 +191,12 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                   <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 400, color: 'var(--dim)' }}>؟</span>
                 ) : newCount < 0 ? (
                   <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--danger)' }}>منفی</span>
+                ) : newCount > current ? (
+                  <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>{toFa(newCount)}</span>
+                ) : newCount < current ? (
+                  <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--danger)' }}>{toFa(newCount)}</span>
                 ) : (
-                  <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(newCount)}</span>
+                  <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>{toFa(newCount)}</span>
                 )}
               </div>
             </div>
