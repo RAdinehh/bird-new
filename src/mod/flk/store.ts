@@ -120,6 +120,10 @@ export interface Flock {
   type: FlockType;
   birdId: string;
   breedId: string;
+  /** 🆕 standard یا mixed — خالی = standard برای سازگاری */
+  breedKind?: 'standard' | 'mixed';
+  /** 🆕 نام محلی برای گله مختلط */
+  breedLabel?: string;
   hallId: string;
   zoneId: string;
   initialCount: number | null;
@@ -515,7 +519,7 @@ export const useFlk = create<State>()(
     }),
     {
       name: 'pm-flk',
-      version: 4,
+      version: 8,
       migrate: (persistedInput: unknown, version: number) => {
         const persisted = persistedInput as PersistedFlk;
         const state: { flocks?: LegacyFlock[] } = (persisted && persisted.state ? persisted.state : persisted) as { flocks?: LegacyFlock[] };
@@ -669,6 +673,15 @@ export const useFlk = create<State>()(
           const s = state as Partial<State>;
           if (!s.groups) s.groups = [];
           if (!s.groupMembers) s.groupMembers = [];
+        }
+
+        // ─── v7 → v8: breedKind + breedLabel (گله مختلط) ───
+        if (version < 8) {
+          state.flocks = state.flocks.map((f: any) => ({
+            ...f,
+            breedKind: f.breedKind || 'standard',
+            breedLabel: f.breedLabel || '',
+          }));
         }
 
         return persistedInput as State;

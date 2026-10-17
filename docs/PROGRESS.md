@@ -35,3 +35,5 @@
 [2026/10/18 01:24] docs: پاک‌سازی — حذف STANDARDS (تکراری)، حفظ FOUNDATION + FOUNDATION-PATTERNS + UX-FORM-RULES
 
 [2026/10/18 01:28] feat(scripts): session-start.sh + ۱۰ قانون UX در AI-BOOT + ۳ چک UX در check.sh (ratchet)
+
+[2026/10/18 01:39] feat(flk): FlockBreed additive — breedKind/breedLabel + UI مختلط + ۳ تست

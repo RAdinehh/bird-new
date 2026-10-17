@@ -6,6 +6,10 @@ import type { FlockType, FlockStatus } from './store';
 export interface F {
   id?: string;
   name: string; type: FlockType; birdId: string; breedId: string;
+  /** 🆕 standard یا mixed — خالی = standard برای سازگاری */
+  breedKind?: 'standard' | 'mixed';
+  /** 🆕 نام محلی برای گله مختلط */
+  breedLabel?: string;
   hallId: string; zoneId: string;
   initialCount: string; currentCount: string;
   maleCount: string; femaleCount: string;

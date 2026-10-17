@@ -185,29 +185,50 @@ export default function FlocksModal(props: FlocksModalProps) {
             autoThreshold={6}
           />
         </Field>
-        <Field label="نژاد" error={showError('breedId')} onTouch={() => markTouched('breedId')}>
-          <DependentSelect
-            value={form.breedId}
-            onChange={v => {
-              const std = breedStd.byBreedId(v);
-              const layStart = std?.biology?.layingStartDay;
-              if (layStart != null) {
-                setForm(f => ({ ...f, breedId: v, layingStartDay: String(layStart) }));
-                setLayingFromStd(true);
-              } else {
-                setForm(f => ({ ...f, breedId: v }));
-                setLayingFromStd(false);
-              }
-            }}
-            parentValue={form.birdId}
-            parentLabel="پرنده"
-            options={breedsForBird.map(b => ({ value: b.id, label: b.name }))}
-            emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
-            placeholder="— انتخاب نژاد —"
-            modalTitle="انتخاب نژاد"
-          />
+        <Field label="نژاد" error={form.breedKind === 'mixed' ? undefined : showError('breedId')} onTouch={() => markTouched('breedId')}>
+          {form.breedKind === 'mixed' ? (
+            <Input
+              value={form.breedLabel || ''}
+              onChange={e => setForm(f => ({ ...f, breedLabel: e.target.value }))}
+              placeholder="مثلاً: مرندی محلی"
+            />
+          ) : (
+            <DependentSelect
+              value={form.breedId}
+              onChange={v => {
+                const std = breedStd.byBreedId(v);
+                const layStart = std?.biology?.layingStartDay;
+                if (layStart != null) {
+                  setForm(f => ({ ...f, breedId: v, layingStartDay: String(layStart) }));
+                  setLayingFromStd(true);
+                } else {
+                  setForm(f => ({ ...f, breedId: v }));
+                  setLayingFromStd(false);
+                }
+              }}
+              parentValue={form.birdId}
+              parentLabel="پرنده"
+              options={breedsForBird.map(b => ({ value: b.id, label: b.name }))}
+              emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
+              placeholder="— انتخاب نژاد —"
+              modalTitle="انتخاب نژاد"
+            />
+          )}
         </Field>
       </Grid2>
+        {form.birdId && (
+          <div style={{ textAlign: 'right', fontSize: 'var(--fs-xs)', marginTop: 4 }}>
+            {form.breedKind === 'mixed' ? (
+              <button type="button" onClick={() => setForm(f => ({ ...f, breedKind: 'standard', breedLabel: '' }))} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: 0, fontFamily: 'inherit', fontSize: 'inherit', textDecoration: 'underline' }}>
+                بازگشت به انتخاب نژاد استاندارد
+              </button>
+            ) : (
+              <button type="button" onClick={() => setForm(f => ({ ...f, breedKind: 'mixed', breedId: '' }))} style={{ background: 'none', border: 'none', color: 'var(--dim)', cursor: 'pointer', padding: 0, fontFamily: 'inherit', fontSize: 'inherit', textDecoration: 'underline' }}>
+                نژاد مورد نظر نیست؟ ثبت گله مختلط
+              </button>
+            )}
+          </div>
+        )}
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📍 مکان</div>
       <Grid2>
