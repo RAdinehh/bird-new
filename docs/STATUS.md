@@ -1,373 +1,254 @@
-# 🐔 STATUS.md — تاریخچه و نقشه راه
+# 📊 STATUS.md — تاریخچه و نقشه راه Bird-new
 
-> آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۷ — hal نهایی + UX فرم)
-> این سند فقط **تاریخچه** و **Roadmap** رو نگه می‌داره.
-> وضعیت فعلی و کارهای جاری → `HANDOFF.md`
-
----
+> آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۱۲)
+> وضعیت فعلی → `HANDOFF.md` · معماری → `ARCHITECTURE.md`
 
 ## ✅ تاریخ فازها
 
 ### فاز ۱ — پایه (تموم)
 - زیرساخت React/TS/Vite/PWA
-- ۱۸ ماژول CRUD کامل
-- ۱۰۷۰ تست ۱۰۰٪ pass
-- استاندارد ۲۳ نژاد + راهنمای علمی
-- Multi-Select در ۲۰+ ماژول
-- آبشاری در ۸ ماژول
-- Toast + FAB + Dialog کامل
+- ۱۸ ماژول CRUD
+- ۱۰۶۸ تست pass
+- استاندارد ۲۳ نژاد
+- Multi-Select، آبشاری، Toast، FAB، Dialog
 - Feature flag واکسن/دارو
 
 ### فاز ۲ — شکستن فایل‌های بزرگ (تموم)
-- filter/configs.tsx (۱۷۲۰→۱۴ فایل)
-- shr/components/ui.tsx (۱۳۱۴→۱۰ فایل)
-- FilterBar.tsx (۶۴۴→۳۶۶ + ۳ فایل)
-- tra/store.ts (۶۹۷→۴ فایل)
-- ItemDetailsForm.tsx (۵۱۷→۵ فایل)
-- data-breeds.ts (۱۳۷۶→۸ فایل)
+- `filter/configs.tsx` → ۱۴ فایل
+- `shr/components/ui.tsx` → ۱۰ فایل
+- `FilterBar.tsx` → ۴ فایل
+- `tra/store.ts` → ۴ فایل
+- `data-breeds.ts` → ۸ فایل
 
 ### فاز ۳ — Capacitor + APK (تموم)
 - نصب Capacitor
-- پوشه android/ ساخته شد
-- GitHub Actions برای Build خودکار
-- اولین APK روی گوشی نصب شد ✅
-- هر git push → APK جدید (~۳ دقیقه)
+- پوشه `android/`
+- GitHub Actions APK
+- هر push → APK جدید (~۳ دقیقه)
 
 ### فاز ۴ — A11y (تموم)
-- Focus Visible (پاکسازی ۳ بلوک تکراری)
-- useKeyboardSafeFocus (فیلد میاد وسط صفحه)
-- حذف ۵۵۱ فایل .bak (۱۴ MB)
-- سند استانداردها تدوین شد
+- Focus Visible
+- useKeyboardSafeFocus
+- حذف ۵۵۱ فایل `.bak` (۱۴ MB)
+- سند استانداردها
 
-### فاز ۵ — brd (تموم — قفل‌شده)
-- ممیزی کامل (AUDIT-BRD.md)
+### فاز ۵ — brd (تموم)
+- ممیزی کامل (`AUDIT-BRD.md`)
 - ۱۱ fix موفق
-- refactor کامل (BirdForm, BirdCard, BreedForm, BreedCard)
-- Single Resolver (resolveStandard)
-- Master Data (قانون ۱۶)
-- tsc: ۰ خطا، تست: ۱۰۶۴/۱۰۶۴
+- refactor BirdForm/BirdCard/BreedForm/BreedCard
+- Single Resolver
+- Master Data
+- ⚠️ **ولی ۶۱ any مونده** (جلسه ۱۲ کشف شد)
 
-### فاز ۶ — hal (تموم — قفل‌شده ✅)
-- ممیزی کامل (AUDIT-HAL.md)
+### فاز ۶ — hal (تموم)
+- ممیزی کامل (`AUDIT-HAL.md`)
 - EquipmentPage: ۴۳۷ → ۳۱۱ خط
-- ZonesPage: ۴۱۴ → ۳۵۷ خط
+- ZonesPage: ۴۱۴ → ۳۵۷ → دوباره ۴۴۴
 - استخراج useEquipmentForm + ZoneFormModal
 - توکنی‌سازی ۷۰+ مورد
-- **جلسه ۵:** ۹۶ any → ۶ (۹۴٪ کاهش) — قفل ۱۰۰/۱۰۰
 
 ### فاز ۷ — FOUNDATION (تموم)
-- FOUNDATION.md (۱۳ بخش)
-- FOUNDATION-PATTERNS.md (۱۶ بخش)
-- ۳۰+ الگوی تفکر
+- `FOUNDATION.md` (۱۳ بخش)
+- `FOUNDATION-PATTERNS.md` (۲۸ بخش — ۳۰+ الگو)
 
-### فاز ۱۴ — flk + Carousel سراسری + Smart Capacity (تموم — جلسه ۱۱)
-- ✅ flk قفل ۹۵٪ — FilterBar + smart capacity + KPI + touched errors
-- ✅ Carousel در alt/ctc/dlg (مثل hal)
-- ✅ useFormErrors hook (الگوی Reward Early/Punish Late)
-- ✅ useCarousel v4 (deps + MutationObserver)
-- ✅ hallCapacity با منطق کامل + ۱۱ تست
-- ✅ separator `•` در ۶۹ فایل
-- 🔴 باقی‌مونده: FlocksModal ۴۲۴ · ZonesPage ۴۴۵ · debug box
+### فاز ۸ — ابزارها + hal نهایی (تموم)
+- ESLint + config
+- GitHub Actions CI
+- `scripts/check-any.py`
+- `docs/TYPE-REGISTRY.md`
+- Aliases پروژه (`af`, `chk`, ...)
+- hal صفر any (۹۶ → ۶ migration)
+- ESLint --fix روی ۱۵ ماژول
+- rename `*Payload` vs `*FormData`
+- ۱۰۶۸ تست pass
 
-### فاز ۱۳ — hal قفل نهایی (تموم — جلسه ۱۰) 🎉
-- ✅ **hal ۱۰۰٪** — صفر any واقعی، همه فایل‌ها < ۴۰۰
-- ✅ **تب آرشیو** (Segmented Control + conditional)
-- ✅ **۲ زیرنوع جدید** feeder + ۱ drinker
-- ✅ **۶ دسته گم‌شده** اضافه شد
-- ✅ **KPI Cards** تجهیزات
-- ✅ **Zod limits** واقع‌بینانه صنعت مرغداری
-- ✅ **autoClamp در blur** (نه تایپ)
-- ✅ **placeholder داینامیک** (۵۰+ زیرنوع)
-- ✅ **EquipmentCard refactor** ۲۳۷ → ۱۵۹ خط
-- ✅ **useBodyScrollLock** ساده (بدون position:fixed)
-- ✅ **رفع باگ محاسبه بستر** (۲ ماده)
+### فاز ۹ — انکوباسیون + استاندارد بستر (تموم)
+- استاندارد بستر per-material (`kgPerM2ByMaterial`)
+- کاهش وزن تخم + هشدار alt
+- پروفایل دما/رطوبت روز‌به‌روز (`IncubationPhase`)
+- `IncubationProfileEditor`
+- EST + CO₂/O₂ + چرخش
+- `inc/needs.ts` — ۶ تابع pure
+- پایش زنده + نمودار روند (`DeviceReading`)
 
-### فاز ۱۲ — تجهیزات hal (تموم — جلسه ۹)
-- ✅ **حذف کد تکراری** در EquipmentFormModal
-- ✅ **hook جدید** `useBodyScrollLock` در shr/hooks
-- ✅ **HallEquipSection** زیر ۴۰۰ (۳۸۵ خط)
+### فاز ۱۰ — hal نهایی + UX فرم (تموم)
+- ۲۵+ fix روی hal
+- ۹ باگ پنهان کشف شد:
+  - `zoneId` در buildPayload نبود
+  - `litter_roll ≠ paper_roll` (۱۰ برابر خطا!)
+  - `birdId` از `breedId` مشتق می‌شد
+  - `fan_tunnel stdKey` غلط
+  - `lamp_led stdKey` غلط
+  - و ۴ مورد دیگر
+- گروه‌بندی بصری فرم‌ها (۵ + ۴ گروه)
+- حذف گروه ⚙️ سیستم‌ها (Single Source)
+- sync کامل Hall ↔ Equipment
+- `saveAttempted` + `onErrorClear`
+- auto-fill فارسی + اعداد فارسی
+- KPI Cards دو ستونه
+- استاندارد دانخوری/آبخوری ۸ نژاد
+- ۲۲ hint استاندارد
 
-### فاز ۱۱ — Zones بهبود (تموم — جلسه ۸)
-- ✅ **crossError** — اعتبارسنجی cross-field + بلاک save
-- ✅ **توکنی‌سازی** کارت «ارثی از سالن»
-- ✅ **استخراج `ZoneCard.tsx`** — ZonesPage زیر ۴۰۰ (۳۹۰ خط)
-- ✅ **صفر `any`** در Zone* (hidden bug fix)
-- ✅ **حذف ایموجی ⚠️** طبق UX-FORM-RULES ب۱۶
-- ✅ **رنگ `--warn` → `--danger`** برای crossError
+### فاز ۱۱ — Zones بهبود (تموم)
+- `crossError` — بلاک save اگر مجموع > سالن
+- توکنی‌سازی کارت «ارثی از سالن»
+- استخراج `ZoneCard.tsx`
+- ZonesPage ۴۱۹ → ۳۹۰ (⚠️ بعداً دوباره ۴۴۴ شد)
+- صفر any در Zone*
+- حذف ایموجی ⚠️
+- رنگ `--warn` → `--danger`
 
-### فاز ۱۰ — hal نهایی (تموم — جلسه ۷)
-- ✅ **۲۵+ fix** روی hal (Halls + Zones + Equipment)
-- ✅ **۹ باگ پنهان کشف و fix:**
-  - `zoneId` در buildPayload نبود → بخش از دست می‌رفت
-  - `ErrorBox` در EquipmentFormModal نداشت
-  - **`litter_roll ≠ paper_roll`** → ۱۰ برابر خطا در محاسبه بستر
-  - `ventilation`/`light` از تجهیزات sync نمی‌شد
-  - `realCapacity = area × 9` hardcode
-  - `lampEfficiency = 100` hardcode
-  - **`birdId` از `breedId` مشتق می‌شد** (خطای منطقی)
-  - **`fan_tunnel stdKey = fanM3PerKg`** (ظرفیت ۴.۵ به جای ۴۰۰۰)
-  - **`lamp_led stdKey = lampWattPerM2`** (ظرفیت ۳ به جای ۱۰)
-- ✅ **گروه‌بندی بصری** HallsFormModal (۵ گروه) + EquipmentFormModal (۴ گروه)
-- ✅ **حذف گروه ⚙️ سیستم‌ها** از فرم سالن (Single Source)
-- ✅ **sync کامل** Hall ↔ Equipment (شامل `ventilation`/`light`)
-- ✅ **auto-fill** کامل + اعداد فارسی
-- ✅ **onErrorClear** در ۳ فرم + خطا فقط بعد از ذخیره
-- ✅ **کد سالن** + ۵ ماده litter جدید
-- ✅ **نمایش ×N** به جای درصد > ۱۰۰
-- ✅ **کارت‌های KPI دو ستونه** تجهیزات (Big Dutchman style)
-- ✅ **مدال تجهیزات** با نوار پیشرفت + وضعیت رنگی
-- ✅ **استاندارد دانخوری/آبخوری** ۸ نژاد (bucket/pan/chick + fountain)
-- ✅ **۲۲ hint استاندارد** برای همه تجهیزات
-- ✅ **حذف `turkey_goose.ts`** legacy (۸ خط بدون نژاد)
+### فاز ۱۲ — تجهیزات hal (تموم)
+- حذف کد تکراری EquipmentFormModal
+- hook `useBodyScrollLock`
+- HallEquipSection زیر ۴۰۰
 
-### فاز ۹ — انکوباسیون + استاندارد بستر (تموم — جلسه ۶)
-- ✅ **استاندارد بستر per-material** — `kgPerM2ByMaterial` (رول کاغذی ۰.۳، ماسه ۲۵، کاه ۵، ...)
-- ✅ **migration** برای override قدیمی (`set/store.ts` merge)
-- ✅ **نمایش اعشار صحیح** در LitterEditor (`decimals={2}`)
-- ✅ **کاهش وزن تخم** — ۲ فیلد + `calcWeightLossPct` + محاسبه زنده + نمایش
-- ✅ **`weightLossMinPct/MaxPct`** در `IncubationStandard` (۱۱-۱۳)
-- ✅ **هشدار alt** — کاهش وزن خارج بازه (روز ۷-۱۸)
-- ✅ **پروفایل دما/رطوبت روز‌به‌روز** (`IncubationPhase` + ۸ پروفایل Ross 308)
-- ✅ **`getIncubationPhase` + `getExpectedTempHumidity`** (pure)
-- ✅ **نمایش «🌡 هدف امروز»** در `EggEntryCard`
-- ✅ **`IncubationProfileEditor`** (UI ویرایشگر با پروفایل پیش‌فرض)
-- ✅ **اتصال به `ProductionSection`** (تب 🥚 تولید)
-- ✅ **Extensibility تأیید شد** — نژاد جدید از Master Data با پروفایل کپی می‌شه
-- ✅ **EST + چرخش + CO₂/O₂** — ۵ فیلد استاندارد + پایش زنده در `DeviceFormModal`
-- ✅ **هشدار alt** — EST خارج بازه + CO₂/O₂ (دستگاه‌های فعال)
-- ✅ **`inc/needs.ts`** — ۶ تابع pure (تهویه، چرخش، ذخیره، هچ، chick yield)
-- ✅ **نمایش ذخیره‌سازی تخم** در `EggEntryCard`
-- ✅ **نمایش Chick Yield** در `HatchCard`
-- ✅ **پایش زنده در کارت دستگاه** — ۵ فیلد (دما/رطوبت/EST/CO₂/O₂)
-- ✅ **وضعیت چرخش** (`turningCurrent`) + هشدار قبل/بعد lockdown
-- ✅ **fix باگ save** — پایش زنده (estCurrent/co2Current/o2Current) قبلاً ذخیره نمی‌شد
-- ✅ **نمودار روند** — `DeviceReading` + LineChart + ۵ metric
+### فاز ۱۳ — hal قفل نهایی (تموم)
+- **hal ۱۰۰٪** — صفر any واقعی
+- تب آرشیو (Segmented Control)
+- ۲ زیرنوع جدید feeder + ۱ drinker
+- ۶ دسته گم‌شده اضافه
+- KPI Cards تجهیزات
+- Zod limits واقع‌بینانه
+- `autoClamp` در blur (نه تایپ)
+- placeholder داینامیک
+- EquipmentCard ۲۳۷ → ۱۵۹
+- useBodyScrollLock ساده
 
-### فاز ۸ — ابزارها + hal نهایی (تموم — جلسه ۵)
-- ✅ **ESLint** نصب + config (no-unused-imports, no-explicit-any, prefer-const)
-- ✅ **GitHub Actions CI** — چک خودکار tsc + test + build روی هر push
-- ✅ **`scripts/check-any.py`** — چک any قبل از commit
-- ✅ **`docs/TYPE-REGISTRY.md`** — جدول تایپ‌های ماژول‌ها
-- ✅ **Alias های پروژه** (`af`, `chk`, `hal`, ...) — سرعت × ۳
-- ✅ **hal صفر any** (۹۶ → ۶ migration)
-- ✅ **ESLint `--fix` روی ۱۵ ماژول** (۲۳۰ خط import مرده حذف)
-- ✅ **rename تایپ‌ها** — `*Payload` (Zod) vs `*FormData` (form)
-- ✅ **hint هوشمند** — حذف تکراری‌ها طبق AUDIT
-- ✅ **۱۰۶۸ تست pass** (۱۱ تست جدید hal)
+### فاز ۱۴ — flk + Carousel + Smart Capacity (تموم)
+- flk قفل ۹۵٪ — FilterBar + smart capacity + KPI + touched errors
+- Carousel در alt/ctc/dlg
+- useFormErrors hook (Reward Early/Punish Late)
+- useCarousel v4 (deps + MutationObserver)
+- `hallCapacity` با منطق کامل + ۱۱ تست
+- separator `•` در ۶۹ فایل
+- ⚠️ باقی‌مانده: FlocksModal ۴۲۴ · ZonesPage ۴۴۵ · Debug box
 
----
+### فاز ۱۵ — Event Bus + گروه‌بندی گله (جلسه ۱۲)
+- ✅ ساخته شده: `cor/events/` (۵ فایل)
+- ✅ ۱۸ event type تعریف شده
+- ⚠️ **فقط ۲/۱۸ فعال** (فقط `dlg → flk`)
+- ✅ سیستم گروه‌بندی کامل:
+  - GroupsPage (۵۳۱)
+  - FlockGroup + FlockGroupRule + FlockGroupMember
+  - FlockGroupType: season/breed/cohort/farm/owner/custom/smart
+  - MergeFlocksModal + GroupTimeline + GroupComparisonModal
+  - FlockDealType: own/partnership/consignment/rent
+- 🟡 **در اسناد قبلی کشف‌نشده بود**
 
-## 📋 Roadmap تفصیلی — کارهای آینده
+## 📋 Roadmap — کارهای آینده
 
 ### 🔴 بحرانی (اولویت ۱)
 
-#### ۱. ~~Error Boundary~~ ✅ حل شده (جلسه ۴)
-- **وضعیت:** `main.tsx:48` + `ErrorFallback` + `logError` + تست
-- **نتیجه:** ✅ انجام شد
-
-#### ۲. ~~Export/Import JSON~~ ✅ حل شده (جلسه ۴)
-- **وضعیت:** `BackupTab.tsx` + `backup.ts` (۷ تابع) + `AutoBackup` فعال
-- **نتیجه:** ✅ انجام شد
-
-#### ۳. Decimal.js
-- **چیه؟** محاسبه دقیق اعشاری
-- **چرا؟** جیره + مالی (الان باگ داریم: 0.1 + 0.2 = 0.30004)
-- **زمان:** ۱ روز
-
-#### ۴. ~~رفع ۲ تست fail~~ ✅ حل شده (جلسه ۴)
-- **وضعیت:** ✅ ۱۰۶۸/۱۰۶۸ pass
-- **زمان:** -
-
-#### ۵. `any` cleanup ادامه
-- **چیه؟** ۶۸۵ → ۵۴۸ (۲۰٪ کاهش در جلسه ۵)
-- **چرا؟** جلوگیری از باگ‌های پنهان (مثل `c.fullName` که هیچ‌وقت نبود)
-- **هدف:** صفر
-- **زمان:** ۳-۴ روز
-- **الگو:** `scripts/check-any.py` + `docs/TYPE-REGISTRY.md`
-
-#### ۶. Multi-Select گله‌ها
-- **چیه؟** انتخاب چندتایی برای حذف/آرشیو گروهی
-- **چرا؟** کاربر با ۱۰ گله باید دونه‌دونه حذف کنه
-- **زمان:** ۱ روز
-
----
+| # | کار | زمان | ریسک |
+|---|---|---|---|
+| ۱ | **Event Bus فعال‌سازی** (۱۶/۱۸) | ۲-۳ روز | معماری |
+| ۲ | **catch خالی hal** (۷ مورد) | ۱ ساعت | باگ خاموش |
+| ۳ | **showAlert → Toast** (۱۵ مورد) | ۲ ساعت | قانون |
+| ۴ | **any در inc** (۱۵۵) | ۲ روز | بدهی |
+| ۵ | **any در set** (۱۲۲) | ۲ روز | بدهی |
 
 ### 🟡 مهم (اولویت ۲)
 
-#### ۶. اتصالات باقی‌مونده
-- `tra → egg` — فروش تخم از EggSale به tra.Invoice
-- `fed → dlg` — جیره فعال به فرمول پیش‌فرض dlg
-- `inc → flk` — candling آپدیت گله
-- `cal → inc/dlg` — برنامه واکسن فعال
-- `alt rules` — هشدارهای خودکار
-- **زمان:** ۳-۴ روز
+| # | کار | زمان |
+|---|---|---|
+| ۶ | refactor flk/store (819) | ۱ روز |
+| ۷ | refactor alt/rules (589) | ۱ روز |
+| ۸ | refactor flk/GroupsPage (531) | ۱ روز |
+| ۹ | refactor inc/DevicesPage (506) | ۱ روز |
+| ۱۰ | refactor hal/ZonesPage (444) | نیم روز |
+| ۱۱ | any در shr (۸۸) | ۱ روز |
+| ۱۲ | any در whs (۶۴) | ۱ روز |
+| ۱۳ | any در brd (۶۱) | ۱ روز |
+| ۱۴ | refactor tra/ReceivablesPage (438) | نیم روز |
 
-#### ۷. Event Bus
-- **چیه؟** سیستم ارتباط بین ماژول‌ها بدون import مستقیم
-- **چرا؟** با ۲۰ ماژول، circular dependency ایجاد می‌شه
-- **زمان:** نیم روز
+### 🟢 قابل تعویق (اولویت ۳)
 
-#### ۸. TanStack Virtual
-- **چیه؟** virtualization
-- **چرا؟** لیست‌های طولانی کند می‌شن
-- **زمان:** نیم روز
-
-#### ۹. ثبت چند بار در روز
-- **چیه؟** کاربر صبح و عصر می‌ره سالن
-- **گزینه‌ها:** یک رکورد / چند رکورد / هیبرید
-- **زمان:** ۱-۲ روز
-
-#### ۱۰. تقویم حرفه‌ای (Doran Calendar)
-- **چیه؟** @doranjs/react — تقویم فارسی کامل
-- **چرا؟** تایپ مستقیم، range picker، agenda، Zod
-- **زمان:** ۱ روز
-
-#### ۱۱. i18n پایه
-- **چیه؟** رشته‌ها تو fa.ts متمرکز
-- **چرا؟** بعداً اضافه کردن انگلیسی راحت
-- **زمان:** ۱ روز
-
-#### ۱۲. Driver.js (تور آموزشی)
-- **چیه؟** تور مرحله‌به‌مرحله کاربر جدید
-- **زمان:** ۱ روز
-
----
-
-### 🟢 کم‌اهمیت (اولویت ۳)
-
-#### ۱۳. Refactor فایل‌های بزرگ
-- ui.tsx (۱۲۵۲ خط به ۵ فایل)
-- DailyLogsPage.tsx (۱۱۸۸ خط)
-- EggEntriesPage.tsx (۱۱۳۹ خط)
-- FlocksPage.tsx (۱۰۰۱ خط)
-- **زمان:** ۳-۴ روز
-
-#### ۱۴. حذف کد تکراری
-- num, int, toFa تو ۱۵+ فایل تکرار شده
-- انتقال به shr/utils/
-- **زمان:** ۱ روز
-
-#### ۱۵. UI/UX یکسان‌سازی
-- کارت‌ها، Badgeها، Padding/Gap، سرگروه‌ها
-- **زمان:** ۲-۳ روز
-
-#### ۱۶. Gauge (نمایشگر دما/رطوبت)
-- نمایشگر عقربه‌ای مثل سرعت‌سنج
-- **زمان:** ۱ روز
-
-#### ۱۷. مقایسه گله‌ها
-- مقایسه گله قدیمی با جدید
-- **زمان:** ۲-۳ روز
-
-#### ۱۸. react-aspect-ratio
-- جلوگیری از CLS
-- **زمان:** نیم روز
-
-#### ۱۹. Property-based Testing
-- تست با هزاران ترکیب
-- **زمان:** اختیاری
-
----
+- ۱۳ فایل ۴۰۰-۵۰۰ خط باقی‌مانده
+- ۱۰ اتصالات بین‌ماژولی ناقص
+- `Decimal.js` (دقت اعشاری)
+- Multi-Select گله‌ها
+- TanStack Virtual
+- تقویم Doran Calendar
+- i18n پایه
+- Driver.js (تور آموزشی)
+- E2E Tests (Playwright)
 
 ### 🔵 بلندمدت
 
-#### ۲۰. PWA offline کامل
-#### ۲۱. i18n انگلیسی (react-i18next)
-#### ۲۲. A11y Audit
-#### ۲۳. E2E Tests (Playwright)
-#### ۲۴. Backend (multi-user)
-#### ۲۵. React Native
-
----
-
-## 📌 کارهای نیمه‌کاره قبلی
-
-- ۲۶. inc به flk (candling)
-- ۲۷. alt rules
-- ۲۸. cal (تقویم واکسن فعال)
-- ۲۹. Hen-Day و Hen-Housed خودکار
-- ۳۰. EggSale.flockId
-- ۳۱. Migration FlockEvent
-- ۳۲. ادغام/گروه گله
-- ۳۳. چک‌لیست آماده‌سازی سالن
-
----
+- PWA offline کامل
+- Backend (Supabase multi-user)
+- Auth + Cloud Sync
+- iOS (Capacitor)
+- React Native
 
 ## ❓ سؤال‌های باز (منتظر جواب کاربر)
 
-### سؤال ۱: ثبت چند بار در روز
-- الف) یه رکورد در روز
-- ب) چند رکورد (صبح + عصر جدا)
-- ج) هیبرید — پیشنهاد
+### سؤال ۱ — داکتور
+منظور «داکتور» کدومه؟
+- A) پوشه `docs/` (مستندات) ← **این جلسه انجام شد**
+- B) ماژول دامپزشک (Doctor)
+- C) داکیومنت برای کاربر نهایی
 
-### سؤال ۲: پایان چرخه گله
-- الف) حذف کامل
-- ب) آرشیو — پیشنهاد
-- ج) فروش
+### سؤال ۲ — گروه‌بندی گله
+سیستم کامل ساخته شده (`GroupsPage` ۵۳۱ خط) ولی در اسناد کشف‌نشده بود:
+- refactor به زیر ۴۰۰؟
+- قابلیت جدید اضافه شه؟
 
-### سؤال ۳: کتابخانه‌ها
-- TanStack Virtual؟ (بله)
-- react-aspect-ratio؟ (نیمه)
-- Driver.js؟ (نیمه)
+### سؤال ۳ — Event Bus
+۱۶/۱۸ ایونت غیرفعال:
+- فعال‌سازی کامل (کدوم اولویت؟)
+- یا فقط `dlg→flk` کافیه؟
 
-### سؤال ۴: Multi-Select حذف گروهی
-- الف) یه تأیید برای همه — پیشنهاد
-- ب) هر گله جدا
-- ج) بدون تأیید
+### سؤال ۴ — فایل‌های بزرگ
+refactor چه ترتیبی؟
+- بزرگ‌ترین اول (flk/store)
+- یا کم‌ریسک‌ترین اول (hal/ZonesPage)
 
-### سؤال ۵: cascade حذف
-- الف) همه چیز حذف
-- ب) ارجاع‌ها بمونن
-- ج) فقط اگه ارجاع نداره — پیشنهاد
+## 📊 آمار پیشرفت
 
----
+| فاز | وضعیت |
+|---|---|
+| ۱-۷ (پایه) | ✅ ۱۰۰٪ |
+| ۸-۱۳ (hal + ابزار) | ✅ ۱۰۰٪ |
+| ۱۴ (flk) | 🟡 ۹۵٪ |
+| ۱۵ (Event Bus) | 🟡 ۱۱٪ |
+| بدهی فنی | 🟡 ۳۰٪ |
 
 ## 🎯 ترتیب پیشنهادی اجرا
 
-### هفته ۱
-1. ErrorBoundary
-2. Export/Import JSON
-3. Decimal.js
+### هفته ۱ — زیرساخت
+1. Event Bus فعال‌سازی (اولویت اصلی)
+2. catch خالی hal
+3. showAlert → Toast
 
-### هفته ۲
-4. Multi-Select گله‌ها
-5. Event Bus
-6. اتصالات (tra→egg, fed→dlg)
+### هفته ۲ — پاکسازی
+4. any در inc
+5. any در set
+6. refactor flk/store
 
-### هفته ۳
-7. TanStack Virtual
-8. ثبت چند بار در روز
-9. Doran Calendar
+### هفته ۳ — refactor
+7. alt/rules
+8. flk/GroupsPage
+9. inc/DevicesPage
+10. hal/ZonesPage
 
-### هفته ۴
-10. Driver.js
-11. i18n پایه
-12. UI/UX یکسان
+### هفته ۴ — قابلیت جدید
+11. Multi-Select گله‌ها
+12. Decimal.js
+13. TanStack Virtual
 
-### هفته ۵-۶
-13. Refactor فایل‌های بزرگ
-14. حذف کد تکراری
-15. مقایسه گله‌ها
+## 📌 یادداشت مهم
+
+**ترتیب اولویت کاربر:**
+۱. رفع بدهی فنی (Event Bus، catch، any)
+۲. refactor فایل‌های بزرگ
+۳. قابلیت جدید
+۴. بلندمدت
+
+**قانون:** قبل از هر قابلیت جدید → بدهی موجود رفع شه.
 
 ---
 
-## 📊 آمار کلی
-
-| دسته | تعداد | زمان |
-|---|---|---|
-| بحرانی | ۴ (۲ حل‌شده) | ۲.۵ روز |
-| مهم | ۷ | ۸-۹ روز |
-| کم‌اهمیت | ۷ | ۸-۱۰ روز |
-| بلندمدت | ۶ | ۱-۲ ماه |
-| نیمه‌کاره | ۸ | ۵-۷ روز |
-| **جمع** | **۳۲** | **~۲۴ روز** |
-
-### 📊 پیشرفت جلسه ۵ (۱۴۰۴/۰۷/۲۱)
-| مورد | قبل | بعد |
-|---|---|---|
-| hal | ۹۰٪ | **۱۰۰٪** ✅ |
-| `any` کل | ۶۸۵ | **۵۴۸** (۲۰٪ کاهش) |
-| تست‌ها | ۱۰۶۴ | **۱۰۶۸** |
-| ESLint | ❌ | ✅ |
-| GitHub Actions CI | ❌ | ✅ |
-| Alias ها | ❌ | ✅ |
+*آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ — جلسه ۱۲*
+*این سند تاریخچه + Roadmap است. وضعیت فعلی → `HANDOFF.md`*
