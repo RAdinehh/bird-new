@@ -5,6 +5,8 @@
 import { useMemo } from 'react';
 import { useFlk, calcCosts, getAgeDays, type Flock, type FlockStatus, type FlockType } from '../store';
 import { useTra } from '../../tra/store';
+import { useEgg } from '../../egg/store';
+import { useDlg } from '../../dlg/store';
 import { getFlockRevenue } from '../api/flocksCalc';
 
 export interface GroupFlockRow {
@@ -30,6 +32,14 @@ export interface GroupKpi {
   totalCost: number;
   totalRevenue: number;
   totalProfit: number;
+  /** 🆕 مجموع تخم تولیدی (totalCount) */
+  totalEggs: number;
+  /** 🆕 مجموع دان مصرفی (kg) */
+  totalFeed: number;
+  /** 🆕 تخم به تفکیک هر گله */
+  eggByFlock: Record<string, number>;
+  /** 🆕 دان به تفکیک هر گله */
+  feedByFlock: Record<string, number>;
   byFlock: GroupFlockRow[];
 }
 
@@ -43,6 +53,10 @@ const EMPTY: GroupKpi = {
   totalCost: 0,
   totalRevenue: 0,
   totalProfit: 0,
+  totalEggs: 0,
+  totalFeed: 0,
+  eggByFlock: {},
+  feedByFlock: {},
   byFlock: [],
 };
 
@@ -50,6 +64,8 @@ export function useGroupKpi(groupId: string): GroupKpi {
   const groups = useFlk(s => s.groups);
   const getFlocksInGroup = useFlk(s => s.getFlocksInGroup);
   const invoices = useTra(s => s.invoices);
+  const eggProductions = useEgg(s => s.productions);
+  const dlgLogs = useDlg(s => s.logs);
 
   return useMemo(() => {
     const group = groups.find(g => g.id === groupId);
@@ -85,6 +101,31 @@ export function useGroupKpi(groupId: string): GroupKpi {
     const totalRevenue = byFlock.reduce((s, f) => s + f.revenue, 0);
     const totalProfit = totalRevenue - totalCost;
 
+    // 🆕 Egg aggregate
+    const flockIdSet = new Set(flocks.map(f => f.id));
+    const eggByFlock: Record<string, number> = {};
+    let totalEggs = 0;
+    for (const p of eggProductions) {
+      if (!flockIdSet.has(p.flockId)) continue;
+      const cnt = p.totalCount || 0;
+      if (cnt > 0) {
+        eggByFlock[p.flockId] = (eggByFlock[p.flockId] || 0) + cnt;
+        totalEggs += cnt;
+      }
+    }
+
+    // 🆕 Feed aggregate (kg)
+    const feedByFlock: Record<string, number> = {};
+    let totalFeed = 0;
+    for (const l of dlgLogs) {
+      if (!flockIdSet.has(l.flockId)) continue;
+      const amt = l.feedAmount || 0;
+      if (amt > 0) {
+        feedByFlock[l.flockId] = (feedByFlock[l.flockId] || 0) + amt;
+        totalFeed += amt;
+      }
+    }
+
     return {
       flockCount: byFlock.length,
       liveFlockCount: live.length,
@@ -95,9 +136,13 @@ export function useGroupKpi(groupId: string): GroupKpi {
       totalCost,
       totalRevenue,
       totalProfit,
+      totalEggs,
+      totalFeed,
+      eggByFlock,
+      feedByFlock,
       byFlock,
     };
-  }, [groupId, groups, invoices, getFlocksInGroup]);
+  }, [groupId, groups, invoices, getFlocksInGroup, eggProductions, dlgLogs]);
 }
 
 /**
@@ -107,6 +152,8 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
   const groups = useFlk(s => s.groups);
   const getFlocksInGroup = useFlk(s => s.getFlocksInGroup);
   const invoices = useTra(s => s.invoices);
+  const eggProductions = useEgg(s => s.productions);
+  const dlgLogs = useDlg(s => s.logs);
 
   return useMemo(() => {
     const result: Record<string, GroupKpi> = {};
@@ -135,13 +182,37 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
       const totalCost = byFlock.reduce((s, f) => s + f.cost, 0);
       const totalRevenue = byFlock.reduce((s, f) => s + f.revenue, 0);
 
+      // 🆕 Egg/Feed aggregate
+      const flockIdSet = new Set(flocks.map(f => f.id));
+      const eggByFlock: Record<string, number> = {};
+      let totalEggs = 0;
+      for (const p of eggProductions) {
+        if (!flockIdSet.has(p.flockId)) continue;
+        const cnt = p.totalCount || 0;
+        if (cnt > 0) {
+          eggByFlock[p.flockId] = (eggByFlock[p.flockId] || 0) + cnt;
+          totalEggs += cnt;
+        }
+      }
+      const feedByFlock: Record<string, number> = {};
+      let totalFeed = 0;
+      for (const l of dlgLogs) {
+        if (!flockIdSet.has(l.flockId)) continue;
+        const amt = l.feedAmount || 0;
+        if (amt > 0) {
+          feedByFlock[l.flockId] = (feedByFlock[l.flockId] || 0) + amt;
+          totalFeed += amt;
+        }
+      }
+
       result[groupId] = {
         flockCount: byFlock.length, liveFlockCount: live.length,
         totalInitial, totalCurrent, totalDeaths, mortalityRate,
         totalCost, totalRevenue, totalProfit: totalRevenue - totalCost,
+        totalEggs, totalFeed, eggByFlock, feedByFlock,
         byFlock,
       };
     }
     return result;
-  }, [groupIds.join(','), groups, invoices, getFlocksInGroup]);
+  }, [groupIds.join(','), groups, invoices, getFlocksInGroup, eggProductions, dlgLogs]);
 }
