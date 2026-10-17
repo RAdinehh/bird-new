@@ -6,6 +6,7 @@ import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
 import { DEFAULT_LAYING_START } from '../store';
 import type { Flock } from '../store';
+import { useBrd } from '../../brd/store';
 import type { Bird, Breed } from '../../brd/store';
 import type { Hall } from '../../hal/store';
 import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
@@ -96,6 +97,21 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       return;
     }
     if (!form.birdId) { setErr('پرنده اجباری است'); return; }
+
+    if (form.breedId) {
+      const allBreeds = useBrd.getState().breeds;
+      const breed = allBreeds.find((b: Breed) => b.id === form.breedId);
+      if (breed?.purposes && breed.purposes.length > 0) {
+        if (!breed.purposes.includes(form.type)) {
+          const purposeLabels: Record<string, string> = { layer: 'تخم‌گذار', broiler: 'گوشتی', breeder: 'مادر', ornamental: 'تزئینی' };
+          setErr(
+            'نژاد «' + breed.name + '» برای «' + (purposeLabels[form.type] || form.type) + '» مناسب نیست. ' +
+            '(مناسب برای: ' + breed.purposes.map((p: string) => purposeLabels[p] || p).join('، ') + ')'
+          );
+          return;
+        }
+      }
+    }
     if (!form.startDate.trim() && !form.hatchDate.trim() && !form.purchaseDate.trim()) {
       setErr('حداقل یکی از تاریخ‌های هچ، خرید یا شروع را وارد کنید'); return;
     }
@@ -146,11 +162,16 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       hallId: form.hallId, zoneId: form.zoneId,
       initialCount: int(form.initialCount),
       currentCount: int(form.currentCount) || int(form.initialCount),
-      maleCount: int(form.maleCount), femaleCount: int(form.femaleCount),
-      layingStartDay: form.layingStartDay.trim() === ''
-        ? (breedStd.byBreedId(form.breedId)?.biology?.layingStartDay ?? DEFAULT_LAYING_START)
-        : (int(form.layingStartDay) || DEFAULT_LAYING_START),
-      endOfCycleDay: breedStd.byBreedId(form.breedId)?.biology?.endOfCycleDay ?? null,
+      layingStartDay: (form.type === 'layer' || form.type === 'breeder')
+        ? (form.layingStartDay.trim() === ''
+            ? (breedStd.byBreedId(form.breedId)?.biology?.layingStartDay ?? DEFAULT_LAYING_START)
+            : (int(form.layingStartDay) || DEFAULT_LAYING_START))
+        : 0,
+      endOfCycleDay: (form.type === 'layer' || form.type === 'breeder')
+        ? (breedStd.byBreedId(form.breedId)?.biology?.endOfCycleDay ?? null)
+        : null,
+      maleCount: form.type === 'breeder' ? int(form.maleCount) : null,
+      femaleCount: form.type === 'breeder' ? int(form.femaleCount) : null,
       hatchDate: form.hatchDate.trim(), purchaseDate: form.purchaseDate.trim(),
       startDate: form.startDate.trim(), source: form.source,
       purchasePrice: num(form.purchasePrice),
