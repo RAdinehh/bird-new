@@ -1,7 +1,7 @@
 /**
  * FlocksModal.tsx — فرم افزودن/ویرایش گله
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
   Btn, BtnRow, ErrorBox, Field, Grid2, Input, Modal, MoneyField,
@@ -16,7 +16,7 @@ import { DepBox } from '../helpers';
 import FlockSourcePickers from './FlockSourcePickers';
 import FlockDetailsSection from './FlockDetailsSection';
 import FlockCapacityCard from './FlockCapacityCard';
-import { SOURCE_LABEL, DEFAULT_LAYING_START, sexRatio } from '../store';
+import { SOURCE_LABEL, DEFAULT_LAYING_START, sexRatio, useFlk } from '../store';
 import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
 import { todayJ, jalaliBounds, checkDateBounds } from '../api/flocksCalc';
 import type { F } from '../types-flocks';
@@ -64,6 +64,36 @@ export default function FlocksModal(props: FlocksModalProps) {
   // 🆕 Picker modals
   const [invoicePickerOpen, setInvoicePickerOpen] = useState(false);
   const [hatchPickerOpen, setHatchPickerOpen] = useState(false);
+  const allFlocks = useFlk(st => st.flocks);
+  const nameSuggestions = useMemo(() => {
+    const out: string[] = [];
+    const today = todayJ();
+    const parts = today.split('/');
+    const year = parts[0];
+    const jMonth = parseInt(parts[1]);
+    const season = jMonth <= 3 ? 'بهار' : jMonth <= 6 ? 'تابستان' : jMonth <= 9 ? 'پاییز' : 'زمستان';
+    const base = 'گله ' + season + ' ' + year;
+    const seasonExists = allFlocks.some(f => f.name.trim() === base);
+    out.push(seasonExists ? base + ' - ۲' : base);
+    if (form.hallId) {
+      const hallName = halls.find(h => h.id === form.hallId)?.name || 'سالن';
+      const prefix = 'گله ' + hallName + ' - ';
+      const nums = allFlocks.filter(f => f.hallId === form.hallId && f.name.startsWith(prefix))
+        .map(f => parseInt(f.name.slice(prefix.length)) || 0);
+      out.push(prefix + toFa(Math.max(0, ...nums) + 1));
+    }
+    if (form.breedId) {
+      const std = breedStd.byBreedId(form.breedId);
+      const breedName = (std as { nameFa?: string } | null)?.nameFa || '';
+      if (breedName) {
+        const prefix = 'گله ' + breedName + ' - ';
+        const nums = allFlocks.filter(f => f.name.startsWith(prefix))
+          .map(f => parseInt(f.name.slice(prefix.length)) || 0);
+        out.push(prefix + toFa(Math.max(0, ...nums) + 1));
+      }
+    }
+    return out.filter(sg => sg !== form.name.trim());
+  }, [allFlocks, form.hallId, form.breedId, form.name, halls, breedStd]);
 
   const handleInvoiceSelect = (inv: Invoice) => {
     const birdItems = (inv.items || []).filter((it: InvoiceItem) => it.birdId);
@@ -132,6 +162,20 @@ export default function FlocksModal(props: FlocksModalProps) {
       <Field label="نام گله" required error={showError('name')} onTouch={() => markTouched('name')}>
         <Input placeholder="مثلاً — گله بهار ۱۴۰۵" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
       </Field>
+
+      {nameSuggestions.length > 0 && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: -4, marginBottom: 4, alignItems: 'center' }}>
+          <span style={{ fontSize: 10, color: 'var(--muted)' }}>پیشنهاد:</span>
+          {nameSuggestions.map(sg => (
+            <button
+              key={sg}
+              type="button"
+              onClick={() => setForm(f => ({ ...f, name: sg }))}
+              style={{ padding: '3px 8px', fontSize: 11, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
+            >{sg}</button>
+          ))}
+        </div>
+      )}
 
       <Grid2>
         <Field label="نوع گله" required error={showError('type')} onTouch={() => markTouched('type')}>

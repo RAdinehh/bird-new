@@ -72,6 +72,16 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
   const save = async () => {
     if (!form.name.trim()) { setErr('نام گله اجباری است'); return; }
 
+    const dup = flocks.find(f =>
+      f.id !== form.id &&
+      (f.hallId || '') === (form.hallId || '') &&
+      f.name.trim() === form.name.trim()
+    );
+    if (dup) {
+      setErr('گله‌ای با همین نام در این سالن وجود دارد. نام دیگری انتخاب کنید.');
+      return;
+    }
+
     const _init = int(form.initialCount) || 0;
     const _curr = int(form.currentCount) || _init;
     const _male = int(form.maleCount) || 0;
