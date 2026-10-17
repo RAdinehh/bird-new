@@ -5,7 +5,7 @@
  */
 import { useState, useEffect } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
-import { showAlert, showConfirmAsync } from '../../../cor/store/dialog';
+import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { addDaysJalali, incubationDays } from '../store';
 import type { EggEntry } from '../store';
@@ -103,7 +103,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
       const brd = birds.find(b => b.id === currentRow.birdId);
       const ready = flockReadyForEggs(flk, brd);
       if (!ready.ready) {
-        showAlert('این گله هنوز به سن تخم‌گذاری نرسیده.\n\nسن فعلی — ' + toFa(ready.ageDays) + ' روز\nحداقل — ' + toFa(ready.minAge) + ' روز\n\n' + toFa(ready.daysLeft) + ' روز مانده', '⛔ گله آماده نیست');
+        toastMsg.error('گله به سن تخم‌گذاری نرسیده — سن فعلی ' + toFa(ready.ageDays) + ' روز، حداقل ' + toFa(ready.minAge) + ' روز، ' + toFa(ready.daysLeft) + ' روز مانده');
         return;
       }
     }

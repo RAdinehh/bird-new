@@ -12,7 +12,6 @@ import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import { useFilterSort, FilterBar, getFedFormulasConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { toFa } from '../../shr/utils/fa';
-import { showAlert } from '../../cor/store/dialog';
 import { Row, SectionTitle } from './helpers';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';

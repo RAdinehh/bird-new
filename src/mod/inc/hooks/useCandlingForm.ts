@@ -5,7 +5,6 @@
  */
 import { useState } from 'react';
 import { toEn, toFa } from '../../../shr/utils/fa';
-import { showAlert } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { todayJalali } from '../helpers';
 import { calcAvailableBase, type CandlingLike } from '../api/calc';

@@ -13,7 +13,7 @@ import { useTra } from '../tra/store';
 import { useNavigate } from 'react-router-dom';
 import { Btn, Empty, PageContainer  } from '../../shr/components/ui';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import { showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';

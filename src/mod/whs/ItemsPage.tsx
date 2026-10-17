@@ -14,7 +14,7 @@ import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { format as formatJ } from 'date-fns-jalali';
 const todayJalali = () => formatJ(new Date(), 'yyyy/MM/dd');
-import { showAlert, showConfirmAsync, showPromptAsync } from '../../cor/store/dialog';
+import { showConfirmAsync, showPromptAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
 import HelpBanner from '../../shr/components/HelpBanner';

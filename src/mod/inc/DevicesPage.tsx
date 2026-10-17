@@ -16,7 +16,7 @@ import { useFilterSort, FilterBar, getIncDevicesConfig } from '../../shr/filter'
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { toastMsg } from '../../cor/store/toast';
-import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import { showConfirmAsync } from '../../cor/store/dialog';
 import { Row } from './helpers';
 import MaintenanceModal from './components/MaintenanceModal';
 import DeviceFormModal from './components/DeviceFormModal';

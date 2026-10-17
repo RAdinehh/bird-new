@@ -8,7 +8,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
 import HelpBanner from '../../shr/components/HelpBanner';

@@ -7,7 +7,6 @@ import { useInc, type Candling } from './store';
 import { useBrd } from '../brd/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
 import { useFilterSort, FilterBar, getIncCandlingsConfig } from '../../shr/filter';
 import { todayJalali } from './helpers';

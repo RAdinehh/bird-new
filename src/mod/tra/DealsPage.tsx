@@ -14,7 +14,7 @@ import { useFilterSort, FilterBar, getTraDealsConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { showAlert, showConfirmAsync } from '../../cor/store/dialog';
+import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
 import { format as formatJ } from 'date-fns-jalali';

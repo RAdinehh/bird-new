@@ -4,7 +4,6 @@
 import { useState, useMemo } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
-import { showAlert } from '../../../cor/store/dialog';
 import { paidSum, calcItemTotal, type Invoice, type InvoiceItem, type Payment } from '../store';
 import { emptyForm as empty, type F } from '../types-invoice';
 import { toastMsg } from '../../../cor/store/toast';
