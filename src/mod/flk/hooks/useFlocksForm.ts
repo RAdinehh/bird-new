@@ -3,7 +3,7 @@
  */
 import { useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
-import { showAlert } from '../../../cor/store/dialog';
+import { toastMsg } from '../../../cor/store/toast';
 import { DEFAULT_LAYING_START } from '../store';
 import type { Flock } from '../store';
 import type { Bird, Breed } from '../../brd/store';
@@ -33,8 +33,8 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
   const openNew = () => {
-    if (birds.length === 0) { showAlert('اول پرنده بسازید'); return; }
-    if (halls.length === 0) { showAlert('اول سالن بسازید'); return; }
+    if (birds.length === 0) { toastMsg.error('اول پرنده بسازید'); return; }
+    if (halls.length === 0) { toastMsg.error('اول سالن بسازید'); return; }
     const lastF = flocks.slice().sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''))[0];
     setForm({
       ...emptyForm(),
