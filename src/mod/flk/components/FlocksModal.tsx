@@ -96,6 +96,16 @@ export default function FlocksModal(props: FlocksModalProps) {
     };
     if (entry?.birdId) updates.birdId = entry.birdId;
     if (entry?.breedId) updates.breedId = entry.breedId;
+    
+    // 🆕 انتقال نر/ماده از هچ (برای breeder)
+    if (h.maleCount && h.maleCount > 0) updates.maleCount = toFa(h.maleCount);
+    if (h.femaleCount && h.femaleCount > 0) updates.femaleCount = toFa(h.femaleCount);
+    
+    // 🆕 انتقال قیمت (اگه تخم خریداری شده)
+    if (entry?.unitPrice && entry.unitPrice > 0) {
+      updates.purchasePrice = toFa(entry.unitPrice);
+    }
+    
     setForm((f) => ({ ...f, ...updates }));
   };
 
