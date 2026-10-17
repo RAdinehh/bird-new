@@ -59,7 +59,7 @@ export function checkHallCapacity(
   excludeFlockId?: string,
   newBreedId?: string,
 ): HallCapacityResult | null {
-  if (!hallId || !newCount) return null;
+  if (!hallId || !newCount || newCount < 0) return null;
   const hall = halls.find(h => h.id === hallId);
   if (!hall) return null;
 
@@ -72,7 +72,7 @@ export function checkHallCapacity(
   // ═══════════ ۱. گله با بخش + بخش ظرفیت عددی داره ═══════════
   if (zone && zone.capacity && zone.capacity > 0) {
     const inZone = activeFlocks.filter(f => f.zoneId === zone.id);
-    const current = inZone.reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);
+    const current = inZone.reduce((sum, f) => sum + (f.currentCount ?? f.initialCount ?? 0), 0);
     const total = current + newCount;
     const over = total - zone.capacity;
 
@@ -104,7 +104,7 @@ export function checkHallCapacity(
     const availableForNoZone = Math.max(0, hallCap - occupiedZonesCap);
 
     const withoutZone = activeFlocks.filter(f => !f.zoneId);
-    const current = withoutZone.reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);
+    const current = withoutZone.reduce((sum, f) => sum + (f.currentCount ?? f.initialCount ?? 0), 0);
     const total = current + newCount;
     const over = total - availableForNoZone;
 
@@ -183,7 +183,7 @@ function buildBreakdown(
     .map(z => {
       const used = activeFlocks
         .filter(f => f.zoneId === z.id)
-        .reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);
+        .reduce((sum, f) => sum + (f.currentCount ?? f.initialCount ?? 0), 0);
       const cap = z.capacity || 0;
       return {
         id: z.id,
@@ -204,7 +204,7 @@ function buildBreakdown(
   const noZoneCap = Math.max(0, hallCap - occupiedZonesCap);
   const noZoneUsed = activeFlocks
     .filter(f => !f.zoneId)
-    .reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);
+    .reduce((sum, f) => sum + (f.currentCount ?? f.initialCount ?? 0), 0);
 
   return {
     hallName: hall.name,
