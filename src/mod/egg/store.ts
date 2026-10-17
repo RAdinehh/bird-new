@@ -2,9 +2,9 @@
  * store.ts — Zustand store تخم
  */
 import { create } from 'zustand';
+import { bus } from '../../cor/events';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
-import { useWhs, generateBatchNo } from '../whs/store';
 
 export type EggType = 'eating' | 'fertile' | 'broken';
 
@@ -64,87 +64,6 @@ interface State {
 }
 
 
-/** پیدا یا ساخت آیتم انبار برای تخم */
-function ensureEggItem(kind: 'eating' | 'fertile' | 'consumption'): string {
-  const nameMap: Record<string, string> = {
-    eating: 'تخم مرغ',
-    fertile: 'تخم نطفه‌دار',
-    consumption: 'تخم مصرفی',
-  };
-  const name = nameMap[kind];
-  const whs = useWhs.getState();
-  const found = whs.items.find(i => i.category === 'egg' && i.name === name);
-  if (found) return found.id;
-  const newId = whs.addItem({
-    name,
-    category: 'egg',
-    unit: 'pcs',
-    minStock: 0,
-    currentStock: 0,
-    lastPrice: 0,
-    supplierId: '',
-    expireDate: '',
-    withdrawalDays: null,
-    batchNo: '',
-    storage: 'room',
-    notes: 'ساخته‌شده خودکار توسط ماژول تخم',
-  });
-  return newId || '';
-}
-
-function eggCascade(id: string, p: EggProduction) {
-  const consumptionCount = (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0);
-  let eatingMovementId = '', fertileMovementId = '', consumptionMovementId = '';
-  const whs = useWhs.getState();
-  if (p.eatingCount > 0) {
-    const itemId = ensureEggItem('eating');
-    if (itemId) {
-      const batchNo = generateBatchNo(p.date, whs.movements, itemId);
-      const mid = whs.addMovement({
-        itemId, type: 'in', quantity: p.eatingCount, unitPrice: 0,
-        reason: 'adjustment', date: p.date, partyId: '',
-        notes: 'تولید تخم — خوراکی',
-        flockId: p.flockId, sourceModule: 'egg', sourceId: id, batchNo,
-      });
-      if (mid) eatingMovementId = mid;
-    }
-  }
-  if (p.fertileCount > 0) {
-    const itemId = ensureEggItem('fertile');
-    if (itemId) {
-      const batchNo = generateBatchNo(p.date, whs.movements, itemId);
-      const mid = whs.addMovement({
-        itemId, type: 'in', quantity: p.fertileCount, unitPrice: 0,
-        reason: 'adjustment', date: p.date, partyId: '',
-        notes: 'تولید تخم — نطفه‌دار',
-        flockId: p.flockId, sourceModule: 'egg', sourceId: id, batchNo,
-      });
-      if (mid) fertileMovementId = mid;
-    }
-  }
-  if (consumptionCount > 0) {
-    const itemId = ensureEggItem('consumption');
-    if (itemId) {
-      const batchNo = generateBatchNo(p.date, whs.movements, itemId);
-      const mid = whs.addMovement({
-        itemId, type: 'in', quantity: consumptionCount, unitPrice: 0,
-        reason: 'adjustment', date: p.date, partyId: '',
-        notes: 'تخم مصرفی',
-        flockId: p.flockId, sourceModule: 'egg', sourceId: id, batchNo,
-      });
-      if (mid) consumptionMovementId = mid;
-    }
-  }
-  return { eatingMovementId, fertileMovementId, consumptionMovementId };
-}
-
-function eggCascadeDelete(prev: EggProduction) {
-  const whs = useWhs.getState();
-  if (prev.eatingMovementId) { try { whs.deleteMovement(prev.eatingMovementId); } catch {} }
-  if (prev.fertileMovementId) { try { whs.deleteMovement(prev.fertileMovementId); } catch {} }
-  if (prev.consumptionMovementId) { try { whs.deleteMovement(prev.consumptionMovementId); } catch {} }
-}
-
 const now = () => new Date().toISOString();
 
 export const useEgg = create<State>()(
@@ -158,8 +77,8 @@ export const useEgg = create<State>()(
 
       addProduction: (p) => {
         const id = uuid();
-        const { eatingMovementId, fertileMovementId, consumptionMovementId } = eggCascade(id, p as EggProduction);
-        const newProd = { ...p, eatingMovementId, fertileMovementId, consumptionMovementId, id, createdAt: now() };
+        const newProd: any = { ...p, eatingMovementId: '', fertileMovementId: '', consumptionMovementId: '', id, createdAt: now() };
+        try { void bus.emit('egg:production:created', { prodId: id, production: newProd }, { source: 'egg' }).catch(() => {}); } catch {}
         set({ productions: [...get().productions, newProd] });
         return newProd.id;
       },
@@ -167,18 +86,15 @@ export const useEgg = create<State>()(
       updateProduction: (id, patch) => {
         const prev = get().productions.find(x => x.id === id);
         if (!prev) return;
-        eggCascadeDelete(prev);
-        const merged = { ...prev, ...patch };
-        const { eatingMovementId, fertileMovementId, consumptionMovementId } = eggCascade(id, merged as EggProduction);
-        set({
-          productions: get().productions.map(x => x.id === id
-            ? { ...merged, eatingMovementId, fertileMovementId, consumptionMovementId }
-            : x)
-        });
+        const merged: any = { ...prev, ...patch };
+        try { void bus.emit('egg:production:updated', { prodId: id, production: merged, prevProduction: prev }, { source: 'egg' }).catch(() => {}); } catch {}
+        set({ productions: get().productions.map(x => x.id === id ? merged : x) });
       },
       deleteProduction: (id) => {
         const prev = get().productions.find(x => x.id === id);
-        if (prev) eggCascadeDelete(prev);
+        if (prev) {
+          try { void bus.emit('egg:production:deleted', { prodId: id, production: prev }, { source: 'egg' }).catch(() => {}); } catch {}
+        }
         set({ productions: get().productions.filter(x => x.id !== id) });
       },
 

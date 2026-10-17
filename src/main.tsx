@@ -8,7 +8,7 @@ import { showAlert } from './cor/store/dialog';
 import { applyTheme } from './cor/theme/applyTheme';
 import { useSet } from './mod/set/store';
 import { registerFlkHandlers } from './mod/flk/handlers';
-import { registerWhsHandlers } from './mod/whs/handlers';
+import { registerWhsHandlers, registerEggWhsHandlers } from './mod/whs/handlers';
 
 // ═══ اعمال تم قبل از React mount (صفر پرش) ═══
 try {
@@ -32,6 +32,7 @@ try {
 // ثبت handlerهای Event Bus
 registerFlkHandlers();
 registerWhsHandlers();
+registerEggWhsHandlers();
 
 // Override window.alert
 window.alert = (msg: any) => {

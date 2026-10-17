@@ -19,3 +19,5 @@
 [2026/10/17 22:42] docs: تمیزکاری README
 
 [2026/10/17 23:33] feat(whs): فعال‌سازی event bus tra→whs (invoice created/updated/deleted)
+
+[2026/10/17 23:41] feat(whs): فعال‌سازی event bus egg→whs (production created/updated/deleted)
