@@ -138,6 +138,13 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                 <span>📥 از dlg: {toFa(dlgDeaths)}</span>
                 <span>✏️ سایر: {toFa(Math.max(0, losses - dlgDeaths))}</span>
               </div>
+          {flock.dealType && flock.dealType !== 'own' && (
+            <div style={{ fontSize: 10, color: 'var(--purple)', fontWeight: 600, marginTop: 2 }}>
+              {flock.dealType === 'partnership' && '🤝 شراکتی' + (flock.dealData?.partnerShare ? ' ' + toFa(flock.dealData.partnerShare) + '-' + toFa(100 - (flock.dealData.partnerShare || 0)) : '')}
+              {flock.dealType === 'consignment' && '📦 امانی'}
+              {flock.dealType === 'rent' && '📋 اجاره'}
+            </div>
+          )}
             </div>
           )}
         </div>

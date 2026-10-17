@@ -59,6 +59,13 @@ export default function FlockCard(props: FlockCardProps) {
   } = props;
 
   const [historyOpen, setHistoryOpen] = useState(false);
+  // 🆕 emoji بر اساس گونه پرنده
+  const speciesEmoji = bird?.birdKind === 'duck' ? '🦆' :
+                       bird?.birdKind === 'turkey' ? '🦃' :
+                       bird?.birdKind === 'quail' ? '🐦' :
+                       bird?.birdKind === 'goose' ? '🦢' :
+                       bird?.birdKind === 'chicken' ? '🐔' :
+                       '🐔';
   const ageDays = getAgeDays(f);
   const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, null);
   const isArchived = f.status === 'archived' || f.status === 'sold';
@@ -73,7 +80,7 @@ export default function FlockCard(props: FlockCardProps) {
       ms={ms}
       accent={accentColor}
       index={toFa(i + 1)}
-      iconEmoji="🐔"
+      iconEmoji={speciesEmoji}
       title={f.name}
       subtitle={[bird?.name || '—', breed?.name, hall?.name].filter(Boolean).join(' • ')}
       isOpen={isOpen}

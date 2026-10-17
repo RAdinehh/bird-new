@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { parse, differenceInDays } from 'date-fns-jalali';
 import { toEn } from '../../shr/utils/fa';
 import { todayJ } from './api/flocksCalc';
+import { showToast } from '../../cor/store/toast';
 
 export type FlockType = 'layer' | 'broiler' | 'breeder';
 export type FlockStatus = 'active' | 'archived' | 'sold' | 'merged';
@@ -111,6 +112,7 @@ export interface Flock {
   mergedInto?: string;
   mergedInfo?: FlockMergeInfo;
   sourceInvoiceId?: string;
+  hatchId?: string;
   sourceCategory?: string;
   createdAt: string;
   updatedAt: string;
@@ -185,7 +187,22 @@ export const useFlk = create<State>()(
         return id;
       },
       update: (id, patch) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
-      remove: (id) => set({ flocks: get().flocks.filter(x => x.id !== id) }),
+      remove: (id) => {
+        const f = get().flocks.find(x => x.id === id);
+        if (f?.sourceInvoiceId) {
+          showToast('این گله فاکتور خرید دارد — ابتدا فاکتور را حذف کنید', 'error');
+          return;
+        }
+        if (f?.hatchId) {
+          showToast('این گله از هچ ساخته شده — ابتدا هچ را حذف کنید', 'error');
+          return;
+        }
+        if (f?.dealData?.partnerId || f?.dealData?.consignorId || f?.dealData?.lessorId) {
+          showToast('این گله شراکت/امانی/اجاره دارد — ابتدا مدل بهره‌برداری را حذف کنید', 'error');
+          return;
+        }
+        set({ flocks: get().flocks.filter(x => x.id !== id) });
+      },
       archive: (id, reason) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', endDate: x.endDate || now(), archivedReason: reason || '', updatedAt: now()} : x) }),
       restore: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', endDate: '', archivedReason: '', updatedAt: now()} : x) }),
       toggleHidden: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, hidden: !x.hidden, updatedAt: now()} : x) }),
