@@ -5,7 +5,7 @@ import { toFa } from '../../../shr/utils/fa';
 import type { HallCapacityResult, ZoneBreakdown } from '../api/hallCapacity';
 
 interface Props {
-  hallCapacity: any;
+  hallCapacity: HallCapacityResult | null | undefined;
 }
 
 export default function FlockCapacityCard({ hallCapacity }: Props) {

@@ -10,6 +10,7 @@ import { useFlk } from '../store';
 import { todayJ } from '../api/flocksCalc';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toFa, toEn } from '../../../shr/utils/fa';
+import type { DailyLog as DlgLog } from '../../dlg/store';
 
 const REASON_OPTIONS: { value: FlockEventReasonCode; label: string }[] = [
   { value: 'data_entry_error', label: 'خطای ثبت' },
@@ -42,10 +43,10 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
     let cancelled = false;
     import('../../dlg/store').then((mod) => {
       if (cancelled) return;
-      const logs = (mod as any).useDlg.getState().logs || [];
+      const logs: DlgLog[] = mod.useDlg.getState().logs || [];
       const total = logs
-        .filter((l: any) => l.flockId === flock.id)
-        .reduce((sum: number, l: any) => sum + (l.deathsCount || 0), 0);
+        .filter((l: DlgLog) => l.flockId === flock.id)
+        .reduce((sum: number, l: DlgLog) => sum + (l.deathsCount || 0), 0);
       setDlgDeaths(total);
     }).catch(() => {});
     return () => { cancelled = true; };
