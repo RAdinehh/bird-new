@@ -13,6 +13,7 @@ import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
 type BreedStd = ReturnType<typeof useBreedStandard>;
 import type { F } from '../types-flocks';
 import { emptyForm } from '../types-flocks';
+import { todayJ } from '../api/flocksCalc';
 
 export interface UseFlocksFormParams {
   birds: Bird[];
@@ -88,6 +89,46 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
     if (!form.startDate.trim() && !form.hatchDate.trim() && !form.purchaseDate.trim()) {
       setErr('حداقل یکی از تاریخ‌های هچ، خرید یا شروع را وارد کنید'); return;
     }
+
+    // 🆕 تعداد اولیه > ۰
+    if (_init <= 0) {
+      setErr('تعداد اولیه باید بیشتر از صفر باشد');
+      return;
+    }
+
+    // 🆕 Cross-date: hatch ≤ purchase
+    if (form.hatchDate.trim() && form.purchaseDate.trim() && form.hatchDate > form.purchaseDate) {
+      setErr('تاریخ هچ نمی‌تواند بعد از تاریخ خرید باشد');
+      return;
+    }
+    // 🆕 Cross-date: purchase ≤ start
+    if (form.purchaseDate.trim() && form.startDate.trim() && form.purchaseDate > form.startDate) {
+      setErr('تاریخ خرید نمی‌تواند بعد از تاریخ شروع نگهداری باشد');
+      return;
+    }
+    // 🆕 Cross-date: hatch ≤ start
+    if (form.hatchDate.trim() && form.startDate.trim() && form.hatchDate > form.startDate) {
+      setErr('تاریخ هچ نمی‌تواند بعد از تاریخ شروع نگهداری باشد');
+      return;
+    }
+
+    // 🆕 تاریخ‌های آینده
+    const today = todayJ();
+    if (form.startDate.trim() && form.startDate > today) {
+      setErr('تاریخ شروع نگهداری نمی‌تواند در آینده باشد');
+      return;
+    }
+    if (form.purchaseDate.trim() && form.purchaseDate > today) {
+      setErr('تاریخ خرید نمی‌تواند در آینده باشد');
+      return;
+    }
+    if (form.hatchDate.trim() && form.hatchDate > today) {
+      setErr('تاریخ هچ نمی‌تواند در آینده باشد');
+      return;
+    }
+
+    // 🆕 breeder: male + female > initial (block) — موجود
+    // ⚠️ warning برای < initial در UI هست، اینجا بلاک نمی‌کنیم
 
     const data = {
       name: form.name.trim(), type: form.type,
