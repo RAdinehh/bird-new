@@ -666,8 +666,9 @@ export const useFlk = create<State>()(
 
         // ─── v6 → v7: groups + groupMembers ───
         if (version < 7) {
-          if (!(state as any).groups) (state as any).groups = [];
-          if (!(state as any).groupMembers) (state as any).groupMembers = [];
+          const s = state as Partial<State>;
+          if (!s.groups) s.groups = [];
+          if (!s.groupMembers) s.groupMembers = [];
         }
 
         return persistedInput as State;

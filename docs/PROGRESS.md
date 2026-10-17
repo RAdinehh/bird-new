@@ -27,3 +27,5 @@
 [2026/10/18 00:03] fix(filter): hasActiveFilters — حذف sortState (sort ≠ filter)
 
 [2026/10/18 00:09] fix(flk): catch خالی در hasRefs با console.error
+
+[2026/10/18 00:20] refactor(flk): حذف ۲ any در migrate v6→v7 + تکمیل flk
