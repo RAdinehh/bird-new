@@ -99,3 +99,49 @@ export function useGroupKpi(groupId: string): GroupKpi {
     };
   }, [groupId, groups, invoices, getFlocksInGroup]);
 }
+
+/**
+ * useMultiGroupKpi — چند گروه با هم (بدون violation of hooks rules)
+ */
+export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
+  const groups = useFlk(s => s.groups);
+  const getFlocksInGroup = useFlk(s => s.getFlocksInGroup);
+  const invoices = useTra(s => s.invoices);
+
+  return useMemo(() => {
+    const result: Record<string, GroupKpi> = {};
+    for (const groupId of groupIds) {
+      const group = groups.find(g => g.id === groupId);
+      if (!group) continue;
+      const flocks: Flock[] = getFlocksInGroup(groupId, true);
+      if (flocks.length === 0) continue;
+
+      const byFlock: GroupFlockRow[] = flocks.map(f => {
+        const costs = calcCosts(f);
+        const revenue = getFlockRevenue(f.id, invoices);
+        return {
+          id: f.id, name: f.name, type: f.type, status: f.status,
+          currentCount: f.currentCount || 0, initialCount: f.initialCount || 0,
+          ageDays: getAgeDays(f), cost: costs.total, revenue,
+          profit: revenue - costs.total,
+        };
+      });
+
+      const live = byFlock.filter(f => f.status === 'active');
+      const totalInitial = live.reduce((s, f) => s + f.initialCount, 0);
+      const totalCurrent = live.reduce((s, f) => s + f.currentCount, 0);
+      const totalDeaths = Math.max(0, totalInitial - totalCurrent);
+      const mortalityRate = totalInitial > 0 ? (totalDeaths / totalInitial) * 100 : 0;
+      const totalCost = byFlock.reduce((s, f) => s + f.cost, 0);
+      const totalRevenue = byFlock.reduce((s, f) => s + f.revenue, 0);
+
+      result[groupId] = {
+        flockCount: byFlock.length, liveFlockCount: live.length,
+        totalInitial, totalCurrent, totalDeaths, mortalityRate,
+        totalCost, totalRevenue, totalProfit: totalRevenue - totalCost,
+        byFlock,
+      };
+    }
+    return result;
+  }, [groupIds.join(','), groups, invoices, getFlocksInGroup]);
+}
