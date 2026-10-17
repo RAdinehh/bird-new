@@ -120,6 +120,26 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
         }
       }
     }
+    // 🆕 Deal validation
+    if (form.dealType === 'partnership' && !form.partnerId) {
+      setErr('انتخاب شریک برای گله شراکتی اجباری است');
+      return;
+    }
+    if (form.dealType === 'consignment' && !form.consignorId) {
+      setErr('انتخاب امانت‌دهنده برای گله امانی اجباری است');
+      return;
+    }
+    if (form.dealType === 'rent') {
+      if (!form.lessorId) {
+        setErr('انتخاب موجر برای گله اجاره‌ای اجباری است');
+        return;
+      }
+      if (!form.rentAmount || !num(form.rentAmount)) {
+        setErr('مبلغ اجاره اجباری است');
+        return;
+      }
+    }
+
     if (!form.startDate.trim() && !form.hatchDate.trim() && !form.purchaseDate.trim()) {
       setErr('حداقل یکی از تاریخ‌های هچ، خرید یا شروع را وارد کنید'); return;
     }

@@ -14,6 +14,7 @@ import PickInvoiceModal from './PickInvoiceModal';
 import PickHatchModal from './PickHatchModal';
 import { DepBox } from '../helpers';
 import FlockSourcePickers from './FlockSourcePickers';
+import FlockDealSection from './FlockDealSection';
 import FlockDetailsSection from './FlockDetailsSection';
 import FlockCapacityCard from './FlockCapacityCard';
 import { SOURCE_LABEL, DEFAULT_LAYING_START, sexRatio, useFlk } from '../store';
@@ -186,7 +187,9 @@ export default function FlocksModal(props: FlocksModalProps) {
         onOpenHatchPicker={() => setHatchPickerOpen(true)}
       />
 
-      <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🐔 پرنده و نژاد</div>
+      <FlockDealSection form={form} setForm={setForm} />
+
+            <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🐔 پرنده و نژاد</div>
       <Grid2>
         <Field label="پرنده" required error={showError('birdId')} onTouch={() => markTouched('birdId')}>
           <SmartSelect
