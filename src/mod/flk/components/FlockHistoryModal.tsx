@@ -219,12 +219,12 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
 
   // رنگ آواتار بر اساس نوع
   const avatarStyle: Record<string, string> = {
-    correction: 'linear-gradient(135deg, #fef9c3, #fde68a)',
-    death: 'linear-gradient(135deg, #fecaca, #fca5a5)',
-    sell: 'linear-gradient(135deg, #e9d5ff, #d8b4fe)',
-    transfer: 'linear-gradient(135deg, #bfdbfe, #93c5fd)',
-    add: 'linear-gradient(135deg, #a7f3d0, #6ee7b7)',
-    cull: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+    correction: 'linear-gradient(135deg, var(--warn-soft), color-mix(in srgb, var(--warn) 30%, var(--warn-soft)))',
+    death: 'linear-gradient(135deg, var(--danger-soft), color-mix(in srgb, var(--danger) 30%, var(--danger-soft)))',
+    sell: 'linear-gradient(135deg, var(--purple-soft), color-mix(in srgb, var(--purple) 30%, var(--purple-soft)))',
+    transfer: 'linear-gradient(135deg, var(--info-soft), color-mix(in srgb, var(--info) 30%, var(--info-soft)))',
+    add: 'linear-gradient(135deg, var(--accent-soft), color-mix(in srgb, var(--accent) 30%, var(--accent-soft)))',
+    cull: 'linear-gradient(135deg, var(--warn-soft), color-mix(in srgb, var(--warn) 30%, var(--warn-soft)))',
   };
 
   return (
