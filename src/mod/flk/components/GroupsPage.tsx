@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { Modal, Btn, BtnRow, Field, Input, Select, Textarea } from '../../../shr/components/ui';
 import { useFlk, type FlockGroup, type FlockGroupType } from '../store';
 import { useGroupKpi } from '../hooks/useGroupKpi';
+import GroupReportModal from './GroupReportModal';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { toFa } from '../../../shr/utils/fa';
@@ -56,9 +57,10 @@ const NAME_PLACEHOLDER: Record<FlockGroupType, string> = {
 
 interface GroupKpiRowProps {
   group: FlockGroup;
+  onOpen: () => void;
 }
 
-function GroupKpiRow({ group }: GroupKpiRowProps) {
+function GroupKpiRow({ group, onOpen }: GroupKpiRowProps) {
   const kpi = useGroupKpi(group.id);
   if (kpi.flockCount === 0) return null;
 
@@ -66,17 +68,22 @@ function GroupKpiRow({ group }: GroupKpiRowProps) {
   const mortalityTone = kpi.mortalityRate > 5 ? 'var(--danger)' : kpi.mortalityRate > 3 ? 'var(--warn)' : 'var(--accent)';
 
   return (
-    <div style={{
-      marginTop: 8,
-      paddingTop: 8,
-      borderTop: '1px dashed var(--border)',
-      display: 'flex',
-      gap: 14,
-      flexWrap: 'wrap',
-      fontSize: 11,
-      color: 'var(--muted)',
-      alignItems: 'center',
-    }}>
+    <div
+      onClick={onOpen}
+      style={{
+        marginTop: 8,
+        paddingTop: 8,
+        borderTop: '1px dashed var(--border)',
+        display: 'flex',
+        gap: 14,
+        flexWrap: 'wrap',
+        fontSize: 11,
+        color: 'var(--muted)',
+        alignItems: 'center',
+        cursor: 'pointer',
+      }}
+      title="کلیک برای گزارش کامل"
+    >
       <span>🐔 <b style={{ color: 'var(--text)' }}>{toFa(kpi.totalCurrent)}</b></span>
       {kpi.totalDeaths > 0 && (
         <span>💀 <b style={{ color: mortalityTone }}>{toFa(kpi.totalDeaths)}</b> ({toFa(kpi.mortalityRate.toFixed(1))}٪)</span>
@@ -114,6 +121,7 @@ export default function GroupsPage({ open, onClose }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [showForm, setShowForm] = useState(false);
+  const [reportGroupId, setReportGroupId] = useState<string | null>(null);
 
   const tree = useMemo(() => {
     const build = (parentId: string | undefined): Node[] => {
@@ -209,7 +217,7 @@ export default function GroupsPage({ open, onClose }: Props) {
           <Btn size="sm" onClick={() => handleEdit(node)}>ویرایش</Btn>
           <Btn size="sm" onClick={() => handleDelete(node)} style={{ color: 'var(--danger)' }}>حذف</Btn>
         </div>
-        <GroupKpiRow group={node} />
+        <GroupKpiRow group={node} onOpen={() => setReportGroupId(node.id)} />
       </div>
       {node.children.map(child => renderNode(child, depth + 1))}
     </div>
@@ -282,6 +290,12 @@ export default function GroupsPage({ open, onClose }: Props) {
           </BtnRow>
         </>
       )}
+    
+      <GroupReportModal
+        open={reportGroupId !== null}
+        onClose={() => setReportGroupId(null)}
+        groupId={reportGroupId}
+      />
     </Modal>
   );
 }
