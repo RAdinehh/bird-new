@@ -1,452 +1,219 @@
 # 🤝 HANDOFF.md — سند تحویل به AI بعدی
 
-> **این سند نقشه‌ی راه توئه. اول این رو کامل بخون.**
-> آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۶ — انکوباسیون + استاندارد بستر)
+> اول این رو کامل بخون. آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۱۲)
 
----
+## 📌 خلاصه وضعیت
 
-## 📌 بخش ۱ — خلاصه وضعیت
+**Bird-new** — PWA مدیریت مرغداری (React + TS + Vite + Zustand + Zod)
 
-### پروژه چیه؟
-**Bird-new** — PWA مدیریت مرغداری (React + TS + Vite + Zustand + Zod + date-fns-jalali)
-
-### وضعیت کلی
-- tsc ✅ ۰ خطا
-- تست‌ها: ✅ ۱۰۶۸/۱۰۶۸ pass
-- build ✅ موفق
-
-### آمار
-| مورد | مقدار |
+| مورد | وضعیت |
 |---|---|
-| ماژول | ۲۰ |
-| خطوط کد | ~۶۵٬۰۰۰ |
-| فایل تست | ۱۴۵ |
-| Bundle | ~۱.۹ MB |
-| درصد کلی | ~۸۶٪ |
+| **tsc** | ✅ ۰ خطا |
+| **تست** | ✅ ۱۰۶۸ pass |
+| **build** | ✅ موفق |
+| **ماژول‌ها** | ۱۸ فعال |
+| **Stores** | ۱۴ persist |
+| **Event Bus** | ⚠️ فقط ۲/۱۸ فعال |
 
-### قفل‌شده (تموم و تأییدشده)
-- ✅ `set` (تنظیمات + استانداردها)
-- ✅ `brd` (پرنده و نژاد)
-- ✅ `hal` (سالن‌ها + بخش‌ها + تجهیزات) — ۱۰۰٪ (جلسه ۵)
-- ✅ `doc` (اسناد)
----
+## 📊 درصد پیشرفت کلی
 
-## 📚 بخش ۲ — مستندات مرجع
+| لایه | درصد |
+|---|---|
+| معماری پایه | ۹۵٪ |
+| UI/UX | ۹۰٪ |
+| اتصالات بین‌ماژولی | ۴۰٪ ⚠️ |
+| Event Bus | ۱۱٪ 🔴 |
+| پاکسازی any | ۳۰٪ |
+| رفع فایل‌های بزرگ | ۳۰٪ |
 
-**ترتیب مطالعه:**
+## 🔒 ماژول‌های قفل‌شده
 
-| # | فایل | نقش | اولویت |
-|---|---|---|---|
-| ۱ | `HANDOFF.md` (این) | وضعیت + برنامه | 🔴 اول |
-| ۲ | `FOUNDATION.md` | قوانین آهنین (۱۳ بخش) | 🔴 |
-| ۳ | `FOUNDATION-PATTERNS.md` | الگوهای تفکر (۱۶ بخش) | 🔴 |
-| ۴ | `ARCHITECTURE.md` | نقشه فایل‌ها + وابستگی | 🟡 |
-| ۵ | `AI-RULES.md` | پروتکل کار با کاربر | 🟡 |
-| ۶ | `STANDARDS.md` | استانداردهای UI/UX | 🟢 |
-| ۷ | `AUDIT.md` | چک‌لیست ۷ محوره | 🟢 |
-| ۸ | `AUDIT-BRD.md` | ممیزی brd | مرجع |
-| ۹ | `AUDIT-HAL.md` | ممیزی hal | مرجع |
-| ۱۰ | `STATUS.md` | نقشه راه (قدیمی — فقط کارها) | 🟢 |
+- ✅ `set` — با وجود ۱۲۲ any نیاز به بازبینی
+- ✅ `brd` — با وجود ۶۱ any نیاز به بازبینی
+- ✅ `hal` — ۱۰۰/۱۰۰ (جلسه ۱۰)
+- ✅ `doc` — کامل
+- 🟡 `flk` — ۹۵٪ (فقط store 819 و Groups 531 مونده)
 
-**قانون:** اگه بین `STATUS.md` و `FOUNDATION.md` تضاد دیدی، **FOUNDATION برنده‌ست**.
----
+## 📚 مستندات مرجع (به ترتیب مطالعه)
 
-## 📊 بخش ۳ — وضعیت ماژول‌ها
-
-| ماژول | وضعیت | نکته |
+| # | فایل | نقش |
 |---|---|---|
-| `set` تنظیمات | ✅ ۹۰٪ | استانداردها |
-| `brd` پرنده/نژاد | ✅ ۱۰۰٪ | قفل‌شده، ممیزی کامل |
-| `hal` سالن | ✅ ۱۰۰٪ | قفل‌شده (جلسه ۵) |
-| `ctc` مخاطبین | ✅ ۸۵٪ | — |
-| `flk` گله | 🟡 ۷۰٪ | cascade نیمه |
-| `dlg` ثبت روزانه | 🟡 ۷۰٪ | cascade نیمه |
-| `egg` تخم | ✅ ۹۰٪ | — |
-| `whs` انبار | ✅ ۸۵٪ | — |
-| `fed` جیره | 🟡 ۷۵٪ | cascade نیمه |
-| `inc` جوجه‌کشی | 🟡 ۷۰٪ | cascade نیمه |
-| `tra` معاملات | 🟡 ۷۰٪ | — |
-| `alt` هشدارها | 🟡 ۶۰٪ | validation نیست |
-| `cal` تقویم | 🟡 ۷۰٪ | — |
-| `dsh` داشبورد | 🟡 ۷۰٪ | — |
-| `rep` گزارش | 🟡 ۷۰٪ | — |
-| `doc` اسناد | ✅ ۱۰۰٪ | — |
-| `arc` آرشیو | 🟡 ۷۰٪ | — |
+| ۱ | HANDOFF.md (این) | وضعیت + برنامه |
+| ۲ | FOUNDATION.md | قوانین آهنین |
+| ۳ | FOUNDATION-PATTERNS.md | الگوهای تفکر |
+| ۴ | ARCHITECTURE.md | نقشه کامل |
+| ۵ | EVENT-BUS.md | قرارداد ایونت |
+| ۶ | AI-RULES.md | پروتکل کار |
+| ۷ | STANDARDS.md | UI/UX |
+| ۸ | AUDIT.md | چک‌لیست |
+| ۹ | TYPE-REGISTRY.md | تایپ‌ها |
+| ۱۰ | UX-FORM-RULES.md | ۷۰ دستور |
 
+## 🚨 بدهی فنی (به ترتیب اولویت)
 
----
+### 🔴 فوری
 
-## 🛠 بخش ۳.۵ — ابزارهای نصب‌شده (جلسه ۵)
+| # | کار | مقدار | ریسک |
+|---|---|---|---|
+| ۱ | **Event Bus فعال‌سازی** | ۱۶/۱۸ غیرفعال | بالا — معماری |
+| ۲ | **catch خالی hal** | ۷ مورد | باگ خاموش |
+| ۳ | **any در inc** | ۱۵۵ مورد | بدهی |
+| ۴ | **showAlert → Toast** | ۱۵ مورد | قانون |
 
-### 🔧 Alias ها (~/.bashrc)
+### 🟡 مهم
+
+| # | کار | مقدار |
+|---|---|---|
+| ۵ | any در set | ۱۲۲ |
+| ۶ | refactor flk/store | 819 خط |
+| ۷ | refactor alt/rules | 589 خط |
+| ۸ | refactor flk/GroupsPage | 531 خط |
+| ۹ | any در shr | ۸۸ |
+| ۱۰ | any در whs | ۶۴ |
+| ۱۱ | any در brd (قفل‌شده) | ۶۱ |
+
+### 🟢 قابل تعویق
+
+- ۱۳ فایل ۴۰۰-۵۰۰ خط
+- ۱۰ اتصالات بین‌ماژولی ناقص
+- i18n، E2E، Virtualization
+
+## 📮 Event Bus — نقشه راه فعال‌سازی
+
+**وضعیت فعلی:** فقط `dlg → flk` کار می‌کنه
+
+**باید فعال شن:**
+
+| ناشر | ایونت | مشترک هدف |
+|---|---|---|
+| tra | invoice:created | egg, whs, dsh, rep |
+| egg | production:created | dsh, rep |
+| inc | hatch:created | flk (growing flock) |
+| whs | movement:created | hal, alt |
+| dlg | deaths/vaccine/medication | flk, alt, rep |
+
+**الگو:** هر ماژول `handlers.ts` بسازه + در `main.tsx` ثبت شه
+
+## 👥 سیستم گروه‌بندی گله
+
+**ساخته شده ولی کشف‌نشده!**
+
+- `GroupsPage.tsx` (۵۳۱ خط) — صفحه اصلی
+- `FlockGroupType`: season · breed · cohort · farm · owner · custom · **smart**
+- `MergeFlocksModal`, `GroupTimeline`, `GroupComparisonModal`, `GroupReportModal`, `useGroupKpi`
+- `FlockDealType`: own · partnership · consignment · rent
+
+**نیاز:** refactor `GroupsPage` به زیر ۴۰۰
+
+## 🛠 ابزارها
+
+### Aliases (~/.bashrc)
+
 | Alias | کار |
 |---|---|
 | `af` | `python3 ~/auto_fast.py` |
-| `chk` | `python3 scripts/check-any.py` |
-| `hal` / `brd` / `flk` / ... | پرش سریع به ماژول |
-| `tsc` / `vit` / `gs` / `gl` | دستورات سریع |
-| `dev` | اجرای dev server |
+| `chk` | چک any |
+| `hal` / `brd` / `flk` | پرش ماژول |
+| `tsc` / `vit` | چک سریع |
 
-### 🤖 GitHub Actions CI
-- فایل: `.github/workflows/ci.yml`
-- با هر push: tsc + test + build
-- اگه خطا: ایمیل/نوتیفیکیشن
+### GitHub Actions
 
-### 🔍 ESLint + پلاگین‌ها
-- فایل: `eslint.config.js`
-- `no-unused-imports`: error (auto-fix)
-- `no-explicit-any`: warn
-- `prefer-const`: error
+- `.github/workflows/ci.yml` — tsc + test + build
+- `.github/workflows/build-apk.yml` — APK
 
-### 📊 scripts/check-any.py
-- اجرا در auto_fast.py (مرحله ۳)
-- نمایش: تعداد `any` در فایل‌های staged
-- گزینه `--all`: کل پروژه
+### ESLint
 
-### 📚 docs/TYPE-REGISTRY.md
-- جدول همه‌ی تایپ‌های ماژول‌ها
-- Hook ها و تایپ برگشتی
-- قواعد جایگزینی `any`
+- `.eslintrc` → `no-unused-imports`, `no-explicit-any`, `prefer-const`
 
-### 🏷 الگوهای جدید تایپ‌ها
-- `*Payload` — برای Zod schema (number)
-- `*FormData` — برای form state (string)
-- مثال: `HallPayload` vs `HallFormData`
+## 🎯 پروتکل کار
 
----
-
-## 🔴 بخش ۴ — کارهای باقی‌مونده
-
-### ✅ قبلاً حل شده (تأیید ۱۴۰۴/۰۷/۲۰)
-- [x] **ErrorBoundary ریشه‌ای** — `main.tsx:48` + `ErrorFallback` + `logError` + تست
-- [x] **Export/Import JSON** — `BackupTab.tsx` + `backup.ts` (۷ تابع) + `AutoBackup` فعال در `App.tsx`
-
-### 🔴 بحرانی باقی‌مونده
-- [ ] **Decimal.js** — بررسی عمیق‌تر (فعلاً `parseFloat` ساده در `fa.ts`)
-- [ ] **`any` cleanup ادامه** — ۶۸۵ → ۵۴۸ (۲۰٪ کاهش در جلسه ۵)؛ هدف: صفر
-- [ ] **فرم‌های بلند hal** — HallsFormModal (۱۶ فیلد), EquipmentFormModal (۱۵)
-
-### 🟡 مهم
-- [ ] **اتصالات باقی‌مونده:**
-  - `tra → egg` (فروش تخم)
-  - `fed → dlg` (جیره فعال)
-  - `inc → flk` (candling)
-  - `cal → inc/dlg` (واکسن)
-  - `alt rules` (هشدار خودکار)
-- [ ] **Multi-Select گله**
-- [ ] **Event Bus** (کاهش circular dependency)
-
-### 🟢 کم‌اهمیت
-- [ ] Refactor فایل‌های بزرگ (DailyLogsPage ۱۱۸۸، EggEntriesPage ۱۱۳۹، FlocksPage ۱۰۰۱)
-- [ ] حذف کد تکراری (`num`, `int`, `toFa` توی ۱۵+ فایل)
-- [ ] UI/UX یکدست‌سازی
-- [ ] i18n پایه
-- [ ] Virtualization (TanStack Virtual)
-- [ ] تقویم حرفه‌ای (Doran Calendar)
-
-### 🔵 بلندمدت
-- [ ] PWA offline کامل
-- [ ] Backend (multi-user)
-- [ ] React Native
-- [ ] E2E tests (Playwright)
----
-
-## 🧠 بخش ۵ — پروتکل کار با کاربر
-
-### قاعده ۱: کاربر کدنویس نیست
-- اسکریپت Python کوتاه (زیر ۱۰۰ خط)
-- کاربر فقط کپی/پیست می‌کنه
+### قاعده ۱ — کاربر کدنویس نیست
+- اسکریپت کوتاه (زیر ۵۰ خط)
+- کپی/پیست
 - **پاسخ فارسی، بدون اصطلاح پیچیده**
-- کاربر توکن محدود داره → خلاصه و دقیق
 
-### قاعده ۲: قبل از هر تغییر
-- **فایل واقعی رو ببین** (`cat` یا `sed -n`)
-- **گمان نزن** — anchor حدسی نزن
-- اگه شک داری، **بهترین راه‌حل رو خودت انتخاب کن**
+### قاعده ۲ — قبل از هر تغییر
+- فایل واقعی رو ببین (`cat` / `sed -n`)
+- **حدس نزن** — anchor حدسی نزن
 
-### قاعده ۳: یه تغییر در هر مرحله
-- نکن چند کار با هم
-- بعد از هر تغییر: `python3 ~/auto_fast.py "پیام"`
-- اگه tsc خطا داد → **rollback، نه fix**
+### قاعده ۳ — یه تغییر در هر مرحله
+- بعد هر تغییر: `python3 ~/auto_fast.py "پیام"`
+- tsc خطا داد → rollback، نه fix
 
-### قاعده ۴: کامپوننت‌های قفل‌شده 🔒
+### قاعده ۴ — کامپوننت‌های قفل‌شده 🔒
 `SelectSheetShell`, `SmartSelect`, `EditableSelect`, `AutocompleteSheet`, `DependentSelect`, `Field`, `Input`, `EntityLink`, `OverrideHint`, `ExpandableCard`
 
-**بدون اجازه‌ی صریح کاربر، دست نزن.**
+### قاعده ۵ — git tag قبل از تغییر بزرگ
 
-### قاعده ۵: درخواست‌های چندگانه
-1. لیست کن
-2. به کاربر نشون بده
-3. یکی‌یکی انجام بده
-4. آخر همه رو یادآوری کن
+## 🚦 از کجا شروع کنیم
 
-### قاعده ۶: کامیت
-```
-cd ~/Bird-new && python3 ~/auto_fast.py "پیام commit"
-```
-خودش: tsc → build → commit → push → rollback اگه خطا
----
+### مسیر ۱ — رفع بدهی (توصیه)
+1. Event Bus فعال‌سازی
+2. catch خالی hal
+3. any در inc (۱۵۵)
+4. showAlert → Toast
 
-## 🚦 بخش ۶ — از کجا شروع کنی
+### مسیر ۲ — refactor بزرگ‌ها
+1. flk/store (819)
+2. alt/rules (589)
+3. flk/GroupsPage (531)
 
-### گام ۰: verify وضعیت
-```bash
-cd ~/Bird-new
-git log --oneline -5
-git status -s
-npx tsc --noEmit 2>&1 | tail -3
-```
+### مسیر ۳ — قابلیت جدید
+- بستگی به کاربر
 
-### گام ۱: بخون (ترتیب بخش ۲)
-- `FOUNDATION.md`
-- `FOUNDATION-PATTERNS.md`
-- `ARCHITECTURE.md`
+## 📞 دستورات سریع
 
-### گام ۲: از کاربر بپرس
-«از کجا شروع کنیم؟»
-- **کارهای فوری** → بخش ۴ بحرانی
-- **استاندارد کامل** → فاز A→E
-- **ماژول خاص** → بپرس کدوم
-
-### گام ۳: شروع کن
-- یه تغییر در هر مرحله
-- commit بعد هر تغییر
-- اگه شکستی، برگرد نه fix
-
----
-
-## 📞 بخش ۷ — دستورات سریع
-
-```bash
+~~~
 cd ~/Bird-new
 
-# اجرا
 npm run dev -- --host 0.0.0.0 --port 3000
-
-# تست
 npm test -- --run
-
-# TypeScript
 npx tsc --noEmit
-
-# Build
 npm run build
 
-# کامیت + push
-python3 ~/auto_fast.py "پیام"
+python3 ~/auto_fast.py "پیام commit"
 
-# Git
 git log --oneline -10
 git tag before-XXX-YYYYMMDD
-```
----
+~~~
 
-## ⚠️ بخش ۸ — نکات حیاتی
+## ⚠️ نکات حیاتی
 
-### ۱. localStorage کلیدها
-`pm-settings`, `pm-brd`, `pm-hal`, `pm-ctc`, `pm-flk`, `pm-inc`, `pm-egg`, `pm-dlg`, `pm-whs`, `pm-fed`, `pm-tra`, `pm-alt`, `pm-cal-manual`, `pm-theme`, `pm-custom-options`, `pm-custom-species`
+### localStorage
+`pm-settings`, `pm-brd`, `pm-hal`, `pm-flk`, `pm-inc`, `pm-egg`, `pm-dlg`, `pm-whs`, `pm-fed`, `pm-alt`, `pm-cal-manual`, `pm-ctc`, `pm-tra`, `pm-doc`, `pm-theme`, `pm-custom-options`, `pm-custom-species`
 
-### ۲. قوانین بیولوژیکی (biological.ts)
-- Hen-Day: زیر ۱۰۲٪
-- تخم: وزن ۳۵-۸۵ گرم
-- جوجه: وزن ۲۰-۶۰ گرم
-- Chick yield: ۶۴-۷۱٪
-- FCR: ۱.۰-۵.۰
-- دان/پرنده: ۱۰-۲۶۰ گرم/روز
+### قوانین بیولوژیکی
+- Hen-Day < ۱۰۲٪
+- تخم ۳۵-۸۵ گرم
+- FCR ۱.۰-۵.۰
+- Chick yield ۶۴-۷۱٪
 
-### ۳. نکات محیطی
+### نکات محیطی
 - °C در DB، °F فقط نمایش
-- استانداردها بر اساس نژاد، نه فقط پرنده
-- DB تومان پایه
-- 100svh نه 100dvh روی موبایل
-- کش PWA مشکل اصلی تست: **Unregister Service Worker** قبل تست
+- استاندارد بر اساس نژاد
+- 100svh نه 100dvh
+- کش PWA → Unregister Service Worker
 
-### ۴. Master Data vs Operations (قانون ۱۶)
-- استانداردها فقط توی `/set`
-- پرنده‌ها فقط توی `مدیریت پرنده‌ها`
-- توی `/brd`: فقط انتخاب، نه ساخت
----
+## 📅 تاریخ جلسات
 
-## 🎬 بخش ۹ — تاریخ جلسات
+### جلسه ۱-۷
+brd, hal, set, doc, foundation
 
-### جلسه ۱ (۱۴۰۴/۰۷/۲۰)
-- ممیزی اولیه brd
-- ۳ false positive کشف شد
-- ساخت `FOUNDATION.md` و `AUDIT-BRD.md`
+### جلسه ۸-۱۱
+- hal قفل نهایی
+- flk + carousel + smart capacity
+- استفاده از useFormErrors و useCarousel v4
+- separator `•` در ۶۹ فایل
 
-### جلسه ۲ (۱۴۰۴/۰۷/۲۰ — بعد)
-- ۱۱ fix موفق روی brd
-- refactor BirdForm, BirdCard, BreedForm, BreedCard
-- Zod + توکنی‌سازی کامل
-
-### جلسه ۳ (۱۴۰۴/۰۷/۲۰ — دوم)
-- اضافه شدن ۳ استاندارد مرغ مادر
-- اضافه شدن turkeys (۴)، ducks (۵)، geese (۵)
-- `_display-name` + `_display-values` (Single Resolver)
-- `species.ts` + `customSpecies`
-- Master Data vs Operations (قانون ۱۶)
-- ممیزی کامل hal + تمیزکاری
-- `AUDIT-HAL.md`
-
-### جلسه ۴ (۱۴۰۴/۰۷/۲۰ — سوم)
-- بازنویسی کامل `HANDOFF.md`
-- حذف تکراری‌ها
-- یک سند مرجع
-
-
-### جلسه ۱۱ (۱۴۰۴/۰۷/۲۱ — هفتم) — flk + carousel + smart capacity
-
-#### ماژول flk
-- ✅ DependentSelect سالن→بخش · ۸ header گروه‌بندی · saveAttempted
-- ✅ ۴۱ any → صفر · تایپ F (endOfCycleDay)
-- ✅ KPI Cards · UpcomingFlocks بازنویسی (رینگ زمردی)
-- ✅ Tab counts حذف · ترتیب: فعال · مادر · تخم‌گذار · گوشتی
-- ✅ پنهان/آرشیو conditional · Swipe fix · دات قرمز روی Tab
-- ✅ FlocksTabs جدا · jump به tab بعد save
-- ✅ filterFlocksByTab helper · FilterBar اضافه (نبود!)
-- ✅ فیلتر جدید: بخش + نژاد + آماده ۳ حالت + per-tab persist
-- ✅ vErrors همه ۱۴ فیلد · hallId اجباری
-- ✅ Cross-field تاریخ‌ها (هچ ≤ خرید ≤ شروع)
-- ✅ Min/Max واقعی (۵K / ۱۰K-۵M / ...)
-- ✅ نام تکراری زنده · حذف showAlert تکراری · Success → toast
-- ✅ EntityLink zone · Grid2 در FlockCard
-- ✅ LifecycleBar (Progress Fill) · Cascade delete warning
-- ✅ separator `·` → `•` در ۱۱۱ مورد / ۶۹ فایل
-
-#### دیگه
-- ✅ ctc / dlg / alt → Carousel (مثل hal) · TabPanel جدا
-- ✅ hal — Tab آرشیو conditional + هشدار مجموع بخش‌ها
-- ✅ useCarousel v4 (deps + MutationObserver + transition نرم)
-- ✅ useFormErrors hook (touched/saveAttempted)
-- ✅ Field onTouch · useTabBadge
-- ✅ hallCapacity: گله بدون بخش = کل سالن · ۱۱ تست پاس
-
-#### نیمه‌کاره
-- 🔴 Debug box در FlocksModal (حذف)
-- 🔴 FlocksModal ۴۲۴ خط · ZonesPage ۴۴۵ خط (refactor)
-- 🔴 باگ: ظرفیت وقتی گله قدیم توی همون سالن
-
-### جلسه ۱۰ (۱۴۰۴/۰۷/۲۱ — جلسه ششم) — hal قفل نهایی 🎉
-**hal ۱۰۰٪ کامل شد.**
-
-#### تازه‌های این جلسه
-- ✅ **تب آرشیو** — ۳ بخش (سالن/بخش/تجهیز) با Segmented Control
-- ✅ `onArchive` واقعی برای هر سه
-- ✅ دکمه «بازگردانی» + «حذف دائمی» با چک گله‌های فعال
-- ✅ تب آرشیو conditional (فقط اگه > ۰)
-- ✅ **KPI Cards** تجهیزات (۳ ستونه)
-- ✅ **۶ دسته گم‌شده** (water_treatment, safety, cleaning, hand_tools, weighing, cooling)
-- ✅ **۳ زیرنوع جدید**: feeder_chick_tray, drinker_capsule, drinker_auto_hanging
-- ✅ **placeholder داینامیک** (بر اساس زیرنوع)
-- ✅ **Zod limits** واقع‌بینانه (تعداد ۵K، قیمت ۱۰K-۳B، ظرفیت ۱۰۰K، گارانتی ۶۰)
-- ✅ **autoClamp در blur** (نه در تایپ)
-- ✅ **EquipmentCard refactor** ۲۳۷ → ۱۵۹ خط
-- ✅ **useBodyScrollLock** ساده (بدون position:fixed)
-- ✅ **Badge** «🏭 دارایی» / «📦 مصرفی»
-
-### جلسه ۹ (۱۴۰۴/۰۷/۲۱ — جلسه پنجم) — تجهیزات (hal) ✅
-- ✅ **حذف کد تکراری** EquipmentFormModal — بلوک «وضعیت+تاریخ خرید» ۲ بار بود → ۱ بار
-- ✅ **hook جدید** `useBodyScrollLock` در `shr/hooks/` — قفل اسکرول بدن
-- ✅ **HallEquipSection** از ۴۰۶ → **۳۸۵ خط** (زیر ۴۰۰) با استفاده از hook
-- ✅ **EquipmentFormModal** از ۲۷۱ → **۲۵۶ خط**
-
-### جلسه ۸ (۱۴۰۴/۰۷/۲۱ — جلسه چهارم) — Zones بهبود ✅
-- ✅ **crossError** — بلاک قاطع save اگه مجموع ظرفیت بخش‌ها > ظرفیت سالن
-  - `crossWarn` → `crossError` (معنای دقیق‌تر)
-- ✅ **توکنی‌سازی** کارت «ارثی از سالن»:
-  - `padding: '6px 10px'` → `var(--pad-tight)`
-  - `gap: 6` → `var(--sp-2)`
-  - `lineHeight: 1.6` → `1.7`
-  - `marginTop: -4` → `calc(-1 * var(--sp-1))`
-- ✅ **حذف تکرار «پرنده»** از hint ظرفیت (دو خطی بود)
-- ✅ **استخراج `ZoneCard.tsx`** (۸۱ خط):
-  - `ZonesPage.tsx`: ۴۱۹ → **۳۹۰ خط** ✅ (زیر ۴۰۰)
-  - بلوک `list.map` (۷۱ خط) → `<ZoneCard />` (۱۸ خط)
-- ✅ **رفع باگ `new Map<string, any[]>`** → `new Map<string, Flock[]>`
-- ✅ **حذف ایموجی ⚠️** از error (طبق UX-FORM-RULES ب۱۶)
-- ✅ **رنگ `--warn` → `--danger`** برای crossError
-- ✅ **استخراج `handleDelete`** (منطق تأیید + Undo + Toast)
-
-### جلسه ۷ (۱۴۰۴/۰۷/۲۱ — جلسه سوم) — hal نهایی + UX فرم
-- ✅ **۲۵+ fix روی hal** (Halls + Zones + Equipment)
-- ✅ **۹ باگ پنهان** کشف و fix شد:
-  - `zoneId` در `buildPayload` نبود → بخش از دست می‌رفت
-  - `ErrorBox` در `EquipmentFormModal` نداشت
-  - **`litter_roll ≠ paper_roll`** → ۱۰ برابر خطا در محاسبه بستر
-  - `ventilation`/`light` از تجهیزات sync نمی‌شد
-  - `realCapacity = area × 9` hardcode
-  - `lampEfficiency = 100` hardcode
-  - **`birdId` از `breedId` مشتق می‌شد** (خطای منطقی)
-  - **`fan_tunnel stdKey = fanM3PerKg`** (ظرفیت ۴.۵ به جای ۴۰۰۰)
-  - **`lamp_led stdKey = lampWattPerM2`** (ظرفیت ۳ به جای ۱۰)
-- ✅ **گروه‌بندی بصری** HallsFormModal (۵ گروه) + EquipmentFormModal (۴ گروه)
-- ✅ **حذف گروه ⚙️ سیستم‌ها** از فرم سالن (Single Source)
-- ✅ **sync کامل** Hall ↔ Equipment (شامل `ventilation`/`light`)
-- ✅ **onErrorClear** در ۳ فرم + خطا فقط بعد از ذخیره (saveAttempted)
-- ✅ **کد سالن** + ۵ ماده litter جدید
-- ✅ **auto-fill کامل** + اعداد فارسی (capacity/temp/humidity/light/litter/feeder/drinker)
-- ✅ **کارت‌های KPI دو ستونه** تجهیزات (Big Dutchman style)
-- ✅ **مدال تجهیزات** با نوار پیشرفت + وضعیت رنگی + آیکون در هدر
-- ✅ **Placeholder های فارسی** مختصر برای همه فیلدها
-- ✅ **کارت سالن** Grid2 (ابعاد + هویت + شرایط + زمان‌ها)
-- ✅ **استاندارد دانخوری/آبخوری** ۸ نژاد (bucket/pan/chick + fountain)
-- ✅ **۲۲ hint استاندارد** برای همه تجهیزات
-- ✅ **حذف `turkey_goose.ts`** legacy
-- ✅ **جدید در FOUNDATION ب۳.۷** — قوانین UX فرم
-
-### جلسه ۶ (۱۴۰۴/۰۷/۲۱ — بعد) — انکوباسیون + استاندارد بستر
-- ✅ **استاندارد بستر per-material** (`kgPerM2ByMaterial` + migration)
-- ✅ **کاهش وزن تخم** (فیلد + محاسبه + نمایش + هشدار alt)
-- ✅ **پروفایل دما/رطوبت روز‌به‌روز** (`IncubationPhase` + ۸ نژاد Ross 308)
-- ✅ **`IncubationProfileEditor`** + اتصال به `ProductionSection`
-- ✅ **نمایش «🌡 هدف امروز»** در کارت ورودی تخم
-- ✅ **Extensibility تأیید شد** — نژاد جدید با template، پروفایل کپی می‌شه
-- ✅ **EST + CO₂/O₂ + چرخش** (۵ فیلد استاندارد + پایش زنده Device)
-- ✅ **هشدار alt** — EST/CO₂/O₂ (دستگاه‌های فعال)
-- ✅ **`inc/needs.ts`** — ۶ تابع pure (تهویه، چرخش، ذخیره، هچ، chick yield)
-- ✅ **نمایش ذخیره‌سازی تخم** در EggEntryCard + **Chick Yield** در HatchCard
-- ✅ **پایش زنده در کارت دستگاه** (دما/رطوبت/EST/CO₂/O₂)
-- ✅ **وضعیت چرخش** + هشدار قبل/بعد lockdown
-- ✅ **fix باگ save** — پایش زنده
-- ✅ **نمودار روند** — `DeviceReading` + LineChart
-- ✅ **مستندسازی** به‌روز
-
-### جلسه ۵ (۱۴۰۴/۰۷/۲۱) — hal کامل + ابزارها ⭐
-**کارهای انجام‌شده:**
-- ✅ **hal کامل (۱۰۰/۱۰۰)** — ۹۶ `any` → ۶ (فقط migration — justified)
-- ✅ **Cascade کامل** — سالن/بخش/تجهیز
-- ✅ **رفع باگ قدیمی hooks** — انتقال `flocksByZone` قبل از return
-- ✅ **هماهنگی وضعیت‌های تجهیز** — `broken`/`repair`/`maintenance`
-- ✅ **هشدارهای خودکار تجهیزات** در `alt` و `dsh`
-- ✅ **ESLint نصب + config** — قوانین `no-unused-imports`, `no-explicit-any`, `prefer-const`
-- ✅ **GitHub Actions CI** — `.github/workflows/ci.yml` (tsc + test + build)
-- ✅ **`scripts/check-any.py`** — چک `any` قبل از commit
-- ✅ **`docs/TYPE-REGISTRY.md`** — جدول تایپ‌ها
-- ✅ **Alias های پروژه** — `af`, `chk`, `hal`, `brd`, ...
-- ✅ **حذف خودکار ۸۳ `any`** — از callback ها (۲۸ فایل)
-- ✅ **ESLint `--fix` روی ۱۵ ماژول** — ۲۳۰ خط import مرده حذف
-- ✅ **rename تایپ‌ها** — `*Payload` (Zod) vs `*FormData` (form)
-- ✅ **hint های هوشمند** — حذف تکراری‌ها طبق AUDIT
-- ✅ **۱۱ تست جدید hal** — مجموع ۱۰۶۸ تست pass
-- ✅ **مستندات** — `HANDOFF.md`, `STATUS.md`, `FOUNDATION.md`, `AI-RULES.md`
-
-**درس‌های مهم:**
-- ⚠️ ESLint `--fix` روی `set` فایل رو خالی کرد → rollback با `git tag`
-- ⚠️ regex روی import ها خطرناکه → جایگزینی دقیق
-- ✅ `any` مخفی رو کشف کرد (`c.fullName` که هیچ‌وقت نبود)
-- ✅ ابزارها سرعت رو ۳-۵ برابر کردن
+### جلسه ۱۲ (این جلسه)
+- ✅ بازنویسی ARCHITECTURE
+- ✅ بازنویسی HANDOFF
+- 🟡 کشف: Event Bus ۲/۱۸
+- 🟡 کشف: سیستم گروه‌بندی flk کامل
+- 🟡 کشف: بدهی فنی واقعی
 
 ---
-
-## ⚠️ بخش ۱۰ — هشدار نهایی
-
-**پروژه ۶+ ماه کار و سرمایه‌گذاری کاربره. احترام بذار.**
-
-۱. **قبل از هر تغییر، ۳ بار فکر کن.**
-۲. **اگه شک داری، نکن.**
-۳. **اگه کاربر گفت «کار می‌کنه»، دست نزن.**
-۴. **اگه کاربر گفت «خرابه»، برگرد به نسخه سالم — نه fix.**
 
 **هدف نهایی:** نرم‌افزار سطح اپل/گوگل برای مدیریت مرغداری.
 
-**موفق باشی!** 🐦
+**قبل از هر تغییر:** ۳ بار فکر کن. شک داری؟ نکن.
