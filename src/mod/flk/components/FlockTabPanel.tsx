@@ -365,6 +365,7 @@ export default function FlockTabPanel({
                   togglePaused(f.id);
                   if (!wasPaused) triggerBadge('paused');
                   f.paused ? toastMsg.activated(f.name) : toastMsg.paused(f.name);
+                  logAction('update', 'flk', (f.paused ? 'فعال‌سازی' : 'غیرفعال‌سازی') + ' گله: ' + f.name);
                 }}
               />
             );
