@@ -1,321 +1,154 @@
-# 🏛 ARCHITECTURE.md — نقشه کامل پروژه Bird-new
+# 🏛 ARCHITECTURE.md — نقشه کامل Bird-new
 
-> **این فایل مرجع حقیقت پروژه است.** قبل از هر کار، AI باید بخوندش.
-> آخرین اسکن خودکار: ۱۴۰۴/۰۷/۲۰
+> مرجع حقیقت. آخرین اسکن: ۱۴۰۴/۰۷/۲۱ (جلسه ۱۲)
 
----
+## 📊 آمار کلیدی
+- **۱۸ ماژول** · **۳۲۰+ فایل** TS/TSX
+- **۱۴ Zustand Store** persist
+- **۱۸ Event Type** — ⚠️ فقط ۲ فعال (dlg→flk)
+- **۱۷ فایل > ۴۰۰ خط**
+- **tsc: 0 خطا** ✅ · **تست: ۱۰۶۸ pass** ✅
+- **any: ~۷۱۰ مورد** ⚠️
 
-## 📊 خلاصه پروژه
+## 📦 ماژول‌ها
 
-- **۱۷ ماژول** کاربردی (mod/)
-- **۶۰۰+ فایل** TS/TSX در کل
-- **۴ لایه معماری:** cor/ (هسته) · shr/ (مشترک) · mod/ (ماژول‌ها) · test/
-- **۱۴ Zustand Store** با persist در localStorage
-- **۱۷ فایل فیلتر** (shr/filter/configs/)
-- **۱۶ فایل validation** (shr/validation/rules/)
+| ماژول | فایل | خط | any | <400 |
+|---|---|---|---|---|
+| set | 83 | 11885 | 122 🔴 | ❌ store |
+| inc | 33 | 6332 | 155 🔴 | ❌ Devices(506), EggEntry(408) |
+| flk | 33 | 6215 | 2 ✅ | ❌ store(819), Groups(531), TabPanel(480) |
+| hal | 30 | 5804 | 8 | ❌ Zones(444), store(406) |
+| tra | 18 | 3152 | 40 | ❌ Receivables(438), Invoice(433) |
+| dlg | 20 | 2725 | 25 | ✅ |
+| brd | 16 | 2616 | 61 | ✅ |
+| dsh | 15 | 2104 | 27 | ❌ useDashboardData(431) |
+| fed | 11 | 2101 | 24 | ❌ Ingredients(415) |
+| whs | 9 | 2029 | 64 | ❌ Items(424) |
+| cal | 9 | 1413 | 16 | ✅ |
+| egg | 6 | 1361 | 18 | ❌ Stats(426) |
+| rep | 8 | 1203 | 17 | ✅ |
+| alt | 5 | 1108 | 12 | ❌ rules(589) |
+| doc | 5 | 824 | 0 | ✅ |
+| ctc | 6 | 750 | 3 | ✅ |
+| arc | 2 | 179 | 0 | ✅ |
 
-## 🗺 نقشه فایل‌ها
+## 🔧 shr/ (زیرساخت)
 
-| پوشه | نقش |
-|---|---|
-| cor/ | هسته: روتر، تم، دیالوگ، توست، لاگر |
-| shr/ | زیرساخت مشترک بین ماژول‌ها |
-| shr/components/ | ۴۷ کامپوننت عمومی |
-| shr/filter/ | سیستم فیلتر (configs/ + FilterBar) |
-| shr/validation/ | Zod schemas |
-| shr/hooks/ | ۱۳ hook مشترک |
-| mod/xxx/ | هر ماژول: store.ts + index.tsx + *Page.tsx |
-| docs/ | مستندات + قوانین |
+| پوشه | فایل | خط | بزرگ‌ها |
+|---|---|---|---|
+| components | 47 | 7887 | Charts(487), EditableSelect(428🔒) |
+| filter | 23 | 2725 | — |
+| validation | 17 | 1615 | — |
+| hooks | 16 | 1086 | — |
+| utils | 10 | 949 | — |
+| search | 4 | 650 | GlobalSearch(418) |
+| units | 4 | 390 | — |
+| multiSelect | 2 | 342 | — |
+| icons | 2 | 440 | — |
+| store | 1 | 62 | — |
+| data | 1 | 19 | — |
 
-## 🛠 فایل‌های ابزار (اضافه‌شده جلسه ۵)
+## ⚙️ cor/ (هسته)
 
-### ریشه پروژه
-- .github/workflows/ci.yml — CI خودکار (tsc + test + build)
-- .github/workflows/build-apk.yml — ساخت APK
-- eslint.config.js — config ESLint (flat)
-- docs/TYPE-REGISTRY.md — جدول تایپ‌های همه ماژول‌ها
-- scripts/check-any.py — چک any در فایل‌های staged
+| پوشه | فایل | نقش |
+|---|---|---|
+| events | 5 | Event Bus (۲/۱۸ فعال) |
+| ui | 8 | FAB |
+| store | 4 | dialog, toast |
+| logger | 2 | auditLog |
+| router | 1 | AppRouter |
+| theme | 1 | applyTheme |
 
-### hal — ساختار فعلی (بعد از جلسه ۵)
-- HallsPage.tsx (۳۷۳ خط — از ۴۱۷)
-- HallsFormModal.tsx (۳۴۸ خط)
-- ZonesPage.tsx (۴۰۰ خط)
-- ZoneFormModal.tsx (۱۲۳ خط)
-- EquipmentPage.tsx (۳۱۲ خط)
-- EquipmentFormModal.tsx (۲۶۱ خط)
-- EquipmentCard.tsx (۲۳۷ خط)
-- HallCard.tsx
-- HallEquipSection.tsx
-- _hallsHelpers.ts — تایپ F + emptyForm + calcSuggestedCapacity
-- _typedLabels.ts — getKindLabel, getCategoryLabel, getStatusLabel, getUnitLabel, getEquipLabel, getCategoryColor, getCategorySoft
-- hooks/useHallsCascade.ts — cascade گله‌ها هنگام حذف سالن
-- useEquipmentForm.ts — state + logic فرم تجهیزات
-- store.ts — Zustand (۵ migration)
-- api/equipmentCalc.ts — محاسبات
-- api/equipmentWhs.ts — اتصال انبار
-- components/ — کارت‌ها و مودال‌ها
+## 💾 Stores (۱۴ persist)
 
----
+`pm-settings`(122 any) · `pm-brd`(61) · `pm-hal`(8) · `pm-flk`(2) · `pm-inc`(155) · `pm-egg`(18) · `pm-dlg`(25) · `pm-whs`(64) · `pm-fed`(24) · `pm-alt`(12) · `pm-cal-manual`(16) · `pm-ctc`(3) · `pm-tra`(40) · `pm-doc`
 
-## 🔴 مشکلات شناسایی‌شده (بازبینی‌شده ۱۴۰۴/۰۷/۲۰)
+## 📮 Event Bus — وضعیت واقعی
 
-> ⚠️ این بخش بازبینی شد. **۳ مورد از ۵ مورد اول false positive بودن.**
-> گزارش‌های خودکار قدیمی و نویزدار بودن — هر مورد باید با فایل واقعی verify شه.
+**⚠️ فقط `dlg → flk` فعاله!**
 
-### ❌ False Positive ها
+| ناشر | ایونت‌ها | emit? | handler? |
+|---|---|---|---|
+| dlg | ۶ | ✅ (۲ در کد) | ❌ |
+| flk | ۳ | ❌ | ✅ (۲ on) |
+| tra | ۳ | ❌ | ❌ |
+| egg | ۳ | ❌ | ❌ |
+| inc | ۲ | ❌ | ❌ |
+| whs | ۱ | ❌ | ❌ |
 
-1. **فایل‌های .bak** — قبلاً پاک شدن. `.gitignore` درست تنظیم است. ✅
-2. **dsh ناقص** — false positive. dsh ماژول تک‌صفحه‌ایه و به index.tsx/store.ts نیازی نداره. ✅
-3. **cal و doc بدون نام store** — false positive. cal اصلاً Zustand store نیست (aggregate است)، doc از IndexedDB استفاده می‌کنه. ✅
+**فایل‌ها:** `cor/events/{bus,events,types,index}.ts` + `DebugPanel.tsx`
+**سند:** `docs/EVENT-BUS.md` (باید آپدیت شه)
 
-### 🟡 مشکلات واقعی (فقط عدم یکدستی — نه باگ)
+## 👥 سیستم گروه‌بندی گله (flk)
 
-4. **رنگ‌های hex هاردکد** — ۳۱ مورد واقعی (نه ۷۰).
-   - فایل‌های مجاز (skip): applyTheme.ts, DebugPanel.tsx, export.ts, InvoicePrint.tsx
-   - راه‌حل: جایگزینی با توکن‌های موجود، فایل به فایل.
+**تایپ‌ها:** `FlockGroup` + `FlockGroupRule` + `FlockGroupMember`
+**نوع‌ها:** `season · breed · cohort · farm · owner · custom · smart`
+**وضعیت:** `active · archived · sold · merged`
+**معامله:** `own · partnership · consignment · rent`
 
-5. **padding هاردکد** — ۸۱ مورد واقعی (نه ۵۱۹).
-   - `padding: 0` ها از شمارش حذف شدن (reset طبیعی).
-   - توکن‌ها کاملن: `--sp-1..8`, `--pad-*`, `--gap-*`
-   - راه‌حل: جایگزینی با توکن‌های موجود، فایل به فایل.
+**فایل‌ها (۹):**
+GroupsPage(531) · FlockGroupsModal · MergeFlocksModal · GroupTimeline · GroupComparisonModal · GroupReportModal · useGroupKpi · FlockDealSection · useTabBadge
 
-### 🟢 قابل بهبود
-
-6. **۱۰ فایل > ۴۲۰ خط:** Charts(488)، BirdsPage(467)، DevicesPage(449)، ReceivablesPage(440)، InvoicePage(440)، EquipmentPage(437)، ItemsPage(436)، useDashboardData(433)، EditableSelect(429 — 🔒 قفل)، StatsPage(427)
-7. **آبشار ناقص:** فقط ۲ جا DependentSelect استفاده شده (FlocksModal, HallsFormModal)
-8. **کامپوننت‌های unused:** EmojiPicker, Skeleton, useVisualViewport
-9. **set بدون AUDIT** — ۴۲۳KB، ۴۶ فایل (طبق گزارش خودکار — تأیید نشده)
-
-## 🔗 نقشه وابستگی بین ماژول‌ها
+## 🔗 وابستگی
 
 ~~~
-set    ← پایه (همه)
+set ← پایه
   ↓
-brd    ← hal, flk, egg, inc, tra, alt, rep
+brd ← hal, flk, egg, inc, tra, alt, rep
   ↓
-hal    ← flk
+hal ← flk
   ↓
-whs    ← tra, egg, fed, dlg, hal
+whs ← tra, egg, fed, dlg, hal
 ~~~
 
-**قانون طلایی:** هر ماژول فقط به والدهای خودش وابسته باشه، نه به فرزندها.
+**استثنا:** `set → hal` (HiddenOptionsTab — decision رها شد)
+
+## ⚠️ فایل‌های > ۴۰۰ خط (۱۷ مورد)
+
+| # | فایل | خط | اولویت |
+|---|---|---|---|
+| ۱ | flk/store.ts | 819 | 🔴 |
+| ۲ | alt/rules.ts | 589 | 🔴 |
+| ۳ | flk/GroupsPage.tsx | 531 | 🔴 |
+| ۴ | inc/DevicesPage.tsx | 506 | 🔴 |
+| ۵ | shr/Charts.tsx | 487 | 🟡 |
+| ۶ | flk/FlockTabPanel.tsx | 480 | 🔴 |
+| ۷ | hal/ZonesPage.tsx | 444 | 🔴 |
+| ۸ | tra/ReceivablesPage.tsx | 438 | 🟡 |
+| ۹ | tra/InvoicePage.tsx | 433 | 🟡 |
+| ۱۰ | dsh/useDashboardData | 431 | 🟡 |
+| ۱۱ | shr/EditableSelect.tsx | 428 | 🔒 |
+| ۱۲ | egg/StatsPage.tsx | 426 | 🟡 |
+| ۱۳ | whs/ItemsPage.tsx | 424 | 🟡 |
+| ۱۴ | shr/GlobalSearch.tsx | 418 | 🟡 |
+| ۱۵ | fed/IngredientsPage.tsx | 415 | 🟡 |
+| ۱۶ | inc/EggEntryModal.tsx | 408 | 🔴 |
+| ۱۷ | hal/store.ts | 406 | 🔴 |
+
+## 🚨 بدهی فنی (به ترتیب اولویت)
+
+| # | کار | مقدار | ریسک |
+|---|---|---|---|
+| ۱ | Event Bus فعال‌سازی | ۱۶/۱۸ غیرفعال | 🔴 |
+| ۲ | showAlert → Toast | ۱۵ مورد | 🟡 |
+| ۳ | catch خالی hal | ۷ مورد | 🔴 |
+| ۴ | any در inc | ۱۵۵ | 🔴 |
+| ۵ | any در set | ۱۲۲ | 🟡 |
+| ۶ | refactor flk/store | 819 خط | 🟡 |
+| ۷ | refactor alt/rules | 589 خط | 🟡 |
+
+## 📚 اسناد
+
+| سند | نقش | وضعیت |
+|---|---|---|
+| HANDOFF.md | وضعیت + برنامه | ✅ |
+| FOUNDATION.md | قوانین آهنین | ✅ |
+| FOUNDATION-PATTERNS.md | الگوهای تفکر | ✅ |
+| EVENT-BUS.md | قرارداد ایونت | 🟡 آپدیت لازم |
+| AUDIT.md | چک‌لیست | ✅ |
+| TYPE-REGISTRY.md | تایپ‌ها | 🟡 آپدیت لازم |
+| UX-FORM-RULES.md | ۷۰ دستور | ✅ |
 
 ---
-# ARCHITECTURE.md — نقشه کامل پروژه Bird-new
 
-> این فایل خودکار ساخته شده
-
-
-## ماژول‌ها (mod/)
-
-### alt — 1 صفحه · 2 tsx · 2 ts · 33KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: AlertsPage.tsx
-### arc — 1 صفحه · 2 tsx · 0 ts · 8KB
-  - index.tsx ✅
-  - صفحات: ArchivePage.tsx
-### brd — 2 صفحه · 6 tsx · 4 ts · 68KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: BirdsPage.tsx, BreedsPage.tsx
-### cal — 0 صفحه · 6 tsx · 3 ts · 48KB
-  - index.tsx ✅
-  - store.ts ✅
-### ctc — 1 صفحه · 3 tsx · 1 ts · 28KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: ContactsPage.tsx
-### dlg — 1 صفحه · 10 tsx · 9 ts · 102KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: DailyLogsPage.tsx
-### doc — 1 صفحه · 4 tsx · 1 ts · 28KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: FilesPage.tsx
-### dsh — 0 صفحه · 13 tsx · 2 ts · 86KB
-### egg — 2 صفحه · 5 tsx · 1 ts · 61KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: ProductionsPage.tsx, StatsPage.tsx
-### fed — 3 صفحه · 7 tsx · 4 ts · 83KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: IngredientsPage.tsx, RequirementsPage.tsx, FormulasPage.tsx
-### flk — 1 صفحه · 6 tsx · 6 ts · 75KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: FlocksPage.tsx
-### hal — 3 صفحه · 13 tsx · 9 ts · 213KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: HallsPage.tsx, ZonesPage.tsx, EquipmentPage.tsx
-### inc — 4 صفحه · 20 tsx · 12 ts · 245KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: DevicesPage.tsx, EggEntriesPage.tsx, HatchesPage.tsx, CandlingsPage.tsx
-### rep — 4 صفحه · 7 tsx · 1 ts · 46KB
-  - index.tsx ✅
-  - صفحات: FinancialPage.tsx, ProductionPage.tsx, FlockReportPage.tsx, ComparePage.tsx
-### set — 0 صفحه · 46 tsx · 34 ts · 423KB
-  - index.tsx ✅
-  - store.ts ✅
-### tra — 5 صفحه · 11 tsx · 7 ts · 126KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: PurchasesPage.tsx, SalesPage.tsx, DealsPage.tsx, ReceivablesPage.tsx, InvoicePage.tsx
-### whs — 3 صفحه · 8 tsx · 1 ts · 83KB
-  - index.tsx ✅
-  - store.ts ✅
-  - صفحات: ItemsPage.tsx, MovesPage.tsx, WarningsPage.tsx
-
-## زیرساخت مشترک (shr/)
-
-### shr/components/ — 47 فایل
-  - AccordionSection.tsx
-  - AutocompleteSheet.tsx
-  - BottomNav.tsx
-  - Charts.tsx
-  - ChemicalForm.tsx
-  - DatePicker.tsx
-  - DependentSelect.tsx
-  - DialogHost.tsx
-  - ... و 39 فایل دیگه
-### shr/data/ — 1 فایل
-  - emojis.ts
-### shr/filter/ — 23 فایل
-  - FilterBar.tsx
-  - FilterGroupBody.tsx
-  - RowItem.tsx
-  - _types.ts
-  - alt.tsx
-  - arc.tsx
-  - brd.tsx
-  - ctc.tsx
-  - ... و 15 فایل دیگه
-### shr/hooks/ — 13 فایل
-  - useAutoBackup.ts
-  - useAutoLock.ts
-  - useBreedStandard.ts
-  - useCarousel.ts
-  - useFab.ts
-  - useFocusParam.ts
-  - useFormDraft.ts
-  - useKeyboard.ts
-  - ... و 5 فایل دیگه
-### shr/icons/ — 2 فایل
-  - equipment.tsx
-  - index.tsx
-### shr/multiSelect/ — 2 فایل
-  - MultiSelectBar.tsx
-  - useMultiSelect.ts
-### shr/search/ — 4 فایل
-  - GlobalSearch.tsx
-  - config.ts
-  - index.ts
-  - useGlobalSearch.ts
-### shr/store/ — 1 فایل
-  - customOptions.ts
-### shr/styles/ — 0 فایل
-### shr/units/ — 4 فایل
-  - convert.ts
-  - index.ts
-  - types.ts
-  - useFormat.ts
-### shr/utils/ — 10 فایل
-  - audio.ts
-  - backup.ts
-  - export.ts
-  - fa.ts
-  - itemDetails.ts
-  - pareto.ts
-  - smart.ts
-  - storage.ts
-  - ... و 2 فایل دیگه
-### shr/validation/ — 16 فایل
-  - biological.ts
-  - helpers.ts
-  - index.ts
-  - alt.ts
-  - ctc.ts
-  - dlg.ts
-  - egg.ts
-  - fed.ts
-  - ... و 8 فایل دیگه
-
-## هسته (cor/)
-
-- cor/events/ — 5 فایل
-- cor/logger/ — 2 فایل
-- cor/router/ — 1 فایل
-- cor/store/ — 4 فایل
-- cor/theme/ — 1 فایل
-- cor/ui/ — 8 فایل
-
-## فایل‌های بزرگ
-
-- 536 خط — src/test/rules.test.ts
-- 488 خط — src/shr/components/Charts.tsx
-- 467 خط — src/mod/brd/BirdsPage.tsx
-- 449 خط — src/mod/inc/DevicesPage.tsx
-- 440 خط — src/mod/tra/ReceivablesPage.tsx
-- 440 خط — src/mod/tra/InvoicePage.tsx
-- 437 خط — src/mod/hal/EquipmentPage.tsx
-- 436 خط — src/mod/whs/ItemsPage.tsx
-- 429 خط — src/shr/components/EditableSelect.tsx
-- 427 خط — src/mod/egg/StatsPage.tsx
-- 421 خط — src/mod/fed/IngredientsPage.tsx
-- 419 خط — src/shr/search/GlobalSearch.tsx
-- 416 خط — src/mod/brd/BreedsPage.tsx
-- 415 خط — src/mod/ctc/ContactsPage.tsx
-- 414 خط — src/mod/hal/ZonesPage.tsx
-
-## وابستگی‌های بین ماژول‌ها
-
-- alt → brd, dlg, egg, flk, inc, set, tra, whs
-- arc → brd, flk, hal
-- brd → set
-- cal → brd, dlg, flk, inc, set, tra, whs
-- dlg → brd, egg, fed, flk, hal, set, whs
-- dsh → alt, dlg, flk, hal, tra, whs
-- egg → brd, flk, whs
-- fed → whs
-- flk → brd, cal, hal, set, tra
-- hal → brd, ctc, flk, set, tra, whs
-- inc → brd, ctc, egg, flk, hal, set, tra
-- rep → brd, ctc, dlg, egg, flk, tra
-- set → hal
-- tra → brd, ctc, egg, flk, hal, set, whs
-- whs → ctc, hal
-
-## Zustand Stores
-
-- src/mod/set/store.ts → pm-settings
-- src/mod/brd/store.ts → pm-brd
-- src/mod/hal/store.ts → pm-hal
-- src/mod/flk/store.ts → pm-flk
-- src/mod/inc/store.ts → pm-inc
-- src/mod/egg/store.ts → pm-egg
-- src/mod/dlg/store.ts → pm-dlg
-- src/mod/whs/store.ts → pm-whs
-- src/mod/fed/store.ts → pm-fed
-- src/mod/alt/store.ts → pm-alt
-- src/mod/cal/store.ts → ?
-- src/mod/ctc/store.ts → pm-ctc
-- src/mod/tra/store.ts → pm-tra
-- src/mod/doc/store.ts → ?
----
-
-## ⚠️ استثناهای معماری (تصمیم آگاهانه)
-
-### ۱. `set → hal` (وابستگی معکوس)
-
-- **فایل:** `src/mod/set/HiddenOptionsTab.tsx`
-- **دلیل:** چک استفاده‌ی آپشن سفارشی قبل از حذف دائمی
-- **تحلیل:** کاربرد منطقیه، ولی جریان معماری معکوس
-- **تصمیم:** رها شد (هزینه‌ی refactor > سود)
-- **تاریخ:** ۱۴۰۴/۰۷/۲۰
-- **اگر بخوایم fix کنیم:** با prop `usageCheck` از parent پاس داده شود
-
----
+*این سند منبع حقیقت است. با هر تغییر ساختاری به‌روز شه.*
