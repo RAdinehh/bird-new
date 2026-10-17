@@ -169,6 +169,90 @@ export default function FlockTabPanel({
         setMergeModalOpen(true);
       },
     } } : {}),
+    onCustomActions: tab !== 'archived' ? [
+      {
+        key: 'vaccine',
+        label: 'واکسن',
+        icon: '💉',
+        action: async (ids) => {
+          const { showPromptAsync } = await import('../../../cor/store/dialog');
+          const note = await showPromptAsync(
+            'واکسن گروهی',
+            'نام واکسن برای ' + toFa(ids.length) + ' گله:',
+            { label: 'واکسن', placeholder: 'مثلاً نیوکاسل', required: true, confirmText: 'ثبت' }
+          );
+          if (!note?.trim()) return;
+          const { useFlk } = await import('../store');
+          const addEvent = useFlk.getState().addEvent;
+          const today = new Date().toISOString().slice(0, 10);
+          for (const id of ids) {
+            addEvent(id, {
+              date: today,
+              type: 'add',
+              count: 0,
+              sex: 'mixed',
+              reason: 'واکسن گروهی: ' + note.trim(),
+              notes: 'Bulk vaccine',
+            });
+          }
+          toastMsg.success('واکسن «' + note.trim() + '» برای ' + toFa(ids.length) + ' گله ثبت شد');
+          logAction('add', 'flk', 'واکسن گروهی: ' + note.trim() + ' (' + ids.length + ' گله)');
+        },
+      },
+      {
+        key: 'feed',
+        label: 'دان',
+        icon: '📦',
+        action: async (ids) => {
+          const { showPromptAsync } = await import('../../../cor/store/dialog');
+          const note = await showPromptAsync(
+            'دان گروهی',
+            'توضیح دان برای ' + toFa(ids.length) + ' گله:',
+            { label: 'دان', placeholder: 'مثلاً دان رشد', required: true, confirmText: 'ثبت' }
+          );
+          if (!note?.trim()) return;
+          const { useFlk } = await import('../store');
+          const addEvent = useFlk.getState().addEvent;
+          const today = new Date().toISOString().slice(0, 10);
+          for (const id of ids) {
+            addEvent(id, {
+              date: today,
+              type: 'add',
+              count: 0,
+              sex: 'mixed',
+              reason: 'دان گروهی: ' + note.trim(),
+              notes: 'Bulk feed',
+            });
+          }
+          toastMsg.success('دان «' + note.trim() + '» برای ' + toFa(ids.length) + ' گله ثبت شد');
+          logAction('add', 'flk', 'دان گروهی: ' + note.trim() + ' (' + ids.length + ' گله)');
+        },
+      },
+      {
+        key: 'pdf',
+        label: 'PDF',
+        icon: '📄',
+        action: (ids) => {
+          const selectedFlocks = ids.map(id => flocks.find(f => f.id === id)).filter(Boolean) as Flock[];
+          const lines = ['# گزارش گروهی گله‌ها', '', 'تعداد: ' + toFa(ids.length), ''];
+          for (const f of selectedFlocks) {
+            lines.push('## ' + f.name);
+            lines.push('- تعداد: ' + toFa(f.currentCount || 0) + ' / ' + toFa(f.initialCount || 0));
+            lines.push('- وضعیت: ' + (f.status === 'active' ? 'فعال' : f.status));
+            lines.push('');
+          }
+          const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'flocks-report-' + Date.now() + '.md';
+          a.click();
+          URL.revokeObjectURL(url);
+          toastMsg.success('گزارش دانلود شد');
+          logAction('export', 'flk', 'گزارش گروهی: ' + ids.length + ' گله');
+        },
+      },
+    ] : [],
   });
 
   const handleMergeConfirm = (targetId: string) => {
