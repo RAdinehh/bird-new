@@ -14,7 +14,7 @@ export interface FlocksKpi {
 export function useFlocksKpi(flocks: Flock[]): FlocksKpi {
   return useMemo(() => {
     // همه گله‌های زنده (بدون archive/sold)
-    const live = flocks.filter(f => f.status !== 'archived' && f.status !== 'sold');
+    const live = flocks.filter(f => f.status !== 'archived' && f.status !== 'sold' && !f.paused);
 
     const totalBirds = live.reduce((sum, f) => sum + (f.currentCount || f.initialCount || 0), 0);
 

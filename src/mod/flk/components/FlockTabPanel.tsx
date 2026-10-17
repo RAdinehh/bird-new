@@ -149,7 +149,7 @@ export default function FlockTabPanel({
       logAction('update', 'flk', 'آرشیو گروهی ' + ids.length);
       triggerBadge('archived');
     },
-    onCustomAction: {
+    ...(tab !== 'archived' ? { onCustomAction: {
       label: 'ادغام',
       icon: '🔗',
       action: (ids) => {
@@ -164,7 +164,7 @@ export default function FlockTabPanel({
         setMergeIds(active);
         setMergeModalOpen(true);
       },
-    },
+    } } : {}),
   });
 
   const handleMergeConfirm = (targetId: string) => {
