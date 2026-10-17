@@ -76,6 +76,44 @@ export interface FlockDealData {
   dealId?: string;
 }
 
+export type FlockGroupType = 'season' | 'breed' | 'cohort' | 'farm' | 'owner' | 'custom' | 'smart';
+
+export interface FlockGroupRule {
+  type?: FlockType;
+  status?: FlockStatus;
+  hallId?: string;
+  breedId?: string;
+  birdId?: string;
+  source?: string;
+  dealType?: FlockDealType;
+  minAge?: number;
+  maxAge?: number;
+}
+
+export interface FlockGroup {
+  id: string;
+  name: string;
+  type: FlockGroupType;
+  description?: string;
+  color?: string;
+  parentGroupId?: string;
+  rule?: FlockGroupRule;
+  archived?: boolean;
+  sortOrder?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FlockGroupMember {
+  groupId: string;
+  flockId: string;
+  joinedAt: string;
+  leftAt?: string;
+  role?: 'primary' | 'secondary';
+  weight?: number;
+  notes?: string;
+}
+
 export interface Flock {
   id: string;
   name: string;
@@ -123,6 +161,8 @@ export interface Flock {
 
 interface State {
   flocks: Flock[];
+  groups: FlockGroup[];
+  groupMembers: FlockGroupMember[];
   addEvent: (flockId: string, ev: Omit<FlockEvent, 'id'|'flockId'|'createdAt'>) => void;
   addCorrection: (flockId: string, delta: number, reasonCode: FlockEventReasonCode, reasonLabel: string, notes: string) => void;
   revokeEvent: (flockId: string, eventId: string) => void;
@@ -135,6 +175,21 @@ interface State {
   restore: (id: string) => void;
   toggleHidden: (id: string) => void;
   togglePaused: (id: string) => void;
+
+  // 🆕 Groups
+  addGroup: (g: Omit<FlockGroup, 'id' | 'createdAt' | 'updatedAt'>) => string;
+  updateGroup: (id: string, patch: Partial<FlockGroup>) => void;
+  archiveGroup: (id: string) => void;
+  restoreGroup: (id: string) => void;
+  deleteGroup: (id: string) => void;
+  moveGroup: (groupId: string, newParentId: string | null) => void;
+
+  // 🆕 Group Members
+  addToGroup: (groupId: string, flockId: string, opts?: { role?: 'primary' | 'secondary'; weight?: number; notes?: string }) => void;
+  removeFromGroup: (groupId: string, flockId: string) => void;
+  getFlocksInGroup: (groupId: string, includeDescendants?: boolean) => Flock[];
+  getGroupsForFlock: (flockId: string) => FlockGroup[];
+  getGroupPath: (groupId: string) => FlockGroup[];
 }
 
 const now = () => new Date().toISOString();
@@ -181,6 +236,8 @@ export const useFlk = create<State>()(
   persist(
     (set, get) => ({
       flocks: [],
+      groups: [],
+      groupMembers: [],
       add: (f) => {
         const id = uuid();
         set({ flocks: [...get().flocks, {...f, id, createdAt: now(), updatedAt: now()}] });
@@ -208,6 +265,98 @@ export const useFlk = create<State>()(
       toggleHidden: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, hidden: !x.hidden, updatedAt: now()} : x) }),
       togglePaused: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, paused: !x.paused, updatedAt: now()} : x) }),
 
+      // ═══ 🆕 Groups ═══
+      addGroup: (g) => {
+        const id = uuid();
+        set({ groups: [...get().groups, { ...g, id, createdAt: now(), updatedAt: now() }] });
+        return id;
+      },
+      updateGroup: (id, patch) => set({
+        groups: get().groups.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x),
+      }),
+      archiveGroup: (id) => set({
+        groups: get().groups.map(x => x.id === id ? { ...x, archived: true, updatedAt: now() } : x),
+      }),
+      restoreGroup: (id) => set({
+        groups: get().groups.map(x => x.id === id ? { ...x, archived: false, updatedAt: now() } : x),
+      }),
+      deleteGroup: (id) => set({
+        groups: get().groups.filter(x => x.id !== id),
+        groupMembers: get().groupMembers.filter(m => m.groupId !== id),
+      }),
+      moveGroup: (groupId, newParentId) => {
+        if (newParentId) {
+          let cur: string | undefined = newParentId;
+          const seen = new Set<string>();
+          while (cur) {
+            if (cur === groupId) {
+              showToast('گروه نمی‌تواند والد خودش باشد', 'error');
+              return;
+            }
+            if (seen.has(cur)) break;
+            seen.add(cur);
+            cur = get().groups.find(g => g.id === cur)?.parentGroupId;
+          }
+        }
+        set({
+          groups: get().groups.map(x => x.id === groupId ? { ...x, parentGroupId: newParentId || undefined, updatedAt: now() } : x),
+        });
+      },
+
+      // ═══ 🆕 Group Members ═══
+      addToGroup: (groupId, flockId, opts) => {
+        const exists = get().groupMembers.some(m => m.groupId === groupId && m.flockId === flockId && !m.leftAt);
+        if (exists) return;
+        const member: FlockGroupMember = {
+          groupId, flockId, joinedAt: now(),
+          role: opts?.role, weight: opts?.weight, notes: opts?.notes,
+        };
+        set({ groupMembers: [...get().groupMembers, member] });
+      },
+      removeFromGroup: (groupId, flockId) => set({
+        groupMembers: get().groupMembers.map(m =>
+          m.groupId === groupId && m.flockId === flockId && !m.leftAt
+            ? { ...m, leftAt: now() }
+            : m
+        ),
+      }),
+      getFlocksInGroup: (groupId, includeDescendants) => {
+        const state = get();
+        const directIds = state.groupMembers
+          .filter(m => m.groupId === groupId && !m.leftAt)
+          .map(m => m.flockId);
+        let allIds = directIds;
+        if (includeDescendants) {
+          const children = state.groups.filter(g => g.parentGroupId === groupId && !g.archived);
+          for (const child of children) {
+            const cf = state.getFlocksInGroup(child.id, true);
+            allIds = [...allIds, ...cf.map(f => f.id)];
+          }
+        }
+        return state.flocks.filter(f => allIds.includes(f.id));
+      },
+      getGroupsForFlock: (flockId) => {
+        const state = get();
+        const gids = state.groupMembers
+          .filter(m => m.flockId === flockId && !m.leftAt)
+          .map(m => m.groupId);
+        return state.groups.filter(g => gids.includes(g.id) && !g.archived);
+      },
+      getGroupPath: (groupId) => {
+        const path: FlockGroup[] = [];
+        let cur: string | undefined = groupId;
+        const seen = new Set<string>();
+        while (cur) {
+          if (seen.has(cur)) break;
+          seen.add(cur);
+          const g = get().groups.find(x => x.id === cur);
+          if (!g) break;
+          path.unshift(g);
+          cur = g.parentGroupId;
+        }
+        return path;
+      },
+
       addEvent: (flockId, ev) => set({
         flocks: get().flocks.map(f => {
           if (f.id !== flockId) return f;
@@ -234,7 +383,7 @@ export const useFlk = create<State>()(
             notes,
             createdAt: now(),
             updatedAt: now(),
-            version: 6,
+            version: 7,
           };
           return {
             ...f,
@@ -487,6 +636,12 @@ export const useFlk = create<State>()(
             dealType: f.dealType || 'own',
             dealData: f.dealData || {},
           }));
+        }
+
+        // ─── v6 → v7: groups + groupMembers ───
+        if (version < 7) {
+          if (!(state as any).groups) (state as any).groups = [];
+          if (!(state as any).groupMembers) (state as any).groupMembers = [];
         }
 
         return persistedInput as State;
