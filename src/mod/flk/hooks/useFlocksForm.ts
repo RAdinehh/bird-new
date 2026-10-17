@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
+import { logAction } from '../../../cor/logger/auditLog';
 import { DEFAULT_LAYING_START } from '../store';
 import type { Flock } from '../store';
 import { useBrd } from '../../brd/store';
@@ -222,7 +223,13 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
     // 🆕 حذف شده — warning به صورت inline در Modal نمایش داده می‌شه
     // (کاربر آزاده بیش از ظرفیت ثبت کنه)
 
-    if (form.id) update(form.id, data); else add(data);
+    if (form.id) {
+      update(form.id, data);
+      logAction('update', 'flk', 'ویرایش گله: ' + data.name);
+    } else {
+      add(data);
+      logAction('add', 'flk', 'افزودن گله: ' + data.name + ' (' + (data.initialCount || 0) + ' پرنده)');
+    }
     setOpen(false);
   };
 
