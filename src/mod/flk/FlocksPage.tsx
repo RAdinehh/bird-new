@@ -140,8 +140,9 @@ export default function FlocksPage() {
   }, [form.hallId, form.zoneId, form.initialCount, form.currentCount, form.breedId, form.id, flocks, halls, zones, breedStd]);
 
   // ─── شمارش برای تب‌های conditional ───
-  const hiddenCount = flocks.filter(f => f.hidden && f.status === 'active').length;
+  const hiddenCount = flocks.filter(f => f.hidden && f.status === 'active' && !f.paused).length;
   const archivedCount = flocks.filter(f => f.status === 'archived' || f.status === 'sold').length;
+  const pausedCount = flocks.filter(f => f.paused && f.status === 'active' && !f.hidden).length;
 
   const tabs = useMemo(() => {
     const base: { id: TabId; label: string }[] = [
@@ -150,16 +151,18 @@ export default function FlocksPage() {
       { id: 'layer', label: 'تخم‌گذار' },
       { id: 'broiler', label: 'گوشتی' },
     ];
+    if (pausedCount > 0) base.push({ id: 'paused', label: 'غیرفعال' });
     if (hiddenCount > 0) base.push({ id: 'hidden', label: 'پنهان' });
     if (archivedCount > 0) base.push({ id: 'archived', label: 'آرشیو' });
     return base;
-  }, [hiddenCount, archivedCount]);
+  }, [pausedCount, hiddenCount, archivedCount]);
 
   // ─── اگه کاربر توی تب پنهان/آرشیو باشه و خالی شه، برگرد به «فعال» ───
   useEffect(() => {
     if (tab === 'archived' && archivedCount === 0) setTab('all');
     else if (tab === 'hidden' && hiddenCount === 0) setTab('all');
-  }, [tab, archivedCount, hiddenCount]);
+    else if (tab === 'paused' && pausedCount === 0) setTab('all');
+  }, [tab, archivedCount, hiddenCount, pausedCount]);
 
   // ─── carousel ───
   const tabIds = tabs.map(t => t.id);

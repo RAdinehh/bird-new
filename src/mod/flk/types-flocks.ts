@@ -45,4 +45,4 @@ export const emptyForm = (): F => ({
   consignorId: '', lessorId: '', rentAmount: '', rentPeriod: 'monthly', dealId: '',
 });
 
-export type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'hidden' | 'archived';
+export type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'hidden' | 'archived' | 'paused';

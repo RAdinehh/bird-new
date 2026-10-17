@@ -315,7 +315,9 @@ export default function FlockTabPanel({
                   else { toastMsg.visible(f.name); }
                 }}
                 onTogglePaused={() => {
+                  const wasPaused = f.paused;
                   togglePaused(f.id);
+                  if (!wasPaused) triggerBadge('paused');
                   f.paused ? toastMsg.activated(f.name) : toastMsg.paused(f.name);
                 }}
               />

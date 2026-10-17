@@ -16,12 +16,14 @@ export function filterFlocksByTab(
 
   if (tab === 'archived') {
     arr = arr.filter(f => f.status === 'archived' || f.status === 'sold');
+  } else if (tab === 'paused') {
+    arr = arr.filter(f => f.status === 'active' && f.paused && !f.hidden);
   } else if (tab === 'hidden') {
-    arr = arr.filter(f => f.status === 'active' && f.hidden);
+    arr = arr.filter(f => f.status === 'active' && f.hidden && !f.paused);
   } else if (tab === 'all') {
-    arr = arr.filter(f => f.status === 'active' && !f.hidden);
+    arr = arr.filter(f => f.status === 'active' && !f.hidden && !f.paused);
   } else {
-    arr = arr.filter(f => f.status === 'active' && f.type === tab && !f.hidden);
+    arr = arr.filter(f => f.status === 'active' && f.type === tab && !f.hidden && !f.paused);
   }
 
   if (q.trim()) {
