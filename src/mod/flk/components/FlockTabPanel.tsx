@@ -186,6 +186,7 @@ export default function FlockTabPanel({
       });
     }
     toastMsg.success(`${sources.length + 1} گله ادغام شد`);
+    logAction('update', 'flk', 'ادغام ' + (sources.length + 1) + ' گله در «' + target.name + '»');
     setMergeModalOpen(false);
     setMergeIds([]);
     ms.exitSelection();
