@@ -33,6 +33,26 @@ const TYPE_DESC: Record<FlockGroupType, string> = {
   smart: 'قوانین خودکار',
 };
 
+const TYPE_OPTIONS = [
+  { value: 'season', label: 'فصلی', icon: '🗓', subtitle: 'گله‌های یه فصل' },
+  { value: 'breed', label: 'نژادی', icon: '🧬', subtitle: 'گله‌های هم‌نژاد (سن آزاد)' },
+  { value: 'cohort', label: 'هم‌دوره', icon: '👥', subtitle: 'گله‌های هم‌دوره (سن نزدیک)' },
+  { value: 'farm', label: 'مزرعه', icon: '🏭', subtitle: 'گله‌های یه مزرعه' },
+  { value: 'owner', label: 'مالک', icon: '👤', subtitle: 'گله‌های یه مالک' },
+  { value: 'custom', label: 'سفارشی', icon: '📁', subtitle: 'دسته‌بندی دلخواه' },
+  { value: 'smart', label: 'هوشمند', icon: '🤖', subtitle: 'قوانین خودکار' },
+];
+
+const NAME_PLACEHOLDER: Record<FlockGroupType, string> = {
+  season: 'مثلاً: گله پاییز ۱۴۰۵',
+  breed: 'مثلاً: مرندی‌ها',
+  cohort: 'مثلاً: هم‌دوره مرداد',
+  farm: 'مثلاً: مزرعه شمال',
+  owner: 'مثلاً: گله‌های آقای رضایی',
+  custom: 'مثلاً: گله‌های ممتاز',
+  smart: 'مثلاً: همه لایه‌های فعال',
+};
+
 interface FormState {
   name: string;
   type: FlockGroupType;
@@ -185,16 +205,20 @@ export default function GroupsPage({ open, onClose }: Props) {
             {editingId ? 'ویرایش گروه' : 'گروه جدید'}
           </div>
 
-          <Field label="نام گروه" required>
-            <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="مثلاً مرندی‌های مزرعه" />
-          </Field>
-
           <Field label="نوع گروه" hint={TYPE_DESC[form.type]}>
             <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as FlockGroupType })}>
               {(Object.keys(TYPE_LABEL) as FlockGroupType[]).map(t => (
                 <option key={t} value={t}>{TYPE_LABEL[t]}</option>
               ))}
             </Select>
+          </Field>
+
+          <Field label="نام گروه" required>
+            <Input
+              value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })}
+              placeholder={NAME_PLACEHOLDER[form.type]}
+            />
           </Field>
 
           <Field label="گروه والد (اختیاری)" hint="برای ساختار تودرتو">
