@@ -67,16 +67,15 @@ function GroupKpiRow({ group }: GroupKpiRowProps) {
 
   return (
     <div style={{
-      marginTop: 6,
-      padding: 'var(--pad-tight)',
-      background: 'var(--card-solid)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-sm)',
+      marginTop: 8,
+      paddingTop: 8,
+      borderTop: '1px dashed var(--border)',
       display: 'flex',
-      gap: 8,
+      gap: 14,
       flexWrap: 'wrap',
-      fontSize: 10,
+      fontSize: 11,
       color: 'var(--muted)',
+      alignItems: 'center',
     }}>
       <span>🐔 <b style={{ color: 'var(--text)' }}>{toFa(kpi.totalCurrent)}</b></span>
       {kpi.totalDeaths > 0 && (
