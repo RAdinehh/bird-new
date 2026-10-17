@@ -2,6 +2,7 @@
  * FlocksTabs — نوار تب گله‌ها
  * با نشانگر «آیتم جدید» (دات قرمز)
  */
+import type React from 'react';
 import type { TabId } from '../types-flocks';
 
 export interface FlockTab {
@@ -14,9 +15,10 @@ interface Props {
   activeTab: TabId;
   onTabChange: (id: TabId) => void;
   newTabBadge: TabId | null;
+  rightAction?: React.ReactNode;
 }
 
-export default function FlocksTabs({ tabs, activeTab, onTabChange, newTabBadge }: Props) {
+export default function FlocksTabs({ tabs, activeTab, onTabChange, newTabBadge, rightAction }: Props) {
   return (
     <>
       <style>{`
@@ -26,11 +28,17 @@ export default function FlocksTabs({ tabs, activeTab, onTabChange, newTabBadge }
         }
       `}</style>
       <div style={{
-        display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
-        padding: '0 12px', background: 'var(--header-bg)',
+        display: 'flex', alignItems: 'stretch',
+        borderBottom: '1px solid var(--border)',
+        background: 'var(--header-bg)',
         position: 'sticky', top: 52, zIndex: 11,
-        overflowX: 'auto', scrollbarWidth: 'none',
       }}>
+        <div style={{
+          flex: 1, minWidth: 0,
+          display: 'flex', gap: 0,
+          padding: '0 12px',
+          overflowX: 'auto', scrollbarWidth: 'none',
+        }}>
         {tabs.map(t => (
           <div
             key={t.id}
@@ -69,6 +77,16 @@ export default function FlocksTabs({ tabs, activeTab, onTabChange, newTabBadge }
             )}
           </div>
         ))}
+        </div>
+        {rightAction && (
+          <div style={{
+            display: 'flex', alignItems: 'center',
+            padding: '0 8px',
+            borderRight: '1px solid var(--border)',
+          }}>
+            {rightAction}
+          </div>
+        )}
       </div>
     </>
   );
