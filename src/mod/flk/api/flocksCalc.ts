@@ -56,7 +56,9 @@ export function hasRefs(flockId: string): boolean {
     const tra = safeRead<TraInvRef>('pm-tra');
     const invs = (tra.state?.invoices || (tra.invoices as TraInvRef[] | undefined) || []);
     if (invs.some((i) => i.relatedFlockId === flockId)) return true;
-  } catch {}
+  } catch (e) {
+    try { console.error('[flk] hasRefs failed:', e); } catch {}
+  }
   return false;
 }
 

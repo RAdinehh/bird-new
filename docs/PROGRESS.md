@@ -25,3 +25,5 @@
 [2026/10/17 23:48] docs: تصحیح EVENT-BUS و NEXT بر اساس واقعیت کد (جلسه ۱۳)
 
 [2026/10/18 00:03] fix(filter): hasActiveFilters — حذف sortState (sort ≠ filter)
+
+[2026/10/18 00:09] fix(flk): catch خالی در hasRefs با console.error
