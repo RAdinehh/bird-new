@@ -1,7 +1,7 @@
 /**
  * GroupsPage.tsx — مدیریت گروه‌های گله
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Modal, Btn, BtnRow, Field, Input, Select, Textarea, Grid2 } from '../../../shr/components/ui';
 import { useFlk, type FlockGroup, type FlockGroupType, type FlockGroupRule } from '../store';
 import { useBrd } from '../../brd/store';
@@ -236,6 +236,92 @@ export default function GroupsPage({ open, onClose }: Props) {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [showForm, setShowForm] = useState(false);
   const [reportGroupId, setReportGroupId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExport = () => {
+    try {
+      const exportData = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        groups,
+        groupMembers: useFlk.getState().groupMembers,
+      };
+      const json = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'flk-groups-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      toastMsg.success('گروه‌ها export شد (' + groups.length + ' گروه)');
+    } catch (e) {
+      toastMsg.error('Export ناموفق');
+    }
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data.groups || !Array.isArray(data.groups)) {
+        toastMsg.error('فایل نامعتبر — groups[] نداره');
+        return;
+      }
+      const msg = data.groups.length + ' گروه در فایل موجود است. جایگزین گروه‌های فعلی کنیم؟ (لغو = ادغام)';
+      const replace = await showConfirmAsync('ایمپورت گروه‌ها', msg);
+      
+      const flkStore = useFlk.getState();
+      const existingNames = new Set(flkStore.groups.map(g => g.name));
+      const imported: typeof data.groups = [];
+      const skipped: string[] = [];
+      
+      for (const g of data.groups) {
+        if (!replace && existingNames.has(g.name)) {
+          skipped.push(g.name);
+          continue;
+        }
+        imported.push(g);
+      }
+      
+      if (replace) {
+        flkStore.groups.forEach(g => flkStore.deleteGroup(g.id));
+      }
+      
+      for (const g of imported) {
+        flkStore.addGroup({
+          name: g.name,
+          type: g.type,
+          description: g.description || '',
+          color: g.color || '',
+          parentGroupId: g.parentGroupId,
+          rule: g.rule,
+          archived: g.archived || false,
+          sortOrder: g.sortOrder || 0,
+        });
+      }
+      
+      if (data.groupMembers && Array.isArray(data.groupMembers)) {
+        for (const m of data.groupMembers) {
+          flkStore.addToGroup(m.groupId, m.flockId, {
+            role: m.role,
+            weight: m.weight,
+            notes: m.notes,
+          });
+        }
+      }
+      
+      logAction('import', 'flk', 'ایمپورت گروه‌ها: ' + imported.length + ' مورد');
+      toastMsg.success(imported.length + ' گروه ایمپورت شد' + (skipped.length > 0 ? ' (' + skipped.length + ' رد شد)' : ''));
+      
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } catch (e) {
+      console.error(e);
+      toastMsg.error('ایمپورت ناموفق — فایل JSON معتبر نیست');
+    }
+  };
 
   const tree = useMemo(() => {
     const build = (parentId: string | undefined): Node[] => {
@@ -345,9 +431,18 @@ export default function GroupsPage({ open, onClose }: Props) {
     <Modal open={open} onClose={onClose} title="📁 مدیریت گروه‌های گله">
       {!showForm ? (
         <>
-          <div style={{ marginBottom: 12 }}>
-            <Btn variant="primary" onClick={handleNew} style={{ width: '100%' }}>+ گروه جدید</Btn>
+          <div style={{ marginBottom: 12, display: 'flex', gap: 6 }}>
+            <Btn variant="primary" onClick={handleNew} style={{ flex: 1 }}>+ گروه جدید</Btn>
+            <Btn onClick={handleExport} disabled={groups.length === 0} style={{ flexShrink: 0 }} title="Export JSON">📥</Btn>
+            <Btn onClick={() => fileInputRef.current?.click()} style={{ flexShrink: 0 }} title="Import JSON">📤</Btn>
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            onChange={handleImport}
+            style={{ display: 'none' }}
+          />
 
           {tree.length === 0 ? (
             <div style={{ padding: 32, textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
