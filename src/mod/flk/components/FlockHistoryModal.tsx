@@ -3,7 +3,7 @@
  * طراحی: KPI + گروه‌بندی زمانی + فیلتر + کارت‌های فشرده
  * منابع: Material Design 3 + Apple HIG + Linear
  */
-import { useState, useMemo, type ReactNode } from 'react';
+import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
 import type { Flock, FlockEvent, FlockEventType, FlockEventReasonCode } from '../store';
 import { useFlk } from '../store';
@@ -36,6 +36,20 @@ interface Props {
 
 export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
+  const [dlgDeaths, setDlgDeaths] = useState<number>(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    import('../../dlg/store').then((mod) => {
+      if (cancelled) return;
+      const logs = (mod as any).useDlg.getState().logs || [];
+      const total = logs
+        .filter((l: any) => l.flockId === flock.id)
+        .reduce((sum: number, l: any) => sum + (l.deathsCount || 0), 0);
+      setDlgDeaths(total);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [flock.id, flock.events]);
   const [correctionOpen, setCorrectionOpen] = useState(false);
   const [delta, setDelta] = useState('');
   const [reasonCode, setReasonCode] = useState<FlockEventReasonCode>('data_entry_error');
@@ -112,12 +126,20 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   return (
     <Modal open={open} onClose={onClose} title={'📜 تاریخچه • ' + flock.name}>
       <div style={{ padding: 'var(--sp-3) var(--sp-4)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, fontSize: 13 }}>
-        <span>موجودی: <b>{toFa(current)}</b> از {toFa(initial)}</span>
-        {losses > 0 && (
-          <span style={{ color: lossesPct > 5 ? 'var(--danger)' : 'var(--warn)', fontWeight: 700 }}>
-            تلفات: {toFa(losses)} ({toFa(lossesPct.toFixed(1))}٪)
-          </span>
-        )}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <span>موجودی: <b>{toFa(current)}</b> از {toFa(initial)}</span>
+          {losses > 0 && (
+            <div style={{ fontSize: 11 }}>
+              <span style={{ color: lossesPct > 5 ? 'var(--danger)' : 'var(--warn)', fontWeight: 700 }}>
+                تلفات کل: {toFa(losses)} ({toFa(lossesPct.toFixed(1))}٪)
+              </span>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 2, fontSize: 10, color: 'var(--muted)' }}>
+                <span>📥 از dlg: {toFa(dlgDeaths)}</span>
+                <span>✏️ سایر: {toFa(Math.max(0, losses - dlgDeaths))}</span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {!correctionOpen ? (
@@ -275,7 +297,13 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
         {e.reason && (
           <span style={{ fontSize: 12, color: isRevoked ? 'var(--dim)' : 'var(--muted)' }}>{e.reason}</span>
         )}
-      </div>
+      
+            {e.type === 'correction' && !e.linkedEventId && !e.revoked && (
+              <span style={{ fontSize: 10, color: 'var(--warn)' }}>
+                ⚠️ این اصلاح در dlg ثبت نشده
+              </span>
+            )}
+</div>
 
       {/* ستون چپ: تاریخ + لغو */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', gap: 5, flexShrink: 0 }}>
