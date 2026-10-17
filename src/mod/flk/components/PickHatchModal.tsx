@@ -5,12 +5,13 @@
 import { useMemo } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
 import { useInc } from '../../inc/store';
+import type { HatchResult, EggEntry } from '../../inc/store';
 import { toFa } from '../../../shr/utils/fa';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  onSelect: (hatch: any, eggEntry: any | null) => void;
+  onSelect: (hatch: HatchResult, eggEntry: EggEntry | null) => void;
 }
 
 export default function PickHatchModal({ open, onClose, onSelect }: Props) {
@@ -21,13 +22,13 @@ export default function PickHatchModal({ open, onClose, onSelect }: Props) {
   // هچ‌های تبدیل‌نشده به گله
   const availableHatches = useMemo(() => {
     return (hatches || [])
-      .filter((h: any) => !h.generatedFlockId && (h.hatched || 0) > 0)
+      .filter((h: HatchResult) => !h.generatedFlockId && (h.hatched || 0) > 0)
       .slice()
-      .sort((a: any, b: any) => (b.date || '').localeCompare(a.date || ''));
+      .sort((a: HatchResult, b: HatchResult) => (b.date || '').localeCompare(a.date || ''));
   }, [hatches]);
 
-  const handlePick = (h: any) => {
-    const entry = (eggEntries || []).find((e: any) => e.id === h.eggEntryId);
+  const handlePick = (h: HatchResult) => {
+    const entry = (eggEntries || []).find((e: EggEntry) => e.id === h.eggEntryId);
     onSelect(h, entry || null);
     onClose();
   };
@@ -42,9 +43,9 @@ export default function PickHatchModal({ open, onClose, onSelect }: Props) {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {availableHatches.map((h: any) => {
-            const entry = (eggEntries || []).find((e: any) => e.id === h.eggEntryId);
-            const device = entry ? (devices || []).find((d: any) => d.id === entry.deviceId) : null;
+          {availableHatches.map((h) => {
+            const entry = (eggEntries || []).find((e: EggEntry) => e.id === h.eggEntryId);
+            const device = entry ? (devices || []).find((d) => d.id === entry.deviceId) : null;
             return (
               <button
                 key={h.id}

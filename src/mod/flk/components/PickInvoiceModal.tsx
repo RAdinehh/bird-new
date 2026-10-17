@@ -5,12 +5,13 @@
 import { useMemo } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
 import { useTra } from '../../tra/store';
+import type { Invoice, InvoiceItem } from '../../tra/types';
 import { toFa } from '../../../shr/utils/fa';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  onSelect: (invoice: any) => void;
+  onSelect: (invoice: Invoice) => void;
 }
 
 export default function PickInvoiceModal({ open, onClose, onSelect }: Props) {
@@ -19,12 +20,12 @@ export default function PickInvoiceModal({ open, onClose, onSelect }: Props) {
   // فاکتورهای خرید که آیتم پرنده دارن
   const birdInvoices = useMemo(() => {
     return (invoices || [])
-      .filter((inv: any) => inv.type === 'purchase' && inv.items?.some((it: any) => it.birdId))
+      .filter((inv: Invoice) => inv.type === 'purchase' && inv.items?.some((it: InvoiceItem) => it.birdId))
       .slice()
-      .sort((a: any, b: any) => (b.date || '').localeCompare(a.date || ''));
+      .sort((a: Invoice, b: Invoice) => (b.date || '').localeCompare(a.date || ''));
   }, [invoices]);
 
-  const handlePick = (inv: any) => {
+  const handlePick = (inv: Invoice) => {
     onSelect(inv);
     onClose();
   };
@@ -39,9 +40,9 @@ export default function PickInvoiceModal({ open, onClose, onSelect }: Props) {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {birdInvoices.map((inv: any) => {
-            const birdItems = (inv.items || []).filter((it: any) => it.birdId);
-            const totalQty = birdItems.reduce((s: number, it: any) => s + (it.quantity || 0), 0);
+          {birdInvoices.map((inv) => {
+            const birdItems = (inv.items || []).filter((it: InvoiceItem) => it.birdId);
+            const totalQty = birdItems.reduce((s: number, it: InvoiceItem) => s + (it.quantity || 0), 0);
             const firstBird = birdItems[0] || {};
             return (
               <button

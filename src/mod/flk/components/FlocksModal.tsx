@@ -18,6 +18,8 @@ import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
 import { todayJ, jalaliBounds, checkDateBounds } from '../api/flocksCalc';
 import type { F } from '../types-flocks';
 import type { Bird, Breed } from '../../brd/store';
+import type { Invoice, InvoiceItem } from '../../tra/types';
+import type { HatchResult, EggEntry } from '../../inc/store';
 import type { Hall, Zone } from '../../hal/store';
 import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
 import type { useFormat } from '../../../shr/units';
@@ -60,12 +62,12 @@ export default function FlocksModal(props: FlocksModalProps) {
   const [invoicePickerOpen, setInvoicePickerOpen] = useState(false);
   const [hatchPickerOpen, setHatchPickerOpen] = useState(false);
 
-  const handleInvoiceSelect = (inv: any) => {
-    const birdItems = (inv.items || []).filter((it: any) => it.birdId);
+  const handleInvoiceSelect = (inv: Invoice) => {
+    const birdItems = (inv.items || []).filter((it: InvoiceItem) => it.birdId);
     if (!birdItems.length) return;
-    const totalQty = birdItems.reduce((s: number, it: any) => s + (it.quantity || 0), 0);
+    const totalQty = birdItems.reduce((s: number, it: InvoiceItem) => s + (it.quantity || 0), 0);
     const firstBird = birdItems[0];
-    const updates: any = {
+    const updates: Partial<F> = {
       initialCount: toFa(totalQty),
       currentCount: toFa(totalQty),
       purchaseDate: inv.date || '',
@@ -76,11 +78,11 @@ export default function FlocksModal(props: FlocksModalProps) {
     if (firstBird.unitPrice) updates.purchasePrice = toFa(firstBird.unitPrice);
     if (firstBird.maleCount) updates.maleCount = toFa(firstBird.maleCount);
     if (firstBird.femaleCount) updates.femaleCount = toFa(firstBird.femaleCount);
-    setForm((f: any) => ({ ...f, ...updates }));
+    setForm((f) => ({ ...f, ...updates }));
   };
 
-  const handleHatchSelect = (h: any, entry: any | null) => {
-    const updates: any = {
+  const handleHatchSelect = (h: HatchResult, entry: EggEntry | null) => {
+    const updates: Partial<F> = {
       initialCount: toFa(h.hatched || 0),
       currentCount: toFa(h.hatched || 0),
       hatchDate: h.date || '',
@@ -88,7 +90,7 @@ export default function FlocksModal(props: FlocksModalProps) {
     };
     if (entry?.birdId) updates.birdId = entry.birdId;
     if (entry?.breedId) updates.breedId = entry.breedId;
-    setForm((f: any) => ({ ...f, ...updates }));
+    setForm((f) => ({ ...f, ...updates }));
   };
 
   const {
@@ -191,7 +193,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             {form.sourceInvoiceId && (
               <button
                 type="button"
-                onClick={() => setForm((f: any) => ({ ...f, sourceInvoiceId: '', initialCount: '', currentCount: '', purchaseDate: '', purchasePrice: '' }))}
+                onClick={() => setForm((f) => ({ ...f, sourceInvoiceId: '', initialCount: '', currentCount: '', purchaseDate: '', purchasePrice: '' }))}
                 style={{
                   position: 'absolute',
                   left: 6,
@@ -254,7 +256,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             {form.hatchId && (
               <button
                 type="button"
-                onClick={() => setForm((f: any) => ({ ...f, hatchId: '', initialCount: '', currentCount: '', hatchDate: '' }))}
+                onClick={() => setForm((f) => ({ ...f, hatchId: '', initialCount: '', currentCount: '', hatchDate: '' }))}
                 style={{
                   position: 'absolute',
                   left: 6,
