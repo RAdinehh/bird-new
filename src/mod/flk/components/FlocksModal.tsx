@@ -201,7 +201,15 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       <Grid2>
         <Field label="تعداد اولیه" required error={showError('initialCount')} onTouch={() => markTouched('initialCount')}>
-          <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => setForm({ ...form, initialCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
+          <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => {
+            const v = e.target.value;
+            setForm(f => ({
+              ...f,
+              initialCount: v,
+              // 🆕 اگه currentCount خالی بود یا با initialCount قبلی برابر بود، sync کن
+              currentCount: (!f.currentCount || f.currentCount === f.initialCount) ? v : f.currentCount,
+            }));
+          }} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
         <Field label="تعداد فعلی" hint="اگه خالی بمونه = تعداد اولیه" onTouch={() => markTouched('currentCount')}>
           <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
@@ -300,11 +308,36 @@ export default function FlocksModal(props: FlocksModalProps) {
               <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
             </Field>
           </Grid2>
-          {form.maleCount && form.femaleCount && (
-            <div style={{ padding: 'var(--pad-normal)', background: 'var(--purple-soft)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--purple)', fontWeight: 600 }}>
-              نسبت خروس به مرغ: {sexRatio(parseInt(toEn(form.maleCount)), parseInt(toEn(form.femaleCount)))}
-            </div>
-          )}
+          {form.maleCount && form.femaleCount && (() => {
+            const male = parseInt(toEn(form.maleCount)) || 0;
+            const female = parseInt(toEn(form.femaleCount)) || 0;
+            const init = parseInt(toEn(form.initialCount)) || 0;
+            const sum = male + female;
+            const mismatch = init > 0 && sum !== init;
+            return (
+              <>
+                <div style={{ padding: 'var(--pad-normal)', background: 'var(--purple-soft)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--purple)', fontWeight: 600 }}>
+                  نسبت خروس به مرغ: {sexRatio(male, female)}
+                </div>
+                {mismatch && (
+                  <div style={{
+                    padding: '8px 12px',
+                    background: 'var(--warn-soft)',
+                    border: '1px solid rgba(245,158,11,.4)',
+                    borderRadius: 'var(--r-md)',
+                    color: 'var(--warn)',
+                    fontSize: 'var(--fs-xs)',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}>
+                    ⚠️ مجموع نر و ماده ({toFa(sum)}) با تعداد اولیه ({toFa(init)}) یکسان نیست
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </DepBox>
       )}
 
