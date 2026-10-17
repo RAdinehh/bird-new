@@ -40,26 +40,73 @@ export const poultryFloat = z.preprocess(
 // ═══════════════════════════════════════════════
 
 export const intNonNeg = (label: string, max = 1_000_000) =>
-  poultryInt.pipe(z.number().min(0, `${label} نمی‌تواند منفی باشد`).max(max, `${label} بیش از حد بزرگ است`));
+  z.preprocess(
+    sanitizeNumber,
+    z.number({
+      required_error: `لطفاً ${label} را وارد کنید`,
+      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+    })
+    .int('مقدار باید عدد صحیح باشد')
+    .min(0, `${label} نمی‌تواند منفی باشد`)
+    .max(max, `${label} بیش از حد بزرگ است`),
+  );
 
 export const intPos = (label: string, max = 1_000_000) =>
-  poultryInt.pipe(z.number().min(1, `${label} باید بیشتر از صفر باشد`).max(max, `${label} بیش از حد بزرگ است`));
+  z.preprocess(
+    sanitizeNumber,
+    z.number({
+      required_error: `لطفاً ${label} را وارد کنید`,
+      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+    })
+    .int('مقدار باید عدد صحیح باشد')
+    .min(1, `${label} باید بیشتر از صفر باشد`)
+    .max(max, `${label} بیش از حد بزرگ است`),
+  );
 
 export const intRange = (label: string, min: number, max: number) =>
-  poultryInt.pipe(z.number()
+  z.preprocess(
+    sanitizeNumber,
+    z.number({
+      required_error: `لطفاً ${label} را وارد کنید`,
+      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+    })
+    .int('مقدار باید عدد صحیح باشد')
     .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
-    .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`));
+    .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`),
+  );
 
 export const floatNonNeg = (label: string, max = 1_000_000) =>
-  poultryFloat.pipe(z.number().min(0, `${label} نمی‌تواند منفی باشد`).max(max, `${label} بیش از حد بزرگ است`));
+  z.preprocess(
+    sanitizeNumber,
+    z.number({
+      required_error: `لطفاً ${label} را وارد کنید`,
+      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+    })
+    .min(0, `${label} نمی‌تواند منفی باشد`)
+    .max(max, `${label} بیش از حد بزرگ است`),
+  );
 
 export const floatPos = (label: string, max = 1_000_000) =>
-  poultryFloat.pipe(z.number().min(0.0001, `${label} باید بیشتر از صفر باشد`).max(max, `${label} بیش از حد بزرگ است`));
+  z.preprocess(
+    sanitizeNumber,
+    z.number({
+      required_error: `لطفاً ${label} را وارد کنید`,
+      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+    })
+    .min(0.0001, `${label} باید بیشتر از صفر باشد`)
+    .max(max, `${label} بیش از حد بزرگ است`),
+  );
 
 export const floatRange = (label: string, min: number, max: number) =>
-  poultryFloat.pipe(z.number()
+  z.preprocess(
+    sanitizeNumber,
+    z.number({
+      required_error: `لطفاً ${label} را وارد کنید`,
+      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+    })
     .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
-    .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`));
+    .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`),
+  );
 
 /** 🆕 فیلد اجباری عددی اعشاری با پیام پویا («لطفاً طول را وارد کنید») */
 export const requiredFloatRange = (label: string, min: number, max: number) =>
