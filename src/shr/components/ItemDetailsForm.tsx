@@ -5,15 +5,7 @@ import { useHal } from '../../mod/hal/store';
 import { useFlk } from '../../mod/flk/store';
 import { useWhs } from '../../mod/whs/store';
 import { parseFaNum } from '../utils/fa';
-import {
-  MEDICINE_TYPE_LABEL,
-  type MedicineType,
-  type PriceUnit,
-} from '../utils/itemDetails';
-import { ToggleChip } from './itemFormHelpers';
-import HerbalForm from './HerbalForm';
-import ChemicalForm from './ChemicalForm';
-import VaccineForm from './VaccineForm';
+import { type PriceUnit } from '../utils/itemDetails';
 
 export interface ItemDetailFormData {
   id?: string;
@@ -54,20 +46,13 @@ export interface ItemDetailFormData {
   // Fertile Egg
   eggBatchNo?: string;
   eggDate?: string;
-  eggWeight?: number | null;
   brokenEggCount?: number | null;
-  nonIncubableCount?: number | null;
   sourceFarm?: string;
-  breederFlockAge?: number | null;
-  supplierInvoiceNo?: string;
 
   // Medicine
-  medicineType?: string;
-  storage?: string;
-  usageType?: string;
   batchNo?: string;
   expiryDate?: string;
-  withdrawalDays?: number | null;
+  storage?: string;
 
   // Feed
   feedType?: string;
@@ -84,15 +69,13 @@ export interface ItemDetailFormData {
   bagCount?: number | null;
   stockItemId?: string;
 
-  // Other
-  costType?: string;
-
   // Equipment
-  equipmentCategory?: string;
-  equipmentType?: string;
   model?: string;
   serialNo?: string;
   warrantyMonths?: number | null;
+
+  // Other
+  costType?: string;
 }
 
 interface Props {
@@ -109,45 +92,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
 
-  const setField = (key: string, val: unknown) => updateItem({ [key]: val });
-
   const breedsForBird = birds.filter(b => b.id === item.birdId).length
     ? breeds.filter(b => b.birdId === item.birdId)
     : breeds;
 
   const activeFlocks = flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }));
-
-  // در خرید، کد تخم نطفه‌دار 'egg' است؛ در فروش، 'fertile_egg'
   const isEggCategory = isPurchase ? category === 'egg' : category === 'fertile_egg';
 
   // ========== دارو ==========
   if (category === 'medicine') {
-    // 🆕 مقدار پیش‌فرض: شیمیایی (رایج‌ترین)
-    const mType = (item.medicineType || 'chemical') as MedicineType;
-    
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 4, marginBottom: 2 }}>
-          💊 اطلاعات دارو
-        </div>
-        
-        <Field label="نوع دارو" required hint="برای دیدن فیلدهای تخصصی، یکی را انتخاب کنید">
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {(['herbal', 'chemical', 'vaccine'] as MedicineType[]).map(mt => (
-              <ToggleChip key={mt} label={MEDICINE_TYPE_LABEL[mt]} active={mType === mt} onClick={() => setField('medicineType', mt)} />
-            ))}
-          </div>
-        </Field>
-        
-        {/* فرم اختصاصی بر اساس نوع */}
-        {mType === 'herbal' && <HerbalForm item={item} updateItem={updateItem} />}
-        {mType === 'chemical' && <ChemicalForm item={item} updateItem={updateItem} />}
-        {mType === 'vaccine' && <VaccineForm item={item} updateItem={updateItem} />}
-        
-        <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 6, marginBottom: 2 }}>
-          📦 اطلاعات انبار و ردیابی
-        </div>
-        
         <Grid2>
           <Field label="شماره بچ (Batch)">
             <Input value={String(item.batchNo || '')} onChange={e => updateItem({ batchNo: e.target.value })} placeholder="مثلاً: B-123" />
@@ -156,7 +111,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input value={String(item.expiryDate || '')} onChange={e => updateItem({ expiryDate: e.target.value })} placeholder="1405/12/29" />
           </Field>
         </Grid2>
-        
         <Grid2>
           <Field label="شرایط نگهداری">
             <Select value={String(item.storage || 'room')} onChange={e => updateItem({ storage: e.target.value })}>
@@ -165,29 +119,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <option value="freezer">فریزر (زیر صفر)</option>
             </Select>
           </Field>
-          <Field label="روش مصرف">
-            <Select value={String(item.usageType || '')} onChange={e => updateItem({ usageType: e.target.value })}>
-              <option value="">— انتخاب —</option>
-              <option value="oral">خوراکی (دان/آب)</option>
-              <option value="injectable">تزریقی</option>
-              <option value="spray">اسپری</option>
-            </Select>
-          </Field>
-        </Grid2>
-        
-        <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 6, marginBottom: 2 }}>
-          🐔 اطلاعات مصرف و دوره پرهیز
-        </div>
-        
-        <Grid2>
-          <Field label="دوره پرهیز (روز)" hint="تعداد روزی که نباید تخم/گوشت فروخت">
-            <Input mode="number" value={item.withdrawalDays !== null && item.withdrawalDays !== undefined ? String(item.withdrawalDays) : ''} onChange={e => updateItem({ withdrawalDays: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
-          </Field>
           <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
         </Grid2>
-        
         {sellerSlot}
       </div>
     );
@@ -280,7 +215,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               </Select>
             </Field>
             {item.priceUnit === 'per_kg' && (
-              <Field label="وزن زنده (کیلو)">
+              <Field label="وزن زنده کل (کیلو)">
                 <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
               </Field>
             )}
@@ -299,27 +234,11 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               </Field>
             </Grid2>
             <Grid2>
-              <Field label="وزن تخم (گرم)">
-                <Input mode="number" value={item.eggWeight !== null && item.eggWeight !== undefined ? String(item.eggWeight) : ''} onChange={e => updateItem({ eggWeight: parseFaNum(e.target.value) || null })} unit="گرم" min={0} />
-              </Field>
               <Field label="تعداد شکسته">
                 <Input mode="number" value={item.brokenEggCount !== null && item.brokenEggCount !== undefined ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} />
               </Field>
-            </Grid2>
-            <Grid2>
-              <Field label="تعداد غیرقابل جوجه‌کشی">
-                <Input mode="number" value={item.nonIncubableCount !== null && item.nonIncubableCount !== undefined ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} />
-              </Field>
               <Field label="مبدأ / مرغداری مادر">
                 <Input value={String(item.sourceFarm || '')} onChange={e => updateItem({ sourceFarm: e.target.value })} placeholder="مثلاً: مرغداری آدینه" />
-              </Field>
-            </Grid2>
-            <Grid2>
-              <Field label="سن گله مادر (هفته)">
-                <Input mode="number" value={item.breederFlockAge !== null && item.breederFlockAge !== undefined ? String(item.breederFlockAge) : ''} onChange={e => updateItem({ breederFlockAge: Math.round(parseFaNum(e.target.value)) || null })} unit="هفته" min={0} />
-              </Field>
-              <Field label="شماره فاکتور فروشنده">
-                <Input value={String(item.supplierInvoiceNo || '')} onChange={e => updateItem({ supplierInvoiceNo: e.target.value })} placeholder="مثلاً: INV-1405-001" />
               </Field>
             </Grid2>
           </>
@@ -330,15 +249,13 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     );
   }
 
-  // ========== تخم خوراکی ==========
+  // ========== تخم خوراکی (برای فروش) ==========
   if (!isPurchase && category === 'egg') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {!isPurchase && (
-          <Field label="گله مبدأ" required>
-            <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— انتخاب کنید —" modalTitle="انتخاب گله" autoThreshold={6} />
-          </Field>
-        )}
+        <Field label="گله مبدأ" required>
+          <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— انتخاب کنید —" modalTitle="انتخاب گله" autoThreshold={6} />
+        </Field>
         <Grid2>
           {sellerSlot || <div />}
           <Field label="مبنای قیمت">
@@ -447,27 +364,11 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <Grid2>
-          <Field label="دسته تجهیز">
-            <Input value={String(item.equipmentCategory || '')} onChange={e => updateItem({ equipmentCategory: e.target.value })} placeholder="مثلاً: تهویه، دانخوری" />
+          <Field label="مدل / نوع">
+            <Input value={String(item.model || '')} onChange={e => updateItem({ model: e.target.value })} placeholder="مثلاً: فن تونلی ۱۲۰" />
           </Field>
-          <Field label="نوع تجهیز">
-            <Input value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })} placeholder="مثلاً: فن تونلی، نیپل" />
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label="برند سازنده">
-            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="مثلاً: Big Dutchman" />
-          </Field>
-          <Field label="مدل">
-            <Input value={String(item.model || '')} onChange={e => updateItem({ model: e.target.value })} placeholder="مثلاً: XY-200" />
-          </Field>
-        </Grid2>
-        <Grid2>
           <Field label="شماره سریال">
             <Input value={String(item.serialNo || '')} onChange={e => updateItem({ serialNo: e.target.value })} placeholder="SN-123456" />
-          </Field>
-          <Field label="مدت گارانتی (ماه)">
-            <Input mode="number" value={item.warrantyMonths !== null && item.warrantyMonths !== undefined ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} />
           </Field>
         </Grid2>
         <Grid2>
