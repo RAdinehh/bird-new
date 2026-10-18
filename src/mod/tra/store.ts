@@ -11,6 +11,7 @@ import type { Invoice, InvoiceItem, State } from './types';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { generateInvoiceNumber } from './calc';
 import { showToast } from '../../cor/store/toast';
+import { useInc } from '../inc/store';
 
 const now = () => new Date().toISOString();
 
@@ -49,7 +50,7 @@ export const useTra = create<State>()(
         const mergedWithItems = { ...merged, items: itemsFinal };
         try { itemsFinal = applyInvoiceFlocks(mergedWithItems, prev); } catch(e) {}
         try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
-        try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
+        try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, prev); } catch(e) {}
         // 🎯 اتصال به انبار از طریق Event Bus (rollback قبلی‌ها + حرکت‌های جدید)
         try { void bus.emit('tra:invoice:updated', {
           invoiceId: id,
@@ -92,6 +93,14 @@ export const useTra = create<State>()(
           }
           // 🎯 rollback حرکات انبار از طریق Event Bus
           try { void bus.emit('tra:invoice:deleted', { invoiceId: inv.id, invoice: inv, items: inv.items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
+          // 🎯 rollback ورودی‌های تخم در جوجه‌کشی
+          try {
+            const incState = useInc.getState();
+            const linkedEntries = (incState.eggEntries || []).filter((e: any) => e.sourceInvoiceId === id);
+            for (const entry of linkedEntries) {
+              try { incState.deleteEntry(entry.id); } catch {}
+            }
+          } catch {}
         }
         set({ invoices: get().invoices.filter(x => x.id !== id) });
       },

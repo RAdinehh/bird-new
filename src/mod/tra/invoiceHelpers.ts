@@ -1,3 +1,4 @@
+import { useInc } from '../../mod/inc/store';
 /**
  * tra/invoiceHelpers.ts — اعمال اثر فاکتور روی انبار و گله
  */
@@ -26,33 +27,156 @@ export const BIRD_CATS = ['chick', 'adult', 'fertile_egg'];
 
 /* EGG_LINK */
 /** اتصال فاکتور فروش تخم → EggSale خودکار */
-export function applyInvoiceEgg(inv: Invoice): InvoiceItem[] {
-  if (inv.category !== 'egg' || inv.type !== 'sale') return inv.items;
-  const egg = useEgg.getState();
-  return inv.items.map(it => {
-    if (!it.quantity || it.quantity <= 0) return it;
-    // نوع تخم از فیلد eggTypes
-    const rawType = ((it as any).eggTypes || [])[0] || 'eating';
-    const type = rawType === 'fertile' ? 'fertile' : rawType === 'broken' ? 'broken' : 'eating';
-    // جلوگیری از تکراری
-    const exists = egg.sales.find((x) => x.sourceInvoiceId === inv.id && x.date === inv.date);
-    if (exists) return it;
-    try {
-      egg.addSale({
-        date: inv.date,
-        type,
-        count: it.quantity,
-        unit: 'piece',
-        unitPrice: it.unitPrice || 0,
-        totalPrice: it.total || (it.quantity * (it.unitPrice || 0)),
-        customerId: inv.partyId || '',
-        paymentType: 'cash',
-        notes: `فاکتور ${inv.number || ''}`,
-        sourceInvoiceId: inv.id,
-      } as any);
-    } catch (e) { console.error('[TRA→EGG]', e); }
-    return it;
-  });
+/** ⏱ دوره جوجه‌کشی بر اساس گونه پرنده (روز) */
+function getIncubationDays(birdKind: string | undefined): number {
+  const days: Record<string, number> = {
+    chicken: 21, duck: 28, turkey: 28, goose: 30, quail: 18,
+    pigeon: 18, ostrich: 42,
+  };
+  return days[(birdKind || 'chicken').toLowerCase()] || 21;
+}
+
+/** افزودن N روز به تاریخ جلالی (برای محاسبه تاریخ هچ تخم) */
+function addJalaliDays(dateStr: string, days: number): string {
+  if (!dateStr) return '';
+  const parts = dateStr.split('/').map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return '';
+  
+  let [y, m, d] = parts;
+  d += days;
+  
+  const monthDays = (month: number) => {
+    if (month >= 1 && month <= 6) return 31;
+    if (month >= 7 && month <= 11) return 30;
+    return 29;
+  };
+  
+  while (d > monthDays(m)) {
+    d -= monthDays(m);
+    m++;
+    if (m > 12) { m = 1; y++; }
+  }
+  
+  return `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}`;
+}
+
+export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
+  const outItems: InvoiceItem[] = (inv.items || []).map(it => ({ ...it }));
+  
+  // ─── فروش تخم (خوراکی یا نطفه‌دار) ───
+  if (inv.type === 'sale' && (inv.category === 'egg' || inv.category === 'fertile_egg')) {
+    const egg = useEgg.getState();
+    const saleType = inv.category === 'fertile_egg' ? 'fertile' : 'eating';
+    return outItems.map(it => {
+      if (!it.quantity || it.quantity <= 0) return it;
+      const exists = egg.sales.find((x: any) => x.sourceInvoiceId === inv.id && x.date === inv.date);
+      if (exists) return it;
+      try {
+        egg.addSale({
+          date: inv.date, type: saleType, count: it.quantity,
+          unit: 'piece', unitPrice: it.unitPrice || 0,
+          totalPrice: it.total || (it.quantity * (it.unitPrice || 0)),
+          customerId: inv.partyId || '', paymentType: 'cash',
+          notes: `فاکتور ${inv.number || ''}`,
+          sourceInvoiceId: inv.id,
+        } as any);
+      } catch (e) { console.error('[TRA→EGG sale]', e); }
+      return it;
+    });
+  }
+  
+  // ─── خرید تخم نطفه‌دار → ثبت در جوجه‌کشی ───
+  if (inv.type === 'purchase' && inv.category === 'egg') {
+    const inc = useInc.getState();
+    const brd = useBrd.getState();
+    
+    const keyOf = (it: any) =>
+      `${it.birdId || ''}|${it.breedId || ''}|${it.eggBatchNo || ''}`;
+    
+    const findExisting = (it: any) => {
+      const key = keyOf(it);
+      const marker = `[K:${key}]`;
+      return (inc.eggEntries || []).find((e: any) =>
+        e.sourceInvoiceId === inv.id && (e.notes || '').includes(marker)
+      );
+    };
+    
+    for (let i = 0; i < outItems.length; i++) {
+      const it = outItems[i] as any;
+      if (!it.quantity || it.quantity <= 0) continue;
+      
+      const broken = it.brokenEggCount || 0;
+      const nonIncubable = it.nonIncubableCount || 0;
+      const healthyCount = Math.max(0, it.quantity - broken - nonIncubable);
+      if (healthyCount <= 0) continue;
+      
+      const bird = brd.birds.find((b: any) => b.id === it.birdId);
+      const days = getIncubationDays(bird?.birdKind);
+      const entryDate = inv.date || '';
+      const expectedHatchDate = addJalaliDays(entryDate, days);
+      
+      const marker = `[K:${keyOf(it)}]`;
+      const existing = findExisting(it);
+      
+      if (existing) {
+        try {
+          inc.updateEntry(existing.id, {
+            count: healthyCount,
+            expectedHatchDate,
+            entryDate,
+            unitPrice: it.unitPrice || null,
+            totalPrice: it.total || null,
+            shippingCost: it.transportCost || null,
+          } as any);
+          it.entryId = existing.id;
+        } catch (e) { console.error('[TRA→INC update]', e); }
+        continue;
+      }
+      
+      try {
+        const entryId = inc.addEntry({
+          deviceId: '', hatchGroupId: '',
+          birdId: it.birdId || '', breedId: it.breedId || '',
+          count: healthyCount, entryDate, expectedHatchDate,
+          source: 'purchase',
+          dealType: ((inv as any).dealType || 'own') as any,
+          dealStatus: 'active' as any,
+          dealWithdrawnAt: '', dealWithdrawnReason: '', dealData: {},
+          trayNumbers: '',
+          unitPrice: it.unitPrice || null,
+          totalPrice: it.total || null,
+          shippingCost: it.transportCost || null,
+          status: 'incubating' as any,
+          generatedInvoiceId: '', generatedProductionId: '',
+          notes: `از فاکتور خرید ${inv.number || ''} ${marker}`,
+          sampleWeightInitial: it.eggWeight || null,
+          sampleWeightCurrent: null,
+          sourceInvoiceId: inv.id,
+        });
+        it.entryId = entryId;
+      } catch (e) { console.error('[TRA→INC create]', e); }
+    }
+    
+    // پاکسازی رکوردهای یتیم
+    if (prev) {
+      const newKeys = new Set(
+        outItems.filter((it: any) => it.quantity > 0).map((it: any) => keyOf(it))
+      );
+      const orphans = (inc.eggEntries || []).filter((e: any) => {
+        if (e.sourceInvoiceId !== inv.id) return false;
+        const m = (e.notes || '').match(/\[K:([^\]]+)\]/);
+        if (!m) return true;
+        return !newKeys.has(m[1]);
+      });
+      for (const entry of orphans) {
+        try { inc.deleteEntry(entry.id); } catch (e) { console.error('[TRA→INC cleanup]', e); }
+      }
+    }
+    
+    return outItems;
+  }
+  
+  return inv.items;
 }
 
 /* EQUIP_LINK */

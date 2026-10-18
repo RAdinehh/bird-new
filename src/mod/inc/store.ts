@@ -115,6 +115,7 @@ export interface EggEntry {
   /** 🆕 وزن نمونه فعلی تخم (گرم) */
   sampleWeightCurrent?: number | null;
   createdAt: string; updatedAt: string;
+  sourceInvoiceId?: string;
 }
 
 export interface Candling {
