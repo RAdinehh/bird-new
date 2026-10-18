@@ -217,6 +217,9 @@ export interface State {
   deleteDeal: (id: string) => void;
   /** پرداخت‌های سطح طرف حساب (Phase 6) */
   partyPayments: PartyPayment[];
+  addPartyPayment: (p: Omit<PartyPayment, 'id'|'createdAt'|'updatedAt'>) => string;
+  updatePartyPayment: (id: string, patch: Partial<PartyPayment>) => void;
+  deletePartyPayment: (id: string) => void;
 }
 
 

@@ -40,7 +40,20 @@ export const useTra = create<State>()(
         try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) {}
         // 🎯 ۴. اتصال به انبار از طریق Event Bus (حرکت‌ها + movementId)
         try { void bus.emit('tra:invoice:created', { invoiceId: newInv.id, invoice: newInv, items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
-        const final = { ...newInv, items };
+        const syncedPayments = (newInv.payments || []).map((p: any) => {
+          if (p.partyPaymentId) return p;
+          try {
+            const ppId = get().addPartyPayment({
+              partyId: newInv.partyId, date: p.date, amount: p.amount,
+              method: p.method, type: p.type || 'regular',
+              checkNo: p.checkNo || '', bank: p.bank || '', dueDate: p.dueDate || '',
+              notes: p.notes || '', status: p.status,
+              clearedDate: p.clearedDate, bouncedDate: p.bouncedDate,
+            });
+            return { ...p, partyPaymentId: ppId };
+          } catch (e) { console.error('[TRA sync add]', e); return p; }
+        });
+        const final = { ...newInv, items, payments: syncedPayments };
         set({ invoices: [...get().invoices, final] });
         try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices)); } catch(e) {}
         return id;
@@ -62,7 +75,42 @@ export const useTra = create<State>()(
           items: itemsFinal,
           prevItems: prev.items,
         }, { source: 'tra' }).catch(() => {}); } catch(e) {}
-        const final = { ...mergedWithItems, items: itemsFinal };
+        const prevPayments = (prev.payments || []) as any[];
+        const newPaymentsInput = (mergedWithItems.payments || []) as any[];
+        const syncedPayments = newPaymentsInput.map((p: any) => {
+          if (p.partyPaymentId) return p;
+          try {
+            const ppId = get().addPartyPayment({
+              partyId: mergedWithItems.partyId, date: p.date, amount: p.amount,
+              method: p.method, type: p.type || 'regular',
+              checkNo: p.checkNo || '', bank: p.bank || '', dueDate: p.dueDate || '',
+              notes: p.notes || '', status: p.status,
+              clearedDate: p.clearedDate, bouncedDate: p.bouncedDate,
+            });
+            return { ...p, partyPaymentId: ppId };
+          } catch (e) { console.error('[TRA sync upd]', e); return p; }
+        });
+        const prevPPIds = new Set(prevPayments.map((p: any) => p.partyPaymentId).filter(Boolean));
+        const newPPIds = new Set(syncedPayments.map((p: any) => p.partyPaymentId).filter(Boolean));
+        for (const ppId of prevPPIds) {
+          if (!newPPIds.has(ppId as string)) {
+            try { get().deletePartyPayment(ppId as string); } catch(e) {}
+          }
+        }
+        for (const p of syncedPayments) {
+          if (p.partyPaymentId) {
+            try {
+              get().updatePartyPayment(p.partyPaymentId, {
+                partyId: mergedWithItems.partyId, date: p.date, amount: p.amount,
+                method: p.method, type: p.type || 'regular',
+                checkNo: p.checkNo || '', bank: p.bank || '', dueDate: p.dueDate || '',
+                notes: p.notes || '', status: p.status,
+                clearedDate: p.clearedDate, bouncedDate: p.bouncedDate,
+              });
+            } catch(e) {}
+          }
+        }
+        const final = { ...mergedWithItems, items: itemsFinal, payments: syncedPayments };
         set({ invoices: get().invoices.map(x => x.id === id ? final : x) });
         try {
           setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices));
@@ -108,6 +156,12 @@ export const useTra = create<State>()(
               try { incState.deleteEntry(entry.id); } catch {}
             }
           } catch {}
+        }
+        if (inv) {
+          const paymentIds = new Set((inv.payments || []).map((p: any) => p.partyPaymentId).filter(Boolean));
+          for (const ppId of paymentIds) {
+            try { get().deletePartyPayment(ppId as string); } catch(e) {}
+          }
         }
         set({ invoices: get().invoices.filter(x => x.id !== id) });
         try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices)); } catch(e) {}
