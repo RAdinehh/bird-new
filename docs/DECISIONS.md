@@ -22,6 +22,16 @@
 
 ---
 
+### [1404/07/28] DevicesPage — استثنا در L7
+
+- **تصمیم:** `inc/DevicesPage.tsx` (۵۰۶ خط) به‌عنوان استثنای L7 می‌ماند. split نمی‌شود.
+- **دلیل:** JSX داخلی ۵۰۰ خط با ~۱۵ متغیر useMemo/useState و handlerهای مشترک درهم تنیده شده. هر split نیاز به ~۱۵ prop داره یا context. ریسک شکستن > فایده خط‌شمار.
+- **جایگزین رد شده:** split به `DeviceReadingsSection` + `DeviceMaintenanceSection` — رد شد، چون مرزهای JSX با nested braces قابل اطمینان نیستند (rollback در تلاش اول).
+- **عواقب:** L7 cap از ۴ به ۱ کاهش یافت (فقط `inc/DevicesPage.tsx` باقی می‌ماند). این یک استثنای پذیرفته‌شده است.
+- **فایل متاثر:** `src/mod/inc/DevicesPage.tsx` (دست‌نخورده)
+
+---
+
 ### [1404/07/28] L13: توقف کاهش type=number — مرز بین فیلتر و مبلغ
 
 - **تصمیم:** L13 cap روی ۲۹ می‌مونه. FilterGroupBody برگشت به `type="number"`. کاهش متوقف.

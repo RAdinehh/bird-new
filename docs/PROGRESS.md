@@ -57,3 +57,5 @@
 [2026/10/18 07:27] refactor(flk): استخراج SmartRuleEditor + GroupKpiRow از GroupsPage (529→? خط، زیر ۵۰۰)
 
 [2026/10/18 07:38] refactor(alt): استخراج alerts-inc + alerts-helpers از rules.ts (589→? خط، زیر ۵۰۰)
+
+[2026/10/18 07:46] docs(DECISIONS): ثبت استثنای L7 برای DevicesPage — split رد شد (ریسک > فایده)
