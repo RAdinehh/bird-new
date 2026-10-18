@@ -173,7 +173,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <Btn size="sm" full onClick={addItem}>+ افزودن قلم</Btn>
 
 
-        <AccordionSection icon="📅" title="شرایط پرداخت" defaultOpen summary={form.paymentTerms === 'cash' ? 'نقدی' : form.paymentTerms === 'installment' ? `${toFa(form.installmentCount || '0')} قسط` : 'توافقی'}>
+        <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> شرایط پرداخت</SectionTitle>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {form.isPreorder && (
           <Grid2>
             <Field label="نوع پیش‌پرداخت">
@@ -218,9 +219,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </Grid2>
         )}
 
-        </AccordionSection>
+        </div>
 
-        <AccordionSection icon="💳" title={`پرداخت‌ها — ${toFa(paid.toLocaleString('fa-IR'))} از ${toFa(total.toLocaleString('fa-IR'))}`} defaultOpen={form.payments.length > 0}>
+        <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت‌ها — {toFa(paid.toLocaleString('fa-IR'))} از {toFa(total.toLocaleString('fa-IR'))}</SectionTitle>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {form.payments.map(p => (
           <div key={p.id} style={{ padding: 'var(--pad-normal) 0', borderBottom: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -247,8 +249,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 <Grid2>
                   <Field label="شماره چک"><Input placeholder="مثلاً — ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
                   <Field label="بانک"><Input placeholder="مثلاً — ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
-                  <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
                 </Grid2>
+                <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
                 <Field label="وضعیت چک">
                   <Select value={p.status || 'pending'} onChange={e => updatePayment(p.id, { status: e.target.value as CheckStatus })}>
                     <option value="pending">🟡 در جریان</option>
@@ -264,7 +266,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </div>
         ))}
         <Btn size="sm" full onClick={addPayment}>+ افزودن پرداخت</Btn>
-        </AccordionSection>
+        </div>
 
         {rem > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', color: 'var(--warn)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
