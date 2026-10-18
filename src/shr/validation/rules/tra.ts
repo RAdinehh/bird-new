@@ -76,6 +76,8 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       sourceFarm: optionalStr(100),
       
       medicineType: optionalStr(20),
+      storage: optionalStr(20),
+      usageType: optionalStr(20),
       batchNo: optionalStr(50),
       expiryDate: persianDateOpt('تاریخ انقضا'),
       withdrawalDays: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
@@ -87,6 +89,8 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       bagWeight: floatNonNeg('وزن کیسه', 100).optional(),
       bagCount: floatNonNeg('تعداد کیسه', 10000).optional(),
       
+      equipmentCategory: optionalStr(50),
+      equipmentType: optionalStr(50),
       model: optionalStr(50),
       serialNo: optionalStr(50),
       hallId: optionalId(),

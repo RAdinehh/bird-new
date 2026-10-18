@@ -63,6 +63,8 @@ export interface ItemDetailFormData {
 
   // Medicine
   medicineType?: string;
+  storage?: string;
+  usageType?: string;
   batchNo?: string;
   expiryDate?: string;
   withdrawalDays?: number | null;
@@ -83,6 +85,8 @@ export interface ItemDetailFormData {
   stockItemId?: string;
 
   // Equipment
+  equipmentCategory?: string;
+  equipmentType?: string;
   model?: string;
   serialNo?: string;
   warrantyMonths?: number | null;
@@ -132,6 +136,23 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
           <Field label="تاریخ انقضا">
             <Input value={String(item.expiryDate || '')} onChange={e => updateItem({ expiryDate: e.target.value })} placeholder="1405/12/29" />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="شرایط نگهداری">
+            <Select value={String(item.storage || 'room')} onChange={e => updateItem({ storage: e.target.value })}>
+              <option value="room">دمای اتاق</option>
+              <option value="fridge">یخچال (۲ تا ۸ درجه)</option>
+              <option value="freezer">فریزر (زیر صفر)</option>
+            </Select>
+          </Field>
+          <Field label="روش مصرف">
+            <Select value={String(item.usageType || '')} onChange={e => updateItem({ usageType: e.target.value })}>
+              <option value="">— انتخاب —</option>
+              <option value="oral">خوراکی (دان/آب)</option>
+              <option value="injectable">تزریقی</option>
+              <option value="spray">اسپری</option>
+            </Select>
           </Field>
         </Grid2>
         <Grid2>
@@ -401,11 +422,27 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <Grid2>
+          <Field label="دسته تجهیز">
+            <Input value={String(item.equipmentCategory || '')} onChange={e => updateItem({ equipmentCategory: e.target.value })} placeholder="مثلاً: تهویه، دانخوری" />
+          </Field>
+          <Field label="نوع تجهیز">
+            <Input value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })} placeholder="مثلاً: فن تونلی، نیپل" />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="برند سازنده">
+            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="مثلاً: Big Dutchman" />
+          </Field>
           <Field label="مدل">
             <Input value={String(item.model || '')} onChange={e => updateItem({ model: e.target.value })} placeholder="مثلاً: XY-200" />
           </Field>
+        </Grid2>
+        <Grid2>
           <Field label="شماره سریال">
             <Input value={String(item.serialNo || '')} onChange={e => updateItem({ serialNo: e.target.value })} placeholder="SN-123456" />
+          </Field>
+          <Field label="مدت گارانتی (ماه)">
+            <Input mode="number" value={item.warrantyMonths !== null && item.warrantyMonths !== undefined ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} />
           </Field>
         </Grid2>
         <Grid2>
