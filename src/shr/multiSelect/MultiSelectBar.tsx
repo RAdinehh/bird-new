@@ -20,8 +20,8 @@ export default function MultiSelectBar<T>({
   if (!ms.selectionMode || ms.count === 0) return null;
 
   const btnBase: React.CSSProperties = {
-    flex: 1,
-    padding: '10px 12px',
+    flexShrink: 0,
+    padding: '10px 14px',
     background: 'var(--input-bg)',
     border: '1px solid var(--border)',
     borderRadius: 12,
@@ -52,13 +52,16 @@ export default function MultiSelectBar<T>({
         border: '1px solid ' + (ms.customAction?.danger ? 'var(--danger)' : 'rgba(59,130,246,0.4)'),
         borderRadius: 22,
         boxShadow: '0 16px 44px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.1)',
-        padding: '12px 14px',
+        padding: '10px 12px',
         display: 'flex',
         alignItems: 'center',
-        gap: 6,
+        gap: 8,
         maxWidth: 480,
         margin: '0 auto',
         direction: 'rtl',
+        overflowX: 'auto',
+        scrollbarWidth: 'none',
+        WebkitOverflowScrolling: 'touch',
       }}
     >
       <span

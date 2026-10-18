@@ -87,3 +87,5 @@
 [2026/10/18 10:40] feat(flk): badge «بدون سند» در FlockCard — راهنمای اتصال گله orphan به فاکتور/هچ
 
 [2026/10/18 10:49] feat(flk): Undo برای mergeFlocks — unmergeFlocks + UndoBar (۴ تست)
+
+[2026/10/18 11:05] fix(UI): بازسازی ۳ پچ — هدر GroupsPage منظم + MultiSelectBar اسکرول + FilterGroupBody L13

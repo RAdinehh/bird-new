@@ -2,6 +2,7 @@ import type { ReactNode, CSSProperties } from 'react';
 import { Input } from '../components/ui';
 import { RowItem } from './RowItem';
 import type { FilterDef } from './types';
+import { parseFaNum } from '../utils/fa';
 
 function chipIn(active: boolean): CSSProperties {
   return {
@@ -192,11 +193,11 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter }: {
       const [a, b] = (v as [number, number]) || [null, null];
       return (
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <Input type="number" placeholder="از" value={a ?? ''}
-            onChange={e => setFilter(def.key, [e.target.value ? Number(e.target.value) : null, b ?? null])} />
+          <Input inputMode="numeric" placeholder="از" value={a ?? ''}
+            onChange={e => setFilter(def.key, [e.target.value ? parseFaNum(e.target.value) : null, b ?? null])} />
           <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0 }}>—</span>
-          <Input type="number" placeholder="تا" value={b ?? ''}
-            onChange={e => setFilter(def.key, [a ?? null, e.target.value ? Number(e.target.value) : null])} />
+          <Input inputMode="numeric" placeholder="تا" value={b ?? ''}
+            onChange={e => setFilter(def.key, [a ?? null, e.target.value ? parseFaNum(e.target.value) : null])} />
         </div>
       );
     }

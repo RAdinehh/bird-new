@@ -292,11 +292,15 @@ export default function GroupsPage({ open, onClose }: Props) {
     <Modal open={open} onClose={onClose} title="📁 مدیریت گروه‌های گله">
       {!showForm ? (
         <>
-          <div style={{ marginBottom: 12, display: 'flex', gap: 6 }}>
-            <Btn variant="primary" onClick={handleNew} style={{ flex: 1 }}>+ گروه جدید</Btn>
-            <Btn onClick={handleExport} disabled={groups.length === 0} style={{ flexShrink: 0 }} title="Export JSON">📥</Btn>
-            <Btn onClick={() => fileInputRef.current?.click()} style={{ flexShrink: 0 }} title="Import JSON">📤</Btn>
-            <Btn onClick={() => setComparisonOpen(true)} disabled={groups.length < 2} style={{ flexShrink: 0 }} title="مقایسه">🔍</Btn>
+          <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'stretch' }}>
+            <Btn variant="primary" onClick={handleNew} style={{ flex: 1, minHeight: 42, fontWeight: 700 }}>
+              + گروه جدید
+            </Btn>
+            <div style={{ display: 'flex', gap: 2, padding: 3, background: 'var(--input-bg)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)' }}>
+              <button type="button" onClick={handleExport} disabled={groups.length === 0} title="Export JSON" aria-label="Export" style={{ width: 36, height: 36, background: 'transparent', border: 'none', borderRadius: 6, cursor: groups.length === 0 ? 'not-allowed' : 'pointer', fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: groups.length === 0 ? 0.4 : 1, transition: 'background .15s' }}>📥</button>
+              <button type="button" onClick={() => fileInputRef.current?.click()} title="Import JSON" aria-label="Import" style={{ width: 36, height: 36, background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .15s' }}>📤</button>
+              <button type="button" onClick={() => setComparisonOpen(true)} disabled={groups.length < 2} title="مقایسه" aria-label="مقایسه" style={{ width: 36, height: 36, background: 'transparent', border: 'none', borderRadius: 6, cursor: groups.length < 2 ? 'not-allowed' : 'pointer', fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: groups.length < 2 ? 0.4 : 1, transition: 'background .15s' }}>🔍</button>
+            </div>
           </div>
           <input
             ref={fileInputRef}
