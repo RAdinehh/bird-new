@@ -89,6 +89,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       bagWeight: floatNonNeg('وزن کیسه', 100).optional(),
       bagCount: floatNonNeg('تعداد کیسه', 10000).optional(),
       
+      costType: optionalStr(30),
       equipmentCategory: optionalStr(50),
       equipmentType: optionalStr(50),
       model: optionalStr(50),

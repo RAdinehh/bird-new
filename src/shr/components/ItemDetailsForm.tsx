@@ -84,6 +84,9 @@ export interface ItemDetailFormData {
   bagCount?: number | null;
   stockItemId?: string;
 
+  // Other
+  costType?: string;
+
   // Equipment
   equipmentCategory?: string;
   equipmentType?: string;
@@ -462,6 +465,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'other') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <Field label="نوع هزینه" hint="دسته‌بندی هزینه برای گزارش‌های مالی">
+          <Select value={String(item.costType || '')} onChange={e => updateItem({ costType: e.target.value })}>
+            <option value="">— انتخاب —</option>
+            <option value="transport">حمل و نقل (کرایه)</option>
+            <option value="labor">دستمزد و کارگر</option>
+            <option value="utilities">قبوض (آب، برق، گاز)</option>
+            <option value="maintenance">تعمیرات و نگهداری</option>
+            <option value="packaging">بسته‌بندی (کارتن، سبد)</option>
+            <option value="other">سایر هزینه‌ها</option>
+          </Select>
+        </Field>
         <Field label="گله مقصد (اختیاری)" hint="برای سرشکن کردن هزینه روی گله">
           <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
         </Field>
