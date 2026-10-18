@@ -12,6 +12,7 @@ import { format as formatJ, startOfDay, differenceInCalendarDays as diffCalDays,
 import { useSet } from '../set/store';
 import { getEffectiveEnv } from '../set/standards/resolve';
 import { getStandardFor } from '../set/standards/index';
+import type { BirdStandard } from '../set/standards/types';
 import { today, jalaliDate, todayJalali, type RuleAlert } from './alerts-helpers';
 import { detectIncAlerts } from './alerts-inc';
 
@@ -19,7 +20,7 @@ import { detectIncAlerts } from './alerts-inc';
 /** تشخیص همه‌ی هشدارهای خودکار */
 export function detectAllAlerts(): RuleAlert[] {
   const alerts: RuleAlert[] = [];
-  const _s = useSet.getState() as any;
+  const _s = useSet.getState() as { features?: { vaccine?: boolean; medicine?: boolean }; customStandards?: Record<string, BirdStandard> };
   const vaccineEnabled = _s.features?.vaccine !== false;
   const medicineEnabled = _s.features?.medicine !== false;
 
@@ -51,7 +52,7 @@ export function detectAllAlerts(): RuleAlert[] {
     }
 
     // انقضا — بر اساس دسته
-    const cat = (item as any).category;
+    const cat = item.category;
     const isVaccine = cat === 'vaccine';
     const isMedicine = cat === 'medicine' || cat === 'herbal';
     if (isVaccine && !vaccineEnabled) return;
@@ -59,7 +60,7 @@ export function detectAllAlerts(): RuleAlert[] {
 
     const ew = expiryWarning(item);
     const days = daysToExpiry(item.expireDate);
-    const alertCat: any = isVaccine ? 'vaccine' : isMedicine ? 'other' : 'stock';
+    const alertCat: AlertCategory = isVaccine ? 'vaccine' : isMedicine ? 'other' : 'stock';
     if (ew === 'expired') {
       alerts.push({
         level: 'critical',
@@ -84,7 +85,7 @@ export function detectAllAlerts(): RuleAlert[] {
 
     // ─── تجهیزات: گارانتی نزدیک پایان ───
     if (cat === 'equipment') {
-      const eq = item as any;
+      const eq = item;
       if (eq.warrantyUntil) {
         const wDays = daysToExpiry(eq.warrantyUntil);
         if (wDays !== null && wDays >= 0 && wDays <= 7) {
@@ -289,9 +290,9 @@ export function detectAllAlerts(): RuleAlert[] {
     try {
       const stdForMort = getEffectiveEnv(birdForMort?.name, flockAgeForMort, null, { customStandards: customStandardsForMort });
       // target از standards نیومده، از mortality جداگانه بخونیم
-      const stdFull = getStandardFor(birdForMort?.name, { customStandards: customStandardsForMort }) as any;
+      const stdFull = getStandardFor(birdForMort?.name, { customStandards: customStandardsForMort });
       if (stdFull?.mortality && Array.isArray(stdFull.mortality)) {
-        const range = stdFull.mortality.find((m: any) => flockAgeForMort >= m.dayFrom && flockAgeForMort <= m.dayTo);
+        const range = stdFull.mortality.find((m) => flockAgeForMort >= m.dayFrom && flockAgeForMort <= m.dayTo);
         if (range?.maxPct) maxMortalityPerThousand = range.maxPct * 10;
       }
     } catch { /* silent */ }

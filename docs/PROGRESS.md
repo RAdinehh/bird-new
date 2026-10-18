@@ -61,3 +61,5 @@
 [2026/10/18 07:46] docs(DECISIONS): ثبت استثنای L7 برای DevicesPage — split رد شد (ریسک > فایده)
 
 [2026/10/18 07:54] fix(UX): showAlert → showToast در ۸ مورد (set, egg, dlg) — L4: ۱۰→۰
+
+[2026/10/18 08:05] refactor(alt): حذف ۶ any از rules.ts — تایپ دقیق Item, AlertCategory, BirdStandard
