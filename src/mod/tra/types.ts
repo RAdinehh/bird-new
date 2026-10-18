@@ -16,10 +16,20 @@ export type CheckStatus = 'pending' | 'cleared' | 'bounced';
 
 export interface Installment {
   id: string;
+  /** شماره قسط (۱، ۲، ۳، ...) */
+  number: number;
   dueDate: string;
   amount: number;
+  /** وضعیت: در انتظار | پرداخت شده | معوق */
+  status: 'pending' | 'paid' | 'overdue';
+  /** @deprecated — برای سازگاری با نسخه قبلی. از status استفاده کنید */
   paid: boolean;
+  /** @deprecated — برای سازگاری با نسخه قبلی. از paidAt استفاده کنید */
   paidDate: string;
+  paidAt?: string;
+  paidAmount?: number;
+  /** شناسه Payment که این قسط را پرداخت کرده */
+  paymentId?: string;
 }
 
 export interface Deferral {

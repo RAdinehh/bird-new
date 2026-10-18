@@ -1,7 +1,8 @@
 /**
  * types-invoice.ts — نوع‌های InvoicePage
  */
-import type { InvoiceItem, Payment } from './store';
+import type { InvoiceItem, Payment, Installment } from './types';
+import type { InvoiceItem as StoreInvoiceItem, Payment as StorePayment } from './store';
 
 export interface F {
   id?: string;
