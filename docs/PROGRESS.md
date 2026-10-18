@@ -45,3 +45,5 @@
 [2026/10/18 06:09] fix(L13): توقف کاهش type=number — برگشت FilterGroupBody (formatNumWhileTyping باگ می‌ساخت) + cap→29 + DECISIONS
 
 [2026/10/18 06:14] fix(UX): حذف emoji از ۷ پیام خطا/هشدار در Modal (ratchet 12→5)
+
+[2026/10/18 06:30] refactor(whs): حذف ۱۶ any در MoveFormModal — تایپ F از MovesPage، Person از ctc، React.ChangeEvent (ratchet 599→583)

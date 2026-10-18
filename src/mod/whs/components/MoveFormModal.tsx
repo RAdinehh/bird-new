@@ -5,7 +5,10 @@ import { Btn, BtnRow, Field, Grid2, Modal, MoneyField, NumField, Select, Textare
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { toFa } from '../../../shr/utils/fa';
-import { MOVEMENT_REASON, UNIT_LABEL, CATEGORY_ICON, CATEGORY_LABEL, type MovementType, type MovementReason } from '../store';
+import { MOVEMENT_REASON, UNIT_LABEL, CATEGORY_ICON, CATEGORY_LABEL, type MovementType, type MovementReason, type Item } from '../store';
+import type { Person } from '../../ctc/store';
+import type { F } from '../MovesPage';
+import type React from 'react';
 
 const REASONS_BY_TYPE: Record<MovementType, MovementReason[]> = {
   in: ['purchase', 'gift', 'return', 'adjustment'],
@@ -16,19 +19,19 @@ const REASONS_BY_TYPE: Record<MovementType, MovementReason[]> = {
 interface Props {
   open: boolean;
   setOpen: (v: boolean) => void;
-  form: any;
-  setForm: any;
+  form: F;
+  setForm: React.Dispatch<React.SetStateAction<F>>;
   err: string;
   vErrors: Record<string, string>;
-  items: any[];
-  filteredContacts: any[];
+  items: Item[];
+  filteredContacts: Person[];
   onSave: () => void;
 }
 
 export default function MoveFormModal(props: Props) {
   const { open, setOpen, form, setForm, err, vErrors, items, filteredContacts, onSave } = props;
 
-  const selectedItem = items.find((i: any) => i.id === form.itemId);
+  const selectedItem = items.find((i) => i.id === form.itemId);
   const currentStock = selectedItem?.currentStock || 0;
   const isAdjustment = form.type === 'adjust';
   const isPurchase = form.reason === 'purchase';
@@ -45,7 +48,7 @@ export default function MoveFormModal(props: Props) {
       >
         <Grid2>
           <Field label="نوع گردش" required>
-            <Select value={form.type} onChange={(e: any) => {
+            <Select value={form.type} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
               const newType = e.target.value as MovementType;
               const validReasons = REASONS_BY_TYPE[newType];
               const newReason = validReasons.includes(form.reason) ? form.reason : validReasons[0];
@@ -56,22 +59,22 @@ export default function MoveFormModal(props: Props) {
             </Select>
           </Field>
           <Field label="دلیل" required error={vErrors.reason}>
-            <Select value={form.reason} onChange={(e: any) => setForm({ ...form, reason: e.target.value as MovementReason })}>
-              {(REASONS_BY_TYPE as any)[form.type].map((r: any) =>
-                <option key={r} value={r}>{(MOVEMENT_REASON as any)[r]}</option>
+            <Select value={form.reason} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, reason: e.target.value as MovementReason })}>
+              {REASONS_BY_TYPE[form.type].map((r) =>
+                <option key={r} value={r}>{MOVEMENT_REASON[r]}</option>
               )}
             </Select>
           </Field>
         </Grid2>
 
-        <Field label="کالا" required hint={selectedItem ? `موجودی فعلی — ${toFa(currentStock)} ${(UNIT_LABEL as any)[selectedItem.unit]}` : undefined}>
+        <Field label="کالا" required hint={selectedItem ? `موجودی فعلی — ${toFa(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined}>
           <SmartSelect
             value={form.itemId}
             onChange={v => setForm({ ...form, itemId: v })}
             options={items.map(it => ({
               value: it.id,
               label: it.name,
-              subtitle: `${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit]}`,
+              subtitle: `${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`,
               group: it.category,
             }))}
             groupLabels={Object.fromEntries(
@@ -90,12 +93,12 @@ export default function MoveFormModal(props: Props) {
           <Field label="تعداد" required error={vErrors.quantity}>
             <NumField placeholder="مثلاً — ۱۰۰"
               value={form.quantity}
-              onChange={(e: any) => setForm({ ...form, quantity: e.target.value })}
-              unit={selectedItem ? (UNIT_LABEL as any)[selectedItem.unit] : ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, quantity: e.target.value })}
+              unit={selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}
               max={form.type === 'out' ? currentStock : undefined} min={0} />
           </Field>
           <Field label="قیمت واحد">
-            <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={form.unitPrice} onChange={(e: any) => setForm({ ...form, unitPrice: e.target.value })} />
+            <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={form.unitPrice} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, unitPrice: e.target.value })} />
           </Field>
         </Grid2>
 
@@ -129,7 +132,7 @@ export default function MoveFormModal(props: Props) {
                     value: c.id,
                     label: c.name,
                     subtitle: c.roles.length > 0
-                      ? c.roles.map((r: any) => r === 'customer' ? 'مشتری' : r === 'supplier' ? 'فروشنده' : 'کارگر').join('، ')
+                      ? c.roles.map((r) => r === 'customer' ? 'مشتری' : r === 'supplier' ? 'فروشنده' : 'کارگر').join('، ')
                       : undefined,
                   }))}
                   placeholder={partyRequired ? `— انتخاب ${partyLabel} —` : '— بدون مخاطب —'}
@@ -146,7 +149,7 @@ export default function MoveFormModal(props: Props) {
         )}
 
         <Field label="یادداشت">
-            <Textarea placeholder="..." value={form.notes} onChange={(e: any) => setForm({ ...form, notes: e.target.value })} />
+            <Textarea placeholder="..." value={form.notes} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
         <ErrorBox>{err}</ErrorBox>

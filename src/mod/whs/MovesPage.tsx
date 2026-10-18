@@ -19,7 +19,7 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { useFilterSort, FilterBar, getWhsMovesConfig } from '../../shr/filter';
 import { createMovementSchema } from '../../shr/validation/rules/whs';
 
-interface F {
+export interface F {
   id?: string;
   itemId: string;
   type: MovementType;
