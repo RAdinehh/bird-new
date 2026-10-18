@@ -1,15 +1,19 @@
 /** filter/configs/tra.tsx */
-import { IconFolder, IconActivity, IconTag, IconDollar, IconClock, IconUser, IconCalendar } from '../../icons';
+import { IconFolder, IconActivity, IconTag, IconDollar, IconClock, IconUser, IconCalendar, IconChart } from '../../icons';
 import { type Deal, type Invoice, DEAL_LABEL as TRA_DEAL_LABEL, remaining as traRemaining, ageDays as traAgeDays, agingBucket as traAgingBucket, WORKFLOW_LABEL as TRA_WORKFLOW_LABEL } from '../../../mod/tra/store';
 import type { FilterConfig } from './_types';
 
+// ═══════════════════════════════════════════════════
+// tra/DealsPage — معاملات (قراردادها)
+// ═══════════════════════════════════════════════════
 export function getTraDealsConfig(ctx: {
   partyNames: Record<string, string>;
 }): FilterConfig<Deal> {
   return {
     filterDefs: [
+      // ═══ ۱. نوع معامله ═══
       {
-        key: 'type', label: 'نوع', kind: 'enum',
+        key: 'type', label: 'نوع معامله', kind: 'enum',
         icon: <IconTag size={18} />,
         options: (Object.keys(TRA_DEAL_LABEL) as Array<keyof typeof TRA_DEAL_LABEL>).map(t => ({
           value: t,
@@ -18,6 +22,7 @@ export function getTraDealsConfig(ctx: {
         getValue: (d: Deal) => d.type || '',
         multi: true,
       },
+      // ═══ ۲. وضعیت ═══
       {
         key: 'status', label: 'وضعیت', kind: 'enum',
         icon: <IconActivity size={18} />,
@@ -29,6 +34,7 @@ export function getTraDealsConfig(ctx: {
         getValue: (d: Deal) => d.status || 'open',
         multi: true,
       },
+      // ═══ ۳. طرف معامله ═══
       {
         key: 'partyId', label: 'طرف معامله', kind: 'enum',
         icon: <IconUser size={18} />,
@@ -72,6 +78,7 @@ export function getTraReceivablesConfig(ctx: {
 }): FilterConfig<Invoice> {
   return {
     filterDefs: [
+      // ═══ ۱. وضعیت سرسید ═══
       {
         key: 'dueStatus', label: 'وضعیت سرسید', kind: 'enum',
         icon: <IconCalendar size={18} />,
@@ -91,6 +98,7 @@ export function getTraReceivablesConfig(ctx: {
         },
         multi: true,
       },
+      // ═══ ۲. سن بدهی ═══
       {
         key: 'aging', label: 'سن بدهی', kind: 'enum',
         icon: <IconClock size={18} />,
@@ -104,6 +112,7 @@ export function getTraReceivablesConfig(ctx: {
         getValue: (i: Invoice) => traAgingBucket(traAgeDays(i)),
         multi: true,
       },
+      // ═══ ۳. طرف معامله ═══
       {
         key: 'partyId', label: 'طرف معامله', kind: 'enum',
         icon: <IconUser size={18} />,
@@ -148,6 +157,18 @@ export function getTraInvoicesConfig(ctx: {
 }): FilterConfig<Invoice> {
   return {
     filterDefs: [
+      // ═══ ۱. نوع فاکتور (خرید/فروش) ═══
+      {
+        key: 'type', label: 'نوع فاکتور', kind: 'enum',
+        icon: <IconTag size={18} />,
+        options: [
+          { value: 'purchase', label: '📥 خرید' },
+          { value: 'sale', label: '📤 فروش' },
+        ],
+        getValue: (i: Invoice) => i.type || '',
+        multi: true,
+      },
+      // ═══ ۲. دسته ═══
       {
         key: 'category', label: 'دسته', kind: 'enum',
         icon: <IconFolder size={18} />,
@@ -155,6 +176,7 @@ export function getTraInvoicesConfig(ctx: {
         getValue: (i: Invoice) => i.category || '',
         multi: true,
       },
+      // ═══ ۳. وضعیت پرداخت ═══
       {
         key: 'workflow', label: 'وضعیت پرداخت', kind: 'enum',
         icon: <IconActivity size={18} />,
@@ -165,9 +187,10 @@ export function getTraInvoicesConfig(ctx: {
         getValue: (i: Invoice) => i.workflowStatus || 'draft',
         multi: true,
       },
+      // ═══ ۴. وضعیت تسویه ═══
       {
         key: 'paymentStatus', label: 'وضعیت تسویه', kind: 'enum',
-        icon: <IconDollar size={18} />,
+        icon: <IconChart size={18} />,
         options: [
           { value: 'paid', label: 'تسویه شده' },
           { value: 'partial', label: 'جزئی' },
@@ -182,6 +205,7 @@ export function getTraInvoicesConfig(ctx: {
         },
         multi: true,
       },
+      // ═══ ۵. طرف معامله ═══
       {
         key: 'partyId', label: 'طرف معامله', kind: 'enum',
         icon: <IconUser size={18} />,

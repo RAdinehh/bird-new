@@ -5,7 +5,6 @@ import { parse as parseJ, format as formatJ, addDays } from 'date-fns-jalali';
 import { useFlk } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { getBiology, getStandardFor } from '../set/standards/resolve';
-import { findOrphanMatches } from '../flk/helpers-store';
 import { showToast } from '../../cor/store/toast';
 import { useHal } from '../hal/store';
 import { useEgg } from '../egg/store';
@@ -113,15 +112,28 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
     const ref = n0 || p0;
     if (!ref) continue;
     const it = ref.item;
-    const explicitFlockId = it.flockId || '';
+    // 🆕 اولویت: relatedFlockId فاکتور → flockId آیتم
+    const explicitFlockId = (inv as any).relatedFlockId || it.flockId || '';
     const type = ref.type;
     const sign = type === 'purchase' ? +1 : -1;
 
     if (explicitFlockId) {
       const f = flk.flocks.find(x => x.id === explicitFlockId);
       if (!f) continue;
-      const next = (f.currentCount ?? 0) + sign * delta;
-      flk.update(explicitFlockId, { currentCount: Math.max(0, next) });
+      const next = Math.max(0, (f.currentCount ?? 0) + sign * delta);
+      const patch: any = { currentCount: next };
+      if (type === 'purchase' && delta > 0) {
+        patch.initialCount = (f.initialCount ?? 0) + delta;
+        patch.sourceInvoiceId = inv.id;
+        patch.sourceCategory = ref.cat;
+        if (it.unitPrice) patch.purchasePrice = it.unitPrice;
+        if (it.shipping) patch.deliveryCost = it.shipping;
+        if (inv.date) patch.purchaseDate = inv.date;
+      }
+      flk.update(explicitFlockId, patch);
+      for (let i = 0; i < inv.items.length; i++) {
+        if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = explicitFlockId;
+      }
     } else if (type === 'purchase') {
       const birdId = it.birdId || '';
       const breedId = it.breedId || '';
@@ -138,49 +150,16 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = existing.id;
         }
       } else if (delta > 0) {
-        // 🆕 Pre-check: گله orphan مشابه؟
-        const orphanMatches = findOrphanMatches({
-          birdId,
-          breedId,
-          flocks: flk.flocks,
-        });
-
-        if (orphanMatches.length === 1) {
-          // 🆕 auto-link به همان گله (کاربر قبلاً دستی ساخته)
-          const orphan = orphanMatches[0];
-          const newCount = (orphan.currentCount ?? 0) + delta;
-          const newInitial = (orphan.initialCount ?? 0) + delta;
-          flk.update(orphan.id, {
-            sourceInvoiceId: inv.id,
-            sourceCategory: ref.cat,
-            purchaseDate: inv.date,
-            purchasePrice: it.unitPrice || orphan.purchasePrice || 0,
-            deliveryCost: it.shipping || orphan.deliveryCost || 0,
-            initialCount: newInitial,
-            currentCount: newCount,
-          });
-          for (let i = 0; i < inv.items.length; i++) {
-            if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = orphan.id;
-          }
-          try {
-            showToast('این فاکتور به گله «' + orphan.name + '» لینک شد', 'info');
-          } catch {}
-          continue;
-        }
-
         const breed = brd.breeds.find(b => b.id === it.breedId);
         const bird = brd.birds.find(b => b.id === it.birdId);
         const name = `گله ${breed?.name || bird?.name || '?'} — ${inv.date}`;
-        // 🆕 type و layingStartDay از استاندارد نژاد خونده می‌شن
+        // type و layingStartDay از استاندارد نژاد
         const standard = breed ? getStandardFor(breed.name || bird?.name || '', {}) : (bird ? getStandardFor(bird.name, {}) : null);
         const biology = standard?.biology || null;
-
-        // نوع گله از روی category آیتم تشخیص داده می‌شود
         const inferredType: 'layer' | 'broiler' | 'breeder' =
           ref.cat === 'broiler' ? 'broiler' :
           ref.cat === 'breeder' ? 'breeder' :
           ref.cat === 'layer' ? 'layer' :
-          // fallback بر اساس نژاد
           (standard?.purposes?.includes('broiler') ? 'broiler' :
            standard?.purposes?.includes('breeder') ? 'breeder' : 'layer');
 
@@ -212,12 +191,6 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           sourceCategory: ref.cat,
         });
 
-        // 🆕 اگر چند گله orphan مشابه بود، هشدار بده
-        if (orphanMatches.length > 1) {
-          try {
-            showToast(orphanMatches.length + ' گله بدون سند مشابه پیدا شد. این گله جدید ساخته شد — از کارت گله لینک کنید.', 'warn');
-          } catch {}
-        }
         for (let i = 0; i < inv.items.length; i++) {
           if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = newFlockId;
         }

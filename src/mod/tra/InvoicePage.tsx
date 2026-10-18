@@ -31,6 +31,7 @@ import { emptyForm as empty } from './types-invoice';
 import { useInvoiceForm } from './hooks/useInvoiceForm';
 import TransferModal from './components/TransferModal';
 import InvoiceFormModal from './components/InvoiceFormModal';
+import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
   const isPurchase = kind === 'purchase';
@@ -42,6 +43,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [printId, setPrintId] = useState<string | null>(null);
   const [transferModal, setTransferModal] = useState<{ id: string; to: WorkflowStatus } | null>(null);
+  const [newFlockModalOpen, setNewFlockModalOpen] = useState(false);
   const [transferNote, setTransferNote] = useState('');
   const [transferDate, setTransferDate] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -393,6 +395,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         setOpen={setOpen}
         form={form}
         setForm={setForm}
+        onNewFlock={() => setNewFlockModalOpen(true)}
         isPurchase={isPurchase}
         parties={parties}
         flocks={flocks}
@@ -409,6 +412,12 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         addPayment={addPayment}
         updatePayment={updatePayment}
         removePayment={removePayment}
+      />
+
+      <FlockCreateStandalone
+        open={newFlockModalOpen}
+        onClose={() => setNewFlockModalOpen(false)}
+        onSaved={(id) => setForm(f => ({ ...f, relatedFlockId: id }))}
       />
 
       {/* Modal انتقال workflow */}

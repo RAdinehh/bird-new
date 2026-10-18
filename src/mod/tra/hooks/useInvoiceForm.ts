@@ -143,36 +143,6 @@ export function useInvoiceForm(params: {
     if (form.id) {
       updateInvoice(form.id, data);
     } else {
-      // 🆕 Preview: چک گله orphan قبل از add
-      const birdItems = (form.items || []).filter((it: any) => it.birdId);
-      if (kind === 'purchase' && birdItems.length > 0 && !data.skipAutoLink) {
-        try {
-          const { findOrphanMatches } = await import('../../flk/helpers-store');
-          const { useFlk } = await import('../../flk/store');
-          const allFlocks = useFlk.getState().flocks;
-          const firstBird = birdItems[0];
-          const matches = findOrphanMatches({
-            birdId: firstBird.birdId || '',
-            breedId: firstBird.breedId || '',
-            flocks: allFlocks,
-          });
-          if (matches.length === 1) {
-            const orphan = matches[0];
-            const okPreview = await showConfirmAsync(
-              'گله مشابه پیدا شد',
-              'گله «' + orphan.name + '» (' + (orphan.currentCount || 0) + ' پرنده) بدون سند خرید ئه.\n\nاین فاکتور (خرید جوجه) به این گله اضافه شود یا گله جدید بسازم؟',
-            );
-            if (okPreview === false) {
-              // کاربر لغو کرد — ذخیره نمی‌شه
-              return;
-            }
-            // okPreview = true → auto-link عادی (applyInvoiceFlocks)
-            // برای «گله جدید»: باید گزینه‌ی جدا داشتیم — فعلاً فقط تأیید auto-link
-          }
-        } catch (e) {
-          console.error('[invoice preview]', e);
-        }
-      }
       addInvoice(data);
     }
     setOpen(false);

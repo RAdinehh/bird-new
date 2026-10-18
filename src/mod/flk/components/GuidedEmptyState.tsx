@@ -1,8 +1,3 @@
-/**
- * GuidedEmptyState.tsx — Empty state راهنمایی‌شده برای گله
- * طبق NN/g (Guided Empty State) + SAP Fiori
- * طراحی: فشرده، ۳ مسیر، فارسی خالص
- */
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
@@ -13,158 +8,86 @@ export default function GuidedEmptyState({ onManualAdd }: Props) {
   const nav = useNavigate();
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 8,
-      padding: '16px 12px',
-      maxWidth: 480,
-      margin: '0 auto',
-    }}>
-      {/* عنوان و توضیح — فشرده */}
-      <div style={{ textAlign: 'center', marginBottom: 4 }}>
-        <div style={{ fontSize: 40, marginBottom: 6 }} aria-hidden="true">🐔</div>
-        <h2 style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, marginBottom: 4 }}>
-          هنوز گله‌ای ندارید
-        </h2>
-        <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.6 }}>
-          اولین گله خود را از یکی از این سه راه بسازید.
-        </p>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--sp-6) var(--sp-4)', textAlign: 'center', width: '100%' }}>
+      <div style={{ fontSize: 56, marginBottom: 'var(--sp-2)', lineHeight: 1 }} aria-hidden="true">🐔</div>
+      <h2 style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text)', marginBottom: 'var(--sp-1)' }}>
+        هنوز گله‌ای ندارید
+      </h2>
+      <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginBottom: 'var(--sp-5)' }}>
+        اولین گله خود را از یکی از این سه راه بسازید.
+      </p>
+
+      <div style={{ width: '100%', maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+        {/* کادر خرید */}
+        <button
+          type="button"
+          onClick={() => nav('/tra')}
+          aria-label="ایجاد از معاملات (خرید)"
+          style={{
+            background: 'var(--accent-soft)',
+            border: '1px solid var(--accent-border)',
+            borderRadius: 'var(--r-lg)',
+            padding: 'var(--sp-3) var(--sp-4)',
+            display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
+            cursor: 'pointer', textAlign: 'right', width: '100%', fontFamily: 'inherit'
+          }}
+        >
+          <div style={{ width: 44, height: 44, borderRadius: 'var(--r-md)', background: 'var(--card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }} aria-hidden="true">🛒</div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--accent)' }}>از معاملات (خرید)</div>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.5 }}>تعداد، قیمت و تاریخ خودکار پر می‌شود</div>
+          </div>
+          <div style={{ color: 'var(--accent)', fontSize: 20, fontWeight: 300, marginLeft: 'var(--sp-1)' }} aria-hidden="true">‹</div>
+        </button>
+
+        {/* کادر جوجه‌کشی */}
+        <button
+          type="button"
+          onClick={() => nav('/inc')}
+          aria-label="ایجاد از جوجه‌کشی"
+          style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-lg)',
+            padding: 'var(--sp-3) var(--sp-4)',
+            display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
+            cursor: 'pointer', textAlign: 'right', width: '100%', fontFamily: 'inherit'
+          }}
+        >
+          <div style={{ width: 44, height: 44, borderRadius: 'var(--r-md)', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }} aria-hidden="true">🥚</div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ fontSize: 'var(--fs-md)', fontWeight: 600, color: 'var(--text)' }}>از جوجه‌کشی</div>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.5 }}>انتقال خودکار جوجه‌های هچ‌شده</div>
+          </div>
+          <div style={{ color: 'var(--border)', fontSize: 20, fontWeight: 300, marginLeft: 'var(--sp-1)' }} aria-hidden="true">‹</div>
+        </button>
+
+        {/* کادر دستی */}
+        <button
+          type="button"
+          onClick={onManualAdd}
+          aria-label="ایجاد دستی"
+          style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-lg)',
+            padding: 'var(--sp-3) var(--sp-4)',
+            display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
+            cursor: 'pointer', textAlign: 'right', width: '100%', fontFamily: 'inherit'
+          }}
+        >
+          <div style={{ width: 44, height: 44, borderRadius: 'var(--r-md)', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }} aria-hidden="true">✏️</div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ fontSize: 'var(--fs-md)', fontWeight: 600, color: 'var(--text)' }}>ایجاد دستی</div>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.5 }}>بدون اتصال به فاکتور یا جوجه‌کشی</div>
+          </div>
+          <div style={{ color: 'var(--border)', fontSize: 20, fontWeight: 300, marginLeft: 'var(--sp-1)' }} aria-hidden="true">‹</div>
+        </button>
       </div>
 
-      {/* کارت ۱: خرید از معاملات */}
-      <button
-        type="button"
-        onClick={() => nav('/tra')}
-        style={{
-          display: 'flex',
-          gap: 10,
-          padding: '10px 12px',
-          background: 'var(--card)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--r-md)',
-          textAlign: 'right',
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-          color: 'var(--text)',
-          alignItems: 'center',
-          transition: 'border-color .15s, background .15s',
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
-        onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-      >
-        <div style={{
-          width: 36, height: 36,
-          background: 'var(--accent-soft)',
-          color: 'var(--accent)',
-          borderRadius: 'var(--r-sm)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 20,
-          flexShrink: 0,
-        }} aria-hidden="true">🛒</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', marginBottom: 2 }}>
-            از معاملات (خرید)
-          </div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-            تعداد، قیمت و تاریخ خودکار
-          </div>
-        </div>
-        <div style={{ color: 'var(--dim)', fontSize: 16 }} aria-hidden="true">‹</div>
-      </button>
-
-      {/* کارت ۲: تفریخ از جوجه‌کشی */}
-      <button
-        type="button"
-        onClick={() => nav('/inc')}
-        style={{
-          display: 'flex',
-          gap: 10,
-          padding: '10px 12px',
-          background: 'var(--card)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--r-md)',
-          textAlign: 'right',
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-          color: 'var(--text)',
-          alignItems: 'center',
-          transition: 'border-color .15s, background .15s',
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
-        onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-      >
-        <div style={{
-          width: 36, height: 36,
-          background: 'var(--accent-soft)',
-          color: 'var(--accent)',
-          borderRadius: 'var(--r-sm)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 20,
-          flexShrink: 0,
-        }} aria-hidden="true">🥚</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', marginBottom: 2 }}>
-            از جوجه‌کشی (تفریخ)
-          </div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-            تعداد نر/ماده خودکار
-          </div>
-        </div>
-        <div style={{ color: 'var(--dim)', fontSize: 16 }} aria-hidden="true">‹</div>
-      </button>
-
-      {/* کارت ۳: دستی */}
-      <button
-        type="button"
-        onClick={onManualAdd}
-        style={{
-          display: 'flex',
-          gap: 10,
-          padding: '10px 12px',
-          background: 'var(--card)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--r-md)',
-          textAlign: 'right',
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-          color: 'var(--text)',
-          alignItems: 'center',
-          transition: 'border-color .15s, background .15s',
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--warn)'}
-        onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-      >
-        <div style={{
-          width: 36, height: 36,
-          background: 'var(--warn-soft)',
-          color: 'var(--warn)',
-          borderRadius: 'var(--r-sm)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 20,
-          flexShrink: 0,
-        }} aria-hidden="true">✏️</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', marginBottom: 2 }}>
-            ایجاد دستی (پیشرفته)
-          </div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>
-            ⚠️ بدون اتصال به فاکتور/هچ
-          </div>
-        </div>
-        <div style={{ color: 'var(--dim)', fontSize: 16 }} aria-hidden="true">‹</div>
-      </button>
-
-      {/* راهنمای پایین */}
-      <p style={{ textAlign: 'center', fontSize: 'var(--fs-xs)', color: 'var(--dim)', marginTop: 4 }}>
+      <div style={{ marginTop: 'var(--sp-5)', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
         اگر مطمئن نیستید، ابتدا معاملات یا جوجه‌کشی را ببینید.
-      </p>
+      </div>
     </div>
   );
 }

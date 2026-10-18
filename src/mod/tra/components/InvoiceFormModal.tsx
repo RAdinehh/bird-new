@@ -36,12 +36,14 @@ export interface InvoiceFormModalProps {
   addPayment: () => void;
   updatePayment: (id: string, patch: Partial<Payment>) => void;
   removePayment: (id: string) => void;
+  /** 🆕 باز کردن مودال ساخت گله جدید */
+  onNewFlock?: () => void;
 }
 
 export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   const {
     open, setOpen, form, setForm, isPurchase,
-    parties, flocks, whsItems, vErrors, err,
+    parties, flocks, whsItems, vErrors, err, onNewFlock,
     total, paid, rem,
     save, addItem, updateItem, removeItem,
     addPayment, updatePayment, removePayment,
@@ -81,16 +83,60 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </Field>
         </Grid2>
 
-        {!isPurchase && (
-          <Field label="گله مربوطه" hint="اختیاری — برای محاسبه ROI گله">
-            <Select value={form.relatedFlockId} onChange={e => setForm({ ...form, relatedFlockId: e.target.value })}>
-              <option value="">— بدون گله —</option>
+        <Field
+          label={isPurchase ? 'گله‌ی مقصد' : 'گله مربوطه'}
+          hint={isPurchase
+            ? 'اختیاری — اگه انتخاب شه، فاکتور به این گله ادغام می‌شه'
+            : 'اختیاری — برای محاسبه ROI'}
+        >
+          <div style={{ display: 'flex', gap: 6 }}>
+            <Select
+              value={form.relatedFlockId}
+              onChange={e => setForm({ ...form, relatedFlockId: e.target.value })}
+              style={{ flex: 1 }}
+            >
+              <option value="">{isPurchase ? '— بدون گله (فقط انبار) —' : '— بدون گله —'}</option>
               {flocks.filter(f => f.status === 'active').map(f => (
-                <option key={f.id} value={f.id}>{f.name}</option>
+                <option key={f.id} value={f.id}>
+                  {f.name} — {f.currentCount ?? 0} پرنده
+                </option>
               ))}
             </Select>
-          </Field>
-        )}
+            {onNewFlock && (
+              <Btn
+                size="sm"
+                onClick={onNewFlock}
+                style={{ flexShrink: 0 }}
+                title="ساخت گله جدید"
+              >
+                + جدید
+              </Btn>
+            )}
+          </div>
+          {(() => {
+            if (!form.relatedFlockId) return null;
+            const f = flocks.find((x: any) => x.id === form.relatedFlockId);
+            if (!f) return null;
+            const firstBird = form.items.find((it: any) => it.birdId);
+            if (!firstBird) return null;
+            if (!f.breedId || !firstBird.breedId) return null;
+            if (f.breedId === firstBird.breedId) return null;
+            return (
+              <div style={{
+                marginTop: 6,
+                padding: '6px 10px',
+                background: 'var(--warn-soft, #ffedd5)',
+                color: 'var(--warn, #ea580c)',
+                border: '1px solid var(--warn, #ea580c)',
+                borderRadius: 6,
+                fontSize: 11,
+                lineHeight: 1.6,
+              }}>
+                ⚠️ نژاد گله با نژاد فاکتور متفاوت ئه — با احتیاط ادامه دهید
+              </div>
+            );
+          })()}
+        </Field>
 
         {form.isPreorder && (
           <>
