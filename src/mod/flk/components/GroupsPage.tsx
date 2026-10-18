@@ -3,6 +3,7 @@
  */
 import { useState, useMemo, useRef } from 'react';
 import { Modal, Btn, BtnRow, Field, Input, Select, Textarea, Grid2 } from '../../../shr/components/ui';
+import { IconX, IconSearch } from '../../../shr/icons';
 import { useFlk, type FlockGroup, type FlockGroupType, type FlockGroupRule } from '../store';
 import { useBrd } from '../../brd/store';
 import { useHal } from '../../hal/store';
@@ -51,6 +52,11 @@ const TYPE_OPTIONS = [
   { value: 'smart', label: 'هوشمند', icon: '🤖', subtitle: 'قوانین خودکار' },
 ];
 
+const TYPE_ICON_MAP: Record<FlockGroupType, string> = TYPE_OPTIONS.reduce((acc, o) => {
+  acc[o.value as FlockGroupType] = o.icon;
+  return acc;
+}, {} as Record<FlockGroupType, string>);
+
 const NAME_PLACEHOLDER: Record<FlockGroupType, string> = {
   season: 'مثلاً: گله پاییز ۱۴۰۵',
   breed: 'مثلاً: مرندی‌ها',
@@ -89,12 +95,15 @@ export default function GroupsPage({ open, onClose }: Props) {
   const addGroup = useFlk(s => s.addGroup);
   const updateGroup = useFlk(s => s.updateGroup);
   const deleteGroup = useFlk(s => s.deleteGroup);
+  const archiveGroup = useFlk(s => s.archiveGroup);
   const { breeds } = useBrd();
   const { halls } = useHal();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [showForm, setShowForm] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [reportGroupId, setReportGroupId] = useState<string | null>(null);
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -194,9 +203,20 @@ export default function GroupsPage({ open, onClose }: Props) {
           children: build(g.id),
           memberCount: groupMembers.filter(m => m.groupId === g.id && !m.leftAt).length,
         }));
+
     };
     return build(undefined);
   }, [groups, groupMembers]);
+
+  const visibleTree = useMemo(() => {
+    if (!searchQuery.trim()) return tree;
+    const q = searchQuery.trim().toLowerCase();
+    const filterTree = (nodes: Node[]): Node[] =>
+      nodes
+        .map(n => ({ ...n, children: filterTree(n.children) }))
+        .filter(n => n.name.toLowerCase().includes(q) || n.children.length > 0);
+    return filterTree(tree);
+  }, [tree, searchQuery]);
 
   const handleNew = () => {
     setEditingId(null);
@@ -246,6 +266,18 @@ export default function GroupsPage({ open, onClose }: Props) {
     setEditingId(null);
   };
 
+  const handleArchive = async (g: FlockGroup) => {
+    const childCount = groups.filter(c => c.parentGroupId === g.id).length;
+    const msg = childCount > 0
+      ? 'گروه «' + g.name + '» ' + toFa(childCount) + ' زیرگروه دارد. آرشیو شود؟'
+      : 'گروه «' + g.name + '» آرشیو شود؟';
+    const okA = await showConfirmAsync('آرشیو گروه', msg, {});
+    if (!okA) return;
+    archiveGroup(g.id);
+    toastMsg.saved(g.name);
+    logAction('update', 'flk', 'آرشیو گروه: ' + g.name);
+  };
+
   const handleDelete = async (g: FlockGroup) => {
     const childCount = groups.filter(c => c.parentGroupId === g.id).length;
     const msg = childCount > 0
@@ -259,28 +291,39 @@ export default function GroupsPage({ open, onClose }: Props) {
   };
 
   const renderNode = (node: Node, depth: number = 0) => (
-    <div key={node.id} style={{ marginRight: depth * 20 }}>
+    <div key={node.id} style={{ marginRight: depth * 20, marginBottom: 8 }}>
       <div style={{
-        display: 'flex', flexDirection: 'column',
-        padding: 'var(--pad-normal)', background: 'var(--card)',
-        border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
-        marginBottom: 4,
-        borderRight: node.color ? '3px solid ' + node.color : undefined,
+        background: 'var(--card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r-lg)',
+        padding: '12px 14px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 'var(--r-md)',
+            background: node.type === 'smart' ? 'var(--info-soft)' :
+                        node.type === 'season' ? 'var(--warn-soft)' : 'var(--purple-soft)',
+            color: node.type === 'smart' ? 'var(--info)' :
+                   node.type === 'season' ? 'var(--warn)' : 'var(--purple)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+            flexShrink: 0,
+          }}>{TYPE_ICON_MAP[node.type] || '📁'}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{node.name}</span>
-              <span style={{ fontSize: 10, color: 'var(--muted)', background: 'var(--input-bg)', padding: '1px 6px', borderRadius: 4 }}>
-                {TYPE_LABEL[node.type]}
-              </span>
-            </div>
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-              {toFa(node.memberCount)} گله{node.description ? ' · ' + node.description : ''}
+            <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700 }}>{node.name}</div>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+              <span style={{ padding: '1px 6px', borderRadius: 4, background: 'var(--input-bg)', color: 'var(--muted)', fontSize: 10, fontWeight: 700 }}>{TYPE_LABEL[node.type]}</span>
+              <span>·</span>
+              <span>{toFa(node.memberCount)} گله عضو</span>
             </div>
           </div>
-          <Btn size="sm" onClick={() => handleEdit(node)}>ویرایش</Btn>
-          <Btn size="sm" onClick={() => handleDelete(node)} style={{ color: 'var(--danger)' }}>حذف</Btn>
+        </div>
+        <div style={{ display: 'flex', gap: 6, paddingTop: 8, borderTop: '1px dashed var(--border)' }}>
+          <Btn size="sm" onClick={() => handleEdit(node)} style={{ flex: 1 }}>ویرایش</Btn>
+          <Btn size="sm" onClick={() => handleArchive(node)} style={{ flex: 1 }}>📦 آرشیو</Btn>
+          <Btn size="sm" onClick={() => handleDelete(node)} style={{ flex: 1, color: 'var(--danger)' }}>حذف</Btn>
         </div>
         <GroupKpiRow group={node} onOpen={() => setReportGroupId(node.id)} />
       </div>
@@ -289,18 +332,69 @@ export default function GroupsPage({ open, onClose }: Props) {
   );
 
   return (
-    <Modal open={open} onClose={onClose} title="📁 مدیریت گروه‌های گله">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="📁 مدیریت گروه‌های گله"
+      headerAction={
+        showForm ? (
+          <button
+            type="button"
+            onClick={() => { setShowForm(false); setEditingId(null); }}
+            aria-label="بازگشت به لیست گروه‌ها"
+            title="بازگشت"
+            style={{
+              width: 36, height: 36, borderRadius: 'var(--r-md)',
+              background: 'transparent',
+              border: 'none', cursor: 'pointer',
+              color: 'var(--muted)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => { setShowSearch(v => !v); if (showSearch) setSearchQuery(''); }}
+            aria-label="جستجو"
+            style={{
+              width: 36, height: 36, borderRadius: 'var(--r-md)',
+              background: showSearch ? 'var(--accent-soft)' : 'transparent',
+              border: 'none', cursor: 'pointer',
+              color: showSearch ? 'var(--accent)' : 'var(--muted)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <IconSearch size={18} />
+          </button>
+        )
+      }
+    >
       {!showForm ? (
         <>
-          <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'stretch' }}>
-            <Btn variant="primary" onClick={handleNew} style={{ flex: 1, minHeight: 42, fontWeight: 700 }}>
-              + گروه جدید
-            </Btn>
-            <div style={{ display: 'flex', gap: 2, padding: 3, background: 'var(--input-bg)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)' }}>
-              <button type="button" onClick={handleExport} disabled={groups.length === 0} title="Export JSON" aria-label="Export" style={{ width: 36, height: 36, background: 'transparent', border: 'none', borderRadius: 6, cursor: groups.length === 0 ? 'not-allowed' : 'pointer', fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: groups.length === 0 ? 0.4 : 1, transition: 'background .15s' }}>📥</button>
-              <button type="button" onClick={() => fileInputRef.current?.click()} title="Import JSON" aria-label="Import" style={{ width: 36, height: 36, background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .15s' }}>📤</button>
-              <button type="button" onClick={() => setComparisonOpen(true)} disabled={groups.length < 2} title="مقایسه" aria-label="مقایسه" style={{ width: 36, height: 36, background: 'transparent', border: 'none', borderRadius: 6, cursor: groups.length < 2 ? 'not-allowed' : 'pointer', fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: groups.length < 2 ? 0.4 : 1, transition: 'background .15s' }}>🔍</button>
-            </div>
+          <div style={{ marginBottom: 12 }}>
+            {showSearch && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', height: 40, marginBottom: 8 }}>
+                <IconSearch size={16} style={{ color: 'var(--dim)', flexShrink: 0 }} />
+                <input
+                  type="text"
+                  placeholder="جستجوی گروه..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontFamily: 'inherit', fontSize: 'var(--fs-base)', color: 'var(--text)', height: '100%' }}
+                  autoFocus
+                />
+                {searchQuery && (
+                  <button type="button" onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'var(--muted)', display: 'flex' }} aria-label="پاک کردن">
+                    <IconX size={14} />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
           <input
             ref={fileInputRef}
@@ -320,13 +414,13 @@ export default function GroupsPage({ open, onClose }: Props) {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {tree.map(node => renderNode(node))}
+              {visibleTree.map(node => renderNode(node))}
             </div>
           )}
         </>
       ) : (
         <>
-          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 12, color: 'var(--accent)' }}>
+          <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, marginBottom: 6, color: 'var(--muted)', textAlign: 'center' }}>
             {editingId ? 'ویرایش گروه' : 'گروه جدید'}
           </div>
 
@@ -389,6 +483,16 @@ export default function GroupsPage({ open, onClose }: Props) {
         open={comparisonOpen}
         onClose={() => setComparisonOpen(false)}
       />
+          {!showForm && (
+        <div style={{ position: 'sticky', bottom: 0, padding: '12px 4px', borderTop: '1px solid var(--border)', background: 'var(--card-solid)', display: 'flex', gap: 6, alignItems: 'stretch', marginTop: 12 }}>
+        <Btn variant="primary" onClick={handleNew} style={{ flex: 1, height: 40 }}>+ گروه جدید</Btn>
+        <div style={{ flex: 1, display: 'flex', gap: 4 }}>
+          <button type="button" onClick={() => fileInputRef.current?.click()} title="Import JSON" aria-label="Import" style={{ flex: 1, height: 40, borderRadius: 'var(--r-md)', border: '1px solid var(--border)', background: 'var(--btn-bg)', color: 'var(--muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>📥</button>
+          <button type="button" onClick={handleExport} disabled={groups.length === 0} title="Export JSON" aria-label="Export" style={{ flex: 1, height: 40, borderRadius: 'var(--r-md)', border: '1px solid var(--border)', background: 'var(--btn-bg)', color: 'var(--muted)', cursor: groups.length === 0 ? 'not-allowed' : 'pointer', opacity: groups.length === 0 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>📤</button>
+          <button type="button" onClick={() => setComparisonOpen(true)} disabled={groups.length < 2} title="مقایسه" aria-label="مقایسه" style={{ flex: 1, height: 40, borderRadius: 'var(--r-md)', border: '1px solid var(--border)', background: 'var(--btn-bg)', color: 'var(--muted)', cursor: groups.length < 2 ? 'not-allowed' : 'pointer', opacity: groups.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>📊</button>
+        </div>
+      </div>
+      )}
     </Modal>
   );
 }
