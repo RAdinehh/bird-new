@@ -132,6 +132,8 @@ export interface Flock {
   currentCount: number | null;
   maleCount: number | null;
   femaleCount: number | null;
+  /** 🆕 پرنده‌های با جنسیت نامشخص (مخلوط) */
+  unknownCount?: number | null;
   layingStartDay: number; // سن شروع تخم‌گذاری (روز) — قابل ویرایش کاربر
   endOfCycleDay: number | null;
   endDate?: string; // سن پایان چرخه (از استاندارد نژاد لحظه ساخت)
@@ -483,7 +485,7 @@ export const useFlk = create<State>()(
     }),
     {
       name: 'pm-flk',
-      version: 8,
+      version: 9,
       migrate: flkMigrate,
     }
   )

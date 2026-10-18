@@ -13,6 +13,7 @@ export interface F {
   hallId: string; zoneId: string;
   initialCount: string; currentCount: string;
   maleCount: string; femaleCount: string;
+  unknownCount?: string;
   layingStartDay: string;
   endOfCycleDay: string;
   vaccineScheduleId: string;

@@ -24,6 +24,11 @@ export function applyInvoiceToForm(form: F, inv: Invoice): Partial<F> | null {
   if (firstBird.unitPrice) updates.purchasePrice = toFa(firstBird.unitPrice);
   if (firstBird.maleCount) updates.maleCount = toFa(firstBird.maleCount);
   if (firstBird.femaleCount) updates.femaleCount = toFa(firstBird.femaleCount);
+  if (firstBird.unknownCount) updates.unknownCount = toFa(firstBird.unknownCount);
+  // 🆕 هزینه حمل از فاکتور
+  if (inv.shipping && inv.shipping > 0) updates.deliveryCost = toFa(inv.shipping);
+  // 🆕 تاریخ شروع = تاریخ فاکتور
+  if (inv.date) updates.startDate = inv.date;
   return updates;
 }
 

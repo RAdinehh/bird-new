@@ -69,3 +69,5 @@
 [2026/10/18 08:26] fix(flk/groups): محاسبه تلفات از events + هزینه جاری از whs (خوراک/واکسن/دارو) — ۶ تست
 
 [2026/10/18 08:35] fix(tra→flk): نوع گله از category فاکتور + layingStartDay/endOfCycleDay از استاندارد نژاد
+
+[2026/10/18 08:48] feat(flk): unknownCount (v9) + deliveryCost/startDate در applyInvoiceToForm + migrate کامل

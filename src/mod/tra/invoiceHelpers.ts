@@ -163,6 +163,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           currentCount: delta,
           maleCount: it.maleCount ?? null,
           femaleCount: it.femaleCount ?? null,
+          unknownCount: it.unknownCount ?? null,
           layingStartDay: biology?.layingStartDay ?? 0,
           endOfCycleDay: biology?.endOfCycleDay ?? null,
           vaccineScheduleId: '',
