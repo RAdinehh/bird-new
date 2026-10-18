@@ -13,6 +13,7 @@ export interface HatchInput {
   date: string;
   maleCount?: number | null;
   femaleCount?: number | null;
+  unknownCount?: number | null;
   hatched?: number | null;
 }
 
@@ -45,7 +46,7 @@ export function buildFlockFromHatch(params: {
     currentCount: count,
     maleCount: hatch.maleCount || null,
     femaleCount: hatch.femaleCount || null,
-    unknownCount: (hatch as any).unknownCount || null,
+    unknownCount: hatch.unknownCount || null,
     layingStartDay: layingStartDayFromStd ?? 0,
     vaccineScheduleId: '',
     hatchDate: hatch.date,
