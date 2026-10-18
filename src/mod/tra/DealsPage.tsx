@@ -196,7 +196,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       />
 
       {!ms.selectionMode && list.length > 1 && (
-        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+        <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید
         </div>
       )}
@@ -205,7 +205,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
           <button type="button"
             onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
-            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-2xs)', fontWeight: 600, cursor: 'pointer' }}>
             {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
           </button>
         </div>
