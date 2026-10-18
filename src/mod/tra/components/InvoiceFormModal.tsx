@@ -189,7 +189,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             <ItemDetailsForm
               category={form.category}
               item={it}
-              updateItem={(patch: any) => updateItem(it.id, patch)}
+              updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
               isPurchase={true}
               sellerSlot={
                 <Field label="فروشنده این قلم" hint="خالی = فروشنده اصلی">
