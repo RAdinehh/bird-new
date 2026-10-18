@@ -11,6 +11,7 @@ import { useFed } from '../../fed/store';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { feedSystemFromHall, waterSystemFromHall } from '../../../shr/utils/systemType';
 import { showAlert } from '../../../cor/store/dialog';
+import { showToast } from '../../../cor/store/toast';
 
 export function newLog(flockId = ''): F {
   return {
@@ -60,7 +61,7 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
   };
 
   const openNew = () => {
-    if (activeFlocks.length === 0) { showAlert('اول یک گله بسازید'); return; }
+    if (activeFlocks.length === 0) { showToast('اول یک گله بسازید', 'warn'); return; }
     const flock = activeFlocks[0];
     const sys = detectSystems(flock.id);
     // 🆕 اگر فقط یک فرمول active هست، خودکار انتخاب شه

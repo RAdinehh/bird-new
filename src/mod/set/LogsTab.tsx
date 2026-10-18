@@ -69,7 +69,7 @@ export default function LogsTab() {
       await navigator.clipboard.writeText(tab === 'activity' ? exportAuditLogs() : exportLogs());
       toastMsg.info('در کلیپ‌بورد کپی شد')
     } catch {
-      showAlert('✕ خطا در کپی');
+      showToast('خطا در کپی', 'error');
     }
   };
 

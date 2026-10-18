@@ -22,6 +22,7 @@ import { Row, SectionTitle } from './helpers';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { createEggSchema } from '../../shr/validation/rules/egg';
+import { showToast } from '../../cor/store/toast';
 
 interface F {
   id?: string;
@@ -113,7 +114,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
   };
 
   const openNew = () => {
-    if (activeFlocks.length === 0) { showAlert('اول یک گله تخم‌گذار بسازید'); return; }
+    if (activeFlocks.length === 0) { showToast('اول یک گله تخم‌گذار بسازید', 'warn'); return; }
     setForm({ ...empty(), flockId: activeFlocks[0].id });
     setErr(''); setOpen(true);
   };

@@ -9,6 +9,7 @@ import { Btn, Modal, Tag } from '../../shr/components/ui';
 import { showConfirmAsync, showAlert, showSuccess } from '../../cor/store/dialog';
 import { toFa } from '../../shr/utils/fa';
 import { Section, SubSection } from './helpers';
+import { showToast } from '../../cor/store/toast';
 
 export default function AboutTab() {
   const resetHelpBanners = () => {
@@ -86,7 +87,7 @@ export default function AboutTab() {
           label="بازنشانی آموزش اولیه"
           onClick={() => {
             safeStorage.remove('pm-onboarding-done');
-            showAlert('آموزش اولیه بازنشانی شد — صفحه را رفرش کنید');
+            showToast('آموزش اولیه بازنشانی شد — صفحه را رفرش کنید', 'info');
           }}
         />
       </Section>
@@ -94,10 +95,10 @@ export default function AboutTab() {
 
       {/* ═══ ۴. ارتباط و اطلاعات ═══ */}
       <Section title="📞 ارتباط و اطلاعات">
-        <LinkRow icon="✉️" label="ارسال بازخورد" onClick={() => showAlert('ارسال بازخورد — در گام بعدی')} />
-        <LinkRow icon="🔍" label="بررسی بروزرسانی" onClick={() => showAlert('بررسی بروزرسانی — در گام بعدی')} />
-        <LinkRow icon="📜" label="شرایط استفاده" onClick={() => showAlert('شرایط استفاده — در گام بعدی')} />
-        <LinkRow icon="🔒" label="سیاست حریم خصوصی" onClick={() => showAlert('حریم خصوصی — در گام بعدی')} />
+        <LinkRow icon="✉️" label="ارسال بازخورد" onClick={() => showToast('ارسال بازخورد — در گام بعدی', 'info')} />
+        <LinkRow icon="🔍" label="بررسی بروزرسانی" onClick={() => showToast('بررسی بروزرسانی — در گام بعدی', 'info')} />
+        <LinkRow icon="📜" label="شرایط استفاده" onClick={() => showToast('شرایط استفاده — در گام بعدی', 'info')} />
+        <LinkRow icon="🔒" label="سیاست حریم خصوصی" onClick={() => showToast('حریم خصوصی — در گام بعدی', 'info')} />
       </Section>
 
       {/* ═══ ۵. عملیات حساس ═══ */}
