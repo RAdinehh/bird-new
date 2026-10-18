@@ -272,11 +272,14 @@ export default function FlockCard(props: FlockCardProps) {
         {f.initialCount != null && f.currentCount != null && f.initialCount !== f.currentCount && (
           <Row l="تلفات" v={`${fmt.int(f.initialCount - f.currentCount)} (${toFa(((f.initialCount - f.currentCount) / f.initialCount * 100).toFixed(1))}٪)`} />
         )}
-        {f.type === 'breeder' && f.maleCount != null && f.femaleCount != null && f.maleCount > 0 && f.femaleCount > 0 && (
+        {f.type === 'breeder' && ((f.maleCount ?? 0) + (f.femaleCount ?? 0) + (f.unknownCount ?? 0) > 0) && (
           <>
-            <Row l="تعداد نر" v={fmt.int(f.maleCount)} />
-            <Row l="تعداد ماده" v={fmt.int(f.femaleCount)} />
-            <Row l="نسبت نر/ماده" v={sexRatio(f.maleCount, f.femaleCount)} />
+            {(f.maleCount ?? 0) > 0 && <Row l="تعداد نر" v={fmt.int(f.maleCount)} />}
+            {(f.femaleCount ?? 0) > 0 && <Row l="تعداد ماده" v={fmt.int(f.femaleCount)} />}
+            {(f.unknownCount ?? 0) > 0 && <Row l="جنسیت نامشخص" v={fmt.int(f.unknownCount)} />}
+            {f.maleCount != null && f.femaleCount != null && f.maleCount > 0 && f.femaleCount > 0 && (
+              <Row l="نسبت نر/ماده" v={sexRatio(f.maleCount, f.femaleCount)} />
+            )}
           </>
         )}
         <Row l="منبع" v={SOURCE_LABEL[f.source] || '—'} />

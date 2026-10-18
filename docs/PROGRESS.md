@@ -105,3 +105,5 @@
 [2026/10/18 14:59] feat(flk): SmartRuleEditor ۲ ستونه + hint هوشمند (نمایش تا انتخاب/تایپ)
 
 [2026/10/18 15:15] feat(flk): SmartRuleEditor — رنگ ملایم (کارت سفید + نوار بنفش) + ageConflict >= (min==max)
+
+[2026/10/18 15:21] feat(flk): FlockCard — unknownCount + شرط male/female نرم‌تر (حداقل یکی > ۰)
