@@ -150,7 +150,12 @@ export function itemsSum(items: InvoiceItem[]): number {
 }
 
 export function paidSum(payments: Payment[]): number {
-  return Math.round(payments.reduce((a, x) => a + (x.amount || 0), 0));
+  return Math.round(payments.reduce((a, x) => {
+    const amt = x.amount || 0;
+    // عودت وجه (refund) از مبلغ پرداخت‌شده کم می‌شود
+    if ((x as any).type === 'refund') return a - amt;
+    return a + amt;
+  }, 0));
 }
 
 export function invoiceStatus(inv: Invoice): InvoiceStatus {

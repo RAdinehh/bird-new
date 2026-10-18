@@ -9,7 +9,7 @@ import { bus } from '../../cor/events';
 
 import type { Invoice, InvoiceItem, State } from './types';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
-import { generateInvoiceNumber } from './calc';
+import { generateInvoiceNumber, paidSum } from './calc';
 import { showToast } from '../../cor/store/toast';
 import { useInc } from '../inc/store';
 
@@ -118,13 +118,8 @@ export const useTra = create<State>()(
           // مقادیر پیش‌فرض بر اساس وضعیت فعلی
           const payments = inv.payments || [];
           const total = inv.total || 0;
-          const paidSum = payments.reduce((a: number, p: any) => {
-    const amt = p.amount || 0;
-    // عودت وجه (refund) از مبلغ پرداخت‌شده کم می‌شود
-    if (p.type === 'refund') return a - amt;
-    return a + amt;
-  }, 0);
-          const isPaid = total > 0 && paidSum >= total;
+          const paidSumVal = paidSum(payments);
+          const isPaid = total > 0 && paidSumVal >= total;
 
           // وضعیت workflow خودکار
           let workflowStatus = 'confirmed';
