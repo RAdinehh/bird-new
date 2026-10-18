@@ -52,6 +52,11 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       shipping: floatNonNeg('حمل', 1_000_000_000_000).optional(),
       itemPartyId: optionalId(),
       // فیلدهای پرنده
+            priceUnit: optionalStr(20),
+      liveWeight: floatNonNeg('وزن زنده', 1_000_000).optional(),
+      medicineType: optionalStr(20),
+      model: optionalStr(50),
+      warrantyMonths: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
       birdId: optionalId(),
       breedId: optionalId(),
       flockId: optionalId(),
@@ -107,6 +112,40 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         });
       }
     }
+    // اعتبارسنجی آبشاری بر اساس دسته (Category)
+    for (let i = 0; i < (d.items || []).length; i++) {
+      const it = d.items[i];
+      
+      // ۱. اگر دسته جوجه، پرنده بالغ یا تخم نطفه‌دار است -> انتخاب پرنده اجباری است
+      if (['chick', 'adult', 'fertile_egg'].includes(d.category)) {
+        if (!it.birdId) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'انتخاب پرنده برای این دسته اجباری است',
+            path: ['items', String(i), 'birdId'],
+          });
+        }
+      }
+
+      // ۲. اگر دسته دارو است -> انتخاب نوع دارو اجباری است
+      if (d.category === 'medicine' && !it.medicineType) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'انتخاب نوع دارو اجباری است',
+          path: ['items', String(i), 'medicineType'],
+        });
+      }
+
+      // ۳. اگر مبنای قیمت بر کیلو است -> وزن زنده اجباری است
+      if (it.priceUnit === 'per_kg' && (!it.liveWeight || Number(it.liveWeight) <= 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'برای مبنای قیمت هر کیلو، وارد کردن وزن زنده اجباری است',
+          path: ['items', String(i), 'liveWeight'],
+        });
+      }
+    }
+
     // فروش پرنده باید گله داشته باشد
     if (d.type === 'sale') {
       for (let i = 0; i < (d.items || []).length; i++) {
