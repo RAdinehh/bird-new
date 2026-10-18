@@ -117,6 +117,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
   const activeFlocks = flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }));
 
+  // در خرید، کد تخم نطفه‌دار 'egg' است؛ در فروش، 'fertile_egg'
+  const isEggCategory = isPurchase ? category === 'egg' : category === 'fertile_egg';
+
   // ========== دارو ==========
   if (category === 'medicine') {
     const mType = (item.medicineType || '') as MedicineType;
@@ -172,7 +175,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   }
 
   // ========== پرنده‌ای (جوجه، بالغ، تخم نطفه‌دار) ==========
-  if (['chick', 'adult', 'fertile_egg'].includes(category)) {
+  if (['chick', 'adult'].includes(category) || isEggCategory) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <Grid2>
@@ -266,7 +269,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         )}
 
         {/* اختصاصی تخم نطفه‌دار */}
-        {category === 'fertile_egg' && (
+        {isEggCategory && (
           <>
             <Grid2>
               <Field label="شماره بچ تخم">
@@ -309,7 +312,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   }
 
   // ========== تخم خوراکی ==========
-  if (category === 'egg') {
+  if (!isPurchase && category === 'egg') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {!isPurchase && (

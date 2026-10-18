@@ -149,7 +149,10 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       const it = d.items[i];
       
       // ۱. اگر دسته جوجه، پرنده بالغ یا تخم نطفه‌دار است -> انتخاب پرنده اجباری است
-      if (['chick', 'adult', 'fertile_egg'].includes(d.category)) {
+      const isBirdOrEgg = ['chick', 'adult'].includes(d.category) || 
+        (d.type === 'purchase' && d.category === 'egg') || 
+        (d.type === 'sale' && d.category === 'fertile_egg');
+      if (isBirdOrEgg) {
         if (!it.birdId) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
