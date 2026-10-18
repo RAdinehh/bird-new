@@ -7,6 +7,7 @@ import { useFlk, calcCosts, getAgeDays, type Flock, type FlockStatus, type Flock
 import { useTra } from '../../tra/store';
 import { useEgg } from '../../egg/store';
 import { useDlg } from '../../dlg/store';
+import { useWhs } from '../../whs/store';
 import { getFlockRevenue } from '../api/flocksCalc';
 
 export interface GroupFlockRow {
@@ -66,6 +67,8 @@ export function useGroupKpi(groupId: string): GroupKpi {
   const invoices = useTra(s => s.invoices);
   const eggProductions = useEgg(s => s.productions);
   const dlgLogs = useDlg(s => s.logs);
+  const movements = useWhs(s => s.movements);
+  const whsItems = useWhs(s => s.items);
 
   return useMemo(() => {
     const group = groups.find(g => g.id === groupId);
@@ -74,8 +77,20 @@ export function useGroupKpi(groupId: string): GroupKpi {
     const flocks: Flock[] = getFlocksInGroup(groupId, true);
     if (flocks.length === 0) return EMPTY;
 
+    // 🆕 هزینه جاری (خوراک/واکسن/دارو) از whs.movements
+    const operationalCostByFlock: Record<string, number> = {};
+    for (const m of movements) {
+      if (m.type !== 'out' || !m.flockId) continue;
+      if (m.reason !== 'consumption') continue;
+      const item = whsItems.find(i => i.id === m.itemId);
+      const price = item?.avgPrice ?? item?.lastPrice ?? 0;
+      operationalCostByFlock[m.flockId] = (operationalCostByFlock[m.flockId] || 0) + (m.quantity * price);
+    }
+
     const byFlock: GroupFlockRow[] = flocks.map(f => {
       const costs = calcCosts(f);
+      const opCost = operationalCostByFlock[f.id] || 0;
+      const totalFlockCost = costs.total + opCost;
       const revenue = getFlockRevenue(f.id, invoices);
       return {
         id: f.id,
@@ -85,16 +100,23 @@ export function useGroupKpi(groupId: string): GroupKpi {
         currentCount: f.currentCount || 0,
         initialCount: f.initialCount || 0,
         ageDays: getAgeDays(f),
-        cost: costs.total,
+        cost: totalFlockCost,
         revenue,
-        profit: revenue - costs.total,
+        profit: revenue - totalFlockCost,
       };
     });
 
     const live = byFlock.filter(f => f.status === 'active');
     const totalInitial = live.reduce((s, f) => s + f.initialCount, 0);
     const totalCurrent = live.reduce((s, f) => s + f.currentCount, 0);
-    const totalDeaths = Math.max(0, totalInitial - totalCurrent);
+    // 🆕 تلفات از events (death + cull) — نه از تفاوت initial/current
+    const totalDeaths = live.reduce((sum, row) => {
+      const flock = flocks.find(f => f.id === row.id);
+      if (!flock) return sum;
+      return sum + (flock.events || [])
+        .filter(e => e.type === 'death' || e.type === 'cull')
+        .reduce((s, e) => s + e.count, 0);
+    }, 0);
     const mortalityRate = totalInitial > 0 ? (totalDeaths / totalInitial) * 100 : 0;
 
     const totalCost = byFlock.reduce((s, f) => s + f.cost, 0);
@@ -142,7 +164,7 @@ export function useGroupKpi(groupId: string): GroupKpi {
       feedByFlock,
       byFlock,
     };
-  }, [groupId, groups, invoices, getFlocksInGroup, eggProductions, dlgLogs]);
+  }, [groupId, groups, invoices, getFlocksInGroup, eggProductions, dlgLogs, movements, whsItems]);
 }
 
 /**

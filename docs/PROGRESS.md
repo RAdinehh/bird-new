@@ -65,3 +65,5 @@
 [2026/10/18 08:05] refactor(alt): حذف ۶ any از rules.ts — تایپ دقیق Item, AlertCategory, BirdStandard
 
 [2026/10/18 08:16] refactor(inc): کاهش ۱۸ any + فیکس importها و bird optional (EggEntryCard)
+
+[2026/10/18 08:26] fix(flk/groups): محاسبه تلفات از events + هزینه جاری از whs (خوراک/واکسن/دارو) — ۶ تست
