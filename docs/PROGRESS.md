@@ -77,3 +77,5 @@
 [2026/10/18 09:27] feat(flk): GuidedEmptyState — راهنمای سه‌مسیره برای ساخت گله (NN/g + SAP Fiori)
 
 [2026/10/18 09:38] feat(flk): Pre-check auto-link برای فاکتور→گله — جلوگیری از تکرار (۸ تست) + فیکس hatchId
+
+[2026/10/18 09:49] feat(flk): فیلد unknownCount در FlocksModal — فرم گله + validation + mismatch check

@@ -38,7 +38,7 @@ export interface F {
 
 export const emptyForm = (): F => ({
   name: '', type: 'layer', birdId: '', breedId: '', hallId: '', zoneId: '',
-  initialCount: '', currentCount: '', maleCount: '', femaleCount: '',
+  initialCount: '', currentCount: '', maleCount: '', femaleCount: '', unknownCount: '',
   layingStartDay: '',
   endOfCycleDay: '',
   vaccineScheduleId: '',

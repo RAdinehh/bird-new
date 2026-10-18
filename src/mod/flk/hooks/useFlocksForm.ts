@@ -57,6 +57,7 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       currentCount: f.currentCount ? toFa(f.currentCount) : '',
       maleCount: f.maleCount ? toFa(f.maleCount) : '',
       femaleCount: f.femaleCount ? toFa(f.femaleCount) : '',
+      unknownCount: f.unknownCount ? toFa(f.unknownCount) : '',
       layingStartDay: f.layingStartDay ? toFa(f.layingStartDay) : '',
       endOfCycleDay: f.endOfCycleDay ? toFa(f.endOfCycleDay) : '',
       vaccineScheduleId: f.vaccineScheduleId || '',
@@ -96,13 +97,14 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
     const _curr = int(form.currentCount) || _init;
     const _male = int(form.maleCount) || 0;
     const _female = int(form.femaleCount) || 0;
+    const _unknown = int(form.unknownCount || '') || 0;
 
     if (_curr > _init) {
       setErr(`تعداد فعلی (${toFa(_curr)}) نمی‌تواند بیشتر از تعداد اولیه (${toFa(_init)}) باشد`);
       return;
     }
-    if (form.type === 'breeder' && (_male + _female) > _init) {
-      setErr(`مجموع خروس (${toFa(_male)}) و مرغ (${toFa(_female)}) بیشتر از تعداد اولیه است`);
+    if (form.type === 'breeder' && (_male + _female + _unknown) > _init) {
+      setErr(`مجموع خروس (${toFa(_male)})، مرغ (${toFa(_female)}) و نامشخص (${toFa(_unknown)}) بیشتر از تعداد اولیه است`);
       return;
     }
     if (!form.birdId) { setErr('پرنده اجباری است'); return; }
@@ -201,6 +203,7 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
         : null,
       maleCount: form.type === 'breeder' ? int(form.maleCount) : null,
       femaleCount: form.type === 'breeder' ? int(form.femaleCount) : null,
+      unknownCount: int(form.unknownCount || '') || null,
       hatchDate: form.hatchDate.trim(), purchaseDate: form.purchaseDate.trim(),
       startDate: form.startDate.trim(), source: form.source,
       purchasePrice: num(form.purchasePrice),

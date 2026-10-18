@@ -311,11 +311,15 @@ export default function FlocksModal(props: FlocksModalProps) {
               <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
             </Field>
           </Grid2>
+          <Field label="جنسیت نامشخص (اختیاری)" hint="پرنده‌هایی که جنسیتشان هنوز مشخص نیست — معمولاً از هچ">
+            <NumField placeholder="۰" value={form.unknownCount || ''} onChange={e => setForm({ ...form, unknownCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
+          </Field>
           {form.maleCount && form.femaleCount && (() => {
             const male = parseInt(toEn(form.maleCount)) || 0;
             const female = parseInt(toEn(form.femaleCount)) || 0;
+            const unknown = parseInt(toEn(form.unknownCount || '0')) || 0;
             const init = parseInt(toEn(form.initialCount)) || 0;
-            const sum = male + female;
+            const sum = male + female + unknown;
             const mismatch = init > 0 && sum !== init;
             return (
               <>
