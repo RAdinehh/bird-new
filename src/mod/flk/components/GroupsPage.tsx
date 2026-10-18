@@ -430,23 +430,6 @@ export default function GroupsPage({ open, onClose }: Props) {
             {editingId ? 'ویرایش گروه' : 'گروه جدید'}
           </div>
 
-          <Field label="نوع گروه" hint={TYPE_DESC[form.type]}>
-            <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as FlockGroupType })}>
-              {(Object.keys(TYPE_LABEL) as FlockGroupType[]).map(t => (
-                <option key={t} value={t}>{TYPE_LABEL[t]}</option>
-              ))}
-            </Select>
-          </Field>
-
-          {form.type === 'smart' && (
-            <SmartRuleEditor
-              rule={form.rule}
-              onChange={(rule) => setForm({ ...form, rule })}
-              breeds={breeds.map(b => ({ id: b.id, name: b.name, birdId: b.birdId }))}
-              halls={halls.map(h => ({ id: h.id, name: h.name }))}
-            />
-          )}
-
           <Field label="نام گروه" required>
             <Input
               value={form.name}
@@ -455,7 +438,16 @@ export default function GroupsPage({ open, onClose }: Props) {
             />
           </Field>
 
-          <Field label="گروه والد (اختیاری)" hint="برای ساختار تودرتو">
+          <Grid2>
+<Field label="نوع گروه" hint={TYPE_DESC[form.type]}>
+            <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as FlockGroupType })}>
+              {(Object.keys(TYPE_LABEL) as FlockGroupType[]).map(t => (
+                <option key={t} value={t}>{TYPE_LABEL[t]}</option>
+              ))}
+            </Select>
+          </Field>
+
+<Field label="گروه والد (اختیاری)" hint="برای ساختار تودرتو">
             <Select value={form.parentGroupId} onChange={e => setForm({ ...form, parentGroupId: e.target.value })}>
               <option value="">— بدون والد —</option>
               {groups.filter(g => {
@@ -479,6 +471,17 @@ export default function GroupsPage({ open, onClose }: Props) {
               ))}
             </Select>
           </Field>
+          </Grid2>
+
+          {form.type === 'smart' && (
+            <SmartRuleEditor
+              rule={form.rule}
+              onChange={(rule) => setForm({ ...form, rule })}
+              breeds={breeds.map(b => ({ id: b.id, name: b.name, birdId: b.birdId }))}
+              halls={halls.map(h => ({ id: h.id, name: h.name }))}
+            />
+          )}
+
 
           <Field label="توضیحات (اختیاری)" hint="چی این گروه رو از بقیه جدا می‌کنه؟">
             <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="مثلاً: گروه گله‌های ممتاز نژاد مرندی" rows={2} />

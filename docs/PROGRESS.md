@@ -99,3 +99,5 @@
 [2026/10/18 13:53] feat(flk): footer ۵۰/۵۰ (گروه جدید | Import/Export/Compare) + back button خاکستری
 
 [2026/10/18 14:47] feat(flk): بهبود فرم گروه — حذف color مرده + placeholder هوشمند + description در لیست + cascade parent filter
+
+[2026/10/18 14:54] feat(flk): چیدمان ۲ ستونه فرم گروه — نام بالا، نوع+والد کنار هم، smart rule زیرشان
