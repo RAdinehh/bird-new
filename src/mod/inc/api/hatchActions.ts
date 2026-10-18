@@ -50,7 +50,7 @@ export function buildFlockFromHatch(params: {
     otherCosts: null,
     status: 'active',
     notes: 'از هچ ' + hatch.date,
-    sourceHatchId: hatch.id,
+    hatchId: hatch.id,
   } as any;
 }
 

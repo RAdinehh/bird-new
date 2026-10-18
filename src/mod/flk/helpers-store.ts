@@ -147,3 +147,24 @@ export function calcCosts(f: Flock) {
   const perBird = f.initialCount ? total / f.initialCount : 0;
   return { birdCost, delivery, other, total, perBird };
 }
+
+/**
+ * findOrphanMatches — گله‌های «بدون سند» مشابه پیدا می‌کند
+ * orphan = بدون sourceInvoiceId و hatchId و active
+ * طبق Pre-check طراحی: تک‌match → auto-link، چند match → هشدار
+ */
+export function findOrphanMatches(params: {
+  birdId: string;
+  breedId: string;
+  flocks: Flock[];
+}): Flock[] {
+  const { birdId, breedId, flocks } = params;
+  if (!birdId) return [];
+  return flocks.filter(f =>
+    f.status === 'active' &&
+    !f.sourceInvoiceId &&
+    !f.hatchId &&
+    f.birdId === birdId &&
+    (f.breedId || '') === (breedId || '')
+  );
+}

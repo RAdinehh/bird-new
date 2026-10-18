@@ -5,6 +5,8 @@ import { parse as parseJ, format as formatJ, addDays } from 'date-fns-jalali';
 import { useFlk } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { getBiology, getStandardFor } from '../set/standards/resolve';
+import { findOrphanMatches } from '../flk/helpers-store';
+import { showToast } from '../../cor/store/toast';
 import { useHal } from '../hal/store';
 import { useEgg } from '../egg/store';
 import type { Invoice, InvoiceItem, InvoiceType } from './types';
@@ -136,6 +138,36 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = existing.id;
         }
       } else if (delta > 0) {
+        // 🆕 Pre-check: گله orphan مشابه؟
+        const orphanMatches = findOrphanMatches({
+          birdId,
+          breedId,
+          flocks: flk.flocks,
+        });
+
+        if (orphanMatches.length === 1) {
+          // 🆕 auto-link به همان گله (کاربر قبلاً دستی ساخته)
+          const orphan = orphanMatches[0];
+          const newCount = (orphan.currentCount ?? 0) + delta;
+          const newInitial = (orphan.initialCount ?? 0) + delta;
+          flk.update(orphan.id, {
+            sourceInvoiceId: inv.id,
+            sourceCategory: ref.cat,
+            purchaseDate: inv.date,
+            purchasePrice: it.unitPrice || orphan.purchasePrice || 0,
+            deliveryCost: it.shipping || orphan.deliveryCost || 0,
+            initialCount: newInitial,
+            currentCount: newCount,
+          });
+          for (let i = 0; i < inv.items.length; i++) {
+            if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = orphan.id;
+          }
+          try {
+            showToast('این فاکتور به گله «' + orphan.name + '» لینک شد', 'info');
+          } catch {}
+          continue;
+        }
+
         const breed = brd.breeds.find(b => b.id === it.breedId);
         const bird = brd.birds.find(b => b.id === it.birdId);
         const name = `گله ${breed?.name || bird?.name || '?'} — ${inv.date}`;
@@ -179,6 +211,13 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           sourceInvoiceId: inv.id,
           sourceCategory: ref.cat,
         });
+
+        // 🆕 اگر چند گله orphan مشابه بود، هشدار بده
+        if (orphanMatches.length > 1) {
+          try {
+            showToast(orphanMatches.length + ' گله بدون سند مشابه پیدا شد. این گله جدید ساخته شد — از کارت گله لینک کنید.', 'warn');
+          } catch {}
+        }
         for (let i = 0; i < inv.items.length; i++) {
           if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = newFlockId;
         }
