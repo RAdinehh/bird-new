@@ -58,18 +58,77 @@ export function applyInvoiceEgg(inv: Invoice): InvoiceItem[] {
 /* EQUIP_LINK */
 /** اتصال فاکتور تجهیزات → Equipment.sourceInvoiceId (خرید) */
 export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
+  if (inv.type !== 'purchase') return inv.items;
+  
   const hal = useHal.getState();
-  return inv.items.map(it => {
-    const eqId = (it as any).equipmentId;
-    if (!eqId) return it;
-    const eq = hal.equipment.find(e => e.id === eqId);
-    if (!eq) return it;
-    // فقط خرید → لینک به فاکتور
-    if (inv.type === 'purchase' && !eq.sourceInvoiceId) {
-      try { hal.updateEquip(eqId, { sourceInvoiceId: inv.id } as any); } catch {}
+  const outItems: InvoiceItem[] = (inv.items || []).map(it => ({ ...it }));
+  
+  for (let i = 0; i < outItems.length; i++) {
+    const it = outItems[i] as any;
+    
+    // ۱. اگر equipmentId از قبل ست شده → لینک به تجهیز موجود
+    const eqId = it.equipmentId;
+    if (eqId) {
+      const eq = hal.equipment.find(e => e.id === eqId);
+      if (eq && !eq.sourceInvoiceId) {
+        try { hal.updateEquip(eqId, { sourceInvoiceId: inv.id } as any); } catch {}
+      }
+      continue;
     }
-    return it;
-  });
+    
+    // ۲. اگر سالن انتخاب نشده → رد شو
+    if (!it.hallId) continue;
+    
+    // ۳. اگر دسته تجهیزات نیست → رد شو
+    const itemCat = it.category || inv.category;
+    if (itemCat !== 'equipment') continue;
+    
+    // ۴. بررسی تکراری: آیا قبلاً برای همین فاکتور ساخته شده؟
+    const existing = hal.equipment.find(
+      (e: any) => e.sourceInvoiceId === inv.id && e.name === (it.description || it.model || '')
+    );
+    
+    if (existing) {
+      // آپدیت تجهیز موجود
+      try {
+        hal.updateEquip(existing.id, {
+          hallId: it.hallId,
+          zoneId: it.zoneId || '',
+          count: it.quantity || 1,
+          unitPrice: it.unitPrice || null,
+          warranty: it.warrantyMonths || null,
+          brand: it.brand || '',
+        } as any);
+        it.equipmentId = existing.id;
+      } catch (e) { console.error('[TRA→HAL update]', e); }
+      continue;
+    }
+    
+    // ۵. ساخت تجهیز جدید
+    try {
+      const newId = hal.addEquip({
+        hallId: it.hallId,
+        zoneId: it.zoneId || '',
+        category: (it.equipmentCategory || 'other') as any,
+        type: it.equipmentType || 'other',
+        name: it.description || it.model || 'تجهیز',
+        count: it.quantity || 1,
+        unit: (it.unit || 'pcs') as any,
+        unitPrice: it.unitPrice || null,
+        purchasedAt: inv.date || '',
+        warranty: it.warrantyMonths || null,
+        notes: `از فاکتور ${inv.number || ''}`
+          + (it.model ? ` | مدل: ${it.model}` : '')
+          + (it.serialNo ? ` | سریال: ${it.serialNo}` : ''),
+        brand: it.brand || '',
+        supplierId: inv.partyId || '',
+        sourceInvoiceId: inv.id,
+      } as any);
+      it.equipmentId = newId;
+    } catch (e) { console.error('[TRA→HAL create]', e); }
+  }
+  
+  return outItems;
 }
 
 

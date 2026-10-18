@@ -57,6 +57,10 @@ export interface InvoiceItem extends ItemCategoryFields {
   costType?: string;
   equipmentCategory?: string;
   equipmentType?: string;
+  equipmentId?: string;
+  model?: string;
+  serialNo?: string;
+  warrantyMonths?: number | null;
   hallId?: string;
   zoneId?: string;
   hatchDate?: string;
