@@ -268,7 +268,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
   // ========== دان (Feed) ==========
   if (category === 'feed') {
-    const totalWeight = (Number(item.bagWeight) || 0) * (Number(item.bagCount) || 0);
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <SecTitle icon="🏷" title="هویت کالا" />
@@ -292,20 +291,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <div />
         </Grid2>
 
-        <SecTitle icon="📦" title="بسته‌بندی" />
-        <Grid2>
-          <Field label="وزن هر کیسه (kg)">
-            <Input mode="number" value={item.bagWeight !== null && item.bagWeight !== undefined ? String(item.bagWeight) : ''} onChange={e => updateItem({ bagWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
-          </Field>
-          <Field label="تعداد کیسه">
-            <Input mode="number" value={item.bagCount !== null && item.bagCount !== undefined ? String(item.bagCount) : ''} onChange={e => updateItem({ bagCount: Math.round(parseFaNum(e.target.value)) || null })} unit="کیسه" min={0} />
-          </Field>
-        </Grid2>
-        {totalWeight > 0 && (
-          <div style={{ padding: 'var(--pad-tight)', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, textAlign: 'center' }}>
-            وزن کل: {totalWeight.toLocaleString('fa-IR')} kg
-          </div>
-        )}
+
 
         <SecTitle icon="📅" title="انبار و ردیابی" />
         <Grid2>
