@@ -12,12 +12,15 @@ import type { EggEntry } from '../store';
 import { makeRow, type DraftRow } from '../types-eggentries';
 import { nowTime, flockReadyForEggs, DRAFT_KEY } from '../api/eggEntriesCalc';
 import { todayJalali } from '../helpers';
+import type { Device } from '../store';
+import type { Bird } from '../../brd/store';
+import type { Flock } from '../../flk/store';
 
 export interface UseEggEntriesFormParams {
-  devices: any[];
-  birds: any[];
-  eggEntries: any[];
-  flocks: any[];
+  devices: Device[];
+  birds: Bird[];
+  eggEntries: EggEntry[];
+  flocks: Flock[];
   initialDevice?: string;
   addEntry: (e: any) => string;
   updateEntry: (id: string, patch: any) => void;

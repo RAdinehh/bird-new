@@ -8,6 +8,8 @@ import {
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import HatchEntryRow, { type HatchRowData } from './HatchEntryRow';
+import type { EggEntry } from '../store';
+import type { Candling } from '../store';
 
 export interface HatchFormModalProps {
   open: boolean;
@@ -23,16 +25,16 @@ export interface HatchFormModalProps {
   err: string;
   vErrors: Record<string, string>;
   // داده
-  eggEntries: any[];
+  eggEntries: EggEntry[];
   devices: { id: string; name: string }[];
   availableEntries: any[];
   birdsById: Record<string, any>;
   devicesById: Record<string, any>;
-  candlings: any[];
+  candlings: Candling[];
   latestCandByEntry: Record<string, any>;
   // helpers
   daysAgo: (date: string) => number;
-  isLockdown: (e: any) => boolean;
+  isLockdown: (e: EggEntry) => boolean;
   // actions
   toggleEntry: (id: string) => void;
   updateData: (id: string, patch: Partial<HatchRowData>) => void;

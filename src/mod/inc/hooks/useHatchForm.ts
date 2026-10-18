@@ -7,6 +7,8 @@ import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
 import { calcCurrentFertile } from '../api/hatchCalc';
 import type { HatchResult } from '../store';
+import type { EggEntry } from '../store';
+import type { Candling } from '../store';
 
 export interface HatchRowData {
   hatched: string; unhatched: string; deadInShell: string; pipped: string; other: string;
@@ -21,8 +23,8 @@ export const emptyRow = (): HatchRowData => ({
 });
 
 export interface UseHatchFormParams {
-  eggEntries: any[];
-  candlings: any[];
+  eggEntries: EggEntry[];
+  candlings: Candling[];
   hatches: HatchResult[];
   entriesById: Record<string, any>;
   addHatch: (h: any) => void;

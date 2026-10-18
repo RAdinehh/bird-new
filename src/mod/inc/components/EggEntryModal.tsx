@@ -15,6 +15,9 @@ import SmartSelect from '../../../shr/components/SmartSelect';
 import { DEAL_LABEL, type DealType } from '../store';
 import type { DraftRow } from '../types-eggentries';
 import { flockReadyForEggs } from '../api/eggEntriesCalc';
+import type { Bird } from '../../brd/store';
+import type { Flock } from '../../flk/store';
+import type { Person } from '../../ctc/store';
 
 export interface EggEntryModalProps {
   open: boolean;
@@ -29,11 +32,11 @@ export interface EggEntryModalProps {
   setCurrentRow: React.Dispatch<React.SetStateAction<DraftRow>>;
   // داده
   devices: { id: string; name: string }[];
-  birds: any[];
+  birds: Bird[];
   breeds: any[];
-  flocks: any[];
-  contacts: any[];
-  suppliers: any[];
+  flocks: Flock[];
+  contacts: Person[];
+  suppliers: Person[];
   allPersons: any[];
   breedsForBird: any[];
   liveUsage: { used: number; total: number; percent: number; remaining: number } | null;

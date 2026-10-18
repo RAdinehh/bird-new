@@ -63,3 +63,5 @@
 [2026/10/18 07:54] fix(UX): showAlert → showToast در ۸ مورد (set, egg, dlg) — L4: ۱۰→۰
 
 [2026/10/18 08:05] refactor(alt): حذف ۶ any از rules.ts — تایپ دقیق Item, AlertCategory, BirdStandard
+
+[2026/10/18 08:16] refactor(inc): کاهش ۱۸ any + فیکس importها و bird optional (EggEntryCard)

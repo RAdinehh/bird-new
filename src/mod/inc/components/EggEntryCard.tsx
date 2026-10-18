@@ -9,15 +9,19 @@ import ProgressTracker from '../../../shr/components/ProgressTracker';
 import { DEAL_LABEL, ENTRY_STATUS_LABEL, isLockdown, isHatchWindow } from '../store';
 import { calcWeightLossPct, getExpectedTempHumidity } from '../api/hatchCalc';
 import { needEggStorageDays } from '../api/needs';
+import type { EggEntry } from '../store';
+import type { Bird } from '../../brd/store';
+import type { Flock } from '../../flk/store';
+import type { Person } from '../../ctc/store';
 
 export interface EggEntryCardProps {
-  entry: any;
+  entry: EggEntry;
   index: number;
   device: any;
-  bird: any;
+  bird?: Bird;
   breed: any;
-  flocks: any[];
-  contacts: any[];
+  flocks: Flock[];
+  contacts: Person[];
   hatches: any[];
   age: number;
   expectedHatch: string;

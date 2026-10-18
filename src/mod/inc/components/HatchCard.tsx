@@ -7,13 +7,15 @@ import ExpandableCard, { StatBox, Dot } from '../../../shr/components/Expandable
 import { Row } from '../helpers';
 import { costPerChick, type HatchResult } from '../store';
 import { calcChickYield } from '../api/needs';
+import type { Bird } from '../../brd/store';
+import type { EggEntry } from '../store';
 
 export interface HatchCardProps {
   hatch: HatchResult;
   index: number;
-  bird: any;
+  bird: Bird;
   dev: any;
-  entry: any;
+  entry: EggEntry;
   isOpen: boolean;
   ms: any;
   hr: number;
