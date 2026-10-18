@@ -121,6 +121,31 @@ export default function FlockCard(props: FlockCardProps) {
             {lc.label}
           </Tag>
         )}
+        {!isArchived && !f.sourceInvoiceId && !f.hatchId && (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onEdit(); }}
+            title="این گله به هیچ سند (فاکتور خرید یا نتیجه هچ) لینک نیست — کلیک برای اتصال"
+            aria-label="اتصال گله به سند"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              padding: '2px 7px',
+              background: 'var(--warn-soft)',
+              color: 'var(--warn)',
+              border: '1px solid var(--warn)',
+              borderRadius: 'var(--r-sm)',
+              fontSize: 10,
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              lineHeight: 1.6,
+            }}
+          >
+            🔗 بدون سند
+          </button>
+        )}
         {f.hidden && <Tag tone="gray">👁</Tag>}
         {f.paused && <Tag tone="amber">⏸</Tag>}
         {flockGroups.slice(0, 2).map(g => {

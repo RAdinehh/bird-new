@@ -83,3 +83,5 @@
 [2026/10/18 10:04] feat(inc): Preview Modal ساخت گله — نمایش و ویرایش خودکار مقادیر از هچ/تخم/استاندارد نژاد
 
 [2026/10/18 10:13] refactor(inc): حذف ۵ any از HatchesPage — HatchInput.unknownCount + تایپ دقیق
+
+[2026/10/18 10:40] feat(flk): badge «بدون سند» در FlockCard — راهنمای اتصال گله orphan به فاکتور/هچ
