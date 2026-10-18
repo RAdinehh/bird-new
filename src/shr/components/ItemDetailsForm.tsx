@@ -122,19 +122,31 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
   // ========== دارو ==========
   if (category === 'medicine') {
-    const mType = (item.medicineType || '') as MedicineType;
+    // 🆕 مقدار پیش‌فرض: شیمیایی (رایج‌ترین)
+    const mType = (item.medicineType || 'chemical') as MedicineType;
+    
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <Field label="نوع دارو" required>
-          <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 4, marginBottom: 2 }}>
+          💊 اطلاعات دارو
+        </div>
+        
+        <Field label="نوع دارو" required hint="برای دیدن فیلدهای تخصصی، یکی را انتخاب کنید">
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {(['herbal', 'chemical', 'vaccine'] as MedicineType[]).map(mt => (
               <ToggleChip key={mt} label={MEDICINE_TYPE_LABEL[mt]} active={mType === mt} onClick={() => setField('medicineType', mt)} />
             ))}
           </div>
         </Field>
+        
+        {/* فرم اختصاصی بر اساس نوع */}
         {mType === 'herbal' && <HerbalForm item={item} updateItem={updateItem} />}
         {mType === 'chemical' && <ChemicalForm item={item} updateItem={updateItem} />}
         {mType === 'vaccine' && <VaccineForm item={item} updateItem={updateItem} />}
+        
+        <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 6, marginBottom: 2 }}>
+          📦 اطلاعات انبار و ردیابی
+        </div>
         
         <Grid2>
           <Field label="شماره بچ (Batch)">
@@ -144,6 +156,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input value={String(item.expiryDate || '')} onChange={e => updateItem({ expiryDate: e.target.value })} placeholder="1405/12/29" />
           </Field>
         </Grid2>
+        
         <Grid2>
           <Field label="شرایط نگهداری">
             <Select value={String(item.storage || 'room')} onChange={e => updateItem({ storage: e.target.value })}>
@@ -161,6 +174,11 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Select>
           </Field>
         </Grid2>
+        
+        <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 6, marginBottom: 2 }}>
+          🐔 اطلاعات مصرف و دوره پرهیز
+        </div>
+        
         <Grid2>
           <Field label="دوره پرهیز (روز)" hint="تعداد روزی که نباید تخم/گوشت فروخت">
             <Input mode="number" value={item.withdrawalDays !== null && item.withdrawalDays !== undefined ? String(item.withdrawalDays) : ''} onChange={e => updateItem({ withdrawalDays: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
@@ -169,6 +187,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
         </Grid2>
+        
         {sellerSlot}
       </div>
     );
