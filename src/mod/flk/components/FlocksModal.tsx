@@ -132,7 +132,7 @@ export default function FlocksModal(props: FlocksModalProps) {
               const hasCountChange = original ? (original.currentCount !== original.initialCount) : false;
               if ((hasEvents || hasCountChange) && newType !== original?.type) {
                 const ok = await showConfirmAsync(
-                  '⚠️ تغییر نوع گله',
+                  'تغییر نوع گله',
                   'این گله داده دارد (رویدادها یا تغییر موجودی). تغییر نوع ممکنه گزارش‌های گذشته رو مختل کنه. ادامه؟'
                 );
                 if (!ok) return;
@@ -335,7 +335,7 @@ export default function FlocksModal(props: FlocksModalProps) {
                     alignItems: 'center',
                     gap: 6,
                   }}>
-                    ⚠️ مجموع نر و ماده ({toFa(sum)}) با تعداد اولیه ({toFa(init)}) یکسان نیست
+                    مجموع نر و ماده ({toFa(sum)}) با تعداد اولیه ({toFa(init)}) یکسان نیست
                   </div>
                 )}
               </>

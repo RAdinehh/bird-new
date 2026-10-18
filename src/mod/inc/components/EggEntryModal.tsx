@@ -98,7 +98,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               <span>📊 استفاده کل</span>
               <span>{toFa(liveUsage.used)} / {toFa(liveUsage.total)} ({toFa(liveUsage.percent)}٪)</span>
             </div>
-            {liveUsage.percent > 100 && <div style={{ marginTop: 4 }}>⚠️ {toFa(Math.abs(liveUsage.remaining))} واحد اضافی</div>}
+            {liveUsage.percent > 100 && <div style={{ marginTop: 4 }}>{toFa(Math.abs(liveUsage.remaining))} واحد اضافی</div>}
           </div>
         )}
       </div>

@@ -36,7 +36,7 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> مشخصات اصلی</SectionTitle>
         <Field label="نام دستگاه" required hint={
           form.name && devices.some(x => x.id !== form.id && x.name.trim() === form.name.trim())
-            ? '⚠️ این نام قبلاً استفاده شده'
+            ? 'این نام قبلاً استفاده شده'
             : undefined
         }>
           <Input

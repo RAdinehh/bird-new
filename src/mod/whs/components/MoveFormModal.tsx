@@ -119,7 +119,7 @@ export default function MoveFormModal(props: Props) {
                   color: 'var(--warn)',
                   fontWeight: 600,
                 }}>
-                  ⚠️ {isPurchase ? 'هیچ فروشنده‌ای تعریف نشده' : isSale ? 'هیچ مشتری‌ای تعریف نشده' : 'مخاطبی تعریف نشده'}
+                  {isPurchase ? 'هیچ فروشنده‌ای تعریف نشده' : isSale ? 'هیچ مشتری‌ای تعریف نشده' : 'مخاطبی تعریف نشده'}
                 </div>
               ) : (
                 <SmartSelect

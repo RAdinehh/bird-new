@@ -74,7 +74,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
 
       {target && others.length > 0 && (
         <div style={{ marginTop: 12, padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>
-          ⚠️ {toFa(others.length)} گله به «{target.name}» ادغام می‌شود. این عمل قابل بازگشت نیست (از طریق Undo).
+          {toFa(others.length)} گله به «{target.name}» ادغام می‌شود. این عمل قابل بازگشت نیست (از طریق Undo).
         </div>
       )}
 
