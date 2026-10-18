@@ -228,14 +228,18 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
     // 🆕 حذف شده — warning به صورت inline در Modal نمایش داده می‌شه
     // (کاربر آزاده بیش از ظرفیت ثبت کنه)
 
+    let savedId = form.id || '';
+    let isNew = false;
     if (form.id) {
       update(form.id, data);
       logAction('update', 'flk', 'ویرایش گله: ' + data.name);
     } else {
-      add(data);
+      savedId = add(data);
+      isNew = true;
       logAction('add', 'flk', 'افزودن گله: ' + data.name + ' (' + (data.initialCount || 0) + ' پرنده)');
     }
     setOpen(false);
+    return { id: savedId, isNew };
   };
 
   return {

@@ -17,13 +17,14 @@ import { useFormat } from '../../shr/units';
 import { useValidation } from '../../shr/validation/useValidation';
 import { useFormErrors } from '../../shr/hooks/useFormErrors';
 import { createFlkSchema } from '../../shr/validation/rules/flk';
-import { toEn } from '../../shr/utils/fa';
+import { toEn, toFa } from '../../shr/utils/fa';
 import type { TabId } from './types-flocks';
 import FlocksTabs from './components/FlocksTabs';
 import FlockTabPanel from './components/FlockTabPanel';
 import FlocksModal from './components/FlocksModal';
 import GroupsPage from './components/GroupsPage';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { showToast } from '../../cor/store/toast';
 
 export default function FlocksPage() {
   const fmt = useFormat();
@@ -319,7 +320,58 @@ export default function FlocksPage() {
           }
 
           const t = form.type as TabId | undefined;
-          await save();
+          const saveResult = await save();
+
+          // 🆕 Shadow Invoice: گله دستی + هزینه > 0 → فاکتور خودکار
+          if (saveResult && saveResult.isNew) {
+            const isManual = !form.source || (form.source !== 'purchase' && form.source !== 'hatch');
+            const _qty = parseInt(toEn(form.initialCount || '0')) || 0;
+            const _unitPrice = parseFloat(toEn(form.purchasePrice || '0')) || 0;
+            const _delivery = parseFloat(toEn(form.deliveryCost || '0')) || 0;
+            const _other = parseFloat(toEn(form.otherCosts || '0')) || 0;
+            const _total = _qty * _unitPrice + _delivery + _other;
+
+            if (isManual && _total > 0) {
+              const okShadow = await showConfirmAsync(
+                'فاکتور خرید خودکار',
+                'این گله هزینه‌ای معادل ' + toFa(_total.toLocaleString('fa-IR')) + ' تومان دارد.\n\nآیا یک فاکتور خرید پیش‌نویس در «معاملات» بسازم تا هزینه‌ها در گزارش‌های مالی هم لحاظ شوند؟',
+              );
+              if (okShadow) {
+                try {
+                  const { useTra } = await import('../tra/store');
+                  const invDate = form.purchaseDate || form.startDate || form.hatchDate || '';
+                  const invId = useTra.getState().addInvoice({
+                    type: 'purchase',
+                    date: invDate,
+                    partyId: '',
+                    category: form.type,
+                    items: [{
+                      id: 'item-' + Date.now(),
+                      description: 'گله ' + form.name + ' — ' + _qty + ' پرنده',
+                      unit: 'پرنده',
+                      quantity: _qty,
+                      unitPrice: _unitPrice,
+                      total: _qty * _unitPrice,
+                    }],
+                    shipping: _delivery,
+                    total: _qty * _unitPrice + _delivery,
+                    payments: [],
+                    dueDate: '',
+                    relatedFlockId: saveResult.id,
+                    relatedEntryId: '',
+                    notes: 'خودکار از گله دستی «' + form.name + '»' + (_other > 0 ? ' · سایر هزینه‌ها: ' + toFa(_other.toLocaleString('fa-IR')) + ' ت' : ''),
+                  } as any);
+                  if (invId) {
+                    useFlk.getState().update(saveResult.id, { sourceInvoiceId: invId });
+                    showToast('فاکتور خرید خودکار ساخته شد', 'success');
+                  }
+                } catch (e) {
+                  console.error('[flk→tra shadow invoice]', e);
+                }
+              }
+            }
+          }
+
           if (t === 'layer' || t === 'breeder' || t === 'broiler') {
             setTimeout(() => { setInstant(); setTab(t); }, 120);
           }

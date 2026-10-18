@@ -116,9 +116,17 @@ export default function FlockTabPanel({
       const withoutRefs = ids.filter(id => !hasRefs(id));
 
       let msg = toFa(ids.length) + ' گله حذف شوند؟';
+      // 🆕 هشدار لینک به فاکتور/هچ
+      const withLinks = ids.filter(id => {
+        const f = flocks.find(x => x.id === id);
+        return !!(f?.sourceInvoiceId || f?.hatchId);
+      });
+      if (withLinks.length > 0) {
+        msg += '\n\n⚠️ ' + toFa(withLinks.length) + ' گله به فاکتور/هچ لینک دارن — با حذف گله، اون سند بدون گله می‌مونه.';
+      }
       if (withRefs.length > 0) {
-        msg = '';
-        if (withoutRefs.length > 0) {
+        if (withLinks.length === 0) msg = '';
+        if (withoutRefs.length > 0 && withLinks.length === 0) {
           msg += toFa(withoutRefs.length) + ' گله بدون ارجاع → حذف می‌شن\n';
         }
         msg += toFa(withRefs.length) + ' گله ارجاع دارن (dlg/egg/tra) → حذف با هشدار\n';

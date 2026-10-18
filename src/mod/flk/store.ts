@@ -110,19 +110,7 @@ export const useFlk = create<State>()(
       },
       update: (id, patch) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       remove: (id) => {
-        const f = get().flocks.find(x => x.id === id);
-        if (f?.sourceInvoiceId) {
-          showToast('این گله فاکتور خرید دارد — ابتدا فاکتور را حذف کنید', 'error');
-          return;
-        }
-        if (f?.hatchId) {
-          showToast('این گله از هچ ساخته شده — ابتدا هچ را حذف کنید', 'error');
-          return;
-        }
-        if (f?.dealData?.partnerId || f?.dealData?.consignorId || f?.dealData?.lessorId) {
-          showToast('این گله شراکت/امانی/اجاره دارد — ابتدا مدل بهره‌برداری را حذف کنید', 'error');
-          return;
-        }
+        // 🆕 حذف مستقیم — تأیید و هشدار لینک‌ها در UI گرفته می‌شه
         set({ flocks: get().flocks.filter(x => x.id !== id) });
       },
       archive: (id, reason) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', endDate: x.endDate || now(), archivedReason: reason || '', updatedAt: now()} : x) }),

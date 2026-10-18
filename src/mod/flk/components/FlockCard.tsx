@@ -238,6 +238,63 @@ export default function FlockCard(props: FlockCardProps) {
         />
       )}
 
+      {/* 🔗 ادغام‌شده — merge history */}
+      {f.mergedInfo && f.mergedInfo.sources.length > 1 && (
+        <>
+          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🔗 ادغام‌شده</div>
+          <div style={{
+            padding: 10,
+            background: 'var(--purple-soft)',
+            border: '1px solid var(--purple)',
+            borderRadius: 'var(--r-md)',
+            fontSize: 'var(--fs-xs)',
+          }}>
+            <div style={{ fontSize: 10, color: 'var(--purple)', fontWeight: 700, marginBottom: 6 }}>
+              ادغام در {f.mergedInfo.mergedAt.slice(0, 10)} — {toFa(f.mergedInfo.sources.length)} منبع
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {f.mergedInfo.sources.map((src, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '4px 0',
+                    borderBottom: idx < (f.mergedInfo?.sources.length ?? 0) - 1 ? '1px dashed var(--border)' : 'none',
+                  }}
+                >
+                  <span style={{ color: 'var(--text)' }}>
+                    {idx === 0 ? '📦 گله اصلی' : `📦 منبع ${toFa(idx + 1)}`} — {src.flockName}
+                  </span>
+                  <span style={{ color: 'var(--muted)' }}>
+                    {fmt.int(src.count)} پرنده ({fmt.int(src.ageDays)} روز)
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div
+              style={{
+                marginTop: 6,
+                paddingTop: 6,
+                borderTop: '1px solid var(--border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 6,
+              }}
+            >
+              <span style={{ color: 'var(--purple)', fontWeight: 700 }}>
+                👥 جمع: {fmt.int(f.initialCount)} پرنده
+              </span>
+              <span style={{ color: 'var(--purple)', fontWeight: 700 }}>
+                🎂 سن میانگین: {toFa(f.mergedInfo.avgAgeDays.toFixed(1))} روز
+              </span>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* 🐔 پرنده و نژاد */}
       {(bird || breed) && (
         <>
