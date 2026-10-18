@@ -3,7 +3,7 @@
  */
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
-  Btn, BtnRow, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField,
+  Btn, BtnRow, Field, Grid2, Input, Modal, MoneyField, NumField,
   SectionTitle, Select, Textarea, ErrorBox,
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -167,11 +167,11 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
             <Input placeholder="توضیح" value={it.description} onChange={e => updateItem(it.id, { description: e.target.value })} />
 
-            <Grid3>
+            <Grid2>
               <Field label="واحد"><Input placeholder="عدد" value={it.unit} onChange={e => updateItem(it.id, { unit: e.target.value })} /></Field>
               <Field label="تعداد"><NumField value={String(it.quantity)} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} /></Field>
               <Field label="قیمت"><MoneyField value={String(it.unitPrice)} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
-            </Grid3>
+            </Grid2>
 
             <Grid2>
               <Field label="تخفیف">
@@ -289,11 +289,11 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </Field>
             {p.method === 'check' && (
               <>
-                <Grid3>
+                <Grid2>
                   <Field label="شماره چک"><Input placeholder="مثلاً — ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
                   <Field label="بانک"><Input placeholder="مثلاً — ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
                   <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
-                </Grid3>
+                </Grid2>
                 <Field label="وضعیت چک">
                   <Select value={p.status || 'pending'} onChange={e => updatePayment(p.id, { status: e.target.value as CheckStatus })}>
                     <option value="pending">🟡 در جریان</option>
