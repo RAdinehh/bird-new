@@ -51,12 +51,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       discountValue: floatNonNeg('تخفیف', 1_000_000_000_000).optional(),
       shipping: floatNonNeg('حمل', 1_000_000_000_000).optional(),
       itemPartyId: optionalId(),
-      // فیلدهای پرنده
-            priceUnit: optionalStr(20),
-      liveWeight: floatNonNeg('وزن زنده', 1_000_000).optional(),
-      medicineType: optionalStr(20),
-      model: optionalStr(50),
-      warrantyMonths: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
+      
       birdId: optionalId(),
       breedId: optionalId(),
       flockId: optionalId(),
@@ -64,6 +59,38 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       maleCount: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
       femaleCount: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
       unknownCount: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
+      
+      hatchDate: persianDateOpt('تاریخ هچ'),
+      hatcheryBatchNo: optionalStr(50),
+      chickWeight: floatNonNeg('وزن اولیه جوجه', 150).optional(),
+      transportCost: floatNonNeg('هزینه حمل', 1_000_000_000).optional(),
+      
+      priceUnit: optionalStr(20),
+      liveWeight: floatNonNeg('وزن زنده', 1_000_000).optional(),
+      
+      eggBatchNo: optionalStr(50),
+      eggDate: persianDateOpt('تاریخ تخم'),
+      eggWeight: floatNonNeg('وزن تخم', 200).optional(),
+      brokenEggCount: floatNonNeg('تعداد شکسته', 100000).optional(),
+      nonIncubableCount: floatNonNeg('تعداد غیرقابل جوجه‌کشی', 100000).optional(),
+      sourceFarm: optionalStr(100),
+      
+      medicineType: optionalStr(20),
+      batchNo: optionalStr(50),
+      expiryDate: persianDateOpt('تاریخ انقضا'),
+      withdrawalDays: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
+      
+      feedType: optionalStr(20),
+      brand: optionalStr(50),
+      protein: floatNonNeg('پروتئین', 100).optional(),
+      energy: floatNonNeg('انرژی', 10000).optional(),
+      bagWeight: floatNonNeg('وزن کیسه', 100).optional(),
+      bagCount: floatNonNeg('تعداد کیسه', 10000).optional(),
+      
+      model: optionalStr(50),
+      serialNo: optionalStr(50),
+      hallId: optionalId(),
+      warrantyMonths: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
     })).min(1, 'حداقل یک قلم لازم است'),
     discount: floatNonNeg('تخفیف کل', 1_000_000_000_000).optional(),
     shipping: floatNonNeg('حمل', 1_000_000_000_000).optional(),
