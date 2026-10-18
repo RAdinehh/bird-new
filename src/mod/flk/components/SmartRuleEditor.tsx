@@ -1,6 +1,6 @@
 /**
  * SmartRuleEditor.tsx — ویرایشگر قانون گروه هوشمند
- * جدا شده از GroupsPage.tsx
+ * چیدمان ۲ ستونه + راهنمای زمینه‌ای (hint فقط وقتی خالیه)
  */
 import { Select, Field, Input, Grid2 } from '../../../shr/components/ui';
 import type { FlockGroupRule, FlockGroupType, FlockStatus } from '../store';
@@ -15,7 +15,6 @@ export interface SmartRuleEditorProps {
 export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEditorProps) {
   const update = (patch: Partial<FlockGroupRule>) => {
     const next: FlockGroupRule = { ...rule, ...patch };
-    // حذف فیلدهای خالی
     Object.keys(next).forEach(k => {
       const v = (next as Record<string, unknown>)[k];
       if (v === '' || v === undefined || v === null) {
@@ -33,7 +32,7 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
       borderRadius: 'var(--r-md)',
       display: 'flex',
       flexDirection: 'column',
-      gap: 8,
+      gap: 10,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--purple)' }}>
         🤖 قوانین خودکار
@@ -42,39 +41,56 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
         </span>
       </div>
 
-      <Field label="نوع گله">
-        <Select value={rule.type || ''} onChange={e => update({ type: e.target.value as FlockGroupRule['type'] || undefined })}>
-          <option value="">همه</option>
-          <option value="layer">تخم‌گذار</option>
-          <option value="broiler">گوشتی</option>
-          <option value="breeder">مادر</option>
-        </Select>
-      </Field>
+      <Grid2>
+        <Field
+          label="نوع گله"
+          hint={!rule.type ? 'مثلاً: تخم‌گذار — خالی = همه' : undefined}
+        >
+          <Select value={rule.type || ''} onChange={e => update({ type: e.target.value as FlockGroupRule['type'] || undefined })}>
+            <option value="">همه</option>
+            <option value="layer">تخم‌گذار</option>
+            <option value="broiler">گوشتی</option>
+            <option value="breeder">مادر</option>
+          </Select>
+        </Field>
+        <Field
+          label="نژاد"
+          hint={!rule.breedId ? 'نژاد خاص — خالی = همه' : undefined}
+        >
+          <Select value={rule.breedId || ''} onChange={e => update({ breedId: e.target.value || undefined })}>
+            <option value="">همه</option>
+            {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+          </Select>
+        </Field>
+      </Grid2>
 
-      <Field label="نژاد">
-        <Select value={rule.breedId || ''} onChange={e => update({ breedId: e.target.value || undefined })}>
-          <option value="">همه</option>
-          {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-        </Select>
-      </Field>
+      <Grid2>
+        <Field
+          label="سالن"
+          hint={!rule.hallId ? 'محل نگهداری — خالی = همه' : undefined}
+        >
+          <Select value={rule.hallId || ''} onChange={e => update({ hallId: e.target.value || undefined })}>
+            <option value="">همه</option>
+            {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
+          </Select>
+        </Field>
+        <Field
+          label="وضعیت"
+          hint={!rule.status ? 'وضعیت گله — خالی = همه' : undefined}
+        >
+          <Select value={rule.status || ''} onChange={e => update({ status: e.target.value as FlockGroupRule['status'] || undefined })}>
+            <option value="">همه</option>
+            <option value="active">فعال</option>
+            <option value="archived">آرشیو</option>
+            <option value="sold">فروخته‌شده</option>
+          </Select>
+        </Field>
+      </Grid2>
 
-      <Field label="سالن">
-        <Select value={rule.hallId || ''} onChange={e => update({ hallId: e.target.value || undefined })}>
-          <option value="">همه</option>
-          {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-        </Select>
-      </Field>
-
-      <Field label="وضعیت">
-        <Select value={rule.status || ''} onChange={e => update({ status: e.target.value as FlockGroupRule['status'] || undefined })}>
-          <option value="">همه</option>
-          <option value="active">فعال</option>
-          <option value="archived">آرشیو</option>
-          <option value="sold">فروخته‌شده</option>
-        </Select>
-      </Field>
-
-      <Field label="منبع">
+      <Field
+        label="منبع"
+        hint={!rule.source ? 'گله‌ها از کجا اومدن — خالی = همه' : undefined}
+      >
         <Select value={rule.source || ''} onChange={e => update({ source: e.target.value || undefined })}>
           <option value="">همه</option>
           <option value="purchase">خریداری</option>
@@ -84,7 +100,10 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
       </Field>
 
       <Grid2>
-        <Field label="سن از (روز)">
+        <Field
+          label="سن از (روز)"
+          hint={!rule.minAge ? 'حداقل سن — مثلاً: ۱۴۰' : undefined}
+        >
           <Input
             value={rule.minAge || ''}
             onChange={e => update({ minAge: e.target.value ? parseInt(e.target.value) : undefined })}
@@ -92,7 +111,10 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
             inputMode="numeric"
           />
         </Field>
-        <Field label="سن تا (روز)">
+        <Field
+          label="سن تا (روز)"
+          hint={!rule.maxAge ? 'حداکثر سن — مثلاً: ۲۰۰' : undefined}
+        >
           <Input
             value={rule.maxAge || ''}
             onChange={e => update({ maxAge: e.target.value ? parseInt(e.target.value) : undefined })}
