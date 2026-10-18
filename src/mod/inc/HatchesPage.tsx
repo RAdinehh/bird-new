@@ -22,10 +22,12 @@ import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { format as formatJ } from 'date-fns-jalali';
 import { buildFlockFromHatch, buildSaleInvoiceFromHatch } from './api/hatchActions';
 import FlockCreateModal from './components/FlockCreateModal';
+import type { FlockForm } from './components/FlockCreateModal';
 import SellModal from './components/SellModal';
 import HatchFormModal from './components/HatchFormModal';
 import HatchCard from './components/HatchCard';
 import { logAction } from '../../cor/logger/auditLog';
+import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 
 const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
 
@@ -43,7 +45,8 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
   const [deviceFilter, setDeviceFilter] = useState('');
 
   const [flockModal, setFlockModal] = useState<{ hatchId: string; count: number } | null>(null);
-  const [flockForm, setFlockForm] = useState({ name:'', type:'layer', hallId:'', zoneId:'' });
+  const [flockForm, setFlockForm] = useState<FlockForm>({ name:'', type:'layer', hallId:'', zoneId:'' });
+  const breedStd = useBreedStandard();
   const [sellModal, setSellModal] = useState<{ hatchId: string; count: number } | null>(null);
   const [sellForm, setSellForm] = useState({ buyerId:'', count:'', unitPrice:'', date:'' });
 
@@ -127,14 +130,31 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
     const entry = _entriesById[h.eggEntryId];
     const bird = entry ? _birdsById[entry.birdId] : null;
     if (!bird) { toastMsg.error('پرنده پیدا نشد'); return; }
+    const std = entry?.breedId ? breedStd.byBreedId(entry.breedId) : null;
+    // 🆕 محاسبه از form (کاربر ممکنه ویرایش کرده باشه)
+    const eggCount = entry?.count || 0;
+    const hatched = flockModal.count || 0;
+    const uPrice = parseFloat(flockForm.unitPrice || '0') || 0;
+    const shipCost = parseFloat(flockForm.shippingCost || '0') || 0;
+    const purchasePricePerChick = hatched > 0 && uPrice > 0 ? Math.round((uPrice * eggCount) / hatched) : null;
+
     const data = buildFlockFromHatch({
       formName: flockForm.name.trim(),
       formType: flockForm.type,
       formHallId: flockForm.hallId,
       formZoneId: flockForm.zoneId,
-      hatch: { ...h, hatched: flockModal.count } as any,
+      hatch: {
+        ...h,
+        hatched: flockModal.count,
+        maleCount: flockForm.maleCount ? parseInt(flockForm.maleCount) || null : h.maleCount,
+        femaleCount: flockForm.femaleCount ? parseInt(flockForm.femaleCount) || null : h.femaleCount,
+        unknownCount: flockForm.unknownCount ? parseInt(flockForm.unknownCount) || null : (h as any).unknownCount,
+      } as any,
       bird,
       breedId: entry?.breedId || '',
+      entryUnitPrice: purchasePricePerChick,
+      entryShippingCost: shipCost > 0 ? shipCost : null,
+      layingStartDayFromStd: flockForm.layingStartDay ? parseInt(flockForm.layingStartDay) || null : (std?.biology?.layingStartDay ?? null),
     });
     const newFlockId = addFlock(data as any);
     if (newFlockId) {
@@ -314,7 +334,23 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
                 onToggle={() => setExpandedId(isOpen ? null : h.id)}
                 onEdit={() => openEdit(h)}
                 onDelete={() => doDelete(h.id)}
-                onOpenFlock={() => { setFlockModal({ hatchId: h.id, count: h.hatched || 0 }); setFlockForm({ name: 'گله ' + (bird?.name || '') + ' ' + toFa(formatJ(new Date(), 'yyyy')), type: 'layer', hallId: '', zoneId: '' }); }}
+                onOpenFlock={() => {
+  const _e = _entriesById[h.eggEntryId];
+  const _s = _e?.breedId ? breedStd.byBreedId(_e.breedId) : null;
+  setFlockModal({ hatchId: h.id, count: h.hatched || 0 });
+  setFlockForm({
+    name: 'گله ' + (bird?.name || '') + ' ' + toFa(formatJ(new Date(), 'yyyy')),
+    type: 'layer',
+    hallId: '',
+    zoneId: '',
+    maleCount: h.maleCount ? String(h.maleCount) : '',
+    femaleCount: h.femaleCount ? String(h.femaleCount) : '',
+    unknownCount: (h as any).unknownCount ? String((h as any).unknownCount) : '',
+    unitPrice: _e?.unitPrice ? String(_e.unitPrice) : '',
+    shippingCost: _e?.shippingCost ? String(_e.shippingCost) : '',
+    layingStartDay: _s?.biology?.layingStartDay ? String(_s.biology.layingStartDay) : '',
+  });
+}}
                 onOpenSell={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}
               />
             );
@@ -357,16 +393,32 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
       {ms.selectionMode && <div style={{ height: 90 }} />}
 
       {/* ═══ Modal گله ═══ */}
-      <FlockCreateModal
-        open={!!flockModal}
-        count={flockModal?.count || 0}
-        form={flockForm}
-        setForm={setFlockForm}
-        halls={halls}
-        zones={zones}
-        onCreate={createFlock}
-        onClose={() => setFlockModal(null)}
-      />
+      {flockModal && (() => {
+        const _h = hatches.find(x => x.id === flockModal.hatchId);
+        const _e = _h ? _entriesById[_h.eggEntryId] : null;
+        const _s = _e?.breedId ? breedStd.byBreedId(_e.breedId) : null;
+        return (
+          <FlockCreateModal
+            open={!!flockModal}
+            count={flockModal?.count || 0}
+            form={flockForm}
+            setForm={setFlockForm}
+            halls={halls}
+            zones={zones}
+            sourceData={{
+              maleCount: _h?.maleCount,
+              femaleCount: _h?.femaleCount,
+              unknownCount: (_h as any)?.unknownCount,
+              unitPrice: _e?.unitPrice,
+              shippingCost: _e?.shippingCost,
+              layingStartDay: _s?.biology?.layingStartDay,
+              eggCount: _e?.count,
+            }}
+            onCreate={createFlock}
+            onClose={() => setFlockModal(null)}
+          />
+        );
+      })()}
 
       {/* ═══ Modal فروش ═══ */}
       <SellModal

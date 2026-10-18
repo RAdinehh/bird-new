@@ -25,8 +25,14 @@ export function buildFlockFromHatch(params: {
   hatch: HatchInput;
   bird: Bird;
   breedId: string;
+  /** 🆕 هزینه خرید تخم (از EggEntry) */
+  entryUnitPrice?: number | null;
+  entryShippingCost?: number | null;
+  /** 🆕 سن شروع تخم‌گذاری از استاندارد نژاد */
+  layingStartDayFromStd?: number | null;
 }): Omit<Flock, 'id' | 'createdAt' | 'updatedAt'> {
-  const { formName, formType, formHallId, formZoneId, hatch, bird, breedId } = params;
+  const { formName, formType, formHallId, formZoneId, hatch, bird, breedId,
+    entryUnitPrice, entryShippingCost, layingStartDayFromStd } = params;
   const count = hatch.hatched || 0;
   return {
     name: formName,
@@ -39,14 +45,15 @@ export function buildFlockFromHatch(params: {
     currentCount: count,
     maleCount: hatch.maleCount || null,
     femaleCount: hatch.femaleCount || null,
-    layingStartDay: 0,
+    unknownCount: (hatch as any).unknownCount || null,
+    layingStartDay: layingStartDayFromStd ?? 0,
     vaccineScheduleId: '',
     hatchDate: hatch.date,
     purchaseDate: '',
     startDate: hatch.date,
     source: 'hatch',
-    purchasePrice: null,
-    deliveryCost: null,
+    purchasePrice: entryUnitPrice ?? null,
+    deliveryCost: entryShippingCost ?? null,
     otherCosts: null,
     status: 'active',
     notes: 'از هچ ' + hatch.date,

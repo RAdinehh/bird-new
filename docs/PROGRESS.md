@@ -79,3 +79,5 @@
 [2026/10/18 09:38] feat(flk): Pre-check auto-link برای فاکتور→گله — جلوگیری از تکرار (۸ تست) + فیکس hatchId
 
 [2026/10/18 09:49] feat(flk): فیلد unknownCount در FlocksModal — فرم گله + validation + mismatch check
+
+[2026/10/18 10:04] feat(inc): Preview Modal ساخت گله — نمایش و ویرایش خودکار مقادیر از هچ/تخم/استاندارد نژاد
