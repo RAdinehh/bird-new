@@ -89,3 +89,5 @@
 [2026/10/18 10:49] feat(flk): Undo برای mergeFlocks — unmergeFlocks + UndoBar (۴ تست)
 
 [2026/10/18 11:05] fix(UI): بازسازی ۳ پچ — هدر GroupsPage منظم + MultiSelectBar اسکرول + FilterGroupBody L13
+
+[2026/10/18 11:38] fix(UI): MultiSelectBar زیر Modal (zIndex 90) + حذف bullet point از متن مدال‌ها

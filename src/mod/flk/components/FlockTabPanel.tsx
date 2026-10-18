@@ -110,9 +110,9 @@ export default function FlockTabPanel({
       if (withRefs.length > 0) {
         msg = '';
         if (withoutRefs.length > 0) {
-          msg += '• ' + toFa(withoutRefs.length) + ' گله بدون ارجاع → حذف می‌شن\n';
+          msg += toFa(withoutRefs.length) + ' گله بدون ارجاع → حذف می‌شن\n';
         }
-        msg += '• ' + toFa(withRefs.length) + ' گله ارجاع دارن (dlg/egg/tra) → حذف با هشدار\n';
+        msg += toFa(withRefs.length) + ' گله ارجاع دارن (dlg/egg/tra) → حذف با هشدار\n';
         msg += '\n⚠️ اگه ارجاع‌ها باقی بمونن، آمار اشتباه می‌شه.';
       }
 

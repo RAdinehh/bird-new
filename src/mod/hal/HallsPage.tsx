@@ -125,9 +125,9 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         
       if (totalZones > 0 || totalEquip > 0 || hasFlocks > 0) {
         msg += `📋 تأثیرات این حذف:\n`;
-        if (totalZones > 0) msg += `• ${toFa(totalZones)} بخش (Zone) به طور کامل حذف می‌شود.\n`;
-        if (totalEquip > 0) msg += `• ${toFa(totalEquip)} تجهیز متصل به این سالن حذف می‌شود.\n`;
-        if (hasFlocks > 0) msg += `• ${toFa(hasFlocks)} گله فعال بدون سالن می‌ماند (گله‌ها حذف نمی‌شوند).\n`;
+        if (totalZones > 0) msg += `${toFa(totalZones)} بخش (Zone) به طور کامل حذف می‌شود.\n`;
+        if (totalEquip > 0) msg += `${toFa(totalEquip)} تجهیز متصل به این سالن حذف می‌شود.\n`;
+        if (hasFlocks > 0) msg += `${toFa(hasFlocks)} گله فعال بدون سالن می‌ماند (گله‌ها حذف نمی‌شوند).\n`;
       } else {
         msg += `این سالن هیچ بخش، تجهیز یا گله فعالی ندارد.`;
       }
