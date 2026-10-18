@@ -145,7 +145,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               }
             />
 
-            {whsItems.length > 0 && (
+            {whsItems.length > 0 && !['chick', 'egg', 'fertile_egg', 'adult'].includes(form.category) && (
               <>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', cursor: 'pointer' }}>
                   <input type="checkbox" checked={!!it.itemId}

@@ -58,8 +58,6 @@ export interface ItemDetailFormData {
   phosphorus?: number | null;
   methionine?: number | null;
   lysine?: number | null;
-  bagWeight?: number | null;
-  bagCount?: number | null;
   stockItemId?: string;
 
   model?: string;
@@ -100,16 +98,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'chick') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <SecTitle icon="📄" title="اسناد و تامین‌کننده" />
-        <Grid2>
-          <Field label="نام گله / بچ جدید" hint="خالی = نام خودکار">
-            <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder="مثلاً: گله آذر" />
-          </Field>
-          <Field label="بچ هچری">
-            <Input value={String(item.hatcheryBatchNo || '')} onChange={e => updateItem({ hatcheryBatchNo: e.target.value })} placeholder="H-99" />
-          </Field>
-        </Grid2>
-
+        
         <SecTitle icon="🧬" title="هویت و نژاد" />
         <Grid2>
           <Field label="نوع پرنده">
@@ -119,12 +108,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
           </Field>
         </Grid2>
+
+        <SecTitle icon="📄" title="اسناد و تامین‌کننده" />
         <Grid2>
-          <Field label="تاریخ هچ">
-            <Input value={String(item.hatchDate || '')} onChange={e => updateItem({ hatchDate: e.target.value })} placeholder="1405/07/26" />
+          <Field label="نام گله / بچ جدید" hint="خالی = نام خودکار">
+            <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder="مثلاً: گله آذر" />
           </Field>
-          <Field label="سن (روز)">
-            <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
+          <Field label="بچ هچری">
+            <Input value={String(item.hatcheryBatchNo || '')} onChange={e => updateItem({ hatcheryBatchNo: e.target.value })} placeholder="H-99" />
           </Field>
         </Grid2>
 
@@ -141,6 +132,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="گله مقصد (موجود)">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله (جدید) —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
+          <Field label="تاریخ هچ">
+            <Input value={String(item.hatchDate || '')} onChange={e => updateItem({ hatchDate: e.target.value })} placeholder="1405/07/26" />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="سن (روز)">
+            <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
+          </Field>
           <Field label="وزن اولیه (گرم)">
             <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => updateItem({ chickWeight: parseFaNum(e.target.value) || null })} unit="g" min={0} />
           </Field>
@@ -153,17 +152,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
           </Field>
         </Grid2>
+
+        <SecTitle icon="💰" title="هزینه و مالی" />
         <Grid2>
-          <Field label="تعداد نامعلوم">
-            <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
+          <Field label="هزینه حمل اختصاصی">
+            <Input mode="number" value={item.transportCost !== null && item.transportCost !== undefined ? String(item.transportCost) : ''} onChange={e => updateItem({ transportCost: parseFaNum(e.target.value) || null })} unit="ت" min={0} />
           </Field>
           <div />
         </Grid2>
-
-        <SecTitle icon="💰" title="هزینه و مالی" />
-        <Field label="هزینه حمل اختصاصی">
-          <Input mode="number" value={item.transportCost !== null && item.transportCost !== undefined ? String(item.transportCost) : ''} onChange={e => updateItem({ transportCost: parseFaNum(e.target.value) || null })} unit="ت" min={0} />
-        </Field>
         {sellerSlot}
       </div>
     );
@@ -173,6 +169,16 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (isEggCategory) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <SecTitle icon="🧬" title="هویت و نژاد" />
+        <Grid2>
+          <Field label="نوع پرنده">
+            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
+          </Field>
+          <Field label="نژاد">
+            <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
+          </Field>
+        </Grid2>
+
         <SecTitle icon="📄" title="اسناد و تامین‌کننده" />
         <Grid2>
           <Field label="شماره بچ تخم">
@@ -183,27 +189,20 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
 
-        <SecTitle icon="🧬" title="هویت و نژاد" />
-        <Grid2>
-          <Field label="نوع پرنده">
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
-          </Field>
-          <Field label="نژاد">
-            <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
-          </Field>
-        </Grid2>
-        <Field label="تاریخ تولید تخم">
-          <Input value={String(item.eggDate || '')} onChange={e => updateItem({ eggDate: e.target.value })} placeholder="1405/07/20" />
-        </Field>
-
         <SecTitle icon="🔢" title="تعداد و تخصیص مکان" />
         <Grid2>
           <Field label="گله مقصد (موجود)">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
+          <Field label="تاریخ تولید تخم">
+            <Input value={String(item.eggDate || '')} onChange={e => updateItem({ eggDate: e.target.value })} placeholder="1405/07/20" />
+          </Field>
+        </Grid2>
+        <Grid2>
           <Field label="تعداد شکسته">
             <Input mode="number" value={item.brokenEggCount !== null && item.brokenEggCount !== undefined ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} />
           </Field>
+          <div />
         </Grid2>
 
         <SecTitle icon="💰" title="هزینه و مالی" />
@@ -225,25 +224,22 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
           </Field>
         </Grid2>
-        <Field label="سن (روز)">
-          <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
-        </Field>
 
         <SecTitle icon="🔢" title="تعداد و تخصیص مکان" />
         <Grid2>
           <Field label="گله مقصد (موجود)">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
-          <Field label="تعداد نر">
-            <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
+          <Field label="سن (روز)">
+            <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
           </Field>
         </Grid2>
         <Grid2>
+          <Field label="تعداد نر">
+            <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
+          </Field>
           <Field label="تعداد ماده">
             <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
-          </Field>
-          <Field label="تعداد نامعلوم">
-            <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
           </Field>
         </Grid2>
         
@@ -290,8 +286,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
           <div />
         </Grid2>
-
-
 
         <SecTitle icon="📅" title="انبار و ردیابی" />
         <Grid2>
@@ -359,13 +353,16 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input value={String(item.expiryDate || '')} onChange={e => updateItem({ expiryDate: e.target.value })} placeholder="1405/12/29" />
           </Field>
         </Grid2>
-        <Field label="شرایط نگهداری">
-          <Select value={String(item.storage || 'room')} onChange={e => updateItem({ storage: e.target.value })}>
-            <option value="room">دمای اتاق</option>
-            <option value="fridge">یخچال (۲ تا ۸ درجه)</option>
-            <option value="freezer">فریزر (زیر صفر)</option>
-          </Select>
-        </Field>
+        <Grid2>
+          <Field label="شرایط نگهداری">
+            <Select value={String(item.storage || 'room')} onChange={e => updateItem({ storage: e.target.value })}>
+              <option value="room">دمای اتاق</option>
+              <option value="fridge">یخچال (۲ تا ۸ درجه)</option>
+              <option value="freezer">فریزر (زیر صفر)</option>
+            </Select>
+          </Field>
+          <div />
+        </Grid2>
 
         <SecTitle icon="💰" title="هزینه و مالی" />
         <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
