@@ -4,6 +4,7 @@
 import { parse as parseJ, format as formatJ, addDays } from 'date-fns-jalali';
 import { useFlk } from '../flk/store';
 import { useBrd } from '../brd/store';
+import { getBiology, getStandardFor } from '../set/standards/resolve';
 import { useHal } from '../hal/store';
 import { useEgg } from '../egg/store';
 import type { Invoice, InvoiceItem, InvoiceType } from './types';
@@ -138,9 +139,22 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
         const breed = brd.breeds.find(b => b.id === it.breedId);
         const bird = brd.birds.find(b => b.id === it.birdId);
         const name = `گله ${breed?.name || bird?.name || '?'} — ${inv.date}`;
+        // 🆕 type و layingStartDay از استاندارد نژاد خونده می‌شن
+        const standard = breed ? getStandardFor(breed.name || bird?.name || '', {}) : (bird ? getStandardFor(bird.name, {}) : null);
+        const biology = standard?.biology || null;
+
+        // نوع گله از روی category آیتم تشخیص داده می‌شود
+        const inferredType: 'layer' | 'broiler' | 'breeder' =
+          ref.cat === 'broiler' ? 'broiler' :
+          ref.cat === 'breeder' ? 'breeder' :
+          ref.cat === 'layer' ? 'layer' :
+          // fallback بر اساس نژاد
+          (standard?.purposes?.includes('broiler') ? 'broiler' :
+           standard?.purposes?.includes('breeder') ? 'breeder' : 'layer');
+
         const newFlockId = flk.add({
           name,
-          type: 'layer',
+          type: inferredType,
           birdId: birdId,
           breedId: breedId,
           hallId: '',
@@ -149,8 +163,8 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           currentCount: delta,
           maleCount: it.maleCount ?? null,
           femaleCount: it.femaleCount ?? null,
-          layingStartDay: 0,
-          endOfCycleDay: null,
+          layingStartDay: biology?.layingStartDay ?? 0,
+          endOfCycleDay: biology?.endOfCycleDay ?? null,
           vaccineScheduleId: '',
           hatchDate: computeHatchDate(inv.date, it.ageDays),
           purchaseDate: inv.date,

@@ -67,3 +67,5 @@
 [2026/10/18 08:16] refactor(inc): کاهش ۱۸ any + فیکس importها و bird optional (EggEntryCard)
 
 [2026/10/18 08:26] fix(flk/groups): محاسبه تلفات از events + هزینه جاری از whs (خوراک/واکسن/دارو) — ۶ تست
+
+[2026/10/18 08:35] fix(tra→flk): نوع گله از category فاکتور + layingStartDay/endOfCycleDay از استاندارد نژاد
