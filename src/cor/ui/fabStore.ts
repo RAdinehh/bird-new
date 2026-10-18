@@ -14,6 +14,8 @@ export interface FabConfig {
   onClick: () => void;
   hidden?: boolean;
   icon?: string;
+  /** 🆕 wake: FAB با اسکرول/لمس ظاهر می‌شه و ۳ ثانیه بعد از سکون محو می‌شه */
+  wakeMode?: boolean;
 }
 
 interface FabState {

@@ -83,11 +83,11 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
       background: 'var(--accent-soft)',
       border: '1px solid var(--accent-border)',
       borderRadius: 'var(--r-lg)',
-      padding: 'var(--pad-comfy)',
+      padding: '8px 10px',
     }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}>
-        <span style={{ fontSize: 'var(--fs-md)' }} aria-hidden>⏳</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
+        <span style={{ fontSize: 'var(--fs-sm)' }} aria-hidden>⏳</span>
         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)', flex: 1 }}>
           نزدیک به شروع تخم‌گذاری
         </span>
@@ -103,7 +103,7 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
         display: isMulti ? 'grid' : 'flex',
         gridTemplateColumns: isMulti ? '1fr 1fr' : undefined,
         flexDirection: isMulti ? undefined : 'column',
-        gap: 'var(--sp-2)',
+        gap: '6px',
       }}>
         {items.map(({ f, age, startDay, remain, pct }) => {
           const isWarn = remain <= 14;
@@ -115,17 +115,17 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
                 background: 'var(--card)',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--r-md)',
-                padding: 'var(--pad-tight)',
+                padding: '6px 8px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 'var(--sp-2)',
+                gap: '4px',
                 minWidth: 0,
                 textAlign: 'center',
               }}>
-                <Ring pct={pct} color={color} size={40} />
+                <Ring pct={pct} color={color} size={36} />
                 <div style={{
-                  fontSize: 'var(--fs-xs)', fontWeight: 700,
+                  fontSize: 'var(--fs-sm)', fontWeight: 700,
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                   width: '100%',
                 }}>{f.name}</div>
@@ -142,20 +142,20 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
               background: 'var(--card)',
               border: '1px solid var(--border)',
               borderRadius: 'var(--r-md)',
-              padding: '10px 12px',
+              padding: '8px 10px',
               display: 'flex',
               alignItems: 'center',
-              gap: 'var(--sp-3)',
+              gap: '8px',
               minWidth: 0,
             }}>
-              <Ring pct={pct} color={color} size={40} />
+              <Ring pct={pct} color={color} size={36} />
               {/* (رینگ اول توی DOM = راست توی RTL) */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
                   fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 4,
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                 }}>{f.name}</div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <span>سن: <b style={{ color: 'var(--text)' }}>{toFa(age)}</b> روز</span>
                   <span aria-hidden>·</span>
                   <span>شروع: <b style={{ color: 'var(--text)' }}>{toFa(startDay)}</b> روز</span>
@@ -165,7 +165,7 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
                 flexShrink: 0, textAlign: 'center', lineHeight: 1.1, color,
               }}>
                 <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{fmt.int(remain)}</div>
-                <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', marginTop: 2 }}>روز مانده</div>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>روز مانده</div>
               </div>
             </div>
           );

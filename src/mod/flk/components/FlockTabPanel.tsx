@@ -90,7 +90,16 @@ export default function FlockTabPanel({
     initialSort: config.initialSort,
   });
 
-  useFab(active ? { label: 'افزودن گله', onClick: onAdd } : null);
+  // FAB: ۰ گله → مخفی · ۱-۴ → ثابت · ۵+ → wake
+  useFab(
+    active && flocks.length > 0
+      ? {
+          label: 'افزودن گله',
+          onClick: onAdd,
+          wakeMode: flocks.length >= 5,
+        }
+      : null
+  );
 
   const [mergeIds, setMergeIds] = useState<string[]>([]);
   const [groupFlockId, setGroupFlockId] = useState<string | null>(null);

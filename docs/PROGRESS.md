@@ -91,3 +91,5 @@
 [2026/10/18 11:05] fix(UI): بازسازی ۳ پچ — هدر GroupsPage منظم + MultiSelectBar اسکرول + FilterGroupBody L13
 
 [2026/10/18 11:38] fix(UI): MultiSelectBar زیر Modal (zIndex 90) + حذف bullet point از متن مدال‌ها
+
+[2026/10/18 12:43] feat(flk): FAB سه‌حالته — ۰ گله مخفی، ۱-۴ ثابت، ۵+ wake با اسکرول و تایمر ۳ث

@@ -21,5 +21,5 @@ export function useFab(cfg: FabConfig | null) {
     set(cfg, id);
     return () => set(null, id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cfg?.label, cfg?.hidden, cfg?.onClick]);
+  }, [cfg?.label, cfg?.hidden, cfg?.onClick, cfg?.wakeMode]);
 }
