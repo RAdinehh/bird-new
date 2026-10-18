@@ -83,78 +83,12 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </Field>
         </Grid2>
 
-        <Field
-          label={isPurchase ? 'گله‌ی مقصد' : 'گله مربوطه'}
-          hint={isPurchase
-            ? 'اختیاری — اگه انتخاب شه، فاکتور به این گله ادغام می‌شه'
-            : 'اختیاری — برای محاسبه ROI'}
-        >
-          <div style={{ display: 'flex', gap: 6 }}>
-            <Select
-              value={form.relatedFlockId}
-              onChange={e => setForm({ ...form, relatedFlockId: e.target.value })}
-              style={{ flex: 1 }}
-            >
-              <option value="">{isPurchase ? '— بدون گله (فقط انبار) —' : '— بدون گله —'}</option>
-              {flocks.filter(f => f.status === 'active').map(f => (
-                <option key={f.id} value={f.id}>
-                  {f.name} — {f.currentCount ?? 0} پرنده
-                </option>
-              ))}
-            </Select>
-            {onNewFlock && (
-              <Btn
-                size="sm"
-                onClick={onNewFlock}
-                style={{ flexShrink: 0 }}
-                title="ساخت گله جدید"
-              >
-                + جدید
-              </Btn>
-            )}
-          </div>
-          {(() => {
-            if (!form.relatedFlockId) return null;
-            const f = flocks.find((x: any) => x.id === form.relatedFlockId);
-            if (!f) return null;
-            const firstBird = form.items.find((it: any) => it.birdId);
-            if (!firstBird) return null;
-            if (!f.breedId || !firstBird.breedId) return null;
-            if (f.breedId === firstBird.breedId) return null;
-            return (
-              <div style={{
-                marginTop: 6,
-                padding: '6px 10px',
-                background: 'var(--warn-soft, #ffedd5)',
-                color: 'var(--warn, #ea580c)',
-                border: '1px solid var(--warn, #ea580c)',
-                borderRadius: 6,
-                fontSize: 11,
-                lineHeight: 1.6,
-              }}>
-                ⚠️ نژاد گله با نژاد فاکتور متفاوت ئه — با احتیاط ادامه دهید
-              </div>
-            );
-          })()}
-        </Field>
+
 
         {form.isPreorder && (
-          <>
-            <Field label="تاریخ تحویل" required>
-              <DatePicker value={form.deliveryDate} onChange={v => setForm({...form, deliveryDate: v})}  autoToday />
-            </Field>
-            <Grid2>
-              <Field label="نوع پیش‌پرداخت">
-                <Select value={form.advanceType} onChange={e => setForm({...form, advanceType: e.target.value as 'percent' | 'amount'})}>
-                  <option value="percent">درصد (٪)</option>
-                  <option value="amount">مبلغ (ت)</option>
-                </Select>
-              </Field>
-              <Field label="مقدار">
-                <NumField placeholder="مثلاً — ۱۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
-              </Field>
-            </Grid2>
-          </>
+          <Field label="تاریخ تحویل" required>
+            <DatePicker value={form.deliveryDate} onChange={v => setForm({...form, deliveryDate: v})}  autoToday />
+          </Field>
         )}
 
         <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت</SectionTitle>
@@ -240,6 +174,19 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
 
         <AccordionSection icon="📅" title="شرایط پرداخت" defaultOpen summary={form.paymentTerms === 'cash' ? 'نقدی' : form.paymentTerms === 'installment' ? `${toFa(form.installmentCount || '0')} قسط` : 'توافقی'}>
+        {form.isPreorder && (
+          <Grid2>
+            <Field label="نوع پیش‌پرداخت">
+              <Select value={form.advanceType} onChange={e => setForm({...form, advanceType: e.target.value as 'percent' | 'amount'})}>
+                <option value="percent">درصد (٪)</option>
+                <option value="amount">مبلغ (ت)</option>
+              </Select>
+            </Field>
+            <Field label="مقدار پیش‌پرداخت">
+              <NumField placeholder="مثلاً — ۱۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
+            </Field>
+          </Grid2>
+        )}
         <Grid2>
           <Field label="نوع پرداخت" required>
             <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
