@@ -25,6 +25,7 @@ export const useTra = create<State>()(
   persist(
     (set, get) => ({
       invoices: [],
+      partyPayments: [],
       deals: [],
       addInvoice: (i) => {
         const id = uuid();
@@ -111,6 +112,22 @@ export const useTra = create<State>()(
         set({ invoices: get().invoices.filter(x => x.id !== id) });
         try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices)); } catch(e) {}
       },
+
+      // ═══ Phase 6: پرداخت‌های طرف حساب ═══
+      addPartyPayment: (p: any) => {
+        const id = uuid();
+        const now = new Date().toISOString();
+        const pp = { ...p, id, createdAt: now, updatedAt: now };
+        set({ partyPayments: [...get().partyPayments, pp] });
+        return id;
+      },
+      updatePartyPayment: (id: string, patch: any) => {
+        set({ partyPayments: get().partyPayments.map((x: any) => x.id === id ? { ...x, ...patch, updatedAt: new Date().toISOString() } : x) });
+      },
+      deletePartyPayment: (id: string) => {
+        set({ partyPayments: get().partyPayments.filter((x: any) => x.id !== id) });
+      },
+
       addDeal: (d) => set({ deals: [...get().deals, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       updateDeal: (id, patch) => set({ deals: get().deals.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       deleteDeal: (id) => set({ deals: get().deals.filter(x => x.id !== id) })

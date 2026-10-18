@@ -60,6 +60,35 @@ export const CHECK_STATUS_LABEL: Record<CheckStatus, string> = {
 };
 
 
+
+/** پرداخت مستقل در سطح طرف حساب (برای تخصیص چندگانه) */
+export interface PartyPayment {
+  id: string;
+  partyId: string;
+  date: string;
+  amount: number;
+  method: 'cash' | 'card' | 'check';
+  type?: 'regular' | 'advance' | 'refund' | 'settlement';
+  checkNo: string;
+  bank: string;
+  dueDate: string;
+  notes: string;
+  status?: CheckStatus;
+  clearedDate?: string;
+  bouncedDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** تخصیص پرداخت به فاکتور */
+export interface Allocation {
+  id: string;
+  paymentId: string;
+  invoiceId: string;
+  amount: number;
+  createdAt: string;
+}
+
 export interface InvoiceItem extends ItemCategoryFields {
   flockName?: string;
   storage?: string;
@@ -186,6 +215,8 @@ export interface State {
   addDeal: (d: Omit<Deal, 'id'|'createdAt'|'updatedAt'>) => void;
   updateDeal: (id: string, patch: Partial<Deal>) => void;
   deleteDeal: (id: string) => void;
+  /** پرداخت‌های سطح طرف حساب (Phase 6) */
+  partyPayments: PartyPayment[];
 }
 
 
