@@ -164,12 +164,12 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
            standard?.purposes?.includes('breeder') ? 'breeder' : 'layer');
 
         const newFlockId = flk.add({
-          name,
+          name: (it as any).flockName || name,
           type: inferredType,
           birdId: birdId,
           breedId: breedId,
-          hallId: '',
-          zoneId: '',
+          hallId: (it as any).hallId || '',
+          zoneId: (it as any).zoneId || '',
           initialCount: delta,
           currentCount: delta,
           maleCount: it.maleCount ?? null,
@@ -183,7 +183,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           startDate: inv.date,
           source: 'purchase',
           purchasePrice: it.unitPrice || 0,
-          deliveryCost: it.shipping || 0,
+          deliveryCost: (it as any).transportCost || 0,
           otherCosts: 0,
           status: 'active',
           notes: `از فاکتور ${inv.number || ''}`,
