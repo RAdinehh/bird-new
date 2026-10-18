@@ -7,6 +7,7 @@ import { toFa, toEn } from '../../../shr/utils/fa';
 import { paidSum, calcItemTotal, type Invoice, type InvoiceItem, type Payment } from '../store';
 import { emptyForm as empty, type F } from '../types-invoice';
 import { toastMsg } from '../../../cor/store/toast';
+import { showConfirmAsync } from '../../../cor/store/dialog';
 
 export function useInvoiceForm(params: {
   kind: 'purchase' | 'sale';
@@ -121,7 +122,7 @@ export function useInvoiceForm(params: {
   };
 
   // ذخیره
-  const save = () => {
+  const save = async () => {
     if (!form.partyId) { setErr(isPurchase ? 'فروشنده اجباری است' : 'مشتری اجباری است'); return; }
     if (!form.date.trim()) { setErr('تاریخ اجباری است'); return; }
     if (form.items.length === 0) { setErr('حداقل یک قلم اضافه کنید'); return; }
@@ -139,7 +140,41 @@ export function useInvoiceForm(params: {
       advancePercent: form.isPreorder && form.advanceType === 'percent' ? num(form.advanceValue) : 0,
       advancePayment: form.isPreorder && form.advanceType === 'amount' ? num(form.advanceValue) : 0,
     };
-    if (form.id) updateInvoice(form.id, data); else addInvoice(data);
+    if (form.id) {
+      updateInvoice(form.id, data);
+    } else {
+      // 🆕 Preview: چک گله orphan قبل از add
+      const birdItems = (form.items || []).filter((it: any) => it.birdId);
+      if (kind === 'purchase' && birdItems.length > 0 && !data.skipAutoLink) {
+        try {
+          const { findOrphanMatches } = await import('../../flk/helpers-store');
+          const { useFlk } = await import('../../flk/store');
+          const allFlocks = useFlk.getState().flocks;
+          const firstBird = birdItems[0];
+          const matches = findOrphanMatches({
+            birdId: firstBird.birdId || '',
+            breedId: firstBird.breedId || '',
+            flocks: allFlocks,
+          });
+          if (matches.length === 1) {
+            const orphan = matches[0];
+            const okPreview = await showConfirmAsync(
+              'گله مشابه پیدا شد',
+              'گله «' + orphan.name + '» (' + (orphan.currentCount || 0) + ' پرنده) بدون سند خرید ئه.\n\nاین فاکتور (خرید جوجه) به این گله اضافه شود یا گله جدید بسازم؟',
+            );
+            if (okPreview === false) {
+              // کاربر لغو کرد — ذخیره نمی‌شه
+              return;
+            }
+            // okPreview = true → auto-link عادی (applyInvoiceFlocks)
+            // برای «گله جدید»: باید گزینه‌ی جدا داشتیم — فعلاً فقط تأیید auto-link
+          }
+        } catch (e) {
+          console.error('[invoice preview]', e);
+        }
+      }
+      addInvoice(data);
+    }
     setOpen(false);
   };
 

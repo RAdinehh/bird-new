@@ -115,3 +115,5 @@
 [2026/10/18 16:24] refactor(flk): split store.ts→types-store.ts (۵۲۴→~۴۱۶) + GroupsPage→groupsConstants.ts (۵۱۹→~۴۷۱)
 
 [2026/10/18 16:49] feat(flk+tra): Shadow Invoice — گله دستی با هزینه > ۰ → confirm + فاکتور خرید خودکار در tra
+
+[2026/10/18 17:57] feat(tra): Preview modal قبل از auto-link — چک گله مشابه در فاکتور خرید جوجه
