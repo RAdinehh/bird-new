@@ -81,6 +81,7 @@ describe('FlocksPage — نمایش لیست', () => {
 describe('FlocksPage — افزودن', () => {
   it('دکمه افزودن دیده میشه وقتی خالیه', async () => {
     renderWithRouter(<FlocksPage />);
-    expect(await screen.findByText(/افزودن گله/)).toBeInTheDocument();
+    // GuidedEmptyState سه‌مسیره — «ایجاد دستی» به‌جای «افزودن گله»
+    expect(await screen.findByText(/ایجاد دستی/)).toBeInTheDocument();
   });
 });
