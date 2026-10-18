@@ -48,7 +48,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
     reason: 'purchase', date: '', partyId: '', notes: ''
   });
   const [err, setErr] = useState('');
-  const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
+  const [undoData, setUndoData] = useState<{ item: Movement | Movement[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // ─── فیلتر / مرتب‌سازی (از config مرکزی) ───
@@ -70,11 +70,11 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
   // ─── Multi-Select ───
   const ms = useMultiSelect({
     items: list,
-    getId: (x: any) => x.id,
+    getId: (x: Movement) => x.id,
     onDelete: async (ids: string[]) => {
       const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' تراکنش حذف شوند؟', { danger: true });
       if (!ok) return;
-      const backups: any[] = [];
+      const backups: Movement[] = [];
       for (const id of ids) {
         const it = movements.find(x => x.id === id);
         if (!it) continue;
@@ -83,7 +83,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });
-        setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
+        setTimeout(() => setUndoData((cur) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
       toastMsg.deletedBulk(backups.length, 'تراکنش')
     },
@@ -95,8 +95,8 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
 
   const undoDelete = () => {
     if (!undoData) return;
-    const raw = (undoData as any).item;
-    const arr: any[] = Array.isArray(raw) ? raw : [raw];
+    const raw = undoData?.item;
+    const arr: Movement[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
     try {
       for (const it of arr) {
         try { addMovement(it); } catch {}
@@ -208,8 +208,8 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
       {undoData && (
         <UndoBar
           label={(() => {
-            const raw = (undoData as any).item;
-            const arr: any[] = Array.isArray(raw) ? raw : [raw];
+            const raw = undoData?.item;
+            const arr: Movement[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
             if (arr.length === 1) {
               const it = arr[0];
               const name = it?.itemId ? (items.find(x => x.id === it.itemId)?.name || 'گردش') : 'گردش';
@@ -331,9 +331,9 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
                   <Btn size="sm" onClick={() => openEdit(m)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
-                    const idToDel = m.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel);
+                    const idToDel = m.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.item) && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel);
                     logAction('delete', 'whs', 'حذف از انبار');
-                    const itemName = item ? (items.find(x => x.id === (item as any).itemId)?.name || 'گردش') : 'گردش';
+                    const itemName = item ? (items.find(x => x.id === item.itemId)?.name || 'گردش') : 'گردش';
                     toastMsg.deleted(itemName)
                     }} style={{ flex: 1 }}>حذف</Btn>
                 </div>

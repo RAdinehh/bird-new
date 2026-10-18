@@ -47,3 +47,5 @@
 [2026/10/18 06:14] fix(UX): حذف emoji از ۷ پیام خطا/هشدار در Modal (ratchet 12→5)
 
 [2026/10/18 06:30] refactor(whs): حذف ۱۶ any در MoveFormModal — تایپ F از MovesPage، Person از ctc، React.ChangeEvent (ratchet 599→583)
+
+[2026/10/18 06:41] refactor(whs): حذف ۱۰ any در MovesPage — Movement[] و undoData تایپ‌دار (ratchet 583→573)
