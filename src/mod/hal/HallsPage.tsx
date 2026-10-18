@@ -118,15 +118,18 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
           if (flocks.some((f: Flock) => f.hallId === id && f.status === 'active')) hasFlocks++;
         } catch { /* silent */ }
       }
-      let msg = toFa(ids.length) + ' سالن حذف شوند؟';
-      if (totalZones > 0 || totalEquip > 0) {
-        msg += '\n\n';
-        if (totalZones > 0) msg += '• ' + toFa(totalZones) + ' بخش\n';
-        if (totalEquip > 0) msg += '• ' + toFa(totalEquip) + ' تجهیز\n';
-        msg += 'هم حذف می‌شوند.';
-      }
-      if (hasFlocks > 0) {
-        msg += '\n\n⚠️ ' + toFa(hasFlocks) + ' سالن گله فعال دارن.';
+      const targetNames = ids.map(id => halls.find(h => h.id === id)?.name).filter(Boolean).join('، ');
+      let msg = ids.length === 1 
+        ? `آیا از حذف سالن «${targetNames}» مطمئن هستید؟\n\n`
+        : `آیا از حذف ${toFa(ids.length)} سالن (${targetNames}) مطمئن هستید؟\n\n`;
+        
+      if (totalZones > 0 || totalEquip > 0 || hasFlocks > 0) {
+        msg += `📋 تأثیرات این حذف:\n`;
+        if (totalZones > 0) msg += `• ${toFa(totalZones)} بخش (Zone) به طور کامل حذف می‌شود.\n`;
+        if (totalEquip > 0) msg += `• ${toFa(totalEquip)} تجهیز متصل به این سالن حذف می‌شود.\n`;
+        if (hasFlocks > 0) msg += `• ${toFa(hasFlocks)} گله فعال بدون سالن می‌ماند (گله‌ها حذف نمی‌شوند).\n`;
+      } else {
+        msg += `این سالن هیچ بخش، تجهیز یا گله فعالی ندارد.`;
       }
       const ok = await showConfirmAsync('حذف گروهی', msg, { danger: true });
       if (!ok) return;

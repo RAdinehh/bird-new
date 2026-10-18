@@ -71,3 +71,5 @@
 [2026/10/18 08:35] fix(tra→flk): نوع گله از category فاکتور + layingStartDay/endOfCycleDay از استاندارد نژاد
 
 [2026/10/18 08:48] feat(flk): unknownCount (v9) + deliveryCost/startDate در applyInvoiceToForm + migrate کامل
+
+[2026/10/18 08:57] fix(UI): MultiSelectBar اسکرول افقی + مدال حذف سالن دقیق + هدر GroupsPage منظم

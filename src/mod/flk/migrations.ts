@@ -201,7 +201,7 @@ export function flkMigrate(persistedInput: unknown, version: number): State {
 
   // ─── v7 → v8: breedKind + breedLabel (گله مختلط) ───
   if (version < 8) {
-    state.flocks = state.flocks.map((f: any) => ({
+    state.flocks = state.flocks.map((f: LegacyFlock) => ({
       ...f,
       breedKind: f.breedKind || 'standard',
       breedLabel: f.breedLabel || '',
@@ -210,7 +210,7 @@ export function flkMigrate(persistedInput: unknown, version: number): State {
 
   // ─── v8 → v9: unknownCount ───
   if (version < 9) {
-    state.flocks = state.flocks.map((f: any) => ({
+    state.flocks = state.flocks.map((f: LegacyFlock) => ({
       ...f,
       unknownCount: f.unknownCount ?? null,
     }));
