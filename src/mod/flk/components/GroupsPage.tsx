@@ -7,6 +7,8 @@ import { useFlk, type FlockGroup, type FlockGroupType, type FlockGroupRule } fro
 import { useBrd } from '../../brd/store';
 import { useHal } from '../../hal/store';
 import { useGroupKpi } from '../hooks/useGroupKpi';
+import { SmartRuleEditor } from './SmartRuleEditor';
+import { GroupKpiRow } from './GroupKpiRow';
 import GroupReportModal from './GroupReportModal';
 import GroupComparisonModal from './GroupComparisonModal';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -59,150 +61,9 @@ const NAME_PLACEHOLDER: Record<FlockGroupType, string> = {
   smart: 'مثلاً: همه لایه‌های فعال',
 };
 
-interface GroupKpiRowProps {
-  group: FlockGroup;
-  onOpen: () => void;
-}
 
-function GroupKpiRow({ group, onOpen }: GroupKpiRowProps) {
-  const kpi = useGroupKpi(group.id);
-  if (kpi.flockCount === 0) return null;
 
-  const profitTone = kpi.totalProfit > 0 ? 'var(--accent)' : kpi.totalProfit < 0 ? 'var(--danger)' : 'var(--muted)';
-  const mortalityTone = kpi.mortalityRate > 5 ? 'var(--danger)' : kpi.mortalityRate > 3 ? 'var(--warn)' : 'var(--accent)';
 
-  return (
-    <div
-      onClick={onOpen}
-      style={{
-        marginTop: 8,
-        paddingTop: 8,
-        borderTop: '1px dashed var(--border)',
-        display: 'flex',
-        gap: 14,
-        flexWrap: 'wrap',
-        fontSize: 11,
-        color: 'var(--muted)',
-        alignItems: 'center',
-        cursor: 'pointer',
-      }}
-      title="کلیک برای گزارش کامل"
-    >
-      <span>🐔 <b style={{ color: 'var(--text)' }}>{toFa(kpi.totalCurrent)}</b></span>
-      {kpi.totalDeaths > 0 && (
-        <span>💀 <b style={{ color: mortalityTone }}>{toFa(kpi.totalDeaths)}</b> ({toFa(kpi.mortalityRate.toFixed(1))}٪)</span>
-      )}
-      {kpi.totalCost > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{toFa(Math.round(kpi.totalCost / 1_000_000))}M</b></span>}
-      {kpi.totalRevenue > 0 && <span>📈 <b style={{ color: profitTone }}>{toFa(Math.round(kpi.totalProfit / 1_000_000))}M</b></span>}
-    </div>
-  );
-}
-
-interface SmartRuleEditorProps {
-  rule: FlockGroupRule;
-  onChange: (rule: FlockGroupRule) => void;
-  breeds: Array<{ id: string; name: string; birdId: string }>;
-  halls: Array<{ id: string; name: string }>;
-}
-
-function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEditorProps) {
-  const update = (patch: Partial<FlockGroupRule>) => {
-    const next: FlockGroupRule = { ...rule, ...patch };
-    // حذف فیلدهای خالی
-    Object.keys(next).forEach(k => {
-      const v = (next as Record<string, unknown>)[k];
-      if (v === '' || v === undefined || v === null) {
-        delete (next as Record<string, unknown>)[k];
-      }
-    });
-    onChange(next);
-  };
-
-  return (
-    <div style={{
-      padding: 'var(--pad-normal)',
-      background: 'var(--purple-soft)',
-      border: '1px solid var(--purple)',
-      borderRadius: 'var(--r-md)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 8,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--purple)' }}>
-        🤖 قوانین خودکار
-        <span style={{ fontSize: 10, fontWeight: 400, opacity: 0.7 }}>
-          (فقط گله‌های منطبق عضو می‌شن)
-        </span>
-      </div>
-
-      <Field label="نوع گله">
-        <Select value={rule.type || ''} onChange={e => update({ type: e.target.value as FlockGroupRule['type'] || undefined })}>
-          <option value="">همه</option>
-          <option value="layer">تخم‌گذار</option>
-          <option value="broiler">گوشتی</option>
-          <option value="breeder">مادر</option>
-        </Select>
-      </Field>
-
-      <Field label="نژاد">
-        <Select value={rule.breedId || ''} onChange={e => update({ breedId: e.target.value || undefined })}>
-          <option value="">همه</option>
-          {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-        </Select>
-      </Field>
-
-      <Field label="سالن">
-        <Select value={rule.hallId || ''} onChange={e => update({ hallId: e.target.value || undefined })}>
-          <option value="">همه</option>
-          {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-        </Select>
-      </Field>
-
-      <Field label="وضعیت">
-        <Select value={rule.status || ''} onChange={e => update({ status: e.target.value as FlockGroupRule['status'] || undefined })}>
-          <option value="">همه</option>
-          <option value="active">فعال</option>
-          <option value="archived">آرشیو</option>
-          <option value="sold">فروخته‌شده</option>
-        </Select>
-      </Field>
-
-      <Field label="منبع">
-        <Select value={rule.source || ''} onChange={e => update({ source: e.target.value || undefined })}>
-          <option value="">همه</option>
-          <option value="purchase">خریداری</option>
-          <option value="hatch">جوجه‌کشی خودم</option>
-          <option value="gift">اهدا</option>
-        </Select>
-      </Field>
-
-      <Grid2>
-        <Field label="سن از (روز)">
-          <Input
-            value={rule.minAge || ''}
-            onChange={e => update({ minAge: e.target.value ? parseInt(e.target.value) : undefined })}
-            placeholder="—"
-            inputMode="numeric"
-          />
-        </Field>
-        <Field label="سن تا (روز)">
-          <Input
-            value={rule.maxAge || ''}
-            onChange={e => update({ maxAge: e.target.value ? parseInt(e.target.value) : undefined })}
-            placeholder="—"
-            inputMode="numeric"
-          />
-        </Field>
-      </Grid2>
-
-      <div style={{ fontSize: 10, color: 'var(--purple)', fontStyle: 'italic' }}>
-        {Object.keys(rule).length === 0
-          ? '⚠️ هیچ شرطی تعریف نشده — همه گله‌ها عضو می‌شن'
-          : '✅ گله‌هایی که با همه شرط‌های بالا منطبق باشن، خودکار عضو می‌شن'}
-      </div>
-    </div>
-  );
-}
 
 interface FormState {
   name: string;
