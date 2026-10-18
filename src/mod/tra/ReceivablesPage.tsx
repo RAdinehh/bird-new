@@ -12,6 +12,7 @@ import { toFa } from '../../shr/utils/fa';
 import { showSuccess } from '../../cor/store/dialog';
 import { Line, tab } from './helpers';
 import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/filter';
+import MultiPayModal from './components/MultiPayModal';
 
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 type QuickFilter = 'all' | 'overdue' | 'soon';
@@ -19,6 +20,7 @@ type QuickFilter = 'all' | 'overdue' | 'soon';
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
   const { invoices, updateInvoice } = useTra();
   const { contacts } = useCtc();
+  const [multiPayOpen, setMultiPayOpen] = useState(false);
   const [kind, setKind] = useState<'sale' | 'purchase'>('sale');
   const [expandedBucket, setExpandedBucket] = useState<BucketKey | null>(null);
   const [expandedInvoice, setExpandedInvoice] = useState<string | null>(null);
@@ -130,6 +132,16 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
           📤 بدهی
         </button>
       </div>
+
+      {/* 🆕 دکمه پرداخت گروهی */}
+      <Btn
+        size="sm"
+        variant="primary"
+        onClick={() => setMultiPayOpen(true)}
+        style={{ marginBottom: 8, width: '100%' }}
+      >
+        💳 {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
+      </Btn>
 
       {/* خلاصه — یه خط */}
       {totalOpen > 0 ? (
@@ -433,6 +445,11 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         deferReason={deferReason}
         setDeferReason={setDeferReason}
         onConfirm={doDefer}
+      />
+          <MultiPayModal
+        open={multiPayOpen}
+        onClose={() => setMultiPayOpen(false)}
+        kind={kind}
       />
     </PageContainer>
   );
