@@ -154,6 +154,8 @@ export function paidSum(payments: Payment[]): number {
     const amt = x.amount || 0;
     // عودت وجه (refund) از مبلغ پرداخت‌شده کم می‌شود
     if ((x as any).type === 'refund') return a - amt;
+    // چک برگشتی: پول واریز نشده، پس از جمع کسر نمی‌شود
+    if (x.method === 'check' && x.status === 'bounced') return a;
     return a + amt;
   }, 0));
 }
@@ -253,4 +255,32 @@ export function computeCashDiscount(inv: Invoice): number {
   
   if (eligiblePaid <= 0) return 0;
   return Math.round(eligiblePaid * pct / 100);
+}
+
+
+/** تاریخ امروز شمسی (YYYY/MM/DD) */
+export function getTodayJalali(): string {
+  try {
+    const d = new Date();
+    const fmt = new Intl.DateTimeFormat('en-u-ca-persian-nu-latn', {
+      year: 'numeric', month: '2-digit', day: '2-digit'
+    });
+    const parts = fmt.formatToParts(d);
+    const y = parts.find(p => p.type === 'year')?.value || '';
+    const m = parts.find(p => p.type === 'month')?.value || '';
+    const dd = parts.find(p => p.type === 'day')?.value || '';
+    return `${y}/${m}/${dd}`;
+  } catch {
+    return '';
+  }
+}
+
+/** آیا فاکتور چک برگشتی دارد؟ */
+export function hasBouncedCheck(inv: any): boolean {
+  return (inv?.payments || []).some((p: any) => p.method === 'check' && p.status === 'bounced');
+}
+
+/** تعداد چک‌های برگشتی */
+export function countBouncedChecks(inv: any): number {
+  return (inv?.payments || []).filter((p: any) => p.method === 'check' && p.status === 'bounced').length;
 }

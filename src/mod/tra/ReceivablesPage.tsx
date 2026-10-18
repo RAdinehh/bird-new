@@ -340,6 +340,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                       {items.map(inv => {
                         const party = contacts.find(c => c.id === inv.partyId);
                         const rem = remaining(inv);
+                        const _bouncedCount = (inv.payments || []).filter((p: any) => p.method === 'check' && p.status === 'bounced').length;
                         const days = ageDays(inv);
                         const invOpen = expandedInvoice === inv.id;
                         const dUntil = daysUntilDue(inv);

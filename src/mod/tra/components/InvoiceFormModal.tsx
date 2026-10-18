@@ -16,6 +16,7 @@ import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
 import { useCtc } from '../../ctc/store';
 import { computePartyCredit } from '../store';
+import { getTodayJalali } from '../calc';
 
 export interface InvoiceFormModalProps {
   open: boolean;
@@ -315,7 +316,21 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 </Grid2>
                 <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
                 <Field label="وضعیت چک">
-                  <Select value={p.status || 'pending'} onChange={e => updatePayment(p.id, { status: e.target.value as CheckStatus })}>
+                  <Select value={p.status || 'pending'} onChange={e => {
+                  const newStatus = e.target.value as CheckStatus;
+                  const patch: Partial<Payment> = { status: newStatus };
+                  if (newStatus === 'bounced') {
+                    patch.bouncedDate = getTodayJalali();
+                    patch.clearedDate = '';
+                  } else if (newStatus === 'cleared') {
+                    patch.clearedDate = getTodayJalali();
+                    patch.bouncedDate = '';
+                  } else {
+                    patch.bouncedDate = '';
+                    patch.clearedDate = '';
+                  }
+                  updatePayment(p.id, patch);
+                }}>
                     <option value="pending">🟡 در جریان</option>
                     <option value="cleared">✅ نقد شد</option>
                     <option value="bounced">❌ برگشتی</option>
