@@ -165,25 +165,29 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               <button type="button" onClick={() => removeItem(it.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
             </div>
 
-            <Input placeholder="توضیح" value={it.description} onChange={e => updateItem(it.id, { description: e.target.value })} />
+            <div style={{ paddingTop: 12, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginBottom: 4 }}>
+              📦 مشخصات پایه
+            </div>
+
+            <Input placeholder="توضیح (مثلاً: تخم نطفه‌دار نژاد راس)" value={it.description} onChange={e => updateItem(it.id, { description: e.target.value })} />
 
             <Grid2>
-              <Field label="واحد"><Input placeholder="عدد" value={it.unit} onChange={e => updateItem(it.id, { unit: e.target.value })} /></Field>
               <Field label="تعداد"><NumField value={String(it.quantity)} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} /></Field>
-              <Field label="قیمت"><MoneyField value={String(it.unitPrice)} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
+              <Field label="واحد"><Input placeholder="عدد" value={it.unit} onChange={e => updateItem(it.id, { unit: e.target.value })} /></Field>
             </Grid2>
 
             <Grid2>
+              <Field label="قیمت واحد"><MoneyField value={String(it.unitPrice)} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
               <Field label="تخفیف">
-                <MoneyField placeholder="مثلاً — ۱۰٬۰۰۰" value={String(it.discountValue ||
-                  '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) ||
-                  0 })} />
+                <MoneyField placeholder="مثلاً — ۱۰٬۰۰۰" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
               </Field>
+            </Grid2>
+
+            <Grid2>
               <Field label="حمل">
-                <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={String(it.shipping ||
-                  '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) ||
-                  0 })} />
+                <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
               </Field>
+              <div /> {/* Spacer برای هم‌ترازی دو ستونه */}
             </Grid2>
 
             <ItemDetailsForm
