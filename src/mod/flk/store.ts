@@ -176,6 +176,7 @@ export interface State {
   revokeEvent: (flockId: string, eventId: string) => void;
   removeEvent: (flockId: string, eventId: string) => void;
   mergeFlocks: (targetId: string, sourceId: string, opts: { targetAgeDays: number; sourceAgeDays: number; hatchDate?: string }) => void;
+  unmergeFlocks: (targetId: string) => void;
   add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => string;
   update: (id: string, patch: Partial<Flock>) => void;
   remove: (id: string) => void;
@@ -481,7 +482,39 @@ export const useFlk = create<State>()(
             updatedAt: now(),
           };
         }),
-      })
+      }),
+      unmergeFlocks: (targetId) => {
+        const state = get();
+        const target = state.flocks.find(f => f.id === targetId);
+        if (!target || !target.mergedInfo || !target.mergedInfo.sources || target.mergedInfo.sources.length < 2) return;
+        const sources = target.mergedInfo.sources;
+        const lastSource = sources[sources.length - 1];
+        const remainingSources = sources.slice(0, -1);
+        set({
+          flocks: state.flocks.map(f => {
+            if (f.id === lastSource.flockId) {
+              return {
+                ...f,
+                status: 'active' as FlockStatus,
+                mergedInto: undefined,
+                currentCount: lastSource.count,
+                initialCount: lastSource.count,
+                updatedAt: now(),
+              };
+            }
+            if (f.id !== targetId) return f;
+            return {
+              ...f,
+              currentCount: Math.max(0, (f.currentCount || 0) - lastSource.count),
+              initialCount: Math.max(0, (f.initialCount || 0) - lastSource.count),
+              mergedInfo: remainingSources.length > 1
+                ? { ...f.mergedInfo!, sources: remainingSources }
+                : undefined,
+              updatedAt: now(),
+            };
+          }),
+        });
+      },
     }),
     {
       name: 'pm-flk',

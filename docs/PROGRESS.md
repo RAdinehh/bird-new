@@ -85,3 +85,5 @@
 [2026/10/18 10:13] refactor(inc): حذف ۵ any از HatchesPage — HatchInput.unknownCount + تایپ دقیق
 
 [2026/10/18 10:40] feat(flk): badge «بدون سند» در FlockCard — راهنمای اتصال گله orphan به فاکتور/هچ
+
+[2026/10/18 10:49] feat(flk): Undo برای mergeFlocks — unmergeFlocks + UndoBar (۴ تست)
