@@ -179,7 +179,6 @@ function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEditorProps
       <Grid2>
         <Field label="سن از (روز)">
           <Input
-            type="number"
             value={rule.minAge || ''}
             onChange={e => update({ minAge: e.target.value ? parseInt(e.target.value) : undefined })}
             placeholder="—"
@@ -188,7 +187,6 @@ function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEditorProps
         </Field>
         <Field label="سن تا (روز)">
           <Input
-            type="number"
             value={rule.maxAge || ''}
             onChange={e => update({ maxAge: e.target.value ? parseInt(e.target.value) : undefined })}
             placeholder="—"
