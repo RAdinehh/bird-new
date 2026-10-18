@@ -55,3 +55,5 @@
 [2026/10/18 07:18] refactor(flk): استخراج migrate از store.ts → migrations.ts (691→490 خط، زیر ۵۰۰)
 
 [2026/10/18 07:27] refactor(flk): استخراج SmartRuleEditor + GroupKpiRow از GroupsPage (529→? خط، زیر ۵۰۰)
+
+[2026/10/18 07:38] refactor(alt): استخراج alerts-inc + alerts-helpers از rules.ts (589→? خط، زیر ۵۰۰)
