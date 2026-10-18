@@ -51,6 +51,10 @@ export const CHECK_STATUS_LABEL: Record<CheckStatus, string> = {
 
 
 export interface InvoiceItem extends ItemCategoryFields {
+  flockName?: string;
+  hallId?: string;
+  zoneId?: string;
+  hatchDate?: string;
   id: string;
   description: string;
   unit: string;

@@ -1,6 +1,7 @@
 import { Field, Grid2, Grid3, Input, Select } from './ui';
 import SmartSelect from './SmartSelect';
 import { useBrd } from '../../mod/brd/store';
+import { useHal } from '../../mod/hal/store';
 import { useFlk } from '../../mod/flk/store';
 import { parseFaNum } from '../utils/fa';
 import {
@@ -24,6 +25,7 @@ interface Props {
 
 export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, sellerSlot }: Props) {
   const { birds, breeds } = useBrd();
+  const { halls, zones } = useHal();
   const { flocks } = useFlk();
 
   // دسته‌های پرنده‌ای (خرید: chick, adult, fertile_egg — فروش: chick, adult, fertile_egg)
