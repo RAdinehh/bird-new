@@ -107,3 +107,5 @@
 [2026/10/18 15:15] feat(flk): SmartRuleEditor — رنگ ملایم (کارت سفید + نوار بنفش) + ageConflict >= (min==max)
 
 [2026/10/18 15:21] feat(flk): FlockCard — unknownCount + شرط male/female نرم‌تر (حداقل یکی > ۰)
+
+[2026/10/18 15:26] feat(flk): placeholder هوشمند نام گله بر اساس type و source

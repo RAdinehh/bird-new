@@ -119,7 +119,18 @@ export default function FlocksModal(props: FlocksModalProps) {
     >
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🏷 هویت</div>
       <Field label="نام گله" required error={showError('name')} onTouch={() => markTouched('name')}>
-        <Input placeholder="مثلاً — گله بهار ۱۴۰۵" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+        <Input
+          placeholder={
+            form.source === 'hatch' ? 'مثلاً — جوجه‌های تفریخ مرداد'
+            : form.source === 'purchase'
+              ? (form.type === 'broiler' ? 'مثلاً — گله گوشتی پاییز'
+                : form.type === 'breeder' ? 'مثلاً — گله مادر مرندی'
+                : 'مثلاً — گله تخم‌گذار بهار')
+              : 'مثلاً — گله اصلی'
+          }
+          value={form.name}
+          onChange={e => setForm({ ...form, name: e.target.value })}
+        />
       </Field>
 
       <Grid2>
