@@ -30,6 +30,7 @@ import { createInvoiceSchema } from '../../shr/validation/rules/tra';
 import { emptyForm as empty } from './types-invoice';
 import { useInvoiceForm } from './hooks/useInvoiceForm';
 import TransferModal from './components/TransferModal';
+import InvoiceCard from './components/InvoiceCard';
 import InvoiceFormModal from './components/InvoiceFormModal';
 import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
@@ -289,97 +290,17 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
           {list.map((inv, i) => {
             const party = parties.find(c => c.id === inv.partyId);
             const isOpen = !ms.selectionMode && expandedId === inv.id;
-            const rem2 = remaining(inv);
-            const st = rem2 === 0 ? 'paid' : paidSum(inv.payments || []) > 0 ? 'partial' : 'unpaid';
             return (
-              <ExpandableCard
+              <InvoiceCard
                 key={inv.id}
-                id={inv.id}
-                ms={ms}
-                accent={rem2 === 0 ? 'accent' : 'warn'}
-                index={toFa(i + 1)}
-                iconEmoji="🛒"
-                title={party?.name || '—'}
-                subtitle={`${toFa(inv.date)}${inv.number ? ` • ${inv.number}` : ''}`}
+                inv={inv}
+                partyName={party?.name}
                 isOpen={isOpen}
+                ms={ms}
                 onToggle={() => setExpandedId(isOpen ? null : inv.id)}
-                badge={
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    <Tag tone={workflowTone(inv.workflowStatus)}>
-                      {WORKFLOW_LABEL[inv.workflowStatus || 'draft']}
-                    </Tag>
-                    <Tag tone={st === 'paid' ? 'green' : st === 'partial' ? 'amber' : 'red'}>
-                      {STATUS_LABEL[st as keyof typeof STATUS_LABEL] || '—'}
-                    </Tag>
-                  </div>
-                }
-                stats={
-                  <>
-                    <span>کل: <b>{toFa(inv.total.toLocaleString('fa-IR'))} ت</b></span>
-                    {rem2 > 0 && <span style={{ color: 'var(--warn)' }}>مانده: <b>{toFa(rem2.toLocaleString('fa-IR'))}</b></span>}
-                    {inv.items.length > 0 && <span>{toFa(inv.items.length)} قلم</span>}
-                  </>
-                }
-              >
-                <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات</SectionTitle>
-                <Row l="فروشنده" v={party?.name || '—'} />
-                <Row l="تاریخ" v={toFa(inv.date)} />
-                {inv.number ? <Row l="شماره" v={inv.number} /> : null}
-                {inv.dueDate ? <Row l="سرسید" v={toFa(inv.dueDate)} /> : null}
-                {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تاریخ تحویل" v={toFa(inv.deliveryDate)} /> : null}
-
-                <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
-                {inv.items.map(it => (
-                  <div key={it.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                    <span>{it.description || '—'} × {toFa(it.quantity)}</span>
-                    <span style={{ fontWeight: 600 }}>{toFa(it.total.toLocaleString('fa-IR'))} ت</span>
-                  </div>
-                ))}
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                  <span>جمع کل:</span>
-                  <span>{toFa(inv.total.toLocaleString('fa-IR'))} ت</span>
-                </div>
-
-                {inv.payments && inv.payments.length > 0 && (
-                  <>
-                    <SectionTitle>💳 پرداخت‌ها</SectionTitle>
-                    {inv.payments.map(p => (
-                      <div key={p.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span>{p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • {toFa(p.date)}</span>
-                          <span style={{ fontWeight: 600 }}>{toFa(p.amount.toLocaleString('fa-IR'))} ت</span>
-                        </div>
-                        {p.method === 'check' && (
-                          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                            چک {p.checkNo} • {p.bank} • {CHECK_STATUS_LABEL[p.status || 'pending']}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </>
-                )}
-
-                {nextWorkflowStatus(inv.workflowStatus) && (
-                  <Btn
-                    size="sm" variant="primary" full
-                    onClick={() => setTransferModal({ id: inv.id, to: nextWorkflowStatus(inv.workflowStatus)! })}
-                  >
-                    ▶️ {WORKFLOW_LABEL[nextWorkflowStatus(inv.workflowStatus)!]}
-                  </Btn>
-                )}
-
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => setPrintId(inv.id)} style={{ flex: 1 }}>🖨 چاپ</Btn>
-                  <Btn size="sm" onClick={() => openEdit(inv)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                          const ok = await showConfirmAsync('تأیید حذف', 'این فاکتور حذف شود؟', { danger: true });
-                          if (!ok) return;
-                          deleteInvoice(inv.id);
-                          logAction('delete', 'tra', 'حذف از معاملات');
-                          toastMsg.deleted('فاکتور')
-                        }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+                onTransferClick={() => setTransferModal({ id: inv.id, to: nextWorkflowStatus(inv.workflowStatus)! })}
+                index={i}
+              />
             );
           })}
         </>
