@@ -233,6 +233,32 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </Field>
           )}
         </Grid2>
+        
+        {form.paymentTerms !== 'custom' && (
+          <>
+            <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 8, marginBottom: 4 }}>
+              💰 تخفیف نقدی (اختیاری)
+            </div>
+            <Grid2>
+              <Field label="درصد تخفیف" hint="اگر زودتر پرداخت شود">
+                <NumField placeholder="مثلاً — ۲" value={form.cashDiscountPct || ''} onChange={e => setForm({...form, cashDiscountPct: e.target.value})} unit="٪" min={0} max={100} />
+              </Field>
+              <Field label="مهلت (روز)" hint="چند روز از تاریخ فاکتور">
+                <NumField placeholder="مثلاً — ۱۰" value={form.cashDiscountDays || ''} onChange={e => setForm({...form, cashDiscountDays: e.target.value})} unit="روز" min={0} />
+              </Field>
+            </Grid2>
+            {form.cashDiscountPct && form.cashDiscountDays && total > 0 && (
+              <div style={{
+                padding: 'var(--pad-tight)', background: 'var(--accent-soft)',
+                borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)',
+                color: 'var(--accent)', textAlign: 'center',
+                marginTop: 4, fontWeight: 600,
+              }}>
+                💰 تا {toFa(form.cashDiscountDays)} روز: تخفیف {toFa(form.cashDiscountPct)}٪ (≈ {toFa(Math.round(total * parseFloat(toEn(form.cashDiscountPct)) / 100).toLocaleString('fa-IR'))} ت)
+              </div>
+            )}
+          </>
+        )}
 
         {form.paymentTerms === 'installment' && (
           <Grid2>

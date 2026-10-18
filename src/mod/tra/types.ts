@@ -138,6 +138,10 @@ export interface Invoice {
   installmentGapDays?: number;
   customDueDate?: string;
   paymentNote?: string;
+  /** درصد تخفیف نقدی */
+  cashDiscountPct?: number;
+  /** مهلت تخفیف نقدی (روز) */
+  cashDiscountDays?: number;
 
   // ===== فاز B — Workflow =====
   workflowStatus?: WorkflowStatus;

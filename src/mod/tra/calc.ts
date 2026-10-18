@@ -193,7 +193,7 @@ function migrateInvDates(inv: any): any {
 
 export function remaining(inv: Invoice): number {
   const paid = paidSum(inv.payments || []);
-  return Math.round(Math.max(0, (inv.total || 0) - paid));
+  return Math.max(0, (Math.round(Math.max(0, (inv.total || 0) - paid))) - computeCashDiscount(inv));
 }
 
 export function ageDays(inv: Invoice): number {
@@ -224,3 +224,33 @@ export const AGING_BUCKETS = [
   { key: '61-90', label: '۶۱-۹۰ روز', color: 'amber' },
   { key: '+90', label: 'بیش از ۹۰ روز', color: 'red' }
 ];
+
+export function computeCashDiscount(inv: Invoice): number {
+  const pct = (inv as any).cashDiscountPct || 0;
+  const days = (inv as any).cashDiscountDays || 0;
+  if (pct <= 0 || days <= 0 || !inv.date) return 0;
+  
+  const toDays = (y: number, m: number, d: number) => {
+    let total = y * 365 + d;
+    for (let i = 1; i < m; i++) total += (i <= 6) ? 31 : 30;
+    return total;
+  };
+  
+  const sp = inv.date.split('/').map(Number);
+  if (sp.length !== 3 || sp.some(isNaN)) return 0;
+  const invDay = toDays(sp[0], sp[1], sp[2]);
+  
+  let eligiblePaid = 0;
+  for (const p of (inv.payments || [])) {
+    if (!p.date) continue;
+    if ((p as any).type === 'refund') continue;
+    const pp = p.date.split('/').map(Number);
+    if (pp.length !== 3 || pp.some(isNaN)) continue;
+    const payDay = toDays(pp[0], pp[1], pp[2]);
+    const diff = payDay - invDay;
+    if (diff >= 0 && diff <= days) eligiblePaid += p.amount || 0;
+  }
+  
+  if (eligiblePaid <= 0) return 0;
+  return Math.round(eligiblePaid * pct / 100);
+}

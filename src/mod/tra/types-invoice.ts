@@ -14,6 +14,8 @@ export interface F {
   installmentCount: string;
   installmentGapDays: string;
   customDueDate: string;
+  cashDiscountPct: string;
+  cashDiscountDays: string;
   isPreorder: boolean;
   deliveryDate: string;
   advanceType: 'percent' | 'amount';
@@ -27,7 +29,7 @@ export interface F {
 export const emptyForm = (isPurchase: boolean): F => ({
   date: '', partyId: '', category: isPurchase ? 'egg' : 'fertile_egg', items: [],
   paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
-  customDueDate: '', isPreorder: false, deliveryDate: '',
+  customDueDate: '', cashDiscountPct: '', cashDiscountDays: '', isPreorder: false, deliveryDate: '',
   advanceType: 'percent', advanceValue: '',
   dueDate: '', payments: [], relatedFlockId: '', notes: '',
 });
