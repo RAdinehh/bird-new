@@ -12,7 +12,7 @@ import {
 import { useWhs } from '../whs/store';
 import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
-import { Btn, Empty, PageContainer, Tag } from '../../shr/components/ui';;
+import { Btn, Empty, PageContainer, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useFilterSort, FilterBar, getTraInvoicesConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
@@ -262,7 +262,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
       />
 
       {!ms.selectionMode && list.length > 1 && (
-        <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+        <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
           برای انتخاب چندتایی، روی یک کارت نگه دارید
         </div>
       )}
@@ -271,7 +271,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
           <button type="button"
             onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
-            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}>
+            style={{ padding: '4px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-2xs)', fontWeight: 600, cursor: 'pointer' }}>
             {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
           </button>
         </div>
@@ -321,14 +321,14 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
                   </>
                 }
               >
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات</SectionTitle>
+                <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات</SectionTitle>
                 <Row l="فروشنده" v={party?.name || '—'} />
                 <Row l="تاریخ" v={toFa(inv.date)} />
                 {inv.number ? <Row l="شماره" v={inv.number} /> : null}
                 {inv.dueDate ? <Row l="سرسید" v={toFa(inv.dueDate)} /> : null}
                 {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تاریخ تحویل" v={toFa(inv.deliveryDate)} /> : null}
 
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
+                <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
                 {inv.items.map(it => (
                   <div key={it.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                     <span>{it.description || '—'} × {toFa(it.quantity)}</span>
