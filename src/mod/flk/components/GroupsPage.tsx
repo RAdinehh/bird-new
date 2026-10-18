@@ -317,6 +317,12 @@ export default function GroupsPage({ open, onClose }: Props) {
               <span style={{ padding: '1px 6px', borderRadius: 4, background: 'var(--input-bg)', color: 'var(--muted)', fontSize: 10, fontWeight: 700 }}>{TYPE_LABEL[node.type]}</span>
               <span>·</span>
               <span>{toFa(node.memberCount)} گله عضو</span>
+              {node.description && (
+                <>
+                  <span>·</span>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>{node.description}</span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -452,18 +458,30 @@ export default function GroupsPage({ open, onClose }: Props) {
           <Field label="گروه والد (اختیاری)" hint="برای ساختار تودرتو">
             <Select value={form.parentGroupId} onChange={e => setForm({ ...form, parentGroupId: e.target.value })}>
               <option value="">— بدون والد —</option>
-              {groups.filter(g => g.id !== editingId && !g.archived).map(g => (
+              {groups.filter(g => {
+                if (g.id === editingId) return false;
+                if (g.archived) return false;
+                if (!editingId) return true;
+                // حذف زیرگروه‌های خود editingId (جلوگیری از loop)
+                let cur: string | undefined = g.parentGroupId;
+                const seen = new Set<string>();
+                while (cur) {
+                  if (seen.has(cur)) break;
+                  seen.add(cur);
+                  if (cur === editingId) return false;
+                  const gg = groups.find(x => x.id === cur);
+                  if (!gg) break;
+                  cur = gg.parentGroupId;
+                }
+                return true;
+              }).map(g => (
                 <option key={g.id} value={g.id}>{g.name}</option>
               ))}
             </Select>
           </Field>
 
-          <Field label="رنگ (اختیاری)">
-            <Input value={form.color} onChange={e => setForm({ ...form, color: e.target.value })} placeholder="مثلاً: قرمز، آبی، ..." />
-          </Field>
-
-          <Field label="توضیحات (اختیاری)">
-            <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="..." rows={2} />
+          <Field label="توضیحات (اختیاری)" hint="چی این گروه رو از بقیه جدا می‌کنه؟">
+            <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="مثلاً: گروه گله‌های ممتاز نژاد مرندی" rows={2} />
           </Field>
 
           <BtnRow>

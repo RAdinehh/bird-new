@@ -97,3 +97,5 @@
 [2026/10/18 13:01] feat(FAB): سه‌حالته سراسری — مخفی در Empty CTA، ثابت در کوتاه، wake در اسکرول‌پذیر
 
 [2026/10/18 13:53] feat(flk): footer ۵۰/۵۰ (گروه جدید | Import/Export/Compare) + back button خاکستری
+
+[2026/10/18 14:47] feat(flk): بهبود فرم گروه — حذف color مرده + placeholder هوشمند + description در لیست + cascade parent filter
