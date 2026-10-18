@@ -14,6 +14,8 @@ import { type CheckStatus } from '../store';
 import { CATEGORIES, type InvoiceItem, type Payment } from '../store';
 import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
+import { useCtc } from '../../ctc/store';
+import { computePartyCredit } from '../store';
 
 export interface InvoiceFormModalProps {
   open: boolean;
@@ -48,6 +50,30 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
     save, addItem, updateItem, removeItem,
     addPayment, updatePayment, removePayment,
   } = props;
+
+  const _contacts = useCtc(s => s.contacts);
+  const _currentPartyCredit = (() => {
+    if (!form.partyId) return 0;
+    const c = _contacts.find(x => x.id === form.partyId);
+    return c?.creditBalance || 0;
+  })();
+  const _canUseCredit = _currentPartyCredit > 0.5 && rem > 0.5;
+  const _handleUseCredit = () => {
+    if (!_canUseCredit) return;
+    const useAmount = Math.min(_currentPartyCredit, rem);
+    setForm(f => ({
+      ...f,
+      payments: [...f.payments, {
+        id: crypto.randomUUID(),
+        date: form.date || '',
+        amount: useAmount,
+        method: 'cash' as const,
+        type: 'advance' as const,
+        checkNo: '', bank: '', dueDate: '',
+        notes: 'استفاده از اعتبار طرف حساب',
+      }],
+    }));
+  };
 
   return (
       <Modal

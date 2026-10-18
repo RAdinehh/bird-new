@@ -12,6 +12,7 @@ import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS }
 import { generateInvoiceNumber, paidSum } from './calc';
 import { showToast } from '../../cor/store/toast';
 import { useInc } from '../inc/store';
+import { setPartyCredit } from '../ctc/store';
 
 const now = () => new Date().toISOString();
 
@@ -40,6 +41,7 @@ export const useTra = create<State>()(
         try { void bus.emit('tra:invoice:created', { invoiceId: newInv.id, invoice: newInv, items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
         const final = { ...newInv, items };
         set({ invoices: [...get().invoices, final] });
+        try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices)); } catch(e) {}
         return id;
       },
       updateInvoice: (id, patch) => {
@@ -61,6 +63,10 @@ export const useTra = create<State>()(
         }, { source: 'tra' }).catch(() => {}); } catch(e) {}
         const final = { ...mergedWithItems, items: itemsFinal };
         set({ invoices: get().invoices.map(x => x.id === id ? final : x) });
+        try {
+          setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices));
+          if (prev.partyId && prev.partyId !== final.partyId) setPartyCredit(prev.partyId, computePartyCredit(prev.partyId, get().invoices));
+        } catch(e) {}
       },
       deleteInvoice: (id) => {
         const inv = get().invoices.find(x => x.id === id);
@@ -103,6 +109,7 @@ export const useTra = create<State>()(
           } catch {}
         }
         set({ invoices: get().invoices.filter(x => x.id !== id) });
+        try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices)); } catch(e) {}
       },
       addDeal: (d) => set({ deals: [...get().deals, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       updateDeal: (id, patch) => set({ deals: get().deals.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
@@ -172,3 +179,11 @@ export const useTra = create<State>()(
   )
 );
 
+
+
+export function computePartyCredit(partyId: string, invoices: Invoice[]): number {
+  if (!partyId) return 0;
+  return invoices
+    .filter(inv => inv.partyId === partyId)
+    .reduce((acc, inv) => acc + (paidSum(inv.payments || []) - (inv.total || 0)), 0);
+}

@@ -36,6 +36,8 @@ export interface Person {
 
   createdAt: string;
   updatedAt: string;
+  /** موجودی اعتباری: مثبت=طلبکار، منفی=بدهکار */
+  creditBalance?: number;
 }
 
 interface State {
@@ -122,4 +124,13 @@ export const SALARY_TYPES: [string, string][] = [
 export function avatarLetter(name: string): string {
   if (!name) return '؟';
   return name.trim().charAt(0);
+}
+
+
+export function setPartyCredit(partyId: string, amount: number): void {
+  const state = useCtc.getState() as any;
+  const updated = state.contacts.map((c: any) =>
+    c.id === partyId ? { ...c, creditBalance: amount } : c
+  );
+  useCtc.setState({ contacts: updated } as any);
 }
