@@ -107,7 +107,7 @@ export default function FlockCard(props: FlockCardProps) {
       index={toFa(i + 1)}
       iconEmoji={speciesEmoji}
       title={f.name}
-      subtitle={[bird?.name || '—', breed?.name, hall?.name].filter(Boolean).join(' • ')}
+      subtitle={[bird?.name || '—', breed?.name || (f.breedKind === 'mixed' ? f.breedLabel : ''), hall?.name].filter(Boolean).join(' • ')}
       isOpen={isOpen}
       onToggle={onToggle}
       badge={<>
@@ -204,6 +204,9 @@ export default function FlockCard(props: FlockCardProps) {
           <RowGrid>
             {bird && <Row l="پرنده" v={<EntityLink type="bird" id={bird.id} label={bird.name} />} />}
             {breed && <Row l="نژاد" v={<EntityLink type="breed" id={breed.id} label={breed.name} badge badgeBg="var(--purple-soft)" />} />}
+            {!breed && f.breedKind === 'mixed' && f.breedLabel && (
+              <Row l="نژاد" v={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 'var(--fs-sm)', fontWeight: 700, padding: '3px 8px', borderRadius: 'var(--r-sm)', background: 'var(--dim-soft, var(--input-bg))', color: 'var(--muted)' }}>🔀 {f.breedLabel} <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 400, color: 'var(--dim)' }}>(مختلط)</span></span>} />
+            )}
           </RowGrid>
         </>
       )}

@@ -677,7 +677,7 @@ export const useFlk = create<State>()(
 
         // ─── v7 → v8: breedKind + breedLabel (گله مختلط) ───
         if (version < 8) {
-          state.flocks = state.flocks.map((f: any) => ({
+          state.flocks = state.flocks.map((f) => ({
             ...f,
             breedKind: f.breedKind || 'standard',
             breedLabel: f.breedLabel || '',
