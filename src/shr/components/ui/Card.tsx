@@ -84,6 +84,7 @@ export function Empty({ icon, title, desc, action, tone = 'accent' }: EmptyProps
   return (
     <div
       role="status"
+      data-empty-cta={action ? 'true' : 'false'}
       style={{
         display: 'flex',
         flexDirection: 'column',

@@ -17,7 +17,40 @@ export default function FloatingAdd() {
   const hasScrolled = useRef(false);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const wakeMode = config?.wakeMode === true;
+  // 🆕 auto-detect: صفحه اسکرول‌پذیر ئه؟ + Empty State دکمه داره؟
+  const [pageScrollable, setPageScrollable] = useState(false);
+  const [pageHasEmptyCTA, setPageHasEmptyCTA] = useState(false);
+
+  useEffect(() => {
+    const checkState = () => {
+      const scrollable = document.documentElement.scrollHeight > window.innerHeight + 100;
+      const emptyEls = Array.from(document.querySelectorAll('[data-empty-cta="true"]'));
+      const hasVisibleCTA = emptyEls.some(el => {
+        const rect = (el as HTMLElement).getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
+      setPageScrollable(scrollable);
+      setPageHasEmptyCTA(hasVisibleCTA);
+    };
+    checkState();
+    window.addEventListener('resize', checkState);
+    const observer = new MutationObserver(checkState);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      window.removeEventListener('resize', checkState);
+      observer.disconnect();
+    };
+  }, []);
+
+  // explicit true/false → استفاده از همان
+  // explicit 'auto' یا undefined → خودکار بر اساس اسکرول‌پذیری
+  const explicit = config?.wakeMode;
+  const wakeMode =
+    explicit === false
+      ? false
+      : explicit === true
+        ? true
+        : pageScrollable;
 
   // با هر تغییر wakeMode، ریست کن
   useEffect(() => {
@@ -66,6 +99,9 @@ export default function FloatingAdd() {
   }, [wakeMode]);
 
   if (!config || config.hidden) return null;
+
+  // 🆕 اگه Empty State دکمه‌ی مستقل داره → FAB رو نشون نده
+  if (pageHasEmptyCTA) return null;
 
   const wakeStyle: React.CSSProperties = wakeMode
     ? {
