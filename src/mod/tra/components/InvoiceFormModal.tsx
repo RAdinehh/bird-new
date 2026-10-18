@@ -55,7 +55,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         title={form.id ? (isPurchase ? 'ویرایش خرید' : 'ویرایش فروش') : (isPurchase ? 'ثبت خرید' : 'ثبت فروش')}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
+        <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
         <Grid2>
           <Field label="تاریخ" required error={vErrors.date}>
             <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
@@ -157,7 +157,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </>
         )}
 
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت</SectionTitle>
+        <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت</SectionTitle>
         {form.items.map((it, idx) => (
           <div key={it.id} style={{ padding: 'var(--pad-normal) 0', borderBottom: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -318,7 +318,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </div>
         )}
 
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
+        <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
         <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>

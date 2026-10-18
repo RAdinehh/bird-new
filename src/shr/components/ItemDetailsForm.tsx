@@ -129,7 +129,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         {/* جنسیت — فقط برای پرنده بالغ */}
         {category === 'adult' && (
-          <Grid3>
+          <Grid2>
             <Field label="تعداد نر">
               <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
             </Field>
@@ -139,7 +139,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Field label="نامعلوم">
               <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
             </Field>
-          </Grid3>
+          </Grid2>
         )}
 
         {/* فروشنده + مبنای قیمت — فقط برای بالغ */}
