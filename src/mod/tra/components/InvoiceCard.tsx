@@ -5,12 +5,13 @@ import {
   WORKFLOW_LABEL, STATUS_LABEL, remaining, paidSum, workflowTone, nextWorkflowStatus, CHECK_STATUS_LABEL, type Invoice
 } from '../store';
 import { Row, SectionTitle } from '../helpers';
+import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 
 interface Props {
   inv: Invoice;
   partyName?: string;
   isOpen: boolean;
-  ms: any;
+  ms: MultiSelectState<Invoice>;
   onToggle: () => void;
   onTransferClick: () => void;
   index: number;
