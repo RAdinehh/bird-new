@@ -60,6 +60,8 @@ export interface FlocksModalProps {
   fmt: Fmt;
   // actions
   onSave: () => void;
+  onArchive?: () => void;
+  onRestore?: () => void;
 }
 
 export default function FlocksModal(props: FlocksModalProps) {
@@ -83,7 +85,7 @@ export default function FlocksModal(props: FlocksModalProps) {
   const {
     open, onClose, form, setForm, layingFromStd, setLayingFromStd,
     err, vErrors, showError, markTouched, isValid, hallCapacity, birds, breedsForBird, halls, zonesForHall,
-    breedStd, vaccineEnabled, fmt, onSave,
+    breedStd, vaccineEnabled, fmt, onSave, onArchive, onRestore,
   } = props;
   const allFlocks = useFlk(st => st.flocks);
 
@@ -112,6 +114,12 @@ export default function FlocksModal(props: FlocksModalProps) {
       title={form.id ? 'ویرایش گله' : 'افزودن گله'}
       footer={
         <BtnRow>
+          {form.id && form.status === 'archived' && onRestore && (
+            <Btn onClick={onRestore} style={{ color: 'var(--accent)' }}>📦 بازگردانی</Btn>
+          )}
+          {form.id && form.status !== 'archived' && onArchive && (
+            <Btn onClick={onArchive}>📦 آرشیو</Btn>
+          )}
           <Btn variant="primary" onClick={onSave}>ذخیره</Btn>
           <Btn onClick={onClose}>لغو</Btn>
         </BtnRow>
@@ -272,19 +280,34 @@ export default function FlocksModal(props: FlocksModalProps) {
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📊 تعداد</div>
 
       {(form.type === 'layer' || form.type === 'breeder') && (
-        <Field
-          label="سن شروع تخم‌گذاری (روز)"
-          autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
-        >
-          <NumField
-            value={form.layingStartDay || (formLaying ? String(formLaying) : '')}
-            onChange={e => { setForm({ ...form, layingStartDay: e.target.value }); setLayingFromStd(false); }}
-            placeholder={fmt.int(formLaying)}
-            unit="روز"
-            max={250}
-            min={100}
-          />
-        </Field>
+        <Grid2>
+          <Field
+            label="سن شروع تخم‌گذاری (روز)"
+            autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
+          >
+            <NumField
+              value={form.layingStartDay || (formLaying ? String(formLaying) : '')}
+              onChange={e => { setForm({ ...form, layingStartDay: e.target.value }); setLayingFromStd(false); }}
+              placeholder={fmt.int(formLaying)}
+              unit="روز"
+              max={250}
+              min={100}
+            />
+          </Field>
+          <Field
+            label="سن پایان چرخه (روز)"
+            hint={form.endOfCycleDay ? undefined : 'خالی = از استاندارد نژاد'}
+          >
+            <NumField
+              value={form.endOfCycleDay || ''}
+              onChange={e => setForm({ ...form, endOfCycleDay: e.target.value })}
+              placeholder={formStd?.biology?.endOfCycleDay ? fmt.int(formStd.biology.endOfCycleDay) : '—'}
+              unit="روز"
+              max={600}
+              min={100}
+            />
+          </Field>
+        </Grid2>
       )}
 
       <Grid2>

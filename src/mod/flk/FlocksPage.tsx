@@ -28,7 +28,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 export default function FlocksPage() {
   const fmt = useFormat();
   const breedStd = useBreedStandard();
-  const { flocks, add, update } = useFlk();
+  const { flocks, add, update, archive, restore } = useFlk();
   const vaccineEnabled = useSet(s => s.features?.vaccine !== false);
   const { birds: _birdsRaw, breeds } = useBrd();
   const { halls: _hallsRaw, zones } = useHal();
@@ -280,6 +280,19 @@ export default function FlocksPage() {
         breedStd={breedStd}
         vaccineEnabled={vaccineEnabled}
         fmt={fmt}
+        onArchive={form.id ? async () => {
+          const okA = await showConfirmAsync(
+            'آرشیو گله',
+            'گله «' + form.name + '» آرشیو شود؟\n\nگله از لیست فعال حذف می‌شود ولی داده‌ها حفظ می‌شوند.',
+          );
+          if (!okA) return;
+          archive(form.id!, 'دستی');
+          setOpen(false);
+        } : undefined}
+        onRestore={form.id ? () => {
+          restore(form.id!);
+          setOpen(false);
+        } : undefined}
         onSave={async () => {
           attemptSave();
 

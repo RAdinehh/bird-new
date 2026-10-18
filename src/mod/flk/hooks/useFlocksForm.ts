@@ -199,7 +199,9 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
             : (int(form.layingStartDay) || DEFAULT_LAYING_START))
         : 0,
       endOfCycleDay: (form.type === 'layer' || form.type === 'breeder')
-        ? (breedStd.byBreedId(form.breedId)?.biology?.endOfCycleDay ?? null)
+        ? (form.endOfCycleDay && form.endOfCycleDay.trim() !== ''
+            ? (int(form.endOfCycleDay) || null)
+            : (breedStd.byBreedId(form.breedId)?.biology?.endOfCycleDay ?? null))
         : null,
       maleCount: form.type === 'breeder' ? int(form.maleCount) : null,
       femaleCount: form.type === 'breeder' ? int(form.femaleCount) : null,
