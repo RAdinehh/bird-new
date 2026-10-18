@@ -73,3 +73,5 @@
 [2026/10/18 08:48] feat(flk): unknownCount (v9) + deliveryCost/startDate در applyInvoiceToForm + migrate کامل
 
 [2026/10/18 08:57] fix(UI): MultiSelectBar اسکرول افقی + مدال حذف سالن دقیق + هدر GroupsPage منظم
+
+[2026/10/18 09:27] feat(flk): GuidedEmptyState — راهنمای سه‌مسیره برای ساخت گله (NN/g + SAP Fiori)

@@ -28,6 +28,7 @@ import UpcomingFlocks from './UpcomingFlocks';
 import FlockCard from './FlockCard';
 import FlockGroupsModal from './FlockGroupsModal';
 import MergeFlocksModal from './MergeFlocksModal';
+import GuidedEmptyState from './GuidedEmptyState';
 
 type BreedStd = ReturnType<typeof useBreedStandard>;
 type Fmt = ReturnType<typeof useFormat>;
@@ -363,7 +364,9 @@ export default function FlockTabPanel({
         </div>
       )}
 
-      {list.length === 0 ? (
+      {list.length === 0 && flocks.length === 0 && tab === 'all' && !hasActiveFilters ? (
+        <GuidedEmptyState onManualAdd={onAdd} />
+      ) : list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>}
           title={
