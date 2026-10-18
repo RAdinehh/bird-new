@@ -118,7 +118,12 @@ export const useTra = create<State>()(
           // مقادیر پیش‌فرض بر اساس وضعیت فعلی
           const payments = inv.payments || [];
           const total = inv.total || 0;
-          const paidSum = payments.reduce((a: number, p: any) => a + (p.amount || 0), 0);
+          const paidSum = payments.reduce((a: number, p: any) => {
+    const amt = p.amount || 0;
+    // عودت وجه (refund) از مبلغ پرداخت‌شده کم می‌شود
+    if (p.type === 'refund') return a - amt;
+    return a + amt;
+  }, 0);
           const isPaid = total > 0 && paidSum >= total;
 
           // وضعیت workflow خودکار

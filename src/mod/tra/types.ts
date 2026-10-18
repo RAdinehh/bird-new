@@ -94,6 +94,13 @@ export interface Payment {
   clearedDate?: string;
   bouncedDate?: string;
   bouncedInvoiceId?: string;
+
+  /** نوع پرداخت: عادی | پیش‌پرداخت | عودت | تسویه */
+  type?: 'regular' | 'advance' | 'refund' | 'settlement';
+  /** شناسه فاکتور مرتبط (برای تخصیص چندگانه) */
+  invoiceId?: string;
+  /** شناسه طرف حساب (برای اعتبار) */
+  partyId?: string;
 }
 
 export interface Invoice {

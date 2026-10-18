@@ -12,6 +12,7 @@ export const PaymentSchema = z.object({
   date: persianDateOpt('تاریخ پرداخت'),
   amount: floatPos('مبلغ', 1_000_000_000_000),
   method: oneOf('روش', ['cash', 'card', 'check'] as const),
+  type: oneOf('نوع پرداخت', ['regular', 'advance', 'refund', 'settlement'] as const).optional(),
   checkNo: optionalStr(50),
   bank: optionalStr(80),
   dueDate: persianDateOpt('سرسید'),

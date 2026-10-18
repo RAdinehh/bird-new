@@ -230,6 +230,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               <button type="button" onClick={() => removePayment(p.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
             </div>
             <Grid2>
+              <Field label="نوع پرداخت">
+                <Select value={p.type || 'regular'} onChange={e => updatePayment(p.id, { type: e.target.value as 'regular' | 'advance' | 'refund' | 'settlement' })}>
+                  <option value="regular">💵 پرداخت عادی</option>
+                  <option value="advance">📌 پیش‌پرداخت</option>
+                  <option value="settlement">✅ تسویه قسط</option>
+                  <option value="refund">↩️ عودت وجه</option>
+                </Select>
+              </Field>
               <Field label="روش">
                 <Select value={p.method} onChange={e => updatePayment(p.id, { method: e.target.value as 'cash' | 'card' | 'check' })}>
                   <option value="cash">نقدی</option>
@@ -237,13 +245,16 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   <option value="check">چک</option>
                 </Select>
               </Field>
+            </Grid2>
+
+            <Grid2>
               <Field label="مبلغ">
                 <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={String(p.amount)} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
               </Field>
+              <Field label="تاریخ">
+                <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })}  autoToday />
+              </Field>
             </Grid2>
-            <Field label="تاریخ">
-              <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })}  autoToday />
-            </Field>
             {p.method === 'check' && (
               <>
                 <Grid2>
