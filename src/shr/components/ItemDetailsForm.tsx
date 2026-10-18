@@ -201,6 +201,55 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     );
   }
 
+  // ========== دان و مواد اولیه ==========
+  if (category === 'feed') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <Grid2>
+          <Field label="نوع دان">
+            <Select value={String(item.feedType || '')} onChange={e => updateItem({ feedType: e.target.value })}>
+              <option value="">— انتخاب —</option>
+              <option value="starter">آغازین (Starter)</option>
+              <option value="grower">میانی (Grower)</option>
+              <option value="finisher">پایانی (Finisher)</option>
+            </Select>
+          </Field>
+          <Field label="نام تجاری / برند">
+            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="مثلاً: پیشگامان" />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="درصد پروتئین">
+            <Input mode="number" value={item.protein !== null && item.protein !== undefined ? String(item.protein) : ''} onChange={e => updateItem({ protein: parseFaNum(e.target.value) || null })} unit="٪" min={0} max={100} />
+          </Field>
+          <Field label="انرژی (کیلوکالری)">
+            <Input mode="number" value={item.energy !== null && item.energy !== undefined ? String(item.energy) : ''} onChange={e => updateItem({ energy: parseFaNum(e.target.value) || null })} unit="Kcal" min={0} />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="وزن هر کیسه (kg)">
+            <Input mode="number" value={item.bagWeight !== null && item.bagWeight !== undefined ? String(item.bagWeight) : ''} onChange={e => updateItem({ bagWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
+          </Field>
+          <Field label="تعداد کیسه">
+            <Input mode="number" value={item.bagCount !== null && item.bagCount !== undefined ? String(item.bagCount) : ''} onChange={e => updateItem({ bagCount: Math.round(parseFaNum(e.target.value)) || null })} unit="کیسه" min={0} />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="شماره بچ تولید">
+            <Input value={String(item.batchNo || '')} onChange={e => updateItem({ batchNo: e.target.value })} placeholder="مثلاً: F-123" />
+          </Field>
+          <Field label="تاریخ انقضا">
+            <Input value={String(item.expiryDate || '')} onChange={e => updateItem({ expiryDate: e.target.value })} placeholder="1405/12/29" />
+          </Field>
+        </Grid2>
+        <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
+          <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+        </Field>
+        {sellerSlot}
+      </div>
+    );
+  }
+
   // ========== تجهیزات ==========
   if (equipmentCategories.includes(category)) {
     return (
