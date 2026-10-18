@@ -51,3 +51,5 @@
 [2026/10/18 06:41] refactor(whs): حذف ۱۰ any در MovesPage — Movement[] و undoData تایپ‌دار (ratchet 583→573)
 
 [2026/10/18 07:08] refactor(flk): split store.ts → helpers-store.ts (833→692 خط) — برچسب‌ها و helpers جدا شدند
+
+[2026/10/18 07:18] refactor(flk): استخراج migrate از store.ts → migrations.ts (691→490 خط، زیر ۵۰۰)
