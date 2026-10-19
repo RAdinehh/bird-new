@@ -74,6 +74,67 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         <span>{toFa(inv.total.toLocaleString('fa-IR'))} ت</span>
       </div>
 
+      {inv.installments && inv.installments.length > 0 && (() => {
+        const totalCount = inv.installments.length;
+        const paidCount = inv.installments.filter(x => x.status === 'paid').length;
+        const overdueCount = inv.installments.filter(x => x.status === 'overdue').length;
+        return (
+          <>
+            <SectionTitle>
+              <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span>
+              اقساط — {toFa(paidCount)} از {toFa(totalCount)} پرداخت شده
+            </SectionTitle>
+            {overdueCount > 0 && (
+              <div style={{
+                padding: 'var(--pad-tight)', background: 'var(--danger-soft)',
+                color: 'var(--danger)', borderRadius: 'var(--r-sm)',
+                fontSize: 'var(--fs-xs)', fontWeight: 600, textAlign: 'center',
+                marginBottom: 'var(--sp-1)',
+              }}>
+                ⚠️ {toFa(overdueCount)} قسط معوق
+              </div>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+              {inv.installments.map(inst => {
+                const tone = inst.status === 'paid' ? 'green' : inst.status === 'overdue' ? 'red' : 'amber';
+                const label = inst.status === 'paid' ? 'پرداخت شده' : inst.status === 'overdue' ? 'معوق' : 'در انتظار';
+                const isPartial = inst.paidAmount !== undefined && inst.paidAmount > 0 && inst.paidAmount < (inst.amount || 0);
+                return (
+                  <div key={inst.id} style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: 'var(--pad-tight) var(--pad-normal)',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--r-sm)',
+                    gap: 'var(--sp-2)',
+                  }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+                        قسط {toFa(inst.number)}
+                      </span>
+                      <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)' }}>
+                        سرسید: {toFa(inst.dueDate)}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                      <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+                        {toFa((inst.amount || 0).toLocaleString('fa-IR'))} ت
+                      </span>
+                      {isPartial && (
+                        <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)' }}>
+                          پرداخت: {toFa((inst.paidAmount || 0).toLocaleString('fa-IR'))} ت
+                        </span>
+                      )}
+                      <Tag tone={tone}>{label}</Tag>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        );
+      })()}
+
       {inv.payments && inv.payments.length > 0 && (
         <>
           <SectionTitle>💳 پرداخت‌ها</SectionTitle>
