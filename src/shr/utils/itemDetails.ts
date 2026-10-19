@@ -111,6 +111,8 @@ export interface VaccineDetails {
 }
 
 export interface ItemCategoryFields {
+  /** دسته اختصاصی قلم (برای فاکتور مختلط و فرم جزئیات) */
+  category?: string;
   medicineType?: MedicineType;
   herbalDetails?: HerbalDetails;
   chemicalDetails?: ChemicalDetails;

@@ -90,6 +90,8 @@ export interface Allocation {
 }
 
 export interface InvoiceItem extends ItemCategoryFields {
+  /** دسته اختصاصی قلم — برای فاکتور مختلط. اگر خالی باشد از Invoice.category استفاده می‌شود. */
+  category?: string;
   flockName?: string;
   storage?: string;
   usageType?: string;

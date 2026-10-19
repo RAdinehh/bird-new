@@ -62,15 +62,17 @@ function addJalaliDays(dateStr: string, days: number): string {
 
 export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
   const outItems: InvoiceItem[] = (inv.items || []).map(it => ({ ...it }));
-  
-  // ─── فروش تخم (خوراکی یا نطفه‌دار) ───
-  if (inv.type === 'sale' && (inv.category === 'egg' || inv.category === 'fertile_egg')) {
+
+  // ─── فروش تخم (خوراکی یا نطفه‌دار) — برای هر قلم جداگانه ───
+  if (inv.type === 'sale') {
     const egg = useEgg.getState();
-    const saleType = inv.category === 'fertile_egg' ? 'fertile' : 'eating';
-    return outItems.map(it => {
-      if (!it.quantity || it.quantity <= 0) return it;
+    for (const it of outItems) {
+      const cat = it.category || inv.category;
+      if (cat !== 'egg' && cat !== 'fertile_egg') continue;
+      if (!it.quantity || it.quantity <= 0) continue;
+      const saleType = cat === 'fertile_egg' ? 'fertile' : 'eating';
       const exists = egg.sales.find((x: any) => x.sourceInvoiceId === inv.id && x.date === inv.date);
-      if (exists) return it;
+      if (exists) continue;
       try {
         egg.addSale({
           date: inv.date, type: saleType, count: it.quantity,
@@ -81,18 +83,18 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
           sourceInvoiceId: inv.id,
         } as any);
       } catch (e) { console.error('[TRA→EGG sale]', e); }
-      return it;
-    });
+    }
+    return outItems;
   }
-  
+
   // ─── خرید تخم نطفه‌دار → ثبت در جوجه‌کشی ───
-  if (inv.type === 'purchase' && inv.category === 'egg') {
+  if (inv.type === 'purchase') {
     const inc = useInc.getState();
     const brd = useBrd.getState();
-    
+
     const keyOf = (it: any) =>
       `${it.birdId || ''}|${it.breedId || ''}|${it.eggBatchNo || ''}`;
-    
+
     const findExisting = (it: any) => {
       const key = keyOf(it);
       const marker = `[K:${key}]`;
@@ -100,24 +102,26 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
         e.sourceInvoiceId === inv.id && (e.notes || '').includes(marker)
       );
     };
-    
+
     for (let i = 0; i < outItems.length; i++) {
       const it = outItems[i] as any;
+      const cat = it.category || inv.category;
+      if (cat !== 'egg') continue;
       if (!it.quantity || it.quantity <= 0) continue;
-      
+
       const broken = it.brokenEggCount || 0;
       const nonIncubable = it.nonIncubableCount || 0;
       const healthyCount = Math.max(0, it.quantity - broken - nonIncubable);
       if (healthyCount <= 0) continue;
-      
+
       const bird = brd.birds.find((b: any) => b.id === it.birdId);
       const days = getIncubationDays(bird?.birdKind);
       const entryDate = inv.date || '';
       const expectedHatchDate = addJalaliDays(entryDate, days);
-      
+
       const marker = `[K:${keyOf(it)}]`;
       const existing = findExisting(it);
-      
+
       if (existing) {
         try {
           inc.updateEntry(existing.id, {
@@ -132,7 +136,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
         } catch (e) { console.error('[TRA→INC update]', e); }
         continue;
       }
-      
+
       try {
         const entryId = inc.addEntry({
           deviceId: '', hatchGroupId: '',
@@ -156,8 +160,8 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
         it.entryId = entryId;
       } catch (e) { console.error('[TRA→INC create]', e); }
     }
-    
-    // پاکسازی رکوردهای یتیم
+
+    // پاک‌سازی رکوردهای یتیم
     if (prev) {
       const newKeys = new Set(
         outItems.filter((it: any) => it.quantity > 0).map((it: any) => keyOf(it))
@@ -172,10 +176,10 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
         try { inc.deleteEntry(entry.id); } catch (e) { console.error('[TRA→INC cleanup]', e); }
       }
     }
-    
+
     return outItems;
   }
-  
+
   return inv.items;
 }
 
@@ -270,13 +274,14 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
   const buildMap = (inv2: Invoice | undefined): Map<string, G> => {
     const m = new Map<string, G>();
     if (!inv2) return m;
-    if (!BIRD_CATS.includes(inv2.category)) return m;
     for (const it of inv2.items || []) {
       if (!it.birdId) continue;
-      const k = keyOf(inv2.category, it);
+      const cat = it.category || inv2.category;
+      if (!BIRD_CATS.includes(cat)) continue;
+      const k = keyOf(cat, it);
       const cur = m.get(k);
       if (cur) cur.qty += (it.quantity || 0);
-      else m.set(k, { item: it, cat: inv2.category, qty: it.quantity || 0, type: inv2.type });
+      else m.set(k, { item: it, cat, qty: it.quantity || 0, type: inv2.type });
     }
     return m;
   };
@@ -315,7 +320,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       }
       flk.update(explicitFlockId, patch);
       for (let i = 0; i < inv.items.length; i++) {
-        if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = explicitFlockId;
+        if (keyOf(inv.items[i].category || inv.category, inv.items[i]) === k) outItems[i].flockId = explicitFlockId;
       }
     } else if (type === 'purchase') {
       const birdId = it.birdId || '';
@@ -330,7 +335,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
         const next = (existing.currentCount ?? 0) + delta;
         flk.update(existing.id, { currentCount: Math.max(0, next) });
         for (let i = 0; i < inv.items.length; i++) {
-          if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = existing.id;
+          if (keyOf(inv.items[i].category || inv.category, inv.items[i]) === k) outItems[i].flockId = existing.id;
         }
       } else if (delta > 0) {
         const breed = brd.breeds.find(b => b.id === it.breedId);
@@ -375,7 +380,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
         });
 
         for (let i = 0; i < inv.items.length; i++) {
-          if (keyOf(inv.category, inv.items[i]) === k) outItems[i].flockId = newFlockId;
+          if (keyOf(inv.items[i].category || inv.category, inv.items[i]) === k) outItems[i].flockId = newFlockId;
         }
       }
     }
