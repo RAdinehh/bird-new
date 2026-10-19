@@ -91,8 +91,14 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
     expectedFrom: 'species_temp', comparison: 'range',
     biologicalRange: { min: 15, max: 35 },
   }),
-  'dlg.temperatureMin': P('dlg.temperatureMin', 'temperature', -20, 50, { expectedFrom: 'species_temp', comparison: 'range' }),
-  'dlg.temperatureMax': P('dlg.temperatureMax', 'temperature', -20, 50, { expectedFrom: 'species_temp', comparison: 'range' }),
+  'dlg.temperatureMin': P('dlg.temperatureMin', 'temperature', -20, 50, {
+    expectedFrom: 'species_temp', comparison: 'range',
+    biologicalRange: { min: 5, max: 45 },
+  }),
+  'dlg.temperatureMax': P('dlg.temperatureMax', 'temperature', -20, 50, {
+    expectedFrom: 'species_temp', comparison: 'range',
+    biologicalRange: { min: 5, max: 45 },
+  }),
   'hal.targetTemp': P('hal.targetTemp', 'temperature', 0, 100, {
     expectedFrom: 'species_temp', comparison: 'range',
     biologicalRange: { min: 15, max: 35 },
@@ -104,6 +110,14 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
   'dlg.humidity': P('dlg.humidity', 'humidity', 0, 100, {
     expectedFrom: 'species', comparison: 'range',
     biologicalRange: { min: 30, max: 75 },
+  }),
+  'dlg.humidityMin': P('dlg.humidityMin', 'humidity', 0, 100, {
+    expectedFrom: 'species', comparison: 'range',
+    biologicalRange: { min: 10, max: 95 },
+  }),
+  'dlg.humidityMax': P('dlg.humidityMax', 'humidity', 0, 100, {
+    expectedFrom: 'species', comparison: 'range',
+    biologicalRange: { min: 10, max: 95 },
   }),
   'hal.targetHumidity': P('hal.targetHumidity', 'humidity', 0, 100, {
     expectedFrom: 'species', comparison: 'range',
@@ -179,7 +193,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
   // ══════════════════════════════════════════════════════════════════
   // Q6 — وزن (۴ فیلد)
   // ══════════════════════════════════════════════════════════════════
-  'dlg.weightSamples': P('dlg.weightSamples', 'weight', 0.1, 250_000, {
+  'dlg.weightSamples': P('dlg.weightSamples', 'weight', 0.01, 250, {
     expectedFrom: 'species_curve', comparison: 'ratio', suppressIfNoHistory: false,
   }),
   'chickWeight': P('chickWeight', 'weight', 0.3, 1_200, {

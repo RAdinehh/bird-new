@@ -3,6 +3,7 @@
  */
 import { Field, Grid2, Grid3, NumField, PercentField, Select, Textarea } from '../../../shr/components/ui';
 import type { F } from '../types';
+import { FieldHint } from '../../../shr/intelligence';
 
 interface Props {
   form: F;
@@ -15,21 +16,33 @@ export default function EnvironmentSection({ form, setForm, vErrors }: Props) {
     <>
 
       <Grid2>
-        <Field label="حداقل دما" hint="۱۵-۳۰ درجه" error={vErrors.temperatureMin}>
-          <NumField placeholder="۲۰" value={form.temperatureMin} onChange={e => setForm({ ...form, temperatureMin: e.target.value })} unit="°C" min={-10} max={50} />
-        </Field>
-        <Field label="حداکثر دما" hint="۱۵-۳۰ درجه" error={vErrors.temperatureMax}>
-          <NumField placeholder="۲۵" value={form.temperatureMax} onChange={e => setForm({ ...form, temperatureMax: e.target.value })} unit="°C" min={-10} max={50} />
-        </Field>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+          <Field label="حداقل دما" hint="۱۵-۳۰ درجه" error={vErrors.temperatureMin}>
+            <NumField placeholder="۲۰" value={form.temperatureMin} onChange={e => setForm({ ...form, temperatureMin: e.target.value })} unit="°C" min={-10} max={50} />
+          </Field>
+          <FieldHint fieldPath="dlg.temperatureMin" value={form.temperatureMin} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+          <Field label="حداکثر دما" hint="۱۵-۳۰ درجه" error={vErrors.temperatureMax}>
+            <NumField placeholder="۲۵" value={form.temperatureMax} onChange={e => setForm({ ...form, temperatureMax: e.target.value })} unit="°C" min={-10} max={50} />
+          </Field>
+          <FieldHint fieldPath="dlg.temperatureMax" value={form.temperatureMax} />
+        </div>
       </Grid2>
 
       <Grid2>
-        <Field label="حداقل رطوبت" hint="۴۰-۷۰٪" error={vErrors.humidityMin}>
-          <PercentField placeholder="۵۰" value={form.humidityMin} onChange={e => setForm({ ...form, humidityMin: e.target.value })} />
-        </Field>
-        <Field label="حداکثر رطوبت" hint="۴۰-۷۰٪" error={vErrors.humidityMax}>
-          <PercentField placeholder="۷۰" value={form.humidityMax} onChange={e => setForm({ ...form, humidityMax: e.target.value })} />
-        </Field>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+          <Field label="حداقل رطوبت" hint="۴۰-۷۰٪" error={vErrors.humidityMin}>
+            <PercentField placeholder="۵۰" value={form.humidityMin} onChange={e => setForm({ ...form, humidityMin: e.target.value })} />
+          </Field>
+          <FieldHint fieldPath="dlg.humidityMin" value={form.humidityMin} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+          <Field label="حداکثر رطوبت" hint="۴۰-۷۰٪" error={vErrors.humidityMax}>
+            <PercentField placeholder="۷۰" value={form.humidityMax} onChange={e => setForm({ ...form, humidityMax: e.target.value })} />
+          </Field>
+          <FieldHint fieldPath="dlg.humidityMax" value={form.humidityMax} />
+        </div>
       </Grid2>
 
       <Grid2>

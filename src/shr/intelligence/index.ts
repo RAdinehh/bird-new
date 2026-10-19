@@ -12,4 +12,5 @@ export {
 } from './anomalyDetector';
 export { useAnomalyHint } from './useAnomalyHint';
 export { AnomalyHint } from './AnomalyHint';
+export { FieldHint } from './FieldHint';
 export { formatWarning } from './formatWarning';

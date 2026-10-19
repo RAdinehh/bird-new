@@ -5,6 +5,8 @@ import { Btn, Field, Grid2, NumField, Select } from '../../../shr/components/ui'
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { avgWeight, cvWeight } from '../store';
 import type { F } from '../types';
+import { FieldHint } from '../../../shr/intelligence';
+import { useFlk } from '../../flk/store';
 
 interface Props {
   form: F;
@@ -16,23 +18,40 @@ interface Props {
 export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCount }: Props) {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
 
+  // context
+  const { flocks } = useFlk();
+  const selectedFlock = flocks.find(f => f.id === form.flockId);
+  const femaleCount = selectedFlock?.femaleCount ?? flockAliveCount;
+
   return (
     <>
           <Grid2>
-            <Field label="🥚 تخم خوراکی" error={vErrors.eatingEggs}>
-              <NumField placeholder="۰" value={form.eatingEggs} onChange={e => setForm({...form, eatingEggs: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
-            </Field>
-            <Field label="🌱 تخم نطفه‌دار" error={vErrors.fertileEggs}>
-              <NumField placeholder="۰" value={form.fertileEggs} onChange={e => setForm({...form, fertileEggs: e.target.value})} unit="عدد" min={0} />
-            </Field>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+              <Field label="🥚 تخم خوراکی" error={vErrors.eatingEggs}>
+                <NumField placeholder="۰" value={form.eatingEggs} onChange={e => setForm({...form, eatingEggs: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
+              </Field>
+              <FieldHint fieldPath="dlg.eatingEggs" value={form.eatingEggs} context={{ femaleCount, flockSize: flockAliveCount }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+              <Field label="🌱 تخم نطفه‌دار" error={vErrors.fertileEggs}>
+                <NumField placeholder="۰" value={form.fertileEggs} onChange={e => setForm({...form, fertileEggs: e.target.value})} unit="عدد" min={0} />
+              </Field>
+              <FieldHint fieldPath="dlg.fertileEggs" value={form.fertileEggs} context={{ femaleCount, flockSize: flockAliveCount }} />
+            </div>
           </Grid2>
           <Grid2>
-            <Field label="💔 شکسته" error={vErrors.brokenEggs}>
-              <NumField placeholder="۰" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} unit="عدد" min={0} />
-            </Field>
-            <Field label="📦 سایر (نرم/کثیف)" error={vErrors.otherEggs}>
-              <NumField placeholder="۰" value={form.otherEggs} onChange={e => setForm({...form, otherEggs: e.target.value})} unit="عدد" min={0} />
-            </Field>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+              <Field label="💔 شکسته" error={vErrors.brokenEggs}>
+                <NumField placeholder="۰" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} unit="عدد" min={0} />
+              </Field>
+              <FieldHint fieldPath="dlg.brokenEggs" value={form.brokenEggs} context={{ femaleCount, flockSize: flockAliveCount }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+              <Field label="📦 سایر (نرم/کثیف)" error={vErrors.otherEggs}>
+                <NumField placeholder="۰" value={form.otherEggs} onChange={e => setForm({...form, otherEggs: e.target.value})} unit="عدد" min={0} />
+              </Field>
+              <FieldHint fieldPath="dlg.otherEggs" value={form.otherEggs} context={{ femaleCount, flockSize: flockAliveCount }} />
+            </div>
           </Grid2>
       {form.weightSamples.length > 0 && (
         <Grid2>
@@ -55,16 +74,19 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
       )}
 
       {form.weightSamples.map((w) => (
-        <div key={w.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          <div style={{ flex: 1 }}>
-            <NumField
-              placeholder="وزن (kg)"
-              value={w.weight}
-              onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
-              unit="kg" min={0} />
+        <div key={w.id} style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <div style={{ flex: 1 }}>
+              <NumField
+                placeholder="وزن (kg)"
+                value={w.weight}
+                onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
+                unit="kg" min={0} />
+            </div>
+            <button type="button" onClick={() => setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) }))}
+              style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
           </div>
-          <button type="button" onClick={() => setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) }))}
-            style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
+          <FieldHint fieldPath="dlg.weightSamples" value={w.weight} context={{ species: selectedFlock?.breedId }} />
         </div>
       ))}
 

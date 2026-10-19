@@ -10,6 +10,9 @@ import { WATER_SYSTEM_LABEL } from '../../../shr/utils/systemType';
 import { useFed } from '../../fed/store';
 import { useWhs } from '../../whs/store';
 import type { F } from '../types';
+import { FieldHint } from '../../../shr/intelligence';
+import { useFlk } from '../../flk/store';
+import { parseNumericValue } from '../../../shr/intelligence/useAnomalyHint';
 
 interface Props {
   form: F;
@@ -23,6 +26,12 @@ export default function FeedSection({ form, setForm, vErrors }: Props) {
   const feedItems = useMemo(() => whsItems.filter(x => x.category === 'feed'), [whsItems]);
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
+
+  // context برای هوشمندسازی
+  const { flocks } = useFlk();
+  const selectedFlock = flocks.find(f => f.id === form.flockId);
+  const flockSize = selectedFlock?.currentCount || selectedFlock?.initialCount || 0;
+  const feedAmtNum = parseNumericValue(form.feedAmount);
 
   return (
     <>
@@ -112,12 +121,18 @@ export default function FeedSection({ form, setForm, vErrors }: Props) {
       })()}
 
       <Grid2>
-        <Field label="مقدار دان مصرفی">
-          <NumField placeholder="۵۰" value={form.feedAmount} onChange={e => setForm({ ...form, feedAmount: e.target.value })} unit="kg" min={0} />
-        </Field>
-        <Field label="دان باقیمانده">
-          <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
-        </Field>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+          <Field label="مقدار دان مصرفی">
+            <NumField placeholder="۵۰" value={form.feedAmount} onChange={e => setForm({ ...form, feedAmount: e.target.value })} unit="kg" min={0} />
+          </Field>
+          <FieldHint fieldPath="dlg.feedAmount" value={form.feedAmount} context={{ flockSize }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+          <Field label="دان باقیمانده">
+            <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
+          </Field>
+          <FieldHint fieldPath="dlg.feedRemaining" value={form.feedRemaining} context={{ feedAmount: feedAmtNum ?? undefined, flockSize }} />
+        </div>
       </Grid2>
 
       {form.waterMethod === 'manual' && (
@@ -126,12 +141,18 @@ export default function FeedSection({ form, setForm, vErrors }: Props) {
             💡 حالت دستی: تعداد بار × حجم هر بار
           </div>
           <Grid2>
-            <Field label="تعداد بار">
-              <NumField placeholder="۵" value={form.waterFillCount} onChange={e => setForm({ ...form, waterFillCount: e.target.value })} unit="بار" min={0} />
-            </Field>
-            <Field label="حجم هر بار">
-              <NumField placeholder="۲۰" value={form.waterFillVolume} onChange={e => setForm({ ...form, waterFillVolume: e.target.value })} unit="L" min={0} />
-            </Field>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+              <Field label="تعداد بار">
+                <NumField placeholder="۵" value={form.waterFillCount} onChange={e => setForm({ ...form, waterFillCount: e.target.value })} unit="بار" min={0} />
+              </Field>
+              <FieldHint fieldPath="dlg.waterFillCount" value={form.waterFillCount} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+              <Field label="حجم هر بار">
+                <NumField placeholder="۲۰" value={form.waterFillVolume} onChange={e => setForm({ ...form, waterFillVolume: e.target.value })} unit="L" min={0} />
+              </Field>
+              <FieldHint fieldPath="dlg.waterFillVolume" value={form.waterFillVolume} />
+            </div>
           </Grid2>
           {(form.waterFillCount && form.waterFillVolume) && (
             <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
@@ -146,9 +167,12 @@ export default function FeedSection({ form, setForm, vErrors }: Props) {
           <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600 }}>
             ⚠️ سیستم {WATER_SYSTEM_LABEL[form.waterMethod as 'nipple' | 'trough' | 'tank']} — فعلاً فقط دستی پیاده شده
           </div>
-          <Field label="مقدار آب مصرفی (تخمینی)">
-            <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
-          </Field>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+            <Field label="مقدار آب مصرفی (تخمینی)">
+              <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
+            </Field>
+            <FieldHint fieldPath="dlg.waterAmount" value={form.waterAmount} context={{ flockSize }} />
+          </div>
         </>
       )}
 
