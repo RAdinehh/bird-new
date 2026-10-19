@@ -279,9 +279,10 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       const cat = it.category || inv2.category;
       if (!BIRD_CATS.includes(cat)) continue;
       const k = keyOf(cat, it);
+      const qty = (it.healthyCount ?? it.quantity) || 0;
       const cur = m.get(k);
-      if (cur) cur.qty += (it.quantity || 0);
-      else m.set(k, { item: it, cat, qty: it.quantity || 0, type: inv2.type });
+      if (cur) cur.qty += qty;
+      else m.set(k, { item: it, cat, qty, type: inv2.type });
     }
     return m;
   };
@@ -315,7 +316,8 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
         patch.sourceInvoiceId = inv.id;
         patch.sourceCategory = ref.cat;
         if (it.unitPrice) patch.purchasePrice = it.unitPrice;
-        if (it.shipping) patch.deliveryCost = it.shipping;
+        const transport = (it as any).transportCost ?? it.shipping;
+        if (transport) patch.deliveryCost = transport;
         if (inv.date) patch.purchaseDate = inv.date;
       }
       flk.update(explicitFlockId, patch);

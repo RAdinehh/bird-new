@@ -92,6 +92,8 @@ export interface Allocation {
 export interface InvoiceItem extends ItemCategoryFields {
   /** دسته اختصاصی قلم — برای فاکتور مختلط. اگر خالی باشد از Invoice.category استفاده می‌شود. */
   category?: string;
+  /** تعداد سالم در زمان تحویل (DOA) — اگر خالی باشد از quantity استفاده می‌شود */
+  healthyCount?: number | null;
   flockName?: string;
   storage?: string;
   usageType?: string;
