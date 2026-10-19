@@ -173,9 +173,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="تاریخ تولید تخم" required>
             <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
           </Field>
-          <Field label="گله مقصد (موجود)">
-            <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
-          </Field>
+          <div />
         </Grid2>
         <Grid3>
           <Field label="تعداد شکسته">
