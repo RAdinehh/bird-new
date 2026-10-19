@@ -63,6 +63,8 @@ export interface Movement {
   sourceId?: string;
   /** 🆕 شماره دسته (Batch) — برای تخم و دارو */
   batchNo?: string;
+  /** 🆕 تاریخ انقضا (برای دارو) */
+  expiryDate?: string;
 }
 
 interface State {

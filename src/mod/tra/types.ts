@@ -94,6 +94,16 @@ export interface InvoiceItem extends ItemCategoryFields {
   category?: string;
   /** تعداد سالم در زمان تحویل (DOA) — اگر خالی باشد از quantity استفاده می‌شود */
   healthyCount?: number | null;
+  /** تاریخ تولید تخم — اگر خالی باشد از Invoice.date استفاده می‌شود */
+  eggDate?: string;
+  /** شماره بچ هچری (برای جوجه یک‌روزه) */
+  hatcheryBatchNo?: string;
+  /** وزن اولیه جوجه به گرم */
+  chickWeight?: number | null;
+  /** شماره بچ دارو/دان (برای انتقال به Movement) */
+  batchNo?: string;
+  /** تاریخ انقضا دارو/دان (برای انتقال به Movement) */
+  expiryDate?: string;
   flockName?: string;
   storage?: string;
   usageType?: string;
