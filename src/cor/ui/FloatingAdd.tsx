@@ -26,8 +26,21 @@ export default function FloatingAdd() {
       const scrollable = document.documentElement.scrollHeight > window.innerHeight + 100;
       const emptyEls = Array.from(document.querySelectorAll('[data-empty-cta="true"]'));
       const hasVisibleCTA = emptyEls.some(el => {
-        const rect = (el as HTMLElement).getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0;
+        const elm = el as HTMLElement;
+        // ۱. المان واقعاً رندر شده؟ (offsetParent !== null یا position:fixed)
+        const style = getComputedStyle(elm);
+        if (elm.offsetParent === null && style.position !== 'fixed') return false;
+        if (style.display === 'none' || style.visibility === 'hidden') return false;
+        // ۲. واقعاً در viewport دیده می‌شود؟
+        const rect = elm.getBoundingClientRect();
+        const inViewport =
+          rect.top < window.innerHeight &&
+          rect.bottom > 0 &&
+          rect.left < window.innerWidth &&
+          rect.right > 0 &&
+          rect.width > 0 &&
+          rect.height > 0;
+        return inViewport;
       });
       setPageScrollable(scrollable);
       setPageHasEmptyCTA(hasVisibleCTA);
@@ -100,8 +113,8 @@ export default function FloatingAdd() {
 
   if (!config || config.hidden) return null;
 
-  // نکته: شرط pageHasEmptyCTA غیرفعال شد چون در حالت‌های واقعی با وجود فاکتور هم
-  // المان‌هایی با data-empty-cta به صورت پنهان رندر می‌شدند و FAB را پنهان می‌کردند.
+  // 🆕 FAB مخفی می‌شود اگر Empty واقعاً در viewport دیده شود
+  if (pageHasEmptyCTA) return null;
 
   const wakeStyle: React.CSSProperties = wakeMode
     ? {
