@@ -119,6 +119,11 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         )}
 
         <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت</SectionTitle>
+        {form.items.length === 0 && (
+          <div style={{ textAlign: 'center', padding: 'var(--sp-4)', color: 'var(--muted)', fontSize: 'var(--fs-sm)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 'var(--sp-2)' }}>
+            هنوز کالایی اضافه نکرده‌اید. روی دکمه زیر بزنید.
+          </div>
+        )}
         {form.items.map((it, idx) => (
           <div key={it.id} style={{ padding: 'var(--pad-normal) 0', borderBottom: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -232,7 +237,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </Field>
           {form.paymentTerms !== 'custom' && (
             <Field label="سرسید (خودکار)">
-              <Input placeholder="خودکار محاسبه می‌شود" readOnly value={form.dueDate} dir="ltr" />
+              <Input placeholder="خودکار محاسبه می‌شود" readOnly value={toFa(form.dueDate)} style={{ textAlign: 'right' }} />
             </Field>
           )}
           {form.paymentTerms === 'custom' && (
@@ -392,6 +397,18 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
+
+        {/* 🆕 خلاصه فاکتور قبل از ذخیره */}
+        <div style={{ marginTop: 'var(--sp-4)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+            <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
+            <span style={{ fontWeight: 700 }}>{toFa(total.toLocaleString('fa-IR'))} ت</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: rem > 0.5 ? 'var(--warn)' : 'var(--accent)', fontWeight: 700 }}>
+            <span>مانده نهایی:</span>
+            <span>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
+          </div>
+        </div>
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>
