@@ -22,7 +22,9 @@ function applyInvoiceMovements(
   }
 
   items.forEach(it => {
-    if (!it.itemId || !it.quantity || it.quantity <= 0) {
+    // UoM: اگر baseQuantity مثبت باشد، از آن استفاده کن (مثلاً 1000 کیسه × 50kg = 50000 kg)
+    const qty = (it.baseQuantity && it.baseQuantity > 0) ? it.baseQuantity : it.quantity;
+    if (!it.itemId || !qty || qty <= 0) {
       it.movementId = '';
       return;
     }
@@ -30,12 +32,13 @@ function applyInvoiceMovements(
       const mid = whs.addMovement({
         itemId: it.itemId,
         type: invoice.type === 'purchase' ? 'in' : 'out',
-        quantity: it.quantity,
+        quantity: qty,
         unitPrice: it.unitPrice || 0,
         reason: invoice.type === 'purchase' ? 'purchase' : 'sale',
         date: invoice.date,
         partyId: invoice.partyId || '',
         notes: `فاکتور ${invoice.number || ''} — ${it.description || ''}`,
+        expiryDate: it.expiryDate || undefined,
       });
       it.movementId = mid;
     } catch (e) {

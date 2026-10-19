@@ -74,6 +74,10 @@ export interface TraInvoiceItemRef {
   unitPrice?: number;
   description?: string;
   movementId?: string;
+  /** مقدار به واحد پایه انبار (UoM) — اگر خالی/صفر باشد از quantity استفاده می‌شود */
+  baseQuantity?: number | null;
+  /** تاریخ انقضا (برای دارو) */
+  expiryDate?: string;
 }
 
 export interface TraInvoiceCreated {
