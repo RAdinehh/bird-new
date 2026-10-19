@@ -33,7 +33,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       isOpen={isOpen}
       onToggle={onToggle}
       badge={
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div style={{ display: 'flex', gap: 'var(--sp-1)' }}>
           {/* اگر workflowStatus=paid، اون با STATUS_LABEL تکراری ئه — نشون نده */}
           {inv.workflowStatus && inv.workflowStatus !== 'paid' && (
             <Tag tone={workflowTone(inv.workflowStatus)}>
@@ -63,7 +63,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       </RowGrid>
 
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
         {inv.items.map(it => (
           <div key={it.id} style={{
             display: 'flex', justifyContent: 'space-between',
@@ -84,7 +84,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       {inv.payments && inv.payments.length > 0 && (
         <>
           <SectionTitle>💳 پرداخت‌ها</SectionTitle>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
             {inv.payments.map(p => (
               <div key={p.id}>
                 <div style={{
