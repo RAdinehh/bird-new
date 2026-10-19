@@ -23,6 +23,7 @@ import FlocksTabs from './components/FlocksTabs';
 import FlockTabPanel from './components/FlockTabPanel';
 import FlocksModal from './components/FlocksModal';
 import GroupsPage from './components/GroupsPage';
+import WithdrawalModal from './components/WithdrawalModal';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
 
@@ -31,12 +32,14 @@ export default function FlocksPage() {
   const breedStd = useBreedStandard();
   const { flocks, add, update, archive, restore } = useFlk();
   const vaccineEnabled = useSet(s => s.features?.vaccine !== false);
+  const withdrawalEnabled = useSet(s => s.features?.withdrawal === true);
   const { birds: _birdsRaw, breeds } = useBrd();
   const { halls: _hallsRaw, zones } = useHal();
   const { invoices } = useTra();
 
   const [tab, setTab] = useState<TabId>('all');
   const [groupsOpen, setGroupsOpen] = useState(false);
+  const [withdrawalOpen, setWithdrawalOpen] = useState(false);
   const { badge: newTabBadge, trigger: triggerBadge } = useTabBadge();
 
   // ─── dedupe پرنده‌ها و سالن‌ها ───
@@ -185,22 +188,42 @@ export default function FlocksPage() {
         onTabChange={(id) => { setInstant(); setTab(id); }}
         newTabBadge={newTabBadge}
         rightAction={
-          <button
-            type="button"
-            onClick={() => setGroupsOpen(true)}
-            aria-label="گروه‌ها"
-            title="مدیریت گروه‌ها"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--muted)',
-              fontSize: 18,
-              cursor: 'pointer',
-              padding: '6px 8px',
-              borderRadius: 'var(--r-sm)',
-              fontFamily: 'inherit',
-            }}
-          >📁</button>
+          <>
+            {withdrawalEnabled && (
+              <button
+                type="button"
+                onClick={() => setWithdrawalOpen(true)}
+                aria-label="دوره پرهیز"
+                title="مدیریت دوره پرهیز"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--muted)',
+                  fontSize: 18,
+                  cursor: 'pointer',
+                  padding: '6px 8px',
+                  borderRadius: 'var(--r-sm)',
+                  fontFamily: 'inherit',
+                }}
+              >🩺</button>
+            )}
+            <button
+              type="button"
+              onClick={() => setGroupsOpen(true)}
+              aria-label="گروه‌ها"
+              title="مدیریت گروه‌ها"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--muted)',
+                fontSize: 18,
+                cursor: 'pointer',
+                padding: '6px 8px',
+                borderRadius: 'var(--r-sm)',
+                fontFamily: 'inherit',
+              }}
+            >📁</button>
+          </>
         }
       />
 
@@ -380,6 +403,7 @@ export default function FlocksPage() {
     
 
       <GroupsPage open={groupsOpen} onClose={() => setGroupsOpen(false)} />
+      <WithdrawalModal open={withdrawalOpen} onClose={() => setWithdrawalOpen(false)} />
       </div>
   );
 }
