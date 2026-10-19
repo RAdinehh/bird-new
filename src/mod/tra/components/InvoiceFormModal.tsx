@@ -160,8 +160,24 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               <div /> {/* Spacer برای هم‌ترازی دو ستونه */}
             </Grid2>
 
+            <Field label="دستهٔ این قلم" hint="خالی = همان دستهٔ فاکتور (برای فاکتور مختلط)">
+              <Select value={it.category || ''} onChange={e => updateItem(it.id, { category: e.target.value || undefined })}>
+                <option value="">همان فاکتور — {(() => {
+                  const saleOnly = ['manure', 'broken', 'fertile_egg'];
+                  const list = saleOnly.includes(form.category) ? CATEGORIES.sale : CATEGORIES.purchase;
+                  const found = list.find(x => x[0] === form.category);
+                  return found ? found[1] : form.category;
+                })()}</option>
+                {(() => {
+                  const saleOnly = ['manure', 'broken', 'fertile_egg'];
+                  const list = saleOnly.includes(form.category) ? CATEGORIES.sale : CATEGORIES.purchase;
+                  return list.map(([k, v]) => <option key={k} value={k}>{v}</option>);
+                })()}
+              </Select>
+            </Field>
+
             <ItemDetailsForm
-              category={form.category}
+              category={it.category || form.category}
               item={it}
               updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
               isPurchase={true}
@@ -177,7 +193,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               }
             />
 
-            {whsItems.length > 0 && !['chick', 'egg', 'fertile_egg', 'adult'].includes(form.category) && (
+            {whsItems.length > 0 && !['chick', 'egg', 'fertile_egg', 'adult'].includes(it.category || form.category) && (
               <>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', cursor: 'pointer' }}>
                   <input type="checkbox" checked={!!it.itemId}
