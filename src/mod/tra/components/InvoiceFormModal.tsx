@@ -219,7 +219,23 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               <>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', cursor: 'pointer' }}>
                   <input type="checkbox" checked={!!it.itemId}
-                    onChange={e => updateItem(it.id, { itemId: e.target.checked ? (whsItems[0]?.id || '') : '' })}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        const first = whsItems[0];
+                        if (first) {
+                          const patch: any = {
+                            itemId: first.id,
+                            description: it.description || first.name,
+                            unit: first.unit,
+                          };
+                          if (first.storage && !it.storage) patch.storage = first.storage;
+                          if (first.expireDate && !it.expiryDate) patch.expiryDate = first.expireDate;
+                          updateItem(it.id, patch);
+                        }
+                      } else {
+                        updateItem(it.id, { itemId: '' });
+                      }
+                    }}
                     style={{ cursor: 'pointer', accentColor: 'var(--accent)' }} />
                   اتصال به انبار
                 </label>
@@ -228,10 +244,18 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     value={it.itemId}
                     onChange={v => {
                       const w = whsItems.find(x => x.id === v);
-                      updateItem(it.id, {
+                      if (!w) {
+                        updateItem(it.id, { itemId: v });
+                        return;
+                      }
+                      const patch: any = {
                         itemId: v,
-                        ...(w ? { description: it.description || w.name, unit: w.unit } : {})
-                      });
+                        description: it.description || w.name,
+                        unit: w.unit,
+                      };
+                      if (w.storage && !it.storage) patch.storage = w.storage;
+                      if (w.expireDate && !it.expiryDate) patch.expiryDate = w.expireDate;
+                      updateItem(it.id, patch);
                     }}
                     options={whsItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${toFa(w.currentStock)} ${(UNIT_LABEL as any)[w.unit]}`, group: w.category }))}
                     placeholder="— انتخاب کالا —" modalTitle="انتخاب کالای انبار" autoThreshold={6}
