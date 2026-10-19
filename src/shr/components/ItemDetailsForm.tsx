@@ -1,4 +1,4 @@
-import { Field, Grid2, Input, Select } from './ui';
+import { Field, Grid2, Grid3, Input, Select } from './ui';
 import SmartSelect from './SmartSelect';
 import { useBrd } from '../../mod/brd/store';
 import { useHal } from '../../mod/hal/store';
@@ -148,14 +148,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => updateItem({ chickWeight: parseFaNum(e.target.value) || null })} unit="g" min={0} />
           </Field>
         </Grid2>
-        <Grid2>
+        <Grid3>
           <Field label="تعداد نر">
             <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
           </Field>
           <Field label="تعداد ماده">
             <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
           </Field>
-        </Grid2>
+          <Field label="نامشخص" hint="برای جوجه‌های مخلوط">
+            <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
+          </Field>
+        </Grid3>
 
         <SecTitle icon="💰" title="هزینه و مالی" />
         <Grid2>
