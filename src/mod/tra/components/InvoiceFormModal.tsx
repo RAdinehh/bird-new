@@ -129,7 +129,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </Field>
           <Field label="نوع سفارش">
             <Select value={form.isPreorder ? 'preorder' : 'stock'} onChange={e => setForm({ ...form, isPreorder: e.target.value === 'preorder' })}>
-              <option value="stock">📦 از موجودی</option>
+              <option value="stock">📦 خرید از موجودی</option>
               <option value="preorder">📅 پیش‌خرید</option>
             </Select>
           </Field>

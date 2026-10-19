@@ -35,7 +35,7 @@ function applyInvoiceMovements(
         quantity: qty,
         unitPrice: it.unitPrice || 0,
         reason: invoice.type === 'purchase' ? 'purchase' : 'sale',
-        date: invoice.date,
+        date: invoice.deliveryDate || invoice.date,
         partyId: invoice.partyId || '',
         notes: `فاکتور ${invoice.number || ''} — ${it.description || ''}`,
         expiryDate: it.expiryDate || undefined,
