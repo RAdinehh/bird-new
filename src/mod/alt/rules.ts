@@ -20,7 +20,7 @@ import { detectIncAlerts } from './alerts-inc';
 /** تشخیص همه‌ی هشدارهای خودکار */
 export function detectAllAlerts(): RuleAlert[] {
   const alerts: RuleAlert[] = [];
-  const _s = useSet.getState() as { features?: { vaccine?: boolean; medicine?: boolean }; customStandards?: Record<string, BirdStandard> };
+  const _s = useSet.getState() as { features?: { vaccine?: boolean; medicine?: boolean; withdrawal?: boolean }; customStandards?: Record<string, BirdStandard> };
   const vaccineEnabled = _s.features?.vaccine !== false;
   const medicineEnabled = _s.features?.medicine !== false;
 
