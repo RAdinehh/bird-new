@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { paidSum, calcItemTotal, generateInstallments, type Invoice, type InvoiceItem, type Payment } from '../store';
+import { createInvoiceSchema } from '../../../shr/validation/rules/tra';
 import { emptyForm as empty, type F } from '../types-invoice';
 import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -139,6 +140,39 @@ export function useInvoiceForm(params: {
 
   // ذخیره
   const save = async () => {
+    // ═══ اعتبارسنجی Zod (منبع حقیقت) ═══
+    const validationData = {
+      type: kind,
+      date: form.date || '',
+      partyId: form.partyId || '',
+      category: form.category || '',
+      items: (form.items || []).map(it => ({
+        ...it,
+        category: it.category || form.category,
+      })),
+      discount: 0,
+      shipping: 0,
+      total,
+      payments: form.payments || [],
+      dueDate: form.dueDate || '',
+      relatedFlockId: form.relatedFlockId || '',
+      relatedEntryId: '',
+      notes: form.notes?.trim() || '',
+      paymentTerms: form.paymentTerms,
+      isPreorder: form.isPreorder,
+      deliveryDate: form.deliveryDate || '',
+    };
+    const zodResult = createInvoiceSchema({}).safeParse(validationData);
+    if (!zodResult.success) {
+      const firstErr = zodResult.error.issues[0];
+      const path = firstErr.path.join('.');
+      const itemMatch = path.match(/^items\.(\d+)\./);
+      const itemLabel = itemMatch ? `قلم ${toFa(parseInt(itemMatch[1]) + 1)}: ` : '';
+      setErr(`${itemLabel}${firstErr.message}`);
+      return;
+    }
+    // ═══ پایان اعتبارسنجی Zod ═══
+    
     if (!form.partyId) { setErr(isPurchase ? 'فروشنده اجباری است' : 'مشتری اجباری است'); return; }
     if (!form.date.trim()) { setErr('تاریخ اجباری است'); return; }
     if (form.items.length === 0) { setErr('حداقل یک قلم اضافه کنید'); return; }
