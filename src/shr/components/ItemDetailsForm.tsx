@@ -45,7 +45,6 @@ export interface ItemDetailFormData {
   brokenEggCount?: number | null;
   sourceFarm?: string;
 
-  batchNo?: string;
   expiryDate?: string;
   storage?: string;
 
@@ -298,14 +297,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
 
         <SecTitle icon="📅" title="انبار و ردیابی" />
-        <Grid2>
-          <Field label="بچ تولید">
-            <Input value={String(item.batchNo || '')} onChange={e => updateItem({ batchNo: e.target.value })} placeholder="F-123" />
-          </Field>
-          <Field label="تاریخ انقضا">
-            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
-          </Field>
-        </Grid2>
+        <Field label="تاریخ انقضا">
+          <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
+        </Field>
 
         <SecTitle icon="🧪" title="ترکیبات تغذیه‌ای" />
         <Grid2>
@@ -355,14 +349,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <SecTitle icon="📦" title="اطلاعات انبار" />
-        <Grid2>
-          <Field label="شماره بچ (Batch)">
-            <Input value={String(item.batchNo || '')} onChange={e => updateItem({ batchNo: e.target.value })} placeholder="B-123" />
-          </Field>
-          <Field label="تاریخ انقضا">
-            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
-          </Field>
-        </Grid2>
+        <Field label="تاریخ انقضا">
+          <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
+        </Field>
         <Grid2>
           <Field label="شرایط نگهداری">
             <Select value={String(item.storage || 'room')} onChange={e => updateItem({ storage: e.target.value })}>

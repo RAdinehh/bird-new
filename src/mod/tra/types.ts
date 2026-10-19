@@ -101,8 +101,6 @@ export interface InvoiceItem extends ItemCategoryFields {
   hatcheryBatchNo?: string;
   /** وزن اولیه جوجه به گرم */
   chickWeight?: number | null;
-  /** شماره بچ دارو/دان (برای انتقال به Movement) */
-  batchNo?: string;
   /** تاریخ انقضا دارو/دان (برای انتقال به Movement) */
   expiryDate?: string;
   flockName?: string;

@@ -79,7 +79,6 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       medicineType: optionalStr(20),
       storage: optionalStr(20),
       usageType: optionalStr(20),
-      batchNo: optionalStr(50),
       expiryDate: persianDateOpt('تاریخ انقضا'),
       withdrawalDays: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
       
