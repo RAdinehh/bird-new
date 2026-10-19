@@ -190,9 +190,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="شماره بچ تخم">
             <Input value={String(item.eggBatchNo || '')} onChange={e => updateItem({ eggBatchNo: e.target.value })} placeholder="B-102" />
           </Field>
-          <Field label="مبدأ / مرغداری مادر">
-            <Input value={String(item.sourceFarm || '')} onChange={e => updateItem({ sourceFarm: e.target.value })} placeholder="آدینه" />
-          </Field>
+
         </Grid2>
 
         <SecTitle icon="🔢" title="تعداد و تخصیص مکان" />
@@ -252,20 +250,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         
-        <SecTitle icon="💰" title="هزینه و مالی" />
-        <Grid2>
-          <Field label="مبنای قیمت">
-            <Select value={String(item.priceUnit || 'per_unit')} onChange={e => updateItem({ priceUnit: e.target.value as PriceUnit })}>
-              <option value="per_unit">هر عدد</option>
-              <option value="per_kg">هر کیلو</option>
-            </Select>
-          </Field>
-          {item.priceUnit === 'per_kg' ? (
-            <Field label="وزن زنده کل (kg)">
-              <Input mode="number" value={item.liveWeight !== null && item.liveWeight !== undefined ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
-            </Field>
-          ) : <div />}
-        </Grid2>
+
         {sellerSlot}
       </div>
     );
@@ -280,60 +265,16 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="اتصال به انبار" hint="برای موجودی">
             <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).map(i => ({ value: i.id, label: i.name }))} placeholder="— کالا —" modalTitle="انتخاب کالای انبار" autoThreshold={6} />
           </Field>
-          <Field label="نوع دان">
-            <Select value={String(item.feedType || '')} onChange={e => updateItem({ feedType: e.target.value })}>
-              <option value="">— انتخاب —</option>
-              <option value="starter">آغازین (Starter)</option>
-              <option value="grower">میانی (Grower)</option>
-              <option value="finisher">پایانی (Finisher)</option>
-            </Select>
-          </Field>
+
         </Grid2>
-        <Grid2>
-          <Field label="برند">
-            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="پیشگامان" />
-          </Field>
-          <div />
-        </Grid2>
+
 
         <SecTitle icon="📅" title="انبار و ردیابی" />
         <Field label="تاریخ انقضا">
           <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
         </Field>
 
-        <SecTitle icon="🧪" title="ترکیبات تغذیه‌ای" />
-        <Grid2>
-          <Field label="درصد پروتئین">
-            <Input mode="number" value={item.protein !== null && item.protein !== undefined ? String(item.protein) : ''} onChange={e => updateItem({ protein: parseFaNum(e.target.value) || null })} unit="٪" min={0} max={100} />
-          </Field>
-          <Field label="انرژی (Kcal)">
-            <Input mode="number" value={item.energy !== null && item.energy !== undefined ? String(item.energy) : ''} onChange={e => updateItem({ energy: parseFaNum(e.target.value) || null })} unit="Kcal" min={0} />
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label="چربی">
-            <Input mode="number" value={item.fat !== null && item.fat !== undefined ? String(item.fat) : ''} onChange={e => updateItem({ fat: parseFaNum(e.target.value) || null })} unit="٪" min={0} />
-          </Field>
-          <Field label="فیبر">
-            <Input mode="number" value={item.fiber !== null && item.fiber !== undefined ? String(item.fiber) : ''} onChange={e => updateItem({ fiber: parseFaNum(e.target.value) || null })} unit="٪" min={0} />
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label="کلسیم">
-            <Input mode="number" value={item.calcium !== null && item.calcium !== undefined ? String(item.calcium) : ''} onChange={e => updateItem({ calcium: parseFaNum(e.target.value) || null })} unit="٪" min={0} />
-          </Field>
-          <Field label="فسفر">
-            <Input mode="number" value={item.phosphorus !== null && item.phosphorus !== undefined ? String(item.phosphorus) : ''} onChange={e => updateItem({ phosphorus: parseFaNum(e.target.value) || null })} unit="٪" min={0} />
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label="متیونین">
-            <Input mode="number" value={item.methionine !== null && item.methionine !== undefined ? String(item.methionine) : ''} onChange={e => updateItem({ methionine: parseFaNum(e.target.value) || null })} unit="٪" min={0} />
-          </Field>
-          <Field label="لیزین">
-            <Input mode="number" value={item.lysine !== null && item.lysine !== undefined ? String(item.lysine) : ''} onChange={e => updateItem({ lysine: parseFaNum(e.target.value) || null })} unit="٪" min={0} />
-          </Field>
-        </Grid2>
+
 
         <SecTitle icon="💰" title="هزینه و مالی" />
         <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
@@ -352,16 +293,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <Field label="تاریخ انقضا">
           <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
         </Field>
-        <Grid2>
-          <Field label="شرایط نگهداری">
-            <Select value={String(item.storage || 'room')} onChange={e => updateItem({ storage: e.target.value })}>
-              <option value="room">دمای اتاق</option>
-              <option value="fridge">یخچال (۲ تا ۸ درجه)</option>
-              <option value="freezer">فریزر (زیر صفر)</option>
-            </Select>
-          </Field>
-          <div />
-        </Grid2>
+
 
         <SecTitle icon="💰" title="هزینه و مالی" />
         <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
