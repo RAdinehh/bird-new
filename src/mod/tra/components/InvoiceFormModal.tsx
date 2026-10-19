@@ -52,7 +52,7 @@ const getUnitForCategory = (cat: string): string => {
     case 'fertile_egg': return 'pcs';
     case 'broken': return 'pcs';
     case 'feed': return 'kg';
-    case 'medicine': return 'box';
+    case 'medicine': return 'ml';
     case 'equipment': return 'pcs';
     case 'manure': return 'kg';
     default: return 'pcs';

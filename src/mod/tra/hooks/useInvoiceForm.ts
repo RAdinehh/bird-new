@@ -18,7 +18,7 @@ function getUnitForCategory(cat: string): string {
     case 'fertile_egg': return 'pcs';
     case 'broken': return 'pcs';
     case 'feed': return 'kg'; // کیلوگرم
-    case 'medicine': return 'box'; // بسته (یا ویال)
+    case 'medicine': return 'ml'; // بسته (یا ویال)
     case 'equipment': return 'pcs';
     case 'manure': return 'kg';
     default: return 'pcs';
