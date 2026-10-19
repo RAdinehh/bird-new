@@ -188,7 +188,7 @@ export const useTra = create<State>()(
     }),
     {
       name: 'pm-tra',
-      version: 4,
+      version: 5,
       migrate: (persisted: any, version: number) => {
         if (!persisted?.invoices) return persisted;
 
@@ -227,6 +227,8 @@ export const useTra = create<State>()(
             // فاز D
             deferrals: inv.deferrals || [],
             remindersMuted: inv.remindersMuted ?? false,
+            // اقساط
+            installments: inv.installments || [],
             // گسترش Payment
             payments: (inv.payments || []).map((p: any) => ({
               ...p,

@@ -2,7 +2,7 @@
  * tra/calc.ts — توابع محاسباتی خالص معاملات
  */
 import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ, addDays } from 'date-fns-jalali';
-import type { Invoice, InvoiceItem, Payment, WorkflowStatus, CheckStatus, InvoiceStatus, InvoiceType, PaymentTerms } from './types';
+import type { Invoice, InvoiceItem, Payment, WorkflowStatus, CheckStatus, InvoiceStatus, InvoiceType, PaymentTerms, Installment } from './types';
 
 export function generateInvoiceNumber(
   type: InvoiceType,
@@ -297,3 +297,49 @@ export function formatInvoiceNumber(num: string | undefined | null): string {
   const faDigits = rest.replace(/\d/g, (d: string) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
   return prefix ? `${prefix}${faDigits}` : faDigits;
 }
+/** افزودن N روز به تاریخ شمسی */
+export function addJalaliDays(dateStr: string, days: number): string {
+  if (!dateStr) return '';
+  try {
+    const en = dateStr.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const base = parseJ(en, 'yyyy/MM/dd', new Date());
+    if (isNaN(base.getTime())) return dateStr;
+    return formatJ(addDays(base, days), 'yyyy/MM/dd');
+  } catch { return dateStr; }
+}
+
+/** تولید آرایه اقساط — استاندارد صنعت: باقیمانده روی آخرین قسط، پیش‌پرداخت کسر می‌شود */
+export function generateInstallments(
+  totalAmount: number,
+  count: number,
+  gapDays: number,
+  startDate: string,
+  advancePaid: number = 0
+): Installment[] {
+  if (!totalAmount || totalAmount <= 0) return [];
+  if (!count || count <= 0) return [];
+  if (!startDate) return [];
+  const gap = gapDays > 0 ? gapDays : 30;
+  const remaining = Math.max(0, totalAmount - (advancePaid || 0));
+  if (remaining <= 0) return [];
+  const perInstallment = Math.round(remaining / count);
+  const out: Installment[] = [];
+  let accumulated = 0;
+  for (let i = 0; i < count; i++) {
+    const isLast = i === count - 1;
+    const amount = isLast ? (remaining - accumulated) : perInstallment;
+    accumulated += amount;
+    const dueDate = addJalaliDays(startDate, (i + 1) * gap);
+    out.push({
+      id: crypto.randomUUID(),
+      number: i + 1,
+      dueDate,
+      amount,
+      status: 'pending',
+      paid: false,
+      paidDate: '',
+    });
+  }
+  return out;
+}
+

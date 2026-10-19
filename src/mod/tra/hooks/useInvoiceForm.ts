@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
-import { paidSum, calcItemTotal, type Invoice, type InvoiceItem, type Payment } from '../store';
+import { paidSum, calcItemTotal, generateInstallments, type Invoice, type InvoiceItem, type Payment } from '../store';
 import { emptyForm as empty, type F } from '../types-invoice';
 import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -119,6 +119,7 @@ export function useInvoiceForm(params: {
       payments: inv.payments || [],
       relatedFlockId: (inv as any).relatedFlockId || '',
       notes: inv.notes || '',
+      installments: inv.installments || [],
     });
     setErr(''); setOpen(true);
   };
@@ -144,6 +145,14 @@ export function useInvoiceForm(params: {
       advancePercent: form.isPreorder && form.advanceType === 'percent' ? num(form.advanceValue) : 0,
       advancePayment: form.isPreorder && form.advanceType === 'amount' ? num(form.advanceValue) : 0,
     };
+    if (form.paymentTerms === 'installment') {
+      const cnt = parseInt(toEn(form.installmentCount)) || 0;
+      const gap = parseInt(toEn(form.installmentGapDays)) || 30;
+      const advance = form.isPreorder && form.advanceType === 'amount' ? num(form.advanceValue) : 0;
+      data.installments = generateInstallments(total, cnt, gap, form.date, advance);
+    } else {
+      data.installments = [];
+    }
     if (form.id) {
       updateInvoice(form.id, data);
     } else {

@@ -190,6 +190,8 @@ export interface Invoice {
 
   // ===== فاز D — سرسید و تعویق =====
   deferrals?: Deferral[];
+  // ===== اقساط =====
+  installments?: Installment[];
   remindersMuted?: boolean;
 }
 

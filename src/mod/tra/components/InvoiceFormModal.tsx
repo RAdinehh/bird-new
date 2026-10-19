@@ -11,7 +11,7 @@ import SmartSelect from '../../../shr/components/SmartSelect';
 import { AccordionSection } from '../../../shr/components/AccordionSection';
 import ItemDetailsForm from '../../../shr/components/ItemDetailsForm';
 import { type CheckStatus } from '../store';
-import { CATEGORIES, type InvoiceItem, type Payment } from '../store';
+import { CATEGORIES, generateInstallments, type InvoiceItem, type Payment } from '../store';
 import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
 import { useCtc } from '../../ctc/store';
@@ -297,6 +297,40 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </Field>
           </Grid2>
         )}
+
+        {form.paymentTerms === 'installment' && (() => {
+          const toEnLocal = (s: string) => s.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+          const cnt = parseInt(toEnLocal(form.installmentCount)) || 0;
+          const gap = parseInt(toEnLocal(form.installmentGapDays)) || 30;
+          const advanceAmt = form.isPreorder && form.advanceType === 'amount'
+            ? (parseFloat(toEnLocal(form.advanceValue).replace('٫','.')) || 0) : 0;
+          const totalLocal = form.items.reduce((acc, it) => {
+            const base = (it.quantity || 0) * (it.unitPrice || 0);
+            let disc = 0;
+            if (it.discountType === 'percent') disc = base * ((it.discountValue || 0) / 100);
+            else if (it.discountType === 'amount') disc = it.discountValue || 0;
+            return acc + Math.max(0, base - disc) + (it.shipping || 0);
+          }, 0);
+          const preview = generateInstallments(totalLocal, cnt, gap, form.date, advanceAmt);
+          if (preview.length === 0) return null;
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 8 }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 4 }}>📅 پیش‌نمایش اقساط</div>
+              {preview.map(inst => (
+                <div key={inst.id} style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+                  borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)',
+                  color: 'var(--text)',
+                }}>
+                  <span>قسط {inst.number}</span>
+                  <span style={{ color: 'var(--muted)' }}>{inst.dueDate}</span>
+                  <span style={{ fontWeight: 700 }}>{inst.amount.toLocaleString('fa-IR')} ت</span>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
 
         </div>
 

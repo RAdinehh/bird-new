@@ -24,6 +24,7 @@ export interface F {
   payments: Payment[];
   relatedFlockId: string;
   notes: string;
+  installments: Installment[];
 }
 
 export const emptyForm = (isPurchase: boolean): F => ({
@@ -31,5 +32,5 @@ export const emptyForm = (isPurchase: boolean): F => ({
   paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
   customDueDate: '', cashDiscountPct: '', cashDiscountDays: '', isPreorder: false, deliveryDate: '',
   advanceType: 'percent', advanceValue: '',
-  dueDate: '', payments: [], relatedFlockId: '', notes: '',
+  dueDate: '', payments: [], relatedFlockId: '', notes: '', installments: [],
 });
