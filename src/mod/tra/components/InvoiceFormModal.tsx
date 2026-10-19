@@ -106,32 +106,44 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           <Field label="دسته">
             <Select value={form.category} onChange={e => {
               const newCat = e.target.value;
-              // ═══ جادوی آبشاری: واحد همه اقلامی که دسته اختصاصی ندارند را آپدیت کن ═══
               const newUnit = getUnitForCategory(newCat);
               const newItems = form.items.map(it => {
                 if (!it.category) return { ...it, unit: newUnit };
                 return it;
               });
-              setForm({ ...form, category: newCat, items: newItems });
+              const isOther = newCat === 'other';
+              setForm({ 
+                ...form, 
+                category: newCat, 
+                items: newItems,
+                isPreorder: isOther ? false : form.isPreorder,
+                deliveryDate: isOther ? '' : form.deliveryDate,
+                advanceValue: isOther ? '' : form.advanceValue,
+              });
             }}>
               {(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </Select>
           </Field>
         </Grid2>
         <Grid2>
+          <Field label="نوع سفارش">
+            <Select 
+              value={(form.isPreorder && form.category !== 'other') ? 'preorder' : 'stock'} 
+              onChange={e => setForm({ ...form, isPreorder: e.target.value === 'preorder' })}
+            >
+              <option value="stock">📦 خرید از موجودی</option>
+              {form.category !== 'other' && (
+                <option value="preorder">📅 پیش‌خرید</option>
+              )}
+            </Select>
+          </Field>
           <Field label={isPurchase ? 'فروشنده' : 'مشتری'} required error={vErrors.partyId}>
             <SmartSelect
               value={form.partyId}
               onChange={v => setForm({...form, partyId: v})}
-              options={parties.map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
+              options={parties.map(cc => ({ value: cc.id, label: cc.name, subtitle: cc.phone || undefined }))}
               placeholder="— انتخاب کنید —" modalTitle={isPurchase ? 'انتخاب فروشنده' : 'انتخاب مشتری'} autoThreshold={6}
             />
-          </Field>
-          <Field label="نوع سفارش">
-            <Select value={form.isPreorder ? 'preorder' : 'stock'} onChange={e => setForm({ ...form, isPreorder: e.target.value === 'preorder' })}>
-              <option value="stock">📦 خرید از موجودی</option>
-              <option value="preorder">📅 پیش‌خرید</option>
-            </Select>
           </Field>
         </Grid2>
 

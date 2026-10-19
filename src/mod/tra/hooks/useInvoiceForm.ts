@@ -181,8 +181,8 @@ export function useInvoiceForm(params: {
       customDueDate: form.paymentTerms === 'custom' ? form.customDueDate : '',
       cashDiscountPct: form.cashDiscountPct ? parseFloat(toEn(form.cashDiscountPct)) : undefined,
       cashDiscountDays: form.cashDiscountDays ? parseInt(toEn(form.cashDiscountDays)) : undefined,
-      isPreorder: form.isPreorder,
-      deliveryDate: form.isPreorder ? form.deliveryDate : '',
+      isPreorder: form.category === 'other' ? false : form.isPreorder,
+      deliveryDate: (form.category !== 'other' && form.isPreorder) ? form.deliveryDate : '',
       advancePercent: form.isPreorder && form.advanceType === 'percent' ? num(form.advanceValue) : 0,
       advancePayment: form.isPreorder ? (
         form.advanceType === 'percent' 
