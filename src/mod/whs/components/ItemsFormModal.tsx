@@ -176,6 +176,57 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
           </>
         )}
 
+        {form.category === 'feed' && (
+          <>
+            <SectionTitle>🧪 ترکیبات تغذیه‌ای</SectionTitle>
+            <Grid2>
+              <Field label="نوع دان">
+                <Select value={form.feedType || ''} onChange={e => setForm({ ...form, feedType: e.target.value })}>
+                  <option value="">— انتخاب —</option>
+                  <option value="starter">آغازین (Starter)</option>
+                  <option value="grower">میانی (Grower)</option>
+                  <option value="finisher">پایانی (Finisher)</option>
+                </Select>
+              </Field>
+              <Field label="برند">
+                <Input value={form.brand || ''} onChange={e => setForm({ ...form, brand: e.target.value })} placeholder="پیشگامان" />
+              </Field>
+            </Grid2>
+            <Grid2>
+              <Field label="درصد پروتئین">
+                <NumField value={form.protein || ''} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" min={0} max={100} />
+              </Field>
+              <Field label="انرژی (Kcal)">
+                <NumField value={form.energy || ''} onChange={e => setForm({ ...form, energy: e.target.value })} unit="Kcal" min={0} />
+              </Field>
+            </Grid2>
+            <Grid2>
+              <Field label="چربی">
+                <NumField value={form.fat || ''} onChange={e => setForm({ ...form, fat: e.target.value })} unit="٪" min={0} />
+              </Field>
+              <Field label="فیبر">
+                <NumField value={form.fiber || ''} onChange={e => setForm({ ...form, fiber: e.target.value })} unit="٪" min={0} />
+              </Field>
+            </Grid2>
+            <Grid2>
+              <Field label="کلسیم">
+                <NumField value={form.calcium || ''} onChange={e => setForm({ ...form, calcium: e.target.value })} unit="٪" min={0} />
+              </Field>
+              <Field label="فسفر">
+                <NumField value={form.phosphorus || ''} onChange={e => setForm({ ...form, phosphorus: e.target.value })} unit="٪" min={0} />
+              </Field>
+            </Grid2>
+            <Grid2>
+              <Field label="متیونین">
+                <NumField value={form.methionine || ''} onChange={e => setForm({ ...form, methionine: e.target.value })} unit="٪" min={0} />
+              </Field>
+              <Field label="لیزین">
+                <NumField value={form.lysine || ''} onChange={e => setForm({ ...form, lysine: e.target.value })} unit="٪" min={0} />
+              </Field>
+            </Grid2>
+          </>
+        )}
+
         {form.category === 'equipment' && (
           <>
             <SectionTitle>🔧 اطلاعات تجهیزات</SectionTitle>
