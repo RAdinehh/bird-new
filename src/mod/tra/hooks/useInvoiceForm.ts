@@ -184,12 +184,20 @@ export function useInvoiceForm(params: {
       isPreorder: form.isPreorder,
       deliveryDate: form.isPreorder ? form.deliveryDate : '',
       advancePercent: form.isPreorder && form.advanceType === 'percent' ? num(form.advanceValue) : 0,
-      advancePayment: form.isPreorder && form.advanceType === 'amount' ? num(form.advanceValue) : 0,
+      advancePayment: form.isPreorder ? (
+        form.advanceType === 'percent' 
+          ? (total * (num(form.advanceValue) / 100)) 
+          : num(form.advanceValue)
+      ) : 0,
     };
     if (form.paymentTerms === 'installment') {
       const cnt = parseInt(toEn(form.installmentCount)) || 0;
       const gap = parseInt(toEn(form.installmentGapDays)) || 30;
-      const advance = form.isPreorder && form.advanceType === 'amount' ? num(form.advanceValue) : 0;
+      const advance = form.isPreorder ? (
+        form.advanceType === 'percent' 
+          ? (total * (num(form.advanceValue) / 100)) 
+          : num(form.advanceValue)
+      ) : 0;
       data.installments = generateInstallments(total, cnt, gap, form.date, advance);
     } else {
       data.installments = [];

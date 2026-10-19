@@ -33,14 +33,16 @@ export const useTra = create<State>()(
         const num = generateInvoiceNumber(i.type, i.date, get().invoices);
         const newInv = { ...i, id, number: i.number || num, createdAt: now(), updatedAt: now() } as any;
         let items: InvoiceItem[] = newInv.items || [];
-        // 🎯 ۱. اعمال روی گله‌ها (خرید/فروش پرنده)
-        try { items = applyInvoiceFlocks({ ...newInv, items }); } catch(e) {}
-        // 🎯 ۲. اتصال تجهیزات به فاکتور
-        try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) {}
-        // 🎯 ۳. اتصال فروش تخم به ماژول egg
-        try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) {}
-        // 🎯 ۴. اتصال به انبار از طریق Event Bus (حرکت‌ها + movementId)
-        try { void bus.emit('tra:invoice:created', { invoiceId: newInv.id, invoice: newInv, items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
+        if (!newInv.isPreorder) {
+          // 🎯 ۱. اعمال روی گله‌ها (خرید/فروش پرنده)
+          try { items = applyInvoiceFlocks({ ...newInv, items }); } catch(e) {}
+          // 🎯 ۲. اتصال تجهیزات به فاکتور
+          try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) {}
+          // 🎯 ۳. اتصال فروش تخم به ماژول egg
+          try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) {}
+          // 🎯 ۴. اتصال به انبار از طریق Event Bus (حرکت‌ها + movementId)
+          try { void bus.emit('tra:invoice:created', { invoiceId: newInv.id, invoice: newInv, items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
+        }
         const syncedPayments = (newInv.payments || []).map((p: any) => {
           if (p.partyPaymentId) return p;
           try {
@@ -69,17 +71,23 @@ export const useTra = create<State>()(
         const merged = { ...prev, ...patch, updatedAt: now() } as Invoice;
         let itemsFinal: InvoiceItem[] = merged.items || [];
         const mergedWithItems = { ...merged, items: itemsFinal };
-        try { itemsFinal = applyInvoiceFlocks(mergedWithItems, prev); } catch(e) {}
-        try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
-        try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, prev); } catch(e) {}
-        // 🎯 اتصال به انبار از طریق Event Bus (rollback قبلی‌ها + حرکت‌های جدید)
-        try { void bus.emit('tra:invoice:updated', {
-          invoiceId: id,
-          invoice: merged,
-          prevInvoice: prev,
-          items: itemsFinal,
-          prevItems: prev.items,
-        }, { source: 'tra' }).catch(() => {}); } catch(e) {}
+        
+        // اگر قبلاً پیش‌خرید بوده و الان تایید شده (تحویل گرفته شده)
+        const isReceiving = prev.isPreorder && !merged.isPreorder;
+
+        if (!merged.isPreorder || isReceiving) {
+          try { itemsFinal = applyInvoiceFlocks(mergedWithItems, isReceiving ? undefined : prev); } catch(e) {}
+          try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
+          try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
+          // 🎯 اتصال به انبار از طریق Event Bus (rollback قبلی‌ها + حرکت‌های جدید)
+          try { void bus.emit('tra:invoice:updated', {
+            invoiceId: id,
+            invoice: merged,
+            prevInvoice: isReceiving ? {} : prev,
+            items: itemsFinal,
+            prevItems: isReceiving ? [] : prev.items,
+          }, { source: 'tra' }).catch(() => {}); } catch(e) {}
+        }
         const prevPayments = (prev.payments || []) as any[];
         const newPaymentsInput = (mergedWithItems.payments || []) as any[];
         const syncedPayments = newPaymentsInput.map((p: any) => {
