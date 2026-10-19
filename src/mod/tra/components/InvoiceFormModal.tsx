@@ -254,7 +254,17 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         </Btn>
 
 
-        <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> شرایط پرداخت</SectionTitle>
+        <AccordionSection
+          title="شرایط پرداخت"
+          icon="📅"
+          defaultOpen={form.paymentTerms !== 'cash' || form.isPreorder}
+          summary={
+            form.isPreorder ? 'پیش‌فروش'
+            : form.paymentTerms === 'cash' ? 'نقدی'
+            : form.paymentTerms === 'installment' ? `${toFa(form.installmentCount || '۰')} قسط`
+            : 'توافقی'
+          }
+        >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {form.isPreorder && (
           <Grid2>
@@ -361,8 +371,13 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         })()}
 
         </div>
+        </AccordionSection>
 
-        <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت‌ها — {toFa(paid.toLocaleString('fa-IR'))} از {toFa(total.toLocaleString('fa-IR'))}</SectionTitle>
+        <AccordionSection
+          title={`پرداخت‌ها — ${toFa(paid.toLocaleString('fa-IR'))} از ${toFa(total.toLocaleString('fa-IR'))}`}
+          icon="💳"
+          defaultOpen={form.payments.length > 0}
+        >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {form.payments.map(p => (
           <div key={p.id} style={{ padding: 'var(--pad-normal) 0', borderBottom: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -463,6 +478,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           افزودن پرداخت
         </Btn>
         </div>
+        </AccordionSection>
 
         {rem > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', color: 'var(--warn)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
@@ -471,10 +487,16 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </div>
         )}
 
-        <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
+        <AccordionSection
+          title="یادداشت"
+          icon="📝"
+          defaultOpen={!!form.notes}
+          summary={form.notes ? (form.notes.length > 30 ? form.notes.slice(0, 30) + '…' : form.notes) : ''}
+        >
         <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
+        </AccordionSection>
 
         {/* 🆕 خلاصه فاکتور قبل از ذخیره */}
         <div style={{ marginTop: 'var(--sp-4)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 4 }}>
