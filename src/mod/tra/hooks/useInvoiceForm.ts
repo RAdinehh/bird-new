@@ -6,6 +6,7 @@ import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { paidSum, calcItemTotal, generateInstallments, type Invoice, type InvoiceItem, type Payment } from '../store';
 import { createInvoiceSchema } from '../../../shr/validation/rules/tra';
+import { recordHistory } from '../../../shr/intelligence';
 import { emptyForm as empty, type F } from '../types-invoice';
 import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -241,6 +242,17 @@ export function useInvoiceForm(params: {
     } else {
       addInvoice(data);
     }
+
+    // ثبت تاریخچه‌ی قیمت‌ها برای سیستم هوشمند
+    try {
+      for (const it of form.items) {
+        if (it.unitPrice && it.unitPrice > 0) {
+          const cat = it.category || form.category;
+          recordHistory(`tra.price_${cat}`, it.unitPrice, {});
+        }
+      }
+    } catch { /* silent */ }
+
     setOpen(false);
   };
 

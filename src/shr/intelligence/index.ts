@@ -10,3 +10,5 @@ export {
 export {
   analyzeAnomaly, analyzeAndRecord, getCrossFieldExpected,
 } from './anomalyDetector';
+export { useAnomalyHint } from './useAnomalyHint';
+export { AnomalyHint } from './AnomalyHint';

@@ -2,6 +2,7 @@
  * InvoiceFormModal — فرم ثبت/ویرایش فاکتور
  */
 import { toFa, toEn } from '../../../shr/utils/fa';
+import { AnomalyHint, useAnomalyHint, analyzeAnomaly } from '../../../shr/intelligence';
 import {
   Btn, BtnRow, Field, Grid2, Input, Modal, MoneyField, NumField,
   SectionTitle, Select, Textarea, ErrorBox,
