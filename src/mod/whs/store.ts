@@ -14,6 +14,16 @@ export interface Item {
   id: string;
   name: string;
   category: ItemCategory;
+  feedType?: string;
+  brand?: string;
+  protein?: number | null;
+  energy?: number | null;
+  fat?: number | null;
+  fiber?: number | null;
+  calcium?: number | null;
+  phosphorus?: number | null;
+  methionine?: number | null;
+  lysine?: number | null;
   unit: ItemUnit;
   minStock: number;
   currentStock: number;

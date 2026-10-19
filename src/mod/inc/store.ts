@@ -116,6 +116,8 @@ export interface EggEntry {
   sampleWeightCurrent?: number | null;
   createdAt: string; updatedAt: string;
   sourceInvoiceId?: string;
+  sourceFarm?: string;
+  nonIncubableCount?: number | null;
 }
 
 export interface Candling {
