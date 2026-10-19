@@ -13,7 +13,7 @@ import ItemDetailsForm from '../../../shr/components/ItemDetailsForm';
 import InvoiceSmartSummary from './InvoiceSmartSummary';
 import { type CheckStatus } from '../store';
 import { CATEGORIES, generateInstallments, type InvoiceItem, type Payment } from '../store';
-import { UNIT_LABEL, CATEGORY_DEFAULTS } from '../../whs/store';
+import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
 import { useCtc } from '../../ctc/store';
 import { computePartyCredit } from '../store';
@@ -43,6 +43,21 @@ export interface InvoiceFormModalProps {
   /** 🆕 باز کردن مودال ساخت گله جدید */
   onNewFlock?: () => void;
 }
+
+const getUnitForCategory = (cat: string): string => {
+  switch (cat) {
+    case 'chick': return 'pcs';
+    case 'adult': return 'pcs';
+    case 'egg': return 'pcs';
+    case 'fertile_egg': return 'pcs';
+    case 'broken': return 'pcs';
+    case 'feed': return 'kg';
+    case 'medicine': return 'box';
+    case 'equipment': return 'pcs';
+    case 'manure': return 'kg';
+    default: return 'pcs';
+  }
+};
 
 export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   const {
@@ -89,7 +104,16 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
           </Field>
           <Field label="دسته">
-            <Select value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
+            <Select value={form.category} onChange={e => {
+              const newCat = e.target.value;
+              // ═══ جادوی آبشاری: واحد همه اقلامی که دسته اختصاصی ندارند را آپدیت کن ═══
+              const newUnit = getUnitForCategory(newCat);
+              const newItems = form.items.map(it => {
+                if (!it.category) return { ...it, unit: newUnit };
+                return it;
+              });
+              setForm({ ...form, category: newCat, items: newItems });
+            }}>
               {(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </Select>
           </Field>
@@ -179,9 +203,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             <Field label="دستهٔ این قلم" hint="خالی = همان دستهٔ فاکتور (برای فاکتور مختلط)">
               <Select value={it.category || ''} onChange={e => {
                   const newCat = e.target.value;
-                  const def = (CATEGORY_DEFAULTS as any)[newCat];
-                  // اگر دسته انتخاب شده، واحد پیش‌فرض انبار را بگیر، وگرنه واحد قبلی را نگه دار
-                  const newUnit = def ? def.unit : it.unit;
+                  // واحد بر اساس دسته جدیدِ قلم (یا دسته هدر اگر قلم خالی شد) تعیین می‌شود
+                  const targetCat = newCat || form.category;
+                  const newUnit = getUnitForCategory(targetCat);
                   updateItem(it.id, { category: newCat || undefined, unit: newUnit });
                 }}>
                 <option value="">همان فاکتور — {(() => {

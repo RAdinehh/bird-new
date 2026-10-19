@@ -5,10 +5,25 @@ import { useState, useMemo } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { paidSum, calcItemTotal, generateInstallments, type Invoice, type InvoiceItem, type Payment } from '../store';
-import { CATEGORY_DEFAULTS } from '../../whs/store';
 import { emptyForm as empty, type F } from '../types-invoice';
 import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
+
+// ═══ نقشه اختصاصی واحد برای دسته‌های فاکتور (خرید/فروش) ═══
+function getUnitForCategory(cat: string): string {
+  switch (cat) {
+    case 'chick': return 'pcs'; // عدد
+    case 'adult': return 'pcs';
+    case 'egg': return 'pcs';
+    case 'fertile_egg': return 'pcs';
+    case 'broken': return 'pcs';
+    case 'feed': return 'kg'; // کیلوگرم
+    case 'medicine': return 'box'; // بسته (یا ویال)
+    case 'equipment': return 'pcs';
+    case 'manure': return 'kg';
+    default: return 'pcs';
+  }
+}
 
 export function useInvoiceForm(params: {
   kind: 'purchase' | 'sale';
@@ -57,8 +72,7 @@ export function useInvoiceForm(params: {
   // اقلام
   const addItem = () => setForm(f => {
     const cat = f.category || (isPurchase ? 'chick' : 'egg');
-    const def = (CATEGORY_DEFAULTS as any)[cat];
-    const defaultUnit = def ? def.unit : 'pcs'; // Fallback استاندارد
+    const defaultUnit = getUnitForCategory(cat);
     return { ...f, items: [...f.items, {
       id: crypto.randomUUID(), description: '', unit: defaultUnit,
       quantity: 1, unitPrice: 0, total: 0, itemId: '', movementId: '',
