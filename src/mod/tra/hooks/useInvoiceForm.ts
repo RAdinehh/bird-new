@@ -129,6 +129,34 @@ export function useInvoiceForm(params: {
     if (!form.partyId) { setErr(isPurchase ? 'فروشنده اجباری است' : 'مشتری اجباری است'); return; }
     if (!form.date.trim()) { setErr('تاریخ اجباری است'); return; }
     if (form.items.length === 0) { setErr('حداقل یک قلم اضافه کنید'); return; }
+
+    // ─── اعتبارسنجی نرم (Soft Validation) ───
+    const warnings: string[] = [];
+    form.items.forEach((it, idx) => {
+      const cat = it.category || form.category;
+      const label = `قلم ${toFa(idx + 1)}`;
+      if (kind === 'purchase') {
+        if ((cat === 'chick' || cat === 'adult') && !it.breedId && !it.birdId) {
+          warnings.push(`• ${label} (${cat === 'chick' ? 'جوجه' : 'بالغ'}): نژاد/پرنده انتخاب نشده — گله ساخته نمی‌شود.`);
+        }
+        if (['feed', 'medicine', 'equipment'].includes(cat) && !it.itemId) {
+          warnings.push(`• ${label}: به انبار وصل نیست — در موجودی انبار ثبت نمی‌شود.`);
+        }
+      } else {
+        if ((cat === 'chick' || cat === 'adult') && !it.flockId) {
+          warnings.push(`• ${label} (${cat === 'chick' ? 'جوجه' : 'بالغ'}): گله مبدا انتخاب نشده — از موجودی گله کم نمی‌شود.`);
+        }
+      }
+    });
+    if (warnings.length > 0) {
+      const ok = await showConfirmAsync(
+        '⚠️ پیش‌نیازهای تکمیل نشده',
+        warnings.join('\n') + '\n\nاگر ادامه دهید، این اقلام در بخش‌های مربوطه (گله/انبار) ثبت نمی‌شوند.\nادامه می‌دهید؟',
+        { danger: true }
+      );
+      if (!ok) return;
+    }
+    // ────────────────────────────────────────
     const data: any = {
       type: kind, date: form.date, partyId: form.partyId, category: form.category,
       items: form.items, discount: 0, shipping: 0, total, payments: form.payments,
