@@ -125,7 +125,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </div>
         )}
         {form.items.map((it, idx) => (
-          <div key={it.id} style={{ padding: 'var(--sp-3)', background: 'var(--border-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div key={it.id} style={{ padding: 'var(--sp-3)', background: 'var(--border-solid)', ['--input-bg' as string]: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>قلم {toFa(idx + 1)}</span>
               <button type="button" onClick={() => removeItem(it.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
@@ -380,7 +380,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {form.payments.map(p => (
-          <div key={p.id} style={{ padding: 'var(--sp-3)', background: 'var(--border-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div key={p.id} style={{ padding: 'var(--sp-3)', background: 'var(--border-solid)', ['--input-bg' as string]: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>پرداخت</span>
               <button type="button" onClick={() => removePayment(p.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
@@ -487,19 +487,13 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </div>
         )}
 
-        <AccordionSection
-          title="یادداشت"
-          icon="📝"
-          defaultOpen={!!form.notes}
-          summary={form.notes ? (form.notes.length > 30 ? form.notes.slice(0, 30) + '…' : form.notes) : ''}
-        >
+        <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
         <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
-        </AccordionSection>
 
         {/* 🆕 خلاصه فاکتور قبل از ذخیره */}
-        <div style={{ marginTop: 'var(--sp-4)', padding: 'var(--sp-3)', background: 'var(--border-solid)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ marginTop: 'var(--sp-4)', padding: 'var(--sp-3)', background: 'var(--border-solid)', ['--input-bg' as string]: 'var(--card-solid)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
             <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
             <span style={{ fontWeight: 700 }}>{toFa(total.toLocaleString('fa-IR'))} ت</span>
