@@ -95,6 +95,32 @@ describe('Preorder lifecycle — chick', () => {
     expect(flocks[0].purchaseDate).toBe('1405/08/15');
     expect(flocks[0].startDate).toBe('1405/08/15');
   });
+
+it('receiving preorder: uses user hatchDate and transportCost', () => {
+    const id = useTra.getState().addInvoice(baseInvoice({
+      isPreorder: true,
+      deliveryDate: '1405/08/15',
+      items: [{
+        id: 'i1', description: 'جوجه راس', unit: 'pcs',
+        quantity: 1000, unitPrice: 20000, total: 20_000_000,
+        birdId: 'bird-1', breedId: 'breed-1',
+        hatchDate: '1405/08/10',  // کاربر مستقیماً وارد کرد
+        transportCost: 50000,      // هزینه حمل
+        flockName: 'گله تست',
+      }],
+    }) as any);
+
+    useTra.getState().updateInvoice(id, { isPreorder: false, workflowStatus: 'received' });
+
+    const flocks = useFlk.getState().flocks;
+    expect(flocks).toHaveLength(1);
+    // ✅ تاریخ هچ باید ورودی کاربر باشد، نه محاسبه از ageDays
+    expect(flocks[0].hatchDate).toBe('1405/08/10');
+    // ✅ هزینه حمل باید منتقل شود
+    expect(flocks[0].deliveryCost).toBe(50000);
+    // ✅ نام گله باید ورودی کاربر باشد
+    expect(flocks[0].name).toBe('گله تست');
+  });
 });
 
 describe('Preorder lifecycle — feed (warehouse)', () => {
@@ -132,30 +158,6 @@ describe('Stock (non-preorder) baseline', () => {
     expect(useFlk.getState().flocks).toHaveLength(1);
     expect(useFlk.getState().flocks[0].purchaseDate).toBe('1405/07/27');
   
-  it('receiving preorder: uses user hatchDate and transportCost', () => {
-    const id = useTra.getState().addInvoice(baseInvoice({
-      isPreorder: true,
-      deliveryDate: '1405/08/15',
-      items: [{
-        id: 'i1', description: 'جوجه راس', unit: 'pcs',
-        quantity: 1000, unitPrice: 20000, total: 20_000_000,
-        birdId: 'bird-1', breedId: 'breed-1',
-        hatchDate: '1405/08/10',  // کاربر مستقیماً وارد کرد
-        transportCost: 50000,      // هزینه حمل
-        flockName: 'گله تست',
-      }],
-    }) as any);
 
-    useTra.getState().updateInvoice(id, { isPreorder: false, workflowStatus: 'received' });
-
-    const flocks = useFlk.getState().flocks;
-    expect(flocks).toHaveLength(1);
-    // ✅ تاریخ هچ باید ورودی کاربر باشد، نه محاسبه از ageDays
-    expect(flocks[0].hatchDate).toBe('1405/08/10');
-    // ✅ هزینه حمل باید منتقل شود
-    expect(flocks[0].deliveryCost).toBe(50000);
-    // ✅ نام گله باید ورودی کاربر باشد
-    expect(flocks[0].name).toBe('گله تست');
-  });
 });
 });
