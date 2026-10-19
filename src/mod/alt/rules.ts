@@ -15,7 +15,7 @@ import { getStandardFor } from '../set/standards/index';
 import type { BirdStandard } from '../set/standards/types';
 import { today, jalaliDate, todayJalali, type RuleAlert } from './alerts-helpers';
 import { detectIncAlerts } from './alerts-inc';
-
+import { detectWithdrawalAlerts } from './alerts-withdrawal';
 
 /** تشخیص همه‌ی هشدارهای خودکار */
 export function detectAllAlerts(): RuleAlert[] {
@@ -380,6 +380,7 @@ export function detectAllAlerts(): RuleAlert[] {
   });
 
   detectIncAlerts(alerts);
+  if (_s.features?.withdrawal) detectWithdrawalAlerts(alerts);
 
   // اطمینان از وجود notes
   alerts.forEach(a => { if (a.notes === undefined) a.notes = ''; });
