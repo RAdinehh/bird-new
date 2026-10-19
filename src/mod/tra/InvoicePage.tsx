@@ -159,7 +159,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
-  useFab(active ? { label: 'ثبت فاکتور', onClick: openNew } : null);
+  useFab(active ? { label: 'ثبت فاکتور', onClick: openNew, wakeMode: false } : null);
 
   // ═══ اعتبارسنجی زنده ═══
   const { errors: vErrors } = useValidation(

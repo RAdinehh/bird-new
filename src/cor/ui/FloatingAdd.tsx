@@ -100,8 +100,8 @@ export default function FloatingAdd() {
 
   if (!config || config.hidden) return null;
 
-  // 🆕 اگه Empty State دکمه‌ی مستقل داره → FAB رو نشون نده
-  if (pageHasEmptyCTA) return null;
+  // نکته: شرط pageHasEmptyCTA غیرفعال شد چون در حالت‌های واقعی با وجود فاکتور هم
+  // المان‌هایی با data-empty-cta به صورت پنهان رندر می‌شدند و FAB را پنهان می‌کردند.
 
   const wakeStyle: React.CSSProperties = wakeMode
     ? {

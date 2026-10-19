@@ -34,9 +34,12 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       onToggle={onToggle}
       badge={
         <div style={{ display: 'flex', gap: 4 }}>
-          <Tag tone={workflowTone(inv.workflowStatus)}>
-            {WORKFLOW_LABEL[inv.workflowStatus || 'draft']}
-          </Tag>
+          {/* اگر workflowStatus=paid، اون با STATUS_LABEL تکراری ئه — نشون نده */}
+          {inv.workflowStatus && inv.workflowStatus !== 'paid' && (
+            <Tag tone={workflowTone(inv.workflowStatus)}>
+              {WORKFLOW_LABEL[inv.workflowStatus]}
+            </Tag>
+          )}
           <Tag tone={st === 'paid' ? 'green' : st === 'partial' ? 'amber' : 'red'}>
             {STATUS_LABEL[st as keyof typeof STATUS_LABEL] || '—'}
           </Tag>
