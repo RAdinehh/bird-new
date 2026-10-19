@@ -120,6 +120,8 @@ export interface InvoiceItem extends ItemCategoryFields {
   hallId?: string;
   zoneId?: string;
   hatchDate?: string;
+  /** هزینه حمل اختصاصی این قلم */
+  transportCost?: number | null;
   id: string;
   description: string;
   unit: string;
