@@ -76,7 +76,7 @@ export const useTra = create<State>()(
         const isReceiving = prev.isPreorder && !merged.isPreorder;
 
         if (!merged.isPreorder || isReceiving) {
-          try { itemsFinal = applyInvoiceFlocks(mergedWithItems, isReceiving ? undefined : prev); } catch(e) {}
+          try { itemsFinal = applyInvoiceFlocks(mergedWithItems, isReceiving ? undefined : prev); } catch(e) { console.error('[updateInvoice] applyInvoiceFlocks failed:', e); }
           try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
           try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
           // 🎯 اتصال به انبار از طریق Event Bus (rollback قبلی‌ها + حرکت‌های جدید)

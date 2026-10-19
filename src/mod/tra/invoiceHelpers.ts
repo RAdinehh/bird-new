@@ -309,6 +309,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
     const explicitFlockId = (inv as any).relatedFlockId || it.flockId || '';
     const type = ref.type;
     const sign = type === 'purchase' ? +1 : -1;
+    const effectiveDate = (inv as any).deliveryDate || inv.date || '';
 
     if (explicitFlockId) {
       const f = flk.flocks.find(x => x.id === explicitFlockId);
@@ -322,7 +323,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
         if (it.unitPrice) patch.purchasePrice = it.unitPrice;
         const transport = (it as any).transportCost ?? it.shipping;
         if (transport) patch.deliveryCost = transport;
-        if (inv.date) patch.purchaseDate = inv.date;
+        if (effectiveDate) patch.purchaseDate = effectiveDate;
       }
       flk.update(explicitFlockId, patch);
       for (let i = 0; i < inv.items.length; i++) {
@@ -346,10 +347,16 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       } else if (delta > 0) {
         const breed = brd.breeds.find(b => b.id === it.breedId);
         const bird = brd.birds.find(b => b.id === it.birdId);
-        const name = `گله ${breed?.name || bird?.name || '?'} — ${inv.date}`;
+        const name = `گله ${breed?.name || bird?.name || '?'} — ${effectiveDate}`;
         // type و layingStartDay از استاندارد نژاد
-        const standard = breed ? getStandardFor(breed.name || bird?.name || '', {}) : (bird ? getStandardFor(bird.name, {}) : null);
-        const biology = standard?.biology || null;
+        let standard: any = null;
+        let biology: any = null;
+        try {
+          standard = breed ? getStandardFor(breed.name || bird?.name || '', {}) : (bird ? getStandardFor(bird.name, {}) : null);
+          biology = standard?.biology || null;
+        } catch(e) {
+          console.warn('[applyInvoiceFlocks] getStandardFor failed, using defaults:', e);
+        }
         const inferredType: 'layer' | 'broiler' | 'breeder' =
           ref.cat === 'broiler' ? 'broiler' :
           ref.cat === 'breeder' ? 'breeder' :
@@ -372,9 +379,9 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           layingStartDay: biology?.layingStartDay ?? 0,
           endOfCycleDay: biology?.endOfCycleDay ?? null,
           vaccineScheduleId: '',
-          hatchDate: computeHatchDate(inv.date, it.ageDays),
-          purchaseDate: inv.date,
-          startDate: inv.date,
+          hatchDate: computeHatchDate(effectiveDate, it.ageDays),
+          purchaseDate: effectiveDate,
+          startDate: effectiveDate,
           source: 'purchase',
           purchasePrice: it.unitPrice || 0,
           deliveryCost: (it as any).transportCost || 0,
