@@ -6,6 +6,7 @@ import { useFlk } from '../../mod/flk/store';
 import { useWhs } from '../../mod/whs/store';
 import { parseFaNum } from '../utils/fa';
 import { type PriceUnit } from '../utils/itemDetails';
+import DatePicker from './DatePicker';
 
 export interface ItemDetailFormData {
   id?: string;
@@ -133,7 +134,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله (جدید) —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
           <Field label="تاریخ هچ">
-            <Input value={String(item.hatchDate || '')} onChange={e => updateItem({ hatchDate: e.target.value })} placeholder="1405/07/26" />
+            <DatePicker value={String(item.hatchDate || '')} onChange={v => updateItem({ hatchDate: v })} placeholder="1405/07/26" autoToday />
           </Field>
         </Grid2>
         <Grid2>
@@ -195,7 +196,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
           <Field label="تاریخ تولید تخم">
-            <Input value={String(item.eggDate || '')} onChange={e => updateItem({ eggDate: e.target.value })} placeholder="1405/07/20" />
+            <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
           </Field>
         </Grid2>
         <Grid2>
@@ -293,7 +294,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input value={String(item.batchNo || '')} onChange={e => updateItem({ batchNo: e.target.value })} placeholder="F-123" />
           </Field>
           <Field label="تاریخ انقضا">
-            <Input value={String(item.expiryDate || '')} onChange={e => updateItem({ expiryDate: e.target.value })} placeholder="1405/12/29" />
+            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
           </Field>
         </Grid2>
 
@@ -350,7 +351,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input value={String(item.batchNo || '')} onChange={e => updateItem({ batchNo: e.target.value })} placeholder="B-123" />
           </Field>
           <Field label="تاریخ انقضا">
-            <Input value={String(item.expiryDate || '')} onChange={e => updateItem({ expiryDate: e.target.value })} placeholder="1405/12/29" />
+            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
           </Field>
         </Grid2>
         <Grid2>
