@@ -112,7 +112,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="گله مقصد (موجود)">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله (جدید) —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
-          <Field label="تاریخ هچ">
+          <Field label="تاریخ هچ" required>
             <DatePicker value={String(item.hatchDate || '')} onChange={v => updateItem({ hatchDate: v })} placeholder="1405/07/26" autoToday />
           </Field>
         </Grid2>
@@ -269,7 +269,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <SecTitle icon="⚙️" title="اطلاعات تجهیز" />
         <Grid2>
-          <Field label="مدل / نوع">
+          <Field label="مدل / نوع" required>
             <Input value={String(item.model || '')} onChange={e => updateItem({ model: e.target.value })} placeholder="فن تونلی ۱۲۰" />
           </Field>
           <Field label="شماره سریال">
@@ -295,7 +295,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <SecTitle icon="📋" title="اطلاعات هزینه" />
         <Grid2>
-          <Field label="نوع هزینه" hint="برای گزارش‌های مالی">
+          <Field label="نوع هزینه" hint="برای گزارش‌های مالی" required>
             <Select value={String(item.costType || '')} onChange={e => updateItem({ costType: e.target.value })}>
               <option value="">— انتخاب —</option>
               <option value="transport">حمل و نقل</option>
