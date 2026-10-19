@@ -17,7 +17,9 @@ import { toastMsg } from '../../../cor/store/toast';
 import { toFa } from '../../../shr/utils/fa';
 import type { F } from '../types';
 import type { DailyLog } from '../store';
+import { format as formatJ, addDays, parse as parseJ } from 'date-fns-jalali';
 import type { Flock } from '../../flk/store';
+import { useFlk } from '../../flk/store';
 import type { Dispatch, SetStateAction } from 'react';
 
 export interface UseDlgSaveParams {
@@ -32,6 +34,18 @@ export interface UseDlgSaveParams {
   isLayerFlock: boolean;
   num: (s: string) => number | null;
   int: (s: string) => number | null;
+}
+
+
+/** افزودن N روز به تاریخ شمسی YYYY/MM/DD */
+function addJalaliDays(dateStr: string, days: number): string {
+  if (!dateStr) return '';
+  try {
+    const en = dateStr.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const base = parseJ(en, 'yyyy/MM/dd', new Date());
+    if (isNaN(base.getTime())) return '';
+    return formatJ(addDays(base, days), 'yyyy/MM/dd');
+  } catch { return ''; }
 }
 
 export function useDlgSave(params: UseDlgSaveParams) {
@@ -149,6 +163,33 @@ export function useDlgSave(params: UseDlgSaveParams) {
     } else {
       logId = add(data);
     }
+
+    // 🆕 ذخیره activeWithdrawal روی گله (Silent — بدون نمایش)
+    try {
+      const meds = form.medications || [];
+      const maxWithdrawal = meds.reduce((a, m) => Math.max(a, m.withdrawalDays || 0), 0);
+      if (maxWithdrawal > 0 && form.flockId) {
+        const until = addJalaliDays(form.date, maxWithdrawal);
+        if (until) {
+          const flk = useFlk.getState();
+          const flock = flk.flocks.find(f => f.id === form.flockId);
+          if (flock) {
+            const existingUntil = flock.activeWithdrawal?.until || '';
+            const finalUntil = existingUntil && existingUntil > until ? existingUntil : until;
+            const medName = meds.find(m => (m.withdrawalDays || 0) === maxWithdrawal)?.name || 'دارو';
+            flk.update(form.flockId, {
+              activeWithdrawal: {
+                until: finalUntil,
+                medicine: medName,
+                days: maxWithdrawal,
+                startedAt: form.date,
+                logId,
+              },
+            } as any);
+          }
+        }
+      }
+    } catch { /* silent */ }
 
     // ۹) sync با egg
     try {
