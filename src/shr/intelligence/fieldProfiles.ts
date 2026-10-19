@@ -215,6 +215,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
   // Q8 — ظرفیت‌ها (۱۲ فیلد)
   // ══════════════════════════════════════════════════════════════════
   'flk.initialCount': P('flk.initialCount', 'count', 1, 1_000_000),
+  'flk.currentCount': P('flk.currentCount', 'count', 0, 1_000_000),
   'hal.capacity': P('hal.capacity', 'capacity', 1, 1_000_000),
   'hal.areaSqM': P('hal.areaSqM', 'area', 1, 50_000),
   'hal.zoneCapacity': P('hal.zoneCapacity', 'capacity', 1, 200_000, {

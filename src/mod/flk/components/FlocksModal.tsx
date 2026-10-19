@@ -23,6 +23,7 @@ import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
 import { todayJ, jalaliBounds, checkDateBounds } from '../api/flocksCalc';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import type { F } from '../types-flocks';
+import { FieldHint } from '../../../shr/intelligence';
 import type { Bird, Breed } from '../../brd/store';
 import type { Invoice, InvoiceItem } from '../../tra/types';
 import type { HatchResult, EggEntry } from '../../inc/store';
@@ -281,32 +282,38 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       {(form.type === 'layer' || form.type === 'breeder') && (
         <Grid2>
-          <Field
-            label="سن شروع تخم‌گذاری (روز)"
-            autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
-          >
-            <NumField
-              value={form.layingStartDay || (formLaying ? String(formLaying) : '')}
-              onChange={e => { setForm({ ...form, layingStartDay: e.target.value }); setLayingFromStd(false); }}
-              placeholder={fmt.int(formLaying)}
-              unit="روز"
-              max={250}
-              min={100}
-            />
-          </Field>
-          <Field
-            label="سن پایان چرخه (روز)"
-            hint={form.endOfCycleDay ? undefined : 'خالی = از استاندارد نژاد'}
-          >
-            <NumField
-              value={form.endOfCycleDay || ''}
-              onChange={e => setForm({ ...form, endOfCycleDay: e.target.value })}
-              placeholder={formStd?.biology?.endOfCycleDay ? fmt.int(formStd.biology.endOfCycleDay) : '—'}
-              unit="روز"
-              max={600}
-              min={100}
-            />
-          </Field>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+            <Field
+              label="سن شروع تخم‌گذاری (روز)"
+              autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
+            >
+              <NumField
+                value={form.layingStartDay || (formLaying ? String(formLaying) : '')}
+                onChange={e => { setForm({ ...form, layingStartDay: e.target.value }); setLayingFromStd(false); }}
+                placeholder={fmt.int(formLaying)}
+                unit="روز"
+                max={250}
+                min={100}
+              />
+            </Field>
+            <FieldHint fieldPath="flk.layingStartDay" value={form.layingStartDay || formLaying} context={{ expected: formLaying || undefined }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+            <Field
+              label="سن پایان چرخه (روز)"
+              hint={form.endOfCycleDay ? undefined : 'خالی = از استاندارد نژاد'}
+            >
+              <NumField
+                value={form.endOfCycleDay || ''}
+                onChange={e => setForm({ ...form, endOfCycleDay: e.target.value })}
+                placeholder={formStd?.biology?.endOfCycleDay ? fmt.int(formStd.biology.endOfCycleDay) : '—'}
+                unit="روز"
+                max={600}
+                min={100}
+              />
+            </Field>
+            <FieldHint fieldPath="flk.endOfCycleDay" value={form.endOfCycleDay} context={{ expected: formStd?.biology?.endOfCycleDay ?? undefined }} />
+          </div>
         </Grid2>
       )}
 
@@ -338,16 +345,25 @@ export default function FlocksModal(props: FlocksModalProps) {
       {form.type === 'breeder' && (
         <DepBox title="اطلاعات گله مادر" tone="purple">
           <Grid2>
-            <Field label="تعداد خروس">
-              <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
-            </Field>
-            <Field label="تعداد مرغ">
-              <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
-            </Field>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+              <Field label="تعداد خروس">
+                <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
+              </Field>
+              <FieldHint fieldPath="flk.maleCount" value={form.maleCount} context={{ initialCount: form.initialCount }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+              <Field label="تعداد مرغ">
+                <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
+              </Field>
+              <FieldHint fieldPath="flk.femaleCount" value={form.femaleCount} context={{ initialCount: form.initialCount }} />
+            </div>
           </Grid2>
-          <Field label="جنسیت نامشخص (اختیاری)" hint="پرنده‌هایی که جنسیتشان هنوز مشخص نیست — معمولاً از هچ">
-            <NumField placeholder="۰" value={form.unknownCount || ''} onChange={e => setForm({ ...form, unknownCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
-          </Field>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+            <Field label="جنسیت نامشخص (اختیاری)" hint="پرنده‌هایی که جنسیتشان هنوز مشخص نیست — معمولاً از هچ">
+              <NumField placeholder="۰" value={form.unknownCount || ''} onChange={e => setForm({ ...form, unknownCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
+            </Field>
+            <FieldHint fieldPath="flk.unknownCount" value={form.unknownCount} context={{ initialCount: form.initialCount }} />
+          </div>
           {form.maleCount && form.femaleCount && (() => {
             const male = parseInt(toEn(form.maleCount)) || 0;
             const female = parseInt(toEn(form.femaleCount)) || 0;

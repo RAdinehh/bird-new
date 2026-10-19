@@ -7,6 +7,7 @@ import { toFa } from '../../../shr/utils/fa';
 import { jalaliBounds, checkDateBounds } from '../api/flocksCalc';
 import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
 import type { F } from '../types-flocks';
+import { FieldHint } from '../../../shr/intelligence';
 
 interface Props {
   form: F;
@@ -65,16 +66,25 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
 
       <div style={dividerStyle}>💰 هزینه‌ها</div>
       <Grid2>
-        <Field label="قیمت هر پرنده" error={showError('purchasePrice')} onTouch={() => markTouched('purchasePrice')}>
-          <MoneyField placeholder="۰" min={1000} max={5000000} value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
-        </Field>
-        <Field label="هزینه حمل" error={showError('deliveryCost')} onTouch={() => markTouched('deliveryCost')}>
-          <MoneyField placeholder="۰" max={500000000} value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
-        </Field>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+          <Field label="قیمت هر پرنده" error={showError('purchasePrice')} onTouch={() => markTouched('purchasePrice')}>
+            <MoneyField placeholder="۰" min={1000} max={5000000} value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
+          </Field>
+          <FieldHint fieldPath="flk.purchasePrice" value={form.purchasePrice} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+          <Field label="هزینه حمل" error={showError('deliveryCost')} onTouch={() => markTouched('deliveryCost')}>
+            <MoneyField placeholder="۰" max={500000000} value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
+          </Field>
+          <FieldHint fieldPath="flk.deliveryCost" value={form.deliveryCost} />
+        </div>
       </Grid2>
-      <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه" error={showError('otherCosts')} onTouch={() => markTouched('otherCosts')}>
-        <MoneyField placeholder="۰" max={500000000} value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} />
-      </Field>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+        <Field label="سایر هزینه‌ها" hint="واکسن اولیه، دارو، تجهیزات همراه" error={showError('otherCosts')} onTouch={() => markTouched('otherCosts')}>
+          <MoneyField placeholder="۰" max={500000000} value={form.otherCosts} onChange={e => setForm({ ...form, otherCosts: e.target.value })} />
+        </Field>
+        <FieldHint fieldPath="flk.otherCosts" value={form.otherCosts} />
+      </div>
 
       {liveCosts.total > 0 && (
         <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 'var(--fs-sm)' }}>

@@ -23,7 +23,7 @@ function resolveLimit(limit: number | string, ctx: AnalysisContext): number | nu
   const m = trimmed.match(/^\$\{(\w+)\}$/);
   if (m) {
     const v = ctx[m[1]];
-    if (typeof v === 'number' && Number.isFinite(v)) return v;
+    if (typeof v === 'number' && Number.isFinite(v) && v > 0) return v;
     return null;
   }
   return null;
@@ -78,9 +78,13 @@ function getCrossFieldExpected(
 // ══════════════════════════════════════════════════════════════════
 function decideLevel(signals: Signal[]): AlertLevel | null {
   if (signals.length === 0) return null;
-  // استثنا: تک سیگنال قوی (weight ≥ 3) → حداقل yellow
-  // برای مقادیر فاحش (مثل ratio 10x) که حتی بدون سیگنال دوم مشکوک هستند
-  if (signals.length === 1 && signals[0].weight >= 3) return 'yellow';
+  // تک سیگنال: بر اساس وزن تصمیم بگیر
+  if (signals.length === 1) {
+    const w = signals[0].weight;
+    if (w >= 5) return 'red';   // cross-field سخت (مثلاً تلفات > موجودی)
+    if (w >= 3) return 'yellow'; // ratio قوی (مثلاً 10x)
+    return null;
+  }
   if (signals.length < 2) return null;  // ≥ ۲ سیگنال لازم برای بقیه
   const total = signals.reduce((s, x) => s + x.weight, 0);
   if (total >= 5) return 'red';
@@ -149,7 +153,8 @@ export function analyzeAnomaly(
     }
   }
 
-  if (expected !== null && expected > 0) {
+  // برای comparison='absolute' (cross-field سخت مثل deaths≤alive), ratio معنی ندارد
+  if (profile.comparison !== 'absolute' && expected !== null && expected > 0) {
     const ratio = value / expected;
     if (ratio > 5) signals.push({ type: 'ratio', weight: 3, detail: `${ratio.toFixed(1)}x (خیلی بالا)` });
     else if (ratio > 3) signals.push({ type: 'ratio', weight: 2, detail: `${ratio.toFixed(1)}x (بالا)` });

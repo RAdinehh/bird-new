@@ -9,6 +9,7 @@ import { toFa, toEn } from '../../../shr/utils/fa';
 import { DEATH_CAUSES } from '../store';
 import { useWhs } from '../../whs/store';
 import type { F } from '../types';
+import { FieldHint } from '../../../shr/intelligence';
 
 interface Props {
   form: F;
@@ -27,12 +28,17 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
   return (
     <>
 
-      {form.deaths.length > 0 && (
-        <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn-border, var(--border))', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
-          مجموع: {toFa(form.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده
-          {flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''}
-        </div>
-      )}
+      {form.deaths.length > 0 && (() => {
+        const total = form.deaths.reduce((a, x) => a + (x.count || 0), 0);
+        const exceeds = flockAliveCount > 0 && total > flockAliveCount;
+        return (
+          <div style={{ padding: 'var(--pad-normal)', background: exceeds ? 'var(--danger-soft)' : 'var(--warn-soft)', border: `1px solid ${exceeds ? 'var(--danger)' : 'var(--warn-border, var(--border))'}`, borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: exceeds ? 'var(--danger)' : 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
+            مجموع: {toFa(total)} پرنده
+            {flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''}
+            {exceeds && ' ⚠️ بیشتر از موجودی گله'}
+          </div>
+        );
+      })()}
 
       {form.deaths.map((d, i) => (
         <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -42,11 +48,14 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
           </div>
           <Grid2>
-            <Field label="تعداد" error={vErrors.deathsCount || vErrors.deaths}>
-              <NumField placeholder="۰" value={String(d.count || '')}
-                onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
-                min={0} max={flockAliveCount || undefined} unit="پرنده" />
-            </Field>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+              <Field label="تعداد" error={vErrors.deathsCount || vErrors.deaths}>
+                <NumField placeholder="۰" value={String(d.count || '')}
+                  onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
+                  min={0} max={flockAliveCount || undefined} unit="پرنده" />
+              </Field>
+              <FieldHint fieldPath="dlg.deathsCount" value={d.count} context={{ currentCount: flockAliveCount }} />
+            </div>
             <Field label="علت">
               <Select value={d.cause || ''} onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, cause: e.target.value } : x) }))}>
                 {DEATH_CAUSES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
