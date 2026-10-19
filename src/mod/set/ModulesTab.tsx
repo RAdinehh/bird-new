@@ -31,10 +31,11 @@ function Toggle({ enabled, disabled, onToggle }: { enabled: boolean; disabled?: 
 }
 
 
-function FeatureToggle({ icon, title, desc, featureKey }: { icon: string; title: string; desc: string; featureKey: string }) {
+function FeatureToggle({ icon, title, desc, featureKey, defaultOn = true }: { icon: string; title: string; desc: string; featureKey: string; defaultOn?: boolean }) {
   const features = useSet(s => (s as any).features || {});
   const updateSection = useSet(s => s.updateSection);
-  const enabled = features[featureKey] !== false;
+  const raw = features[featureKey];
+  const enabled = raw === undefined ? defaultOn : raw === true;
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 10,
@@ -117,6 +118,13 @@ export default function ModulesTab() {
           title="دارو (گیاهی + شیمیایی)"
           desc="داروها: فرم ثبت روزانه، هشدار انقضا"
           featureKey="medicine"
+        />
+        <FeatureToggle
+          icon="🩺"
+          title="دوره پرهیز دارو"
+          desc="نمایش زمان پرهیز در گله‌ها، هشدار و modal مستقل"
+          featureKey="withdrawal"
+          defaultOn={false}
         />
       </div>
 
