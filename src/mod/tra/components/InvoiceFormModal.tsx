@@ -161,7 +161,13 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </Grid2>
 
             <Field label="دستهٔ این قلم" hint="خالی = همان دستهٔ فاکتور (برای فاکتور مختلط)">
-              <Select value={it.category || ''} onChange={e => updateItem(it.id, { category: e.target.value || undefined })}>
+              <Select value={it.category || ''} onChange={e => {
+                  const newCat = e.target.value;
+                  let newUnit = it.unit;
+                  if (['chick', 'adult', 'egg', 'fertile_egg', 'broken'].includes(newCat)) newUnit = 'pcs';
+                  else if (newCat === 'feed') newUnit = 'kg';
+                  updateItem(it.id, { category: newCat || undefined, unit: newUnit });
+                }}>
                 <option value="">همان فاکتور — {(() => {
                   const saleOnly = ['manure', 'broken', 'fertile_egg'];
                   const list = saleOnly.includes(form.category) ? CATEGORIES.sale : CATEGORIES.purchase;
@@ -204,7 +210,13 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 {it.itemId && (
                   <SmartSelect
                     value={it.itemId}
-                    onChange={v => updateItem(it.id, { itemId: v })}
+                    onChange={v => {
+                      const w = whsItems.find(x => x.id === v);
+                      updateItem(it.id, {
+                        itemId: v,
+                        ...(w ? { description: it.description || w.name, unit: w.unit } : {})
+                      });
+                    }}
                     options={whsItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${toFa(w.currentStock)} ${(UNIT_LABEL as any)[w.unit]}`, group: w.category }))}
                     placeholder="— انتخاب کالا —" modalTitle="انتخاب کالای انبار" autoThreshold={6}
                   />

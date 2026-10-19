@@ -103,7 +103,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="🧬" title="هویت و نژاد" />
         <Grid2>
           <Field label="نوع پرنده">
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
+            <SmartSelect value={String(item.birdId || '')} onChange={v => {
+              const bBreeds = breeds.filter(b => b.birdId === v);
+              updateItem({ birdId: v, breedId: bBreeds.length === 1 ? bBreeds[0].id : '' });
+            }} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
           </Field>
           <Field label="نژاد">
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
@@ -173,7 +176,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="🧬" title="هویت و نژاد" />
         <Grid2>
           <Field label="نوع پرنده">
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
+            <SmartSelect value={String(item.birdId || '')} onChange={v => {
+              const bBreeds = breeds.filter(b => b.birdId === v);
+              updateItem({ birdId: v, breedId: bBreeds.length === 1 ? bBreeds[0].id : '' });
+            }} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
           </Field>
           <Field label="نژاد">
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
@@ -219,7 +225,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="🧬" title="هویت و نژاد" />
         <Grid2>
           <Field label="نوع پرنده">
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
+            <SmartSelect value={String(item.birdId || '')} onChange={v => {
+              const bBreeds = breeds.filter(b => b.birdId === v);
+              updateItem({ birdId: v, breedId: bBreeds.length === 1 ? bBreeds[0].id : '' });
+            }} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
           </Field>
           <Field label="نژاد">
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
