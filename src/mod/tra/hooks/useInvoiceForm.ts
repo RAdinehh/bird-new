@@ -16,7 +16,9 @@ export function useInvoiceForm(params: {
   addInvoice: (i: any) => string | undefined;
   updateInvoice: (id: string, patch: any) => void;
 }) {
-  const { kind, invoices, contacts, addInvoice, updateInvoice } = params;
+  // invoices از پارامترها گرفته می‌شود اما در openNew استفاده نمی‌شود
+  // (جلوگیری از کپی داده‌ی قبلی در فرم جدید)
+  const { kind, contacts, addInvoice, updateInvoice } = params;
   const isPurchase = kind === 'purchase';
 
   const [open, setOpen] = useState(false);
@@ -77,23 +79,14 @@ export function useInvoiceForm(params: {
   const removePayment = (id: string) =>
     setForm(f => ({ ...f, payments: f.payments.filter(x => x.id !== id) }));
 
-  // باز کردن فرم جدید
+  // باز کردن فرم جدید — همیشه خالی (فقط تاریخ امروز)
+  // ⚠️ هرگز داده‌ی فاکتور قبلی کپی نمی‌شود (جلوگیری از ساخت تصادفی رکورد تکراری)
   const openNew = () => {
     if (parties.length === 0) { toastMsg.error(isPurchase ? 'اول یک فروشنده بسازید' : 'اول یک مشتری بسازید'); return; }
     const today = formatJ(new Date(), 'yyyy/MM/dd');
-    const lastInv = invoices.filter(i => i.type === kind && i.partyId).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
-    const defaultParty = lastInv?.partyId || parties[0].id;
-    const lastCatInv = invoices.filter(i => i.type === kind && i.category).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
-    const defaultCat = lastCatInv?.category;
-    const lastPayInv = invoices.filter(i => i.type === kind && i.paymentTerms).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
-    const defaultPaymentTerms = lastPayInv?.paymentTerms;
-    const lastItems = lastInv?.items || [];
-    const defaultItems = lastItems.length > 0 ? lastItems.map(it => ({ ...it, id: crypto.randomUUID() })) : [];
     setForm({
-      ...empty(isPurchase), date: today, partyId: defaultParty,
-      ...(defaultCat ? { category: defaultCat } : {}),
-      ...(defaultPaymentTerms ? { paymentTerms: defaultPaymentTerms } : {}),
-      ...(defaultItems.length > 0 ? { items: defaultItems } : {}),
+      ...empty(isPurchase),
+      date: today,
     });
     setErr(''); setOpen(true);
   };
