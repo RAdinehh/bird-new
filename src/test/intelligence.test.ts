@@ -245,3 +245,74 @@ describe('getUserPattern', () => {
     expect(p?.std).toBe(0);
   });
 });
+
+
+// ══════════════════════════════════════════════════════════════════
+// formatWarning — پیام کوتاه طبیعی
+// ══════════════════════════════════════════════════════════════════
+import { formatWarning } from '../shr/intelligence/formatWarning';
+
+describe('formatWarning — کوتاه و طبیعی', () => {
+  it('hard_min', () => {
+    const w = { level: 'red' as const, field: 'tra.price_chick', value: 500,
+      reason: 'x', signals: [{ type: 'hard_min', weight: 10, detail: '' }] };
+    const s = formatWarning(w);
+    expect(s).toContain('کمتر از');
+    expect(s).toContain('قیمت جوجه');
+  });
+  it('hard_max', () => {
+    const w = { level: 'red' as const, field: 'tra.price_chick', value: 50_000_000,
+      reason: 'x', signals: [{ type: 'hard_max', weight: 10, detail: '' }] };
+    expect(formatWarning(w)).toContain('بالاتر از سقف');
+  });
+  it('ratio بالا price — "برابر شده"', () => {
+    const w = { level: 'orange' as const, field: 'tra.price_chick', value: 500_000, expected: 100_000,
+      reason: 'x', signals: [{ type: 'ratio', weight: 2, detail: '' }] };
+    const s = formatWarning(w);
+    expect(s).toContain('قیمت جوجه');
+    expect(s).toContain('برابر شده');
+    expect(s.length).toBeLessThan(40);
+  });
+  it('ratio پایین', () => {
+    const w = { level: 'yellow' as const, field: 'tra.price_chick', value: 30_000, expected: 100_000,
+      reason: 'x', signals: [{ type: 'ratio', weight: 2, detail: '' }] };
+    expect(formatWarning(w)).toContain('کمتر شده');
+  });
+  it('دما — "درجه بالاتر از هدف"', () => {
+    const w = { level: 'yellow' as const, field: 'dlg.temperature', value: 50, expected: 32,
+      reason: 'x', signals: [{ type: 'ratio', weight: 1, detail: '' }] };
+    const s = formatWarning(w);
+    expect(s).toContain('درجه بالاتر از هدف');
+    expect(s).toContain('دمای سالن');
+  });
+  it('وزن — "درصد کمتر از استاندارد"', () => {
+    const w = { level: 'orange' as const, field: 'chickWeight', value: 1000, expected: 2500,
+      reason: 'x', signals: [{ type: 'ratio', weight: 2, detail: '' }] };
+    const s = formatWarning(w);
+    expect(s).toContain('کمتر از استاندارد');
+    expect(s).toContain('وزن جوجه');
+  });
+  it('cross-field lte_current — "موجودی گله"', () => {
+    const w = { level: 'red' as const, field: 'dlg.deathsCount', value: 500, expected: 100,
+      reason: 'x', signals: [{ type: 'cross_absolute', weight: 5, detail: '' }] };
+    expect(formatWarning(w)).toContain('موجودی گله');
+  });
+  it('cross-field lte_female — "مرغ ماده"', () => {
+    const w = { level: 'red' as const, field: 'dlg.eatingEggs', value: 5000, expected: 1000,
+      reason: 'x', signals: [{ type: 'cross_absolute', weight: 5, detail: '' }] };
+    expect(formatWarning(w)).toContain('مرغ ماده');
+  });
+  it('pattern — "الگوی همیشگی"', () => {
+    const w = { level: 'orange' as const, field: 'flk.partnerPercent', value: 80, expected: 50,
+      reason: 'x', signals: [{ type: 'pattern', weight: 3, detail: '' }] };
+    const s = formatWarning(w);
+    expect(s).toContain('الگوی همیشگی');
+    expect(s).toContain('درصد شریک');
+  });
+  it('biological', () => {
+    const w = { level: 'yellow' as const, field: 'dlg.temperature', value: 50,
+      reason: 'x', signals: [{ type: 'biological', weight: 1, detail: '' }] };
+    expect(formatWarning(w)).toContain('بیرون از محدوده');
+  });
+});
+

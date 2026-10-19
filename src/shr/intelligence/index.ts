@@ -12,3 +12,4 @@ export {
 } from './anomalyDetector';
 export { useAnomalyHint } from './useAnomalyHint';
 export { AnomalyHint } from './AnomalyHint';
+export { formatWarning } from './formatWarning';

@@ -243,13 +243,14 @@ export function useInvoiceForm(params: {
       addInvoice(data);
     }
 
-    // ثبت تاریخچه‌ی قیمت‌ها برای سیستم هوشمند
+    // ثبت تاریخچه برای سیستم هوشمند
     try {
       for (const it of form.items) {
-        if (it.unitPrice && it.unitPrice > 0) {
-          const cat = it.category || form.category;
-          recordHistory(`tra.price_${cat}`, it.unitPrice, {});
-        }
+        const cat = it.category || form.category;
+        if (it.unitPrice && it.unitPrice > 0) recordHistory(`tra.price_${cat}`, it.unitPrice, {});
+        if (it.quantity && it.quantity > 0) recordHistory('tra.quantity', it.quantity, {});
+        if (it.discountValue && it.discountValue > 0) recordHistory('tra.discountValue', it.discountValue, {});
+        if (it.shipping && it.shipping > 0) recordHistory('tra.shipping', it.shipping, {});
       }
     } catch { /* silent */ }
 
