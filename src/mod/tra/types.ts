@@ -94,6 +94,7 @@ export interface InvoiceItem extends ItemCategoryFields {
   category?: string;
   /** تعداد سالم در زمان تحویل (DOA) — اگر خالی باشد از quantity استفاده می‌شود */
   healthyCount?: number | null;
+  baseQuantity?: number | null;
   /** تاریخ تولید تخم — اگر خالی باشد از Invoice.date استفاده می‌شود */
   eggDate?: string;
   /** شماره بچ هچری (برای جوجه یک‌روزه) */

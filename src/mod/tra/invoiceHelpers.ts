@@ -116,7 +116,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
 
       const bird = brd.birds.find((b: any) => b.id === it.birdId);
       const days = getIncubationDays(bird?.birdKind);
-      const entryDate = inv.date || '';
+      const entryDate = (it as any).eggDate || inv.date || '';
       const expectedHatchDate = addJalaliDays(entryDate, days);
 
       const marker = `[K:${keyOf(it)}]`;
@@ -379,6 +379,8 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           notes: `از فاکتور ${inv.number || ''}`,
           sourceInvoiceId: inv.id,
           sourceCategory: ref.cat,
+          hatcheryBatchNo: (it as any).hatcheryBatchNo || undefined,
+          chickWeight: (it as any).chickWeight ?? null,
         });
 
         for (let i = 0; i < inv.items.length; i++) {
