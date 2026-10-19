@@ -7,6 +7,7 @@ import {
 import { Row, RowGrid, SectionTitle } from '../helpers';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 import { formatInvoiceNumber } from '../calc';
+import { useTra } from '../store';
 
 interface Props {
   inv: Invoice;
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, index }: Props) {
+  const { updateInvoice } = useTra();
   const rem2 = remaining(inv);
   const st = rem2 === 0 ? 'paid' : paidSum(inv.payments || []) > 0 ? 'partial' : 'unpaid';
 
@@ -156,6 +158,23 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         </>
       )}
 
+      {inv.isPreorder && (
+        <Btn
+          variant="primary"
+          size="sm"
+          full
+          onClick={() => {
+            updateInvoice(inv.id, { 
+              isPreorder: false, 
+              workflowStatus: 'received',
+              receivedAt: new Date().toISOString()
+            });
+          }}
+          style={{ marginBottom: 8 }}
+        >
+          📦 تحویل گرفتم (ایجاد گله و موجودی)
+        </Btn>
+      )}
       {nextWorkflowStatus(inv.workflowStatus) && (
         <Btn
           size="sm" variant="primary" full
