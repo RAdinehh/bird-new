@@ -66,15 +66,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
         {inv.items.map(it => (
-          <div key={it.id} style={{
-            display: 'flex', justifyContent: 'space-between',
-            fontSize: 'var(--fs-sm)', padding: '4px 8px',
-            borderRadius: 'var(--r-sm)',
-            color: 'var(--text)',
-          }}>
-            <span style={{ color: 'var(--muted)' }}>{it.description || '—'} × {toFa(it.quantity)}</span>
-            <span style={{ fontWeight: 600 }}>{toFa(it.total.toLocaleString('fa-IR'))} ت</span>
-          </div>
+          <Row key={it.id} l={`${it.description || '—'} × ${toFa(it.quantity)}`} v={`${toFa(it.total.toLocaleString('fa-IR'))} ت`} />
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
@@ -88,18 +80,12 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
             {inv.payments.map(p => (
               <div key={p.id}>
-                <div style={{
-                  display: 'flex', justifyContent: 'space-between',
-                  fontSize: 'var(--fs-sm)', padding: '4px 8px',
-                  borderRadius: 'var(--r-sm)',
-                }}>
-                  <span style={{ color: 'var(--muted)' }}>
-                    {p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • {toFa(p.date)}
-                  </span>
-                  <span style={{ fontWeight: 600 }}>{toFa(p.amount.toLocaleString('fa-IR'))} ت</span>
-                </div>
+                <Row
+                  l={`${p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • ${toFa(p.date)}`}
+                  v={`${toFa(p.amount.toLocaleString('fa-IR'))} ت`}
+                />
                 {p.method === 'check' && (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 8px 2px', lineHeight: 1.4 }}>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '2px 8px' }}>
                     چک {p.checkNo} • {p.bank} • {CHECK_STATUS_LABEL[p.status || 'pending']}
                   </div>
                 )}
