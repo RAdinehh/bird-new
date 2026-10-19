@@ -284,3 +284,16 @@ export function hasBouncedCheck(inv: any): boolean {
 export function countBouncedChecks(inv: any): number {
   return (inv?.payments || []).filter((p: any) => p.method === 'check' && p.status === 'bounced').length;
 }
+
+/** فرمت نمایشی شماره فاکتور: P140507001 → P۰۵۰۷۰۰۱ (حذف ۲ رقم اول سال + اعداد فارسی) */
+export function formatInvoiceNumber(num: string | undefined | null): string {
+  if (!num) return '—';
+  let prefix = '';
+  let rest = num;
+  if (num.startsWith('P')) { prefix = 'P'; rest = num.slice(1); }
+  else if (num.startsWith('S')) { prefix = 'S'; rest = num.slice(1); }
+  // حذف ۲ رقم اول سال: 140507001 → 0507001
+  if (rest.length >= 6) rest = rest.slice(2);
+  const faDigits = rest.replace(/\d/g, (d: string) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+  return prefix ? `${prefix}${faDigits}` : faDigits;
+}

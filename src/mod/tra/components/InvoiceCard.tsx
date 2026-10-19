@@ -6,6 +6,7 @@ import {
 } from '../store';
 import { Row, RowGrid, SectionTitle } from '../helpers';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
+import { formatInvoiceNumber } from '../calc';
 
 interface Props {
   inv: Invoice;
@@ -29,7 +30,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       index={toFa(index + 1)}
       iconEmoji="🛒"
       title={partyName || '—'}
-      subtitle={`${toFa(inv.date)}${inv.number ? ` • ${inv.number}` : ''}`}
+      subtitle={`${toFa(inv.date)}${inv.number ? ` • ${formatInvoiceNumber(inv.number)}` : ''}`}
       isOpen={isOpen}
       onToggle={onToggle}
       badge={
@@ -57,7 +58,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       <RowGrid>
         <Row l="فروشنده" v={partyName || '—'} />
         <Row l="تاریخ" v={toFa(inv.date)} />
-        {inv.number ? <Row l="شماره" v={inv.number} /> : null}
+        {inv.number ? <Row l="شماره" v={formatInvoiceNumber(inv.number)} /> : null}
         {inv.dueDate ? <Row l="سرسید" v={toFa(inv.dueDate)} /> : null}
         {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تحویل" v={toFa(inv.deliveryDate)} /> : null}
       </RowGrid>

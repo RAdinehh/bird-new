@@ -6,6 +6,7 @@ import { useCtc } from '../ctc/store';
 import { PAYMENT_LABEL, remaining, paidSum, invoiceStatus, type Invoice } from './store';
 import { toFa } from '../../shr/utils/fa';
 import { printHTML, printTemplate } from '../../shr/utils/export';
+import { formatInvoiceNumber } from './calc';
 
 interface Props {
   invoice: Invoice;
@@ -74,7 +75,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
         <div style="text-align: left;">
           <h2>${title}</h2>
           <div class="farm-info">
-            شماره: ${invoice.number || '—'}<br>
+            شماره: ${formatInvoiceNumber(invoice.number)}<br>
             تاریخ: ${toFa(invoice.date)}<br>
             ${invoice.dueDate ? 'سرسید — ' + toFa(invoice.dueDate) : ''}
           </div>
@@ -151,7 +152,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
       </div>
     `;
 
-    return printTemplate(title + ' — ' + (invoice.number || ''), body);
+    return printTemplate(title + ' — ' + formatInvoiceNumber(invoice.number), body);
   };
 
   const handlePrint = () => {
@@ -211,7 +212,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
           }}>
             <div style={{ textAlign: 'center', marginBottom: 10 }}>
               <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>{settings.farm.name || 'مرغداری'}</div>
-              <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{title} — {invoice.number}</div>
+              <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{title} — {formatInvoiceNumber(invoice.number)}</div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 10, paddingBottom: 8, borderBottom: '1px solid #e2e8f0' }}>
