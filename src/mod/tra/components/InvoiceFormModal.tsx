@@ -272,9 +272,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         ))}
         <Btn type="button" onClick={addItem} style={{
             width: '100%',
-            height: 'auto',
+            height: 38,
             boxSizing: 'border-box',
-            padding: 'var(--sp-3)',
+            padding: '0 12px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -339,7 +339,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           )}
         </Grid2>
         
-        {form.paymentTerms !== 'custom' && (
+        {form.paymentTerms !== 'cash' && (
           <>
             <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 8, marginBottom: 4 }}>
               💰 تخفیف نقدی (اختیاری)
@@ -512,9 +512,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         ))}
         <Btn type="button" onClick={addPayment} style={{
             width: '100%',
-            height: 'auto',
+            height: 38,
             boxSizing: 'border-box',
-            padding: 'var(--sp-3)',
+            padding: '0 12px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
