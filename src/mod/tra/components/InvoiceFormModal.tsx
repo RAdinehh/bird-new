@@ -197,7 +197,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </div>
           </div>
         ))}
-        <Btn size="sm" full onClick={addItem}>+ افزودن قلم</Btn>
+        <Btn 
+          size="sm" 
+          full 
+          onClick={addItem} 
+          style={{ marginTop: 'var(--sp-2)', borderStyle: 'dashed' }}
+        >
+          + افزودن قلم
+        </Btn>
 
 
         <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> شرایط پرداخت</SectionTitle>
@@ -343,7 +350,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             )}
           </div>
         ))}
-        <Btn size="sm" full onClick={addPayment}>+ افزودن پرداخت</Btn>
+        <Btn 
+          size="sm" 
+          full 
+          onClick={addPayment} 
+          style={{ marginTop: 'var(--sp-2)', borderStyle: 'dashed' }}
+        >
+          + افزودن پرداخت
+        </Btn>
         </div>
 
         {rem > 0 && (
