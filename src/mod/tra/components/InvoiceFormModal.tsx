@@ -121,15 +121,27 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
         <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت</SectionTitle>
         {form.items.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 'var(--sp-4)', color: 'var(--muted)', fontSize: 'var(--fs-sm)', background: 'var(--bg)', borderRadius: 'var(--r-sm)', marginBottom: 'var(--sp-2)' }}>
+          <div style={{ textAlign: 'center', padding: 'var(--sp-4)', color: 'var(--muted)', fontSize: 'var(--fs-sm)', background: 'var(--card)', borderRadius: 'var(--r-sm)', marginBottom: 'var(--sp-2)' }}>
             هنوز کالایی اضافه نکرده‌اید. روی دکمه زیر بزنید.
           </div>
         )}
         {form.items.map((it, idx) => (
-          <div key={it.id} style={{ padding: 'var(--sp-3)', paddingRight: 'calc(var(--sp-3) + 6px)', background: 'var(--bg)', ['--input-bg' as string]: 'var(--card-solid)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', borderLeft: '1px solid var(--border)', borderRight: (['chick', 'adult'].includes(it.category || form.category)) ? '5px solid var(--purple)' :
-                          (['feed', 'medicine', 'equipment'].includes(it.category || form.category)) ? '5px solid var(--accent)' :
-                          (['egg', 'fertile_egg'].includes(it.category || form.category)) ? '5px solid var(--warn)' :
-                          '5px solid var(--border)', borderRadius: 'var(--r-md)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div key={it.id} style={{
+            padding: 'var(--sp-3)',
+            background: 'var(--card)',
+            borderTop: '1px solid var(--border)',
+            borderBottom: '1px solid var(--border)',
+            borderLeft: '1px solid var(--border)',
+            borderRight: (['chick', 'adult'].includes(it.category || form.category)) ? '4px solid var(--purple)' :
+                        (['feed', 'medicine', 'equipment'].includes(it.category || form.category)) ? '4px solid var(--accent)' :
+                        (['egg', 'fertile_egg'].includes(it.category || form.category)) ? '4px solid var(--warn)' :
+                        '4px solid var(--border)',
+            borderRadius: 'var(--r-lg)',
+            marginBottom: 'var(--sp-2)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>قلم {toFa(idx + 1)}</span>
               <button type="button" onClick={() => removeItem(it.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
@@ -384,10 +396,22 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {form.payments.map(p => (
-          <div key={p.id} style={{ padding: 'var(--sp-3)', paddingRight: 'calc(var(--sp-3) + 6px)', background: 'var(--bg)', ['--input-bg' as string]: 'var(--card-solid)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', borderLeft: '1px solid var(--border)', borderRight: p.type === 'refund' ? '5px solid var(--danger)' :
-                          p.type === 'advance' ? '5px solid var(--purple)' :
-                          p.method === 'check' ? '5px solid var(--info)' :
-                          '5px solid var(--accent)', borderRadius: 'var(--r-md)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div key={p.id} style={{
+            padding: 'var(--sp-3)',
+            background: 'var(--card)',
+            borderTop: '1px solid var(--border)',
+            borderBottom: '1px solid var(--border)',
+            borderLeft: '1px solid var(--border)',
+            borderRight: p.type === 'refund' ? '4px solid var(--danger)' :
+                        p.type === 'advance' ? '4px solid var(--purple)' :
+                        p.method === 'check' ? '4px solid var(--info)' :
+                        '4px solid var(--accent)',
+            borderRadius: 'var(--r-lg)',
+            marginBottom: 'var(--sp-2)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>پرداخت</span>
               <button type="button" onClick={() => removePayment(p.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
@@ -500,7 +524,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </Field>
 
         {/* 🆕 خلاصه فاکتور قبل از ذخیره */}
-        <div style={{ marginTop: 'var(--sp-4)', padding: 'var(--sp-3)', background: 'var(--bg)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ marginTop: 'var(--sp-4)', padding: 'var(--sp-3)', background: 'var(--card)', borderRadius: 'var(--r-lg)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
             <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
             <span style={{ fontWeight: 700 }}>{toFa(total.toLocaleString('fa-IR'))} ت</span>
