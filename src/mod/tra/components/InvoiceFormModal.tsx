@@ -202,13 +202,29 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </div>
           </div>
         ))}
-        <Btn 
-          size="sm" 
-          full 
-          onClick={addItem} 
-          style={{ marginTop: 'var(--sp-2)', borderStyle: 'dashed', width: '100%', height: 40, boxSizing: 'border-box' }}
+        <Btn
+          type="button"
+          onClick={addItem}
+          style={{
+            width: '100%',
+            height: 44,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'var(--sp-2)',
+            background: 'var(--input-bg)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-md)',
+            color: 'var(--text)',
+            fontSize: 'var(--fs-sm)',
+            fontWeight: 600,
+            cursor: 'pointer',
+            marginTop: 'var(--sp-3)',
+            marginBottom: 'var(--sp-3)',
+          }}
         >
-          + افزودن قلم
+          <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)', fontWeight: 700 }}>+</span>
+          افزودن قلم
         </Btn>
 
 
@@ -376,13 +392,29 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             )}
           </div>
         ))}
-        <Btn 
-          size="sm" 
-          full 
-          onClick={addPayment} 
-          style={{ marginTop: 'var(--sp-2)', borderStyle: 'dashed', width: '100%', height: 40, boxSizing: 'border-box' }}
+        <Btn
+          type="button"
+          onClick={addPayment}
+          style={{
+            width: '100%',
+            height: 44,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'var(--sp-2)',
+            background: 'var(--input-bg)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-md)',
+            color: 'var(--text)',
+            fontSize: 'var(--fs-sm)',
+            fontWeight: 600,
+            cursor: 'pointer',
+            marginTop: 'var(--sp-3)',
+            marginBottom: 'var(--sp-3)',
+          }}
         >
-          + افزودن پرداخت
+          <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)', fontWeight: 700 }}>+</span>
+          افزودن پرداخت
         </Btn>
         </div>
 
