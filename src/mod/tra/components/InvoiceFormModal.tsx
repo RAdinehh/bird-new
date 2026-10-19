@@ -272,9 +272,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         ))}
         <Btn type="button" onClick={addItem} style={{
             width: '100%',
-            height: 38,
+            height: 'auto',
             boxSizing: 'border-box',
-            padding: '0 12px',
+            padding: 'var(--sp-3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -282,7 +282,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             background: 'transparent',
             border: '1.5px dashed var(--border-solid)',
             borderRadius: 'var(--r-md)',
-            color: 'var(--text)',
+            color: 'var(--muted)',
             fontSize: 'var(--fs-sm)',
             fontWeight: 600,
             cursor: 'pointer',
@@ -327,7 +327,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               <option value="custom">✏️ توافقی</option>
             </Select>
           </Field>
-          {form.paymentTerms !== 'custom' && (
+          {form.paymentTerms !== 'cash' && (
             <Field label="سرسید (خودکار)">
               <Input placeholder="خودکار محاسبه می‌شود" readOnly value={toFa(form.dueDate)} style={{ textAlign: 'right' }} />
             </Field>
@@ -512,9 +512,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         ))}
         <Btn type="button" onClick={addPayment} style={{
             width: '100%',
-            height: 38,
+            height: 'auto',
             boxSizing: 'border-box',
-            padding: '0 12px',
+            padding: 'var(--sp-3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -522,7 +522,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             background: 'transparent',
             border: '1.5px dashed var(--border-solid)',
             borderRadius: 'var(--r-md)',
-            color: 'var(--text)',
+            color: 'var(--muted)',
             fontSize: 'var(--fs-sm)',
             fontWeight: 600,
             cursor: 'pointer',
