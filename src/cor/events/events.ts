@@ -78,6 +78,8 @@ export interface TraInvoiceItemRef {
   baseQuantity?: number | null;
   /** تاریخ انقضا (برای دارو) */
   expiryDate?: string;
+  /** 🆕 گله مرتبط */
+  flockId?: string;
 }
 
 export interface TraInvoiceCreated {

@@ -39,6 +39,7 @@ function applyInvoiceMovements(
         partyId: invoice.partyId || '',
         notes: `فاکتور ${invoice.number || ''} — ${it.description || ''}`,
         expiryDate: it.expiryDate || undefined,
+        flockId: (it as any).flockId || undefined,
       });
       it.movementId = mid;
     } catch (e) {
