@@ -131,6 +131,8 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
             unitPrice: it.unitPrice || null,
             totalPrice: it.total || null,
             shippingCost: it.transportCost || null,
+            sourceFarm: it.sourceFarm || '',
+            nonIncubableCount: it.nonIncubableCount ?? 0,
           } as any);
           it.entryId = existing.id;
         } catch (e) { console.error('[TRA→INC update]', e); }
@@ -156,6 +158,8 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
           sampleWeightInitial: it.eggWeight || null,
           sampleWeightCurrent: null,
           sourceInvoiceId: inv.id,
+          sourceFarm: it.sourceFarm || '',
+          nonIncubableCount: it.nonIncubableCount ?? 0,
         });
         it.entryId = entryId;
       } catch (e) { console.error('[TRA→INC create]', e); }

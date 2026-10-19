@@ -97,6 +97,10 @@ export interface InvoiceItem extends ItemCategoryFields {
   baseQuantity?: number | null;
   /** تاریخ تولید تخم — اگر خالی باشد از Invoice.date استفاده می‌شود */
   eggDate?: string;
+  /** مبدأ / مرغداری مادر (برای تخم نطفه‌دار) */
+  sourceFarm?: string;
+  /** تعداد تخم‌های غیرقابل جوجه‌کشی */
+  nonIncubableCount?: number | null;
   /** شماره بچ هچری (برای جوجه یک‌روزه) */
   hatcheryBatchNo?: string;
   /** وزن اولیه جوجه به گرم */

@@ -43,6 +43,7 @@ export interface ItemDetailFormData {
   eggBatchNo?: string;
   eggDate?: string;
   brokenEggCount?: number | null;
+  nonIncubableCount?: number | null;
   sourceFarm?: string;
 
   expiryDate?: string;
@@ -190,6 +191,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="شماره بچ تخم">
             <Input value={String(item.eggBatchNo || '')} onChange={e => updateItem({ eggBatchNo: e.target.value })} placeholder="B-102" />
           </Field>
+          <Field label="مبدأ / مرغداری مادر" hint="برای ردیابی">
+            <Input value={String(item.sourceFarm || '')} onChange={e => updateItem({ sourceFarm: e.target.value })} placeholder="آدینه" />
+          </Field>
 
         </Grid2>
 
@@ -206,7 +210,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="تعداد شکسته">
             <Input mode="number" value={item.brokenEggCount !== null && item.brokenEggCount !== undefined ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} />
           </Field>
-          <div />
+          <Field label="غیرقابل جوجه">
+            <Input mode="number" value={item.nonIncubableCount !== null && item.nonIncubableCount !== undefined ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} />
+          </Field>
         </Grid2>
 
         <SecTitle icon="💰" title="هزینه و مالی" />
