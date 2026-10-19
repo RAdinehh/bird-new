@@ -280,7 +280,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             justifyContent: 'center',
             gap: 'var(--sp-2)',
             background: 'transparent',
-            border: '1.5px dashed var(--border-solid)',
+            border: 'none', outline: '1.5px dashed var(--border-solid)', outlineOffset: '-1.5px',
             borderRadius: 'var(--r-md)',
             color: 'var(--muted)',
             fontSize: 'var(--fs-sm)',
@@ -417,6 +417,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           title={`پرداخت‌ها — ${toFa(paid.toLocaleString('fa-IR'))} از ${toFa(total.toLocaleString('fa-IR'))}`}
           icon="💳"
           defaultOpen={form.payments.length > 0}
+          key={`payments-${form.payments.length}`} // Force remount when length changes
         >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {form.payments.map(p => (
@@ -520,7 +521,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             justifyContent: 'center',
             gap: 'var(--sp-2)',
             background: 'transparent',
-            border: '1.5px dashed var(--border-solid)',
+            border: 'none', outline: '1.5px dashed var(--border-solid)', outlineOffset: '-1.5px',
             borderRadius: 'var(--r-md)',
             color: 'var(--muted)',
             fontSize: 'var(--fs-sm)',
