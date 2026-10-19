@@ -120,6 +120,15 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               <Input placeholder="نام" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
               <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
             </Grid2>
+
+            <Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
+              <NumField
+                placeholder="مثلاً ۷"
+                value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
+                onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, withdrawalDays: e.target.value === '' ? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
+                unit="روز" min={0}
+              />
+            </Field>
             {medicineItems.length > 0 && (
               <Grid2>
                 <Field label="از انبار" autoFrom="انبار (مصرف کسر می‌شه)" hint="اگه انتخاب کنی، به‌طور خودکار از موجودی انبار کم می‌شه">
