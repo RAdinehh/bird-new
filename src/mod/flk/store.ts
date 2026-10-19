@@ -59,6 +59,14 @@ export interface Flock {
   // 💼 مدل بهره‌برداری
   dealType?: FlockDealType;
   dealData?: FlockDealData;
+  // 🆕 دوره پرهیز دارو (اختیاری — نمایش فقط اگر features.withdrawal = true)
+  activeWithdrawal?: {
+    until: string;        // تاریخ شمسی پایان دوره پرهیز
+    medicine: string;     // نام داروی اصلی
+    days: number;         // تعداد روز پرهیز
+    startedAt: string;    // تاریخ شروع دوره
+    logId: string;        // شناسه لاگ ثبت روزانه مبدأ
+  };
 }
 
 export interface State {
