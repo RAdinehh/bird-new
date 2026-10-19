@@ -102,3 +102,15 @@ export function dueLabel(days: number | null): string {
   if (days === 0) return 'امروز';
   return `${days} روز مانده`;
 }
+
+export function RowGrid({ children }: { children: ReactNode }) {
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: 'var(--sp-1)',
+    }}>
+      {children}
+    </div>
+  );
+}

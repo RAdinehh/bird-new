@@ -4,7 +4,7 @@ import { toFa } from '../../../shr/utils/fa';
 import {
   WORKFLOW_LABEL, STATUS_LABEL, remaining, paidSum, workflowTone, nextWorkflowStatus, CHECK_STATUS_LABEL, type Invoice
 } from '../store';
-import { Row, SectionTitle } from '../helpers';
+import { Row, RowGrid, SectionTitle } from '../helpers';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 
 interface Props {
@@ -54,19 +54,20 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       }
     >
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات</SectionTitle>
-      <Row l="فروشنده" v={partyName || '—'} />
-      <Row l="تاریخ" v={toFa(inv.date)} />
-      {inv.number ? <Row l="شماره" v={inv.number} /> : null}
-      {inv.dueDate ? <Row l="سرسید" v={toFa(inv.dueDate)} /> : null}
-      {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تاریخ تحویل" v={toFa(inv.deliveryDate)} /> : null}
+      <RowGrid>
+        <Row l="فروشنده" v={partyName || '—'} />
+        <Row l="تاریخ" v={toFa(inv.date)} />
+        {inv.number ? <Row l="شماره" v={inv.number} /> : null}
+        {inv.dueDate ? <Row l="سرسید" v={toFa(inv.dueDate)} /> : null}
+        {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تحویل" v={toFa(inv.deliveryDate)} /> : null}
+      </RowGrid>
 
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
-      {inv.items.map(it => (
-        <div key={it.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-          <span>{it.description || '—'} × {toFa(it.quantity)}</span>
-          <span style={{ fontWeight: 600 }}>{toFa(it.total.toLocaleString('fa-IR'))} ت</span>
-        </div>
-      ))}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+        {inv.items.map(it => (
+          <Row key={it.id} l={`${it.description || '—'} × ${toFa(it.quantity)}`} v={`${toFa(it.total.toLocaleString('fa-IR'))} ت`} />
+        ))}
+      </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
         <span>جمع کل:</span>
         <span>{toFa(inv.total.toLocaleString('fa-IR'))} ت</span>
@@ -75,19 +76,21 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       {inv.payments && inv.payments.length > 0 && (
         <>
           <SectionTitle>💳 پرداخت‌ها</SectionTitle>
-          {inv.payments.map(p => (
-            <div key={p.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>{p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • {toFa(p.date)}</span>
-                <span style={{ fontWeight: 600 }}>{toFa(p.amount.toLocaleString('fa-IR'))} ت</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+            {inv.payments.map(p => (
+              <div key={p.id}>
+                <Row
+                  l={`${p.method === 'cash' ? '💵' : p.method === 'card' ? '💳' : '📄'} ${toFa(p.date)}`}
+                  v={`${toFa(p.amount.toLocaleString('fa-IR'))} ت`}
+                />
+                {p.method === 'check' && (
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '2px 8px' }}>
+                    چک {p.checkNo} • {p.bank} • {CHECK_STATUS_LABEL[p.status || 'pending']}
+                  </div>
+                )}
               </div>
-              {p.method === 'check' && (
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                  چک {p.checkNo} • {p.bank} • {CHECK_STATUS_LABEL[p.status || 'pending']}
-                </div>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </>
       )}
 
