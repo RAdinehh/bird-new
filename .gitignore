@@ -35,10 +35,8 @@ project.txt
 project-final.txt
 unfinished.txt
 scripts/
-scripts/
 coverage
 .vitest
-*.bak
 *.bak_ms
 *.bak_*
 *.bak*
@@ -48,3 +46,5 @@ coverage
 # Backup files (all variants)
 *.save_*
 *.save-*
+limits_survey.txt
+full_limits_survey.txt
