@@ -44,6 +44,35 @@ export interface InvoiceFormModalProps {
   onNewFlock?: () => void;
 }
 
+const getDescriptionPlaceholder = (cat: string): string => {
+  switch (cat) {
+    case 'chick':       return 'مثلاً: جوجه یک‌روزه راس ۳۰۸';
+    case 'adult':       return 'مثلاً: مرغ مادر بالغ';
+    case 'egg':         return 'مثلاً: تخم نطفه‌دار نژاد راس';
+    case 'fertile_egg': return 'مثلاً: تخم نطفه‌دار نژاد راس';
+    case 'feed':        return 'مثلاً: دان استارتر پیشگامان';
+    case 'medicine':    return 'مثلاً: داکسی‌سایکلین ۱۰۰ml';
+    case 'equipment':   return 'مثلاً: فن تونلی ۱۲۰';
+    case 'broken':      return 'مثلاً: تخم‌های شکسته';
+    case 'manure':      return 'مثلاً: کود مرغی خشک';
+    case 'other':       return 'مثلاً: هزینه حمل بار';
+    default:            return 'توضیح';
+  }
+};
+
+const getPricePlaceholder = (cat: string): string => {
+  switch (cat) {
+    case 'chick':       return 'قیمت هر جوجه';
+    case 'adult':       return 'قیمت هر پرنده';
+    case 'egg':         return 'قیمت هر تخم';
+    case 'fertile_egg': return 'قیمت هر تخم';
+    case 'feed':        return 'قیمت هر کیلو';
+    case 'medicine':    return 'قیمت هر بسته';
+    case 'equipment':   return 'قیمت هر عدد';
+    default:            return 'مثلاً — ۱۰٬۰۰۰';
+  }
+};
+
 const getUnitForCategory = (cat: string): string => {
   switch (cat) {
     case 'chick': return 'pcs';
@@ -187,7 +216,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               📦 مشخصات پایه
             </div>
 
-            <Input placeholder="توضیح (مثلاً: تخم نطفه‌دار نژاد راس)" value={it.description} onChange={e => updateItem(it.id, { description: e.target.value })} />
+            <Input placeholder={getDescriptionPlaceholder(it.category || form.category)} value={it.description} onChange={e => updateItem(it.id, { description: e.target.value })} />
 
             <Grid2>
               <Field label="تعداد"><NumField value={toFa(String(it.quantity))} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} /></Field>
@@ -199,7 +228,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </Grid2>
 
             <Grid2>
-              <Field label="قیمت واحد"><MoneyField value={toFa(String(it.unitPrice))} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
+              <Field label="قیمت واحد"><MoneyField placeholder={getPricePlaceholder(it.category || form.category)} value={toFa(String(it.unitPrice))} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} /></Field>
               <Field label="تخفیف">
                 <MoneyField placeholder="مثلاً — ۱۰٬۰۰۰" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
               </Field>
