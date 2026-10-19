@@ -343,3 +343,61 @@ export function generateInstallments(
   return out;
 }
 
+/** آبشار بانکی: پرداخت‌ها به ترتیب FIFO روی اقساط تخصیص می‌یابند.
+ *  idempotent: هر بار از صفر محاسبه می‌شود (پرداخت‌های جدید لحاظ می‌شوند).
+ *  چک برگشتی و عودت وجه در استخر حساب نمی‌شوند.
+ *  سرسید گذشته و کامل پرداخت‌نشده → overdue.
+ */
+export function applyPaymentsToInstallments(
+  installments: Installment[],
+  payments: Payment[]
+): Installment[] {
+  if (!installments || installments.length === 0) return installments || [];
+
+  const todayStr = getTodayJalali();
+
+  let pool = 0;
+  for (const p of payments || []) {
+    if ((p as { type?: string }).type === 'refund') continue;
+    if (p.method === 'check' && p.status === 'bounced') continue;
+    pool += p.amount || 0;
+  }
+
+  const sorted = [...installments].sort((a, b) => a.number - b.number);
+  const result: Installment[] = [];
+
+  for (const inst of sorted) {
+    const need = inst.amount || 0;
+    const isOverdue = inst.dueDate < todayStr;
+
+    if (need > 0 && pool >= need) {
+      pool -= need;
+      result.push({
+        ...inst,
+        paidAmount: need,
+        paid: true,
+        paidAt: inst.paidAt || todayStr,
+        status: 'paid',
+      });
+    } else if (need > 0 && pool > 0) {
+      const applied = pool;
+      pool = 0;
+      result.push({
+        ...inst,
+        paidAmount: applied,
+        paid: false,
+        status: isOverdue ? 'overdue' : 'pending',
+      });
+    } else {
+      result.push({
+        ...inst,
+        paidAmount: 0,
+        paid: false,
+        status: isOverdue ? 'overdue' : 'pending',
+      });
+    }
+  }
+
+  return result;
+}
+

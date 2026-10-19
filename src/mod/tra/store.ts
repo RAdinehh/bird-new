@@ -8,6 +8,7 @@ import { useFlk } from '../flk/store';
 import { bus } from '../../cor/events';
 
 import type { Invoice, InvoiceItem, State } from './types';
+import { applyPaymentsToInstallments } from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { generateInvoiceNumber, paidSum } from './calc';
 import { showToast } from '../../cor/store/toast';
@@ -53,7 +54,11 @@ export const useTra = create<State>()(
             return { ...p, partyPaymentId: ppId };
           } catch (e) { console.error('[TRA sync add]', e); return p; }
         });
-        const final = { ...newInv, items, payments: syncedPayments };
+        const final: Invoice = { ...newInv, items, payments: syncedPayments };
+        // 🆕 آبشار بانکی: تخصیص پرداخت‌ها به اقساط
+        if (final.installments && final.installments.length > 0) {
+          try { final.installments = applyPaymentsToInstallments(final.installments, syncedPayments); } catch(e) {}
+        }
         set({ invoices: [...get().invoices, final] });
         try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices)); } catch(e) {}
         return id;
@@ -110,7 +115,11 @@ export const useTra = create<State>()(
             } catch(e) {}
           }
         }
-        const final = { ...mergedWithItems, items: itemsFinal, payments: syncedPayments };
+        const final: Invoice = { ...mergedWithItems, items: itemsFinal, payments: syncedPayments };
+        // 🆕 آبشار بانکی: تخصیص پرداخت‌ها به اقساط
+        if (final.installments && final.installments.length > 0) {
+          try { final.installments = applyPaymentsToInstallments(final.installments, syncedPayments); } catch(e) {}
+        }
         set({ invoices: get().invoices.map(x => x.id === id ? final : x) });
         try {
           setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices));
