@@ -230,7 +230,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   };
 
   return (
-    <PageContainer>
+    <PageContainer bottomPad={100}>
       {undoData && (
         <UndoBar
           label="حذف شد"

@@ -23,8 +23,8 @@ export function Grid3({ children }: { children: React.ReactNode }) {
     }}>{children}</div>
   );
 }
-export function PageContainer({ children }: { children: React.ReactNode }) {
-  return <div style={{ padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>{children}</div>;
+export function PageContainer({ children, bottomPad }: { children: React.ReactNode; bottomPad?: number }) {
+  return <div style={{ padding: 'var(--sp-3)', paddingBottom: bottomPad ? `calc(var(--sp-3) + ${bottomPad}px)` : 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>{children}</div>;
 }
 export function SectionTitle({ children }: { children: React.ReactNode }) {
   return (

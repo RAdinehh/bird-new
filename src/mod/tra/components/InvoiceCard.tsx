@@ -63,9 +63,17 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       </RowGrid>
 
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {inv.items.map(it => (
-          <Row key={it.id} l={`${it.description || '—'} × ${toFa(it.quantity)}`} v={`${toFa(it.total.toLocaleString('fa-IR'))} ت`} />
+          <div key={it.id} style={{
+            display: 'flex', justifyContent: 'space-between',
+            fontSize: 'var(--fs-sm)', padding: '4px 8px',
+            borderRadius: 'var(--r-sm)',
+            color: 'var(--text)',
+          }}>
+            <span style={{ color: 'var(--muted)' }}>{it.description || '—'} × {toFa(it.quantity)}</span>
+            <span style={{ fontWeight: 600 }}>{toFa(it.total.toLocaleString('fa-IR'))} ت</span>
+          </div>
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
@@ -76,15 +84,21 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       {inv.payments && inv.payments.length > 0 && (
         <>
           <SectionTitle>💳 پرداخت‌ها</SectionTitle>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {inv.payments.map(p => (
               <div key={p.id}>
-                <Row
-                  l={`${p.method === 'cash' ? '💵' : p.method === 'card' ? '💳' : '📄'} ${toFa(p.date)}`}
-                  v={`${toFa(p.amount.toLocaleString('fa-IR'))} ت`}
-                />
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  fontSize: 'var(--fs-sm)', padding: '4px 8px',
+                  borderRadius: 'var(--r-sm)',
+                }}>
+                  <span style={{ color: 'var(--muted)' }}>
+                    {p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • {toFa(p.date)}
+                  </span>
+                  <span style={{ fontWeight: 600 }}>{toFa(p.amount.toLocaleString('fa-IR'))} ت</span>
+                </div>
                 {p.method === 'check' && (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '2px 8px' }}>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '0 8px 2px', lineHeight: 1.4 }}>
                     چک {p.checkNo} • {p.bank} • {CHECK_STATUS_LABEL[p.status || 'pending']}
                   </div>
                 )}
