@@ -125,7 +125,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           </div>
         )}
         {form.items.map((it, idx) => (
-          <div key={it.id} style={{ padding: 'var(--sp-3)', background: 'var(--border-solid)', ['--input-bg' as string]: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div key={it.id} style={{ position: 'relative', overflow: 'hidden', padding: 'var(--sp-3)', background: 'var(--border-solid)', ['--input-bg' as string]: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{
+              position: 'absolute', top: 0, right: 0, bottom: 0, width: 4,
+              background: (['chick', 'adult'].includes(it.category || form.category)) ? 'var(--purple)' :
+                          (['feed', 'medicine', 'equipment'].includes(it.category || form.category)) ? 'var(--accent)' :
+                          (['egg', 'fertile_egg'].includes(it.category || form.category)) ? 'var(--warn)' :
+                          'var(--border)',
+            }} aria-hidden="true" />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>قلم {toFa(idx + 1)}</span>
               <button type="button" onClick={() => removeItem(it.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
@@ -380,7 +387,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {form.payments.map(p => (
-          <div key={p.id} style={{ padding: 'var(--sp-3)', background: 'var(--border-solid)', ['--input-bg' as string]: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div key={p.id} style={{ position: 'relative', overflow: 'hidden', padding: 'var(--sp-3)', background: 'var(--border-solid)', ['--input-bg' as string]: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{
+              position: 'absolute', top: 0, right: 0, bottom: 0, width: 4,
+              background: p.type === 'refund' ? 'var(--danger)' :
+                          p.type === 'advance' ? 'var(--purple)' :
+                          p.method === 'check' ? 'var(--info)' :
+                          'var(--accent)',
+            }} aria-hidden="true" />
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>پرداخت</span>
               <button type="button" onClick={() => removePayment(p.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
