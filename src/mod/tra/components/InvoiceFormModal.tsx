@@ -304,18 +304,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
         <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت‌ها — {toFa(paid.toLocaleString('fa-IR'))} از {toFa(total.toLocaleString('fa-IR'))}</SectionTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {/* 🆕 نوار خلاصه فاکتور */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8, padding: 'var(--pad-tight) var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
-            <span style={{ fontWeight: 600 }}>{toFa(total.toLocaleString('fa-IR'))} ت</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: rem > 0.5 ? 'var(--warn)' : 'var(--accent)', fontWeight: 700 }}>
-            <span>مانده پرداخت:</span>
-            <span>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
-          </div>
-        </div>
-
         {form.payments.map(p => (
           <div key={p.id} style={{ padding: 'var(--pad-normal) 0', borderBottom: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
