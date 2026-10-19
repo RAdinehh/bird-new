@@ -64,11 +64,11 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       </RowGrid>
 
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
-      <RowGrid>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
         {inv.items.map(it => (
           <Row key={it.id} l={`${it.description || '—'} × ${toFa(it.quantity)}`} v={`${toFa(it.total.toLocaleString('fa-IR'))} ت`} />
         ))}
-      </RowGrid>
+      </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
         <span>جمع کل:</span>
         <span>{toFa(inv.total.toLocaleString('fa-IR'))} ت</span>
@@ -77,21 +77,21 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       {inv.payments && inv.payments.length > 0 && (
         <>
           <SectionTitle>💳 پرداخت‌ها</SectionTitle>
-          <RowGrid>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
             {inv.payments.map(p => (
               <div key={p.id}>
                 <Row
-                  l={`${p.method === 'cash' ? '💵' : p.method === 'card' ? '💳' : '📄'} ${toFa(p.date)}`}
+                  l={`${p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • ${toFa(p.date)}`}
                   v={`${toFa(p.amount.toLocaleString('fa-IR'))} ت`}
                 />
                 {p.method === 'check' && (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '2px 8px', gridColumn: '1 / -1' }}>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '2px 8px' }}>
                     چک {p.checkNo} • {p.bank} • {CHECK_STATUS_LABEL[p.status || 'pending']}
                   </div>
                 )}
               </div>
             ))}
-          </RowGrid>
+          </div>
         </>
       )}
 
