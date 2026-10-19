@@ -13,7 +13,7 @@ import ItemDetailsForm from '../../../shr/components/ItemDetailsForm';
 import InvoiceSmartSummary from './InvoiceSmartSummary';
 import { type CheckStatus } from '../store';
 import { CATEGORIES, generateInstallments, type InvoiceItem, type Payment } from '../store';
-import { UNIT_LABEL } from '../../whs/store';
+import { UNIT_LABEL, CATEGORY_DEFAULTS } from '../../whs/store';
 import type { F } from '../types-invoice';
 import { useCtc } from '../../ctc/store';
 import { computePartyCredit } from '../store';
@@ -179,9 +179,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             <Field label="دستهٔ این قلم" hint="خالی = همان دستهٔ فاکتور (برای فاکتور مختلط)">
               <Select value={it.category || ''} onChange={e => {
                   const newCat = e.target.value;
-                  let newUnit = it.unit;
-                  if (['chick', 'adult', 'egg', 'fertile_egg', 'broken'].includes(newCat)) newUnit = 'pcs';
-                  else if (newCat === 'feed') newUnit = 'kg';
+                  const def = (CATEGORY_DEFAULTS as any)[newCat];
+                  // اگر دسته انتخاب شده، واحد پیش‌فرض انبار را بگیر، وگرنه واحد قبلی را نگه دار
+                  const newUnit = def ? def.unit : it.unit;
                   updateItem(it.id, { category: newCat || undefined, unit: newUnit });
                 }}>
                 <option value="">همان فاکتور — {(() => {

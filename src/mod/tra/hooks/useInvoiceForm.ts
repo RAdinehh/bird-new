@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { paidSum, calcItemTotal, generateInstallments, type Invoice, type InvoiceItem, type Payment } from '../store';
+import { CATEGORY_DEFAULTS } from '../../whs/store';
 import { emptyForm as empty, type F } from '../types-invoice';
 import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -54,11 +55,16 @@ export function useInvoiceForm(params: {
   const rem = Math.max(0, total - paid);
 
   // اقلام
-  const addItem = () => setForm(f => ({ ...f, items: [...f.items, {
-    id: crypto.randomUUID(), description: '', unit: isPurchase ? 'عدد' : 'شانه',
-    quantity: 1, unitPrice: 0, total: 0, itemId: '', movementId: '',
-    discountType: '', discountValue: 0, shipping: 0,
-  }] }));
+  const addItem = () => setForm(f => {
+    const cat = f.category || (isPurchase ? 'chick' : 'egg');
+    const def = (CATEGORY_DEFAULTS as any)[cat];
+    const defaultUnit = def ? def.unit : 'pcs'; // Fallback استاندارد
+    return { ...f, items: [...f.items, {
+      id: crypto.randomUUID(), description: '', unit: defaultUnit,
+      quantity: 1, unitPrice: 0, total: 0, itemId: '', movementId: '',
+      discountType: '', discountValue: 0, shipping: 0,
+    }] };
+  });
   const updateItem = (id: string, patch: Partial<InvoiceItem>) => {
     setForm(f => ({ ...f, items: f.items.map(x => {
       if (x.id !== id) return x;
