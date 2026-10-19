@@ -88,6 +88,35 @@ const getUnitForCategory = (cat: string): string => {
   }
 };
 
+const getUnitPriceMax = (cat: string): number => {
+  switch (cat) {
+    case 'chick': return 30000000;            // ۳۰ میلیون تومان
+    case 'adult': return 20000000;            // ۲۰ میلیون تومان
+    case 'egg':
+    case 'fertile_egg': return 5000000;       // ۵ میلیون تومان
+    case 'feed': return 30000000;             // ۳۰ میلیون تومان/کیلو
+    case 'medicine': return 200000000;        // ۲۰۰ میلیون تومان
+    case 'equipment': return 20000000000;     // ۲۰ میلیارد تومان
+    case 'broken': return 5000000;
+    case 'manure': return 5000000;
+    case 'other': return 5000000000;          // ۵ میلیارد تومان
+    default: return 100000000;                // ۱۰۰ میلیون تومان
+  }
+};
+
+const getQuantityMax = (cat: string): number | undefined => {
+  switch (cat) {
+    case 'chick': return 50000;
+    case 'adult': return 100000;
+    case 'egg':
+    case 'fertile_egg': return 150000;
+    case 'feed': return 20000;   // ۲۰ تن (یک کامیون)
+    case 'medicine': return 5000;
+    case 'equipment': return 500;
+    default: return undefined;
+  }
+};
+
 export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   const {
     open, setOpen, form, setForm, isPurchase,
@@ -219,7 +248,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             <Input placeholder={getDescriptionPlaceholder(it.category || form.category)} value={it.description} onChange={e => updateItem(it.id, { description: e.target.value })} />
 
             <Grid2>
-              <Field label="تعداد"><NumField value={toFa(String(it.quantity))} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} /></Field>
+              <Field label="تعداد"><NumField value={toFa(String(it.quantity))} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(it.category || form.category)} /></Field>
               <Field label="واحد">
                 <Select value={it.unit || 'pcs'} onChange={e => updateItem(it.id, { unit: e.target.value })}>
                   {Object.entries(UNIT_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -236,7 +265,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
             <Grid2>
               <Field label="حمل">
-                <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={10000000000} />
               </Field>
               <div /> {/* Spacer برای هم‌ترازی دو ستونه */}
             </Grid2>

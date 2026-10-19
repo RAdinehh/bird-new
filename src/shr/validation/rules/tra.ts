@@ -194,6 +194,34 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         }
       }
     }
+    
+    // ── محدودیت قیمت واحد ──
+    const CATEGORY_MAX_PRICE: Record<string, number> = {
+      chick: 30000000,
+      adult: 20000000,
+      egg: 5000000,
+      fertile_egg: 5000000,
+      feed: 30000000,
+      medicine: 200000000,
+      equipment: 20000000000,
+      broken: 5000000,
+      manure: 5000000,
+      other: 5000000000,
+    };
+    for (let i = 0; i < (d.items || []).length; i++) {
+      const it = d.items[i];
+      const cat = it.category || d.category;
+      const p = (f: string) => ['items', String(i), f];
+      
+      const maxPrice = CATEGORY_MAX_PRICE[cat];
+      if (maxPrice && Number(it.unitPrice) > maxPrice) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `حداکثر قیمت واحد برای این دسته ${maxPrice.toLocaleString('fa-IR')} تومان است`, path: p('unitPrice') });
+      }
+      
+      if (Number(it.shipping) > 10000000000) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'هزینه حمل حداکثر ۱۰ میلیارد تومان است', path: p('shipping') });
+      }
+    }
   });
 }
 

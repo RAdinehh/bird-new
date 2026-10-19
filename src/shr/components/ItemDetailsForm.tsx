@@ -118,13 +118,13 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         <Grid3>
           <Field label="تعداد نر">
-            <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
+            <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} max={item.quantity || undefined} />
           </Field>
           <Field label="تعداد ماده">
-            <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
+            <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} max={item.quantity || undefined} />
           </Field>
           <Field label="نامشخص" hint="برای مخلوط">
-            <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
+            <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} max={item.quantity || undefined} />
           </Field>
         </Grid3>
         <Grid2>
@@ -132,14 +132,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
           </Field>
           <Field label="وزن اولیه (گرم)">
-            <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => updateItem({ chickWeight: parseFaNum(e.target.value) || null })} unit="g" min={0} />
+            <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => updateItem({ chickWeight: parseFaNum(e.target.value) || null })} unit="g" min={25} max={50} />
           </Field>
         </Grid2>
 
         <SecTitle icon="💰" title="هزینه" />
         <Grid2>
           <Field label="هزینه حمل اختصاصی">
-            <Input mode="number" value={item.transportCost !== null && item.transportCost !== undefined ? String(item.transportCost) : ''} onChange={e => updateItem({ transportCost: parseFaNum(e.target.value) || null })} unit="ت" min={0} />
+            <Input mode="number" value={item.transportCost !== null && item.transportCost !== undefined ? String(item.transportCost) : ''} onChange={e => updateItem({ transportCost: parseFaNum(e.target.value) || null })} unit="ت" min={0} max={100000000} />
           </Field>
           <div />
         </Grid2>
@@ -177,10 +177,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         <Grid3>
           <Field label="تعداد شکسته">
-            <Input mode="number" value={item.brokenEggCount !== null && item.brokenEggCount !== undefined ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} />
+            <Input mode="number" value={item.brokenEggCount !== null && item.brokenEggCount !== undefined ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
           </Field>
           <Field label="غیرقابل جوجه">
-            <Input mode="number" value={item.nonIncubableCount !== null && item.nonIncubableCount !== undefined ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} />
+            <Input mode="number" value={item.nonIncubableCount !== null && item.nonIncubableCount !== undefined ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
           </Field>
           <div />
         </Grid3>
@@ -278,7 +278,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         <Grid2>
           <Field label="گارانتی (ماه)">
-            <Input mode="number" value={item.warrantyMonths !== null && item.warrantyMonths !== undefined ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} />
+            <Input mode="number" value={item.warrantyMonths !== null && item.warrantyMonths !== undefined ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} max={60} />
           </Field>
           <Field label="سالن مقصد" hint="محل نصب تجهیز">
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
