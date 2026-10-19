@@ -120,7 +120,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
         <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت</SectionTitle>
         {form.items.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 'var(--sp-4)', color: 'var(--muted)', fontSize: 'var(--fs-sm)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 'var(--sp-2)' }}>
+          <div style={{ textAlign: 'center', padding: 'var(--sp-4)', color: 'var(--muted)', fontSize: 'var(--fs-sm)', background: 'var(--card-solid)', borderRadius: 'var(--r-sm)', marginBottom: 'var(--sp-2)' }}>
             هنوز کالایی اضافه نکرده‌اید. روی دکمه زیر بزنید.
           </div>
         )}
@@ -239,7 +239,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 'var(--sp-2)',
-            background: 'var(--bg)',
+            background: 'var(--card-solid)',
             border: '1px solid var(--border)',
             borderRadius: 'var(--r-md)',
             color: 'var(--text)',
@@ -464,7 +464,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 'var(--sp-2)',
-            background: 'var(--bg)',
+            background: 'var(--card-solid)',
             border: '1px solid var(--border)',
             borderRadius: 'var(--r-md)',
             color: 'var(--text)',
