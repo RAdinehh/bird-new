@@ -206,7 +206,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           size="sm" 
           full 
           onClick={addItem} 
-          style={{ marginTop: 'var(--sp-2)', borderStyle: 'dashed' }}
+          style={{ marginTop: 'var(--sp-2)', borderStyle: 'dashed', width: '100%', height: 40, boxSizing: 'border-box' }}
         >
           + افزودن قلم
         </Btn>
@@ -380,7 +380,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           size="sm" 
           full 
           onClick={addPayment} 
-          style={{ marginTop: 'var(--sp-2)', borderStyle: 'dashed' }}
+          style={{ marginTop: 'var(--sp-2)', borderStyle: 'dashed', width: '100%', height: 40, boxSizing: 'border-box' }}
         >
           + افزودن پرداخت
         </Btn>
