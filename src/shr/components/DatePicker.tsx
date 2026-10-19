@@ -150,8 +150,7 @@ export default function DatePicker({
           minWidth: 0,
           outline: 'none',
         }}
-        onFocus={(e) => { if (!disabled) e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)'; }}
-        onBlur={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+        
       >
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {value ? toFa(value) : placeholder}
