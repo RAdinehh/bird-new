@@ -43,6 +43,7 @@ export interface Settings {
   features: {
     vaccine: boolean;         // واکسن و برنامه واکسن
     medicine: boolean;        // دارو (گیاهی + شیمیایی)
+    withdrawal: boolean;      // دوره پرهیز دارو (اختیاری)
   };
 
   // منوی پایین — ۵ ماژول انتخابی
@@ -95,7 +96,7 @@ const defaultSettings: Settings = {
   lowPowerMode: false,
   printPaper: 'A4',
   modules: {},
-  features: { vaccine: true, medicine: true },
+  features: { vaccine: true, medicine: true, withdrawal: false },
   customStandards: {},
   customSpecies: [],
   customOverrides: {},
