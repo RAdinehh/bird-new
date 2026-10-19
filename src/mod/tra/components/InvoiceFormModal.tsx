@@ -10,6 +10,7 @@ import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { AccordionSection } from '../../../shr/components/AccordionSection';
 import ItemDetailsForm from '../../../shr/components/ItemDetailsForm';
+import InvoiceSmartSummary from './InvoiceSmartSummary';
 import { type CheckStatus } from '../store';
 import { CATEGORIES, generateInstallments, type InvoiceItem, type Payment } from '../store';
 import { UNIT_LABEL } from '../../whs/store';
@@ -517,6 +518,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             <span>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
           </div>
         </div>
+
+        <InvoiceSmartSummary form={form} total={total} paid={paid} />
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>
