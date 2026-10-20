@@ -5,6 +5,7 @@ import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../../shr/components/ExpandableCard';
 import { Row } from '../helpers';
+import EntityLink from '../../../shr/components/EntityLink';
 import ProgressTracker from '../../../shr/components/ProgressTracker';
 import { DEAL_LABEL, ENTRY_STATUS_LABEL, isLockdown, isHatchWindow } from '../store';
 import { calcWeightLossPct, getExpectedTempHumidity } from '../api/hatchCalc';
@@ -96,6 +97,12 @@ export default function EggEntryCard(props: EggEntryCardProps) {
           return <Row l="کاهش وزن نمونه" v={(inRange ? '✅ ' : '⚠️ ') + toFa(pct) + '٪'} />;
         })()}
         <Row l="تاریخ ورود" v={toFa(e.entryDate)} />
+        {e.sourceInvoiceId && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
+            <span style={{ color: 'var(--muted)', fontWeight: 600 }}>فاکتور خرید</span>
+            <EntityLink type="invoice" id={e.sourceInvoiceId} label="مشاهده" />
+          </div>
+        )}
         {(() => {
           const st = needEggStorageDays(age);
           if (!st) return null;
