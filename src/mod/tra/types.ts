@@ -140,6 +140,8 @@ export interface InvoiceItem extends ItemCategoryFields {
   shipping?: number;
   // فروشنده/خریدار قلم
   itemPartyId?: string;
+  /** 🆕 اتصال به گله موجود (بدون ساخت گله جدید) */
+  existingFlockId?: string;
 }
 
 export interface Payment {

@@ -50,6 +50,7 @@ export interface ItemDetailFormData {
 
   costType?: string;
   stockItemId?: string;
+  existingFlockId?: string;
 }
 
 interface Props {
@@ -84,6 +85,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <SecTitle icon="🧬" title="اطلاعات گله" />
+        {isPurchase && (
+          <Field label="اتصال به گله موجود" hint="اگر قبلاً گله را دستی ساخته‌اید">
+            <SmartSelect
+              value={String(item.existingFlockId || '')}
+              onChange={v => updateItem({ existingFlockId: v, flockId: v })}
+              options={flocks.filter(f => f.status === 'active' && !f.sourceInvoiceId).map(f => ({ value: f.id, label: f.name }))}
+              placeholder="— ایجاد گله جدید —"
+              modalTitle="انتخاب گله"
+            />
+          </Field>
+        )}
         <Grid2>
           <Field label="نوع پرنده" required>
             <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
@@ -186,6 +198,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <SecTitle icon="🐓" title="اطلاعات پرنده بالغ" />
+        {isPurchase && (
+          <Field label="اتصال به گله موجود" hint="اگر قبلاً گله را دستی ساخته‌اید">
+            <SmartSelect
+              value={String(item.existingFlockId || '')}
+              onChange={v => updateItem({ existingFlockId: v, flockId: v })}
+              options={flocks.filter(f => f.status === 'active' && !f.sourceInvoiceId).map(f => ({ value: f.id, label: f.name }))}
+              placeholder="— ایجاد گله جدید —"
+              modalTitle="انتخاب گله"
+            />
+          </Field>
+        )}
         <Grid2>
           <Field label="نوع پرنده" required>
             <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />

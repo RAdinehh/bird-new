@@ -290,6 +290,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
     if (!inv2) return m;
     for (const it of inv2.items || []) {
       if (!it.birdId) continue;
+      if (it.existingFlockId) continue; // 🆕 اتصال دستی
       const cat = it.category || inv2.category;
       if (!BIRD_CATS.includes(cat)) continue;
       const k = keyOf(cat, it);
@@ -300,6 +301,26 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
     }
     return m;
   };
+
+  // 🆕 لینک کردن به گله‌های موجود بدون تغییر در تعداد
+  if (inv.type === 'purchase') {
+    for (let i = 0; i < outItems.length; i++) {
+      const it = outItems[i];
+      if (it.existingFlockId) {
+        const f = flk.flocks.find(x => x.id === it.existingFlockId);
+        if (f) {
+          const patch: any = { sourceInvoiceId: inv.id };
+          if (it.unitPrice) patch.purchasePrice = it.unitPrice;
+          const transport = it.transportCost ?? it.shipping;
+          if (transport) patch.deliveryCost = transport;
+          const effDate = (inv as any).deliveryDate || inv.date || '';
+          if (effDate) patch.purchaseDate = effDate;
+          flk.update(it.existingFlockId, patch);
+          it.flockId = it.existingFlockId;
+        }
+      }
+    }
+  }
 
   const prevMap = buildMap(prev);
   const newMap = buildMap(inv);
