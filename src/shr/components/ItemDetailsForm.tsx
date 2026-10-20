@@ -4,6 +4,7 @@ import { useBrd } from '../../mod/brd/store';
 import { useHal } from '../../mod/hal/store';
 import { useFlk } from '../../mod/flk/store';
 import { useWhs } from '../../mod/whs/store';
+import { useInc } from '../../mod/inc/store';
 import { parseFaNum, toEn } from '../utils/fa';
 import { differenceInCalendarDays, parse as parseJ, format as formatJ, subDays, isValid } from 'date-fns-jalali';
 import DatePicker from './DatePicker';
@@ -52,6 +53,7 @@ export interface ItemDetailFormData {
   costType?: string;
   stockItemId?: string;
   existingFlockId?: string;
+  deviceId?: string;
 }
 
 interface Props {
