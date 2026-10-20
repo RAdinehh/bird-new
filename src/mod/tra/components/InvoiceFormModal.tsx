@@ -113,15 +113,18 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [advancedOpenId, setAdvancedOpenId] = useState<string | null>(null);
 
-  // باز کردن خودکار آخرین قلمی که اضافه می‌شود
+  // باز کردن خودکار قلم جدید به همراه تنظیمات تکمیلی آن
+  const prevLengthRef = React.useRef(form.items.length);
   useEffect(() => {
-    if (form.items.length > 0) {
+    if (form.items.length > prevLengthRef.current) {
+      // یک قلم جدید اضافه شده است
       const lastItem = form.items[form.items.length - 1];
-      if (lastItem && !lastItem.quantity && !lastItem.unitPrice) {
+      if (lastItem) {
         setExpandedItemId(lastItem.id);
-        setAdvancedOpenId(lastItem.id);
+        setAdvancedOpenId(lastItem.id); // باز کردن خودکار تنظیمات (مثل تخم نطفه‌دار)
       }
     }
+    prevLengthRef.current = form.items.length;
   }, [form.items.length]);
 
   return (
@@ -280,19 +283,39 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     </Field>
                   </Grid2>
 
-                  <Grid3>
+                  <Grid2>
                     <Field label="تعداد">
                       <NumField value={toFa(String(it.quantity))} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                     </Field>
                     <Field label="قیمت واحد">
                       <MoneyField placeholder={getPricePlaceholder(cat)} value={toFa(String(it.unitPrice))} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                     </Field>
-                    <Field label="جمع">
+                  </Grid2>
+
+                  <Grid2>
+                    <Field label="نام فروشنده این قلم" hint="خالی = فروشنده اصلی فاکتور">
+                      <SmartSelect
+                        value={it.itemPartyId || ''}
+                        onChange={v => updateItem(it.id, { itemPartyId: v })}
+                        options={parties.map(c => ({ value: c.id, label: c.name }))}
+                        placeholder="— انتخاب کنید —" modalTitle="انتخاب فروشنده" autoThreshold={6}
+                      />
+                    </Field>
+                    <Field label="هزینه حمل این قلم">
+                      <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
+                    </Field>
+                  </Grid2>
+
+                  <Grid2>
+                    <Field label="تخفیف این قلم">
+                      <MoneyField placeholder="مثلاً — ۱۰٬۰۰۰" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                    </Field>
+                    <Field label="مبلغ کل این قلم">
                       <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'ltr' }}>
-                        {toFa(it.total.toLocaleString('fa-IR'))}
+                        {toFa(it.total.toLocaleString('fa-IR'))} ت
                       </div>
                     </Field>
-                  </Grid3>
+                  </Grid2>
 
                   <button 
                     type="button"
@@ -316,16 +339,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                         invoiceDate={form.date}
                         updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
                         isPurchase={true}
-                        sellerSlot={form.isMixed ? (
-                          <Field label="فروشنده این قلم" hint="خالی = فروشنده اصلی">
-                            <SmartSelect
-                              value={it.itemPartyId || ''}
-                              onChange={v => updateItem(it.id, { itemPartyId: v })}
-                              options={parties.map(c => ({ value: c.id, label: c.name }))}
-                              placeholder="— همان اصلی —" modalTitle="انتخاب فروشنده" autoThreshold={6}
-                            />
-                          </Field>
-                        ) : undefined}
                       />
                     </div>
                   )}
