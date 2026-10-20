@@ -515,10 +515,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                         <div style={{ marginTop: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
                           <Grid2>
                             <Field label="نوع پرداخت">
-                              <Select value={p.type || 'regular'} onChange={e => updatePayment(p.id, { type: e.target.value as 'regular' | 'advance' | 'refund' | 'settlement' })}>
+                              <Select value={p.type || 'regular'} onChange={e => updatePayment(p.id, { type: e.target.value as 'regular' | 'refund' })}>
                                 <option value="regular">💵 پرداخت عادی</option>
-                                <option value="advance">📌 پیش‌پرداخت</option>
-                                <option value="settlement">✅ تسویه قسط</option>
+                                
+                                
                                 <option value="refund">↩️ عودت وجه</option>
                               </Select>
                             </Field>
