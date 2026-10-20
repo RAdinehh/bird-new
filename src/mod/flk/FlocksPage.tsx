@@ -391,6 +391,7 @@ export default function FlocksPage() {
                       quantity: _qty,
                       unitPrice: _unitPrice,
                       total: _qty * _unitPrice,
+                      shipping: _delivery,
                     }],
                     shipping: _delivery,
                     total: _qty * _unitPrice + _delivery,
@@ -401,7 +402,13 @@ export default function FlocksPage() {
                     notes: 'خودکار از گله دستی «' + form.name + '»' + (_other > 0 ? ' · سایر هزینه‌ها: ' + toFa(_other.toLocaleString('fa-IR')) + ' ت' : ''),
                   } as any);
                   if (invId) {
-                    useFlk.getState().update(saveResult.id, { sourceInvoiceId: invId });
+                    // 🆕 Fix double-count: cascade گله رو از قبل با _qty ساخته بود،
+                    // applyInvoiceFlocks دوباره += delta زده → reset به مقدار اصلی
+                    useFlk.getState().update(saveResult.id, {
+                      sourceInvoiceId: invId,
+                      initialCount: _qty,
+                      currentCount: _qty,
+                    });
                     showToast('فاکتور خرید خودکار ساخته شد', 'success');
                   }
                 } catch (e) {
