@@ -111,7 +111,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   } = props;
 
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
-  const [advancedOpenId, setAdvancedOpenId] = useState<string | null>(null);
 
   // باز کردن خودکار قلم جدید به همراه تنظیمات تکمیلی آن
   const prevLengthRef = React.useRef(form.items.length);
@@ -121,7 +120,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       const lastItem = form.items[form.items.length - 1];
       if (lastItem) {
         setExpandedItemId(lastItem.id);
-        setAdvancedOpenId(lastItem.id); // باز کردن خودکار تنظیمات (مثل تخم نطفه‌دار)
       }
     }
     prevLengthRef.current = form.items.length;
@@ -206,7 +204,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         
         {form.items.map((it, idx) => {
           const isExpanded = expandedItemId === it.id;
-          const isAdvancedOpen = advancedOpenId === it.id;
           const cat = it.category || form.category;
           
           return (
@@ -223,7 +220,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               {/* هدر قلم */}
               <div 
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: isExpanded ? 'default' : 'pointer' }}
-                onClick={() => !isExpanded && setExpandedItemId(it.id)}
+                onClick={() => setExpandedItemId(isExpanded ? null : it.id)}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>
@@ -311,21 +308,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     </Field>
                   </Grid2>
 
-                  <button 
-                    type="button"
-                    onClick={() => setAdvancedOpenId(isAdvancedOpen ? null : it.id)}
-                    style={{ 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, 
-                      fontSize: 'var(--fs-xs)', color: 'var(--muted)', background: 'var(--bg)', 
-                      border: '1px dashed var(--border)', cursor: 'pointer', padding: 8, 
-                      fontFamily: 'inherit', fontWeight: 600, borderRadius: 'var(--r-sm)', marginTop: 4 
-                    }}
-                  >
-                    <span>{isAdvancedOpen ? 'بستن جزئیات' : 'جزئیات بیشتر (تاریخ هچ، سن، جنسیت...)'}</span>
-                    <span style={{ transition: 'transform .2s', transform: isAdvancedOpen ? 'rotate(180deg)' : 'none' }}>▼</span>
-                  </button>
-
-                  {isAdvancedOpen && (
+                  {isExpanded && (
                     <div style={{ paddingTop: 'var(--sp-2)' }}>
                       <ItemDetailsForm
                         category={cat}
@@ -346,7 +329,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           type="button" 
           onClick={addItem} 
           style={{
-            width: '100%', height: 46, background: 'var(--accent-soft)', 
+            width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'var(--accent-soft)', 
             border: '1.5px dashed var(--accent-border)', borderRadius: 'var(--r-md)', 
             color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', 
             fontWeight: 700, cursor: 'pointer', display: 'flex', 
@@ -359,7 +342,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       </div>
 
       {/* ====== پرداخت و تسویه (ادغام) ====== */}
-      {total > 0 && (
+      {form.items.length > 0 && (
         <>
           <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت و تسویه</SectionTitle>
           <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
@@ -562,7 +545,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               type="button" 
               onClick={addPayment} 
               style={{
-                width: '100%', height: 46, background: 'var(--accent-soft)', 
+                width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'var(--accent-soft)', 
                 border: '1.5px dashed var(--accent-border)', borderRadius: 'var(--r-md)', 
                 color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', 
                 fontWeight: 700, cursor: 'pointer', display: 'flex', 
