@@ -162,7 +162,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       >
         <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
         <Grid2>
-          <Field label="تاریخ" required error={showError('date')} onTouch={() => markTouched('date')}>
+          <Field label="تاریخ فاکتور" required error={showError('date')} onTouch={() => markTouched('date')}>
             <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
           </Field>
           <Field label="دسته">
@@ -425,7 +425,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               <option value="custom">✏️ توافقی</option>
             </Select>
           </Field>
-          {form.paymentTerms !== 'cash' && (
+          {form.paymentTerms !== 'cash' && form.paymentTerms !== 'custom' && (
             <Field label="سرسید (خودکار)">
               <Input placeholder="خودکار محاسبه می‌شود" readOnly value={toFa(form.dueDate)} style={{ textAlign: 'right' }} />
             </Field>
@@ -443,7 +443,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               💰 تخفیف نقدی (اختیاری)
             </div>
             <Grid2>
-              <Field label="درصد تخفیف" hint="اگر زودتر پرداخت شود">
+              <Field label="تخفیف نقدی (٪)" hint="اگر زودتر پرداخت شود">
                 <NumField placeholder="مثلاً — ۲" value={form.cashDiscountPct || ''} onChange={e => setForm({...form, cashDiscountPct: e.target.value})} unit="٪" min={0} max={100} />
               </Field>
               <Field label="مهلت (روز)" hint="چند روز از تاریخ فاکتور">
@@ -570,7 +570,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   )}
                 </div>
               </Field>
-              <Field label="تاریخ">
+              <Field label="تاریخ پرداخت">
                 <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })}  autoToday />
               </Field>
             </Grid2>
@@ -603,7 +603,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   </Select>
                 </Field>
                 {p.status === 'cleared' && (
-                  <Field label="تاریخ نقد"><DatePicker value={p.clearedDate || ''} onChange={v => updatePayment(p.id, { clearedDate: v })}  autoToday /></Field>
+                  <Field label="تاریخ نقد شدن"><DatePicker value={p.clearedDate || ''} onChange={v => updatePayment(p.id, { clearedDate: v })}  autoToday /></Field>
                 )}
               </>
             )}
