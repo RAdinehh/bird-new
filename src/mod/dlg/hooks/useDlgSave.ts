@@ -240,10 +240,10 @@ export function useDlgSave(params: UseDlgSaveParams) {
       recN('dlg.waterAmount', num(form.waterAmount));
       recN('dlg.waterFillCount', num(form.waterFillCount));
       recN('dlg.waterFillVolume', num(form.waterFillVolume));
-      recN('dlg.temperature', num(form.temperature));
+      recN('dlg.temperature', typeof data.temperature === 'number' ? data.temperature : null);
       recN('dlg.temperatureMin', num(form.temperatureMin));
       recN('dlg.temperatureMax', num(form.temperatureMax));
-      recN('dlg.humidity', num(form.humidity));
+      recN('dlg.humidity', typeof data.humidity === 'number' ? data.humidity : null);
       recN('dlg.deathsCount', Number(data.deathsCount) || null);
       recN('dlg.eatingEggs', int(form.eatingEggs));
       recN('dlg.fertileEggs', int(form.fertileEggs));
