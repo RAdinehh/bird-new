@@ -360,9 +360,30 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         </button>
       </div>
 
-      {/* ====== شرایط پرداخت ====== */}
-      <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> شرایط پرداخت</SectionTitle>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+      {/* ====== پرداخت و تسویه (ادغام) ====== */}
+      {total > 0 && (
+        <>
+          <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت و تسویه</SectionTitle>
+          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+            
+            {/* خلاصه مالی */}
+            <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-2) var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
+                <span style={{ fontWeight: 700 }}>{toFa(total.toLocaleString('fa-IR'))} ت</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                <span style={{ color: 'var(--muted)' }}>پرداخت‌شده:</span>
+                <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(paid.toLocaleString('fa-IR'))} ت</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                <span style={{ color: 'var(--muted)' }}>مانده نهایی:</span>
+                <span style={{ fontWeight: 700, color: rem > 0.5 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>شرایط پرداخت</div>
         {form.isPreorder && (
           <Grid2>
             <Field label="نوع پیش‌پرداخت">
@@ -456,29 +477,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </div>
           );
         })()}
-      </div>
-
-      {/* ====== پرداخت‌ها ====== */}
-      {total > 0 && (
-        <>
-          <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت‌ها و تسویه</SectionTitle>
-          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
-            
-            {/* خلاصه مالی */}
-            <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-2) var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-                <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
-                <span style={{ fontWeight: 700 }}>{toFa(total.toLocaleString('fa-IR'))} ت</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-                <span style={{ color: 'var(--muted)' }}>پرداخت‌شده:</span>
-                <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(paid.toLocaleString('fa-IR'))} ت</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-                <span style={{ color: 'var(--muted)' }}>مانده نهایی:</span>
-                <span style={{ fontWeight: 700, color: rem > 0.5 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
-              </div>
             </div>
+
+            <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>پرداخت‌های ثبت‌شده</div>
 
             {form.payments.map(p => (
               <div key={p.id} style={{ padding: 'var(--sp-3)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', position: 'relative', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
@@ -561,6 +563,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             <button type="button" onClick={addPayment} style={{ width: '100%', height: 42, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)' }}>+</span> افزودن پرداخت دیگر
             </button>
+            </div>
           </div>
         </>
       )}
