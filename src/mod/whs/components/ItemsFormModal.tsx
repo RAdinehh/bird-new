@@ -5,6 +5,7 @@ import { Btn, BtnRow, ErrorBox, Field, Grid2, Grid3, Input, Modal, MoneyField, N
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { toFa } from '../../../shr/utils/fa';
+import { FieldHint } from '../../../shr/intelligence';
 import { CATEGORY_DEFAULTS, UNIT_LABEL, CATEGORY_ICON, CATEGORY_LABEL, type ItemUnit, type ItemCategory } from '../store';
 
 export interface ItemsFormModalProps {
@@ -136,9 +137,12 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
             {(extras.needsWithdrawal || extras.needsStorage) && (
               <Grid2>
                 {extras.needsWithdrawal && (
-                  <Field label="دوره منع مصرف">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                    <Field label="دوره منع مصرف">
                     <NumField placeholder="مثلاً — ۳" value={form.withdrawalDays} onChange={e => setForm({ ...form, withdrawalDays: e.target.value })} unit="روز" min={0} />
                   </Field>
+                    <FieldHint fieldPath="whs.withdrawalDays" value={form.withdrawalDays} />
+                  </div>
                 )}
                 {extras.needsStorage && (
                   <Field label="نگهداری">
@@ -164,9 +168,12 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                       <option value="spray">🌫 اسپری</option>
                     </Select>
                   </Field>
-                  <Field label="دوز هر پرنده" hint="اختیاری">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                    <Field label="دوز هر پرنده" hint="اختیاری">
                     <NumField placeholder="۰.۵" value={form.dosePerBird} onChange={e => setForm({ ...form, dosePerBird: e.target.value })} unit="ml" min={0} />
                   </Field>
+                    <FieldHint fieldPath="whs.dosePerBird" value={form.dosePerBird} />
+                  </div>
                   <Field label="تاریخ تولید" hint="اختیاری">
                     <DatePicker value={form.productionDate} onChange={v => setForm({ ...form, productionDate: v })} />
                   </Field>
@@ -193,36 +200,60 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
               </Field>
             </Grid2>
             <Grid2>
-              <Field label="درصد پروتئین">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                <Field label="درصد پروتئین">
                 <NumField value={form.protein || ''} onChange={e => setForm({ ...form, protein: e.target.value })} unit="٪" min={0} max={100} />
               </Field>
-              <Field label="انرژی (Kcal)">
+                <FieldHint fieldPath="feed.protein" value={form.protein} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                <Field label="انرژی (Kcal)">
                 <NumField value={form.energy || ''} onChange={e => setForm({ ...form, energy: e.target.value })} unit="Kcal" min={0} />
               </Field>
+                <FieldHint fieldPath="feed.energy" value={form.energy} />
+              </div>
             </Grid2>
             <Grid2>
-              <Field label="چربی">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                <Field label="چربی">
                 <NumField value={form.fat || ''} onChange={e => setForm({ ...form, fat: e.target.value })} unit="٪" min={0} />
               </Field>
-              <Field label="فیبر">
+                <FieldHint fieldPath="feed.fat" value={form.fat} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                <Field label="فیبر">
                 <NumField value={form.fiber || ''} onChange={e => setForm({ ...form, fiber: e.target.value })} unit="٪" min={0} />
               </Field>
+                <FieldHint fieldPath="feed.fiber" value={form.fiber} />
+              </div>
             </Grid2>
             <Grid2>
-              <Field label="کلسیم">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                <Field label="کلسیم">
                 <NumField value={form.calcium || ''} onChange={e => setForm({ ...form, calcium: e.target.value })} unit="٪" min={0} />
               </Field>
-              <Field label="فسفر">
+                <FieldHint fieldPath="feed.calcium" value={form.calcium} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                <Field label="فسفر">
                 <NumField value={form.phosphorus || ''} onChange={e => setForm({ ...form, phosphorus: e.target.value })} unit="٪" min={0} />
               </Field>
+                <FieldHint fieldPath="feed.phosphorus" value={form.phosphorus} />
+              </div>
             </Grid2>
             <Grid2>
-              <Field label="متیونین">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                <Field label="متیونین">
                 <NumField value={form.methionine || ''} onChange={e => setForm({ ...form, methionine: e.target.value })} unit="٪" min={0} />
               </Field>
-              <Field label="لیزین">
+                <FieldHint fieldPath="feed.methionine" value={form.methionine} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                <Field label="لیزین">
                 <NumField value={form.lysine || ''} onChange={e => setForm({ ...form, lysine: e.target.value })} unit="٪" min={0} />
               </Field>
+                <FieldHint fieldPath="feed.lysine" value={form.lysine} />
+              </div>
             </Grid2>
           </>
         )}
