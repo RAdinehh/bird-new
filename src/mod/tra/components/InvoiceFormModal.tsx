@@ -222,8 +222,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           
           return (
             <div key={it.id} style={{ 
-              background: 'var(--card-solid)', 
-              border: isExpanded ? '1.5px solid var(--accent)' : '1px solid var(--border)', 
+              background: 'transparent', 
+              border: isExpanded ? '1.5px solid var(--accent)' : 'none', 
               borderRadius: 'var(--r-md)', 
               padding: 'var(--sp-3)', 
               display: 'flex', 
@@ -436,8 +436,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         )}
         
         <Grid2>
-          <Field label="نوع پرداخت" required>
-            <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
+          <Field label="شرایط پرداخت" required>
+          <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
               <option value="cash">💵 نقدی</option>
               <option value="installment">📅 قسطی</option>
               <option value="custom">✏️ توافقی</option>
