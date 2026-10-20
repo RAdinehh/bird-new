@@ -231,7 +231,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
 
     // 🆕 ثبت تاریخچه برای Intelligence (silent — بدون تغییر UX)
     try {
-      const ctxIntel = { flockSize: flockAliveCount, currentCount: flockAliveCount };
+      const ctxIntel = { flockSize: flockAliveCount, currentCount: flockAliveCount, femaleCount: selectedFlock?.femaleCount ?? undefined };
       const recN = (p: string, v: number | null) => {
         if (v !== null && Number.isFinite(v) && v > 0) recordHistory(p, v, ctxIntel);
       };
@@ -249,6 +249,10 @@ export function useDlgSave(params: UseDlgSaveParams) {
       recN('dlg.fertileEggs', int(form.fertileEggs));
       recN('dlg.brokenEggs', int(form.brokenEggs));
       recN('dlg.otherEggs', int(form.otherEggs));
+      // 🆕 sync با egg.* (cross_field lte_female — تشخیص «تخم بیشتر از مرغ»)
+      recN('egg.eatingCount', int(form.eatingEggs));
+      recN('egg.fertileCount', int(form.fertileEggs));
+      recN('egg.brokenCount', int(form.brokenEggs));
     } catch { /* silent */ }
 
     setOpen(false);
