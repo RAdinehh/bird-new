@@ -177,23 +177,28 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           📦 تحویل گرفتم (ایجاد گله و موجودی)
         </Btn>
       )}
-      {inv.workflowStatus !== 'paid' && onEdit && (
-        <Btn
-          size="sm" variant="outline" full
-          onClick={onEdit}
-          style={{ marginBottom: 8 }}
-        >
-          ✏️ ویرایش فاکتور
-        </Btn>
-      )}
-      {nextWorkflowStatus(inv.workflowStatus) && (
-        <Btn
-          size="sm" variant="primary" full
-          onClick={onTransferClick}
-        >
-          انتقال به {WORKFLOW_LABEL[nextWorkflowStatus(inv.workflowStatus)!]}
-        </Btn>
-      )}
+      {(inv.workflowStatus !== 'paid' && onEdit) || nextWorkflowStatus(inv.workflowStatus) ? (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+          {inv.workflowStatus !== 'paid' && onEdit && (
+            <Btn
+              size="sm" variant="outline"
+              onClick={onEdit}
+              style={{ flex: 1 }}
+            >
+              ✏️ ویرایش فاکتور
+            </Btn>
+          )}
+          {nextWorkflowStatus(inv.workflowStatus) && (
+            <Btn
+              size="sm" variant="primary"
+              onClick={onTransferClick}
+              style={{ flex: 1 }}
+            >
+              انتقال به {WORKFLOW_LABEL[nextWorkflowStatus(inv.workflowStatus)!]}
+            </Btn>
+          )}
+        </div>
+      ) : null}
 
       {inv.workflowStatus === 'paid' && onReopen && (
         <Btn
