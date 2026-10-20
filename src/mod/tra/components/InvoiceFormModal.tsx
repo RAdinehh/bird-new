@@ -313,7 +313,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                         item={it}
                         invoiceDate={form.date}
                         updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
-                        isPurchase={true}
+                        isPurchase={isPurchase}
                       />
                     </div>
                   )}
