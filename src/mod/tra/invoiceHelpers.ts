@@ -116,7 +116,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
 
       const bird = brd.birds.find((b: any) => b.id === it.birdId);
       const days = getIncubationDays(bird?.birdKind);
-      const entryDate = inv.deliveryDate || (it as any).eggDate || inv.date || '';
+      const entryDate = inv.deliveryDate || it.eggDate || inv.date || '';
       const expectedHatchDate = addJalaliDays(entryDate, days);
 
       const marker = `[K:${keyOf(it)}]`;
@@ -321,7 +321,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
         patch.sourceInvoiceId = inv.id;
         patch.sourceCategory = ref.cat;
         if (it.unitPrice) patch.purchasePrice = it.unitPrice;
-        const transport = (it as any).transportCost ?? it.shipping;
+        const transport = it.transportCost ?? it.shipping;
         if (transport) patch.deliveryCost = transport;
         if (effectiveDate) patch.purchaseDate = effectiveDate;
       }
@@ -365,12 +365,12 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
            standard?.purposes?.includes('breeder') ? 'breeder' : 'layer');
 
         const newFlockId = flk.add({
-          name: (it as any).flockName || name,
+          name: it.flockName || name,
           type: inferredType,
           birdId: birdId,
           breedId: breedId,
-          hallId: (it as any).hallId || '',
-          zoneId: (it as any).zoneId || '',
+          hallId: it.hallId || '',
+          zoneId: it.zoneId || '',
           initialCount: delta,
           currentCount: delta,
           maleCount: it.maleCount ?? null,
@@ -379,19 +379,19 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           layingStartDay: biology?.layingStartDay ?? 0,
           endOfCycleDay: biology?.endOfCycleDay ?? null,
           vaccineScheduleId: '',
-          hatchDate: (it as any).hatchDate || computeHatchDate(effectiveDate, it.ageDays),
+          hatchDate: it.hatchDate || computeHatchDate(effectiveDate, it.ageDays),
           purchaseDate: effectiveDate,
           startDate: effectiveDate,
           source: 'purchase',
           purchasePrice: it.unitPrice || 0,
-          deliveryCost: typeof (it as any).transportCost === 'number' && (it as any).transportCost > 0 ? (it as any).transportCost : 0,
+          deliveryCost: typeof it.transportCost === 'number' && it.transportCost > 0 ? it.transportCost : 0,
           otherCosts: 0,
           status: 'active',
           notes: `از فاکتور ${inv.number || ''}`,
           sourceInvoiceId: inv.id,
           sourceCategory: ref.cat,
-          hatcheryBatchNo: (it as any).hatcheryBatchNo || undefined,
-          chickWeight: (it as any).chickWeight ?? null,
+          hatcheryBatchNo: it.hatcheryBatchNo || undefined,
+          chickWeight: it.chickWeight ?? null,
         });
 
         for (let i = 0; i < inv.items.length; i++) {
