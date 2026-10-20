@@ -16,10 +16,11 @@ interface Props {
   ms: MultiSelectState<Invoice>;
   onToggle: () => void;
   onTransferClick: () => void;
+  onReopen?: () => void;
   index: number;
 }
 
-export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, index }: Props) {
+export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, index }: Props) {
   const { updateInvoice } = useTra();
   const rem2 = remaining(inv);
   const st = rem2 === 0 ? 'paid' : paidSum(inv.payments || []) > 0 ? 'partial' : 'unpaid';
@@ -181,6 +182,15 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           onClick={onTransferClick}
         >
           انتقال به {WORKFLOW_LABEL[nextWorkflowStatus(inv.workflowStatus)!]}
+        </Btn>
+      )}
+
+      {inv.workflowStatus === 'paid' && onReopen && (
+        <Btn
+          size="sm" variant="primary" full
+          onClick={onReopen}
+        >
+          🔓 بازگشایی برای ویرایش
         </Btn>
       )}
     </ExpandableCard>

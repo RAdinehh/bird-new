@@ -36,7 +36,7 @@ import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
   const isPurchase = kind === 'purchase';
-  const { invoices, addInvoice, updateInvoice, deleteInvoice } = useTra();
+  const { invoices, addInvoice, updateInvoice, deleteInvoice, reopenInvoice} = useTra();
   const { contacts } = useCtc();
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
@@ -235,7 +235,20 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     setTransferModal(null); setTransferNote(''); setTransferDate('');
   };
 
-  return (
+  
+  const handleReopen = async (inv: Invoice) => {
+    const ok = await showConfirmAsync(
+      'بازگشایی فاکتور',
+      'این فاکتور پرداخت شده است.\n\nبا بازگشایی:\n• وضعیت به «تایید شده» برمی‌گردد\n• می‌توانید فیلدها را ویرایش کنید\n• پس از ویرایش باید دوباره پرداخت ثبت کنید\n\nادامه می‌دهید؟',
+      { danger: true }
+    );
+    if (!ok) return;
+    reopenInvoice(inv.id);
+    try { logAction('update', 'tra', 'بازگشایی فاکتور ' + (inv.number || inv.id)); } catch {}
+    setTimeout(() => openEdit(inv), 100);
+  };
+
+return (
     <PageContainer bottomPad={100}>
       {undoData && (
         <UndoBar
@@ -305,6 +318,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
                 ms={ms}
                 onToggle={() => setExpandedId(isOpen ? null : inv.id)}
                 onTransferClick={() => setTransferModal({ id: inv.id, to: nextWorkflowStatus(inv.workflowStatus)! })}
+                onReopen={inv.workflowStatus === 'paid' ? () => handleReopen(inv) : undefined}
                 index={i}
               />
             );
