@@ -222,8 +222,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           
           return (
             <div key={it.id} style={{ 
-              background: 'transparent', 
-              border: isExpanded ? '1.5px solid var(--accent)' : 'none', 
+              background: isExpanded ? 'var(--accent-soft)' : 'transparent',
+              border: 'none', 
               borderRadius: 'var(--r-md)', 
               padding: 'var(--sp-3)', 
               display: 'flex', 
@@ -390,7 +390,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       {(total > 0 || showPaymentSection) && form.items.length > 0 && (
         <>
           <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت و تسویه</SectionTitle>
-          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-2)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
             
             {/* خلاصه مالی */}{total > 0 && (
             <div style={{ padding: 'var(--sp-2) 0', borderBottom: '1px dashed var(--border)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -458,8 +458,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         {form.paymentTerms === 'cash' && (
           <div style={{
             padding: '8px 12px',
-            background: 'var(--bg)',
-            borderRadius: 'var(--r-sm)',
             fontSize: 'var(--fs-xs)',
             color: 'var(--muted)',
             textAlign: 'center',
