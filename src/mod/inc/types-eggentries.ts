@@ -22,6 +22,8 @@ export interface DraftRow {
   dealWithdrawnReason: string;
   sampleWeightInitial: string;
   sampleWeightCurrent: string;
+  /** 🆕 منبع: فاکتور خرید */
+  sourceInvoiceId?: string;
 }
 
 export const makeRow = (): DraftRow => ({
@@ -43,4 +45,5 @@ export const makeRow = (): DraftRow => ({
   dealWithdrawnReason: '',
   sampleWeightInitial: '',
   sampleWeightCurrent: '',
+  sourceInvoiceId: '',
 });

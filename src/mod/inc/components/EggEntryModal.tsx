@@ -12,7 +12,7 @@ import {
 import DatePicker from '../../../shr/components/DatePicker';
 import TimePicker from '../../../shr/components/TimePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import { DEAL_LABEL, type DealType } from '../store';
+import { DEAL_LABEL, type DealType, useInc } from '../store';
 import type { DraftRow } from '../types-eggentries';
 import { flockReadyForEggs } from '../api/eggEntriesCalc';
 import { FieldHint } from '../../../shr/intelligence';
@@ -60,6 +60,13 @@ export default function EggEntryModal(props: EggEntryModalProps) {
     breedsForBird, liveUsage,
     setD, addRowToList, editRow, removeRow, saveAll, resetCurrentRow,
   } = props;
+
+  // 🆕 چک: آیا این ردیف از فاکتور خرید اومده؟
+  const sourceLinked = useInc((s) => {
+    if (!editingRowId) return false;
+    const entry = s.eggEntries.find((e: any) => e.id === editingRowId);
+    return !!entry?.sourceInvoiceId;
+  });
 
   return (
     <Modal
@@ -329,8 +336,8 @@ export default function EggEntryModal(props: EggEntryModalProps) {
           </Grid2>
           <Grid2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-  <Field label="تعداد تخم" required>
-                <NumField value={currentRow.count} onChange={e => setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} autoClamp />
+  <Field label={sourceLinked ? <span>تعداد تخم <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تعداد تخم'} required>
+                <NumField value={currentRow.count} onChange={e => !sourceLinked && setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} disabled={sourceLinked} autoClamp />
               </Field>
               <FieldHint
                 fieldPath="inc.count"
