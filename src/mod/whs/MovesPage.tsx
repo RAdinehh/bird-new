@@ -8,6 +8,7 @@ import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { recordHistory } from '../../shr/intelligence';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
@@ -184,6 +185,13 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
     };
 
     addMovement(data);
+    // 🆕 ثبت تاریخچه برای Intelligence
+    try {
+      const qty = num(form.quantity);
+      if (selectedItem && qty !== null && Number.isFinite(qty) && qty > 0) {
+        recordHistory(`whs.qty_${selectedItem.unit}`, qty, { itemId: form.itemId });
+      }
+    } catch { /* silent */ }
     setOpen(false);
   };
 
