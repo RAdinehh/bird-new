@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { AnomalyHint, useAnomalyHint, analyzeAnomaly } from '../../../shr/intelligence';
 import {
-  Btn, BtnRow, Field, Grid2, Input, Modal, MoneyField, NumField,
+  Btn, BtnRow, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField,
   SectionTitle, Select, Textarea, ErrorBox,
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
