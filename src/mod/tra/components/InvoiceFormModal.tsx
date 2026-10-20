@@ -375,9 +375,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           onClick={() => setShowPaymentSection(true)}
           style={{
             width: '100%', height: 38, marginBottom: 'var(--sp-4)',
-            background: 'var(--card-solid)', border: '1px solid var(--border)',
-            borderRadius: 'var(--r-md)', color: 'var(--muted)',
-            fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600,
+            background: 'var(--accent-soft)', border: '1.5px dashed var(--accent-border)',
+            borderRadius: 'var(--r-md)', color: 'var(--accent)',
+            fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
             cursor: 'pointer', display: 'flex', alignItems: 'center',
             justifyContent: 'center', gap: 6
           }}
@@ -390,7 +390,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       {(total > 0 || showPaymentSection) && form.items.length > 0 && (
         <>
           <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت و تسویه</SectionTitle>
-          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-2)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginBottom: 'var(--sp-4)' }}>
             
             {/* خلاصه مالی */}{total > 0 && (
             <div style={{ padding: 'var(--sp-2) 0', borderBottom: '1px dashed var(--border)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 4 }}>
