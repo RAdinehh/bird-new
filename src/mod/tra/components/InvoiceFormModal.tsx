@@ -228,7 +228,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)' }}>
       
       {form.items.length === 0 && (
-        <div style={{ textAlign: 'center', padding: 'var(--sp-4)', color: 'var(--muted)', fontSize: 'var(--fs-sm)', background: 'var(--card)', borderRadius: 'var(--r-sm)', marginBottom: 'var(--sp-2)' }}>
+        <div style={{ textAlign: 'center', padding: 'var(--sp-4) 0', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
           هنوز کالایی اضافه نکرده‌اید. روی دکمه زیر بزنید.
         </div>
       )}
@@ -412,8 +412,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       <SectionTitle>
         <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> شرایط پرداخت
       </SectionTitle>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', background: 'var(--card-solid)', marginBottom: 'var(--sp-4)' }}>
-        <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', background: 'var(--card-solid)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', paddingBottom: 'var(--sp-2)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', paddingBottom: 'var(--sp-2)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {form.isPreorder && (
             <Grid2>
@@ -515,7 +515,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       <SectionTitle>
         <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت‌ها و تسویه
       </SectionTitle>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', background: 'var(--card-solid)', marginBottom: 'var(--sp-4)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', paddingBottom: 'var(--sp-2)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           
           {/* خلاصه مالی */}
@@ -612,7 +612,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </div>
           ))}
 
-          <button type="button" onClick={addPayment} style={{ width: '100%', height: 42, boxSizing: 'border-box', padding: '0 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--sp-2)', background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', marginTop: 'var(--sp-2)' }}>
+          <button type="button" onClick={addPayment} style={{ width: '100%', height: 42, boxSizing: 'border-box', padding: '0 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--sp-2)', background: 'var(--btn-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', marginTop: 'var(--sp-2)' }}>
             <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)' }}>+</span> افزودن پرداخت دیگر
           </button>
         </div>
