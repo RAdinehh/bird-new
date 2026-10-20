@@ -59,7 +59,7 @@ interface Props {
 }
 
 const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
-  <div style={{ paddingTop: 12, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginBottom: 4 }}>
+  <div style={{ paddingTop: 12, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginBottom: 8 }}>
     {icon} {title}
   </div>
 );
@@ -153,7 +153,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         
         <Grid2>
           <Field label="تعداد کل (خریداری شده)" hint="از بخش اقلام بالا">
-            <Input disabled value={item.quantity || 0} unit="عدد" style={{ background: 'var(--input-bg)', color: 'var(--muted)' }} />
+            <Input disabled value={item.quantity || 0} unit="عدد" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
           </Field>
           <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
             <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => {

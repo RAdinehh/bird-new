@@ -1,7 +1,7 @@
 /**
- * InvoiceFormModal — فرم ثبت/ویرایش فاکتور
+ * InvoiceFormModal — فرم ثبت/ویرایش فاکتور (طراحی تمیز و استاندارد)
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
   Btn, BtnRow, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField,
@@ -113,6 +113,17 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [advancedOpenId, setAdvancedOpenId] = useState<string | null>(null);
 
+  // باز کردن خودکار آخرین قلمی که اضافه می‌شود
+  useEffect(() => {
+    if (form.items.length > 0) {
+      const lastItem = form.items[form.items.length - 1];
+      if (lastItem && !lastItem.quantity && !lastItem.unitPrice) {
+        setExpandedItemId(lastItem.id);
+        setAdvancedOpenId(lastItem.id);
+      }
+    }
+  }, [form.items.length]);
+
   return (
     <Modal
       open={open} onClose={() => setOpen(false)}
@@ -184,145 +195,163 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
       {/* ====== اقلام ====== */}
       <SectionTitle>
-        <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت
+        <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام {total > 0 && `— جمع: ${toFa(total.toLocaleString('fa-IR'))} ت`}
       </SectionTitle>
       
-      {form.items.length === 0 && (
-        <div style={{ textAlign: 'center', padding: 'var(--sp-3)', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
-          هنوز کالایی اضافه نکرده‌اید. روی دکمه زیر بزنید.
-        </div>
-      )}
-      
-      {form.items.map((it, idx) => {
-        const isExpanded = expandedItemId === it.id;
-        const isAdvancedOpen = advancedOpenId === it.id;
-        const cat = it.category || form.category;
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}>
+        {form.items.length === 0 && (
+          <div style={{ textAlign: 'center', padding: 'var(--sp-4) var(--sp-2)', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
+            هنوز کالایی اضافه نکرده‌اید. روی دکمه زیر بزنید.
+          </div>
+        )}
         
-        return (
-          <div key={it.id} style={{ 
-            background: 'var(--card-solid)', 
-            border: isExpanded ? '1.5px solid var(--accent)' : '1px solid var(--border)', 
-            borderRadius: 'var(--r-md)', 
-            padding: 'var(--sp-3)', 
-            boxShadow: isExpanded ? '0 2px 8px rgba(22,163,74,.1)' : 'var(--elev-1)', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: 'var(--sp-3)',
-            transition: 'all 0.2s',
-            marginBottom: 'var(--sp-2)'
-          }}>
-            {/* هدر قلم */}
-            <div 
-              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: isExpanded ? 'default' : 'pointer' }}
-              onClick={() => !isExpanded && setExpandedItemId(it.id)}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: 'var(--text)' }}>
-                  {it.description || (cat === 'chick' ? 'جوجه یک‌روزه' : 'قلم جدید')}
-                </span>
-                {!isExpanded && (
+        {form.items.map((it, idx) => {
+          const isExpanded = expandedItemId === it.id;
+          const isAdvancedOpen = advancedOpenId === it.id;
+          const cat = it.category || form.category;
+          
+          return (
+            <div key={it.id} style={{ 
+              background: 'var(--card-solid)', 
+              border: isExpanded ? '1.5px solid var(--accent)' : '1px solid var(--border)', 
+              borderRadius: 'var(--r-md)', 
+              padding: 'var(--sp-3)', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 'var(--sp-3)',
+              transition: 'all 0.2s',
+            }}>
+              {/* هدر قلم */}
+              <div 
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: isExpanded ? 'default' : 'pointer' }}
+                onClick={() => !isExpanded && setExpandedItemId(it.id)}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>
+                    {it.description || (cat === 'chick' ? 'جوجه یک‌روزه' : cat === 'egg' || cat === 'fertile_egg' ? 'تخم نطفه‌دار' : 'قلم جدید')}
+                  </span>
                   <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
                     {it.quantity > 0 || it.unitPrice > 0
                       ? `${toFa(it.quantity)} ${(UNIT_LABEL as any)[it.unit || 'pcs'] || 'عدد'} × ${toFa(it.unitPrice)} ت`
-                      : 'تکمیل نشده — برای ویرایش کلیک کنید'}
+                      : 'در حال ویرایش...'}
                   </span>
-                )}
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-1)' }}>
-                <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 800, color: 'var(--accent)', direction: 'ltr' }}>
-                  {toFa(it.total.toLocaleString('fa-IR'))} ت
-                </span>
-                {!isExpanded && (
+                </div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
+                  <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: it.total > 0 ? 'var(--accent)' : 'var(--muted)' }}>
+                    {toFa(it.total.toLocaleString('fa-IR'))} ت
+                  </span>
                   <button 
                     type="button" 
-                    onClick={(e) => { e.stopPropagation(); setExpandedItemId(it.id); }}
-                    style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 16 }}
+                    onClick={(e) => { e.stopPropagation(); removeItem(it.id); }} 
+                    style={{ 
+                      background: 'transparent', border: 'none', 
+                      color: 'var(--danger)', cursor: 'pointer', padding: 4, fontSize: 16, lineHeight: 1
+                    }}
+                    title="حذف قلم"
                   >
-                    ✏️
+                    ✕
                   </button>
-                )}
-                <button 
-                  type="button" 
-                  onClick={(e) => { e.stopPropagation(); removeItem(it.id); }} 
-                  style={{ 
-                    background: 'var(--danger-soft)', border: '1px solid var(--danger)', 
-                    color: 'var(--danger)', borderRadius: 'var(--r-sm)', width: 32, height: 32, 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                    cursor: 'pointer', fontSize: 11, fontWeight: 700 
-                  }}
-                >
-                  ✕
-                </button>
+                </div>
               </div>
-            </div>
 
-            {/* بدنه قلم */}
-            {isExpanded && (
-              <>
-                <Grid3>
-                  <Field label="تعداد">
-                    <NumField value={toFa(String(it.quantity))} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
-                  </Field>
-                  <Field label="قیمت واحد">
-                    <MoneyField placeholder={getPricePlaceholder(cat)} value={toFa(String(it.unitPrice))} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
-                  </Field>
-                  <Field label="جمع">
-                    <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'ltr' }}>
-                      {toFa(it.total.toLocaleString('fa-IR'))}
+              {/* بدنه قلم */}
+              {isExpanded && (
+                <div style={{ marginTop: 'var(--sp-1)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+                  
+                  <Grid2>
+                    <Field label="شرح">
+                      <Input placeholder={getDescriptionPlaceholder(cat)} value={it.description} onChange={e => updateItem(it.id, { description: e.target.value })} />
+                    </Field>
+                    <Field label="دستهٔ این قلم" hint="خالی = همان دستهٔ فاکتور">
+                      <Select value={it.category || ''} onChange={e => {
+                        const newCat = e.target.value;
+                        const targetCat = newCat || form.category;
+                        const newUnit = getUnitForCategory(targetCat);
+                        updateItem(it.id, { category: newCat || undefined, unit: newUnit });
+                      }}>
+                        <option value="">همان فاکتور</option>
+                        {(() => {
+                          const saleOnly = ['manure', 'broken', 'fertile_egg'];
+                          const list = saleOnly.includes(form.category) ? CATEGORIES.sale : CATEGORIES.purchase;
+                          return list.map(([k, v]) => <option key={k} value={k}>{v}</option>);
+                        })()}
+                      </Select>
+                    </Field>
+                  </Grid2>
+
+                  <Grid3>
+                    <Field label="تعداد">
+                      <NumField value={toFa(String(it.quantity))} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
+                    </Field>
+                    <Field label="قیمت واحد">
+                      <MoneyField placeholder={getPricePlaceholder(cat)} value={toFa(String(it.unitPrice))} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                    </Field>
+                    <Field label="جمع">
+                      <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'ltr' }}>
+                        {toFa(it.total.toLocaleString('fa-IR'))}
+                      </div>
+                    </Field>
+                  </Grid3>
+
+                  <button 
+                    type="button"
+                    onClick={() => setAdvancedOpenId(isAdvancedOpen ? null : it.id)}
+                    style={{ 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, 
+                      fontSize: 'var(--fs-xs)', color: 'var(--muted)', background: 'var(--bg)', 
+                      border: '1px dashed var(--border)', cursor: 'pointer', padding: 8, 
+                      fontFamily: 'inherit', fontWeight: 600, borderRadius: 'var(--r-sm)', marginTop: 4 
+                    }}
+                  >
+                    <span>{isAdvancedOpen ? 'بستن جزئیات' : 'جزئیات بیشتر (تاریخ هچ، سن، جنسیت...)'}</span>
+                    <span style={{ transition: 'transform .2s', transform: isAdvancedOpen ? 'rotate(180deg)' : 'none' }}>▼</span>
+                  </button>
+
+                  {isAdvancedOpen && (
+                    <div style={{ paddingTop: 'var(--sp-2)' }}>
+                      <ItemDetailsForm
+                        category={cat}
+                        item={it}
+                        invoiceDate={form.date}
+                        updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
+                        isPurchase={true}
+                        sellerSlot={form.isMixed ? (
+                          <Field label="فروشنده این قلم" hint="خالی = فروشنده اصلی">
+                            <SmartSelect
+                              value={it.itemPartyId || ''}
+                              onChange={v => updateItem(it.id, { itemPartyId: v })}
+                              options={parties.map(c => ({ value: c.id, label: c.name }))}
+                              placeholder="— همان اصلی —" modalTitle="انتخاب فروشنده" autoThreshold={6}
+                            />
+                          </Field>
+                        ) : undefined}
+                      />
                     </div>
-                  </Field>
-                </Grid3>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
 
-                <button 
-                  type="button"
-                  onClick={() => setAdvancedOpenId(isAdvancedOpen ? null : it.id)}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, fontSize: 'var(--fs-xs)', color: 'var(--accent)', background: 'var(--accent-soft)', border: 'none', cursor: 'pointer', padding: 8, fontFamily: 'inherit', fontWeight: 700, borderRadius: 'var(--r-sm)' }}
-                >
-                  <span>تنظیمات تکمیلی (هچ، سن، جنسیت)</span>
-                  <span style={{ transition: 'transform .2s', transform: isAdvancedOpen ? 'rotate(180deg)' : 'none' }}>▼</span>
-                </button>
-
-                {isAdvancedOpen && (
-                  <div style={{ background: 'var(--bg)', borderRadius: 'var(--r-sm)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
-                    <ItemDetailsForm
-                      category={cat}
-                      item={it}
-                      invoiceDate={form.date}
-                      updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
-                      isPurchase={true}
-                      sellerSlot={form.isMixed ? (
-                        <Field label="فروشنده این قلم" hint="خالی = فروشنده اصلی">
-                          <SmartSelect
-                            value={it.itemPartyId || ''}
-                            onChange={v => updateItem(it.id, { itemPartyId: v })}
-                            options={parties.map(c => ({ value: c.id, label: c.name }))}
-                            placeholder="— همان اصلی —" modalTitle="انتخاب فروشنده" autoThreshold={6}
-                          />
-                        </Field>
-                      ) : undefined}
-                    />
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        );
-      })}
-      
-      <button 
-        type="button" 
-        onClick={addItem} 
-        style={{
-          width: '100%', height: 42, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 'var(--sp-4)'
-        }}
-      >
-        <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)' }}>+</span> افزودن قلم جدید
-      </button>
+        <button 
+          type="button" 
+          onClick={addItem} 
+          style={{
+            width: '100%', height: 42, background: 'var(--btn-bg)', border: '1px solid var(--border)', 
+            borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', 
+            fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4
+          }}
+        >
+          <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)' }}>+</span> افزودن قلم
+        </button>
+      </div>
 
       {/* ====== شرایط پرداخت ====== */}
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> شرایط پرداخت</SectionTitle>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
         {form.isPreorder && (
           <Grid2>
             <Field label="نوع پیش‌پرداخت">
@@ -359,7 +388,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
         {form.paymentTerms !== 'cash' && (
           <>
-            <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 8, marginBottom: 4 }}>
+            <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 4, marginBottom: 0 }}>
               💰 تخفیف نقدی (اختیاری)
             </div>
             <Grid2>
@@ -371,7 +400,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               </Field>
             </Grid2>
             {form.cashDiscountPct && form.cashDiscountDays && total > 0 && (
-              <div style={{ padding: 'var(--pad-tight)', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', textAlign: 'center', marginTop: 4, fontWeight: 600 }}>
+              <div style={{ padding: 'var(--pad-tight)', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', textAlign: 'center', fontWeight: 600 }}>
                 💰 تا {toFa(form.cashDiscountDays)} روز: تخفیف {toFa(form.cashDiscountPct)}٪ (≈ {toFa(Math.round(total * parseFloat(toEn(form.cashDiscountPct)) / 100).toLocaleString('fa-IR'))} ت)
               </div>
             )}
@@ -404,10 +433,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           const preview = generateInstallments(totalLocal, cnt, gap, form.date, advanceAmt);
           if (preview.length === 0) return null;
           return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 4 }}>📅 پیش‌نمایش اقساط</div>
               {preview.map(inst => (
-                <div key={inst.id} style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--text)' }}>
+                <div key={inst.id} style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--pad-tight)', background: 'var(--bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--text)' }}>
                   <span>قسط {inst.number}</span>
                   <span style={{ color: 'var(--muted)' }}>{inst.dueDate}</span>
                   <span style={{ fontWeight: 700 }}>{inst.amount.toLocaleString('fa-IR')} ت</span>
@@ -419,107 +448,111 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       </div>
 
       {/* ====== پرداخت‌ها ====== */}
-      <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت‌ها و تسویه</SectionTitle>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        
-        {/* خلاصه مالی */}
-        <div style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-2) var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-            <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
-            <span style={{ fontWeight: 700 }}>{toFa(total.toLocaleString('fa-IR'))} ت</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-            <span style={{ color: 'var(--muted)' }}>پرداخت‌شده:</span>
-            <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(paid.toLocaleString('fa-IR'))} ت</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-            <span style={{ color: 'var(--muted)' }}>مانده نهایی:</span>
-            <span style={{ fontWeight: 700, color: rem > 0.5 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
-          </div>
-        </div>
-
-        {form.payments.map(p => (
-          <div key={p.id} style={{ padding: 'var(--sp-3)', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', position: 'relative', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <button type="button" onClick={() => removePayment(p.id)} style={{ position: 'absolute', top: 8, left: 8, background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', borderRadius: 'var(--r-sm)', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>✕</button>
+      {total > 0 && (
+        <>
+          <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت‌ها و تسویه</SectionTitle>
+          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
             
-            <div style={{ marginTop: 4 }}>
-              <Grid2>
-                <Field label="نوع پرداخت">
-                  <Select value={p.type || 'regular'} onChange={e => updatePayment(p.id, { type: e.target.value as 'regular' | 'advance' | 'refund' | 'settlement' })}>
-                    <option value="regular">💵 پرداخت عادی</option>
-                    <option value="advance">📌 پیش‌پرداخت</option>
-                    <option value="settlement">✅ تسویه قسط</option>
-                    <option value="refund">↩️ عودت وجه</option>
-                  </Select>
-                </Field>
-                <Field label="روش">
-                  <Select value={p.method} onChange={e => updatePayment(p.id, { method: e.target.value as 'cash' | 'card' | 'check' })}>
-                    <option value="cash">نقدی</option>
-                    <option value="card">کارت</option>
-                    <option value="check">چک</option>
-                  </Select>
-                </Field>
-              </Grid2>
+            {/* خلاصه مالی */}
+            <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-2) var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
+                <span style={{ fontWeight: 700 }}>{toFa(total.toLocaleString('fa-IR'))} ت</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                <span style={{ color: 'var(--muted)' }}>پرداخت‌شده:</span>
+                <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(paid.toLocaleString('fa-IR'))} ت</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                <span style={{ color: 'var(--muted)' }}>مانده نهایی:</span>
+                <span style={{ fontWeight: 700, color: rem > 0.5 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
+              </div>
+            </div>
 
-              <Grid2>
-                <Field label="تاریخ پرداخت">
-                  <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={toEn(form.date)} autoToday />
-                </Field>
-                <Field label="مبلغ">
-                  <MoneyField
-                    placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰"
-                    value={toFa(String(p.amount))}
-                    onChange={e => {
-                      const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                      const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw;
-                      updatePayment(p.id, { amount: val });
-                    }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '0 4px' }}>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} ت` : ''}</span>
-                    {rem > 0 && p.type !== 'refund' && (
-                      <button type="button" onClick={() => updatePayment(p.id, { amount: (p.amount || 0) + rem })} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>
-                    )}
-                  </div>
-                </Field>
-              </Grid2>
-
-              {p.method === 'check' && (
-                <>
+            {form.payments.map(p => (
+              <div key={p.id} style={{ padding: 'var(--sp-3)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', position: 'relative', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+                <button type="button" onClick={() => removePayment(p.id)} style={{ position: 'absolute', top: 8, left: 8, background: 'transparent', border: 'none', color: 'var(--danger)', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 14 }}>✕</button>
+                
+                <div style={{ marginTop: 8 }}>
                   <Grid2>
-                    <Field label="شماره چک"><Input placeholder="مثلاً — ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
-                    <Field label="بانک"><Input placeholder="مثلاً — ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
-                  </Grid2>
-                  <Grid2>
-                    <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
-                    <Field label="وضعیت چک">
-                      <Select value={p.status || 'pending'} onChange={e => {
-                        const newStatus = e.target.value as CheckStatus;
-                        const patch: Partial<Payment> = { status: newStatus };
-                        if (newStatus === 'bounced') { patch.bouncedDate = getTodayJalali(); patch.clearedDate = ''; }
-                        else if (newStatus === 'cleared') { patch.clearedDate = getTodayJalali(); patch.bouncedDate = ''; }
-                        else { patch.bouncedDate = ''; patch.clearedDate = ''; }
-                        updatePayment(p.id, patch);
-                      }}>
-                        <option value="pending">🟡 در جریان</option>
-                        <option value="cleared">✅ نقد شد</option>
-                        <option value="bounced">❌ برگشتی</option>
+                    <Field label="نوع پرداخت">
+                      <Select value={p.type || 'regular'} onChange={e => updatePayment(p.id, { type: e.target.value as 'regular' | 'advance' | 'refund' | 'settlement' })}>
+                        <option value="regular">💵 پرداخت عادی</option>
+                        <option value="advance">📌 پیش‌پرداخت</option>
+                        <option value="settlement">✅ تسویه قسط</option>
+                        <option value="refund">↩️ عودت وجه</option>
+                      </Select>
+                    </Field>
+                    <Field label="روش">
+                      <Select value={p.method} onChange={e => updatePayment(p.id, { method: e.target.value as 'cash' | 'card' | 'check' })}>
+                        <option value="cash">نقدی</option>
+                        <option value="card">کارت</option>
+                        <option value="check">چک</option>
                       </Select>
                     </Field>
                   </Grid2>
-                  {p.status === 'cleared' && (
-                    <Field label="تاریخ نقد شدن"><DatePicker value={p.clearedDate || ''} onChange={v => updatePayment(p.id, { clearedDate: v })}  autoToday /></Field>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-        ))}
 
-        <button type="button" onClick={addPayment} style={{ width: '100%', height: 42, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)' }}>+</span> افزودن پرداخت دیگر
-        </button>
-      </div>
+                  <Grid2>
+                    <Field label="تاریخ پرداخت">
+                      <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={toEn(form.date)} autoToday />
+                    </Field>
+                    <Field label="مبلغ">
+                      <MoneyField
+                        placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰"
+                        value={toFa(String(p.amount))}
+                        onChange={e => {
+                          const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                          const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw;
+                          updatePayment(p.id, { amount: val });
+                        }}
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '0 4px' }}>
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} ت` : ''}</span>
+                        {rem > 0 && p.type !== 'refund' && (
+                          <button type="button" onClick={() => updatePayment(p.id, { amount: (p.amount || 0) + rem })} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>
+                        )}
+                      </div>
+                    </Field>
+                  </Grid2>
+
+                  {p.method === 'check' && (
+                    <>
+                      <Grid2>
+                        <Field label="شماره چک"><Input placeholder="مثلاً — ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
+                        <Field label="بانک"><Input placeholder="مثلاً — ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
+                      </Grid2>
+                      <Grid2>
+                        <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
+                        <Field label="وضعیت چک">
+                          <Select value={p.status || 'pending'} onChange={e => {
+                            const newStatus = e.target.value as CheckStatus;
+                            const patch: Partial<Payment> = { status: newStatus };
+                            if (newStatus === 'bounced') { patch.bouncedDate = getTodayJalali(); patch.clearedDate = ''; }
+                            else if (newStatus === 'cleared') { patch.clearedDate = getTodayJalali(); patch.bouncedDate = ''; }
+                            else { patch.bouncedDate = ''; patch.clearedDate = ''; }
+                            updatePayment(p.id, patch);
+                          }}>
+                            <option value="pending">🟡 در جریان</option>
+                            <option value="cleared">✅ نقد شد</option>
+                            <option value="bounced">❌ برگشتی</option>
+                          </Select>
+                        </Field>
+                      </Grid2>
+                      {p.status === 'cleared' && (
+                        <Field label="تاریخ نقد شدن"><DatePicker value={p.clearedDate || ''} onChange={v => updatePayment(p.id, { clearedDate: v })}  autoToday /></Field>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            <button type="button" onClick={addPayment} style={{ width: '100%', height: 42, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)' }}>+</span> افزودن پرداخت دیگر
+            </button>
+          </div>
+        </>
+      )}
 
       {/* ====== یادداشت ====== */}
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
@@ -527,7 +560,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <Textarea placeholder="..." rows={3} minRows={3} value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
       </Field>
 
-      <InvoiceSmartSummary form={form} total={total} paid={paid} />
+      {form.items.length > 0 && total > 0 && <InvoiceSmartSummary form={form} total={total} paid={paid} />}
       <ErrorBox>{err}</ErrorBox>
     </Modal>
   );
