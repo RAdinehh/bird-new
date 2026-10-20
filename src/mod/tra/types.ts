@@ -232,6 +232,7 @@ export interface Deal {
 }
 
 export interface State {
+  reopenInvoice: (id: string) => void;
   invoices: Invoice[];
   deals: Deal[];
   addInvoice: (i: Omit<Invoice, 'id'|'createdAt'|'updatedAt'>) => string;

@@ -28,6 +28,20 @@ export const useTra = create<State>()(
       invoices: [],
       partyPayments: [],
       deals: [],
+      reopenInvoice: (id) => {
+        const prev = get().invoices.find(x => x.id === id);
+        if (!prev || !prev.paidAt) return;
+        set({
+          invoices: get().invoices.map(x => x.id === id
+            ? { ...x, paidAt: '', workflowStatus: 'confirmed', updatedAt: now() }
+            : x)
+        });
+        try {
+          void import('../../cor/logger/auditLog').then(m => {
+            m.logAction('update', 'tra', 'بازگشایی فاکتور ' + (prev.number || id));
+          }).catch(() => {});
+        } catch {}
+      },
       addInvoice: (i) => {
         const id = uuid();
         const num = generateInvoiceNumber(i.type, i.date, get().invoices);
@@ -68,6 +82,10 @@ export const useTra = create<State>()(
       updateInvoice: (id, patch) => {
         const prev = get().invoices.find(x => x.id === id);
         if (!prev) return;
+        if (prev.paidAt) {
+          console.warn('[tra] cannot edit paid invoice — reopen first');
+          return;
+        }
         const merged = { ...prev, ...patch, updatedAt: now() } as Invoice;
         let itemsFinal: InvoiceItem[] = merged.items || [];
         const mergedWithItems = { ...merged, items: itemsFinal };
