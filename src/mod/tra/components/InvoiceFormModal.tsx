@@ -281,6 +281,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               {isExpanded && (
                 <div style={{ marginTop: 'var(--sp-1)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
                   
+                  {form.isMixed && (
                   <Grid2>
                     
                     <Field label="دستهٔ این قلم" hint="خالی = همان دستهٔ فاکتور">
@@ -299,6 +300,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       </Select>
                     </Field>
                   </Grid2>
+                  )}
 
                   <Grid2>
                     <Field label="تعداد">
