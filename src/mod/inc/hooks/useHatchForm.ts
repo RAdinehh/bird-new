@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
+import { recordHistory } from '../../../shr/intelligence';
 import { calcCurrentFertile } from '../api/hatchCalc';
 import type { HatchResult } from '../store';
 import type { EggEntry } from '../store';
@@ -157,6 +158,26 @@ export function useHatchForm(p: UseHatchFormParams) {
     });
     setOpen(false);
     toastMsg.success(toFa(saved) + ' نتیجه هچ ثبت شد');
+
+    // 🆕 ثبت تاریخچه برای Intelligence (فقط bulk/create)
+    try {
+      const recN = (p: string, v: number | null, ctx: Record<string, unknown> = {}) => {
+        if (v !== null && Number.isFinite(v) && v > 0) recordHistory(p, v, ctx);
+      };
+      Array.from(selectedIds).forEach(id => {
+        const d = dataFor(id);
+        const entry = (entriesById as any)[id] ?? (entriesById as any).get?.(id);
+        const eggCount = entry?.count ?? null;
+        const ctx = eggCount !== null ? { eggCount } : {};
+        recN('inc.count', eggCount);
+        recN('inc.hatched', int(d.hatched), ctx);
+        recN('inc.unhatched', int(d.unhatched), ctx);
+        recN('inc.deadInShell', int(d.deadInShell), ctx);
+        recN('inc.pipped', int(d.pipped), ctx);
+        recN('inc.other', int(d.other), ctx);
+        recN('inc.avgWeight', num(d.avgWeight));
+      });
+    } catch { /* silent */ }
   };
 
   return {
