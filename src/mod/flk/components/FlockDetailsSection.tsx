@@ -67,14 +67,14 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
       <div style={dividerStyle}>💰 هزینه‌ها</div>
       <Grid2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-          <Field label="قیمت هر پرنده" error={showError('purchasePrice')} onTouch={() => markTouched('purchasePrice')}>
-            <MoneyField placeholder="۰" min={1000} max={5000000} value={form.purchasePrice} onChange={e => setForm({ ...form, purchasePrice: e.target.value })} />
+          <Field label={isSourceLinked && form.sourceInvoiceId ? <span>قیمت هر پرنده <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'قیمت هر پرنده'} hint={isSourceLinked && form.sourceInvoiceId ? '🔒 از فاکتور — برای تغییر، فاکتور را ویرایش کنید' : undefined} error={showError('purchasePrice')} onTouch={() => markTouched('purchasePrice')}>
+            <MoneyField placeholder="۰" min={1000} max={5000000} disabled={isSourceLinked && !!form.sourceInvoiceId} value={form.purchasePrice} onChange={e => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, purchasePrice: e.target.value })} />
           </Field>
           <FieldHint fieldPath="flk.purchasePrice" value={form.purchasePrice} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-          <Field label="هزینه حمل" error={showError('deliveryCost')} onTouch={() => markTouched('deliveryCost')}>
-            <MoneyField placeholder="۰" max={500000000} value={form.deliveryCost} onChange={e => setForm({ ...form, deliveryCost: e.target.value })} />
+          <Field label={isSourceLinked && form.sourceInvoiceId ? <span>هزینه حمل <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'هزینه حمل'} hint={isSourceLinked && form.sourceInvoiceId ? '🔒 از فاکتور — برای تغییر، فاکتور را ویرایش کنید' : undefined} error={showError('deliveryCost')} onTouch={() => markTouched('deliveryCost')}>
+            <MoneyField placeholder="۰" max={500000000} disabled={isSourceLinked && !!form.sourceInvoiceId} value={form.deliveryCost} onChange={e => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, deliveryCost: e.target.value })} />
           </Field>
           <FieldHint fieldPath="flk.deliveryCost" value={form.deliveryCost} />
         </div>

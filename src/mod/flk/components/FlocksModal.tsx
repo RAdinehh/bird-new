@@ -198,11 +198,12 @@ export default function FlocksModal(props: FlocksModalProps) {
         <Field label="پرنده" required error={showError('birdId')} onTouch={() => markTouched('birdId')}>
           <SmartSelect
             value={form.birdId}
-            onChange={v => setForm(f => ({ ...f, birdId: v, breedId: '' }))}
+            onChange={v => !isSourceLinked && setForm(f => ({ ...f, birdId: v, breedId: '' }))}
             options={birds.map(c => ({ value: c.id, label: c.name }))}
             placeholder="— انتخاب کنید —"
             modalTitle="انتخاب پرنده"
             autoThreshold={6}
+            disabled={isSourceLinked}
           />
         </Field>
         <Field label="نژاد" error={form.breedKind === 'mixed' ? undefined : showError('breedId')} onTouch={() => markTouched('breedId')}>
@@ -255,11 +256,12 @@ export default function FlocksModal(props: FlocksModalProps) {
         <Field label="سالن" required error={showError('hallId')} onTouch={() => markTouched('hallId')}>
           <SmartSelect
             value={form.hallId}
-            onChange={v => setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
+            onChange={v => !isSourceLinked && setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
             options={halls.map(c => ({ value: c.id, label: c.name }))}
             placeholder="— انتخاب کنید —"
             modalTitle="انتخاب سالن"
             autoThreshold={6}
+            disabled={isSourceLinked}
           />
         </Field>
         <Field label="بخش">
