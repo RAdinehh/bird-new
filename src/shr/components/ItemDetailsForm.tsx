@@ -19,7 +19,6 @@ export interface ItemDetailFormData {
   discountType?: string;
   discountValue?: number;
   shipping?: number;
-  itemPartyId?: string;
   flockId?: string;
   hallId?: string;
   zoneId?: string;

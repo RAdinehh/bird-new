@@ -26,7 +26,6 @@ export interface F {
   notes: string;
   installments: Installment[];
   /** 🆕 فاکتور مختلط — فروشنده هر قلم متفاوت */
-  isMixed?: boolean;
 }
 
 export const emptyForm = (isPurchase: boolean): F => ({
@@ -34,5 +33,5 @@ export const emptyForm = (isPurchase: boolean): F => ({
   paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
   customDueDate: '', cashDiscountPct: '', cashDiscountDays: '', isPreorder: false, deliveryDate: '',
   advanceType: 'percent', advanceValue: '',
-  dueDate: '', payments: [], relatedFlockId: '', notes: '', installments: [], isMixed: false,
+  dueDate: '', payments: [], relatedFlockId: '', notes: '', installments: [],
 });

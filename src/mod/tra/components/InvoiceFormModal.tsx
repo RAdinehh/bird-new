@@ -196,10 +196,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         </Field>
       </Grid2>
 
-      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)', color: 'var(--muted)', cursor: 'pointer', marginTop: 8 }}>
-        <input type="checkbox" checked={!!form.isMixed} onChange={e => setForm({...form, isMixed: e.target.checked})} />
-        فاکتور مختلط (فروشنده هر قلم متفاوت است)
-      </label>
       
       {form.isPreorder && (
         <Field label="تاریخ تحویل" required>
@@ -281,26 +277,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               {isExpanded && (
                 <div style={{ marginTop: 'var(--sp-1)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
                   
-                  {form.isMixed && (
-                  <Grid2>
-                    
-                    <Field label="دستهٔ این قلم" hint="خالی = همان دستهٔ فاکتور">
-                      <Select value={it.category || ''} onChange={e => {
-                        const newCat = e.target.value;
-                        const targetCat = newCat || form.category;
-                        const newUnit = getUnitForCategory(targetCat);
-                        updateItem(it.id, { category: newCat || undefined, unit: newUnit });
-                      }}>
-                        <option value="">همان فاکتور</option>
-                        {(() => {
-                          const saleOnly = ['manure', 'broken', 'fertile_egg'];
-                          const list = saleOnly.includes(form.category) ? CATEGORIES.sale : CATEGORIES.purchase;
-                          return list.map(([k, v]) => <option key={k} value={k}>{v}</option>);
-                        })()}
-                      </Select>
-                    </Field>
-                  </Grid2>
-                  )}
 
                   <Grid2>
                     <Field label="تعداد">
@@ -312,14 +288,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   </Grid2>
 
                   <Grid2>
-                    <Field label="نام فروشنده این قلم" hint="خالی = فروشنده اصلی فاکتور">
-                      <SmartSelect
-                        value={it.itemPartyId || ''}
-                        onChange={v => updateItem(it.id, { itemPartyId: v })}
-                        options={parties.map(c => ({ value: c.id, label: c.name }))}
-                        placeholder="— انتخاب کنید —" modalTitle="انتخاب فروشنده" autoThreshold={6}
-                      />
-                    </Field>
                     <Field label="هزینه حمل این قلم">
                       <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
                     </Field>

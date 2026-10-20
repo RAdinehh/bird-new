@@ -181,7 +181,6 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         discountType: it.discountType || '',
         discountValue: Number(it.discountValue) || 0,
         shipping: Number(it.shipping) || 0,
-        itemPartyId: it.itemPartyId || '',
         birdId: it.birdId || '',
         breedId: it.breedId || '',
         flockId: it.flockId || '',

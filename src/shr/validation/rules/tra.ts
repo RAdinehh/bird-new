@@ -51,7 +51,6 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       discountType: optionalStr(10),
       discountValue: floatNonNeg('تخفیف', 1_000_000_000_000).optional(),
       shipping: floatNonNeg('حمل', 1_000_000_000_000).optional(),
-      itemPartyId: optionalId(),
       
       birdId: optionalId(),
       breedId: optionalId(),
