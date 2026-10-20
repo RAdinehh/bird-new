@@ -611,13 +611,13 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         </>
       )}
 
+      {form.items.length > 0 && total > 0 && <InvoiceSmartSummary form={form} total={total} paid={paid} />}
+
       {/* ====== یادداشت ====== */}
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
       <Field label="یادداشت">
         <Textarea placeholder="..." rows={3} minRows={3} value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
       </Field>
-
-      {form.items.length > 0 && total > 0 && <InvoiceSmartSummary form={form} total={total} paid={paid} />}
       <ErrorBox>{err}</ErrorBox>
     </Modal>
   );
