@@ -263,9 +263,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 <div style={{ marginTop: 'var(--sp-1)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
                   
                   <Grid2>
-                    <Field label="شرح">
-                      <Input placeholder={getDescriptionPlaceholder(cat)} value={it.description} onChange={e => updateItem(it.id, { description: e.target.value })} />
-                    </Field>
+                    
                     <Field label="دستهٔ این قلم" hint="خالی = همان دستهٔ فاکتور">
                       <Select value={it.category || ''} onChange={e => {
                         const newCat = e.target.value;

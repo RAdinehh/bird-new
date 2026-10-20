@@ -109,9 +109,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="نام گله (اختیاری)" hint={`در صورت خالی بودن، "${autoFlockName}" انتخاب می‌شود`}>
             <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder={autoFlockName} />
           </Field>
-          <Field label="بچ هچری (اختیاری)" hint="اگر فروشنده شماره بچ داده است وارد کنید">
-            <Input value={String(item.hatcheryBatchNo || '')} onChange={e => updateItem({ hatcheryBatchNo: e.target.value })} placeholder="H-99" />
-          </Field>
+          
         </Grid2>
         <Grid2>
           <Field label="سالن مقصد">
@@ -240,9 +238,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="شماره بچ تخم" required>
-            <Input value={String(item.eggBatchNo || '')} onChange={e => updateItem({ eggBatchNo: e.target.value })} placeholder="B-102" />
-          </Field>
+          
           <Field label="مبدأ / مرغداری مادر" hint="برای ردیابی">
             <Input value={String(item.sourceFarm || '')} onChange={e => updateItem({ sourceFarm: e.target.value })} placeholder="آدینه" />
           </Field>
@@ -263,6 +259,20 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input mode="number" value={item.nonIncubableCount !== null && item.nonIncubableCount !== undefined ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
           </Field>
         </Grid2>
+        {(() => {
+          const q = item.quantity || 0;
+          const broken = item.brokenEggCount || 0;
+          const nonInc = item.nonIncubableCount || 0;
+          const healthy = Math.max(0, q - broken - nonInc);
+          if (q > 0 && (broken > 0 || nonInc > 0)) {
+            return (
+              <div style={{ color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', marginTop: 4 }}>
+                ✅ تعداد قابل جوجه: {toFa(healthy)} عدد (از {toFa(q)} تخم)
+              </div>
+            );
+          }
+          return null;
+        })()}
         {sellerSlot}
       </div>
     );
