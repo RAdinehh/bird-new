@@ -111,6 +111,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   } = props;
 
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
+  const [expandedPaymentId, setExpandedPaymentId] = useState<string | null>(null);
 
   // باز کردن خودکار قلم جدید به همراه تنظیمات تکمیلی آن
   const prevLengthRef = React.useRef(form.items.length);
@@ -124,6 +125,17 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
     }
     prevLengthRef.current = form.items.length;
   }, [form.items.length]);
+
+  const prevPaymentsLengthRef = React.useRef(form.payments.length);
+  useEffect(() => {
+    if (form.payments.length > prevPaymentsLengthRef.current) {
+      const lastPayment = form.payments[form.payments.length - 1];
+      if (lastPayment) {
+        setExpandedPaymentId(lastPayment.id);
+      }
+    }
+    prevPaymentsLengthRef.current = form.payments.length;
+  }, [form.payments.length]);
 
   return (
     <Modal
@@ -463,83 +475,118 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
               <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>پرداخت‌های ثبت‌شده</div>
 
-            {form.payments.map(p => (
-              <div key={p.id} style={{ padding: 'var(--sp-3)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', position: 'relative', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
-                <button type="button" onClick={() => removePayment(p.id)} style={{ position: 'absolute', top: 8, left: 8, background: 'transparent', border: 'none', color: 'var(--danger)', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 14 }}>✕</button>
-                
-                <div style={{ marginTop: 8 }}>
-                  <Grid2>
-                    <Field label="نوع پرداخت">
-                      <Select value={p.type || 'regular'} onChange={e => updatePayment(p.id, { type: e.target.value as 'regular' | 'advance' | 'refund' | 'settlement' })}>
-                        <option value="regular">💵 پرداخت عادی</option>
-                        <option value="advance">📌 پیش‌پرداخت</option>
-                        <option value="settlement">✅ تسویه قسط</option>
-                        <option value="refund">↩️ عودت وجه</option>
-                      </Select>
-                    </Field>
-                    <Field label="روش">
-                      <Select value={p.method} onChange={e => updatePayment(p.id, { method: e.target.value as 'cash' | 'card' | 'check' })}>
-                        <option value="cash">نقدی</option>
-                        <option value="card">کارت</option>
-                        <option value="check">چک</option>
-                      </Select>
-                    </Field>
-                  </Grid2>
-
-                  <Grid2>
-                    <Field label="تاریخ پرداخت">
-                      <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={toEn(form.date)} autoToday />
-                    </Field>
-                    <Field label="مبلغ">
-                      <MoneyField
-                        placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰"
-                        value={toFa(String(p.amount))}
-                        onChange={e => {
-                          const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                          const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw;
-                          updatePayment(p.id, { amount: val });
-                        }}
-                      />
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '0 4px' }}>
-                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} ت` : ''}</span>
-                        {rem > 0 && p.type !== 'refund' && (
-                          <button type="button" onClick={() => updatePayment(p.id, { amount: (p.amount || 0) + rem })} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>
-                        )}
-                      </div>
-                    </Field>
-                  </Grid2>
-
-                  {p.method === 'check' && (
-                    <>
+            {form.payments.map(p => {
+              const isExpanded = expandedPaymentId === p.id;
+              const methodLabel = p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک';
+              return (
+                <div key={p.id} style={{ 
+                  padding: isExpanded ? 'var(--sp-3)' : 'var(--sp-2) var(--sp-3)', 
+                  background: 'var(--card-solid)', 
+                  border: isExpanded ? '1.5px solid var(--accent)' : '1px solid var(--border)', 
+                  borderRadius: 'var(--r-md)', 
+                  transition: 'all 0.2s'
+                }}>
+                  <div 
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: isExpanded ? 'default' : 'pointer' }}
+                    onClick={() => !isExpanded && setExpandedPaymentId(p.id)}
+                  >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
+                        {methodLabel}
+                      </span>
+                      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
+                        {p.amount > 0 
+                          ? `${toFa(String(p.amount))} ت — ${toFa(p.date)}`
+                          : 'در حال ویرایش...'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
+                      <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: p.amount > 0 ? 'var(--accent)' : 'var(--muted)' }}>
+                        {toFa(String(p.amount))} ت
+                      </span>
+                      <button 
+                        type="button" 
+                        onClick={(e) => { e.stopPropagation(); removePayment(p.id); }} 
+                        style={{ background: 'transparent', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: 4, fontSize: 16, lineHeight: 1 }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                  {isExpanded && (
+                    <div style={{ marginTop: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
                       <Grid2>
-                        <Field label="شماره چک"><Input placeholder="مثلاً — ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
-                        <Field label="بانک"><Input placeholder="مثلاً — ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
-                      </Grid2>
-                      <Grid2>
-                        <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
-                        <Field label="وضعیت چک">
-                          <Select value={p.status || 'pending'} onChange={e => {
-                            const newStatus = e.target.value as CheckStatus;
-                            const patch: Partial<Payment> = { status: newStatus };
-                            if (newStatus === 'bounced') { patch.bouncedDate = getTodayJalali(); patch.clearedDate = ''; }
-                            else if (newStatus === 'cleared') { patch.clearedDate = getTodayJalali(); patch.bouncedDate = ''; }
-                            else { patch.bouncedDate = ''; patch.clearedDate = ''; }
-                            updatePayment(p.id, patch);
-                          }}>
-                            <option value="pending">🟡 در جریان</option>
-                            <option value="cleared">✅ نقد شد</option>
-                            <option value="bounced">❌ برگشتی</option>
+                        <Field label="نوع پرداخت">
+                          <Select value={p.type || 'regular'} onChange={e => updatePayment(p.id, { type: e.target.value as 'regular' | 'advance' | 'refund' | 'settlement' })}>
+                            <option value="regular">💵 پرداخت عادی</option>
+                            <option value="advance">📌 پیش‌پرداخت</option>
+                            <option value="settlement">✅ تسویه قسط</option>
+                            <option value="refund">↩️ عودت وجه</option>
+                          </Select>
+                        </Field>
+                        <Field label="روش">
+                          <Select value={p.method} onChange={e => updatePayment(p.id, { method: e.target.value as 'cash' | 'card' | 'check' })}>
+                            <option value="cash">نقدی</option>
+                            <option value="card">کارت</option>
+                            <option value="check">چک</option>
                           </Select>
                         </Field>
                       </Grid2>
-                      {p.status === 'cleared' && (
-                        <Field label="تاریخ نقد شدن"><DatePicker value={p.clearedDate || ''} onChange={v => updatePayment(p.id, { clearedDate: v })}  autoToday /></Field>
+                      <Grid2>
+                        <Field label="تاریخ پرداخت">
+                          <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={toEn(form.date)} autoToday />
+                        </Field>
+                        <Field label="مبلغ">
+                          <MoneyField
+                            placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰"
+                            value={toFa(String(p.amount))}
+                            onChange={e => {
+                              const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                              const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw;
+                              updatePayment(p.id, { amount: val });
+                            }}
+                          />
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '0 4px' }}>
+                            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} ت` : ''}</span>
+                            {rem > 0 && p.type !== 'refund' && (
+                              <button type="button" onClick={() => updatePayment(p.id, { amount: (p.amount || 0) + rem })} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>
+                            )}
+                          </div>
+                        </Field>
+                      </Grid2>
+                      {p.method === 'check' && (
+                        <>
+                          <Grid2>
+                            <Field label="شماره چک"><Input placeholder="مثلاً — ۰۰۱" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
+                            <Field label="بانک"><Input placeholder="مثلاً — ملی" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
+                          </Grid2>
+                          <Grid2>
+                            <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
+                            <Field label="وضعیت چک">
+                              <Select value={p.status || 'pending'} onChange={e => {
+                                const newStatus = e.target.value as CheckStatus;
+                                const patch: Partial<Payment> = { status: newStatus };
+                                if (newStatus === 'bounced') { patch.bouncedDate = getTodayJalali(); patch.clearedDate = ''; }
+                                else if (newStatus === 'cleared') { patch.clearedDate = getTodayJalali(); patch.bouncedDate = ''; }
+                                else { patch.bouncedDate = ''; patch.clearedDate = ''; }
+                                updatePayment(p.id, patch);
+                              }}>
+                                <option value="pending">🟡 در جریان</option>
+                                <option value="cleared">✅ نقد شد</option>
+                                <option value="bounced">❌ برگشتی</option>
+                              </Select>
+                            </Field>
+                          </Grid2>
+                          {p.status === 'cleared' && (
+                            <Field label="تاریخ نقد شدن"><DatePicker value={p.clearedDate || ''} onChange={v => updatePayment(p.id, { clearedDate: v })}  autoToday /></Field>
+                          )}
+                        </>
                       )}
-                    </>
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             <button 
               type="button" 
