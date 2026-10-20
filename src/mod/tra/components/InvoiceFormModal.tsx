@@ -387,7 +387,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>شرایط تسویه</span>
                   <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>{form.paymentTerms === 'cash' ? 'نقدی' : form.paymentTerms === 'installment' ? (form.installmentCount && form.installmentGapDays ? `${toFa(form.installmentCount)} قسط × ${toFa(form.installmentGapDays)} روز` : 'قسطی') : (form.customDueDate ? `توافقی — تا ${toFa(form.customDueDate)}` : 'توافقی')}</span>
                 </div>
-                <span style={{ fontSize: 'var(--fs-base)', color: 'var(--muted)', lineHeight: 1 }}>{showTerms ? '▾' : '▸'}</span>
+                <span style={{ fontSize: 'var(--fs-base)', color: 'var(--muted)', lineHeight: 1 }}>{showTerms ? '▼' : '▶'}</span>
               </div>
               {showTerms && (<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
@@ -406,7 +406,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               )}
 
               <Grid2>
-                <Field label="شرایط پرداخت" required>
+                <Field label="نوع تسویه">
                   <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
                     <option value="cash">💵 نقدی</option>
                     <option value="installment">📅 قسطی</option>
@@ -425,11 +425,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 )}
               </Grid2>
 
-              {form.paymentTerms === 'cash' && (
-                <div style={{ padding: '8px 12px', fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center', fontWeight: 600 }}>
-                  💡 پرداخت نقدی — نیازی به تنظیمات اضافه نیست
-                </div>
-              )}
+              
 
               {form.paymentTerms !== 'cash' && (
                 <>
@@ -496,7 +492,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             {form.payments.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
                 <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                  💳 پرداخت‌های ثبت‌شده
+                  پرداخت‌های ثبت‌شده
                 </div>
                 {form.payments.map((p, idx) => {
                   const isExpanded = expandedPaymentId === p.id;
@@ -509,7 +505,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                             پرداخت {toFa(idx + 1)} — {methodLabel}
                           </span>
                           <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
-                            {p.amount > 0 ? `${toFa(p.date)}` : 'در حال ویرایش...'}
+                            {toFa(p.date)}
                           </span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
@@ -541,7 +537,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                               <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={toEn(form.date)} autoToday />
                             </Field>
                             <Field label="مبلغ">
-                              <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={toFa(String(p.amount))} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0; const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw; updatePayment(p.id, { amount: val }); }} />
+                              <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0; const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw; updatePayment(p.id, { amount: val }); }} />
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '0 4px' }}>
                                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} ت` : ''}</span>
                                 {rem > 0 && p.type !== 'refund' && (<button type="button" onClick={() => updatePayment(p.id, { amount: (p.amount || 0) + rem })} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>)}
