@@ -167,7 +167,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
   'egg.dirtyCount': P('egg.dirtyCount', 'egg', 0, '${femaleCount}', {
     expectedFrom: 'cross_field', comparison: 'absolute', crossFieldRule: 'lte_female',
   }),
-  'inc.count': P('inc.count', 'egg', 1, 200_000),
+  'inc.count': P('inc.count', 'egg', 1, '${capacity}'),
   'inc.hatched': P('inc.hatched', 'egg', 0, '${eggCount}', {
     expectedFrom: 'cross_field', comparison: 'absolute', crossFieldRule: 'lte_egg_count',
   }),

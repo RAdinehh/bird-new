@@ -15,6 +15,7 @@ import SmartSelect from '../../../shr/components/SmartSelect';
 import { DEAL_LABEL, type DealType } from '../store';
 import type { DraftRow } from '../types-eggentries';
 import { flockReadyForEggs } from '../api/eggEntriesCalc';
+import { FieldHint } from '../../../shr/intelligence';
 import type { Bird } from '../../brd/store';
 import type { Flock } from '../../flk/store';
 import type { Person } from '../../ctc/store';
@@ -327,9 +328,16 @@ export default function EggEntryModal(props: EggEntryModalProps) {
             </Field>
           </Grid2>
           <Grid2>
-            <Field label="تعداد تخم" required>
-              <NumField value={currentRow.count} onChange={e => setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} autoClamp />
-            </Field>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+  <Field label="تعداد تخم" required>
+                <NumField value={currentRow.count} onChange={e => setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} autoClamp />
+              </Field>
+              <FieldHint
+                fieldPath="inc.count"
+                value={currentRow.count}
+                context={liveUsage && liveUsage.total > 0 ? { capacity: liveUsage.total } : {}}
+              />
+            </div>
             <Field label="طبقات (Tray)">
               <Input placeholder="۱-۲-۳" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
             </Field>
