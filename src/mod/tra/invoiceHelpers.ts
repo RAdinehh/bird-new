@@ -137,6 +137,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
             shippingCost: it.transportCost || it.shipping || null,
             sourceFarm: it.sourceFarm || '',
             nonIncubableCount: it.nonIncubableCount ?? 0,
+            brokenEggCount: it.brokenEggCount ?? null,
           } as any);
           it.entryId = existing.id;
         } catch (e) { console.error('[TRA→INC update]', e); }
@@ -164,6 +165,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
           sourceInvoiceId: inv.id,
           sourceFarm: it.sourceFarm || '',
           nonIncubableCount: it.nonIncubableCount ?? 0,
+          brokenEggCount: it.brokenEggCount ?? null,
         });
         it.entryId = entryId;
       } catch (e) { console.error('[TRA→INC create]', e); }
@@ -234,6 +236,9 @@ export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
           unitPrice: it.unitPrice || null,
           warranty: it.warrantyMonths || null,
           brand: it.brand || '',
+                      serialNo: it.serialNo || '',
+                      model: it.model || '',
+                      status: (it.equipmentStatus as any) || undefined,
         } as any);
         it.equipmentId = existing.id;
       } catch (e) { console.error('[TRA→HAL update]', e); }
@@ -253,12 +258,13 @@ export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
         unitPrice: it.unitPrice || null,
         purchasedAt: inv.deliveryDate || inv.date || '',
         warranty: it.warrantyMonths || null,
-        notes: `از فاکتور ${inv.number || ''}`
-          + (it.model ? ` | مدل: ${it.model}` : '')
-          + (it.serialNo ? ` | سریال: ${it.serialNo}` : ''),
+        notes: `از فاکتور ${inv.number || ''}`,
         brand: it.brand || '',
         supplierId: inv.partyId || '',
         sourceInvoiceId: inv.id,
+        serialNo: it.serialNo || '',
+        model: it.model || '',
+        status: (it.equipmentStatus as any) || 'active',
       } as any);
       it.equipmentId = newId;
     } catch (e) { console.error('[TRA→HAL create]', e); }
