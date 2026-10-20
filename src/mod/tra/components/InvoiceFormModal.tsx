@@ -562,28 +562,41 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </Grid2>
 
             <Grid2>
-              <Field label="مبلغ" hint={rem > 0 && p.type !== 'refund' ? `باقی‌مانده فاکتور: ${toFa(rem.toLocaleString('fa-IR'))} ت` : undefined}>
-                <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={toFa(String(p.amount))} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
-                {rem > 0 && p.type !== 'refund' && (
-                  <div style={{ textAlign: 'left', marginTop: 4 }}>
+              <Field label="مبلغ">
+                <MoneyField 
+                  placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" 
+                  value={toFa(String(p.amount))} 
+                  onChange={e => {
+                    const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                    // 🆕 Clamp: اگر کاربر بیشتر از باقی‌مانده زد، به باقی‌مانده محدود شود
+                    const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw;
+                    updatePayment(p.id, { amount: val });
+                  }} 
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                    {rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} ت` : ''}
+                  </span>
+                  {rem > 0 && p.type !== 'refund' && (
                     <button
                       type="button"
                       onClick={() => updatePayment(p.id, { amount: rem })}
                       style={{
-                        background: 'none',
-                        border: 'none',
+                        background: 'var(--accent-soft)',
                         color: 'var(--accent)',
+                        border: '1px solid var(--accent)',
+                        borderRadius: 'var(--r-sm)',
+                        padding: '2px 8px',
                         fontSize: 'var(--fs-xs)',
-                        cursor: 'pointer',
-                        padding: 0,
                         fontWeight: 700,
+                        cursor: 'pointer',
                         fontFamily: 'inherit',
                       }}
                     >
-                      تسویه کل ({toFa(rem.toLocaleString('fa-IR'))} ت)
+                      تسویه کل
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </Field>
               <Field label="تاریخ پرداخت">
                 <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })}  autoToday />
