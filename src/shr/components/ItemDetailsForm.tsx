@@ -20,36 +20,29 @@ export interface ItemDetailFormData {
   discountValue?: number;
   shipping?: number;
   itemPartyId?: string;
-
   flockId?: string;
   hallId?: string;
   zoneId?: string;
-
   birdId?: string;
   breedId?: string;
   ageDays?: number | null;
   maleCount?: number | null;
   femaleCount?: number | null;
   unknownCount?: number | null;
-
   hatchDate?: string;
   hatcheryBatchNo?: string;
   chickWeight?: number | null;
   transportCost?: number | null;
   flockName?: string;
-
   eggBatchNo?: string;
   eggDate?: string;
   brokenEggCount?: number | null;
   nonIncubableCount?: number | null;
   sourceFarm?: string;
-
   expiryDate?: string;
-
   model?: string;
   serialNo?: string;
   warrantyMonths?: number | null;
-
   costType?: string;
   stockItemId?: string;
   existingFlockId?: string;
@@ -82,7 +75,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     : breeds;
 
   const activeFlocks = flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }));
-  
   const birdObj = birds.find(b => b.id === item.birdId);
   const breedObj = breeds.find(b => b.id === item.breedId);
   const autoFlockName = `گله ${breedObj?.name || birdObj?.name || '...'} — ${invoiceDate || '...'}`;
@@ -91,7 +83,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== جوجه یک‌روزه ==========
   if (category === 'chick') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="🧬" title="اطلاعات گله" />
         {isPurchase && (
           <Field label="اتصال به گله موجود" hint="اگر قبلاً گله را دستی ساخته‌اید">
@@ -113,10 +105,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="نام گله / بچ جدید" hint="خالی = نام خودکار">
-            <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder="مثلاً: گله آذر" />
+          <Field label="نام گله (اختیاری)" hint={`در صورت خالی بودن، "${autoFlockName}" انتخاب می‌شود`}>
+            <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder={autoFlockName} />
           </Field>
-          <Field label="بچ هچری">
+          <Field label="بچ هچری (اختیاری)" hint="اگر فروشنده شماره بچ داده است وارد کنید">
             <Input value={String(item.hatcheryBatchNo || '')} onChange={e => updateItem({ hatcheryBatchNo: e.target.value })} placeholder="H-99" />
           </Field>
         </Grid2>
@@ -129,19 +121,48 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="گله مقصد (موجود)">
-            <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله (جدید) —" modalTitle="انتخاب گله" autoThreshold={6} />
-          </Field>
           <Field label="تاریخ هچ" required>
-            <DatePicker value={String(item.hatchDate || '')} onChange={v => updateItem({ hatchDate: v, ageDays: 1 })} placeholder="1405/07/26" autoToday />
+            <DatePicker value={String(item.hatchDate || '')} onChange={v => {
+              let age = null;
+              if (v && invoiceDate) {
+                try {
+                  const d1 = parseJ(toEn(v), 'yyyy/MM/dd', new Date());
+                  const d2 = parseJ(toEn(invoiceDate), 'yyyy/MM/dd', new Date());
+                  if (isValid(d1) && isValid(d2)) age = Math.max(0, differenceInCalendarDays(d2, d1));
+                } catch {}
+              }
+              updateItem({ hatchDate: v, ageDays: age });
+            }} placeholder="1405/07/26" autoToday />
+          </Field>
+          <Field label="سن (روز)" hint="با تغییر سن، تاریخ هچ محاسبه می‌شود">
+            <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => {
+              let age = Math.round(parseFaNum(e.target.value)) || null;
+              if (age !== null && age > 150) age = 150;
+              let hDate = item.hatchDate;
+              if (age !== null && invoiceDate) {
+                try {
+                  const d2 = parseJ(toEn(invoiceDate), 'yyyy/MM/dd', new Date());
+                  if (isValid(d2)) hDate = formatJ(subDays(d2, age), 'yyyy/MM/dd');
+                } catch {}
+              }
+              updateItem({ ageDays: age, hatchDate: hDate });
+            }} unit="روز" min={0} max={150} />
           </Field>
         </Grid2>
+        
         <Grid2>
           <Field label="تعداد کل (خریداری شده)" hint="از بخش اقلام بالا">
             <Input disabled value={item.quantity || 0} unit="عدد" style={{ background: 'var(--input-bg)', color: 'var(--muted)' }} />
           </Field>
-          <div />
+          <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
+            <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => {
+              let v = parseFaNum(e.target.value) || null;
+              if (v !== null && v > 100) v = 100;
+              updateItem({ chickWeight: v });
+            }} unit="g" min={20} max={100} />
+          </Field>
         </Grid2>
+
         <Grid3>
           <Field label="تعداد نر">
             <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => {
@@ -165,27 +186,30 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             }} min={0} max={item.quantity || undefined} />
           </Field>
         </Grid3>
-        {(item.maleCount || 0) + (item.femaleCount || 0) + (item.unknownCount || 0) > (item.quantity || 0) && (
-          <div style={{ color: 'var(--danger)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)' }}>
-            ⚠️ مجموع نر + ماده + نامشخص ({(item.maleCount || 0) + (item.femaleCount || 0) + (item.unknownCount || 0)}) از تعداد کل ({(item.quantity || 0)}) بیشتر است. لطفاً اصلاح کنید.
-          </div>
-        )}
-        <Grid2>
-          <Field label="سن (روز)" hint="خودکار از تاریخ هچ">
-            <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => {
-              let v = Math.round(parseFaNum(e.target.value)) || null;
-              if (v !== null && v > 150) v = 150;
-              updateItem({ ageDays: v });
-            }} unit="روز" min={0} max={150} />
-          </Field>
-          <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
-            <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => {
-              let v = parseFaNum(e.target.value) || null;
-              if (v !== null && v > 100) v = 100;
-              updateItem({ chickWeight: v });
-            }} unit="g" min={20} max={100} />
-          </Field>
-        </Grid2>
+        
+        {(() => {
+          const q = item.quantity || 0;
+          if (!q) return null;
+          const sum = (item.maleCount || 0) + (item.femaleCount || 0) + (item.unknownCount || 0);
+          const diff = q - sum;
+          if (diff === 0) return (
+            <div style={{ color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)' }}>
+              ✅ مجموع نر + ماده + نامشخص با تعداد کل برابر است.
+            </div>
+          );
+          if (diff < 0) return (
+            <div style={{ color: 'var(--danger)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)' }}>
+              ⚠️ مجموع نر + ماده + نامشخص ({sum}) از تعداد کل ({q}) بیشتر است. لطفاً اصلاح کنید.
+            </div>
+          );
+          return (
+            <div style={{ color: 'var(--warn)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>⚠️ مجموع وارد شده ({sum}) با تعداد کل ({q}) برابر نیست. ({diff} عدد مانده)</span>
+              <button type="button" onClick={() => updateItem({ unknownCount: (item.unknownCount || 0) + diff })} style={{ background: 'var(--warn)', color: '#fff', border: 'none', borderRadius: '4px', padding: '2px 8px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700 }}>پر کردن نامشخص</button>
+            </div>
+          );
+        })()}
+        
         {sellerSlot}
       </div>
     );
@@ -194,7 +218,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== تخم نطفه‌دار ==========
   if (isEggCategory) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="🥚" title="اطلاعات تخم نطفه‌دار" />
         <Grid2>
           <Field label="نوع پرنده" required>
@@ -216,17 +240,18 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="تاریخ تولید تخم" required>
             <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
           </Field>
-          <div />
+          <Field label="دستگاه جوجه‌کشی" hint="برای ثبت خودکار در جوجه‌کشی">
+            <SmartSelect value={String(item.deviceId || '')} onChange={v => updateItem({ deviceId: v })} options={(useInc((s: any) => s.devices || []) as any[]).map((d: any) => ({ value: d.id, label: d.name }))} placeholder="— بدون دستگاه —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
+          </Field>
         </Grid2>
-        <Grid3>
+        <Grid2>
           <Field label="تعداد شکسته">
             <Input mode="number" value={item.brokenEggCount !== null && item.brokenEggCount !== undefined ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
           </Field>
           <Field label="غیرقابل جوجه">
             <Input mode="number" value={item.nonIncubableCount !== null && item.nonIncubableCount !== undefined ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
           </Field>
-          <div />
-        </Grid3>
+        </Grid2>
         {sellerSlot}
       </div>
     );
@@ -235,7 +260,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== پرنده بالغ ==========
   if (category === 'adult') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="🐓" title="اطلاعات پرنده بالغ" />
         {isPurchase && (
           <Field label="اتصال به گله موجود" hint="اگر قبلاً گله را دستی ساخته‌اید">
@@ -264,15 +289,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
           </Field>
         </Grid2>
-        <Grid3>
+        <Grid2>
           <Field label="تعداد نر">
             <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
           </Field>
           <Field label="تعداد ماده">
             <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
           </Field>
-          <div />
-        </Grid3>
+        </Grid2>
         {sellerSlot}
       </div>
     );
@@ -281,7 +305,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== دان ==========
   if (category === 'feed') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="🌾" title="اطلاعات دان" />
         <Field label="اتصال به انبار" hint="برای موجودی و ثبت خودکار">
           <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).map(i => ({ value: i.id, label: i.name }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب کالای انبار" autoThreshold={6} />
@@ -302,7 +326,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== دارو ==========
   if (category === 'medicine') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="💊" title="اطلاعات دارو" />
         <Grid2>
           <Field label="تاریخ انقضا">
@@ -320,7 +344,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== تجهیزات ==========
   if (category === 'equipment') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="⚙️" title="اطلاعات تجهیز" />
         <Grid2>
           <Field label="مدل / نوع" required>
@@ -346,7 +370,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== سایر ==========
   if (category === 'other') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="📋" title="اطلاعات هزینه" />
         <Grid2>
           <Field label="نوع هزینه" hint="برای گزارش‌های مالی" required>
