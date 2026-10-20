@@ -125,26 +125,57 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله (جدید) —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
           <Field label="تاریخ هچ" required>
-            <DatePicker value={String(item.hatchDate || '')} onChange={v => updateItem({ hatchDate: v })} placeholder="1405/07/26" autoToday />
+            <DatePicker value={String(item.hatchDate || '')} onChange={v => updateItem({ hatchDate: v, ageDays: 1 })} placeholder="1405/07/26" autoToday />
           </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="تعداد کل (خریداری شده)" hint="از بخش اقلام بالا">
+            <Input disabled value={item.quantity || 0} unit="عدد" style={{ background: 'var(--input-bg)', color: 'var(--muted)' }} />
+          </Field>
+          <div />
         </Grid2>
         <Grid3>
           <Field label="تعداد نر">
-            <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} max={item.quantity || undefined} />
+            <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => {
+              let v = Math.round(parseFaNum(e.target.value)) || null;
+              if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
+              updateItem({ maleCount: v });
+            }} min={0} max={item.quantity || undefined} />
           </Field>
           <Field label="تعداد ماده">
-            <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} max={item.quantity || undefined} />
+            <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => {
+              let v = Math.round(parseFaNum(e.target.value)) || null;
+              if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
+              updateItem({ femaleCount: v });
+            }} min={0} max={item.quantity || undefined} />
           </Field>
           <Field label="نامشخص" hint="برای مخلوط">
-            <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => updateItem({ unknownCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} max={item.quantity || undefined} />
+            <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => {
+              let v = Math.round(parseFaNum(e.target.value)) || null;
+              if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
+              updateItem({ unknownCount: v });
+            }} min={0} max={item.quantity || undefined} />
           </Field>
         </Grid3>
+        {(item.maleCount || 0) + (item.femaleCount || 0) + (item.unknownCount || 0) > (item.quantity || 0) && (
+          <div style={{ color: 'var(--danger)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)' }}>
+            ⚠️ مجموع نر + ماده + نامشخص ({(item.maleCount || 0) + (item.femaleCount || 0) + (item.unknownCount || 0)}) از تعداد کل ({(item.quantity || 0)}) بیشتر است. لطفاً اصلاح کنید.
+          </div>
+        )}
         <Grid2>
-          <Field label="سن (روز)">
-            <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
+          <Field label="سن (روز)" hint="خودکار از تاریخ هچ">
+            <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => {
+              let v = Math.round(parseFaNum(e.target.value)) || null;
+              if (v !== null && v > 150) v = 150;
+              updateItem({ ageDays: v });
+            }} unit="روز" min={0} max={150} />
           </Field>
-          <Field label="وزن اولیه (گرم)">
-            <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => updateItem({ chickWeight: parseFaNum(e.target.value) || null })} unit="g" min={25} max={50} />
+          <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
+            <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => {
+              let v = parseFaNum(e.target.value) || null;
+              if (v !== null && v > 100) v = 100;
+              updateItem({ chickWeight: v });
+            }} unit="g" min={20} max={100} />
           </Field>
         </Grid2>
         {sellerSlot}
