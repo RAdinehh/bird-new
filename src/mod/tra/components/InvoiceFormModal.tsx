@@ -113,7 +113,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [expandedPaymentId, setExpandedPaymentId] = useState<string | null>(null);
   const [showPaymentSection, setShowPaymentSection] = useState(false);
-  const [showTermsEditor, setShowTermsEditor] = useState(true);
 
   // باز کردن خودکار قلم جدید به همراه تنظیمات تکمیلی آن
   const prevLengthRef = React.useRef(form.items.length);
@@ -410,16 +409,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             )}
 
             <div>
-              <div 
-                onClick={() => setShowTermsEditor(!showTermsEditor)} 
-                style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderBottom: showTermsEditor ? '1px dashed var(--border)' : 'none' }}
-              >
-                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>
-                  ⚙️ تنظیمات پرداخت: {form.paymentTerms === 'cash' ? '💵 نقدی' : form.paymentTerms === 'installment' ? `📅 قسطی (${toFa(form.installmentCount || '۰')} قسط)` : '✏️ توافقی'}
-                </span>
-                <span style={{ color: 'var(--muted)', fontSize: 12, transition: 'transform 0.2s', display: 'inline-block', transform: showTermsEditor ? 'rotate(180deg)' : 'none' }}>▼</span>
+              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', marginBottom: 'var(--sp-2)', paddingBottom: 'var(--sp-2)', borderBottom: '1px dashed var(--border)' }}>
+                💳 شرایط پرداخت
               </div>
-              {showTermsEditor && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', padding: 'var(--sp-3)' }}>
         {form.isPreorder && (
           <Grid2>
@@ -527,7 +519,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           );
         })()}
             </div>
-              )}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
