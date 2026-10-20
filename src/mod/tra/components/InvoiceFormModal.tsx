@@ -112,6 +112,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [expandedPaymentId, setExpandedPaymentId] = useState<string | null>(null);
+  const [showPaymentSection, setShowPaymentSection] = useState(false);
 
   // باز کردن خودکار قلم جدید به همراه تنظیمات تکمیلی آن
   const prevLengthRef = React.useRef(form.items.length);
@@ -366,8 +367,26 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         </button>
       </div>
 
+      {/* ⚙️ دکمه تنظیم شرایط پرداخت (وقتی قیمت هنوز وارد نشده) */}
+      {form.items.length > 0 && total === 0 && !showPaymentSection && (
+        <button 
+          type="button" 
+          onClick={() => setShowPaymentSection(true)}
+          style={{
+            width: '100%', height: 38, marginBottom: 'var(--sp-4)',
+            background: 'var(--card-solid)', border: '1px solid var(--border)',
+            borderRadius: 'var(--r-md)', color: 'var(--muted)',
+            fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600,
+            cursor: 'pointer', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', gap: 6
+          }}
+        >
+          ⚙️ تنظیم شرایط پرداخت (اختیاری)
+        </button>
+      )}
+
       {/* ====== پرداخت و تسویه (ادغام) ====== */}
-      {form.items.length > 0 && (
+      {(total > 0 || showPaymentSection) && form.items.length > 0 && (
         <>
           <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت و تسویه</SectionTitle>
           <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
