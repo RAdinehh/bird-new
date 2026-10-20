@@ -69,6 +69,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const { halls, zones } = useHal();
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
+  const incDevices = useInc((s: any) => s.devices || []) as any[];
 
   const breedsForBird = birds.filter(b => b.id === item.birdId).length
     ? breeds.filter(b => b.birdId === item.birdId)
@@ -251,7 +252,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
           </Field>
           <Field label="دستگاه جوجه‌کشی" hint="برای ثبت خودکار در جوجه‌کشی">
-            <SmartSelect value={String(item.deviceId || '')} onChange={v => updateItem({ deviceId: v })} options={(useInc((s: any) => s.devices || []) as any[]).map((d: any) => ({ value: d.id, label: d.name }))} placeholder="— بدون دستگاه —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
+            <SmartSelect value={String(item.deviceId || '')} onChange={v => updateItem({ deviceId: v })} options={incDevices.map((d: any) => ({ value: d.id, label: d.name }))} placeholder="— بدون دستگاه —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
           </Field>
         </Grid2>
         <Grid2>
