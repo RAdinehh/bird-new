@@ -516,7 +516,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         </AccordionSection>
 
         <AccordionSection
-          title={`پرداخت‌ها — ${toFa(paid.toLocaleString('fa-IR'))} از ${toFa(total.toLocaleString('fa-IR'))}`}
+          title="پرداخت‌ها"
           icon="💳"
           defaultOpen={form.payments.length > 0}
           key={`payments-${form.payments.length}`} // Force remount when length changes
@@ -589,6 +589,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                         cursor: 'pointer',
                         fontFamily: 'inherit',
                         textDecoration: 'underline',
+                        whiteSpace: 'nowrap',
                       }}
                     >
                       تسویه کل
@@ -597,7 +598,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 </div>
               </Field>
               <Field label="تاریخ پرداخت">
-                <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={form.date} autoToday />
+                <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={toEn(form.date)} autoToday />
               </Field>
             </Grid2>
             {p.method === 'check' && (
@@ -682,7 +683,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <InvoiceSmartSummary form={form} total={total} paid={paid} />
 
         <ErrorBox>{err}</ErrorBox>
-        <div style={{ height: 350 }} />
+        
       </Modal>
   );
 }
