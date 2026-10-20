@@ -177,9 +177,9 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           📦 تحویل گرفتم (ایجاد گله و موجودی)
         </Btn>
       )}
-      {(inv.workflowStatus !== 'paid' && onEdit) || nextWorkflowStatus(inv.workflowStatus) ? (
+      {(onEdit || nextWorkflowStatus(inv.workflowStatus)) ? (
         <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-          {inv.workflowStatus !== 'paid' && onEdit && (
+          {onEdit && (
             <Btn
               size="sm" variant="outline"
               onClick={onEdit}
@@ -200,7 +200,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         </div>
       ) : null}
 
-      {inv.workflowStatus === 'paid' && onReopen && (
+      {onReopen && (
         <Btn
           size="sm" variant="primary" full
           onClick={onReopen}
