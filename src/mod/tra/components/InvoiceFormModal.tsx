@@ -535,11 +535,11 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                             پرداخت {toFa(idx + 1)} — {methodLabel}
                           </span>
                           <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
-                            {p.amount > 0 ? `${toFa(String(p.amount))} ت — ${toFa(p.date)}` : 'در حال ویرایش...'}
+                            {p.amount > 0 ? `${toFa(p.date)}` : 'در حال ویرایش...'}
                           </span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
-                          <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: p.amount > 0 ? 'var(--accent)' : 'var(--muted)' }}>{toFa(String(p.amount))} ت</span>
+                          <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: p.amount > 0 ? 'var(--accent)' : 'var(--muted)' }}>{p.amount > 0 ? toFa(p.amount.toLocaleString('fa-IR')) + ' ت' : '—'}</span>
                           <button type="button" onClick={(e) => { e.stopPropagation(); removePayment(p.id); }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, padding: 0, flexShrink: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
                         </div>
                       </div>
