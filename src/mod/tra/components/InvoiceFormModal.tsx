@@ -539,8 +539,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               return (
                 <div key={p.id} style={{ 
                   padding: isExpanded ? 'var(--sp-3)' : 'var(--sp-2) var(--sp-3)', 
-                  background: 'var(--card-solid)', 
-                  border: isExpanded ? '1.5px solid var(--accent)' : '1px solid var(--border)', 
+                  background: 'transparent',
+                  border: 'none', 
                   borderRadius: 'var(--r-md)', 
                   transition: 'all 0.2s'
                 }}>
