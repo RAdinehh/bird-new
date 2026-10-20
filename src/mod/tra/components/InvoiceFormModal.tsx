@@ -202,11 +202,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       </SectionTitle>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}>
-        {form.items.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 'var(--sp-4) var(--sp-2)', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
-            هنوز کالایی اضافه نکرده‌اید. روی دکمه زیر بزنید.
-          </div>
-        )}
+        
         
         {form.items.map((it, idx) => {
           const isExpanded = expandedItemId === it.id;
@@ -350,13 +346,15 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           type="button" 
           onClick={addItem} 
           style={{
-            width: '100%', height: 42, background: 'var(--btn-bg)', border: '1px solid var(--border)', 
-            borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', 
-            fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4
+            width: '100%', height: 46, background: 'var(--accent-soft)', 
+            border: '1.5px dashed var(--accent-border)', borderRadius: 'var(--r-md)', 
+            color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', 
+            fontWeight: 700, cursor: 'pointer', display: 'flex', 
+            alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4
           }}
         >
-          <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)' }}>+</span> افزودن قلم
+          <span style={{ fontSize: 20, lineHeight: 1 }}>+</span> 
+          {form.items.length === 0 ? 'افزودن اولین قلم' : 'افزودن قلم دیگر'}
         </button>
       </div>
 
@@ -560,8 +558,19 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               </div>
             ))}
 
-            <button type="button" onClick={addPayment} style={{ width: '100%', height: 42, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)' }}>+</span> افزودن پرداخت دیگر
+            <button 
+              type="button" 
+              onClick={addPayment} 
+              style={{
+                width: '100%', height: 46, background: 'var(--accent-soft)', 
+                border: '1.5px dashed var(--accent-border)', borderRadius: 'var(--r-md)', 
+                color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', 
+                fontWeight: 700, cursor: 'pointer', display: 'flex', 
+                alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4
+              }}
+            >
+              <span style={{ fontSize: 20, lineHeight: 1 }}>+</span> 
+              {form.payments.length === 0 ? 'افزودن اولین پرداخت' : 'افزودن پرداخت دیگر'}
             </button>
             </div>
           </div>
