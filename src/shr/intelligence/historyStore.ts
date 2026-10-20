@@ -113,12 +113,24 @@ export interface HistoryOptions {
 }
 
 function isExpired(dateStr: string, todayStr: string): boolean {
-  // فرمت: YYYY/MM/DD (شمسی) — مقایسه ساده‌ی string
+  // پشتیبانی از ISO میلادی "2026-10-20" و شمسی "1404/07/29"
   if (!dateStr || !todayStr) return false;
-  const parts = dateStr.split('/').map(Number);
-  const todayParts = todayStr.split('/').map(Number);
-  if (parts.length !== 3 || todayParts.length !== 3) return false;
-  const days = (todayParts[0] - parts[0]) * 365 + (todayParts[1] - parts[1]) * 30 + (todayParts[2] - parts[2]);
+  const parse = (s: string): [number, number, number] | null => {
+    const m = s.trim().match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    return m ? [+m[1], +m[2], +m[3]] : null;
+  };
+  const a = parse(dateStr);
+  const b = parse(todayStr);
+  if (!a || !b) return false;
+  const aGregorian = a[0] >= 1900;
+  const bGregorian = b[0] >= 1900;
+  if (aGregorian !== bGregorian) return false;
+  if (aGregorian) {
+    const ta = Date.UTC(a[0], a[1] - 1, a[2]);
+    const tb = Date.UTC(b[0], b[1] - 1, b[2]);
+    return (tb - ta) / 86400000 > TTL_DAYS;
+  }
+  const days = (b[0] - a[0]) * 365 + (b[1] - a[1]) * 30 + (b[2] - a[2]);
   return days > TTL_DAYS;
 }
 
