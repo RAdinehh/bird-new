@@ -222,5 +222,9 @@ export function formatWarning(w: Warning): string {
     return `${label} خارج از محدوده رایج`;
   }
 
+  // جلوگیری از تکرار کلمات وزنی در label (مقدار مقدار غیرعادی → مقدار غیرعادی)
+  if (/^(مقدار|تعداد|وزن|حجم|قیمت|مبلغ|درصد|ضریب)/.test(label)) {
+    return `${label} غیرعادی`;
+  }
   return `${label} مقدار غیرعادی`;
 }
