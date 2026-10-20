@@ -135,14 +135,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => updateItem({ chickWeight: parseFaNum(e.target.value) || null })} unit="g" min={25} max={50} />
           </Field>
         </Grid2>
-
-        <SecTitle icon="💰" title="هزینه" />
-        <Grid2>
-          <Field label="هزینه حمل اختصاصی">
-            <Input mode="number" value={item.transportCost !== null && item.transportCost !== undefined ? String(item.transportCost) : ''} onChange={e => updateItem({ transportCost: parseFaNum(e.target.value) || null })} unit="ت" min={0} max={100000000} />
-          </Field>
-          <div />
-        </Grid2>
         {sellerSlot}
       </div>
     );
