@@ -297,7 +297,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
                   <Grid2>
                     <Field label="تخفیف این قلم">
-                      <MoneyField placeholder="مبلغ تخفیف این قلم" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                      <MoneyField placeholder="مبلغ تخفیف" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                     </Field>
                     <Field label="مبلغ کل این قلم">
                       <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'ltr', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
@@ -395,7 +395,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     </Select>
                   </Field>
                   <Field label="مقدار پیش‌پرداخت">
-                    <NumField placeholder="مقدار پیش‌پرداخت را وارد کنید" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
+                    <NumField placeholder="مقدار پیش‌پرداخت" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
                   </Field>
                 </Grid2>
               )}
@@ -429,10 +429,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   </div>
                   <Grid2>
                     <Field label="تخفیف نقدی (٪)" hint="اگر زودتر پرداخت شود">
-                      <NumField placeholder="درصد تخفیف را وارد کنید" value={form.cashDiscountPct || ''} onChange={e => setForm({...form, cashDiscountPct: e.target.value})} unit="٪" min={0} max={100} />
+                      <NumField placeholder="درصد تخفیف" value={form.cashDiscountPct || ''} onChange={e => setForm({...form, cashDiscountPct: e.target.value})} unit="٪" min={0} max={100} />
                     </Field>
                     <Field label="مهلت (روز)" hint="چند روز از تاریخ فاکتور">
-                      <NumField placeholder="تعداد روز مهلت را وارد کنید" value={form.cashDiscountDays || ''} onChange={e => setForm({...form, cashDiscountDays: e.target.value})} unit="روز" min={0} />
+                      <NumField placeholder="تعداد روز" value={form.cashDiscountDays || ''} onChange={e => setForm({...form, cashDiscountDays: e.target.value})} unit="روز" min={0} />
                     </Field>
                   </Grid2>
                   {form.cashDiscountPct && form.cashDiscountDays && total > 0 && (
@@ -446,10 +446,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               {form.paymentTerms === 'installment' && (
                 <Grid2>
                   <Field label="تعداد اقساط" required>
-                    <NumField placeholder="تعداد اقساط را وارد کنید" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
+                    <NumField placeholder="تعداد اقساط" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
                   </Field>
                   <Field label="فاصله" required>
-                    <NumField placeholder="فاصله روزها را وارد کنید" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
+                    <NumField placeholder="فاصله روزها" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
                   </Field>
                 </Grid2>
               )}
@@ -532,7 +532,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                               <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={toEn(form.date)} autoToday />
                             </Field>
                             <Field label="مبلغ">
-                              <MoneyField placeholder="مبلغ پرداخت را وارد کنید" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0; const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw; updatePayment(p.id, { amount: val }); }} />
+                              <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0; const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw; updatePayment(p.id, { amount: val }); }} />
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '0 4px' }}>
                                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} ت` : ''}</span>
                                 {rem > 0 && p.type !== 'refund' && (<button type="button" onClick={() => updatePayment(p.id, { amount: (p.amount || 0) + rem })} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>)}
@@ -542,8 +542,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           {p.method === 'check' && (
                             <>
                               <Grid2>
-                                <Field label="شماره چک"><Input placeholder="شماره چک را وارد کنید" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
-                                <Field label="بانک"><Input placeholder="نام بانک را وارد کنید" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
+                                <Field label="شماره چک"><Input placeholder="شماره چک" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
+                                <Field label="بانک"><Input placeholder="نام بانک" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
                               </Grid2>
                               <Grid2>
                                 <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
