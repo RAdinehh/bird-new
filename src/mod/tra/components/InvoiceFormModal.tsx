@@ -563,13 +563,13 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
             <Grid2>
               <Field label="مبلغ" hint={rem > 0 && p.type !== 'refund' ? `باقی‌مانده فاکتور: ${toFa(rem.toLocaleString('fa-IR'))} ت` : undefined}>
-                <div style={{ display: 'flex', gap: 4, alignItems: 'stretch' }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', gap: 4, alignItems: 'stretch', flexWrap: 'nowrap' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={toFa(String(p.amount))} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                   </div>
                   {rem > 0 && p.type !== 'refund' && (
-                    <Btn variant="outline" onClick={() => updatePayment(p.id, { amount: rem })} style={{ flexShrink: 0, whiteSpace: 'nowrap', height: 38, padding: '0 12px' }}>
-                      تسویه کل
+                    <Btn size="sm" variant="outline" onClick={() => updatePayment(p.id, { amount: rem })} style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+                      تسویه
                     </Btn>
                   )}
                 </div>
@@ -638,12 +638,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         </div>
         </AccordionSection>
 
-        {rem > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', color: 'var(--warn)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-            <span>مانده:</span>
-            <span>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
-          </div>
-        )}
+
 
         <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
         <Field label="یادداشت">
@@ -665,7 +660,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <InvoiceSmartSummary form={form} total={total} paid={paid} />
 
         <ErrorBox>{err}</ErrorBox>
-        <div style={{ height: 80 }} />
+        <div style={{ height: 160 }} />
       </Modal>
   );
 }
