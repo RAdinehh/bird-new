@@ -665,6 +665,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <InvoiceSmartSummary form={form} total={total} paid={paid} />
 
         <ErrorBox>{err}</ErrorBox>
+        <div style={{ height: 80 }} />
       </Modal>
   );
 }
