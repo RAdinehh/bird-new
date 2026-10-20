@@ -222,7 +222,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           
           return (
             <div key={it.id} style={{ 
-              background: isExpanded ? 'var(--accent-soft)' : 'transparent',
+              background: 'transparent',
               border: 'none', 
               borderRadius: 'var(--r-md)', 
               padding: 'var(--sp-3)', 
