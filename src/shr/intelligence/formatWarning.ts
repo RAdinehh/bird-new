@@ -63,6 +63,31 @@ const FIELD_LABELS: Record<string, string> = {
   'egg.softCount': 'تخم نرم',
   'egg.dirtyCount': 'تخم کثیف',
   'egg.avgWeight': 'وزن تخم',
+  // ─── رطوبت ───
+  'dlg.humidityMin': 'حداقل رطوبت',
+  'dlg.humidityMax': 'حداکثر رطوبت',
+  // ─── دان ───
+  'feed.unitPrice': 'قیمت واحد دان',
+  'feed.protein': 'پروتئین دان',
+  'feed.fat': 'چربی دان',
+  'feed.fiber': 'فیبر دان',
+  'feed.calcium': 'کلسیم دان',
+  'feed.phosphorus': 'فسفر دان',
+  'feed.methionine': 'متیونین دان',
+  'feed.lysine': 'لیزین دان',
+  'feed.sodium': 'سدیم دان',
+  'feed.energy': 'انرژی دان',
+  'feed.perBirdGramsPerDay': 'گرم/پرنده/روز',
+  'feed.bagWeight': 'وزن کیسه',
+  'feed.bagCount': 'تعداد کیسه',
+  // ─── گله (شاخص) ───
+  'flk.fcr': 'ضریب تبدیل',
+  'flk.adg': 'افزایش وزن روزانه',
+  // ─── تخم (درصد) ───
+  'egg.hatchOfTotal': 'درصد هچ از کل',
+  'egg.hatchOfFertile': 'درصد هچ از نطفه‌دار',
+  'egg.chickYieldPercent': 'درصد جوجه‌دهی',
+  'egg.henDayPercent': 'درصد تخم‌گذاری',
   // ─── whs (انبار) ───
   'whs.qty_kg': 'مقدار (کیلوگرم)',
   'whs.qty_g': 'مقدار (گرم)',
@@ -75,6 +100,15 @@ const FIELD_LABELS: Record<string, string> = {
   'whs.withdrawalDays': 'دوره پرهیز',
 };
 
+const FALLBACK_FA: Record<string, string> = {
+  quantity: 'مقدار', count: 'تعداد', amount: 'مقدار', total: 'مجموع',
+  unitPrice: 'قیمت واحد', price: 'قیمت', value: 'مقدار',
+  weight: 'وزن', volume: 'حجم', capacity: 'ظرفیت',
+  date: 'تاریخ', dueDate: 'مهلت', notes: 'یادداشت',
+  discount: 'تخفیف', totalPrice: 'مبلغ کل',
+  minStock: 'حداقل موجودی', currentStock: 'موجودی',
+};
+
 function getLabel(fieldPath: string): string {
   if (FIELD_LABELS[fieldPath]) return FIELD_LABELS[fieldPath];
   const parts = fieldPath.split('.');
@@ -83,7 +117,7 @@ function getLabel(fieldPath: string): string {
     const cat = last.slice(6);
     return FIELD_LABELS[`tra.price_${cat}`] ?? cat;
   }
-  return last;
+  return FALLBACK_FA[last] ?? last;
 }
 
 function toFaDigit(s: string): string {
