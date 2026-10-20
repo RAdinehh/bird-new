@@ -507,7 +507,23 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       <button 
                         type="button" 
                         onClick={(e) => { e.stopPropagation(); removePayment(p.id); }} 
-                        style={{ background: 'transparent', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: 4, fontSize: 16, lineHeight: 1 }}
+                        style={{
+                        background: 'var(--danger-soft)', 
+                        border: '1px solid var(--danger)', 
+                        color: 'var(--danger)', 
+                        cursor: 'pointer', 
+                        borderRadius: 'var(--r-sm)', 
+                        width: 28, 
+                        height: 28, 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        fontSize: 12, 
+                        padding: 0, 
+                        flexShrink: 0, 
+                        fontFamily: 'inherit', 
+                        fontWeight: 700
+                      }}
                       >
                         ✕
                       </button>
