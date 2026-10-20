@@ -158,12 +158,39 @@ export function analyzeAnomaly(
 
   // برای comparison='absolute' (cross-field سخت مثل deaths≤alive), ratio معنی ندارد
   if (profile.comparison !== 'absolute' && expected !== null && expected > 0) {
-    const ratio = value / expected;
-    if (ratio > 5) signals.push({ type: 'ratio', weight: 3, detail: `${ratio.toFixed(1)}x (خیلی بالا)` });
-    else if (ratio > 3) signals.push({ type: 'ratio', weight: 2, detail: `${ratio.toFixed(1)}x (بالا)` });
-    else if (ratio > 1.5) signals.push({ type: 'ratio', weight: 1, detail: `${ratio.toFixed(1)}x` });
-    else if (ratio < 0.3) signals.push({ type: 'ratio', weight: 2, detail: `${ratio.toFixed(2)}x (پایین)` });
-    else if (ratio < 0.5) signals.push({ type: 'ratio', weight: 1, detail: `${ratio.toFixed(2)}x (پایین)` });
+    const isMin = profile.fieldPath.endsWith('Min');
+    const isMax = profile.fieldPath.endsWith('Max');
+    const targetVal = context.expected;
+
+    // ─── دما: آستانه بر اساس اختلاف مطلق از target (برای کاربر تازه هم حساس) ───
+    if (profile.kind === 'temperature' && typeof targetVal === 'number' && (isMin || isMax)) {
+      const diff = isMin
+        ? Math.max(0, targetVal - value)
+        : Math.max(0, value - targetVal);
+      if (diff > 12) signals.push({ type: 'ratio', weight: 5, detail: `${diff.toFixed(1)}°C خارج از هدف` });
+      else if (diff > 8) signals.push({ type: 'ratio', weight: 4, detail: `${diff.toFixed(1)}°C خارج از هدف` });
+      else if (diff > 5) signals.push({ type: 'ratio', weight: 3, detail: `${diff.toFixed(1)}°C خارج از هدف` });
+      else if (diff > 3) signals.push({ type: 'ratio', weight: 2, detail: `${diff.toFixed(1)}°C خارج از هدف` });
+    }
+    // ─── رطوبت: آستانه اختصاصی (٪) ───
+    else if (profile.kind === 'humidity' && typeof targetVal === 'number' && (isMin || isMax)) {
+      const diff = isMin
+        ? Math.max(0, targetVal - value)
+        : Math.max(0, value - targetVal);
+      if (diff > 30) signals.push({ type: 'ratio', weight: 5, detail: `${diff.toFixed(0)}٪ خارج از هدف` });
+      else if (diff > 20) signals.push({ type: 'ratio', weight: 4, detail: `${diff.toFixed(0)}٪ خارج از هدف` });
+      else if (diff > 12) signals.push({ type: 'ratio', weight: 3, detail: `${diff.toFixed(0)}٪ خارج از هدف` });
+      else if (diff > 8) signals.push({ type: 'ratio', weight: 2, detail: `${diff.toFixed(0)}٪ خارج از هدف` });
+    }
+    // ─── بقیه (price, count, weight, ...): آستانه‌های ratio فعلی ───
+    else {
+      const ratio = value / expected;
+      if (ratio > 5) signals.push({ type: 'ratio', weight: 3, detail: `${ratio.toFixed(1)}x (خیلی بالا)` });
+      else if (ratio > 3) signals.push({ type: 'ratio', weight: 2, detail: `${ratio.toFixed(1)}x (بالا)` });
+      else if (ratio > 1.5) signals.push({ type: 'ratio', weight: 1, detail: `${ratio.toFixed(1)}x` });
+      else if (ratio < 0.3) signals.push({ type: 'ratio', weight: 2, detail: `${ratio.toFixed(2)}x (پایین)` });
+      else if (ratio < 0.5) signals.push({ type: 'ratio', weight: 1, detail: `${ratio.toFixed(2)}x (پایین)` });
+    }
   }
 
   // ─── سیگنال ۲: Z-Score ───
