@@ -164,21 +164,21 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
 
         <Grid3>
-          <Field label="تعداد نر">
+          <Field label="تعداد نر (اختیاری)">
             <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
               updateItem({ maleCount: v });
             }} min={0} max={item.quantity || undefined} />
           </Field>
-          <Field label="تعداد ماده">
+          <Field label="تعداد ماده (اختیاری)">
             <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
               updateItem({ femaleCount: v });
             }} min={0} max={item.quantity || undefined} />
           </Field>
-          <Field label="نامشخص" hint="برای مخلوط">
+          <Field label="نامشخص (اختیاری)" hint="برای مخلوط">
             <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
@@ -190,7 +190,18 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {(() => {
           const q = item.quantity || 0;
           if (!q) return null;
+          
+          const hasMale = item.maleCount !== null && item.maleCount !== undefined;
+          const hasFemale = item.femaleCount !== null && item.femaleCount !== undefined;
+          const hasUnknown = item.unknownCount !== null && item.unknownCount !== undefined;
+          const hasAny = hasMale || hasFemale || hasUnknown;
+          
+          // اگر هیچ‌کدام پر نشده باشد، هیچ هشداری نده
+          if (!hasAny) return null; 
+
           const sum = (item.maleCount || 0) + (item.femaleCount || 0) + (item.unknownCount || 0);
+          if (sum === 0) return null;
+
           const diff = q - sum;
           if (diff === 0) return (
             <div style={{ color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)' }}>

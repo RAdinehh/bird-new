@@ -226,6 +226,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       <SectionTitle>
         <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام — جمع: {toFa(total.toLocaleString('fa-IR'))} ت
       </SectionTitle>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)' }}>
       
       {form.items.length === 0 && (
         <div style={{ textAlign: 'center', padding: 'var(--sp-4)', color: 'var(--muted)', fontSize: 'var(--fs-sm)', background: 'var(--card)', borderRadius: 'var(--r-sm)', marginBottom: 'var(--sp-2)' }}>
@@ -407,6 +408,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       >
         <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)' }}>+</span> افزودن قلم جدید
       </button>
+      </div>
 
       <AccordionSection
         title="شرایط پرداخت"
@@ -419,8 +421,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           : 'توافقی'
         }
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {form.isPreorder && (
+        <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', background: 'var(--card-solid)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {form.isPreorder && (
             <Grid2>
               <Field label="نوع پیش‌پرداخت">
                 <Select value={form.advanceType} onChange={e => setForm({...form, advanceType: e.target.value as 'percent' | 'amount'})}>
@@ -513,6 +516,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               </div>
             );
           })()}
+        </div>
         </div>
       </AccordionSection>
 
