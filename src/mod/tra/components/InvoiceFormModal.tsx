@@ -327,33 +327,29 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           type="button" 
           onClick={addItem} 
           style={{
-            width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'var(--accent-soft)', 
-            border: '1.5px dashed var(--accent-border)', borderRadius: 'var(--r-md)', 
-            color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', 
+            width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', 
             fontWeight: 700, cursor: 'pointer', display: 'flex', 
             alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4
           }}
         >
-          <span style={{ fontSize: 20, lineHeight: 1 }}>+</span> 
-          {form.items.length === 0 ? 'افزودن اولین قلم' : 'افزودن قلم دیگر'}
+          + {form.items.length === 0 ? 'افزودن اولین قلم' : 'افزودن قلم دیگر'}
         </button>
       </div>
 
-      {/* ⚙️ دکمه تنظیم شرایط پرداخت (وقتی قیمت هنوز وارد نشده) */}
+      {/* + دکمه تنظیم شرایط پرداخت (وقتی قیمت هنوز وارد نشده) */}
       {form.items.length > 0 && total === 0 && !showPaymentSection && (
         <button 
           type="button" 
           onClick={() => setShowPaymentSection(true)}
           style={{
-            width: '100%', height: 38, marginBottom: 'var(--sp-4)',
-            background: 'var(--accent-soft)', border: '1.5px dashed var(--accent-border)',
-            borderRadius: 'var(--r-md)', color: 'var(--accent)',
+            width: '100%', height: 40, marginBottom: 'var(--sp-4)',
+            background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)',
             fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
             cursor: 'pointer', display: 'flex', alignItems: 'center',
             justifyContent: 'center', gap: 6
           }}
         >
-          ⚙️ تنظیم شرایط پرداخت (اختیاری)
+          + تنظیم شرایط پرداخت (اختیاری)
         </button>
       )}
 
@@ -567,9 +563,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             )}
 
             {/* دکمه افزودن پرداخت */}
-            <button type="button" onClick={addPayment} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'var(--accent-soft)', border: '1.5px dashed var(--accent-border)', borderRadius: 'var(--r-md)', color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4 }}>
-              <span style={{ fontSize: 20, lineHeight: 1 }}>+</span> 
-              {form.payments.length === 0 ? 'افزودن اولین پرداخت' : 'افزودن پرداخت دیگر'}
+            <button type="button" onClick={addPayment} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4 }}>
+              + {form.payments.length === 0 ? 'افزودن اولین پرداخت' : 'افزودن پرداخت دیگر'}
             </button>
 
           </div>
