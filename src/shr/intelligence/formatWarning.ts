@@ -63,6 +63,16 @@ const FIELD_LABELS: Record<string, string> = {
   'egg.softCount': 'تخم نرم',
   'egg.dirtyCount': 'تخم کثیف',
   'egg.avgWeight': 'وزن تخم',
+  // ─── whs (انبار) ───
+  'whs.qty_kg': 'مقدار (کیلوگرم)',
+  'whs.qty_g': 'مقدار (گرم)',
+  'whs.qty_L': 'مقدار (لیتر)',
+  'whs.qty_ml': 'مقدار (میلی‌لیتر)',
+  'whs.qty_pcs': 'مقدار (عدد)',
+  'whs.qty_vial': 'مقدار (ویال)',
+  'whs.qty_pack': 'مقدار (بسته)',
+  'whs.dosePerBird': 'دوز هر پرنده',
+  'whs.withdrawalDays': 'دوره پرهیز',
 };
 
 function getLabel(fieldPath: string): string {
