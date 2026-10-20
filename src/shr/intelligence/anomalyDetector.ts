@@ -139,17 +139,21 @@ export function analyzeAnomaly(
 
   if (typeof context.expected === 'number' && Number.isFinite(context.expected)) {
     expected = context.expected;
-  } else if (profile.expectedFrom === 'cross_field' && profile.crossFieldRule) {
+  }
+  // Cascade fallback: اگر استراتژی اول null داد، سراغ بعدی برو
+  if (expected === null && profile.expectedFrom === 'cross_field' && profile.crossFieldRule) {
     expected = getCrossFieldExpected(profile.crossFieldRule, context);
-  } else if (profile.expectedFrom === 'user_pattern') {
+  }
+  if (expected === null && profile.expectedFrom === 'user_pattern') {
     const pattern = getUserPattern(fieldPath, opts);
     if (pattern) expected = pattern.mean;
-  } else {
-    const hist = getHistory(fieldPath, opts);
-    if (hist?.stats) {
-      expected = hist.stats.structuralBreak && hist.stats.recentMean
-        ? hist.stats.recentMean
-        : hist.stats.mean;
+  }
+  if (expected === null) {
+    const histFb = getHistory(fieldPath, opts);
+    if (histFb?.stats) {
+      expected = histFb.stats.structuralBreak && histFb.stats.recentMean
+        ? histFb.stats.recentMean
+        : histFb.stats.mean;
     }
   }
 
