@@ -336,6 +336,11 @@ export default function EggEntryModal(props: EggEntryModalProps) {
           </Grid2>
           <Grid2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+  {sourceLinked && (
+    <div style={{ padding: '6px 10px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600, marginBottom: 6 }}>
+      🔒 این ردیف از فاکتور خرید اومده — برای تغییر، فاکتور را ویرایش کنید
+    </div>
+  )}
   <Field label={sourceLinked ? <span>تعداد تخم <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تعداد تخم'} required>
                 <NumField value={currentRow.count} onChange={e => !sourceLinked && setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} disabled={sourceLinked} autoClamp />
               </Field>
