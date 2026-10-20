@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
+import { recordHistory } from '../../../shr/intelligence';
 import { addDaysJalali, incubationDays } from '../store';
 import type { EggEntry } from '../store';
 import { makeRow, type DraftRow } from '../types-eggentries';
@@ -251,6 +252,14 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
           generatedProductionId: '',
         };
         const newId = addEntry(data as any);
+
+        // 🆕 ثبت تاریخچه — inc.count (تعداد تخم ورودی به دستگاه)
+        try {
+          const cnt = (data as any).count;
+          if (typeof cnt === 'number' && Number.isFinite(cnt) && cnt > 0) {
+            recordHistory('inc.count', cnt, {});
+          }
+        } catch { /* silent */ }
 
         const refIds: any = {};
         try {
