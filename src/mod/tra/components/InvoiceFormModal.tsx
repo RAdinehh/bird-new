@@ -146,6 +146,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
     >
       {/* ====== اطلاعات پایه ====== */}
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--sp-1)', marginBottom: 'var(--sp-2)', paddingRight: 4, lineHeight: 1.4 }}>تاریخ، طرف حساب و نوع معامله</div>
       
       <Grid2>
         <Field label="تاریخ فاکتور" required error={showError('date')} onTouch={() => markTouched('date')}>
@@ -207,6 +208,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       <SectionTitle>
         <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام {total > 0 && `— جمع: ${toFa(total.toLocaleString('fa-IR'))} ت`}
       </SectionTitle>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--sp-1)', marginBottom: 'var(--sp-2)', paddingRight: 4, lineHeight: 1.4 }}>کالا یا خدمت اضافه کنید</div>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}>
         
@@ -359,6 +361,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       {(total > 0 || showPaymentSection) && form.items.length > 0 && (
         <>
           <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت و تسویه</SectionTitle>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--sp-1)', marginBottom: 'var(--sp-2)', paddingRight: 4, lineHeight: 1.4 }}>نحوه تسویه و ثبت پرداخت‌ها</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginBottom: 'var(--sp-4)' }}>
 
             {/* خلاصه مالی */}
@@ -577,6 +580,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
       {/* ====== یادداشت ====== */}
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--sp-1)', marginBottom: 'var(--sp-2)', paddingRight: 4, lineHeight: 1.4 }}>توضیحات اختیاری برای این فاکتور</div>
       <Field label="یادداشت">
         <Textarea placeholder="توضیحات این فاکتور" rows={3} minRows={3} value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
       </Field>
