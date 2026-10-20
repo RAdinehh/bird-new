@@ -5,6 +5,7 @@ import { Btn, BtnRow, Field, Grid2, Modal, MoneyField, NumField, Select, Textare
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { toFa } from '../../../shr/utils/fa';
+import { FieldHint } from '../../../shr/intelligence';
 import { MOVEMENT_REASON, UNIT_LABEL, CATEGORY_ICON, CATEGORY_LABEL, type MovementType, type MovementReason, type Item } from '../store';
 import type { Person } from '../../ctc/store';
 import type { F } from '../MovesPage';
@@ -90,13 +91,20 @@ export default function MoveFormModal(props: Props) {
         </Field>
 
         <Grid2>
-          <Field label="تعداد" required error={vErrors.quantity}>
-            <NumField placeholder="مثلاً — ۱۰۰"
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+            <Field label="تعداد" required error={vErrors.quantity}>
+              <NumField placeholder="مثلاً — ۱۰۰"
+                value={form.quantity}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, quantity: e.target.value })}
+                unit={selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}
+                max={form.type === 'out' ? currentStock : undefined} min={0} />
+            </Field>
+            <FieldHint
+              fieldPath={selectedItem ? `whs.qty_${selectedItem.unit}` : ''}
               value={form.quantity}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, quantity: e.target.value })}
-              unit={selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}
-              max={form.type === 'out' ? currentStock : undefined} min={0} />
-          </Field>
+              context={{ itemId: form.itemId }}
+            />
+          </div>
           <Field label="قیمت واحد">
             <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={form.unitPrice} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, unitPrice: e.target.value })} />
           </Field>
