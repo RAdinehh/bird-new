@@ -27,7 +27,7 @@ const FIELD_LABELS: Record<string, string> = {
   'dlg.eatingEggs': 'تخم خوراکی',
   'dlg.fertileEggs': 'تخم نطفه‌دار',
   'dlg.brokenEggs': 'تخم شکسته',
-  'dlg.otherEggs': 'تخم سایر',
+  'dlg.otherEggs': 'سایر تخم‌ها',
   'dlg.deathsCount': 'تعداد تلفات',
   'dlg.dose': 'دوز دارو',
   'dlg.withdrawalDays': 'دوره پرهیز',
@@ -47,10 +47,10 @@ const FIELD_LABELS: Record<string, string> = {
   'inc.humidity': 'رطوبت دستگاه',
   'inc.count': 'تعداد تخم',
   'inc.hatched': 'تخم هچ‌شده',
-  'inc.unhatched': 'هچ‌نشده',
-  'inc.deadInShell': 'مرده در پوسته',
-  'inc.pipped': 'نوک‌زده',
-  'inc.other': 'سایر',
+  'inc.unhatched': 'تعداد هچ‌نشده',
+  'inc.deadInShell': 'تعداد مرده در پوسته',
+  'inc.pipped': 'تعداد نوک‌زده',
+  'inc.other': 'تعداد سایر (هچ)',
   'inc.avgWeight': 'وزن جوجه',
   'hal.capacity': 'ظرفیت سالن',
   'hal.targetTemp': 'دمای هدف',
@@ -77,7 +77,7 @@ const FIELD_LABELS: Record<string, string> = {
   'feed.lysine': 'لیزین دان',
   'feed.sodium': 'سدیم دان',
   'feed.energy': 'انرژی دان',
-  'feed.perBirdGramsPerDay': 'گرم/پرنده/روز',
+  'feed.perBirdGramsPerDay': 'مصرف روزانه هر پرنده',
   'feed.bagWeight': 'وزن کیسه',
   'feed.bagCount': 'تعداد کیسه',
   // ─── گله (شاخص) ───
@@ -216,15 +216,11 @@ export function formatWarning(w: Warning): string {
   if (signals.some(s => s.type === 'zscore')) {
     return expected !== undefined
       ? `${label} غیرعادی (معمول: ${fmtNum(expected)})`
-      : `${label} مقدار غیرعادی`;
+      : `${label} غیرعادی`;
   }
   if (signals.some(s => s.type === 'iqr')) {
     return `${label} خارج از محدوده رایج`;
   }
 
-  // جلوگیری از تکرار کلمات وزنی در label (مقدار مقدار غیرعادی → مقدار غیرعادی)
-  if (/^(مقدار|تعداد|وزن|حجم|قیمت|مبلغ|درصد|ضریب)/.test(label)) {
-    return `${label} غیرعادی`;
-  }
-  return `${label} مقدار غیرعادی`;
+  return `${label} غیرعادی`;
 }
