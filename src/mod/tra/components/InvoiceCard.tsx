@@ -17,10 +17,11 @@ interface Props {
   onToggle: () => void;
   onTransferClick: () => void;
   onReopen?: () => void;
+  onEdit?: () => void;
   index: number;
 }
 
-export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, index }: Props) {
+export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, index }: Props) {
   const { updateInvoice } = useTra();
   const rem2 = remaining(inv);
   const st = rem2 === 0 ? 'paid' : paidSum(inv.payments || []) > 0 ? 'partial' : 'unpaid';
@@ -174,6 +175,15 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           style={{ marginBottom: 8 }}
         >
           📦 تحویل گرفتم (ایجاد گله و موجودی)
+        </Btn>
+      )}
+      {inv.workflowStatus !== 'paid' && onEdit && (
+        <Btn
+          size="sm" variant="outline" full
+          onClick={onEdit}
+          style={{ marginBottom: 8 }}
+        >
+          ✏️ ویرایش فاکتور
         </Btn>
       )}
       {nextWorkflowStatus(inv.workflowStatus) && (
