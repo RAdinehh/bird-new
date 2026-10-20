@@ -73,7 +73,6 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       eggWeight: floatNonNeg('وزن تخم', 200).optional(),
       brokenEggCount: floatNonNeg('تعداد شکسته', 100000).optional(),
       nonIncubableCount: floatNonNeg('تعداد غیرقابل جوجه‌کشی', 100000).optional(),
-      sourceFarm: optionalStr(100),
       
       medicineType: optionalStr(20),
       storage: optionalStr(20),

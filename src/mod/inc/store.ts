@@ -116,7 +116,6 @@ export interface EggEntry {
   sampleWeightCurrent?: number | null;
   createdAt: string; updatedAt: string;
   sourceInvoiceId?: string;
-  sourceFarm?: string;
   nonIncubableCount?: number | null;
   /** 🆕 تعداد تخم شکسته در فاکتور خرید */
   brokenEggCount?: number | null;

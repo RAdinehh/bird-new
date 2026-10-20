@@ -135,7 +135,6 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
             unitPrice: it.unitPrice || null,
             totalPrice: it.total || null,
             shippingCost: it.transportCost || it.shipping || null,
-            sourceFarm: it.sourceFarm || '',
             nonIncubableCount: it.nonIncubableCount ?? 0,
             brokenEggCount: it.brokenEggCount ?? null,
           } as any);
@@ -163,7 +162,6 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
           sampleWeightInitial: it.eggWeight || null,
           sampleWeightCurrent: null,
           sourceInvoiceId: inv.id,
-          sourceFarm: it.sourceFarm || '',
           nonIncubableCount: it.nonIncubableCount ?? 0,
           brokenEggCount: it.brokenEggCount ?? null,
         });

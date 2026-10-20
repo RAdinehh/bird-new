@@ -37,7 +37,6 @@ export interface ItemDetailFormData {
   eggDate?: string;
   brokenEggCount?: number | null;
   nonIncubableCount?: number | null;
-  sourceFarm?: string;
   expiryDate?: string;
   model?: string;
   serialNo?: string;
@@ -234,12 +233,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
           <Field label="نژاد" required>
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
-          </Field>
-        </Grid2>
-        <Grid2>
-          
-          <Field label="مبدأ / مرغداری مادر" hint="برای ردیابی">
-            <Input value={String(item.sourceFarm || '')} onChange={e => updateItem({ sourceFarm: e.target.value })} placeholder="آدینه" />
           </Field>
         </Grid2>
         <Grid2>
