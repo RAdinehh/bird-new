@@ -218,7 +218,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           return (
             <div key={it.id} style={{ 
               background: 'var(--card-solid)',
-              border: isExpanded ? '1.5px solid var(--accent)' : '1px solid var(--border)', 
+              border: '1px solid var(--border)', 
               borderRadius: 'var(--r-md)', 
               padding: 'var(--sp-3)',  marginBottom: 'var(--sp-2)',
               display: 'flex', 
@@ -496,7 +496,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   const isExpanded = expandedPaymentId === p.id;
                   const methodLabel = p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک';
                   return (
-                    <div key={p.id} style={{ padding: isExpanded ? 'var(--sp-3)' : 'var(--sp-2) var(--sp-3)', background: 'transparent', border: isExpanded ? '1.5px solid var(--accent)' : '1px solid var(--border)', borderRadius: 'var(--r-md)', transition: 'all 0.2s' }}>
+                    <div key={p.id} style={{ padding: isExpanded ? 'var(--sp-3)' : 'var(--sp-2) var(--sp-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', transition: 'all 0.2s' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: isExpanded ? 'default' : 'pointer' }} onClick={() => setExpandedPaymentId(isExpanded ? null : p.id)}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                           <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>

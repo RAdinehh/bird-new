@@ -77,7 +77,7 @@ export function useInvoiceForm(params: {
     const defaultUnit = getUnitForCategory(cat);
     return { ...f, items: [...f.items, {
       id: crypto.randomUUID(), description: '', unit: defaultUnit,
-      quantity: 1, unitPrice: 0, total: 0, itemId: '', movementId: '',
+      quantity: 0, unitPrice: 0, total: 0, itemId: '', movementId: '',
       discountType: '', discountValue: 0, shipping: 0,
     }] };
   });
