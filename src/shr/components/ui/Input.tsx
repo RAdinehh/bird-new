@@ -141,7 +141,7 @@ export function MoneyField({ value, ...props }: Omit<InputProps, 'mode' | 'dir' 
   const displayValue = value !== undefined && value !== null && String(value) !== ''
     ? formatNumWhileTyping(String(value))
     : '';
-  return <Input mode="number" dir="ltr" inputMode="numeric" unit="تومان" min={0} showWords autoClamp value={displayValue} {...props} />;
+  return <Input mode="number" inputMode="numeric" unit="تومان" min={0} showWords autoClamp value={displayValue} {...props} />;
 }
 export function PhoneField({ maxLength = 11, ...props }: Omit<InputProps, 'unit' | 'inputMode'> & { maxLength?: number }) {
   return <Input dir="ltr" inputMode="numeric" maxLength={maxLength} {...props} />;
@@ -151,10 +151,10 @@ export function DigitField({ maxLength, ...props }: Omit<InputProps, 'unit' | 'i
 }
 export function NumField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode'>) {
   const inputMode = (props as any).integer ? 'numeric' : 'decimal';
-  return <Input mode="number" dir="ltr" inputMode={inputMode} min={0} {...props} />;
+  return <Input mode="number" inputMode={inputMode} min={0} {...props} />;
 }
 export function PercentField(props: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'min' | 'max'>) {
-  return <Input mode="number" dir="ltr" inputMode="decimal" unit="٪" min={0} max={100} {...props} />;
+  return <Input mode="number" inputMode="decimal" unit="٪" min={0} max={100} {...props} />;
 }
 interface TextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
   error?: string;
