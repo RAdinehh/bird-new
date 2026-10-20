@@ -379,7 +379,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             )}
 
             {/* کادر شرایط پرداخت */}
-            <div style={{ background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', transition: 'all 0.2s' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
               {form.isPreorder && (
