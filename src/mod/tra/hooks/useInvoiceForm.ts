@@ -133,6 +133,7 @@ export function useInvoiceForm(params: {
       dueDate: inv.dueDate || '',
       payments: inv.payments || [],
       relatedFlockId: (inv as any).relatedFlockId || '',
+      isMixed: (inv as any).isMixed || false,
       notes: inv.notes || '',
       installments: inv.installments || [],
     });
@@ -156,7 +157,7 @@ export function useInvoiceForm(params: {
       total,
       payments: form.payments || [],
       dueDate: form.dueDate || '',
-      relatedFlockId: form.relatedFlockId || '',
+      relatedFlockId: form.relatedFlockId || '', isMixed: form.isMixed || false,
       relatedEntryId: '',
       notes: form.notes?.trim() || '',
       paymentTerms: form.paymentTerms,
@@ -208,7 +209,7 @@ export function useInvoiceForm(params: {
     const data: any = {
       type: kind, date: form.date, partyId: form.partyId, category: form.category,
       items: form.items, discount: 0, shipping: 0, total, payments: form.payments,
-      dueDate: form.dueDate, relatedFlockId: form.relatedFlockId || '',
+      dueDate: form.dueDate, relatedFlockId: form.relatedFlockId || '', isMixed: form.isMixed || false,
       relatedEntryId: '', notes: form.notes.trim(),
       paymentTerms: form.paymentTerms,
       installmentCount: form.paymentTerms === 'installment' ? (parseInt(toEn(form.installmentCount)) || 1) : undefined,

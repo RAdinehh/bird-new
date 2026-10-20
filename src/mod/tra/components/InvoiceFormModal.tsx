@@ -211,6 +211,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
 
 
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)', color: 'var(--muted)', cursor: 'pointer', marginTop: 8 }}>
+          <input type="checkbox" checked={!!form.isMixed} onChange={e => setForm({...form, isMixed: e.target.checked})} />
+          فاکتور مختلط (فروشنده هر قلم متفاوت است)
+        </label>
         {form.isPreorder && (
           <Field label="تاریخ تحویل" required>
             <DatePicker value={form.deliveryDate} onChange={v => setForm({...form, deliveryDate: v})}  autoToday />
@@ -301,7 +305,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               item={it}
               updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
               isPurchase={true}
-              sellerSlot={
+              sellerSlot={form.isMixed ? (
                 <Field label="فروشنده این قلم" hint="خالی = فروشنده اصلی">
                   <SmartSelect
                     value={it.itemPartyId || ''}
@@ -310,7 +314,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     placeholder="— همان اصلی —" modalTitle="انتخاب فروشنده" autoThreshold={6}
                   />
                 </Field>
-              }
+              ) : undefined}
             />
 
             {whsItems.length > 0 && !['chick', 'egg', 'fertile_egg', 'adult'].includes(it.category || form.category) && (
