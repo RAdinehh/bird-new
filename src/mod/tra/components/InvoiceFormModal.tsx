@@ -443,6 +443,20 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           )}
         </Grid2>
 
+        {form.paymentTerms === 'cash' && (
+          <div style={{
+            padding: '8px 12px',
+            background: 'var(--bg)',
+            borderRadius: 'var(--r-sm)',
+            fontSize: 'var(--fs-xs)',
+            color: 'var(--muted)',
+            textAlign: 'center',
+            fontWeight: 600
+          }}>
+            💡 پرداخت نقدی — نیازی به تنظیمات اضافه نیست
+          </div>
+        )}
+
         {form.paymentTerms !== 'cash' && (
           <>
             <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginTop: 4, marginBottom: 0 }}>
