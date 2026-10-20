@@ -101,6 +101,10 @@ export interface InvoiceItem extends ItemCategoryFields {
   sourceFarm?: string;
   /** تعداد تخم‌های غیرقابل جوجه‌کشی */
   nonIncubableCount?: number | null;
+  /** تعداد تخم شکسته (کمک به healthyCount) */
+  brokenEggCount?: number | null;
+  /** وزن یک تخم به گرم (برای entry به جوجه‌کشی) */
+  eggWeight?: number | null;
   /** شماره بچ هچری (برای جوجه یک‌روزه) */
   hatcheryBatchNo?: string;
   /** وزن اولیه جوجه به گرم */

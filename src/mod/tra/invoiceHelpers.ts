@@ -66,13 +66,16 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
   // ─── فروش تخم (خوراکی یا نطفه‌دار) — برای هر قلم جداگانه ───
   if (inv.type === 'sale') {
     const egg = useEgg.getState();
+    // 🆕 rebuild: پاک‌سازی sales قبلی این فاکتور، سپس افزودن مجدد
+    const oldSales = egg.sales.filter((x: any) => x.sourceInvoiceId === inv.id);
+    for (const s of oldSales) {
+      try { egg.deleteSale(s.id); } catch {}
+    }
     for (const it of outItems) {
       const cat = it.category || inv.category;
       if (cat !== 'egg' && cat !== 'fertile_egg') continue;
       if (!it.quantity || it.quantity <= 0) continue;
       const saleType = cat === 'fertile_egg' ? 'fertile' : 'eating';
-      const exists = egg.sales.find((x: any) => x.sourceInvoiceId === inv.id && x.date === inv.date);
-      if (exists) continue;
       try {
         egg.addSale({
           date: inv.date, type: saleType, count: it.quantity,
@@ -93,7 +96,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
     const brd = useBrd.getState();
 
     const keyOf = (it: any) =>
-      `${it.birdId || ''}|${it.breedId || ''}|${it.eggBatchNo || ''}`;
+      `${it.category || ''}|${it.birdId || ''}|${it.breedId || ''}|${it.eggBatchNo || ''}`;
 
     const findExisting = (it: any) => {
       const key = keyOf(it);
@@ -106,7 +109,8 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
     for (let i = 0; i < outItems.length; i++) {
       const it = outItems[i] as any;
       const cat = it.category || inv.category;
-      if (cat !== 'egg') continue;
+      // 🆕 fertile_egg هم به عنوان ورودی تخم‌گذاری ثبت می‌شه (نه flock)
+      if (cat !== 'egg' && cat !== 'fertile_egg') continue;
       if (!it.quantity || it.quantity <= 0) continue;
 
       const broken = it.brokenEggCount || 0;
