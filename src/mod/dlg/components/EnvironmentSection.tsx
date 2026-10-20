@@ -4,6 +4,8 @@
 import { Field, Grid2, Grid3, NumField, PercentField, Select, Textarea } from '../../../shr/components/ui';
 import type { F } from '../types';
 import { FieldHint } from '../../../shr/intelligence';
+import { useFlk } from '../../flk/store';
+import { useHal } from '../../hal/store';
 
 interface Props {
   form: F;
@@ -12,6 +14,11 @@ interface Props {
 }
 
 export default function EnvironmentSection({ form, setForm, vErrors }: Props) {
+  const flock = useFlk(s => form.flockId ? s.flocks.find(f => f.id === form.flockId) : undefined);
+  const hall = useHal(s => flock?.hallId ? s.halls.find(h => h.id === flock.hallId) : undefined);
+  const targetTemp = hall?.targetTemp ?? null;
+  const targetHumidity = hall?.targetHumidity ?? null;
+
   return (
     <>
 
@@ -20,13 +27,13 @@ export default function EnvironmentSection({ form, setForm, vErrors }: Props) {
           <Field label="حداقل دما" hint="۱۵-۳۰ درجه" error={vErrors.temperatureMin}>
             <NumField placeholder="۲۰" value={form.temperatureMin} onChange={e => setForm({ ...form, temperatureMin: e.target.value })} unit="°C" min={-10} max={50} />
           </Field>
-          <FieldHint fieldPath="dlg.temperatureMin" value={form.temperatureMin} />
+          <FieldHint fieldPath="dlg.temperatureMin" value={form.temperatureMin} context={targetTemp !== null ? { expected: targetTemp } : {}} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
           <Field label="حداکثر دما" hint="۱۵-۳۰ درجه" error={vErrors.temperatureMax}>
             <NumField placeholder="۲۵" value={form.temperatureMax} onChange={e => setForm({ ...form, temperatureMax: e.target.value })} unit="°C" min={-10} max={50} />
           </Field>
-          <FieldHint fieldPath="dlg.temperatureMax" value={form.temperatureMax} />
+          <FieldHint fieldPath="dlg.temperatureMax" value={form.temperatureMax} context={targetTemp !== null ? { expected: targetTemp } : {}} />
         </div>
       </Grid2>
 
@@ -35,13 +42,13 @@ export default function EnvironmentSection({ form, setForm, vErrors }: Props) {
           <Field label="حداقل رطوبت" hint="۴۰-۷۰٪" error={vErrors.humidityMin}>
             <PercentField placeholder="۵۰" value={form.humidityMin} onChange={e => setForm({ ...form, humidityMin: e.target.value })} />
           </Field>
-          <FieldHint fieldPath="dlg.humidityMin" value={form.humidityMin} />
+          <FieldHint fieldPath="dlg.humidityMin" value={form.humidityMin} context={targetHumidity !== null ? { expected: targetHumidity } : {}} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
           <Field label="حداکثر رطوبت" hint="۴۰-۷۰٪" error={vErrors.humidityMax}>
             <PercentField placeholder="۷۰" value={form.humidityMax} onChange={e => setForm({ ...form, humidityMax: e.target.value })} />
           </Field>
-          <FieldHint fieldPath="dlg.humidityMax" value={form.humidityMax} />
+          <FieldHint fieldPath="dlg.humidityMax" value={form.humidityMax} context={targetHumidity !== null ? { expected: targetHumidity } : {}} />
         </div>
       </Grid2>
 
