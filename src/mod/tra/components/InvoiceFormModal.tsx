@@ -372,7 +372,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت و تسویه</SectionTitle>
           <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
             
-            {/* خلاصه مالی */}
+            {/* خلاصه مالی */}{total > 0 && (
             <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-2) var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
                 <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
@@ -387,9 +387,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 <span style={{ fontWeight: 700, color: rem > 0.5 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
               </div>
             </div>
+            )}
 
-            <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
-              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>شرایط پرداخت</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', marginTop: 'var(--sp-2)' }}>
         {form.isPreorder && (
           <Grid2>
             <Field label="نوع پیش‌پرداخت">
@@ -486,7 +486,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </div>
 
             <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
-              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>پرداخت‌های ثبت‌شده</div>
+              
 
             {form.payments.map(p => {
               const isExpanded = expandedPaymentId === p.id;
