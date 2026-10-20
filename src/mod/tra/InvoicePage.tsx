@@ -212,6 +212,12 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     },
   );
 
+  // 🆕 per-field validation (show errors after touch or save attempt)
+  const [saveAttempted, setSaveAttempted] = useState(false);
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
+  const markTouched = (f: string) => setTouchedFields((prev) => { const n = new Set(prev); n.add(f); return n; });
+  const showError = (f: string) => (saveAttempted || touchedFields.has(f)) ? vErrors[f] : undefined;
+
   const doTransfer = () => {
     if (!transferModal) return;
     const inv = invoices.find(i => i.id === transferModal.id);
@@ -313,7 +319,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
 
       <InvoiceFormModal
         open={open}
-        setOpen={setOpen}
+        setOpen={(v: boolean) => { if (!v) { setSaveAttempted(false); setTouchedFields(new Set()); } setOpen(v); }}
         form={form}
         setForm={setForm}
         onNewFlock={() => setNewFlockModalOpen(true)}
@@ -322,11 +328,13 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         flocks={flocks}
         whsItems={whsItems}
         vErrors={vErrors}
+        showError={showError}
+        markTouched={markTouched}
         err={err}
         total={total}
         paid={paid}
         rem={rem}
-        save={save}
+        save={() => { setSaveAttempted(true); save(); }}
         addItem={addItem}
         updateItem={updateItem}
         removeItem={removeItem}

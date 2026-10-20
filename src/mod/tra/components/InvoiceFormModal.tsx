@@ -31,6 +31,9 @@ export interface InvoiceFormModalProps {
   whsItems: any[];
   vErrors: Record<string, string>;
   err: string;
+  /** 🆕 per-field validation */
+  showError: (field: string) => string | undefined;
+  markTouched: (field: string) => void;
   total: number;
   paid: number;
   rem: number;
@@ -121,7 +124,7 @@ const getQuantityMax = (cat: string): number | undefined => {
 export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   const {
     open, setOpen, form, setForm, isPurchase,
-    parties, flocks, whsItems, vErrors, err, onNewFlock,
+    parties, flocks, whsItems, vErrors, err, onNewFlock, showError, markTouched,
     total, paid, rem,
     save, addItem, updateItem, removeItem,
     addPayment, updatePayment, removePayment,
@@ -159,7 +162,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       >
         <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
         <Grid2>
-          <Field label="تاریخ" required error={vErrors.date}>
+          <Field label="تاریخ" required error={showError('date')} onTouch={() => markTouched('date')}>
             <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
           </Field>
           <Field label="دسته">
@@ -196,7 +199,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               )}
             </Select>
           </Field>
-          <Field label={isPurchase ? 'فروشنده' : 'مشتری'} required error={vErrors.partyId}>
+          <Field label={isPurchase ? 'فروشنده' : 'مشتری'} required error={showError('partyId')} onTouch={() => markTouched('partyId')}>
             <SmartSelect
               value={form.partyId}
               onChange={v => setForm({...form, partyId: v})}
