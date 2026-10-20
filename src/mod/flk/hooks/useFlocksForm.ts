@@ -74,7 +74,9 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       lessorId: f.dealData?.lessorId || '',
       rentAmount: f.dealData?.rentAmount ? toFa(f.dealData.rentAmount) : '',
       rentPeriod: f.dealData?.rentPeriod || 'monthly',
-      dealId: f.dealData?.dealId || ''
+      dealId: f.dealData?.dealId || '',
+      sourceInvoiceId: f.sourceInvoiceId || '',
+      hatchId: f.hatchId || ''
     });
     setLayingFromStd(false);
     setErr(''); setOpen(true);

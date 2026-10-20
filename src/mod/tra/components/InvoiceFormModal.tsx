@@ -568,7 +568,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={toFa(String(p.amount))} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                   </div>
                   {rem > 0 && p.type !== 'refund' && (
-                    <Btn size="sm" variant="outline" onClick={() => updatePayment(p.id, { amount: rem })} style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+                    <Btn variant="outline" onClick={() => updatePayment(p.id, { amount: rem })} style={{ flexShrink: 0, whiteSpace: 'nowrap', height: 38, padding: '0 12px' }}>
                       تسویه کل
                     </Btn>
                   )}
@@ -647,7 +647,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
         <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
         <Field label="یادداشت">
-            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+            <Textarea placeholder="..." rows={3} minRows={3} value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
 
         {/* 🆕 خلاصه فاکتور قبل از ذخیره */}

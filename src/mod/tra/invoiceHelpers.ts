@@ -393,6 +393,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           purchaseDate: effectiveDate,
           startDate: effectiveDate,
           source: 'purchase',
+          dealType: 'own',
           purchasePrice: it.unitPrice || 0,
           deliveryCost: (typeof it.transportCost === 'number' && it.transportCost > 0) ? it.transportCost : (typeof it.shipping === 'number' && it.shipping > 0 ? it.shipping : 0),
           otherCosts: 0,
