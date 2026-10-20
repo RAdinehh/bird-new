@@ -76,7 +76,7 @@ function getCrossFieldExpected(
 // ══════════════════════════════════════════════════════════════════
 // رأی‌گیری
 // ══════════════════════════════════════════════════════════════════
-function decideLevel(signals: Signal[]): AlertLevel | null {
+function decideLevel(signals: Signal[], cv?: number | null): AlertLevel | null {
   if (signals.length === 0) return null;
   // تک سیگنال: بر اساس وزن تصمیم بگیر
   if (signals.length === 1) {
@@ -85,11 +85,16 @@ function decideLevel(signals: Signal[]): AlertLevel | null {
     if (w >= 3) return 'yellow'; // ratio قوی (مثلاً 10x)
     return null;
   }
-  if (signals.length < 2) return null;  // ≥ ۲ سیگنال لازم برای بقیه
+  if (signals.length < 2) return null;
+  // CV بالا (>0.5) = کاربر متغیر → آستانه‌ها سخت‌تر (کاهش false positive)
+  const variable = cv !== null && cv !== undefined && cv > 0.5;
   const total = signals.reduce((s, x) => s + x.weight, 0);
-  if (total >= 5) return 'red';
-  if (total >= 3) return 'orange';
-  if (total >= 2) return 'yellow';
+  const redMin = variable ? 6 : 5;
+  const orangeMin = variable ? 5 : 3;
+  const yellowMin = variable ? 4 : 2;
+  if (total >= redMin) return 'red';
+  if (total >= orangeMin) return 'orange';
+  if (total >= yellowMin) return 'yellow';
   return null;
 }
 
@@ -247,7 +252,7 @@ export function analyzeAnomaly(
   }
 
   // ═══ ۵. تصمیم نهایی ═══
-  const level = decideLevel(signals);
+  const level = decideLevel(signals, hist?.stats?.cv ?? null);
   if (!level) return null;
 
   return {
