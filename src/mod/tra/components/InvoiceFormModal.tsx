@@ -298,7 +298,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       <MoneyField placeholder="مثلاً — ۱۰٬۰۰۰" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                     </Field>
                     <Field label="مبلغ کل این قلم">
-                      <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'ltr' }}>
+                      <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'ltr', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
                         {toFa(it.total.toLocaleString('fa-IR'))} ت
                       </div>
                     </Field>
