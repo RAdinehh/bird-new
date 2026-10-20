@@ -118,6 +118,8 @@ export interface EggEntry {
   sourceInvoiceId?: string;
   sourceFarm?: string;
   nonIncubableCount?: number | null;
+  /** 🆕 تعداد تخم شکسته در فاکتور خرید */
+  brokenEggCount?: number | null;
 }
 
 export interface Candling {

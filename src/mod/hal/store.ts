@@ -116,6 +116,10 @@ export interface Equipment {
   supplierId?: string;
   sourceInvoiceId?: string;
   warehouseItemId?: string;
+  /** 🆕 شماره سریال تجهیز */
+  serialNo?: string;
+  /** 🆕 مدل / نوع تجهیز */
+  model?: string;
   createdAt: string;
   updatedAt: string;
 }
