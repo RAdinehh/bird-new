@@ -4,7 +4,8 @@ import { useBrd } from '../../mod/brd/store';
 import { useHal } from '../../mod/hal/store';
 import { useFlk } from '../../mod/flk/store';
 import { useWhs } from '../../mod/whs/store';
-import { parseFaNum } from '../utils/fa';
+import { parseFaNum, toEn } from '../utils/fa';
+import { differenceInCalendarDays, parse as parseJ, format as formatJ, subDays, isValid } from 'date-fns-jalali';
 import DatePicker from './DatePicker';
 
 export interface ItemDetailFormData {
@@ -58,6 +59,7 @@ interface Props {
   item: ItemDetailFormData;
   updateItem: (patch: Partial<ItemDetailFormData>) => void;
   isPurchase?: boolean;
+  invoiceDate?: string;
   sellerSlot?: React.ReactNode;
 }
 
@@ -67,7 +69,7 @@ const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
   </div>
 );
 
-export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, sellerSlot }: Props) {
+export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, invoiceDate, sellerSlot }: Props) {
   const { birds, breeds } = useBrd();
   const { halls, zones } = useHal();
   const { flocks } = useFlk();
@@ -78,6 +80,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     : breeds;
 
   const activeFlocks = flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }));
+  
+  const birdObj = birds.find(b => b.id === item.birdId);
+  const breedObj = breeds.find(b => b.id === item.breedId);
+  const autoFlockName = `گله ${breedObj?.name || birdObj?.name || '...'} — ${invoiceDate || '...'}`;
   const isEggCategory = isPurchase ? category === 'egg' : category === 'fertile_egg';
 
   // ========== جوجه یک‌روزه ==========
