@@ -563,16 +563,27 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
             <Grid2>
               <Field label="مبلغ" hint={rem > 0 && p.type !== 'refund' ? `باقی‌مانده فاکتور: ${toFa(rem.toLocaleString('fa-IR'))} ت` : undefined}>
-                <div style={{ display: 'flex', gap: 4, alignItems: 'stretch', flexWrap: 'nowrap' }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={toFa(String(p.amount))} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={toFa(String(p.amount))} onChange={e => updatePayment(p.id, { amount: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                {rem > 0 && p.type !== 'refund' && (
+                  <div style={{ textAlign: 'left', marginTop: 4 }}>
+                    <button
+                      type="button"
+                      onClick={() => updatePayment(p.id, { amount: rem })}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--accent)',
+                        fontSize: 'var(--fs-xs)',
+                        cursor: 'pointer',
+                        padding: 0,
+                        fontWeight: 700,
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      تسویه کل ({toFa(rem.toLocaleString('fa-IR'))} ت)
+                    </button>
                   </div>
-                  {rem > 0 && p.type !== 'refund' && (
-                    <Btn size="sm" variant="outline" onClick={() => updatePayment(p.id, { amount: rem })} style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
-                      تسویه
-                    </Btn>
-                  )}
-                </div>
+                )}
               </Field>
               <Field label="تاریخ پرداخت">
                 <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })}  autoToday />
@@ -660,7 +671,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <InvoiceSmartSummary form={form} total={total} paid={paid} />
 
         <ErrorBox>{err}</ErrorBox>
-        <div style={{ height: 160 }} />
+        <div style={{ height: 220 }} />
       </Modal>
   );
 }
