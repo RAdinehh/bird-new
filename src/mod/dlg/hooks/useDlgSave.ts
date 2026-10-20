@@ -15,6 +15,7 @@ import { bus } from '../../../cor/events';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { toFa } from '../../../shr/utils/fa';
+import { recordHistory } from '../../../shr/intelligence';
 import type { F } from '../types';
 import type { DailyLog } from '../store';
 import { format as formatJ, addDays, parse as parseJ } from 'date-fns-jalali';
@@ -227,6 +228,29 @@ export function useDlgSave(params: UseDlgSaveParams) {
     } catch { /* silent */ }
 
     toastMsg.saved('ثبت روزانه');
+
+    // 🆕 ثبت تاریخچه برای Intelligence (silent — بدون تغییر UX)
+    try {
+      const ctxIntel = { flockSize: flockAliveCount, currentCount: flockAliveCount };
+      const recN = (p: string, v: number | null) => {
+        if (v !== null && Number.isFinite(v) && v > 0) recordHistory(p, v, ctxIntel);
+      };
+      recN('dlg.feedAmount', num(form.feedAmount));
+      recN('dlg.feedRemaining', num(form.feedRemaining));
+      recN('dlg.waterAmount', num(form.waterAmount));
+      recN('dlg.waterFillCount', num(form.waterFillCount));
+      recN('dlg.waterFillVolume', num(form.waterFillVolume));
+      recN('dlg.temperature', num(form.temperature));
+      recN('dlg.temperatureMin', num(form.temperatureMin));
+      recN('dlg.temperatureMax', num(form.temperatureMax));
+      recN('dlg.humidity', num(form.humidity));
+      recN('dlg.deathsCount', Number(data.deathsCount) || null);
+      recN('dlg.eatingEggs', int(form.eatingEggs));
+      recN('dlg.fertileEggs', int(form.fertileEggs));
+      recN('dlg.brokenEggs', int(form.brokenEggs));
+      recN('dlg.otherEggs', int(form.otherEggs));
+    } catch { /* silent */ }
+
     setOpen(false);
     setSaving(false);
     return true;
