@@ -112,7 +112,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [expandedPaymentId, setExpandedPaymentId] = useState<string | null>(null);
-  const [showTerms, setShowTerms] = useState(false);
   const [showPaymentSection, setShowPaymentSection] = useState(false);
 
   // باز کردن خودکار قلم جدید به همراه تنظیمات تکمیلی آن
@@ -382,14 +381,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
             {/* کادر شرایط پرداخت */}
             <div style={{ background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', transition: 'all 0.2s' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: showTerms ? 'default' : 'pointer' }} onClick={() => setShowTerms(!showTerms)}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>شرایط تسویه</span>
-                  <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>{form.paymentTerms === 'cash' ? 'نقدی' : form.paymentTerms === 'installment' ? (form.installmentCount && form.installmentGapDays ? `${toFa(form.installmentCount)} قسط × ${toFa(form.installmentGapDays)} روز` : 'قسطی') : (form.customDueDate ? `توافقی — تا ${toFa(form.customDueDate)}` : 'توافقی')}</span>
-                </div>
-                <span style={{ fontSize: 'var(--fs-base)', color: 'var(--muted)', lineHeight: 1 }}>{showTerms ? '▼' : '▶'}</span>
-              </div>
-              {showTerms && (<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
               {form.isPreorder && (
                 <Grid2>
@@ -486,7 +478,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   </div>
                 );
               })()}
-            </div>)}</div>
+            </div></div>
 
             {/* پرداخت‌های ثبت‌شده */}
             {form.payments.length > 0 && (
