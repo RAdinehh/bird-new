@@ -10,7 +10,6 @@ import {
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import { AccordionSection } from '../../../shr/components/AccordionSection';
 import ItemDetailsForm from '../../../shr/components/ItemDetailsForm';
 import InvoiceSmartSummary from './InvoiceSmartSummary';
 import { type CheckStatus } from '../store';
@@ -410,17 +409,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       </button>
       </div>
 
-      <AccordionSection
-        title="شرایط پرداخت"
-        icon="📅"
-        defaultOpen={form.paymentTerms !== 'cash' || form.isPreorder}
-        summary={
-          form.isPreorder ? 'پیش‌فروش'
-          : form.paymentTerms === 'cash' ? 'نقدی'
-          : form.paymentTerms === 'installment' ? `${toFa(form.installmentCount || '۰')} قسط`
-          : 'توافقی'
-        }
-      >
+      <SectionTitle>
+        <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> شرایط پرداخت
+      </SectionTitle>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', background: 'var(--card-solid)', marginBottom: 'var(--sp-4)' }}>
         <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', background: 'var(--card-solid)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {form.isPreorder && (
@@ -518,14 +510,12 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           })()}
         </div>
         </div>
-      </AccordionSection>
+      </div>
 
-      <AccordionSection
-        title="پرداخت‌ها و تسویه"
-        icon="💳"
-        defaultOpen={form.payments.length > 0}
-        key={`payments-${form.payments.length}`}
-      >
+      <SectionTitle>
+        <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت‌ها و تسویه
+      </SectionTitle>
+      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', background: 'var(--card-solid)', marginBottom: 'var(--sp-4)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           
           {/* خلاصه مالی */}
@@ -626,7 +616,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             <span style={{ fontSize: 18, lineHeight: 1, color: 'var(--accent)' }}>+</span> افزودن پرداخت دیگر
           </button>
         </div>
-      </AccordionSection>
+      </div>
 
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
       <Field label="یادداشت">
