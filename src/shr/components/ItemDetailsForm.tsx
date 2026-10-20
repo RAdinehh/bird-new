@@ -196,7 +196,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           const hasUnknown = item.unknownCount !== null && item.unknownCount !== undefined;
           const hasAny = hasMale || hasFemale || hasUnknown;
           
-          // اگر هیچ‌کدام پر نشده باشد، هیچ هشداری نده
           if (!hasAny) return null; 
 
           const sum = (item.maleCount || 0) + (item.femaleCount || 0) + (item.unknownCount || 0);
