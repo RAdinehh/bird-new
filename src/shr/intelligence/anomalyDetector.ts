@@ -140,7 +140,6 @@ export function analyzeAnomaly(
   if (typeof context.expected === 'number' && Number.isFinite(context.expected)) {
     expected = context.expected;
   }
-  // Cascade fallback: اگر استراتژی اول null داد، سراغ بعدی برو
   if (expected === null && profile.expectedFrom === 'cross_field' && profile.crossFieldRule) {
     expected = getCrossFieldExpected(profile.crossFieldRule, context);
   }

@@ -132,7 +132,9 @@ export function formatWarning(w: Warning): string {
 
   // pattern باید قبل از ratio چک بشه (چون هر دو expected دارن)
   if (signals.some(s => s.type === 'pattern')) {
-    return `${label} با الگوی همیشگی فرق داره`;
+    return expected !== undefined
+      ? `${label} با الگوی همیشگی فرق داره (معمول: ${fmtNum(expected)})`
+      : `${label} با الگوی همیشگی فرق داره`;
   }
 
   if (expected !== undefined && expected > 0) {
@@ -155,8 +157,12 @@ export function formatWarning(w: Warning): string {
         : `${label} ${fmtNum(pct)}٪ کمتر از استاندارد`;
     }
     const ratio = value / expected;
-    if (ratio > 1) return `${label} ${fmtMult(ratio)} برابر شده`;
-    return `${label} ${fmtMult(1 / ratio)} برابر کمتر شده`;
+    if (ratio >= 1) {
+      if (ratio >= 1.5) return `${label} ${fmtMult(ratio)} برابر شده`;
+      return `${label} ${fmtNum(Math.round((ratio - 1) * 100))}٪ بیشتر شده`;
+    }
+    const pctDown = Math.round((1 - ratio) * 100);
+    return `${label} ${fmtNum(pctDown)}٪ کمتر شده`;
   }
 
   if (signals.some(s => s.type === 'biological') && profile?.biologicalRange) {
@@ -172,5 +178,5 @@ export function formatWarning(w: Warning): string {
     return `${label} خارج از محدوده رایج`;
   }
 
-  return w.reason;
+  return `${label} مقدار غیرعادی`;
 }
