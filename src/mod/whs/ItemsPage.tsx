@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { recordHistory } from '../../shr/intelligence';
 import ItemCard from './components/ItemCard';
 import ItemsFormModal from './components/ItemsFormModal';
 import { useFab } from '../../shr/hooks/useFab';
@@ -57,6 +58,17 @@ interface F {
   equipmentStatus: string;
   warrantyUntil: string;
   initialPrice: string;
+  // ─── آنالیز دان ───
+  feedType: string;
+  brand: string;
+  protein: string;
+  energy: string;
+  fat: string;
+  fiber: string;
+  calcium: string;
+  phosphorus: string;
+  methionine: string;
+  lysine: string;
   // ─── دارو/واکسن ───
   usageType: string;
   productionDate: string;
@@ -70,7 +82,10 @@ const empty = (): F => ({
   withdrawalDays: '', batchNo: '', storage: 'room',
   notes: '',
   purchaseDate: '', purchasePrice: '', hallId: '', equipmentStatus: 'active', warrantyUntil: '', initialPrice: '',
-  usageType: '', productionDate: '', dosePerBird: ''
+  usageType: '', productionDate: '', dosePerBird: '',
+    feedType: '', brand: '',
+    protein: '', energy: '', fat: '', fiber: '',
+    calcium: '', phosphorus: '', methionine: '', lysine: ''
 });
 
 const EQUIP_STATUS: Record<string, string> = { active: 'فعال', repair: 'در تعمیر', scrapped: 'اسقاط' };
@@ -209,7 +224,17 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       initialPrice: '',
       usageType: it.usageType || '',
       productionDate: it.productionDate || '',
-      dosePerBird: it.dosePerBird ? toFa(it.dosePerBird) : ''
+      dosePerBird: it.dosePerBird ? toFa(it.dosePerBird) : '',
+      feedType: it.feedType || '',
+      brand: it.brand || '',
+      protein: it.protein ? toFa(it.protein) : '',
+      energy: it.energy ? toFa(it.energy) : '',
+      fat: it.fat ? toFa(it.fat) : '',
+      fiber: it.fiber ? toFa(it.fiber) : '',
+      calcium: it.calcium ? toFa(it.calcium) : '',
+      phosphorus: it.phosphorus ? toFa(it.phosphorus) : '',
+      methionine: it.methionine ? toFa(it.methionine) : '',
+      lysine: it.lysine ? toFa(it.lysine) : ''
     });
     setErr(''); setOpen(true);
   };
@@ -274,7 +299,17 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         initialPrice: num(form.initialPrice),
         usageType: isMed ? form.usageType : '',
         productionDate: isMed ? form.productionDate : '',
-        dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0
+        dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0,
+        feedType: form.feedType || '',
+        brand: form.brand || '',
+        protein: num(form.protein),
+        energy: num(form.energy),
+        fat: num(form.fat),
+        fiber: num(form.fiber),
+        calcium: num(form.calcium),
+        phosphorus: num(form.phosphorus),
+        methionine: num(form.methionine),
+        lysine: num(form.lysine)
       });
     } else {
       // ویرایش: currentStock و lastPrice نباید تغییر کنن
@@ -296,8 +331,40 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         warrantyUntil: form.category === 'equipment' ? form.warrantyUntil : '',
         usageType: isMed ? form.usageType : '',
         productionDate: isMed ? form.productionDate : '',
-        dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0
+        dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0,
+        feedType: form.feedType || '',
+        brand: form.brand || '',
+        protein: num(form.protein),
+        energy: num(form.energy),
+        fat: num(form.fat),
+        fiber: num(form.fiber),
+        calcium: num(form.calcium),
+        phosphorus: num(form.phosphorus),
+        methionine: num(form.methionine),
+        lysine: num(form.lysine)
       });
+    // 🆕 Intelligence — ثبت تاریخچه
+    try {
+      if (form.category === 'feed') {
+        const rn = (p: string, v: number | null) => {
+          if (v !== null && Number.isFinite(v) && v > 0) recordHistory(p, v, {});
+        };
+        rn('feed.protein', num(form.protein));
+        rn('feed.energy', num(form.energy));
+        rn('feed.fat', num(form.fat));
+        rn('feed.fiber', num(form.fiber));
+        rn('feed.calcium', num(form.calcium));
+        rn('feed.phosphorus', num(form.phosphorus));
+        rn('feed.methionine', num(form.methionine));
+        rn('feed.lysine', num(form.lysine));
+      }
+      if (form.category === 'medicine' || form.category === 'vaccine') {
+        const dose = form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : null;
+        const wd = form.withdrawalDays.trim() !== '' ? int(form.withdrawalDays) : null;
+        if (dose !== null && Number.isFinite(dose) && dose > 0) recordHistory('whs.dosePerBird', dose, {});
+        if (wd !== null && Number.isFinite(wd) && wd > 0) recordHistory('whs.withdrawalDays', wd, {});
+      }
+    } catch { /* silent */ }
     }
     setOpen(false);
   };
