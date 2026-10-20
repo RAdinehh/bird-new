@@ -18,6 +18,7 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { useFormErrors } from '../../shr/hooks/useFormErrors';
 import { createFlkSchema } from '../../shr/validation/rules/flk';
 import { toEn, toFa } from '../../shr/utils/fa';
+import { recordHistory } from '../../shr/intelligence';
 import type { TabId } from './types-flocks';
 import FlocksTabs from './components/FlocksTabs';
 import FlockTabPanel from './components/FlockTabPanel';
@@ -347,6 +348,21 @@ export default function FlocksPage() {
 
           // 🆕 Shadow Invoice: گله دستی + هزینه > 0 → فاکتور خودکار
           if (saveResult && saveResult.isNew) {
+            // 🆕 ثبت تاریخچه برای Intelligence (silent — فقط در ایجاد گله)
+            try {
+              const parseN = (s: string | undefined) => {
+                if (!s) return null;
+                const n = parseFloat(toEn(s).replace('٫', '.'));
+                return Number.isFinite(n) && n > 0 ? n : null;
+              };
+              const pPrice = parseN(form.purchasePrice);
+              const dCost = parseN(form.deliveryCost);
+              const oCost = parseN(form.otherCosts);
+              if (pPrice !== null) recordHistory('flk.purchasePrice', pPrice, {});
+              if (dCost !== null) recordHistory('flk.deliveryCost', dCost, {});
+              if (oCost !== null) recordHistory('flk.otherCosts', oCost, {});
+            } catch { /* silent */ }
+
             const isManual = !form.source || (form.source !== 'purchase' && form.source !== 'hatch');
             const _qty = parseInt(toEn(form.initialCount || '0')) || 0;
             const _unitPrice = parseFloat(toEn(form.purchasePrice || '0')) || 0;
