@@ -393,7 +393,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-3)', marginBottom: 'var(--sp-4)', background: 'var(--card-solid)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
             
             {/* خلاصه مالی */}{total > 0 && (
-            <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 'var(--sp-2) var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={{ padding: 'var(--sp-2) 0', borderBottom: '1px dashed var(--border)', marginBottom: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
                 <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
                 <span style={{ fontWeight: 700 }}>{toFa(total.toLocaleString('fa-IR'))} ت</span>
@@ -409,7 +409,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             </div>
             )}
 
-            <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', background: 'var(--bg)', overflow: 'hidden' }}>
+            <div>
               <div 
                 onClick={() => setShowTermsEditor(!showTermsEditor)} 
                 style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderBottom: showTermsEditor ? '1px dashed var(--border)' : 'none' }}
@@ -532,7 +532,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               )}
             </div>
 
-            <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
               
 
             {form.payments.map(p => {
