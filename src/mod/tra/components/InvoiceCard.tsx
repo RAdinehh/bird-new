@@ -70,7 +70,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
         {inv.items.map(it => (
-          <Row key={it.id} l={`${it.description || '—'} × ${toFa(it.quantity)}`} v={`${toFa(it.total.toLocaleString('fa-IR'))} ت`} />
+          <Row key={it.id} l={`${it.description || '—'} • ${toFa(it.quantity)} عدد × ${toFa(it.unitPrice)} ت`} v={`${toFa(it.total.toLocaleString('fa-IR'))} ت`} />
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>

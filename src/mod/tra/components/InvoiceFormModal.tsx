@@ -579,7 +579,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   {rem > 0 && p.type !== 'refund' && (
                     <button
                       type="button"
-                      onClick={() => updatePayment(p.id, { amount: rem })}
+                      onClick={() => updatePayment(p.id, { amount: (p.amount || 0) + rem })}
                       style={{
                         background: 'none',
                         border: 'none',
