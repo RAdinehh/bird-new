@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { useFlk } from '../flk/store';
+import { verifyInvariantsIfDev } from '../../shr/dev/invariants';
 import { useWhs } from '../whs/store';
 import { useHal } from '../hal/store';
 import { bus } from '../../cor/events';
@@ -278,6 +279,7 @@ export const useTra = create<State>()(
           }
         }
         set({ invoices: get().invoices.filter(x => x.id !== id) });
+    try { verifyInvariantsIfDev(); } catch(e) {}
         try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices, get().allocations)); } catch(e) {}
       },
 

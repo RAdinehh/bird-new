@@ -1,6 +1,5 @@
 /**
  * invariants.ts — Dev-only sanity checks (silent in production)
- * هر بار بعد از save/delete اجرا می‌شه، اگه ناسازگاری پیدا شد console.error می‌ده.
  */
 import { useTra } from '../../mod/tra/store';
 import { useWhs } from '../../mod/whs/store';
@@ -32,7 +31,7 @@ export function verifyInvariants(): string[] {
     }
   }
 
-  // ۲. flk: sourceInvoiceId باید اشاره به فاکتور موجود کنه
+  // ۲. flk: sourceInvoiceId → invoice exists
   const invoiceIds = new Set(invoices.map(i => i.id));
   for (const f of flk.flocks) {
     if (f.sourceInvoiceId && !invoiceIds.has(f.sourceInvoiceId)) {
@@ -40,21 +39,21 @@ export function verifyInvariants(): string[] {
     }
   }
 
-  // ۳. hal: همون
+  // ۳. hal
   for (const e of hal.equipment) {
     if (e.sourceInvoiceId && !invoiceIds.has(e.sourceInvoiceId)) {
       issues.push(`hal: "${e.name}" references missing invoice`);
     }
   }
 
-  // ۴. inc: همون
+  // ۴. inc
   for (const e of inc.eggEntries) {
     if (e.sourceInvoiceId && !invoiceIds.has(e.sourceInvoiceId)) {
       issues.push(`inc: eggEntry references missing invoice`);
     }
   }
 
-  // ۵. tra: payments غیرمنفی (به‌جز refund)
+  // ۵. tra: payments غیرمنفی
   for (const inv of invoices) {
     for (const p of inv.payments || []) {
       if ((p.amount || 0) < 0 && p.type !== 'refund') {

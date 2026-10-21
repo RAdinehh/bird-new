@@ -309,8 +309,10 @@ export function useInvoiceForm(params: {
     if (form.id) {
       updateInvoice(form.id, data);
       verifyInvariantsIfDev();
+      verifyInvariantsIfDev();
     } else {
       addInvoice(data);
+      verifyInvariantsIfDev();
       verifyInvariantsIfDev();
     }
 
