@@ -39,6 +39,7 @@ const FIELD_LABELS: Record<string, string> = {
   'flk.unknownCount': 'تعداد نامشخص',
   'flk.partnerPercent': 'درصد شریک',
   'flk.rentAmount': 'مبلغ اجاره',
+  'flk.rentPayments.amount': 'مبلغ پرداخت',
   'flk.layingStartDay': 'شروع تخم‌گذاری',
   'flk.endOfCycleDay': 'پایان چرخه',
   'flk.purchasePrice': 'قیمت خرید',
@@ -152,8 +153,20 @@ function crossFieldLabel(rule?: string): string {
     case 'lte_initial_sum':  return 'تعداد کل گله';
     case 'lte_egg_count':    return 'تعداد تخم ورودی';
     case 'lte_hall':         return 'ظرفیت سالن';
+    case 'lte_rent':         return 'مبلغ کل اجاره';
     default:                 return 'حد منطقی';
   }
+}
+
+export function formatWarningDetail(w: Warning): string {
+  const parts: string[] = [`مقدار: ${fmtNum(w.value)}`];
+  if (w.expected !== undefined) parts.push(`مرجع: ${fmtNum(w.expected)}`);
+  const profile = getProfile(w.field);
+  if (profile) {
+    if (typeof profile.hardMin === 'number') parts.push(`حداقل: ${fmtNum(profile.hardMin)}`);
+    if (typeof profile.hardMax === 'number') parts.push(`سقف: ${fmtNum(profile.hardMax)}`);
+  }
+  return parts.join(' · ');
 }
 
 export function formatWarning(w: Warning): string {
@@ -163,22 +176,18 @@ export function formatWarning(w: Warning): string {
   const kind = profile?.kind ?? 'count';
 
   if (signals.some(s => s.type === 'hard_min')) {
-    const lim = profile && typeof profile.hardMin === 'number' ? profile.hardMin : null;
-    return lim !== null ? `${label} کمتر از حداقل (${fmtNum(lim)})` : `${label} کمتر از حداقل مجاز`;
+    return `${label} کمتر از حداقل مجاز`;
   }
   if (signals.some(s => s.type === 'hard_max')) {
-    const lim = profile && typeof profile.hardMax === 'number' ? profile.hardMax : null;
-    return lim !== null ? `${label} بالاتر از سقف (${fmtNum(lim)})` : `${label} بالاتر از سقف مجاز`;
+    return `${label} بالاتر از سقف مجاز`;
   }
   if (signals.some(s => s.type === 'cross_absolute') && expected !== undefined) {
-    return `${label} بیشتر از ${crossFieldLabel(profile?.crossFieldRule)} (${fmtNum(expected)})`;
+    return `${label} بیش از ${crossFieldLabel(profile?.crossFieldRule)}`;
   }
 
   // pattern باید قبل از ratio چک بشه (چون هر دو expected دارن)
   if (signals.some(s => s.type === 'pattern')) {
-    return expected !== undefined
-      ? `${label} با الگوی همیشگی فرق داره (معمول: ${fmtNum(expected)})`
-      : `${label} با الگوی همیشگی فرق داره`;
+    return `${label} غیرمعمول`;
   }
 
   if (expected !== undefined && expected > 0) {
@@ -210,13 +219,10 @@ export function formatWarning(w: Warning): string {
   }
 
   if (signals.some(s => s.type === 'biological') && profile?.biologicalRange) {
-    const br = profile.biologicalRange;
-    return `${label} بیرون از محدوده (${fmtNum(br.min)}-${fmtNum(br.max)})`;
+    return `${label} بیرون از محدوده زیستی`;
   }
   if (signals.some(s => s.type === 'zscore')) {
-    return expected !== undefined
-      ? `${label} غیرعادی (معمول: ${fmtNum(expected)})`
-      : `${label} غیرعادی`;
+    return `${label} غیرعادی`;
   }
   if (signals.some(s => s.type === 'iqr')) {
     return `${label} خارج از محدوده رایج`;

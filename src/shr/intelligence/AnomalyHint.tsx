@@ -2,7 +2,7 @@
  * intelligence/AnomalyHint.tsx — یک خط نازک زیر فیلد
  */
 import type { Warning } from './types';
-import { formatWarning } from './formatWarning';
+import { formatWarning, formatWarningDetail } from './formatWarning';
 
 const TONES = {
   yellow: { bg: 'var(--warn-soft)', color: 'var(--warn)', icon: '⚠️' },
@@ -14,9 +14,10 @@ export function AnomalyHint({ warning }: { warning: Warning | null }) {
   if (!warning) return null;
   const c = TONES[warning.level];
   const msg = formatWarning(warning);
+  const detail = formatWarningDetail(warning);
   return (
     <div
-      role="status"
+      role="status" title={detail}
       style={{
         display: 'flex',
         alignItems: 'center',
