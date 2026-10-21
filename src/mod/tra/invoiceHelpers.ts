@@ -404,14 +404,16 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       if (!f) continue;
       const next = Math.max(0, (f.currentCount ?? 0) + sign * delta);
       const patch: any = { currentCount: next };
-      if (type === 'purchase' && delta > 0) {
-        patch.initialCount = (f.initialCount ?? 0) + delta;
-        patch.sourceInvoiceId = inv.id;
-        patch.sourceCategory = ref.cat;
-        if (it.unitPrice) patch.purchasePrice = it.unitPrice;
-        const transport = it.transportCost ?? it.shipping;
-        if (transport) patch.deliveryCost = transport;
-        if (effectiveDate) patch.purchaseDate = effectiveDate;
+      if (type === 'purchase') {
+        patch.initialCount = Math.max(0, (f.initialCount ?? 0) + delta);
+        if (delta > 0) {
+          patch.sourceInvoiceId = inv.id;
+          patch.sourceCategory = ref.cat;
+          if (it.unitPrice) patch.purchasePrice = it.unitPrice;
+          const transport = it.transportCost ?? it.shipping;
+          if (transport) patch.deliveryCost = transport;
+          if (effectiveDate) patch.purchaseDate = effectiveDate;
+        }
       }
       flk.update(explicitFlockId, patch);
       for (let i = 0; i < inv.items.length; i++) {
@@ -487,6 +489,38 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           if (keyOf(inv.items[i].category || inv.category, inv.items[i]) === k) outItems[i].flockId = newFlockId;
         }
       }
+    }
+  }
+
+
+  // 🆕 محاسبه delta برای گله‌های موجود (existingFlockId)
+  if (inv.type === 'purchase') {
+    const buildExistingMap = (inv2: Invoice | undefined): Map<string, number> => {
+      const mm = new Map<string, number>();
+      if (!inv2) return mm;
+      for (const it of inv2.items || []) {
+        if (!it.existingFlockId) continue;
+        const cat = it.category || inv2.category;
+        if (!BIRD_CATS.includes(cat)) continue;
+        const qty = (it.healthyCount ?? it.quantity) || 0;
+        mm.set(it.existingFlockId, (mm.get(it.existingFlockId) || 0) + qty);
+      }
+      return mm;
+    };
+    const prevEx = buildExistingMap(prev);
+    const newEx = buildExistingMap(inv);
+    const allExIds = new Set<string>([...prevEx.keys(), ...newEx.keys()]);
+    for (const flockId of allExIds) {
+      const pq = prevEx.get(flockId) || 0;
+      const nq = newEx.get(flockId) || 0;
+      const delta = nq - pq;
+      if (delta === 0) continue;
+      const f = flk.flocks.find((x: any) => x.id === flockId);
+      if (!f) continue;
+      flk.update(flockId, {
+        initialCount: Math.max(0, (f.initialCount ?? 0) + delta),
+        currentCount: Math.max(0, (f.currentCount ?? 0) + delta),
+      });
     }
   }
 
