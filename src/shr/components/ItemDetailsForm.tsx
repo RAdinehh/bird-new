@@ -111,7 +111,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="نام گله (اختیاری)" hint={`در صورت خالی بودن، "${autoFlockName}" انتخاب می‌شود`}>
+          <Field label="نام گله (اختیاری)" hint="در صورت خالی بودن، خودکار نام‌گذاری می‌شود">
             <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder={autoFlockName} />
           </Field>
           
@@ -168,21 +168,21 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
 
         <Grid3>
-          <Field label="تعداد نر (اختیاری)">
+          <Field label="نر" hint="اختیاری">
             <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
               updateItem({ maleCount: v });
             }} min={0} max={item.quantity || undefined} />
           </Field>
-          <Field label="تعداد ماده (اختیاری)">
+          <Field label="ماده" hint="اختیاری">
             <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
               updateItem({ femaleCount: v });
             }} min={0} max={item.quantity || undefined} />
           </Field>
-          <Field label="نامشخص (اختیاری)" hint="برای مخلوط">
+          <Field label="نامشخص" hint="مخلوط">
             <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;

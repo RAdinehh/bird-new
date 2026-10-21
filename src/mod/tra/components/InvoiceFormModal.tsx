@@ -241,7 +241,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
                     {it.quantity > 0 || it.unitPrice > 0
                       ? `${toFa(it.quantity)} ${(UNIT_LABEL as any)[it.unit || 'pcs'] || 'عدد'} × ${toFa(it.unitPrice)} ت`
-                      : 'در حال ویرایش...'}
+                      : ''}
                   </span>
                 </div>
                 
@@ -301,7 +301,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       <MoneyField placeholder="مبلغ تخفیف" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                     </Field>
                     <Field label="مبلغ کل این قلم">
-                      <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'ltr', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
+                      <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
                         {toFa(it.total.toLocaleString('fa-IR'))} ت
                       </div>
                     </Field>

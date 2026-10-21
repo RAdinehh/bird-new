@@ -70,7 +70,7 @@ export default function PaymentsSection({
                     </Select>
                   </Field>
                   <Field label="مقدار پیش‌پرداخت">
-                    <NumField placeholder="مقدار پیش‌پرداخت" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
+                    <NumField placeholder="مثلاً ۵۰۰,۰۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
                   </Field>
                 </Grid2>
               )}
@@ -104,10 +104,10 @@ export default function PaymentsSection({
                   </div>
                   <Grid2>
                     <Field label="تخفیف نقدی (٪)" hint="اگر زودتر پرداخت شود">
-                      <NumField placeholder="درصد تخفیف" value={form.cashDiscountPct || ''} onChange={e => setForm({...form, cashDiscountPct: e.target.value})} unit="٪" min={0} max={100} />
+                      <NumField placeholder="مثلاً ۲" value={form.cashDiscountPct || ''} onChange={e => setForm({...form, cashDiscountPct: e.target.value})} unit="٪" min={0} max={100} />
                     </Field>
                     <Field label="مهلت (روز)" hint="چند روز از تاریخ فاکتور">
-                      <NumField placeholder="تعداد روز" value={form.cashDiscountDays || ''} onChange={e => setForm({...form, cashDiscountDays: e.target.value})} unit="روز" min={0} />
+                      <NumField placeholder="مثلاً ۱۰" value={form.cashDiscountDays || ''} onChange={e => setForm({...form, cashDiscountDays: e.target.value})} unit="روز" min={0} />
                     </Field>
                   </Grid2>
                   {form.cashDiscountPct && form.cashDiscountDays && total > 0 && (
@@ -121,10 +121,10 @@ export default function PaymentsSection({
               {form.paymentTerms === 'installment' && (
                 <Grid2>
                   <Field label="تعداد اقساط" required>
-                    <NumField placeholder="تعداد اقساط" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
+                    <NumField placeholder="مثلاً ۱۲" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
                   </Field>
                   <Field label="فاصله" required>
-                    <NumField placeholder="فاصله روزها" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
+                    <NumField placeholder="مثلاً ۳۰" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
                   </Field>
                 </Grid2>
               )}
@@ -207,7 +207,7 @@ export default function PaymentsSection({
                               <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={toEn(form.date)} autoToday />
                             </Field>
                             <Field label="مبلغ">
-                              <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0; const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw; updatePayment(p.id, { amount: val }); }} />
+                              <MoneyField placeholder="مبلغ" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0; const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw; updatePayment(p.id, { amount: val }); }} />
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '0 4px' }}>
                                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} ت` : ''}</span>
                                 {rem > 0 && p.type !== 'refund' && (<button type="button" onClick={() => updatePayment(p.id, { amount: (p.amount || 0) + rem })} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>)}
