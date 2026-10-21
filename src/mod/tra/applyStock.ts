@@ -84,7 +84,7 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
   for (const [key, newQty] of newQtyByKey) {
     const prevQty = prevQtyByKey.get(key) || 0;
     const delta = newQty - prevQty;
-    if (delta > 0) {
+    if (delta !== 0) {
       const sample = outItems.find(it => isStockItem(it, inv) && stockKey(it) === key);
       if (sample) deltaByKey.set(key, { delta, sample });
     }
@@ -95,7 +95,7 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
     if (!itemId) continue;
     try {
       whs.addMovement({
-        itemId, type: 'in', quantity: delta,
+        itemId, type: (delta > 0 ? 'in' : 'out') as any, quantity: Math.abs(delta),
         unitPrice: Number(sample.unitPrice) || 0,
         reason: 'purchase',
         date: inv.deliveryDate || inv.date || '',
