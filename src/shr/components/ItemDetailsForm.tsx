@@ -45,6 +45,11 @@ export interface ItemDetailFormData {
   stockItemId?: string;
   existingFlockId?: string;
   deviceId?: string;
+  equipmentCategory?: string;
+  equipmentKind?: string;
+  equipmentType?: string;
+  equipmentStatus?: string;
+  brand?: string;
 }
 
 interface Props {
@@ -360,6 +365,33 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="⚙️" title="اطلاعات تجهیز" />
         <Grid2>
+          <Field label="دسته تجهیزات" required>
+            <Select value={String(item.equipmentCategory || '')} onChange={e => updateItem({ equipmentCategory: e.target.value })}>
+              <option value="">— انتخاب —</option>
+              <option value="cooling">❄️ سرمایشی (کولر، مه‌پاش، فن تونلی)</option>
+              <option value="heating">🔥 گرمایشی (هیتر، لامپ حرارتی)</option>
+              <option value="ventilation">💨 تهویه (فن هوایی، اینلت)</option>
+              <option value="feeding">🌾 دانخوری</option>
+              <option value="drinking">💧 آبخوری</option>
+              <option value="lighting">💡 روشنایی</option>
+              <option value="litter">🛏️ بستر</option>
+              <option value="power">⚡ برق و ژنراتور</option>
+              <option value="auxiliary">🔌 تجهیزات جانبی</option>
+              <option value="water_treatment">💦 تصفیه آب</option>
+              <option value="safety">🚨 ایمنی و آتش‌نشانی</option>
+              <option value="cleaning">🧹 نظافت و شستشو</option>
+              <option value="hand_tools">🔧 ابزار دستی (قیچی، پیچ‌گوشتی)</option>
+              <option value="weighing">⚖️ توزین</option>
+            </Select>
+          </Field>
+          <Field label="نوع" required>
+            <Select value={String(item.equipmentKind || 'asset')} onChange={e => updateItem({ equipmentKind: e.target.value })}>
+              <option value="asset">🏗️ دارایی (نصب در سالن)</option>
+              <option value="consumable">📦 مصرفی (نگهداری در انبار)</option>
+            </Select>
+          </Field>
+        </Grid2>
+        <Grid2>
           <Field label="مدل / نوع" required>
             <Input value={String(item.model || '')} onChange={e => updateItem({ model: e.target.value })} placeholder="فن تونلی ۱۲۰" />
           </Field>
@@ -371,7 +403,12 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="گارانتی (ماه)">
             <Input mode="number" value={item.warrantyMonths !== null && item.warrantyMonths !== undefined ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} max={60} />
           </Field>
-          <Field label="سالن مقصد" required hint="محل نصب — برای ثبت در انبار تجهیزات">
+          <Field label="برند / سازنده">
+            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="پارس، آکو، ..." />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="سالن مقصد" required={item.equipmentKind !== 'consumable'} hint={item.equipmentKind === 'consumable' ? 'برای مصرفی اختیاری' : 'محل نصب — برای ثبت در انبار تجهیزات'}>
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
           </Field>
         </Grid2>
