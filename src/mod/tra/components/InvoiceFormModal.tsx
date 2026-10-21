@@ -247,7 +247,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: it.total > 0 ? 'var(--accent)' : 'var(--muted)' }}>
-                    {toFa(it.total.toLocaleString('fa-IR'))} تومان
+                    {it.total > 0 ? `${toFa(it.total.toLocaleString('fa-IR'))} تومان` : ''}
                   </span>
                   <button 
                     type="button" 
@@ -283,10 +283,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
                   <Grid2>
                     <Field label="تعداد">
-                      <NumField value={toFa(String(it.quantity))} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
+                      <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                     </Field>
                     <Field label="قیمت واحد">
-                      <MoneyField placeholder={getPricePlaceholder(cat)} value={toFa(String(it.unitPrice))} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                      <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? toFa(String(it.unitPrice)) : ''} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                     </Field>
                   </Grid2>
 
@@ -302,7 +302,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     </Field>
                     <Field label="مبلغ کل این قلم">
                       <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
-                        {toFa(it.total.toLocaleString('fa-IR'))} تومان
+                        {it.total > 0 ? `${toFa(it.total.toLocaleString('fa-IR'))} تومان` : ''}
                       </div>
                     </Field>
                   </Grid2>
