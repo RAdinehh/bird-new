@@ -2,8 +2,10 @@
  * useInvoiceForm — state و منطق فرم فاکتور
  */
 import { useState, useMemo } from 'react';
+import { logAction } from '../../../cor/logger/auditLog';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
+import { useFlk } from '../../flk/store';
 import { paidSum, calcItemTotal, generateInstallments, type Invoice, type InvoiceItem, type Payment } from '../store';
 import { createInvoiceSchema } from '../../../shr/validation/rules/tra';
 import { recordHistory } from '../../../shr/intelligence';
@@ -220,6 +222,49 @@ export function useInvoiceForm(params: {
       if (!ok) return;
     }
     // ────────────────────────────────────────
+    // ═══ چک گله تکراری + دیالوگ تأیید (Odoo/SAP standard) ═══
+    if (kind === 'purchase') {
+      const flkState = useFlk.getState();
+      const duplicates: Array<{ item: any; dup: any }> = [];
+      for (const it of cleanedItems as any[]) {
+        const cat = it.category || form.category;
+        if (cat !== 'chick' && cat !== 'adult') continue;
+        if (it.existingFlockId) continue;
+        if (!it.birdId || !it.breedId) continue;
+        const incomingHall = String(it.hallId || '');
+        const dup = flkState.flocks.find((f: any) =>
+          f.status === 'active' &&
+          (f.birdId || '') === it.birdId &&
+          (f.breedId || '') === it.breedId &&
+          String(f.hallId || '') === incomingHall
+        );
+        if (dup) duplicates.push({ item: it, dup });
+      }
+
+      if (duplicates.length > 0) {
+        const dup = duplicates[0].dup;
+        const hallHint = dup.hallId ? '' : ' (بدون سالن)';
+        const count = duplicates.length;
+        const msg =
+          `گله مشابه موجود است:\n«${dup.name}»${hallHint}\n` +
+          `${toFa(dup.currentCount || 0)} پرنده\n\n` +
+          (count > 1 ? `(${toFa(count)} مورد مشابه یافت شد)\n\n` : '') +
+          `با تأیید، گله جدید ساخته می‌شود.\n` +
+          `برای اتصال به گله موجود، «لغو» را بزنید و از «اتصال به گله» استفاده کنید.`;
+
+        const ok = await showConfirmAsync('⚠️ گله تکراری', msg, {
+          confirmText: 'ادامه بده',
+          cancelText: 'لغو',
+        });
+        if (!ok) {
+          return;
+        }
+        try {
+          logAction('other', 'tra', `تایید ساخت گله تکراری — ${count} مورد: ${dup.name}`);
+        } catch {}
+      }
+    }
+
     const data: any = {
       type: kind, date: form.date, partyId: form.partyId, category: form.category,
       items: cleanedItems, discount: 0, shipping: 0, total, payments: cleanPayments,
