@@ -10,6 +10,7 @@ import {
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import ItemDetailsForm from '../../../shr/components/ItemDetailsForm';
+import { HELP } from '../../../shr/help/helpTexts';
 import InvoiceSmartSummary from './InvoiceSmartSummary';
 import PaymentsSection from './PaymentsSection';
 import { type CheckStatus } from '../store';
@@ -177,7 +178,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       </Grid2>
       
       <Grid2>
-        <Field label="نوع سفارش">
+        <Field label="نوع سفارش" help={HELP.tra.invoice.orderType}>
           <Select
             value={(form.isPreorder && form.category !== 'other') ? 'preorder' : 'stock'}
             onChange={e => setForm({ ...form, isPreorder: e.target.value === 'preorder' })}
