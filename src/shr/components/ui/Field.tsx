@@ -1,5 +1,6 @@
 /** components/ui/Field.tsx */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { HelpIcon } from './HelpIcon';
 
 interface FieldProps {
   label: React.ReactNode;
@@ -13,9 +14,25 @@ interface FieldProps {
   warning?: string;
   /** 🆕 وقتی کاربر از فیلد خارج شد (blur) */
   onTouch?: () => void;
+  help?: string;
+  autoHideMs?: number;
   children: React.ReactNode;
 }
-export function Field({ label, required, hint, autoFrom, error, warning, onTouch, children }: FieldProps) {
+export function Field({ label, required, hint, autoFrom, error, warning, onTouch, help, autoHideMs = 4000, children }: FieldProps) {
+  const [showError, setShowError] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
+  useEffect(() => {
+    if (!error) { setShowError(false); return; }
+    setShowError(true);
+    const t = setTimeout(() => setShowError(false), autoHideMs);
+    return () => clearTimeout(t);
+  }, [error, autoHideMs]);
+  useEffect(() => {
+    if (!warning) { setShowWarning(false); return; }
+    setShowWarning(true);
+    const t = setTimeout(() => setShowWarning(false), autoHideMs);
+    return () => clearTimeout(t);
+  }, [warning, autoHideMs]);
   return (
     <div
       style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}
@@ -77,7 +94,7 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
           )}
         </div>
       )}
-      {error && (
+      {error && showError && (
         <div style={{
           fontSize: 'var(--fs-xs)',
           color: 'var(--danger)',

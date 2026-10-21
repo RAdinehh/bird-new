@@ -68,20 +68,20 @@ export default function PaymentsSection({
 
               {form.isPreorder && (
                 <Grid2>
-                  <Field label="نوع پیش‌پرداخت">
+                  <Field label="نوع پیش‌پرداخت" help="درصد یا مبلغ — هرکدوم برات راحت‌تره">
                     <Select value={form.advanceType} onChange={e => setForm({...form, advanceType: e.target.value as 'percent' | 'amount'})}>
                       <option value="percent">درصد (٪)</option>
                       <option value="amount">مبلغ (ت)</option>
                     </Select>
                   </Field>
-                  <Field label="مقدار پیش‌پرداخت">
+                  <Field label="مقدار پیش‌پرداخت" help="پولی که همین الان می‌دی، بقیه اقساط">
                     <NumField placeholder="مثلاً ۵۰۰,۰۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'تومان'} min={0} />
                   </Field>
                 </Grid2>
               )}
 
               <Grid2>
-                <Field label="نوع تسویه">
+                <Field label="نوع تسویه" help="نقدی، قسطی، یا توافقی">
                   <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
                     <option value="cash">💵 نقدی</option>
                     <option value="installment">📅 قسطی</option>
@@ -94,7 +94,7 @@ export default function PaymentsSection({
                   </Field>
                 )}
                 {form.paymentTerms === 'custom' && (
-                  <Field label="تاریخ سرسید" required>
+                  <Field label="تاریخ سرسید" required help="تاریخ پرداخت نهایی — خودکار یا دستی">
                     <DatePicker value={form.customDueDate} onChange={v => setForm({...form, customDueDate: v, dueDate: v})}  autoToday />
                   </Field>
                 )}
@@ -108,10 +108,10 @@ export default function PaymentsSection({
                     💰 تخفیف نقدی (اختیاری)
                   </div>
                   <Grid2>
-                    <Field label="تخفیف نقدی (٪)" hint="پرداخت زودتر">
+                    <Field label="تخفیف نقدی (٪)" hint="پرداخت زودتر" help="درصد تخفیف اگه زودتر پرداخت شه">
                       <NumField placeholder="مثلاً ۲" value={form.cashDiscountPct || ''} onChange={e => setForm({...form, cashDiscountPct: e.target.value})} unit="٪" min={0} max={100} />
                     </Field>
-                    <Field label="مهلت (روز)" hint="از تاریخ فاکتور">
+                    <Field label="مهلت (روز)" hint="از تاریخ فاکتور" help="چند روز مهلت برای پرداخت با تخفیف">
                       <NumField placeholder="مثلاً ۱۰" value={form.cashDiscountDays || ''} onChange={e => setForm({...form, cashDiscountDays: e.target.value})} unit="روز" min={0} />
                     </Field>
                   </Grid2>
@@ -125,7 +125,7 @@ export default function PaymentsSection({
 
               {form.paymentTerms === 'installment' && (
                 <Grid2>
-                  <Field label="تعداد اقساط" required>
+                  <Field label="تعداد اقساط" required help="تعداد دفعات پرداخت — مثلاً ۴ برای ۴ قسط">
                     <NumField placeholder="مثلاً ۱۲" value={form.installmentCount} onChange={e => {
                     const newVal = e.target.value;
                     const cnt = parseInt(toEn(newVal)) || 0;
@@ -137,7 +137,7 @@ export default function PaymentsSection({
                     setForm({...form, installmentCount: newVal, installments: newInst});
                   }} unit="قسط" min={0} />
                   </Field>
-                  <Field label="فاصله" required>
+                  <Field label="فاصله" required help="تعداد روز بین هر قسط — ۳۰ = ماهانه">
                     <NumField placeholder="مثلاً ۳۰" value={form.installmentGapDays} onChange={e => {
                     const newVal = e.target.value;
                     const cnt = parseInt(toEn(form.installmentCount)) || 0;
