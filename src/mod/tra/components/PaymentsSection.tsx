@@ -82,7 +82,7 @@ export default function PaymentsSection({
               )}
 
               <Grid2>
-                <Field label="نوع تسویه" help="نقدی، قسطی، یا توافقی">
+                <Field label="نوع تسویه" help={HELP.tra.payment.paymentTerms}>
                   <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
                     <option value="cash">💵 نقدی</option>
                     <option value="installment">📅 قسطی</option>
