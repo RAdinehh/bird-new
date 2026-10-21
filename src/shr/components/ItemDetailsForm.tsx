@@ -166,7 +166,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
 
-        <Grid3>
+        <div style={{ display: (item.quantity || 0) > 0 ? 'contents' : 'none' }}>
+<Grid3>
           <Field label="نر">
             <Input mode="number" value={item.maleCount != null && item.maleCount > 0 ? String(item.maleCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
@@ -189,6 +190,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             }} min={0} max={item.quantity || undefined} />
           </Field>
         </Grid3>
+</div>
         
         {(() => {
           const q = item.quantity || 0;

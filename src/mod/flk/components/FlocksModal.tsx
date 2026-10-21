@@ -300,7 +300,8 @@ export default function FlocksModal(props: FlocksModalProps) {
             </Field>
             <FieldHint fieldPath="flk.layingStartDay" value={form.layingStartDay || formLaying} context={{ expected: formLaying || undefined }} />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+          <div style={{ display: (parseInt(toEn(form.initialCount)) || 0) > 0 ? 'contents' : 'none' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field
               label="سن پایان چرخه (روز)"
               hint={form.endOfCycleDay ? undefined : 'خالی = از استاندارد نژاد'}
@@ -316,6 +317,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             </Field>
             <FieldHint fieldPath="flk.endOfCycleDay" value={form.endOfCycleDay} context={{ expected: formStd?.biology?.endOfCycleDay ?? undefined }} />
           </div>
+</div>
         </Grid2>
       )}
 
