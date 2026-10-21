@@ -20,6 +20,9 @@ export const PaymentSchema = z.object({
   status: oneOf('وضعیت چک', ['pending', 'cleared', 'bounced'] as const).optional(),
 }).superRefine((data, ctx) => {
   const d = data as any;
+  if (!d.date || String(d.date).trim() === '') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'تاریخ پرداخت اجباری است', path: ['date'] });
+  }
   if (d.method === 'check') {
     if (!d.checkNo || d.checkNo.trim().length === 0) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'شماره چک اجباری است', path: ['checkNo'] });
