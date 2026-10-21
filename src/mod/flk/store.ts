@@ -427,7 +427,7 @@ export const useFlk = create<State>()(
     }),
     {
       name: 'pm-flk',
-      version: 9,
+      version: 10,
       migrate: flkMigrate,
     }
   )

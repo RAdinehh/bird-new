@@ -71,6 +71,12 @@ export interface FlockDealData {
   rentAmount?: number;
   rentPeriod?: 'monthly' | 'season' | 'total';
   dealId?: string;
+  /** 🆕 شروع اجاره (ممکنه ≠ startDate گله) */
+  rentStartDate?: string;
+  /** 🆕 پایان قرارداد اجاره */
+  rentEndDate?: string;
+  /** 🆕 پرداخت‌های واقعی اجاره */
+  rentPayments?: Array<{ id: string; date: string; amount: number; notes: string }>;
 }
 
 export type FlockGroupType = 'season' | 'breed' | 'cohort' | 'farm' | 'owner' | 'custom' | 'smart';

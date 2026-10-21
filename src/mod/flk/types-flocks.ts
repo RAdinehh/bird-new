@@ -34,6 +34,9 @@ export interface F {
   rentAmount: string;
   rentPeriod: string;
   dealId: string;
+  rentStartDate: string;
+  rentEndDate: string;
+  rentPayments?: Array<{ id: string; date: string; amount: number; notes: string }>;
 }
 
 export const emptyForm = (): F => ({
@@ -48,6 +51,7 @@ export const emptyForm = (): F => ({
   dealType: 'own',
   partnerId: '', partnerShare: '',
   consignorId: '', lessorId: '', rentAmount: '', rentPeriod: 'monthly', dealId: '',
+  rentStartDate: '', rentEndDate: '',
 });
 
 export type TabId = 'all' | 'layer' | 'broiler' | 'breeder' | 'hidden' | 'archived' | 'paused';

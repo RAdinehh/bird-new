@@ -216,5 +216,22 @@ export function flkMigrate(persistedInput: unknown, version: number): State {
     }));
   }
 
+  // ─── v9 → v10: rent dates + payments ───
+  if (version < 10) {
+    state.flocks = state.flocks.map((f: any) => {
+      if (f.dealType !== 'rent') return f;
+      const dd = f.dealData || {};
+      return {
+        ...f,
+        dealData: {
+          ...dd,
+          rentStartDate: dd.rentStartDate || f.startDate || f.purchaseDate || '',
+          rentEndDate: dd.rentEndDate || '',
+          rentPayments: dd.rentPayments || [],
+        },
+      };
+    });
+  }
+
   return persistedInput as State;
 }
