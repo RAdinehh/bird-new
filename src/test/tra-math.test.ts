@@ -40,8 +40,8 @@ describe('paidSum', () => {
   it('bounced check ignored', () => {
     expect(paidSum([{ amount: 1000, method: 'cash' }, { amount: 5000, method: 'check', status: 'bounced' }] as any)).toBe(1000);
   });
-  it('pending + cleared both counted', () => {
-    expect(paidSum([{ amount: 1000, method: 'check', status: 'pending' }, { amount: 2000, method: 'check', status: 'cleared' }] as any)).toBe(3000);
+  it('only cleared check counted (pending ignored)', () => {
+    expect(paidSum([{ amount: 1000, method: 'check', status: 'pending' }, { amount: 2000, method: 'check', status: 'cleared' }] as any)).toBe(2000);
   });
 });
 

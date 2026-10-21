@@ -150,13 +150,25 @@ export function itemsSum(items: InvoiceItem[]): number {
 }
 
 export function paidSum(payments: Payment[]): number {
+  // استاندارد ERP: فقط پرداخت‌های قطعی (cash، card، چک نقد‌شده)
   return Math.round(payments.reduce((a, x) => {
     const amt = x.amount || 0;
-    // عودت وجه (refund) از مبلغ پرداخت‌شده کم می‌شود
     if ((x as any).type === 'refund') return a - amt;
-    // چک برگشتی: پول واریز نشده، پس از جمع کسر نمی‌شود
-    if (x.method === 'check' && x.status === 'bounced') return a;
+    if (x.method === 'check') {
+      return x.status === 'cleared' ? a + amt : a;
+    }
     return a + amt;
+  }, 0));
+}
+
+/**
+ * پرداخت‌های در انتظار (چک pending — هنوز نقد نشده)
+ */
+export function paidPendingSum(payments: Payment[]): number {
+  return Math.round(payments.reduce((a, x) => {
+    if (x.method !== 'check') return a;
+    if ((x.status || 'pending') === 'pending') return a + (x.amount || 0);
+    return a;
   }, 0));
 }
 
