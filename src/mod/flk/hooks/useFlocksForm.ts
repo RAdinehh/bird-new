@@ -8,6 +8,7 @@ import { logAction } from '../../../cor/logger/auditLog';
 import { DEFAULT_LAYING_START } from '../store';
 import type { Flock } from '../store';
 import { useBrd } from '../../brd/store';
+import { useTra } from '../../tra/store';
 import type { Bird, Breed } from '../../brd/store';
 import type { Hall } from '../../hal/store';
 import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
@@ -189,9 +190,23 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
     // 🆕 breeder: male + female > initial (block) — موجود
     // ⚠️ warning برای < initial در UI هست، اینجا بلاک نمی‌کنیم
 
+    // 🆕 Backfill birdId/breedId from source invoice if empty
+    let resolvedBirdId = form.birdId;
+    let resolvedBreedId = form.breedId;
+    if (form.sourceInvoiceId && (!resolvedBirdId || !resolvedBreedId)) {
+      try {
+        const inv = useTra.getState().invoices.find((i: any) => i.id === form.sourceInvoiceId);
+        const srcItem = inv?.items?.find((it: any) => it.birdId || it.breedId);
+        if (srcItem) {
+          if (!resolvedBirdId && srcItem.birdId) resolvedBirdId = srcItem.birdId;
+          if (!resolvedBreedId && srcItem.breedId) resolvedBreedId = srcItem.breedId;
+        }
+      } catch (e) { console.warn('[flk save] source-invoice backfill failed:', e); }
+    }
+
     const data = {
       name: form.name.trim(), type: form.type,
-      birdId: form.birdId, breedId: form.breedId,
+      birdId: resolvedBirdId, breedId: resolvedBreedId,
       hallId: form.hallId, zoneId: form.zoneId,
       initialCount: int(form.initialCount),
       currentCount: int(form.currentCount) || int(form.initialCount),
