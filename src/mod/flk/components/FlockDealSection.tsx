@@ -55,6 +55,29 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
 
   const partnerShare = parseInt(toEn(form.partnerShare || '')) || 0;
   const rentAmountNum = parseFloat(toEn(form.rentAmount).replace('٫', '.').replace(/[,٬]/g, '')) || 0;
+  const rentPaidTotal = (form.rentPayments || []).reduce((a, p) => a + (Number(p.amount) || 0), 0);
+  const rentOutstanding = Math.max(0, rentAmountNum - rentPaidTotal);
+
+  // 🆕 سقف داینامیک پرداخت‌ها
+  const maxPayments = (() => {
+    let days = 0;
+    if (form.rentStartDate && form.rentEndDate) {
+      try {
+        const s = parseJ(toEn(form.rentStartDate), 'yyyy/MM/dd', new Date());
+        const e = parseJ(toEn(form.rentEndDate), 'yyyy/MM/dd', new Date());
+        if (!isNaN(s.getTime()) && !isNaN(e.getTime())) {
+          days = Math.max(0, Math.floor((e.getTime() - s.getTime()) / 86400000));
+        }
+      } catch {}
+    }
+    if (!days) return form.rentPeriod === 'total' ? 10 : 20;
+    if (form.rentPeriod === 'total') return 10;
+    if (form.rentPeriod === 'season') return Math.min(60, Math.max(8, Math.ceil(days / 90) * 3 + 2));
+    return Math.min(60, Math.max(12, Math.ceil(days / 30) * 2 + 2));
+  })();
+  const paymentCount = (form.rentPayments || []).length;
+  const canAddPayment = paymentCount < maxPayments;
+  const nearLimit = paymentCount >= Math.floor(maxPayments * 0.8);
   const cycleEnd = (() => {
     try {
       if (!form.hatchDate || !form.endOfCycleDay) return '';
@@ -189,12 +212,23 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
               </div>
             ))
           )}
-          <button type="button" onClick={() => {
-            const newP = { id: crypto.randomUUID(), date: todayJ(), amount: 0, notes: '' };
-            setForm({ ...form, rentPayments: [...(form.rentPayments || []), newP] });
-          }} style={{ width: '100%', height: 38, background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            + افزودن پرداخت
-          </button>
+          {canAddPayment ? (
+            <button type="button" onClick={() => {
+              const newP = { id: crypto.randomUUID(), date: todayJ(), amount: 0, notes: '' };
+              setForm({ ...form, rentPayments: [...(form.rentPayments || []), newP] });
+            }} style={{ width: '100%', height: 38, background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              + افزودن پرداخت {nearLimit && <span style={{ color: 'var(--warn)', fontSize: 'var(--fs-xs)' }}>({paymentCount}/{maxPayments})</span>}
+            </button>
+          ) : (
+            <div style={{ width: '100%', height: 38, background: 'var(--bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              🔒 حداکثر {maxPayments} پرداخت
+            </div>
+          )}
+          {nearLimit && canAddPayment && (
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', textAlign: 'center' }}>
+              ⚠️ {paymentCount} از {maxPayments} پرداخت — نزدیک به حداکثر
+            </div>
+          )}
           {(form.rentPayments || []).length > 0 && (
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center' }}>
               جمع پرداخت‌ها: {toFa((form.rentPayments || []).reduce((a, p) => a + (p.amount || 0), 0).toLocaleString('fa-IR'))} تومان{showError && showError('rentPayments') && (<span style={{ display: 'block', marginTop: 4, color: 'var(--danger)', fontWeight: 600, fontSize: 'var(--fs-xs)' }}>⚠️ {showError('rentPayments')}</span>)}
