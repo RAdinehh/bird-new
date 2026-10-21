@@ -373,10 +373,25 @@ export default function FlockCard(props: FlockCardProps) {
             {costs.birdCost > 0 && <Row l="قیمت پرنده‌ها" v={fmt.money(costs.birdCost)} />}
             {costs.delivery > 0 && <Row l="هزینه حمل" v={fmt.money(costs.delivery)} />}
             {costs.other > 0 && <Row l="سایر" v={fmt.money(costs.other)} />}
-            {dealType === 'rent' && rentAmount > 0 && (
-              <Row l={`اجاره (${rentPeriodLabel[dealData.rentPeriod || 'monthly'] || 'ماهانه'})`} v={`${fmt.money(rentAmount)} ⚠️`} />
+            {dealType === 'rent' && costs.rentOwed > 0 && (
+              <>
+                <Row l={`اجاره انباشته (${rentPeriodLabel[dealData.rentPeriod || 'monthly'] || 'ماهانه'})`} v={fmt.money(costs.rentOwed)} />
+                {costs.rentInfo.paid > 0 && (
+                  <Row l="پرداخت‌شده" v={fmt.money(costs.rentInfo.paid)} />
+                )}
+                {costs.rentInfo.outstanding > 0 && (
+                  <Row l="بدهی اجاره" v={fmt.money(costs.rentInfo.outstanding)} />
+                )}
+              </>
             )}
-            <Row l="جمع کل" v={fmt.money(costs.total)} accent />
+            {costs.rentOwed > 0 ? (
+              <>
+                <Row l="جمع خرید" v={fmt.money(costs.purchaseTotal)} />
+                <Row l="هزینه کل (با اجاره)" v={fmt.money(costs.grandTotalOwed)} accent />
+              </>
+            ) : (
+              <Row l="جمع کل" v={fmt.money(costs.total)} accent />
+            )}
             {costs.perBird > 0 && <Row l="هر پرنده" v={fmt.money(Math.round(costs.perBird))} accent />}
           </RowGrid>
         </>
@@ -385,8 +400,8 @@ export default function FlockCard(props: FlockCardProps) {
       {(() => {
         const revenue = invoiceRevenue;
         if (revenue === 0 && costs.total === 0) return null;
-        const profit = revenue - costs.total;
-        const roi = costs.total > 0 ? (profit / costs.total) * 100 : 0;
+        const profit = revenue - costs.grandTotalOwed;
+        const roi = costs.grandTotalOwed > 0 ? (profit / costs.grandTotalOwed) * 100 : 0;
         const isProfit = profit >= 0;
         const color = isProfit ? 'var(--accent)' : 'var(--danger)';
         return (

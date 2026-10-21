@@ -4,6 +4,7 @@
  */
 import { toEn } from '../../shr/utils/fa';
 import { parse, differenceInDays, differenceInCalendarDays } from 'date-fns-jalali';
+import { todayJ } from './api/flocksCalc';
 import type { Flock, FlockType, FlockStatus, FlockGroupRule } from './store';
 
 export const TYPE_LABEL: Record<FlockType, string> = { layer: 'تخم‌گذار', broiler: 'گوشتی', breeder: 'مادر' };
@@ -138,13 +139,96 @@ export function daysUntilLaying(f: Flock): number {
   return Math.max(0, getLayingStartDay(f) - getAgeDays(f));
 }
 
+function _toEnDigits(s: string): string {
+  return s.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+}
+
+function _daysBetween(start: string, end: string): number {
+  if (!start || !end) return 0;
+  try {
+    const s = parse(_toEnDigits(start), 'yyyy/MM/dd', new Date());
+    const e = parse(_toEnDigits(end), 'yyyy/MM/dd', new Date());
+    if (isNaN(s.getTime()) || isNaN(e.getTime())) return 0;
+    return Math.max(0, differenceInDays(e, s));
+  } catch { return 0; }
+}
+
+export interface RentAccrual {
+  owed: number;
+  paid: number;
+  outstanding: number;
+  daysElapsed: number;
+  totalDays: number;
+  isActive: boolean;
+}
+
+/** محاسبه اجاره انباشته (Owed) بر اساس روزهای سپری‌شده */
+export function calcRentAccrual(f: Flock): RentAccrual {
+  const zero: RentAccrual = { owed: 0, paid: 0, outstanding: 0, daysElapsed: 0, totalDays: 0, isActive: false };
+  if ((f as any).dealType !== 'rent') return zero;
+
+  const dd = (f as any).dealData || {};
+  const rentAmount = Number(dd.rentAmount) || 0;
+  if (rentAmount <= 0) return zero;
+
+  const period: 'monthly' | 'season' | 'total' = dd.rentPeriod || 'monthly';
+  const startDate = dd.rentStartDate || f.startDate || f.purchaseDate || '';
+  const endDate = dd.rentEndDate || '';
+
+  const isActive = f.status === 'active';
+  const effectiveEnd = f.status === 'active' ? todayJ() : (f.endDate || todayJ());
+
+  if (!startDate) return zero;
+
+  const daysElapsed = _daysBetween(startDate, effectiveEnd);
+  let owed = 0;
+  let totalDays = daysElapsed;
+
+  if (period === 'total') {
+    if (endDate) {
+      totalDays = _daysBetween(startDate, endDate);
+      owed = totalDays > 0 ? Math.round(rentAmount * Math.min(daysElapsed, totalDays) / totalDays) : rentAmount;
+    } else {
+      owed = rentAmount;
+    }
+  } else {
+    const periodDays = period === 'season' ? 90 : 30;
+    owed = rentAmount * Math.floor(daysElapsed / periodDays);
+  }
+
+  const paid = (dd.rentPayments || []).reduce((a: number, p: any) => a + (Number(p.amount) || 0), 0);
+  const outstanding = Math.max(0, owed - paid);
+
+  return { owed, paid, outstanding, daysElapsed, totalDays, isActive };
+}
+
 /** محاسبه‌ی هزینه‌ها */
 export function calcCosts(f: Flock) {
   const birdCost = (f.initialCount || 0) * (f.purchasePrice || 0);
   const delivery = f.deliveryCost || 0;
   const other = f.otherCosts || 0;
-  const total = birdCost + delivery + other;
-  const perBird = f.initialCount ? total / f.initialCount : 0;
-  return { birdCost, delivery, other, total, perBird };
+  const purchaseTotal = birdCost + delivery + other;
+
+  const rentInfo = calcRentAccrual(f);
+  const rentOwed = rentInfo.owed;
+  const rentPaid = rentInfo.paid;
+
+  const grandTotalOwed = purchaseTotal + rentOwed;
+  const grandTotalPaid = purchaseTotal + rentPaid;
+  const perBird = f.initialCount ? purchaseTotal / f.initialCount : 0;
+  const perBirdGrand = f.initialCount ? grandTotalOwed / f.initialCount : 0;
+
+  return {
+    birdCost, delivery, other,
+    total: purchaseTotal,       // backward-compat
+    purchaseTotal,
+    rentOwed,
+    rentPaid,
+    rentInfo,
+    grandTotalOwed,
+    grandTotalPaid,
+    perBird,
+    perBirdGrand,
+  };
 }
 

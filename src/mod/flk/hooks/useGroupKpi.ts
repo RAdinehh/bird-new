@@ -90,7 +90,7 @@ export function useGroupKpi(groupId: string): GroupKpi {
     const byFlock: GroupFlockRow[] = flocks.map(f => {
       const costs = calcCosts(f);
       const opCost = operationalCostByFlock[f.id] || 0;
-      const totalFlockCost = costs.total + opCost;
+      const totalFlockCost = costs.grandTotalOwed + opCost;
       const revenue = getFlockRevenue(f.id, invoices);
       return {
         id: f.id,
@@ -191,8 +191,8 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
         return {
           id: f.id, name: f.name, type: f.type, status: f.status,
           currentCount: f.currentCount || 0, initialCount: f.initialCount || 0,
-          ageDays: getAgeDays(f), cost: costs.total, revenue,
-          profit: revenue - costs.total,
+          ageDays: getAgeDays(f), cost: costs.grandTotalOwed, revenue,
+          profit: revenue - costs.grandTotalOwed,
         };
       });
 
