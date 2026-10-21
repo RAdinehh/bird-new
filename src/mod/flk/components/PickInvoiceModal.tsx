@@ -33,10 +33,10 @@ export default function PickInvoiceModal({ open, onClose, onSelect }: Props) {
   return (
     <Modal open={open} onClose={onClose} title="📄 انتخاب فاکتور خرید پرنده">
       {birdInvoices.length === 0 ? (
-        <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
-          <div style={{ fontSize: 40, marginBottom: 8 }}>📄</div>
+        <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-base)' }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>📄</div>
           <div>هیچ فاکتور خرید پرنده‌ای پیدا نشد</div>
-          <div style={{ fontSize: 11, marginTop: 4, opacity: 0.7 }}>ابتدا از بخش معاملات، فاکتور خرید پرنده ثبت کنید</div>
+          <div style={{ fontSize: 'var(--fs-sm)', marginTop: 4, opacity: 0.7 }}>ابتدا از بخش معاملات، فاکتور خرید پرنده ثبت کنید</div>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -66,14 +66,14 @@ export default function PickInvoiceModal({ open, onClose, onSelect }: Props) {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--accent)' }}>
+                  <span style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--accent)' }}>
                     {toFa(totalQty)} پرنده
                   </span>
-                  <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--muted)' }}>
+                  <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
                     {toFa(inv.date)}
                   </span>
                 </div>
-                <div style={{ fontSize: 11, color: 'var(--muted)', display: 'flex', gap: 6, alignItems: 'center' }}>
+                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', display: 'flex', gap: 6, alignItems: 'center' }}>
                   {inv.number && <span>#{inv.number}</span>}
                   {firstBird.breedId && <span>· نژاد: {firstBird.breedId.slice(0, 6)}</span>}
                   {inv.total > 0 && <span>· {toFa(Math.round(inv.total).toLocaleString('fa-IR'))} ت</span>}

@@ -6,6 +6,7 @@ import { toFa, toEn } from '../../../shr/utils/fa';
 import { useCtc } from '../../ctc/store';
 import { useTra } from '../../tra/store';
 import type { F } from '../types-flocks';
+import { HELP } from '../../../shr/help/helpTexts';
 
 interface Props {
   form: F;
@@ -59,7 +60,7 @@ export default function FlockDealSection({ form, setForm }: Props) {
     <>
       <div style={DIVIDER}>💼 مدل بهره‌برداری</div>
 
-      <Field label="نوع مالکیت">
+      <Field label="نوع مالکیت" help={HELP.flk.ownership.type}>
         <Select value={form.dealType || 'own'} onChange={e => setForm({ ...form, dealType: e.target.value })}>
           {Object.entries(DEAL_TYPE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </Select>
@@ -67,14 +68,14 @@ export default function FlockDealSection({ form, setForm }: Props) {
 
       {form.dealType === 'partnership' && (
         <>
-          <Field label="شریک" required>
+          <Field label="شریک" required help={HELP.flk.ownership.partner}>
             <Select value={form.partnerId || ''} onChange={e => setForm({ ...form, partnerId: e.target.value })}>
               <option value="">— انتخاب —</option>
               {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </Select>
           </Field>
           <Grid2>
-            <Field label="سهم شریک">
+            <Field label="سهم شریک" help={HELP.flk.ownership.partnerShare}>
               <NumField value={form.partnerShare || ''} onChange={e => setForm({ ...form, partnerShare: e.target.value })} unit="٪" min={0} max={100} />
             </Field>
             <Field label="سهم من" hint="خودکار">
@@ -85,7 +86,7 @@ export default function FlockDealSection({ form, setForm }: Props) {
       )}
 
       {form.dealType === 'consignment' && (
-        <Field label="امانت‌دهنده" required>
+        <Field label="امانت‌دهنده" required help={HELP.flk.ownership.consignor}>
           <Select value={form.consignorId || ''} onChange={e => setForm({ ...form, consignorId: e.target.value })}>
             <option value="">— انتخاب —</option>
             {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -95,17 +96,17 @@ export default function FlockDealSection({ form, setForm }: Props) {
 
       {form.dealType === 'rent' && (
         <>
-          <Field label="موجر (اجاره‌دهنده)" required>
+          <Field label="موجر (اجاره‌دهنده)" required help={HELP.flk.ownership.lessor}>
             <Select value={form.lessorId || ''} onChange={e => setForm({ ...form, lessorId: e.target.value })}>
               <option value="">— انتخاب —</option>
               {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </Select>
           </Field>
           <Grid2>
-            <Field label="مبلغ اجاره" required>
+            <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount}>
               <MoneyField value={form.rentAmount || ''} onChange={e => setForm({ ...form, rentAmount: e.target.value })} />
             </Field>
-            <Field label="دوره">
+            <Field label="دوره" help={HELP.flk.ownership.rentPeriod}>
               <Select value={form.rentPeriod || 'monthly'} onChange={e => setForm({ ...form, rentPeriod: e.target.value })}>
                 <option value="monthly">ماهانه</option>
                 <option value="season">فصلی</option>
