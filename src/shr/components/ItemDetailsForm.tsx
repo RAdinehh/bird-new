@@ -90,32 +90,25 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="🧬" title="اطلاعات گله" />
-        {isPurchase && (
-          <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
-            <SmartSelect
-              value={String(item.existingFlockId || '')}
-              onChange={v => updateItem({ existingFlockId: v, flockId: v })}
-              options={flocks.filter(f => f.status === 'active' && !f.sourceInvoiceId).map(f => ({ value: f.id, label: f.name }))}
-              placeholder="— ایجاد گله جدید —"
-              modalTitle="انتخاب گله"
-            />
-          </Field>
-        )}
-        <Grid2>
-          <Field label="نوع پرنده" required>
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
-          </Field>
-          <Field label="نژاد" required>
-            <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
-          </Field>
-        </Grid2>
-        <Grid2>
-          <Field label="نام گله (اختیاری)" hint="در صورت خالی بودن، خودکار نام‌گذاری می‌شود">
-            <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder={autoFlockName} />
-          </Field>
-          
-        </Grid2>
-        <Grid2>
+              <Grid2>
+                {isPurchase && (
+                  <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
+                    <SmartSelect value={String(item.existingFlockId || '')} onChange={v => updateItem({ existingFlockId: v, flockId: v })} options={flocks.filter(f => f.status === 'active' && !f.sourceInvoiceId).map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
+                  </Field>
+                )}
+                <Field label="نام گله (اختیاری)" hint="در صورت خالی بودن، خودکار نام‌گذاری می‌شود">
+                  <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder={autoFlockName} />
+                </Field>
+              </Grid2>
+              <Grid2>
+                <Field label="نوع پرنده" required>
+                  <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
+                </Field>
+                <Field label="نژاد" required>
+                  <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!!item.existingFlockId} />
+                </Field>
+              </Grid2>
+              <Grid2>
           <Field label="سالن مقصد">
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
           </Field>
