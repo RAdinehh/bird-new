@@ -8,6 +8,8 @@ import { useInc } from '../../mod/inc/store';
 import { parseFaNum, toEn, toFa } from '../utils/fa';
 import { differenceInCalendarDays, parse as parseJ, format as formatJ, subDays, isValid } from 'date-fns-jalali';
 import DatePicker from './DatePicker';
+import { typesForCategory } from '../../mod/hal/_equipHelpers';
+import { getEquipLabel } from '../../mod/hal/_typedLabels';
 
 export interface ItemDetailFormData {
   id?: string;
@@ -366,7 +368,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="⚙️" title="اطلاعات تجهیز" />
         <Grid2>
           <Field label="دسته تجهیزات" required>
-            <Select value={String(item.equipmentCategory || '')} onChange={e => updateItem({ equipmentCategory: e.target.value })}>
+            <Select value={String(item.equipmentCategory || '')} onChange={e => { const c = e.target.value; const nextType = (typesForCategory(c) as string[])[0] || ''; updateItem({ equipmentCategory: c, equipmentType: nextType }); }}>
               <option value="">— انتخاب —</option>
               <option value="cooling">❄️ سرمایشی (کولر، مه‌پاش، فن تونلی)</option>
               <option value="heating">🔥 گرمایشی (هیتر، لامپ حرارتی)</option>
@@ -388,6 +390,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Select value={String(item.equipmentKind || 'asset')} onChange={e => updateItem({ equipmentKind: e.target.value })}>
               <option value="asset">🏗️ دارایی (نصب در سالن)</option>
               <option value="consumable">📦 مصرفی (نگهداری در انبار)</option>
+            </Select>
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="نوع تجهیز" required>
+            <Select value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })}>
+              <option value="">— انتخاب —</option>
+              {(typesForCategory(String(item.equipmentCategory || '')) as string[]).map((t: string) => {
+                const lbl = getEquipLabel(t);
+                return <option key={t} value={t}>{lbl?.name || t}</option>;
+              })}
             </Select>
           </Field>
         </Grid2>
