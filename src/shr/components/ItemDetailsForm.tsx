@@ -371,7 +371,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="گارانتی (ماه)">
             <Input mode="number" value={item.warrantyMonths !== null && item.warrantyMonths !== undefined ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} max={60} />
           </Field>
-          <Field label="سالن مقصد" hint="محل نصب تجهیز">
+          <Field label="سالن مقصد" required hint="محل نصب — برای ثبت در انبار تجهیزات">
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
           </Field>
         </Grid2>
