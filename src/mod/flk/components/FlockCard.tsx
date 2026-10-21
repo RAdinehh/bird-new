@@ -227,9 +227,7 @@ export default function FlockCard(props: FlockCardProps) {
         {costs.perBird > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{fmt.money(Math.round(costs.perBird))}</b></span>}
       </>}
     >
-      {/* 🆕 گروه‌ها */}
 
-      {/* نوار چرخه زندگی — ۳ مرحله + نشانگر موقعیت */}
       {!isArchived && (
         <LifecycleBar
           type={f.type}
@@ -238,7 +236,6 @@ export default function FlockCard(props: FlockCardProps) {
         />
       )}
 
-      {/* 🔗 ادغام‌شده — merge history */}
       {f.mergedInfo && f.mergedInfo.sources.length > 1 && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🔗 ادغام‌شده</div>
@@ -295,7 +292,6 @@ export default function FlockCard(props: FlockCardProps) {
         </>
       )}
 
-      {/* 🐔 پرنده و نژاد */}
       {(bird || breed) && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 پرنده و نژاد</div>
@@ -309,7 +305,6 @@ export default function FlockCard(props: FlockCardProps) {
         </>
       )}
 
-      {/* 📍 مکان */}
       {(hall || zone) && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📍 مکان</div>
@@ -320,7 +315,6 @@ export default function FlockCard(props: FlockCardProps) {
         </>
       )}
 
-      {/* 📊 مشخصات */}
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات</div>
       <RowGrid>
         {ageDays > 0 && <Row l="سن" v={`${fmt.int(ageDays)} روز`} />}
@@ -354,7 +348,6 @@ export default function FlockCard(props: FlockCardProps) {
         })()}
       </RowGrid>
 
-      {/* 📅 تاریخ‌ها */}
       {(f.hatchDate || f.purchaseDate || f.startDate) && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📅 تاریخ‌ها</div>
@@ -366,7 +359,6 @@ export default function FlockCard(props: FlockCardProps) {
         </>
       )}
 
-      {/* 💰 هزینه‌ها */}
       {costs.total > 0 && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 هزینه‌ها</div>
@@ -380,7 +372,6 @@ export default function FlockCard(props: FlockCardProps) {
         </>
       )}
 
-      {/* 📈 درآمد و سود */}
       {(() => {
         const revenue = invoiceRevenue;
         if (revenue === 0 && costs.total === 0) return null;
@@ -403,14 +394,12 @@ export default function FlockCard(props: FlockCardProps) {
         );
       })()}
 
-      {/* دلیل آرشیو */}
       {isArchived && f.archivedReason && (
         <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)' }}>
           <b>دلیل آرشیو:</b> {f.archivedReason}
         </div>
       )}
 
-      {/* 📝 یادداشت */}
       {f.notes && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
@@ -418,7 +407,6 @@ export default function FlockCard(props: FlockCardProps) {
         </>
       )}
 
-      {/* دکمه‌ها */}
       {isArchived ? (
         <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
           <Btn size="sm" onClick={onRestore} style={{ flex: 1 }}>بازگردانی</Btn>
