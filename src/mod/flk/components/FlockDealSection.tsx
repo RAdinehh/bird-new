@@ -219,17 +219,30 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
                     setForm({ ...form, rentPayments: updated });
                   }} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => {
-                    const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                    const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, amount: raw } : x);
-                    setForm({ ...form, rentPayments: updated });
-                  }} />
-                
-                {p.amount > 0 && rentAmountNum > 0 && (
-                  <FieldHint fieldPath="flk.rentPayments.amount" value={p.amount} context={{ rentAmount: totalRentAmount }} />
-                )}
-                </div>
+                {(() => {
+                  const otherSum = (form.rentPayments || []).reduce((a, x, i) => i === idx ? a : a + (Number(x.amount) || 0), 0);
+                  const maxAllowed = totalRentAmount > 0 ? Math.max(0, totalRentAmount - otherSum) : Infinity;
+                  const isOver = totalRentAmount > 0 && p.amount > maxAllowed;
+                  return (
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ border: isOver ? '2px solid var(--danger)' : '2px solid transparent', borderRadius: 'var(--r-md)', transition: 'border-color 150ms' }}>
+                        <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => {
+                          const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                          const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, amount: raw } : x);
+                          setForm({ ...form, rentPayments: updated });
+                        }} />
+                      </div>
+                      {isOver && (
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginTop: 4, fontWeight: 600 }}>
+                          ⚠️ حداکثر {toFa(maxAllowed.toLocaleString('fa-IR'))} تومان مانده
+                        </div>
+                      )}
+                      {!isOver && p.amount > 0 && totalRentAmount > 0 && (
+                        <FieldHint fieldPath="flk.rentPayments.amount" value={p.amount} context={{ rentAmount: totalRentAmount }} />
+                      )}
+                    </div>
+                  );
+                })()}
                 <button type="button" onClick={() => {
                   const updated = (form.rentPayments || []).filter((_, i) => i !== idx);
                   setForm({ ...form, rentPayments: updated });
