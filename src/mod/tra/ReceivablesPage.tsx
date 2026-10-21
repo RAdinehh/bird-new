@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { daysUntilDue, dueTone, dueLabel } from './helpers';
 import DeferModal from './components/DeferModal';
-import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSum, WORKFLOW_LABEL, type Invoice, type Deferral } from './store';
+import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSumAllocated, WORKFLOW_LABEL, type Invoice, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
@@ -19,7 +19,7 @@ import UpcomingDueSection from './components/UpcomingDueSection';
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
-  const { invoices, updateInvoice } = useTra();
+  const { invoices, updateInvoice, allocations } = useTra();
   const { contacts } = useCtc();
   const [multiPayOpen, setMultiPayOpen] = useState(false);
   const [kind, setKind] = useState<'sale' | 'purchase'>('sale');
@@ -31,7 +31,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [showUpcoming, setShowUpcoming] = useState(false);
 
   const openInvoices = useMemo(
-    () => invoices.filter(i => i.type === kind && remaining(i) > 0),
+    () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0),
     [invoices, kind]
   );
 
@@ -79,9 +79,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   }, [filtered]);
 
   const bucketSum = (key: string) =>
-    (byBucket[key] || []).reduce((a, inv) => a + remaining(inv), 0);
+    (byBucket[key] || []).reduce((a, inv) => a + remaining(inv, allocations), 0);
 
-  const totalOpen = filtered.reduce((a, inv) => a + remaining(inv), 0);
+  const totalOpen = filtered.reduce((a, inv) => a + remaining(inv, allocations), 0);
   const overdueCount = openInvoices.filter(i => {
     const d = daysUntilDue(i);
     return d !== null && d < 0;
@@ -235,7 +235,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                     <div style={{ padding: '0 12px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
                       {items.map(inv => {
                         const party = contacts.find(c => c.id === inv.partyId);
-                        const rem = remaining(inv);
+                        const rem = remaining(inv, allocations);
                         const days = ageDays(inv);
                         const invOpen = expandedInvoice === inv.id;
                         const dUntil = daysUntilDue(inv);
@@ -289,7 +289,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                                   display: 'flex', flexDirection: 'column', gap: 3
                                 }}>
                                   <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
-                                  <Line l="پرداخت‌شده" v={`${toFa(paidSum(inv.payments || []).toLocaleString('fa-IR'))} تومان`} />
+                                  <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
                                   {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
                                   {inv.workflowStatus ? (
                                     <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus]} />

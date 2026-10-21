@@ -2,7 +2,7 @@ import { Tag, Btn } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { toFa } from '../../../shr/utils/fa';
 import {
-  WORKFLOW_LABEL, STATUS_LABEL, remaining, paidSum, workflowTone, nextWorkflowStatus, CHECK_STATUS_LABEL, type Invoice
+  WORKFLOW_LABEL, STATUS_LABEL, remaining, paidSumAllocated, workflowTone, nextWorkflowStatus, CHECK_STATUS_LABEL, type Invoice
 } from '../store';
 import { Row, RowGrid, SectionTitle } from '../helpers';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
@@ -22,9 +22,9 @@ interface Props {
 }
 
 export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, index }: Props) {
-  const { updateInvoice } = useTra();
-  const rem2 = remaining(inv);
-  const st = rem2 === 0 ? 'paid' : paidSum(inv.payments || []) > 0 ? 'partial' : 'unpaid';
+  const { updateInvoice, allocations } = useTra();
+  const rem2 = remaining(inv, allocations);
+  const st = rem2 === 0 ? 'paid' : paidSumAllocated(inv, allocations) > 0 ? 'partial' : 'unpaid';
 
   return (
     <ExpandableCard

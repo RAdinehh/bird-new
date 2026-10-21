@@ -8,7 +8,7 @@ import { useFlk } from '../flk/store';
 import { bus } from '../../cor/events';
 
 import type { Invoice, InvoiceItem, State } from './types';
-import { applyPaymentsToInstallments } from './calc';
+import { applyPaymentsToInstallments, paidSumAllocated } from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { applyInvoiceStock } from './applyStock';
 import { generateInvoiceNumber, paidSum } from './calc';
@@ -79,7 +79,7 @@ export const useTra = create<State>()(
           try { final.installments = applyPaymentsToInstallments(final.installments, syncedPayments); } catch(e) {}
         }
         set({ invoices: [...get().invoices, final] });
-        try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices)); } catch(e) {}
+        try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices, get().allocations)); } catch(e) {}
         return id;
       },
       updateInvoice: (id, patch) => {
@@ -152,8 +152,8 @@ export const useTra = create<State>()(
         }
         set({ invoices: get().invoices.map(x => x.id === id ? final : x) });
         try {
-          setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices));
-          if (prev.partyId && prev.partyId !== final.partyId) setPartyCredit(prev.partyId, computePartyCredit(prev.partyId, get().invoices));
+          setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices, get().allocations));
+          if (prev.partyId && prev.partyId !== final.partyId) setPartyCredit(prev.partyId, computePartyCredit(prev.partyId, get().invoices, get().allocations));
         } catch(e) {}
       },
       deleteInvoice: (id) => {
@@ -203,7 +203,7 @@ export const useTra = create<State>()(
           }
         }
         set({ invoices: get().invoices.filter(x => x.id !== id) });
-        try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices)); } catch(e) {}
+        try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices, get().allocations)); } catch(e) {}
       },
 
       // ═══ Phase 6: پرداخت‌های طرف حساب ═══
@@ -320,9 +320,9 @@ export const useTra = create<State>()(
 
 
 
-export function computePartyCredit(partyId: string, invoices: Invoice[]): number {
+export function computePartyCredit(partyId: string, invoices: Invoice[], allocations?: any[]): number {
   if (!partyId) return 0;
   return invoices
     .filter(inv => inv.partyId === partyId)
-    .reduce((acc, inv) => acc + (paidSum(inv.payments || []) - (inv.total || 0)), 0);
+    .reduce((acc, inv) => acc + (paidSumAllocated(inv, allocations) - (inv.total || 0)), 0);
 }

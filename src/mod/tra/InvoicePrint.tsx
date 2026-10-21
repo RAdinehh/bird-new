@@ -3,7 +3,7 @@
  */
 import { useSet } from '../set/store';
 import { useCtc } from '../ctc/store';
-import { PAYMENT_LABEL, remaining, paidSum, invoiceStatus, type Invoice } from './store';
+import { PAYMENT_LABEL, remaining, paidSumAllocated, invoiceStatus, useTra, type Invoice } from './store';
 import { toFa } from '../../shr/utils/fa';
 import { printHTML, printTemplate } from '../../shr/utils/export';
 import { formatInvoiceNumber } from './calc';
@@ -14,12 +14,13 @@ interface Props {
 }
 
 export default function InvoicePrint({ invoice, onClose }: Props) {
+  const allocations = useTra(s => s.allocations);
   const settings = useSet();
   const { contacts } = useCtc();
   const party = contacts.find(c => c.id === invoice.partyId);
-  const status = invoiceStatus(invoice);
-  const rem = remaining(invoice);
-  const paid = paidSum(invoice.payments || []);
+  const status = invoiceStatus(invoice, allocations);
+  const rem = remaining(invoice, allocations);
+  const paid = paidSumAllocated(invoice, allocations);
 
   const isSale = invoice.type === 'sale';
   const title = isSale ? 'فاکتور فروش' : 'فاکتور خرید';
