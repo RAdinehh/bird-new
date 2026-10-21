@@ -292,13 +292,13 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
                   <Grid2>
                     <Field label="هزینه حمل این قلم">
-                      <MoneyField placeholder="هزینه ارسال این قلم" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
+                      <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
                     </Field>
                   </Grid2>
 
                   <Grid2>
                     <Field label="تخفیف این قلم">
-                      <MoneyField placeholder="مبلغ تخفیف" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                      <MoneyField placeholder="مبلغ" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                     </Field>
                     <Field label="مبلغ کل این قلم">
                       <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>

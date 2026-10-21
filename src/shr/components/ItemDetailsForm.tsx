@@ -92,7 +92,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="🧬" title="اطلاعات گله" />
         {isPurchase && (
-          <Field label="اتصال به گله موجود" hint="اگر قبلاً گله را دستی ساخته‌اید">
+          <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
             <SmartSelect
               value={String(item.existingFlockId || '')}
               onChange={v => updateItem({ existingFlockId: v, flockId: v })}
@@ -168,21 +168,21 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
 
         <Grid3>
-          <Field label="نر" hint="اختیاری">
+          <Field label="نر">
             <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
               updateItem({ maleCount: v });
             }} min={0} max={item.quantity || undefined} />
           </Field>
-          <Field label="ماده" hint="اختیاری">
+          <Field label="ماده">
             <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
               updateItem({ femaleCount: v });
             }} min={0} max={item.quantity || undefined} />
           </Field>
-          <Field label="نامشخص" hint="مخلوط">
+          <Field label="نامشخص" hint="برای جنسیت مخلوط">
             <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
@@ -283,7 +283,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="🐓" title="اطلاعات پرنده بالغ" />
         {isPurchase && (
-          <Field label="اتصال به گله موجود" hint="اگر قبلاً گله را دستی ساخته‌اید">
+          <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
             <SmartSelect
               value={String(item.existingFlockId || '')}
               onChange={v => updateItem({ existingFlockId: v, flockId: v })}

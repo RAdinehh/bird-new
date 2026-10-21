@@ -103,10 +103,10 @@ export default function PaymentsSection({
                     💰 تخفیف نقدی (اختیاری)
                   </div>
                   <Grid2>
-                    <Field label="تخفیف نقدی (٪)" hint="اگر زودتر پرداخت شود">
+                    <Field label="تخفیف نقدی (٪)" hint="پرداخت زودتر">
                       <NumField placeholder="مثلاً ۲" value={form.cashDiscountPct || ''} onChange={e => setForm({...form, cashDiscountPct: e.target.value})} unit="٪" min={0} max={100} />
                     </Field>
-                    <Field label="مهلت (روز)" hint="چند روز از تاریخ فاکتور">
+                    <Field label="مهلت (روز)" hint="از تاریخ فاکتور">
                       <NumField placeholder="مثلاً ۱۰" value={form.cashDiscountDays || ''} onChange={e => setForm({...form, cashDiscountDays: e.target.value})} unit="روز" min={0} />
                     </Field>
                   </Grid2>
