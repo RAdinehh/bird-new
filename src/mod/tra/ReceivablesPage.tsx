@@ -13,6 +13,7 @@ import { showSuccess } from '../../cor/store/dialog';
 import { Line, tab } from './helpers';
 import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/filter';
 import MultiPayModal from './components/MultiPayModal';
+import SummaryBox from './components/SummaryBox';
 
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 
@@ -143,42 +144,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       </Btn>
 
       {/* خلاصه — یه خط */}
-      {totalOpen > 0 ? (
-        <div style={{
-          padding: 'var(--pad-comfy)',
-          background: kind === 'sale' ? 'var(--accent-soft)' : 'var(--warn-soft)',
-          border: `1px solid ${kind === 'sale' ? 'var(--accent-border)' : 'var(--warn)'}`,
-          borderRadius: 'var(--r-md)',
-        }}>
-          <div style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          }}>
-            <span style={{
-              fontSize: 'var(--fs-sm)', fontWeight: 700,
-              color: kind === 'sale' ? 'var(--accent)' : 'var(--warn)'
-            }}>
-              {kind === 'sale' ? 'مجموع طلب' : 'مجموع بدهی'}
-            </span>
-            <span style={{
-              fontSize: 'var(--fs-lg)', fontWeight: 700,
-              color: kind === 'sale' ? 'var(--accent)' : 'var(--warn)',
-              fontVariantNumeric: 'tabular-nums'
-            }}>
-              {toFa(totalOpen.toLocaleString('fa-IR'))} ت
-            </span>
-          </div>
-          <div style={{
-            display: 'flex', justifyContent: 'center', alignItems: 'center',
-            flexWrap: 'wrap', gap: 4, marginTop: 10
-          }}>
-            <StatBox icon="📋" label="تعداد" value={toFa(openInvoices.length)} />
-            <Dot />
-            <StatBox icon="⏰" label="معوق" value={toFa(overdueCount)} tone={overdueCount > 0 ? 'danger' : 'default'} />
-            <Dot />
-            <StatBox icon="⏳" label="سرسید" value={toFa(soonCount)} tone={soonCount > 0 ? 'warn' : 'default'} />
-          </div>
-        </div>
-      ) : null}
+      <SummaryBox kind={kind} totalOpen={totalOpen} openCount={openInvoices.length} overdueCount={overdueCount} soonCount={soonCount} />
 
       {/* ⏰ سرسیدهای نزدیک — collapsible */}
       {upcoming.length > 0 ? (
