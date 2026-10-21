@@ -99,7 +99,7 @@ export const useTra = create<State>()(
           try { itemsFinal = applyInvoiceFlocks(mergedWithItems, isReceiving ? undefined : prev); } catch(e) { console.error('[updateInvoice] applyInvoiceFlocks failed:', e); }
           try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
           try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
-          try { itemsFinal = applyInvoiceStock({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
+          try { itemsFinal = applyInvoiceStock({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
           // 🎯 اتصال به انبار از طریق Event Bus (rollback قبلی‌ها + حرکت‌های جدید)
           try { void bus.emit('tra:invoice:updated', {
             invoiceId: id,
