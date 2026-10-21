@@ -104,6 +104,17 @@ export default function FlockCreateStandalone({ open, onClose, onSaved }: Props)
     otherCosts: form.otherCosts ? num(form.otherCosts) : undefined,
     status: form.status,
     notes: form.notes || '',
+    dealType: (form.dealType || 'own') as any,
+    rentAmount: form.rentAmount ? num(form.rentAmount) : undefined,
+    rentStartDate: form.rentStartDate || '',
+    rentEndDate: form.rentEndDate || '',
+    rentPeriod: (form.rentPeriod || 'monthly') as any,
+    rentPayments: (form.rentPayments || []).map(p => ({
+      id: p.id,
+      date: p.date,
+      amount: Number(p.amount) || 0,
+      notes: p.notes || '',
+    })),
   });
 
   const { showError, markTouched, isValid, attemptSave } = useFormErrors(vErrors);
