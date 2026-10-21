@@ -120,6 +120,20 @@ export const useFlk = create<State>()(
         set({ flocks: [...get().flocks, {...f, id, createdAt: now(), updatedAt: now()}] });
         return id;
       },
+      repairFlockCounts: () => {
+        let fixed = 0;
+        set({
+          flocks: get().flocks.map((f: any) => {
+            // Fix only flocks where currentCount > initialCount (bug artifact)
+            if (f.currentCount != null && f.initialCount != null && f.currentCount > f.initialCount) {
+              fixed++;
+              return { ...f, currentCount: f.initialCount };
+            }
+            return f;
+          }),
+        });
+        return fixed;
+      },
       update: (id, patch) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       remove: (id) => {
         // 🆕 حذف مستقیم — تأیید و هشدار لینک‌ها در UI گرفته می‌شه
