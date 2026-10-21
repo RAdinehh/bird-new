@@ -84,6 +84,7 @@ export interface State {
   mergeFlocks: (targetId: string, sourceId: string, opts: { targetAgeDays: number; sourceAgeDays: number; hatchDate?: string }) => void;
   unmergeFlocks: (targetId: string) => void;
   add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => string;
+  repairFlockCounts: () => number;
   update: (id: string, patch: Partial<Flock>) => void;
   remove: (id: string) => void;
   archive: (id: string, reason?: string) => void;
