@@ -210,13 +210,15 @@ export default function FlocksModal(props: FlocksModalProps) {
           {form.breedKind === 'mixed' ? (
             <Input
               value={form.breedLabel || ''}
-              onChange={e => setForm(f => ({ ...f, breedLabel: e.target.value }))}
+              onChange={e => !isSourceLinked && setForm(f => ({ ...f, breedLabel: e.target.value }))}
               placeholder="مثلاً: مرندی محلی"
+            disabled={isSourceLinked}
             />
           ) : (
             <DependentSelect
+              disabled={isSourceLinked}
               value={form.breedId}
-              onChange={v => {
+              onChange={v => { if (isSourceLinked) return;
                 const std = breedStd.byBreedId(v);
                 const layStart = std?.biology?.layingStartDay;
                 if (layStart != null) {
