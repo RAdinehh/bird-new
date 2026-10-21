@@ -16,7 +16,7 @@ export function HelpIcon({ text }: Props) {
   useLayoutEffect(() => {
     if (!open || !btnRef.current) return;
     const btnRect = btnRef.current.getBoundingClientRect();
-    const popoverWidth = 240; // حداکثر عرض
+    const popoverWidth = Math.min(240, window.innerWidth - 32);
     const popoverHeight = 80; // تخمین ارتفاع
     const margin = 8;
 

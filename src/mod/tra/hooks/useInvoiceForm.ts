@@ -153,6 +153,9 @@ export function useInvoiceForm(params: {
       return;
     }
 
+    // ═══ فیلتر پرداخت‌های خالی ═══
+    const cleanPayments = (form.payments || []).filter((p: any) => (Number(p.amount) || 0) > 0);
+
     // ═══ اعتبارسنجی Zod (منبع حقیقت) ═══
     const validationData = {
       type: kind,
@@ -166,7 +169,7 @@ export function useInvoiceForm(params: {
       discount: 0,
       shipping: 0,
       total,
-      payments: form.payments || [],
+      payments: cleanPayments,
       dueDate: form.dueDate || '',
       relatedFlockId: form.relatedFlockId || '',
       relatedEntryId: '',
@@ -219,7 +222,7 @@ export function useInvoiceForm(params: {
     // ────────────────────────────────────────
     const data: any = {
       type: kind, date: form.date, partyId: form.partyId, category: form.category,
-      items: cleanedItems, discount: 0, shipping: 0, total, payments: form.payments,
+      items: cleanedItems, discount: 0, shipping: 0, total, payments: cleanPayments,
       dueDate: form.dueDate, relatedFlockId: form.relatedFlockId || '',
       relatedEntryId: '', notes: form.notes.trim(),
       paymentTerms: form.paymentTerms,
