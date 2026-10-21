@@ -31,6 +31,11 @@ export interface F {
   partnerShare: string;
   consignorId: string;
   lessorId: string;
+  barterPartyId?: string;
+  barterValue?: string;
+  barterDescription?: string;
+  barterStartDate?: string;
+  barterEndDate?: string;
   rentAmount: string;
   rentPeriod: string;
   dealId: string;
@@ -50,7 +55,7 @@ export const emptyForm = (): F => ({
   status: 'active', notes: '',
   dealType: 'own',
   partnerId: '', partnerShare: '',
-  consignorId: '', lessorId: '', rentAmount: '', rentPeriod: 'monthly', dealId: '',
+  consignorId: '', lessorId: '', barterPartyId: '', barterValue: '', barterDescription: '', barterStartDate: '', barterEndDate: '', rentAmount: '', rentPeriod: 'monthly', dealId: '',
   rentStartDate: '', rentEndDate: '',
 });
 

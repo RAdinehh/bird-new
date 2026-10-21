@@ -55,7 +55,7 @@ export function createFlkSchema(context: ValidationContext = {}) {
     status: z.enum(['active', 'archived', 'sold', 'merged']).default('active'),
     notes: optionalStr(1000),
     // 🆕 اجاره
-    dealType: z.enum(['own', 'partnership', 'consignment', 'rent']).optional(),
+    dealType: z.enum(['own', 'partnership', 'consignment', 'rent', 'barter']).optional(),
     rentAmount: z.number().min(0).optional().nullable(),
     rentStartDate: persianDateOpt('شروع اجاره'),
     rentEndDate: persianDateOpt('پایان قرارداد'),
@@ -66,6 +66,12 @@ export function createFlkSchema(context: ValidationContext = {}) {
       amount: z.number().min(0),
       notes: z.string().optional(),
     })).optional(),
+    // 🆕 تهاتر
+    barterPartyId: optionalId(),
+    barterValue: z.number().min(0).optional().nullable(),
+    barterDescription: optionalStr(500),
+    barterStartDate: persianDateOpt('تاریخ شروع تهاتر'),
+    barterEndDate: persianDateOpt('تاریخ پایان تهاتر'),
   }).superRefine((data, ctx) => {
     const d = data as any;
 
@@ -194,6 +200,15 @@ export function createFlkSchema(context: ValidationContext = {}) {
     }
 
     // 🆕 اعتبارسنجی اجاره
+    if (d.dealType === 'barter') {
+      if (d.barterStartDate && d.barterEndDate && d.barterStartDate >= d.barterEndDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'تاریخ پایان تهاتر باید بعد از شروع باشد',
+          path: ['barterEndDate'],
+        });
+      }
+    }
     if (d.dealType === 'rent') {
       if (d.rentStartDate && d.rentEndDate && d.rentStartDate >= d.rentEndDate) {
         ctx.addIssue({
