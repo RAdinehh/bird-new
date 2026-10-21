@@ -174,6 +174,11 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount} onTouch={() => markTouched?.('rentAmount')}>
               <MoneyField placeholder={form.rentPeriod === 'total' ? 'مبلغ کل دوره' : 'مبلغ هر دوره'} value={form.rentAmount || ''} onChange={e => setForm({ ...form, rentAmount: e.target.value })} />
             
+              {rentAmountNum > 0 && form.rentPeriod !== 'total' && calcDays > 0 && (
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4, paddingRight: 2 }}>
+                  مبلغ کل دوره ({toFa(Math.max(1, Math.ceil(calcDays / (form.rentPeriod === 'season' ? 90 : 30))))} {form.rentPeriod === 'season' ? 'فصل' : 'ماه'}): {toFa(totalRentAmount.toLocaleString('fa-IR'))} تومان
+                </div>
+              )}
               {rentAmountNum > 0 && <FieldHint fieldPath="flk.rentAmount" value={rentAmountNum} />}
             </Field>
             <Field label="دوره" help={HELP.flk.ownership.rentPeriod}>
@@ -222,7 +227,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
                   }} />
                 
                 {p.amount > 0 && rentAmountNum > 0 && (
-                  <FieldHint fieldPath="flk.rentPayments.amount" value={p.amount} context={{ rentAmount: rentAmountNum }} />
+                  <FieldHint fieldPath="flk.rentPayments.amount" value={p.amount} context={{ rentAmount: totalRentAmount }} />
                 )}
                 </div>
                 <button type="button" onClick={() => {
@@ -251,7 +256,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
           )}
           {(form.rentPayments || []).length > 0 && (
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center' }}>
-              جمع پرداخت‌ها: {toFa((form.rentPayments || []).reduce((a, p) => a + (p.amount || 0), 0).toLocaleString('fa-IR'))} تومان{showError && showError('rentPayments') && (<span style={{ display: 'block', marginTop: 4, color: 'var(--danger)', fontWeight: 600, fontSize: 'var(--fs-xs)' }}>⚠️ {showError('rentPayments')}</span>)}
+              جمع پرداخت‌ها: {toFa(rentPaidTotal.toLocaleString('fa-IR'))} تومان{totalRentAmount > 0 ? (rentOutstanding > 0 ? ' · باقیمانده: ' + toFa(rentOutstanding.toLocaleString('fa-IR')) : ' · ✅ تسویه شده') : ''}{showError && showError('rentPayments') && (<span style={{ display: 'block', marginTop: 4, color: 'var(--danger)', fontWeight: 600, fontSize: 'var(--fs-xs)' }}>⚠️ {showError('rentPayments')}</span>)}
             </div>
           )}
         </>
