@@ -207,7 +207,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
       {/* ====== اقلام (گروه) ====== */}
       <div style={{
-        border: '1.5px solid var(--muted)',
+        border: '1.5px solid var(--border)',
         borderRadius: 'var(--r-md)',
         padding: 'var(--sp-3)',
         marginBottom: 'var(--sp-3)',
@@ -368,7 +368,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       {/* ====== پرداخت و تسویه ====== */}
       {(total > 0 || showPaymentSection) && form.items.length > 0 && (
         <div style={{
-          border: '1.5px solid var(--muted)',
+          border: '1.5px solid var(--border)',
           borderRadius: 'var(--r-md)',
           padding: 'var(--sp-3)',
         }}>
