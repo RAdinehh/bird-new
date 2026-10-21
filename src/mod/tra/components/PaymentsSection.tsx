@@ -267,7 +267,7 @@ export default function PaymentsSection({
             )}
 
             {/* دکمه افزودن پرداخت */}
-            <button type="button" onClick={addPayment} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4 }}>
+            <button type="button" onClick={addPayment} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px dashed var(--accent-border, var(--border))', borderRadius: 'var(--r-md)', color: 'var(--accent, var(--text))', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>
               + {form.payments.length === 0 ? 'افزودن اولین پرداخت' : 'افزودن پرداخت دیگر'}
             </button>
 
