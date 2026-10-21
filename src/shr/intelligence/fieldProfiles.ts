@@ -281,7 +281,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
   'flk.otherCosts': P('flk.otherCosts', 'price', 1_000, 50_000_000_000, {
     expectedFrom: 'history_refbook', structuralBreakAware: true,
   }),
-  'flk.rentAmount': P('flk.rentAmount', 'price', 1_000, 50_000_000_000, {
+  'flk.rentAmount': P('flk.rentAmount', 'price', 100_000, 500_000_000_000, {
     expectedFrom: 'history', structuralBreakAware: true,
   }),
 

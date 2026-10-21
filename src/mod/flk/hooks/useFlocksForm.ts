@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
+import { recordHistory } from '../../../shr/intelligence';
 import { DEFAULT_LAYING_START } from '../store';
 import type { Flock } from '../store';
 import { useBrd } from '../../brd/store';
@@ -261,6 +262,16 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       isNew = true;
       logAction('add', 'flk', 'افزودن گله: ' + data.name + ' (' + (data.initialCount || 0) + ' پرنده)');
     }
+    // 🆕 ثبت تاریخچه هوش مصنوعی (null-safe)
+    try {
+      if (form.dealType === 'rent') {
+        const rentAmt = num(form.rentAmount);
+        if (rentAmt !== null && rentAmt > 0) {
+          recordHistory('flk.rentAmount', rentAmt, {});
+        }
+      }
+    } catch (e) { console.warn('[flk save] recordHistory failed:', e); }
+
     setOpen(false);
     return { id: savedId, isNew };
   };
