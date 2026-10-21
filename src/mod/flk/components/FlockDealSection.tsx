@@ -177,6 +177,10 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
                     const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, amount: raw } : x);
                     setForm({ ...form, rentPayments: updated });
                   }} />
+                
+                {p.amount > 0 && rentAmountNum > 0 && (
+                  <FieldHint fieldPath="flk.rentPayments.amount" value={p.amount} context={{ rentAmount: rentAmountNum }} />
+                )}
                 </div>
                 <button type="button" onClick={() => {
                   const updated = (form.rentPayments || []).filter((_, i) => i !== idx);
