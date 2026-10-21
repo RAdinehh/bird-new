@@ -239,7 +239,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           )}
         </Field>
       </Grid2>
-        {form.birdId && (
+        {form.birdId && !isSourceLinked && (
           <div style={{ textAlign: 'right', fontSize: 'var(--fs-xs)', marginTop: 4 }}>
             {form.breedKind === 'mixed' ? (
               <button type="button" onClick={() => setForm(f => ({ ...f, breedKind: 'standard', breedLabel: '' }))} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: 0, fontFamily: 'inherit', fontSize: 'inherit', textDecoration: 'underline' }}>
