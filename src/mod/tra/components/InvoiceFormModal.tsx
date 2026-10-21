@@ -205,6 +205,16 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         </Field>
       )}
 
+      {/* ====== اقلام (گروه) ====== */}
+      <div style={{
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r-md)',
+        padding: 'var(--sp-3)',
+        marginBottom: 'var(--sp-3)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--sp-2)',
+      }}>
       {/* ====== اقلام ====== */}
       <SectionTitle>
         <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام {total > 0 && `— جمع: ${toFa(total.toLocaleString('fa-IR'))} تومان`}
@@ -336,6 +346,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           + {form.items.length === 0 ? 'افزودن اولین قلم' : 'افزودن قلم دیگر'}
         </button>
       </div>
+      </div>
 
       {/* + دکمه تنظیم شرایط پرداخت (وقتی قیمت هنوز وارد نشده) */}
       {form.items.length > 0 && total === 0 && !showPaymentSection && (
@@ -356,6 +367,11 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
       {/* ====== پرداخت و تسویه ====== */}
       {(total > 0 || showPaymentSection) && form.items.length > 0 && (
+        <div style={{
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-md)',
+          padding: 'var(--sp-3)',
+        }}>
         <PaymentsSection
           form={form}
           setForm={setForm}
@@ -368,6 +384,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           updatePayment={updatePayment}
           removePayment={removePayment}
         />
+        </div>
       )}
 
       {form.items.length > 0 && total > 0 && <InvoiceSmartSummary form={form} total={total} paid={paid} />}
