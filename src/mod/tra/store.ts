@@ -29,6 +29,7 @@ export const useTra = create<State>()(
       invoices: [],
       partyPayments: [],
       deals: [],
+      allocations: [],
       reopenInvoice: (id) => {
         const prev = get().invoices.find(x => x.id === id);
         if (!prev || !prev.paidAt) return;
@@ -222,15 +223,42 @@ export const useTra = create<State>()(
 
       addDeal: (d) => set({ deals: [...get().deals, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       updateDeal: (id, patch) => set({ deals: get().deals.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
-      deleteDeal: (id) => set({ deals: get().deals.filter(x => x.id !== id) })
+      deleteDeal: (id) => set({ deals: get().deals.filter(x => x.id !== id) }),
+      addAllocation: (a) => {
+        const id = uuid();
+        set({ allocations: [...get().allocations, { ...a, id }] });
+        return id;
+      },
+      updateAllocation: (id, patch) => {
+        set({ allocations: get().allocations.map(x => x.id === id ? { ...x, ...patch } : x) });
+      },
+      deleteAllocation: (id) => {
+        set({ allocations: get().allocations.filter(x => x.id !== id) });
+      }
     }),
     {
       name: 'pm-tra',
-      version: 5,
+      version: 6,
       migrate: (persisted: any, version: number) => {
         if (!persisted?.invoices) return persisted;
 
-        persisted.invoices = persisted.invoices.map((inv: any) => {
+        // v5 → v6: build allocations from existing payments
+      if (version < 6) {
+        persisted.allocations = [];
+        for (const inv of (persisted.invoices || [])) {
+          for (const p of (inv.payments || [])) {
+            persisted.allocations.push({
+              id: uuid(),
+              paymentId: p.id,
+              invoiceId: inv.id,
+              amount: p.amount || 0,
+              date: p.date || '',
+              notes: 'migrated',
+            });
+          }
+        }
+      }
+      persisted.invoices = persisted.invoices.map((inv: any) => {
           // مقادیر پیش‌فرض بر اساس وضعیت فعلی
           const payments = inv.payments || [];
           const total = inv.total || 0;

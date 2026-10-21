@@ -232,10 +232,23 @@ export interface Deal {
   updatedAt: string;
 }
 
+export interface PaymentAllocation {
+  id: string;
+  paymentId: string;
+  invoiceId: string;
+  amount: number;
+  date: string;
+  notes?: string;
+}
+
 export interface State {
   reopenInvoice: (id: string) => void;
   invoices: Invoice[];
   deals: Deal[];
+  allocations: PaymentAllocation[];
+  addAllocation: (a: Omit<PaymentAllocation, 'id'>) => string;
+  updateAllocation: (id: string, patch: Partial<PaymentAllocation>) => void;
+  deleteAllocation: (id: string) => void;
   addInvoice: (i: Omit<Invoice, 'id'|'createdAt'|'updatedAt'>) => string;
   updateInvoice: (id: string, patch: Partial<Invoice>) => void;
   deleteInvoice: (id: string) => void;
