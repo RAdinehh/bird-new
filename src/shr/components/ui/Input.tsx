@@ -137,11 +137,11 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
     </div>
   );
 }
-export function MoneyField({ value, ...props }: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit' | 'showWords'>) {
+export function MoneyField({ value, showWords = true, ...props }: Omit<InputProps, 'mode' | 'dir' | 'inputMode' | 'unit'>) {
   const displayValue = value !== undefined && value !== null && String(value) !== ''
     ? formatNumWhileTyping(String(value))
     : '';
-  return <Input mode="number" inputMode="numeric" unit="تومان" min={0} showWords autoClamp value={displayValue} {...props} />;
+  return <Input mode="number" inputMode="numeric" unit="تومان" min={0} showWords={showWords} autoClamp value={displayValue} {...props} />;
 }
 export function PhoneField({ maxLength = 11, ...props }: Omit<InputProps, 'unit' | 'inputMode'> & { maxLength?: number }) {
   return <Input dir="ltr" inputMode="numeric" maxLength={maxLength} {...props} />;
