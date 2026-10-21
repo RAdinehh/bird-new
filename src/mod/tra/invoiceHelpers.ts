@@ -9,6 +9,7 @@ import { getBiology, getStandardFor } from '../set/standards/resolve';
 import { showToast } from '../../cor/store/toast';
 import { useHal } from '../hal/store';
 import { useEgg } from '../egg/store';
+import { useWhs } from '../whs/store';
 import type { Invoice, InvoiceItem, InvoiceType } from './types';
 
 /** اعمال اثر فاکتور روی گله‌ها — خرید جوجه/پرنده → افزودن، فروش → کاهش */
@@ -193,10 +194,62 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
 
 /* EQUIP_LINK */
 /** اتصال فاکتور تجهیزات → Equipment.sourceInvoiceId (خرید) */
+function ensureWhsItem(it: any, inv: Invoice, whs: any): string {
+  const name = String(it.description || it.model || '').trim();
+  if (!name) return '';
+  const qty = Number(it.quantity) || 1;
+
+  const addMovement = (itemId: string) => {
+    try {
+      whs.addMovement({
+        itemId, type: 'in', quantity: qty,
+        unitPrice: Number(it.unitPrice) || 0,
+        reason: 'purchase',
+        date: inv.deliveryDate || inv.date || '',
+        partyId: inv.partyId || '',
+        notes: `فاکتور ${inv.number || ''}${it.description ? ' — ' + it.description : ''}`,
+        sourceModule: 'tra', sourceId: inv.id,
+      } as any);
+    } catch (e) { console.error('[TRA→WHS movement]', e); }
+  };
+
+  if (it.stockItemId && whs.items.find((x: any) => x.id === it.stockItemId)) {
+    addMovement(it.stockItemId);
+    return it.stockItemId;
+  }
+
+  const existing = whs.items.find((x: any) => x.name === name && x.category === 'equipment');
+  if (existing) {
+    addMovement(existing.id);
+    return existing.id;
+  }
+
+  try {
+    const id = whs.addItem({
+      name, category: 'equipment', unit: (it.unit || 'pcs') as any,
+      minStock: 0, currentStock: 0,
+      lastPrice: Number(it.unitPrice) || 0,
+      supplierId: inv.partyId || '', expireDate: '',
+      withdrawalDays: null, batchNo: '', storage: 'room',
+      notes: `از فاکتور ${inv.number || ''}`,
+      brand: it.brand || '', hallId: it.hallId || '',
+      equipmentStatus: it.equipmentStatus || '',
+      purchaseDate: inv.deliveryDate || inv.date || '',
+      purchasePrice: Number(it.unitPrice) || 0,
+    } as any);
+    addMovement(id);
+    return id;
+  } catch (e) {
+    console.error('[TRA→WHS equipment addItem]', e);
+    return '';
+  }
+}
+
 export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
   if (inv.type !== 'purchase') return inv.items;
   
   const hal = useHal.getState();
+  const whs = useWhs.getState();
   const outItems: InvoiceItem[] = (inv.items || []).map(it => ({ ...it }));
   
   for (let i = 0; i < outItems.length; i++) {
@@ -207,7 +260,8 @@ export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
     if (eqId) {
       const eq = hal.equipment.find(e => e.id === eqId);
       if (eq && !eq.sourceInvoiceId) {
-        try { hal.updateEquip(eqId, { sourceInvoiceId: inv.id } as any); } catch {}
+        const whsId = ensureWhsItem(it, inv, whs);
+          try { hal.updateEquip(eqId, { sourceInvoiceId: inv.id, warehouseItemId: whsId || undefined } as any); } catch {}
       }
       continue;
     }
@@ -218,16 +272,20 @@ export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
     // ۳. اگر دسته تجهیزات نیست → رد شو
     const itemCat = it.category || inv.category;
     if (itemCat !== 'equipment') continue;
+    if (it.equipmentKind === 'consumable') continue;
     
     // ۴. بررسی تکراری: آیا قبلاً برای همین فاکتور ساخته شده؟
     const existing = hal.equipment.find(
       (e: any) => e.sourceInvoiceId === inv.id && e.name === (it.description || it.model || '')
     );
     
+    const whsIdExisting = ensureWhsItem(it, inv, whs);
+
     if (existing) {
       // آپدیت تجهیز موجود
       try {
         hal.updateEquip(existing.id, {
+            warehouseItemId: whsIdExisting || undefined,
           hallId: it.hallId,
           zoneId: it.zoneId || '',
           count: it.quantity || 1,
@@ -260,11 +318,13 @@ export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
         brand: it.brand || '',
         supplierId: inv.partyId || '',
         sourceInvoiceId: inv.id,
+        warehouseItemId: whsIdExisting || undefined,
         serialNo: it.serialNo || '',
         model: it.model || '',
         status: (it.equipmentStatus as any) || 'active',
       } as any);
       it.equipmentId = newId;
+      it.stockItemId = whsIdExisting || it.stockItemId;
     } catch (e) { console.error('[TRA→HAL create]', e); }
   }
   
