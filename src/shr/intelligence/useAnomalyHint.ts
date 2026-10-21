@@ -1,7 +1,7 @@
 /**
  * intelligence/useAnomalyHint.ts — hook نمایش هشدار
  */
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import type { AnalysisContext, Warning } from './types';
 import { analyzeAnomaly } from './anomalyDetector';
 
@@ -21,17 +21,24 @@ export function useAnomalyHint(
   value: number | string | null | undefined,
   context: AnalysisContext = {},
 ): Warning | null {
+  const [warning, setWarning] = useState<Warning | null>(null);
   const ctxKey = JSON.stringify(context);
   const valueKey = typeof value === 'number' ? value : String(value ?? '');
-  return useMemo(() => {
-    if (!fieldPath) return null;
-    const n = parseNumericValue(value);
-    if (n === null) return null;
-    try {
-      return analyzeAnomaly(fieldPath, n, context);
-    } catch {
-      return null;
-    }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!fieldPath) { setWarning(null); return; }
+      const n = parseNumericValue(value);
+      if (n === null) { setWarning(null); return; }
+      try {
+        setWarning(analyzeAnomaly(fieldPath, n, context));
+      } catch {
+        setWarning(null);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fieldPath, valueKey, ctxKey]);
+
+  return warning;
 }

@@ -128,7 +128,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             </Select>
           </Field>
           <Grid2>
-            <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount}>
+            <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount} onTouch={() => markTouched?.('rentAmount')}>
               <MoneyField placeholder={form.rentPeriod === 'total' ? 'مبلغ کل دوره' : 'مبلغ هر دوره'} value={form.rentAmount || ''} onChange={e => setForm({ ...form, rentAmount: e.target.value })} />
             
               {rentAmountNum > 0 && <FieldHint fieldPath="flk.rentAmount" value={rentAmountNum} />}
@@ -164,9 +164,9 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             </div>
           ) : (
             (form.rentPayments || []).map((p, idx) => (
-              <div key={p.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <div key={p.id} style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <DatePicker value={p.date} onChange={v => {
+                  <DatePicker value={p.date} min={form.rentStartDate || undefined} max={form.rentEndDate || undefined} onChange={v => {
                     const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, date: v } : x);
                     setForm({ ...form, rentPayments: updated });
                   }} />

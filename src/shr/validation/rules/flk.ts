@@ -207,9 +207,31 @@ export function createFlkSchema(context: ValidationContext = {}) {
         if (sum > d.rentAmount) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `جمع پرداخت‌ها (${sum.toLocaleString('fa-IR')}) از مبلغ کل اجاره (${d.rentAmount.toLocaleString('fa-IR')}) بیشتر است`,
+            message: `جمع پرداخت‌ها از مبلغ کل اجاره بیشتر است`,
             path: ['rentPayments'],
           });
+        }
+      }
+      // 🆕 تاریخ پرداخت‌ها داخل بازه اجاره
+      if (Array.isArray(d.rentPayments)) {
+        for (let i = 0; i < d.rentPayments.length; i++) {
+          const p = d.rentPayments[i];
+          if (p.date && d.rentStartDate && p.date < d.rentStartDate) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `تاریخ پرداخت ${i + 1} قبل از شروع اجاره است`,
+              path: ['rentPayments'],
+            });
+            break;
+          }
+          if (p.date && d.rentEndDate && p.date > d.rentEndDate) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `تاریخ پرداخت ${i + 1} بعد از پایان قرارداد است`,
+              path: ['rentPayments'],
+            });
+            break;
+          }
         }
       }
     }
