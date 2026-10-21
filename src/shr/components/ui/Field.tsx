@@ -1,5 +1,5 @@
 /** components/ui/Field.tsx */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { HelpIcon } from './HelpIcon';
 
 interface FieldProps {
@@ -21,22 +21,43 @@ interface FieldProps {
 export function Field({ label, required, hint, autoFrom, error, warning, onTouch, help, autoHideMs = 4000, children }: FieldProps) {
   const [showError, setShowError] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleInput = useCallback(() => {
+    setIsTyping(true);
+    if (typingTimer.current) clearTimeout(typingTimer.current);
+    typingTimer.current = setTimeout(() => setIsTyping(false), 500);
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    if (typingTimer.current) clearTimeout(typingTimer.current);
+    setIsTyping(false);
+    onTouch?.();
+  }, [onTouch]);
+
+  useEffect(() => () => {
+    if (typingTimer.current) clearTimeout(typingTimer.current);
+  }, []);
   useEffect(() => {
+    if (isTyping) { setShowError(false); return; }
     if (!error) { setShowError(false); return; }
     setShowError(true);
     const t = setTimeout(() => setShowError(false), autoHideMs);
     return () => clearTimeout(t);
-  }, [error, autoHideMs]);
+  }, [error, autoHideMs, isTyping]);
   useEffect(() => {
+    if (isTyping) { setShowWarning(false); return; }
     if (!warning) { setShowWarning(false); return; }
     setShowWarning(true);
     const t = setTimeout(() => setShowWarning(false), autoHideMs);
     return () => clearTimeout(t);
-  }, [warning, autoHideMs]);
+  }, [warning, autoHideMs, isTyping]);
   return (
     <div
       style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}
-      onBlurCapture={onTouch}
+      onInput={handleInput}
+      onBlurCapture={handleBlur}
     >
       <label style={{
         fontSize: 'var(--fs-sm)',
