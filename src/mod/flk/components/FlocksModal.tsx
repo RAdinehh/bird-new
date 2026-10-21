@@ -195,7 +195,7 @@ export default function FlocksModal(props: FlocksModalProps) {
 
             <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🐔 پرنده و نژاد</div>
       <Grid2>
-        <Field label="پرنده" required error={showError('birdId')} onTouch={() => markTouched('birdId')}>
+        <Field label={isSourceLinked ? <span>🔒 پرنده</span> : "پرنده"} required error={isSourceLinked ? undefined : showError('birdId')} onTouch={() => !isSourceLinked && markTouched('birdId')}>
           <SmartSelect
             value={form.birdId}
             onChange={v => !isSourceLinked && setForm(f => ({ ...f, birdId: v, breedId: '' }))}
@@ -206,7 +206,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             disabled={isSourceLinked}
           />
         </Field>
-        <Field label="نژاد" error={form.breedKind === 'mixed' ? undefined : showError('breedId')} onTouch={() => markTouched('breedId')}>
+        <Field label={isSourceLinked ? <span>🔒 نژاد</span> : "نژاد"} error={isSourceLinked ? undefined : (form.breedKind === 'mixed' ? undefined : showError('breedId'))} onTouch={() => !isSourceLinked && markTouched('breedId')}>
           {form.breedKind === 'mixed' ? (
             <Input
               value={form.breedLabel || ''}
@@ -255,7 +255,7 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📍 مکان</div>
       <Grid2>
-        <Field label="سالن" required error={showError('hallId')} onTouch={() => markTouched('hallId')}>
+        <Field label={isSourceLinked ? <span>🔒 سالن</span> : "سالن"} required error={isSourceLinked ? undefined : showError('hallId')} onTouch={() => markTouched('hallId')}>
           <SmartSelect
             value={form.hallId}
             onChange={v => !isSourceLinked && setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
