@@ -147,7 +147,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
     >
       {/* ====== اطلاعات پایه ====== */}
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--sp-1)', marginBottom: 'var(--sp-2)', paddingRight: 4, lineHeight: 1.4 }}>تاریخ، طرف حساب و نوع معامله</div>
+
       
       <Grid2>
         <Field label="تاریخ فاکتور" required error={showError('date')} onTouch={() => markTouched('date')}>
