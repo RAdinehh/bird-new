@@ -245,7 +245,11 @@ export function useInvoiceForm(params: {
           ? (total * (num(form.advanceValue) / 100)) 
           : num(form.advanceValue)
       ) : 0;
-      data.installments = generateInstallments(total, cnt, gap, form.date, advance);
+      if (form.installments && form.installments.length > 0) {
+        data.installments = form.installments;
+      } else {
+        data.installments = generateInstallments(total, cnt, gap, form.date, advance);
+      }
     } else {
       data.installments = [];
     }

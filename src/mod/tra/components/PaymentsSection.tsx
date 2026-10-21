@@ -121,10 +121,28 @@ export default function PaymentsSection({
               {form.paymentTerms === 'installment' && (
                 <Grid2>
                   <Field label="تعداد اقساط" required>
-                    <NumField placeholder="مثلاً ۱۲" value={form.installmentCount} onChange={e => setForm({...form, installmentCount: e.target.value})} unit="قسط" min={0} />
+                    <NumField placeholder="مثلاً ۱۲" value={form.installmentCount} onChange={e => {
+                    const newVal = e.target.value;
+                    const cnt = parseInt(toEn(newVal)) || 0;
+                    const gap = parseInt(toEn(form.installmentGapDays)) || 30;
+                    const advanceAmt = form.isPreorder && form.advanceType === 'amount'
+                      ? (parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0)
+                      : 0;
+                    const newInst = cnt > 0 ? generateInstallments(total, cnt, gap, form.date, advanceAmt) : [];
+                    setForm({...form, installmentCount: newVal, installments: newInst});
+                  }} unit="قسط" min={0} />
                   </Field>
                   <Field label="فاصله" required>
-                    <NumField placeholder="مثلاً ۳۰" value={form.installmentGapDays} onChange={e => setForm({...form, installmentGapDays: e.target.value})} unit="روز" min={0} />
+                    <NumField placeholder="مثلاً ۳۰" value={form.installmentGapDays} onChange={e => {
+                    const newVal = e.target.value;
+                    const cnt = parseInt(toEn(form.installmentCount)) || 0;
+                    const gap = parseInt(toEn(newVal)) || 30;
+                    const advanceAmt = form.isPreorder && form.advanceType === 'amount'
+                      ? (parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0)
+                      : 0;
+                    const newInst = cnt > 0 ? generateInstallments(total, cnt, gap, form.date, advanceAmt) : [];
+                    setForm({...form, installmentGapDays: newVal, installments: newInst});
+                  }} unit="روز" min={0} />
                   </Field>
                 </Grid2>
               )}
@@ -141,15 +159,22 @@ export default function PaymentsSection({
                   else if (it.discountType === 'amount') disc = it.discountValue || 0;
                   return acc + Math.max(0, base - disc) + (it.shipping || 0);
                 }, 0);
-                const preview = generateInstallments(totalLocal, cnt, gap, form.date, advanceAmt);
+                const generated = generateInstallments(totalLocal, cnt, gap, form.date, advanceAmt);
+                const preview = (form.installments && form.installments.length > 0) ? form.installments : generated;
                 if (preview.length === 0) return null;
                 return (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 4 }}>📅 پیش‌نمایش اقساط</div>
-                    {preview.map(inst => (
+                    {preview.map((inst, idx) => (
                       <div key={inst.id} style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--pad-tight)', background: 'var(--bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--text)' }}>
                         <span>قسط {inst.number}</span>
-                        <span style={{ color: 'var(--muted)' }}>{inst.dueDate}</span>
+                        <div style={{ flex: 1, maxWidth: 170 }}>
+                        <DatePicker value={inst.dueDate} onChange={(v) => {
+                          const base = (form.installments && form.installments.length > 0) ? form.installments : preview;
+                          const updated = base.map((x: any, i: number) => i === idx ? { ...x, dueDate: v } : x);
+                          setForm({ ...form, installments: updated });
+                        }} compact />
+                      </div>
                         <span style={{ fontWeight: 700 }}>{inst.amount.toLocaleString('fa-IR')} تومان</span>
                       </div>
                     ))}
