@@ -55,6 +55,7 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
             flexShrink: 0,
           }} aria-label={'از ' + autoFrom} />
         ) : null}
+  {help && <HelpIcon text={help} />}
       </label>
       {children}
       {(hint || autoFrom) && (
