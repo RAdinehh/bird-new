@@ -162,6 +162,7 @@ export interface Payment {
   type?: 'regular' | 'advance' | 'refund' | 'settlement';
   /** شناسه فاکتور مرتبط (برای تخصیص چندگانه) */
   invoiceId?: string;
+  partyPaymentId?: string;
   /** شناسه طرف حساب (برای اعتبار) */
   partyId?: string;
 }
@@ -260,6 +261,8 @@ export interface State {
   addPartyPayment: (p: Omit<PartyPayment, 'id'|'createdAt'|'updatedAt'>) => string;
   updatePartyPayment: (id: string, patch: Partial<PartyPayment>) => void;
   deletePartyPayment: (id: string) => void;
+  bouncePartyPayment: (ppId: string) => void;
+  clearPartyPayment: (ppId: string) => void;
 }
 
 

@@ -79,6 +79,15 @@ export const useTra = create<State>()(
           try { final.installments = applyPaymentsToInstallments(final.installments, syncedPayments); } catch(e) {}
         }
         set({ invoices: [...get().invoices, final] });
+      try {
+        for (const p of (final.payments || [])) {
+          get().addAllocation({
+            paymentId: p.id, invoiceId: final.id,
+            amount: p.amount, date: p.date,
+            notes: 'auto',
+          });
+        }
+      } catch(e) { console.error('[addInvoice] alloc:', e); }
         try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices, get().allocations)); } catch(e) {}
         return id;
       },
@@ -155,6 +164,29 @@ export const useTra = create<State>()(
           setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices, get().allocations));
           if (prev.partyId && prev.partyId !== final.partyId) setPartyCredit(prev.partyId, computePartyCredit(prev.partyId, get().invoices, get().allocations));
         } catch(e) {}
+        if (patch.payments) {
+          try {
+            const oldAllocs = get().allocations.filter(a => a.invoiceId === id);
+            const newPayments = merged.payments || [];
+            const newIds = new Set(newPayments.map(p => p.id));
+            for (const a of oldAllocs) {
+              if (!newIds.has(a.paymentId)) get().deleteAllocation(a.id);
+            }
+            const oldByPaymentId = new Map(oldAllocs.map(a => [a.paymentId, a]));
+            for (const p of newPayments) {
+              const existing = oldByPaymentId.get(p.id);
+              if (!existing) {
+                get().addAllocation({
+                  paymentId: p.id, invoiceId: id,
+                  amount: p.amount, date: p.date,
+                  notes: 'auto',
+                });
+              } else if (existing.amount !== p.amount || existing.date !== p.date) {
+                get().updateAllocation(existing.id, { amount: p.amount, date: p.date });
+              }
+            }
+          } catch(e) { console.error('[updateInvoice] alloc sync:', e); }
+        }
       },
       deleteInvoice: (id) => {
         const inv = get().invoices.find(x => x.id === id);
@@ -219,6 +251,52 @@ export const useTra = create<State>()(
       },
       deletePartyPayment: (id: string) => {
         set({ partyPayments: get().partyPayments.filter((x: any) => x.id !== id) });
+      },
+      bouncePartyPayment: (ppId: string) => {
+        const pp = get().partyPayments.find(x => x.id === ppId);
+        if (!pp) return;
+        const today = new Date().toISOString().slice(0, 10);
+        set({
+          partyPayments: get().partyPayments.map(x => x.id === ppId
+            ? { ...x, status: 'bounced' as const, bouncedDate: today, clearedDate: '' }
+            : x),
+        });
+        set({
+          invoices: get().invoices.map(inv => {
+            const payments = inv.payments || [];
+            if (!payments.some((p: any) => p.partyPaymentId === ppId)) return inv;
+            return {
+              ...inv,
+              payments: payments.map((p: any) => p.partyPaymentId === ppId
+                ? { ...p, status: 'bounced' as const, bouncedDate: today, clearedDate: '' }
+                : p),
+              updatedAt: new Date().toISOString(),
+            };
+          }),
+        });
+      },
+      clearPartyPayment: (ppId: string) => {
+        const pp = get().partyPayments.find(x => x.id === ppId);
+        if (!pp) return;
+        const today = new Date().toISOString().slice(0, 10);
+        set({
+          partyPayments: get().partyPayments.map(x => x.id === ppId
+            ? { ...x, status: 'cleared' as const, clearedDate: today, bouncedDate: '' }
+            : x),
+        });
+        set({
+          invoices: get().invoices.map(inv => {
+            const payments = inv.payments || [];
+            if (!payments.some((p: any) => p.partyPaymentId === ppId)) return inv;
+            return {
+              ...inv,
+              payments: payments.map((p: any) => p.partyPaymentId === ppId
+                ? { ...p, status: 'cleared' as const, clearedDate: today, bouncedDate: '' }
+                : p),
+              updatedAt: new Date().toISOString(),
+            };
+          }),
+        });
       },
 
       addDeal: (d) => set({ deals: [...get().deals, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
