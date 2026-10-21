@@ -68,7 +68,6 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       priceUnit: optionalStr(20),
       liveWeight: floatNonNeg('وزن زنده', 1_000_000).optional(),
       
-      eggBatchNo: optionalStr(50),
       eggDate: persianDateOpt('تاریخ تخم'),
       eggWeight: floatNonNeg('وزن تخم', 200).optional(),
       brokenEggCount: floatNonNeg('تعداد شکسته', 100000).optional(),

@@ -35,7 +35,6 @@ export interface ItemDetailFormData {
   chickWeight?: number | null;
   transportCost?: number | null;
   flockName?: string;
-  eggBatchNo?: string;
   eggDate?: string;
   brokenEggCount?: number | null;
   nonIncubableCount?: number | null;

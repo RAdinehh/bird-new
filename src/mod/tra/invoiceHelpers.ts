@@ -96,16 +96,12 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
     const inc = useInc.getState();
     const brd = useBrd.getState();
 
-    const keyOf = (it: any) =>
-      `${it.category || ''}|${it.birdId || ''}|${it.breedId || ''}|${it.eggBatchNo || ''}`;
-
-    const findExisting = (it: any) => {
-      const key = keyOf(it);
-      const marker = `[K:${key}]`;
-      return (inc.eggEntries || []).find((e: any) =>
-        e.sourceInvoiceId === inv.id && (e.notes || '').includes(marker)
+    const findExisting = (it: any) =>
+      (inc.eggEntries || []).find((e: any) =>
+        e.sourceInvoiceId === inv.id &&
+        e.birdId === (it.birdId || '') &&
+        e.breedId === (it.breedId || '')
       );
-    };
 
     for (let i = 0; i < outItems.length; i++) {
       const it = outItems[i] as any;
@@ -124,8 +120,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
       const entryDate = inv.deliveryDate || it.eggDate || inv.date || '';
       const expectedHatchDate = addJalaliDays(entryDate, days);
 
-      const marker = `[K:${keyOf(it)}]`;
-      const existing = findExisting(it);
+        const existing = findExisting(it);
 
       if (existing) {
         try {
@@ -159,7 +154,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
           shippingCost: it.transportCost || it.shipping || null,
           status: 'incubating' as any,
           generatedInvoiceId: '', generatedProductionId: '',
-          notes: `از فاکتور خرید ${inv.number || ''} ${marker}`,
+          notes: `از فاکتور خرید ${inv.number || ''}`,
           sampleWeightInitial: it.eggWeight || null,
           sampleWeightCurrent: null,
           sourceInvoiceId: inv.id,
@@ -172,14 +167,18 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
 
     // پاک‌سازی رکوردهای یتیم
     if (prev) {
-      const newKeys = new Set(
-        outItems.filter((it: any) => it.quantity > 0).map((it: any) => keyOf(it))
+      const newBB = new Set(
+        outItems
+          .filter((it: any) => {
+            const c = it.category || inv.category;
+            return (c === 'egg' || c === 'fertile_egg') && (it.quantity || 0) > 0;
+          })
+          .map((it: any) => `${it.birdId || ''}|${it.breedId || ''}`)
       );
       const orphans = (inc.eggEntries || []).filter((e: any) => {
         if (e.sourceInvoiceId !== inv.id) return false;
-        const m = (e.notes || '').match(/\[K:([^\]]+)\]/);
-        if (!m) return true;
-        return !newKeys.has(m[1]);
+        const key = `${e.birdId || ''}|${e.breedId || ''}`;
+        return !newBB.has(key);
       });
       for (const entry of orphans) {
         try { inc.deleteEntry(entry.id); } catch (e) { console.error('[TRA→INC cleanup]', e); }
