@@ -7,6 +7,8 @@ import { useCtc } from '../../ctc/store';
 import { useTra } from '../../tra/store';
 import type { F } from '../types-flocks';
 import { HELP } from '../../../shr/help/helpTexts';
+import DatePicker from '../../../shr/components/DatePicker';
+import { todayJ } from '../api/flocksCalc';
 
 interface Props {
   form: F;
@@ -61,7 +63,14 @@ export default function FlockDealSection({ form, setForm }: Props) {
       <div style={DIVIDER}>💼 مدل بهره‌برداری</div>
 
       <Field label="نوع مالکیت" help={HELP.flk.ownership.type}>
-        <Select value={form.dealType || 'own'} onChange={e => setForm({ ...form, dealType: e.target.value })}>
+        <Select value={form.dealType || 'own'} onChange={e => {
+              const newType = e.target.value;
+              const patch: any = { dealType: newType };
+              if (newType === 'rent' && !form.rentStartDate && form.startDate) {
+                patch.rentStartDate = form.startDate;
+              }
+              setForm({ ...form, ...patch });
+            }}>
           {Object.entries(DEAL_TYPE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </Select>
       </Field>
@@ -114,6 +123,56 @@ export default function FlockDealSection({ form, setForm }: Props) {
               </Select>
             </Field>
           </Grid2>
+          <Grid2>
+            <Field label="شروع اجاره" required help={HELP.flk.ownership.rentStartDate}>
+              <DatePicker value={form.rentStartDate || ''} onChange={v => setForm({ ...form, rentStartDate: v })} autoToday />
+            </Field>
+            {form.rentPeriod === 'total' && (
+              <Field label="پایان قرارداد" required help={HELP.flk.ownership.rentEndDate}>
+                <DatePicker value={form.rentEndDate || ''} onChange={v => setForm({ ...form, rentEndDate: v })} min={form.rentStartDate} />
+              </Field>
+            )}
+          </Grid2>
+
+          <div style={DIVIDER}>💳 پرداخت‌های اجاره</div>
+          {(form.rentPayments || []).length === 0 ? (
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center', padding: '6px 0' }}>
+              هنوز پرداختی ثبت نشده
+            </div>
+          ) : (
+            (form.rentPayments || []).map((p, idx) => (
+              <div key={p.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <DatePicker value={p.date} onChange={v => {
+                    const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, date: v } : x);
+                    setForm({ ...form, rentPayments: updated });
+                  }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <MoneyField value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => {
+                    const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                    const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, amount: raw } : x);
+                    setForm({ ...form, rentPayments: updated });
+                  }} />
+                </div>
+                <button type="button" onClick={() => {
+                  const updated = (form.rentPayments || []).filter((_, i) => i !== idx);
+                  setForm({ ...form, rentPayments: updated });
+                }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 32, height: 38, padding: 0, fontFamily: 'inherit', fontWeight: 700, flexShrink: 0 }}>✕</button>
+              </div>
+            ))
+          )}
+          <button type="button" onClick={() => {
+            const newP = { id: crypto.randomUUID(), date: todayJ(), amount: 0, notes: '' };
+            setForm({ ...form, rentPayments: [...(form.rentPayments || []), newP] });
+          }} style={{ width: '100%', height: 38, background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            + افزودن پرداخت
+          </button>
+          {(form.rentPayments || []).length > 0 && (
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center' }}>
+              جمع پرداخت‌ها: {toFa((form.rentPayments || []).reduce((a, p) => a + (p.amount || 0), 0).toLocaleString('fa-IR'))} تومان
+            </div>
+          )}
         </>
       )}
 
