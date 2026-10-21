@@ -84,7 +84,6 @@ export interface State {
   mergeFlocks: (targetId: string, sourceId: string, opts: { targetAgeDays: number; sourceAgeDays: number; hatchDate?: string }) => void;
   unmergeFlocks: (targetId: string) => void;
   add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => string;
-  repairFlockCounts: () => number;
   update: (id: string, patch: Partial<Flock>) => void;
   remove: (id: string) => void;
   archive: (id: string, reason?: string) => void;
@@ -120,20 +119,6 @@ export const useFlk = create<State>()(
         const id = uuid();
         set({ flocks: [...get().flocks, {...f, id, createdAt: now(), updatedAt: now()}] });
         return id;
-      },
-      repairFlockCounts: () => {
-        let fixed = 0;
-        set({
-          flocks: get().flocks.map((f: any) => {
-            // Fix only flocks where currentCount > initialCount (bug artifact)
-            if (f.currentCount != null && f.initialCount != null && f.currentCount > f.initialCount) {
-              fixed++;
-              return { ...f, currentCount: f.initialCount };
-            }
-            return f;
-          }),
-        });
-        return fixed;
       },
       update: (id, patch) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       remove: (id) => {
