@@ -10,6 +10,7 @@ import { bus } from '../../cor/events';
 import type { Invoice, InvoiceItem, State } from './types';
 import { applyPaymentsToInstallments } from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
+import { applyInvoiceStock } from './applyStock';
 import { generateInvoiceNumber, paidSum } from './calc';
 import { showToast } from '../../cor/store/toast';
 import { useInc } from '../inc/store';
@@ -54,6 +55,7 @@ export const useTra = create<State>()(
           try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) {}
           // 🎯 ۳. اتصال فروش تخم به ماژول egg
           try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) {}
+          try { items = applyInvoiceStock({ ...newInv, items }); } catch(e) {}
           // 🎯 ۴. اتصال به انبار از طریق Event Bus (حرکت‌ها + movementId)
           try { void bus.emit('tra:invoice:created', { invoiceId: newInv.id, invoice: newInv, items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
         }
@@ -97,6 +99,7 @@ export const useTra = create<State>()(
           try { itemsFinal = applyInvoiceFlocks(mergedWithItems, isReceiving ? undefined : prev); } catch(e) { console.error('[updateInvoice] applyInvoiceFlocks failed:', e); }
           try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
           try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
+          try { itemsFinal = applyInvoiceStock({ ...mergedWithItems, items: itemsFinal }); } catch(e) {}
           // 🎯 اتصال به انبار از طریق Event Bus (rollback قبلی‌ها + حرکت‌های جدید)
           try { void bus.emit('tra:invoice:updated', {
             invoiceId: id,
