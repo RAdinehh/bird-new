@@ -138,7 +138,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             }} placeholder="1405/07/26" autoToday />
           </Field>
           <Field label="سن (روز)" hint="با تغییر سن، تاریخ هچ محاسبه می‌شود">
-            <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => {
+            <Input mode="number" value={item.ageDays != null && item.ageDays > 0 ? String(item.ageDays) : ''} onChange={e => {
               let age = Math.round(parseFaNum(e.target.value)) || null;
               if (age !== null && age > 150) age = 150;
               let hDate = item.hatchDate;
@@ -158,7 +158,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input disabled value={item.quantity || 0} unit="عدد" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
           </Field>
           <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
-            <Input mode="number" value={item.chickWeight !== null && item.chickWeight !== undefined ? String(item.chickWeight) : ''} onChange={e => {
+            <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
               let v = parseFaNum(e.target.value) || null;
               if (v !== null && v > 100) v = 100;
               updateItem({ chickWeight: v });
@@ -168,21 +168,21 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         <Grid3>
           <Field label="نر">
-            <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => {
+            <Input mode="number" value={item.maleCount != null && item.maleCount > 0 ? String(item.maleCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
               updateItem({ maleCount: v });
             }} min={0} max={item.quantity || undefined} />
           </Field>
           <Field label="ماده">
-            <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => {
+            <Input mode="number" value={item.femaleCount != null && item.femaleCount > 0 ? String(item.femaleCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
               updateItem({ femaleCount: v });
             }} min={0} max={item.quantity || undefined} />
           </Field>
           <Field label="نامشخص" hint="برای جنسیت مخلوط">
-            <Input mode="number" value={item.unknownCount !== null && item.unknownCount !== undefined ? String(item.unknownCount) : ''} onChange={e => {
+            <Input mode="number" value={item.unknownCount != null && item.unknownCount > 0 ? String(item.unknownCount) : ''} onChange={e => {
               let v = Math.round(parseFaNum(e.target.value)) || null;
               if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
               updateItem({ unknownCount: v });
@@ -251,10 +251,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         <Grid2>
           <Field label="تعداد شکسته">
-            <Input mode="number" value={item.brokenEggCount !== null && item.brokenEggCount !== undefined ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
+            <Input mode="number" value={item.brokenEggCount != null && item.brokenEggCount > 0 ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
           </Field>
           <Field label="غیرقابل جوجه">
-            <Input mode="number" value={item.nonIncubableCount !== null && item.nonIncubableCount !== undefined ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
+            <Input mode="number" value={item.nonIncubableCount != null && item.nonIncubableCount > 0 ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
           </Field>
         </Grid2>
         {(() => {
@@ -305,15 +305,15 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
           <Field label="سن (روز)">
-            <Input mode="number" value={item.ageDays !== null && item.ageDays !== undefined ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
+            <Input mode="number" value={item.ageDays != null && item.ageDays > 0 ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
           </Field>
         </Grid2>
         <Grid2>
           <Field label="تعداد نر">
-            <Input mode="number" value={item.maleCount !== null && item.maleCount !== undefined ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
+            <Input mode="number" value={item.maleCount != null && item.maleCount > 0 ? String(item.maleCount) : ''} onChange={e => updateItem({ maleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
           </Field>
           <Field label="تعداد ماده">
-            <Input mode="number" value={item.femaleCount !== null && item.femaleCount !== undefined ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
+            <Input mode="number" value={item.femaleCount != null && item.femaleCount > 0 ? String(item.femaleCount) : ''} onChange={e => updateItem({ femaleCount: Math.round(parseFaNum(e.target.value)) || null })} min={0} />
           </Field>
         </Grid2>
         {sellerSlot}
@@ -413,7 +413,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         <Grid2>
           <Field label="گارانتی (ماه)">
-            <Input mode="number" value={item.warrantyMonths !== null && item.warrantyMonths !== undefined ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} max={60} />
+            <Input mode="number" value={item.warrantyMonths != null && item.warrantyMonths > 0 ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} max={60} />
           </Field>
           <Field label="برند / سازنده">
             <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="پارس، آکو، ..." />
