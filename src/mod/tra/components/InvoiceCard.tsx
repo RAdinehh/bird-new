@@ -177,13 +177,13 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           📦 تحویل گرفتم (ایجاد گله و موجودی)
         </Btn>
       )}
-      {(onEdit || nextWorkflowStatus(inv.workflowStatus)) ? (
-        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+      {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen) ? (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
           {onEdit && (
             <Btn
               size="sm" variant="outline"
               onClick={onEdit}
-              style={{ flex: 1 }}
+              style={{ flex: '1 1 120px' }}
             >
               ✏️ ویرایش فاکتور
             </Btn>
@@ -192,22 +192,23 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             <Btn
               size="sm" variant="primary"
               onClick={onTransferClick}
-              style={{ flex: 1 }}
+              style={{ flex: '1 1 120px' }}
             >
               انتقال به {WORKFLOW_LABEL[nextWorkflowStatus(inv.workflowStatus)!]}
+            </Btn>
+          )}
+          {onReopen && (
+            <Btn
+              size="sm" variant="primary"
+              onClick={onReopen}
+              style={{ flex: '1 1 120px' }}
+            >
+              🔓 بازگشایی
             </Btn>
           )}
         </div>
       ) : null}
 
-      {onReopen && (
-        <Btn
-          size="sm" variant="primary" full
-          onClick={onReopen}
-        >
-          🔓 بازگشایی برای ویرایش
-        </Btn>
-      )}
     </ExpandableCard>
   );
 }
