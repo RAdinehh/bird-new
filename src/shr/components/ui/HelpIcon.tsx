@@ -5,6 +5,16 @@ interface Props {
   text: string;
 }
 
+function renderBold(text: string) {
+  const parts = text.split(/\*\*(.+?)\*\*/g);
+  return parts.map((part, i) => {
+    if (i % 2 === 1) {
+      return <strong key={i} style={{ fontWeight: 800, color: 'var(--text)' }}>{part}</strong>;
+    }
+    return part;
+  });
+}
+
 export function HelpIcon({ text }: Props) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
@@ -142,7 +152,7 @@ export function HelpIcon({ text }: Props) {
             textAlign: 'right',
             direction: 'rtl',
           }}
-        >{text}</div>,
+        >{renderBold(text)}</div>,
         document.body
       )}
     </>
