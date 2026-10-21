@@ -56,7 +56,27 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
   const partnerShare = parseInt(toEn(form.partnerShare || '')) || 0;
   const rentAmountNum = parseFloat(toEn(form.rentAmount).replace('٫', '.').replace(/[,٬]/g, '')) || 0;
   const rentPaidTotal = (form.rentPayments || []).reduce((a, p) => a + (Number(p.amount) || 0), 0);
-  const rentOutstanding = Math.max(0, rentAmountNum - rentPaidTotal);
+  
+  const calcDays = (() => {
+    if (!form.rentStartDate || !form.rentEndDate) return 0;
+    try {
+      const s = parseJ(toEn(form.rentStartDate), 'yyyy/MM/dd', new Date());
+      const e = parseJ(toEn(form.rentEndDate), 'yyyy/MM/dd', new Date());
+      if (!isNaN(s.getTime()) && !isNaN(e.getTime())) {
+        return Math.max(0, Math.floor((e.getTime() - s.getTime()) / 86400000));
+      }
+    } catch {}
+    return 0;
+  })();
+
+  const totalRentAmount = (() => {
+    if (form.rentPeriod === 'total') return rentAmountNum;
+    if (!calcDays) return rentAmountNum;
+    if (form.rentPeriod === 'season') return rentAmountNum * Math.max(1, Math.ceil(calcDays / 90));
+    return rentAmountNum * Math.max(1, Math.ceil(calcDays / 30));
+  })();
+
+  const rentOutstanding = Math.max(0, totalRentAmount - rentPaidTotal);
 
   // 🆕 سقف داینامیک پرداخت‌ها
   const maxPayments = (() => {
@@ -169,7 +189,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
               <DatePicker placeholder="از چه تاریخی؟" value={form.rentStartDate || ''} onChange={v => setForm({ ...form, rentStartDate: v })} autoToday />
             </Field>
             {form.rentPeriod === 'total' && (
-              <Field label="پایان قرارداد" required help={HELP.flk.ownership.rentEndDate}>
+              <Field label="پایان قرارداد" required help={HELP.flk.ownership.rentEndDate} error={form.rentStartDate && form.rentEndDate && form.rentStartDate >= form.rentEndDate ? 'باید بعد از شروع باشد' : undefined}>
                 <DatePicker placeholder="تا چه تاریخی؟" value={form.rentEndDate || ''} onChange={v => setForm({ ...form, rentEndDate: v })} min={form.rentStartDate} />
                 {rentEndWarn && (
                   <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', paddingRight: 2, marginTop: 4 }}>

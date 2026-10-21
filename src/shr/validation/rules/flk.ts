@@ -195,19 +195,33 @@ export function createFlkSchema(context: ValidationContext = {}) {
 
     // 🆕 اعتبارسنجی اجاره
     if (d.dealType === 'rent') {
-      if (d.rentStartDate && d.rentEndDate && d.rentStartDate > d.rentEndDate) {
+      if (d.rentStartDate && d.rentEndDate && d.rentStartDate >= d.rentEndDate) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'پایان قرارداد باید بعد از شروع اجاره باشد',
           path: ['rentEndDate'],
         });
       }
-      if (d.rentPeriod === 'total' && d.rentAmount > 0 && Array.isArray(d.rentPayments) && d.rentPayments.length > 0) {
+      if (d.dealType === 'rent' && d.rentAmount > 0 && Array.isArray(d.rentPayments) && d.rentPayments.length > 0) {
+        let totalRentAmount = d.rentAmount;
+        if (d.rentPeriod !== 'total' && d.rentStartDate && d.rentEndDate) {
+          const [sy, sm, sd] = d.rentStartDate.split('/').map(Number);
+          const [ey, em, ed] = d.rentEndDate.split('/').map(Number);
+          if (sy && sm && sd && ey && em && ed) {
+            const s = Date.UTC(sy, sm - 1, sd);
+            const e = Date.UTC(ey, em - 1, ed);
+            const days = Math.max(0, Math.floor((e - s) / 86400000));
+            if (days > 0) {
+              if (d.rentPeriod === 'season') totalRentAmount = d.rentAmount * Math.max(1, Math.ceil(days / 90));
+              else if (d.rentPeriod === 'monthly') totalRentAmount = d.rentAmount * Math.max(1, Math.ceil(days / 30));
+            }
+          }
+        }
         const sum = d.rentPayments.reduce((a: number, p: any) => a + (Number(p.amount) || 0), 0);
-        if (sum > d.rentAmount) {
+        if (sum > totalRentAmount) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `جمع پرداخت‌ها از مبلغ کل اجاره بیشتر است`,
+            message: `جمع پرداخت‌ها (${sum.toLocaleString('fa-IR')}) از مبلغ کل اجاره (${totalRentAmount.toLocaleString('fa-IR')}) بیشتر است`,
             path: ['rentPayments'],
           });
         }
