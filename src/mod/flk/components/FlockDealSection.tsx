@@ -197,7 +197,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
           </button>
           {(form.rentPayments || []).length > 0 && (
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center' }}>
-              جمع پرداخت‌ها: {toFa((form.rentPayments || []).reduce((a, p) => a + (p.amount || 0), 0).toLocaleString('fa-IR'))} تومان
+              جمع پرداخت‌ها: {toFa((form.rentPayments || []).reduce((a, p) => a + (p.amount || 0), 0).toLocaleString('fa-IR'))} تومان{showError && showError('rentPayments') && (<span style={{ display: 'block', marginTop: 4, color: 'var(--danger)', fontWeight: 600, fontSize: 'var(--fs-xs)' }}>⚠️ {showError('rentPayments')}</span>)}
             </div>
           )}
         </>
