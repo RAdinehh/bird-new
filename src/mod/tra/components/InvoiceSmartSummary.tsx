@@ -72,7 +72,7 @@ export default function InvoiceSmartSummary({ form, total, paid }: Props) {
   return (
     <div style={{
       position: 'relative',
-      overflow: 'hidden',
+      overflow: 'visible',
       background: 'var(--card)',
       borderRadius: 'var(--r-md)',
       padding: 'var(--sp-3)',
