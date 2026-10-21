@@ -8,12 +8,15 @@ import { useTra } from '../../tra/store';
 import type { F } from '../types-flocks';
 import { HELP } from '../../../shr/help/helpTexts';
 import DatePicker from '../../../shr/components/DatePicker';
+import { FieldHint } from '../../../shr/intelligence';
 import { parse as parseJ, addDays, format as formatJ } from 'date-fns-jalali';
 import { todayJ } from '../api/flocksCalc';
 
 interface Props {
   form: F;
   setForm: (updater: F | ((prev: F) => F)) => void;
+  showError?: (field: string) => string | undefined;
+  markTouched?: (field: string) => void;
 }
 
 const DEAL_TYPE_LABEL: Record<string, string> = {
@@ -46,11 +49,12 @@ const DISABLED_FIELD = {
   color: 'var(--muted)',
 } as const;
 
-export default function FlockDealSection({ form, setForm }: Props) {
+export default function FlockDealSection({ form, setForm, showError, markTouched }: Props) {
   const contacts = useCtc((s: { contacts: Array<{ id: string; name: string }> }) => s.contacts) || [];
   const deals = useTra((s: { deals: Array<{ id: string; type: string; date: string }> }) => s.deals) || [];
 
   const partnerShare = parseInt(toEn(form.partnerShare || '')) || 0;
+  const rentAmountNum = parseFloat(toEn(form.rentAmount).replace('٫', '.').replace(/[,٬]/g, '')) || 0;
   const cycleEnd = (() => {
     try {
       if (!form.hatchDate || !form.endOfCycleDay) return '';
@@ -126,6 +130,8 @@ export default function FlockDealSection({ form, setForm }: Props) {
           <Grid2>
             <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount}>
               <MoneyField placeholder={form.rentPeriod === 'total' ? 'مبلغ کل دوره' : 'مبلغ هر دوره'} value={form.rentAmount || ''} onChange={e => setForm({ ...form, rentAmount: e.target.value })} />
+            
+              {rentAmountNum > 0 && <FieldHint fieldPath="flk.rentAmount" value={rentAmountNum} />}
             </Field>
             <Field label="دوره" help={HELP.flk.ownership.rentPeriod}>
               <Select value={form.rentPeriod || 'monthly'} onChange={e => setForm({ ...form, rentPeriod: e.target.value })}>

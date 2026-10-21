@@ -191,7 +191,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         onOpenHatchPicker={() => setHatchPickerOpen(true)}
       />
 
-      <FlockDealSection form={form} setForm={setForm} />
+      <FlockDealSection form={form} setForm={setForm} showError={showError} markTouched={markTouched} />
 
             <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🐔 پرنده و نژاد</div>
       <Grid2>
