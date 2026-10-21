@@ -54,6 +54,18 @@ export function createFlkSchema(context: ValidationContext = {}) {
 
     status: z.enum(['active', 'archived', 'sold', 'merged']).default('active'),
     notes: optionalStr(1000),
+    // 🆕 اجاره
+    dealType: z.enum(['own', 'partnership', 'consignment', 'rent']).optional(),
+    rentAmount: z.number().min(0).optional().nullable(),
+    rentStartDate: persianDateOpt('شروع اجاره'),
+    rentEndDate: persianDateOpt('پایان قرارداد'),
+    rentPeriod: z.enum(['monthly', 'season', 'total']).optional(),
+    rentPayments: z.array(z.object({
+      id: z.string(),
+      date: z.string(),
+      amount: z.number().min(0),
+      notes: z.string().optional(),
+    })).optional(),
   }).superRefine((data, ctx) => {
     const d = data as any;
 
@@ -179,6 +191,27 @@ export function createFlkSchema(context: ValidationContext = {}) {
         message: 'برای منبع «خریداری» تاریخ خرید اجباری است',
         path: ['purchaseDate'],
       });
+    }
+
+    // 🆕 اعتبارسنجی اجاره
+    if (d.dealType === 'rent') {
+      if (d.rentStartDate && d.rentEndDate && d.rentStartDate > d.rentEndDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'پایان قرارداد باید بعد از شروع اجاره باشد',
+          path: ['rentEndDate'],
+        });
+      }
+      if (d.rentPeriod === 'total' && d.rentAmount > 0 && Array.isArray(d.rentPayments) && d.rentPayments.length > 0) {
+        const sum = d.rentPayments.reduce((a: number, p: any) => a + (Number(p.amount) || 0), 0);
+        if (sum > d.rentAmount) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `جمع پرداخت‌ها (${sum.toLocaleString('fa-IR')}) از مبلغ کل اجاره (${d.rentAmount.toLocaleString('fa-IR')}) بیشتر است`,
+            path: ['rentPayments'],
+          });
+        }
+      }
     }
   });
 }

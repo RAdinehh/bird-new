@@ -8,6 +8,7 @@ import { useTra } from '../../tra/store';
 import type { F } from '../types-flocks';
 import { HELP } from '../../../shr/help/helpTexts';
 import DatePicker from '../../../shr/components/DatePicker';
+import { parse as parseJ, addDays, format as formatJ } from 'date-fns-jalali';
 import { todayJ } from '../api/flocksCalc';
 
 interface Props {
@@ -50,6 +51,17 @@ export default function FlockDealSection({ form, setForm }: Props) {
   const deals = useTra((s: { deals: Array<{ id: string; type: string; date: string }> }) => s.deals) || [];
 
   const partnerShare = parseInt(toEn(form.partnerShare || '')) || 0;
+  const cycleEnd = (() => {
+    try {
+      if (!form.hatchDate || !form.endOfCycleDay) return '';
+      const hatch = parseJ(toEn(form.hatchDate), 'yyyy/MM/dd', new Date());
+      if (isNaN(hatch.getTime())) return '';
+      const days = parseInt(toEn(form.endOfCycleDay)) || 0;
+      if (days <= 0) return '';
+      return formatJ(addDays(hatch, days), 'yyyy/MM/dd');
+    } catch { return ''; }
+  })();
+  const rentEndWarn = !!(cycleEnd && form.rentEndDate && form.rentEndDate > cycleEnd);
   const myShare = Math.max(0, 100 - partnerShare);
 
   const relevantDeals = deals.filter((d) => {
@@ -113,7 +125,7 @@ export default function FlockDealSection({ form, setForm }: Props) {
           </Field>
           <Grid2>
             <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount}>
-              <MoneyField value={form.rentAmount || ''} onChange={e => setForm({ ...form, rentAmount: e.target.value })} />
+              <MoneyField placeholder={form.rentPeriod === 'total' ? 'مبلغ کل دوره' : 'مبلغ هر دوره'} value={form.rentAmount || ''} onChange={e => setForm({ ...form, rentAmount: e.target.value })} />
             </Field>
             <Field label="دوره" help={HELP.flk.ownership.rentPeriod}>
               <Select value={form.rentPeriod || 'monthly'} onChange={e => setForm({ ...form, rentPeriod: e.target.value })}>
@@ -125,11 +137,16 @@ export default function FlockDealSection({ form, setForm }: Props) {
           </Grid2>
           <Grid2>
             <Field label="شروع اجاره" required help={HELP.flk.ownership.rentStartDate}>
-              <DatePicker value={form.rentStartDate || ''} onChange={v => setForm({ ...form, rentStartDate: v })} autoToday />
+              <DatePicker placeholder="از چه تاریخی؟" value={form.rentStartDate || ''} onChange={v => setForm({ ...form, rentStartDate: v })} autoToday />
             </Field>
             {form.rentPeriod === 'total' && (
               <Field label="پایان قرارداد" required help={HELP.flk.ownership.rentEndDate}>
-                <DatePicker value={form.rentEndDate || ''} onChange={v => setForm({ ...form, rentEndDate: v })} min={form.rentStartDate} />
+                <DatePicker placeholder="تا چه تاریخی؟" value={form.rentEndDate || ''} onChange={v => setForm({ ...form, rentEndDate: v })} min={form.rentStartDate} />
+                {rentEndWarn && (
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', paddingRight: 2, marginTop: 4 }}>
+                    ⚠️ پایان اجاره بعد از پایان چرخه گله ({cycleEnd}) — مطمئن شو قرارداد رو تمدید می‌کنی
+                  </div>
+                )}
               </Field>
             )}
           </Grid2>
@@ -149,7 +166,7 @@ export default function FlockDealSection({ form, setForm }: Props) {
                   }} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <MoneyField value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => {
+                  <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => {
                     const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                     const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, amount: raw } : x);
                     setForm({ ...form, rentPayments: updated });
