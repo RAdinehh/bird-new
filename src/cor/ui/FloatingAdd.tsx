@@ -141,7 +141,7 @@ export default function FloatingAdd() {
         title={config.label}
         style={{
           position: 'fixed',
-          bottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 16px)',
+          bottom: 'calc(110px + env(safe-area-inset-bottom, 0px))',
           left: 16,
           zIndex: 50,
           width: 56,
