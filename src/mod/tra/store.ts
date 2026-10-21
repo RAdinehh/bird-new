@@ -201,9 +201,8 @@ export const useTra = create<State>()(
             try { flkState.update(f.id, { sourceInvoiceId: '', sourceCategory: '' } as any); } catch {}
           });
           if (linked.length > 0) {
-            try {
-              showToast(linked.length + ' گله از این فاکتور جدا شد (بدون سند)', 'info');
-            } catch {}
+            // Merge info — no separate toast (single notification policy)
+            try { console.info(`[deleteInvoice] ${linked.length} گله از فاکتور ${inv.number || id} جدا شد`); } catch {}
           }
         }
         if (inv) {
