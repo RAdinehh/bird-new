@@ -239,7 +239,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     const ok = await showConfirmAsync(
       'بازگشایی فاکتور',
       'این فاکتور پرداخت شده است.\n\nبا بازگشایی:\n• وضعیت به «تایید شده» برمی‌گردد\n• می‌توانید فیلدها را ویرایش کنید\n• پس از ویرایش باید دوباره پرداخت ثبت کنید\n\nادامه می‌دهید؟',
-      { danger: true }
+      { confirmText: 'بازگشایی' }
     );
     if (!ok) return;
     reopenInvoice(inv.id);

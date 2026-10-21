@@ -28,6 +28,6 @@ export function PageContainer({ children, bottomPad }: { children: React.ReactNo
 }
 export function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ paddingTop: 10, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
+    <div style={{ paddingTop: 10, marginTop: 4, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)' }}>{children}</div>
   );
 }
