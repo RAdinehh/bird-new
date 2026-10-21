@@ -2,6 +2,7 @@
  * tra/calc.ts — توابع محاسباتی خالص معاملات
  */
 import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ, addDays } from 'date-fns-jalali';
+import type { PaymentAllocation } from './types';
 import type { Invoice, InvoiceItem, Payment, WorkflowStatus, CheckStatus, InvoiceStatus, InvoiceType, PaymentTerms, Installment } from './types';
 
 export function generateInvoiceNumber(
@@ -162,6 +163,28 @@ export function paidSum(payments: Payment[]): number {
 }
 
 /**
+ * paidSum با پشتیبانی از PaymentAllocation
+ * - اگر allocations موجود بود → از allocations می‌خونه
+ * - چک pending/bounced شمرده نمی‌شود
+ * - fallback: paidSum(payments)
+ */
+export function paidSumAllocated(inv: Invoice, allocations?: PaymentAllocation[]): number {
+  if (allocations && allocations.length > 0) {
+    const invAllocs = allocations.filter(a => a.invoiceId === inv.id);
+    if (invAllocs.length > 0) {
+      return Math.round(invAllocs.reduce((sum, a) => {
+        const p = (inv.payments || []).find(x => x.id === a.paymentId);
+        if (!p) return sum;
+        if (p.method === 'check' && p.status !== 'cleared') return sum;
+        if (p.type === 'refund') return sum - a.amount;
+        return sum + a.amount;
+      }, 0));
+    }
+  }
+  return paidSum(inv.payments || []);
+}
+
+/**
  * پرداخت‌های در انتظار (چک pending — هنوز نقد نشده)
  */
 export function paidPendingSum(payments: Payment[]): number {
@@ -172,8 +195,8 @@ export function paidPendingSum(payments: Payment[]): number {
   }, 0));
 }
 
-export function invoiceStatus(inv: Invoice): InvoiceStatus {
-  const paid = paidSum(inv.payments || []);
+export function invoiceStatus(inv: Invoice, allocations?: PaymentAllocation[]): InvoiceStatus {
+  const paid = paidSumAllocated(inv, allocations);
   const total = inv.total || 0;
   if (paid >= total && total > 0) return 'paid';
   if (paid > 0) return 'partial';
@@ -205,8 +228,8 @@ function migrateInvDates(inv: any): any {
   return inv;
 }
 
-export function remaining(inv: Invoice): number {
-  const paid = paidSum(inv.payments || []);
+export function remaining(inv: Invoice, allocations?: PaymentAllocation[]): number {
+  const paid = paidSumAllocated(inv, allocations);
   return Math.max(0, (Math.round(Math.max(0, (inv.total || 0) - paid))) - computeCashDiscount(inv));
 }
 
