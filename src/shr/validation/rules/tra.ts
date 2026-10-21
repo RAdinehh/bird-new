@@ -65,15 +65,12 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       chickWeight: floatNonNeg('وزن اولیه جوجه', 150).optional(),
       transportCost: floatNonNeg('هزینه حمل', 1_000_000_000).optional(),
       
-      priceUnit: optionalStr(20),
-      liveWeight: floatNonNeg('وزن زنده', 1_000_000).optional(),
       
       eggDate: persianDateOpt('تاریخ تخم'),
       eggWeight: floatNonNeg('وزن تخم', 200).optional(),
       brokenEggCount: floatNonNeg('تعداد شکسته', 100000).optional(),
       nonIncubableCount: floatNonNeg('تعداد غیرقابل جوجه‌کشی', 100000).optional(),
       
-      medicineType: optionalStr(20),
       storage: optionalStr(20),
       usageType: optionalStr(20),
       expiryDate: persianDateOpt('تاریخ انقضا'),
@@ -89,6 +86,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       costType: optionalStr(30),
       equipmentCategory: optionalStr(50),
       equipmentType: optionalStr(50),
+      equipmentKind: oneOf('نوع تجهیز', ['asset', 'consumable'] as const).optional(),
       model: optionalStr(50),
       serialNo: optionalStr(50),
       hallId: optionalId(),
@@ -106,6 +104,9 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     workflowStatus: oneOf('وضعیت', ['draft', 'confirmed', 'received', 'paid'] as const).optional(),
   }).superRefine((data, ctx) => {
     const d = data as any;
+    if (!d.date || String(d.date).trim() === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'تاریخ فاکتور اجباری است', path: ['date'] });
+    }
     // مجموع اقلام = total
     const itemsSum = (d.items || []).reduce((a: number, it: any) => a + (Number(it.total) || 0), 0);
     const expectedTotal = Math.max(0, itemsSum - (d.discount || 0) + (d.shipping || 0));
@@ -168,13 +169,19 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         });
       }
 
-      // ۳. اگر مبنای قیمت بر کیلو است -> وزن زنده اجباری است
-      if (it.priceUnit === 'per_kg' && (!it.liveWeight || Number(it.liveWeight) <= 0)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'برای مبنای قیمت هر کیلو، وارد کردن وزن زنده اجباری است',
-          path: ['items', String(i), 'liveWeight'],
-        });
+      // ۳. تجهیزات: دسته و نوع اجباری
+      const itCat = it.category || d.category;
+      if (itCat === 'equipment') {
+        if (!it.equipmentCategory) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'دسته تجهیزات اجباری است', path: ['items', String(i), 'equipmentCategory'] });
+        }
+        if (!it.equipmentType) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'نوع تجهیز اجباری است', path: ['items', String(i), 'equipmentType'] });
+        }
+      }
+      // ۴. سایر: نوع هزینه اجباری
+      if (itCat === 'other' && !it.costType) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'نوع هزینه اجباری است', path: ['items', String(i), 'costType'] });
       }
     }
 
