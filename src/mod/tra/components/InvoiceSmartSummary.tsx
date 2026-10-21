@@ -50,10 +50,10 @@ export default function InvoiceSmartSummary({ form, total, paid }: Props) {
   const installmentInfo = form.paymentTerms === 'installment'
     && installmentCount > 0
     && installmentBase > 0
-    ? `${toFa(installmentCount)} قسط × ~${toFa(Math.round(installmentBase / installmentCount).toLocaleString('fa-IR'))} ت`
+    ? `${toFa(installmentCount)} قسط × ~${toFa(Math.round(installmentBase / installmentCount).toLocaleString('fa-IR'))} تومان`
     : null;
 
-  const paidInfo = paid > 0 ? toFa(paid.toLocaleString('fa-IR')) + ' ت' : null;
+  const paidInfo = paid > 0 ? toFa(paid.toLocaleString('fa-IR')) + ' تومان' : null;
 
   const expiringCount = form.items.filter(it => {
     if (!it.expiryDate) return false;

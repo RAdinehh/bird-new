@@ -213,7 +213,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                     fontSize: 'var(--fs-sm)', fontWeight: 700,
                     color: `var(--${color})`, fontVariantNumeric: 'tabular-nums'
                   }}>
-                    {toFa(sum.toLocaleString('fa-IR'))} ت
+                    {toFa(sum.toLocaleString('fa-IR'))} تومان
                   </div>
                   <svg width="12" height="12" viewBox="0 0 24 24"
                     fill="none" stroke={isOpen ? `var(--${color})` : 'var(--dim)'}
@@ -273,7 +273,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                                 fontVariantNumeric: 'tabular-nums',
                                 flexShrink: 0
                               }}>
-                                {toFa(rem.toLocaleString('fa-IR'))} ت
+                                {toFa(rem.toLocaleString('fa-IR'))} تومان
                               </div>
                             </div>
 
@@ -288,8 +288,8 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                                   borderTop: '1px dashed var(--border)',
                                   display: 'flex', flexDirection: 'column', gap: 3
                                 }}>
-                                  <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} ت`} />
-                                  <Line l="پرداخت‌شده" v={`${toFa(paidSum(inv.payments || []).toLocaleString('fa-IR'))} ت`} />
+                                  <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
+                                  <Line l="پرداخت‌شده" v={`${toFa(paidSum(inv.payments || []).toLocaleString('fa-IR'))} تومان`} />
                                   {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
                                   {inv.workflowStatus ? (
                                     <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus]} />

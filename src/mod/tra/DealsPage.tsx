@@ -239,7 +239,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                 badge={<Tag tone={d.status === 'settled' ? 'green' : d.status === 'cancelled' ? 'gray' : 'amber'}>{STATUS_LABEL[d.status]}</Tag>}
                 stats={
                   <>
-                    {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(d.value.toLocaleString('fa-IR'))} ت</b></span>}
+                    {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(d.value.toLocaleString('fa-IR'))} تومان</b></span>}
                     {d.percent !== null && d.percent !== undefined && <span>درصد: <b style={{ color: 'var(--text)' }}>{toFa(d.percent)}٪</b></span>}
                     {d.dueDate ? <span>سرسید: <b style={{ color: 'var(--text)' }}>{toFa(d.dueDate)}</b></span> : null}
                   </>
@@ -258,7 +258,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                 {(d.value > 0 || (d.percent !== null && d.percent !== undefined)) ? (
                   <>
                     <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
-                    {d.value > 0 ? <Row l="ارزش کل" v={`${toFa(d.value.toLocaleString('fa-IR'))} ت`} /> : null}
+                    {d.value > 0 ? <Row l="ارزش کل" v={`${toFa(d.value.toLocaleString('fa-IR'))} تومان`} /> : null}
                     {d.percent !== null && d.percent !== undefined ? <Row l="درصد" v={`${toFa(d.percent)}٪`} /> : null}
                   </>
                 ) : null}
@@ -331,7 +331,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
 
         <Grid2>
           <Field label="ارزش (تومان)">
-            <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="ت" min={0} />
+            <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="تومان" min={0} />
           </Field>
           <Field label="درصد" hint="۰ تا ۱۰۰">
             <NumField placeholder="مثلاً — ۱۰" value={form.percent} onChange={e => {

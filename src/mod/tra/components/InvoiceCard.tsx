@@ -52,7 +52,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       }
       stats={
         <>
-          <span>کل: <b>{toFa(inv.total.toLocaleString('fa-IR'))} ت</b></span>
+          <span>کل: <b>{toFa(inv.total.toLocaleString('fa-IR'))} تومان</b></span>
           {rem2 > 0 && <span style={{ color: 'var(--warn)' }}>مانده: <b>{toFa(rem2.toLocaleString('fa-IR'))}</b></span>}
           {inv.items.length > 0 && <span>{toFa(inv.items.length)} قلم</span>}
         </>
@@ -70,12 +70,12 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
         {inv.items.map(it => (
-          <Row key={it.id} l={`${it.description || '—'} • ${toFa(it.quantity)} عدد × ${toFa(it.unitPrice)} ت`} v={`${toFa(it.total.toLocaleString('fa-IR'))} ت`} />
+          <Row key={it.id} l={`${it.description || '—'} • ${toFa(it.quantity)} عدد × ${toFa(it.unitPrice)} تومان`} v={`${toFa(it.total.toLocaleString('fa-IR'))} تومان`} />
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
         <span>جمع کل:</span>
-        <span>{toFa(inv.total.toLocaleString('fa-IR'))} ت</span>
+        <span>{toFa(inv.total.toLocaleString('fa-IR'))} تومان</span>
       </div>
 
       {inv.installments && inv.installments.length > 0 && (() => {
@@ -122,11 +122,11 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                       <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                        {toFa((inst.amount || 0).toLocaleString('fa-IR'))} ت
+                        {toFa((inst.amount || 0).toLocaleString('fa-IR'))} تومان
                       </span>
                       {isPartial && (
                         <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)' }}>
-                          پرداخت: {toFa((inst.paidAmount || 0).toLocaleString('fa-IR'))} ت
+                          پرداخت: {toFa((inst.paidAmount || 0).toLocaleString('fa-IR'))} تومان
                         </span>
                       )}
                       <Tag tone={tone}>{label}</Tag>
@@ -147,7 +147,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
               <div key={p.id}>
                 <Row
                   l={`${p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • ${toFa(p.date)}`}
-                  v={`${toFa(p.amount.toLocaleString('fa-IR'))} ت`}
+                  v={`${toFa(p.amount.toLocaleString('fa-IR'))} تومان`}
                 />
                 {p.method === 'check' && (
                   <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '2px 8px' }}>

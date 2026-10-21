@@ -19,7 +19,7 @@ export default function SummaryBox({ kind, totalOpen, openCount, overdueCount, s
           {isSale ? 'مجموع طلب' : 'مجموع بدهی'}
         </span>
         <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: isSale ? 'var(--accent)' : 'var(--warn)', fontVariantNumeric: 'tabular-nums' }}>
-          {toFa(totalOpen.toLocaleString('fa-IR'))} ت
+          {toFa(totalOpen.toLocaleString('fa-IR'))} تومان
         </span>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: 4, marginTop: 10 }}>

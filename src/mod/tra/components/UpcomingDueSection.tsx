@@ -33,7 +33,7 @@ export default function UpcomingDueSection({ upcoming, contacts, showUpcoming, o
                     <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: `var(--${tone})` }}>{party?.name || '—'}</div>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1 }}>{dueLabel(days)}</div>
                   </div>
-                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${tone})`, flexShrink: 0 }}>{toFa(remaining(inv).toLocaleString('fa-IR'))} ت</div>
+                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${tone})`, flexShrink: 0 }}>{toFa(remaining(inv).toLocaleString('fa-IR'))} تومان</div>
                   <button type="button" onClick={() => onDefer(inv)} style={{ padding: '3px 8px', background: 'transparent', border: `1px solid var(--${tone})`, borderRadius: 'var(--r-sm)', color: `var(--${tone})`, fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>⏰</button>
                 </div>
               );

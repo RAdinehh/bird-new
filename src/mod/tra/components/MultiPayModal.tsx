@@ -269,12 +269,12 @@ export default function MultiPayModal({ open, onClose, kind }: Props) {
                         فاکتور {inv.number || inv.id.slice(0, 8)}
                       </div>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                        📅 {toFa(inv.date)} • مانده: {toFa(rem.toLocaleString('fa-IR'))} ت
+                        📅 {toFa(inv.date)} • مانده: {toFa(rem.toLocaleString('fa-IR'))} تومان
                       </div>
                     </div>
                     {isSelected && alloc > 0 && (
                       <div style={{ fontWeight: 700, color: 'var(--accent)', fontSize: 'var(--fs-sm)' }}>
-                        {toFa(alloc.toLocaleString('fa-IR'))} ت
+                        {toFa(alloc.toLocaleString('fa-IR'))} تومان
                       </div>
                     )}
                   </div>
@@ -292,9 +292,9 @@ export default function MultiPayModal({ open, onClose, kind }: Props) {
               fontSize: 'var(--fs-sm)',
               display: 'flex', justifyContent: 'space-between',
             }}>
-              <span>توزیع‌شده: <b>{toFa(totalAllocated.toLocaleString('fa-IR'))} ت</b></span>
+              <span>توزیع‌شده: <b>{toFa(totalAllocated.toLocaleString('fa-IR'))} تومان</b></span>
               {leftover > 0.5 && (
-                <span style={{ color: 'var(--warn)' }}>باقی‌مانده: <b>{toFa(leftover.toLocaleString('fa-IR'))} ت</b></span>
+                <span style={{ color: 'var(--warn)' }}>باقی‌مانده: <b>{toFa(leftover.toLocaleString('fa-IR'))} تومان</b></span>
               )}
               {leftover <= 0.5 && leftover > -0.5 && (
                 <span style={{ color: 'var(--accent)' }}>✅ کامل توزیع شد</span>

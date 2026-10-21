@@ -44,15 +44,15 @@ export default function PaymentsSection({
               <div style={{ padding: 'var(--sp-2) 0', borderBottom: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
                   <span style={{ color: 'var(--muted)' }}>جمع کل فاکتور:</span>
-                  <span style={{ fontWeight: 700 }}>{toFa(total.toLocaleString('fa-IR'))} ت</span>
+                  <span style={{ fontWeight: 700 }}>{toFa(total.toLocaleString('fa-IR'))} تومان</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
                   <span style={{ color: 'var(--muted)' }}>پرداخت‌شده:</span>
-                  <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(paid.toLocaleString('fa-IR'))} ت</span>
+                  <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(paid.toLocaleString('fa-IR'))} تومان</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
                   <span style={{ color: 'var(--muted)' }}>مانده نهایی:</span>
-                  <span style={{ fontWeight: 700, color: rem > 0.5 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(rem.toLocaleString('fa-IR'))} ت</span>
+                  <span style={{ fontWeight: 700, color: rem > 0.5 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(rem.toLocaleString('fa-IR'))} تومان</span>
                 </div>
               </div>
             )}
@@ -70,7 +70,7 @@ export default function PaymentsSection({
                     </Select>
                   </Field>
                   <Field label="مقدار پیش‌پرداخت">
-                    <NumField placeholder="مثلاً ۵۰۰,۰۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'ت'} min={0} />
+                    <NumField placeholder="مثلاً ۵۰۰,۰۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'تومان'} min={0} />
                   </Field>
                 </Grid2>
               )}
@@ -112,7 +112,7 @@ export default function PaymentsSection({
                   </Grid2>
                   {form.cashDiscountPct && form.cashDiscountDays && total > 0 && (
                     <div style={{ padding: 'var(--pad-tight)', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', textAlign: 'center', fontWeight: 600 }}>
-                      💰 تا {toFa(form.cashDiscountDays)} روز: تخفیف {toFa(form.cashDiscountPct)}٪ (≈ {toFa(Math.round(total * parseFloat(toEn(form.cashDiscountPct)) / 100).toLocaleString('fa-IR'))} ت)
+                      💰 تا {toFa(form.cashDiscountDays)} روز: تخفیف {toFa(form.cashDiscountPct)}٪ (≈ {toFa(Math.round(total * parseFloat(toEn(form.cashDiscountPct)) / 100).toLocaleString('fa-IR'))} تومان)
                     </div>
                   )}
                 </>
@@ -150,7 +150,7 @@ export default function PaymentsSection({
                       <div key={inst.id} style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--pad-tight)', background: 'var(--bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--text)' }}>
                         <span>قسط {inst.number}</span>
                         <span style={{ color: 'var(--muted)' }}>{inst.dueDate}</span>
-                        <span style={{ fontWeight: 700 }}>{inst.amount.toLocaleString('fa-IR')} ت</span>
+                        <span style={{ fontWeight: 700 }}>{inst.amount.toLocaleString('fa-IR')} تومان</span>
                       </div>
                     ))}
                   </div>
@@ -179,7 +179,7 @@ export default function PaymentsSection({
                           </span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
-                          <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: p.amount > 0 ? 'var(--accent)' : 'var(--muted)' }}>{p.amount > 0 ? toFa(p.amount.toLocaleString('fa-IR')) + ' ت' : '—'}</span>
+                          <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: p.amount > 0 ? 'var(--accent)' : 'var(--muted)' }}>{p.amount > 0 ? toFa(p.amount.toLocaleString('fa-IR')) + ' تومان' : '—'}</span>
                           <button type="button" onClick={(e) => { e.stopPropagation(); removePayment(p.id); }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, padding: 0, flexShrink: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
                         </div>
                       </div>
@@ -209,7 +209,7 @@ export default function PaymentsSection({
                             <Field label="مبلغ">
                               <MoneyField placeholder="مبلغ" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0; const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw; updatePayment(p.id, { amount: val }); }} />
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '0 4px' }}>
-                                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} ت` : ''}</span>
+                                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} تومان` : ''}</span>
                                 {rem > 0 && p.type !== 'refund' && (<button type="button" onClick={() => updatePayment(p.id, { amount: (p.amount || 0) + rem })} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>)}
                               </div>
                             </Field>
