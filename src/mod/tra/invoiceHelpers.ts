@@ -244,7 +244,7 @@ function ensureWhsItem(it: any, inv: Invoice, whs: any): string {
   }
 }
 
-export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
+export function applyInvoiceEquipment(inv: Invoice, prev?: Invoice): InvoiceItem[] {
   if (inv.type !== 'purchase') return inv.items;
   
   const hal = useHal.getState();
@@ -255,15 +255,33 @@ export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
     const it = outItems[i] as any;
     
     // ۱. اگر equipmentId از قبل ست شده → لینک به تجهیز موجود
-    const eqId = it.equipmentId;
-    if (eqId) {
-      const eq = hal.equipment.find(e => e.id === eqId);
-      if (eq && !eq.sourceInvoiceId) {
-        const whsId = ensureWhsItem(it, inv, whs);
-          try { hal.updateEquip(eqId, { sourceInvoiceId: inv.id, warehouseItemId: whsId || undefined } as any); } catch {}
+const eqId = it.equipmentId;
+      if (eqId) {
+        const eq = hal.equipment.find(e => e.id === eqId);
+        if (eq) {
+          if (!eq.sourceInvoiceId) {
+            const whsId = eq.warehouseItemId || ensureWhsItem(it, inv, whs);
+            try { hal.updateEquip(eqId, { sourceInvoiceId: inv.id, warehouseItemId: whsId || undefined } as any); } catch {}
+          } else if (eq.sourceInvoiceId === inv.id) {
+            const whsId = eq.warehouseItemId || ensureWhsItem(it, inv, whs);
+            try {
+              hal.updateEquip(eqId, {
+                hallId: it.hallId || eq.hallId,
+                zoneId: it.zoneId || '',
+                count: it.quantity || 1,
+                unitPrice: it.unitPrice || null,
+                warranty: it.warrantyMonths || null,
+                brand: it.brand || '',
+                serialNo: it.serialNo || '',
+                model: it.model || '',
+                name: it.description || it.model || eq.name,
+                warehouseItemId: whsId || undefined,
+              } as any);
+            } catch (e) { console.error('[TRA→HAL own-update]', e); }
+          }
+        }
+        continue;
       }
-      continue;
-    }
     
     // ۲. اگر سالن انتخاب نشده → رد شو
     if (!it.hallId) continue;
@@ -327,6 +345,19 @@ export function applyInvoiceEquipment(inv: Invoice): InvoiceItem[] {
     } catch (e) { console.error('[TRA→HAL create]', e); }
   }
   
+  // 🆕 Orphan cleanup — remove Equipment no longer matched
+  if (prev) {
+    const activeEqIds = new Set(
+      outItems.map((it: any) => it.equipmentId).filter(Boolean)
+    );
+    const orphans = hal.equipment.filter(
+      (e: any) => e.sourceInvoiceId === inv.id && !activeEqIds.has(e.id)
+    );
+    for (const orphan of orphans) {
+      try { hal.deleteEquip(orphan.id); } catch (e) { console.error('[TRA→HAL orphan]', e); }
+    }
+  }
+
   return outItems;
 }
 
