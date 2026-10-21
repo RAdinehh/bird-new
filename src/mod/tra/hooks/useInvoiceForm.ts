@@ -245,8 +245,12 @@ export function useInvoiceForm(params: {
           ? (total * (num(form.advanceValue) / 100)) 
           : num(form.advanceValue)
       ) : 0;
-      if (form.installments && form.installments.length > 0) {
-        data.installments = form.installments;
+      const savedInst = form.installments || [];
+      const savedSum = savedInst.reduce((a: number, x: any) => a + (x.amount || 0), 0);
+      const expectedSum = Math.max(0, total - advance);
+      const isStale = savedInst.length !== cnt || Math.abs(savedSum - expectedSum) > 100;
+      if (savedInst.length > 0 && !isStale) {
+        data.installments = savedInst;
       } else {
         data.installments = generateInstallments(total, cnt, gap, form.date, advance);
       }

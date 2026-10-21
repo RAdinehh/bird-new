@@ -14,6 +14,7 @@ import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
 import { useCtc } from '../../ctc/store';
 import { getTodayJalali } from '../calc';
+import { toastMsg } from '../../../cor/store/toast';
 
 interface Props {
   form: F;
@@ -156,15 +157,14 @@ export default function PaymentsSection({
                 const cnt = parseInt(toEnLocal(form.installmentCount)) || 0;
                 const gap = parseInt(toEnLocal(form.installmentGapDays)) || 30;
                 const advanceAmt = form.isPreorder && form.advanceType === 'amount' ? (parseFloat(toEnLocal(form.advanceValue).replace('٫','.')) || 0) : 0;
-                const totalLocal = form.items.reduce((acc, it) => {
-                  const base = (it.quantity || 0) * (it.unitPrice || 0);
-                  let disc = 0;
-                  if (it.discountType === 'percent') disc = base * ((it.discountValue || 0) / 100);
-                  else if (it.discountType === 'amount') disc = it.discountValue || 0;
-                  return acc + Math.max(0, base - disc) + (it.shipping || 0);
-                }, 0);
-                const generated = generateInstallments(totalLocal, cnt, gap, form.date, advanceAmt);
-                const preview = (form.installments && form.installments.length > 0) ? form.installments : generated;
+                const totalBase = total;
+                const generated = generateInstallments(totalBase, cnt, gap, form.date, advanceAmt);
+                // detect stale form.installments (total/count/gap changed)
+                const savedInst = form.installments || [];
+                const savedSum = savedInst.reduce((a: number, x: any) => a + (x.amount || 0), 0);
+                const expectedSum = Math.max(0, totalBase - advanceAmt);
+                const isStale = savedInst.length !== cnt || Math.abs(savedSum - expectedSum) > 100;
+                const preview = isStale ? generated : savedInst;
                 if (preview.length === 0) return null;
                 return (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
@@ -174,7 +174,15 @@ export default function PaymentsSection({
                         <span>قسط {inst.number}</span>
                         <div style={{ flex: 1, maxWidth: 170 }}>
                         <DatePicker value={inst.dueDate} onChange={(v) => {
-                          const base = (form.installments && form.installments.length > 0) ? form.installments : preview;
+                          const base = preview;
+                          if (idx > 0 && v <= base[idx - 1].dueDate) {
+                            toastMsg.error('تاریخ باید بعد از قسط قبلی باشد');
+                            return;
+                          }
+                          if (idx < base.length - 1 && v >= base[idx + 1].dueDate) {
+                            toastMsg.error('تاریخ باید قبل از قسط بعدی باشد');
+                            return;
+                          }
                           const updated = base.map((x: any, i: number) => i === idx ? { ...x, dueDate: v } : x);
                           setForm({ ...form, installments: updated });
                         }} compact />
