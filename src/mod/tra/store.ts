@@ -5,6 +5,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { useFlk } from '../flk/store';
+import { useWhs } from '../whs/store';
+import { useHal } from '../hal/store';
 import { bus } from '../../cor/events';
 
 import type { Invoice, InvoiceItem, State } from './types';
@@ -227,8 +229,49 @@ export const useTra = create<State>()(
               try { incState.deleteEntry(entry.id); } catch {}
             }
           } catch {}
+      // 🆕 حذف Equipmentهای ساخته‌شده از این فاکتور
+      try {
+        const halState = useHal.getState();
+        const linkedEq = halState.equipment.filter((e: any) => e.sourceInvoiceId === id);
+        for (const eq of linkedEq) {
+          try { halState.deleteEquip(eq.id); } catch {}
         }
-        if (inv) {
+      } catch (e) { console.error('[tra delete] equipment cleanup:', e); }
+        }
+        // 🆕 برگشت موجودی انبار (out movement)
+    if (inv) {
+      try {
+        const whsState = useWhs.getState();
+        for (const it of inv.items || []) {
+          const cat = (it as any).category || inv.category;
+          const isStock = ['feed', 'medicine', 'vaccine', 'other'].includes(cat);
+          const isEquipConsumable = cat === 'equipment' && (it as any).equipmentKind === 'consumable';
+          if (!isStock && !isEquipConsumable) continue;
+          const qty = Number(it.quantity) || 0;
+          if (qty <= 0) continue;
+          const stockItemId = (it as any).stockItemId;
+          if (!stockItemId) continue;
+          const wItem = whsState.items.find((i: any) => i.id === stockItemId);
+          if (!wItem) continue;
+          try {
+            whsState.addMovement({
+              itemId: stockItemId,
+              type: 'out',
+              quantity: qty,
+              unitPrice: Number(it.unitPrice) || 0,
+              reason: 'adjustment',
+              date: inv.date || '',
+              partyId: '',
+              notes: `حذف فاکتور ${inv.number || ''}`,
+              sourceModule: 'tra',
+              sourceId: inv.id,
+            } as any);
+          } catch (e) { console.error('[tra delete] whs reversal:', e); }
+        }
+      } catch (e) { console.error('[tra delete] whs state:', e); }
+    }
+
+    if (inv) {
           const paymentIds = new Set((inv.payments || []).map((p: any) => p.partyPaymentId).filter(Boolean));
           for (const ppId of paymentIds) {
             try { get().deletePartyPayment(ppId as string); } catch(e) {}

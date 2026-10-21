@@ -249,3 +249,249 @@ describe('cascade: mixed & isolation', () => {
     expect(useFlk.getState().flocks.length).toBe(2);
   });
 });
+
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 6: Multiple items, same key
+// ═══════════════════════════════════════════════════════════
+describe('complex: multiple items with same key', () => {
+  it('two feed items same description → whs aggregates', () => {
+    const inv = feedInvoice(100);
+    inv.items.push({
+      ...baseItem(50, 1000, { category: 'feed', unit: 'kg', description: 'دان استارتر' }),
+    });
+    (inv as any).total = 150_000;
+    useTra.getState().addInvoice(inv as any);
+    const items = useWhs.getState().items;
+    expect(items.length).toBe(1);
+    expect(items[0].currentStock).toBe(150);
+  });
+
+  it('edit one of two items: 100+50 → 30+50 = 80', () => {
+    const inv = feedInvoice(100);
+    inv.items.push({
+      ...baseItem(50, 1000, { category: 'feed', unit: 'kg', description: 'دان استارتر' }),
+    });
+    (inv as any).total = 150_000;
+    const id = useTra.getState().addInvoice(inv as any);
+    const prev = useTra.getState().invoices.find(i => i.id === id)!;
+    const newItems = prev.items.map((it, i) => i === 0
+      ? { ...it, quantity: 30, total: 30_000 }
+      : it);
+    useTra.getState().updateInvoice(id, { items: newItems, total: 80_000 });
+    expect(useWhs.getState().items[0].currentStock).toBe(80);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 7: Sequential edits (drift detection)
+// ═══════════════════════════════════════════════════════════
+describe('complex: sequential edits no drift', () => {
+  it('100 → 150 → 50 → 200 → whs=200 (no drift)', () => {
+    const id = useTra.getState().addInvoice(feedInvoice(100) as any);
+    const edits = [150, 50, 200];
+    for (const qty of edits) {
+      const prev = useTra.getState().invoices.find(i => i.id === id)!;
+      const newItems = prev.items.map(it => ({ ...it, quantity: qty, total: qty * 1000 }));
+      useTra.getState().updateInvoice(id, { items: newItems, total: qty * 1000 });
+    }
+    expect(useWhs.getState().items[0].currentStock).toBe(200);
+  });
+
+  it('flock 100 → 200 → 50 → 150 (no drift)', () => {
+    const id = useTra.getState().addInvoice(chickInvoice(100) as any);
+    for (const qty of [200, 50, 150]) {
+      const prev = useTra.getState().invoices.find(i => i.id === id)!;
+      const newItems = prev.items.map(it => ({ ...it, quantity: qty, total: qty * 20_000 }));
+      useTra.getState().updateInvoice(id, { items: newItems, total: qty * 20_000 });
+    }
+    expect(useFlk.getState().flocks[0].initialCount).toBe(150);
+    expect(useFlk.getState().flocks[0].currentCount).toBe(150);
+  });
+
+  it('equipment 2→5→1 (count tracks last value)', () => {
+    const id = useTra.getState().addInvoice(equipInvoice(2) as any);
+    for (const qty of [5, 1]) {
+      const prev = useTra.getState().invoices.find(i => i.id === id)!;
+      const newItems = prev.items.map(it => ({ ...it, quantity: qty, total: qty * 5_000_000 }));
+      useTra.getState().updateInvoice(id, { items: newItems, total: qty * 5_000_000 });
+    }
+    expect(useHal.getState().equipment[0].count).toBe(1);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 8: Edit to zero / remove all items
+// ═══════════════════════════════════════════════════════════
+describe('complex: edit to zero', () => {
+  it('feed 100 → 0 → whs=0', () => {
+    const id = useTra.getState().addInvoice(feedInvoice(100) as any);
+    const prev = useTra.getState().invoices.find(i => i.id === id)!;
+    const newItems = prev.items.map(it => ({ ...it, quantity: 0, total: 0 }));
+    useTra.getState().updateInvoice(id, { items: newItems, total: 0 });
+    const items = useWhs.getState().items;
+    const stock = items.length > 0 ? items[0].currentStock : 0;
+    expect(stock).toBe(0);
+  });
+
+  it('remove all items → equipment orphan cleaned', () => {
+    const id = useTra.getState().addInvoice(equipInvoice(2) as any);
+    useTra.getState().updateInvoice(id, { items: [], total: 0 });
+    expect(useHal.getState().equipment.length).toBe(0);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 9: Existing flock — full cycle
+// ═══════════════════════════════════════════════════════════
+describe('complex: existing flock edit cycle', () => {
+  it('flock 500 + inv 100 → 600; edit inv to 50 → 550; edit to 200 → 700', () => {
+    const flockId = useFlk.getState().add({
+      name: 'Flock A', type: 'layer', birdId: 'bird-1', breedId: 'breed-1',
+      hallId: 'hall-1', zoneId: '',
+      initialCount: 500, currentCount: 500,
+      maleCount: null, femaleCount: null, unknownCount: null,
+      layingStartDay: 140, endOfCycleDay: null, vaccineScheduleId: '',
+      hatchDate: '1405/01/01', purchaseDate: FA_DATE, startDate: FA_DATE,
+      source: 'manual', purchasePrice: null, deliveryCost: null, otherCosts: null,
+      status: 'active', notes: '', dealType: 'own',
+    } as any);
+
+    const id = useTra.getState().addInvoice(chickInvoice(100, 'hall-1', flockId) as any);
+    expect(useFlk.getState().flocks.find(f => f.id === flockId)!.initialCount).toBe(600);
+
+    // edit to 50
+    let prev = useTra.getState().invoices.find(i => i.id === id)!;
+    let newItems = prev.items.map(it => ({ ...it, quantity: 50, total: 1_000_000 }));
+    useTra.getState().updateInvoice(id, { items: newItems, total: 1_000_000 });
+    expect(useFlk.getState().flocks.find(f => f.id === flockId)!.initialCount).toBe(550);
+
+    // edit to 200
+    prev = useTra.getState().invoices.find(i => i.id === id)!;
+    newItems = prev.items.map(it => ({ ...it, quantity: 200, total: 4_000_000 }));
+    useTra.getState().updateInvoice(id, { items: newItems, total: 4_000_000 });
+    expect(useFlk.getState().flocks.find(f => f.id === flockId)!.initialCount).toBe(700);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 10: Two separate invoices same stock item
+// ═══════════════════════════════════════════════════════════
+describe('complex: two invoices same stock item', () => {
+  it('inv A 100 + inv B 50 → whs either 150 (merged) or two items', () => {
+    useTra.getState().addInvoice(feedInvoice(100) as any);
+    useTra.getState().addInvoice(feedInvoice(50) as any);
+    const items = useWhs.getState().items;
+    const totalStock = items.reduce((a, it) => a + (it.currentStock || 0), 0);
+    // either aggregated to one item (150) or two items (100+50) — both valid
+    expect(totalStock).toBe(150);
+  });
+
+  it('delete inv A → inv B remains, whs drops by 100', () => {
+    const idA = useTra.getState().addInvoice(feedInvoice(100) as any);
+    useTra.getState().addInvoice(feedInvoice(50) as any);
+    const before = useWhs.getState().items.reduce((a, it) => a + (it.currentStock || 0), 0);
+    expect(before).toBe(150);
+    useTra.getState().deleteInvoice(idA);
+    const after = useWhs.getState().items.reduce((a, it) => a + (it.currentStock || 0), 0);
+    expect(after).toBe(50);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 11: Equipment rename
+// ═══════════════════════════════════════════════════════════
+describe('complex: equipment rename', () => {
+  it('rename فن A → فن B: same equipmentId preserved (no duplicate)', () => {
+    const id = useTra.getState().addInvoice(equipInvoice(2) as any);
+    const eqBefore = useHal.getState().equipment[0];
+    const eqIdBefore = eqBefore.id;
+
+    const prev = useTra.getState().invoices.find(i => i.id === id)!;
+    const newItems = prev.items.map(it => ({ ...it, description: 'فن B' }));
+    useTra.getState().updateInvoice(id, { items: newItems, total: 10_000_000 });
+
+    const eqs = useHal.getState().equipment;
+    expect(eqs.length).toBe(1);
+    expect(eqs[0].id).toBe(eqIdBefore);
+    expect(eqs[0].name).toBe('فن B');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 12: Partial removal (multi-item)
+// ═══════════════════════════════════════════════════════════
+describe('complex: partial removal multi-item', () => {
+  it('2 equipment items → remove 1 → 1 equipment remains', () => {
+    const inv = equipInvoice(2);
+    inv.items.push({
+      ...baseItem(1, 3_000_000, {
+        category: 'equipment', description: 'کولر',
+        equipmentKind: 'asset', equipmentCategory: 'cooling',
+        equipmentType: 'cooler', hallId: 'hall-1',
+      }),
+    });
+    (inv as any).total = 13_000_000;
+    const id = useTra.getState().addInvoice(inv as any);
+    expect(useHal.getState().equipment.length).toBe(2);
+
+    // remove "کولر" (index 1)
+    const prev = useTra.getState().invoices.find(i => i.id === id)!;
+    useTra.getState().updateInvoice(id, {
+      items: [prev.items[0]],
+      total: 10_000_000,
+    });
+    const eqs = useHal.getState().equipment;
+    expect(eqs.length).toBe(1);
+    expect(eqs[0].name).toContain('فن');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 13: Mixed category invoice
+// ═══════════════════════════════════════════════════════════
+describe('complex: mixed category invoice', () => {
+  it('feed + chick + equipment → all cascades fire', () => {
+    const inv = feedInvoice(100);
+    inv.items.push({
+      ...baseItem(50, 20_000, {
+        category: 'chick', description: 'جوجه',
+        birdId: 'bird-1', breedId: 'breed-1', hallId: 'hall-2',
+        hatchDate: '1405/06/01',
+      }),
+    });
+    inv.items.push({
+      ...baseItem(2, 5_000_000, {
+        category: 'equipment', description: 'فن',
+        equipmentKind: 'asset', equipmentCategory: 'cooling',
+        equipmentType: 'fan', hallId: 'hall-1',
+      }),
+    });
+    (inv as any).total = 100_000 + 1_000_000 + 10_000_000;
+    useTra.getState().addInvoice(inv as any);
+
+    expect(useWhs.getState().items.length).toBeGreaterThanOrEqual(2); // feed + equipment
+    expect(useFlk.getState().flocks.length).toBe(1);
+    expect(useHal.getState().equipment.length).toBe(1);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 14: Deletion cascades
+// ═══════════════════════════════════════════════════════════
+describe('complex: deletion cascades', () => {
+  it('delete feed invoice → whs item stays with 0 (or removed)', () => {
+    const id = useTra.getState().addInvoice(feedInvoice(100) as any);
+    useTra.getState().deleteInvoice(id);
+    const items = useWhs.getState().items;
+    const total = items.reduce((a, it) => a + (it.currentStock || 0), 0);
+    expect(total).toBe(0);
+  });
+
+  it('delete equipment invoice → equipment removed', () => {
+    const id = useTra.getState().addInvoice(equipInvoice(2) as any);
+    expect(useHal.getState().equipment.length).toBe(1);
+    useTra.getState().deleteInvoice(id);
+    expect(useHal.getState().equipment.length).toBe(0);
+  });
+});
