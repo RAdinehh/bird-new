@@ -2,6 +2,7 @@
  * useInvoiceForm — state و منطق فرم فاکتور
  */
 import { useState, useMemo } from 'react';
+import { verifyInvariantsIfDev } from '../../../shr/dev/invariants';
 import { logAction } from '../../../cor/logger/auditLog';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
@@ -307,8 +308,10 @@ export function useInvoiceForm(params: {
     }
     if (form.id) {
       updateInvoice(form.id, data);
+      verifyInvariantsIfDev();
     } else {
       addInvoice(data);
+      verifyInvariantsIfDev();
     }
 
     // ثبت تاریخچه برای سیستم هوشمند

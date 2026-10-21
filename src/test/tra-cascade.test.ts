@@ -495,3 +495,72 @@ describe('complex: deletion cascades', () => {
     expect(useHal.getState().equipment.length).toBe(0);
   });
 });
+
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 15: sale cascade
+// ═══════════════════════════════════════════════════════════
+describe('sale: feed from stock', () => {
+  it('setup whs 100, sale 30 → whs 70', () => {
+    useTra.getState().addInvoice(feedInvoice(100) as any);
+    expect(useWhs.getState().items[0].currentStock).toBe(100);
+
+    const sale = feedInvoice(30);
+    (sale as any).type = 'sale';
+    useTra.getState().addInvoice(sale as any);
+
+    const items = useWhs.getState().items;
+    const total = items.reduce((a: number, it: any) => a + (it.currentStock || 0), 0);
+    expect(total).toBe(70);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 16: equipment consumable vs asset
+// ═══════════════════════════════════════════════════════════
+describe('equipment: consumable vs asset', () => {
+  it('consumable → whs only (no hal)', () => {
+    const inv = equipInvoice(5);
+    (inv.items[0] as any).equipmentKind = 'consumable';
+    (inv.items[0] as any).hallId = '';
+    useTra.getState().addInvoice(inv as any);
+    expect(useHal.getState().equipment.length).toBe(0);
+    expect(useWhs.getState().items.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('asset with hall → hal + whs', () => {
+    useTra.getState().addInvoice(equipInvoice(2, 'hall-1') as any);
+    expect(useHal.getState().equipment.length).toBe(1);
+    expect(useWhs.getState().items.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('asset without hall → no hal (skip)', () => {
+    const inv = equipInvoice(2);
+    (inv.items[0] as any).hallId = '';
+    useTra.getState().addInvoice(inv as any);
+    expect(useHal.getState().equipment.length).toBe(0);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 17: preorder behavior
+// ═══════════════════════════════════════════════════════════
+describe('preorder: deferred cascade', () => {
+  it('preorder chick → no flock yet', () => {
+    const inv = chickInvoice(100);
+    (inv as any).isPreorder = true;
+    useTra.getState().addInvoice(inv as any);
+    expect(useFlk.getState().flocks.length).toBe(0);
+  });
+
+  it('preorder → received → flock created', () => {
+    const inv = chickInvoice(100);
+    (inv as any).isPreorder = true;
+    const id = useTra.getState().addInvoice(inv as any);
+    expect(useFlk.getState().flocks.length).toBe(0);
+
+    useTra.getState().updateInvoice(id, { isPreorder: false } as any);
+    expect(useFlk.getState().flocks.length).toBe(1);
+    expect(useFlk.getState().flocks[0].initialCount).toBe(100);
+  });
+});

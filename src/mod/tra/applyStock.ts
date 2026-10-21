@@ -58,6 +58,74 @@ function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
 }
 
 export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
+  // 🆕 Sale: کاهش موجودی (self-contained)
+  if (inv.type === 'sale') {
+    const whs = useWhs.getState();
+    const outItems: InvoiceItem[] = (inv.items || []).map(it => ({ ...it }));
+
+    const buildMap = (inv2: Invoice | undefined): Map<string, { qty: number; sample: any }> => {
+      const mm = new Map<string, { qty: number; sample: any }>();
+      if (!inv2) return mm;
+      for (const it of inv2.items || []) {
+        if (!isStockItem(it, inv2)) continue;
+        const key = stockKey(it);
+        if (!key || key === '|') continue;
+        const cur = mm.get(key);
+        if (cur) cur.qty += Number(it.quantity) || 0;
+        else mm.set(key, { qty: Number(it.quantity) || 0, sample: it });
+      }
+      return mm;
+    };
+
+    const prevMap = buildMap(prev);
+    const newMap = buildMap(inv);
+
+    for (const [key, { qty: newQty, sample }] of newMap) {
+      const prevQty = prevMap.get(key)?.qty || 0;
+      const delta = newQty - prevQty;
+      if (delta <= 0) continue;
+
+      let itemId = String((sample as any).stockItemId || '');
+      if (itemId && !whs.items.find((x: any) => x.id === itemId)) itemId = '';
+      if (!itemId) {
+        const name = String(sample.description || sample.model || '').trim();
+        const cat = sample.category || inv.category;
+        const targetCat = mapCategory(cat, (sample as any).equipmentKind);
+        const existing = whs.items.find((x: any) =>
+          x.name === name && (x.category === targetCat || x.category === cat)
+        );
+        if (existing) itemId = existing.id;
+      }
+      if (!itemId) {
+        console.warn('[applyInvoiceStock/sale] item not found, skip:', sample.description);
+        continue;
+      }
+
+      try {
+        whs.addMovement({
+          itemId, type: 'out', quantity: delta,
+          unitPrice: Number(sample.unitPrice) || 0,
+          reason: 'sale',
+          date: inv.deliveryDate || inv.date || '',
+          partyId: inv.partyId || '',
+          notes: `فروش — فاکتور ${inv.number || ''}`,
+          sourceModule: 'tra', sourceId: inv.id,
+        } as any);
+      } catch (e) {
+        console.error('[applyInvoiceStock/sale] addMovement failed:', e);
+        continue;
+      }
+
+      for (const it of outItems) {
+        if (isStockItem(it, inv) && stockKey(it) === key) {
+          (it as any).stockItemId = itemId;
+        }
+      }
+    }
+
+    return outItems;
+  }
+
   if (inv.type !== 'purchase') return inv.items;
   const whs = useWhs.getState();
   const outItems: InvoiceItem[] = (inv.items || []).map(it => ({ ...it }));
