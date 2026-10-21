@@ -3,6 +3,7 @@
  * هر تست: reset همه storeها → ساخت فاکتور → انتظار در whs/flk/hal/inc
  */
 import { describe, it, expect, beforeEach } from 'vitest';
+import { paidSum, paidSumAllocated, paidPendingSum, remaining } from '../mod/tra/calc';
 import { useTra } from '../mod/tra/store';
 import { useWhs } from '../mod/whs/store';
 import { useFlk } from '../mod/flk/store';
@@ -562,5 +563,208 @@ describe('preorder: deferred cascade', () => {
     useTra.getState().updateInvoice(id, { isPreorder: false } as any);
     expect(useFlk.getState().flocks.length).toBe(1);
     expect(useFlk.getState().flocks[0].initialCount).toBe(100);
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 18: payment lifecycle (paidSum invariants)
+// ═══════════════════════════════════════════════════════════
+describe('payment: lifecycle', () => {
+  it('pending check → paidSum=0', () => {
+    const inv = feedInvoice(100);
+    (inv as any).payments = [{
+      id: 'p1', amount: 50_000, method: 'check', status: 'pending',
+      date: FA_DATE, checkNo: '123', bank: 'ملی', dueDate: FA_DATE, notes: '',
+    }];
+    const id = useTra.getState().addInvoice(inv as any);
+    const saved = useTra.getState().invoices.find(i => i.id === id)!;
+    // paidSum باید pending رو نشمره → remaining=total
+    expect(paidSumAllocated(saved)).toBe(0);
+    expect(remaining(saved)).toBe(100_000);
+  });
+
+  it('cleared check → paidSum=amount', () => {
+    const inv = feedInvoice(100);
+    (inv as any).payments = [{
+      id: 'p1', amount: 50_000, method: 'check', status: 'cleared',
+      date: FA_DATE, checkNo: '123', bank: 'ملی', dueDate: FA_DATE, notes: '',
+      clearedDate: FA_DATE,
+    }];
+    const id = useTra.getState().addInvoice(inv as any);
+    const saved = useTra.getState().invoices.find(i => i.id === id)!;
+    expect(paidSumAllocated(saved)).toBe(50_000);
+    expect(remaining(saved)).toBe(50_000);
+  });
+
+  it('cash + pending check → only cash counted', () => {
+    const inv = feedInvoice(100);
+    (inv as any).payments = [
+      { id: 'p1', amount: 30_000, method: 'cash', status: 'cleared', date: FA_DATE, checkNo: '', bank: '', dueDate: '', notes: '' },
+      { id: 'p2', amount: 40_000, method: 'check', status: 'pending', date: FA_DATE, checkNo: '123', bank: 'ملی', dueDate: FA_DATE, notes: '' },
+    ];
+    const id = useTra.getState().addInvoice(inv as any);
+    const saved = useTra.getState().invoices.find(i => i.id === id)!;
+    expect(paidSumAllocated(saved)).toBe(30_000);
+    expect(paidPendingSum((saved as any).payments)).toBe(40_000);
+  });
+
+  it('refund subtracts', () => {
+    const inv = feedInvoice(100);
+    (inv as any).payments = [
+      { id: 'p1', amount: 50_000, method: 'cash', type: 'regular', date: FA_DATE, checkNo: '', bank: '', dueDate: '', notes: '' },
+      { id: 'p2', amount: 20_000, method: 'cash', type: 'refund', date: FA_DATE, checkNo: '', bank: '', dueDate: '', notes: '' },
+    ];
+    const id = useTra.getState().addInvoice(inv as any);
+    const saved = useTra.getState().invoices.find(i => i.id === id)!;
+    expect(paidSumAllocated(saved)).toBe(30_000);
+  });
+
+  it('bounced check → paidSum ignores', () => {
+    const inv = feedInvoice(100);
+    (inv as any).payments = [{
+      id: 'p1', amount: 50_000, method: 'check', status: 'bounced',
+      date: FA_DATE, checkNo: '123', bank: 'ملی', dueDate: FA_DATE, notes: '',
+      bouncedDate: FA_DATE,
+    }];
+    const id = useTra.getState().addInvoice(inv as any);
+    const saved = useTra.getState().invoices.find(i => i.id === id)!;
+    expect(paidSumAllocated(saved)).toBe(0);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 19: preorder full cycle (deeper)
+// ═══════════════════════════════════════════════════════════
+describe('preorder: full cycle', () => {
+  it('preorder equipment → no hal yet', () => {
+    const inv = equipInvoice(2);
+    (inv as any).isPreorder = true;
+    useTra.getState().addInvoice(inv as any);
+    expect(useHal.getState().equipment.length).toBe(0);
+    expect(useWhs.getState().items.length).toBe(0);
+  });
+
+  it('preorder → received → hal + whs created', () => {
+    const inv = equipInvoice(2);
+    (inv as any).isPreorder = true;
+    const id = useTra.getState().addInvoice(inv as any);
+    expect(useHal.getState().equipment.length).toBe(0);
+
+    useTra.getState().updateInvoice(id, { isPreorder: false } as any);
+    expect(useHal.getState().equipment.length).toBe(1);
+    expect(useWhs.getState().items.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('preorder egg → no eggEntry yet, received → created', () => {
+    const inv = eggInvoice(100);
+    (inv as any).isPreorder = true;
+    const id = useTra.getState().addInvoice(inv as any);
+    expect(useInc.getState().eggEntries.length).toBe(0);
+
+    useTra.getState().updateInvoice(id, { isPreorder: false } as any);
+    expect(useInc.getState().eggEntries.length).toBe(1);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 20: allocation auto-creation
+// ═══════════════════════════════════════════════════════════
+describe('allocation: auto-creation', () => {
+  it('invoice with 2 payments → 2 allocations', () => {
+    const inv = feedInvoice(100);
+    (inv as any).payments = [
+      { id: 'p1', amount: 50_000, method: 'cash', date: FA_DATE, checkNo: '', bank: '', dueDate: '', notes: '' },
+      { id: 'p2', amount: 30_000, method: 'card', date: FA_DATE, checkNo: '', bank: '', dueDate: '', notes: '' },
+    ];
+    useTra.getState().addInvoice(inv as any);
+    const allocs = useTra.getState().allocations;
+    expect(allocs.length).toBe(2);
+    expect(allocs[0].amount).toBe(50_000);
+    expect(allocs[1].amount).toBe(30_000);
+  });
+
+  it('update payments → allocations synced', () => {
+    const inv = feedInvoice(100);
+    (inv as any).payments = [
+      { id: 'p1', amount: 50_000, method: 'cash', date: FA_DATE, checkNo: '', bank: '', dueDate: '', notes: '' },
+    ];
+    const id = useTra.getState().addInvoice(inv as any);
+    expect(useTra.getState().allocations.length).toBe(1);
+
+    // add a second payment
+    const saved = useTra.getState().invoices.find(i => i.id === id)!;
+    const newPayments = [...(saved.payments || []),
+      { id: 'p2', amount: 30_000, method: 'card', date: FA_DATE, checkNo: '', bank: '', dueDate: '', notes: '' },
+    ];
+    useTra.getState().updateInvoice(id, { payments: newPayments } as any);
+    expect(useTra.getState().allocations.length).toBe(2);
+  });
+
+  it('remove payment → allocation removed', () => {
+    const inv = feedInvoice(100);
+    (inv as any).payments = [
+      { id: 'p1', amount: 50_000, method: 'cash', date: FA_DATE, checkNo: '', bank: '', dueDate: '', notes: '' },
+      { id: 'p2', amount: 30_000, method: 'card', date: FA_DATE, checkNo: '', bank: '', dueDate: '', notes: '' },
+    ];
+    const id = useTra.getState().addInvoice(inv as any);
+    const saved = useTra.getState().invoices.find(i => i.id === id)!;
+    const newPayments = [(saved.payments || [])[0]];
+    useTra.getState().updateInvoice(id, { payments: newPayments } as any);
+    expect(useTra.getState().allocations.length).toBe(1);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 21: chick distribution validation
+// ═══════════════════════════════════════════════════════════
+describe('chick: distribution', () => {
+  it('male 300 + female 200 = qty 500', () => {
+    const inv = chickInvoice(500);
+    (inv.items[0] as any).maleCount = 300;
+    (inv.items[0] as any).femaleCount = 200;
+    useTra.getState().addInvoice(inv as any);
+    const flock = useFlk.getState().flocks[0];
+    expect(flock.maleCount).toBe(300);
+    expect(flock.femaleCount).toBe(200);
+    expect(flock.initialCount).toBe(500);
+  });
+
+  it('male + female + unknown = qty', () => {
+    const inv = chickInvoice(500);
+    (inv.items[0] as any).maleCount = 200;
+    (inv.items[0] as any).femaleCount = 200;
+    (inv.items[0] as any).unknownCount = 100;
+    useTra.getState().addInvoice(inv as any);
+    const flock = useFlk.getState().flocks[0];
+    expect((flock.maleCount || 0) + (flock.femaleCount || 0) + (flock.unknownCount || 0)).toBe(500);
+  });
+
+  it('all unknown → male/female null', () => {
+    const inv = chickInvoice(500);
+    (inv.items[0] as any).unknownCount = 500;
+    useTra.getState().addInvoice(inv as any);
+    const flock = useFlk.getState().flocks[0];
+    expect(flock.unknownCount).toBe(500);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GROUP 22: egg arithmetic
+// ═══════════════════════════════════════════════════════════
+describe('egg: arithmetic', () => {
+  it('broken=5 → count=95', () => {
+    useTra.getState().addInvoice(eggInvoice(100, 5, 0) as any);
+    expect(useInc.getState().eggEntries[0].count).toBe(95);
+  });
+
+  it('nonInc=3 → count=97', () => {
+    useTra.getState().addInvoice(eggInvoice(100, 0, 3) as any);
+    expect(useInc.getState().eggEntries[0].count).toBe(97);
+  });
+
+  it('broken=100 (all) → no eggEntry (healthy=0)', () => {
+    useTra.getState().addInvoice(eggInvoice(100, 100, 0) as any);
+    expect(useInc.getState().eggEntries.length).toBe(0);
   });
 });
