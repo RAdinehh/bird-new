@@ -24,7 +24,7 @@ function computeHatchDate(invDate: string, ageDays: number | null | undefined): 
   } catch { return ''; }
 }
 
-export const BIRD_CATS = ['chick', 'adult', 'fertile_egg'];
+export const BIRD_CATS = ['chick', 'adult'];
 
 /* EGG_LINK */
 /** اتصال فاکتور فروش تخم → EggSale خودکار */
