@@ -24,6 +24,7 @@ const DEAL_TYPE_LABEL: Record<string, string> = {
   partnership: '🤝 شراکتی',
   consignment: '📦 امانی',
   rent: '📋 اجاره‌ای',
+  barter: '🔄 تهاتر',
 };
 
 const DIVIDER = {
@@ -114,6 +115,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
   const relevantDeals = deals.filter((d) => {
     if (form.dealType === 'partnership') return d.type === 'partnership';
     if (form.dealType === 'consignment') return d.type === 'consignment';
+    if (form.dealType === 'barter') return d.type === 'barter';
     return false;
   });
 
@@ -160,6 +162,31 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </Select>
         </Field>
+      )}
+
+      {form.dealType === 'barter' && (
+        <>
+          <Field label="طرف تهاتر" required>
+            <Select value={form.barterPartyId || ''} onChange={e => setForm({ ...form, barterPartyId: e.target.value })}>
+              <option value="">— انتخاب —</option>
+              {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </Select>
+          </Field>
+          <Field label="ارزش ریالی تهاتر">
+            <MoneyField placeholder="مبلغ معادل" value={form.barterValue || ''} onChange={e => setForm({ ...form, barterValue: e.target.value })} />
+          </Field>
+          <Field label="شرح کالا/خدمات معاوضی">
+            <input type="text" value={form.barterDescription || ''} onChange={e => setForm({ ...form, barterDescription: e.target.value })} placeholder="مثلاً: ۵ تن دان" style={{ width: '100%', height: 38, padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-base)', fontFamily: 'inherit', textAlign: 'right', boxSizing: 'border-box' }} />
+          </Field>
+          <Grid2>
+            <Field label="تاریخ شروع تهاتر">
+              <DatePicker value={form.barterStartDate || ''} onChange={v => setForm({ ...form, barterStartDate: v })} placeholder="از چه تاریخی؟" autoToday />
+            </Field>
+            <Field label="تاریخ پایان تهاتر" error={form.barterStartDate && form.barterEndDate && form.barterStartDate >= form.barterEndDate ? 'باید بعد از شروع باشد' : undefined}>
+              <DatePicker value={form.barterEndDate || ''} onChange={v => setForm({ ...form, barterEndDate: v })} placeholder="تا چه تاریخی؟" min={form.barterStartDate} />
+            </Field>
+          </Grid2>
+        </>
       )}
 
       {form.dealType === 'rent' && (
