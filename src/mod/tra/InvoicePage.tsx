@@ -244,7 +244,11 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     if (!ok) return;
     reopenInvoice(inv.id);
     try { logAction('update', 'tra', 'بازگشایی فاکتور ' + (inv.number || inv.id)); } catch {}
-    setTimeout(() => openEdit(inv), 100);
+    setTimeout(() => {
+      const fresh = useTra.getState().invoices.find(i => i.id === inv.id);
+      if (fresh) openEdit(fresh);
+      else openEdit(inv);
+    }, 100);
   };
 
 return (
