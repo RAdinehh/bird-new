@@ -14,6 +14,7 @@ import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
 import { useCtc } from '../../ctc/store';
 import { getTodayJalali } from '../calc';
+import { HELP } from '../../../shr/help/helpTexts';
 import { toastMsg } from '../../../cor/store/toast';
 
 interface Props {
@@ -68,7 +69,7 @@ export default function PaymentsSection({
 
               {form.isPreorder && (
                 <Grid2>
-                  <Field label="نوع پیش‌پرداخت" help="**درصد** یا **مبلغ** — هرکدوم برات راحت‌تره">
+                  <Field label="نوع پیش‌پرداخت" help={HELP.tra.payment.advanceType}>
                     <Select value={form.advanceType} onChange={e => setForm({...form, advanceType: e.target.value as 'percent' | 'amount'})}>
                       <option value="percent">درصد (٪)</option>
                       <option value="amount">مبلغ (ت)</option>
@@ -223,7 +224,7 @@ export default function PaymentsSection({
                       {isExpanded && (
                         <div style={{ marginTop: 'var(--sp-2)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
                           <Grid2>
-                            <Field label="نوع پرداخت" help="**پرداخت عادی** = پرداخت معمولی مشتری به شما، **عودت وجه** = برگشت پول به مشتری (کاهش پرداخت‌شده)">
+                            <Field label="نوع پرداخت" help={HELP.tra.payment.type}>
                               <Select value={p.type || 'regular'} onChange={e => updatePayment(p.id, { type: e.target.value as 'regular' | 'refund' })}>
                                 <option value="regular">💵 پرداخت عادی</option>
                                 
@@ -231,7 +232,7 @@ export default function PaymentsSection({
                                 <option value="refund">↩️ عودت وجه</option>
                               </Select>
                             </Field>
-                            <Field label="روش پرداخت" help="نحوه پرداخت این ردیف: **نقدی** (پول نقد در همان لحظه)، **کارت** (کارت به کارت یا POS)، **چک** (تعهد پرداخت در تاریخ سرسید)">
+                            <Field label="روش پرداخت" help={HELP.tra.payment.method}>
                               <Select value={p.method} onChange={e => updatePayment(p.id, { method: e.target.value as 'cash' | 'card' | 'check' })}>
                                 <option value="cash">نقدی</option>
                                 <option value="card">کارت</option>
@@ -259,7 +260,7 @@ export default function PaymentsSection({
                               </Grid2>
                               <Grid2>
                                 <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
-                                <Field label="وضعیت چک" help="وضعیت چک بانکی: **در جریان** = هنوز پاس نشده و پولی نیامده، **نقد شد** = پول به حساب نشسته، **برگشتی** = چک بی‌محل شده و پولی واریز نمی‌شود">
+                                <Field label="وضعیت چک" help={HELP.tra.payment.checkStatus}>
                                   <Select value={p.status || 'pending'} onChange={e => { const newStatus = e.target.value as CheckStatus; const patch: Partial<Payment> = { status: newStatus }; if (newStatus === 'bounced') { patch.bouncedDate = getTodayJalali(); patch.clearedDate = ''; } else if (newStatus === 'cleared') { patch.clearedDate = getTodayJalali(); patch.bouncedDate = ''; } else { patch.bouncedDate = ''; patch.clearedDate = ''; } updatePayment(p.id, patch); }}>
                                     <option value="pending">🟡 در جریان</option>
                                     <option value="cleared">✅ نقد شد</option>
