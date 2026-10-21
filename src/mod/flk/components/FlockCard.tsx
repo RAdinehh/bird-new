@@ -99,6 +99,13 @@ export default function FlockCard(props: FlockCardProps) {
   const ready = isLayingReady(f);
   const untilLay = daysUntilLaying(f);
   const costs = calcCosts(f);
+  // 🆕 deal display helpers
+  const dealData = (f as any).dealData || {};
+  const dealType = (f as any).dealType || 'own';
+  const rentAmount = Number(dealData.rentAmount) || 0;
+  const rentPeriodLabel: Record<string, string> = { monthly: 'ماهانه', season: 'فصلی', total: 'کل دوره' };
+  const partnerShare = Number(dealData.partnerShare) || 0;
+  const myShare = Math.max(0, 100 - partnerShare);
   const accentColor: 'accent' | 'dim' = isArchived ? 'dim' : 'accent';
 
   // 🆕 N Counter: ساخت آرایه badge با اولویت
@@ -366,6 +373,9 @@ export default function FlockCard(props: FlockCardProps) {
             {costs.birdCost > 0 && <Row l="قیمت پرنده‌ها" v={fmt.money(costs.birdCost)} />}
             {costs.delivery > 0 && <Row l="هزینه حمل" v={fmt.money(costs.delivery)} />}
             {costs.other > 0 && <Row l="سایر" v={fmt.money(costs.other)} />}
+            {dealType === 'rent' && rentAmount > 0 && (
+              <Row l={`اجاره (${rentPeriodLabel[dealData.rentPeriod || 'monthly'] || 'ماهانه'})`} v={`${fmt.money(rentAmount)} ⚠️`} />
+            )}
             <Row l="جمع کل" v={fmt.money(costs.total)} accent />
             {costs.perBird > 0 && <Row l="هر پرنده" v={fmt.money(Math.round(costs.perBird))} accent />}
           </RowGrid>
@@ -389,6 +399,12 @@ export default function FlockCard(props: FlockCardProps) {
               <Row l="فروش کل" v={fmt.money(revenue)} />
               <Row l={isProfit ? 'سود خالص' : 'زیان'} v={fmt.money(Math.abs(profit))} accent={isProfit} />
               {costs.total > 0 && <Row l="ROI" v={`${toFa(roi.toFixed(1))}٪`} />}
+              {dealType === 'partnership' && partnerShare > 0 && (
+                <>
+                  <Row l={`سهم شریک (${toFa(partnerShare)}٪)`} v={fmt.money(Math.round(profit * partnerShare / 100))} />
+                  <Row l={`سهم شما (${toFa(myShare)}٪)`} v={fmt.money(Math.round(profit * myShare / 100))} accent={isProfit} />
+                </>
+              )}
             </RowGrid>
           </>
         );
