@@ -141,13 +141,25 @@ export function useInvoiceForm(params: {
 
   // ذخیره
   const save = async () => {
+    // ═══ فیلتر اقلام کاملاً خالی ═══
+    const isEmptyItem = (it: any) =>
+      (Number(it.quantity) || 0) === 0 &&
+      (Number(it.unitPrice) || 0) === 0 &&
+      !String(it.description || '').trim();
+
+    const cleanedItems = (form.items || []).filter((it: any) => !isEmptyItem(it));
+    if (cleanedItems.length === 0) {
+      setErr('حداقل یک قلم با تعداد یا قیمت وارد کنید');
+      return;
+    }
+
     // ═══ اعتبارسنجی Zod (منبع حقیقت) ═══
     const validationData = {
       type: kind,
       date: form.date || '',
       partyId: form.partyId || '',
       category: form.category || '',
-      items: (form.items || []).map(it => ({
+      items: cleanedItems.map(it => ({
         ...it,
         category: it.category || form.category,
       })),
@@ -176,11 +188,11 @@ export function useInvoiceForm(params: {
     
     if (!form.partyId) { setErr(isPurchase ? 'فروشنده اجباری است' : 'مشتری اجباری است'); return; }
     if (!form.date.trim()) { setErr('تاریخ اجباری است'); return; }
-    if (form.items.length === 0) { setErr('حداقل یک قلم اضافه کنید'); return; }
+
 
     // ─── اعتبارسنجی نرم (Soft Validation) ───
     const warnings: string[] = [];
-    form.items.forEach((it, idx) => {
+    cleanedItems.forEach((it, idx) => {
       const cat = it.category || form.category;
       const label = `قلم ${toFa(idx + 1)}`;
       if (kind === 'purchase') {
@@ -207,7 +219,7 @@ export function useInvoiceForm(params: {
     // ────────────────────────────────────────
     const data: any = {
       type: kind, date: form.date, partyId: form.partyId, category: form.category,
-      items: form.items, discount: 0, shipping: 0, total, payments: form.payments,
+      items: cleanedItems, discount: 0, shipping: 0, total, payments: form.payments,
       dueDate: form.dueDate, relatedFlockId: form.relatedFlockId || '',
       relatedEntryId: '', notes: form.notes.trim(),
       paymentTerms: form.paymentTerms,

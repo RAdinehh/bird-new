@@ -375,9 +375,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       {/* ====== یادداشت ====== */}
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--sp-1)', marginBottom: 'var(--sp-2)', paddingRight: 4, lineHeight: 1.4 }}>توضیحات اختیاری برای این فاکتور</div>
-      <Field label="یادداشت">
-        <Textarea placeholder="توضیحات این فاکتور" rows={3} minRows={3} value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
-      </Field>
+      <Textarea placeholder="توضیحات این فاکتور" rows={3} minRows={3} value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
       <ErrorBox>{err}</ErrorBox>
     </Modal>
   );
