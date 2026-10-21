@@ -15,7 +15,6 @@ import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/fil
 import MultiPayModal from './components/MultiPayModal';
 
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
-type QuickFilter = 'all' | 'overdue' | 'soon';
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
   const { invoices, updateInvoice } = useTra();
@@ -352,11 +351,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                       {items.map(inv => {
                         const party = contacts.find(c => c.id === inv.partyId);
                         const rem = remaining(inv);
-                        const _bouncedCount = (inv.payments || []).filter((p: any) => p.method === 'check' && p.status === 'bounced').length;
                         const days = ageDays(inv);
                         const invOpen = expandedInvoice === inv.id;
                         const dUntil = daysUntilDue(inv);
-                        const tone = dueTone(dUntil);
                         return (
                           <div
                             key={inv.id}
