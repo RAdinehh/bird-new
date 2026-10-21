@@ -83,8 +83,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const activeFlocks = flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }));
   const birdObj = birds.find(b => b.id === item.birdId);
   const breedObj = breeds.find(b => b.id === item.breedId);
-  const autoFlockName = `گله ${breedObj?.name || birdObj?.name || '...'} — ${invoiceDate || '...'}`;
-  const isEggCategory = isPurchase ? category === 'egg' : category === 'fertile_egg';
+    const isEggCategory = isPurchase ? category === 'egg' : category === 'fertile_egg';
 
   // ========== جوجه یک‌روزه ==========
   if (category === 'chick') {
@@ -98,7 +97,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                   </Field>
                 )}
                 <Field label="نام گله (اختیاری)" help={HELP.tra.chick.flockName}>
-                  <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder={autoFlockName} />
+                  <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder="نام گله" />
                 </Field>
               </Grid2>
               <Grid2>
