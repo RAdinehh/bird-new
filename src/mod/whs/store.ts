@@ -6,7 +6,7 @@ import { validate } from '../../shr/validation/helpers';
 import { createItemSchema, createMovementSchema } from '../../shr/validation/rules/whs';
 
 export type ItemCategory = 'feed' | 'medicine' | 'vaccine' | 'herbal' | 'equipment' | 'consumable' | 'egg';
-export type ItemUnit = 'kg' | 'g' | 'L' | 'ml' | 'pcs' | 'vial' | 'pack';
+export type ItemUnit = 'kg' | 'g' | 'L' | 'l' | 'ml' | 'pcs' | 'vial' | 'pack' | 'ton' | 'bag' | 'dose';
 export type MovementType = 'in' | 'out' | 'adjust';
 export type MovementReason = 'purchase' | 'consumption' | 'sale' | 'gift' | 'loss' | 'adjustment' | 'return';
 
@@ -323,8 +323,8 @@ export const CATEGORY_DEFAULTS: Record<ItemCategory, {
 };
 
 export const UNIT_LABEL: Record<ItemUnit, string> = {
-  kg: 'کیلوگرم', g: 'گرم', L: 'لیتر', ml: 'میلی‌لیتر',
-  pcs: 'عدد', vial: 'ویال', pack: 'بسته'
+  kg: 'کیلوگرم', g: 'گرم', L: 'لیتر', l: 'لیتر', ml: 'میلی‌لیتر',
+  pcs: 'عدد', vial: 'ویال', pack: 'بسته', ton: 'تن', bag: 'کیسه', dose: 'دوز'
 };
 
 export const MOVEMENT_REASON: Record<MovementReason, string> = {
