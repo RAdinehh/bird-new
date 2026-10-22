@@ -385,7 +385,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         <Grid2>
           <Field label="نوع تجهیز" required hint={!item.equipmentCategory ? 'اول دسته را انتخاب کنید' : undefined}>
-            <Select value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })} disabled={!item.equipmentCategory}>
+            <Select key={item.equipmentCategory || 'none'} value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })} disabled={!item.equipmentCategory}>
               <option value="">— انتخاب —</option>
               {(typesForCategory(String(item.equipmentCategory || '')) as string[]).map((t: string) => {
                 const lbl = getEquipLabel(t);
@@ -410,7 +410,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Input
             placeholder={(() => {
               const lbl = item.equipmentType ? getEquipLabel(item.equipmentType) : null;
-              return lbl?.name ? `مثلاً ${lbl.name}` : 'مثلاً فن تونلی ۱۲۰';
+              return lbl?.name ? lbl.name : 'فن تونلی ۱۲۰';
             })()}
             value={String(item.description || '')}
             onChange={e => updateItem({ description: e.target.value })}
@@ -419,7 +419,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Field>
 
         <Grid2>
-          <Field label="سالن مقصد (اختیاری)" hint="اگر مطمئن نیستید، بعداً در بخش سالن تعیین کنید">
+          <Field label="سالن مقصد (اختیاری)" hint="قابل تغییر بعداً در سالن">
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
           </Field>
           <Field label="بخش مقصد (اختیاری)">
@@ -429,11 +429,11 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         
                 <Grid2>
           <Field label="برند / سازنده">
-            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="مثلاً پارس، آکو" />
+            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="پارس، آکو" />
           </Field>
-          <Field label="گارانتی (ماه)" hint="اختیاری — چند ماه تأمین‌کننده گارانتی داده؟">
+          <Field label="گارانتی (ماه)" hint="تعداد ماه گارانتی">
             <NumField
-              placeholder="مثلاً ۱۲"
+              placeholder="۱۲"
               value={item.warrantyMonths != null && item.warrantyMonths > 0 ? String(item.warrantyMonths) : ''}
               onChange={e => updateItem({ warrantyMonths: parseFloat(toEn(e.target.value).replace('٫','.')) || null })}
               unit="ماه"
