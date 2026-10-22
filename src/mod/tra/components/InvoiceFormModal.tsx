@@ -153,7 +153,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       
       <Grid2>
         <Field label="تاریخ فاکتور" required error={showError('date')} onTouch={() => markTouched('date')}>
-          <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
+          <DatePicker value={form.date} onChange={v => setForm(f => ({ ...f, date: v}))}  autoToday />
         </Field>
         <Field label="دسته">
           <Select value={form.category} onChange={e => {
@@ -182,7 +182,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <Field label="نوع سفارش" help={HELP.tra.invoice.orderType}>
           <Select
             value={(form.isPreorder && form.category !== 'other') ? 'preorder' : 'stock'}
-            onChange={e => setForm({ ...form, isPreorder: e.target.value === 'preorder' })}
+            onChange={e => setForm(f => ({ ...f, isPreorder: e.target.value === 'preorder' }))}
           >
             <option value="stock">📦 خرید از موجودی</option>
             {form.category !== 'other' && (
@@ -193,7 +193,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <Field label={isPurchase ? 'فروشنده' : 'مشتری'} required error={showError('partyId')} onTouch={() => markTouched('partyId')}>
           <SmartSelect
             value={form.partyId}
-            onChange={v => setForm({...form, partyId: v})}
+            onChange={v => setForm(f => ({ ...f, partyId: v}))}
             options={parties.map(cc => ({ value: cc.id, label: cc.name, subtitle: cc.phone || undefined }))}
             placeholder="— انتخاب کنید —" modalTitle={isPurchase ? 'انتخاب فروشنده' : 'انتخاب مشتری'} autoThreshold={6}
           />
@@ -203,7 +203,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       
       {form.isPreorder && (
         <Field label="تاریخ تحویل" required>
-          <DatePicker value={form.deliveryDate} onChange={v => setForm({...form, deliveryDate: v})}  autoToday />
+          <DatePicker value={form.deliveryDate} onChange={v => setForm(f => ({ ...f, deliveryDate: v}))}  autoToday />
         </Field>
       )}
 
@@ -499,7 +499,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       {/* ====== یادداشت ====== */}
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
       
-      <Textarea placeholder="توضیحات این فاکتور" rows={3} minRows={3} value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+      <Textarea placeholder="توضیحات این فاکتور" rows={3} minRows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value}))} />
       <ErrorBox>{err}</ErrorBox>
     </Modal>
   );

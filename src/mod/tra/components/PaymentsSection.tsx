@@ -70,20 +70,20 @@ export default function PaymentsSection({
               {form.isPreorder && (
                 <Grid2>
                   <Field label="نوع پیش‌پرداخت" help={HELP.tra.payment.advanceType}>
-                    <Select value={form.advanceType} onChange={e => setForm({...form, advanceType: e.target.value as 'percent' | 'amount'})}>
+                    <Select value={form.advanceType} onChange={e => setForm(f => ({ ...f, advanceType: e.target.value as 'percent' | 'amount'}))}>
                       <option value="percent">درصد (٪)</option>
                       <option value="amount">مبلغ (ت)</option>
                     </Select>
                   </Field>
                   <Field label="مقدار پیش‌پرداخت" help="مبلغی که در همان لحظه خرید پرداخت می‌شود. این مبلغ از کل فاکتور کسر شده و باقی‌مانده بین اقساط تقسیم می‌شود">
-                    <NumField placeholder="مثلاً ۵۰۰,۰۰۰" value={form.advanceValue} onChange={e => setForm({...form, advanceValue: e.target.value})} unit={form.advanceType === 'percent' ? '٪' : 'تومان'} min={0} />
+                    <NumField placeholder="مثلاً ۵۰۰,۰۰۰" value={form.advanceValue} onChange={e => setForm(f => ({ ...f, advanceValue: e.target.value}))} unit={form.advanceType === 'percent' ? '٪' : 'تومان'} min={0} />
                   </Field>
                 </Grid2>
               )}
 
               <Grid2>
                 <Field label="نوع تسویه" help={HELP.tra.payment.paymentTerms}>
-                  <Select value={form.paymentTerms} onChange={e => setForm({...form, paymentTerms: e.target.value as any})}>
+                  <Select value={form.paymentTerms} onChange={e => setForm(f => ({ ...f, paymentTerms: e.target.value as any}))}>
                     <option value="cash">💵 نقدی</option>
                     <option value="installment">📅 قسطی</option>
                     <option value="custom">✏️ توافقی</option>
@@ -96,7 +96,7 @@ export default function PaymentsSection({
                 )}
                 {form.paymentTerms === 'custom' && (
                   <Field label="تاریخ سرسید" required help="آخرین مهلت پرداخت فاکتور. اگر حالت «قسطی» را انتخاب کرده باشید، این تاریخ به‌صورت خودکار محاسبه می‌شود. در حالت «توافقی»، می‌توانید تاریخ را به‌صورت دستی وارد کنید">
-                    <DatePicker value={form.customDueDate} onChange={v => setForm({...form, customDueDate: v, dueDate: v})}  autoToday />
+                    <DatePicker value={form.customDueDate} onChange={v => setForm(f => ({ ...f, customDueDate: v, dueDate: v}))}  autoToday />
                   </Field>
                 )}
               </Grid2>
@@ -110,10 +110,10 @@ export default function PaymentsSection({
                   </div>
                   <Grid2>
                     <Field label="تخفیف نقدی (٪)" hint="پرداخت زودتر" help="اگر مشتری مبلغ فاکتور را زودتر از موعد سرسید پرداخت کند، این درصد از مبلغ کل کسر می‌شود. مثلاً ۲٪ تخفیف برای پرداخت تا ۱۰ روز">
-                      <NumField placeholder="مثلاً ۲" value={form.cashDiscountPct || ''} onChange={e => setForm({...form, cashDiscountPct: e.target.value})} unit="٪" min={0} max={100} />
+                      <NumField placeholder="مثلاً ۲" value={form.cashDiscountPct || ''} onChange={e => setForm(f => ({ ...f, cashDiscountPct: e.target.value}))} unit="٪" min={0} max={100} />
                     </Field>
                     <Field label="مهلت (روز)" hint="از تاریخ فاکتور" help="مدت زمانی که مشتری فرصت دارد با استفاده از تخفیف نقدی پرداخت کند. اگر پرداخت بعد از این مهلت انجام شود، تخفیف اعمال نمی‌شود">
-                      <NumField placeholder="مثلاً ۱۰" value={form.cashDiscountDays || ''} onChange={e => setForm({...form, cashDiscountDays: e.target.value})} unit="روز" min={0} />
+                      <NumField placeholder="مثلاً ۱۰" value={form.cashDiscountDays || ''} onChange={e => setForm(f => ({ ...f, cashDiscountDays: e.target.value}))} unit="روز" min={0} />
                     </Field>
                   </Grid2>
                   {form.cashDiscountPct && form.cashDiscountDays && total > 0 && (
@@ -135,7 +135,7 @@ export default function PaymentsSection({
                       ? (parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0)
                       : 0;
                     const newInst = cnt > 0 ? generateInstallments(total, cnt, gap, form.date, advanceAmt) : [];
-                    setForm({...form, installmentCount: newVal, installments: newInst});
+                    setForm(f => ({ ...f, installmentCount: newVal, installments: newInst}));
                   }} unit="قسط" min={0} />
                   </Field>
                   <Field label="فاصله" required help="فاصله زمانی بین هر قسط به روز. مثلاً ۳۰ روز یعنی ماهانه پرداخت می‌کنید. تاریخ قسط‌ها به صورت خودکار از این فاصله محاسبه می‌شود">
@@ -147,7 +147,7 @@ export default function PaymentsSection({
                       ? (parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0)
                       : 0;
                     const newInst = cnt > 0 ? generateInstallments(total, cnt, gap, form.date, advanceAmt) : [];
-                    setForm({...form, installmentGapDays: newVal, installments: newInst});
+                    setForm(f => ({ ...f, installmentGapDays: newVal, installments: newInst}));
                   }} unit="روز" min={0} />
                   </Field>
                 </Grid2>
@@ -185,7 +185,7 @@ export default function PaymentsSection({
                             return;
                           }
                           const updated = base.map((x: any, i: number) => i === idx ? { ...x, dueDate: v } : x);
-                          setForm({ ...form, installments: updated });
+                          setForm(f => ({ ...f, installments: updated }));
                         }} compact />
                       </div>
                         <span style={{ fontWeight: 700 }}>{inst.amount.toLocaleString('fa-IR')} تومان</span>
