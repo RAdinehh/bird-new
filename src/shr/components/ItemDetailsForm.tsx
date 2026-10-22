@@ -84,10 +84,47 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const breedObj = breeds.find(b => b.id === item.breedId);
     const isEggCategory = isPurchase ? category === 'egg' : category === 'fertile_egg';
 
+  const nameFieldJsx = (
+    <Field
+      label={
+        category === 'herbal' ? 'نام داروی گیاهی' :
+        category === 'medicine' ? 'نام دارو' :
+        category === 'feed' ? 'نام دان' :
+        category === 'vaccine' ? 'نام واکسن' :
+        category === 'equipment' ? 'نام تجهیز' :
+        category === 'chick' ? 'نام گله / جوجه' :
+        category === 'egg' || category === 'fertile_egg' ? 'نام تخم' :
+        category === 'adult' ? 'نام پرنده' :
+        category === 'manure' ? 'نام کود' :
+        'نام کالا / شرح'
+      }
+      required
+    >
+      <Input
+        placeholder={
+          category === 'feed' ? 'ذرت، سویا، کنجاله' :
+          category === 'medicine' ? 'آنتی‌بیوتیک، ویتامین' :
+          category === 'herbal' ? 'آویشن، پودر سیر' :
+          category === 'vaccine' ? 'نیوکاسل، برونشیت' :
+          category === 'equipment' ? 'فن تونلی ۱۲۰' :
+          category === 'chick' ? 'جوجه گوشتی راس' :
+          category === 'egg' || category === 'fertile_egg' ? 'تخم نطفه‌دار' :
+          category === 'adult' ? 'مرغ مادر' :
+          category === 'manure' ? 'کود مرغی' :
+          'نام کالا یا شرح'
+        }
+        value={String(item.description || '')}
+        onChange={e => updateItem({ description: e.target.value })}
+      />
+    </Field>
+  );
+
+
   // ========== جوجه یک‌روزه ==========
   if (category === 'chick') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
         <SecTitle icon="🧬" title="اطلاعات گله" />
               <Grid2>
                 {isPurchase && (
@@ -224,6 +261,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (isEggCategory) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
         <SecTitle icon="🥚" title="اطلاعات تخم نطفه‌دار" />
         <Grid2>
           <Field label="نوع پرنده" required>
@@ -272,6 +310,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'adult') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
         <SecTitle icon="🐓" title="اطلاعات پرنده بالغ" />
         {isPurchase && (
           <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
@@ -317,6 +356,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'feed') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
         <SecTitle icon="🌾" title="اطلاعات دان" />
         <Field label="اتصال به انبار" hint="برای موجودی و ثبت خودکار" help="اگر این کالا از قبل در انبار ثبت شده، از این لیست انتخابش کن تا موجودی به همان کالا اضافه شود (نه کالای تکراری). اگر خالی بگذاری، سیستم به‌طور خودکار یک کالای جدید در انبار می‌سازد.">
           <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter((w: any) => w.category === 'feed').map((i: any) => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب کالای انبار" autoThreshold={6} />
@@ -338,6 +378,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'medicine') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
         <SecTitle icon="💊" title="اطلاعات دارو" />
         <Grid2>
           <Field label="تاریخ انقضا">
@@ -356,6 +397,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'equipment') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
         <SecTitle icon="⚙️" title="اطلاعات تجهیز" />
         <Grid2>
           <Field label="دسته تجهیزات" required>
@@ -421,23 +463,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Select>
           </Field>
         </Grid2>
-        {/* 🆕 نام تجهیز — آبشاری از نوع */}
-        <Field
-          label="نام تجهیز"
-          required
-          hint={!item.equipmentType ? 'اول نوع تجهیز را انتخاب کنید' : undefined}
-        >
-          <Input
-            placeholder={(() => {
-              const lbl = item.equipmentType ? getEquipLabel(item.equipmentType) : null;
-              return lbl?.name ? lbl.name : 'فن تونلی ۱۲۰';
-            })()}
-            value={String(item.description || '')}
-            onChange={e => updateItem({ description: e.target.value })}
-            disabled={!item.equipmentType}
-          />
-        </Field>
-
         <Grid2>
           <Field label="سالن مقصد (اختیاری)" hint="قابل تغییر بعداً در سالن">
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
@@ -472,6 +497,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'herbal') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
         <SecTitle icon="🌿" title="اطلاعات داروی گیاهی" />
         <Grid2>
           <Field label="تاریخ انقضا">
@@ -491,6 +517,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'vaccine') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
         <SecTitle icon="💉" title="اطلاعات واکسن" />
         <Grid2>
           <Field label="تاریخ انقضا">
@@ -514,6 +541,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'manure' && !isPurchase) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
         <SecTitle icon="💩" title="اطلاعات کود" />
         <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود" help="اگر این خرید را برای گله مشخصی انجام داده‌ای، گله را انتخاب کن تا هزینه همان لحظه در سود و زیان آن گله ثبت شود. اگر این کالا برای چند گله یا انبار عمومی خریده شده، این فیلد را خالی بگذار؛ هزینه بعداً هنگام مصرف در «ثبت روزانه» به‌طور خودکار روی گله سرشکن می‌شود.">
           <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
@@ -527,6 +555,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'other') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
         <SecTitle icon="📋" title="اطلاعات هزینه" />
         <Grid2>
           <Field label="نوع هزینه" hint="برای گزارش‌های مالی" required>
