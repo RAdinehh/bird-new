@@ -29,7 +29,8 @@ export const COBB_500: BirdStandard = {
   { dayFrom: 8, dayTo: 14, temp: { min: 24, max: 28, target: 26 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
   { dayFrom: 15, dayTo: 21, temp: { min: 21, max: 25, target: 23 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 28, temp: { min: 19, max: 23, target: 21 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 29, dayTo: 42, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 29, dayTo: 35, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 36, dayTo: 42, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 7, feedG: 35, waterMl: 70, phaseName: 'استارتر', lysinePct: 1.35, methioninePct: 0.53, calciumPct: 0.93, availablePhosphorusPct: 0.47, saltPct: 0.3, mainIngredients: ['ذرت', 'کنجاله سویا', 'روغن', 'مکمل'] },
@@ -95,7 +96,8 @@ export const ROSS_308: BirdStandard = {
   { dayFrom: 8, dayTo: 14, temp: { min: 24, max: 28, target: 26 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
   { dayFrom: 15, dayTo: 21, temp: { min: 21, max: 25, target: 23 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 28, temp: { min: 19, max: 23, target: 21 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 29, dayTo: 42, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 29, dayTo: 35, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 36, dayTo: 42, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 60, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 7, feedG: 35, waterMl: 70, phaseName: 'استارتر', lysinePct: 1.35, methioninePct: 0.53, calciumPct: 0.93, availablePhosphorusPct: 0.47, saltPct: 0.3, mainIngredients: ['ذرت', 'کنجاله سویا', 'روغن', 'مکمل'] },
@@ -161,7 +163,8 @@ export const IRAN_BROILER: BirdStandard = {
   { dayFrom: 8, dayTo: 14, temp: { min: 23, max: 27, target: 25 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 15, dayTo: 21, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   { dayFrom: 22, dayTo: 28, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
-  { dayFrom: 29, dayTo: 42, temp: { min: 17, max: 21, target: 19 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 29, dayTo: 35, temp: { min: 17, max: 21, target: 19 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
+  { dayFrom: 36, dayTo: 42, temp: { min: 17, max: 21, target: 19 }, humidity: { min: 55, max: 65 }, light: { hours: 22 } },
   ],
   feed: [
   { dayFrom: 1, dayTo: 7, feedG: 33, waterMl: 66, phaseName: 'استارتر', lysinePct: 1.2, methioninePct: 0.5, calciumPct: 0.9, availablePhosphorusPct: 0.45, saltPct: 0.28, mainIngredients: ['ذرت', 'کنجاله سویا', 'گندم', 'مکمل'] },
