@@ -273,8 +273,7 @@ const eqId = it.equipmentId;
                 unitPrice: it.unitPrice || null,
                 warranty: it.warrantyMonths || null,
                 brand: it.brand || '',
-                serialNo: it.serialNo || '',
-                model: it.model || '',
+                        model: it.model || '',
                 name: it.description || it.model || eq.name,
                 warehouseItemId: whsId || undefined,
               } as any);
@@ -310,8 +309,7 @@ const eqId = it.equipmentId;
           unitPrice: it.unitPrice || null,
           warranty: it.warrantyMonths || null,
           brand: it.brand || '',
-                      serialNo: it.serialNo || '',
-                      model: it.model || '',
+                                    model: it.model || '',
                       status: (it.equipmentStatus as any) || undefined,
         } as any);
         it.equipmentId = existing.id;
@@ -337,7 +335,6 @@ const eqId = it.equipmentId;
         supplierId: inv.partyId || '',
         sourceInvoiceId: inv.id,
         warehouseItemId: whsIdExisting || undefined,
-        serialNo: it.serialNo || '',
         model: it.model || '',
         status: (it.equipmentStatus as any) || 'active',
       } as any);

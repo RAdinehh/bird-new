@@ -120,7 +120,6 @@ export interface InvoiceItem extends ItemCategoryFields {
   equipmentId?: string;
   stockItemId?: string;
   model?: string;
-  serialNo?: string;
   warrantyMonths?: number | null;
   hallId?: string;
   zoneId?: string;

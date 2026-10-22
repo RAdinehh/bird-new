@@ -40,7 +40,6 @@ export interface ItemDetailFormData {
   nonIncubableCount?: number | null;
   expiryDate?: string;
   model?: string;
-  serialNo?: string;
   warrantyMonths?: number | null;
   costType?: string;
   stockItemId?: string;
