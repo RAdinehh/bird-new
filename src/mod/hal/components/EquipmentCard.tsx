@@ -158,6 +158,48 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
                   </>
                 )}
+              {e.transferHistory && e.transferHistory.length > 0 && (
+                <details style={{
+                  marginTop: 'var(--sp-2)',
+                  background: 'var(--bg)',
+                  padding: '8px 10px',
+                  borderRadius: 'var(--r-sm)',
+                  border: '1px solid var(--border)',
+                }}>
+                  <summary style={{
+                    cursor: 'pointer',
+                    fontSize: 'var(--fs-sm)',
+                    fontWeight: 700,
+                    color: 'var(--text)',
+                  }}>
+                    🔀 تاریخچه جابجایی ({toFa(e.transferHistory.length)} مورد)
+                  </summary>
+                  <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {e.transferHistory.slice().reverse().map((log) => (
+                      <div
+                        key={log.id}
+                        style={{
+                          fontSize: 'var(--fs-xs)',
+                          padding: '6px 10px',
+                          background: 'var(--card-solid)',
+                          borderRadius: 'var(--r-sm)',
+                          border: '1px solid var(--border)',
+                        }}
+                      >
+                        <div style={{ fontWeight: 600, color: 'var(--text)' }}>
+                          {log.fromHallName || '—'} → {log.toHallName || '—'}
+                        </div>
+                        <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-2xs)', marginTop: 2 }}>
+                          📅 {toFa(log.date)}
+                          {log.note && <span> — {log.note}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
+
+
 
                 <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
                   {e.unitPrice && e.unitPrice > 0 && (
