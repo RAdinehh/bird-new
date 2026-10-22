@@ -4,6 +4,8 @@
 import { Field } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 import type { F } from '../types-flocks';
+import { useTra } from '../../tra/store';
+import { useCtc } from '../../ctc/store';
 
 interface Props {
   form: F;
@@ -13,6 +15,15 @@ interface Props {
 }
 
 export default function FlockSourcePickers({ form, setForm, onOpenInvoicePicker, onOpenHatchPicker }: Props) {
+  const invoices = useTra((s: any) => s.invoices || s.deals) || [];
+  const contacts = useCtc((s: any) => s.contacts) || [];
+  const inv = invoices.find((i: any) => i.id === form.sourceInvoiceId);
+  const contact = inv ? contacts.find((c: any) => c.id === (inv as any).partyId || c.id === (inv as any).supplierId) : null;
+  
+  const invoiceLabel = form.sourceInvoiceId
+    ? (contact ? `📄 فاکتور ${contact.name}` : (inv ? `📄 فاکتور ${(inv as any).date || ''}` : `📄 فاکتور ${form.sourceInvoiceId.slice(0, 8)}`))
+    : '— انتخاب از فاکتور —';
+
   return (
     <>
       {form.source === 'purchase' && (
@@ -40,7 +51,7 @@ export default function FlockSourcePickers({ form, setForm, onOpenInvoicePicker,
               }}
             >
               <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {form.sourceInvoiceId ? '📄 فاکتور ' + form.sourceInvoiceId.slice(0, 8) : '— انتخاب از فاکتور —'}
+                {invoiceLabel}
               </span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2.5">
                 <path d="m6 9 6 6 6-6"/>
