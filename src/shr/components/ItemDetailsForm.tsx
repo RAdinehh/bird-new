@@ -359,8 +359,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="⚙️" title="اطلاعات تجهیز" />
         <Grid2>
           <Field label="دسته تجهیزات" required>
-            <Select value={String(item.equipmentCategory || '')} onChange={e => {
-              const c = e.target.value;
+            <Select value={String(item.equipmentCategory || '')} onChange={(e: any) => {
+              const c = typeof e === 'string' ? e : (e?.target?.value || '');
+              if (!c) return;
               const nextType = (typesForCategory(c) as string[])[0] || '';
               const defaultKind = nextType ? kindForType(nextType) : 'asset';
               updateItem({ equipmentCategory: c, equipmentType: nextType, equipmentKind: defaultKind });
@@ -391,7 +392,11 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         <Grid2>
           <Field label="نوع تجهیز" required hint={!item.equipmentCategory ? 'اول دسته را انتخاب کنید' : undefined}>
-            <Select key={item.equipmentCategory || 'none'} value={String(item.equipmentType || '')} onChange={e => { const t = e.target.value; updateItem({ equipmentType: t, equipmentKind: kindForType(t) }); }} disabled={!item.equipmentCategory}>
+            <Select key={item.equipmentCategory || 'none'} value={String(item.equipmentType || '')} onChange={(e: any) => {
+                const t = typeof e === 'string' ? e : (e?.target?.value || '');
+                if (!t) return;
+                updateItem({ equipmentType: t, equipmentKind: kindForType(t) });
+              }} disabled={!item.equipmentCategory}>
               <option value="">— انتخاب —</option>
               {(typesForCategory(String(item.equipmentCategory || '')) as string[]).map((t: string) => {
                 const lbl = getEquipLabel(t);
