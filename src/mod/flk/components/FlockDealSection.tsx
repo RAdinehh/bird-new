@@ -253,13 +253,11 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
                   const isOver = totalRentAmount > 0 && p.amount > maxAllowed;
                   return (
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ border: isOver ? '2px solid var(--danger)' : '2px solid transparent', borderRadius: 'var(--r-md)', transition: 'border-color 150ms' }}>
-                        <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => {
-                          const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                          const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, amount: raw } : x);
-                          setForm({ ...form, rentPayments: updated });
-                        }} />
-                      </div>
+                      <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => {
+                        const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                        const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, amount: raw } : x);
+                        setForm({ ...form, rentPayments: updated });
+                      }} />
                       {isOver && (
                         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginTop: 4, fontWeight: 600 }}>
                           ⚠️ حداکثر {toFa(maxAllowed.toLocaleString('fa-IR'))} تومان مانده
