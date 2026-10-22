@@ -302,7 +302,18 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     'نام کالا / شرح'
                   } required>
                     <Input
-                      placeholder="مثلاً: آویشن خشک"
+                      placeholder={
+                      cat === 'feed' ? 'مثلاً: ذرت، سویا، کنجاله' :
+                      cat === 'medicine' ? 'مثلاً: آنتی‌بیوتیک، ویتامین' :
+                      cat === 'herbal' ? 'مثلاً: آویشن، پودر سیر' :
+                      cat === 'vaccine' ? 'مثلاً: نیوکاسل، برونشیت' :
+                      cat === 'equipment' ? 'مثلاً: فن تونلی، دانخوری' :
+                      cat === 'chick' ? 'مثلاً: جوجه گوشتی راس' :
+                      cat === 'egg' || cat === 'fertile_egg' ? 'مثلاً: تخم نطفه‌دار' :
+                      cat === 'adult' ? 'مثلاً: مرغ مادر' :
+                      cat === 'manure' ? 'مثلاً: کود مرغی' :
+                      'نام کالا یا شرح'
+                    }
                       value={it.description || ''}
                       onChange={e => updateItem(it.id, { description: e.target.value })}
                     />
