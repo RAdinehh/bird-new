@@ -135,3 +135,42 @@ export function parseDecimal(s: any): number {
     .replace(/[^\d.-]/g, '');
   return parseFloat(cleaned) || 0;
 }
+
+
+/** نمایش هوشمند مقدار + واحد با تبدیل خودکار به واحد بزرگ‌تر (Base UoM) */
+export function formatQty(qty: number | null | undefined, baseUnit: string): string {
+  if (qty == null || isNaN(qty)) return '';
+  const absQty = Math.abs(qty);
+  const sign = qty < 0 ? '-' : '';
+  const fmt = (n: number): string => {
+    const abs = Math.abs(n);
+    let precision: number;
+    if (abs === 0) precision = 0;
+    else if (abs < 0.001) precision = 6;
+    else if (abs < 0.01) precision = 4;
+    else if (abs < 0.1) precision = 3;
+    else if (abs < 1) precision = 2;
+    else if (abs < 1000) precision = 1;
+    else precision = 0;
+    return Number(n.toFixed(precision)).toLocaleString('fa-IR');
+  };
+  if (baseUnit === 'g') {
+    if (absQty >= 1_000_000) return `${sign}${fmt(absQty / 1_000_000)} تن`;
+    if (absQty >= 1000) return `${sign}${fmt(absQty / 1000)} کیلوگرم`;
+    return `${sign}${fmt(absQty)} گرم`;
+  }
+  if (baseUnit === 'kg') {
+    if (absQty >= 1_000_000) return `${sign}${fmt(absQty / 1_000_000)} هزار تن`;
+    if (absQty >= 1000) return `${sign}${fmt(absQty / 1000)} تن`;
+    return `${sign}${fmt(absQty)} کیلوگرم`;
+  }
+  if (baseUnit === 'ml') {
+    if (absQty >= 1000) return `${sign}${fmt(absQty / 1000)} لیتر`;
+    return `${sign}${fmt(absQty)} میلی‌لیتر`;
+  }
+  if (baseUnit === 'pcs') return `${sign}${fmt(Math.round(absQty))} عدد`;
+  if (baseUnit === 'dose') return `${sign}${fmt(absQty)} دوز`;
+  if (baseUnit === 'vial') return `${sign}${fmt(absQty)} ویال`;
+  if (baseUnit === 'pack') return `${sign}${fmt(absQty)} بسته`;
+  return `${sign}${fmt(absQty)} ${baseUnit}`;
+}
