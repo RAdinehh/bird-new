@@ -1,6 +1,6 @@
 import { Tag, Btn } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
-import { toFa } from '../../../shr/utils/fa';
+import { toFa , formatQty } from '../../../shr/utils/fa';
 import {
   WORKFLOW_LABEL, STATUS_LABEL, remaining, paidSumAllocated, workflowTone, nextWorkflowStatus, CHECK_STATUS_LABEL, type Invoice
 } from '../store';
@@ -99,7 +99,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
         {inv.items.map(it => (
-          <Row key={it.id} l={`${it.description || '—'} • ${toFa(it.quantity)} عدد × ${toFa(it.unitPrice)} تومان`} v={`${toFa(it.total.toLocaleString('fa-IR'))} تومان`} />
+          <Row key={it.id} l={`${it.description || '—'} • ${formatQty(it.quantity, it.unit || 'pcs')} × ${toFa((it.unitPrice || 0).toLocaleString('fa-IR'))} تومان`} v={`${toFa(it.total.toLocaleString('fa-IR'))} تومان`} />
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
