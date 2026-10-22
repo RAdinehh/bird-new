@@ -5,7 +5,7 @@ import { useHal } from '../../mod/hal/store';
 import { useFlk } from '../../mod/flk/store';
 import { useWhs } from '../../mod/whs/store';
 import { useInc } from '../../mod/inc/store';
-import { parseFaNum, toEn, toFa } from '../utils/fa';
+import { parseFaNum, toEn, toFa, formatQty } from '../utils/fa';
 import { differenceInCalendarDays, parse as parseJ, format as formatJ, subDays, isValid } from 'date-fns-jalali';
 import DatePicker from './DatePicker';
 import { typesForCategory } from '../../mod/hal/_equipHelpers';
@@ -321,7 +321,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="🌾" title="اطلاعات دان" />
         <Field label="اتصال به انبار" hint="برای موجودی و ثبت خودکار" help="اگر این کالا از قبل در انبار ثبت شده، از این لیست انتخابش کن تا موجودی به همان کالا اضافه شود (نه کالای تکراری). اگر خالی بگذاری، سیستم به‌طور خودکار یک کالای جدید در انبار می‌سازد.">
-          <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).map(i => ({ value: i.id, label: i.name }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب کالای انبار" autoThreshold={6} />
+          <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter((w: any) => w.category === 'feed').map((i: any) => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب کالای انبار" autoThreshold={6} />
         </Field>
         <Grid2>
           <Field label="تاریخ انقضا">
