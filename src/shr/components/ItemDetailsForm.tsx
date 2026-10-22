@@ -397,17 +397,21 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         <Grid2>
           <Field label="نوع تجهیز" required hint={!item.equipmentCategory ? 'اول دسته را انتخاب کنید' : undefined}>
-            <Select key={item.equipmentCategory || 'none'} value={String(item.equipmentType || '')} onChange={(e: any) => {
-                const t = typeof e === 'string' ? e : (e?.target?.value || '');
-                if (!t) return;
-                updateItem({ equipmentType: t, equipmentKind: kindForType(t) });
-              }} disabled={!item.equipmentCategory}>
-              <option value="">— انتخاب —</option>
-              {(typesForCategory(String(item.equipmentCategory || '')) as string[]).map((t: string) => {
+            <SmartSelect
+              value={String(item.equipmentType || '')}
+              onChange={(v: string) => {
+                if (!v) return;
+                updateItem({ equipmentType: v, equipmentKind: kindForType(v) });
+              }}
+              options={(typesForCategory(String(item.equipmentCategory || '')) as string[]).map((t: string) => {
                 const lbl = getEquipLabel(t);
-                return <option key={t} value={t}>{lbl?.name || t}</option>;
+                return { value: t, label: lbl?.name || t };
               })}
-            </Select>
+              placeholder={item.equipmentCategory ? '— انتخاب —' : 'اول دسته را انتخاب کنید'}
+              modalTitle="انتخاب نوع تجهیز"
+              autoThreshold={4}
+              disabled={!item.equipmentCategory}
+            />
           </Field>
           <Field label="وضعیت تجهیز">
             <Select value={String(item.equipmentStatus || 'new')} onChange={e => updateItem({ equipmentStatus: e.target.value })}>
