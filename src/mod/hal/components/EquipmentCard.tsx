@@ -28,6 +28,7 @@ export interface EquipmentCardProps {
   onDelete: (id: string) => void;
   onRetire: (id: string) => void;
   onRestore: (id: string) => void;
+  onTransfer: (eq: Equipment) => void;
   onUndo: (item: Equipment) => void;
   supplierNames?: Map<string, string>;
   invoiceNumbers?: Map<string, string>;
@@ -36,7 +37,7 @@ export interface EquipmentCardProps {
 }
 
 export default function EquipmentCard(props: EquipmentCardProps) {
-  const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onRetire, onRestore, onUndo, supplierNames,
+  const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onRetire, onRestore, onTransfer, onUndo, supplierNames,
         invoiceNumbers, whsItemNames, zoneNames } = props;
   const _cm = allCustomOpts.find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
   const _isDeleted = _cm ? _cm.hidden === true : false;
@@ -181,6 +182,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     </Btn>
                   )}
                   <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
+                  <Btn size="sm" variant="outline" onClick={() => onTransfer(e)} style={{ flex: 1 }}>🔀 جابجایی</Btn>
                   {e.status === 'retired' ? (
                     <Btn size="sm" variant="outline" onClick={async () => {
                       const ok = await showConfirmAsync('تأیید بازگردانی', 'این تجهیز به لیست فعال‌ها برگردد؟', {});

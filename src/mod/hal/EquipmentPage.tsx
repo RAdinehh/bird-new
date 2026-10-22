@@ -9,11 +9,12 @@ import { categoriesForKind, typesForCategory, calcEquipNeed, calcEquipValue } fr
 import EquipmentFormModal from './components/EquipmentFormModal';
 import { useEquipmentForm } from './useEquipmentForm';
 import EquipmentCard from './components/EquipmentCard';
+import TransferEquipModal from './components/TransferEquipModal';
 import EquipmentKpiCards from './components/EquipmentKpiCards';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
-import { useHal, type Equipment } from './store';
+import { useHal, type Equipment, type TransferLog } from './store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useFilterSort, FilterBar, getHalEquipmentConfig } from '../../shr/filter';
@@ -59,6 +60,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const equipNeed = calcEquipNeed(form.type, form.hallId, flocks || [], breedStd, hallArea);
   // 🆕 استاندارد نژاد سالن انتخاب‌شده
   const selectedBreedStd = __selectedHall?.breedId ? breedStd.byBreedId(__selectedHall.breedId) : null;
+  const [transferEq, setTransferEq] = useState<Equipment | null>(null);
   const [undoData, setUndoData] = useState<{ item: Equipment | Equipment[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -302,6 +304,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
                 onEdit={() => handleOpenEdit(e)}
                 onDelete={deleteEquip}
                 onRetire={(id) => updateEquip(id, { status: 'retired' })}
+                onTransfer={(eq) => setTransferEq(eq)}
                 onRestore={(id) => updateEquip(id, { status: 'active' })}
                 onUndo={(item) => {
                   setUndoData({ item });
@@ -343,6 +346,34 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         stdForDefaults={selectedBreedStd}
         save={handleSave}
       />
-    </PageContainer>
+          <TransferEquipModal
+        open={!!transferEq}
+        onClose={() => setTransferEq(null)}
+        equipment={transferEq}
+        halls={halls}
+        zones={zones}
+        onConfirm={(eq, toHallId, toZoneId, date, note) => {
+          const fromHall = halls.find(h => h.id === eq.hallId);
+          const toHall = halls.find(h => h.id === toHallId);
+          const log: TransferLog = {
+            id: crypto.randomUUID(),
+            fromHallId: eq.hallId || '',
+            fromHallName: fromHall?.name || '—',
+            toHallId,
+            toHallName: toHall?.name || '—',
+            date,
+            note,
+            createdAt: new Date().toISOString(),
+          };
+          updateEquip(eq.id, {
+            hallId: toHallId,
+            zoneId: toZoneId,
+            transferHistory: [...(eq.transferHistory || []), log],
+          });
+          logAction('update', 'hal', `جابجایی: ${eq.name} → ${toHall?.name}`);
+          toastMsg.success('جابجایی ثبت شد');
+        }}
+      />
+</PageContainer>
   );
 }
