@@ -276,7 +276,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
               </div>
             ))
           )}
-          {canAddPayment ? (
+          {rentAmountNum > 0 && (canAddPayment ? (
             <button type="button" onClick={() => {
               const newP = { id: crypto.randomUUID(), date: todayJ(), amount: 0, notes: '' };
               setForm({ ...form, rentPayments: [...(form.rentPayments || []), newP] });
@@ -287,7 +287,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             <div style={{ width: '100%', height: 38, background: 'var(--bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
               🔒 حداکثر {maxPayments} پرداخت
             </div>
-          )}
+          ))}
           {nearLimit && canAddPayment && (
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', textAlign: 'center' }}>
               ⚠️ {paymentCount} از {maxPayments} پرداخت — نزدیک به حداکثر
