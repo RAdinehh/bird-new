@@ -120,18 +120,11 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
         {!!extras && (
           <>
             <SectionTitle>{extras.title}</SectionTitle>
-            {(extras.needsBatch || extras.needsExpiry) && (
+            {extras.needsExpiry && (
               <Grid2>
-                {extras.needsBatch && (
-                  <Field label="شماره بچ">
-                    <Input placeholder="..." dir="ltr" value={form.batchNo} onChange={e => setForm({ ...form, batchNo: e.target.value })} />
-                  </Field>
-                )}
-                {extras.needsExpiry && (
-                  <Field label="تاریخ انقضا">
-                    <DatePicker value={form.expireDate} onChange={v => setForm({ ...form, expireDate: v })}  autoToday />
-                  </Field>
-                )}
+                <Field label="تاریخ انقضا">
+                  <DatePicker value={form.expireDate} onChange={v => setForm({ ...form, expireDate: v })}  autoToday />
+                </Field>
               </Grid2>
             )}
             {(extras.needsWithdrawal || extras.needsStorage) && (

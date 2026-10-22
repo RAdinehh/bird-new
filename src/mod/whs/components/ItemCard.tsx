@@ -91,7 +91,6 @@ export default function ItemCard(props: ItemCardProps) {
       {(it.category === 'medicine' || it.category === 'vaccine') ? (
         <>
           <SectionTitle>💊 اطلاعات دارویی</SectionTitle>
-          {it.batchNo ? <Row l="شماره بچ" v={it.batchNo} /> : null}
           {it.expireDate ? <Row l="تاریخ انقضا" v={toFa(it.expireDate)} /> : null}
           {days !== null ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: days < 0 ? 'var(--danger-soft)' : days <= 30 ? 'var(--warn-soft)' : 'var(--input-bg)', color: days < 0 ? 'var(--danger)' : days <= 30 ? 'var(--warn)' : 'var(--muted)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
