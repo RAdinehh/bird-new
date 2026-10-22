@@ -358,7 +358,13 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="⚙️" title="اطلاعات تجهیز" />
         <Grid2>
           <Field label="دسته تجهیزات" required>
-            <Select value={String(item.equipmentCategory || '')} onChange={e => { const c = e.target.value; const nextType = (typesForCategory(c) as string[])[0] || ''; updateItem({ equipmentCategory: c, equipmentType: nextType }); }}>
+            <Select value={String(item.equipmentCategory || '')} onChange={e => {
+              const c = e.target.value;
+              const nextType = (typesForCategory(c) as string[])[0] || '';
+              const consumableCats = ['litter', 'cleaning', 'hand_tools'];
+              const defaultKind = consumableCats.includes(c) ? 'consumable' : 'asset';
+              updateItem({ equipmentCategory: c, equipmentType: nextType, equipmentKind: defaultKind });
+            }}>
               <option value="">— انتخاب —</option>
               <option value="cooling">❄️ سرمایشی</option>
               <option value="heating">🔥 گرمایشی</option>
