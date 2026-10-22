@@ -14,6 +14,7 @@ import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
 import EntityLink from '../../../shr/components/EntityLink';
 import { Row, RowGrid } from '../helpers';
+import { getWarrantyStatus } from '../api/warranty';
 
 export interface EquipmentCardProps {
   e: Equipment;
@@ -68,11 +69,26 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       return <Tag tone={st.tone || 'gray'}>{st.icon} {st.name}</Tag>;
                     })()}
                     {e.count ? <Tag tone="blue">{toFa(e.count)} {getUnitLabel(e.unit)}</Tag> : undefined}
+                    {(() => {
+                      const ws = getWarrantyStatus(e.purchasedAt, e.warranty);
+                      if (ws.status === 'expired') return <Tag tone="red">⚠️ گارانتی تمام</Tag>;
+                      if (ws.status === 'expiring' && ws.daysLeft !== null) return <Tag tone="amber">⏰ {toFa(ws.daysLeft)} روز گارانتی</Tag>;
+                      return null;
+                    })()}
                   </div>
                 }
                 stats={<>
                   {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(value.toLocaleString('fa-IR'))} ت</b></span>}
-                  {e.warranty && <span>گارانتی: <b style={{ color: 'var(--text)' }}>{toFa(e.warranty)} ماه</b></span>}
+                  {e.warranty && (() => {
+                    const ws = getWarrantyStatus(e.purchasedAt, e.warranty);
+                    const color = ws.status === 'expired' ? 'var(--danger)' : ws.status === 'expiring' ? 'var(--warn)' : 'var(--text)';
+                    return (
+                      <span>
+                        گارانتی: <b style={{ color }}>{toFa(e.warranty)} ماه</b>
+                        {ws.endDate && <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-2xs)' }}> (تا {toFa(ws.endDate)}{ws.status === 'expired' ? ' — منقضی' : ws.daysLeft !== null && ws.daysLeft > 0 ? ` — ${toFa(ws.daysLeft)} روز مانده` : ''})</span>}
+                      </span>
+                    );
+                  })()}
                 </>}
               >
                                 {/* 🏷 طبقه‌بندی */}
