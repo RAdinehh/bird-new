@@ -9,6 +9,7 @@ import { useEgg } from '../../egg/store';
 import { useDlg } from '../../dlg/store';
 import { useWhs } from '../../whs/store';
 import { getFlockRevenue } from '../api/flocksCalc';
+import { sexRatio } from '../helpers-store';
 
 export interface GroupFlockRow {
   id: string;
@@ -103,6 +104,11 @@ export function useGroupKpi(groupId: string): GroupKpi {
         cost: totalFlockCost,
         revenue,
         profit: revenue - totalFlockCost,
+        maleCount: f.maleCount || 0,
+        femaleCount: f.femaleCount || 0,
+        sexRatio: (f.type === 'breeder' || f.type === 'layer')
+          ? sexRatio(f.maleCount, f.femaleCount)
+          : '—',
       };
     });
 
@@ -193,6 +199,11 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
           currentCount: f.currentCount || 0, initialCount: f.initialCount || 0,
           ageDays: getAgeDays(f), cost: costs.grandTotalOwed, revenue,
           profit: revenue - costs.grandTotalOwed,
+          maleCount: f.maleCount || 0,
+          femaleCount: f.femaleCount || 0,
+          sexRatio: (f.type === 'breeder' || f.type === 'layer')
+            ? sexRatio(f.maleCount, f.femaleCount)
+            : '—',
         };
       });
 
