@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { Btn, Field, Grid2, Input, NumField, Select, Textarea } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
+import { formatQty } from '../../../shr/utils/fa';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { DEATH_CAUSES } from '../store';
 import { useWhs } from '../../whs/store';
@@ -93,7 +94,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
                   <SmartSelect
                     value={v.itemId || ''}
                     onChange={id => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
-                    options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${toFa(w.currentStock)} ${UNIT_LABEL[w.unit]}` }))}
+                    options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
                     placeholder="— متصل نکن —"
                     modalTitle="انتخاب از انبار"
                     autoThreshold={6}
@@ -144,7 +145,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
                   <SmartSelect
                     value={m.itemId || ''}
                     onChange={id => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
-                    options={medicineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${toFa(w.currentStock)} ${UNIT_LABEL[w.unit]}` }))}
+                    options={medicineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
                     placeholder="— متصل نکن —"
                     modalTitle="انتخاب از انبار"
                     autoThreshold={6}
