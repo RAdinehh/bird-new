@@ -359,29 +359,34 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="⚙️" title="اطلاعات تجهیز" />
         <Grid2>
           <Field label="دسته تجهیزات" required>
-            <Select value={String(item.equipmentCategory || '')} onChange={(e: any) => {
-              const c = typeof e === 'string' ? e : (e?.target?.value || '');
-              if (!c) return;
-              const nextType = (typesForCategory(c) as string[])[0] || '';
-              const defaultKind = nextType ? kindForType(nextType) : 'asset';
-              updateItem({ equipmentCategory: c, equipmentType: nextType, equipmentKind: defaultKind });
-            }}>
-              <option value="">— انتخاب —</option>
-              <option value="cooling">❄️ سرمایشی</option>
-              <option value="heating">🔥 گرمایشی</option>
-              <option value="ventilation">💨 تهویه</option>
-              <option value="feeding">🌾 دانخوری</option>
-              <option value="drinking">💧 آبخوری</option>
-              <option value="lighting">💡 روشنایی</option>
-              <option value="litter">🛏️ بستر</option>
-              <option value="power">⚡ برق</option>
-              <option value="auxiliary">🔌 جانبی</option>
-              <option value="water_treatment">💦 تصفیه آب</option>
-              <option value="safety">🚨 ایمنی</option>
-              <option value="cleaning">🧹 نظافت</option>
-              <option value="hand_tools">🔧 ابزار دستی</option>
-              <option value="weighing">⚖️ توزین</option>
-            </Select>
+            <SmartSelect
+              value={String(item.equipmentCategory || '')}
+              onChange={(v: string) => {
+                if (!v) return;
+                const nextType = (typesForCategory(v) as string[])[0] || '';
+                const defaultKind = nextType ? kindForType(nextType) : 'asset';
+                updateItem({ equipmentCategory: v, equipmentType: nextType, equipmentKind: defaultKind });
+              }}
+              options={[
+                { value: 'cooling', label: '❄️ سرمایشی' },
+                { value: 'heating', label: '🔥 گرمایشی' },
+                { value: 'ventilation', label: '💨 تهویه' },
+                { value: 'feeding', label: '🌾 دانخوری' },
+                { value: 'drinking', label: '💧 آبخوری' },
+                { value: 'lighting', label: '💡 روشنایی' },
+                { value: 'litter', label: '🛏️ بستر' },
+                { value: 'power', label: '⚡ برق' },
+                { value: 'auxiliary', label: '🔌 جانبی' },
+                { value: 'water_treatment', label: '💦 تصفیه آب' },
+                { value: 'safety', label: '🚨 ایمنی' },
+                { value: 'cleaning', label: '🧹 نظافت' },
+                { value: 'hand_tools', label: '🔧 ابزار دستی' },
+                { value: 'weighing', label: '⚖️ توزین' },
+              ]}
+              placeholder="— انتخاب —"
+              modalTitle="انتخاب دسته تجهیزات"
+              autoThreshold={4}
+            />
           </Field>
           <Field label="نوع" required>
             <Select value={String(item.equipmentKind || 'asset')} onChange={e => updateItem({ equipmentKind: e.target.value })}>
