@@ -291,6 +291,17 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               {/* بدنه قلم */}
               {isExpanded && (
                 <div style={{ marginTop: 'var(--sp-1)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+
+                  {/* 🆕 برای تجهیزات: ItemDetailsForm در بالا */}
+                  {cat === 'equipment' && (
+                    <ItemDetailsForm
+                      category={cat}
+                      item={it}
+                      invoiceDate={form.date}
+                      updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
+                      isPurchase={isPurchase}
+                    />
+                  )}
                   
 
                   {(() => {
@@ -338,14 +349,14 @@ const nameFieldJsx = (
                       <>
                         {isSingleUnit ? (
                           <Grid2>
-                            {nameFieldJsx}
+                            {cat !== 'equipment' && nameFieldJsx}
                             <Field label="تعداد">
                               <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                             </Field>
                           </Grid2>
                         ) : (
                           <>
-                            {nameFieldJsx}
+                            {cat !== 'equipment' && nameFieldJsx}
                             <Grid2>
                               <Field label="تعداد">
                                 <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
@@ -433,7 +444,7 @@ const nameFieldJsx = (
                     </Field>
                   </Grid2>
 
-                  {isExpanded && (
+                  {cat !== 'equipment' && (
                     <div style={{ paddingTop: 'var(--sp-2)' }}>
                       <ItemDetailsForm
                         category={cat}
