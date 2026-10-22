@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import MoveFormModal from './components/MoveFormModal';
 import { useFab } from '../../shr/hooks/useFab';
 import { useWhs, UNIT_LABEL, MOVEMENT_REASON, CATEGORY_ICON, type Movement, type MovementType, type MovementReason } from './store';
+import { formatQty } from '../../shr/utils/fa';
 import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer, Tag } from '../../shr/components/ui';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -165,7 +166,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
     if (form.type === 'out' && qty > currentStock) {
       const ok = await showConfirmAsync(
         '⚠️ موجودی کافی نیست',
-        `موجودی فعلی: ${toFa(currentStock)} ${selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}\n` +
+        `موجودی فعلی: ${selectedItem ? formatQty(currentStock, selectedItem.unit) : ''}\n` +
         `مقدار خروج: ${toFa(qty)}\n\n` +
         `با ثبت این گردش، موجودی منفی می‌شود. ادامه می‌دهید؟`,
         { danger: true }
@@ -299,7 +300,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                 badge={<Tag tone={m.type === 'in' ? 'green' : 'amber'}>{m.type === 'in' ? 'ورود' : 'خروج'}</Tag>}
                 stats={
                   <>
-                    <span>مقدار: <b style={{ color: 'var(--text)' }}>{toFa(m.quantity)} {item ? UNIT_LABEL[item.unit] : ''}</b></span>
+                    <span>مقدار: <b style={{ color: 'var(--text)' }}>{item ? formatQty(m.quantity, item.unit) : toFa(m.quantity)}</b></span>
                     {m.unitPrice > 0 ? <span>قیمت: <b style={{ color: 'var(--text)' }}>{toFa(m.unitPrice.toLocaleString('fa-IR'))}</b></span> : null}
                     {total > 0 ? <span>جمع: <b style={{ color: 'var(--text)' }}>{toFa(total.toLocaleString('fa-IR'))} ت</b></span> : null}
                   </>
@@ -310,7 +311,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                 <Row l="نوع" v={m.type === 'in' ? 'ورود' : 'خروج'} />
                 <Row l="دلیل" v={MOVEMENT_REASON[m.reason]} />
                 <Row l="تاریخ" v={toFa(m.date)} />
-                <Row l="مقدار" v={`${toFa(m.quantity)} ${item ? UNIT_LABEL[item.unit] : ''}`} />
+                <Row l="مقدار" v={item ? formatQty(m.quantity, item.unit) : toFa(m.quantity)} />
                 {party ? <Row l="طرف معامله" v={party.name} /> : null}
 
                 {m.unitPrice > 0 ? (
