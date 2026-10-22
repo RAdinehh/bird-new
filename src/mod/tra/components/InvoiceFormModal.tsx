@@ -372,7 +372,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                 <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? toFa(String(it.unitPrice)) : ''} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                                 {it.quantity > 0 && it.unitPrice > 0 && (
                                   <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4, paddingRight: 2 }}>
-                                    {toFa(it.quantity)} {currentUnitLabel} {factor !== 1 ? `(${toFa(baseQty)} ${baseUnitLabel})` : ''} × {toFa(it.unitPrice.toLocaleString('fa-IR'))} تومان = <b style={{ color: 'var(--accent)' }}>{toFa(liveTotal.toLocaleString('fa-IR'))} تومان</b>
+                                    {toFa(it.quantity)} {currentUnitLabel} {factor !== 1 && !currentUnitLabel.includes(baseUnitLabel) ? `(${toFa(baseQty)} ${baseUnitLabel})` : ''} × {toFa(it.unitPrice.toLocaleString('fa-IR'))} تومان = <b style={{ color: 'var(--accent)' }}>{toFa(liveTotal.toLocaleString('fa-IR'))} تومان</b>
                                   </div>
                                 )}
                               </Field>

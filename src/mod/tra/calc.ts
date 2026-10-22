@@ -437,3 +437,8 @@ export function applyPaymentsToInstallments(
   return result;
 }
 
+
+
+export function calcInvoiceTotal(items: any[]): number {
+  return (items || []).reduce((sum, it) => sum + (it.total ?? ((it.quantity || 0) * (it.unitPrice || 0))), 0);
+}
