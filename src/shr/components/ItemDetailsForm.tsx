@@ -411,7 +411,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="سالن مقصد (اختیاری)" hint="اگر الان نمی‌دانید، خالی بگذارید. بعداً در بخش سالن می‌توانید تعیین کنید.">
+          <Field label="سالن مقصد (اختیاری)" hint="اگر مطمئن نیستید، بعداً در بخش سالن تعیین کنید">
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
           </Field>
           <Field label="بخش مقصد (اختیاری)">
