@@ -416,9 +416,80 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         <Grid2>
           <Field label="سالن مقصد" required={item.equipmentKind !== 'consumable'} hint={item.equipmentKind === 'consumable' ? 'برای مصرفی اختیاری' : 'محل نصب — برای ثبت در انبار تجهیزات'}>
-            <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
+            <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
+          </Field>
+          <Field label="بخش مقصد">
+            <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder={item.hallId ? "— بخش —" : "اول سالن"} modalTitle="انتخاب بخش" autoThreshold={6} />
           </Field>
         </Grid2>
+        <Grid2>
+          <Field label="وضعیت تجهیز">
+            <Select value={String(item.equipmentStatus || 'new')} onChange={e => updateItem({ equipmentStatus: e.target.value })}>
+              <option value="new">نو (دست اول)</option>
+              <option value="used">کارکرده (دست دوم)</option>
+              <option value="broken">خراب / نیاز به تعمیر</option>
+            </Select>
+          </Field>
+        </Grid2>
+        {sellerSlot}
+      </div>
+    );
+  }
+
+  // ========== داروی گیاهی ==========
+  if (category === 'herbal') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <SecTitle icon="🌿" title="اطلاعات داروی گیاهی" />
+        <Grid2>
+          <Field label="تاریخ انقضا">
+            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
+          </Field>
+          <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
+            <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="برند / سازنده">
+            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="نام برند" />
+          </Field>
+        </Grid2>
+        {sellerSlot}
+      </div>
+    );
+  }
+
+  // ========== واکسن ==========
+  if (category === 'vaccine') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <SecTitle icon="💉" title="اطلاعات واکسن" />
+        <Grid2>
+          <Field label="تاریخ انقضا">
+            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
+          </Field>
+          <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
+            <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="برند / سازنده">
+            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="نام برند" />
+          </Field>
+        </Grid2>
+        {sellerSlot}
+      </div>
+    );
+  }
+
+  // ========== کود ==========
+  if (category === 'manure' && !isPurchase) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <SecTitle icon="💩" title="اطلاعات کود" />
+        <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
+          <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+        </Field>
         {sellerSlot}
       </div>
     );
@@ -443,6 +514,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
           <Field label="گله مقصد (اختیاری)" hint="سرشکن هزینه">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="برند / سازنده">
+            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="نام برند" />
+          </Field>
+          <Field label="تاریخ انقضا (اختیاری)">
+            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
           </Field>
         </Grid2>
         {sellerSlot}
