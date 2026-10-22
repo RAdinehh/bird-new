@@ -5,6 +5,7 @@
 import { useMemo } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
 import { useTra } from '../../tra/store';
+import { useBrd } from '../../brd/store';
 import type { Invoice, InvoiceItem } from '../../tra/types';
 import { toFa } from '../../../shr/utils/fa';
 
@@ -75,7 +76,7 @@ export default function PickInvoiceModal({ open, onClose, onSelect }: Props) {
                 </div>
                 <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', display: 'flex', gap: 6, alignItems: 'center' }}>
                   {inv.number && <span>#{inv.number}</span>}
-                  {firstBird.breedId && <span>· نژاد: {firstBird.breedId.slice(0, 6)}</span>}
+                  {firstBird.breedId && <span>· نژاد: {(useBrd.getState().breeds || []).find(b => b.id === firstBird.breedId)?.name || firstBird.breedId.slice(0, 6)}</span>}
                   {inv.total > 0 && <span>· {toFa(Math.round(inv.total).toLocaleString('fa-IR'))} ت</span>}
                 </div>
               </button>
