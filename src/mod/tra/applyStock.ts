@@ -5,10 +5,10 @@
 import { useWhs } from '../whs/store';
 import type { Invoice, InvoiceItem } from './store';
 
-const STOCK_CATS = ['feed', 'medicine', 'vaccine', 'other'];
+const STOCK_CATS = ['feed', 'medicine', 'vaccine', 'herbal', 'other'];
 
 function mapCategory(cat: string, kind?: string): any {
-  if (['feed', 'medicine', 'vaccine', 'egg'].includes(cat)) return cat;
+  if (['feed', 'medicine', 'vaccine', 'herbal', 'egg'].includes(cat)) return cat;
   if (cat === 'equipment') return kind === 'consumable' ? 'consumable' : 'equipment';
   return 'consumable';
 }
