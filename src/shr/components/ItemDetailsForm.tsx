@@ -320,14 +320,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="🌾" title="اطلاعات دان" />
-        <Field label="اتصال به انبار" hint="برای موجودی و ثبت خودکار">
+        <Field label="اتصال به انبار" hint="برای موجودی و ثبت خودکار" help="اگر این کالا از قبل در انبار ثبت شده، از این لیست انتخابش کن تا موجودی به همان کالا اضافه شود (نه کالای تکراری). اگر خالی بگذاری، سیستم به‌طور خودکار یک کالای جدید در انبار می‌سازد.">
           <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).map(i => ({ value: i.id, label: i.name }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب کالای انبار" autoThreshold={6} />
         </Field>
         <Grid2>
           <Field label="تاریخ انقضا">
             <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
           </Field>
-          <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
+          <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود" help="اگر این خرید را برای گله مشخصی انجام داده‌ای، گله را انتخاب کن تا هزینه همان لحظه در سود و زیان آن گله ثبت شود. اگر این کالا برای چند گله یا انبار عمومی خریده شده، این فیلد را خالی بگذار؛ هزینه بعداً هنگام مصرف در «ثبت روزانه» به‌طور خودکار روی گله سرشکن می‌شود.">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
         </Grid2>
@@ -345,7 +345,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="تاریخ انقضا">
             <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
           </Field>
-          <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
+          <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود" help="اگر این خرید را برای گله مشخصی انجام داده‌ای، گله را انتخاب کن تا هزینه همان لحظه در سود و زیان آن گله ثبت شود. اگر این کالا برای چند گله یا انبار عمومی خریده شده، این فیلد را خالی بگذار؛ هزینه بعداً هنگام مصرف در «ثبت روزانه» به‌طور خودکار روی گله سرشکن می‌شود.">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
         </Grid2>
@@ -443,7 +443,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="تاریخ انقضا">
             <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
           </Field>
-          <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
+          <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود" help="اگر این خرید را برای گله مشخصی انجام داده‌ای، گله را انتخاب کن تا هزینه همان لحظه در سود و زیان آن گله ثبت شود. اگر این کالا برای چند گله یا انبار عمومی خریده شده، این فیلد را خالی بگذار؛ هزینه بعداً هنگام مصرف در «ثبت روزانه» به‌طور خودکار روی گله سرشکن می‌شود.">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
         </Grid2>
@@ -466,7 +466,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="تاریخ انقضا">
             <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
           </Field>
-          <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
+          <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود" help="اگر این خرید را برای گله مشخصی انجام داده‌ای، گله را انتخاب کن تا هزینه همان لحظه در سود و زیان آن گله ثبت شود. اگر این کالا برای چند گله یا انبار عمومی خریده شده، این فیلد را خالی بگذار؛ هزینه بعداً هنگام مصرف در «ثبت روزانه» به‌طور خودکار روی گله سرشکن می‌شود.">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
         </Grid2>
@@ -485,7 +485,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <SecTitle icon="💩" title="اطلاعات کود" />
-        <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود">
+        <Field label="گله مقصد" hint="هزینه به این گله متصل می‌شود" help="اگر این خرید را برای گله مشخصی انجام داده‌ای، گله را انتخاب کن تا هزینه همان لحظه در سود و زیان آن گله ثبت شود. اگر این کالا برای چند گله یا انبار عمومی خریده شده، این فیلد را خالی بگذار؛ هزینه بعداً هنگام مصرف در «ثبت روزانه» به‌طور خودکار روی گله سرشکن می‌شود.">
           <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
         </Field>
         {sellerSlot}
