@@ -145,13 +145,13 @@ export function useInvoiceForm(params: {
   // محاسبات
   const total = useMemo(
     () => form.items.reduce((acc, it) => {
-      const base = (it.quantity || 0) * (it.unitPrice || 0);
-      let disc = 0;
-      if (it.discountType === 'percent') disc = base * ((it.discountValue || 0) / 100);
-      else if (it.discountType === 'amount') disc = it.discountValue || 0;
-      return acc + Math.max(0, base - disc) + (it.shipping || 0);
+      const cat = it.category || form.category;
+      const unit = it.unit || 'pcs';
+      const unitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === unit);
+      const factor = (unitDef && unitDef.factor !== null) ? unitDef.factor : (it.unitWeight || 1);
+      return acc + calcItemTotal(it.quantity || 0, it.unitPrice || 0, it.discountType, it.discountValue, factor) + (it.shipping || 0);
     }, 0),
-    [form.items]
+    [form.items, form.category]
   );
   const paid = useMemo(() => paidSum(form.payments), [form.payments]);
   const rem = Math.max(0, total - paid);
