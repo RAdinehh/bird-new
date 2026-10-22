@@ -61,7 +61,7 @@ export const useTra = create<State>()(
           try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) {}
           try { items = applyInvoiceStock({ ...newInv, items }); } catch(e) {}
           // 🎯 ۴. اتصال به انبار از طریق Event Bus (حرکت‌ها + movementId)
-          try { void bus.emit('tra:invoice:created', { invoiceId: newInv.id, invoice: newInv, items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
+          // ✅ آپدیت انبار فقط از طریق applyInvoiceStock انجام می‌شود
         }
         const syncedPayments = (newInv.payments || []).map((p: any) => {
           if (p.partyPaymentId) return p;
@@ -114,13 +114,7 @@ export const useTra = create<State>()(
           try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
           try { itemsFinal = applyInvoiceStock({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
           // 🎯 اتصال به انبار از طریق Event Bus (rollback قبلی‌ها + حرکت‌های جدید)
-          try { void bus.emit('tra:invoice:updated', {
-            invoiceId: id,
-            invoice: merged,
-            prevInvoice: isReceiving ? {} : prev,
-            items: itemsFinal,
-            prevItems: isReceiving ? [] : prev.items,
-          }, { source: 'tra' }).catch(() => {}); } catch(e) {}
+          // ✅ آپدیت انبار فقط از طریق applyInvoiceStock انجام می‌شود
         }
         const prevPayments = (prev.payments || []) as any[];
         const newPaymentsInput = (mergedWithItems.payments || []) as any[];
