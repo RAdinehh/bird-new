@@ -58,7 +58,7 @@ function normalizeName(s: string): string {
 
 function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
   const name = String(it.description || it.model || '').trim();
-  if (!name) return '';
+  if (!name) { console.warn('[applyInvoiceStock] SKIP — empty description:', it); return ''; }
   const cat = it.category || inv.category;
   const targetCat = mapCategory(cat, (it as any).equipmentKind);
 
@@ -91,6 +91,7 @@ function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
 }
 
 export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
+  console.info('[applyInvoiceStock] called:', { type: inv.type, itemsCount: inv.items?.length, categories: inv.items?.map(i => i.category || inv.category) });
   // 🆕 Sale: کاهش موجودی (self-contained)
   if (inv.type === 'sale') {
     const whs = useWhs.getState();
@@ -208,6 +209,7 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
       } as any);
     } catch (e) {
       console.error('[applyInvoiceStock] addMovement failed:', e);
+      console.warn('[applyInvoiceStock] movement done:', { itemId, qty: Math.abs(delta) * uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight), factor: uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight), rawDelta: delta });
       continue;
     }
     for (const it of outItems) {
