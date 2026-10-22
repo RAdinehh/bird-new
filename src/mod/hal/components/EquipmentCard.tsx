@@ -26,6 +26,7 @@ export interface EquipmentCardProps {
   onEdit: () => void;
   onDelete: (id: string) => void;
   onRetire: (id: string) => void;
+  onRestore: (id: string) => void;
   onUndo: (item: Equipment) => void;
   supplierNames?: Map<string, string>;
   invoiceNumbers?: Map<string, string>;
@@ -34,7 +35,7 @@ export interface EquipmentCardProps {
 }
 
 export default function EquipmentCard(props: EquipmentCardProps) {
-  const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onRetire, onUndo, supplierNames,
+  const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onRetire, onRestore, onUndo, supplierNames,
         invoiceNumbers, whsItemNames, zoneNames } = props;
   const _cm = allCustomOpts.find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
   const _isDeleted = _cm ? _cm.hidden === true : false;
@@ -164,13 +165,23 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     </Btn>
                   )}
                   <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" variant="danger" onClick={async () => {
-                    const ok = await showConfirmAsync('تأیید اسقاط', 'این تجهیز از لیست فعال خارج شود؟ سوابق مالی حفظ می‌شود.', { danger: true });
-                    if (!ok) return;
-                    onRetire(e.id);
-                    logAction('update', 'hal', 'اسقاط تجهیز: ' + e.name);
-                    toastMsg.success('تجهیز اسقاط شد');
-                  }} style={{ flex: 1 }}>🔚 اسقاط / فروش</Btn>
+                  {e.status === 'retired' ? (
+                    <Btn size="sm" variant="outline" onClick={async () => {
+                      const ok = await showConfirmAsync('تأیید بازگردانی', 'این تجهیز به لیست فعال‌ها برگردد؟', {});
+                      if (!ok) return;
+                      onRestore(e.id);
+                      logAction('update', 'hal', 'بازگردانی تجهیز: ' + e.name);
+                      toastMsg.success('تجهیز بازگردانی شد');
+                    }} style={{ flex: 1 }}>♻️ بازگردانی</Btn>
+                  ) : (
+                    <Btn size="sm" variant="danger" onClick={async () => {
+                      const ok = await showConfirmAsync('تأیید اسقاط', 'این تجهیز از لیست فعال خارج شود؟ سوابق مالی حفظ می‌شود.', { danger: true });
+                      if (!ok) return;
+                      onRetire(e.id);
+                      logAction('update', 'hal', 'اسقاط تجهیز: ' + e.name);
+                      toastMsg.success('تجهیز اسقاط شد');
+                    }} style={{ flex: 1 }}>🔚 اسقاط / فروش</Btn>
+                  )}
                 </div>
               </ExpandableCard>
             );
