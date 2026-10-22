@@ -9,6 +9,7 @@ import { costPerChick, type HatchResult } from '../store';
 import { calcChickYield } from '../api/needs';
 import type { Bird } from '../../brd/store';
 import type { EggEntry } from '../store';
+import { CardActions } from '../../../shr/components/ui';
 
 export interface HatchCardProps {
   hatch: HatchResult;
@@ -128,10 +129,10 @@ export default function HatchCard(props: HatchCardProps) {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={onDelete} aria-label="حذف هچ" style={{ flex: 1 }}>حذف</Btn>
-                </div>
+                <CardActions actions={[
+                  { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
+                  { label: 'حذف', onClick: onDelete, variant: 'danger' }
+                ]} />
               </ExpandableCard>
   );
 }

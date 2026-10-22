@@ -18,6 +18,7 @@ import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Section, Row } from '../helpers';
 import { Grid2, Grid3 } from '../../../shr/components/ui';
+import { CardActions } from '../../../shr/components/ui';
 
 export interface LogCardProps {
   log: DailyLog;
@@ -199,19 +200,12 @@ export default function LogCard(props: LogCardProps) {
         </Section>
       )}
 
-      <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        {(l.status || 'active') === 'active' ? (
-          <>
-            <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-            <Btn size="sm" onClick={onArchive} style={{ flex: 1 }}>📦 آرشیو</Btn>
-          </>
-        ) : (
-          <>
-            <Btn size="sm" variant="primary" onClick={onRestore} style={{ flex: 1 }}>♻️ بازگردانی</Btn>
-            <Btn size="sm" onClick={onDelete} style={{ flex: 1 }}>حذف</Btn>
-          </>
-        )}
-      </div>
+      <CardActions actions={[
+        { label: 'ویرایش', onClick: onEdit, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
+        { label: '📦 آرشیو', onClick: onArchive, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
+        { label: '♻️ بازگردانی', onClick: onRestore, variant: 'primary', hidden: (l.status || 'active') === 'active' },
+        { label: 'حذف', onClick: onDelete, variant: 'danger', hidden: (l.status || 'active') === 'active' }
+      ]} />
     </ExpandableCard>
   );
 }
