@@ -22,6 +22,7 @@ import type { Bird, Breed } from '../../brd/store';
 import type { Hall, Zone } from '../../hal/store';
 import type { useFormat } from '../../../shr/units';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
+import { CardActions } from '../../../shr/components/ui';
 
 type Fmt = ReturnType<typeof useFormat>;
 
@@ -439,25 +440,19 @@ export default function FlockCard(props: FlockCardProps) {
       )}
 
       {isArchived ? (
-        <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
-          <Btn size="sm" onClick={onRestore} style={{ flex: 1 }}>بازگردانی</Btn>
-          <Btn size="sm" onClick={onDelete} style={{ flex: 1 }}>حذف</Btn>
-        </div>
+        <CardActions actions={[
+          { label: 'بازگردانی', onClick: onRestore, variant: 'primary' },
+          { label: 'حذف', onClick: onDelete, variant: 'danger' }
+        ]} />
       ) : (
         <>
-          <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
-            <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-            <Btn size="sm" onClick={() => setHistoryOpen(true)} style={{ flex: 1 }}>📜 تاریخچه</Btn>
-            <Btn size="sm" onClick={onOpenGroups} style={{ flex: 1 }}>📁 گروه‌ها</Btn>
-          </div>
-          <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
-            <Btn size="sm" onClick={onToggleHidden} style={{ flex: 1 }}>
-              {f.hidden ? '👁 نمایان' : '👁 پنهان'}
-            </Btn>
-            <Btn size="sm" onClick={onTogglePaused} style={{ flex: 1 }}>
-              {f.paused ? '▶️ فعال' : '⏸ غیرفعال'}
-            </Btn>
-          </div>
+          <CardActions actions={[
+            { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
+            { label: '📜 تاریخچه', onClick: () => setHistoryOpen(true), variant: 'outline' },
+            { label: '📁 گروه‌ها', onClick: onOpenGroups, variant: 'outline' },
+            { label: f.hidden ? '👁 نمایان' : '👁 پنهان', onClick: onToggleHidden, variant: 'outline' },
+            { label: f.paused ? '▶️ فعال' : '⏸ غیرفعال', onClick: onTogglePaused, variant: 'outline' }
+          ]} />
         </>
       )}
 

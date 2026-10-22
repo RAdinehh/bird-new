@@ -6,6 +6,7 @@ import type { Device, DeviceStatus } from '../store';
 import { STATUS_FA, MODE_FA } from '../types-devices';
 import { Row } from '../helpers';
 import { warrantyInfo } from '../api/warranty';
+import { CardActions } from '../../../shr/components/ui';
 
 interface Props {
   d: Device;
@@ -166,8 +167,10 @@ export default function DeviceCard({
                 )}
 
                 <div style={{ display: 'flex', gap: 'var(--sp-2)' as any, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={onDelete} aria-label="حذف دستگاه" style={{ flex: 1 }}>حذف</Btn>
+                  <CardActions actions={[
+                    { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
+                    { label: 'حذف', onClick: onDelete, variant: 'danger' }
+                  ]} />
                 </div>
               </ExpandableCard>
   );
