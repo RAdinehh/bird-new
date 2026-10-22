@@ -47,6 +47,15 @@ function isStockItem(it: InvoiceItem, inv: Invoice): boolean {
   return isStock || isEquipConsumable;
 }
 
+function normalizeName(s: string): string {
+  return String(s || '').trim()
+    .replace(/ي/g, 'ی')
+    .replace(/ك/g, 'ک')
+    .replace(/\u200c/g, '')
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
+}
+
 function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
   const name = String(it.description || it.model || '').trim();
   if (!name) return '';
@@ -56,7 +65,8 @@ function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
   if (it.stockItemId && whs.items.find((x: any) => x.id === it.stockItemId)) {
     return it.stockItemId;
   }
-  const existing = whs.items.find((x: any) => x.name === name && x.category === targetCat);
+  const normalizedName = normalizeName(name);
+  const existing = whs.items.find((x: any) => normalizeName(x.name) === normalizedName && x.category === targetCat);
   if (existing) return existing.id;
 
   try {
