@@ -29,6 +29,11 @@ function moneyUnit(change: number): string {
   return `تومان • ${sign}${change}٪`;
 }
 
+// 🆕 استاندارد چرخه تخم‌گذاری (SAP)
+const START_WINDOW_DAYS = 14;   // ۱۴ روز قبل از شروع تخم‌گذاری
+const END_WINDOW_DAYS = 30;     // ۳۰ روز قبل از پایان چرخه
+const FALLBACK_END_DAYS = 550;  // پایان پیش‌فرض breeder اگر کاربر تعریف نکرده
+
 export function useDashboardData() {
   const nav = useNavigate();
 const [, _setTick] = useState(0);
@@ -377,14 +382,34 @@ const [, _setTick] = useState(0);
     const critical = activeAlerts(alerts).filter(a => a.level === 'critical').length;
     if (critical > 0) list.push({ icon: '🚨', label: 'هشدار بحرانی', count: critical, tone: 'danger', route: '/alt' });
 
-    // ۵. گله آماده تخم‌گذاری
-    const readyFlocks = activeFlocks.filter(f => {
-      if (f.type !== 'layer' && f.type !== 'breeder') return false;
+    // ۵. چرخه تخم‌گذاری (SAP 4-stage lifecycle)
+    const layerBreeds = activeFlocks.filter(f =>
+      (f.type === 'layer' || f.type === 'breeder') && f.status === 'active'
+    );
+    let startingSoon = 0;
+    let endingSoon = 0;
+    let stopped = 0;
+    for (const f of layerBreeds) {
       const age = getAgeDays(f);
       const start = f.layingStartDay || 140;
-      return age >= start && age <= start + 7;
-    }).length;
-    if (readyFlocks > 0) list.push({ icon: '🥚', label: 'گله آماده تخم‌گذاری', count: readyFlocks, tone: 'accent', route: '/flk' });
+      const end = f.endOfCycleDay || FALLBACK_END_DAYS;
+      if (age > end) {
+        stopped++;
+      } else if (age >= end - END_WINDOW_DAYS) {
+        endingSoon++;
+      } else if (age >= start - START_WINDOW_DAYS && age < start) {
+        startingSoon++;
+      }
+    }
+    if (stopped > 0) {
+      list.push({ icon: '⏹', label: 'تخم‌گذاری متوقف', count: stopped, tone: 'muted', route: '/flk' });
+    }
+    if (endingSoon > 0) {
+      list.push({ icon: '🔚', label: 'پایان چرخه نزدیک', count: endingSoon, tone: 'danger', route: '/flk' });
+    }
+    if (startingSoon > 0) {
+      list.push({ icon: '⏰', label: 'شروع تخم‌گذاری نزدیک', count: startingSoon, tone: 'warn', route: '/flk' });
+    }
 
     return list;
   }, [whsItems, eggEntries, alerts, activeFlocks]);
