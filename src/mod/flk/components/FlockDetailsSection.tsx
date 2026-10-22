@@ -27,42 +27,27 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
     <>
       <div style={dividerStyle}>📅 تاریخ‌ها</div>
 
-      {form.source === 'hatch' && (
-        <Grid2>
-          <Field
-            label={isSourceLinked && form.hatchId ? <span>تاریخ هچ <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ هچ'}
-            hint={isSourceLinked && form.hatchId ? '🔒 از هچ — برای تغییر، لینک هچ را پاک کنید' : 'خروج جوجه از دستگاه'}
-            error={showError('hatchDate')}
-            onTouch={() => markTouched('hatchDate')}
-          >
-            <DatePicker value={form.hatchDate} onChange={v => !(isSourceLinked && form.hatchId) && setForm({ ...form, hatchDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} disabled={isSourceLinked && !!form.hatchId} />
-          </Field>
-          <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
-            <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
-          </Field>
-        </Grid2>
-      )}
-
-      {form.source === 'purchase' && (
-        <>
-          <Grid2>
-            <Field
-              label={isSourceLinked && form.sourceInvoiceId ? <span>تاریخ خرید <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ خرید'}
-              hint={isSourceLinked && form.sourceInvoiceId ? '🔒 از فاکتور — برای تغییر، لینک فاکتور را پاک کنید' : 'روزی که گله رسید'}
-              error={showError('purchaseDate')}
-              onTouch={() => markTouched('purchaseDate')}
-            >
-              <DatePicker value={form.purchaseDate} onChange={v => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, purchaseDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} disabled={isSourceLinked && !!form.sourceInvoiceId} />
-            </Field>
-            <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
-              <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
-            </Field>
-          </Grid2>
-          <Field label="تاریخ هچ (اختیاری)" hint="اگر فروشنده گفته">
-            <DatePicker value={form.hatchDate} onChange={v => setForm({ ...form, hatchDate: v })} placeholder="اختیاری" />
-          </Field>
-        </>
-      )}
+      <Grid2>
+        <Field
+                    label={isSourceLinked && form.hatchId ? <span>تاریخ هچ <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ هچ'}
+                    hint={isSourceLinked && form.hatchId ? '🔒 از هچ — برای تغییر، لینک هچ را پاک کنید' : 'خروج جوجه از دستگاه'}
+                    error={showError('hatchDate')}
+                    onTouch={() => markTouched('hatchDate')}
+                  >
+                    <DatePicker value={form.hatchDate} onChange={v => !(isSourceLinked && form.hatchId) && setForm({ ...form, hatchDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} disabled={isSourceLinked && !!form.hatchId} />
+                  </Field>
+        <Field
+                      label={isSourceLinked && form.sourceInvoiceId ? <span>تاریخ خرید <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ خرید'}
+                      hint={isSourceLinked && form.sourceInvoiceId ? '🔒 از فاکتور — برای تغییر، لینک فاکتور را پاک کنید' : 'روزی که گله رسید'}
+                      error={showError('purchaseDate')}
+                      onTouch={() => markTouched('purchaseDate')}
+                    >
+                      <DatePicker value={form.purchaseDate} onChange={v => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, purchaseDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} disabled={isSourceLinked && !!form.sourceInvoiceId} />
+                    </Field>
+      </Grid2>
+      <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
+                  <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
+                </Field>
 
       <div style={dividerStyle}>💰 هزینه‌ها</div>
       <Grid2>
