@@ -171,59 +171,62 @@ export function formatWarningDetail(w: Warning): string {
 
 export function formatWarning(w: Warning): string {
   const { value, expected, signals, field } = w;
+  const label = getLabel(field);
   const profile = getProfile(field);
   const kind = profile?.kind ?? 'count';
 
-  // ═══ LAYER 1: Hard Rules (قوانین قطعی) ═══
   if (signals.some(s => s.type === 'hard_min')) {
-    const minVal = typeof profile?.hardMin === 'number' ? fmtNum(profile.hardMin) : null;
-    return minVal ? `حداقل: ${minVal}` : 'کمتر از حداقل';
+    return `${label} کمتر از حداقل مجاز`;
   }
   if (signals.some(s => s.type === 'hard_max')) {
-    const maxVal = typeof profile?.hardMax === 'number' ? fmtNum(profile.hardMax) : null;
-    return maxVal ? `حداکثر: ${maxVal}` : 'بیشتر از سقف';
+    return `${label} بالاتر از سقف مجاز`;
   }
-
-  // ═══ LAYER 4: Cross-Field (قوی، weight 5) ═══
   if (signals.some(s => s.type === 'cross_absolute') && expected !== undefined) {
-    return `بیش از ${crossFieldLabel(profile?.crossFieldRule)}`;
+    return `${label} بیش از ${crossFieldLabel(profile?.crossFieldRule)}`;
   }
 
-  // ═══ LAYER 3: Statistical + ANTI-INFLATION ═══
-  // اگر structural break داریم (تورم) → سرکوب (مطابق SAP: فقط لاگ، نه هشدار)
-  if ((w as any).structuralBreak) {
-    return 'تورم — نادیده';
-  }
-
+  // pattern باید قبل از ratio چک بشه (چون هر دو expected دارن)
   if (signals.some(s => s.type === 'pattern')) {
-    return 'غیرمعمول';
+    return `${label} غیرمعمول`;
   }
 
   if (expected !== undefined && expected > 0) {
     if (kind === 'temperature') {
       const diff = Math.round(value - expected);
-      return diff > 0 ? `+${fmtNum(diff)}°` : `−${fmtNum(-diff)}°`;
+      return diff > 0
+        ? `${label} ${fmtNum(diff)} درجه بالاتر از هدف`
+        : `${label} ${fmtNum(-diff)} درجه پایین‌تر از هدف`;
     }
     if (kind === 'humidity') {
       const diff = Math.round(value - expected);
-      return diff > 0 ? `+${fmtNum(diff)}٪` : `−${fmtNum(-diff)}٪`;
+      return diff > 0
+        ? `${label} ${fmtNum(diff)}٪ بالاتر از هدف`
+        : `${label} ${fmtNum(-diff)}٪ پایین‌تر از هدف`;
     }
     if (kind === 'weight') {
       const pct = Math.round(Math.abs(1 - value / expected) * 100);
-      return value > expected ? `+${fmtNum(pct)}٪` : `−${fmtNum(pct)}٪`;
+      return value > expected
+        ? `${label} ${fmtNum(pct)}٪ بیشتر از استاندارد`
+        : `${label} ${fmtNum(pct)}٪ کمتر از استاندارد`;
     }
     const ratio = value / expected;
-    if (ratio >= 1.5) return `${fmtMult(ratio)}×`;
-    if (ratio > 1) return `+${fmtNum(Math.round((ratio - 1) * 100))}٪`;
-    return `−${fmtNum(Math.round((1 - ratio) * 100))}٪`;
+    if (ratio >= 1) {
+      if (ratio >= 1.5) return `${label} ${fmtMult(ratio)} برابر شده`;
+      return `${label} ${fmtNum(Math.round((ratio - 1) * 100))}٪ بیشتر شده`;
+    }
+    const pctDown = Math.round((1 - ratio) * 100);
+    return `${label} ${fmtNum(pctDown)}٪ کمتر شده`;
   }
 
-  // ═══ LAYER 2: Biological ═══
-  if (w.reason === 'biological') {
-    return 'بیرون از زیستی';
+  if (signals.some(s => s.type === 'biological') && profile?.biologicalRange) {
+    return `${label} بیرون از محدوده زیستی`;
   }
-  if (w.reason === 'pattern') {
-    return 'خارج از رایج';
+  if (signals.some(s => s.type === 'zscore')) {
+    return `${label} غیرعادی`;
   }
-  return 'غیرعادی';
+  if (signals.some(s => s.type === 'iqr')) {
+    return `${label} خارج از محدوده رایج`;
+  }
+
+  return `${label} غیرعادی`;
 }
