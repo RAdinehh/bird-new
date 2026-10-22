@@ -95,9 +95,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                     <SmartSelect value={String(item.existingFlockId || '')} onChange={v => updateItem({ existingFlockId: v, flockId: v })} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
                   </Field>
                 )}
-                <Field label="نام گله (اختیاری)" help={HELP.tra.chick.flockName}>
-                  <Input value={String(item.flockName || '')} onChange={e => updateItem({ flockName: e.target.value })} placeholder="نام گله" />
-                </Field>
+
               </Grid2>
               <Grid2>
                 <Field label="نوع پرنده" required>

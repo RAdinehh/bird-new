@@ -486,7 +486,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
            standard?.purposes?.includes('breeder') ? 'breeder' : 'layer');
 
         const newFlockId = flk.add({
-          name: it.flockName || name,
+          name: it.flockName || it.description || name,
           type: inferredType,
           birdId: birdId,
           breedId: breedId,
