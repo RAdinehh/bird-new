@@ -129,11 +129,13 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   //   - در غیر این صورت → آرشیوها مخفی
   const list = useMemo(() => {
     const sf = filters.status as string | string[] | undefined;
-    const wantsArchived = Array.isArray(sf)
-      ? sf.includes('archived')
-      : sf === 'archived';
-    if (wantsArchived) return _listRaw;
-    return _listRaw.filter(e => e.status !== 'archived');
+    // کاربر می‌خواد اسقاط‌شده‌ها یا آرشیو رو ببینه؟
+    const wantsHidden = Array.isArray(sf)
+      ? sf.some(s => s === 'archived' || s === 'retired')
+      : (sf === 'archived' || sf === 'retired');
+    if (wantsHidden) return _listRaw;
+    // پیش‌فرض: اسقاط و آرشیو مخفی (استاندارد SAP/Odoo)
+    return _listRaw.filter(e => e.status !== 'archived' && e.status !== 'retired');
   }, [_listRaw, filters.status]);
 
   // ─── KPI Cards ───
