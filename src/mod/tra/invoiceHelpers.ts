@@ -283,9 +283,6 @@ const eqId = it.equipmentId;
         continue;
       }
     
-    // ۲. اگر سالن انتخاب نشده → رد شو
-    if (!it.hallId) continue;
-    
     // ۳. اگر دسته تجهیزات نیست → رد شو
     const itemCat = it.category || inv.category;
     if (itemCat !== 'equipment') continue;
