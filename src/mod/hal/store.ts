@@ -90,6 +90,17 @@ export type EquipmentCategory =
 
 export type EquipmentUnit = 'pcs' | 'kg' | 'm2' | 'm' | 'L';
 
+export interface TransferLog {
+  id: string;
+  fromHallId: string;
+  fromHallName: string;
+  toHallId: string;
+  toHallName: string;
+  date: string;
+  note?: string;
+  createdAt: string;
+}
+
 export interface Equipment {
   id: string;
   hallId: string;
@@ -119,6 +130,8 @@ export interface Equipment {
   /** 🆕 شماره سریال تجهیز */
   /** 🆕 مدل / نوع تجهیز */
   model?: string;
+  /** 🆕 تاریخچه جابجایی بین سالن‌ها (Odoo standard) */
+  transferHistory?: TransferLog[];
   createdAt: string;
   updatedAt: string;
 }
