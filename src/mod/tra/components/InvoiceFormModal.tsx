@@ -381,14 +381,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                 <div style={{
                                   marginTop: 'var(--sp-1)',
                                   padding: '10px 12px',
-                                  background: 'var(--input-bg)',
-                                  border: '1px dashed var(--border)',
+                                  background: 'var(--accent-soft)',
+                                  border: '1px dashed var(--accent)',
                                   borderRadius: 'var(--r-md)',
                                   display: 'flex',
                                   flexDirection: 'column',
                                   gap: '6px'
                                 }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600 }}>
                                     <span>
                                       {toFa(it.quantity)} {currentUnitLabel}
                                       {factor !== 1 && !currentUnitLabel.includes(baseUnitLabel) ? ` (${toFa(baseQty)} ${baseUnitLabel})` : ''}
@@ -397,9 +397,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                   </div>
                                   <div style={{
                                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                    borderTop: '1px solid var(--border)', paddingTop: '6px', marginTop: '2px'
+                                    borderTop: '1px dashed var(--accent)', paddingTop: '6px', marginTop: '2px'
                                   }}>
-                                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>جمع محاسبه‌شده:</span>
+                                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>جمع محاسبه‌شده:</span>
                                     <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: 'var(--accent)' }}>
                                       {toFa(liveTotal.toLocaleString('fa-IR'))} تومان
                                     </span>
