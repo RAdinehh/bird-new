@@ -126,7 +126,7 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
 
       try {
         whs.addMovement({
-          itemId, type: 'out', quantity: delta,
+          itemId, type: 'out', quantity: Math.abs(delta) * uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight),
           unitPrice: (() => { const f = uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight); return f > 0 ? (Number(sample.unitPrice) || 0) / f : 0; })(),
           reason: 'sale',
           date: inv.deliveryDate || inv.date || '',
