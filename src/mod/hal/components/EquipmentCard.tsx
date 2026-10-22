@@ -64,6 +64,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       if (kind === 'consumable') return <Tag tone="gray">📦 مصرفی</Tag>;
                       return null;
                     })()}
+                    {(!e.hallId || e.hallId === '') && <Tag tone="amber">⚠️ بدون سالن</Tag>}
                     {e.status && e.status !== 'active' && (() => {
                       const st = getStatusLabel(e.status);
                       if (!st) return null;
@@ -201,7 +202,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
 
 
 
-                <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-2)', paddingTop: 'var(--sp-2)' }}>
                   {e.unitPrice && e.unitPrice > 0 && (
                     <Btn
                       size="sm"
@@ -218,13 +219,13 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                         });
                         window.location.href = '/tra?' + params.toString();
                       }}
-                      style={{ flex: 1 }}
+                      style={{ width: '100%' }}
                     >
                       💰 ثبت فاکتور
                     </Btn>
                   )}
-                  <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" variant="outline" onClick={() => onTransfer(e)} style={{ flex: 1 }}>🔀 جابجایی</Btn>
+                  <Btn size="sm" onClick={onEdit} style={{ width: '100%' }}>ویرایش</Btn>
+                  <Btn size="sm" variant="outline" onClick={() => onTransfer(e)} style={{ width: '100%' }}>🔀 جابجایی</Btn>
                   {e.status === 'retired' ? (
                     <Btn size="sm" variant="outline" onClick={async () => {
                       const ok = await showConfirmAsync('تأیید بازگردانی', 'این تجهیز به لیست فعال‌ها برگردد؟', {});
@@ -232,7 +233,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       onRestore(e.id);
                       logAction('update', 'hal', 'بازگردانی تجهیز: ' + e.name);
                       toastMsg.success('تجهیز بازگردانی شد');
-                    }} style={{ flex: 1 }}>♻️ بازگردانی</Btn>
+                    }} style={{ width: '100%' }}>♻️ بازگردانی</Btn>
                   ) : (
                     <Btn size="sm" variant="danger" onClick={async () => {
                       const ok = await showConfirmAsync('تأیید اسقاط', 'این تجهیز از لیست فعال خارج شود؟ سوابق مالی حفظ می‌شود.', { danger: true });
@@ -240,7 +241,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       onRetire(e.id);
                       logAction('update', 'hal', 'اسقاط تجهیز: ' + e.name);
                       toastMsg.success('تجهیز اسقاط شد');
-                    }} style={{ flex: 1 }}>🔚 اسقاط / فروش</Btn>
+                    }} style={{ width: '100%' }}>🔚 اسقاط / فروش</Btn>
                   )}
                 </div>
               </ExpandableCard>
