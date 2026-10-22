@@ -13,6 +13,7 @@ import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
 import { HallEquipSection } from '../HallEquipSection';
 import EntityLink from '../../../shr/components/EntityLink';
+import { CardActions } from '../../../shr/components/ui';
 
 export interface HallCardProps {
   h: Hall;
@@ -217,8 +218,10 @@ export default function HallCard(props: HallCardProps) {
         legacy={{ ventilationSystem: h.ventilationSystem, feederType: h.feederType, drinkerType: h.drinkerType, litterType: h.litterType }} />
 
       <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
-        <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }}>حذف</Btn>
+        <CardActions actions={[
+          { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
+          { label: 'حذف', onClick: handleDelete, variant: 'danger' }
+        ]} />
       </div>
     </ExpandableCard>
   );

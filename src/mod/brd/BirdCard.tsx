@@ -11,6 +11,7 @@ import { Btn, Tag } from '../../shr/components/ui';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
 import { logAction } from '../../cor/logger/auditLog';
+import { CardActions } from '../../shr/components/ui';
 
 interface Props {
   bird: Bird;
@@ -221,8 +222,10 @@ export default function BirdCard({
       ) : null}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <Btn size="sm" onClick={() => onEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش پرنده ${getBirdDisplayName(b, customStandards)}`}>ویرایش</Btn>
-        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }} aria-label={`حذف پرنده ${getBirdDisplayName(b, customStandards)}`}>حذف</Btn>
+        <CardActions actions={[
+          { label: 'ویرایش', onClick: () => onEdit(b), variant: 'outline' },
+          { label: 'حذف', onClick: handleDelete, variant: 'danger' }
+        ]} />
       </div>
     </ExpandableCard>
   );
