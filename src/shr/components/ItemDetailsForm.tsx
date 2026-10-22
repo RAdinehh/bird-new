@@ -402,14 +402,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Select>
           </Field>
         </Grid2>
-        <Grid2>
-          <Field label="مدل / نوع" required>
-            <Input value={String(item.model || '')} onChange={e => updateItem({ model: e.target.value })} placeholder="فن تونلی ۱۲۰" />
-          </Field>
-          <Field label="شماره سریال">
+        <Field label="شماره سریال">
             <Input value={String(item.serialNo || '')} onChange={e => updateItem({ serialNo: e.target.value })} placeholder="SN-123456" />
           </Field>
-        </Grid2>
         <Grid2>
           <Field label="گارانتی (ماه)">
             <Input mode="number" value={item.warrantyMonths != null && item.warrantyMonths > 0 ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} max={60} />
