@@ -127,22 +127,21 @@ export default function FlocksModal(props: FlocksModalProps) {
       }
     >
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🏷 هویت</div>
-      <Field label="نام گله" required error={showError('name')} onTouch={() => markTouched('name')}>
-        <Input
-          placeholder={
-            form.source === 'hatch' ? 'مثلاً — جوجه‌های تفریخ مرداد'
-            : form.source === 'purchase'
-              ? (form.type === 'broiler' ? 'مثلاً — گله گوشتی پاییز'
-                : form.type === 'breeder' ? 'مثلاً — گله مادر مرندی'
-                : 'مثلاً — گله تخم‌گذار بهار')
-              : 'مثلاً — گله اصلی'
-          }
-          value={form.name}
-          onChange={e => setForm({ ...form, name: e.target.value })}
-        />
-      </Field>
-
       <Grid2>
+  <Field label="نام گله" required error={showError('name')} onTouch={() => markTouched('name')}>
+    <Input
+      placeholder={
+        form.source === 'hatch' ? 'مثلاً — جوجه‌های تفریخ مرداد'
+        : form.source === 'purchase'
+          ? (form.type === 'broiler' ? 'مثلاً — گله گوشتی پاییز'
+            : form.type === 'breeder' ? 'مثلاً — گله مادر مرندی'
+            : 'مثلاً — گله تخم‌گذار بهار')
+          : 'مثلاً — گله اصلی'
+      }
+      value={form.name}
+      onChange={e => setForm({ ...form, name: e.target.value })}
+    />
+  </Field>
         <Field label="نوع گله" required error={showError('type')} onTouch={() => markTouched('type')}>
           <Select value={form.type} onChange={async e => {
             const newType = e.target.value as 'layer' | 'broiler' | 'breeder';
@@ -165,6 +164,9 @@ export default function FlocksModal(props: FlocksModalProps) {
             <option value="breeder">مادر (تخم نطفه‌دار)</option>
           </Select>
         </Field>
+      </Grid2>
+
+      <Grid2>
         <Field label="منبع">
           <Select value={form.source} onChange={e => {
             const newSource = e.target.value;
@@ -182,14 +184,13 @@ export default function FlocksModal(props: FlocksModalProps) {
             {Object.entries(SOURCE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </Select>
         </Field>
+  <FlockSourcePickers
+    form={form}
+    setForm={setForm}
+    onOpenInvoicePicker={() => setInvoicePickerOpen(true)}
+    onOpenHatchPicker={() => setHatchPickerOpen(true)}
+  />
       </Grid2>
-
-      <FlockSourcePickers
-        form={form}
-        setForm={setForm}
-        onOpenInvoicePicker={() => setInvoicePickerOpen(true)}
-        onOpenHatchPicker={() => setHatchPickerOpen(true)}
-      />
 
       <FlockDealSection form={form} setForm={setForm} showError={showError} markTouched={markTouched} />
 
