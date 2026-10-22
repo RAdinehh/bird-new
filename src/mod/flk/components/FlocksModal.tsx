@@ -256,15 +256,14 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📍 مکان</div>
       <Grid2>
-        <Field label={isSourceLinked ? <span>🔒 سالن</span> : "سالن (اختیاری)"} hint={isSourceLinked ? undefined : "قابل تخصیص بعداً"} error={isSourceLinked ? undefined : showError('hallId')} onTouch={() => markTouched('hallId')}>
+        <Field label="سالن (اختیاری)" hint="قابل تخصیص بعداً" error={showError('hallId')} onTouch={() => markTouched('hallId')}>
           <SmartSelect
             value={form.hallId}
-            onChange={v => !isSourceLinked && setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
+            onChange={v => setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
             options={halls.map(c => ({ value: c.id, label: c.name }))}
             placeholder="— انتخاب کنید —"
             modalTitle="انتخاب سالن"
             autoThreshold={6}
-            disabled={isSourceLinked}
           />
         </Field>
         <Field label="بخش">
