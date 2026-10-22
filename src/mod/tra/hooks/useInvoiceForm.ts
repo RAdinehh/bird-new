@@ -15,21 +15,98 @@ import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 
 // ═══ نقشه استاندارد واحدها (UoM) بر اساس دسته‌بندی ═══
-export type UOMUnit = { value: string; label: string };
-export const UOM_CATEGORIES: Record<string, { units: UOMUnit[]; default: string }> = {
-  egg: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
-  fertile_egg: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
-  chick: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
-  adult: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
-  broken: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
-  equipment: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
-  feed: { units: [{ value: 'kg', label: 'کیلوگرم' }, { value: 'g', label: 'گرم' }, { value: 'ton', label: 'تن' }, { value: 'bag', label: 'کیسه' }], default: 'kg' },
-  medicine: { units: [{ value: 'ml', label: 'میلی‌لیتر' }, { value: 'l', label: 'لیتر' }, { value: 'vial', label: 'ویال' }, { value: 'pack', label: 'بسته' }], default: 'ml' },
-  herbal: { units: [{ value: 'kg', label: 'کیلوگرم' }, { value: 'g', label: 'گرم' }, { value: 'l', label: 'لیتر' }, { value: 'pack', label: 'بسته' }], default: 'kg' },
-  vaccine: { units: [{ value: 'vial', label: 'ویال' }, { value: 'dose', label: 'دوز' }, { value: 'pack', label: 'بسته' }], default: 'vial' },
-  manure: { units: [{ value: 'kg', label: 'کیلوگرم' }, { value: 'ton', label: 'تن' }], default: 'kg' },
-  other: { units: [{ value: 'pcs', label: 'عدد' }, { value: 'kg', label: 'کیلوگرم' }, { value: 'pack', label: 'بسته' }], default: 'pcs' },
+export type UOMUnit = { value: string; label: string; factor: number | null };
+export const UOM_CATEGORIES: Record<string, { baseUnit: string; units: UOMUnit[]; default: string }> = {
+  // تک‌واحدی‌ها (بدون تبدیل)
+  egg: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
+  fertile_egg: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
+  chick: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
+  adult: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
+  broken: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
+  equipment: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
+  
+  // چندواحدی‌ها (با تبدیل به واحد پایه)
+  // ─── دان: پایه = کیلوگرم ───
+  feed: {
+    baseUnit: 'kg',
+    units: [
+      { value: 'kg', label: 'کیلوگرم', factor: 1 },
+      { value: 'g', label: 'گرم', factor: 0.001 },
+      { value: 'ton', label: 'تن', factor: 1000 },
+      { value: 'bag', label: 'کیسه (۲۵ کیلو)', factor: 25 },
+    ],
+    default: 'kg',
+  },
+  // ─── دارو: پایه = میلی‌لیتر ───
+  medicine: {
+    baseUnit: 'ml',
+    units: [
+      { value: 'ml', label: 'میلی‌لیتر', factor: 1 },
+      { value: 'l', label: 'لیتر', factor: 1000 },
+      { value: 'vial', label: 'ویال', factor: null },   // وزن هر ویال باید داده شود
+      { value: 'pack', label: 'بسته', factor: null },   // وزن هر بسته باید داده شود
+    ],
+    default: 'ml',
+  },
+  // ─── داروی گیاهی: پایه = گرم ───
+  herbal: {
+    baseUnit: 'g',
+    units: [
+      { value: 'g', label: 'گرم', factor: 1 },
+      { value: 'kg', label: 'کیلوگرم', factor: 1000 },
+      { value: 'l', label: 'لیتر (معادل گرم)', factor: 1000 },
+      { value: 'pack', label: 'بسته', factor: null },   // وزن هر بسته باید داده شود
+    ],
+    default: 'g',
+  },
+  // ─── واکسن: پایه = دوز ───
+  vaccine: {
+    baseUnit: 'dose',
+    units: [
+      { value: 'dose', label: 'دوز', factor: 1 },
+      { value: 'vial', label: 'ویال', factor: null },   // تعداد دوز هر ویال
+      { value: 'pack', label: 'بسته', factor: null },   // تعداد دوز هر بسته
+    ],
+    default: 'dose',
+  },
+  // ─── کود: پایه = کیلوگرم ───
+  manure: {
+    baseUnit: 'kg',
+    units: [
+      { value: 'kg', label: 'کیلوگرم', factor: 1 },
+      { value: 'ton', label: 'تن', factor: 1000 },
+    ],
+    default: 'kg',
+  },
+  // ─── سایر: پایه = عدد ───
+  other: {
+    baseUnit: 'pcs',
+    units: [
+      { value: 'pcs', label: 'عدد', factor: 1 },
+      { value: 'kg', label: 'کیلوگرم', factor: 1 },
+      { value: 'pack', label: 'بسته', factor: null },
+    ],
+    default: 'pcs',
+  },
 };
+
+/** آیا واحد انتخابی نیاز به ضریب دستی (unitWeight) دارد؟ */
+export function unitNeedsWeight(cat: string, unit: string): boolean {
+  const uom = UOM_CATEGORIES[cat];
+  if (!uom) return false;
+  const u = uom.units.find(x => x.value === unit);
+  return !!u && u.factor === null;
+}
+
+/** ضریب تبدیل نهایی: از factor یا unitWeight */
+export function resolveUomFactor(cat: string, unit: string, unitWeight?: number | null): number {
+  const uom = UOM_CATEGORIES[cat];
+  if (!uom) return 1;
+  const u = uom.units.find(x => x.value === unit);
+  if (!u) return 1;
+  if (u.factor !== null) return u.factor;
+  return unitWeight && unitWeight > 0 ? unitWeight : 1;
+}
 
 export function getUnitForCategory(cat: string): string {
   return UOM_CATEGORIES[cat]?.default || 'pcs';
