@@ -291,6 +291,22 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               {/* بدنه قلم */}
               {isExpanded && (
                 <div style={{ marginTop: 'var(--sp-1)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+                  <Field label={
+                    cat === 'herbal' ? 'نام داروی گیاهی' :
+                    cat === 'medicine' ? 'نام دارو' :
+                    cat === 'feed' ? 'نام دان' :
+                    cat === 'vaccine' ? 'نام واکسن' :
+                    cat === 'equipment' ? 'نام تجهیز' :
+                    cat === 'chick' ? 'نام گله / جوجه' :
+                    cat === 'egg' || cat === 'fertile_egg' ? 'نام تخم' :
+                    'نام کالا / شرح'
+                  } required>
+                    <Input
+                      placeholder="مثلاً: آویشن خشک"
+                      value={it.description || ''}
+                      onChange={e => updateItem(it.id, { description: e.target.value })}
+                    />
+                  </Field>
                   
 
                   {(() => {
