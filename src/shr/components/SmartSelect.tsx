@@ -64,6 +64,8 @@ export default function SmartSelect({
   const fontSize = compact ? 'var(--fs-sm)' : 'var(--fs-base)';
 
   // ═══ حالت ۱: لیست کوتاه — Select بومی ═══
+  const [visibleCount, setVisibleCount] = useState(10);
+
   if (options.length <= autoThreshold) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
@@ -129,6 +131,7 @@ export default function SmartSelect({
     onChange(val);
     setOpen(false);
     setQuery('');
+    setVisibleCount(10);
   };
 
   return (
@@ -137,7 +140,7 @@ export default function SmartSelect({
       <button
         type="button"
         disabled={disabled}
-        onClick={() => { if (disabled) return; setOpen(true); setQuery(''); }}
+        onClick={() => { if (disabled) return; setOpen(true); setQuery(''); setVisibleCount(10); }}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={required ? `${placeholder} (اجباری)` : placeholder}
@@ -183,7 +186,7 @@ export default function SmartSelect({
 
       <SelectSheetShell
         open={open}
-        onClose={() => { setOpen(false); setQuery(''); }}
+        onClose={() => { setOpen(false); setQuery(''); setVisibleCount(10); }}
         title={modalTitle}
         subtitle={`${toFa(options.length)} مورد`}
         searchable={searchable}
@@ -191,7 +194,7 @@ export default function SmartSelect({
           <Input
             placeholder="جستجو..."
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => { setQuery(e.target.value); setVisibleCount(10); }}
           />
         }
       >
@@ -223,17 +226,41 @@ export default function SmartSelect({
             </SheetGroup>
           ))
         ) : (
-          <SheetGroup title="" count={filtered.length}>
-            {filtered.map(o => (
-              <SheetItem
-                key={o.value}
-                icon={o.icon}
-                title={o.label}
-                selected={value === o.value}
-                onClick={() => !o.disabled && handlePick(o.value)}
-              />
-            ))}
-          </SheetGroup>
+          <>
+            <SheetGroup title="" count={filtered.length}>
+              {filtered.slice(0, visibleCount).map(o => (
+                <SheetItem
+                  key={o.value}
+                  icon={o.icon}
+                  title={o.label}
+                  selected={value === o.value}
+                  onClick={() => !o.disabled && handlePick(o.value)}
+                />
+              ))}
+            </SheetGroup>
+            {visibleCount < filtered.length && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount(c => c + 10)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'var(--input-bg)',
+                  border: '1px dashed var(--border)',
+                  borderRadius: 'var(--r-md)',
+                  color: 'var(--text)',
+                  fontFamily: 'inherit',
+                  fontSize: 'var(--fs-sm)',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  marginTop: 4,
+                }}
+              >
+                + نمایش {toFa(Math.min(10, filtered.length - visibleCount))} مورد بیشتر
+                ({toFa(filtered.length - visibleCount)} باقی‌مانده)
+              </button>
+            )}
+          </>
         )}
       </SelectSheetShell>
     </div>
