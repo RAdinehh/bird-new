@@ -5,6 +5,29 @@
 import { useWhs } from '../whs/store';
 import type { Invoice, InvoiceItem } from './store';
 
+// ─── UOM base + factors (inlined to avoid circular dep with useInvoiceForm) ───
+const UOM_BASE: Record<string, string> = {
+  egg: 'pcs', fertile_egg: 'pcs', chick: 'pcs', adult: 'pcs', broken: 'pcs',
+  equipment: 'pcs', feed: 'kg', medicine: 'ml', herbal: 'g', vaccine: 'dose',
+  manure: 'kg', other: 'pcs',
+};
+const UOM_FACTORS: Record<string, Record<string, number | null>> = {
+  feed: { kg: 1, g: 0.001, ton: 1000, bag: 25 },
+  medicine: { ml: 1, l: 1000, vial: null, pack: null },
+  herbal: { g: 1, kg: 1000, l: 1000, pack: null },
+  vaccine: { dose: 1, vial: null, pack: null },
+  manure: { kg: 1, ton: 1000 },
+  other: { pcs: 1, kg: 1, pack: null },
+};
+function uomBase(cat: string): string { return UOM_BASE[cat] || 'pcs'; }
+function uomFactor(cat: string, unit: string, unitWeight?: number | null): number {
+  const m = UOM_FACTORS[cat];
+  if (!m) return 1;
+  const f = m[unit];
+  if (f !== undefined && f !== null) return f;
+  return unitWeight && unitWeight > 0 ? unitWeight : 1;
+}
+
 const STOCK_CATS = ['feed', 'medicine', 'vaccine', 'herbal', 'other'];
 
 function mapCategory(cat: string, kind?: string): any {
@@ -38,9 +61,9 @@ function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
 
   try {
     return whs.addItem({
-      name, category: targetCat, unit: (it.unit || 'pcs') as any,
+      name, category: targetCat, unit: uomBase(it.category || inv.category) as any,
       minStock: 0, currentStock: 0,
-      lastPrice: Number(it.unitPrice) || 0,
+      lastPrice: (() => { const f = uomFactor(it.category || inv.category, it.unit || '', (it as any).unitWeight); return f > 0 ? (Number(it.unitPrice) || 0) / f : 0; })(),
       supplierId: inv.partyId || '', expireDate: String(it.expiryDate || ''),
       withdrawalDays: null,
       storage: String((it as any).storage || 'room'),
@@ -104,7 +127,7 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
       try {
         whs.addMovement({
           itemId, type: 'out', quantity: delta,
-          unitPrice: Number(sample.unitPrice) || 0,
+          unitPrice: (() => { const f = uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight); return f > 0 ? (Number(sample.unitPrice) || 0) / f : 0; })(),
           reason: 'sale',
           date: inv.deliveryDate || inv.date || '',
           partyId: inv.partyId || '',
@@ -163,8 +186,8 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
     if (!itemId) continue;
     try {
       whs.addMovement({
-        itemId, type: (delta > 0 ? 'in' : 'out') as any, quantity: Math.abs(delta),
-        unitPrice: Number(sample.unitPrice) || 0,
+        itemId, type: (delta > 0 ? 'in' : 'out') as any, quantity: Math.abs(delta) * uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight),
+        unitPrice: (() => { const f = uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight); return f > 0 ? (Number(sample.unitPrice) || 0) / f : 0; })(),
         reason: 'purchase',
         date: inv.deliveryDate || inv.date || '',
         partyId: inv.partyId || '',
