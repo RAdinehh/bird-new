@@ -138,13 +138,13 @@ export const TURKEY_BREEDER: BirdStandard = {
     { dayFrom: 8, dayTo: 28, temp: { min: 22, max: 28, target: 25 }, humidity: { min: 55, max: 65 }, light: { hours: 8 } },
     { dayFrom: 29, dayTo: 200, temp: { min: 16, max: 22, target: 19 }, humidity: { min: 50, max: 65 }, light: { hours: 8 } },
     { dayFrom: 201, dayTo: 380, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 30 } },
-    { dayFrom: 381, dayTo: 9999, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 16, lux: 30 } },
+    { dayFrom: 381, dayTo: 1825, temp: { min: 18, max: 22, target: 20 }, humidity: { min: 50, max: 65 }, light: { hours: 16, lux: 30 } },
   ],
   feed: [
     { dayFrom: 1, dayTo: 28, feedG: 45, waterMl: 90, phaseName: 'استارتر' },
     { dayFrom: 29, dayTo: 200, feedG: 180, waterMl: 360, phaseName: 'رشد محدود' },
     { dayFrom: 201, dayTo: 380, feedG: 280, waterMl: 560, phaseName: 'تولید' },
-    { dayFrom: 381, dayTo: 9999, feedG: 260, waterMl: 520, phaseName: 'پایان' },
+    { dayFrom: 381, dayTo: 1825, feedG: 260, waterMl: 520, phaseName: 'پایان' },
   ],
   growth: {
     weightByAge: [
@@ -152,7 +152,7 @@ export const TURKEY_BREEDER: BirdStandard = {
       { dayFrom: 29, dayTo: 100, weightG: 3500, adgG: 36, fcr: 2.5 },
       { dayFrom: 101, dayTo: 200, weightG: 7500, adgG: 40, fcr: 3.2 },
       { dayFrom: 201, dayTo: 380, weightG: 12000, adgG: 25, fcr: 3.5 },
-      { dayFrom: 381, dayTo: 9999, weightG: 12500, adgG: 5, fcr: 3.3 },
+      { dayFrom: 381, dayTo: 1825, weightG: 12500, adgG: 5, fcr: 3.3 },
     ],
     finalWeightG: 12500,
   },
@@ -170,7 +170,7 @@ export const TURKEY_BREEDER: BirdStandard = {
     { dayFrom: 1, dayTo: 7, maxPct: 2.5 },
     { dayFrom: 8, dayTo: 28, maxPct: 3.0 },
     { dayFrom: 29, dayTo: 200, maxPct: 4.0 },
-    { dayFrom: 201, dayTo: 9999, maxPct: 6.0 },
+    { dayFrom: 201, dayTo: 1825, maxPct: 6.0 },
   ],
   mortalityTotalPct: 12,
   notes: 'مادر بوقلمون — تخم نطفه‌دار برای جوجه‌کشی',

@@ -76,7 +76,7 @@ const BROILER: BirdStandard = {
     { dayFrom: 8,  dayTo: 14,  temp: { min: 27, max: 30, target: 28 }, humidity: { min: 55, max: 65 }, light: { hours: 18, lux: 20 } },
     { dayFrom: 15, dayTo: 21,  temp: { min: 24, max: 27, target: 25 }, humidity: { min: 55, max: 65 }, light: { hours: 18, lux: 15 } },
     { dayFrom: 22, dayTo: 35,  temp: { min: 21, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 18, lux: 15 } },
-    { dayFrom: 36, dayTo: 9999, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 20, lux: 10 } },
+    { dayFrom: 36, dayTo: 1825, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 20, lux: 10 } },
   ],
 
   feed: [
@@ -85,7 +85,7 @@ const BROILER: BirdStandard = {
     { dayFrom: 15, dayTo: 21,   feedG: 85, waterMl: 160, proteinPct: 20, energyKcal: 3100 },
     { dayFrom: 22, dayTo: 28,   feedG: 120, waterMl: 230, proteinPct: 19, energyKcal: 3150 },
     { dayFrom: 29, dayTo: 35,   feedG: 150, waterMl: 290, proteinPct: 19, energyKcal: 3150 },
-    { dayFrom: 36, dayTo: 9999, feedG: 170, waterMl: 325, proteinPct: 18, energyKcal: 3200 },
+    { dayFrom: 36, dayTo: 1825, feedG: 170, waterMl: 325, proteinPct: 18, energyKcal: 3200 },
   ],
 
   growth: {
@@ -96,7 +96,7 @@ const BROILER: BirdStandard = {
       { dayFrom: 22, dayTo: 28,  weightG: 1620, adgG: 95,  fcr: 1.4 },
       { dayFrom: 29, dayTo: 35,  weightG: 2200, adgG: 90,  fcr: 1.5 },
       { dayFrom: 36, dayTo: 42,  weightG: 2650, adgG: 80,  fcr: 1.6 },
-      { dayFrom: 43, dayTo: 9999, weightG: 2800, adgG: 60, fcr: 1.65 },
+      { dayFrom: 43, dayTo: 1825, weightG: 2800, adgG: 60, fcr: 1.65 },
     ],
     finalWeightG: 2800,
   },
@@ -162,7 +162,7 @@ const LAYER: BirdStandard = {
     { dayFrom: 8,  dayTo: 14,  temp: { min: 28, max: 30, target: 29 }, humidity: { min: 55, max: 65 }, light: { hours: 18, lux: 25 } },
     { dayFrom: 15, dayTo: 42,  temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 12, lux: 15 } },
     { dayFrom: 43, dayTo: 140, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 20 } },
-    { dayFrom: 141, dayTo: 9999, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 16, lux: 30 } },
+    { dayFrom: 141, dayTo: 1825, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 16, lux: 30 } },
   ],
 
   feed: [
@@ -170,7 +170,7 @@ const LAYER: BirdStandard = {
     { dayFrom: 8,  dayTo: 14,   feedG: 30, waterMl: 55, proteinPct: 19, energyKcal: 2850 },
     { dayFrom: 15, dayTo: 42,   feedG: 50, waterMl: 95, proteinPct: 17, energyKcal: 2750 },
     { dayFrom: 43, dayTo: 140,  feedG: 75, waterMl: 145, proteinPct: 16, energyKcal: 2750 },
-    { dayFrom: 141, dayTo: 9999, feedG: 115, waterMl: 220, proteinPct: 17, energyKcal: 2750 },
+    { dayFrom: 141, dayTo: 1825, feedG: 115, waterMl: 220, proteinPct: 17, energyKcal: 2750 },
   ],
 
   growth: {
@@ -180,7 +180,7 @@ const LAYER: BirdStandard = {
       { dayFrom: 15, dayTo: 42,   weightG: 450,  adgG: 12,  fcr: 2.5 },
       { dayFrom: 43, dayTo: 91,   weightG: 1050, adgG: 13,  fcr: 3.2 },
       { dayFrom: 92, dayTo: 140,  weightG: 1600, adgG: 12,  fcr: 4.0 },
-      { dayFrom: 141, dayTo: 9999, weightG: 1950, adgG: 3,  fcr: 5.0 },
+      { dayFrom: 141, dayTo: 1825, weightG: 1950, adgG: 3,  fcr: 5.0 },
     ],
     finalWeightG: 1950,
   },
@@ -222,7 +222,7 @@ const LAYER: BirdStandard = {
     { dayFrom: 1,  dayTo: 7,    maxPct: 1 },
     { dayFrom: 8,  dayTo: 21,   maxPct: 1.5 },
     { dayFrom: 22, dayTo: 140,  maxPct: 2.5 },
-    { dayFrom: 141, dayTo: 9999, maxPct: 4 },
+    { dayFrom: 141, dayTo: 1825, maxPct: 4 },
   ],
   incubation: CHICKEN_INCUBATION,
   mortalityTotalPct: 8,
@@ -243,7 +243,7 @@ export const DEFAULT_STANDARDS: Record<string, BirdStandard> = {
 
 export const FALLBACK_ENV: EnvRange = {
   dayFrom: 0,
-  dayTo: 9999,
+  dayTo: 1825,
   temp: { min: 18, max: 26, target: 22 },
   humidity: { min: 40, max: 70 },
   light: { hours: 14 },
@@ -251,14 +251,14 @@ export const FALLBACK_ENV: EnvRange = {
 
 export const FALLBACK_FEED: FeedRange = {
   dayFrom: 0,
-  dayTo: 9999,
+  dayTo: 1825,
   feedG: 80,
   waterMl: 160,
 };
 
 export const FALLBACK_GROWTH: GrowthRange = {
   dayFrom: 0,
-  dayTo: 9999,
+  dayTo: 1825,
   weightG: 1500,
   adgG: 15,
   fcr: 3,
