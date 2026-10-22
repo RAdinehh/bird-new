@@ -90,6 +90,17 @@ export type EquipmentCategory =
 
 export type EquipmentUnit = 'pcs' | 'kg' | 'm2' | 'm' | 'L';
 
+export interface SaleInfo {
+  reason: 'sale' | 'scrap';
+  salePrice: number;
+  totalCost: number;
+  profit: number;
+  soldAt: string;
+  buyer?: string;
+  note?: string;
+  createdAt: string;
+}
+
 export interface TransferLog {
   id: string;
   fromHallId: string;
@@ -132,6 +143,8 @@ export interface Equipment {
   model?: string;
   /** 🆕 تاریخچه جابجایی بین سالن‌ها (Odoo standard) */
   transferHistory?: TransferLog[];
+  /** 🆕 اطلاعات فروش/اسقاط (SAP standard) */
+  saleInfo?: SaleInfo;
   createdAt: string;
   updatedAt: string;
 }
