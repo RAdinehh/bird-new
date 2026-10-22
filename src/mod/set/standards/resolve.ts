@@ -48,7 +48,7 @@ export function resolveBirdType(birdName: string | null | undefined): string | n
 }
 
 // ═══ Helpers ═══
-function findInRange<T extends { dayFrom: number; dayTo: number }>(arr: T[], ageDays: number): T | null {
+export function findInRange<T extends { dayFrom: number; dayTo: number }>(arr: T[], ageDays: number): T | null {
   if (!arr || arr.length === 0) return null;
   const safeAge = Math.max(1, ageDays || 0);
   for (const range of arr) {

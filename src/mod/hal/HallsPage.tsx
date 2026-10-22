@@ -27,6 +27,8 @@ import { useHallsCascade } from './hooks/useHallsCascade';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
+import { findInRange } from '../set/standards/resolve';
+import { getAgeDays } from '../flk/helpers-store';
 
 
 
@@ -64,8 +66,12 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     parseFloat(toEn(form.width)) || null,
     __breedStd?.space?.densityMax ?? null,
   );
-  const __stdTemp = __breedStd?.env?.[0]?.temp?.target ?? null;
-  const __stdHumidity = __breedStd?.env?.[0]?.humidity?.min ?? null;
+  // 🆕 محاسبه پویا: اگر گله فعالی در این سالن باشد، از سن گله استفاده کن
+  const __editingFlock = form.id ? flocks.find(f => f.hallId === form.id && f.status === 'active') : null;
+  const __editingAge = __editingFlock ? getAgeDays(__editingFlock) : 1;
+  const __stdEnv = __breedStd?.env ? findInRange(__breedStd.env, __editingAge) : null;
+  const __stdTemp = (__stdEnv as any)?.temp?.target ?? __breedStd?.env?.[0]?.temp?.target ?? null;
+  const __stdHumidity = (__stdEnv as any)?.humidity?.min ?? __breedStd?.env?.[0]?.humidity?.min ?? null;
   const fmt = useFormat();
 
   const halls = useMemo(() => {
