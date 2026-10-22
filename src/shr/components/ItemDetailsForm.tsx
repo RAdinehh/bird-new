@@ -9,6 +9,7 @@ import { parseFaNum, toEn, toFa, formatQty } from '../utils/fa';
 import { differenceInCalendarDays, parse as parseJ, format as formatJ, subDays, isValid } from 'date-fns-jalali';
 import DatePicker from './DatePicker';
 import { typesForCategory } from '../../mod/hal/_equipHelpers';
+import { kindForType } from '../../mod/hal/api/equipmentCalc';
 import { getEquipLabel } from '../../mod/hal/_typedLabels';
 import { HELP } from '../help/helpTexts';
 
@@ -361,8 +362,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Select value={String(item.equipmentCategory || '')} onChange={e => {
               const c = e.target.value;
               const nextType = (typesForCategory(c) as string[])[0] || '';
-              const consumableCats = ['litter', 'cleaning', 'hand_tools'];
-              const defaultKind = consumableCats.includes(c) ? 'consumable' : 'asset';
+              const defaultKind = nextType ? kindForType(nextType) : 'asset';
               updateItem({ equipmentCategory: c, equipmentType: nextType, equipmentKind: defaultKind });
             }}>
               <option value="">— انتخاب —</option>
@@ -391,7 +391,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         <Grid2>
           <Field label="نوع تجهیز" required hint={!item.equipmentCategory ? 'اول دسته را انتخاب کنید' : undefined}>
-            <Select key={item.equipmentCategory || 'none'} value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })} disabled={!item.equipmentCategory}>
+            <Select key={item.equipmentCategory || 'none'} value={String(item.equipmentType || '')} onChange={e => { const t = e.target.value; updateItem({ equipmentType: t, equipmentKind: kindForType(t) }); }} disabled={!item.equipmentCategory}>
               <option value="">— انتخاب —</option>
               {(typesForCategory(String(item.equipmentCategory || '')) as string[]).map((t: string) => {
                 const lbl = getEquipLabel(t);
