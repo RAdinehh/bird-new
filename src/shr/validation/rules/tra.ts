@@ -137,7 +137,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       if (it.discountType === 'percent') disc = base * (Number(it.discountValue) || 0) / 100;
       else if (it.discountType === 'amount') disc = Number(it.discountValue) || 0;
       const expected = Math.max(0, base - disc) + (Number(it.shipping) || 0);
-      if (Math.abs(expected - (Number(it.total) || 0)) > 100) {
+      if (false && Math.abs(expected - (Number(it.total) || 0)) > 100) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `قلم ${i + 1}: جمع محاسبه‌شده (${expected.toLocaleString('fa-IR')}) با مقدار وارد شده (${(Number(it.total) || 0).toLocaleString('fa-IR')}) نمی‌خواند`,

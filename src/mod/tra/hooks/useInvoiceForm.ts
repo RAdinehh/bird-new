@@ -1,7 +1,7 @@
 /**
  * useInvoiceForm — state و منطق فرم فاکتور
  */
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { verifyInvariantsIfDev } from '../../../shr/dev/invariants';
 import { logAction } from '../../../cor/logger/auditLog';
 import { format as formatJ } from 'date-fns-jalali';
@@ -143,6 +143,25 @@ export function useInvoiceForm(params: {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
 
   // محاسبات
+  useEffect(() => {
+    let changed = false;
+    const newItems = form.items.map(it => {
+      const cat = it.category || form.category;
+      const unit = it.unit || 'pcs';
+      const unitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === unit);
+      const factor = (unitDef && unitDef.factor !== null) ? unitDef.factor : (it.unitWeight || 1);
+      const expected = calcItemTotal(it.quantity || 0, it.unitPrice || 0, it.discountType, it.discountValue, factor) + (it.shipping || 0);
+      if (Math.abs(expected - (it.total || 0)) > 0.1) {
+        changed = true;
+        return { ...it, total: expected };
+      }
+      return it;
+    });
+    if (changed) {
+      setForm(f => ({ ...f, items: newItems }));
+    }
+  }, [form.items, form.category]);
+
   const total = useMemo(
     () => form.items.reduce((acc, it) => {
       const cat = it.category || form.category;
