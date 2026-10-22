@@ -25,6 +25,8 @@ export interface GroupFlockRow {
   maleCount: number;
   femaleCount: number;
   sexRatio: string;
+  profitPerMale: number | null;
+  profitPerFemale: number | null;
 }
 
 export interface GroupKpi {
@@ -112,6 +114,12 @@ export function useGroupKpi(groupId: string): GroupKpi {
         sexRatio: (f.type === 'breeder' || f.type === 'layer')
           ? sexRatio(f.maleCount, f.femaleCount)
           : '—',
+        profitPerMale: (f.type === 'breeder' || f.type === 'layer') && (f.maleCount || 0) > 0
+          ? (revenue - totalFlockCost) / (f.maleCount || 1)
+          : null,
+        profitPerFemale: (f.type === 'breeder' || f.type === 'layer') && (f.femaleCount || 0) > 0
+          ? (revenue - totalFlockCost) / (f.femaleCount || 1)
+          : null,
       };
     });
 
@@ -207,6 +215,12 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
           sexRatio: (f.type === 'breeder' || f.type === 'layer')
             ? sexRatio(f.maleCount, f.femaleCount)
             : '—',
+          profitPerMale: (f.type === 'breeder' || f.type === 'layer') && (f.maleCount || 0) > 0
+            ? (revenue - costs.grandTotalOwed) / (f.maleCount || 1)
+            : null,
+          profitPerFemale: (f.type === 'breeder' || f.type === 'layer') && (f.femaleCount || 0) > 0
+            ? (revenue - costs.grandTotalOwed) / (f.femaleCount || 1)
+            : null,
         };
       });
 

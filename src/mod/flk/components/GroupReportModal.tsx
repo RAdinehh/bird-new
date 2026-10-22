@@ -37,6 +37,11 @@ function fmtMoney(n: number): string {
   return toFa(Math.round(n));
 }
 
+function fmtPerBird(v: number): string {
+  const sign = v < 0 ? '−' : '';
+  return sign + fmtMoney(Math.abs(v));
+}
+
 export default function GroupReportModal({ open, onClose, groupId }: Props) {
   const groups = useFlk(s => s.groups);
   const group = useMemo(() => groups.find(g => g.id === groupId), [groups, groupId]);
@@ -187,6 +192,16 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
                   <span>🐔 <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b>/{toFa(f.initialCount)}</span>
                   {f.sexRatio !== '—' && (
                     <span title="نسبت خروس به مرغ">♂️♀️ <b style={{ color: 'var(--text)' }}>{f.sexRatio}</b></span>
+                  )}
+                  {f.profitPerMale !== null && (
+                    <span title="سود خالص به ازای هر خروس" style={{ color: f.profitPerMale >= 0 ? 'var(--accent)' : 'var(--danger)', fontWeight: 600 }}>
+                      ♂️ {fmtPerBird(f.profitPerMale)}
+                    </span>
+                  )}
+                  {f.profitPerFemale !== null && (
+                    <span title="سود خالص به ازای هر مرغ" style={{ color: f.profitPerFemale >= 0 ? 'var(--accent)' : 'var(--danger)', fontWeight: 600 }}>
+                      ♀️ {fmtPerBird(f.profitPerFemale)}
+                    </span>
                   )}
                   <span>🎂 {toFa(f.ageDays)} روز</span>
                   <span>💰 {fmtMoney(f.cost)}</span>
