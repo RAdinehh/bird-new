@@ -109,7 +109,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="سالن مقصد">
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
           </Field>
-          <Field label="بخش مقصد">
+          <Field label="بخش مقصد (اختیاری)">
             <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder={item.hallId ? "— بخش —" : "اول سالن"} modalTitle="انتخاب بخش" autoThreshold={6} />
           </Field>
         </Grid2>
@@ -402,9 +402,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Select>
           </Field>
         </Grid2>
-        <Field label="شماره سریال">
-            <Input value={String(item.serialNo || '')} onChange={e => updateItem({ serialNo: e.target.value })} placeholder="SN-123456" />
-          </Field>
         <Grid2>
           <Field label="گارانتی (ماه)">
             <Input mode="number" value={item.warrantyMonths != null && item.warrantyMonths > 0 ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} max={60} />
@@ -414,10 +411,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="سالن مقصد" required={item.equipmentKind !== 'consumable'} hint={item.equipmentKind === 'consumable' ? 'برای مصرفی اختیاری' : 'محل نصب — برای ثبت در انبار تجهیزات'}>
+          <Field label="سالن مقصد (اختیاری)" hint="اگر الان نمی‌دانید، خالی بگذارید. بعداً در بخش سالن می‌توانید تعیین کنید.">
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
           </Field>
-          <Field label="بخش مقصد">
+          <Field label="بخش مقصد (اختیاری)">
             <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder={item.hallId ? "— بخش —" : "اول سالن"} modalTitle="انتخاب بخش" autoThreshold={6} />
           </Field>
         </Grid2>
