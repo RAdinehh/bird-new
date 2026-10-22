@@ -76,11 +76,14 @@ export function createFlkSchema(context: ValidationContext = {}) {
     const d = data as any;
 
     // نر + ماده = کل (اگه هر دو پر شده)
-    if (d.maleCount > 0 && d.femaleCount > 0) {
-      if (d.maleCount + d.femaleCount !== d.initialCount) {
+    const male = d.maleCount || 0;
+    const female = d.femaleCount || 0;
+    const unknown = d.unknownCount || 0;
+    if (male > 0 || female > 0 || unknown > 0) {
+      if (male + female + unknown !== d.initialCount) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `مجموع نر (${d.maleCount.toLocaleString('fa-IR')}) و ماده (${d.femaleCount.toLocaleString('fa-IR')}) با تعداد اولیه (${d.initialCount.toLocaleString('fa-IR')}) یکسان نیست`,
+          message: `مجموع نر (${male.toLocaleString('fa-IR')})، ماده (${female.toLocaleString('fa-IR')}) و نامشخص (${unknown.toLocaleString('fa-IR')}) با تعداد اولیه (${d.initialCount.toLocaleString('fa-IR')}) یکسان نیست`,
           path: ['initialCount'],
         });
       }
