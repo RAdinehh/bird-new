@@ -25,6 +25,7 @@ export interface EquipmentCardProps {
   onToggle: () => void;
   onEdit: () => void;
   onDelete: (id: string) => void;
+  onRetire: (id: string) => void;
   onUndo: (item: Equipment) => void;
   supplierNames?: Map<string, string>;
   invoiceNumbers?: Map<string, string>;
@@ -33,7 +34,7 @@ export interface EquipmentCardProps {
 }
 
 export default function EquipmentCard(props: EquipmentCardProps) {
-  const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onUndo, supplierNames,
+  const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onRetire, onUndo, supplierNames,
         invoiceNumbers, whsItemNames, zoneNames } = props;
   const _cm = allCustomOpts.find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
   const _isDeleted = _cm ? _cm.hidden === true : false;
@@ -163,9 +164,13 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     </Btn>
                   )}
                   <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                    const ok = await showConfirmAsync('تأیید حذف', 'این تجهیز حذف شود؟', { danger: true }); if (!ok) return; onUndo(e); onDelete(e.id); logAction('delete', 'hal', 'حذف از سالن‌ها'); toastMsg.deleted('تجهیز')
-                    }} style={{ flex: 1 }}>حذف</Btn>
+                  <Btn size="sm" variant="danger" onClick={async () => {
+                    const ok = await showConfirmAsync('تأیید اسقاط', 'این تجهیز از لیست فعال خارج شود؟ سوابق مالی حفظ می‌شود.', { danger: true });
+                    if (!ok) return;
+                    onRetire(e.id);
+                    logAction('update', 'hal', 'اسقاط تجهیز: ' + e.name);
+                    toastMsg.success('تجهیز اسقاط شد');
+                  }} style={{ flex: 1 }}>🔚 اسقاط / فروش</Btn>
                 </div>
               </ExpandableCard>
             );

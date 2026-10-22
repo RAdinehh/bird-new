@@ -299,6 +299,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
                 onToggle={() => setExpandedId(isOpen ? null : e.id)}
                 onEdit={() => handleOpenEdit(e)}
                 onDelete={deleteEquip}
+                onRetire={(id) => updateEquip(id, { status: 'retired' })}
                 onUndo={(item) => {
                   setUndoData({ item });
                   setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.item) && cur.item.id === item.id ? null : cur), 6000);
