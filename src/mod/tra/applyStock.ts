@@ -42,7 +42,7 @@ function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
       minStock: 0, currentStock: 0,
       lastPrice: Number(it.unitPrice) || 0,
       supplierId: inv.partyId || '', expireDate: String(it.expiryDate || ''),
-      withdrawalDays: null, batchNo: String(it.hatcheryBatchNo || ''),
+      withdrawalDays: null,
       storage: String((it as any).storage || 'room'),
       notes: `از فاکتور ${inv.number || ''}`,
       brand: (it as any).brand || '', hallId: (it as any).hallId || '',
@@ -170,7 +170,7 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
         partyId: inv.partyId || '',
         notes: `فاکتور ${inv.number || ''}${sample.description ? ' — ' + sample.description : ''}`,
         sourceModule: 'tra', sourceId: inv.id,
-        batchNo: sample.hatcheryBatchNo,
+        
         expiryDate: sample.expiryDate,
       } as any);
     } catch (e) {

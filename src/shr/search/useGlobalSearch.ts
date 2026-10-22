@@ -90,8 +90,8 @@ export function useGlobalSearch(query: string): GroupedResult[] {
          ...(p.customerTypes || []), ...(p.supplierTypes || [])])),
 
       whs: (items || []).map(it => mk(it.id, 'whs', it.name,
-        [it.batchNo, it.storage].filter(Boolean).join(' • '),
-        [it.name, it.notes, it.batchNo, it.storage, it.category, it.unit,
+        [it.storage].filter(Boolean).join(' • '),
+        [it.name, it.notes, it.storage, it.category, it.unit,
          partyMap.get(it.supplierId), it.currentStock, it.lastPrice, it.minStock,
          it.expireDate, it.productionDate, it.purchaseDate, it.hallId])),
 

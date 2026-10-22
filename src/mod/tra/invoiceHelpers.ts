@@ -229,7 +229,7 @@ function ensureWhsItem(it: any, inv: Invoice, whs: any): string {
       minStock: 0, currentStock: 0,
       lastPrice: Number(it.unitPrice) || 0,
       supplierId: inv.partyId || '', expireDate: '',
-      withdrawalDays: null, batchNo: '', storage: 'room',
+      withdrawalDays: null, storage: 'room',
       notes: `از فاکتور ${inv.number || ''}`,
       brand: it.brand || '', hallId: it.hallId || '',
       equipmentStatus: it.equipmentStatus || '',
@@ -512,7 +512,6 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           notes: `از فاکتور ${inv.number || ''}`,
           sourceInvoiceId: inv.id,
           sourceCategory: ref.cat,
-          hatcheryBatchNo: it.hatcheryBatchNo || undefined,
           chickWeight: it.chickWeight ?? null,
         });
 
