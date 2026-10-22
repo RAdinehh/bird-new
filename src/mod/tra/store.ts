@@ -56,7 +56,7 @@ export const useTra = create<State>()(
           // 🎯 ۱. اعمال روی گله‌ها (خرید/فروش پرنده)
           try { items = applyInvoiceFlocks({ ...newInv, items }); } catch(e) {}
           // 🎯 ۲. اتصال تجهیزات به فاکتور
-          try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) {}
+          try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) { console.error('❌ [tra] applyInvoiceEquipment error:', e); }
           // 🎯 ۳. اتصال فروش تخم به ماژول egg
           try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) {}
           try { items = applyInvoiceStock({ ...newInv, items }); } catch(e) {}
@@ -110,7 +110,7 @@ export const useTra = create<State>()(
 
         if (!merged.isPreorder || isReceiving) {
           try { itemsFinal = applyInvoiceFlocks(mergedWithItems, isReceiving ? undefined : prev); } catch(e) { console.error('[updateInvoice] applyInvoiceFlocks failed:', e); }
-          try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
+          try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) { console.error('❌ [tra] applyInvoiceEquipment error (update):', e); }
           try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
           try { itemsFinal = applyInvoiceStock({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
           // 🎯 اتصال به انبار از طریق Event Bus (rollback قبلی‌ها + حرکت‌های جدید)

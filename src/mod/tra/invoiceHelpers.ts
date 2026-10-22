@@ -253,6 +253,7 @@ export function applyInvoiceEquipment(inv: Invoice, prev?: Invoice): InvoiceItem
   
   for (let i = 0; i < outItems.length; i++) {
     const it = outItems[i] as any;
+    console.log('[applyInvoiceEquipment] بررسی قلم:', it.description, '| دسته:', it.category, '| نوع:', it.equipmentKind, '| سالن:', it.hallId);
     
     // ۱. اگر equipmentId از قبل ست شده → لینک به تجهیز موجود
 const eqId = it.equipmentId;
