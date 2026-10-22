@@ -26,8 +26,7 @@ const makeItem = (o: any = {}) => ({
   id: 'it-' + Math.random().toString(36).slice(2, 9),
   name: 'دان', category: 'feed', unit: 'kg',
   minStock: 0, currentStock: 0, lastPrice: 10000, avgPrice: 10000,
-  supplierId: '', expireDate: '', withdrawalDays: null, batchNo: '',
-  storage: 'room', notes: '',
+  supplierId: '', expireDate: '', withdrawalDays: null, storage: 'room', notes: '',
   createdAt: '2026-01-01', updatedAt: '2026-01-01',
   ...o,
 });

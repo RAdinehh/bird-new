@@ -12,7 +12,7 @@ const mkItem = (o: any = {}) => ({
   name: 'ذرت', category: 'feed', unit: 'kg',
   minStock: 10, currentStock: 0, lastPrice: 0,
   supplierId: '', expireDate: '', withdrawalDays: null,
-  batchNo: '', storage: 'room', notes: '',
+  storage: 'room', notes: '',
   ...o,
 });
 const mkMove = (o: any = {}) => ({

@@ -34,7 +34,7 @@ function seedWarehouseItem() {
       id: 'item-feed', name: 'دان استارتر', category: 'feed',
       unit: 'kg', minStock: 0, currentStock: 0, lastPrice: 0,
       supplierId: '', expireDate: '', withdrawalDays: null,
-      batchNo: '', storage: 'room', notes: '',
+      storage: 'room', notes: '',
       createdAt: '', updatedAt: '',
     }] as any,
     movements: [],

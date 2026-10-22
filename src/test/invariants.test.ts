@@ -33,7 +33,7 @@ describe('invariants: healthy state', () => {
       name: 'دان', category: 'feed', unit: 'kg',
       minStock: 0, currentStock: 0, lastPrice: 1000,
       supplierId: '', expireDate: '', withdrawalDays: null,
-      batchNo: '', storage: 'room', notes: '',
+      storage: 'room', notes: '',
     } as any);
     useWhs.getState().addMovement({
       itemId, type: 'in', quantity: 100, unitPrice: 1000,
@@ -52,7 +52,7 @@ describe('invariants: detect whs mismatch', () => {
       name: 'دان', category: 'feed', unit: 'kg',
       minStock: 0, currentStock: 999, lastPrice: 1000,   // ← currentStock دستی خراب
       supplierId: '', expireDate: '', withdrawalDays: null,
-      batchNo: '', storage: 'room', notes: '',
+      storage: 'room', notes: '',
     } as any);
     useWhs.getState().addMovement({
       itemId, type: 'in', quantity: 100, unitPrice: 1000,
@@ -144,7 +144,7 @@ describe('invariants: multiple issues', () => {
       name: 'دان', category: 'feed', unit: 'kg',
       minStock: 0, currentStock: 999, lastPrice: 0,
       supplierId: '', expireDate: '', withdrawalDays: null,
-      batchNo: '', storage: 'room', notes: '',
+      storage: 'room', notes: '',
     } as any);
     useWhs.getState().addMovement({
       itemId, type: 'in', quantity: 100, unitPrice: 0,
