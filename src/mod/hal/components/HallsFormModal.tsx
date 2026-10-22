@@ -225,7 +225,19 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 onChange={v => setForm({...form, breedId: v})}
                 parentValue={form.birdId || ''}
                 parentLabel="پرنده"
-                options={breedsForBird.map((b: Breed) => ({ value: b.id, label: b.name }))}
+                options={breedsForBird.map((b: Breed) => {
+                  const purposeMap: Record<string, string> = {
+                    layer: '🥚 تخم‌گذار',
+                    breeder: '🐣 مادر',
+                    broiler: '🍗 گوشتی',
+                    ornamental: '🌸 زینتی',
+                  };
+                  const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
+                  return {
+                    value: b.id,
+                    label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name,
+                  };
+                })}
                 emptyMode="select"
                 placeholder="— انتخاب نژاد —"
                 modalTitle="انتخاب نژاد"
