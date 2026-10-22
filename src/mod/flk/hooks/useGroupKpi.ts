@@ -22,6 +22,9 @@ export interface GroupFlockRow {
   cost: number;
   revenue: number;
   profit: number;
+  maleCount: number;
+  femaleCount: number;
+  sexRatio: string;
 }
 
 export interface GroupKpi {

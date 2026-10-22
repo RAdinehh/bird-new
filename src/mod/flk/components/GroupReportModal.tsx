@@ -185,6 +185,9 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
                 </div>
                 <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', fontSize: 11, color: 'var(--muted)' }}>
                   <span>🐔 <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b>/{toFa(f.initialCount)}</span>
+                  {f.sexRatio !== '—' && (
+                    <span title="نسبت خروس به مرغ">♂️♀️ <b style={{ color: 'var(--text)' }}>{f.sexRatio}</b></span>
+                  )}
                   <span>🎂 {toFa(f.ageDays)} روز</span>
                   <span>💰 {fmtMoney(f.cost)}</span>
                   <span>📈 {fmtMoney(f.revenue)}</span>
