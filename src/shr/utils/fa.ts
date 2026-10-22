@@ -172,5 +172,8 @@ export function formatQty(qty: number | null | undefined, baseUnit: string): str
   if (baseUnit === 'dose') return `${sign}${fmt(absQty)} دوز`;
   if (baseUnit === 'vial') return `${sign}${fmt(absQty)} ویال`;
   if (baseUnit === 'pack') return `${sign}${fmt(absQty)} بسته`;
+  if (baseUnit === 'bag') return `${sign}${fmt(absQty)} کیسه`;
+  if (baseUnit === 'ton') return `${sign}${fmt(absQty)} تن`;
+  if (baseUnit === 'L' || baseUnit === 'l') return `${sign}${fmt(absQty)} لیتر`;
   return `${sign}${fmt(absQty)} ${baseUnit}`;
 }
