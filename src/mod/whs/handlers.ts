@@ -1,5 +1,5 @@
 import { bus } from '../../cor/events';
-import { useWhs, generateBatchNo } from './store';
+import { useWhs } from './store';
 import type { TraInvoiceItemRef } from '../../cor/events/events';
 
 /**
@@ -139,12 +139,11 @@ function eggApplyCascade(productionId: string, p: any): void {
   if (p.eatingCount > 0) {
     const itemId = ensureEggItem('eating');
     if (itemId) {
-      const batchNo = generateBatchNo(p.date, whs.movements, itemId);
       const mid = useWhs.getState().addMovement({
         itemId, type: 'in', quantity: p.eatingCount, unitPrice: 0,
         reason: 'adjustment', date: p.date, partyId: '',
         notes: 'تولید تخم — خوراکی',
-        flockId: p.flockId, sourceModule: 'egg', sourceId: productionId, batchNo,
+        flockId: p.flockId, sourceModule: 'egg', sourceId: productionId,
       });
       p.eatingMovementId = mid || '';
     }
@@ -152,12 +151,11 @@ function eggApplyCascade(productionId: string, p: any): void {
   if (p.fertileCount > 0) {
     const itemId = ensureEggItem('fertile');
     if (itemId) {
-      const batchNo = generateBatchNo(p.date, whs.movements, itemId);
       const mid = useWhs.getState().addMovement({
         itemId, type: 'in', quantity: p.fertileCount, unitPrice: 0,
         reason: 'adjustment', date: p.date, partyId: '',
         notes: 'تولید تخم — نطفه‌دار',
-        flockId: p.flockId, sourceModule: 'egg', sourceId: productionId, batchNo,
+        flockId: p.flockId, sourceModule: 'egg', sourceId: productionId,
       });
       p.fertileMovementId = mid || '';
     }
@@ -165,12 +163,11 @@ function eggApplyCascade(productionId: string, p: any): void {
   if (consumptionCount > 0) {
     const itemId = ensureEggItem('consumption');
     if (itemId) {
-      const batchNo = generateBatchNo(p.date, whs.movements, itemId);
       const mid = useWhs.getState().addMovement({
         itemId, type: 'in', quantity: consumptionCount, unitPrice: 0,
         reason: 'adjustment', date: p.date, partyId: '',
         notes: 'تخم مصرفی',
-        flockId: p.flockId, sourceModule: 'egg', sourceId: productionId, batchNo,
+        flockId: p.flockId, sourceModule: 'egg', sourceId: productionId,
       });
       p.consumptionMovementId = mid || '';
     }

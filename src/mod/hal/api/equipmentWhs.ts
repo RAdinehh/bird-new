@@ -58,7 +58,6 @@ export function ensureWhsItem(eq: Equipment): string {
       supplierId: eq.supplierId || '',
       expireDate: '',
       withdrawalDays: null,
-      batchNo: '',
       storage: 'room',
       notes: '',
       purchaseDate: eq.purchasedAt || '',

@@ -48,7 +48,6 @@ interface F {
   supplierId: string;
   expireDate: string;
   withdrawalDays: string;
-  batchNo: string;
   storage: string;
   notes: string;
   // ─── تجهیزات ───
@@ -79,7 +78,7 @@ const empty = (): F => ({
   name: '', category: 'feed', unit: 'kg',
   minStock: '', initialStock: '',
   supplierId: '', expireDate: '',
-  withdrawalDays: '', batchNo: '', storage: 'room',
+  withdrawalDays: '', storage: 'room',
   notes: '',
   purchaseDate: '', purchasePrice: '', hallId: '', equipmentStatus: 'active', warrantyUntil: '', initialPrice: '',
   usageType: '', productionDate: '', dosePerBird: '',
@@ -213,7 +212,6 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       supplierId: it.supplierId || '',
       expireDate: it.expireDate || '',
       withdrawalDays: it.withdrawalDays === null || it.withdrawalDays === undefined ? '' : toFa(it.withdrawalDays),
-      batchNo: it.batchNo || '',
       storage: it.storage || 'room',
       notes: it.notes || '',
       purchaseDate: it.purchaseDate || '',
@@ -255,7 +253,6 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       supplierId: form.supplierId || '',
       expireDate: form.expireDate || '',
       withdrawalDays: form.withdrawalDays ? int(form.withdrawalDays) : null,
-      batchNo: form.batchNo || '',
       storage: form.storage || 'room',
       notes: form.notes || '',
     },
@@ -288,7 +285,6 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         supplierId: form.supplierId,
         expireDate: hasExpiry ? form.expireDate : '',
         withdrawalDays: isMed && form.withdrawalDays.trim() !== '' ? int(form.withdrawalDays) : null,
-        batchNo: isMed ? form.batchNo.trim() : '',
         storage: form.storage,
         notes: form.notes.trim(),
         purchaseDate: form.category === 'equipment' ? form.purchaseDate : '',
@@ -321,7 +317,6 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         supplierId: form.supplierId,
         expireDate: hasExpiry ? form.expireDate : '',
         withdrawalDays: isMed && form.withdrawalDays.trim() !== '' ? int(form.withdrawalDays) : null,
-        batchNo: isMed ? form.batchNo.trim() : '',
         storage: form.storage,
         notes: form.notes.trim(),
         purchaseDate: form.category === 'equipment' ? form.purchaseDate : '',

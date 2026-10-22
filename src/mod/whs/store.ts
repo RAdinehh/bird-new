@@ -33,7 +33,6 @@ export interface Item {
   supplierId: string;
   expireDate: string;
   withdrawalDays: number | null;  // فقط برای دارو
-  batchNo: string;                 // فقط برای دارو/واکسن
   storage: string;                 // fridge | freezer | room
   notes: string;
   // ─── فیلدهای تجهیزات (اختیاری) ───
@@ -72,7 +71,6 @@ export interface Movement {
   /** 🆕 رهگیری: ID رکورد مبدأ */
   sourceId?: string;
   /** 🆕 شماره دسته (Batch) — برای تخم و دارو */
-  batchNo?: string;
   /** 🆕 تاریخ انقضا (برای دارو) */
   expiryDate?: string;
 }
@@ -89,18 +87,6 @@ interface State {
 
 
 /** تولید شماره دسته — B-YYYY-MM-DD-NNN */
-export function generateBatchNo(date: string, existingMovements: Movement[], itemId: string): string {
-  if (!date) return '';
-  const clean = date.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
-  const parts = clean.split('/');
-  if (parts.length !== 3) return '';
-  const prefix = `B-${parts[0]}-${String(parts[1]).padStart(2, '0')}-${String(parts[2]).padStart(2, '0')}`;
-  const todayMovements = existingMovements.filter(m =>
-    m.itemId === itemId && (m.batchNo || '').startsWith(prefix)
-  );
-  const next = todayMovements.length + 1;
-  return `${prefix}-${String(next).padStart(3, '0')}`;
-}
 
 const now = () => new Date().toISOString();
 
