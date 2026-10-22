@@ -26,7 +26,7 @@ export interface EquipmentCardProps {
   onToggle: () => void;
   onEdit: () => void;
   onDelete: (id: string) => void;
-  onRetire: (id: string) => void;
+  onRetire: (eq: Equipment) => void;
   onRestore: (id: string) => void;
   onTransfer: (eq: Equipment) => void;
   onUndo: (item: Equipment) => void;
@@ -235,13 +235,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       toastMsg.success('تجهیز بازگردانی شد');
                     }} style={{ width: '100%' }}>♻️ بازگردانی</Btn>
                   ) : (
-                    <Btn size="sm" variant="danger" onClick={async () => {
-                      const ok = await showConfirmAsync('تأیید اسقاط', 'این تجهیز از لیست فعال خارج شود؟ سوابق مالی حفظ می‌شود.', { danger: true });
-                      if (!ok) return;
-                      onRetire(e.id);
-                      logAction('update', 'hal', 'اسقاط تجهیز: ' + e.name);
-                      toastMsg.success('تجهیز اسقاط شد');
-                    }} style={{ width: '100%' }}>🔚 اسقاط / فروش</Btn>
+                    <Btn size="sm" variant="danger" onClick={() => onRetire(e)} style={{ width: '100%' }}>🔚 اسقاط / فروش</Btn>
                   )}
                 </div>
               </ExpandableCard>

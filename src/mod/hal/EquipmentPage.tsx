@@ -10,11 +10,12 @@ import EquipmentFormModal from './components/EquipmentFormModal';
 import { useEquipmentForm } from './useEquipmentForm';
 import EquipmentCard from './components/EquipmentCard';
 import TransferEquipModal from './components/TransferEquipModal';
+import RetireEquipModal from './components/RetireEquipModal';
 import EquipmentKpiCards from './components/EquipmentKpiCards';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
 import { EquipmentSchema } from '../../shr/validation/rules/hal';
-import { useHal, type Equipment, type TransferLog } from './store';
+import { useHal, type Equipment, type TransferLog, type SaleInfo } from './store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { useFilterSort, FilterBar, getHalEquipmentConfig } from '../../shr/filter';
@@ -61,6 +62,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   // 🆕 استاندارد نژاد سالن انتخاب‌شده
   const selectedBreedStd = __selectedHall?.breedId ? breedStd.byBreedId(__selectedHall.breedId) : null;
   const [transferEq, setTransferEq] = useState<Equipment | null>(null);
+  const [retireEq, setRetireEq] = useState<Equipment | null>(null);
   const [undoData, setUndoData] = useState<{ item: Equipment | Equipment[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -303,7 +305,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
                 onToggle={() => setExpandedId(isOpen ? null : e.id)}
                 onEdit={() => handleOpenEdit(e)}
                 onDelete={deleteEquip}
-                onRetire={(id) => updateEquip(id, { status: 'retired' })}
+                onRetire={(eq) => setRetireEq(eq)}
                 onTransfer={(eq) => setTransferEq(eq)}
                 onRestore={(id) => updateEquip(id, { status: 'active' })}
                 onUndo={(item) => {
@@ -346,6 +348,18 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         stdForDefaults={selectedBreedStd}
         save={handleSave}
       />
+          <RetireEquipModal
+            open={!!retireEq}
+            onClose={() => setRetireEq(null)}
+            equipment={retireEq}
+            onConfirm={(eq, info) => {
+              updateEquip(eq.id, { status: 'retired', saleInfo: info });
+              logAction('update', 'hal', `${info.reason === 'sale' ? 'فروش' : 'اسقاط'}: ${eq.name} — ${info.reason === 'sale' ? info.salePrice.toLocaleString('fa-IR') + ' تومان' : 'بدون مبلغ'}`);
+              toastMsg.success(info.reason === 'sale' ? 'فروش ثبت شد' : 'تجهیز اسقاط شد');
+              setRetireEq(null);
+            }}
+          />
+
           <TransferEquipModal
         open={!!transferEq}
         onClose={() => setTransferEq(null)}
