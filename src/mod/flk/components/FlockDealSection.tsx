@@ -166,15 +166,17 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
 
       {form.dealType === 'barter' && (
         <>
-          <Field label="طرف تهاتر" required>
-            <Select value={form.barterPartyId || ''} onChange={e => setForm({ ...form, barterPartyId: e.target.value })}>
-              <option value="">— انتخاب —</option>
-              {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </Select>
-          </Field>
-          <Field label="ارزش ریالی تهاتر">
-            <MoneyField placeholder="مبلغ معادل" value={form.barterValue || ''} onChange={e => setForm({ ...form, barterValue: e.target.value })} />
-          </Field>
+          <Grid2>
+            <Field label="طرف تهاتر" required>
+              <Select value={form.barterPartyId || ''} onChange={e => setForm({ ...form, barterPartyId: e.target.value })}>
+                <option value="">— انتخاب —</option>
+                {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </Select>
+            </Field>
+            <Field label="ارزش ریالی تهاتر">
+              <MoneyField placeholder="مبلغ معادل" value={form.barterValue || ''} onChange={e => setForm({ ...form, barterValue: e.target.value })} />
+            </Field>
+          </Grid2>
           <Field label="شرح کالا/خدمات معاوضی">
             <input type="text" value={form.barterDescription || ''} onChange={e => setForm({ ...form, barterDescription: e.target.value })} placeholder="مثلاً: ۵ تن دان" style={{ width: '100%', height: 38, padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-base)', fontFamily: 'inherit', textAlign: 'right', boxSizing: 'border-box' }} />
           </Field>
@@ -191,23 +193,24 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
 
       {form.dealType === 'rent' && (
         <>
-          <Field label="موجر (اجاره‌دهنده)" required help={HELP.flk.ownership.lessor}>
-            <Select value={form.lessorId || ''} onChange={e => setForm({ ...form, lessorId: e.target.value })}>
-              <option value="">— انتخاب —</option>
-              {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </Select>
-          </Field>
           <Grid2>
+            <Field label="موجر (اجاره‌دهنده)" required help={HELP.flk.ownership.lessor}>
+              <Select value={form.lessorId || ''} onChange={e => setForm({ ...form, lessorId: e.target.value })}>
+                <option value="">— انتخاب —</option>
+                {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </Select>
+            </Field>
             <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount} onTouch={() => markTouched?.('rentAmount')}>
               <MoneyField placeholder={form.rentPeriod === 'total' ? 'مبلغ کل دوره' : 'مبلغ هر دوره'} value={form.rentAmount || ''} onChange={e => setForm({ ...form, rentAmount: e.target.value })} />
-            
-              {rentAmountNum > 0 && form.rentPeriod !== 'total' && calcDays > 0 && (
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4, paddingRight: 2 }}>
-                  مبلغ کل دوره ({toFa(Math.max(1, Math.ceil(calcDays / (form.rentPeriod === 'season' ? 90 : 30))))} {form.rentPeriod === 'season' ? 'فصل' : 'ماه'}): {toFa(totalRentAmount.toLocaleString('fa-IR'))} تومان
-                </div>
-              )}
               {rentAmountNum > 0 && <FieldHint fieldPath="flk.rentAmount" value={rentAmountNum} />}
             </Field>
+          </Grid2>
+          {rentAmountNum > 0 && form.rentPeriod !== 'total' && calcDays > 0 && (
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4, paddingRight: 2 }}>
+              مبلغ کل دوره ({toFa(Math.max(1, Math.ceil(calcDays / (form.rentPeriod === 'season' ? 90 : 30))))} {form.rentPeriod === 'season' ? 'فصل' : 'ماه'}): {toFa(totalRentAmount.toLocaleString('fa-IR'))} تومان
+            </div>
+          )}
+          <Grid2>
             <Field label="دوره" help={HELP.flk.ownership.rentPeriod}>
               <Select value={form.rentPeriod || 'monthly'} onChange={e => setForm({ ...form, rentPeriod: e.target.value })}>
                 <option value="monthly">ماهانه</option>
@@ -215,22 +218,20 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
                 <option value="total">کل دوره</option>
               </Select>
             </Field>
-          </Grid2>
-          <Grid2>
             <Field label="شروع اجاره" required help={HELP.flk.ownership.rentStartDate}>
               <DatePicker placeholder="از چه تاریخی؟" value={form.rentStartDate || ''} onChange={v => setForm({ ...form, rentStartDate: v })} autoToday />
             </Field>
-            {form.rentPeriod === 'total' && (
-              <Field label="پایان قرارداد" required help={HELP.flk.ownership.rentEndDate} error={form.rentStartDate && form.rentEndDate && form.rentStartDate >= form.rentEndDate ? 'باید بعد از شروع باشد' : undefined}>
-                <DatePicker placeholder="تا چه تاریخی؟" value={form.rentEndDate || ''} onChange={v => setForm({ ...form, rentEndDate: v })} min={form.rentStartDate} />
-                {rentEndWarn && (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', paddingRight: 2, marginTop: 4 }}>
-                    ⚠️ پایان اجاره بعد از پایان چرخه گله ({cycleEnd}) — مطمئن شو قرارداد رو تمدید می‌کنی
-                  </div>
-                )}
-              </Field>
-            )}
           </Grid2>
+          {form.rentPeriod === 'total' && (
+            <Field label="پایان قرارداد" required help={HELP.flk.ownership.rentEndDate} error={form.rentStartDate && form.rentEndDate && form.rentStartDate >= form.rentEndDate ? 'باید بعد از شروع باشد' : undefined}>
+              <DatePicker placeholder="تا چه تاریخی؟" value={form.rentEndDate || ''} onChange={v => setForm({ ...form, rentEndDate: v })} min={form.rentStartDate} />
+              {rentEndWarn && (
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', paddingRight: 2, marginTop: 4 }}>
+                  ⚠️ پایان اجاره بعد از پایان چرخه گله ({cycleEnd}) — مطمئن شو قرارداد رو تمدید می‌کنی
+                </div>
+              )}
+            </Field>
+          )}
 
           <div style={DIVIDER}>💳 پرداخت‌های اجاره</div>
           {(form.rentPayments || []).length === 0 ? (
