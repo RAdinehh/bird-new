@@ -293,8 +293,17 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   
 
                   <Grid2>
-                    <Field label="تعداد">
-                      <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
+                    <Field label="تعداد و واحد">
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
+                        <Select value={it.unit || 'pcs'} onChange={e => updateItem(it.id, { unit: e.target.value })} style={{ width: 75, flexShrink: 0 }}>
+                          <option value="pcs">عدد</option>
+                          <option value="kg">کیلو</option>
+                          <option value="ml">ml</option>
+                          <option value="بسته">بسته</option>
+                          <option value="لیتر">لیتر</option>
+                        </Select>
+                      </div>
                     </Field>
                     <Field label="قیمت واحد">
                       <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? toFa(String(it.unitPrice)) : ''} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
