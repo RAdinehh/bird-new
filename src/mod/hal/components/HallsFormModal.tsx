@@ -37,7 +37,9 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom, error, n
   })();
 
   const displayVal = celsius == null ? '' : (
-    tempUnit === 'c' ? String(celsius) : String(Math.round((celsius * 9 / 5 + 32) * 10) / 10)
+    tempUnit === 'c'
+      ? toFa(String(celsius))
+      : toFa(String(Math.round((celsius * 9 / 5 + 32) * 10) / 10))
   );
 
   const shown = editing ? local : displayVal;
@@ -155,6 +157,7 @@ export interface HallsFormModalProps {
 
 export default function HallsFormModal(props: HallsFormModalProps) {
   const breedsForBird = (props.breeds || []).filter((b: Breed) => b.birdId === props.form.birdId);
+  const currentBreedName = breedsForBird.find((b: Breed) => b.id === props.form.breedId)?.name || '';
   const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save, stdCapacity, stdTemp, stdHumidity, workers, onErrorClear } = props;
 
   const capCurrent = form.capacity ? parseInt(toEn(form.capacity)) || null : null;
@@ -321,11 +324,11 @@ export default function HallsFormModal(props: HallsFormModalProps) {
 
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🌡 شرایط محیطی</div>
           <Grid2>
-          <Field label="دمای هدف" autoFrom={autoFields.has("targetTemp") ? "استاندارد" : undefined} error={vErrors.targetTemp}>
+          <Field label="دمای هدف" autoFrom={autoFields.has("targetTemp") ? (currentBreedName ? `استاندارد «${currentBreedName}»` : 'استاندارد') : undefined} help="این مقدار از استاندارد نژاد پرنده (در بخش تنظیمات) خوانده شده و قابل ویرایش است" error={vErrors.targetTemp}>
             <TempFormField noLabel placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
             <OverrideHint {...tempHint} />
           </Field>
-          <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? "استاندارد" : undefined} error={vErrors.targetHumidity}>
+          <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? (currentBreedName ? `استاندارد «${currentBreedName}»` : 'استاندارد') : undefined} help="این مقدار از استاندارد نژاد پرنده (در بخش تنظیمات) خوانده شده و قابل ویرایش است" error={vErrors.targetHumidity}>
             <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={0} max={100} autoClamp />
             <OverrideHint {...humHint} />
           </Field>
