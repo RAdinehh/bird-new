@@ -46,6 +46,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       id: z.string(),
       description: optionalStr(200),
       unit: optionalStr(20),
+      unitWeight: z.number().min(0).optional().nullable(),
       quantity: floatPos('تعداد', 1_000_000),
       unitPrice: floatNonNeg('قیمت واحد', 1_000_000_000_000),
       total: floatNonNeg('جمع قلم', 1_000_000_000_000_000),
