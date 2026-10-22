@@ -86,7 +86,11 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                   <>
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📍 مکان</div>
                     <RowGrid>
-                      {hall && <Row l="سالن" v={<EntityLink type="hall" id={hall.id} label={hall.name} />} />}
+                      <Row l="سالن" v={
+                      hall
+                        ? <EntityLink type="hall" id={hall.id} label={hall.name} />
+                        : <span style={{ color: 'var(--warn)', fontWeight: 700 }}>⚠️ در انتظار تخصیص</span>
+                    } />
                       {e.zoneId && <Row l="بخش" v={zoneNames?.get(e.zoneId) || '—'} />}
                     </RowGrid>
                   </>
