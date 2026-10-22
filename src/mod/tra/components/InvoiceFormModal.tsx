@@ -296,6 +296,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   {(() => {
                     const uom = UOM_CATEGORIES[cat] || UOM_CATEGORIES.other;
                     const isSingleUnit = uom.units.length === 1;
+                    const currentUnit = it.unit || uom.default;
+                    const unitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
+                    const needsWeight = !!(unitDef && unitDef.factor === null);
+                    const weightLabel = currentUnit === 'pack'
+                      ? `وزن/حجم هر بسته (${uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'گرم'})`
+                      : currentUnit === 'vial'
+                      ? `تعداد دوز هر ویال`
+                      : `مقدار هر واحد (${uom.baseUnit})`;
                     return (
                       <>
                         {isSingleUnit ? (
@@ -308,11 +316,21 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                               <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                             </Field>
                             <Field label="واحد">
-                              <Select value={it.unit || uom.default} onChange={e => updateItem(it.id, { unit: e.target.value })}>
+                              <Select value={currentUnit} onChange={e => updateItem(it.id, { unit: e.target.value, unitWeight: null })}>
                                 {uom.units.map((u: UOMUnit) => <option key={u.value} value={u.value}>{u.label}</option>)}
                               </Select>
                             </Field>
                           </Grid2>
+                        )}
+                        {needsWeight && (
+                          <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار">
+                            <NumField
+                              placeholder="مثلاً ۵۰۰"
+                              value={it.unitWeight != null && it.unitWeight > 0 ? toFa(String(it.unitWeight)) : ''}
+                              onChange={e => updateItem(it.id, { unitWeight: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
+                              min={0}
+                            />
+                          </Field>
                         )}
                         <Grid2>
                           <Field label="قیمت واحد">
