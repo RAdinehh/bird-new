@@ -4,6 +4,7 @@
  */
 import {
   KIND_LABELS, CATEGORY_LABELS, UNIT_LABELS_EQ, STATUS_LABELS, EQUIP_LABELS,
+  VENT_SYS_LABELS, FEEDER_LABELS, DRINKER_LABELS, LITTER_LABELS,
 } from './store';
 import { CATEGORY_COLORS } from '../../shr/icons/equipment';
 
@@ -37,9 +38,18 @@ export function getUnitLabel(unit: string | undefined): string {
   return m[unit || 'pcs'] || 'عدد';
 }
 
+const SUB_LABEL_MAPS: Record<string, string>[] = [
+  LITTER_LABELS, DRINKER_LABELS, FEEDER_LABELS, VENT_SYS_LABELS,
+];
+
 export function getEquipLabel(key: string | undefined): LabelInfo | undefined {
   if (!key) return undefined;
-  return (EQUIP_LABELS as unknown as LabelsMap)[key];
+  const eq = (EQUIP_LABELS as unknown as LabelsMap)[key];
+  if (eq) return eq;
+  for (const map of SUB_LABEL_MAPS) {
+    if (map[key]) return { name: map[key], icon: '' };
+  }
+  return undefined;
 }
 
 export function getCategoryColor(cat: string | undefined): string {
