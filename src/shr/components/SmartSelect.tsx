@@ -194,7 +194,7 @@ export default function SmartSelect({
           <Input
             placeholder="جستجو..."
             value={query}
-            onChange={e => { setQuery(e.target.value); setVisibleCount(10); }}
+            onChange={e => { const v = e.target.value; setQuery(v); setVisibleCount(v.trim() ? 9999 : 10); }}
           />
         }
       >
