@@ -170,7 +170,11 @@ export function useInvoiceForm(params: {
     setForm(f => ({ ...f, items: f.items.map(x => {
       if (x.id !== id) return x;
       const nx = { ...x, ...patch };
-      nx.total = calcItemTotal(nx.quantity, nx.unitPrice, nx.discountType, nx.discountValue) + (nx.shipping || 0);
+      const cat = nx.category || f.category;
+      const unit = nx.unit || 'pcs';
+      const unitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === unit);
+      const factor = (unitDef && unitDef.factor !== null) ? unitDef.factor : (nx.unitWeight || 1);
+      nx.total = calcItemTotal(nx.quantity, nx.unitPrice, nx.discountType, nx.discountValue, factor) + (nx.shipping || 0);
       return nx;
     }) }));
   };

@@ -359,14 +359,29 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                             />
                           </Field>
                         )}
-                        <Grid2>
-                          <Field label="قیمت واحد">
-                            <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? toFa(String(it.unitPrice)) : ''} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
-                          </Field>
-                          <Field label="هزینه حمل این قلم">
-                            <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
-                          </Field>
-                        </Grid2>
+                        {(() => {
+                          const currentUnitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
+                          const currentUnitLabel = currentUnitDef?.label || 'واحد';
+                          const factor = (currentUnitDef && currentUnitDef.factor !== null) ? currentUnitDef.factor : (it.unitWeight || 1);
+                          const baseQty = (it.quantity || 0) * factor;
+                          const liveTotal = baseQty * (it.unitPrice || 0);
+                          const baseUnitLabel = uom.baseUnit === 'kg' ? 'کیلوگرم' : uom.baseUnit === 'g' ? 'گرم' : uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'واحد';
+                          return (
+                            <Grid2>
+                              <Field label={`قیمت هر ${baseUnitLabel}`}>
+                                <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? toFa(String(it.unitPrice)) : ''} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                                {it.quantity > 0 && it.unitPrice > 0 && (
+                                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4, paddingRight: 2 }}>
+                                    {toFa(it.quantity)} {currentUnitLabel} {factor !== 1 ? `(${toFa(baseQty)} ${baseUnitLabel})` : ''} × {toFa(it.unitPrice.toLocaleString('fa-IR'))} تومان = <b style={{ color: 'var(--accent)' }}>{toFa(liveTotal.toLocaleString('fa-IR'))} تومان</b>
+                                  </div>
+                                )}
+                              </Field>
+                              <Field label="هزینه حمل این قلم">
+                                <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
+                              </Field>
+                            </Grid2>
+                          );
+                        })()}
                       </>
                     );
                   })()}

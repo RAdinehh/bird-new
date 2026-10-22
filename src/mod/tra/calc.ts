@@ -94,9 +94,10 @@ export function calcItemTotal(
   quantity: number,
   unitPrice: number,
   discountType?: string,
-  discountValue?: number
+  discountValue?: number,
+  factor: number = 1
 ): number {
-  const base = (quantity || 0) * (unitPrice || 0);
+  const base = (quantity || 0) * factor * (unitPrice || 0);
   if (!discountType || !discountValue) return base;
 
   let discount = 0;

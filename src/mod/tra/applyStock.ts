@@ -73,7 +73,7 @@ function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
     return whs.addItem({
       name, category: targetCat, unit: uomBase(it.category || inv.category) as any,
       minStock: 0, currentStock: 0,
-      lastPrice: (() => { const f = uomFactor(it.category || inv.category, it.unit || '', (it as any).unitWeight); return f > 0 ? (Number(it.unitPrice) || 0) / f : 0; })(),
+      lastPrice: Number(it.unitPrice) || 0,
       supplierId: inv.partyId || '', expireDate: String(it.expiryDate || ''),
       withdrawalDays: null,
       storage: String((it as any).storage || 'room'),
@@ -138,7 +138,7 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
       try {
         whs.addMovement({
           itemId, type: 'out', quantity: Math.abs(delta) * uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight),
-          unitPrice: (() => { const f = uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight); return f > 0 ? (Number(sample.unitPrice) || 0) / f : 0; })(),
+          unitPrice: Number(sample.unitPrice) || 0,
           reason: 'sale',
           date: inv.deliveryDate || inv.date || '',
           partyId: inv.partyId || '',
@@ -198,7 +198,7 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
     try {
       whs.addMovement({
         itemId, type: (delta > 0 ? 'in' : 'out') as any, quantity: Math.abs(delta) * uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight),
-        unitPrice: (() => { const f = uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight); return f > 0 ? (Number(sample.unitPrice) || 0) / f : 0; })(),
+        unitPrice: Number(sample.unitPrice) || 0,
         reason: 'purchase',
         date: inv.deliveryDate || inv.date || '',
         partyId: inv.partyId || '',
