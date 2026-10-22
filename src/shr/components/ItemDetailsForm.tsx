@@ -401,6 +401,23 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Select>
           </Field>
         </Grid2>
+        {/* 🆕 نام تجهیز — آبشاری از نوع */}
+        <Field
+          label="نام تجهیز"
+          required
+          hint={!item.equipmentType ? 'اول نوع تجهیز را انتخاب کنید' : undefined}
+        >
+          <Input
+            placeholder={(() => {
+              const lbl = item.equipmentType ? getEquipLabel(item.equipmentType) : null;
+              return lbl?.name ? `مثلاً ${lbl.name}` : 'مثلاً فن تونلی ۱۲۰';
+            })()}
+            value={String(item.description || '')}
+            onChange={e => updateItem({ description: e.target.value })}
+            disabled={!item.equipmentType}
+          />
+        </Field>
+
         <Grid2>
           <Field label="سالن مقصد (اختیاری)" hint="اگر مطمئن نیستید، بعداً در بخش سالن تعیین کنید">
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
