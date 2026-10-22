@@ -303,8 +303,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       ? `وزن/حجم هر بسته (${uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'گرم'})`
                       : currentUnit === 'vial'
                       ? `تعداد دوز هر ویال`
-                      : currentUnit === 'roll'
-                      ? 'وزن یا متراژ هر رول (کیلوگرم یا متر)'
                       : `مقدار هر واحد (${uom.baseUnit})`;
 const nameFieldJsx = (
                       <Field label={

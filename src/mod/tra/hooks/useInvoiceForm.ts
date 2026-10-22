@@ -23,14 +23,15 @@ export const UOM_CATEGORIES: Record<string, { baseUnit: string; units: UOMUnit[]
   chick: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
   adult: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
   broken: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
+  // ═══ تجهیزات: منبع حقیقت = HAL EquipmentUnit (pcs, kg, m2, m, L) ═══
   equipment: {
     baseUnit: 'pcs',
     units: [
       { value: 'pcs', label: 'عدد', factor: 1 },
-      { value: 'roll', label: 'رول', factor: null },
-      { value: 'm', label: 'متر', factor: 1 },
-      { value: 'm2', label: 'متر مربع', factor: 1 },
       { value: 'kg', label: 'کیلوگرم', factor: 1 },
+      { value: 'm2', label: 'متر مربع', factor: 1 },
+      { value: 'm', label: 'متر', factor: 1 },
+      { value: 'L', label: 'لیتر', factor: 1 },
     ],
     default: 'pcs',
   },

@@ -71,7 +71,11 @@ function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
 
   try {
     return whs.addItem({
-      name, category: targetCat, unit: uomBase(it.category || inv.category) as any,
+      name, category: targetCat, unit: (() => {
+        const c = it.category || inv.category;
+        if (c === 'equipment' && it.unit) return it.unit as any;
+        return uomBase(c) as any;
+      })(),
       minStock: 0, currentStock: 0,
       lastPrice: Number(it.unitPrice) || 0,
       supplierId: inv.partyId || '', expireDate: String(it.expiryDate || ''),
