@@ -292,16 +292,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               {isExpanded && (
                 <div style={{ marginTop: 'var(--sp-1)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
-                  {/* 🆕 برای تجهیزات: ItemDetailsForm در بالا */}
-                  {cat === 'equipment' && (
-                    <ItemDetailsForm
-                      category={cat}
-                      item={it}
-                      invoiceDate={form.date}
-                      updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
-                      isPurchase={isPurchase}
-                    />
-                  )}
+                  {/* 🆕 ItemDetailsForm در بالا برای همه دسته‌ها */}
+                  <ItemDetailsForm
+                    category={cat}
+                    item={it}
+                    invoiceDate={form.date}
+                    updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
+                    isPurchase={isPurchase}
+                  />
                   
 
                   {(() => {
@@ -444,17 +442,7 @@ const nameFieldJsx = (
                     </Field>
                   </Grid2>
 
-                  {cat !== 'equipment' && (
-                    <div style={{ paddingTop: 'var(--sp-2)' }}>
-                      <ItemDetailsForm
-                        category={cat}
-                        item={it}
-                        invoiceDate={form.date}
-                        updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
-                        isPurchase={isPurchase}
-                      />
-                    </div>
-                  )}
+
                 </div>
               )}
             </div>
