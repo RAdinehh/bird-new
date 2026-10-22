@@ -171,23 +171,30 @@ export function formatWarningDetail(w: Warning): string {
 
 export function formatWarning(w: Warning): string {
   const { value, expected, signals, field } = w;
-  const label = getLabel(field);
   const profile = getProfile(field);
   const kind = profile?.kind ?? 'count';
 
+  // ═══ LAYER 1: Hard Rules (قوانین قطعی) ═══
   if (signals.some(s => s.type === 'hard_min')) {
     const minVal = typeof profile?.hardMin === 'number' ? fmtNum(profile.hardMin) : null;
-    return minVal ? `حداقل: ${minVal}` : `کمتر از حداقل`;
+    return minVal ? `حداقل: ${minVal}` : 'کمتر از حداقل';
   }
   if (signals.some(s => s.type === 'hard_max')) {
     const maxVal = typeof profile?.hardMax === 'number' ? fmtNum(profile.hardMax) : null;
-    return maxVal ? `حداکثر: ${maxVal}` : `بیشتر از سقف`;
+    return maxVal ? `حداکثر: ${maxVal}` : 'بیشتر از سقف';
   }
+
+  // ═══ LAYER 4: Cross-Field (قوی، weight 5) ═══
   if (signals.some(s => s.type === 'cross_absolute') && expected !== undefined) {
     return `بیش از ${crossFieldLabel(profile?.crossFieldRule)}`;
   }
 
-  // pattern باید قبل از ratio چک بشه (چون هر دو expected دارن)
+  // ═══ LAYER 3: Statistical + ANTI-INFLATION ═══
+  // اگر structural break داریم (تورم) → سرکوب (مطابق SAP: فقط لاگ، نه هشدار)
+  if ((w as any).structuralBreak) {
+    return 'تورم — نادیده';
+  }
+
   if (signals.some(s => s.type === 'pattern')) {
     return 'غیرمعمول';
   }
@@ -195,40 +202,28 @@ export function formatWarning(w: Warning): string {
   if (expected !== undefined && expected > 0) {
     if (kind === 'temperature') {
       const diff = Math.round(value - expected);
-      return diff > 0
-        ? `${label} ${fmtNum(diff)} درجه بالاتر از هدف`
-        : `${label} ${fmtNum(-diff)} درجه پایین‌تر از هدف`;
+      return diff > 0 ? `+${fmtNum(diff)}°` : `−${fmtNum(-diff)}°`;
     }
     if (kind === 'humidity') {
       const diff = Math.round(value - expected);
-      return diff > 0
-        ? `${label} ${fmtNum(diff)}٪ بالاتر از هدف`
-        : `${label} ${fmtNum(-diff)}٪ پایین‌تر از هدف`;
+      return diff > 0 ? `+${fmtNum(diff)}٪` : `−${fmtNum(-diff)}٪`;
     }
     if (kind === 'weight') {
       const pct = Math.round(Math.abs(1 - value / expected) * 100);
-      return value > expected
-        ? `${label} ${fmtNum(pct)}٪ بیشتر از استاندارد`
-        : `${label} ${fmtNum(pct)}٪ کمتر از استاندارد`;
+      return value > expected ? `+${fmtNum(pct)}٪` : `−${fmtNum(pct)}٪`;
     }
     const ratio = value / expected;
-    if (ratio >= 1) {
-      if (ratio >= 1.5) return `${fmtMult(ratio)} برابر`;
-      return `+${fmtNum(Math.round((ratio - 1) * 100))}٪`;
-    }
-    const pctDown = Math.round((1 - ratio) * 100);
-    return `−${fmtNum(pctDown)}٪`;
+    if (ratio >= 1.5) return `${fmtMult(ratio)}×`;
+    if (ratio > 1) return `+${fmtNum(Math.round((ratio - 1) * 100))}٪`;
+    return `−${fmtNum(Math.round((1 - ratio) * 100))}٪`;
   }
 
-  if (signals.some(s => s.type === 'biological') && profile?.biologicalRange) {
-    return 'بیرون از محدوده زیستی';
+  // ═══ LAYER 2: Biological ═══
+  if (w.reason === 'biological') {
+    return 'بیرون از زیستی';
   }
-  if (signals.some(s => s.type === 'zscore')) {
-    return 'غیرعادی';
+  if (w.reason === 'pattern') {
+    return 'خارج از رایج';
   }
-  if (signals.some(s => s.type === 'iqr')) {
-    return 'خارج از محدوده رایج';
-  }
-
   return 'غیرعادی';
 }
