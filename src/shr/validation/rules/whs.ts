@@ -22,7 +22,6 @@ export function createItemSchema(_ctx: ValidationContext = {}) {
     supplierId: optionalId(),
     expireDate: persianDateOpt('تاریخ انقضا'),
     withdrawalDays: intNonNeg('دوره منع مصرف (روز)', 365).nullable().optional(),
-    batchNo: optionalStr(50),
     storage: oneOf('محل نگهداری', ['room', 'fridge', 'freezer'] as const).optional().default('room'),
     notes: optionalStr(1000),
   }).superRefine((data, ctx) => {
@@ -57,7 +56,6 @@ export function createMovementSchema(_ctx: ValidationContext = {}) {
     flockId: optionalId(),
     sourceModule: oneOf('ماژول مبدأ', ['egg', 'dlg', 'tra', 'inc', 'fed', 'manual'] as const).optional(),
     sourceId: optionalId(),
-    batchNo: optionalStr(50),
   }).superRefine((data, ctx) => {
     // فقط adjust می‌تونه صفر باشه (تنظیم به صفر)
     if (data.type !== 'adjust' && data.quantity <= 0) {

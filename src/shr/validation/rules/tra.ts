@@ -64,7 +64,6 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       unknownCount: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
       
       hatchDate: persianDateOpt('تاریخ هچ'),
-      hatcheryBatchNo: optionalStr(50),
       chickWeight: floatNonNeg('وزن اولیه جوجه', 150).optional(),
       transportCost: floatNonNeg('هزینه حمل', 1_000_000_000).optional(),
       

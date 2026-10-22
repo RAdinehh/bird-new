@@ -55,7 +55,6 @@ export interface Flock {
   hatchId?: string;
   sourceCategory?: string;
   /** شماره بچ هچری (اگر از خرید جوجه ساخته شده) */
-  hatcheryBatchNo?: string;
   /** وزن اولیه جوجه به گرم */
   chickWeight?: number | null;
   createdAt: string;

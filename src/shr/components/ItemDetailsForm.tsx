@@ -32,7 +32,6 @@ export interface ItemDetailFormData {
   femaleCount?: number | null;
   unknownCount?: number | null;
   hatchDate?: string;
-  hatcheryBatchNo?: string;
   chickWeight?: number | null;
   transportCost?: number | null;
   flockName?: string;

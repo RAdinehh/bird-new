@@ -105,7 +105,6 @@ export interface InvoiceItem extends ItemCategoryFields {
   /** وزن یک تخم به گرم (برای entry به جوجه‌کشی) */
   eggWeight?: number | null;
   /** شماره بچ هچری (برای جوجه یک‌روزه) */
-  hatcheryBatchNo?: string;
   /** وزن اولیه جوجه به گرم */
   chickWeight?: number | null;
   /** تاریخ انقضا دارو/دان (برای انتقال به Movement) */
