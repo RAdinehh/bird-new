@@ -291,33 +291,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               {/* بدنه قلم */}
               {isExpanded && (
                 <div style={{ marginTop: 'var(--sp-1)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
-                  <Field label={
-                    cat === 'herbal' ? 'نام داروی گیاهی' :
-                    cat === 'medicine' ? 'نام دارو' :
-                    cat === 'feed' ? 'نام دان' :
-                    cat === 'vaccine' ? 'نام واکسن' :
-                    cat === 'equipment' ? 'نام تجهیز' :
-                    cat === 'chick' ? 'نام گله / جوجه' :
-                    cat === 'egg' || cat === 'fertile_egg' ? 'نام تخم' :
-                    'نام کالا / شرح'
-                  } required>
-                    <Input
-                      placeholder={
-                      cat === 'feed' ? 'مثلاً: ذرت، سویا، کنجاله' :
-                      cat === 'medicine' ? 'مثلاً: آنتی‌بیوتیک، ویتامین' :
-                      cat === 'herbal' ? 'مثلاً: آویشن، پودر سیر' :
-                      cat === 'vaccine' ? 'مثلاً: نیوکاسل، برونشیت' :
-                      cat === 'equipment' ? 'مثلاً: فن تونلی، دانخوری' :
-                      cat === 'chick' ? 'مثلاً: جوجه گوشتی راس' :
-                      cat === 'egg' || cat === 'fertile_egg' ? 'مثلاً: تخم نطفه‌دار' :
-                      cat === 'adult' ? 'مثلاً: مرغ مادر' :
-                      cat === 'manure' ? 'مثلاً: کود مرغی' :
-                      'نام کالا یا شرح'
-                    }
-                      value={it.description || ''}
-                      onChange={e => updateItem(it.id, { description: e.target.value })}
-                    />
-                  </Field>
                   
 
                   {(() => {
@@ -331,23 +304,59 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       : currentUnit === 'vial'
                       ? `تعداد دوز هر ویال`
                       : `مقدار هر واحد (${uom.baseUnit})`;
-                    return (
+const nameFieldJsx = (
+                      <Field label={
+                        cat === 'herbal' ? 'نام داروی گیاهی' :
+                        cat === 'medicine' ? 'نام دارو' :
+                        cat === 'feed' ? 'نام دان' :
+                        cat === 'vaccine' ? 'نام واکسن' :
+                        cat === 'equipment' ? 'نام تجهیز' :
+                        cat === 'chick' ? 'نام گله / جوجه' :
+                        cat === 'egg' || cat === 'fertile_egg' ? 'نام تخم' :
+                        'نام کالا / شرح'
+                      } required>
+                        <Input
+                          placeholder={
+                            cat === 'feed' ? 'مثلاً: ذرت، سویا، کنجاله' :
+                            cat === 'medicine' ? 'مثلاً: آنتی‌بیوتیک، ویتامین' :
+                            cat === 'herbal' ? 'مثلاً: آویشن، پودر سیر' :
+                            cat === 'vaccine' ? 'مثلاً: نیوکاسل، برونشیت' :
+                            cat === 'equipment' ? 'مثلاً: فن تونلی، دانخوری' :
+                            cat === 'chick' ? 'مثلاً: جوجه گوشتی راس' :
+                            cat === 'egg' || cat === 'fertile_egg' ? 'مثلاً: تخم نطفه‌دار' :
+                            cat === 'adult' ? 'مثلاً: مرغ مادر' :
+                            cat === 'manure' ? 'مثلاً: کود مرغی' :
+                            'نام کالا یا شرح'
+                          }
+                          value={it.description || ''}
+                          onChange={e => updateItem(it.id, { description: e.target.value })}
+                        />
+                      </Field>
+                    );
+
+                                        return (
                       <>
                         {isSingleUnit ? (
-                          <Field label="تعداد">
-                            <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
-                          </Field>
-                        ) : (
                           <Grid2>
+                            {nameFieldJsx}
                             <Field label="تعداد">
                               <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                             </Field>
-                            <Field label="واحد">
-                              <Select value={currentUnit} onChange={e => updateItem(it.id, { unit: e.target.value, unitWeight: null })}>
-                                {uom.units.map((u: UOMUnit) => <option key={u.value} value={u.value}>{u.label}</option>)}
-                              </Select>
-                            </Field>
                           </Grid2>
+                        ) : (
+                          <>
+                            {nameFieldJsx}
+                            <Grid2>
+                              <Field label="تعداد">
+                                <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
+                              </Field>
+                              <Field label="واحد">
+                                <Select value={currentUnit} onChange={e => updateItem(it.id, { unit: e.target.value, unitWeight: null })}>
+                                  {uom.units.map((u: UOMUnit) => <option key={u.value} value={u.value}>{u.label}</option>)}
+                                </Select>
+                              </Field>
+                            </Grid2>
+                          </>
                         )}
                         {needsWeight && (
                           <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار">
