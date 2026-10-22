@@ -14,6 +14,7 @@ import type { EggEntry } from '../store';
 import type { Bird } from '../../brd/store';
 import type { Flock } from '../../flk/store';
 import type { Person } from '../../ctc/store';
+import { CardActions } from '../../../shr/components/ui';
 
 export interface EggEntryCardProps {
   entry: EggEntry;
@@ -160,8 +161,10 @@ export default function EggEntryCard(props: EggEntryCardProps) {
       )}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-        <Btn size="sm" onClick={onDelete} aria-label="حذف ورودی" style={{ flex: 1 }}>حذف</Btn>
+        <CardActions actions={[
+          { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
+          { label: 'حذف', onClick: onDelete, variant: 'danger' }
+        ]} />
       </div>
     </ExpandableCard>
   );

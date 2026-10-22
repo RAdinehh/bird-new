@@ -9,6 +9,7 @@ import { Btn, Tag } from '../../shr/components/ui';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
 import { logAction } from '../../cor/logger/auditLog';
+import { CardActions } from '../../shr/components/ui';
 
 interface Props {
   breed: Breed;
@@ -159,8 +160,10 @@ export default function BreedCard({
       )}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <Btn size="sm" onClick={() => onEdit(b)} style={{ flex: 1 }} aria-label={`ویرایش نژاد ${getBreedDisplayName(b, { customStandards, customOverrides })}`}>ویرایش</Btn>
-        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }} aria-label={`حذف نژاد ${getBreedDisplayName(b, { customStandards, customOverrides })}`}>حذف</Btn>
+        <CardActions actions={[
+          { label: 'ویرایش', onClick: () => onEdit(b), variant: 'outline' },
+          { label: 'حذف', onClick: handleDelete, variant: 'danger' }
+        ]} />
       </div>
     </ExpandableCard>
   );

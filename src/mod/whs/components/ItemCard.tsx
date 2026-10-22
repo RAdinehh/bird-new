@@ -10,6 +10,7 @@ import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
 import { formatQty } from '../../../shr/utils/fa';
+import { CardActions } from '../../../shr/components/ui';
 
 const USAGE_LABEL: Record<string, string> = {
   oral: 'خوراکی', injectable: 'تزریقی', water: 'آب آشامیدنی', spray: 'اسپری',
@@ -138,9 +139,11 @@ export default function ItemCard(props: ItemCardProps) {
       ) : null}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <Btn size="sm" onClick={onAdjust} style={{ flex: 1 }}>🔄 اصلاح</Btn>
-        <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-        <Btn size="sm" onClick={handleDelete} style={{ flex: 1 }}>حذف</Btn>
+        <CardActions actions={[
+          { label: '🔄 اصلاح', onClick: onAdjust, variant: 'primary' },
+          { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
+          { label: 'حذف', onClick: handleDelete, variant: 'danger' }
+        ]} />
       </div>
     </ExpandableCard>
   );

@@ -9,6 +9,7 @@ import { toFa } from '../../../shr/utils/fa';
 import type { Zone, Hall } from '../store';
 import type { Flock } from '../../flk/store';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
+import { CardActions } from '../../../shr/components/ui';
 
 interface Props {
   zone: Zone;
@@ -73,8 +74,10 @@ export default function ZoneCard({
         </>
       )}
       <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
-        <Btn size="sm" onClick={onEdit} style={{ flex: 1 }}>ویرایش</Btn>
-        <Btn size="sm" onClick={onDelete} style={{ flex: 1 }}>حذف</Btn>
+        <CardActions actions={[
+          { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
+          { label: 'حذف', onClick: onDelete, variant: 'danger' }
+        ]} />
       </div>
     </ExpandableCard>
   );
