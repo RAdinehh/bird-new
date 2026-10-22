@@ -217,7 +217,9 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
               ✏️ ویرایش فاکتور
             </Btn>
           )}
-          {nextWorkflowStatus(inv.workflowStatus) && (
+          {nextWorkflowStatus(inv.workflowStatus) && 
+           !((String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card') 
+             && nextWorkflowStatus(inv.workflowStatus) === 'received') && (
             <Btn
               size="sm" variant="primary"
               onClick={onTransferClick}
