@@ -59,25 +59,28 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
               {toFa(inv.items.length)} قلم
               {(() => {
                 const catSet = new Set((inv.items || []).map((it: any) => it.category || inv.category));
-                if (catSet.size === 1) {
-                  const cat = Array.from(catSet)[0] as string;
-                  const labels: Record<string, string> = {
-                    egg: 'تخم نطفه‌دار',
-                    fertile_egg: 'تخم نطفه‌دار',
-                    chick: 'جوجه',
-                    adult: 'پرنده بالغ',
-                    feed: 'دان',
-                    medicine: 'دارو',
-                    herbal: 'داروی گیاهی',
-                    vaccine: 'واکسن',
-                    equipment: 'تجهیزات',
-                    manure: 'کود',
-                    broken: 'شکسته',
-                    other: 'سایر',
-                  };
-                  return <span style={{ color: 'var(--accent)', fontWeight: 700 }}> • {labels[cat] || cat}</span>;
+                const labels: Record<string, string> = {
+                  egg: 'تخم نطفه‌دار', fertile_egg: 'تخم نطفه‌دار',
+                  chick: 'جوجه', adult: 'پرنده بالغ', feed: 'دان',
+                  medicine: 'دارو', herbal: 'داروی گیاهی', vaccine: 'واکسن',
+                  equipment: 'تجهیزات', manure: 'کود', broken: 'شکسته', other: 'سایر',
+                };
+                const catNames = Array.from(catSet).map((c: any) => labels[c] || c);
+                
+                if (catNames.length === 1) {
+                  return <span style={{ color: 'var(--accent)', fontWeight: 700 }}> • {catNames[0]}</span>;
                 }
-                return <span style={{ color: 'var(--muted)' }}> • مختلط</span>;
+                
+                if (catNames.length === 2) {
+                  return <span style={{ color: 'var(--accent)', fontWeight: 700 }}> • {catNames.join('، ')}</span>;
+                }
+                
+                // اگه بیشتر از ۲ دسته بود
+                return (
+                  <span style={{ color: 'var(--accent)', fontWeight: 700 }}>
+                    {' • '}{catNames.slice(0, 2).join('، ')} و {toFa(catNames.length - 2)} دسته دیگر
+                  </span>
+                );
               })()}
             </span>
           )}
