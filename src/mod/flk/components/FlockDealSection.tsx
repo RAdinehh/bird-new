@@ -77,7 +77,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
     return rentAmountNum * Math.max(1, Math.ceil(calcDays / 30));
   })();
 
-  const rentOutstanding = Math.max(0, totalRentAmount - rentPaidTotal);
+  const rentOutstanding = totalRentAmount - rentPaidTotal;
 
   // 🆕 سقف داینامیک پرداخت‌ها
   const maxPayments = (() => {
@@ -247,28 +247,16 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
                     setForm({ ...form, rentPayments: updated });
                   }} />
                 </div>
-                {(() => {
-                  const otherSum = (form.rentPayments || []).reduce((a, x, i) => i === idx ? a : a + (Number(x.amount) || 0), 0);
-                  const maxAllowed = totalRentAmount > 0 ? Math.max(0, totalRentAmount - otherSum) : Infinity;
-                  const isOver = totalRentAmount > 0 && p.amount > maxAllowed;
-                  return (
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => {
-                        const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                        const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, amount: raw } : x);
-                        setForm({ ...form, rentPayments: updated });
-                      }} />
-                      {isOver && (
-                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginTop: 4, fontWeight: 600 }}>
-                          ⚠️ حداکثر {toFa(maxAllowed.toLocaleString('fa-IR'))} تومان مانده
-                        </div>
-                      )}
-                      {!isOver && p.amount > 0 && totalRentAmount > 0 && (
-                        <FieldHint fieldPath="flk.rentPayments.amount" value={p.amount} context={{ rentAmount: totalRentAmount }} />
-                      )}
-                    </div>
-                  );
-                })()}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => {
+                    const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                    const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, amount: raw } : x);
+                    setForm({ ...form, rentPayments: updated });
+                  }} />
+                  {p.amount > 0 && totalRentAmount > 0 && (
+                    <FieldHint fieldPath="flk.rentPayments.amount" value={p.amount} context={{ rentAmount: totalRentAmount }} />
+                  )}
+                </div>
                 <button type="button" onClick={() => {
                   const updated = (form.rentPayments || []).filter((_, i) => i !== idx);
                   setForm({ ...form, rentPayments: updated });
@@ -294,8 +282,21 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             </div>
           )}
           {(form.rentPayments || []).length > 0 && (
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center' }}>
-              جمع پرداخت‌ها: {toFa(rentPaidTotal.toLocaleString('fa-IR'))} تومان{totalRentAmount > 0 ? (rentOutstanding > 0 ? ' · باقیمانده: ' + toFa(rentOutstanding.toLocaleString('fa-IR')) : ' · ✅ تسویه شده') : ''}{showError && showError('rentPayments') && (<span style={{ display: 'block', marginTop: 4, color: 'var(--danger)', fontWeight: 600, fontSize: 'var(--fs-xs)' }}>⚠️ {showError('rentPayments')}</span>)}
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center', marginTop: 8 }}>
+              جمع پرداخت‌ها: {toFa(rentPaidTotal.toLocaleString('fa-IR'))} تومان
+              {totalRentAmount > 0 && (
+                rentPaidTotal === totalRentAmount ? ' · ✅ تسویه شده' :
+                rentPaidTotal > totalRentAmount ? ' · ❌ مازاد: ' + toFa((rentPaidTotal - totalRentAmount).toLocaleString('fa-IR')) :
+                ' · باقیمانده: ' + toFa((totalRentAmount - rentPaidTotal).toLocaleString('fa-IR'))
+              )}
+              {rentPaidTotal > totalRentAmount && (
+                <div style={{ marginTop: 6, color: 'var(--danger)', fontWeight: 700, background: 'var(--danger-soft)', padding: '6px', borderRadius: 'var(--r-sm)' }}>
+                  ⚠️ مجموع پرداخت‌ها از مبلغ کل اجاره بیشتر است!
+                </div>
+              )}
+              {showError && showError('rentPayments') && (
+                <div style={{ marginTop: 6, color: 'var(--danger)', fontWeight: 600 }}>⚠️ {showError('rentPayments')}</div>
+              )}
             </div>
           )}
         </>
