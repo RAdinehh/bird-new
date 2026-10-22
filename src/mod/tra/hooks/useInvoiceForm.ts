@@ -14,21 +14,25 @@ import { emptyForm as empty, type F } from '../types-invoice';
 import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 
-// ═══ نقشه اختصاصی واحد برای دسته‌های فاکتور (خرید/فروش) ═══
-function getUnitForCategory(cat: string): string {
-  switch (cat) {
-    case 'chick': return 'pcs'; // عدد
-    case 'adult': return 'pcs';
-    case 'egg': return 'pcs';
-    case 'fertile_egg': return 'pcs';
-    case 'broken': return 'pcs';
-    case 'feed': return 'kg'; // کیلوگرم
-    case 'medicine': return 'ml';
-    case 'herbal': return 'بسته';
-    case 'equipment': return 'pcs';
-    case 'manure': return 'kg';
-    default: return 'pcs';
-  }
+// ═══ نقشه استاندارد واحدها (UoM) بر اساس دسته‌بندی ═══
+export type UOMUnit = { value: string; label: string };
+export const UOM_CATEGORIES: Record<string, { units: UOMUnit[]; default: string }> = {
+  egg: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
+  fertile_egg: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
+  chick: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
+  adult: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
+  broken: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
+  equipment: { units: [{ value: 'pcs', label: 'عدد' }], default: 'pcs' },
+  feed: { units: [{ value: 'kg', label: 'کیلوگرم' }, { value: 'g', label: 'گرم' }, { value: 'ton', label: 'تن' }, { value: 'bag', label: 'کیسه' }], default: 'kg' },
+  medicine: { units: [{ value: 'ml', label: 'میلی‌لیتر' }, { value: 'l', label: 'لیتر' }, { value: 'vial', label: 'ویال' }, { value: 'pack', label: 'بسته' }], default: 'ml' },
+  herbal: { units: [{ value: 'kg', label: 'کیلوگرم' }, { value: 'g', label: 'گرم' }, { value: 'l', label: 'لیتر' }, { value: 'pack', label: 'بسته' }], default: 'kg' },
+  vaccine: { units: [{ value: 'vial', label: 'ویال' }, { value: 'dose', label: 'دوز' }, { value: 'pack', label: 'بسته' }], default: 'vial' },
+  manure: { units: [{ value: 'kg', label: 'کیلوگرم' }, { value: 'ton', label: 'تن' }], default: 'kg' },
+  other: { units: [{ value: 'pcs', label: 'عدد' }, { value: 'kg', label: 'کیلوگرم' }, { value: 'pack', label: 'بسته' }], default: 'pcs' },
+};
+
+export function getUnitForCategory(cat: string): string {
+  return UOM_CATEGORIES[cat]?.default || 'pcs';
 }
 
 export function useInvoiceForm(params: {
