@@ -363,19 +363,19 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="دسته تجهیزات" required>
             <Select value={String(item.equipmentCategory || '')} onChange={e => { const c = e.target.value; const nextType = (typesForCategory(c) as string[])[0] || ''; updateItem({ equipmentCategory: c, equipmentType: nextType }); }}>
               <option value="">— انتخاب —</option>
-              <option value="cooling">❄️ سرمایشی (کولر، مه‌پاش، فن تونلی)</option>
-              <option value="heating">🔥 گرمایشی (هیتر، لامپ حرارتی)</option>
-              <option value="ventilation">💨 تهویه (فن هوایی، اینلت)</option>
+              <option value="cooling">❄️ سرمایشی</option>
+              <option value="heating">🔥 گرمایشی</option>
+              <option value="ventilation">💨 تهویه</option>
               <option value="feeding">🌾 دانخوری</option>
               <option value="drinking">💧 آبخوری</option>
               <option value="lighting">💡 روشنایی</option>
               <option value="litter">🛏️ بستر</option>
-              <option value="power">⚡ برق و ژنراتور</option>
-              <option value="auxiliary">🔌 تجهیزات جانبی</option>
+              <option value="power">⚡ برق</option>
+              <option value="auxiliary">🔌 جانبی</option>
               <option value="water_treatment">💦 تصفیه آب</option>
-              <option value="safety">🚨 ایمنی و آتش‌نشانی</option>
-              <option value="cleaning">🧹 نظافت و شستشو</option>
-              <option value="hand_tools">🔧 ابزار دستی (قیچی، پیچ‌گوشتی)</option>
+              <option value="safety">🚨 ایمنی</option>
+              <option value="cleaning">🧹 نظافت</option>
+              <option value="hand_tools">🔧 ابزار دستی</option>
               <option value="weighing">⚖️ توزین</option>
             </Select>
           </Field>
@@ -387,13 +387,20 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="نوع تجهیز" required>
-            <Select value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })}>
+          <Field label="نوع تجهیز" required hint={!item.equipmentCategory ? 'اول دسته را انتخاب کنید' : undefined}>
+            <Select value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })} disabled={!item.equipmentCategory}>
               <option value="">— انتخاب —</option>
               {(typesForCategory(String(item.equipmentCategory || '')) as string[]).map((t: string) => {
                 const lbl = getEquipLabel(t);
                 return <option key={t} value={t}>{lbl?.name || t}</option>;
               })}
+            </Select>
+          </Field>
+          <Field label="وضعیت تجهیز">
+            <Select value={String(item.equipmentStatus || 'new')} onChange={e => updateItem({ equipmentStatus: e.target.value })}>
+              <option value="new">نو (دست اول)</option>
+              <option value="used">کارکرده (دست دوم)</option>
+              <option value="broken">خراب / نیاز به تعمیر</option>
             </Select>
           </Field>
         </Grid2>
@@ -421,15 +428,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder={item.hallId ? "— بخش —" : "اول سالن"} modalTitle="انتخاب بخش" autoThreshold={6} />
           </Field>
         </Grid2>
-        <Grid2>
-          <Field label="وضعیت تجهیز">
-            <Select value={String(item.equipmentStatus || 'new')} onChange={e => updateItem({ equipmentStatus: e.target.value })}>
-              <option value="new">نو (دست اول)</option>
-              <option value="used">کارکرده (دست دوم)</option>
-              <option value="broken">خراب / نیاز به تعمیر</option>
-            </Select>
-          </Field>
-        </Grid2>
+        
         {sellerSlot}
       </div>
     );
