@@ -523,6 +523,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
           </Field>
         </Grid2>
+        <Grid2>
+          <Field label="برند / سازنده">
+            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="نام برند" />
+          </Field>
+          <Field label="تاریخ انقضا (اختیاری)">
+            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
+          </Field>
+        </Grid2>
         {sellerSlot}
       </div>
     );
