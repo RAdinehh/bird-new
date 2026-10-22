@@ -6,6 +6,7 @@ import { toEn } from '../../shr/utils/fa';
 import { parse, differenceInDays, differenceInCalendarDays } from 'date-fns-jalali';
 import { todayJ } from './api/flocksCalc';
 import type { Flock, FlockType, FlockStatus, FlockGroupRule } from './store';
+import { useTra } from '../tra/store';
 
 export const TYPE_LABEL: Record<FlockType, string> = { layer: 'تخم‌گذار', broiler: 'گوشتی', breeder: 'مادر' };
 export const STATUS_LABEL: Record<FlockStatus, string> = { active: 'فعال', archived: 'آرشیو', sold: 'فروخته‌شده', merged: 'ادغام‌شده' };
@@ -202,7 +203,7 @@ export function calcRentAccrual(f: Flock): RentAccrual {
   return { owed, paid, outstanding, daysElapsed, totalDays, isActive };
 }
 
-/** محاسبه‌ی هزینه‌ها */
+/** محاسبه‌ی هزینه‌ها — شامل هزینه‌های عملیاتی (دان، دارو، داروی گیاهی، واکسن) */
 export function calcCosts(f: Flock) {
   const birdCost = (f.initialCount || 0) * (f.purchasePrice || 0);
   const delivery = f.deliveryCost || 0;
@@ -213,7 +214,29 @@ export function calcCosts(f: Flock) {
   const rentOwed = rentInfo.owed;
   const rentPaid = rentInfo.paid;
 
-  const grandTotalOwed = purchaseTotal + rentOwed;
+  // 🆕 هزینه‌های عملیاتی از فاکتورهای مرتبط با این گله
+  const opBreakdown = { feed: 0, medicine: 0, herbal: 0, vaccine: 0 };
+  let operationalCost = 0;
+  try {
+    const invoices = useTra.getState().invoices || [];
+    for (const inv of invoices as any[]) {
+      if (inv.type !== 'purchase') continue;
+      const relatedFlockId = inv.relatedFlockId || '';
+      for (const it of inv.items || []) {
+        const isRelated = (it.flockId && it.flockId === f.id) || relatedFlockId === f.id;
+        if (!isRelated) continue;
+        const cat = it.category || inv.category;
+        if (!(cat in opBreakdown)) continue;
+        const amt = Number(it.total) || 0;
+        (opBreakdown as any)[cat] += amt;
+        operationalCost += amt;
+      }
+    }
+  } catch (e) {
+    console.error('[calcCosts] opCost failed:', e);
+  }
+
+  const grandTotalOwed = purchaseTotal + rentOwed + operationalCost;
   const grandTotalPaid = purchaseTotal + rentPaid;
   const perBird = f.initialCount ? purchaseTotal / f.initialCount : 0;
   const perBirdGrand = f.initialCount ? grandTotalOwed / f.initialCount : 0;
@@ -225,6 +248,8 @@ export function calcCosts(f: Flock) {
     rentOwed,
     rentPaid,
     rentInfo,
+    operationalCost,            // 🆕
+    opBreakdown,                // 🆕
     grandTotalOwed,
     grandTotalPaid,
     perBird,
