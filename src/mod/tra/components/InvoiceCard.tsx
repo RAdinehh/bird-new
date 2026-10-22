@@ -54,7 +54,33 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         <>
           <span>کل: <b>{toFa(inv.total.toLocaleString('fa-IR'))} تومان</b></span>
           {rem2 > 0 && <span style={{ color: 'var(--warn)' }}>مانده: <b>{toFa(rem2.toLocaleString('fa-IR'))}</b></span>}
-          {inv.items.length > 0 && <span>{toFa(inv.items.length)} قلم</span>}
+          {inv.items.length > 0 && (
+            <span>
+              {toFa(inv.items.length)} قلم
+              {(() => {
+                const catSet = new Set((inv.items || []).map((it: any) => it.category || inv.category));
+                if (catSet.size === 1) {
+                  const cat = Array.from(catSet)[0] as string;
+                  const labels: Record<string, string> = {
+                    egg: 'تخم نطفه‌دار',
+                    fertile_egg: 'تخم نطفه‌دار',
+                    chick: 'جوجه',
+                    adult: 'پرنده بالغ',
+                    feed: 'دان',
+                    medicine: 'دارو',
+                    herbal: 'داروی گیاهی',
+                    vaccine: 'واکسن',
+                    equipment: 'تجهیزات',
+                    manure: 'کود',
+                    broken: 'شکسته',
+                    other: 'سایر',
+                  };
+                  return <span style={{ color: 'var(--accent)', fontWeight: 700 }}> • {labels[cat] || cat}</span>;
+                }
+                return <span style={{ color: 'var(--muted)' }}> • مختلط</span>;
+              })()}
+            </span>
+          )}
         </>
       }
     >
