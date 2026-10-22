@@ -403,14 +403,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="گارانتی (ماه)">
-            <Input mode="number" value={item.warrantyMonths != null && item.warrantyMonths > 0 ? String(item.warrantyMonths) : ''} onChange={e => updateItem({ warrantyMonths: Math.round(parseFaNum(e.target.value)) || null })} unit="ماه" min={0} max={60} />
-          </Field>
-          <Field label="برند / سازنده">
-            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="پارس، آکو، ..." />
-          </Field>
-        </Grid2>
-        <Grid2>
           <Field label="سالن مقصد (اختیاری)" hint="اگر مطمئن نیستید، بعداً در بخش سالن تعیین کنید">
             <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
           </Field>
