@@ -66,6 +66,31 @@ export default function SmartSelect({
   // ═══ حالت ۱: لیست کوتاه — Select بومی ═══
   const [visibleCount, setVisibleCount] = useState(10);
 
+  const groups = useMemo(
+    () => Array.from(new Set(options.map(o => o.group).filter(Boolean))) as string[],
+    [options],
+  );
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return options;
+    const q = query.trim().toLowerCase();
+    return options.filter(o =>
+      o.label.toLowerCase().includes(q) ||
+      (o.subtitle?.toLowerCase() || '').includes(q),
+    );
+  }, [options, query]);
+
+  // گروه‌بندی
+  const grouped = useMemo(() => {
+    const map: Record<string, SmartOption[]> = {};
+    filtered.forEach(o => {
+      const g = o.group || '_flat';
+      if (!map[g]) map[g] = [];
+      map[g].push(o);
+    });
+    return map;
+  }, [filtered]);
+
   if (options.length <= autoThreshold) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
@@ -99,30 +124,6 @@ export default function SmartSelect({
   const current = options.find(o => o.value === value);
   const searchable = options.length > 5;
 
-  const groups = useMemo(
-    () => Array.from(new Set(options.map(o => o.group).filter(Boolean))) as string[],
-    [options],
-  );
-
-  const filtered = useMemo(() => {
-    if (!query.trim()) return options;
-    const q = query.trim().toLowerCase();
-    return options.filter(o =>
-      o.label.toLowerCase().includes(q) ||
-      (o.subtitle?.toLowerCase() || '').includes(q),
-    );
-  }, [options, query]);
-
-  // گروه‌بندی
-  const grouped = useMemo(() => {
-    const map: Record<string, SmartOption[]> = {};
-    filtered.forEach(o => {
-      const g = o.group || '_flat';
-      if (!map[g]) map[g] = [];
-      map[g].push(o);
-    });
-    return map;
-  }, [filtered]);
 
   const groupKeys = Object.keys(grouped);
   const hasGroups = groupKeys.length > 1 || (groupKeys.length === 1 && groupKeys[0] !== '_flat');
