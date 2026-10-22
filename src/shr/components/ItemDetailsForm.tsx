@@ -1,4 +1,4 @@
-import { Field, Grid2, Grid3, Input, Select } from './ui';
+import { Field, Grid2, Grid3, Input, Select , NumField} from './ui';
 import SmartSelect from './SmartSelect';
 import { useBrd } from '../../mod/brd/store';
 import { useHal } from '../../mod/hal/store';
@@ -410,6 +410,22 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         
+                <Grid2>
+          <Field label="برند / سازنده">
+            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="مثلاً پارس، آکو" />
+          </Field>
+          <Field label="گارانتی (ماه)" hint="اختیاری — چند ماه تأمین‌کننده گارانتی داده؟">
+            <NumField
+              placeholder="مثلاً ۱۲"
+              value={item.warrantyMonths != null && item.warrantyMonths > 0 ? String(item.warrantyMonths) : ''}
+              onChange={e => updateItem({ warrantyMonths: parseFloat(toEn(e.target.value).replace('٫','.')) || null })}
+              unit="ماه"
+              min={0}
+              max={120}
+            />
+          </Field>
+        </Grid2>
+
         {sellerSlot}
       </div>
     );
