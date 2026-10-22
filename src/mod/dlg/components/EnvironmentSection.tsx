@@ -6,6 +6,9 @@ import type { F } from '../types';
 import { FieldHint } from '../../../shr/intelligence';
 import { useFlk } from '../../flk/store';
 import { useHal } from '../../hal/store';
+import { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
+import { findInRange } from '../../set/standards/resolve';
+import { getAgeDays } from '../../flk/store';
 
 interface Props {
   form: F;
@@ -16,8 +19,12 @@ interface Props {
 export default function EnvironmentSection({ form, setForm, vErrors }: Props) {
   const flock = useFlk(s => form.flockId ? s.flocks.find(f => f.id === form.flockId) : undefined);
   const hall = useHal(s => flock?.hallId ? s.halls.find(h => h.id === flock.hallId) : undefined);
-  const targetTemp = hall?.targetTemp ?? null;
-  const targetHumidity = hall?.targetHumidity ?? null;
+  const breedStd = useBreedStandard();
+  const flockAge = flock ? getAgeDays(flock) : null;
+  const hallStd = hall?.breedId ? breedStd.byBreedId(hall.breedId) : null;
+  const dynStd = hallStd?.env && flockAge ? findInRange(hallStd.env, flockAge) : null;
+  const targetTemp = (dynStd as any)?.temp?.target ?? hall?.targetTemp ?? null;
+  const targetHumidity = (dynStd as any)?.humidity?.min ?? hall?.targetHumidity ?? null;
 
   return (
     <>

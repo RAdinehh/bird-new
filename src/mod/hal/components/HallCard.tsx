@@ -14,6 +14,7 @@ import { logAction } from '../../../cor/logger/auditLog';
 import { HallEquipSection } from '../HallEquipSection';
 import EntityLink from '../../../shr/components/EntityLink';
 import { CardActions } from '../../../shr/components/ui';
+import { findInRange } from '../../set/standards/resolve';
 
 export interface HallCardProps {
   h: Hall;
@@ -74,6 +75,11 @@ export default function HallCard(props: HallCardProps) {
 
   // 🆕 تراکم از استاندارد نژاد سالن (fallback: ۹)
   const hallStd = h.breedId ? breedStd.byBreedId(h.breedId) : null;
+  const __activeFlock = (flocks || []).find((f: any) => f.hallId === h.id && f.status === 'active');
+  const __flockAge = __activeFlock ? getAgeDays(__activeFlock) : null;
+  const __dynStd = hallStd?.env && __flockAge ? findInRange(hallStd.env, __flockAge) : null;
+  const __dynTemp = (__dynStd as any)?.temp?.target ?? h.targetTemp;
+  const __dynHum = (__dynStd as any)?.humidity?.min ?? h.targetHumidity;
   const hallDensity = hallStd?.space?.densityMax ?? 9;
   const realCapacity = area > 0 && h.breedId ? Math.floor(area * hallDensity) : null;
   const hallFlocks = (flocks || []).filter((f: Flock) => f.hallId === h.id && f.status === 'active');
@@ -157,8 +163,8 @@ export default function HallCard(props: HallCardProps) {
 
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 شرایط محیطی</div>
       <RowGrid>
-        <Row l="دمای هدف" v={h.targetTemp != null ? fmt.temp(h.targetTemp) : '—'} />
-        <Row l="رطوبت هدف" v={h.targetHumidity ? `${fmt.num(h.targetHumidity, { decimals: 0 })}٪` : '—'} />
+        <Row l="دمای هدف" v={__dynTemp != null ? fmt.temp(__dynTemp) : '—'} />
+        <Row l="رطوبت هدف" v={__dynHum != null ? `${fmt.num(__dynHum, { decimals: 0 })}٪` : '—'} />
       </RowGrid>
       <RowWithStatus l="تهویه"
           v={
