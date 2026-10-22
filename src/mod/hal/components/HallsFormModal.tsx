@@ -180,7 +180,8 @@ export default function HallsFormModal(props: HallsFormModalProps) {
     onReset: () => setForm((f) => ({ ...f, targetHumidity: stdHumidity != null ? String(stdHumidity) : '' })),
     unit: '٪', decimals: 0,
   });
-
+  const tempAtStandard = stdTemp != null && tempCurrent != null && tempCurrent === stdTemp;
+  const humAtStandard = stdHumidity != null && humCurrent != null && humCurrent === stdHumidity;
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
