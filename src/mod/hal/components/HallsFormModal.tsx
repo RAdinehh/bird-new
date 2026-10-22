@@ -182,9 +182,10 @@ export default function HallsFormModal(props: HallsFormModalProps) {
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش سالن' : 'افزودن سالن'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', marginBottom: 8 }}>🏷 هویت و مدیریت</div>
-          <Field label="نام سالن" required error={vErrors.name}><Input placeholder="شمالی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} /></Field>
-
         <Grid2>
+          <Field label="نام سالن" required error={vErrors.name}>
+            <Input placeholder="شمالی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} />
+          </Field>
           <Field label="وضعیت سالن" hint="تعمیر/ضدعفونی: ثبت گله ممنوع">
             <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
               <option value="active">🟢 فعال</option>
@@ -194,19 +195,19 @@ export default function HallsFormModal(props: HallsFormModalProps) {
               <option value="inactive">⚫ غیرفعال</option>
             </Select>
           </Field>
-          {(workers && workers.length > 0) ? (
-            <Field label="مسئول سالن">
-              <SmartSelect
-                value={form.responsibleId || ''}
-                onChange={v => setForm({...form, responsibleId: v})}
-                options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
-                placeholder="— انتخاب کنید —"
-                modalTitle="انتخاب مسئول"
-                autoThreshold={6}
-              />
-            </Field>
-          ) : <div />}
         </Grid2>
+        {(workers && workers.length > 0) && (
+          <Field label="مسئول سالن">
+            <SmartSelect
+              value={form.responsibleId || ''}
+              onChange={v => setForm({...form, responsibleId: v})}
+              options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
+              placeholder="— انتخاب کنید —"
+              modalTitle="انتخاب مسئول"
+              autoThreshold={6}
+            />
+          </Field>
+        )}
         <Grid2>
             <Field label="پرنده" required error={vErrors.birdId}>
               <SmartSelect
