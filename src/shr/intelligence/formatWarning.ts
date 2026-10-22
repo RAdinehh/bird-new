@@ -176,18 +176,20 @@ export function formatWarning(w: Warning): string {
   const kind = profile?.kind ?? 'count';
 
   if (signals.some(s => s.type === 'hard_min')) {
-    return `${label} کمتر از حداقل مجاز`;
+    const minVal = typeof profile?.hardMin === 'number' ? fmtNum(profile.hardMin) : null;
+    return minVal ? `حداقل: ${minVal}` : `کمتر از حداقل`;
   }
   if (signals.some(s => s.type === 'hard_max')) {
-    return `${label} بالاتر از سقف مجاز`;
+    const maxVal = typeof profile?.hardMax === 'number' ? fmtNum(profile.hardMax) : null;
+    return maxVal ? `حداکثر: ${maxVal}` : `بیشتر از سقف`;
   }
   if (signals.some(s => s.type === 'cross_absolute') && expected !== undefined) {
-    return `${label} بیش از ${crossFieldLabel(profile?.crossFieldRule)}`;
+    return `بیش از ${crossFieldLabel(profile?.crossFieldRule)}`;
   }
 
   // pattern باید قبل از ratio چک بشه (چون هر دو expected دارن)
   if (signals.some(s => s.type === 'pattern')) {
-    return `${label} غیرمعمول`;
+    return 'غیرمعمول';
   }
 
   if (expected !== undefined && expected > 0) {
@@ -211,22 +213,22 @@ export function formatWarning(w: Warning): string {
     }
     const ratio = value / expected;
     if (ratio >= 1) {
-      if (ratio >= 1.5) return `${label} ${fmtMult(ratio)} برابر شده`;
-      return `${label} ${fmtNum(Math.round((ratio - 1) * 100))}٪ بیشتر شده`;
+      if (ratio >= 1.5) return `${fmtMult(ratio)} برابر`;
+      return `+${fmtNum(Math.round((ratio - 1) * 100))}٪`;
     }
     const pctDown = Math.round((1 - ratio) * 100);
-    return `${label} ${fmtNum(pctDown)}٪ کمتر شده`;
+    return `−${fmtNum(pctDown)}٪`;
   }
 
   if (signals.some(s => s.type === 'biological') && profile?.biologicalRange) {
-    return `${label} بیرون از محدوده زیستی`;
+    return 'بیرون از محدوده زیستی';
   }
   if (signals.some(s => s.type === 'zscore')) {
-    return `${label} غیرعادی`;
+    return 'غیرعادی';
   }
   if (signals.some(s => s.type === 'iqr')) {
-    return `${label} خارج از محدوده رایج`;
+    return 'خارج از محدوده رایج';
   }
 
-  return `${label} غیرعادی`;
+  return 'غیرعادی';
 }
