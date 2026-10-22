@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
-  Btn, BtnRow, ErrorBox, Field, Grid2, Input, Modal, MoneyField,
+  Btn, BtnRow, ErrorBox, Field, Grid2, Grid3, Input, Modal, MoneyField,
   NumField, Select, Textarea,
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -351,7 +351,7 @@ export default function FlocksModal(props: FlocksModalProps) {
 
       {form.type === 'breeder' && (
         <DepBox title="اطلاعات گله مادر" tone="purple">
-          <Grid2>
+          <Grid3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="تعداد خروس">
                 <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
@@ -364,13 +364,13 @@ export default function FlocksModal(props: FlocksModalProps) {
               </Field>
               <FieldHint fieldPath="flk.femaleCount" value={form.femaleCount} context={{ initialCount: form.initialCount }} />
             </div>
-          </Grid2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field label="جنسیت نامشخص (اختیاری)" hint="پرنده‌هایی که جنسیتشان هنوز مشخص نیست — معمولاً از هچ">
               <NumField placeholder="۰" value={form.unknownCount || ''} onChange={e => setForm({ ...form, unknownCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
             </Field>
             <FieldHint fieldPath="flk.unknownCount" value={form.unknownCount} context={{ initialCount: form.initialCount }} />
           </div>
+          </Grid3>
           {form.maleCount && form.femaleCount && (() => {
             const male = parseInt(toEn(form.maleCount)) || 0;
             const female = parseInt(toEn(form.femaleCount)) || 0;
