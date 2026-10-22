@@ -225,7 +225,9 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
               onClick={onTransferClick}
               style={{ flex: '1 1 120px' }}
             >
-              انتقال به {WORKFLOW_LABEL[nextWorkflowStatus(inv.workflowStatus)!]}
+              {nextWorkflowStatus(inv.workflowStatus) === 'confirmed' && '✅ ثبت نهایی'}
+              {nextWorkflowStatus(inv.workflowStatus) === 'received' && '📦 کالا رسید'}
+              {nextWorkflowStatus(inv.workflowStatus) === 'paid' && '💰 پرداخت کردم'}
             </Btn>
           )}
           {onReopen && (
