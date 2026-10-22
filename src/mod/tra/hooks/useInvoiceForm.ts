@@ -287,8 +287,8 @@ export function useInvoiceForm(params: {
         if ((cat === 'chick' || cat === 'adult') && !it.breedId && !it.birdId) {
           warnings.push(`• ${label} (${cat === 'chick' ? 'جوجه' : 'بالغ'}): نژاد/پرنده انتخاب نشده — گله ساخته نمی‌شود.`);
         }
-        if (['feed', 'medicine', 'equipment'].includes(cat) && !it.itemId) {
-          warnings.push(`• ${label}: به انبار وصل نیست — در موجودی انبار ثبت نمی‌شود.`);
+        if (['feed', 'medicine', 'vaccine', 'herbal', 'equipment', 'other'].includes(cat) && !it.itemId) {
+          warnings.push(`• ${label}: به انبار وصل نیست — سیستم به طور خودکار کالای جدید ثبت می‌کند.`);
         }
       } else {
         if ((cat === 'chick' || cat === 'adult') && !it.flockId) {
@@ -298,9 +298,9 @@ export function useInvoiceForm(params: {
     });
     if (warnings.length > 0) {
       const ok = await showConfirmAsync(
-        '⚠️ پیش‌نیازهای تکمیل نشده',
-        warnings.join('\n') + '\n\nاگر ادامه دهید، این اقلام در بخش‌های مربوطه (گله/انبار) ثبت نمی‌شوند.\nادامه می‌دهید؟',
-        { danger: true }
+        '⚠️ تأیید ذخیره فاکتور',
+        warnings.join('\n') + '\n\nبا تأیید شما، سیستم به طور خودکار کالاهای جدید را در انبار ثبت و لینک می‌کند.\nادامه می‌دهید؟',
+        {}
       );
       if (!ok) return;
     }
