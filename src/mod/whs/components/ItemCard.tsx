@@ -9,6 +9,7 @@ import { CATEGORY_ICON, CATEGORY_LABEL, UNIT_LABEL, STORAGE_LABEL, stockWarning,
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
+import { formatQty } from '../../../shr/utils/fa';
 
 const USAGE_LABEL: Record<string, string> = {
   oral: 'خوراکی', injectable: 'تزریقی', water: 'آب آشامیدنی', spray: 'اسپری',
@@ -56,7 +57,7 @@ export default function ItemCard(props: ItemCardProps) {
   return (
     <ExpandableCard key={it.id} id={it.id} ms={ms} accent={accent} index={toFa(i + 1)}
       iconEmoji={(CATEGORY_ICON as any)[it.category]} title={it.name}
-      subtitle={`${(CATEGORY_LABEL as any)[it.category]} • ${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit]}`}
+      subtitle={`${(CATEGORY_LABEL as any)[it.category]} • ${formatQty(it.currentStock, it.unit)}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={
         it.currentStock < 0 ? <Tag tone="red">⚠️ منفی</Tag> :
@@ -67,7 +68,7 @@ export default function ItemCard(props: ItemCardProps) {
         <Tag tone="green">موجود</Tag>
       }
       stats={<>
-        <span>موجودی: <b style={{ color: 'var(--text)' }}>{toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit]}</b></span>
+        <span>موجودی: <b style={{ color: 'var(--text)' }}>{formatQty(it.currentStock, it.unit)}</b></span>
         {it.minStock > 0 ? <span>حد: <b style={{ color: 'var(--text)' }}>{toFa(it.minStock)}</b></span> : null}
         {it.lastPrice > 0 ? <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa((it.currentStock * getAvgPrice(it)).toLocaleString('fa-IR'))} ت</b></span> : null}
       </>}
@@ -75,7 +76,7 @@ export default function ItemCard(props: ItemCardProps) {
       <SectionTitle>📦 مشخصات قلم</SectionTitle>
       <Row l="دسته" v={(CATEGORY_LABEL as any)[it.category]} />
       <Row l="واحد" v={(UNIT_LABEL as any)[it.unit]} />
-      <Row l="موجودی فعلی" v={`${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit]}`} />
+      <Row l="موجودی فعلی" v={formatQty(it.currentStock, it.unit)} />
       {it.minStock > 0 ? <Row l="حداقل موجودی" v={`${toFa(it.minStock)} ${(UNIT_LABEL as any)[it.unit]}`} /> : null}
       {it.avgPrice && it.avgPrice > 0 ? <Row l="💰 قیمت میانگین" v={`${toFa(getAvgPrice(it).toLocaleString('fa-IR'))} ت`} /> : null}
       {it.lastPrice > 0 ? <Row l="آخرین قیمت خرید" v={`${toFa(it.lastPrice.toLocaleString('fa-IR'))} ت`} /> : null}
@@ -122,7 +123,7 @@ export default function ItemCard(props: ItemCardProps) {
           <SectionTitle>📋 آخرین گردش‌ها ({toFa(myMovements.length)})</SectionTitle>
           {myMovements.slice(-3).reverse().map((m) => (
             <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between' }}>
-              <span>{m.type === 'in' ? '📥' : '📤'} {toFa(m.quantity)} {(UNIT_LABEL as any)[it.unit]}</span>
+              <span>{m.type === 'in' ? '📥' : '📤'} {formatQty(m.quantity, it.unit)}</span>
               <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{toFa(m.date)}</span>
             </div>
           ))}
