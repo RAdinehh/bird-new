@@ -152,6 +152,75 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                   </>
                 )}
 
+                {/* 🔚 اطلاعات خروج (فروش/اسقاط) — SAP standard */}
+                {e.status === 'retired' && e.saleInfo && (
+                  <>
+                    <div style={{
+                      paddingTop: 8,
+                      fontSize: 'var(--fs-base)',
+                      color: 'var(--text)',
+                      fontWeight: 700,
+                      letterSpacing: '.3px',
+                      borderTop: '1px dashed var(--border)',
+                      marginBottom: 6,
+                    }}>
+                      🔚 اطلاعات خروج
+                    </div>
+                    <div style={{
+                      padding: '10px 12px',
+                      background: e.saleInfo.profit >= 0 ? 'var(--accent-soft)' : 'var(--danger-soft)',
+                      border: '1px solid ' + (e.saleInfo.profit >= 0 ? 'var(--accent-border)' : 'var(--danger-border)'),
+                      borderRadius: 'var(--r-md)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 6,
+                      marginBottom: 8,
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                        <span style={{ color: 'var(--muted)' }}>نوع خروج:</span>
+                        <b>{e.saleInfo.reason === 'sale' ? '💰 فروش' : '🔚 اسقاط'}</b>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                        <span style={{ color: 'var(--muted)' }}>قیمت خرید:</span>
+                        <b>{toFa((e.saleInfo.totalCost || 0).toLocaleString('fa-IR'))} ت</b>
+                      </div>
+                      {e.saleInfo.reason === 'sale' && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                          <span style={{ color: 'var(--muted)' }}>مبلغ فروش:</span>
+                          <b>{toFa((e.saleInfo.salePrice || 0).toLocaleString('fa-IR'))} ت</b>
+                        </div>
+                      )}
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        fontSize: 'var(--fs-md)',
+                        fontWeight: 700,
+                        borderTop: '1px solid var(--border)',
+                        paddingTop: 6,
+                        marginTop: 2,
+                        color: e.saleInfo.profit >= 0 ? 'var(--accent)' : 'var(--danger)',
+                      }}>
+                        <span>{e.saleInfo.profit >= 0 ? '✅ سود:' : '❌ ضرر:'}</span>
+                        <b>{toFa(Math.abs(e.saleInfo.profit).toLocaleString('fa-IR'))} ت</b>
+                      </div>
+                      {e.saleInfo.buyer && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                          <span style={{ color: 'var(--muted)' }}>خریدار:</span>
+                          <b>{e.saleInfo.buyer}</b>
+                        </div>
+                      )}
+                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                        📅 {toFa(e.saleInfo.soldAt)}
+                      </div>
+                      {e.saleInfo.note && (
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                          📝 {e.saleInfo.note}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
                 {/* 📝 یادداشت */}
                 {e.notes && (
                   <>
