@@ -2,7 +2,7 @@
  * helpers-store.ts — برچسب‌ها و توابع کمکی flk
  * جدا شده از store.ts
  */
-import { toEn } from '../../shr/utils/fa';
+import { toFa, toEn } from '../../shr/utils/fa';
 import { parse, differenceInDays, differenceInCalendarDays } from 'date-fns-jalali';
 import { todayJ } from './api/flocksCalc';
 import type { Flock, FlockType, FlockStatus, FlockGroupRule } from './store';
@@ -116,9 +116,18 @@ export function formatAge(days: number): string {
 }
 
 export function sexRatio(male: number | null, female: number | null): string {
-  if (!male || !female) return '—';
+  if (male == null || female == null) return '—';
+  if (male === 0 && female === 0) return '—';
+  if (male === 0) return `۰ : ${toFa(String(female))}`;
+  if (female === 0) return `${toFa(String(male))} : ۰`;
   const r = female / male;
-  return `۱ به ${r.toFixed(1)}`;
+  if (r >= 1) {
+    const rounded = r >= 10 ? Math.round(r) : Number(r.toFixed(1));
+    return `${toFa('1')} : ${toFa(String(rounded))}`;
+  }
+  const inv = male / female;
+  const rounded = inv >= 10 ? Math.round(inv) : Number(inv.toFixed(1));
+  return `${toFa(String(rounded))} : ${toFa('1')}`;
 }
 
 /** سن پیش‌فرض تخم‌گذاری (اگه استاندارد نژاد موجود نبود) — استاندارد ایران */
