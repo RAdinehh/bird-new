@@ -179,14 +179,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       </Grid2>
       
       <Grid2>
-        <Field label="نوع سفارش" help={HELP.tra.invoice.orderType}>
+        <Field label="نوع سفارش" help={isPurchase ? HELP.tra.invoice.orderType : HELP.tra.invoice.orderTypeSale}>
           <Select
             value={(form.isPreorder && form.category !== 'other') ? 'preorder' : 'stock'}
             onChange={e => setForm(f => ({ ...f, isPreorder: e.target.value === 'preorder' }))}
           >
-            <option value="stock">📦 خرید از موجودی</option>
+            <option value="stock">{isPurchase ? "📦 خرید از موجودی" : "📦 فروش از موجودی"}</option>
             {form.category !== 'other' && (
-              <option value="preorder">📅 پیش‌خرید</option>
+              <option value="preorder">{isPurchase ? "📅 پیش‌خرید" : "📅 پیش‌فروش"}</option>
             )}
           </Select>
         </Field>
