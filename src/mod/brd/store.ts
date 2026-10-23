@@ -68,7 +68,7 @@ export const useBrd = create<State>()(
         const seen = new Set<string>();
         const cleaned = get().breeds.filter(b => {
           const purposesKey = ((b as any).purposes || []).slice().sort().join(',');
-          const key = b.birdId + '|' + b.name.trim().toLowerCase() + '|' + purposesKey;
+          const key = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase() + '|' + purposesKey + '|' + (b.standardKey || '');
           if (seen.has(key)) return false;
           seen.add(key);
           return true;
@@ -79,7 +79,7 @@ export const useBrd = create<State>()(
       dedupeBirds: () => {
         const seen = new Set<string>();
         const cleaned = get().birds.filter(b => {
-          const key = b.name.trim().toLowerCase();
+          const key = (b.name || '').trim().toLowerCase() + '|' + (b.birdKind || '') + '|' + (b.standardKey || '');
           if (seen.has(key)) return false;
           seen.add(key);
           return true;
@@ -114,7 +114,7 @@ export const useBrd = create<State>()(
           if (Array.isArray(persisted.birds)) {
             const seen = new Set<string>();
             persisted.birds = persisted.birds.filter((b: any) => {
-              const key = (b.name || '').trim().toLowerCase();
+              const key = (b.name || '').trim().toLowerCase() + '|' + (b.birdKind || '') + '|' + (b.standardKey || '');
               if (seen.has(key)) return false;
               seen.add(key);
               return true;
@@ -124,7 +124,7 @@ export const useBrd = create<State>()(
             const seen = new Set<string>();
             persisted.breeds = persisted.breeds.filter((b: any) => {
               const purposesKey = ((b as any).purposes || []).slice().sort().join(',');
-              const key = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase() + '|' + purposesKey;
+              const key = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase() + '|' + purposesKey + '|' + (b.standardKey || '');
               if (seen.has(key)) return false;
               seen.add(key);
               return true;
