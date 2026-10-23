@@ -36,7 +36,7 @@ import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
   const isPurchase = kind === 'purchase';
-  const { invoices, addInvoice, updateInvoice, deleteInvoice, reopenInvoice} = useTra();
+  const { invoices, addInvoice, updateInvoice, deleteInvoice, reopenInvoice, allocations } = useTra();
   const { contacts } = useCtc();
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
