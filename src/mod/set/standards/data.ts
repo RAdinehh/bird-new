@@ -18,10 +18,10 @@ import type { BirdStandard, EnvRange, FeedRange, GrowthRange, IncubationStandard
 // رنج‌های Brooding مشترک
 // ═══════════════════════════════════════════════
 const COMMON_BROODING: EnvRange[] = [
-  { dayFrom: 1,  dayTo: 3,   temp: { min: 32, max: 35, target: 33 }, humidity: { min: 60, max: 70 }, light: { hours: 23, lux: 25 } },
-  { dayFrom: 4,  dayTo: 7,   temp: { min: 30, max: 33, target: 31 }, humidity: { min: 60, max: 70 }, light: { hours: 22, lux: 25 } },
-  { dayFrom: 8,  dayTo: 14,  temp: { min: 28, max: 31, target: 29 }, humidity: { min: 55, max: 65 }, light: { hours: 20, lux: 20 } },
-  { dayFrom: 15, dayTo: 21,  temp: { min: 26, max: 29, target: 27 }, humidity: { min: 55, max: 65 }, light: { hours: 18, lux: 20 } },
+  { dayFrom: 1,  dayTo: 3,   temp: { min: 32, max: 35, target: 33 }, humidity: { min: 60, max: 70, target: 65 }, light: { hours: 23, lux: 25 } },
+  { dayFrom: 4,  dayTo: 7,   temp: { min: 30, max: 33, target: 31 }, humidity: { min: 60, max: 70, target: 65 }, light: { hours: 22, lux: 25 } },
+  { dayFrom: 8,  dayTo: 14,  temp: { min: 28, max: 31, target: 29 }, humidity: { min: 55, max: 65, target: 60 }, light: { hours: 20, lux: 20 } },
+  { dayFrom: 15, dayTo: 21,  temp: { min: 26, max: 29, target: 27 }, humidity: { min: 55, max: 65, target: 60 }, light: { hours: 18, lux: 20 } },
 ];
 
 
@@ -71,19 +71,19 @@ const BROILER: BirdStandard = {
   },
 
   env: [
-    { dayFrom: 1,  dayTo: 3,   temp: { min: 32, max: 34, target: 33 }, humidity: { min: 60, max: 70 }, light: { hours: 23, lux: 25 } },
-    { dayFrom: 4,  dayTo: 7,   temp: { min: 30, max: 32, target: 31 }, humidity: { min: 60, max: 70 }, light: { hours: 20, lux: 25 } },
-    { dayFrom: 8,  dayTo: 14,  temp: { min: 27, max: 30, target: 28 }, humidity: { min: 55, max: 65 }, light: { hours: 18, lux: 20 } },
-    { dayFrom: 15, dayTo: 21,  temp: { min: 24, max: 27, target: 25 }, humidity: { min: 55, max: 65 }, light: { hours: 18, lux: 15 } },
-    { dayFrom: 22, dayTo: 35,  temp: { min: 21, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 18, lux: 15 } },
-    { dayFrom: 36, dayTo: 42, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 20, lux: 10 } },
-    { dayFrom: 43, dayTo: 49, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 20, lux: 10 } },
-    { dayFrom: 50, dayTo: 56, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 20, lux: 10 } },
-    { dayFrom: 57, dayTo: 63, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 20, lux: 10 } },
-    { dayFrom: 64, dayTo: 70, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 20, lux: 10 } },
-    { dayFrom: 71, dayTo: 77, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 20, lux: 10 } },
-    { dayFrom: 78, dayTo: 84, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 20, lux: 10 } },
-    { dayFrom: 85, dayTo: 1825, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 20, lux: 10 } },
+    { dayFrom: 1,  dayTo: 3,   temp: { min: 32, max: 34, target: 33 }, humidity: { min: 60, max: 70, target: 65 }, light: { hours: 23, lux: 25 } },
+    { dayFrom: 4,  dayTo: 7,   temp: { min: 30, max: 32, target: 31 }, humidity: { min: 60, max: 70, target: 65 }, light: { hours: 20, lux: 25 } },
+    { dayFrom: 8,  dayTo: 14,  temp: { min: 27, max: 30, target: 28 }, humidity: { min: 55, max: 65, target: 60 }, light: { hours: 18, lux: 20 } },
+    { dayFrom: 15, dayTo: 21,  temp: { min: 24, max: 27, target: 25 }, humidity: { min: 55, max: 65, target: 60 }, light: { hours: 18, lux: 15 } },
+    { dayFrom: 22, dayTo: 35,  temp: { min: 21, max: 24, target: 22 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 18, lux: 15 } },
+    { dayFrom: 36, dayTo: 42, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 20, lux: 10 } },
+    { dayFrom: 43, dayTo: 49, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 20, lux: 10 } },
+    { dayFrom: 50, dayTo: 56, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 20, lux: 10 } },
+    { dayFrom: 57, dayTo: 63, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 20, lux: 10 } },
+    { dayFrom: 64, dayTo: 70, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 20, lux: 10 } },
+    { dayFrom: 71, dayTo: 77, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 20, lux: 10 } },
+    { dayFrom: 78, dayTo: 84, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 20, lux: 10 } },
+    { dayFrom: 85, dayTo: 1825, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 20, lux: 10 } },
   ],
 
   feed: [
@@ -164,18 +164,18 @@ const LAYER: BirdStandard = {
   },
 
   env: [
-    { dayFrom: 1,  dayTo: 3,   temp: { min: 32, max: 35, target: 33 }, humidity: { min: 60, max: 70 }, light: { hours: 23, lux: 30 } },
-    { dayFrom: 4,  dayTo: 7,   temp: { min: 30, max: 33, target: 31 }, humidity: { min: 60, max: 70 }, light: { hours: 22, lux: 30 } },
-    { dayFrom: 8,  dayTo: 14,  temp: { min: 28, max: 30, target: 29 }, humidity: { min: 55, max: 65 }, light: { hours: 18, lux: 25 } },
-    { dayFrom: 15, dayTo: 42,  temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65 }, light: { hours: 12, lux: 15 } },
-    { dayFrom: 43, dayTo: 49, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 20 } },
-    { dayFrom: 50, dayTo: 56, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 20 } },
-    { dayFrom: 57, dayTo: 63, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 20 } },
-    { dayFrom: 64, dayTo: 70, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 20 } },
-    { dayFrom: 71, dayTo: 77, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 20 } },
-    { dayFrom: 78, dayTo: 84, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 20 } },
-    { dayFrom: 85, dayTo: 140, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65 }, light: { hours: 14, lux: 20 } },
-    { dayFrom: 141, dayTo: 1825, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65 }, light: { hours: 16, lux: 30 } },
+    { dayFrom: 1,  dayTo: 3,   temp: { min: 32, max: 35, target: 33 }, humidity: { min: 60, max: 70, target: 65 }, light: { hours: 23, lux: 30 } },
+    { dayFrom: 4,  dayTo: 7,   temp: { min: 30, max: 33, target: 31 }, humidity: { min: 60, max: 70, target: 65 }, light: { hours: 22, lux: 30 } },
+    { dayFrom: 8,  dayTo: 14,  temp: { min: 28, max: 30, target: 29 }, humidity: { min: 55, max: 65, target: 60 }, light: { hours: 18, lux: 25 } },
+    { dayFrom: 15, dayTo: 42,  temp: { min: 22, max: 26, target: 24 }, humidity: { min: 55, max: 65, target: 60 }, light: { hours: 12, lux: 15 } },
+    { dayFrom: 43, dayTo: 49, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 14, lux: 20 } },
+    { dayFrom: 50, dayTo: 56, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 14, lux: 20 } },
+    { dayFrom: 57, dayTo: 63, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 14, lux: 20 } },
+    { dayFrom: 64, dayTo: 70, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 14, lux: 20 } },
+    { dayFrom: 71, dayTo: 77, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 14, lux: 20 } },
+    { dayFrom: 78, dayTo: 84, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 14, lux: 20 } },
+    { dayFrom: 85, dayTo: 140, temp: { min: 20, max: 24, target: 22 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 14, lux: 20 } },
+    { dayFrom: 141, dayTo: 1825, temp: { min: 18, max: 24, target: 21 }, humidity: { min: 50, max: 65, target: 58 }, light: { hours: 16, lux: 30 } },
   ],
 
   feed: [
@@ -258,7 +258,7 @@ export const FALLBACK_ENV: EnvRange = {
   dayFrom: 0,
   dayTo: 1825,
   temp: { min: 18, max: 26, target: 22 },
-  humidity: { min: 40, max: 70 },
+  humidity: { min: 40, max: 70, target: 55 },
   light: { hours: 14 },
 };
 
