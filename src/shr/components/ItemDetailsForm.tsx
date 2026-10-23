@@ -78,7 +78,10 @@ const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
 
 export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, invoiceDate, sellerSlot }: Props) {
   const { birds, breeds } = useBrd();
-  const { halls, zones } = useHal();
+  const halState = useHal() as any;
+  const halls: any[] = halState.halls || [];
+  const zones: any[] = halState.zones || [];
+  const halEquipment: any[] = halState.equipment || [];
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
   const incDevices = useInc((s: any) => s.devices || []) as any[];
@@ -273,6 +276,33 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     );
   }
 
+  // ========== تخم خوراکی (فقط فروش) ==========
+  if (!isPurchase && category === 'egg') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
+        <SecTitle icon="🥚" title="اطلاعات تخم خوراکی" />
+        <Grid2>
+          <Field label="گله مبدأ" required>
+            <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+          </Field>
+          <Field label="تاریخ تولید تخم">
+            <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="وزن تخم (گرم)" hint="اختیاری — برای گریدبندی">
+            <Input mode="number" value={item.eggWeight != null && item.eggWeight > 0 ? String(item.eggWeight) : ''} onChange={e => updateItem({ eggWeight: parseFaNum(e.target.value) || null })} unit="g" min={0} max={100} />
+          </Field>
+          <Field label="تعداد کل">
+            <Input disabled value={item.quantity && item.quantity > 0 ? toFa(String(item.quantity)) : ''} unit="عدد" placeholder="از بخش اقلام بالا" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
+          </Field>
+        </Grid2>
+        {sellerSlot}
+      </div>
+    );
+  }
+
   // ========== تخم نطفه‌دار ==========
   if (isEggCategory) {
     return (
@@ -426,6 +456,56 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
   // ========== تجهیزات ==========
   if (category === 'equipment') {
+    if (!isPurchase) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {nameFieldJsx}
+          <SecTitle icon="⚙️" title="انتخاب تجهیز فروشی" />
+          <Field label="تجهیز موجود" required hint="از سالن یا انبار انتخاب کنید">
+            <SmartSelect
+              value={String(item.equipmentId || '')}
+              onChange={v => {
+                const eq = (halEquipment || []).find((e: any) => e.id === v);
+                if (eq) {
+                  updateItem({
+                    equipmentId: v,
+                    hallId: eq.hallId || '',
+                    equipmentCategory: eq.category || '',
+                    equipmentType: eq.type || '',
+                    equipmentKind: 'asset',
+                    description: eq.name || '',
+                    brand: eq.brand || '',
+                  });
+                } else {
+                  updateItem({ equipmentId: v });
+                }
+              }}
+              options={(halEquipment || []).map((e: any) => ({
+                value: e.id,
+                label: `${e.name} — ${e.hallId ? 'در سالن' : 'در انبار'}${e.count ? ` (×${e.count})` : ''}`,
+              }))}
+              placeholder="— انتخاب تجهیز —"
+              modalTitle="انتخاب تجهیز فروشی"
+              autoThreshold={6}
+            />
+          </Field>
+          {item.equipmentId && (() => {
+            const eq = (halEquipment || []).find((e: any) => e.id === item.equipmentId);
+            if (!eq) return null;
+            return (
+              <div style={{ padding: '10px 12px', background: 'var(--accent-soft)', border: '1px dashed var(--accent)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div><b>نام:</b> {eq.name}</div>
+                <div><b>دسته:</b> {eq.category || '—'}</div>
+                <div><b>تعداد موجود:</b> {eq.count || 0}</div>
+                <div><b>قیمت خرید:</b> {eq.unitPrice ? toFa(String(eq.unitPrice)) + ' تومان' : '—'}</div>
+              </div>
+            );
+          })()}
+          {sellerSlot}
+        </div>
+      );
+    }
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
@@ -610,6 +690,44 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
           <Field label="تاریخ انقضا (اختیاری)">
             <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
+          </Field>
+        </Grid2>
+        {sellerSlot}
+      </div>
+    );
+  }
+
+  // ========== تخم شکسته (فقط فروش) ==========
+  if (category === 'broken') {
+    const brokenItems = (whsItems || []).filter((w: any) => w.category === 'broken');
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
+        <SecTitle icon="💔" title="اطلاعات تخم شکسته" />
+        <Field label="اتصال به انبار" hint="کالای تخم شکسته موجود">
+          <SmartSelect
+            value={String(item.stockItemId || '')}
+            onChange={v => updateItem({ stockItemId: v })}
+            options={brokenItems.map((i: any) => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))}
+            placeholder="— انتخاب کالای انبار —"
+            modalTitle="انتخاب کالای تخم شکسته"
+            autoThreshold={6}
+          />
+        </Field>
+        <Grid2>
+          <Field label="گله مبدأ" required>
+            <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+          </Field>
+          <Field label="تاریخ تولید تخم">
+            <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
+          </Field>
+        </Grid2>
+        <Grid2>
+          <Field label="تعداد شکسته" hint="اختیاری — جزئیات بیشتر">
+            <Input mode="number" value={item.brokenEggCount != null && item.brokenEggCount > 0 ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} />
+          </Field>
+          <Field label="تعداد کل">
+            <Input disabled value={item.quantity && item.quantity > 0 ? toFa(String(item.quantity)) : ''} unit="عدد" placeholder="از بخش اقلام بالا" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
           </Field>
         </Grid2>
         {sellerSlot}
