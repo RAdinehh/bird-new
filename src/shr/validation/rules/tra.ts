@@ -289,6 +289,40 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       }
     }
 
+    // 2.5 🆕 سقف اعتبار مشتری (فقط فروش، فقط ایجاد)
+    if (d.type === 'sale' && !vIsEdit && vContacts && d.partyId) {
+      const party = vContacts.find((c: any) => c.id === d.partyId);
+      if (party && party.creditLimit && party.creditLimit > 0) {
+        // محاسبه بدهی فعلی از ctx اگر invoices پاس داده شده باشه
+        const vInvoices = (ctx as any).invoices as any[] | undefined;
+        const vAllocations = (ctx as any).allocations as any[] | undefined;
+        if (vInvoices) {
+          // محاسبه ساده بدهی: sum(total - paid) برای فاکتورهای sale تسویه‌نشده
+          let currentDebt = 0;
+          for (const inv of vInvoices) {
+            if (inv.partyId !== d.partyId || inv.type !== 'sale') continue;
+            const total = Number(inv.total) || 0;
+            const paid = (inv.payments || []).reduce((s: number, p: any) => {
+              if (p.method === 'check' && p.status === 'bounced') return s;
+              if (p.method === 'check' && p.status === 'pending') return s;
+              if (p.type === 'refund') return s - (Number(p.amount) || 0);
+              return s + (Number(p.amount) || 0);
+            }, 0);
+            currentDebt += Math.max(0, total - paid);
+          }
+          const newTotal = Number(d.total) || 0;
+          const afterSale = currentDebt + newTotal;
+          if (afterSale > party.creditLimit) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `سقف اعتبار مشتری (${party.creditLimit.toLocaleString('fa-IR')} تومان) — بدهی فعلی: ${currentDebt.toLocaleString('fa-IR')}، این فاکتور: ${newTotal.toLocaleString('fa-IR')}`,
+              path: ['partyId'],
+            });
+          }
+        }
+      }
+    }
+
     // 2. فروش: موجودی گله/انبار + دوره پرهیز (فقط ایجاد، نه ویرایش)
     if (d.type === 'sale' && !vIsEdit) {
       const todayParts = new Intl.DateTimeFormat('en-u-ca-persian', { year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());

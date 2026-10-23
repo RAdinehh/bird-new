@@ -71,6 +71,20 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
           <Grid2>
             <Field label="نام" required><Input placeholder="..." value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
             <Field label="تلفن"><PhoneField placeholder="۰۹..." value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></Field>
+            {(form.roles || []).includes('customer') && (
+              <Field label="سقف اعتبار (تومان)" hint="۰ یا خالی = بدون سقف — فروش بیش از این مبلغ مسدود می‌شود">
+                <Input
+                  mode="number"
+                  placeholder="مثلاً ۵۰٬۰۰۰٬۰۰۰"
+                  value={form.creditLimit != null && form.creditLimit > 0 ? String(form.creditLimit) : ''}
+                  onChange={e => {
+                    const v = parseInt(String(e.target.value).replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[,،]/g, '')) || 0;
+                    setForm({ ...form, creditLimit: v > 0 ? v : null });
+                  }}
+                  unit="تومان"
+                />
+              </Field>
+            )}
           </Grid2>
           <Grid2>
             <Field label="کد ملی"><DigitField maxLength={10} placeholder="..." value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} /></Field>

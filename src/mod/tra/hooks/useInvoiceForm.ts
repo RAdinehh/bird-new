@@ -129,12 +129,13 @@ export function useInvoiceForm(params: {
   contacts: any[];
   flocks?: any[];
   whsItems?: any[];
+  allocations?: any[];
   addInvoice: (i: any) => string | undefined;
   updateInvoice: (id: string, patch: any) => void;
 }) {
   // invoices از پارامترها گرفته می‌شود اما در openNew استفاده نمی‌شود
   // (جلوگیری از کپی داده‌ی قبلی در فرم جدید)
-  const { kind, contacts, flocks = [], whsItems = [], addInvoice, updateInvoice } = params;
+  const { kind, contacts, flocks = [], whsItems = [], allocations = [], invoices = [], addInvoice, updateInvoice } = params;
   const isPurchase = kind === 'purchase';
 
   const [open, setOpen] = useState(false);
@@ -341,7 +342,7 @@ export function useInvoiceForm(params: {
       isPreorder: form.isPreorder,
       deliveryDate: form.deliveryDate || '',
     };
-    const zodResult = createInvoiceSchema({ flocks, whsItems, contacts, isEdit: !!form.id } as any).safeParse(validationData);
+    const zodResult = createInvoiceSchema({ flocks, whsItems, contacts, invoices, allocations, isEdit: !!form.id } as any).safeParse(validationData);
     if (!zodResult.success) {
       const firstErr = zodResult.error.issues[0];
       const path = firstErr.path.join('.');
