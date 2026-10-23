@@ -9,7 +9,11 @@
     "preview": "vite preview --host 0.0.0.0 --port 3000",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "typecheck": "tsc --noEmit",
+    "test:ci": "vitest run --coverage",
+    "ci": "npm run typecheck && npm run test:ci",
+    "check:catch": "grep -rn 'catch (e) {}' src/mod --include='*.ts*' || true"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",
@@ -40,6 +44,7 @@
     "@typescript-eslint/eslint-plugin": "^8.71.2",
     "@typescript-eslint/parser": "^8.71.2",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^5.0.5",
     "@vitest/ui": "^5.0.3",
     "autoprefixer": "^10.4.20",
     "eslint": "^10.12.0",

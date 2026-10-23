@@ -283,7 +283,11 @@ export function computeCashDiscount(inv: Invoice): number {
   }
   
   if (eligiblePaid <= 0) return 0;
-  return Math.round(eligiblePaid * pct / 100);
+  // تخفیف از TOTAL فاکتور محاسبه می‌شود، نه از پرداخت‌شده (استاندارد accounting)
+  const discount = Math.round(inv.total * pct / 100);
+  // فقط اگه پرداخت به‌اندازه‌ای بوده که با تخفیف تسویه حساب شه اعمال می‌شود
+  if (eligiblePaid >= inv.total - discount) return discount;
+  return 0;
 }
 
 
