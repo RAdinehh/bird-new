@@ -175,45 +175,12 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           )}
         </Grid2>
 
-        {/* ردیف ۳: (خرید: بخش) + تاریخ هچ */}
-        <Grid2>
-          {isPurchase && (
+        {/* ردیف ۳ (خرید): بخش + وزن اولیه | (فروش): تاریخ هچ + سن */}
+        {isPurchase ? (
+          <Grid2>
             <Field label="بخش مقصد (اختیاری)">
               <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" autoThreshold={6} />
             </Field>
-          )}
-          <Field label="تاریخ هچ" required>
-            <DatePicker value={String(item.hatchDate || '')} onChange={v => {
-              let age = null;
-              if (v && invoiceDate) {
-                try {
-                  const d1 = parseJ(toEn(v), 'yyyy/MM/dd', new Date());
-                  const d2 = parseJ(toEn(invoiceDate), 'yyyy/MM/dd', new Date());
-                  if (isValid(d1) && isValid(d2)) age = Math.max(0, differenceInCalendarDays(d2, d1));
-                } catch {}
-              }
-              updateItem({ hatchDate: v, ageDays: age });
-            }} placeholder="1405/07/26" autoToday />
-          </Field>
-        </Grid2>
-
-        {/* ردیف ۴: سن + (خرید: وزن اولیه) */}
-        <Grid2>
-          <Field label="سن (روز)" hint="با تغییر سن، تاریخ هچ محاسبه می‌شود">
-            <Input mode="number" value={item.ageDays != null && item.ageDays > 0 ? String(item.ageDays) : ''} onChange={e => {
-              let age = Math.round(parseFaNum(e.target.value)) || null;
-              if (age !== null && age > 150) age = 150;
-              let hDate = item.hatchDate;
-              if (age !== null && invoiceDate) {
-                try {
-                  const d2 = parseJ(toEn(invoiceDate), 'yyyy/MM/dd', new Date());
-                  if (isValid(d2)) hDate = formatJ(subDays(d2, age), 'yyyy/MM/dd');
-                } catch {}
-              }
-              updateItem({ ageDays: age, hatchDate: hDate });
-            }} unit="روز" min={0} max={150} />
-          </Field>
-          {isPurchase && (
             <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
               <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
                 let v = parseFaNum(e.target.value) || null;
@@ -221,15 +188,39 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 updateItem({ chickWeight: v });
               }} unit="g" min={20} max={100} />
             </Field>
-          )}
-        </Grid2>
+          </Grid2>
+        ) : (
+          <Grid2>
+            <Field label="تاریخ هچ" required>
+              <DatePicker value={String(item.hatchDate || '')} onChange={v => {
+                let age = null;
+                if (v && invoiceDate) {
+                  try {
+                    const d1 = parseJ(toEn(v), 'yyyy/MM/dd', new Date());
+                    const d2 = parseJ(toEn(invoiceDate), 'yyyy/MM/dd', new Date());
+                    if (isValid(d1) && isValid(d2)) age = Math.max(0, differenceInCalendarDays(d2, d1));
+                  } catch {}
+                }
+                updateItem({ hatchDate: v, ageDays: age });
+              }} placeholder="1405/07/26" autoToday />
+            </Field>
+            <Field label="سن (روز)" hint="با تغییر سن، تاریخ هچ محاسبه می‌شود">
+              <Input mode="number" value={item.ageDays != null && item.ageDays > 0 ? String(item.ageDays) : ''} onChange={e => {
+                let age = Math.round(parseFaNum(e.target.value)) || null;
+                if (age !== null && age > 150) age = 150;
+                let hDate = item.hatchDate;
+                if (age !== null && invoiceDate) {
+                  try {
+                    const d2 = parseJ(toEn(invoiceDate), 'yyyy/MM/dd', new Date());
+                    if (isValid(d2)) hDate = formatJ(subDays(d2, age), 'yyyy/MM/dd');
+                  } catch {}
+                }
+                updateItem({ ageDays: age, hatchDate: hDate });
+              }} unit="روز" min={0} max={150} />
+            </Field>
+          </Grid2>
+        )}
 
-        {/* ردیف ۵: تعداد */}
-        <Grid2>
-          <Field label={isPurchase ? "تعداد کل (خریداری شده)" : "تعداد"} hint="از بخش اقلام بالا">
-            <Input disabled value={item.quantity && item.quantity > 0 ? toFa(String(item.quantity)) : ''} unit="عدد" placeholder="از بخش اقلام بالا" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
-          </Field>
-        </Grid2>
 
         {/* ردیف ۶: نر/ماده/نامشخص */}
         <div style={{ display: (item.quantity || 0) > 0 ? 'contents' : 'none' }}>
@@ -314,9 +305,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="وزن تخم (گرم)" hint="اختیاری — برای گریدبندی">
             <Input mode="number" value={item.eggWeight != null && item.eggWeight > 0 ? String(item.eggWeight) : ''} onChange={e => updateItem({ eggWeight: parseFaNum(e.target.value) || null })} unit="g" min={0} max={100} />
           </Field>
-          <Field label="تعداد کل">
-            <Input disabled value={item.quantity && item.quantity > 0 ? toFa(String(item.quantity)) : ''} unit="عدد" placeholder="از بخش اقلام بالا" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
-          </Field>
+
         </Grid2>
 
         {sellerSlot}
