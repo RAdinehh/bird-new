@@ -12,7 +12,7 @@ import { useHal } from '../hal/store';
 import { bus } from '../../cor/events';
 
 import type { Invoice, InvoiceItem, State } from './types';
-import { applyPaymentsToInstallments, paidSumAllocated } from './calc';
+import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount } from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { applyInvoiceStock } from './applyStock';
 import { generateInvoiceNumber, paidSum } from './calc';
@@ -450,5 +450,10 @@ export function computePartyCredit(partyId: string, invoices: Invoice[], allocat
   if (!partyId) return 0;
   return invoices
     .filter(inv => inv.partyId === partyId)
-    .reduce((acc, inv) => acc + (paidSumAllocated(inv, allocations) - (inv.total || 0)), 0);
+    .reduce((acc, inv) => {
+      const total = inv.total || 0;
+      const paid = paidSumAllocated(inv, allocations);
+      const cashDiscount = computeCashDiscount(inv);
+      return acc + (paid - (total - cashDiscount));
+    }, 0);
 }

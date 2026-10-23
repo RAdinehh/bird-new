@@ -17,6 +17,7 @@ import { today, jalaliDate, todayJalali, type RuleAlert } from './alerts-helpers
 import { detectIncAlerts } from './alerts-inc';
 import { detectCycleAlerts } from './alerts-cycle';
 import { detectWithdrawalAlerts } from './alerts-withdrawal';
+import { daysUntilDue } from '../tra/helpers';
 
 /** تشخیص همه‌ی هشدارهای خودکار */
 export function detectAllAlerts(): RuleAlert[] {
@@ -146,7 +147,8 @@ export function detectAllAlerts(): RuleAlert[] {
     const rem = remaining(inv);
     if (rem <= 0) return;
 
-    const days = ageDays(inv);
+    const dUntil = daysUntilDue(inv);
+    const days = dUntil !== null && dUntil < 0 ? -dUntil : 0;
     const bucket = agingBucket(days);
 
     if (inv.type === 'sale') {
