@@ -1,6 +1,6 @@
 /** components/ui/Input.tsx */
 import React, { useRef, useEffect, useState } from 'react';
-import { formatNumWhileTyping, numberToWords, parseFaNum } from '../../utils/fa';
+import { formatNumWhileTyping, numberToWords, parseFaNum, toFa } from '../../utils/fa';
 
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   unit?: string; error?: string; warn?: string;
@@ -20,7 +20,7 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
   const [isEditing, setIsEditing] = React.useState(false);
   const [localValue, setLocalValue] = React.useState<string>('');
   const parentValueStr = (value === undefined || value === null) ? '' : String(value);
-  const displayValue = isEditing ? localValue : parentValueStr;
+  const displayValue = toFa(isEditing ? localValue : parentValueStr);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
