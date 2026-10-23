@@ -547,7 +547,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     }
 
     return (
-    return (
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="⚙️" title="اطلاعات تجهیز" />
