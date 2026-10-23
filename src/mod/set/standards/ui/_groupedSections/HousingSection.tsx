@@ -9,6 +9,7 @@ import { LitterEditor } from '../editors';
 import type { SectionProps } from './types';
 import { isChanged } from './types';
 import OverridableField from './OverridableField';
+import { HELP } from '../../../../../shr/help/helpTexts';
 
 export default function HousingSection({ std, def, updateBird, overrides, setOverride, clearOverride }: SectionProps) {
   const spaceChanged = isChanged(std.space, def.space);
@@ -27,6 +28,7 @@ export default function HousingSection({ std, def, updateBird, overrides, setOve
     <SettingsGroup
       icon="🏠"
       title="تأسیسات"
+      help={HELP.set.standards.housing}
       subtitle={subtitle}
       exclusiveGroup="std-sections"
       persist={false}

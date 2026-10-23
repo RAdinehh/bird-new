@@ -7,6 +7,7 @@ import SettingsGroup from '../../../SettingsGroup';
 import { EnvEditor, LightingEditor, VentilationEditor, WaterQualityEditor } from '../editors';
 import type { SectionProps } from './types';
 import { isChanged } from './types';
+import { HELP } from '../../../../../shr/help/helpTexts';
 
 export default function EnvironmentSection({ std, def, updateBird }: SectionProps) {
   const envChanged = isChanged(std.env, def.env);
@@ -24,6 +25,7 @@ export default function EnvironmentSection({ std, def, updateBird }: SectionProp
     <SettingsGroup
       icon="🌡"
       title="محیط"
+      help={HELP.set.standards.environment}
       subtitle={subtitle}
       exclusiveGroup="std-sections"
       persist={false}

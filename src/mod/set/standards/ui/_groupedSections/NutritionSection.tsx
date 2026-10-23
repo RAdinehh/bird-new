@@ -8,6 +8,7 @@ import { FeedEditor, GrowthEditor } from '../editors';
 import type { SectionProps } from './types';
 import { isChanged } from './types';
 import { useFormat } from '../../../../../shr/units/useFormat';
+import { HELP } from '../../../../../shr/help/helpTexts';
 
 export default function NutritionSection({ std, def, updateBird }: SectionProps) {
   const fmt = useFormat();
@@ -23,6 +24,7 @@ export default function NutritionSection({ std, def, updateBird }: SectionProps)
     <SettingsGroup
       icon="🍽"
       title="تغذیه و رشد"
+      help={HELP.set.standards.nutrition}
       subtitle={subtitle}
       exclusiveGroup="std-sections"
       persist={false}

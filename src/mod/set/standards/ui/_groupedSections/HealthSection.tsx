@@ -9,6 +9,7 @@ import type { SectionProps } from './types';
 import { isChanged } from './types';
 import { useFormat } from '../../../../../shr/units/useFormat';
 import OverridableField from './OverridableField';
+import { HELP } from '../../../../../shr/help/helpTexts';
 
 export default function HealthSection({ std, def, updateBird, overrides, setOverride, clearOverride }: SectionProps) {
   const fmt = useFormat();
@@ -28,6 +29,7 @@ export default function HealthSection({ std, def, updateBird, overrides, setOver
     <SettingsGroup
       icon="💀"
       title="سلامت"
+      help={HELP.set.standards.health}
       subtitle={subtitle}
       exclusiveGroup="std-sections"
       persist={false}

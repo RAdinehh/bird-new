@@ -7,6 +7,7 @@ import SettingsGroup from '../../../SettingsGroup';
 import type { SectionProps } from './types';
 import { isChanged } from './types';
 import OverridableField from './OverridableField';
+import { HELP } from '../../../../../shr/help/helpTexts';
 
 export default function IdentitySection({ std, def, updateBird, overrides, setOverride, clearOverride }: SectionProps) {
   const changed =
@@ -24,6 +25,7 @@ export default function IdentitySection({ std, def, updateBird, overrides, setOv
     <SettingsGroup
       icon="📝"
       title="شناسه نژاد"
+      help={HELP.set.standards.identity}
       subtitle={changed ? '🔸 تغییر یافته' : `${std.nameFa} • ${std.birdName}`}
       exclusiveGroup="std-sections"
       persist={false}

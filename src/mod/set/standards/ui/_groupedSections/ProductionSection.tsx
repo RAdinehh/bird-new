@@ -9,6 +9,7 @@ import { HatchingEditor, IncubationProfileEditor } from '../editors';
 import type { SectionProps } from './types';
 import { isChanged } from './types';
 import OverridableField from './OverridableField';
+import { HELP } from '../../../../../shr/help/helpTexts';
 
 export default function ProductionSection({ std, def, updateBird, overrides, setOverride, clearOverride }: SectionProps) {
   const bioChanged = isChanged(std.biology, def.biology);
@@ -31,6 +32,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
     <SettingsGroup
       icon="🥚"
       title="تولید"
+      help={HELP.set.standards.production}
       subtitle={subtitle}
       exclusiveGroup="std-sections"
       persist={false}
