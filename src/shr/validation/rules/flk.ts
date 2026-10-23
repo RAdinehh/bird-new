@@ -33,13 +33,13 @@ export function createFlkSchema(context: ValidationContext = {}) {
 
     initialCount: intPos('تعداد اولیه', 100000),
     // 🆕 تعداد فعلی اختیاری ئه — اگه خالی باشه، = تعداد اولیه فرض می‌شه
-    currentCount: z.number().optional().nullable(),
+    currentCount: z.number().min(0, 'تعداد فعلی نمی‌تواند منفی باشد').optional().nullable(),
     maleCount: intNonNeg('تعداد نر', 100000),
     femaleCount: intNonNeg('تعداد ماده', 100000),
 
     // 🆕 این دو فیلد فقط برای layer/breeder معنی دارن — برای broiler skip می‌شن
-    layingStartDay: z.number().optional().nullable(),
-    endOfCycleDay: z.number().optional().nullable(),
+    layingStartDay: z.number().min(0, 'سن تخم‌گذاری نمی‌تواند منفی باشد').optional().nullable(),
+    endOfCycleDay: z.number().min(0, 'سن پایان چرخه نمی‌تواند منفی باشد').optional().nullable(),
     vaccineScheduleId: optionalId(),
 
     hatchDate: persianDateOpt('تاریخ هچ'),

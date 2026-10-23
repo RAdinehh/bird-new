@@ -25,6 +25,7 @@ export interface FlockEvent {
   type: FlockEventType;
   count: number;
   sex: FlockEventSex;
+  direction?: 1 | -1;
   origin?: 'purchase' | 'hatch' | 'transfer';
   buyerId?: string;
   reason?: string;
@@ -61,7 +62,7 @@ export interface FlockMergeInfo {
   mergedAt: string;
 }
 
-export type FlockDealType = 'own' | 'partnership' | 'consignment' | 'rent';
+export type FlockDealType = 'own' | 'partnership' | 'consignment' | 'rent' | 'barter';
 
 export interface FlockDealData {
   partnerId?: string;

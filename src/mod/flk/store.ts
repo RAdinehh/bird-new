@@ -251,7 +251,12 @@ export const useFlk = create<State>()(
         flocks: get().flocks.map(f => {
           if (f.id !== flockId) return f;
           const newEvent: FlockEvent = { ...ev, id: uuid(), flockId, createdAt: now() };
-          return { ...f, events: [...(f.events || []), newEvent], updatedAt: now() };
+          const cur = f.currentCount ?? 0;
+          let delta = 0;
+          if (ev.type === 'death' || ev.type === 'cull' || ev.type === 'sell') delta = -ev.count;
+          else if (ev.type === 'add' || ev.type === 'transfer') delta = +ev.count;
+          const next = Math.max(0, cur + delta);
+          return { ...f, currentCount: next, events: [...(f.events || []), newEvent], updatedAt: now() };
         })
       }),
       addCorrection: (flockId, delta, reasonCode, reasonLabel, notes) => set({
@@ -266,7 +271,7 @@ export const useFlk = create<State>()(
             flockId,
             date: todayJ(),
             type: 'correction',
-            count: Math.abs(actualDelta),
+            count: Math.abs(actualDelta), direction: actualDelta > 0 ? 1 : -1,
             sex: 'mixed',
             reasonCode,
             reason: reasonLabel,
@@ -294,8 +299,8 @@ export const useFlk = create<State>()(
           // محاسبه‌ی معکوس
           let sign = 0;
           if (ev.type === 'correction') {
-            const r = (ev.reason || '').includes('افزودن') ? 1 : -1;
-            sign = -r;
+            const dir = ev.direction ?? ((ev.reason || '').includes('افزودن') ? 1 : -1);
+            sign = -dir;
           } else if (ev.type === 'death' || ev.type === 'cull' || ev.type === 'sell') {
             sign = 1; // برگشت به تعداد
           } else if (ev.type === 'add' || ev.type === 'transfer') {

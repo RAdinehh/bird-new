@@ -126,7 +126,7 @@ describe('useFlk — events', () => {
 // ═══ revokeEvent ═══
 describe('useFlk — revokeEvent', () => {
   it('revoke death → currentCount برمی‌گرده', () => {
-    const f = makeFlock({ currentCount: 995 });
+    const f = makeFlock({ currentCount: 1000 });
     useFlk.setState({ flocks: [f] } as any);
     useFlk.getState().addEvent(f.id, {
       date: '1405/07/01', type: 'death', count: 5, sex: 'mixed', reason: '',
@@ -137,7 +137,7 @@ describe('useFlk — revokeEvent', () => {
   });
 
   it('revoke دوباره → لغو نمی‌شه', () => {
-    const f = makeFlock({ currentCount: 995 });
+    const f = makeFlock({ currentCount: 1000 });
     useFlk.setState({ flocks: [f] } as any);
     useFlk.getState().addEvent(f.id, {
       date: '1405/07/01', type: 'death', count: 5, sex: 'mixed', reason: '',
