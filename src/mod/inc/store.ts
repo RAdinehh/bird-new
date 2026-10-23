@@ -6,6 +6,8 @@ import { getIncubation } from '../set/standards';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
+import { useFlk } from '../flk/store';
+import { useBrd } from '../brd/store';
 import { parse as parseJ, addDays as addDaysJ, format as formatJ, differenceInDays as diffDaysJ, startOfDay } from 'date-fns-jalali';
 import { toEn } from '../../shr/utils/fa';
 import { showToast } from '../../cor/store/toast';
@@ -223,10 +225,67 @@ export const useInc = create<State>()(
       updateCandling: (id, patch) => set({ candlings: get().candlings.map(x => x.id === id ? {...x, ...patch} : x) }),
       deleteCandling: (id) => set({ candlings: get().candlings.filter(x => x.id !== id) }),
 
-      addHatch: (h) => set({ hatches: [...get().hatches, {...h, id: uuid(), createdAt: now()}] }),
+      addHatch: (h) => {
+        const id = uuid();
+        const newHatch: any = { ...h, id, createdAt: now() };
+
+        // 🆕 فیکس ۶: ایجاد گله خودکار از هچ
+        if (newHatch.hatched && newHatch.hatched > 0 && !newHatch.generatedFlockId) {
+          try {
+            const entry = get().eggEntries.find((e: any) => e.id === newHatch.eggEntryId);
+            if (entry) {
+              const flkStore = useFlk.getState();
+              const brdStore = useBrd.getState();
+              const breed = brdStore.breeds.find((b: any) => b.id === entry.breedId);
+              const bird = brdStore.birds.find((b: any) => b.id === entry.birdId);
+
+              const hasGender = ((newHatch.maleCount || 0) + (newHatch.femaleCount || 0) + (newHatch.unknownCount || 0)) > 0;
+              const inferredType: 'layer' | 'broiler' | 'breeder' = 'broiler';
+
+              const flockId = flkStore.add({
+                name: `گله از هچ ${newHatch.date}${breed?.name ? ' — ' + breed.name : (bird?.name ? ' — ' + bird.name : '')}`,
+                type: inferredType,
+                birdId: entry.birdId || '',
+                breedId: entry.breedId || '',
+                hallId: '',
+                zoneId: '',
+                initialCount: newHatch.hatched,
+                currentCount: newHatch.hatched,
+                maleCount: hasGender ? (newHatch.maleCount ?? null) : null,
+                femaleCount: hasGender ? (newHatch.femaleCount ?? null) : null,
+                unknownCount: hasGender ? (newHatch.unknownCount ?? null) : newHatch.hatched,
+                layingStartDay: 0,
+                endOfCycleDay: null,
+                vaccineScheduleId: '',
+                hatchDate: newHatch.date,
+                purchaseDate: newHatch.date,
+                startDate: newHatch.date,
+                source: 'hatch',
+                dealType: 'own',
+                purchasePrice: 0,
+                deliveryCost: 0,
+                otherCosts: 0,
+                status: 'active',
+                notes: `از هچ ${newHatch.date}`,
+                chickWeight: newHatch.avgWeight ?? null,
+              } as any);
+
+              newHatch.generatedFlockId = flockId;
+            }
+          } catch (e) { console.error('[addHatch] auto flock failed:', e); }
+        }
+
+        set({ hatches: [...get().hatches, newHatch] });
+      },
       updateHatch: (id, patch) => set({ hatches: get().hatches.map(x => x.id === id ? {...x, ...patch} : x) }),
       deleteHatch: (id) => {
         const h = get().hatches.find(x => x.id === id);
+        // 🆕 فیکس ۶: حذف گله متصل به هچ
+        if (h && (h as any).generatedFlockId) {
+          try {
+            useFlk.getState().remove((h as any).generatedFlockId);
+          } catch (e) { console.error('[deleteHatch] flock cleanup failed:', e); }
+        }
         if (h?.generatedFlockId) {
           showToast('این هچ قبلاً گله ساخته — ابتدا گله را حذف کنید', 'error');
           return;
