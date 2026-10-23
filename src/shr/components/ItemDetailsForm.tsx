@@ -405,6 +405,20 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Grid2>
         )}
 
+        {!isPurchase && (
+          <Field label="دلیل فروش">
+            <Select value={String(item.saleReason || '')} onChange={e => updateItem({ saleReason: e.target.value })}>
+              <option value="">— انتخاب —</option>
+              <option value="culling">حذف از گله (کالینگ)</option>
+              <option value="sick">بیماری</option>
+              <option value="old_age">سن بالا</option>
+              <option value="surplus">مازاد</option>
+              <option value="breeding_stock">فروش مولد</option>
+              <option value="other">سایر</option>
+            </Select>
+          </Field>
+        )}
+
         {sellerSlot}
       </div>
     );
@@ -695,6 +709,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {nameFieldJsx}
         <SecTitle icon="📋" title="اطلاعات هزینه" />
         <Grid2>
+          {isPurchase && (
           <Field label="نوع هزینه" hint="برای گزارش‌های مالی" required>
             <Select value={String(item.costType || '')} onChange={e => updateItem({ costType: e.target.value })}>
               <option value="">— انتخاب —</option>
@@ -706,6 +721,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <option value="other">سایر</option>
             </Select>
           </Field>
+          )}
           <Field label="گله مقصد (اختیاری)" hint="سرشکن هزینه">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
