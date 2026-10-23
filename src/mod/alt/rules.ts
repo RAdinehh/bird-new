@@ -148,9 +148,8 @@ export function detectAllAlerts(): RuleAlert[] {
     const rem = remaining(inv);
     if (rem <= 0) return;
 
-    const dUntil = daysUntilDue(inv);
-    const days = dUntil !== null && dUntil < 0 ? -dUntil : 0;
-    const bucket = agingBucket(days);
+    const days = overdueDays(inv);
+    const bucket = agingBucketFromDue(inv);
 
     if (inv.type === 'sale') {
       // طلب از مشتری
