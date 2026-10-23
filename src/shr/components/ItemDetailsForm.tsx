@@ -186,16 +186,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
             </Field>
           ) : (
-            <Field label="دلیل فروش">
-              <Select value={String(item.saleReason || '')} onChange={e => updateItem({ saleReason: e.target.value })}>
-                <option value="">— انتخاب —</option>
-                <option value="culling">حذف از گله (کالینگ)</option>
-                <option value="sick">بیماری</option>
-                <option value="old_age">سن بالا</option>
-                <option value="surplus">مازاد</option>
-                <option value="breeding_stock">فروش مولد</option>
-                <option value="other">سایر</option>
-              </Select>
+            <Field label="تعداد کل" hint="از بخش اقلام بالا">
+              <Input disabled value={item.quantity && item.quantity > 0 ? toFa(String(item.quantity)) : ''} unit="عدد" placeholder="از بخش اقلام بالا" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
             </Field>
           )}
         </Grid2>
@@ -955,6 +947,31 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="💔" title="اطلاعات تخم شکسته" />
+
+        {/* انتخاب از تولیدات تخم — شکسته */}
+        <Field label="انتخاب از تولیدات تخم شکسته" hint="برای پر شدن خودکار مشخصات">
+          <SmartSelect
+            value=""
+            onChange={v => {
+              const prod = (productions || []).find(x => x.id === v);
+              if (prod) {
+                updateItem({
+                  flockId: prod.flockId,
+                  eggDate: prod.date,
+                  brokenEggCount: prod.brokenCount,
+                  quantity: prod.brokenCount,
+                  description: item.description || `تخم شکسته - ${prod.date}`,
+                });
+              }
+            }}
+            options={(productions || []).filter(prod => (prod.brokenCount || 0) > 0).map(prod => ({
+              value: prod.id,
+              label: `${prod.date} — ${prod.brokenCount} عدد`
+            }))}
+            placeholder="— انتخاب از تولیدات —"
+            modalTitle="انتخاب از تولیدات تخم شکسته"
+          />
+        </Field>
 
         {/* ردیف ۱: گله + تاریخ */}
         <Grid2>
