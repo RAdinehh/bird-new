@@ -226,6 +226,48 @@ export const useTra = create<State>()(
         }
       } catch (e) { console.error('[tra delete] egg sales reversal:', e); }
 
+      // 🎯 rollback تجهیزات فروش — برگرداندن به hal
+      try {
+        const halState = useHal.getState();
+        for (const it of inv.items || []) {
+          const cat = (it as any).category || inv.category;
+          if (cat !== 'equipment') continue;
+          if ((it as any).equipmentKind === 'consumable') continue;
+          const eqId = (it as any).equipmentId;
+          const qty = Number(it.quantity) || 1;
+          if (!eqId) continue;
+          const eq = halState.equipment.find((e: any) => e.id === eqId);
+          if (eq) {
+            // تجهیز هنوز هست → تعداد رو برگردون
+            try {
+              halState.updateEquip(eqId, { count: (eq.count || 0) + qty } as any);
+            } catch {}
+          } else {
+            // تجهیز حذف شده بود → بازسازی
+            try {
+              halState.addEquip({
+                hallId: (it as any).hallId || '',
+                zoneId: (it as any).zoneId || '',
+                category: (it as any).equipmentCategory || 'other',
+                type: (it as any).equipmentType || 'other',
+                name: it.description || 'تجهیز',
+                count: qty,
+                unit: it.unit || 'pcs',
+                unitPrice: it.unitPrice || null,
+                purchasedAt: '',
+                warranty: null,
+                notes: `بازگشت از حذف فاکتور ${inv.number || ''}`,
+                brand: (it as any).brand || '',
+                supplierId: '',
+                sourceInvoiceId: '',
+                model: (it as any).model || '',
+                status: 'active',
+              } as any);
+            } catch (e) { console.error('[tra delete] equip restore:', e); }
+          }
+        }
+      } catch (e) { console.error('[tra delete] hal equip reversal:', e); }
+
           // 🎯 rollback ورودی‌های تخم در جوجه‌کشی
           try {
             const incState = useInc.getState();
