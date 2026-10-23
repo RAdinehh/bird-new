@@ -19,6 +19,7 @@ import { generateInvoiceNumber, paidSum } from './calc';
 import { showToast } from '../../cor/store/toast';
 import { useInc } from '../inc/store';
 import { setPartyCredit } from '../ctc/store';
+import { partyBalance } from './formulas';
 
 const now = () => new Date().toISOString();
 
@@ -447,13 +448,6 @@ export const useTra = create<State>()(
 
 
 export function computePartyCredit(partyId: string, invoices: Invoice[], allocations?: any[]): number {
-  if (!partyId) return 0;
-  return invoices
-    .filter(inv => inv.partyId === partyId)
-    .reduce((acc, inv) => {
-      const total = inv.total || 0;
-      const paid = paidSumAllocated(inv, allocations);
-      const cashDiscount = computeCashDiscount(inv);
-      return acc + (paid - (total - cashDiscount));
-    }, 0);
+  // SINGLE SOURCE OF TRUTH — partyBalance (formulas.ts)
+  return partyBalance(partyId, invoices, allocations);
 }

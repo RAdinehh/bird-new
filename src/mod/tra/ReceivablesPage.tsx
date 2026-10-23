@@ -15,6 +15,7 @@ import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/fil
 import MultiPayModal from './components/MultiPayModal';
 import SummaryBox from './components/SummaryBox';
 import UpcomingDueSection from './components/UpcomingDueSection';
+import { agingBucketFromDue } from './formulas';
 
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 
@@ -71,10 +72,8 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       '0-15': [], '16-30': [], '31-60': [], '61-90': [], '+90': []
     };
     filtered.forEach(inv => {
-      // Aging of receivables = روزهای overdue از dueDate، نه سن فاکتور
-      const dUntil = daysUntilDue(inv);
-      const days = dUntil !== null && dUntil < 0 ? -dUntil : 0;
-      const b = agingBucket(days);
+      // SINGLE SOURCE OF TRUTH — formulas.ts
+      const b = agingBucketFromDue(inv);
       if (map[b]) map[b].push(inv);
     });
     return map;

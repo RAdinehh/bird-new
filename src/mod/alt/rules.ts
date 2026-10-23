@@ -18,6 +18,7 @@ import { detectIncAlerts } from './alerts-inc';
 import { detectCycleAlerts } from './alerts-cycle';
 import { detectWithdrawalAlerts } from './alerts-withdrawal';
 import { daysUntilDue } from '../tra/helpers';
+import { agingBucketFromDue, overdueDays } from '../tra/formulas';
 
 /** تشخیص همه‌ی هشدارهای خودکار */
 export function detectAllAlerts(): RuleAlert[] {
