@@ -98,7 +98,7 @@ export function calcItemTotal(
   factor: number = 1
 ): number {
   const base = (quantity || 0) * factor * (unitPrice || 0);
-  if (!discountType || !discountValue) return base;
+  if (!discountType || !discountValue) return Math.round(base);
 
   let discount = 0;
   if (discountType === 'percent') {
@@ -268,24 +268,17 @@ export function computeCashDiscount(inv: Invoice): number {
   const days = (inv as any).cashDiscountDays || 0;
   if (pct <= 0 || days <= 0 || !inv.date) return 0;
   
-  const toDays = (y: number, m: number, d: number) => {
-    let total = y * 365 + d;
-    for (let i = 1; i < m; i++) total += (i <= 6) ? 31 : 30;
-    return total;
-  };
-  
-  const sp = inv.date.split('/').map(Number);
-  if (sp.length !== 3 || sp.some(isNaN)) return 0;
-  const invDay = toDays(sp[0], sp[1], sp[2]);
+  const toEnDigits = (s: string) => String(s || '').replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+  const invDate = parseJ(toEnDigits(inv.date), 'yyyy/MM/dd', new Date());
+  if (isNaN(invDate.getTime())) return 0;
   
   let eligiblePaid = 0;
   for (const p of (inv.payments || [])) {
     if (!p.date) continue;
     if ((p as any).type === 'refund') continue;
-    const pp = p.date.split('/').map(Number);
-    if (pp.length !== 3 || pp.some(isNaN)) continue;
-    const payDay = toDays(pp[0], pp[1], pp[2]);
-    const diff = payDay - invDay;
+    const payDate = parseJ(toEnDigits(p.date), 'yyyy/MM/dd', new Date());
+    if (isNaN(payDate.getTime())) continue;
+    const diff = diffDaysJ(payDate, invDate);
     if (diff >= 0 && diff <= days) eligiblePaid += p.amount || 0;
   }
   
@@ -358,7 +351,7 @@ export function generateInstallments(
   const gap = gapDays > 0 ? gapDays : 30;
   const remaining = Math.max(0, totalAmount - (advancePaid || 0));
   if (remaining <= 0) return [];
-  const perInstallment = Math.round(remaining / count);
+  const perInstallment = Math.floor(remaining / count);
   const out: Installment[] = [];
   let accumulated = 0;
   for (let i = 0; i < count; i++) {
@@ -440,5 +433,5 @@ export function applyPaymentsToInstallments(
 
 
 export function calcInvoiceTotal(items: any[]): number {
-  return (items || []).reduce((sum, it) => sum + (it.total ?? ((it.quantity || 0) * (it.unitPrice || 0))), 0);
+  return Math.round((items || []).reduce((sum, it) => sum + (it.total ?? ((it.quantity || 0) * (it.unitPrice || 0))), 0));
 }
