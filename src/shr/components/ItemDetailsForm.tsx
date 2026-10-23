@@ -208,6 +208,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                   birdId: f?.birdId || item.birdId,
                   breedId: f?.breedId || item.breedId,
                   ageDays: f ? getAgeDays(f) : item.ageDays,
+                  hatchDate: f?.hatchDate || item.hatchDate,
                 });
               }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
             </Field>
@@ -245,6 +246,19 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 if (v !== null && v > 100) v = 100;
                 updateItem({ chickWeight: v });
               }} unit="g" min={20} max={100} />
+            </Field>
+          </Grid2>
+        ) : (item.flockId || item.hatchId) ? (
+          <Grid2>
+            <Field label="تاریخ هچ" hint="از منبع انتخاب‌شده — غیرقابل تغییر">
+              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
+                {item.hatchDate ? toFa(item.hatchDate) : '—'}
+              </div>
+            </Field>
+            <Field label="سن (روز)" hint="از منبع انتخاب‌شده — غیرقابل تغییر">
+              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
+                {item.ageDays != null && item.ageDays > 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
+              </div>
             </Field>
           </Grid2>
         ) : (
@@ -505,6 +519,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                   birdId: f?.birdId || item.birdId,
                   breedId: f?.breedId || item.breedId,
                   ageDays: f ? getAgeDays(f) : item.ageDays,
+                  hatchDate: f?.hatchDate || item.hatchDate,
                 });
               }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
             </Field>
