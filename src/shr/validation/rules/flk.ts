@@ -80,11 +80,12 @@ export function createFlkSchema(context: ValidationContext = {}) {
     const female = d.femaleCount || 0;
     const unknown = d.unknownCount || 0;
     if (male > 0 || female > 0 || unknown > 0) {
-      if (male + female + unknown !== d.initialCount) {
+      const targetCount = (d.currentCount != null && d.currentCount > 0) ? d.currentCount : d.initialCount;
+      if (male + female + unknown !== targetCount) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `مجموع نر (${male.toLocaleString('fa-IR')})، ماده (${female.toLocaleString('fa-IR')}) و نامشخص (${unknown.toLocaleString('fa-IR')}) با تعداد اولیه (${d.initialCount.toLocaleString('fa-IR')}) یکسان نیست`,
-          path: ['initialCount'],
+          message: `مجموع نر (${male.toLocaleString('fa-IR')}) + ماده (${female.toLocaleString('fa-IR')}) + نامشخص (${unknown.toLocaleString('fa-IR')}) = ${(male+female+unknown).toLocaleString('fa-IR')} — باید با تعداد فعلی (${targetCount.toLocaleString('fa-IR')}) برابر باشد`,
+          path: ['maleCount'],
         });
       }
     }
