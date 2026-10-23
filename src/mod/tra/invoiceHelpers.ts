@@ -432,6 +432,25 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       if (!f) continue;
       const next = Math.max(0, (f.currentCount ?? 0) + sign * delta);
       const patch: any = { currentCount: next };
+
+      // 🆕 فاز ۱: تفکیک جنسیت
+      const mDelta = Number(it.maleCount || 0);
+      const fDelta = Number(it.femaleCount || 0);
+      const uDelta = Number(it.unknownCount || 0);
+      const gSum = mDelta + fDelta + uDelta;
+      if (gSum > 0) {
+        if (mDelta > 0) patch.maleCount = Math.max(0, (f.maleCount ?? 0) + sign * mDelta);
+        if (fDelta > 0) patch.femaleCount = Math.max(0, (f.femaleCount ?? 0) + sign * fDelta);
+        if (uDelta > 0) patch.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * uDelta);
+        const rem = delta - gSum;
+        if (rem > 0) {
+          const base = (uDelta > 0) ? (patch.unknownCount ?? f.unknownCount ?? 0) : (f.unknownCount ?? 0);
+          patch.unknownCount = Math.max(0, base + sign * rem);
+        }
+      } else {
+        patch.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * delta);
+      }
+
       if (type === 'purchase') {
         patch.initialCount = Math.max(0, (f.initialCount ?? 0) + delta);
         if (delta > 0) {
@@ -458,7 +477,24 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       );
       if (existing) {
         const next = (existing.currentCount ?? 0) + delta;
-        flk.update(existing.id, { currentCount: Math.max(0, next) });
+        const patchEx: any = { currentCount: Math.max(0, next) };
+        const mD = Number(it.maleCount || 0);
+        const fD = Number(it.femaleCount || 0);
+        const uD = Number(it.unknownCount || 0);
+        const gS = mD + fD + uD;
+        if (gS > 0) {
+          if (mD > 0) patchEx.maleCount = Math.max(0, (existing.maleCount ?? 0) + mD);
+          if (fD > 0) patchEx.femaleCount = Math.max(0, (existing.femaleCount ?? 0) + fD);
+          if (uD > 0) patchEx.unknownCount = Math.max(0, (existing.unknownCount ?? 0) + uD);
+          const rem = delta - gS;
+          if (rem > 0) {
+            const base = (uD > 0) ? (patchEx.unknownCount ?? existing.unknownCount ?? 0) : (existing.unknownCount ?? 0);
+            patchEx.unknownCount = Math.max(0, base + rem);
+          }
+        } else {
+          patchEx.unknownCount = Math.max(0, (existing.unknownCount ?? 0) + delta);
+        }
+        flk.update(existing.id, patchEx);
         for (let i = 0; i < inv.items.length; i++) {
           if (keyOf(inv.items[i].category || inv.category, inv.items[i]) === k) outItems[i].flockId = existing.id;
         }
@@ -482,6 +518,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           (standard?.purposes?.includes('broiler') ? 'broiler' :
            standard?.purposes?.includes('breeder') ? 'breeder' : 'layer');
 
+        const hasGenderSplit = ((it.maleCount || 0) + (it.femaleCount || 0) + (it.unknownCount || 0)) > 0;
         const newFlockId = flk.add({
           name: it.flockName || it.description || name,
           type: inferredType,
@@ -491,9 +528,9 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           zoneId: it.zoneId || '',
           initialCount: delta,
           currentCount: delta,
-          maleCount: it.maleCount ?? null,
-          femaleCount: it.femaleCount ?? null,
-          unknownCount: it.unknownCount ?? null,
+          maleCount: hasGenderSplit ? (it.maleCount ?? null) : null,
+          femaleCount: hasGenderSplit ? (it.femaleCount ?? null) : null,
+          unknownCount: hasGenderSplit ? (it.unknownCount ?? null) : delta,
           layingStartDay: biology?.layingStartDay ?? 0,
           endOfCycleDay: biology?.endOfCycleDay ?? null,
           vaccineScheduleId: '',
@@ -544,10 +581,30 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       if (delta === 0) continue;
       const f = flk.flocks.find((x: any) => x.id === flockId);
       if (!f) continue;
-      flk.update(flockId, {
+      const patch4: any = {
         initialCount: Math.max(0, (f.initialCount ?? 0) + delta),
         currentCount: Math.max(0, (f.currentCount ?? 0) + delta),
-      });
+      };
+      const sampleItem = (inv.items || []).find((it2: any) => it2.existingFlockId === flockId);
+      if (sampleItem) {
+        const mD = Number(sampleItem.maleCount || 0);
+        const fD = Number(sampleItem.femaleCount || 0);
+        const uD = Number(sampleItem.unknownCount || 0);
+        const gS = mD + fD + uD;
+        if (gS > 0) {
+          if (mD > 0) patch4.maleCount = Math.max(0, (f.maleCount ?? 0) + mD);
+          if (fD > 0) patch4.femaleCount = Math.max(0, (f.femaleCount ?? 0) + fD);
+          if (uD > 0) patch4.unknownCount = Math.max(0, (f.unknownCount ?? 0) + uD);
+          const rem = delta - gS;
+          if (rem > 0) {
+            const base = (uD > 0) ? (patch4.unknownCount ?? f.unknownCount ?? 0) : (f.unknownCount ?? 0);
+            patch4.unknownCount = Math.max(0, base + rem);
+          }
+        } else {
+          patch4.unknownCount = Math.max(0, (f.unknownCount ?? 0) + delta);
+        }
+      }
+      flk.update(flockId, patch4);
     }
   }
 
