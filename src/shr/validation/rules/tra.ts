@@ -71,6 +71,8 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       existingFlockId: optionalId(),
       deviceId: optionalId(),
       equipmentStatus: optionalStr(20),
+      source: oneOf('منبع', ['flock', 'hatch'] as const).optional(),
+      hatchId: optionalId(),
       discountType: optionalStr(10),
       discountValue: floatNonNeg('تخفیف', 1_000_000_000_000).optional(),
       shipping: floatNonNeg('حمل', 1_000_000_000_000).optional(),

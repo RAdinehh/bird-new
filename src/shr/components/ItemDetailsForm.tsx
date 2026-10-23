@@ -5,7 +5,7 @@ import { useHal } from '../../mod/hal/store';
 import { useFlk, getAgeDays } from '../../mod/flk/store';
 import { useEgg } from '../../mod/egg/store';
 import { useWhs } from '../../mod/whs/store';
-import { useInc } from '../../mod/inc/store';
+import { useInc, type HatchResult } from '../../mod/inc/store';
 import { parseFaNum, toEn, toFa, formatQty } from '../utils/fa';
 import { differenceInCalendarDays, parse as parseJ, format as formatJ, subDays, isValid } from 'date-fns-jalali';
 import DatePicker from './DatePicker';
@@ -60,6 +60,8 @@ export interface ItemDetailFormData {
   eggTypes?: any[];
   withdrawalDays?: number | null;
   equipmentId?: string;
+  source?: 'flock' | 'hatch';
+  hatchId?: string;
 }
 
 interface Props {
@@ -98,6 +100,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     });
   };
   const incDevices = useInc((s) => s.devices || []);
+  const incStore = useInc();
+  const allHatches: HatchResult[] = ((incStore as unknown as { hatches?: HatchResult[] }).hatches) || [];
+  const availableHatches = allHatches.filter(h => h.generatedFlockId && (h.hatched || 0) > 0);
 
   const breedsForBird = birds.filter(b => b.id === item.birdId).length
     ? breeds.filter(b => b.birdId === item.birdId)
@@ -152,11 +157,45 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {nameFieldJsx}
         <SecTitle icon="🧬" title="اطلاعات گله" />
 
-        {/* ردیف ۱: گله + نوع پرنده */}
+        {/* 🆕 فروش: منبع جوجه */}
+        {!isPurchase && (
+          <Field label="منبع جوجه" hint="جوجه از گله موجود می‌آید یا از هچری">
+            <Select value={item.source || 'flock'} onChange={e => {
+              const ns = e.target.value as 'flock' | 'hatch';
+              updateItem({ source: ns, flockId: '', hatchId: '' });
+            }}>
+              <option value="flock">🐔 از گله موجود</option>
+              <option value="hatch">🥚 از هچری</option>
+            </Select>
+          </Field>
+        )}
+
+        {/* ردیف ۱: گله/هچ + نوع پرنده */}
         <Grid2>
           {isPurchase ? (
             <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
               <SmartSelect value={String(item.existingFlockId || '')} onChange={v => updateItem({ existingFlockId: v, flockId: v })} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
+            </Field>
+          ) : (item.source || 'flock') === 'hatch' ? (
+            <Field label="هچ مبدأ" required hint="هچی که جوجه‌ها از آن آمده">
+              <SmartSelect value={String(item.hatchId || '')} onChange={v => {
+                const h = availableHatches.find(x => x.id === v);
+                if (!h) return;
+                const f = flocks.find(x => x.id === h.generatedFlockId);
+                updateItem({
+                  hatchId: v,
+                  source: 'hatch',
+                  flockId: h.generatedFlockId || '',
+                  birdId: f?.birdId || item.birdId,
+                  breedId: f?.breedId || item.breedId,
+                  ageDays: f ? getAgeDays(f) : item.ageDays,
+                  hatchDate: h.date,
+                  maleCount: h.maleCount,
+                  femaleCount: h.femaleCount,
+                  unknownCount: h.unknownCount,
+                  description: item.description || `جوجه از هچ ${h.date}`,
+                });
+              }} options={availableHatches.map(h => ({ value: h.id, label: `${h.date} — ${h.hatched} جوجه` }))} placeholder="— انتخاب هچ —" modalTitle="انتخاب هچ" autoThreshold={6} />
             </Field>
           ) : (
             <Field label="گله مبدأ" required hint="گله‌ای که جوجه از آن فروخته می‌شود">
@@ -164,6 +203,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 const f = flocks.find(x => x.id === v);
                 updateItem({
                   flockId: v,
+                  source: 'flock',
+                  hatchId: '',
                   birdId: f?.birdId || item.birdId,
                   breedId: f?.breedId || item.breedId,
                   ageDays: f ? getAgeDays(f) : item.ageDays,

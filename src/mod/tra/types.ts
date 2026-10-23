@@ -141,6 +141,10 @@ export interface InvoiceItem extends ItemCategoryFields {
   // فروشنده/خریدار قلم
   /** 🆕 اتصال به گله موجود (بدون ساخت گله جدید) */
   existingFlockId?: string;
+  /** 🆕 منبع قلم — گله موجود یا هچری */
+  source?: 'flock' | 'hatch';
+  /** 🆕 شناسه هچ مبدأ (اگه source = 'hatch') */
+  hatchId?: string;
 }
 
 export interface Payment {
