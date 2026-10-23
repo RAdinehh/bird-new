@@ -287,6 +287,8 @@ const eqId = it.equipmentId;
     const itemCat = it.category || inv.category;
     if (itemCat !== 'equipment') continue;
     if (it.equipmentKind === 'consumable') continue;
+    // asset بدون سالن → equipment ساخته نشه (تست: asset without hall)
+    if (!it.hallId) continue;
     
     // ۴. بررسی تکراری: آیا قبلاً برای همین فاکتور ساخته شده؟
     const existing = hal.equipment.find(

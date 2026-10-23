@@ -204,8 +204,8 @@ export const useTra = create<State>()(
           const flk = useFlk.getState();
           for (const it of inv.items || []) {
             if (!it.birdId || !it.flockId) continue;
-            if (!BIRD_CATS.includes(inv.category)) continue;
-            const qty = it.quantity || 0;
+            if (!BIRD_CATS.includes((it as any).category || inv.category)) continue;
+            const qty = ((it as any).healthyCount ?? it.quantity) || 0;
             if (qty <= 0) continue;
             const f = flk.flocks.find(x => x.id === it.flockId);
             if (!f) continue;
@@ -238,7 +238,7 @@ export const useTra = create<State>()(
         const whsState = useWhs.getState();
         for (const it of inv.items || []) {
           const cat = (it as any).category || inv.category;
-          const isStock = ['feed', 'medicine', 'vaccine', 'other'].includes(cat);
+          const isStock = ['feed', 'medicine', 'vaccine', 'herbal', 'other'].includes(cat);
           const isEquipConsumable = cat === 'equipment' && (it as any).equipmentKind === 'consumable';
           if (!isStock && !isEquipConsumable) continue;
           const qty = Number(it.quantity) || 0;
@@ -250,7 +250,7 @@ export const useTra = create<State>()(
           try {
             whsState.addMovement({
               itemId: stockItemId,
-              type: 'out',
+              type: inv.type === 'sale' ? 'in' : 'out',
               quantity: qty,
               unitPrice: Number(it.unitPrice) || 0,
               reason: 'adjustment',
