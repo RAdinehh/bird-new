@@ -268,6 +268,20 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           );
         })()}
         
+        {!isPurchase && (
+          <Field label="دلیل فروش">
+            <Select value={String(item.saleReason || '')} onChange={e => updateItem({ saleReason: e.target.value })}>
+              <option value="">— انتخاب —</option>
+              <option value="culling">حذف از گله (کالینگ)</option>
+              <option value="sick">بیماری</option>
+              <option value="old_age">سن بالا</option>
+              <option value="surplus">مازاد</option>
+              <option value="breeding_stock">فروش مولد</option>
+              <option value="other">سایر</option>
+            </Select>
+          </Field>
+        )}
+
         {sellerSlot}
       </div>
     );
