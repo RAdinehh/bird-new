@@ -336,7 +336,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           </>
                         )}
                         {needsWeight && (
-                          <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار">
+                          <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار و محاسبه قیمت">
                             <NumField
                               placeholder="مثلاً ۵۰۰"
                               value={it.unitWeight != null && it.unitWeight > 0 ? toFa(String(it.unitWeight)) : ''}
@@ -349,6 +349,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           const currentUnitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
                           const currentUnitLabel = currentUnitDef?.label || 'واحد';
                           const factor = (currentUnitDef && currentUnitDef.factor !== null) ? currentUnitDef.factor : (it.unitWeight || 1);
+                          // ⚠️ factor: از unitDef (ثابت) یا unitWeight (دستی) — برای بسته‌بندی (bag, vial)
                           const baseQty = (it.quantity || 0) * factor;
                           const liveTotal = baseQty * (it.unitPrice || 0);
                           const baseUnitLabel = uom.baseUnit === 'kg' ? 'کیلوگرم' : uom.baseUnit === 'g' ? 'گرم' : uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'واحد';

@@ -102,8 +102,6 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       brand: optionalStr(50),
       protein: floatNonNeg('پروتئین', 100).optional(),
       energy: floatNonNeg('انرژی', 10000).optional(),
-      bagWeight: floatNonNeg('وزن کیسه', 100).optional(),
-      bagCount: floatNonNeg('تعداد کیسه', 10000).optional(),
       
       costType: optionalStr(30),
       equipmentCategory: optionalStr(50),
