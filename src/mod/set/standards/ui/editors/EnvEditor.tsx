@@ -42,6 +42,12 @@ export function EnvEditor({
               isTemp={true}
             />
             <CompactField
+              label="رطوبت هدف"
+              value={r.humidity.target ?? Math.round((r.humidity.min + r.humidity.max) / 2)}
+              onChange={v => update(i, { humidity: { ...r.humidity, target: v ?? 0 } })}
+              unit="٪"
+            />
+            <CompactField
               label="💧 رطوبت حداقل"
               value={r.humidity.min}
               onChange={v => update(i, { humidity: { ...r.humidity, min: v ?? 0 } })}

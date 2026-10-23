@@ -42,7 +42,7 @@ export interface EnvRange {
   dayFrom: number;
   dayTo: number;
   temp: { min: number; max: number; target: number };
-  humidity: { min: number; max: number };
+  humidity: { min: number; max: number; target?: number };
   light: { hours: number; lux?: number };
 }
 
@@ -342,7 +342,7 @@ export type ResolveSource = 'override' | 'settings' | 'default' | 'fallback';
 
 export interface EffectiveEnv {
   temp: { min: number; max: number; target: number };
-  humidity: { min: number; max: number };
+  humidity: { min: number; max: number; target?: number };
   light: { hours: number; lux?: number };
   source: ResolveSource;
 }
