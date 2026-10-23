@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { validate } from '../../shr/validation/helpers';
 import { createItemSchema, createMovementSchema } from '../../shr/validation/rules/whs';
 
-export type ItemCategory = 'feed' | 'medicine' | 'vaccine' | 'herbal' | 'equipment' | 'consumable' | 'egg';
+export type ItemCategory = 'feed' | 'medicine' | 'vaccine' | 'herbal' | 'equipment' | 'consumable' | 'egg' | 'manure' | 'broken';
 export type ItemUnit = 'kg' | 'g' | 'L' | 'l' | 'ml' | 'pcs' | 'vial' | 'pack' | 'ton' | 'bag' | 'dose';
 export type MovementType = 'in' | 'out' | 'adjust';
 export type MovementReason = 'purchase' | 'consumption' | 'sale' | 'gift' | 'loss' | 'adjustment' | 'return';
@@ -287,7 +287,9 @@ export const CATEGORY_LABEL: Record<ItemCategory, string> = {
   vaccine: 'واکسن',
   herbal: 'گیاه دارویی',
   equipment: 'تجهیزات',
-  consumable: 'مصرفی'
+  consumable: 'مصرفی',
+  manure: '🌱 کود',
+  broken: '💔 تخم شکسته'
 };
 
 export const CATEGORY_ICON: Record<ItemCategory, string> = {
@@ -297,7 +299,9 @@ export const CATEGORY_ICON: Record<ItemCategory, string> = {
   vaccine: '💉',
   herbal: '🌿',
   equipment: '🔧',
-  consumable: '📦'
+  consumable: '📦',
+  manure: '🌱',
+  broken: '💔'
 };
 
 
@@ -320,6 +324,8 @@ export const CATEGORY_DEFAULTS: Record<ItemCategory, {
   herbal:     { unit: 'g',    storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🌿 اطلاعات گیاهی' },
   equipment:  { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: true,  title: '' },
   consumable: { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '' },
+  manure:     { unit: 'kg',   storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🌱 اطلاعات کود' },
+  broken:     { unit: 'pcs',  storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '💔 تخم شکسته' },
 };
 
 export const UNIT_LABEL: Record<ItemUnit, string> = {

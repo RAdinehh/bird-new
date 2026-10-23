@@ -249,7 +249,7 @@ export const useTra = create<State>()(
         const whsState = useWhs.getState();
         for (const it of inv.items || []) {
           const cat = (it as any).category || inv.category;
-          const isStock = ['feed', 'medicine', 'vaccine', 'herbal', 'other'].includes(cat);
+          const isStock = ['feed', 'medicine', 'vaccine', 'herbal', 'other', 'manure', 'broken'].includes(cat);
           const isEquipConsumable = cat === 'equipment' && (it as any).equipmentKind === 'consumable';
           if (!isStock && !isEquipConsumable) continue;
           const qty = Number(it.quantity) || 0;

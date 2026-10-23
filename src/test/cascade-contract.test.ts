@@ -131,3 +131,80 @@ describe('CASCADE: purchase equipment با سالن → delete = no orphan equip
     expect(orphans.length).toBe(0);
   });
 });
+
+
+describe('CASCADE: sale manure → delete = whs balanced', () => {
+  it('کود: out (فروش) + reversal', () => {
+    useWhs.setState({
+      items: [{
+        id: 'whs-manure-1', name: 'کود', category: 'manure',
+        unit: 'kg', currentStock: 100, initialStock: 100,
+        minStock: 0, lastPrice: 0, avgPrice: 0, initialPrice: 0,
+        supplierId: '', expireDate: '', withdrawalDays: null,
+        storage: 'room', notes: '',
+        createdAt: '2026-01-01', updatedAt: '2026-01-01',
+      }],
+      movements: [],
+    } as any);
+
+    const inv = makeInv({
+      type: 'sale', category: 'manure',
+      items: [{
+        id: 'i1', description: 'کود', category: 'manure',
+        unit: 'kg', quantity: 20, unitPrice: 1000, total: 20000,
+        stockItemId: 'whs-manure-1',
+      }],
+      total: 20000,
+    });
+    const id = useTra.getState().addInvoice(inv);
+
+    const afterAdd = useWhs.getState().movements.filter(
+      (m: any) => m.sourceId === id && m.type === 'out'
+    );
+    expect(afterAdd.length).toBeGreaterThanOrEqual(1);
+
+    useTra.getState().deleteInvoice(id);
+    const afterDelete = useWhs.getState().movements.filter(
+      (m: any) => m.sourceId === id && m.type === 'in'
+    );
+    expect(afterDelete.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('CASCADE: sale broken → delete = whs balanced', () => {
+  it('تخم شکسته: out + reversal', () => {
+    useWhs.setState({
+      items: [{
+        id: 'whs-broken-1', name: 'تخم شکسته', category: 'broken',
+        unit: 'pcs', currentStock: 50, initialStock: 50,
+        minStock: 0, lastPrice: 0, avgPrice: 0, initialPrice: 0,
+        supplierId: '', expireDate: '', withdrawalDays: null,
+        storage: 'room', notes: '',
+        createdAt: '2026-01-01', updatedAt: '2026-01-01',
+      }],
+      movements: [],
+    } as any);
+
+    const inv = makeInv({
+      type: 'sale', category: 'broken',
+      items: [{
+        id: 'i1', description: 'تخم شکسته', category: 'broken',
+        unit: 'pcs', quantity: 10, unitPrice: 200, total: 2000,
+        stockItemId: 'whs-broken-1',
+      }],
+      total: 2000,
+    });
+    const id = useTra.getState().addInvoice(inv);
+
+    const afterAdd = useWhs.getState().movements.filter(
+      (m: any) => m.sourceId === id && m.type === 'out'
+    );
+    expect(afterAdd.length).toBeGreaterThanOrEqual(1);
+
+    useTra.getState().deleteInvoice(id);
+    const afterDelete = useWhs.getState().movements.filter(
+      (m: any) => m.sourceId === id && m.type === 'in'
+    );
+    expect(afterDelete.length).toBeGreaterThanOrEqual(1);
+  });
+});

@@ -8,7 +8,7 @@ import {
 } from '../helpers';
 import type { ValidationContext } from '../types';
 
-const CATEGORIES = ['feed', 'medicine', 'vaccine', 'herbal', 'equipment', 'consumable', 'egg'] as const;
+const CATEGORIES = ['feed', 'medicine', 'vaccine', 'herbal', 'equipment', 'consumable', 'egg', 'manure', 'broken'] as const;
 const UNITS = ['kg', 'g', 'L', 'ml', 'pcs', 'vial', 'pack'] as const;
 
 export function createItemSchema(_ctx: ValidationContext = {}) {

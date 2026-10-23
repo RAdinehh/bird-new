@@ -157,6 +157,13 @@ export function getTraInvoicesConfig(ctx: {
 }): FilterConfig<Invoice> {
   return {
     filterDefs: [
+      // ═══ ۰. طرف حساب (مشتری/فروشنده) ═══
+      {
+        key: 'partyId', label: 'طرف حساب', kind: 'enum',
+        options: Object.entries(ctx.partyNames || {}).map(([id, name]) => ({ value: id, label: String(name) })),
+        getValue: (i: Invoice) => i.partyId || '',
+        multi: true,
+      },
       // ═══ ۱. نوع فاکتور (خرید/فروش) ═══
       {
         key: 'type', label: 'نوع فاکتور', kind: 'enum',
