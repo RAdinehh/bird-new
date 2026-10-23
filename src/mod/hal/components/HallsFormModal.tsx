@@ -42,7 +42,7 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom, error, n
       : toFa(String(Math.round((celsius * 9 / 5 + 32) * 10) / 10))
   );
 
-  const shown = editing ? local : displayVal;
+  const shown = editing ? toFa(local) : displayVal;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
