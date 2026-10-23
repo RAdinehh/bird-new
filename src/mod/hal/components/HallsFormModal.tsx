@@ -295,7 +295,8 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 const patch: Partial<HallFormData> = {};
                 if (cap) patch.capacity = toFa(cap);
                 if (env?.temp?.target != null) patch.targetTemp = toFa(env.temp.target);
-                if (env?.humidity?.min != null) patch.targetHumidity = toFa(env.humidity.min);
+                if (env?.humidity?.target != null) patch.targetHumidity = toFa(env.humidity.target);
+                else if (env?.humidity?.min != null) patch.targetHumidity = toFa(env.humidity.min);
                 // 🆕 شدت نور (lux) از استاندارد نژاد
                 if (env?.light?.lux != null) patch.light = toFa(env.light.lux);
 

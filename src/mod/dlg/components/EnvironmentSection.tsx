@@ -24,7 +24,7 @@ export default function EnvironmentSection({ form, setForm, vErrors }: Props) {
   const hallStd = hall?.breedId ? breedStd.byBreedId(hall.breedId) : null;
   const dynStd = hallStd?.env && flockAge ? findInRange(hallStd.env, flockAge) : null;
   const targetTemp = (dynStd as any)?.temp?.target ?? hall?.targetTemp ?? null;
-  const targetHumidity = (dynStd as any)?.humidity?.min ?? hall?.targetHumidity ?? null;
+  const targetHumidity = (dynStd as any)?.humidity?.target ?? (dynStd as any)?.humidity?.min ?? hall?.targetHumidity ?? null;
 
   return (
     <>

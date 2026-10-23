@@ -79,7 +79,7 @@ export default function HallCard(props: HallCardProps) {
   const __flockAge = __activeFlock ? getAgeDays(__activeFlock) : null;
   const __dynStd = hallStd?.env && __flockAge ? findInRange(hallStd.env, __flockAge) : null;
   const __dynTemp = (__dynStd as any)?.temp?.target ?? h.targetTemp;
-  const __dynHum = (__dynStd as any)?.humidity?.min ?? h.targetHumidity;
+  const __dynHum = (__dynStd as any)?.humidity?.target ?? (__dynStd as any)?.humidity?.min ?? h.targetHumidity;
   const hallDensity = hallStd?.space?.densityMax ?? 9;
   const realCapacity = area > 0 && h.breedId ? Math.floor(area * hallDensity) : null;
   const hallFlocks = (flocks || []).filter((f: Flock) => f.hallId === h.id && f.status === 'active');
