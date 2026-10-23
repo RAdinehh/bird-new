@@ -84,34 +84,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const { items: whsItems } = useWhs();
   const { productions } = useEgg();
 
-  // 🆕 توابع auto-fill (حالت آبشاری)
-  const fillFromFlock = (flockId: string) => {
-    const f = flocks.find(x => x.id === flockId);
-    if (!f) { updateItem({ flockId }); return; }
-    const patch: Partial<ItemDetailFormData> = {
-      flockId,
-      birdId: f.birdId || item.birdId,
-      breedId: f.breedId || item.breedId,
-      ageDays: getAgeDays(f),
-    };
-    if (!isPurchase) {
-      patch.hallId = f.hallId || item.hallId;
-      patch.zoneId = f.zoneId || item.zoneId;
-    }
-    updateItem(patch);
-  };
-
-  const fillFromStock = (stockItemId: string) => {
-    const w = whsItems.find(x => x.id === stockItemId);
-    if (!w) { updateItem({ stockItemId }); return; }
-    updateItem({
-      stockItemId,
-      unit: w.unit || item.unit,
-      unitPrice: w.avgPrice ?? w.lastPrice ?? item.unitPrice,
-      description: item.description || w.name,
-    });
-  };
-
+  // 🆕 تابع auto-fill تخم (بقیه auto-fill ها inline هستن)
   const fillFromProduction = (productionId: string, kind: 'eating' | 'fertile') => {
     const prod = productions.find(x => x.id === productionId);
     if (!prod) return;
