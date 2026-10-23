@@ -521,16 +521,28 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
             </Field>
           )}
-          <Field label="نوع پرنده" required>
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
-          </Field>
+          {(isPurchase || item.flockId) ? (
+            <Field label="نوع پرنده" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
+              <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
+            </Field>
+          ) : (
+            <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', fontSize: 'var(--fs-xs)', gap: 4 }}>
+              🔒 ابتدا گله را انتخاب کنید
+            </div>
+          )}
         </Grid2>
 
         {/* ردیف ۲: نژاد + سن */}
         <Grid2>
-          <Field label="نژاد" required>
-            <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
-          </Field>
+          {item.birdId ? (
+            <Field label="نژاد" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
+              <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
+            </Field>
+          ) : (
+            <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', fontSize: 'var(--fs-xs)', gap: 4 }}>
+              🔒 ابتدا پرنده را انتخاب کنید
+            </div>
+          )}
           <Field label="سن (روز)">
             <Input mode="number" value={item.ageDays != null && item.ageDays > 0 ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
           </Field>
