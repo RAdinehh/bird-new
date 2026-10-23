@@ -124,7 +124,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       description: item.description || (kind === 'eating' ? `تخم خوراکی - ${prod.date}` : `تخم نطفه‌دار - ${prod.date}`),
     });
   };
-  const { productions } = useEgg();
   const incDevices = useInc((s) => s.devices || []);
 
   const breedsForBird = birds.filter(b => b.id === item.birdId).length
