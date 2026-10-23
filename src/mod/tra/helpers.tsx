@@ -79,7 +79,32 @@ export function daysUntilDue(inv: Invoice): number | null {
     const en = inv.dueDate.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
     const parts = en.split('/').map(Number);
     if (parts.length !== 3) return null;
-    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    // تبدیل شمسی → میلادی (نمی‌تونیم مستقیم new Date(y,m,d) با سال شمسی بزنیم)
+    let gy = parts[0], gm = parts[1], gd = parts[2];
+    if (gy < 1700) {
+      // تبدیل جلالی → میلادی (الگوریتم استاندارد)
+      const jy = gy, jm = gm, jd = gd;
+      let jy2 = jy + 1595;
+      const daysSum = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+      let gy2 = jy2;
+      let days = 355666 + (365 * jy2) + ((jy2 / 33 | 0) * 8) + 29 + jd;
+      if (jm > 12) return null;
+      days += daysSum[jm - 1];
+      // ساده‌ترین مسیر: از Intl استفاده کنیم
+      try {
+        const target = new Date(Date.UTC(2000, 0, 1));
+        // تقریب: اختلاف روز از 1/1/2000 میلادی
+        const jRef = { y: 1378, m: 10, d: 11 }; // 1/1/2000 = 1378/10/11
+        const dayDiff = (jy - jRef.y) * 365 + ((jy - jRef.y) / 4 | 0) - ((jy - jRef.y) / 100 | 0) + (jd - jRef.d) + (daysSum[jm - 1] - daysSum[jRef.m - 1]);
+        target.setUTCDate(target.getUTCDate() + dayDiff);
+        gy = target.getUTCFullYear();
+        gm = target.getUTCMonth() + 1;
+        gd = target.getUTCDate();
+      } catch {
+        return null;
+      }
+    }
+    const d = new Date(gy, gm - 1, gd);
     if (isNaN(d.getTime())) return null;
     const today = new Date();
     today.setHours(0, 0, 0, 0);

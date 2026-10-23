@@ -71,7 +71,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       '0-15': [], '16-30': [], '31-60': [], '61-90': [], '+90': []
     };
     filtered.forEach(inv => {
-      const days = ageDays(inv);
+      // Aging of receivables = روزهای overdue از dueDate، نه سن فاکتور
+      const dUntil = daysUntilDue(inv);
+      const days = dUntil !== null && dUntil < 0 ? -dUntil : 0;
       const b = agingBucket(days);
       if (map[b]) map[b].push(inv);
     });
