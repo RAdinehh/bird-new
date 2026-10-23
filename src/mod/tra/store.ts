@@ -216,7 +216,7 @@ export const useTra = create<State>()(
             else if (inv.type === 'sale') flk.update(it.flockId, { currentCount: cur + qty });
           }
           // 🎯 rollback حرکات انبار از طریق Event Bus
-          try { void bus.emit('tra:invoice:deleted', { invoiceId: inv.id, invoice: inv, items: inv.items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
+          // ⚠️ Event Bus حذف شد — manual reversal کافی است (پایین‌تر انجام می‌شه)
       // 🎯 rollback فروش تخم (egg.sales) — جلوگیری از orphan
       try {
         const eggState = useEgg.getState();
