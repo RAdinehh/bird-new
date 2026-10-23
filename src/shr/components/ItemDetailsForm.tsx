@@ -6,6 +6,7 @@ import { useFlk, getAgeDays } from '../../mod/flk/store';
 import { useEgg } from '../../mod/egg/store';
 import { useWhs } from '../../mod/whs/store';
 import { useInc, type HatchResult } from '../../mod/inc/store';
+import { useState } from 'react';
 import { parseFaNum, toEn, toFa, formatQty } from '../utils/fa';
 import { differenceInCalendarDays, parse as parseJ, format as formatJ, subDays, isValid } from 'date-fns-jalali';
 import DatePicker from './DatePicker';
@@ -80,6 +81,7 @@ const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
 );
 
 export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, invoiceDate, sellerSlot }: Props) {
+  const [hatchOverride, setHatchOverride] = useState(false);
   const { birds, breeds } = useBrd();
   const { halls, zones, equipment: halEquipment = [] } = useHal();
   const { flocks } = useFlk();
@@ -87,6 +89,18 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const { productions } = useEgg();
 
   // 🆕 تابع auto-fill تخم (بقیه auto-fill ها inline هستن)
+  // 🆕 محاسبه سن از تاریخ هچ و تاریخ فاکتور (scientifically correct)
+  const computeAgeFromHatch = (hatchDateStr: string | undefined): number | null => {
+    if (!hatchDateStr) return null;
+    try {
+      const inv = invoiceDate || new Date().toISOString().slice(0, 10);
+      const d1 = parseJ(toEn(hatchDateStr), 'yyyy/MM/dd', new Date());
+      const d2 = parseJ(toEn(inv), 'yyyy/MM/dd', new Date());
+      if (isValid(d1) && isValid(d2)) return Math.max(0, differenceInCalendarDays(d2, d1));
+    } catch {}
+    return null;
+  };
+
   const fillFromProduction = (productionId: string, kind: 'eating' | 'fertile') => {
     const prod = productions.find(x => x.id === productionId);
     if (!prod) return;
@@ -182,34 +196,38 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 const h = availableHatches.find(x => x.id === v);
                 if (!h) return;
                 const f = flocks.find(x => x.id === h.generatedFlockId);
+                const age = computeAgeFromHatch(h.date);
                 updateItem({
                   hatchId: v,
                   source: 'hatch',
                   flockId: h.generatedFlockId || '',
                   birdId: f?.birdId || item.birdId,
                   breedId: f?.breedId || item.breedId,
-                  ageDays: f ? getAgeDays(f) : item.ageDays,
+                  ageDays: age,
                   hatchDate: h.date,
                   maleCount: h.maleCount,
                   femaleCount: h.femaleCount,
                   unknownCount: h.unknownCount,
                   description: item.description || `جوجه از هچ ${h.date}`,
                 });
+                setHatchOverride(false);
               }} options={availableHatches.map(h => ({ value: h.id, label: `${h.date} — ${h.hatched} جوجه` }))} placeholder="— انتخاب هچ —" modalTitle="انتخاب هچ" autoThreshold={6} />
             </Field>
           ) : (
             <Field label="گله مبدأ" required hint="گله‌ای که جوجه از آن فروخته می‌شود">
               <SmartSelect value={String(item.flockId || '')} onChange={v => {
                 const f = flocks.find(x => x.id === v);
+                const age = computeAgeFromHatch(f?.hatchDate);
                 updateItem({
                   flockId: v,
                   source: 'flock',
                   hatchId: '',
                   birdId: f?.birdId || item.birdId,
                   breedId: f?.breedId || item.breedId,
-                  ageDays: f ? getAgeDays(f) : item.ageDays,
+                  ageDays: age != null ? age : (f ? getAgeDays(f) : item.ageDays),
                   hatchDate: f?.hatchDate || item.hatchDate,
                 });
+                setHatchOverride(false);
               }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
             </Field>
           )}
@@ -248,47 +266,26 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} unit="g" min={20} max={100} />
             </Field>
           </Grid2>
-        ) : (item.flockId || item.hatchId) ? (
-          <Grid2>
-            <Field label="تاریخ هچ" hint="از منبع انتخاب‌شده — غیرقابل تغییر">
-              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.hatchDate ? toFa(item.hatchDate) : '—'}
-              </div>
-            </Field>
-            <Field label="سن (روز)" hint="از منبع انتخاب‌شده — غیرقابل تغییر">
-              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.ageDays != null && item.ageDays > 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
-              </div>
-            </Field>
-          </Grid2>
+        ) : (item.flockId || item.hatchId) && !hatchOverride ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)' }}>
+            <span>📅 هچ: <b style={{ color: 'var(--accent)' }}>{item.hatchDate ? toFa(item.hatchDate) : '—'}</b></span>
+            <span style={{ color: 'var(--muted)' }}>•</span>
+            <span>📊 سن: <b style={{ color: 'var(--accent)' }}>{item.ageDays != null && item.ageDays > 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}</b></span>
+            <span style={{ marginInlineStart: 'auto', color: 'var(--muted)', fontSize: 14 }} title="قفل — از منبع انتخاب‌شده">🔒</span>
+            <button type="button" onClick={() => setHatchOverride(true)} title="ویرایش دستی" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2, color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)' }}>✏️</button>
+          </div>
         ) : (
           <Grid2>
             <Field label="تاریخ هچ" required>
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
-                let age = null;
-                if (v && invoiceDate) {
-                  try {
-                    const d1 = parseJ(toEn(v), 'yyyy/MM/dd', new Date());
-                    const d2 = parseJ(toEn(invoiceDate), 'yyyy/MM/dd', new Date());
-                    if (isValid(d1) && isValid(d2)) age = Math.max(0, differenceInCalendarDays(d2, d1));
-                  } catch {}
-                }
+                const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
               }} placeholder="1405/07/26" autoToday />
             </Field>
-            <Field label="سن (روز)" hint="با تغییر سن، تاریخ هچ محاسبه می‌شود">
-              <Input mode="number" value={item.ageDays != null && item.ageDays > 0 ? String(item.ageDays) : ''} onChange={e => {
-                let age = Math.round(parseFaNum(e.target.value)) || null;
-                if (age !== null && age > 150) age = 150;
-                let hDate = item.hatchDate;
-                if (age !== null && invoiceDate) {
-                  try {
-                    const d2 = parseJ(toEn(invoiceDate), 'yyyy/MM/dd', new Date());
-                    if (isValid(d2)) hDate = formatJ(subDays(d2, age), 'yyyy/MM/dd');
-                  } catch {}
-                }
-                updateItem({ ageDays: age, hatchDate: hDate });
-              }} unit="روز" min={0} max={150} />
+            <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
+              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
+                {item.ageDays != null && item.ageDays > 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
+              </div>
             </Field>
           </Grid2>
         )}
