@@ -222,14 +222,29 @@ export default function FlockCard(props: FlockCardProps) {
       stats={<>
         {ageDays > 0 && <span>🎂 <b style={{ color: 'var(--text)' }}>{fmt.int(ageDays)} روز</b></span>}
         {f.currentCount != null && <span>🐔 <b style={{ color: 'var(--text)' }}>{fmt.int(f.currentCount)}</b></span>}
-        {f.initialCount != null && f.currentCount != null && (f.initialCount - f.currentCount) > 0 && (() => {
-          const deaths = f.initialCount - f.currentCount;
-          const deathsPct = f.initialCount > 0 ? (deaths / f.initialCount) * 100 : 0;
+        {f.initialCount != null && f.currentCount != null && (() => {
+          const events = ((f as any).events || []).filter((e: any) => !e.revoked);
+          const eventSales = events.filter((e: any) => e.type === 'sell').reduce((s: number, e: any) => s + (e.count || 0), 0);
+          const eventDeaths = events.filter((e: any) => e.type === 'death' || e.type === 'cull').reduce((s: number, e: any) => s + (e.count || 0), 0);
+          const totalDiff = (f.initialCount ?? 0) - (f.currentCount ?? 0);
+          const unmatched = Math.max(0, totalDiff - eventSales - eventDeaths);
+          const deaths = eventDeaths + unmatched;
+          const deathsPct = (f.initialCount ?? 0) > 0 ? (deaths / (f.initialCount ?? 1)) * 100 : 0;
           const danger = deathsPct > 5;
+          if (eventSales === 0 && deaths === 0) return null;
           return (
-            <span style={{ color: danger ? 'var(--danger)' : 'var(--warn)', fontWeight: danger ? 700 : 500 }}>
-              💀 <b>{fmt.int(deaths)}</b>{danger ? ` (${fmt.int(Math.round(deathsPct))}٪)` : ''}
-            </span>
+            <>
+              {eventSales > 0 && (
+                <span style={{ color: 'var(--purple)', fontWeight: 500 }} title="تعداد فروخته‌شده">
+                  💰 <b>{fmt.int(eventSales)}</b>
+                </span>
+              )}
+              {deaths > 0 && (
+                <span style={{ color: danger ? 'var(--danger)' : 'var(--warn)', fontWeight: danger ? 700 : 500 }} title="تلفات + کاهش‌های نامشخص">
+                  💀 <b>{fmt.int(deaths)}</b>{danger ? ` (${fmt.int(Math.round(deathsPct))}٪)` : ''}
+                </span>
+              )}
+            </>
           );
         })()}
         {costs.perBird > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{fmt.money(Math.round(costs.perBird))}</b></span>}

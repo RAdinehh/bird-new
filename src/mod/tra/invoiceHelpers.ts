@@ -463,6 +463,38 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
         }
       }
       flk.update(explicitFlockId, patch);
+
+      // 🆕 فیکس ۱: ثبت FlockEvent فروش در تاریخچه گله
+      if (type === 'sale' && delta > 0) {
+        try {
+          const st = useFlk.getState();
+          const evt = {
+            id: `sell-${inv.id}-${explicitFlockId}-${Date.now()}`,
+            flockId: explicitFlockId,
+            date: effectiveDate,
+            type: 'sell' as any,
+            count: delta,
+            sex: 'mixed' as any,
+            direction: -1 as any,
+            buyerId: inv.partyId,
+            unitPrice: it.unitPrice,
+            totalPrice: it.total,
+            invoiceId: inv.id,
+            notes: `فروش از فاکتور ${inv.number || ''}`,
+            createdAt: new Date().toISOString(),
+          };
+          useFlk.setState({
+            flocks: st.flocks.map((ff: any) =>
+              ff.id === explicitFlockId
+                ? { ...ff, events: [...(ff.events || []), evt], updatedAt: new Date().toISOString() }
+                : ff
+            ),
+          } as any);
+        } catch (e) {
+          console.error('[applyInvoiceFlocks] sell event failed:', e);
+        }
+      }
+
       for (let i = 0; i < inv.items.length; i++) {
         if (keyOf(inv.items[i].category || inv.category, inv.items[i]) === k) outItems[i].flockId = explicitFlockId;
       }
