@@ -364,30 +364,73 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="🥚" title="اطلاعات تخم نطفه‌دار" />
-        <Grid2>
-          <Field label="نوع پرنده" required>
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
+
+        {/* 🆕 فروش: انتخاب از تولیدات تخم نطفه‌دار */}
+        {!isPurchase && (
+          <Field label="انتخاب از تولیدات تخم نطفه‌دار" hint="برای پر شدن خودکار مشخصات">
+            <SmartSelect
+              value=""
+              onChange={v => fillFromProduction(v, 'fertile')}
+              options={(productions || []).filter(prod => (prod.fertileCount || 0) > 0).map(prod => ({
+                value: prod.id,
+                label: `${prod.date} — ${prod.fertileCount} عدد`
+              }))}
+              placeholder="— انتخاب از تولیدات —"
+              modalTitle="انتخاب از تولیدات تخم نطفه‌دار"
+            />
           </Field>
+        )}
+
+        {/* ردیف ۱: گله (فقط فروش) / اتصال به گله موجود (فقط خرید) + نوع پرنده */}
+        <Grid2>
+          {isPurchase ? (
+            <Field label="نوع پرنده" required>
+              <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
+            </Field>
+          ) : (
+            <Field label="گله مبدأ" required hint="گله‌ای که تخم از آن تولید شده">
+              <SmartSelect value={String(item.flockId || '')} onChange={v => {
+                const f = flocks.find(x => x.id === v);
+                updateItem({
+                  flockId: v,
+                  birdId: f?.birdId || item.birdId,
+                  breedId: f?.breedId || item.breedId,
+                });
+              }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+            </Field>
+          )}
           <Field label="نژاد" required>
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
           </Field>
         </Grid2>
+
+        {/* ردیف ۲: تاریخ تخم + (خرید: دستگاه | فروش: وزن تخم) */}
         <Grid2>
           <Field label="تاریخ تولید تخم" required>
             <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
           </Field>
-          <Field label="دستگاه جوجه‌کشی" hint="برای ثبت خودکار در جوجه‌کشی">
-            <SmartSelect value={String(item.deviceId || '')} onChange={v => updateItem({ deviceId: v })} options={incDevices.map((d: any) => ({ value: d.id, label: d.name }))} placeholder="— بدون دستگاه —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
-          </Field>
+          {isPurchase ? (
+            <Field label="دستگاه جوجه‌کشی" hint="برای ثبت خودکار در جوجه‌کشی">
+              <SmartSelect value={String(item.deviceId || '')} onChange={v => updateItem({ deviceId: v })} options={incDevices.map((d) => ({ value: d.id, label: d.name }))} placeholder="— بدون دستگاه —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
+            </Field>
+          ) : (
+            <Field label="وزن تخم (گرم)" hint="اختیاری — برای گریدبندی">
+              <Input mode="number" value={item.eggWeight != null && item.eggWeight > 0 ? String(item.eggWeight) : ''} onChange={e => updateItem({ eggWeight: parseFaNum(e.target.value) || null })} unit="g" min={0} max={100} />
+            </Field>
+          )}
         </Grid2>
-        <Grid2>
-          <Field label="تعداد شکسته">
-            <Input mode="number" value={item.brokenEggCount != null && item.brokenEggCount > 0 ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
-          </Field>
-          <Field label="غیرقابل جوجه">
-            <Input mode="number" value={item.nonIncubableCount != null && item.nonIncubableCount > 0 ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
-          </Field>
-        </Grid2>
+
+        {/* ردیف ۳: فقط خرید: DOA fields */}
+        {isPurchase && (
+          <Grid2>
+            <Field label="تعداد شکسته">
+              <Input mode="number" value={item.brokenEggCount != null && item.brokenEggCount > 0 ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
+            </Field>
+            <Field label="غیرقابل جوجه">
+              <Input mode="number" value={item.nonIncubableCount != null && item.nonIncubableCount > 0 ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
+            </Field>
+          </Grid2>
+        )}
         {(() => {
           const q = item.quantity || 0;
           const broken = item.brokenEggCount || 0;
@@ -501,7 +544,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="🌾" title="اطلاعات دان" />
-        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "برای افزودن به موجودی" : "برای کاهش از موجودی"} help="اگر این کالا از قبل در انبار ثبت شده، از این لیست انتخابش کن تا موجودی به همان کالا اضافه شود (نه کالای تکراری). اگر خالی بگذاری، سیستم به‌طور خودکار یک کالای جدید در انبار می‌سازد.">
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "برای افزودن به موجودی" : "برای کاهش از موجودی"} help={isPurchase ? "اگر این کالا از قبل در انبار ثبت شده، از این لیست انتخابش کن تا موجودی به همان کالا اضافه شود (نه کالای تکراری). اگر خالی بگذاری، سیستم به‌طور خودکار یک کالای جدید در انبار می‌سازد." : "کالایی که از انبار کاهش می‌یابد. اگه انتخاب نکنی، سیستم بر اساس نام کالا جستجو می‌کند."}>
           <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
               const wItem = whsItems.find(x => x.id === v);
               updateItem({
