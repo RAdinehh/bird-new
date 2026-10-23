@@ -187,7 +187,7 @@ export function formatWarning(w: Warning): string {
 
   // pattern باید قبل از ratio چک بشه (چون هر دو expected دارن)
   if (signals.some(s => s.type === 'pattern')) {
-    return `${label} غیرمعمول`;
+    return `${label} غیرمعمول — الگوی همیشگی نیست`;
   }
 
   if (expected !== undefined && expected > 0) {

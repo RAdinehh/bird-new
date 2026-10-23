@@ -294,14 +294,15 @@ describe('DEFAULT_STANDARDS integrity', () => {
     });
   });
 
-  it('آخرین env رنج نژادهای بلندمدت تا 9999 میره', () => {
-    // فقط نژادهایی که طول دوره‌شون نامحدوده
-    const longTerm = ['marandi', 'golpaygani', 'golin', 'lari'];
-    longTerm.forEach(key => {
+  it('آخرین env نژادهای محلی حداقل ۵ سال (1825 روز) را پوشش می‌دهد', () => {
+    // نژادهای محلی/بومی (marandi, golpaygani, golin, lari) چرخه طبیعی ۵-۷ ساله دارن
+    // فرض قدیمی 9999 (forever) غلط بود — برای هیچ نژاد زنده‌ای منطقی نیست
+    const native = ['marandi', 'golpaygani', 'golin', 'lari'];
+    native.forEach(key => {
       const std = DEFAULT_STANDARDS[key];
       if (!std) return;
       const last = std.env[std.env.length - 1];
-      expect(last.dayTo, `${key} آخرین env`).toBe(9999);
+      expect(last.dayTo, `${key} آخرین env`).toBeGreaterThanOrEqual(1825);
     });
   });
 });
