@@ -298,6 +298,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="🥚" title="اطلاعات تخم خوراکی" />
+
+        {/* ردیف ۱: گله + تاریخ */}
         <Grid2>
           <Field label="گله مبدأ" required>
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
@@ -306,6 +308,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
           </Field>
         </Grid2>
+
+        {/* ردیف ۲: وزن + تعداد */}
         <Grid2>
           <Field label="وزن تخم (گرم)" hint="اختیاری — برای گریدبندی">
             <Input mode="number" value={item.eggWeight != null && item.eggWeight > 0 ? String(item.eggWeight) : ''} onChange={e => updateItem({ eggWeight: parseFaNum(e.target.value) || null })} unit="g" min={0} max={100} />
@@ -314,6 +318,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <Input disabled value={item.quantity && item.quantity > 0 ? toFa(String(item.quantity)) : ''} unit="عدد" placeholder="از بخش اقلام بالا" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
           </Field>
         </Grid2>
+
         {sellerSlot}
       </div>
     );
@@ -502,11 +507,13 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {nameFieldJsx}
           <SecTitle icon="⚙️" title="انتخاب تجهیز فروشی" />
+
+          {/* ردیف ۱: تجهیز موجود (تمام عرض) */}
           <Field label="تجهیز موجود" required hint="از سالن یا انبار انتخاب کنید">
             <SmartSelect
               value={String(item.equipmentId || '')}
               onChange={v => {
-                const eq = (halEquipment || []).find((e: any) => e.id === v);
+                const eq = (halEquipment || []).find(e => e.id === v);
                 if (eq) {
                   updateItem({
                     equipmentId: v,
@@ -521,7 +528,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                   updateItem({ equipmentId: v });
                 }
               }}
-              options={(halEquipment || []).map((e: any) => ({
+              options={(halEquipment || []).map(e => ({
                 value: e.id,
                 label: `${e.name} — ${e.hallId ? 'در سالن' : 'در انبار'}${e.count ? ` (×${e.count})` : ''}`,
               }))}
@@ -530,8 +537,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               autoThreshold={6}
             />
           </Field>
+
+          {/* ردیف ۲: پیش‌نمایش (اگر انتخاب شده) */}
           {item.equipmentId && (() => {
-            const eq = (halEquipment || []).find((e: any) => e.id === item.equipmentId);
+            const eq = (halEquipment || []).find(e => e.id === item.equipmentId);
             if (!eq) return null;
             return (
               <div style={{ padding: '10px 12px', background: 'var(--accent-soft)', border: '1px dashed var(--accent)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -542,11 +551,13 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               </div>
             );
           })()}
+
           {sellerSlot}
         </div>
       );
     }
 
+    return (
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
