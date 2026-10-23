@@ -93,7 +93,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const computeAgeFromHatch = (hatchDateStr: string | undefined): number | null => {
     if (!hatchDateStr) return null;
     try {
-      const inv = invoiceDate || new Date().toISOString().slice(0, 10);
+      const inv = invoiceDate || formatJ(new Date(), 'yyyy/MM/dd');
       const d1 = parseJ(toEn(hatchDateStr), 'yyyy/MM/dd', new Date());
       const d2 = parseJ(toEn(inv), 'yyyy/MM/dd', new Date());
       if (isValid(d1) && isValid(d2)) return Math.max(0, differenceInCalendarDays(d2, d1));
@@ -270,7 +270,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)' }}>
             <span>📅 هچ: <b style={{ color: 'var(--accent)' }}>{item.hatchDate ? toFa(item.hatchDate) : '—'}</b></span>
             <span style={{ color: 'var(--muted)' }}>•</span>
-            <span>📊 سن: <b style={{ color: 'var(--accent)' }}>{item.ageDays != null && item.ageDays > 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}</b></span>
+            <span>📊 سن: <b style={{ color: 'var(--accent)' }}>{item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}</b></span>
             <span style={{ marginInlineStart: 'auto', color: 'var(--muted)', fontSize: 14 }} title="قفل — از منبع انتخاب‌شده">🔒</span>
             <button type="button" onClick={() => setHatchOverride(true)} title="ویرایش دستی" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2, color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)' }}>✏️</button>
           </div>
@@ -284,7 +284,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
             <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
               <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.ageDays != null && item.ageDays > 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
+                {item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
               </div>
             </Field>
           </Grid2>
