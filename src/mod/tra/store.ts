@@ -212,8 +212,27 @@ export const useTra = create<State>()(
             const f = flk.flocks.find(x => x.id === it.flockId);
             if (!f) continue;
             const cur = f.currentCount ?? 0;
-            if (inv.type === 'purchase') flk.update(it.flockId, { currentCount: Math.max(0, cur - qty) });
-            else if (inv.type === 'sale') flk.update(it.flockId, { currentCount: cur + qty });
+            const sign = inv.type === 'purchase' ? -1 : 1;
+            const patchRevert: any = {
+              currentCount: inv.type === 'purchase' ? Math.max(0, cur - qty) : cur + qty,
+            };
+            const mDelta = Number((it as any).maleCount || 0);
+            const fDelta = Number((it as any).femaleCount || 0);
+            const uDelta = Number((it as any).unknownCount || 0);
+            const gSum = mDelta + fDelta + uDelta;
+            if (gSum > 0) {
+              if (mDelta > 0) patchRevert.maleCount = Math.max(0, (f.maleCount ?? 0) + sign * mDelta);
+              if (fDelta > 0) patchRevert.femaleCount = Math.max(0, (f.femaleCount ?? 0) + sign * fDelta);
+              if (uDelta > 0) patchRevert.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * uDelta);
+              const rem = qty - gSum;
+              if (rem > 0) {
+                const base = (uDelta > 0) ? (patchRevert.unknownCount ?? f.unknownCount ?? 0) : (f.unknownCount ?? 0);
+                patchRevert.unknownCount = Math.max(0, base + sign * rem);
+              }
+            } else {
+              patchRevert.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * qty);
+            }
+            flk.update(it.flockId, patchRevert);
           }
           // 🎯 rollback حرکات انبار از طریق Event Bus
           // ⚠️ Event Bus حذف شد — manual reversal کافی است (پایین‌تر انجام می‌شه)
