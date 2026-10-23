@@ -95,15 +95,16 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const nameFieldJsx = (
     <Field
       label={
-        category === 'herbal' ? 'نام داروی گیاهی' :
-        category === 'medicine' ? 'نام دارو' :
-        category === 'feed' ? 'نام دان' :
-        category === 'vaccine' ? 'نام واکسن' :
-        category === 'equipment' ? 'نام تجهیز' :
-        category === 'chick' ? 'نام گله / جوجه' :
-        category === 'egg' || category === 'fertile_egg' ? 'نام تخم' :
-        category === 'adult' ? 'نام پرنده' :
+        category === 'herbal' ? (isPurchase ? 'نام داروی گیاهی (خرید)' : 'نام داروی گیاهی (فروش)') :
+        category === 'medicine' ? (isPurchase ? 'نام دارو (خرید)' : 'نام دارو (فروش)') :
+        category === 'feed' ? (isPurchase ? 'نام دان (خرید)' : 'نام دان (فروش)') :
+        category === 'vaccine' ? (isPurchase ? 'نام واکسن (خرید)' : 'نام واکسن (فروش)') :
+        category === 'equipment' ? (isPurchase ? 'نام تجهیز (خرید)' : 'نام تجهیز (فروش)') :
+        category === 'chick' ? (isPurchase ? 'نام جوجه (خرید)' : 'نام جوجه (فروش)') :
+        category === 'egg' || category === 'fertile_egg' ? (isPurchase ? 'نام تخم (خرید)' : 'نام تخم (فروش)') :
+        category === 'adult' ? (isPurchase ? 'نام پرنده (خرید)' : 'نام پرنده (فروش)') :
         category === 'manure' ? 'نام کود' :
+        category === 'broken' ? 'نام تخم شکسته' :
         'نام کالا / شرح'
       }
       required
@@ -448,14 +449,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="🌾" title="اطلاعات دان" />
-        <Field label="اتصال به انبار" hint="برای موجودی و ثبت خودکار" help="اگر این کالا از قبل در انبار ثبت شده، از این لیست انتخابش کن تا موجودی به همان کالا اضافه شود (نه کالای تکراری). اگر خالی بگذاری، سیستم به‌طور خودکار یک کالای جدید در انبار می‌سازد.">
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "برای افزودن به موجودی" : "برای کاهش از موجودی"} help="اگر این کالا از قبل در انبار ثبت شده، از این لیست انتخابش کن تا موجودی به همان کالا اضافه شود (نه کالای تکراری). اگر خالی بگذاری، سیستم به‌طور خودکار یک کالای جدید در انبار می‌سازد.">
           <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter(w => w.category === 'feed').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب کالای انبار" autoThreshold={6} />
         </Field>
         <Grid2>
           <Field label="تاریخ انقضا">
             <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
           </Field>
-          <Field label={isPurchase ? "گله مقصد" : "گله مبدأ"} hint="هزینه به این گله متصل می‌شود" help="اگر این خرید را برای گله مشخصی انجام داده‌ای، گله را انتخاب کن تا هزینه همان لحظه در سود و زیان آن گله ثبت شود. اگر این کالا برای چند گله یا انبار عمومی خریده شده، این فیلد را خالی بگذار؛ هزینه بعداً هنگام مصرف در «ثبت روزانه» به‌طور خودکار روی گله سرشکن می‌شود.">
+          <Field label={isPurchase ? "گله مقصد" : "گله مبدأ"} hint={isPurchase ? "هزینه به این گله متصل می‌شود" : "کالا از این گله تخصیص می‌یابد"}>
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
         </Grid2>
@@ -470,16 +471,22 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="💊" title="اطلاعات دارو" />
-        <Field label="اتصال به انبار" hint="کالای دارو موجود">
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "دارو به انبار اضافه می‌شود" : "دارو از انبار کاهش می‌یابد"}>
           <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter(w => w.category === 'medicine').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب دارو" autoThreshold={6} />
         </Field>
         <Grid2>
           <Field label="تاریخ انقضا">
             <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
           </Field>
+          {isPurchase && (
+          {isPurchase && (
+          {isPurchase && (
           <Field label="دوره پرهیز (روز)" hint="بعد از مصرف، چند روز فروش محصول ممنوع">
             <Input mode="number" value={item.withdrawalDays != null && item.withdrawalDays > 0 ? String(item.withdrawalDays) : ''} onChange={e => updateItem({ withdrawalDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} max={365} />
           </Field>
+          )}
+          )}
+          )}
           <Field label={isPurchase ? "گله مقصد" : "گله مبدأ"} hint="هزینه به این گله متصل می‌شود" help="اگر این خرید را برای گله مشخصی انجام داده‌ای، گله را انتخاب کن تا هزینه همان لحظه در سود و زیان آن گله ثبت شود. اگر این کالا برای چند گله یا انبار عمومی خریده شده، این فیلد را خالی بگذار؛ هزینه بعداً هنگام مصرف در «ثبت روزانه» به‌طور خودکار روی گله سرشکن می‌شود.">
             <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
@@ -651,7 +658,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="🌿" title="اطلاعات داروی گیاهی" />
-        <Field label="اتصال به انبار" hint="کالای داروی گیاهی موجود">
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "به انبار اضافه می‌شود" : "از انبار کاهش می‌یابد"}>
           <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter(w => w.category === 'herbal').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب داروی گیاهی" autoThreshold={6} />
         </Field>
         <Grid2>
@@ -677,7 +684,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="💉" title="اطلاعات واکسن" />
-        <Field label="اتصال به انبار" hint="کالای vaccine موجود">
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "واکسن به انبار اضافه" : "واکسن از انبار کاهش"}>
           <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter(w => w.category === 'vaccine').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب واکسن" autoThreshold={6} />
         </Field>
         <Grid2>
@@ -708,7 +715,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="💩" title="اطلاعات کود" />
-        <Field label="اتصال به انبار" hint="کالای کود موجود در انبار">
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
           <SmartSelect
             value={String(item.stockItemId || '')}
             onChange={v => updateItem({ stockItemId: v })}
@@ -792,7 +799,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
 
         {/* ردیف ۳: انتخاب از انبار — تمام عرض */}
-        <Field label="اتصال به انبار" hint="کالای تخم شکسته موجود">
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
           <SmartSelect
             value={String(item.stockItemId || '')}
             onChange={v => updateItem({ stockItemId: v })}
