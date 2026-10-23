@@ -322,7 +322,7 @@ return (
                 onToggle={() => setExpandedId(isOpen ? null : inv.id)}
                 onTransferClick={() => setTransferModal({ id: inv.id, to: nextWorkflowStatus(inv.workflowStatus)! })}
                 onReopen={remaining(inv) <= 0 ? () => handleReopen(inv) : undefined}
-          onEdit={remaining(inv) > 0 ? () => openEdit(inv) : undefined}
+          onEdit={remaining(inv) > 0 && !inv.paidAt ? () => openEdit(inv) : undefined}
                 index={i}
               />
             );
