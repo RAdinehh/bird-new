@@ -470,8 +470,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="💊" title="اطلاعات دارو" />
-        <Field label="اتصال به انبار" hint="کالای medicine موجود">
-          <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter(w => w.category === 'medicine').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب medicine" autoThreshold={6} />
+        <Field label="اتصال به انبار" hint="کالای دارو موجود">
+          <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter(w => w.category === 'medicine').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب دارو" autoThreshold={6} />
         </Field>
         <Grid2>
           <Field label="تاریخ انقضا">
@@ -651,8 +651,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="🌿" title="اطلاعات داروی گیاهی" />
-        <Field label="اتصال به انبار" hint="کالای herbal موجود">
-          <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter(w => w.category === 'herbal').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب herbal" autoThreshold={6} />
+        <Field label="اتصال به انبار" hint="کالای داروی گیاهی موجود">
+          <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter(w => w.category === 'herbal').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب داروی گیاهی" autoThreshold={6} />
         </Field>
         <Grid2>
           <Field label="تاریخ انقضا">
@@ -678,7 +678,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {nameFieldJsx}
         <SecTitle icon="💉" title="اطلاعات واکسن" />
         <Field label="اتصال به انبار" hint="کالای vaccine موجود">
-          <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter(w => w.category === 'vaccine').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب vaccine" autoThreshold={6} />
+          <SmartSelect value={String(item.stockItemId || '')} onChange={v => updateItem({ stockItemId: v })} options={(whsItems || []).filter(w => w.category === 'vaccine').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب واکسن" autoThreshold={6} />
         </Field>
         <Grid2>
           <Field label="تاریخ انقضا">
