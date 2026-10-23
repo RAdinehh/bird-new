@@ -1,9 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { HelpIcon } from '../../shr/components/ui/HelpIcon';
 
 interface Props {
   icon: string;
   title: string;
   subtitle?: string;
+  help?: string;
   defaultOpen?: boolean;
   /** اگه ست بشه، فقط یکی از گروه‌های هم‌نام می‌تونه باز باشه */
   exclusiveGroup?: string;
@@ -17,6 +19,7 @@ export default function SettingsGroup({
   icon,
   title,
   subtitle,
+  help,
   defaultOpen = false,
   exclusiveGroup,
   persist = true,
@@ -97,7 +100,7 @@ export default function SettingsGroup({
             fontSize: 'var(--fs-base)',
             fontWeight: 700,
             color: open ? color : 'var(--text)'
-          }}>{title}</div>
+          }}>{title}{help && <HelpIcon text={help} />}</div>
           {subtitle && !open ? (
             <div style={{
               fontSize: 'var(--fs-xs)',
