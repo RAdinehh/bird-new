@@ -234,6 +234,28 @@ export const useTra = create<State>()(
             }
             flk.update(it.flockId, patchRevert);
           }
+
+      // 🆕 فیکس ۳: Revoke sell events این فاکتور
+      try {
+        const st3 = useFlk.getState();
+        const hasAny3 = st3.flocks.some((f: any) => (f.events || []).some((e: any) => e.invoiceId === id && e.type === 'sell' && !e.revoked));
+        if (hasAny3) {
+          useFlk.setState({
+            flocks: st3.flocks.map((f: any) => {
+              const hasRev = (f.events || []).some((e: any) => e.invoiceId === id && e.type === 'sell' && !e.revoked);
+              if (!hasRev) return f;
+              return {
+                ...f,
+                events: (f.events || []).map((e: any) =>
+                  e.invoiceId === id && e.type === 'sell' && !e.revoked
+                    ? { ...e, revoked: true }
+                    : e
+                ),
+              };
+            }),
+          } as any);
+        }
+      } catch (e) { console.error('[deleteInvoice] sell events revoke failed:', e); }
           // 🎯 rollback حرکات انبار از طریق Event Bus
           // ⚠️ Event Bus حذف شد — manual reversal کافی است (پایین‌تر انجام می‌شه)
       // 🎯 rollback فروش تخم (egg.sales) — جلوگیری از orphan
