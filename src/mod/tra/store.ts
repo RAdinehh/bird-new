@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { useFlk } from '../flk/store';
+import { useEgg } from '../egg/store';
 import { verifyInvariantsIfDev } from '../../shr/dev/invariants';
 import { useWhs } from '../whs/store';
 import { useHal } from '../hal/store';
@@ -215,6 +216,15 @@ export const useTra = create<State>()(
           }
           // 🎯 rollback حرکات انبار از طریق Event Bus
           try { void bus.emit('tra:invoice:deleted', { invoiceId: inv.id, invoice: inv, items: inv.items }, { source: 'tra' }).catch(() => {}); } catch(e) {}
+      // 🎯 rollback فروش تخم (egg.sales) — جلوگیری از orphan
+      try {
+        const eggState = useEgg.getState();
+        const linkedSales = (eggState.sales || []).filter((s: any) => s.sourceInvoiceId === id);
+        for (const sale of linkedSales) {
+          try { eggState.deleteSale(sale.id); } catch {}
+        }
+      } catch (e) { console.error('[tra delete] egg sales reversal:', e); }
+
           // 🎯 rollback ورودی‌های تخم در جوجه‌کشی
           try {
             const incState = useInc.getState();
