@@ -37,6 +37,10 @@ export const PaymentSchema = z.object({
 });
 
 export function createInvoiceSchema(ctx: ValidationContext = {}) {
+  const vFlocks = (ctx as any).flocks as any[] | undefined;
+  const vWhsItems = (ctx as any).whsItems as any[] | undefined;
+  const vContacts = (ctx as any).contacts as any[] | undefined;
+  const vIsEdit = !!(ctx as any).isEdit;
   return z.object({
     type: oneOf('نوع فاکتور', ['purchase', 'sale'] as const),
     date: persianDateOpt('تاریخ'),
@@ -264,6 +268,76 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       
       if (Number(it.shipping) > 10000000000) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'هزینه حمل حداکثر ۱۰ میلیارد تومان است', path: p('shipping') });
+      }
+    }
+
+    // 🆕 Phase B: Cross-module validation
+    // 1. طرف حساب — نقش مناسب
+    if (vContacts && d.partyId) {
+      const party = vContacts.find((c: any) => c.id === d.partyId);
+      if (party) {
+        const needRole = d.type === 'sale' ? 'customer' : 'supplier';
+        if (!Array.isArray(party.roles) || !party.roles.includes(needRole)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: d.type === 'sale'
+              ? 'طرف حساب باید نقش «مشتری» داشته باشد'
+              : 'طرف حساب باید نقش «فروشنده» داشته باشد',
+            path: ['partyId'],
+          });
+        }
+      }
+    }
+
+    // 2. فروش: موجودی گله/انبار + دوره پرهیز (فقط ایجاد، نه ویرایش)
+    if (d.type === 'sale' && !vIsEdit) {
+      const todayParts = new Intl.DateTimeFormat('en-u-ca-persian', { year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+      const todayJ = `${todayParts.find(x => x.type === 'year')?.value || '0'}/${todayParts.find(x => x.type === 'month')?.value || '01'}/${todayParts.find(x => x.type === 'day')?.value || '01'}`;
+
+      for (let i = 0; i < (d.items || []).length; i++) {
+        const it = d.items[i];
+        const itCat = it.category || d.category;
+        const p = (f: string) => ['items', String(i), f];
+
+        // موجودی گله + دوره پرهیز (chick / adult)
+        if (['chick', 'adult'].includes(itCat) && it.flockId && vFlocks) {
+          const flock = vFlocks.find((f: any) => f.id === it.flockId);
+          if (flock) {
+            const qty = Number(it.quantity) || 0;
+            const cur = Number(flock.currentCount ?? 0);
+            if (qty > cur) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `تعداد فروش (${qty}) بیش از موجودی گله (${cur}) است`,
+                path: p('quantity'),
+              });
+            }
+            const aw = flock.activeWithdrawal;
+            if (aw && aw.until && String(aw.until) >= todayJ) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `گله در دوره پرهیز دارویی است (تا ${aw.until}) — فروش ممنوع`,
+                path: p('flockId'),
+              });
+            }
+          }
+        }
+
+        // موجودی انبار
+        if (it.stockItemId && vWhsItems) {
+          const w = vWhsItems.find((x: any) => x.id === it.stockItemId);
+          if (w) {
+            const qty = Number(it.quantity) || 0;
+            const cur = Number(w.currentStock ?? 0);
+            if (qty > cur) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `تعداد فروش (${qty}) بیش از موجودی انبار (${cur}) است`,
+                path: p('quantity'),
+              });
+            }
+          }
+        }
       }
     }
   });

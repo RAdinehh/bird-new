@@ -56,7 +56,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     addItem, updateItem, removeItem,
     addPayment, updatePayment, removePayment,
     openNew, openEdit, save,
-  } = useInvoiceForm({ kind, invoices, contacts, addInvoice, updateInvoice });
+  } = useInvoiceForm({ kind, invoices, contacts, flocks, whsItems, addInvoice, updateInvoice });
 
   // آبشار: اگه partyId دیگه در لیست فیلترشده نیست، پاک شه
   useEffect(() => {
