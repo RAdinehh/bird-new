@@ -102,7 +102,7 @@ export default function Set() {
   );
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{
         display: 'flex',
         gap: 'var(--gap-xs)',
@@ -170,14 +170,12 @@ export default function Set() {
         ))}
       </div>
 
-      <div style={{ padding: 'var(--sp-3)' }}>
+      <div style={{ padding: 'var(--sp-3)', paddingBottom: 90, minHeight: 0 }}>
         <div
           ref={containerRef}
           style={{
-            overflow: 'hidden',
             overflowX: 'hidden',
             width: '100%',
-                        touchAction: 'pan-y',
             isolation: 'isolate',
           }}
         >
@@ -187,7 +185,6 @@ export default function Set() {
               display: 'flex',
               direction: 'ltr',
               willChange: 'transform',
-              touchAction: 'pan-y',
               width: '100%',
               minWidth: 0,
             }}
@@ -203,7 +200,6 @@ export default function Set() {
                     minWidth: 0,
                     maxWidth: '100%',
                     direction: 'rtl',
-                    overflow: 'hidden',
                     boxSizing: 'border-box',
                     isolation: 'isolate',
                   }}

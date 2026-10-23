@@ -56,14 +56,19 @@ function Layout() {
 
   return (
     <div style={{
-      maxWidth: 480, margin: '0 auto', minHeight: '100svh', paddingBottom: 80, boxSizing: 'border-box'
+      maxWidth: 480,
+      margin: '0 auto',
+      minHeight: '100svh',
+      boxSizing: 'border-box',
+      display: 'flex',
+      flexDirection: 'column',
     }}>
       <Header title={title} />
       <MenuDrawer />
       <HelpModal />
       <ShortcutsModal />
       <DialogHost />
-      <main key={loc.pathname}>
+      <main key={loc.pathname} style={{ flex: 1, minHeight: 0 }}>
         <AppRouter />
       </main>
       <BottomNav />

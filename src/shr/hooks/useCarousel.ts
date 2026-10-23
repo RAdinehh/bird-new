@@ -152,6 +152,7 @@ export function useCarousel(
         }
       }
 
+      // فقط افقی: از این به بعد preventDefault مجازه
       if (direction !== 'h') return;
 
       const w = wRef.current || el.clientWidth;
@@ -164,7 +165,7 @@ export function useCarousel(
       if (trackRef.current) {
         trackRef.current.style.transform = `translate3d(${tx}px, 0, 0)`;
       }
-      // جلوگیری از اسکرول افقی صفحه در حین swipe
+      // فقط حالا که افقی هستیم، جلوی اسکرول افقی صفحه رو بگیر
       if (e.cancelable) {
         try { e.preventDefault(); } catch { /* silent */ }
       }

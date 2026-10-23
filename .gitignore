@@ -1,40 +1,37 @@
-# Dependencies
-node_modules
-
-# Build
-dist
-*.tsbuildinfo
-
-# Cache
-.vite
-*.log
-
-# Editor / OS
-.DS_Store
-*.swp
-*~
-
-# Env
-.env
-.env.local
-
-# Backup files
-*.bak
-*.bak-*
-*.save
-*.save.*
 
 # Archive
+# Backup files
+# Build
+# Cache
+# Dependencies
+# Editor / OS
+# Env
+# Old files
+*-backup-*
+*.bak
+*.bak-*
+*.bak_*
+*.bak_cap
+*.log
+*.save
+*.save.*
+*.swp
+*.tsbuildinfo
+*~
+.DS_Store
+.env
+.env.local
+.sref/
+.vite
+.vitest
+AI-PACKAGE.txt
+android/
 archive/
 backup-*
-*-backup-*
-
-# Old files
-AI-PACKAGE.txt
-project.txt
-project-final.txt
-unfinished.txt
-scripts/
-scripts/
 coverage
-.vitest
+dist
+node_modules
+project-final.txt
+project.txt
+scripts/
+unfinished.txt

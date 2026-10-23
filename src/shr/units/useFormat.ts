@@ -42,12 +42,14 @@ function formatNumberRaw(
   sep: ThousandSep,
   decimals: number,
 ): string {
-  if (!isFinite(n)) return '—';
+  if (n == null || typeof n !== 'number' || !isFinite(n)) return '—';
   const sign = n < 0 ? '-' : '';
   const abs = Math.abs(n);
   const fixed = abs.toFixed(decimals);
-  const [intPart = '0', decPart] = fixed.split('.');
-  const sepChar = SEP_MAP[sep];
+  const parts = fixed.split('.');
+  const intPart = parts[0] || '0';
+  const decPart = parts[1] || '';
+  const sepChar = SEP_MAP[sep] || '';
   const intWithSep = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, sepChar);
   let result = sign + intWithSep;
   if (decimals > 0 && decPart) {

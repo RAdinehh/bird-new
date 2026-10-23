@@ -69,16 +69,18 @@ function UnitRow({
       </div>
 
       {/* وسط: preview */}
-      <div style={{
-        fontSize: 'var(--fs-sm)',
-        fontWeight: 700,
-        color: 'var(--accent)',
-        fontVariantNumeric: 'tabular-nums',
-        direction: 'rtl',
-        textAlign: 'left',
-        whiteSpace: 'nowrap',
-        minWidth: 80,
-      }}>
+      <div
+        dir="ltr"
+        style={{
+          fontSize: 'var(--fs-sm)',
+          fontWeight: 700,
+          color: 'var(--accent)',
+          fontVariantNumeric: 'tabular-nums',
+          textAlign: 'left',
+          whiteSpace: 'nowrap',
+          minWidth: 100,
+        }}
+      >
         {preview}
       </div>
 
@@ -239,19 +241,6 @@ export default function UnitsTab() {
             { v: 'ha', l: 'هکتار' },
           ]}
           preview={fmt.area(SAMPLE.area)}
-        />
-
-        <UnitRow
-          icon="⏱" label="زمان"
-          value={units.time}
-          onChange={v => update({ time: v as TimeUnit })}
-          options={[
-            { v: 's', l: 'ثانیه' },
-            { v: 'min', l: 'دقیقه' },
-            { v: 'h', l: 'ساعت' },
-            { v: 'day', l: 'روز' },
-          ]}
-          preview={fmt.time(SAMPLE.time)}
         />
 
       </SettingsGroup>
