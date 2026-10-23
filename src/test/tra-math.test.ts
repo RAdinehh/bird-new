@@ -78,9 +78,17 @@ describe('computeCashDiscount', () => {
   it('no discount config', () => {
     expect(computeCashDiscount({ total: 1000, date: '1405/01/01', payments: [{ date: '1405/01/05', amount: 500 }] } as any)).toBe(0);
   });
-  it('payment within window', () => {
+  it('partial payment within window → no discount (نیاز به تسویه کامل)', () => {
+    // استاندارد accounting: تخفیف نقدی روی total فاکتور اعمال می‌شود
+    // اما فقط وقتی که مشتری به اندازه total-discount پرداخت کند (تسویه)
     const d = computeCashDiscount({ total: 1000, date: '1405/01/01', cashDiscountPct: 5, cashDiscountDays: 10, payments: [{ date: '1405/01/05', amount: 500 }] } as any);
-    expect(d).toBe(25);
+    expect(d).toBe(0);
+  });
+
+  it('full payment within window → discount روی total', () => {
+    // مشتری ۹۵۰ پرداخت کرد (total - 5%) → تخفیف ۵۰ اعمال می‌شود
+    const d = computeCashDiscount({ total: 1000, date: '1405/01/01', cashDiscountPct: 5, cashDiscountDays: 10, payments: [{ date: '1405/01/05', amount: 950 }] } as any);
+    expect(d).toBe(50);
   });
   it('payment outside window', () => {
     expect(computeCashDiscount({ total: 1000, date: '1405/01/01', cashDiscountPct: 5, cashDiscountDays: 10, payments: [{ date: '1405/02/15', amount: 500 }] } as any)).toBe(0);

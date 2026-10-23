@@ -130,7 +130,7 @@ describe('rules — invoices', () => {
   it('طلب 70 روزه از مشتری → critical', () => {
     useTra.setState({
       invoices: [{
-        id: 'inv1', type: 'sale', total: 100000, date: daysAgoJ(70),
+        id: 'inv1', type: 'sale', total: 100000, date: daysAgoJ(70), dueDate: daysAgoJ(70),
         payments: [], number: 'S001',
       }] as any,
     });
@@ -144,7 +144,7 @@ describe('rules — invoices', () => {
   it('طلب 45 روزه → important', () => {
     useTra.setState({
       invoices: [{
-        id: 'inv1', type: 'sale', total: 100000, date: daysAgoJ(45),
+        id: 'inv1', type: 'sale', total: 100000, date: daysAgoJ(45), dueDate: daysAgoJ(45),
         payments: [],
       }] as any,
     });
@@ -170,7 +170,7 @@ describe('rules — invoices', () => {
   it('بدهی 70 روزه به فروشنده → critical', () => {
     useTra.setState({
       invoices: [{
-        id: 'inv1', type: 'purchase', total: 100000, date: daysAgoJ(70),
+        id: 'inv1', type: 'purchase', total: 100000, date: daysAgoJ(70), dueDate: daysAgoJ(70),
         payments: [],
       }] as any,
     });
