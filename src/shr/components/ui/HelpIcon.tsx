@@ -114,18 +114,22 @@ export function HelpIcon({ text }: Props) {
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
         aria-label="راهنما"
         style={{
-          width: 18, height: 18,
-          borderRadius: '50%',
-          border: '1px solid var(--muted)',
-          background: open ? 'var(--accent-soft)' : 'transparent',
+          width: 16, height: 16,
+          background: 'transparent',
+          border: 'none',
+          outline: 'none',
+          padding: 0,
           color: open ? 'var(--accent)' : 'var(--muted)',
-          fontSize: 11, fontWeight: 800,
+          fontSize: 14, fontWeight: 700,
           lineHeight: 1,
-          cursor: 'pointer',
+          cursor: 'help',
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'inherit', padding: 0,
+          fontFamily: 'inherit',
           flexShrink: 0,
           marginRight: 4,
+          opacity: open ? 1 : 0.65,
+          transition: 'opacity 150ms',
+          userSelect: 'none',
         }}
       >?</button>
       {open && coords && createPortal(
