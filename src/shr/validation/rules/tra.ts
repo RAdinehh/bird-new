@@ -52,6 +52,21 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       total: floatNonNeg('جمع قلم', 1_000_000_000_000_000),
       itemId: optionalId(),
       movementId: optionalId(),
+      // 🆕 فیلدهای گم‌شده (Phase A)
+      category: optionalStr(40),
+      medicineType: optionalStr(30),
+      liveWeight: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
+      priceUnit: optionalStr(20),
+      saleReason: optionalStr(50),
+      equipmentId: optionalId(),
+      eggTypes: z.array(z.any()).optional(),
+      sourceType: optionalStr(20),
+      stockItemId: optionalId(),
+      baseQuantity: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
+      healthyCount: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().int().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
+      existingFlockId: optionalId(),
+      deviceId: optionalId(),
+      equipmentStatus: optionalStr(20),
       discountType: optionalStr(10),
       discountValue: floatNonNeg('تخفیف', 1_000_000_000_000).optional(),
       shipping: floatNonNeg('حمل', 1_000_000_000_000).optional(),
@@ -163,14 +178,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         }
       }
 
-      // ۲. اگر دسته دارو است -> انتخاب نوع دارو اجباری است
-      if (d.category === 'medicine' && !it.medicineType) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'انتخاب نوع دارو اجباری است',
-          path: ['items', String(i), 'medicineType'],
-        });
-      }
+      // ۲. medicineType — فرم فیلد ندارد، اجبار حذف شد (Phase A)
 
       // ۳. تجهیزات: دسته و نوع اجباری
       const itCat = it.category || d.category;
@@ -182,23 +190,52 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'نوع تجهیز اجباری است', path: ['items', String(i), 'equipmentType'] });
         }
       }
-      // ۴. سایر: نوع هزینه اجباری
-      if (itCat === 'other' && !it.costType) {
+      // ۴. سایر: نوع هزینه اجباری — فقط خرید (در فروش field مخفی است)
+      if (itCat === 'other' && d.type === 'purchase' && !it.costType) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'نوع هزینه اجباری است', path: ['items', String(i), 'costType'] });
       }
     }
 
-    // فروش پرنده باید گله داشته باشد
+    // 🆕 فروش: چک‌های اختصاصی
     if (d.type === 'sale') {
       for (let i = 0; i < (d.items || []).length; i++) {
         const it = d.items[i];
+        const itCat = it.category || d.category;
+        const p = (f: string) => ['items', String(i), f];
+
+        // ۱. فروش پرنده: گله مبدأ اجباری
         if (it.birdId && !it.flockId) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'برای فروش پرنده، انتخاب گله مبدأ اجباری است',
-            path: ['items', String(i), 'flockId'],
-          });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'برای فروش پرنده، انتخاب گله مبدأ اجباری است', path: p('flockId') });
         }
+
+        // ۲. adult sale: دلیل فروش اجباری
+        if (itCat === 'adult' && !it.saleReason) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'دلیل فروش برای پرنده بالغ اجباری است', path: p('saleReason') });
+        }
+
+        // ۳. sale: stockItemId اجباری برای دسته‌های انباری
+        const STOCK_NEEDED = ['feed', 'medicine', 'vaccine', 'herbal', 'manure', 'broken'];
+        if (STOCK_NEEDED.includes(itCat) && !it.stockItemId) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'انتخاب کالای انبار برای فروش اجباری است', path: p('stockItemId') });
+        }
+
+        // ۴. equipment sale: equipmentId اجباری
+        if (itCat === 'equipment' && !it.equipmentId) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'انتخاب تجهیز موجود برای فروش اجباری است', path: p('equipmentId') });
+        }
+
+        // ۵. withdrawalDays باید null در sale
+        if (it.withdrawalDays != null && Number(it.withdrawalDays) > 0) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'دوره پرهیز فقط در خرید ثبت می‌شود', path: p('withdrawalDays') });
+        }
+      }
+    }
+
+    // 🆕 priceUnit = perKg → liveWeight اجباری (همه انواع)
+    for (let i = 0; i < (d.items || []).length; i++) {
+      const it = d.items[i];
+      if (it.priceUnit === 'perKg' && (it.liveWeight == null || Number(it.liveWeight) <= 0)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'برای قیمت به ازای کیلوگرم، وزن زنده اجباری است', path: ['items', String(i), 'liveWeight'] });
       }
     }
     
