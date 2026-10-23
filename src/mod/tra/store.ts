@@ -115,8 +115,53 @@ export const useTra = create<State>()(
           try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) { console.error('❌ [tra] applyInvoiceEquipment error (update):', e); }
           try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
           try { itemsFinal = applyInvoiceStock({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
-          // 🎯 اتصال به انبار از طریق Event Bus (rollback قبلی‌ها + حرکت‌های جدید)
-          // ✅ آپدیت انبار فقط از طریق applyInvoiceStock انجام می‌شود
+
+          // 🆕 فیکس ۴: Revoke old sell events + recreate new
+          try {
+            if (mergedWithItems.type === 'sale' && !mergedWithItems.isPreorder) {
+              const st4 = useFlk.getState();
+              const affected = new Map<string, number>();
+              for (const it of itemsFinal || []) {
+                const itCat = (it as any).category || mergedWithItems.category;
+                if (!BIRD_CATS.includes(itCat)) continue;
+                if (!it.flockId) continue;
+                const qty = ((it as any).healthyCount ?? it.quantity) || 0;
+                if (qty <= 0) continue;
+                affected.set(it.flockId, (affected.get(it.flockId) || 0) + qty);
+              }
+              const hasAnyOld4 = st4.flocks.some((f: any) => (f.events || []).some((e: any) => e.invoiceId === id && e.type === 'sell' && !e.revoked));
+              if (affected.size > 0 || hasAnyOld4) {
+                useFlk.setState({
+                  flocks: st4.flocks.map((f: any) => {
+                    const hasRev4 = (f.events || []).some((e: any) => e.invoiceId === id && e.type === 'sell' && !e.revoked);
+                    if (!hasRev4 && !affected.has(f.id)) return f;
+                    let newEvents = (f.events || []).map((e: any) =>
+                      e.invoiceId === id && e.type === 'sell' && !e.revoked
+                        ? { ...e, revoked: true }
+                        : e
+                    );
+                    const qty4 = affected.get(f.id) || 0;
+                    if (qty4 > 0) {
+                      newEvents.push({
+                        id: `sell-${id}-${f.id}-${Date.now()}`,
+                        flockId: f.id,
+                        date: mergedWithItems.date || '',
+                        type: 'sell',
+                        count: qty4,
+                        sex: 'mixed',
+                        direction: -1,
+                        buyerId: mergedWithItems.partyId,
+                        invoiceId: id,
+                        notes: `ویرایش فروش از فاکتور ${mergedWithItems.number || ''}`,
+                        createdAt: new Date().toISOString(),
+                      });
+                    }
+                    return { ...f, events: newEvents };
+                  }),
+                } as any);
+              }
+            }
+          } catch (e) { console.error('[updateInvoice] sell events revoke failed:', e); }
         }
         const prevPayments = (prev.payments || []) as any[];
         const newPaymentsInput = (mergedWithItems.payments || []) as any[];
