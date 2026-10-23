@@ -134,37 +134,54 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="🧬" title="اطلاعات گله" />
-              <Grid2>
-                {isPurchase && (
-                  <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
-                    <SmartSelect value={String(item.existingFlockId || '')} onChange={v => updateItem({ existingFlockId: v, flockId: v })} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
-                  </Field>
-                )}
 
-              </Grid2>
-              <Grid2>
-                <Field label="نوع پرنده" required>
-                  <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
-                </Field>
-                <Field label="نژاد" required>
-                  <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!!item.existingFlockId} />
-                </Field>
-              </Grid2>
-        {isPurchase ? (
+        {/* ردیف ۱: گله + نوع پرنده */}
         <Grid2>
-          <Field label="سالن مقصد">
-            <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
-          </Field>
-          <Field label="بخش مقصد (اختیاری)">
-            <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" autoThreshold={6} />
+          {isPurchase ? (
+            <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
+              <SmartSelect value={String(item.existingFlockId || '')} onChange={v => updateItem({ existingFlockId: v, flockId: v })} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
+            </Field>
+          ) : (
+            <Field label="گله مبدأ" required hint="گله‌ای که جوجه از آن فروخته می‌شود">
+              <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+            </Field>
+          )}
+          <Field label="نوع پرنده" required>
+            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
           </Field>
         </Grid2>
-        ) : (
-          <Field label="گله مبدأ" required hint="گله‌ای که جوجه از آن فروخته می‌شود">
-            <SmartSelect value={String(item.flockId || '')} onChange={v => updateItem({ flockId: v })} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
-          </Field>
-        )}
+
+        {/* ردیف ۲: نژاد + (خرید: سالن | فروش: دلیل فروش) */}
         <Grid2>
+          <Field label="نژاد" required>
+            <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={isPurchase && !!item.existingFlockId} />
+          </Field>
+          {isPurchase ? (
+            <Field label="سالن مقصد">
+              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
+            </Field>
+          ) : (
+            <Field label="دلیل فروش">
+              <Select value={String(item.saleReason || '')} onChange={e => updateItem({ saleReason: e.target.value })}>
+                <option value="">— انتخاب —</option>
+                <option value="culling">حذف از گله (کالینگ)</option>
+                <option value="sick">بیماری</option>
+                <option value="old_age">سن بالا</option>
+                <option value="surplus">مازاد</option>
+                <option value="breeding_stock">فروش مولد</option>
+                <option value="other">سایر</option>
+              </Select>
+            </Field>
+          )}
+        </Grid2>
+
+        {/* ردیف ۳: (خرید: بخش) + تاریخ هچ */}
+        <Grid2>
+          {isPurchase && (
+            <Field label="بخش مقصد (اختیاری)">
+              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" autoThreshold={6} />
+            </Field>
+          )}
           <Field label="تاریخ هچ" required>
             <DatePicker value={String(item.hatchDate || '')} onChange={v => {
               let age = null;
@@ -178,6 +195,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               updateItem({ hatchDate: v, ageDays: age });
             }} placeholder="1405/07/26" autoToday />
           </Field>
+        </Grid2>
+
+        {/* ردیف ۴: سن + (خرید: وزن اولیه) */}
+        <Grid2>
           <Field label="سن (روز)" hint="با تغییر سن، تاریخ هچ محاسبه می‌شود">
             <Input mode="number" value={item.ageDays != null && item.ageDays > 0 ? String(item.ageDays) : ''} onChange={e => {
               let age = Math.round(parseFaNum(e.target.value)) || null;
@@ -192,63 +213,61 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               updateItem({ ageDays: age, hatchDate: hDate });
             }} unit="روز" min={0} max={150} />
           </Field>
+          {isPurchase && (
+            <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
+              <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
+                let v = parseFaNum(e.target.value) || null;
+                if (v !== null && v > 100) v = 100;
+                updateItem({ chickWeight: v });
+              }} unit="g" min={20} max={100} />
+            </Field>
+          )}
         </Grid2>
-        
+
+        {/* ردیف ۵: تعداد */}
         <Grid2>
           <Field label={isPurchase ? "تعداد کل (خریداری شده)" : "تعداد"} hint="از بخش اقلام بالا">
             <Input disabled value={item.quantity && item.quantity > 0 ? toFa(String(item.quantity)) : ''} unit="عدد" placeholder="از بخش اقلام بالا" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
           </Field>
-          {isPurchase && (
-          <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
-            <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
-              let v = parseFaNum(e.target.value) || null;
-              if (v !== null && v > 100) v = 100;
-              updateItem({ chickWeight: v });
-            }} unit="g" min={20} max={100} />
-          </Field>
-          )}
         </Grid2>
 
+        {/* ردیف ۶: نر/ماده/نامشخص */}
         <div style={{ display: (item.quantity || 0) > 0 ? 'contents' : 'none' }}>
-<Grid3>
-          <Field label="نر">
-            <Input mode="number" value={item.maleCount != null && item.maleCount > 0 ? String(item.maleCount) : ''} onChange={e => {
-              let v = Math.round(parseFaNum(e.target.value)) || null;
-              if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
-              updateItem({ maleCount: v });
-            }} min={0} max={item.quantity || undefined} />
-          </Field>
-          <Field label="ماده">
-            <Input mode="number" value={item.femaleCount != null && item.femaleCount > 0 ? String(item.femaleCount) : ''} onChange={e => {
-              let v = Math.round(parseFaNum(e.target.value)) || null;
-              if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
-              updateItem({ femaleCount: v });
-            }} min={0} max={item.quantity || undefined} />
-          </Field>
-          <Field label="نامشخص" hint="برای جنسیت مخلوط">
-            <Input mode="number" value={item.unknownCount != null && item.unknownCount > 0 ? String(item.unknownCount) : ''} onChange={e => {
-              let v = Math.round(parseFaNum(e.target.value)) || null;
-              if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
-              updateItem({ unknownCount: v });
-            }} min={0} max={item.quantity || undefined} />
-          </Field>
-        </Grid3>
-</div>
-        
+          <Grid3>
+            <Field label="نر">
+              <Input mode="number" value={item.maleCount != null && item.maleCount > 0 ? String(item.maleCount) : ''} onChange={e => {
+                let v = Math.round(parseFaNum(e.target.value)) || null;
+                if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
+                updateItem({ maleCount: v });
+              }} min={0} max={item.quantity || undefined} />
+            </Field>
+            <Field label="ماده">
+              <Input mode="number" value={item.femaleCount != null && item.femaleCount > 0 ? String(item.femaleCount) : ''} onChange={e => {
+                let v = Math.round(parseFaNum(e.target.value)) || null;
+                if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
+                updateItem({ femaleCount: v });
+              }} min={0} max={item.quantity || undefined} />
+            </Field>
+            <Field label="نامشخص" hint="برای جنسیت مخلوط">
+              <Input mode="number" value={item.unknownCount != null && item.unknownCount > 0 ? String(item.unknownCount) : ''} onChange={e => {
+                let v = Math.round(parseFaNum(e.target.value)) || null;
+                if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
+                updateItem({ unknownCount: v });
+              }} min={0} max={item.quantity || undefined} />
+            </Field>
+          </Grid3>
+        </div>
+
         {(() => {
           const q = item.quantity || 0;
           if (!q) return null;
-          
           const hasMale = item.maleCount !== null && item.maleCount !== undefined;
           const hasFemale = item.femaleCount !== null && item.femaleCount !== undefined;
           const hasUnknown = item.unknownCount !== null && item.unknownCount !== undefined;
           const hasAny = hasMale || hasFemale || hasUnknown;
-          
-          if (!hasAny) return null; 
-
+          if (!hasAny) return null;
           const sum = (item.maleCount || 0) + (item.femaleCount || 0) + (item.unknownCount || 0);
           if (sum === 0) return null;
-
           const diff = q - sum;
           if (diff === 0) return (
             <div style={{ color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)' }}>
@@ -267,20 +286,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </div>
           );
         })()}
-        
-        {!isPurchase && (
-          <Field label="دلیل فروش">
-            <Select value={String(item.saleReason || '')} onChange={e => updateItem({ saleReason: e.target.value })}>
-              <option value="">— انتخاب —</option>
-              <option value="culling">حذف از گله (کالینگ)</option>
-              <option value="sick">بیماری</option>
-              <option value="old_age">سن بالا</option>
-              <option value="surplus">مازاد</option>
-              <option value="breeding_stock">فروش مولد</option>
-              <option value="other">سایر</option>
-            </Select>
-          </Field>
-        )}
 
         {sellerSlot}
       </div>
