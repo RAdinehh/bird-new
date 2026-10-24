@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal, Btn } from '../../../shr/components/ui';
+import { BtnRow } from '../../../shr/components/ui/Btn';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { clearRecycleBin, removeFromRecycleBin } from '../../../shr/utils/recycleBin';
 import { toFa } from '../../../shr/utils/fa';
@@ -146,16 +147,27 @@ export default function RecycleBinModal({ open, onClose }: Props) {
 
                 {/* ردیف پایین: تاریخ، مبلغ، روزهای باقی‌مانده و دکمه */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                    {toFa(inv.date)} • {toFa(inv.total.toLocaleString('fa-IR'))} تومان • {toFa(days)} روز مونده
-                  </div>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    <Btn size="sm" variant="danger" onClick={() => handleDeleteSingle(inv.id)}>
-                      🗑️ حذف
-                    </Btn>
-                    <Btn size="sm" variant="outline" onClick={() => handleRestore(inv.id)}>
-                      ↩️ بازیابی
-                    </Btn>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+                    {/* ردیف اول: تاریخ، مبلغ، روزهای مونده */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4, fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                      <span>{toFa(inv.date)} • {toFa(inv.total.toLocaleString('fa-IR'))} تومان</span>
+                      <span style={{ color: 'var(--warn)', fontWeight: 700 }}>{toFa(days)} روز مونده</span>
+                    </div>
+
+                    {/* ردیف دوم: زمان دقیق حذف */}
+                    <div style={{ fontSize: 10, color: 'var(--dim)' }}>
+                      🗑️ حذف شده در: {new Date(e.deletedAt).toLocaleString('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </div>
+
+                    {/* ردیف سوم: دکمه‌ها با استاندارد BtnRow */}
+                    <BtnRow>
+                      <Btn size="sm" variant="danger" onClick={() => handleDeleteSingle(inv.id)}>
+                        🗑️ حذف کامل
+                      </Btn>
+                      <Btn size="sm" variant="primary" onClick={() => handleRestore(inv.id)}>
+                        ↩️ بازیابی
+                      </Btn>
+                    </BtnRow>
                   </div>
                 </div>
               </div>
