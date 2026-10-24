@@ -335,6 +335,24 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                             </Grid2>
                           </>
                         )}
+                  {cat === 'chick' && isPurchase && (
+                    <Grid2>
+                      <Field label="تعداد سالم تحویلی (اختیاری)" hint="اگر تلفات اولیه نداشتید، خالی بگذارید">
+                        <NumField 
+                          placeholder="تعداد" 
+                          unit="پرنده"
+                          value={it.healthyCount != null && it.healthyCount > 0 ? toFa(String(it.healthyCount)) : ''} 
+                          onChange={e => {
+                            const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0;
+                            const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null;
+                            updateItem(it.id, { healthyCount: clamped });
+                          }} 
+                          min={0} 
+                          max={it.quantity || undefined} 
+                        />
+                      </Field>
+                    </Grid2>
+                  )}
                         {needsWeight && (
                           <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار و محاسبه قیمت">
                             <NumField

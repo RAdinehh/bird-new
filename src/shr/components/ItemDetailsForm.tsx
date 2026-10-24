@@ -299,11 +299,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               </Field>
             </Grid2>
 
-            <Grid2>
-              <Field label="تعداد سالم تحویلی (اختیاری)" hint="اگر تلفات اولیه نداشتید، خالی بگذارید">
-                <Input mode="number" value={item.healthyCount != null && item.healthyCount > 0 ? String(item.healthyCount) : ''} onChange={e => updateItem({ healthyCount: Math.round(parseFaNum(e.target.value)) || null })} unit="پرنده" min={0} max={item.quantity || undefined} />
-              </Field>
-            </Grid2>
           </>
         ) : (item.flockId || item.hatchId) && !hatchOverride ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)' }}>
