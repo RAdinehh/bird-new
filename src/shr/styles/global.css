@@ -554,3 +554,10 @@ html {
 .pm-pulse {
   animation: pmPulse 1.5s infinite;
 }
+
+
+/* 🆕 انیمیشن چشمک زدن نقطه (استاندارد گله) */
+@keyframes flkDotPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.75; }
+}

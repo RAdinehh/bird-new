@@ -2,7 +2,7 @@
  * filter/FilterBar.tsx — نوار فیلتر و مرتب‌سازی مرکزی
  * طراحی: Tabs بین گروه‌ها + ردیف‌های بلند + بدون گرادیانت
  */
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { Sheet, Input, Btn } from '../components/ui';
 import {
   IconFilter, IconSort, IconX, IconArrowUp, IconArrowDown, IconCheck,
@@ -48,6 +48,28 @@ export function FilterBar<T>({
   const [openFilters, setOpenFilters] = useState(false);
   const [openSort, setOpenSort] = useState(false);
   const [openGroup, setOpenGroup] = useState(false);
+
+  // 🆕 الگوی useTabBadge: پالس ۵ ثانیه‌ای فقط وقتی تعداد زیاد می‌شود
+  const [isPulsing, setIsPulsing] = useState(false);
+  const prevRecycleCount = useRef(recycleCount);
+  const pulseTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (recycleCount > prevRecycleCount.current) {
+      if (pulseTimer.current) window.clearTimeout(pulseTimer.current);
+      setIsPulsing(true);
+      pulseTimer.current = window.setTimeout(() => setIsPulsing(false), 5000);
+    } else if (recycleCount === 0) {
+      setIsPulsing(false);
+    }
+    prevRecycleCount.current = recycleCount;
+  }, [recycleCount]);
+
+  useEffect(() => {
+    return () => {
+      if (pulseTimer.current) window.clearTimeout(pulseTimer.current);
+    };
+  }, []);
 
 
   const activeCount = Object.keys(filterState).filter(k => !isEmptyVal(filterState[k])).length;
@@ -160,7 +182,7 @@ export function FilterBar<T>({
                 width: 8, height: 8, borderRadius: '50%',
                 background: 'var(--danger)',
                 boxShadow: '0 0 0 2px var(--bg)',
-                animation: 'flkDotPulse 1s ease-in-out infinite',
+                animation: isPulsing ? 'flkDotPulse 1s ease-in-out infinite' : 'none',
               }}
             />
           </button>
