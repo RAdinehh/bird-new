@@ -103,7 +103,7 @@
 | 99 | Danger Zone | ✅ | cor/store/dialog.ts |
 | 100 | Audit Log | ✅ | cor/logger/auditLog.ts |
 | 101 | Rollback | ✅ | mod/tra/store.ts |
-| 102 | Backup Before Mutation | ❌ | در حال بررسی |
+| 102 | Backup Before Mutation | ✅ | recycleBin.ts + UI |
 | 103 | Readonly | ✅ | shr/components/DatePicker.tsx |
 | 104 | Modal | ✅ | shr/components/DatePicker.tsx |
 | 105 | Expandable Card | ✅ | shr/components/ExpandableCard.tsx |
