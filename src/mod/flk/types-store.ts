@@ -54,6 +54,11 @@ export interface FlockMergeSource {
   flockName: string;
   count: number;
   ageDays: number;
+  // 🆕 برای unmerge دقیق
+  maleCount?: number;
+  femaleCount?: number;
+  unknownCount?: number;
+  genderSplitAt?: string | null;
 }
 
 export interface FlockMergeInfo {
