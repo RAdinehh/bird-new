@@ -272,7 +272,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <span style={{ color: 'var(--muted)' }}>•</span>
             <span>📊 سن: <b style={{ color: 'var(--accent)' }}>{item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}</b></span>
             <span style={{ marginInlineStart: 'auto', color: 'var(--muted)', fontSize: 14 }} title="قفل — از منبع انتخاب‌شده">🔒</span>
-            <button type="button" onClick={() => setHatchOverride(true)} title="ویرایش دستی" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2, color: 'var(--accent)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)' }}>✏️</button>
           </div>
         ) : (
           <Grid2>

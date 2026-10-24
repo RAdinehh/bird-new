@@ -341,8 +341,8 @@ export default function FlocksModal(props: FlocksModalProps) {
             }));
           }} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
-        <Field label="تعداد فعلی" hint={form.id ? '🔒 از فاکتور/هچ — قابل ویرایش نیست' : 'اگه خالی بمونه = تعداد اولیه'} onTouch={() => markTouched('currentCount')}>
-          <NumField placeholder="۸۳۲" value={form.currentCount} disabled={!!form.id} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
+        <Field label="تعداد فعلی" hint="اگه خالی بمونه = تعداد اولیه" onTouch={() => markTouched('currentCount')}>
+          <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
         </Field>
       </Grid2>
 
