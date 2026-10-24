@@ -250,31 +250,33 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         {/* ردیف ۳ (خرید): بخش + وزن اولیه | (فروش): تاریخ هچ + سن */}
         {isPurchase ? (
-          <Grid2>
-            <Field label="تاریخ هچ" required>
-              <DatePicker value={String(item.hatchDate || '')} onChange={v => {
-                const age = computeAgeFromHatch(v);
-                updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="1405/07/26" autoToday />
-            </Field>
-            <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
-              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
-              </div>
-            </Field>
-          </Grid2>
-          <Grid2>
-            <Field label="بخش مقصد (اختیاری)">
-              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" autoThreshold={6} />
-            </Field>
-            <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
-              <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
-                let v = parseFaNum(e.target.value) || null;
-                if (v !== null && v > 100) v = 100;
-                updateItem({ chickWeight: v });
-              }} unit="g" min={20} max={100} />
-            </Field>
-          </Grid2>
+          <>
+            <Grid2>
+              <Field label="تاریخ هچ" required>
+                <DatePicker value={String(item.hatchDate || '')} onChange={v => {
+                  const age = computeAgeFromHatch(v);
+                  updateItem({ hatchDate: v, ageDays: age });
+                }} placeholder="1405/07/26" autoToday />
+              </Field>
+              <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
+                <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
+                  {item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
+                </div>
+              </Field>
+            </Grid2>
+            <Grid2>
+              <Field label="بخش مقصد (اختیاری)">
+                <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" autoThreshold={6} />
+              </Field>
+              <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
+                <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
+                  let v = parseFaNum(e.target.value) || null;
+                  if (v !== null && v > 100) v = 100;
+                  updateItem({ chickWeight: v });
+                }} unit="g" min={20} max={100} />
+              </Field>
+            </Grid2>
+          </>
         ) : (item.flockId || item.hatchId) && !hatchOverride ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)' }}>
             <span>📅 هچ: <b style={{ color: 'var(--accent)' }}>{item.hatchDate ? toFa(item.hatchDate) : '—'}</b></span>
