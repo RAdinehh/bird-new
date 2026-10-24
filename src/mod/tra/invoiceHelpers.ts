@@ -449,7 +449,41 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           patch.unknownCount = Math.max(0, base + sign * rem);
         }
       } else {
-        patch.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * delta);
+        // 🆕 قدم ۵: unsplit — همه در unknown
+        if (!f.genderSplitAt) {
+          // گله unsplit → sync
+          patch.unknownCount = next;
+        } else {
+          // گله split → از unknown با fallback
+          const nextU = (f.unknownCount ?? 0) + sign * delta;
+          if (nextU >= 0) {
+            patch.unknownCount = nextU;
+          } else {
+            const rem = -nextU;
+            patch.unknownCount = 0;
+            const mF = f.maleCount ?? 0;
+            const fF = f.femaleCount ?? 0;
+            if (fF >= mF) {
+              patch.femaleCount = Math.max(0, fF - rem);
+            } else {
+              patch.maleCount = Math.max(0, mF - rem);
+            }
+          }
+        }
+      }
+
+      // 🆕 قدم ۵: set genderSplitAt اگه item جنس داره
+      if (gSum > 0 && !f.genderSplitAt) {
+        patch.genderSplitAt = new Date().toISOString();
+      }
+      // 🆕 قدم ۵: un-split اگه male و female صفر شدن
+      if (f.genderSplitAt) {
+        const finalM = patch.maleCount ?? f.maleCount ?? 0;
+        const finalF = patch.femaleCount ?? f.femaleCount ?? 0;
+        if (finalM === 0 && finalF === 0) {
+          patch.genderSplitAt = null;
+          patch.unknownCount = next;
+        }
       }
 
       if (type === 'purchase') {
@@ -526,7 +560,37 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
             patchEx.unknownCount = Math.max(0, base + rem);
           }
         } else {
-          patchEx.unknownCount = Math.max(0, (existing.unknownCount ?? 0) + delta);
+          // 🆕 قدم ۵
+          if (!existing.genderSplitAt) {
+            patchEx.unknownCount = next;
+          } else {
+            const nextU = (existing.unknownCount ?? 0) + delta;
+            if (nextU >= 0) {
+              patchEx.unknownCount = nextU;
+            } else {
+              const rem = -nextU;
+              patchEx.unknownCount = 0;
+              const mE = existing.maleCount ?? 0;
+              const fE = existing.femaleCount ?? 0;
+              if (fE >= mE) {
+                patchEx.femaleCount = Math.max(0, fE - rem);
+              } else {
+                patchEx.maleCount = Math.max(0, mE - rem);
+              }
+            }
+          }
+        }
+        // 🆕 قدم ۵: set genderSplitAt
+        if (gS > 0 && !existing.genderSplitAt) {
+          patchEx.genderSplitAt = new Date().toISOString();
+        }
+        if (existing.genderSplitAt) {
+          const fm = patchEx.maleCount ?? existing.maleCount ?? 0;
+          const ff = patchEx.femaleCount ?? existing.femaleCount ?? 0;
+          if (fm === 0 && ff === 0) {
+            patchEx.genderSplitAt = null;
+            patchEx.unknownCount = Math.max(0, next);
+          }
         }
         flk.update(existing.id, patchEx);
         for (let i = 0; i < inv.items.length; i++) {
