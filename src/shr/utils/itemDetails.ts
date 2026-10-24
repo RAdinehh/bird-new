@@ -3,7 +3,7 @@
  */
 
 export type MedicineType = 'herbal' | 'chemical' | 'vaccine' | '';
-export type PriceUnit = 'per_unit' | 'per_kg' | '';
+export type PriceUnit = 'perBird' | 'perKg' | 'per_unit' | 'per_kg' | '';
 export type SourceType = 'own_flock' | 'purchased' | '';
 export type EggType = 'intact' | 'small' | 'broken' | 'dirty' | 'other';
 export type SaleReason = 'old' | 'broken' | 'unneeded' | 'replacement' | 'other';

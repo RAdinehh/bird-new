@@ -180,7 +180,15 @@ export function useInvoiceForm(params: {
       const cat = it.category || form.category;
       const unit = it.unit || 'pcs';
       const unitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === unit);
-      const factor = (unitDef && unitDef.factor !== null) ? unitDef.factor : (it.unitWeight || 1);
+      const factor = (() => {
+        if (unitDef && unitDef.factor !== null) return unitDef.factor;
+        if (it.unitWeight) return it.unitWeight;
+        // 🆕 adult sale perKg: factor = liveWeight / quantity
+        if ((it.priceUnit === 'perKg' || it.priceUnit === 'per_kg') && it.liveWeight && it.liveWeight > 0 && it.quantity && it.quantity > 0) {
+          return it.liveWeight / it.quantity;
+        }
+        return 1;
+      })();
       const expected = calcItemTotal(it.quantity || 0, it.unitPrice || 0, it.discountType, it.discountValue, factor) + (it.shipping || 0);
       if (Math.abs(expected - (it.total || 0)) > 0.1) {
         changed = true;
@@ -198,7 +206,15 @@ export function useInvoiceForm(params: {
       const cat = it.category || form.category;
       const unit = it.unit || 'pcs';
       const unitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === unit);
-      const factor = (unitDef && unitDef.factor !== null) ? unitDef.factor : (it.unitWeight || 1);
+      const factor = (() => {
+        if (unitDef && unitDef.factor !== null) return unitDef.factor;
+        if (it.unitWeight) return it.unitWeight;
+        // 🆕 adult sale perKg: factor = liveWeight / quantity
+        if ((it.priceUnit === 'perKg' || it.priceUnit === 'per_kg') && it.liveWeight && it.liveWeight > 0 && it.quantity && it.quantity > 0) {
+          return it.liveWeight / it.quantity;
+        }
+        return 1;
+      })();
       return acc + calcItemTotal(it.quantity || 0, it.unitPrice || 0, it.discountType, it.discountValue, factor) + (it.shipping || 0);
     }, 0),
     [form.items, form.category]
@@ -223,7 +239,15 @@ export function useInvoiceForm(params: {
       const cat = nx.category || f.category;
       const unit = nx.unit || 'pcs';
       const unitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === unit);
-      const factor = (unitDef && unitDef.factor !== null) ? unitDef.factor : (nx.unitWeight || 1);
+      const factor = (() => {
+        if (unitDef && unitDef.factor !== null) return unitDef.factor;
+        if (nx.unitWeight) return nx.unitWeight;
+        // 🆕 adult sale perKg: factor = liveWeight / quantity
+        if ((nx.priceUnit === 'perKg' || nx.priceUnit === 'per_kg') && nx.liveWeight && nx.liveWeight > 0 && nx.quantity && nx.quantity > 0) {
+          return nx.liveWeight / nx.quantity;
+        }
+        return 1;
+      })();
       nx.total = calcItemTotal(nx.quantity, nx.unitPrice, nx.discountType, nx.discountValue, factor) + (nx.shipping || 0);
       return nx;
     }) }));
