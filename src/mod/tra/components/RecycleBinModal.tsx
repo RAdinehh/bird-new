@@ -1,4 +1,7 @@
+import { useState, useEffect } from 'react';
 import { Modal, Btn } from '../../../shr/components/ui';
+import { showConfirmAsync } from '../../../cor/store/dialog';
+import { clearRecycleBin, removeFromRecycleBin } from '../../../shr/utils/recycleBin';
 import { toFa } from '../../../shr/utils/fa';
 import { useTra, CATEGORIES } from '../store';
 import { toastMsg } from '../../../cor/store/toast';
@@ -18,9 +21,32 @@ function daysLeft(expiresAt: string): number {
 
 export default function RecycleBinModal({ open, onClose }: Props) {
   const { restoreInvoice } = useTra();
-  const entries: RecycleBinEntry<DeletedInvoiceSnapshot>[] = open
-    ? listRecycleBin<DeletedInvoiceSnapshot>('tra')
-    : [];
+  const [entries, setEntries] = useState<RecycleBinEntry<DeletedInvoiceSnapshot>[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      const list = listRecycleBin<DeletedInvoiceSnapshot>('tra');
+      setEntries(list.sort((a, b) => new Date(a.expiresAt).getTime() - new Date(b.expiresAt).getTime()));
+    } else {
+      setEntries([]);
+    }
+  }, [open]);
+
+  const handleDeleteSingle = async (id: string) => {
+    const ok = await showConfirmAsync('حذف دائمی', 'این فاکتور برای همیشه حذف شود؟ این عمل غیرقابل بازگشت است.', { danger: true, confirmText: 'حذف کن', cancelText: 'انصراف' });
+    if (!ok) return;
+    removeFromRecycleBin<DeletedInvoiceSnapshot>('tra', (snap) => snap.invoice.id === id);
+    setEntries(prev => prev.filter(e => e.item.invoice.id !== id));
+    toastMsg.success('فاکتور برای همیشه حذف شد');
+  };
+
+  const handleClearAll = async () => {
+    const ok = await showConfirmAsync('خالی کردن سبد', 'آیا از حذف دائمی تمام فاکتورهای داخل سبد بازیابی مطمئنید؟', { danger: true, confirmText: 'همه را حذف کن', cancelText: 'انصراف' });
+    if (!ok) return;
+    clearRecycleBin('tra');
+    setEntries([]);
+    toastMsg.success('سبد بازیابی خالی شد');
+  };
 
   const handleRestore = (id: string) => {
     const ok = restoreInvoice(id);
@@ -49,6 +75,10 @@ export default function RecycleBinModal({ open, onClose }: Props) {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 4, borderBottom: '1px solid var(--border)' }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>مرتب‌شده بر اساس نزدیک‌ترین به انقضا</span>
+            <Btn size="sm" variant="danger" onClick={handleClearAll}>🗑️ خالی کردن سبد</Btn>
+          </div>
           {entries.map((e) => {
             const inv = e.item.invoice;
             const days = daysLeft(e.expiresAt);
@@ -119,13 +149,14 @@ export default function RecycleBinModal({ open, onClose }: Props) {
                   <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
                     {toFa(inv.date)} • {toFa(inv.total.toLocaleString('fa-IR'))} تومان • {toFa(days)} روز مونده
                   </div>
-                  <Btn
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleRestore(inv.id)}
-                  >
-                    ↩️ بازیابی
-                  </Btn>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <Btn size="sm" variant="danger" onClick={() => handleDeleteSingle(inv.id)}>
+                      🗑️ حذف
+                    </Btn>
+                    <Btn size="sm" variant="outline" onClick={() => handleRestore(inv.id)}>
+                      ↩️ بازیابی
+                    </Btn>
+                  </div>
                 </div>
               </div>
             );
