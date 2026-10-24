@@ -538,12 +538,16 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       const uDelta = Number(it.unknownCount || 0);
       const gSum = mDelta + fDelta + uDelta;
       if (gSum > 0) {
-        if (mDelta > 0) patch.maleCount = Math.max(0, (f.maleCount ?? 0) + sign * mDelta);
-        if (fDelta > 0) patch.femaleCount = Math.max(0, (f.femaleCount ?? 0) + sign * fDelta);
-        if (uDelta > 0) patch.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * uDelta);
-        const rem = delta - gSum;
+        // 🆕 Normalize delta to prevent invariant break (gSum > delta)
+        const safeM = Math.min(mDelta, delta);
+        const safeF = Math.min(fDelta, Math.max(0, delta - safeM));
+        const safeU = Math.min(uDelta, Math.max(0, delta - safeM - safeF));
+        if (safeM > 0) patch.maleCount = Math.max(0, (f.maleCount ?? 0) + sign * safeM);
+        if (safeF > 0) patch.femaleCount = Math.max(0, (f.femaleCount ?? 0) + sign * safeF);
+        if (safeU > 0) patch.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * safeU);
+        const rem = delta - safeM - safeF - safeU;
         if (rem > 0) {
-          const base = (uDelta > 0) ? (patch.unknownCount ?? f.unknownCount ?? 0) : (f.unknownCount ?? 0);
+          const base = (safeU > 0) ? (patch.unknownCount ?? f.unknownCount ?? 0) : (f.unknownCount ?? 0);
           patch.unknownCount = Math.max(0, base + sign * rem);
         }
       } else {

@@ -257,6 +257,11 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                   label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name,
                 };
               })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={isPurchase && !!item.existingFlockId} />
+            {item.birdId && breedsForBird.length === 0 && (
+              <div style={{ color: 'var(--warn)', fontSize: 11, marginTop: 4, fontWeight: 600 }}>
+                ⚠️ این پرنده هنوز نژادی ندارد. ابتدا از بخش «پرنده و نژاد» نژاد تعریف کنید.
+              </div>
+            )}
           </Field>
           {isPurchase && (
             <Field label="سالن مقصد">

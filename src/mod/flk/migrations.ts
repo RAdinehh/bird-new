@@ -244,5 +244,29 @@ export function flkMigrate(persistedInput: unknown, version: number): State {
     });
   }
 
+  // 🆕 v12: Fix inconsistent flocks (male + female + unknown > currentCount)
+  if (version < 12) {
+    const state = persistedInput as State;
+    if (state && state.flocks) {
+      let fixed = 0;
+      state.flocks = state.flocks.map((f) => {
+        const m = f.maleCount ?? 0;
+        const fe = f.femaleCount ?? 0;
+        const u = f.unknownCount ?? 0;
+        const cc = f.currentCount ?? 0;
+        const sum = m + fe + u;
+        if (sum > cc && cc > 0) {
+          const newM = Math.min(m, cc);
+          const newF = Math.min(fe, cc - newM);
+          const newU = Math.min(u, cc - newM - newF);
+          fixed++;
+          return { ...f, maleCount: newM, femaleCount: newF, unknownCount: newU };
+        }
+        return f;
+      });
+      if (fixed > 0) console.log(`[migration v12] fixed ${fixed} inconsistent flocks`);
+    }
+  }
+
   return persistedInput as State;
 }
