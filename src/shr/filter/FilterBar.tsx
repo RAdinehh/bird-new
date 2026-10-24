@@ -24,6 +24,8 @@ interface Props<T> {
   resetAll: () => void;
   sortStack?: SortState[];
   appendSort?: (key: string) => void;
+  groupBy?: string;
+  setGroupBy?: (val: string) => void;
   hasActiveFilters: boolean;
   total: number;
   count: number;
@@ -36,9 +38,12 @@ export function FilterBar<T>({
   hasActiveFilters: _hasActiveFilters, total, count,
   sortStack = sortState ? [sortState] : [],
   appendSort,
+  groupBy = 'none',
+  setGroupBy,
 }: Props<T>) {
   const [openFilters, setOpenFilters] = useState(false);
   const [openSort, setOpenSort] = useState(false);
+  const [openGroup, setOpenGroup] = useState(false);
 
 
   const activeCount = Object.keys(filterState).filter(k => !isEmptyVal(filterState[k])).length;
@@ -120,6 +125,14 @@ export function FilterBar<T>({
                 {sortState.dir === 'asc' ? <IconArrowUp size={11} /> : <IconArrowDown size={11} />}
               </span>
             )}
+          </button>
+        )}
+        
+        {setGroupBy && (
+          <button type="button" onClick={() => setOpenGroup(true)}
+            aria-label="گروه‌بندی" style={topBtn(groupBy !== 'none')}>
+            <span>📁</span>
+            <span>{groupBy !== 'none' ? 'گروه‌بندی' : 'گروه'}</span>
           </button>
         )}
 
@@ -305,6 +318,37 @@ export function FilterBar<T>({
           }}>پاک‌سازی</button>
         </div>
       </Sheet>
+
+      {/* ═══ Sheet گروه‌بندی ═══ */}
+      {setGroupBy && (
+        <Sheet open={openGroup} onClose={() => setOpenGroup(false)} title="گروه‌بندی">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {[
+              { val: 'none', label: 'بدون گروه‌بندی' },
+              { val: 'partyId', label: 'طرف حساب' },
+              { val: 'date', label: 'تاریخ' },
+              { val: 'category', label: 'دسته کالا' },
+              { val: 'workflow', label: 'وضعیت پرداخت' }
+            ].map(opt => (
+              <button key={opt.val} type="button" 
+                onClick={() => { setGroupBy(opt.val); setOpenGroup(false); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
+                  width: '100%', padding: '8px 10px', minHeight: 42,
+                  background: groupBy === opt.val ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
+                  border: '1px solid ' + (groupBy === opt.val ? 'var(--accent-border)' : 'var(--border)'),
+                  borderRadius: 'var(--r-lg)', color: 'var(--text)', fontFamily: 'inherit', cursor: 'pointer',
+                  textAlign: 'right', transition: 'all var(--dur-fast) var(--ease-out)',
+                }}>
+                <div style={{ flex: 1, fontSize: 'var(--fs-base)', fontWeight: 700, color: groupBy === opt.val ? 'var(--accent)' : 'var(--text)' }}>
+                  {opt.label}
+                </div>
+                {groupBy === opt.val && <IconCheck size={16} color="var(--accent)" />}
+              </button>
+            ))}
+          </div>
+        </Sheet>
+      )}
 
       {/* ═══ Sheet مرتب‌سازی ═══ */}
       <Sheet open={openSort} onClose={() => setOpenSort(false)} title="مرتب‌سازی">

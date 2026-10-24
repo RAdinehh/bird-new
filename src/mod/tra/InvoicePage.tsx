@@ -307,26 +307,7 @@ return (
         tone="success"
       />
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>گروه‌بندی:</span>
-          <select
-            value={groupBy}
-            onChange={e => setGroupBy(e.target.value)}
-            style={{
-              padding: '4px 8px', borderRadius: 'var(--r-md)',
-              border: '1px solid var(--border)', background: 'var(--card-solid)',
-              fontFamily: 'inherit', fontSize: 'var(--fs-xs)', color: 'var(--text)',
-              outline: 'none', cursor: 'pointer'
-            }}
-          >
-            <option value="none">بدون گروه‌بندی</option>
-            <option value="partyId">طرف حساب</option>
-            <option value="date">تاریخ</option>
-            <option value="category">دسته کالا</option>
-            <option value="workflow">وضعیت پرداخت</option>
-          </select>
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 8 }}>
         <Btn size="sm" variant="outline" onClick={() => setRecycleOpen(true)}>
           🗑️ سبد بازیابی
         </Btn>
@@ -340,7 +321,7 @@ return (
         setFilter={setFilter}
         clearFilter={clearFilter}
         setSort={setSort}
-        toggleSort={toggleSort} sortStack={sortStack} appendSort={appendSort}
+        toggleSort={toggleSort} sortStack={sortStack} appendSort={appendSort} groupBy={groupBy} setGroupBy={setGroupBy}
         resetAll={resetAll}
         hasActiveFilters={hasActiveFilters}
         total={totalFiltered}
