@@ -18,6 +18,7 @@ import FlockSourcePickers from './FlockSourcePickers';
 import FlockDealSection from './FlockDealSection';
 import FlockDetailsSection from './FlockDetailsSection';
 import FlockCapacityCard from './FlockCapacityCard';
+import FlockIntegrityWarning from './FlockIntegrityWarning';
 import { SOURCE_LABEL, DEFAULT_LAYING_START, sexRatio, useFlk } from '../store';
 import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
 import { todayJ, jalaliBounds, checkDateBounds } from '../api/flocksCalc';
@@ -126,6 +127,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         </BtnRow>
       }
     >
+      <FlockIntegrityWarning form={form} setForm={setForm} />
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🏷 هویت</div>
       <Grid2>
   <Field label="نام گله" required error={showError('name')} onTouch={() => markTouched('name')}>
