@@ -215,7 +215,7 @@ export default function FlocksModal(props: FlocksModalProps) {
               value={form.breedLabel || ''}
               onChange={e => !isSourceLinked && setForm(f => ({ ...f, breedLabel: e.target.value }))}
               placeholder="مثلاً: مرندی محلی"
-            disabled={isSourceLinked}
+            disabled={isSourceLinked && !!form.breedId}
             />
           ) : (
             <DependentSelect
