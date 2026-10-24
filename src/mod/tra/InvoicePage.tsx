@@ -45,6 +45,8 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [recycleOpen, setRecycleOpen] = useState(false);
   const [groupBy, setGroupBy] = useState<string>('none');
+  const { listDeletedInvoices } = useTra();
+  const recycleCount = listDeletedInvoices().length;
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [printId, setPrintId] = useState<string | null>(null);
   const [transferModal, setTransferModal] = useState<{ id: string; to: WorkflowStatus } | null>(null);
@@ -307,11 +309,7 @@ return (
         tone="success"
       />
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 8 }}>
-        <Btn size="sm" variant="outline" onClick={() => setRecycleOpen(true)}>
-          🗑️ سبد بازیابی
-        </Btn>
-      </div>
+
       {/* FilterBar */}
       <FilterBar
         filterDefs={config.filterDefs}
@@ -321,7 +319,7 @@ return (
         setFilter={setFilter}
         clearFilter={clearFilter}
         setSort={setSort}
-        toggleSort={toggleSort} sortStack={sortStack} appendSort={appendSort} groupBy={groupBy} setGroupBy={setGroupBy}
+        toggleSort={toggleSort} sortStack={sortStack} appendSort={appendSort} groupBy={groupBy} setGroupBy={setGroupBy} recycleCount={recycleCount} onOpenRecycleBin={() => setRecycleOpen(true)}
         resetAll={resetAll}
         hasActiveFilters={hasActiveFilters}
         total={totalFiltered}

@@ -26,6 +26,8 @@ interface Props<T> {
   appendSort?: (key: string) => void;
   groupBy?: string;
   setGroupBy?: (val: string) => void;
+  recycleCount?: number;
+  onOpenRecycleBin?: () => void;
   hasActiveFilters: boolean;
   total: number;
   count: number;
@@ -40,6 +42,8 @@ export function FilterBar<T>({
   appendSort,
   groupBy = 'none',
   setGroupBy,
+  recycleCount = 0,
+  onOpenRecycleBin,
 }: Props<T>) {
   const [openFilters, setOpenFilters] = useState(false);
   const [openSort, setOpenSort] = useState(false);
@@ -133,6 +137,24 @@ export function FilterBar<T>({
             aria-label="گروه‌بندی" style={topBtn(groupBy !== 'none')}>
             <span>📁</span>
             <span>{groupBy !== 'none' ? 'گروه‌بندی' : 'گروه'}</span>
+          </button>
+        )}
+        
+        {onOpenRecycleBin && (
+          <button 
+            type="button" 
+            onClick={onOpenRecycleBin}
+            disabled={recycleCount === 0}
+            className={recycleCount > 0 ? 'pm-pulse' : ''}
+            style={{
+              ...topBtn(recycleCount > 0),
+              opacity: recycleCount === 0 ? 0.5 : 1,
+              cursor: recycleCount === 0 ? 'not-allowed' : 'pointer',
+            }}
+            title={recycleCount === 0 ? 'سبد بازیابی خالی است' : `${toFa(recycleCount)} فاکتور در سبد بازیابی`}
+          >
+            <span>🗑️</span>
+            <span>بازیابی {recycleCount > 0 ? `(${toFa(recycleCount)})` : ''}</span>
           </button>
         )}
 
