@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal, Btn } from '../../../shr/components/ui';
+import { useCtc } from '../../ctc/store';
 import { BtnRow } from '../../../shr/components/ui/Btn';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { clearRecycleBin, removeFromRecycleBin } from '../../../shr/utils/recycleBin';
@@ -22,6 +23,7 @@ function daysLeft(expiresAt: string): number {
 
 export default function RecycleBinModal({ open, onClose }: Props) {
   const { restoreInvoice } = useTra();
+  const { contacts } = useCtc();
   const [entries, setEntries] = useState<RecycleBinEntry<DeletedInvoiceSnapshot>[]>([]);
 
   useEffect(() => {
@@ -89,91 +91,67 @@ export default function RecycleBinModal({ open, onClose }: Props) {
             const days = daysLeft(e.expiresAt);
             const isSale = inv.type === 'sale';
 
-            // 🆕 استخراج نام دسته کالا از CATEGORIES
+            // استخراج اطلاعات
             const catList = CATEGORIES[inv.type] || [];
             const catLabel = catList.find((c: [string, string]) => c[0] === inv.category)?.[1] || inv.category;
-
-            // 🆕 استخراج نام اقلام (حداکثر ۲ مورد)
-            const itemsText = inv.items
-              .map(it => it.description)
-              .filter(Boolean)
-              .slice(0, 2)
-              .join('، ');
-
-            // 🆕 بررسی وضعیت اتصال به گله
+            const party = contacts.find(c => c.id === inv.partyId);
+            const partyName = party?.name || 'ناشناس';
+            const itemsText = inv.items.map(it => it.description).filter(Boolean).slice(0, 2).join('، ');
             const linkedFlocks = e.item.linkedFlocks || [];
             const hasFlock = linkedFlocks.length > 0;
 
+            // رنگ بج روزهای باقی‌مانده
+            const isUrgent = days <= 7;
+            const badgeBg = isUrgent ? 'var(--danger-soft)' : 'var(--warn-soft)';
+            const badgeColor = isUrgent ? 'var(--danger)' : 'var(--warn)';
+
             return (
-              <div
-                key={inv.id}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
-                  padding: 10,
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-md)',
-                  background: 'var(--card-solid, #fff)',
-                }}
-              >
-                {/* ردیف بالا: آیکون، عنوان و وضعیت گله */}
+              <div key={inv.id} style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 12, border: '1px solid var(--border)', borderRadius: 'var(--r-md)', background: 'var(--card-solid)' }}>
+                {/* ردیف اول: تیتر (طرف حساب + دسته) */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 18 }}>{isSale ? '📤' : '📥'}</span>
+                  <span style={{ fontSize: 20 }}>{isSale ? '📤' : '📥'}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>
-                      {isSale ? 'فروش' : 'خرید'}
-                      {inv.number ? ' — ' + inv.number : ''}
+                    <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
+                      {partyName} — {catLabel}
+                    </div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                      فاکتور: {inv.number} • {toFa(inv.date)}
                     </div>
                   </div>
                   {hasFlock ? (
-                    <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 'var(--r-sm)', background: 'var(--accent-soft)', color: 'var(--accent)', fontWeight: 700 }}>
-                      🔗 متصل به گله
-                    </span>
+                    <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 'var(--r-sm)', background: 'var(--accent-soft)', color: 'var(--accent)', fontWeight: 700 }}>🔗 متصل به گله</span>
                   ) : (
-                    <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 'var(--r-sm)', background: 'var(--input-bg)', color: 'var(--muted)', fontWeight: 700 }}>
-                      بدون گله
-                    </span>
+                    <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 'var(--r-sm)', background: 'var(--input-bg)', color: 'var(--muted)', fontWeight: 700 }}>بدون گله</span>
                   )}
                 </div>
 
-                {/* ردیف میانی: دسته و اقلام */}
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', fontSize: 'var(--fs-xs)' }}>
-                  <span style={{ background: 'var(--input-bg)', padding: '2px 6px', borderRadius: 'var(--r-sm)', color: 'var(--text)' }}>
-                    <b>دسته:</b> {catLabel}
+                {/* ردیف دوم: اقلام */}
+                <div style={{ fontSize: 'var(--fs-xs)' }}>
+                  <span style={{ background: 'var(--input-bg)', padding: '2px 6px', borderRadius: 'var(--r-sm)' }}>اقلام: {itemsText || '—'}</span>
+                </div>
+
+                {/* ردیف سوم: مالی و زمان */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)', marginTop: 2 }}>
+                  <span style={{ color: 'var(--text)', fontWeight: 700 }}>{toFa(inv.total.toLocaleString('fa-IR'))} تومان</span>
+                  <span style={{ padding: '2px 6px', borderRadius: 'var(--r-sm)', background: badgeBg, color: badgeColor, fontWeight: 700 }}>
+                    {toFa(days)} روز مونده
                   </span>
-                  {itemsText && (
-                    <span style={{ background: 'var(--input-bg)', padding: '2px 6px', borderRadius: 'var(--r-sm)', color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
-                      <b>اقلام:</b> {itemsText}
-                    </span>
-                  )}
                 </div>
 
-                {/* ردیف پایین: تاریخ، مبلغ، روزهای باقی‌مانده و دکمه */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-                    {/* ردیف اول: تاریخ، مبلغ، روزهای مونده */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4, fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                      <span>{toFa(inv.date)} • {toFa(inv.total.toLocaleString('fa-IR'))} تومان</span>
-                      <span style={{ color: 'var(--warn)', fontWeight: 700 }}>{toFa(days)} روز مونده</span>
-                    </div>
-
-                    {/* ردیف دوم: زمان دقیق حذف */}
-                    <div style={{ fontSize: 10, color: 'var(--dim)' }}>
-                      🗑️ حذف شده در: {new Date(e.deletedAt).toLocaleString('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                    </div>
-
-                    {/* ردیف سوم: دکمه‌ها با استاندارد BtnRow */}
-                    <BtnRow>
-                      <Btn size="sm" variant="danger" onClick={() => handleDeleteSingle(inv.id)}>
-                        🗑️ حذف کامل
-                      </Btn>
-                      <Btn size="sm" variant="primary" onClick={() => handleRestore(inv.id)}>
-                        ↩️ بازیابی
-                      </Btn>
-                    </BtnRow>
-                  </div>
+                {/* ردیف چهارم: زمان دقیق حذف */}
+                <div style={{ fontSize: 10, color: 'var(--dim)' }}>
+                  🗑️ حذف شده در: {new Date(e.deletedAt).toLocaleString('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                 </div>
+
+                {/* ردیف پنجم: دکمه‌ها (استاندارد) */}
+                <BtnRow>
+                  <Btn size="sm" variant="outline" onClick={() => handleDeleteSingle(inv.id)} style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}>
+                    🗑️ حذف کامل
+                  </Btn>
+                  <Btn size="sm" variant="primary" onClick={() => handleRestore(inv.id)}>
+                    ↩️ بازیابی
+                  </Btn>
+                </BtnRow>
               </div>
             );
           })}
