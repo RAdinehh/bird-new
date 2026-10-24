@@ -466,10 +466,28 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           if (it.hatchDate && it.hatchDate !== f.hatchDate) {
             patch.hatchDate = it.hatchDate;
           }
+          // 🆕 hatchDate sync (existingFlockId)
+          if (it.hatchDate && it.hatchDate !== f.hatchDate) {
+            patch.hatchDate = it.hatchDate;
+          }
           flk.update(it.existingFlockId, patch);
           it.flockId = it.existingFlockId;
         }
       }
+    }
+  }
+
+  // 🆕 sync hatchDate/chickWeight حتی وقتی delta=0 (update case)
+  if (inv.type === 'purchase') {
+    for (const it2 of inv.items || []) {
+      if (!it2.flockId) continue;
+      if (!BIRD_CATS.includes(it2.category || inv.category)) continue;
+      const f2 = flk.flocks.find(x => x.id === it2.flockId);
+      if (!f2) continue;
+      const patch2: any = {};
+      if (it2.hatchDate && it2.hatchDate !== f2.hatchDate) patch2.hatchDate = it2.hatchDate;
+      if (it2.chickWeight != null && it2.chickWeight !== f2.chickWeight) patch2.chickWeight = it2.chickWeight;
+      if (Object.keys(patch2).length > 0) flk.update(it2.flockId, patch2);
     }
   }
 
@@ -576,6 +594,10 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           if (transport) patch.deliveryCost = transport;
           if (effectiveDate) patch.purchaseDate = effectiveDate;
         }
+      }
+      // 🆕 hatchDate sync (explicitFlockId)
+      if (inv.type === 'purchase' && it.hatchDate && it.hatchDate !== f.hatchDate) {
+        patch.hatchDate = it.hatchDate;
       }
       // 🆕 hatchDate sync (explicitFlockId)
       if (inv.type === 'purchase' && it.hatchDate && it.hatchDate !== f.hatchDate) {
