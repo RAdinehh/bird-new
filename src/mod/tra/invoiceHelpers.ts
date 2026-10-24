@@ -141,7 +141,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
 
       try {
         const entryId = inc.addEntry({
-          deviceId: '', hatchGroupId: '',
+          deviceId: it.deviceId || '', hatchGroupId: '',
           birdId: it.birdId || '', breedId: it.breedId || '',
           count: healthyCount, entryDate, expectedHatchDate,
           source: 'purchase',
