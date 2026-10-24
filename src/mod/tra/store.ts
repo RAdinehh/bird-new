@@ -11,7 +11,8 @@ import { useWhs } from '../whs/store';
 import { useHal } from '../hal/store';
 import { bus } from '../../cor/events';
 
-import type { Invoice, InvoiceItem, State } from './types';
+import type { Invoice, InvoiceItem, State, DeletedInvoiceSnapshot } from './types';
+import { saveToRecycleBin, removeFromRecycleBin, listRecycleBin } from '../../shr/utils/recycleBin';
 import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount } from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { applyInvoiceStock } from './applyStock';
@@ -232,8 +233,47 @@ export const useTra = create<State>()(
           } catch(e) { console.error('[updateInvoice] alloc sync:', e); }
         }
       },
+      restoreInvoice: (id) => {
+        const snapshot = removeFromRecycleBin<DeletedInvoiceSnapshot>(
+          'tra',
+          (existing) => existing.invoice.id === id,
+        );
+        if (!snapshot) {
+          console.error('[restoreInvoice] not found in recycle bin:', id);
+          return false;
+        }
+        if (get().invoices.some((x) => x.id === id)) {
+          console.warn('[restoreInvoice] invoice already exists:', id);
+          return false;
+        }
+        set((s) => ({ invoices: [...s.invoices, snapshot.invoice] }));
+        const flk = useFlk.getState();
+        for (const flockId of snapshot.linkedFlockIds) {
+          try {
+            flk.update(flockId, { sourceInvoiceId: id });
+          } catch (e) {
+            console.error('[restoreInvoice] relink flock:', flockId, e);
+          }
+        }
+        console.info('[restoreInvoice] ♻️ restored:', id, '| flocks:', snapshot.linkedFlockIds.length);
+        console.warn('[restoreInvoice] ⚠️ موجودی گله/انبار را دستی بررسی کنید');
+        return true;
+      },
+      listDeletedInvoices: () => listRecycleBin<DeletedInvoiceSnapshot>('tra').map((e) => e.item),
       deleteInvoice: (id) => {
         const inv = get().invoices.find(x => x.id === id);
+        // 🆕 Backup Before Mutation (recycle bin)
+        if (inv) {
+          const snapshotFlockIds = useFlk.getState().flocks
+            .filter((f) => f.sourceInvoiceId === id)
+            .map((f) => f.id);
+          saveToRecycleBin<DeletedInvoiceSnapshot>(
+            'tra',
+            { invoice: inv, linkedFlockIds: snapshotFlockIds },
+            (existing) => existing.invoice.id === id,
+          );
+          console.info('[deleteInvoice] 🗑️ saved to recycle bin:', id);
+        }
         // 🆕 auto-unlink: گله‌های متصل بدون سند می‌شن (حذف نمی‌شن)
         if (inv) {
           const flkState = useFlk.getState();

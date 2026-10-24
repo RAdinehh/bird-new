@@ -171,6 +171,11 @@ export interface Payment {
   partyId?: string;
 }
 
+export interface DeletedInvoiceSnapshot {
+  invoice: Invoice;
+  linkedFlockIds: string[];
+}
+
 export interface Invoice {
   id: string;
   type: InvoiceType;
@@ -257,6 +262,8 @@ export interface State {
   addInvoice: (i: Omit<Invoice, 'id'|'createdAt'|'updatedAt'>) => string;
   updateInvoice: (id: string, patch: Partial<Invoice>) => void;
   deleteInvoice: (id: string) => void;
+  restoreInvoice: (id: string) => boolean;
+  listDeletedInvoices: () => DeletedInvoiceSnapshot[];
   addDeal: (d: Omit<Deal, 'id'|'createdAt'|'updatedAt'>) => void;
   updateDeal: (id: string, patch: Partial<Deal>) => void;
   deleteDeal: (id: string) => void;

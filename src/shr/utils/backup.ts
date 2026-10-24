@@ -12,6 +12,7 @@ export const PM_KEYS = [
   'pm-whs',
   'pm-fed',
   'pm-tra',
+  'pm-recycle-tra',
   'pm-alt',
   'pm-cal-manual',
   'pm-theme'
