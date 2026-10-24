@@ -1,8 +1,8 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- مفهوم: #7 Sort
-- ماژول: shr (useFilterSort)
+- بخش: tra (خرید - Purchase)
+- وضعیت: منطق فرم و گارد تسویه (Paid Guard) تایید شد
 - فاز: verify
 
 ## ✅ DONE (1/205)
