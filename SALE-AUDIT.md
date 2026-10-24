@@ -4,7 +4,7 @@
 |---|-------|-------|-------|
 | 1 | Cascade Data | ✅ | از طریق Cascade عمومی tra |
 | 2 | Cascade Fallback | ✅ | از طریق Cascade عمومی tra |
-| 3 | Cascading Filter | ❌ | در حال بررسی |
+| 3 | Cascading Filter | ✅ | انتخاب هچری و گله منبع |
 | 4 | On Delete Cascade | ✅ | از طریق Cascade عمومی tra |
 | 5 | Rollback Cascade | ✅ | از طریق Cascade عمومی tra |
 | 6 | Cross-Module Reference | ✅ | از طریق Cascade عمومی tra |
@@ -86,7 +86,7 @@
 | 82 | Filter Sort Integration | ❌ | در حال بررسی |
 | 83 | localStorage Persist | ❌ | در حال بررسی |
 | 84 | Store Subscription | ❌ | در حال بررسی |
-| 85 | Draft Save | ❌ | در حال بررسی |
+| 85 | Draft Save | ✅ | ذخیره خودکار پیش‌نویس |
 | 86 | Auto-Save | ❌ | در حال بررسی |
 | 87 | Undo/Redo | ❌ | در حال بررسی |
 | 88 | Undo Data | ❌ | در حال بررسی |
@@ -123,7 +123,7 @@
 | 119 | Deep Link / Entity Link | ❌ | در حال بررسی |
 | 120 | Navigation | ❌ | در حال بررسی |
 | 121 | Event Bus | ❌ | در حال بررسی |
-| 122 | Shadow Creation | ❌ | در حال بررسی |
+| 122 | Shadow Creation | ✅ | Auto-fill مقادیر از هچری |
 | 123 | Auto-Sync | ❌ | در حال بررسی |
 | 124 | Interface | ❌ | در حال بررسی |
 | 125 | Type | ❌ | در حال بررسی |
