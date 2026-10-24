@@ -1,8 +1,8 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- بخش: tra (خرید - Purchase)
-- وضعیت: EntityLink (اتصال فاکتور به گله) اضافه شد
+- بخش: tra (فروش - Sale)
+- وضعیت: در حال بازرسی
 - فاز: verify
 
 ## ✅ DONE (1/205)
