@@ -4,12 +4,11 @@ import { useTra } from '../mod/tra/store';
 
 describe('whs.egg Phantom — Standard ERP Fix', () => {
   beforeEach(() => {
-    useWhs.setState({ items: [], movements: [] } as any);
-    useTra.setState({ invoices: [] } as any);
+    useWhs.setState({ items: [] });
+    useTra.setState({ invoices: [] });
   });
 
   it('فروش تخم‌مرغ با stockItemId → موجودی انبار کاهش می‌یابد', () => {
-    // ساخت کالای انبار
     const eggItemId = useWhs.getState().addItem({
       name: '🥚 تخم مرغ خوراکی',
       category: 'egg',
@@ -22,12 +21,11 @@ describe('whs.egg Phantom — Standard ERP Fix', () => {
       withdrawalDays: null,
       storage: 'room',
       notes: '',
-    } as any);
+    });
     expect(eggItemId).toBeTruthy();
 
-    // شارژ ۵۰۰
     useWhs.getState().addMovement({
-      itemId: eggItemId!,
+      itemId: eggItemId,
       type: 'in',
       quantity: 500,
       unitPrice: 0,
@@ -35,19 +33,19 @@ describe('whs.egg Phantom — Standard ERP Fix', () => {
       date: '1405/07/20',
       partyId: '',
       notes: 'تولید',
-    } as any);
+    });
     expect(useWhs.getState().items.find(x => x.id === eggItemId)!.currentStock).toBe(500);
 
-    // فاکتور فروش با stockItemId (شبیه fillFromProduction)
     useTra.getState().addInvoice({
       type: 'sale',
       date: '1405/07/21',
       partyId: 'p1',
       category: 'egg',
       items: [{
+        id: 'item-1',
         category: 'egg',
         description: 'تخم خوراکی - 1405/07/21',
-        stockItemId: eggItemId,  // 🔥 کلید رفع Phantom
+        stockItemId: eggItemId,
         quantity: 200,
         unitPrice: 1000,
         total: 200000,
@@ -56,9 +54,8 @@ describe('whs.egg Phantom — Standard ERP Fix', () => {
       discount: 0,
       shipping: 0,
       total: 200000,
-    } as any);
+    });
 
-    // انتظار: ۵۰۰ − ۲۰۰ = ۳۰۰
     const after = useWhs.getState().items.find(x => x.id === eggItemId)!.currentStock;
     expect(after).toBe(300);
   });

@@ -106,7 +106,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     if (!prod) return;
     const qty = kind === 'eating' ? prod.eatingCount : prod.fertileCount;
     // 🆕 اتصال مستقیم به کالای انبار (استاندارد ERP — رفع Phantom)
-    const eggStock = (whsItems || []).find((x: any) => x.category === 'egg');
+    const eggStock = whsItems.find(x => x.category === 'egg');
 
     updateItem({
       flockId: prod.flockId,
