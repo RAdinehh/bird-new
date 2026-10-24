@@ -23,6 +23,8 @@ export interface F {
   status: FlockStatus; notes: string;
   /** 🆕 شناسه فاکتور خرید (اگه منبع purchase) */
   sourceInvoiceId?: string;
+  /** 🆕 دسته کالای فاکتور */
+  sourceCategory?: string;
   /** 🆕 شناسه هچ (اگه منبع hatch) */
   hatchId?: string;
   // 💼 مدل بهره‌برداری

@@ -219,7 +219,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             />
           ) : (
             <DependentSelect
-              disabled={isSourceLinked}
+              disabled={isSourceLinked && !!form.breedId}
               value={form.breedId}
               onChange={v => { if (isSourceLinked) return;
                 const std = breedStd.byBreedId(v);

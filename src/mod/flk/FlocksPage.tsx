@@ -104,6 +104,8 @@ export default function FlocksPage() {
       hallId: form.hallId || '',
       zoneId: form.zoneId || '',
       initialCount: form.initialCount ? int(form.initialCount) : undefined,
+      sourceInvoiceId: form.sourceInvoiceId || '',
+      sourceCategory: form.sourceCategory || '',
       currentCount: form.currentCount ? int(form.currentCount) : undefined,
       maleCount: int(form.maleCount) ?? 0,
       femaleCount: int(form.femaleCount) ?? 0,
