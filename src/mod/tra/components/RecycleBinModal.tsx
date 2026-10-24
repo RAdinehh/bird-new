@@ -42,11 +42,15 @@ export default function RecycleBinModal({ open, onClose }: Props) {
   };
 
   const handleClearAll = async () => {
-    const ok = await showConfirmAsync('خالی کردن سبد', 'آیا از حذف دائمی تمام فاکتورهای داخل سبد بازیابی مطمئنید؟', { danger: true, confirmText: 'همه را حذف کن', cancelText: 'انصراف' });
+    const ok = await showConfirmAsync(
+      '⛔ حذف دائمی همه',
+      'با این کار:\n• ارتباط فاکتورها با گله و انبار برای همیشه قطع می‌شود.\n• بدهی طرف حساب و گزارشات مالی/آماری ناقص می‌شوند.\n• امکان بازگشت وجود ندارد.\n\nآیا مطمئنید؟',
+      { danger: true, confirmText: 'بله، همه را حذف کن', cancelText: 'انصراف' }
+    );
     if (!ok) return;
     clearRecycleBin('tra');
     setEntries([]);
-    toastMsg.success('سبد بازیابی خالی شد');
+    toastMsg.success('سبد بازیابی برای همیشه خالی شد');
   };
 
   const handleRestore = (id: string) => {
