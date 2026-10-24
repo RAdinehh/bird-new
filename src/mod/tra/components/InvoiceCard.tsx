@@ -8,6 +8,7 @@ import { Row, RowGrid, SectionTitle } from '../helpers';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 import { formatInvoiceNumber } from '../calc';
 import { useTra } from '../store';
+import { BtnRow } from '../../../shr/components/ui/Btn';
 import { useFlk } from '../../flk/store';
 import { toastMsg } from '../../../cor/store/toast';
 import EntityLink from '../../../shr/components/EntityLink';
@@ -216,51 +217,47 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         </Btn>
       )}
       {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock) ? (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
-          {onEdit && (
-            <Btn
-              size="sm" variant="outline"
-              onClick={onEdit}
-              style={{ flex: '1 1 120px' }}
-            >
-              ✏️ ویرایش فاکتور
-            </Btn>
-          )}
-          {linkedFlock && (
-            <div style={{ flex: '1 1 120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {linkedFlock.status === 'archived' || linkedFlock.status === 'sold' ? (
-                <Btn size="sm" variant="primary" onClick={() => {
-                  restore(linkedFlock.id);
-                  toastMsg.success('گله با موفقیت بازیابی شد');
-                }}>
-                  ♻️ بازیابی گله
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
+          {(onEdit || linkedFlock) && (
+            <BtnRow>
+              {onEdit && (
+                <Btn size="sm" variant="outline" onClick={onEdit}>
+                  ✏️ ویرایش فاکتور
                 </Btn>
-              ) : (
-                <EntityLink type="flock" id={linkedFlock.id} label="🐔 مشاهده گله" />
               )}
-            </div>
+              {linkedFlock && (
+                linkedFlock.status === 'archived' || linkedFlock.status === 'sold' ? (
+                  <Btn size="sm" variant="primary" onClick={() => {
+                    restore(linkedFlock.id);
+                    toastMsg.success('گله با موفقیت بازیابی شد');
+                  }}>
+                    ♻️ بازیابی گله
+                  </Btn>
+                ) : (
+                  <Btn size="sm" variant="outline" onClick={() => window.location.href = '/flk?focus=' + linkedFlock.id}>
+                    🐔 مشاهده گله
+                  </Btn>
+                )
+              )}
+            </BtnRow>
           )}
-          {nextWorkflowStatus(inv.workflowStatus) && 
-           !((String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card') 
-             && nextWorkflowStatus(inv.workflowStatus) === 'received') && (
-            <Btn
-              size="sm" variant="primary"
-              onClick={onTransferClick}
-              style={{ flex: '1 1 120px' }}
-            >
-              {nextWorkflowStatus(inv.workflowStatus) === 'confirmed' && '✅ ثبت نهایی'}
-              {nextWorkflowStatus(inv.workflowStatus) === 'received' && '📦 کالا رسید'}
-              {nextWorkflowStatus(inv.workflowStatus) === 'paid' && '💰 پرداخت کردم'}
-            </Btn>
-          )}
-          {onReopen && (
-            <Btn
-              size="sm" variant="primary"
-              onClick={onReopen}
-              style={{ flex: '1 1 120px' }}
-            >
-              🔓 بازگشایی
-            </Btn>
+          {(nextWorkflowStatus(inv.workflowStatus) || onReopen) && (
+            <BtnRow>
+              {nextWorkflowStatus(inv.workflowStatus) && 
+                !((String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card')
+                 && nextWorkflowStatus(inv.workflowStatus) === 'received') && (
+                <Btn size="sm" variant="primary" onClick={onTransferClick}>
+                  {nextWorkflowStatus(inv.workflowStatus) === 'confirmed' && '✅ ثبت نهایی'}
+                  {nextWorkflowStatus(inv.workflowStatus) === 'received' && '📦 کالا رسید'}
+                  {nextWorkflowStatus(inv.workflowStatus) === 'paid' && '💰 پرداخت کردم'}
+                </Btn>
+              )}
+              {onReopen && (
+                <Btn size="sm" variant="primary" onClick={onReopen}>
+                  🔓 بازگشایی
+                </Btn>
+              )}
+            </BtnRow>
           )}
         </div>
       ) : null}
