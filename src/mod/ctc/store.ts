@@ -23,7 +23,7 @@ export interface Person {
   customerTypes: string[];     // [جدید] چندتایی: wholesale, retail, ...
   trustScore: number | null; // 1-10
   /** 🆕 سقف اعتبار مشتری (تومان) — 0 یا null = بدون سقف */
-  creditLimit: number | null;
+  creditLimit?: number | null;
   defaultDiscount: number | null;
 
   // فروشنده

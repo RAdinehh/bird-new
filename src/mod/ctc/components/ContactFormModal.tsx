@@ -9,7 +9,8 @@ interface F {
   address: string; city: string; nationalId: string; roles: Role[]; notes: string;
   customerType: string; customerTypes: string[]; trustScore: string; defaultDiscount: string;
   supplierTypes: string[]; position: string; startDate: string; salaryType: string; salaryAmount: string; insurance: boolean;
-}
+
+  creditLimit?: number | null;}
 
 interface Props {
   open: boolean;
