@@ -220,6 +220,8 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
         sourceModule: 'tra', sourceId: inv.id,
         
         expiryDate: sample.expiryDate,
+        flockId: sample.flockId || '',
+        batchNo: 'B-' + (inv.number || inv.id).slice(-6) + '-' + Date.now().toString().slice(-4),
       } as any);
     } catch (e) {
       console.error('[applyInvoiceStock] addMovement failed:', e);

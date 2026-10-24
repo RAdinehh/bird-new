@@ -318,7 +318,7 @@ export const CATEGORY_DEFAULTS: Record<ItemCategory, {
   title: string;
 }> = {
   egg:        { unit: 'pcs',  storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🥚 اطلاعات تخم' },
-  feed:       { unit: 'kg',   storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '' },
+  feed:       { unit: 'kg',   storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: true,  needsStorage: false, needsEquipment: false, title: '' },
   medicine:   { unit: 'ml',   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: '💊 اطلاعات دارویی' },
   vaccine:    { unit: 'vial', storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: '💉 اطلاعات واکسن' },
   herbal:     { unit: 'g',    storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🌿 اطلاعات گیاهی' },
