@@ -27,7 +27,11 @@ interface Props {
 export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, index }: Props) {
   const { updateInvoice, allocations } = useTra();
   const { flocks, restore } = useFlk();
-  const linkedFlock = flocks?.find((f: any) => f.sourceInvoiceId === inv.id);
+  // 🆕 استاندارد ERP: خواندن شناسه یکتا از خود سند (بدون حدس زدن)
+  const invFlockId = inv.relatedFlockId || inv.items?.find((it: any) => it.flockId)?.flockId;
+  const linkedFlock = flocks?.find((f: any) => 
+    (invFlockId && f.id === invFlockId) || f.sourceInvoiceId === inv.id
+  );
   const rem2 = remaining(inv, allocations);
   const st = rem2 === 0 ? 'paid' : paidSumAllocated(inv, allocations) > 0 ? 'partial' : 'unpaid';
 
