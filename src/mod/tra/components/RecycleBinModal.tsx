@@ -62,6 +62,12 @@ export default function RecycleBinModal({ open, onClose }: Props) {
     if (ok) {
       toastMsg.restored('فاکتور');
       try { logAction('restore', 'tra', 'بازیابی فاکتور از سبد: ' + id); } catch { /* silent */ }
+      
+      // 🆕 ۱. حذف فوری آیتم از لیست سبد بازیابی (تا کاربر ببیند از سبد خارج شد)
+      setEntries(prev => prev.filter(e => e.item.invoice.id !== id));
+      
+      // 🆕 ۲. بستن خودکار پنجره سبد بازیابی (استاندارد ERP)
+      onClose();
     } else {
       toastMsg.error('بازیابی ناموفق');
     }
