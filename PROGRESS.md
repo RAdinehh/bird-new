@@ -1,8 +1,8 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- مفهوم: #3 Cascading Filter
-- ماژول: shr (FilterSort) / UI
+- مفهوم: #4 On Delete Cascade
+- ماژول: tra (store)
 - فاز: verify
 
 ## ✅ DONE (1/205)
@@ -15,7 +15,6 @@
 ## ⏸ DEFERRED
 
 ## ❌ PENDING (۲۰۵)
-3
 4
 5
 6
