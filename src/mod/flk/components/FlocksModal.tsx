@@ -73,7 +73,21 @@ export default function FlocksModal(props: FlocksModalProps) {
   const [hatchPickerOpen, setHatchPickerOpen] = useState(false);
 
 
-  const handleInvoiceSelect = (inv: Invoice) => {
+  const handleInvoiceSelect = async (inv: Invoice) => {
+    const linkedFlock = useFlk.getState().flocks.find(f => f.sourceInvoiceId === inv.id);
+    if (linkedFlock && (linkedFlock.status === 'archived' || linkedFlock.status === 'sold')) {
+      const wantRestore = await showConfirmAsync(
+        'گله آرشیو شده یافت شد',
+        `از فاکتور ${inv.number || inv.id} قبلاً گله‌ای به نام «${linkedFlock.name}» ساخته شده که در آرشیو است. آیا می‌خواهید آن گله را بازیابی کنید یا یک گله جدید بسازید؟`,
+        { confirmText: '♻️ بازیابی گله قبلی', cancelText: '➕ ساخت گله جدید' }
+      );
+      if (wantRestore) {
+        useFlk.getState().restore(linkedFlock.id);
+        onClose();
+        return;
+      }
+    }
+    
     const updates = applyInvoiceToForm(form, inv);
     if (!updates) return;
     setForm((f) => ({ ...f, ...updates }));
