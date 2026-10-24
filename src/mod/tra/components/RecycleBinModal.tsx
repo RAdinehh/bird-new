@@ -90,9 +90,13 @@ export default function RecycleBinModal({ open, onClose }: Props) {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 4, borderBottom: '1px solid var(--border)' }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>مرتب‌شده بر اساس نزدیک‌ترین به انقضا</span>
-            <Btn size="sm" variant="outline" onClick={handleClearAll} style={{ color: 'var(--danger)', borderColor: 'var(--danger)', fontSize: 11, padding: '2px 8px', minHeight: 28 }}>🗑️ خالی کردن سبد</Btn>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingBottom: 12, borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, background: 'var(--card-solid)', zIndex: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span>🔄</span> مرتب‌سازی: نزدیک‌ترین به انقضا
+              </span>
+              <Btn size="sm" variant="outline" onClick={handleClearAll} style={{ color: 'var(--danger)', borderColor: 'var(--danger)', fontSize: 11, padding: '2px 8px', minHeight: 28 }}>🗑️ خالی کردن سبد</Btn>
+            </div>
           </div>
           {entries.slice(0, visibleCount).map((e) => {
             const inv = e.item.invoice;
@@ -115,7 +119,7 @@ export default function RecycleBinModal({ open, onClose }: Props) {
             const badgeColor = isUrgent ? 'var(--danger)' : 'var(--warn)';
 
             return (
-              <div key={inv.id} style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: 10, border: '1px solid var(--border)', borderRadius: 'var(--r-md)', background: 'var(--card-solid)' }}>
+              <div key={inv.id} style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 12, border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', background: 'var(--card-solid)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                 {/* ردیف اول: تیتر (نام و وضعیت) */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
