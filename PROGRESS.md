@@ -1,8 +1,8 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- مفهوم: #2 Cascade Fallback
-- ماژول: intel (anomalyDetector)
+- مفهوم: #3 Cascading Filter
+- ماژول: shr (FilterSort) / UI
 - فاز: verify
 
 ## ✅ DONE (1/205)
@@ -15,7 +15,6 @@
 ## ⏸ DEFERRED
 
 ## ❌ PENDING (۲۰۵)
-2
 3
 4
 5
