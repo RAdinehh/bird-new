@@ -30,19 +30,19 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
       <Grid2>
         <Field
           label={isSourceLinked ? <span>تاریخ هچ <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ هچ'}
-          hint={isSourceLinked ? '🔒 از فاکتور/هچ — برای تغییر، لینک را پاک کنید' : 'خروج جوجه از دستگاه'}
+          hint={isSourceLinked ? '🔒 از فاکتور — برای تغییر، فاکتور را ویرایش کنید' : 'خروج جوجه از دستگاه'}
           error={showError('hatchDate')}
           onTouch={() => markTouched('hatchDate')}
         >
           <DatePicker value={form.hatchDate} onChange={v => !isSourceLinked && setForm({ ...form, hatchDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} disabled={isSourceLinked} />
         </Field>
         <Field
-          label={isSourceLinked && form.sourceInvoiceId ? <span>تاریخ خرید <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ خرید'}
-          hint={isSourceLinked && form.sourceInvoiceId ? '🔒 از فاکتور — برای تغییر، لینک فاکتور را پاک کنید' : 'روزی که گله رسید'}
+          label={isSourceLinked ? <span>تاریخ خرید <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ خرید'}
+          hint={isSourceLinked ? '🔒 از فاکتور — برای تغییر، فاکتور را ویرایش کنید' : 'روزی که گله رسید'}
           error={showError('purchaseDate')}
           onTouch={() => markTouched('purchaseDate')}
         >
-          <DatePicker value={form.purchaseDate} onChange={v => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, purchaseDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} disabled={isSourceLinked && !!form.sourceInvoiceId} />
+          <DatePicker value={form.purchaseDate} onChange={v => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, purchaseDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} disabled={isSourceLinked} />
         </Field>
         
         <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
@@ -53,14 +53,14 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
       <div style={dividerStyle}>💰 هزینه‌ها</div>
       <Grid2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-          <Field label={isSourceLinked && form.sourceInvoiceId ? <span>قیمت هر پرنده <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'قیمت هر پرنده'} hint={isSourceLinked && form.sourceInvoiceId ? '🔒 از فاکتور — برای تغییر، فاکتور را ویرایش کنید' : undefined} error={showError('purchasePrice')} onTouch={() => markTouched('purchasePrice')}>
-            <MoneyField placeholder="۰" min={1000} max={5000000} disabled={isSourceLinked && !!form.sourceInvoiceId} value={form.purchasePrice} onChange={e => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, purchasePrice: e.target.value })} />
+          <Field label={isSourceLinked ? <span>قیمت هر پرنده <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'قیمت هر پرنده'} hint={isSourceLinked && form.sourceInvoiceId ? '🔒 از فاکتور — برای تغییر، فاکتور را ویرایش کنید' : undefined} error={showError('purchasePrice')} onTouch={() => markTouched('purchasePrice')}>
+            <MoneyField placeholder="۰" min={1000} max={5000000} disabled={isSourceLinked} value={form.purchasePrice} onChange={e => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, purchasePrice: e.target.value })} />
           </Field>
           <FieldHint fieldPath="flk.purchasePrice" value={form.purchasePrice} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-          <Field label={isSourceLinked && form.sourceInvoiceId ? <span>هزینه حمل <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'هزینه حمل'} hint={isSourceLinked && form.sourceInvoiceId ? '🔒 از فاکتور — برای تغییر، فاکتور را ویرایش کنید' : undefined} error={showError('deliveryCost')} onTouch={() => markTouched('deliveryCost')}>
-            <MoneyField placeholder="۰" max={500000000} disabled={isSourceLinked && !!form.sourceInvoiceId} value={form.deliveryCost} onChange={e => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, deliveryCost: e.target.value })} />
+          <Field label={isSourceLinked && form.sourceInvoiceId ? <span>هزینه حمل <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'هزینه حمل'} hint={isSourceLinked ? '🔒 از فاکتور — برای تغییر، فاکتور را ویرایش کنید' : undefined} error={showError('deliveryCost')} onTouch={() => markTouched('deliveryCost')}>
+            <MoneyField placeholder="۰" max={500000000} disabled={isSourceLinked} value={form.deliveryCost} onChange={e => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, deliveryCost: e.target.value })} />
           </Field>
           <FieldHint fieldPath="flk.deliveryCost" value={form.deliveryCost} />
         </div>

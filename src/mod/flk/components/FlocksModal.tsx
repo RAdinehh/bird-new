@@ -329,11 +329,11 @@ export default function FlocksModal(props: FlocksModalProps) {
         <Field
           label={isSourceLinked ? <span>تعداد اولیه <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تعداد اولیه'}
           required
-          hint={isSourceLinked ? '🔒 از فاکتور/هچ — برای تغییر، لینک را پاک کنید' : undefined}
+          hint={isSourceLinked ? '🔒 از فاکتور — برای تغییر، فاکتور را ویرایش کنید' : undefined}
           error={showError('initialCount')}
           onTouch={() => markTouched('initialCount')}
         >
-          <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => {
+          <NumField placeholder="۸۵۰" disabled={isSourceLinked} value={form.initialCount} onChange={e => {
             if (isSourceLinked) return;
             const v = e.target.value;
             setForm(f => ({
