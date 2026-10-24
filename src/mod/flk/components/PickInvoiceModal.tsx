@@ -13,18 +13,28 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onSelect: (invoice: Invoice) => void;
+  currentBirdId?: string;
 }
 
-export default function PickInvoiceModal({ open, onClose, onSelect }: Props) {
+export default function PickInvoiceModal({ open, onClose, onSelect, currentBirdId }: Props) {
   const invoices = useTra(s => s.invoices);
 
   // فاکتورهای خرید که آیتم پرنده دارن
   const birdInvoices = useMemo(() => {
     return (invoices || [])
-      .filter((inv: Invoice) => inv.type === 'purchase' && inv.items?.some((it: InvoiceItem) => it.birdId))
+      .filter((inv: Invoice) => {
+        if (inv.type !== 'purchase') return false;
+        const hasBird = inv.items?.some((it: InvoiceItem) => {
+          if (!it.birdId) return false;
+          // 🆕 فیلتر آبشاری: فقط فاکتورهای همان نوع پرنده
+          if (currentBirdId && it.birdId !== currentBirdId) return false;
+          return true;
+        });
+        return hasBird;
+      })
       .slice()
       .sort((a: Invoice, b: Invoice) => (b.date || '').localeCompare(a.date || ''));
-  }, [invoices]);
+  }, [invoices, currentBirdId]);
 
   const handlePick = (inv: Invoice) => {
     onSelect(inv);

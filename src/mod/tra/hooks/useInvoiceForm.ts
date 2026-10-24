@@ -409,7 +409,9 @@ export function useInvoiceForm(params: {
     }
     // ────────────────────────────────────────
     // ═══ چک گله تکراری + دیالوگ تأیید (Odoo/SAP standard) ═══
-    if (kind === 'purchase') {
+    // 🆕 فیکس: اگر کاربر از قبل گله موجود را انتخاب کرده، پیام تکراری نده
+    const hasExistingLink = cleanedItems.some((it: any) => it.existingFlockId);
+    if (kind === 'purchase' && !hasExistingLink) {
       const flkState = useFlk.getState();
       const duplicates: Array<{ item: any; dup: any }> = [];
       for (const it of cleanedItems as any[]) {

@@ -437,6 +437,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         open={invoicePickerOpen}
         onClose={() => setInvoicePickerOpen(false)}
         onSelect={handleInvoiceSelect}
+        currentBirdId={form.birdId}
       />
       <PickHatchModal
         open={hatchPickerOpen}

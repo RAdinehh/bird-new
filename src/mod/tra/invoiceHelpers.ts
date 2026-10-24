@@ -771,11 +771,18 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       const mm = new Map<string, number>();
       if (!inv2) return mm;
       for (const it of inv2.items || []) {
-        if (!it.existingFlockId) continue;
+        // 🆕 فیکس Double Counting: هر دو فیلد را چک کن
+        const targetFlockId = it.existingFlockId || it.flockId;
+        if (!targetFlockId) continue;
         const cat = it.category || inv2.category;
         if (!BIRD_CATS.includes(cat)) continue;
+        // 🆕 اگر فاکتور قبلی flockId خودکار داشته، فقط اگر گله هنوز به همین فاکتور وصل است آن را حساب کن
+        if (!it.existingFlockId && it.flockId) {
+          const flock = useFlk.getState().flocks.find(f => f.id === it.flockId);
+          if (flock && flock.sourceInvoiceId !== inv2.id) continue;
+        }
         const qty = (it.healthyCount ?? it.quantity) || 0;
-        mm.set(it.existingFlockId, (mm.get(it.existingFlockId) || 0) + qty);
+        mm.set(targetFlockId, (mm.get(targetFlockId) || 0) + qty);
       }
       return mm;
     };
