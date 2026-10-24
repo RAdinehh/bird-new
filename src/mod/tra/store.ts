@@ -250,7 +250,18 @@ export const useTra = create<State>()(
         const flk = useFlk.getState();
         for (const flock of snapshot.linkedFlocks) {
           try {
-            flk.update(flock.id, { sourceInvoiceId: id, sourceCategory: flock.sourceCategory });
+            // اگر birdId یا breedId در گله خالی بود، از فاکتور بخوان
+            const firstItem = snapshot.invoice.items.find(it => it.category === 'chick' || it.category === 'adult');
+            const birdId = flock.birdId || firstItem?.birdId || '';
+            const breedId = flock.breedId || firstItem?.breedId || '';
+
+            flk.update(flock.id, { 
+              sourceInvoiceId: id, 
+              sourceCategory: flock.sourceCategory,
+              birdId,
+              breedId,
+            });
+            console.info('[restoreInvoice] flock relinked with breed:', flock.id, breedId);
           } catch (e) {
             console.error('[restoreInvoice] relink flock:', flock.id, e);
           }
@@ -266,7 +277,12 @@ export const useTra = create<State>()(
         if (inv) {
           const linkedFlocks = useFlk.getState().flocks
             .filter((f) => f.sourceInvoiceId === id)
-            .map((f) => ({ id: f.id, sourceCategory: f.sourceCategory || '' }));
+            .map((f) => ({ 
+              id: f.id, 
+              sourceCategory: f.sourceCategory || '',
+              birdId: f.birdId || null,
+              breedId: f.breedId || null,
+            }));
           saveToRecycleBin<DeletedInvoiceSnapshot>(
             'tra',
             { invoice: inv, linkedFlocks },
