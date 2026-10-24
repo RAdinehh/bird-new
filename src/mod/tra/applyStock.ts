@@ -28,7 +28,7 @@ function uomFactor(cat: string, unit: string, unitWeight?: number | null): numbe
   return unitWeight && unitWeight > 0 ? unitWeight : 1;
 }
 
-const STOCK_CATS = ['feed', 'medicine', 'vaccine', 'herbal', 'other', 'manure', 'broken'];
+const STOCK_CATS = ['feed', 'medicine', 'vaccine', 'herbal', 'other', 'manure', 'broken', 'egg', 'fertile_egg'];
 
 function mapCategory(cat: string, kind?: string): any {
   if (['feed', 'medicine', 'vaccine', 'herbal', 'egg'].includes(cat)) return cat;
