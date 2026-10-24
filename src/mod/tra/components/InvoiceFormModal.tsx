@@ -365,11 +365,11 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <NumField placeholder="نر" value={it.maleCount != null && it.maleCount > 0 ? toFa(String(it.maleCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
-          const hasFemale = it.femaleCount != null;
           const patch: Record<string, number | null> = { maleCount: v };
-          if (hasFemale) {
-            const safeMale = v ?? 0;
-            const safeFemale = it.femaleCount ?? 0;
+          // 🆕 اتوفیل فقط وقتی که هم نر (v) و هم ماده پر باشند
+          if (v !== null && it.femaleCount != null) {
+            const safeMale = v;
+            const safeFemale = it.femaleCount;
             patch.unknownCount = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
           }
           updateItem(it.id, patch);
@@ -379,11 +379,11 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <NumField placeholder="ماده" value={it.femaleCount != null && it.femaleCount > 0 ? toFa(String(it.femaleCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
-          const hasMale = it.maleCount != null;
           const patch: Record<string, number | null> = { femaleCount: v };
-          if (hasMale) {
-            const safeMale = it.maleCount ?? 0;
-            const safeFemale = v ?? 0;
+          // 🆕 اتوفیل فقط وقتی که هم ماده (v) و هم نر پر باشند
+          if (v !== null && it.maleCount != null) {
+            const safeMale = it.maleCount;
+            const safeFemale = v;
             patch.unknownCount = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
           }
           updateItem(it.id, patch);
