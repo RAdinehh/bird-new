@@ -46,7 +46,7 @@
 | 42 | markTouched | ❌ | در حال بررسی |
 | 43 | Required vs Optional | ❌ | در حال بررسی |
 | 44 | Cross-Field Validation | ✅ | در اعتبارسنجی Zod و گاردها دیدیم |
-| 45 | Range Validation | ❌ | در حال بررسی |
+| 45 | Range Validation | ✅ | موجودی انبار/گله |
 | 46 | Date Validation | ❌ | در حال بررسی |
 | 47 | Pattern Validation | ❌ | در حال بررسی |
 | 48 | Enum Validation | ❌ | در حال بررسی |
