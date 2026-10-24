@@ -79,7 +79,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
       const saleType = cat === 'fertile_egg' ? 'fertile' : 'eating';
       try {
         egg.addSale({
-          date: inv.date, type: saleType, count: it.quantity,
+          date: it.eggDate || inv.date, type: saleType, count: it.quantity,
           unit: 'piece', unitPrice: it.unitPrice || 0,
           totalPrice: it.total || (it.quantity * (it.unitPrice || 0)),
           customerId: inv.partyId || '', paymentType: 'cash',
