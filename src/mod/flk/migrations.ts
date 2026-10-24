@@ -233,5 +233,16 @@ export function flkMigrate(persistedInput: unknown, version: number): State {
     });
   }
 
+  // ─── v10 → v11: genderSplitAt ───
+  if (version < 11) {
+    state.flocks = state.flocks.map((f: any) => {
+      const hasSplit = ((f.maleCount ?? 0) > 0) || ((f.femaleCount ?? 0) > 0);
+      return {
+        ...f,
+        genderSplitAt: hasSplit ? (f.updatedAt || f.createdAt || new Date().toISOString()) : null,
+      };
+    });
+  }
+
   return persistedInput as State;
 }

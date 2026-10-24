@@ -46,6 +46,8 @@ export interface Flock {
   paused?: boolean;
   /** دلیل آرشیو (اجباری هنگام بستن) */
   archivedReason?: string;
+  /** 🆕 تاریخ اولین تفکیک جنسیت — null = هیچ‌وقت split نشده */
+  genderSplitAt?: string | null;
   notes: string;
   /** رویدادهای دستی گله */
   events?: FlockEvent[];
@@ -416,7 +418,7 @@ export const useFlk = create<State>()(
     }),
     {
       name: 'pm-flk',
-      version: 10,
+      version: 11,
       migrate: flkMigrate,
     }
   )
