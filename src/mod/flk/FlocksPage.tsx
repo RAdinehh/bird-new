@@ -319,9 +319,27 @@ export default function FlocksPage() {
         vaccineEnabled={vaccineEnabled}
         fmt={fmt}
         onArchive={form.id ? async () => {
+          const flock = useFlk.getState().flocks.find(f => f.id === form.id);
+          let extraWarning = '';
+          
+          if (flock?.sourceInvoiceId) {
+            const inv = useTra.getState().invoices.find(i => i.id === flock.sourceInvoiceId);
+            const invNum = inv?.number ? `شماره ${inv.number}` : 'مرتبط';
+            extraWarning += `\n\n⚠️ هشدار: این گله به فاکتور خرید ${invNum} متصل است. با آرشیو کردن گله، ارتباط آن با این فاکتور قطع می‌شود.`;
+          }
+          
+          if (flock?.hatchId) {
+            extraWarning += `\n\n⚠️ هشدار: این گله از یک سند هچری ساخته شده است. با آرشیو کردن گله، ارتباط آن با هچری قطع می‌شود.`;
+          }
+
+          if (flock?.sourceCategory) {
+            extraWarning += `\n\n⚠️ این گله دارای دسته‌بندی (${flock.sourceCategory}) است.`;
+          }
+
           const okA = await showConfirmAsync(
-            'آرشیو گله',
-            'گله «' + form.name + '» آرشیو شود؟\n\nگله از لیست فعال حذف می‌شود ولی داده‌ها حفظ می‌شوند.',
+            '⚠️ آرشیو (حذف) گله',
+            `آیا از آرشیو گله «${form.name}» مطمئنید؟\n\nگله از لیست فعال حذف می‌شود ولی داده‌های آن حفظ می‌شوند.${extraWarning}`,
+            { confirmText: 'بله، آرشیو کن', cancelText: 'انصراف', danger: true }
           );
           if (!okA) return;
           archive(form.id!, 'دستی');
