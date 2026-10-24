@@ -9,7 +9,7 @@
 | 5 | Rollback Cascade | ✅ | از طریق Cascade عمومی tra |
 | 6 | Cross-Module Reference | ✅ | از طریق Cascade عمومی tra |
 | 7 | Sort | ✅ | cor/ui/index.ts |
-| 8 | Multi-Sort | ❌ | در حال بررسی |
+| 8 | Multi-Sort | ✅ | FilterBar.tsx (UI + Logic) |
 | 9 | Sort Direction | ✅ | shr/filter/FilterBar.tsx |
 | 10 | Default Sort | ✅ | shr/filter/configs/_types.ts |
 | 11 | Persist Sort | ✅ | shr/filter/configs/_types.ts |
