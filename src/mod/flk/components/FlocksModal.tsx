@@ -333,7 +333,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           error={showError('initialCount')}
           onTouch={() => markTouched('initialCount')}
         >
-          <NumField placeholder="۸۵۰" readOnly={isSourceLinked} value={form.initialCount} onChange={e => {
+          <NumField placeholder="۸۵۰" value={form.initialCount} onChange={e => {
             if (isSourceLinked) return;
             const v = e.target.value;
             setForm(f => ({
