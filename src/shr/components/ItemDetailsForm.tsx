@@ -176,7 +176,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {nameFieldJsx}
         <SecTitle icon="🧬" title="اطلاعات گله" />
 
-        {/* 🆕 فروش: منبع جوجه */}
         {!isPurchase && (
           <Field label="منبع جوجه" hint="جوجه از گله موجود می‌آید یا از هچری">
             <Select value={item.source || 'flock'} onChange={e => {
@@ -189,142 +188,106 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         )}
 
-        {/* ردیف ۱: گله/هچ + نوع پرنده */}
+        {/* --- بخش ۱: هویت پرنده --- */}
         <Grid2>
-          {isPurchase ? (
-            <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
-              <SmartSelect value={String(item.existingFlockId || '')} onChange={v => updateItem({ existingFlockId: v, flockId: v })} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
-            </Field>
-          ) : (item.source || 'flock') === 'hatch' ? (
-            <Field label="هچ مبدأ" required hint="هچی که جوجه‌ها از آن آمده">
-              <SmartSelect value={String(item.hatchId || '')} onChange={v => {
-                const h = availableHatches.find(x => x.id === v);
-                if (!h) return;
-                const f = flocks.find(x => x.id === h.generatedFlockId);
-                const age = computeAgeFromHatch(h.date);
-                updateItem({
-                  hatchId: v,
-                  source: 'hatch',
-                  flockId: h.generatedFlockId || '',
-                  birdId: f?.birdId || item.birdId,
-                  breedId: f?.breedId || item.breedId,
-                  ageDays: age,
-                  hatchDate: h.date,
-                  maleCount: h.maleCount,
-                  femaleCount: h.femaleCount,
-                  unknownCount: h.unknownCount,
-                  description: item.description || `جوجه از هچ ${h.date}`,
-                });
-                setHatchOverride(false);
-              }} options={availableHatches.map(h => ({ value: h.id, label: `${h.date} — ${h.hatched} جوجه` }))} placeholder="— انتخاب هچ —" modalTitle="انتخاب هچ" autoThreshold={6} />
-            </Field>
-          ) : (
-            <Field label="گله مبدأ" required hint="گله‌ای که جوجه از آن فروخته می‌شود">
-              <SmartSelect value={String(item.flockId || '')} onChange={v => {
-                const f = flocks.find(x => x.id === v);
-                const age = computeAgeFromHatch(f?.hatchDate);
-                updateItem({
-                  flockId: v,
-                  source: 'flock',
-                  hatchId: '',
-                  birdId: f?.birdId || item.birdId,
-                  breedId: f?.breedId || item.breedId,
-                  ageDays: age != null ? age : (f ? getAgeDays(f) : item.ageDays),
-                  hatchDate: f?.hatchDate || item.hatchDate,
-                });
-                setHatchOverride(false);
-              }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
-            </Field>
-          )}
           <Field label="نوع پرنده" required>
             <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
           </Field>
-        </Grid2>
-
-        {/* ردیف ۲: نژاد + (خرید: سالن | فروش: دلیل فروش) */}
-        <Grid2>
           <Field label="نژاد" required>
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
-                const purposeMap: Record<string, string> = {
-                  layer: '🥚 تخم‌گذار',
-                  breeder: '🐣 مادر',
-                  broiler: '🍗 گوشتی',
-                  ornamental: '🌸 زینتی',
-                };
-                const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
-                return {
-                  value: b.id,
-                  label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name,
-                };
-              })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={isPurchase && !!item.existingFlockId} />
+              const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
+              const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
+              return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
+            })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={isPurchase && !!item.existingFlockId} />
             {item.birdId && breedsForBird.length === 0 && (
               <div style={{ color: 'var(--warn)', fontSize: 11, marginTop: 4, fontWeight: 600 }}>
                 ⚠️ این پرنده هنوز نژادی ندارد. ابتدا از بخش «پرنده و نژاد» نژاد تعریف کنید.
               </div>
             )}
           </Field>
-          {isPurchase && (
-            <Field label="سالن مقصد">
-              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
-            </Field>
-          )}
         </Grid2>
 
-        {/* ردیف ۳ (خرید): بخش + وزن اولیه | (فروش): تاریخ هچ + سن */}
-        {isPurchase ? (
-          <>
-            <Grid2>
-              <Field label="تاریخ هچ" required>
-                <DatePicker value={String(item.hatchDate || '')} onChange={v => {
-                  const age = computeAgeFromHatch(v);
-                  updateItem({ hatchDate: v, ageDays: age });
-                }} placeholder="1405/07/26" autoToday />
-              </Field>
-              <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
-                <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                  {item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
-                </div>
-              </Field>
-            </Grid2>
-            <Grid2>
-              <Field label="بخش مقصد (اختیاری)">
-                <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" autoThreshold={6} />
-              </Field>
-              <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
-                <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
-                  let v = parseFaNum(e.target.value) || null;
-                  if (v !== null && v > 100) v = 100;
-                  updateItem({ chickWeight: v });
-                }} unit="g" min={20} max={100} />
-              </Field>
-            </Grid2>
-
-          </>
-        ) : (item.flockId || item.hatchId) && !hatchOverride ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)' }}>
-            <span>📅 هچ: <b style={{ color: 'var(--accent)' }}>{item.hatchDate ? toFa(item.hatchDate) : '—'}</b></span>
-            <span style={{ color: 'var(--muted)' }}>•</span>
-            <span>📊 سن: <b style={{ color: 'var(--accent)' }}>{item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}</b></span>
-            <span style={{ marginInlineStart: 'auto', color: 'var(--muted)', fontSize: 14 }} title="قفل — از منبع انتخاب‌شده">🔒</span>
-          </div>
-        ) : (
-          <Grid2>
+        {/* ردیف ۲: تاریخ هچ + سن */}
+        <Grid2>
+          {isPurchase ? (
             <Field label="تاریخ هچ" required>
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
               }} placeholder="1405/07/26" autoToday />
             </Field>
-            <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
+          ) : (item.flockId || item.hatchId) && !hatchOverride ? (
+            <Field label="تاریخ هچ (قفل)">
               <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
+                {item.hatchDate ? toFa(item.hatchDate) : '—'}
+                <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — از منبع انتخاب‌شده">🔒</span>
               </div>
+            </Field>
+          ) : (
+            <Field label="تاریخ هچ" required>
+              <DatePicker value={String(item.hatchDate || '')} onChange={v => {
+                const age = computeAgeFromHatch(v);
+                updateItem({ hatchDate: v, ageDays: age });
+              }} placeholder="1405/07/26" autoToday />
+            </Field>
+          )}
+          <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
+            <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
+              {item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
+            </div>
+          </Field>
+        </Grid2>
+
+        {/* ردیف ۳: منبع (هچ/گله) */}
+        {isPurchase ? (
+          <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
+            <SmartSelect value={String(item.existingFlockId || '')} onChange={v => updateItem({ existingFlockId: v, flockId: v })} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
+          </Field>
+        ) : (item.source || 'flock') === 'hatch' ? (
+          <Field label="هچ مبدأ" required hint="هچی که جوجه‌ها از آن آمده">
+            <SmartSelect value={String(item.hatchId || '')} onChange={v => {
+              const h = availableHatches.find(x => x.id === v);
+              if (!h) return;
+              const f = flocks.find(x => x.id === h.generatedFlockId);
+              const age = computeAgeFromHatch(h.date);
+              updateItem({ hatchId: v, source: 'hatch', flockId: h.generatedFlockId || '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age, hatchDate: h.date, maleCount: h.maleCount, femaleCount: h.femaleCount, unknownCount: h.unknownCount, description: item.description || `جوجه از هچ ${h.date}` });
+              setHatchOverride(false);
+            }} options={availableHatches.map(h => ({ value: h.id, label: `${h.date} — ${h.hatched} جوجه` }))} placeholder="— انتخاب هچ —" modalTitle="انتخاب هچ" autoThreshold={6} />
+          </Field>
+        ) : (
+          <Field label="گله مبدأ" required hint="گله‌ای که جوجه از آن فروخته می‌شود">
+            <SmartSelect value={String(item.flockId || '')} onChange={v => {
+              const f = flocks.find(x => x.id === v);
+              const age = computeAgeFromHatch(f?.hatchDate);
+              updateItem({ flockId: v, source: 'flock', hatchId: '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age != null ? age : (f ? getAgeDays(f) : item.ageDays), hatchDate: f?.hatchDate || item.hatchDate });
+              setHatchOverride(false);
+            }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+          </Field>
+        )}
+
+        {/* --- بخش ۲: مکان --- */}
+        {isPurchase && (
+          <Grid2>
+            <Field label="سالن مقصد">
+              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
+            </Field>
+            <Field label="بخش مقصد (اختیاری)">
+              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" autoThreshold={6} />
             </Field>
           </Grid2>
         )}
 
+        {/* --- بخش ۳: مقدار --- */}
+        <Grid2>
+          <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
+            <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
+              let v = parseFaNum(e.target.value) || null;
+              if (v !== null && v > 100) v = 100;
+              updateItem({ chickWeight: v });
+            }} unit="g" min={20} max={100} />
+          </Field>
+        </Grid2>
 
-        {/* ردیف ۶: نر/ماده/نامشخص */}
         <div style={{ display: (item.quantity || 0) > 0 ? 'contents' : 'none' }}>
           <Grid3>
             <Field label="نر">
@@ -350,202 +313,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
           </Grid3>
         </div>
-
-        {(() => {
-          const q = item.quantity || 0;
-          if (!q) return null;
-          const hasMale = item.maleCount !== null && item.maleCount !== undefined;
-          const hasFemale = item.femaleCount !== null && item.femaleCount !== undefined;
-          const hasUnknown = item.unknownCount !== null && item.unknownCount !== undefined;
-          const hasAny = hasMale || hasFemale || hasUnknown;
-          if (!hasAny) return null;
-          const sum = (item.maleCount || 0) + (item.femaleCount || 0) + (item.unknownCount || 0);
-          if (sum === 0) return null;
-          const diff = q - sum;
-          if (diff === 0) return (
-            <div style={{ color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)' }}>
-              ✅ مجموع نر + ماده + نامشخص با تعداد کل برابر است.
-            </div>
-          );
-          if (diff < 0) return (
-            <div style={{ color: 'var(--danger)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)' }}>
-              ⚠️ مجموع نر + ماده + نامشخص ({sum}) از تعداد کل ({q}) بیشتر است. لطفاً اصلاح کنید.
-            </div>
-          );
-          return (
-            <div style={{ color: 'var(--warn)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>⚠️ مجموع وارد شده ({sum}) با تعداد کل ({q}) برابر نیست. ({diff} عدد مانده)</span>
-              <button type="button" onClick={() => updateItem({ unknownCount: (item.unknownCount || 0) + diff })} style={{ background: 'var(--warn)', color: '#fff', border: 'none', borderRadius: '4px', padding: '2px 8px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700 }}>پر کردن نامشخص</button>
-            </div>
-          );
-        })()}
-
-        {sellerSlot}
       </div>
     );
   }
 
-  // ========== تخم خوراکی (فقط فروش) ==========
-  if (!isPurchase && category === 'egg') {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {nameFieldJsx}
-        <SecTitle icon="🥚" title="اطلاعات تخم خوراکی" />
-
-        {/* ردیف ۱: گله + تاریخ */}
-        <Grid2>
-          <Field label="گله مبدأ" required>
-            <SmartSelect value={String(item.flockId || '')} onChange={v => {
-                const f = flocks.find(x => x.id === v);
-                updateItem({
-                  flockId: v,
-                  birdId: f?.birdId || item.birdId,
-                  breedId: f?.breedId || item.breedId,
-                  ageDays: f ? getAgeDays(f) : item.ageDays,
-                });
-              }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
-          </Field>
-          <Field label="تاریخ تولید تخم">
-            <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
-          </Field>
-        </Grid2>
-
-        {/* ردیف ۲: وزن + تعداد */}
-        <Grid2>
-          <Field label="وزن تخم (گرم)" hint="اختیاری — برای گریدبندی">
-            <Input mode="number" value={item.eggWeight != null && item.eggWeight > 0 ? String(item.eggWeight) : ''} onChange={e => updateItem({ eggWeight: parseFaNum(e.target.value) || null })} unit="g" min={0} max={100} />
-          </Field>
-
-        </Grid2>
-
-        <Field label="انتخاب از تولیدات تخم" hint="برای پر شدن خودکار مشخصات">
-          <SmartSelect
-            value=""
-            onChange={v => fillFromProduction(v, 'eating')}
-            options={(productions || []).filter(prod => (prod.eatingCount || 0) > 0).map(prod => ({
-              value: prod.id,
-              label: `${prod.date} — ${prod.eatingCount} عدد`
-            }))}
-            placeholder="— انتخاب از تولیدات —"
-            modalTitle="انتخاب از تولیدات تخم"
-          />
-        </Field>
-        {sellerSlot}
-      </div>
-    );
-  }
-
-  // ========== تخم نطفه‌دار ==========
-  if (isEggCategory) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {nameFieldJsx}
-        <SecTitle icon="🥚" title="اطلاعات تخم نطفه‌دار" />
-
-        {/* 🆕 فروش: انتخاب از تولیدات تخم نطفه‌دار */}
-        {!isPurchase && (
-          <Field label="انتخاب از تولیدات تخم نطفه‌دار" hint="برای پر شدن خودکار مشخصات">
-            <SmartSelect
-              value=""
-              onChange={v => fillFromProduction(v, 'fertile')}
-              options={(productions || []).filter(prod => (prod.fertileCount || 0) > 0).map(prod => ({
-                value: prod.id,
-                label: `${prod.date} — ${prod.fertileCount} عدد`
-              }))}
-              placeholder="— انتخاب از تولیدات —"
-              modalTitle="انتخاب از تولیدات تخم نطفه‌دار"
-            />
-          </Field>
-        )}
-
-        {/* ردیف ۱: گله (فقط فروش) / اتصال به گله موجود (فقط خرید) + نوع پرنده */}
-        <Grid2>
-          {isPurchase ? (
-            <Field label="نوع پرنده" required>
-              <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
-            </Field>
-          ) : (
-            <Field label="گله مبدأ" required hint="گله‌ای که تخم از آن تولید شده">
-              <SmartSelect value={String(item.flockId || '')} onChange={v => {
-                const f = flocks.find(x => x.id === v);
-                updateItem({
-                  flockId: v,
-                  birdId: f?.birdId || item.birdId,
-                  breedId: f?.breedId || item.breedId,
-                });
-              }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
-            </Field>
-          )}
-          {item.birdId ? (
-            <Field label="نژاد" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
-              <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
-                const purposeMap: Record<string, string> = {
-                  layer: '🥚 تخم‌گذار',
-                  breeder: '🐣 مادر',
-                  broiler: '🍗 گوشتی',
-                  ornamental: '🌸 زینتی',
-                };
-                const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
-                return {
-                  value: b.id,
-                  label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name,
-                };
-              })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
-            </Field>
-          ) : (
-            <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', fontSize: 'var(--fs-xs)', gap: 4 }}>
-              🔒 ابتدا {isPurchase ? 'پرنده' : 'گله'} را انتخاب کنید
-            </div>
-          )}
-        </Grid2>
-
-        {/* ردیف ۲: تاریخ تخم + (خرید: دستگاه | فروش: وزن تخم) */}
-        <Grid2>
-          <Field label="تاریخ تولید تخم" required>
-            <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
-          </Field>
-          {isPurchase ? (
-            <Field label="دستگاه جوجه‌کشی" hint="برای ثبت خودکار در جوجه‌کشی">
-              <SmartSelect value={String(item.deviceId || '')} onChange={v => updateItem({ deviceId: v })} options={incDevices.map((d) => ({ value: d.id, label: d.name }))} placeholder="— بدون دستگاه —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
-            </Field>
-          ) : (
-            <Field label="وزن تخم (گرم)" hint="اختیاری — برای گریدبندی">
-              <Input mode="number" value={item.eggWeight != null && item.eggWeight > 0 ? String(item.eggWeight) : ''} onChange={e => updateItem({ eggWeight: parseFaNum(e.target.value) || null })} unit="g" min={0} max={100} />
-            </Field>
-          )}
-        </Grid2>
-
-        {/* ردیف ۳: فقط خرید: DOA fields */}
-        {isPurchase && (
-          <Grid2>
-            <Field label="تعداد شکسته">
-              <Input mode="number" value={item.brokenEggCount != null && item.brokenEggCount > 0 ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
-            </Field>
-            <Field label="غیرقابل جوجه">
-              <Input mode="number" value={item.nonIncubableCount != null && item.nonIncubableCount > 0 ? String(item.nonIncubableCount) : ''} onChange={e => updateItem({ nonIncubableCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} max={item.quantity || undefined} />
-            </Field>
-          </Grid2>
-        )}
-        {(() => {
-          const q = item.quantity || 0;
-          const broken = item.brokenEggCount || 0;
-          const nonInc = item.nonIncubableCount || 0;
-          const healthy = Math.max(0, q - broken - nonInc);
-          if (q > 0 && (broken > 0 || nonInc > 0)) {
-            return (
-              <div style={{ color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 600, padding: '6px 10px', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', marginTop: 4 }}>
-                ✅ تعداد قابل جوجه: {toFa(healthy)} عدد (از {toFa(q)} تخم)
-              </div>
-            );
-          }
-          return null;
-        })()}
-        {sellerSlot}
-      </div>
-    );
-  }
-
-  // ========== پرنده بالغ ==========
   if (category === 'adult') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
