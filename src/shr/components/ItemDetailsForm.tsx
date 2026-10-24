@@ -36,6 +36,7 @@ export interface ItemDetailFormData {
   unknownCount?: number | null;
   hatchDate?: string;
   chickWeight?: number | null;
+  healthyCount?: number | null;
   transportCost?: number | null;
   flockName?: string;
   eggDate?: string;
@@ -278,6 +279,12 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                   if (v !== null && v > 100) v = 100;
                   updateItem({ chickWeight: v });
                 }} unit="g" min={20} max={100} />
+              </Field>
+            </Grid2>
+
+            <Grid2>
+              <Field label="تعداد سالم تحویلی (اختیاری)" hint="اگر تلفات اولیه نداشتید، خالی بگذارید">
+                <Input mode="number" value={item.healthyCount != null && item.healthyCount > 0 ? String(item.healthyCount) : ''} onChange={e => updateItem({ healthyCount: Math.round(parseFaNum(e.target.value)) || null })} unit="پرنده" min={0} max={item.quantity || undefined} />
               </Field>
             </Grid2>
           </>
