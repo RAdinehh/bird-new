@@ -105,12 +105,16 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     const prod = productions.find(x => x.id === productionId);
     if (!prod) return;
     const qty = kind === 'eating' ? prod.eatingCount : prod.fertileCount;
+    // 🆕 اتصال مستقیم به کالای انبار (استاندارد ERP — رفع Phantom)
+    const eggStock = (whsItems || []).find((x: any) => x.category === 'egg');
+
     updateItem({
       flockId: prod.flockId,
       eggDate: prod.date,
       quantity: qty,
       eggWeight: prod.avgWeight ?? item.eggWeight,
       description: item.description || (kind === 'eating' ? `تخم خوراکی - ${prod.date}` : `تخم نطفه‌دار - ${prod.date}`),
+      stockItemId: eggStock?.id || '',
     });
   };
   const incDevices = useInc((s) => s.devices || []);
