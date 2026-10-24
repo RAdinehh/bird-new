@@ -118,7 +118,13 @@ export const useFlk = create<State>()(
       groupMembers: [],
       add: (f) => {
         const id = uuid();
-        set({ flocks: [...get().flocks, {...f, id, createdAt: now(), updatedAt: now()}] });
+        // 🆕 فیکس: auto genderSplitAt
+        const hasSplit = ((f.maleCount ?? 0) > 0) || ((f.femaleCount ?? 0) > 0);
+        const patch: any = { ...f };
+        if (hasSplit && !patch.genderSplitAt) {
+          patch.genderSplitAt = now();
+        }
+        set({ flocks: [...get().flocks, { ...patch, id, createdAt: now(), updatedAt: now() }] });
         return id;
       },
       update: (id, patch) => set({
