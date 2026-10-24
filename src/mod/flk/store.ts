@@ -321,9 +321,30 @@ export const useFlk = create<State>()(
             updatedAt: now(),
             version: 7,
           };
+          const patch: any = { currentCount: newCount };
+          // 🆕 قدم ۳: sync gender
+          const hasSplit = !!f.genderSplitAt;
+          if (!hasSplit) {
+            patch.unknownCount = newCount;
+          } else {
+            const nextU = (f.unknownCount ?? 0) + actualDelta;
+            if (nextU >= 0) {
+              patch.unknownCount = nextU;
+            } else {
+              const rem = -nextU;
+              patch.unknownCount = 0;
+              const m = f.maleCount ?? 0;
+              const fe = f.femaleCount ?? 0;
+              if (fe >= m) {
+                patch.femaleCount = Math.max(0, fe - rem);
+              } else {
+                patch.maleCount = Math.max(0, m - rem);
+              }
+            }
+          }
           return {
             ...f,
-            currentCount: newCount,
+            ...patch,
             events: [...(f.events || []), newEvent],
             updatedAt: now(),
           };
