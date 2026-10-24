@@ -8,6 +8,8 @@ import { Row, RowGrid, SectionTitle } from '../helpers';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 import { formatInvoiceNumber } from '../calc';
 import { useTra } from '../store';
+import { useFlk } from '../../flk/store';
+import EntityLink from '../../../shr/components/EntityLink';
 
 interface Props {
   inv: Invoice;
@@ -23,6 +25,8 @@ interface Props {
 
 export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, index }: Props) {
   const { updateInvoice, allocations } = useTra();
+  const { flocks } = useFlk();
+  const linkedFlock = flocks?.find((f: any) => f.sourceInvoiceId === inv.id);
   const rem2 = remaining(inv, allocations);
   const st = rem2 === 0 ? 'paid' : paidSumAllocated(inv, allocations) > 0 ? 'partial' : 'unpaid';
 
@@ -206,7 +210,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           📦 تحویل گرفتم (ایجاد گله و موجودی)
         </Btn>
       )}
-      {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen) ? (
+      {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock) ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
           {onEdit && (
             <Btn
@@ -216,6 +220,11 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             >
               ✏️ ویرایش فاکتور
             </Btn>
+          )}
+          {linkedFlock && (
+            <div style={{ flex: '1 1 120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <EntityLink type="flock" id={linkedFlock.id} label="🐔 مشاهده گله" />
+            </div>
           )}
           {nextWorkflowStatus(inv.workflowStatus) && 
            !((String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card') 
