@@ -248,14 +248,14 @@ export const useTra = create<State>()(
         }
         set((s) => ({ invoices: [...s.invoices, snapshot.invoice] }));
         const flk = useFlk.getState();
-        for (const flockId of snapshot.linkedFlockIds) {
+        for (const flock of snapshot.linkedFlocks) {
           try {
-            flk.update(flockId, { sourceInvoiceId: id });
+            flk.update(flock.id, { sourceInvoiceId: id, sourceCategory: flock.sourceCategory });
           } catch (e) {
-            console.error('[restoreInvoice] relink flock:', flockId, e);
+            console.error('[restoreInvoice] relink flock:', flock.id, e);
           }
         }
-        console.info('[restoreInvoice] ♻️ restored:', id, '| flocks:', snapshot.linkedFlockIds.length);
+        console.info('[restoreInvoice] ♻️ restored:', id, '| flocks:', snapshot.linkedFlocks.length);
         console.warn('[restoreInvoice] ⚠️ موجودی گله/انبار را دستی بررسی کنید');
         return true;
       },
@@ -264,12 +264,12 @@ export const useTra = create<State>()(
         const inv = get().invoices.find(x => x.id === id);
         // 🆕 Backup Before Mutation (recycle bin)
         if (inv) {
-          const snapshotFlockIds = useFlk.getState().flocks
+          const linkedFlocks = useFlk.getState().flocks
             .filter((f) => f.sourceInvoiceId === id)
-            .map((f) => f.id);
+            .map((f) => ({ id: f.id, sourceCategory: f.sourceCategory || '' }));
           saveToRecycleBin<DeletedInvoiceSnapshot>(
             'tra',
-            { invoice: inv, linkedFlockIds: snapshotFlockIds },
+            { invoice: inv, linkedFlocks },
             (existing) => existing.invoice.id === id,
           );
           console.info('[deleteInvoice] 🗑️ saved to recycle bin:', id);

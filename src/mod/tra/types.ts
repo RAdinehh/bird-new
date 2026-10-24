@@ -173,7 +173,7 @@ export interface Payment {
 
 export interface DeletedInvoiceSnapshot {
   invoice: Invoice;
-  linkedFlockIds: string[];
+  linkedFlocks: Array<{ id: string; sourceCategory: string }>;
 }
 
 export interface Invoice {
