@@ -142,7 +142,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     initialSort: config.initialSort,
   });
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
-          resetAll, hasActiveFilters, total: totalFiltered, count } = fsResult;
+          resetAll, hasActiveFilters, total: totalFiltered, count, sortStack, appendSort } = fsResult;
   const undoDelete = () => {
     if (!undoData) return;
     const arr = Array.isArray((undoData as any).item) ? (undoData as any).item : [(undoData as any).item];
@@ -291,7 +291,7 @@ return (
         setFilter={setFilter}
         clearFilter={clearFilter}
         setSort={setSort}
-        toggleSort={toggleSort}
+        toggleSort={toggleSort} sortStack={sortStack} appendSort={appendSort}
         resetAll={resetAll}
         hasActiveFilters={hasActiveFilters}
         total={totalFiltered}

@@ -51,7 +51,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
     return getTraReceivablesConfig({ partyNames });
   }, [openInvoices, contacts]);
   const { filtered, filters, setFilter, clearFilter, sort, setSort, toggleSort,
-          resetAll, hasActiveFilters, total: totalFiltered, count } = useFilterSort<Invoice>({
+          resetAll, hasActiveFilters, total: totalFiltered, count, sortStack, appendSort } = useFilterSort<Invoice>({
     items: openInvoices,
     filters: config.filterDefs,
     sorts: config.sortDefs,
@@ -160,7 +160,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         setFilter={setFilter}
         clearFilter={clearFilter}
         setSort={setSort}
-        toggleSort={toggleSort}
+        toggleSort={toggleSort} sortStack={sortStack} appendSort={appendSort}
         resetAll={resetAll}
         hasActiveFilters={hasActiveFilters}
         total={totalFiltered}

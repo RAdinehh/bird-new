@@ -63,7 +63,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     return getTraDealsConfig({ partyNames });
   }, [deals, contacts]);
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
-          resetAll, hasActiveFilters, total, count } = useFilterSort<Deal>({
+          resetAll, hasActiveFilters, total, count, sortStack, appendSort } = useFilterSort<Deal>({
     items: deals,
     filters: config.filterDefs,
     sorts: config.sortDefs,
@@ -188,7 +188,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         setFilter={setFilter}
         clearFilter={clearFilter}
         setSort={setSort}
-        toggleSort={toggleSort}
+        toggleSort={toggleSort} sortStack={sortStack} appendSort={appendSort}
         resetAll={resetAll}
         hasActiveFilters={hasActiveFilters}
         total={total}

@@ -10,6 +10,7 @@ import {
 import type { FilterDef, SortDef, FilterState, SortState } from './types';
 import { summarizeChip, isEmptyVal } from './filterHelpers';
 import { FilterGroupBody } from './FilterGroupBody';
+import { toFa } from '../utils/fa';
 
 interface Props<T> {
   filterDefs: FilterDef<T>[];
@@ -21,6 +22,8 @@ interface Props<T> {
   setSort: (s: SortState | null) => void;
   toggleSort: (key: string) => void;
   resetAll: () => void;
+  sortStack?: SortState[];
+  appendSort?: (key: string) => void;
   hasActiveFilters: boolean;
   total: number;
   count: number;
@@ -31,6 +34,8 @@ export function FilterBar<T>({
   filterDefs, sortDefs, filterState, sortState,
   setFilter, clearFilter, setSort: _setSort, toggleSort, resetAll,
   hasActiveFilters: _hasActiveFilters, total, count,
+  sortStack = sortState ? [sortState] : [],
+  appendSort,
 }: Props<T>) {
   const [openFilters, setOpenFilters] = useState(false);
   const [openSort, setOpenSort] = useState(false);
@@ -305,60 +310,76 @@ export function FilterBar<T>({
       <Sheet open={openSort} onClose={() => setOpenSort(false)} title="مرتب‌سازی">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {sortDefs.map(def => {
-            const active = sortState?.key === def.key;
-            const dir = sortState?.dir || 'asc';
+            const stackIdx = sortStack.findIndex(s => s.key === def.key);
+            const isActive = stackIdx !== -1;
+            const isPrimary = sortStack[0]?.key === def.key;
+            const dir = isActive ? sortStack[stackIdx].dir : 'asc';
+            const levelLabel = isActive && sortStack.length > 1 ? toFa(stackIdx + 1) : '';
+            
             return (
-              <button key={def.key} type="button" onClick={() => toggleSort(def.key)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
-                  width: '100%', padding: '8px 10px', minHeight: 42,
-                  background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
-                  border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                  borderRadius: 'var(--r-lg)',
-                  color: 'var(--text)',
-                  fontFamily: 'inherit', cursor: 'pointer',
-                  textAlign: 'right',
-                  transition: 'all var(--dur-fast) var(--ease-out)',
-                }}>
-                {def.icon && (
-                  <span style={{
-                    width: 30, height: 30, borderRadius: 'var(--r-md)',
-                    background: active ? 'var(--accent)' : 'var(--input-bg)',
-                    color: active ? 'var(--avatar-text)' : 'var(--muted)',
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>{def.icon}</span>
-                )}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    fontSize: 'var(--fs-base)', fontWeight: 700,
-                    color: active ? 'var(--accent)' : 'var(--text)',
-                    lineHeight: 1.2,
-                  }}>{def.label}</div>
-                  <div style={{
-                    fontSize: 10.5, color: 'var(--muted)',
-                    marginTop: 2, fontWeight: 500,
+              <div key={def.key} style={{ position: 'relative' }}>
+                <button type="button" onClick={() => toggleSort(def.key)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
+                    width: '100%', padding: '8px 10px', minHeight: 42,
+                    background: isActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
+                    border: '1px solid ' + (isActive ? 'var(--accent-border)' : 'var(--border)'),
+                    borderRadius: 'var(--r-lg)',
+                    color: 'var(--text)',
+                    fontFamily: 'inherit', cursor: 'pointer',
+                    textAlign: 'right',
+                    transition: 'all var(--dur-fast) var(--ease-out)',
                   }}>
-                    {active
-                      ? (dir === 'asc' ? 'صعودی — از کوچک به بزرگ' : 'نزولی — از بزرگ به کوچک')
-                      : (def.hint || 'برای مرتب‌سازی لمس کن')}
+                  {def.icon && (
+                    <span style={{
+                      width: 30, height: 30, borderRadius: 'var(--r-md)',
+                      background: isActive ? 'var(--accent)' : 'var(--input-bg)',
+                      color: isActive ? 'var(--avatar-text)' : 'var(--muted)',
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>{def.icon}</span>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontSize: 'var(--fs-base)', fontWeight: 700,
+                      color: isActive ? 'var(--accent)' : 'var(--text)',
+                      lineHeight: 1.2, display: 'flex', alignItems: 'center', gap: 6
+                    }}>
+                      {def.label}
+                      {levelLabel && (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                          minWidth: 18, height: 18, padding: '0 5px',
+                          background: 'var(--accent)', color: 'var(--avatar-text)',
+                          borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-2xs)', fontWeight: 800,
+                        }}>{levelLabel}</span>
+                      )}
+                    </div>
+                    <div style={{
+                      fontSize: 10.5, color: 'var(--muted)',
+                      marginTop: 2, fontWeight: 500,
+                    }}>
+                      {isActive
+                        ? (dir === 'asc' ? 'صعودی — از کوچک به بزرگ' : 'نزولی — از بزرگ به کوچک')
+                        : (def.hint || 'برای مرتب‌سازی لمس کن')}
+                    </div>
                   </div>
-                </div>
-                {active && (
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    width: 24, height: 24, flexShrink: 0,
-                    background: 'var(--accent)',
-                    color: 'var(--avatar-text)',
-                    borderRadius: '50%',
-                    lineHeight: 1,
-                  }}>
-                    {dir === 'asc' ? <IconArrowUp size={12} /> : <IconArrowDown size={12} />}
-                  </span>
+                </button>
+                {isPrimary && appendSort && (
+                  <button type="button" onClick={(e) => { e.stopPropagation(); appendSort(def.key); }}
+                    title="افزودن به عنوان معیار بعدی"
+                    style={{
+                      position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)',
+                      width: 24, height: 24, borderRadius: '50%',
+                      background: 'var(--accent)', color: 'var(--avatar-text)',
+                      border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 16, fontWeight: 700, cursor: 'pointer', zIndex: 2,
+                    }}>+</button>
                 )}
-              </button>
+              </div>
             );
           })}
+
         </div>
       </Sheet>
     </>
