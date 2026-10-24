@@ -1,8 +1,8 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- مفهوم: #4 On Delete Cascade
-- ماژول: tra (store)
+- مفهوم: #5 Rollback Cascade
+- ماژول: tra (apply)
 - فاز: verify
 
 ## ✅ DONE (1/205)
@@ -15,7 +15,6 @@
 ## ⏸ DEFERRED
 
 ## ❌ PENDING (۲۰۵)
-4
 5
 6
 7
