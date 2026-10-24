@@ -280,6 +280,42 @@ export const useTra = create<State>()(
             flk.update(it.flockId, patchRevert);
           }
 
+          // 🆕 قدم ۶: un-split + consistency check after reversal
+          try {
+            const st6 = useFlk.getState();
+            const affectedIds6 = new Set<string>();
+            for (const it of inv.items || []) {
+              const fid = (it as any).flockId;
+              if (fid) affectedIds6.add(fid);
+            }
+            if (affectedIds6.size > 0) {
+              useFlk.setState({
+                flocks: st6.flocks.map((f: any) => {
+                  if (!affectedIds6.has(f.id)) return f;
+                  const m = f.maleCount ?? 0;
+                  const fe = f.femaleCount ?? 0;
+                  const u = f.unknownCount ?? 0;
+                  const cc = f.currentCount ?? 0;
+
+                  // Un-split: male=female=0 ولی genderSplitAt ست بود
+                  if (m === 0 && fe === 0 && f.genderSplitAt) {
+                    return { ...f, genderSplitAt: null, unknownCount: cc };
+                  }
+
+                  // Consistency: male + female + unknown = current
+                  if (m + fe + u !== cc) {
+                    if (m + fe <= cc) {
+                      return { ...f, unknownCount: cc - m - fe };
+                    }
+                    // داده خراب‌تر از این نشه — فقط log
+                    console.warn('[deleteInvoice] inconsistent flock:', { id: f.id, name: f.name, m, fe, u, cc });
+                  }
+                  return f;
+                }),
+              } as any);
+            }
+          } catch (e) { console.error('[deleteInvoice] post-loop fix failed:', e); }
+
       // 🆕 فیکس ۳: Revoke sell events این فاکتور
       try {
         const st3 = useFlk.getState();
