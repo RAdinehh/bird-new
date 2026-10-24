@@ -364,7 +364,7 @@ export default function FlocksModal(props: FlocksModalProps) {
               <FieldHint fieldPath="flk.femaleCount" value={form.femaleCount} context={{ initialCount: form.initialCount }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-            <Field label="جنسیت نامشخص (اختیاری)" hint="پرنده‌های بدون جنسیت">
+            <Field label="تعداد نامشخص">
               <NumField placeholder="۰" value={form.unknownCount || ''} onChange={e => setForm({ ...form, unknownCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
             </Field>
             <FieldHint fieldPath="flk.unknownCount" value={form.unknownCount} context={{ initialCount: form.initialCount }} />
