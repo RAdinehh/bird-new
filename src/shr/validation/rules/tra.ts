@@ -148,6 +148,46 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         path: ['payments'],
       });
     }
+
+    // 🆕 چک مجموع جنسیت برای جوجه (خرید)
+    if (d.type === 'purchase') {
+      (d.items || []).forEach((it: any, idx: number) => {
+        const cat = it.category || d.category;
+        if (cat === 'chick') {
+          const qty = Number(it.quantity) || 0;
+          const m = Number(it.maleCount) || 0;
+          const fe = Number(it.femaleCount) || 0;
+          const u = Number(it.unknownCount) || 0;
+          if (qty > 0 && (m + fe + u) !== qty) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `مجموع جنسیت‌ها (${m + fe + u}) با تعداد کل (${qty}) نمی‌خواند`,
+              path: ['items', idx, 'maleCount'],
+            });
+          }
+        }
+      });
+    }
+
+    // 🆕 چک مجموع جنسیت برای جوجه (خرید)
+    if (d.type === 'purchase') {
+      (d.items || []).forEach((it: any, idx: number) => {
+        const cat = it.category || d.category;
+        if (cat === 'chick') {
+          const qty = Number(it.quantity) || 0;
+          const m = Number(it.maleCount) || 0;
+          const fe = Number(it.femaleCount) || 0;
+          const u = Number(it.unknownCount) || 0;
+          if (qty > 0 && (m + fe + u) !== qty) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `مجموع جنسیت‌ها (${m + fe + u}) با تعداد کل (${qty}) نمی‌خواند`,
+              path: ['items', idx, 'maleCount'],
+            });
+          }
+        }
+      });
+    }
     // هر قلم: total = quantity × unitPrice − تخفیف + حمل
     for (let i = 0; i < (d.items || []).length; i++) {
       const it = d.items[i];
