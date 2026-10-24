@@ -18,7 +18,7 @@
 | 14 | Group By | ✅ | cor/ui/sortGroup.tsx |
 | 15 | Collapsible Group | ❌ | در حال بررسی |
 | 16 | Group KPI | ✅ | shr/styles/global.css |
-| 17 | Multi-Level Group | ❌ | در حال بررسی |
+| 17 | Multi-Level Group | ✅ | flk/store.ts (parentGroupId) |
 | 18 | Category Hierarchy | ✅ | shr/components/ItemDetailsForm.tsx |
 | 19 | BIRD_CATS | ✅ | mod/tra/store.ts |
 | 20 | Tab-Based Grouping | ✅ | shr/components/DialogHost.tsx |
