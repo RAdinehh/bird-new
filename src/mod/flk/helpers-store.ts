@@ -80,6 +80,7 @@ export function getLifecycle(
   ageDays: number,
   endOfCycleDay?: number | null,
   birdCycleDays?: number | null,
+  layingStartDay?: number | null,
 ): Lifecycle {
   // 🆕 fallback برای type نامعتبر (legacy/import)
   if (type !== 'layer' && type !== 'broiler' && type !== 'breeder') {
@@ -100,10 +101,10 @@ export function getLifecycle(
     return { stage: 'end', label: 'پایان دوره', color: 'gray', progress: 100 };
   }
 
-  if (ageDays <= 7) return { stage: 'chick1', label: 'جوجه', color: 'blue', progress: p };
-  if (ageDays <= 90) return { stage: 'chick2', label: 'نیمچه', color: 'blue', progress: p };
-  if (ageDays <= 120) return { stage: 'grower', label: 'نیمچه', color: 'amber', progress: p };
-  if (ageDays <= 140) return { stage: 'prelayer', label: 'پیش‌تخم‌گذار', color: 'amber', progress: p };
+  const start = layingStartDay && layingStartDay > 0 ? layingStartDay : 140;
+  if (ageDays <= 28) return { stage: 'chick', label: 'جوجه', color: 'green', progress: p };
+  if (ageDays <= start - 14) return { stage: 'grower', label: 'نیمچه', color: 'blue', progress: p };
+  if (ageDays <= start) return { stage: 'prelayer', label: 'پیش‌تخم‌گذار', color: 'amber', progress: p };
   if (ageDays <= cycle) return { stage: 'layer', label: 'تخم‌گذار', color: 'green', progress: p };
   return { stage: 'end', label: 'پایان دوره', color: 'gray', progress: 100 };
 }

@@ -95,7 +95,7 @@ export default function FlockCard(props: FlockCardProps) {
                        bird?.birdKind === 'chicken' ? '🐔' :
                        '🐔';
   const ageDays = getAgeDays(f);
-  const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, null);
+  const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, null, f.layingStartDay ?? null);
   const isArchived = f.status === 'archived' || f.status === 'sold';
   const ready = isLayingReady(f);
   const untilLay = daysUntilLaying(f);
@@ -256,6 +256,7 @@ export default function FlockCard(props: FlockCardProps) {
           type={f.type}
           ageDays={ageDays}
           endOfCycleDay={f.endOfCycleDay ?? null}
+          layingStartDay={f.layingStartDay ?? null}
         />
       )}
 

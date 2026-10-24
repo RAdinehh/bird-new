@@ -9,13 +9,15 @@ interface Props {
   type: FlockType;
   ageDays: number;
   endOfCycleDay: number | null;
+  layingStartDay?: number | null;
 }
 
-export default function LifecycleBar({ type, ageDays, endOfCycleDay }: Props) {
+export default function LifecycleBar({ type, ageDays, endOfCycleDay, layingStartDay }: Props) {
   const cycle = endOfCycleDay && endOfCycleDay > 0
     ? endOfCycleDay
     : (type === 'broiler' ? 42 : 700);
 
+  const start = layingStartDay && layingStartDay > 0 ? layingStartDay : 140;
   const stages = type === 'broiler'
     ? [
         { color: 'var(--info)',   endDay: 7 },
@@ -23,9 +25,10 @@ export default function LifecycleBar({ type, ageDays, endOfCycleDay }: Props) {
         { color: 'var(--accent)', endDay: 42 },
       ]
     : [
-        { color: 'var(--info)',   endDay: 90 },
-        { color: 'var(--warn)',   endDay: 140 },
-        { color: 'var(--accent)', endDay: cycle },
+        { color: 'var(--accent)', endDay: 28 },          // جوجه: سبز
+        { color: 'var(--info)',   endDay: start - 14 },  // نیمچه: آبی
+        { color: 'var(--warn)',   endDay: start },       // پیش‌تخم‌گذار: نارنجی
+        { color: 'var(--accent)', endDay: cycle },       // تخم‌گذار: سبز
       ];
 
   // مرحله فعلی
