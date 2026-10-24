@@ -60,7 +60,7 @@ export default function FlockSourcePickers({ form, setForm, onOpenInvoicePicker,
             {form.sourceInvoiceId && (
               <button
                 type="button"
-                onClick={() => setForm((f) => ({ ...f, sourceInvoiceId: '', initialCount: '', currentCount: '', purchaseDate: '', purchasePrice: '' }))}
+                onClick={() => setForm((f) => ({ ...f, sourceInvoiceId: '', initialCount: '', currentCount: '', purchaseDate: '', purchasePrice: '', deliveryCost: '', startDate: '', hatchDate: '', birdId: '', breedId: '', maleCount: '', femaleCount: '', unknownCount: '' }))}
                 style={{
                   position: 'absolute',
                   left: 6,

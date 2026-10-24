@@ -22,13 +22,23 @@ export function applyInvoiceToForm(form: F, inv: Invoice): Partial<F> | null {
     sourceInvoiceId: inv.id,
   };
   if (firstBird.unitPrice) updates.purchasePrice = toFa(firstBird.unitPrice);
-  if (firstBird.maleCount) updates.maleCount = toFa(firstBird.maleCount);
-  if (firstBird.femaleCount) updates.femaleCount = toFa(firstBird.femaleCount);
-  if (firstBird.unknownCount) updates.unknownCount = toFa(firstBird.unknownCount);
+  if (firstBird.maleCount != null) updates.maleCount = toFa(firstBird.maleCount);
+  if (firstBird.femaleCount != null) updates.femaleCount = toFa(firstBird.femaleCount);
+  if (firstBird.unknownCount != null) updates.unknownCount = toFa(firstBird.unknownCount);
   // 🆕 هزینه حمل از فاکتور
   if (inv.shipping && inv.shipping > 0) updates.deliveryCost = toFa(inv.shipping);
   // 🆕 تاریخ شروع = تاریخ فاکتور
+  // 🆕 فیکس: hatchDate از فاکتور
+  if (firstBird.hatchDate) updates.hatchDate = firstBird.hatchDate;
+  else if (firstBird.eggDate) updates.hatchDate = firstBird.eggDate;
   if (inv.date) updates.startDate = inv.date;
+  // 🆕 فیکس: اگه هیچ‌کدوم از counts ست نشد → همه در unknownCount
+  if (firstBird.maleCount == null && firstBird.femaleCount == null && firstBird.unknownCount == null) {
+    updates.maleCount = '';
+    updates.femaleCount = '';
+    updates.unknownCount = toFa(totalQty);
+  }
+
   return updates;
 }
 
@@ -41,8 +51,16 @@ export function applyHatchToForm(form: F, h: HatchResult, entry: EggEntry | null
   };
   if (entry?.birdId) updates.birdId = entry.birdId;
   if (entry?.breedId) updates.breedId = entry.breedId;
-  if (h.maleCount && h.maleCount > 0) updates.maleCount = toFa(h.maleCount);
-  if (h.femaleCount && h.femaleCount > 0) updates.femaleCount = toFa(h.femaleCount);
+  if (h.maleCount != null) updates.maleCount = toFa(h.maleCount);
+  if (h.femaleCount != null) updates.femaleCount = toFa(h.femaleCount);
+  if (h.unknownCount != null) updates.unknownCount = toFa(h.unknownCount);
+
+  // 🆕 اگه همه null → همه در unknownCount
+  if (h.maleCount == null && h.femaleCount == null && h.unknownCount == null) {
+    updates.maleCount = '';
+    updates.femaleCount = '';
+    updates.unknownCount = toFa(h.hatched || 0);
+  }
   if (entry?.unitPrice && entry.unitPrice > 0) updates.purchasePrice = toFa(entry.unitPrice);
   return updates;
 }
