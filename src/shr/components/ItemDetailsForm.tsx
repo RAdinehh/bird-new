@@ -231,10 +231,18 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} placeholder="1405/07/26" autoToday />
             </Field>
           )}
-          <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
-            <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-              {item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
-            </div>
+          <Field label="سن (روز)" hint="تاریخ هچ خودکار محاسبه می‌شود">
+            <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
+              const v = Math.round(parseFaNum(e.target.value)) || null;
+              if (v !== null) {
+                const invDateStr = invoiceDate || formatJ(new Date(), 'yyyy/MM/dd');
+                const invDate = parseJ(toEn(invDateStr), 'yyyy/MM/dd', new Date());
+                const newHatch = subDays(invDate, v);
+                updateItem({ ageDays: v, hatchDate: formatJ(newHatch, 'yyyy/MM/dd') });
+              } else {
+                updateItem({ ageDays: null });
+              }
+            }} unit="روز" min={0} placeholder="مثلاً ۹۰" />
           </Field>
         </Grid2>
 
@@ -347,10 +355,18 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} placeholder="1405/07/26" autoToday />
             </Field>
           )}
-          <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
-            <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-              {item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
-            </div>
+          <Field label="سن (روز)" hint="تاریخ هچ خودکار محاسبه می‌شود">
+            <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
+              const v = Math.round(parseFaNum(e.target.value)) || null;
+              if (v !== null) {
+                const invDateStr = invoiceDate || formatJ(new Date(), 'yyyy/MM/dd');
+                const invDate = parseJ(toEn(invDateStr), 'yyyy/MM/dd', new Date());
+                const newHatch = subDays(invDate, v);
+                updateItem({ ageDays: v, hatchDate: formatJ(newHatch, 'yyyy/MM/dd') });
+              } else {
+                updateItem({ ageDays: null });
+              }
+            }} unit="روز" min={0} placeholder="مثلاً ۹۰" />
           </Field>
         </Grid2>
 
@@ -400,7 +416,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="وزن زنده کل (کیلوگرم)" hint="برای محاسبه قیمت">
             <Input mode="number" value={item.liveWeight != null && item.liveWeight > 0 ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
           </Field>
-          <Field label="واحد قیمت">
+          <Field 
+            label="واحد قیمت" 
+            help="اگر 'هر پرنده' را انتخاب کنید، مبلغ کل = تعداد × قیمت. اگر 'هر کیلوگرم' را انتخاب کنید، مبلغ کل = وزن زنده کل × قیمت."
+          >
             <Select value={String(item.priceUnit || 'perBird')} onChange={e => updateItem({ priceUnit: e.target.value })}>
               <option value="perBird">به ازای هر پرنده</option>
               <option value="perKg">به ازای هر کیلوگرم</option>
