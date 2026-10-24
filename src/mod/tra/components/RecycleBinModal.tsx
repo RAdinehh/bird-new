@@ -106,6 +106,9 @@ export default function RecycleBinModal({ open, onClose }: Props) {
             const itemsText = inv.items.map(it => it.description).filter(Boolean).slice(0, 2).join('، ');
             const linkedFlocks = e.item.linkedFlocks || [];
             const hasFlock = linkedFlocks.length > 0;
+            
+            // 🆕 استاندارد ERP: فقط پرنده‌ها (جوجه و بالغ) باید به گله وصل شوند
+            const isBirdCategory = ['chick', 'adult'].includes(inv.category);
 
             const isUrgent = days <= 7;
             const badgeBg = isUrgent ? 'var(--danger-soft)' : 'var(--warn-soft)';
@@ -121,10 +124,14 @@ export default function RecycleBinModal({ open, onClose }: Props) {
                       {partyName} — {catLabel}
                     </div>
                   </div>
-                  {hasFlock ? (
-                    <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 'var(--r-sm)', background: 'var(--accent-soft)', color: 'var(--accent)', fontWeight: 700 }}>🔗 متصل به گله</span>
+                  {isBirdCategory ? (
+                    hasFlock ? (
+                      <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 'var(--r-sm)', background: 'var(--accent-soft)', color: 'var(--accent)', fontWeight: 700 }}>🔗 متصل به گله</span>
+                    ) : (
+                      <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 'var(--r-sm)', background: 'var(--warn-soft)', color: 'var(--warn)', fontWeight: 700 }}>بدون گله</span>
+                    )
                   ) : (
-                    <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 'var(--r-sm)', background: 'var(--input-bg)', color: 'var(--muted)', fontWeight: 700 }}>بدون گله</span>
+                    <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 'var(--r-sm)', background: 'var(--input-bg)', color: 'var(--muted)', fontWeight: 700 }}>📦 کالای انباری</span>
                   )}
                 </div>
 
