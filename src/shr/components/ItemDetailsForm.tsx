@@ -241,13 +241,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="نژاد" required>
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={isPurchase && !!item.existingFlockId} />
           </Field>
-          {isPurchase ? (
+          {isPurchase && (
             <Field label="سالن مقصد">
               <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
-            </Field>
-          ) : (
-            <Field label="تعداد کل" hint="از بخش اقلام بالا">
-              <Input disabled value={item.quantity && item.quantity > 0 ? toFa(String(item.quantity)) : ''} unit="عدد" placeholder="از بخش اقلام بالا" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
             </Field>
           )}
         </Grid2>
@@ -1062,9 +1058,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="تعداد شکسته" hint="اختیاری — جزئیات">
             <Input mode="number" value={item.brokenEggCount != null && item.brokenEggCount > 0 ? String(item.brokenEggCount) : ''} onChange={e => updateItem({ brokenEggCount: Math.round(parseFaNum(e.target.value)) || null })} unit="عدد" min={0} />
           </Field>
-          <Field label="تعداد کل">
-            <Input disabled value={item.quantity && item.quantity > 0 ? toFa(String(item.quantity)) : ''} unit="عدد" placeholder="از بخش اقلام بالا" style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
-          </Field>
+
         </Grid2>
 
         {/* ردیف ۳: انتخاب از انبار — تمام عرض */}
