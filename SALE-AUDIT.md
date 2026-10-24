@@ -16,7 +16,7 @@
 | 12 | Index-Based Order | ✅ | shr/components/DialogHost.tsx |
 | 13 | Priority Badge | ✅ | shr/components/Header.tsx |
 | 14 | Group By | ✅ | cor/ui/sortGroup.tsx |
-| 15 | Collapsible Group | ❌ | در حال بررسی |
+| 15 | Collapsible Group | ✅ | InvoicePage (Accordion by party/date/cat/status) |
 | 16 | Group KPI | ✅ | shr/styles/global.css |
 | 17 | Multi-Level Group | ✅ | flk/store.ts (parentGroupId) |
 | 18 | Category Hierarchy | ✅ | shr/components/ItemDetailsForm.tsx |
