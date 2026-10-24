@@ -353,7 +353,23 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       </Field>
                     </Grid2>
                   )}
-                        {needsWeight && (
+                        {cat === 'chick' && (
+  <div style={{ display: (it.quantity || 0) > 0 ? 'contents' : 'none' }}>
+    <Grid3>
+      <Field label="نر">
+        <NumField placeholder="نر" value={it.maleCount != null && it.maleCount > 0 ? toFa(String(it.maleCount)) : ''} onChange={e => { let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null; if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0; updateItem(it.id, { maleCount: v }); }} min={0} max={it.quantity || undefined} />
+      </Field>
+      <Field label="ماده">
+        <NumField placeholder="ماده" value={it.femaleCount != null && it.femaleCount > 0 ? toFa(String(it.femaleCount)) : ''} onChange={e => { let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null; if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0; updateItem(it.id, { femaleCount: v }); }} min={0} max={it.quantity || undefined} />
+      </Field>
+      <Field label="نامشخص" hint="برای جنسیت مخلوط">
+        <NumField placeholder="نامشخص" value={it.unknownCount != null && it.unknownCount > 0 ? toFa(String(it.unknownCount)) : ''} onChange={e => { let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null; if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0; updateItem(it.id, { unknownCount: v }); }} min={0} max={it.quantity || undefined} />
+      </Field>
+    </Grid3>
+  </div>
+)}
+
+{needsWeight && (
                           <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار و محاسبه قیمت">
                             <NumField
                               placeholder="مثلاً ۵۰۰"

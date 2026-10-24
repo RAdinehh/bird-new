@@ -288,31 +288,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
 
-        <div style={{ display: (item.quantity || 0) > 0 ? 'contents' : 'none' }}>
-          <Grid3>
-            <Field label="نر">
-              <Input mode="number" value={item.maleCount != null && item.maleCount > 0 ? String(item.maleCount) : ''} onChange={e => {
-                let v = Math.round(parseFaNum(e.target.value)) || null;
-                if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
-                updateItem({ maleCount: v });
-              }} min={0} max={item.quantity || undefined} />
-            </Field>
-            <Field label="ماده">
-              <Input mode="number" value={item.femaleCount != null && item.femaleCount > 0 ? String(item.femaleCount) : ''} onChange={e => {
-                let v = Math.round(parseFaNum(e.target.value)) || null;
-                if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
-                updateItem({ femaleCount: v });
-              }} min={0} max={item.quantity || undefined} />
-            </Field>
-            <Field label="نامشخص" hint="برای جنسیت مخلوط">
-              <Input mode="number" value={item.unknownCount != null && item.unknownCount > 0 ? String(item.unknownCount) : ''} onChange={e => {
-                let v = Math.round(parseFaNum(e.target.value)) || null;
-                if (v !== null && v > (item.quantity || 0)) v = item.quantity || 0;
-                updateItem({ unknownCount: v });
-              }} min={0} max={item.quantity || undefined} />
-            </Field>
-          </Grid3>
-        </div>
       </div>
     );
   }
