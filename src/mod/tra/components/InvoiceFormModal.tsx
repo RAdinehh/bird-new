@@ -321,7 +321,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                               <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                             </Field>
                                                         {cat === 'chick' && isPurchase && (
-                                                          <Field label="تعداد سالم تحویلی (اختیاری)" hint="اگر تلفات اولیه نداشتید، خالی بگذارید">
+                                                          <Field label="تعداد سالم">
                                                             <NumField placeholder="تعداد" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? toFa(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
                                                           </Field>
                                                         )}
