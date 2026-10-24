@@ -26,12 +26,17 @@ export function useFilterSort<T>(opts: UseFilterSortOptions<T>): UseFilterSortRe
   const [filterState, setFilterState] = useState<FilterState>(() =>
     loadPersisted(persistKey || '', initialFilters)
   );
-  const [sortState, setSortState] = useState<SortState | null>(() => {
-    if (!persistKey) return initialSort || null;
+  const [sortStack, setSortStack] = useState<SortState[]>(() => {
+    if (!persistKey) return initialSort ? [initialSort] : [];
     try {
       const raw = localStorage.getItem(LS_PREFIX + persistKey + '-sort');
-      return raw ? JSON.parse(raw) : (initialSort || null);
-    } catch { return initialSort || null; }
+      if (!raw) return initialSort ? [initialSort] : [];
+      const parsed = JSON.parse(raw);
+      // 🆕 migration: single object → array (backward compat)
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed && typeof parsed === 'object' && 'key' in parsed) return [parsed as SortState];
+      return initialSort ? [initialSort] : [];
+    } catch { return initialSort ? [initialSort] : []; }
   });
 
   // ذخیره در localStorage
@@ -42,10 +47,10 @@ export function useFilterSort<T>(opts: UseFilterSortOptions<T>): UseFilterSortRe
   useEffect(() => {
     if (!persistKey) return;
     try {
-      if (sortState) localStorage.setItem(LS_PREFIX + persistKey + '-sort', JSON.stringify(sortState));
+      if (sortStack.length > 0) localStorage.setItem(LS_PREFIX + persistKey + '-sort', JSON.stringify(sortStack));
       else localStorage.removeItem(LS_PREFIX + persistKey + '-sort');
     } catch {}
-  }, [persistKey, sortState]);
+  }, [persistKey, sortStack]);
 
   const setFilter = useCallback((key: string, value: any) => {
     setFilterState(s => ({ ...s, [key]: value }));
@@ -60,17 +65,48 @@ export function useFilterSort<T>(opts: UseFilterSortOptions<T>): UseFilterSortRe
   }, []);
 
   const toggleSort = useCallback((key: string) => {
-    setSortState(cur => {
-      if (!cur || cur.key !== key) return { key, dir: 'asc' };
-      if (cur.dir === 'asc') return { key, dir: 'desc' };
-      return null; // سه حالت: asc → desc → null
+    setSortStack(cur => {
+      const first = cur[0];
+      if (!first || first.key !== key) return [{ key, dir: 'asc' }];
+      if (first.dir === 'asc') return [{ key, dir: 'desc' }];
+      return []; // سه حالت: asc → desc → null
     });
   }, []);
+
+  // 🆕 Multi-Sort: افزودن سطح بعدی
+  const appendSort = useCallback((key: string) => {
+    setSortStack(cur => {
+      const idx = cur.findIndex(s => s.key === key);
+      if (idx === -1) return [...cur, { key, dir: 'asc' }];
+      const item = cur[idx];
+      if (item.dir === 'asc') {
+        const next = [...cur];
+        next[idx] = { key, dir: 'desc' };
+        return next;
+      }
+      return cur.filter((_, i) => i !== idx);
+    });
+  }, []);
+
+  const removeSortLevel = useCallback((key: string) => {
+    setSortStack(cur => cur.filter(s => s.key !== key));
+  }, []);
+
+  const setSort = useCallback(
+    (s: SortState | null | ((prev: SortState | null) => SortState | null)) => {
+      setSortStack(cur => {
+        const prev = cur[0] ?? null;
+        const next = typeof s === 'function' ? s(prev) : s;
+        return next ? [next] : [];
+      });
+    },
+    []
+  );
 
   const resetAll = useCallback(() => {
     setSearch('');
     setFilterState({});
-    setSortState(null);
+    setSortStack([]);
   }, []);
 
   // استخراج متن جستجو
@@ -131,19 +167,21 @@ export function useFilterSort<T>(opts: UseFilterSortOptions<T>): UseFilterSortRe
       });
     }
 
-    // مرتب‌سازی
-    if (sortState) {
-      const def = sorts.find(s => s.key === sortState.key);
-      if (def) {
-        result.sort((a, b) => {
+    // مرتب‌سازی — multi-level
+    if (sortStack.length > 0) {
+      result.sort((a, b) => {
+        for (const level of sortStack) {
+          const def = sorts.find(s => s.key === level.key);
+          if (!def) continue;
           const c = def.compare(a, b);
-          return sortState.dir === 'asc' ? c : -c;
-        });
-      }
+          if (c !== 0) return level.dir === 'asc' ? c : -c;
+        }
+        return 0;
+      });
     }
 
     return result;
-  }, [items, search, filterState, sortState, filters, sorts, getSearchText]);
+  }, [items, search, filterState, sortStack, filters, sorts, getSearchText]);
 
   // ⚠️ sort ≠ filter — sortState به‌عنوان active filter حساب نمی‌شود
   const hasActiveFilters = !!search ||
@@ -157,7 +195,8 @@ export function useFilterSort<T>(opts: UseFilterSortOptions<T>): UseFilterSortRe
     hasActiveFilters,
     search, setSearch,
     filters: filterState, setFilter, clearFilter,
-    sort: sortState, setSort: setSortState, toggleSort,
+    sort: sortStack[0] ?? null, setSort, toggleSort,
+    sortStack, appendSort, removeSortLevel,
     resetAll,
   };
 }

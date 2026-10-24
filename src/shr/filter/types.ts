@@ -94,6 +94,9 @@ export interface UseFilterSortResult<T> {
   sort: SortState | null;
   setSort: (s: SortState | null) => void;
   toggleSort: (key: string) => void;
+  sortStack: SortState[];
+  appendSort: (key: string) => void;
+  removeSortLevel: (key: string) => void;
   // پاک کردن همه
   resetAll: () => void;
 }
