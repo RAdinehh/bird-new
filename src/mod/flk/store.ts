@@ -379,7 +379,8 @@ export const useFlk = create<State>()(
             date: todayJ(),
             type: 'correction',
             count: Math.abs(sign * ev.count),
-            sex: 'mixed',
+            direction: sign as 1 | -1,
+            sex: ev.sex,
             reasonCode: 'data_entry_error',
             reason: 'لغو ' + (EVENT_LABEL[ev.type] || ev.type),
             notes: 'لغو رویداد ' + ev.id.slice(0, 8),
@@ -388,9 +389,44 @@ export const useFlk = create<State>()(
             updatedAt: now(),
             version: 1,
           };
+          const patch: any = { currentCount: newCount };
+          // 🆕 قدم ۴: sync gender (بر اساس ev.sex اصلی)
+          const hasSplit = !!f.genderSplitAt;
+          if (!hasSplit) {
+            patch.unknownCount = newCount;
+          } else {
+            const actualDelta = newCount - cur;
+            if (ev.sex === 'male') {
+              patch.maleCount = Math.max(0, (f.maleCount ?? 0) + actualDelta);
+            } else if (ev.sex === 'female') {
+              patch.femaleCount = Math.max(0, (f.femaleCount ?? 0) + actualDelta);
+            } else {
+              const nextU = (f.unknownCount ?? 0) + actualDelta;
+              if (nextU >= 0) {
+                patch.unknownCount = nextU;
+              } else {
+                const rem = -nextU;
+                patch.unknownCount = 0;
+                const m = f.maleCount ?? 0;
+                const fe = f.femaleCount ?? 0;
+                if (fe >= m) {
+                  patch.femaleCount = Math.max(0, fe - rem);
+                } else {
+                  patch.maleCount = Math.max(0, m - rem);
+                }
+              }
+            }
+            // اگه male و female صفر شدن → un-split
+            const finalMale = patch.maleCount ?? f.maleCount ?? 0;
+            const finalFemale = patch.femaleCount ?? f.femaleCount ?? 0;
+            if (finalMale === 0 && finalFemale === 0) {
+              patch.genderSplitAt = null;
+              patch.unknownCount = newCount;
+            }
+          }
           return {
             ...f,
-            currentCount: newCount,
+            ...patch,
             events: [...(f.events || []), revokeEv],
             updatedAt: now(),
           };
