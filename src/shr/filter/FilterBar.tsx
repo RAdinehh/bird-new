@@ -51,11 +51,13 @@ export function FilterBar<T>({
 
   // 🆕 الگوی useTabBadge: پالس ۵ ثانیه‌ای فقط وقتی تعداد زیاد می‌شود
   const [isPulsing, setIsPulsing] = useState(false);
+  const [isAcknowledged, setIsAcknowledged] = useState(false);
   const prevRecycleCount = useRef(recycleCount);
   const pulseTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (recycleCount > prevRecycleCount.current) {
+      setIsAcknowledged(false); // 🆕 ریست وقتی فاکتور جدیدی حذف می‌شود
       if (pulseTimer.current) window.clearTimeout(pulseTimer.current);
       setIsPulsing(true);
       pulseTimer.current = window.setTimeout(() => setIsPulsing(false), 5000);
@@ -165,9 +167,14 @@ export function FilterBar<T>({
         {onOpenRecycleBin && recycleCount > 0 && (
           <button
             type="button"
-            onClick={onOpenRecycleBin}
+            onClick={() => {
+              setIsAcknowledged(true);
+              setIsPulsing(false);
+              if (pulseTimer.current) window.clearTimeout(pulseTimer.current);
+              onOpenRecycleBin();
+            }}
             style={{
-              ...topBtn(true),
+              ...topBtn(false),
               position: 'relative',
               cursor: 'pointer',
             }}
@@ -175,16 +182,18 @@ export function FilterBar<T>({
           >
             <span>🗑️</span>
             <span>بازیابی ({toFa(recycleCount)})</span>
-            <span
-              aria-label="آیتم جدید"
-              style={{
-                position: 'absolute', top: -2, left: -2,
-                width: 8, height: 8, borderRadius: '50%',
-                background: 'var(--danger)',
-                boxShadow: '0 0 0 2px var(--bg)',
-                animation: isPulsing ? 'flkDotPulse 1s ease-in-out infinite' : 'none',
-              }}
-            />
+            {!isAcknowledged && (
+              <span
+                aria-label="آیتم جدید"
+                style={{
+                  position: 'absolute', top: -2, left: -2,
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: 'var(--danger)',
+                  boxShadow: '0 0 0 2px var(--bg)',
+                  animation: isPulsing ? 'flkDotPulse 1s ease-in-out infinite' : 'none',
+                }}
+              />
+            )}
           </button>
         )}
 
