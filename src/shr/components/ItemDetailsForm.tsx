@@ -325,9 +325,36 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
 
         <Grid2>
-          <Field label="سن (روز)">
-            <Input mode="number" value={item.ageDays != null && item.ageDays > 0 ? String(item.ageDays) : ''} onChange={e => updateItem({ ageDays: Math.round(parseFaNum(e.target.value)) || null })} unit="روز" min={0} />
+          {isPurchase && !item.existingFlockId ? (
+            <Field label="تاریخ هچ" required>
+              <DatePicker value={String(item.hatchDate || '')} onChange={v => {
+                const age = computeAgeFromHatch(v);
+                updateItem({ hatchDate: v, ageDays: age });
+              }} placeholder="1405/07/26" autoToday />
+            </Field>
+          ) : item.existingFlockId ? (
+            <Field label="تاریخ هچ (قفل از گله)">
+              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
+                {item.hatchDate ? toFa(item.hatchDate) : '—'}
+                <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — از گله انتخاب‌شده">🔒</span>
+              </div>
+            </Field>
+          ) : (
+            <Field label="تاریخ هچ" required>
+              <DatePicker value={String(item.hatchDate || '')} onChange={v => {
+                const age = computeAgeFromHatch(v);
+                updateItem({ hatchDate: v, ageDays: age });
+              }} placeholder="1405/07/26" autoToday />
+            </Field>
+          )}
+          <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
+            <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
+              {item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
+            </div>
           </Field>
+        </Grid2>
+
+        <Grid2>
           {isPurchase ? (
             <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
               <SmartSelect value={String(item.existingFlockId || '')} onChange={v => {
