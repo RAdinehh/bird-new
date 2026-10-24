@@ -453,7 +453,7 @@ export const useTra = create<State>()(
         const whsState = useWhs.getState();
         for (const it of inv.items || []) {
           const cat = (it as any).category || inv.category;
-          const isStock = ['feed', 'medicine', 'vaccine', 'herbal', 'other', 'manure', 'broken'].includes(cat);
+          const isStock = ['feed', 'medicine', 'vaccine', 'herbal', 'other', 'manure', 'broken', 'egg', 'fertile_egg'].includes(cat);
           const isEquipConsumable = cat === 'equipment' && (it as any).equipmentKind === 'consumable';
           if (!isStock && !isEquipConsumable) continue;
           const qty = Number(it.quantity) || 0;
@@ -474,7 +474,7 @@ export const useTra = create<State>()(
               notes: `حذف فاکتور ${inv.number || ''}`,
               sourceModule: 'tra',
               sourceId: inv.id,
-            } as any);
+            });
           } catch (e) { console.error('[tra delete] whs reversal:', e); }
         }
       } catch (e) { console.error('[tra delete] whs state:', e); }
