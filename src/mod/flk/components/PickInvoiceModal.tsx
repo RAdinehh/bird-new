@@ -1,11 +1,13 @@
 /**
  * PickInvoiceModal.tsx — انتخاب فاکتور خرید پرنده از tra
- * auto-fill: تعداد اولیه، تاریخ خرید، قیمت، پرنده، نژاد
+ * نمایش کامل: طرف حساب، نوع پرنده، نژاد، تاریخ هچ، وضعیت اتصال
  */
 import { useMemo } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
 import { useTra } from '../../tra/store';
 import { useBrd } from '../../brd/store';
+import { useCtc } from '../../ctc/store';
+import { useFlk } from '../../flk/store';
 import type { Invoice, InvoiceItem } from '../../tra/types';
 import { toFa } from '../../../shr/utils/fa';
 
@@ -16,17 +18,23 @@ interface Props {
   currentBirdId?: string;
 }
 
+interface FlockLite {
+  id: string;
+  name: string;
+  sourceInvoiceId?: string;
+}
+
 export default function PickInvoiceModal({ open, onClose, onSelect, currentBirdId }: Props) {
   const invoices = useTra(s => s.invoices);
+  const { contacts } = useCtc();
+  const { flocks } = useFlk();
 
-  // فاکتورهای خرید که آیتم پرنده دارن
   const birdInvoices = useMemo(() => {
     return (invoices || [])
       .filter((inv: Invoice) => {
         if (inv.type !== 'purchase') return false;
         const hasBird = inv.items?.some((it: InvoiceItem) => {
           if (!it.birdId) return false;
-          // 🆕 فیلتر آبشاری: فقط فاکتورهای همان نوع پرنده
           if (currentBirdId && it.birdId !== currentBirdId) return false;
           return true;
         });
@@ -36,9 +44,31 @@ export default function PickInvoiceModal({ open, onClose, onSelect, currentBirdI
       .sort((a: Invoice, b: Invoice) => (b.date || '').localeCompare(a.date || ''));
   }, [invoices, currentBirdId]);
 
+  const flocksByInvoice = useMemo(() => {
+    const map = new Map<string, FlockLite>();
+    for (const f of (flocks || []) as FlockLite[]) {
+      if (f.sourceInvoiceId) map.set(f.sourceInvoiceId, f);
+    }
+    return map;
+  }, [flocks]);
+
   const handlePick = (inv: Invoice) => {
     onSelect(inv);
     onClose();
+  };
+
+  const getBirdName = (id?: string): string | undefined => {
+    if (!id) return undefined;
+    return (useBrd.getState().birds || []).find((b: { id: string; name: string }) => b.id === id)?.name;
+  };
+  const getBreedName = (id?: string): string | undefined => {
+    if (!id) return undefined;
+    return (useBrd.getState().breeds || []).find((b: { id: string; name: string }) => b.id === id)?.name;
+  };
+  const getPartyName = (id?: string): string | undefined => {
+    if (!id) return undefined;
+    const list = (contacts || []) as { id: string; name: string }[];
+    return list.find(c => c.id === id)?.name;
   };
 
   return (
@@ -50,25 +80,32 @@ export default function PickInvoiceModal({ open, onClose, onSelect, currentBirdI
           <div style={{ fontSize: 'var(--fs-sm)', marginTop: 4, opacity: 0.7 }}>ابتدا از بخش معاملات، فاکتور خرید پرنده ثبت کنید</div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {birdInvoices.map((inv) => {
             const birdItems = (inv.items || []).filter((it: InvoiceItem) => it.birdId);
             const totalQty = birdItems.reduce((s: number, it: InvoiceItem) => s + (it.quantity || 0), 0);
-            const firstBird = birdItems[0] || {};
+            const firstBird: InvoiceItem = birdItems[0] || ({} as InvoiceItem);
+            const linkedFlock = flocksByInvoice.get(inv.id);
+            const isLinked = !!linkedFlock;
+            const birdName = getBirdName(firstBird.birdId);
+            const breedName = getBreedName(firstBird.breedId);
+            const partyName = getPartyName(inv.partyId);
+            const isChick = (firstBird.category || inv.category) === 'chick';
+
             return (
               <button
                 key={inv.id}
                 type="button"
                 onClick={() => handlePick(inv)}
                 style={{
-                  padding: 'var(--sp-3)',
+                  padding: '10px 12px',
                   background: 'var(--card)',
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--r-md)',
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  gap: 3,
+                  alignItems: 'stretch',
+                  gap: 6,
                   textAlign: 'right',
                   cursor: 'pointer',
                   fontFamily: 'inherit',
@@ -76,18 +113,39 @@ export default function PickInvoiceModal({ open, onClose, onSelect, currentBirdI
                   width: '100%',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--accent)' }}>
+                {/* ردیف ۱: طرف حساب + وضعیت اتصال */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
+                    {partyName || '—'}
+                  </span>
+                  {isLinked ? (
+                    <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 'var(--r-sm)', background: 'var(--accent-soft)', color: 'var(--accent)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                      🔗 {linkedFlock.name}
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 'var(--r-sm)', background: 'var(--input-bg)', color: 'var(--muted)', fontWeight: 700 }}>
+                      بدون گله
+                    </span>
+                  )}
+                </div>
+
+                {/* ردیف ۲: نوع پرنده + نژاد + شماره فاکتور */}
+                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span style={{ color: 'var(--text)', fontWeight: 600 }}>
+                    {isChick ? '🐣' : '🐔'} {birdName || '—'}
+                  </span>
+                  {breedName && <span>· {breedName}</span>}
+                  {inv.number && <span>· #{inv.number}</span>}
+                </div>
+
+                {/* ردیف ۳: تعداد + مبلغ + تاریخ هچ + تاریخ فاکتور */}
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span style={{ color: 'var(--accent)', fontWeight: 700 }}>
                     {toFa(totalQty)} پرنده
                   </span>
-                  <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
-                    {toFa(inv.date)}
-                  </span>
-                </div>
-                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', display: 'flex', gap: 6, alignItems: 'center' }}>
-                  {inv.number && <span>#{inv.number}</span>}
-                  {firstBird.breedId && <span>· نژاد: {(useBrd.getState().breeds || []).find(b => b.id === firstBird.breedId)?.name || firstBird.breedId.slice(0, 6)}</span>}
                   {inv.total > 0 && <span>· {toFa(Math.round(inv.total).toLocaleString('fa-IR'))} ت</span>}
+                  {firstBird.hatchDate && <span>· هچ: {toFa(firstBird.hatchDate)}</span>}
+                  <span style={{ marginInlineStart: 'auto' }}>{toFa(inv.date)}</span>
                 </div>
               </button>
             );
