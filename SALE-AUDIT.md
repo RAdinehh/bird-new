@@ -50,7 +50,7 @@
 | 46 | Date Validation | ✅ | shr/utils/backup.ts |
 | 47 | Pattern Validation | ✅ | shr/intelligence/anomalyDetector.ts |
 | 48 | Enum Validation | ✅ | shr/filter/FilterBar.tsx |
-| 49 | Live Validation | ❌ | در حال بررسی |
+| 49 | Live Validation | ✅ | useValidation.ts (useMemo) |
 | 50 | Save Attempt Validation | ✅ | shr/hooks/useFormErrors.ts |
 | 51 | Duplicate Check | ✅ | mod/flk/FlocksPage.tsx |
 | 52 | Inline Error | ✅ | shr/components/ErrorBoundary.tsx |
@@ -114,7 +114,7 @@
 | 110 | Empty State | ✅ | cor/ui/FloatingAdd.tsx |
 | 111 | Skeleton Loading | ✅ | shr/components/Skeleton.tsx |
 | 112 | Progress Tracker | ✅ | shr/components/ProgressTracker.tsx |
-| 113 | Focus Trap | ❌ | در حال بررسی |
+| 113 | Focus Trap | ✅ | ui/Modal.tsx (first/last) |
 | 114 | Escape Key | ✅ | shr/components/Header.tsx |
 | 115 | Keyboard Navigation | ✅ | cor/ui/a11y.ts |
 | 116 | Section Title | ✅ | shr/components/ui/Layout.tsx |
