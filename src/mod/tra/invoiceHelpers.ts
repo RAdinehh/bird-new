@@ -245,6 +245,68 @@ function ensureWhsItem(it: any, inv: Invoice, whs: any): string {
 }
 
 export function applyInvoiceEquipment(inv: Invoice, prev?: Invoice): InvoiceItem[] {
+
+  // ✅ SALE: کاهش از hal + whs (متقارن با purchase)
+  if (inv.type === 'sale') {
+    const hal = useHal.getState();
+    const whs = useWhs.getState();
+    const outItems: InvoiceItem[] = (inv.items || []).map(it => ({ ...it }));
+
+    for (let i = 0; i < outItems.length; i++) {
+      const it = outItems[i] as any;
+      const itemCat = it.category || inv.category;
+      if (itemCat !== 'equipment') continue;
+      if (it.equipmentKind === 'consumable') continue;  // consumable توسط applyStock
+
+      const qty = Number(it.quantity) || 1;
+
+      // ۱. کاهش از hal.equipment
+      if (it.equipmentId) {
+        const eq = hal.equipment.find(e => e.id === it.equipmentId);
+        if (eq) {
+          const newCount = Math.max(0, (eq.count || 0) - qty);
+          try {
+            if (newCount === 0) {
+              hal.deleteEquip(it.equipmentId);
+            } else {
+              hal.updateEquip(it.equipmentId, { count: newCount } as any);
+            }
+
+            // ۲. کاهش از whs (via warehouseItemId)
+            if (eq.warehouseItemId) {
+              try {
+                whs.addMovement({
+                  itemId: eq.warehouseItemId,
+                  type: 'out',
+                  quantity: qty,
+                  unitPrice: Number(it.unitPrice) || 0,
+                  reason: 'sale',
+                  date: inv.deliveryDate || inv.date || '',
+                  partyId: inv.partyId || '',
+                  notes: `فروش تجهیزات — فاکتور ${inv.number || ''}` ,
+                  sourceModule: 'tra', sourceId: inv.id,
+                } as any);
+              } catch (e) { console.error('[TRA→WHS sale equip]', e); }
+            }
+          } catch (e) { console.error('[TRA→HAL sale]', e); }
+        }
+      }
+    }
+
+    // Orphan cleanup (update case)
+    if (prev) {
+      const activeEqIds = new Set(outItems.map((it: any) => it.equipmentId).filter(Boolean));
+      const orphans = hal.equipment.filter((e: any) =>
+        e.sourceInvoiceId === inv.id && !activeEqIds.has(e.id)
+      );
+      for (const orphan of orphans) {
+        try { hal.deleteEquip(orphan.id); } catch {}
+      }
+    }
+
+    return outItems;
+  }
+
   if (inv.type !== 'purchase') return inv.items;
   
   const hal = useHal.getState();
