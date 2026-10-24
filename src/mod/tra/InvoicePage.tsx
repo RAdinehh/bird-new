@@ -33,6 +33,7 @@ import TransferModal from './components/TransferModal';
 import InvoiceCard from './components/InvoiceCard';
 import InvoiceFormModal from './components/InvoiceFormModal';
 import RecycleBinModal from './components/RecycleBinModal';
+import { AccordionSection } from '../../shr/components/AccordionSection';
 import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
@@ -43,6 +44,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const { items: whsItems } = useWhs();
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [recycleOpen, setRecycleOpen] = useState(false);
+  const [groupBy, setGroupBy] = useState<string>('none');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [printId, setPrintId] = useState<string | null>(null);
   const [transferModal, setTransferModal] = useState<{ id: string; to: WorkflowStatus } | null>(null);
@@ -143,6 +145,34 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   });
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total: totalFiltered, count, sortStack, appendSort } = fsResult;
+
+  // 🆕 منطق گروه‌بندی (Group By)
+  const groupedList = useMemo(() => {
+    if (groupBy === 'none') return null;
+    const groups: Record<string, { title: string; items: typeof list }> = {};
+    for (const inv of list) {
+      let key = '';
+      let title = '';
+      if (groupBy === 'partyId') {
+        key = inv.partyId || 'unknown';
+        const p = parties.find(c => c.id === inv.partyId);
+        title = p ? p.name : 'بدون طرف حساب';
+      } else if (groupBy === 'date') {
+        key = inv.date || 'unknown';
+        title = toFa(inv.date);
+      } else if (groupBy === 'category') {
+        key = inv.category || 'unknown';
+        const cat = CATEGORIES[isPurchase ? 'purchase' : 'sale'].find(c => c[0] === inv.category);
+        title = cat ? cat[1] : 'نامشخص';
+      } else if (groupBy === 'workflow') {
+        key = inv.workflowStatus || 'draft';
+        title = WORKFLOW_LABEL[inv.workflowStatus as keyof typeof WORKFLOW_LABEL] || 'پیش‌نویس';
+      }
+      if (!groups[key]) groups[key] = { title, items: [] };
+      groups[key].items.push(inv);
+    }
+    return Object.values(groups).sort((a, b) => a.title.localeCompare(b.title, 'fa'));
+  }, [list, groupBy, parties, isPurchase]);
   const undoDelete = () => {
     if (!undoData) return;
     const arr = Array.isArray((undoData as any).item) ? (undoData as any).item : [(undoData as any).item];
@@ -277,7 +307,26 @@ return (
         tone="success"
       />
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>گروه‌بندی:</span>
+          <select
+            value={groupBy}
+            onChange={e => setGroupBy(e.target.value)}
+            style={{
+              padding: '4px 8px', borderRadius: 'var(--r-md)',
+              border: '1px solid var(--border)', background: 'var(--card-solid)',
+              fontFamily: 'inherit', fontSize: 'var(--fs-xs)', color: 'var(--text)',
+              outline: 'none', cursor: 'pointer'
+            }}
+          >
+            <option value="none">بدون گروه‌بندی</option>
+            <option value="partyId">طرف حساب</option>
+            <option value="date">تاریخ</option>
+            <option value="category">دسته کالا</option>
+            <option value="workflow">وضعیت پرداخت</option>
+          </select>
+        </div>
         <Btn size="sm" variant="outline" onClick={() => setRecycleOpen(true)}>
           🗑️ سبد بازیابی
         </Btn>
@@ -321,6 +370,37 @@ return (
           desc={isPurchase ? 'اولین خرید خود را ثبت کنید.' : 'اولین فروش خود را ثبت کنید.'}
           action={<Btn variant="primary" onClick={openNew}>{isPurchase ? '+ ثبت خرید' : '+ ثبت فروش'}</Btn>}
         />
+      ) : groupedList ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {groupedList.map(group => (
+            <AccordionSection 
+              key={group.title} 
+              title={group.title} 
+              icon="📁" 
+              summary={`${toFa(group.items.length)} مورد`}
+              defaultOpen={true}
+            >
+              {group.items.map((inv, i) => {
+                const party = parties.find(c => c.id === inv.partyId);
+                const isOpen = !ms.selectionMode && expandedId === inv.id;
+                return (
+                  <InvoiceCard
+                    key={inv.id}
+                    inv={inv}
+                    partyName={party?.name}
+                    isOpen={isOpen}
+                    ms={ms}
+                    onToggle={() => setExpandedId(isOpen ? null : inv.id)}
+                    onTransferClick={() => setTransferModal({ id: inv.id, to: nextWorkflowStatus(inv.workflowStatus)! })}
+                    onReopen={remaining(inv) <= 0 ? () => handleReopen(inv) : undefined}
+                    onEdit={remaining(inv) > 0 && !inv.paidAt ? () => openEdit(inv) : undefined}
+                    index={i}
+                  />
+                );
+              })}
+            </AccordionSection>
+          ))}
+        </div>
       ) : (
         <>
           {list.map((inv, i) => {
