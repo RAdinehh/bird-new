@@ -9,7 +9,9 @@ import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 import { formatInvoiceNumber } from '../calc';
 import { useTra } from '../store';
 import { BtnRow } from '../../../shr/components/ui/Btn';
-import { useFlk } from '../../flk/store';
+import PickFlockModal from './PickFlockModal';
+import { useFlk, type Flock } from '../../flk/store';
+import { useState } from 'react';
 import { toastMsg } from '../../../cor/store/toast';
 import EntityLink from '../../../shr/components/EntityLink';
 
@@ -27,13 +29,38 @@ interface Props {
 
 export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, index }: Props) {
   const { updateInvoice, allocations } = useTra();
-  const { flocks, restore } = useFlk();
+  const { flocks, restore, update: updateFlock } = useFlk();
+  const [flockPickerOpen, setFlockPickerOpen] = useState(false);
   // 🆕 استاندارد ERP: خواندن شناسه یکتا از خود سند (بدون حدس زدن)
   const invFlockId = inv.relatedFlockId || inv.items?.find((it: any) => it.flockId)?.flockId;
   const linkedFlock = flocks?.find((f: any) => 
     (invFlockId && f.id === invFlockId) || f.sourceInvoiceId === inv.id
   );
   const rem2 = remaining(inv, allocations);
+
+  // 🆕 اتصال دستی برای داده‌های قدیمی
+  const handleManualLink = (flock: Flock) => {
+    // ۱. به‌روزرسانی گله (ذخیره شناسه فاکتور)
+    updateFlock(flock.id, { 
+      sourceInvoiceId: inv.id, 
+      sourceCategory: inv.category 
+    });
+
+    // ۲. به‌روزرسانی فاکتور (ذخیره شناسه گله بدون دست زدن به cascade)
+    useTra.setState(state => ({
+      invoices: state.invoices.map(i => 
+        i.id === inv.id 
+          ? { 
+              ...i, 
+              relatedFlockId: flock.id, 
+              items: i.items.map(it => it.birdId ? { ...it, flockId: flock.id } : it) 
+            } 
+          : i
+      )
+    }));
+    
+    toastMsg.success('فاکتور با موفقیت به گله متصل شد');
+  };
   const st = rem2 === 0 ? 'paid' : paidSumAllocated(inv, allocations) > 0 ? 'partial' : 'unpaid';
 
   return (
@@ -218,11 +245,16 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       )}
       {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock) ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
-          {(onEdit || linkedFlock) && (
+          {(onEdit || linkedFlock || (inv.type === 'purchase' && inv.items?.some(it => it.birdId))) && (
             <BtnRow>
               {onEdit && (
                 <Btn size="sm" variant="outline" onClick={onEdit}>
                   ✏️ ویرایش فاکتور
+                </Btn>
+              )}
+              {!linkedFlock && inv.type === 'purchase' && inv.items?.some(it => it.birdId) && (
+                <Btn size="sm" variant="outline" onClick={() => setFlockPickerOpen(true)}>
+                  🔗 اتصال دستی
                 </Btn>
               )}
               {linkedFlock && (
@@ -262,6 +294,11 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         </div>
       ) : null}
 
+      <PickFlockModal 
+        open={flockPickerOpen} 
+        onClose={() => setFlockPickerOpen(false)} 
+        onSelect={handleManualLink} 
+      />
     </ExpandableCard>
   );
 }
