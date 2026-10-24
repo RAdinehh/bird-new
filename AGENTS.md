@@ -89,3 +89,6 @@ CURRENT: #X نام — فاز: [verify|implement|test|approve]
 
 ### قانون ۱۲ — ممنوعیت مطلق as any
 هیچ as any در کد جدید نوشته نشود (حتی با کامنت). از unknown + type guard، Partial، یا تایپ دقیق استفاده شود. کدهای قبلی هم به مرور اصلاح شوند.
+
+### قانون ۱۲ — ممنوعیت مطلق any
+هیچ as any یا (x: any) یا as unknown as در کد جدید نوشته نشود. از تایپ‌های دقیق (unknown + type guard، Partial، Item، Movement، Invoice) استفاده شود. کدهای قبلی هم به مرور اصلاح شوند.
