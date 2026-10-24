@@ -251,6 +251,19 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* ردیف ۳ (خرید): بخش + وزن اولیه | (فروش): تاریخ هچ + سن */}
         {isPurchase ? (
           <Grid2>
+            <Field label="تاریخ هچ" required>
+              <DatePicker value={String(item.hatchDate || '')} onChange={v => {
+                const age = computeAgeFromHatch(v);
+                updateItem({ hatchDate: v, ageDays: age });
+              }} placeholder="1405/07/26" autoToday />
+            </Field>
+            <Field label="سن (روز) — خودکار" hint="از تاریخ هچ + تاریخ فاکتور">
+              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
+                {item.ageDays != null && item.ageDays >= 0 ? toFa(String(item.ageDays)) + ' روز' : '—'}
+              </div>
+            </Field>
+          </Grid2>
+          <Grid2>
             <Field label="بخش مقصد (اختیاری)">
               <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" autoThreshold={6} />
             </Field>

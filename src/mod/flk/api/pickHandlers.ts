@@ -4,7 +4,8 @@
  */
 import type { Invoice, InvoiceItem } from '../../tra/store';
 import type { HatchResult, EggEntry } from '../../inc/store';
-import { toFa } from '../../../shr/utils/fa';
+import { toFa, toEn } from '../../../shr/utils/fa';
+import { parse as parseJ, format as formatJ, subDays, isValid } from 'date-fns-jalali';
 import type { F } from '../types-flocks';
 
 export function applyInvoiceToForm(form: F, inv: Invoice): Partial<F> | null {
@@ -28,9 +29,21 @@ export function applyInvoiceToForm(form: F, inv: Invoice): Partial<F> | null {
   // 🆕 هزینه حمل از فاکتور
   if (inv.shipping && inv.shipping > 0) updates.deliveryCost = toFa(inv.shipping);
   // 🆕 تاریخ شروع = تاریخ فاکتور
-  // 🆕 فیکس: hatchDate از فاکتور
-  if (firstBird.hatchDate) updates.hatchDate = firstBird.hatchDate;
-  else if (firstBird.eggDate) updates.hatchDate = firstBird.eggDate;
+  // 🆕 فیکس: hatchDate از فاکتور (3 سطح fallback)
+  if (firstBird.hatchDate) {
+    updates.hatchDate = firstBird.hatchDate;
+  } else if (firstBird.eggDate) {
+    updates.hatchDate = firstBird.eggDate;
+  } else if (firstBird.ageDays != null && firstBird.ageDays >= 0 && inv.date) {
+    // 🆕 محاسبه hatchDate از ageDays + invoice.date
+    try {
+      const invDate = parseJ(toEn(inv.date), 'yyyy/MM/dd', new Date());
+      if (isValid(invDate)) {
+        const hatch = subDays(invDate, firstBird.ageDays);
+        updates.hatchDate = formatJ(hatch, 'yyyy/MM/dd');
+      }
+    } catch {}
+  }
   if (inv.date) updates.startDate = inv.date;
   // 🆕 فیکس: اگه هیچ‌کدوم از counts ست نشد → همه در unknownCount
   if (firstBird.maleCount == null && firstBird.femaleCount == null && firstBird.unknownCount == null) {
