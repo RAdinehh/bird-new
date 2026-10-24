@@ -1,11 +1,12 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- مفهوم: —
-- ماژول: —
-- فاز: —
+- مفهوم: #2 Cascade Fallback
+- ماژول: intel (anomalyDetector)
+- فاز: verify
 
-## ✅ DONE (0/205)
+## ✅ DONE (1/205)
+1. Cascade Data ✅
 
 ## ⚠️ PARTIAL
 
@@ -14,7 +15,6 @@
 ## ⏸ DEFERRED
 
 ## ❌ PENDING (۲۰۵)
-1
 2
 3
 4
