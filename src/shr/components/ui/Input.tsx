@@ -12,7 +12,7 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   integer?: boolean; // فقط عدد صحیح (بدون اعشار)
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
-export function Input({ unit, error, warn, mode = 'text', showWords, min, max, autoClamp, height: customHeight, style, value, onChange, onBlur, ...rest }: InputProps) {
+export function Input({ unit, error, warn, mode = 'text', showWords, min, max, autoClamp, height: customHeight, style, value, onChange, onBlur, disabled, ...rest }: InputProps) {
   // اگر inputMode عددی بود، خودکار حالت number فعال شود
   const effectiveMode = mode === 'text' && rest.inputMode === 'numeric' ? 'number' : mode;
 
@@ -103,10 +103,13 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
         background: 'var(--input-bg)',
         border: `1px solid ${error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)'}`,
         borderRadius: 'var(--r-md)', padding: '0 12px',
-        display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden'
+        display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden',
+        opacity: disabled ? 0.55 : 1,
+        cursor: disabled ? 'not-allowed' : undefined,
       }}>
         <input enterKeyHint="next" onKeyDown={handleKeyDown}           dir={(rest as any).dir || undefined}
           {...rest}
+          disabled={disabled}
           value={displayValue}
           onChange={handleChange}
           onFocus={handleFocus}
