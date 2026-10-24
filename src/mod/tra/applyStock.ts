@@ -133,6 +133,16 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
           x.name === name && (x.category === targetCat || x.category === cat)
         );
         if (existing) itemId = existing.id;
+        // 🆕 Fallback تخم‌مرغ — رفع Phantom
+        // (description تاریخ‌دار مثل «تخم خوراکی - ۱۴۰۵/۰۷/۲۰» با اسم انبار یکی نیست)
+        if (!itemId && (cat === 'egg' || cat === 'fertile_egg' || cat === 'broken')) {
+          const eggCat = cat === 'broken' ? 'broken' : 'egg';
+          const eggItem = whs.items.find((x: any) => x.category === eggCat);
+          if (eggItem) {
+            itemId = eggItem.id;
+            console.info('[applyInvoiceStock/sale] 🥚 egg fallback used:', eggItem.name);
+          }
+        }
       }
       if (!itemId) {
         console.warn('[applyInvoiceStock/sale] item not found, skip:', sample.description);
