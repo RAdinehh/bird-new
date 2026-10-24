@@ -1,8 +1,8 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- مفهوم: #5 Rollback Cascade
-- ماژول: tra (apply)
+- مفهوم: #6 Cross-Module Reference
+- ماژول: flk / tra / whs
 - فاز: verify
 
 ## ✅ DONE (1/205)
@@ -15,7 +15,6 @@
 ## ⏸ DEFERRED
 
 ## ❌ PENDING (۲۰۵)
-5
 6
 7
 8
