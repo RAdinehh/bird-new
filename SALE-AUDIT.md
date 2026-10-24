@@ -87,7 +87,7 @@
 | 83 | localStorage Persist | ✅ | shr/store/customOptions.ts |
 | 84 | Store Subscription | ✅ | shr/components/Header.tsx |
 | 85 | Draft Save | ✅ | ذخیره خودکار پیش‌نویس |
-| 86 | Auto-Save | ❌ | در حال بررسی |
+| 86 | Auto-Save | ✅ | useInvoiceForm.ts (setTimeout debounce) |
 | 87 | Undo/Redo | ✅ | cor/ui/useUndo.ts |
 | 88 | Undo Data | ✅ | shr/components/EditableSelect.tsx |
 | 89 | Deleted Item Recovery | ✅ | cor/ui/UndoBar.tsx |
