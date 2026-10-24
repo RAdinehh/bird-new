@@ -29,12 +29,12 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
 
       <Grid2>
         <Field
-          label={isSourceLinked && form.hatchId ? <span>تاریخ هچ <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ هچ'}
-          hint={isSourceLinked && form.hatchId ? '🔒 از هچ — برای تغییر، لینک هچ را پاک کنید' : 'خروج جوجه از دستگاه'}
+          label={isSourceLinked ? <span>تاریخ هچ <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ هچ'}
+          hint={isSourceLinked ? '🔒 از فاکتور/هچ — برای تغییر، لینک را پاک کنید' : 'خروج جوجه از دستگاه'}
           error={showError('hatchDate')}
           onTouch={() => markTouched('hatchDate')}
         >
-          <DatePicker value={form.hatchDate} onChange={v => !(isSourceLinked && form.hatchId) && setForm({ ...form, hatchDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} disabled={isSourceLinked && !!form.hatchId} />
+          <DatePicker value={form.hatchDate} onChange={v => !isSourceLinked && setForm({ ...form, hatchDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} disabled={isSourceLinked} />
         </Field>
         <Field
           label={isSourceLinked && form.sourceInvoiceId ? <span>تاریخ خرید <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ خرید'}
