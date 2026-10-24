@@ -1,6 +1,6 @@
 import { Modal, Btn } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
-import { useTra } from '../store';
+import { useTra, CATEGORIES } from '../store';
 import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
 import { listRecycleBin, type RecycleBinEntry } from '../../../shr/utils/recycleBin';
@@ -53,44 +53,80 @@ export default function RecycleBinModal({ open, onClose }: Props) {
             const inv = e.item.invoice;
             const days = daysLeft(e.expiresAt);
             const isSale = inv.type === 'sale';
+
+            // 🆕 استخراج نام دسته کالا از CATEGORIES
+            const catList = CATEGORIES[inv.type] || [];
+            const catLabel = catList.find((c: [string, string]) => c[0] === inv.category)?.[1] || inv.category;
+
+            // 🆕 استخراج نام اقلام (حداکثر ۲ مورد)
+            const itemsText = inv.items
+              .map(it => it.description)
+              .filter(Boolean)
+              .slice(0, 2)
+              .join('، ');
+
+            // 🆕 بررسی وضعیت اتصال به گله
+            const linkedFlocks = e.item.linkedFlocks || [];
+            const hasFlock = linkedFlocks.length > 0;
+
             return (
               <div
                 key={inv.id}
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
+                  flexDirection: 'column',
+                  gap: 6,
                   padding: 10,
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--r-md)',
                   background: 'var(--card-solid, #fff)',
                 }}
               >
-                <span style={{ fontSize: 18 }}>{isSale ? '📤' : '📥'}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>
-                    {isSale ? 'فروش' : 'خرید'}
-                    {inv.number ? ' — ' + inv.number : ''}
+                {/* ردیف بالا: آیکون، عنوان و وضعیت گله */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 18 }}>{isSale ? '📤' : '📥'}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>
+                      {isSale ? 'فروش' : 'خرید'}
+                      {inv.number ? ' — ' + inv.number : ''}
+                    </div>
                   </div>
-                  <div
-                    style={{
-                      fontSize: 'var(--fs-xs)',
-                      color: 'var(--muted)',
-                      marginTop: 2,
-                    }}
-                  >
-                    {toFa(inv.date)} •{' '}
-                    {toFa(inv.total.toLocaleString('fa-IR'))} تومان •{' '}
-                    {toFa(days)} روز مونده
-                  </div>
+                  {hasFlock ? (
+                    <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 'var(--r-sm)', background: 'var(--accent-soft)', color: 'var(--accent)', fontWeight: 700 }}>
+                      🔗 متصل به گله
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 'var(--r-sm)', background: 'var(--input-bg)', color: 'var(--muted)', fontWeight: 700 }}>
+                      بدون گله
+                    </span>
+                  )}
                 </div>
-                <Btn
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleRestore(inv.id)}
-                >
-                  ↩️ بازیابی
-                </Btn>
+
+                {/* ردیف میانی: دسته و اقلام */}
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', fontSize: 'var(--fs-xs)' }}>
+                  <span style={{ background: 'var(--input-bg)', padding: '2px 6px', borderRadius: 'var(--r-sm)', color: 'var(--text)' }}>
+                    <b>دسته:</b> {catLabel}
+                  </span>
+                  {itemsText && (
+                    <span style={{ background: 'var(--input-bg)', padding: '2px 6px', borderRadius: 'var(--r-sm)', color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                      <b>اقلام:</b> {itemsText}
+                    </span>
+                  )}
+                </div>
+
+                {/* ردیف پایین: تاریخ، مبلغ، روزهای باقی‌مانده و دکمه */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                    {toFa(inv.date)} • {toFa(inv.total.toLocaleString('fa-IR'))} تومان • {toFa(days)} روز مونده
+                  </div>
+                  <Btn
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleRestore(inv.id)}
+                  >
+                    ↩️ بازیابی
+                  </Btn>
+                </div>
               </div>
             );
           })}
