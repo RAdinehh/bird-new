@@ -258,7 +258,46 @@ export const useFlk = create<State>()(
           if (ev.type === 'death' || ev.type === 'cull' || ev.type === 'sell') delta = -ev.count;
           else if (ev.type === 'add' || ev.type === 'transfer') delta = +ev.count;
           const next = Math.max(0, cur + delta);
-          return { ...f, currentCount: next, events: [...(f.events || []), newEvent], updatedAt: now() };
+          // 🆕 قدم ۲: sync gender با unknown/male/female
+          const patch: any = { currentCount: next };
+          const hasSplit = !!f.genderSplitAt;
+          if (!hasSplit) {
+            // حالت A: unsplit
+            if (delta > 0 && (ev.sex === 'male' || ev.sex === 'female')) {
+              // اضافه کردن پرنده جنسیت‌دار → transition به split
+              patch.genderSplitAt = now();
+              patch.maleCount = ev.sex === 'male' ? ev.count : 0;
+              patch.femaleCount = ev.sex === 'female' ? ev.count : 0;
+              patch.unknownCount = cur;
+            } else {
+              // mixed → همه چیز unknown
+              patch.unknownCount = next;
+            }
+          } else {
+            // حالت B/C: split شده
+            if (ev.sex === 'male') {
+              patch.maleCount = Math.max(0, (f.maleCount ?? 0) + delta);
+            } else if (ev.sex === 'female') {
+              patch.femaleCount = Math.max(0, (f.femaleCount ?? 0) + delta);
+            } else {
+              // mixed → unknown با fallback
+              const nextU = (f.unknownCount ?? 0) + delta;
+              if (nextU >= 0) {
+                patch.unknownCount = nextU;
+              } else {
+                const rem = -nextU;
+                patch.unknownCount = 0;
+                const m = f.maleCount ?? 0;
+                const fe = f.femaleCount ?? 0;
+                if (fe >= m) {
+                  patch.femaleCount = Math.max(0, fe - rem);
+                } else {
+                  patch.maleCount = Math.max(0, m - rem);
+                }
+              }
+            }
+          }
+          return { ...f, ...patch, events: [...(f.events || []), newEvent], updatedAt: now() };
         })
       }),
       addCorrection: (flockId, delta, reasonCode, reasonLabel, notes) => set({
