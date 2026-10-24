@@ -320,7 +320,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                                         <Field label="تعداد">
                               <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                             </Field>
-                                                        {cat === 'chick' && isPurchase && (
+                                                        {(cat === 'chick' || cat === 'adult') && isPurchase && (
                                                           <Field label="تعداد سالم">
                                                             <NumField placeholder="تعداد" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? toFa(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
                                                           </Field>
@@ -341,7 +341,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           </>
                         )}
                   
-                        {cat === 'chick' && (
+                        {(cat === 'chick' || cat === 'adult') && (
   <div style={{ display: (it.quantity || 0) > 0 ? 'contents' : 'none' }}>
     <Grid3>
       <Field label="نر">

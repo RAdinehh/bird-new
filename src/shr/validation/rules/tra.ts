@@ -153,7 +153,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     if (d.type === 'purchase') {
       (d.items || []).forEach((it: any, idx: number) => {
         const cat = it.category || d.category;
-        if (cat === 'chick') {
+        if (cat === 'chick' || cat === 'adult') {
           const qty = Number(it.quantity) || 0;
           const m = Number(it.maleCount) || 0;
           const fe = Number(it.femaleCount) || 0;
@@ -173,7 +173,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     if (d.type === 'purchase') {
       (d.items || []).forEach((it: any, idx: number) => {
         const cat = it.category || d.category;
-        if (cat === 'chick') {
+        if (cat === 'chick' || cat === 'adult') {
           const qty = Number(it.quantity) || 0;
           const m = Number(it.maleCount) || 0;
           const fe = Number(it.femaleCount) || 0;
