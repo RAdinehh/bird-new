@@ -25,11 +25,13 @@ export default function RecycleBinModal({ open, onClose }: Props) {
   const { restoreInvoice } = useTra();
   const { contacts } = useCtc();
   const [entries, setEntries] = useState<RecycleBinEntry<DeletedInvoiceSnapshot>[]>([]);
+  const [visibleCount, setVisibleCount] = useState(20); // 🆕 نمایش ۲۰ کارت در ابتدا
 
   useEffect(() => {
     if (open) {
       const list = listRecycleBin<DeletedInvoiceSnapshot>('tra');
       setEntries(list.sort((a, b) => new Date(a.expiresAt).getTime() - new Date(b.expiresAt).getTime()));
+      setVisibleCount(20); // 🆕 ریست به ۲۰
     } else {
       setEntries([]);
     }
@@ -86,7 +88,7 @@ export default function RecycleBinModal({ open, onClose }: Props) {
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>مرتب‌شده بر اساس نزدیک‌ترین به انقضا</span>
             <Btn size="sm" variant="outline" onClick={handleClearAll} style={{ color: 'var(--danger)', borderColor: 'var(--danger)', fontSize: 11, padding: '2px 8px', minHeight: 28 }}>🗑️ خالی کردن سبد</Btn>
           </div>
-          {entries.map((e) => {
+          {entries.slice(0, visibleCount).map((e) => {
             const inv = e.item.invoice;
             const days = daysLeft(e.expiresAt);
             const isSale = inv.type === 'sale';
@@ -149,6 +151,15 @@ export default function RecycleBinModal({ open, onClose }: Props) {
               </div>
             );
           })}
+          
+          {/* 🆕 دکمه نمایش بیشتر برای لیست‌های طولانی */}
+          {entries.length > visibleCount && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12, marginBottom: 8 }}>
+              <Btn size="sm" variant="outline" onClick={() => setVisibleCount(c => c + 20)}>
+                نمایش ۲۰ مورد بعدی (از {toFa(entries.length - visibleCount)} مورد باقی‌مانده)
+              </Btn>
+            </div>
+          )}
         </div>
       )}
     </Modal>
