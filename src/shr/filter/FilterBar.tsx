@@ -140,21 +140,29 @@ export function FilterBar<T>({
           </button>
         )}
         
-        {onOpenRecycleBin && (
-          <button 
-            type="button" 
+        {onOpenRecycleBin && recycleCount > 0 && (
+          <button
+            type="button"
             onClick={onOpenRecycleBin}
-            disabled={recycleCount === 0}
-            className={recycleCount > 0 ? 'pm-pulse' : ''}
             style={{
-              ...topBtn(recycleCount > 0),
-              opacity: recycleCount === 0 ? 0.5 : 1,
-              cursor: recycleCount === 0 ? 'not-allowed' : 'pointer',
+              ...topBtn(true),
+              position: 'relative',
+              cursor: 'pointer',
             }}
-            title={recycleCount === 0 ? 'سبد بازیابی خالی است' : `${toFa(recycleCount)} فاکتور در سبد بازیابی`}
+            title={`${toFa(recycleCount)} فاکتور در سبد بازیابی`}
           >
             <span>🗑️</span>
-            <span>بازیابی {recycleCount > 0 ? `(${toFa(recycleCount)})` : ''}</span>
+            <span>بازیابی ({toFa(recycleCount)})</span>
+            <span
+              aria-label="آیتم جدید"
+              style={{
+                position: 'absolute', top: -2, left: -2,
+                width: 8, height: 8, borderRadius: '50%',
+                background: 'var(--danger)',
+                boxShadow: '0 0 0 2px var(--bg)',
+                animation: 'flkDotPulse 1s ease-in-out infinite',
+              }}
+            />
           </button>
         )}
 
