@@ -1,7 +1,7 @@
 import type { ReactNode, CSSProperties } from 'react';
 import { Input } from '../components/ui';
 import { RowItem } from './RowItem';
-import type { FilterDef } from './types';
+import type { FilterDef, FilterState } from './types';
 import { parseFaNum } from '../utils/fa';
 
 function chipIn(active: boolean): CSSProperties {
@@ -19,13 +19,15 @@ function chipIn(active: boolean): CSSProperties {
   };
 }
 
-export function FilterGroupBody<T>({ def, value, setFilter, clearFilter }: {
+export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterState }: {
   def: FilterDef<T>;
   value: string | string[] | [string, string] | [number, number] | boolean | null | undefined;
   setFilter: (key: string, value: any) => void;
   clearFilter: (key: string) => void;
+  filterState: FilterState;
 }): ReactNode {
   const v = value;
+  const displayOptions = def.dynamicOptions ? def.dynamicOptions(filterState) : (def.options || []);
 
     if (def.kind === 'enum') {
       const isMulti = !!def.multi;
@@ -53,7 +55,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter }: {
               }}>
               همه
             </button>
-            {def.options?.map(o => {
+            {displayOptions.map(o => {
               const active = isMulti ? arr.includes(o.value) : v === o.value;
               return (
                 <button key={o.value} type="button"
@@ -107,7 +109,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter }: {
               label="همه"
               onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
             />
-            {def.options?.map(o => {
+            {displayOptions.map(o => {
               const active = isMulti ? arr.includes(o.value) : v === o.value;
               return (
                 <RowItem
@@ -138,7 +140,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter }: {
           <button type="button"
             onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
             style={chipIn(noneActive)}>همه</button>
-          {def.options?.map(o => {
+          {displayOptions.map(o => {
             const active = isMulti ? arr.includes(o.value) : v === o.value;
             return (
               <button key={o.value} type="button"

@@ -35,6 +35,8 @@ export interface FilterDef<T> {
   layout?: 'grid' | 'rows' | 'chips';
   /** نمایش فقط وقتی که این شرط true باشد */
   visible?: (item: T) => boolean;
+  /** 🆕 گزینه‌های داینامیک برای فیلتر آبشاری (Cascading) - بر اساس وضعیت بقیه فیلترها */
+  dynamicOptions?: (currentFilters: FilterState) => FilterOption[];
 }
 
 export interface SortDef<T> {

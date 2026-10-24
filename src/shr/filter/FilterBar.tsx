@@ -265,7 +265,7 @@ export function FilterBar<T>({
                 </div>
                 {/* محتوا — همیشه باز */}
                 <div style={{ paddingBottom: 10, paddingTop: 2 }}>
-                  <FilterGroupBody def={def} value={filterState[def.key]} setFilter={setFilter} clearFilter={clearFilter} />
+                  <FilterGroupBody def={def} value={filterState[def.key]} setFilter={setFilter} clearFilter={clearFilter} filterState={filterState} />
                 </div>
               </div>
             );
