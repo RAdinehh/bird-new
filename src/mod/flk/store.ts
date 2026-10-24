@@ -121,7 +121,23 @@ export const useFlk = create<State>()(
         set({ flocks: [...get().flocks, {...f, id, createdAt: now(), updatedAt: now()}] });
         return id;
       },
-      update: (id, patch) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
+      update: (id, patch) => set({
+        flocks: get().flocks.map(x => {
+          if (x.id !== id) return x;
+          const merged: any = { ...x, ...patch, updatedAt: now() };
+          const m2 = merged.maleCount ?? 0;
+          const fe = merged.femaleCount ?? 0;
+          const cc = merged.currentCount ?? 0;
+          if ((m2 > 0 || fe > 0) && !merged.genderSplitAt) merged.genderSplitAt = now();
+          if (m2 === 0 && fe === 0 && merged.genderSplitAt) {
+            merged.genderSplitAt = null;
+            merged.unknownCount = cc;
+          }
+          const sum = m2 + fe + (merged.unknownCount ?? 0);
+          if (sum !== cc && m2 + fe <= cc) merged.unknownCount = cc - m2 - fe;
+          return merged;
+        }),
+      }),
       remove: (id) => {
         // 🆕 حذف مستقیم — تأیید و هشدار لینک‌ها در UI گرفته می‌شه
         set({ flocks: get().flocks.filter(x => x.id !== id) });
@@ -447,6 +463,9 @@ export const useFlk = create<State>()(
               status: 'merged' as FlockStatus,
               mergedInto: targetId,
               currentCount: 0,
+              maleCount: 0,
+              femaleCount: 0,
+              unknownCount: 0,
               updatedAt: now(),
             };
           }
@@ -473,6 +492,13 @@ export const useFlk = create<State>()(
             ...target,
             initialCount: (target.initialCount || 0) + (source.initialCount || 0),
             currentCount: (target.currentCount || 0) + (source.currentCount || 0),
+            maleCount: (target.maleCount || 0) + (source.maleCount || 0),
+            femaleCount: (target.femaleCount || 0) + (source.femaleCount || 0),
+            unknownCount: (target.unknownCount || 0) + (source.unknownCount || 0),
+            genderSplitAt: (() => {
+              const dates = [target.genderSplitAt, source.genderSplitAt].filter(Boolean) as string[];
+              return dates.length > 0 ? dates.sort()[0] : null;
+            })(),
             hatchDate: opts.hatchDate || target.hatchDate,
             mergedInfo: { sources: newSources, avgAgeDays, mergedAt: now() },
             updatedAt: now(),
