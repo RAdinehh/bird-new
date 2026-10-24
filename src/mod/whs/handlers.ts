@@ -75,17 +75,18 @@ export function registerWhsHandlers(): () => void {
 const EGG_NAME_MAP: Record<string, string> = {
   eating: 'تخم مرغ',
   fertile: 'تخم نطفه‌دار',
-  consumption: 'تخم مصرفی',
+  consumption: 'تخم شکسته',
 };
 
 function ensureEggItem(kind: 'eating' | 'fertile' | 'consumption'): string {
   const name = EGG_NAME_MAP[kind];
   const whs = useWhs.getState();
-  const found = whs.items.find((i: any) => i.category === 'egg' && i.name === name);
+  const targetCat = kind === 'consumption' ? 'broken' : 'egg';
+  const found = whs.items.find((i: any) => i.category === targetCat && i.name === name);
   if (found) return found.id;
   const newId = whs.addItem({
     name,
-    category: 'egg',
+    category: targetCat as any,
     unit: 'pcs',
     minStock: 0,
     currentStock: 0,

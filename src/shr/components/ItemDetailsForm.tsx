@@ -1019,7 +1019,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
   // ========== تخم شکسته (فقط فروش) ==========
   if (category === 'broken') {
-    const brokenItems = (whsItems || []).filter(w => w.category === 'broken');
+    const brokenItems = (whsItems || []).filter(w =>
+      w.category === 'broken' ||
+      (w.category === 'egg' && (w.name === 'تخم مصرفی' || w.name === 'تخم شکسته'))
+    );
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
