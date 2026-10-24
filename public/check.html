@@ -1,0 +1,26 @@
+<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>Check</title>
+<style>body{font-family:sans-serif;padding:16px;background:#1e1e1e;color:#d4d4d4}
+.ok{color:#4ec9b0;padding:8px;background:#1a3a1a;border-radius:4px}
+.err{color:#f48771;padding:8px;background:#3a1a1a;border-radius:4px}
+table{border-collapse:collapse;width:100%;margin:8px 0;font-size:12px}
+th,td{border:1px solid #444;padding:4px;text-align:right}th{background:#2d2d2d}</style></head><body>
+<h1>📊 بررسی سلامت گله</h1><div id="o">...</div>
+<script>
+const o=document.getElementById('o');
+try{
+const p=JSON.parse(localStorage.getItem('pm-flk'));
+const s=p.state||p,f=s.flocks||[];
+const bad=[];
+for(const fl of f){
+  const c=fl.currentCount??0,m=fl.maleCount??0,fe=fl.femaleCount??0,u=fl.unknownCount??0;
+  if(m+fe+u!==c) bad.push(fl);
+  if((m===0&&fe===0&&fl.genderSplitAt)) bad.push(fl); // un-split نشده
+}
+if(bad.length===0){o.innerHTML=`<p class="ok">✅ همه ${f.length} گله سالم</p>`}
+else{
+  let h=`<p class="err">❌ ${bad.length} گله خراب</p><table><tr><th>نام</th><th>current</th><th>m</th><th>f</th><th>u</th><th>split?</th></tr>`;
+  for(const fl of bad) h+=`<tr><td>${fl.name}</td><td>${fl.currentCount}</td><td>${fl.maleCount||0}</td><td>${fl.femaleCount||0}</td><td>${fl.unknownCount||0}</td><td>${fl.genderSplitAt?'✅':'❌'}</td></tr>`;
+  h+='</table>';o.innerHTML=h;
+}
+}catch(e){o.innerHTML=`<p class="err">❌ ${e.message}</p>`}
+</script></body></html>
