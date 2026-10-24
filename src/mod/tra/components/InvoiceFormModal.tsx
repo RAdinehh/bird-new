@@ -362,10 +362,26 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   <div style={{ display: (it.quantity || 0) > 0 ? 'contents' : 'none' }}>
     <Grid3>
       <Field label="نر">
-        <NumField placeholder="نر" value={it.maleCount != null && it.maleCount > 0 ? toFa(String(it.maleCount)) : ''} onChange={e => { let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null; if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0; updateItem(it.id, { maleCount: v }); }} min={0} max={it.quantity || undefined} />
+        <NumField placeholder="نر" value={it.maleCount != null && it.maleCount > 0 ? toFa(String(it.maleCount)) : ''} onChange={e => { 
+  let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null; 
+  if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0; 
+  const safeMale = v ?? 0;
+  const safeFemale = it.femaleCount ?? 0;
+  // 🆕 اتوفیل: نامشخص = کل - نر - ماده
+  const autoUnknown = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
+  updateItem(it.id, { maleCount: v, unknownCount: autoUnknown });
+}} min={0} max={it.quantity || undefined} />
       </Field>
       <Field label="ماده">
-        <NumField placeholder="ماده" value={it.femaleCount != null && it.femaleCount > 0 ? toFa(String(it.femaleCount)) : ''} onChange={e => { let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null; if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0; updateItem(it.id, { femaleCount: v }); }} min={0} max={it.quantity || undefined} />
+        <NumField placeholder="ماده" value={it.femaleCount != null && it.femaleCount > 0 ? toFa(String(it.femaleCount)) : ''} onChange={e => { 
+  let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null; 
+  if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0; 
+  const safeFemale = v ?? 0;
+  const safeMale = it.maleCount ?? 0;
+  // 🆕 اتوفیل: نامشخص = کل - نر - ماده
+  const autoUnknown = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
+  updateItem(it.id, { femaleCount: v, unknownCount: autoUnknown });
+}} min={0} max={it.quantity || undefined} />
       </Field>
       <Field label="نامشخص" hint="برای جنسیت مخلوط">
         <NumField placeholder="نامشخص" value={it.unknownCount != null && it.unknownCount > 0 ? toFa(String(it.unknownCount)) : ''} onChange={e => { let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null; if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0; updateItem(it.id, { unknownCount: v }); }} min={0} max={it.quantity || undefined} />
