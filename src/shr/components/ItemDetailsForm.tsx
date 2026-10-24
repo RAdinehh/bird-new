@@ -244,7 +244,19 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* ردیف ۲: نژاد + (خرید: سالن | فروش: دلیل فروش) */}
         <Grid2>
           <Field label="نژاد" required>
-            <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={isPurchase && !!item.existingFlockId} />
+            <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
+                const purposeMap: Record<string, string> = {
+                  layer: '🥚 تخم‌گذار',
+                  breeder: '🐣 مادر',
+                  broiler: '🍗 گوشتی',
+                  ornamental: '🌸 زینتی',
+                };
+                const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
+                return {
+                  value: b.id,
+                  label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name,
+                };
+              })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={isPurchase && !!item.existingFlockId} />
           </Field>
           {isPurchase && (
             <Field label="سالن مقصد">
@@ -466,7 +478,19 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           )}
           {item.birdId ? (
             <Field label="نژاد" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
-              <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
+              <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
+                const purposeMap: Record<string, string> = {
+                  layer: '🥚 تخم‌گذار',
+                  breeder: '🐣 مادر',
+                  broiler: '🍗 گوشتی',
+                  ornamental: '🌸 زینتی',
+                };
+                const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
+                return {
+                  value: b.id,
+                  label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name,
+                };
+              })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
             </Field>
           ) : (
             <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', fontSize: 'var(--fs-xs)', gap: 4 }}>
@@ -563,7 +587,19 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <Grid2>
           {item.birdId ? (
             <Field label="نژاد" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
-              <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
+              <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
+                const purposeMap: Record<string, string> = {
+                  layer: '🥚 تخم‌گذار',
+                  breeder: '🐣 مادر',
+                  broiler: '🍗 گوشتی',
+                  ornamental: '🌸 زینتی',
+                };
+                const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
+                return {
+                  value: b.id,
+                  label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name,
+                };
+              })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
             </Field>
           ) : (
             <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', fontSize: 'var(--fs-xs)', gap: 4 }}>
