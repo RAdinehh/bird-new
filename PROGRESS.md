@@ -1,8 +1,8 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- مفهوم: #6 Cross-Module Reference
-- ماژول: flk / tra / whs
+- مفهوم: #7 Sort
+- ماژول: shr (useFilterSort)
 - فاز: verify
 
 ## ✅ DONE (1/205)
@@ -15,7 +15,6 @@
 ## ⏸ DEFERRED
 
 ## ❌ PENDING (۲۰۵)
-6
 7
 8
 9
