@@ -32,6 +32,7 @@ import { useInvoiceForm } from './hooks/useInvoiceForm';
 import TransferModal from './components/TransferModal';
 import InvoiceCard from './components/InvoiceCard';
 import InvoiceFormModal from './components/InvoiceFormModal';
+import RecycleBinModal from './components/RecycleBinModal';
 import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
@@ -41,6 +42,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
+  const [recycleOpen, setRecycleOpen] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [printId, setPrintId] = useState<string | null>(null);
   const [transferModal, setTransferModal] = useState<{ id: string; to: WorkflowStatus } | null>(null);
@@ -275,6 +277,11 @@ return (
         tone="success"
       />
 
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+        <Btn size="sm" variant="outline" onClick={() => setRecycleOpen(true)}>
+          🗑️ سبد بازیابی
+        </Btn>
+      </div>
       {/* FilterBar */}
       <FilterBar
         filterDefs={config.filterDefs}
@@ -391,6 +398,7 @@ return (
         if (!inv) return null;
         return <InvoicePrint invoice={inv} onClose={() => setPrintId(null)} />;
       })()}
+      <RecycleBinModal open={recycleOpen} onClose={() => setRecycleOpen(false)} />
     </PageContainer>
   );
 }
