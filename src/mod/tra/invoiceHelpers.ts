@@ -464,6 +464,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
         }
       }
       flk.update(explicitFlockId, patch);
+      updatedFlockIds.add(explicitFlockId);
 
       // 🆕 فیکس ۱: ثبت FlockEvent فروش در تاریخچه گله
       if (type === 'sale' && delta > 0) {
@@ -616,8 +617,11 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       if (!f) continue;
       const patch4: any = {
         initialCount: Math.max(0, (f.initialCount ?? 0) + delta),
-        currentCount: Math.max(0, (f.currentCount ?? 0) + delta),
       };
+      // 🆕 فیکس Double Counting: currentCount فقط اگه قبلاً آپدیت نشده
+      if (!updatedFlockIds.has(flockId)) {
+        patch4.currentCount = Math.max(0, (f.currentCount ?? 0) + delta);
+      }
       const sampleItem = (inv.items || []).find((it2: any) => it2.existingFlockId === flockId);
       if (sampleItem) {
         const mD = Number(sampleItem.maleCount || 0);
