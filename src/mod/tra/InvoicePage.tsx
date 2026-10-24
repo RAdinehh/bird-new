@@ -227,6 +227,13 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
       patch.receivedAt = transferDate || new Date().toISOString();
       patch.receivedNote = transferNote;
     } else if (transferModal.to === 'paid') {
+      // 🆕 فیکس: اگه باقی‌مانده داره، اجازه نده
+      const rem = remaining(inv, allocations);
+      if (rem > 0) {
+        toastMsg.error('فاکتور هنوز تسویه نشده — ابتدا پرداخت را کامل کنید');
+        setTransferModal(null);
+        return;
+      }
       patch.paidAt = transferDate || new Date().toISOString();
       patch.paidNote = transferNote;
     }

@@ -199,7 +199,9 @@ export function paidPendingSum(payments: Payment[]): number {
 export function invoiceStatus(inv: Invoice, allocations?: PaymentAllocation[]): InvoiceStatus {
   const paid = paidSumAllocated(inv, allocations);
   const total = inv.total || 0;
-  if (paid >= total && total > 0) return 'paid';
+  // 🆕 فیکس: remaining باید 0 باشه، نه فقط paid >= total
+  const rem = remaining(inv, allocations);
+  if (rem <= 0 && total > 0) return 'paid';
   if (paid > 0) return 'partial';
   return 'unpaid';
 }

@@ -410,6 +410,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
   const prevMap = buildMap(prev);
   const newMap = buildMap(inv);
   const allKeys = new Set<string>([...prevMap.keys(), ...newMap.keys()]);
+  const updatedFlockIds = new Set<string>(); // 🆕 فیکس Double Counting
 
   for (const k of allKeys) {
     const p0 = prevMap.get(k);
