@@ -111,30 +111,41 @@ export default function FlockTabPanel({
     items: list,
     getId: (f: Flock) => f.id,
     onDelete: async (ids) => {
-      // 🆕 چک ارجاع — کدوم گله‌ها توی dlg/egg/tra استفاده شدن؟
-      const withRefs = ids.filter(id => hasRefs(id));
-      const withoutRefs = ids.filter(id => !hasRefs(id));
-
-      let msg = toFa(ids.length) + ' گله حذف شوند؟';
-      // 🆕 هشدار لینک به فاکتور/هچ
-      const withLinks = ids.filter(id => {
+      // 🆕 استاندارد ERP: بررسی وجود هرگونه ارجاع (فاکتور، هچ، یا رویداد)
+      const withRefs = ids.filter(id => {
         const f = flocks.find(x => x.id === id);
-        return !!(f?.sourceInvoiceId || f?.hatchId);
+        return hasRefs(id) || !!(f?.sourceInvoiceId || f?.hatchId);
       });
-      if (withLinks.length > 0) {
-        msg += '\n\n⚠️ ' + toFa(withLinks.length) + ' گله به فاکتور/هچ لینک دارن — با حذف گله، اون سند بدون گله می‌مونه.';
-      }
-      if (withRefs.length > 0) {
-        if (withLinks.length === 0) msg = '';
-        if (withoutRefs.length > 0 && withLinks.length === 0) {
-          msg += toFa(withoutRefs.length) + ' گله بدون ارجاع → حذف می‌شن\n';
+
+      if (ids.length === 1) {
+        // حالت تک‌گله
+        const flock = flocks.find(x => x.id === ids[0]);
+        if (withRefs.length > 0) {
+          await showConfirmAsync(
+            '⛔ حذف کامل مجاز نیست',
+            `گله «${flock?.name || ''}» دارای سابقه (فاکتور، هچ یا ثبت روزانه) است.\n\nطبق استانداردهای سیستم، حذف کامل گله‌های دارای سابقه ممنوع است تا داده‌های مالی و آماری خراب نشوند.\n\nلطفاً از دکمه «آرشیو» برای انتقال آن به بایگانی استفاده کنید.`,
+            { confirmText: 'متوجه شدم', danger: true }
+          );
+          return;
         }
-        msg += toFa(withRefs.length) + ' گله ارجاع دارن (dlg/egg/tra) → حذف با هشدار\n';
-        msg += '\n⚠️ اگه ارجاع‌ها باقی بمونن، آمار اشتباه می‌شه.';
+        const msg = `آیا از حذف کامل گله «${flock?.name || ''}» (بدون هیچ سابقه‌ای) مطمئنید؟ این عمل غیرقابل بازگشت است.`;
+        const ok = await showConfirmAsync('حذف کامل گله', msg, { danger: true, confirmText: 'بله، حذف کن', cancelText: 'انصراف' });
+        if (!ok) return;
+      } else {
+        // حالت چندگله
+        if (withRefs.length > 0) {
+          await showConfirmAsync(
+            '⛔ حذف کامل مجاز نیست',
+            `از ${toFa(ids.length)} گله انتخاب شده، ${toFa(withRefs.length)} گله دارای سابقه (فاکتور، هچ یا ثبت روزانه) هستند.\n\nطبق استانداردهای سیستم، حذف کامل گله‌های دارای سابقه ممنوع است تا داده‌های مالی و آماری خراب نشوند.\n\nلطفاً از دکمه «آرشیو» برای انتقال آن‌ها به بایگانی استفاده کنید.`,
+            { confirmText: 'متوجه شدم', danger: true }
+          );
+          return;
+        }
+        const msg = `آیا از حذف کامل ${toFa(ids.length)} گله خالی (بدون هیچ سابقه‌ای) مطمئنید؟ این عمل غیرقابل بازگشت است.`;
+        const ok = await showConfirmAsync('حذف کامل گله‌های خالی', msg, { danger: true, confirmText: 'بله، حذف کن', cancelText: 'انصراف' });
+        if (!ok) return;
       }
 
-      const ok = await showConfirmAsync('حذف گروهی', msg, { danger: true });
-      if (!ok) return;
       const backups: Flock[] = [];
       for (const id of ids) {
         const fl = flocks.find(x => x.id === id);
