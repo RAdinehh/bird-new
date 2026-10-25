@@ -135,8 +135,6 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
           {wordsText}
         </div>
       )}
-      {error && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {error}</div>}
-      {warn && !error && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠ {warn}</div>}
     </div>
   );
 }
@@ -201,8 +199,6 @@ export function Textarea({ error, warn, style, rows = 2, autoGrow = true, minRow
         lineHeight: 1.55,
         ...style
       }} />
-      {error && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>✕ {error}</div>}
-      {warn && !error && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠ {warn}</div>}
     </div>
   );
 }
