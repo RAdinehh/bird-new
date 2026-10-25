@@ -14,6 +14,11 @@ import { emptyForm as empty, type F } from '../types-invoice';
 import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 
+import { checkHallCapacity } from '../../flk/api/hallCapacity';
+import { useHal } from '../../hal/store';
+import { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
+
+
 // ═══ نقشه استاندارد واحدها (UoM) بر اساس دسته‌بندی ═══
 export type UOMUnit = { value: string; label: string; factor: number | null };
 export const UOM_CATEGORIES: Record<string, { baseUnit: string; units: UOMUnit[]; default: string }> = {
@@ -450,6 +455,41 @@ export function useInvoiceForm(params: {
         try {
           logAction('other', 'tra', `تایید ساخت گله تکراری — ${count} مورد: ${dup.name}`);
         } catch {}
+      }
+    }
+
+    // ═══ 🆕 VALIDATION: چک ظرفیت سالن/بخش (Over-stocking) ═══
+    if (kind === 'purchase') {
+      const flkState = useFlk.getState();
+      const halState = useHal.getState();
+      const breedStd = useBreedStandard(); // فرض بر در دسترس بودن هوک
+
+      for (const it of cleanedItems) {
+        const cat = it.category || form.category;
+        if (cat !== 'chick' && cat !== 'adult') continue;
+        if (it.existingFlockId) continue; // گله موجود هویت خودش را دارد و ظرفیتش قبلاً ثبت شده
+
+        const hallId = it.hallId || '';
+        const zoneId = it.zoneId || '';
+        const newCount = Number(it.healthyCount ?? it.quantity) || 0;
+        
+        if (hallId && newCount > 0) {
+          const capCheck = checkHallCapacity(
+            hallId, zoneId, newCount, 
+            flkState.flocks, halState.halls, halState.zones, 
+            breedStd, undefined, it.breedId
+          );
+
+          if (capCheck && !capCheck.ok) {
+            const scope = capCheck.scope === 'zone' ? `بخش ${capCheck.scopeName}` : `سالن ${capCheck.scopeName}`;
+            const msg = `ظرفیت ${scope} تکمیل است.\n` +
+                        `ظرفیت کل: ${toFa(capCheck.capacity)}\n` +
+                        `استفاده شده: ${toFa(capCheck.current)}\n` +
+                        `بیشبود: ${toFa(capCheck.over)} پرنده`;
+            setErr(msg);
+            return; // جلوگیری از ذخیره
+          }
+        }
       }
     }
 
