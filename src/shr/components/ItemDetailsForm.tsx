@@ -14,6 +14,7 @@ import { typesForCategory } from '../../mod/hal/_equipHelpers';
 import { kindForType } from '../../mod/hal/api/equipmentCalc';
 import { getEquipLabel } from '../../mod/hal/_typedLabels';
 import { HELP } from '../help/helpTexts';
+import { isFieldRequired } from '../validation/fieldRegistry';
 
 export interface ItemDetailFormData {
   id?: string;
@@ -88,8 +89,16 @@ const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
 export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, invoiceDate, sellerSlot, showError, markTouched }: Props) {
   const [hatchOverride, setHatchOverride] = useState(false);
   const itemIndex = 0; // fallback
-  const err = (field: string) => showError?.(`items.${itemIndex}.${field}`);
-  const touch = (field: string) => () => markTouched?.(`items.${itemIndex}.${field}`);
+  const err = (field: string) => {
+    const kind = isPurchase ? 'purchase' : 'sale';
+    if (!isFieldRequired(category, field, kind, item)) return undefined;
+    return showError?.(`items.${itemIndex}.${field}`);
+  };
+  const touch = (field: string) => () => {
+    const kind = isPurchase ? 'purchase' : 'sale';
+    if (!isFieldRequired(category, field, kind, item)) return;
+    markTouched?.(`items.${itemIndex}.${field}`);
+  };
   const { birds, breeds } = useBrd();
   const { halls, zones, equipment: halEquipment = [] } = useHal();
   const { flocks } = useFlk();
@@ -283,7 +292,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۲: مکان --- */}
         {isPurchase && (
           <Grid2>
-            <Field label="سالن مقصد" error={err('hallId')} onTouch={touch('hallId')}>
+            <Field label="سالن مقصد">
               <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
             </Field>
             <Field label="بخش مقصد (اختیاری)">

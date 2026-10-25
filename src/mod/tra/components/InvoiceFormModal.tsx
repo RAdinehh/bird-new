@@ -165,10 +165,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
       
       <Grid2>
-        <Field label="تاریخ فاکتور" required error={showError('date')} onTouch={() => markTouched('date')}>
+        <Field label="تاریخ فاکتور" error={showError('date')} onTouch={() => markTouched('date')}>
           <DatePicker value={form.date} onChange={v => setForm(f => ({ ...f, date: v}))}  autoToday />
         </Field>
-        <Field label="دسته" required error={showError('category')} onTouch={() => markTouched('category')}>
+        <Field label="دسته" error={showError('category')} onTouch={() => markTouched('category')}>
           <Select value={form.category} onChange={e => {
             const newCat = e.target.value;
             const newUnit = getUnitForCategory(newCat);
