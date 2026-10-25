@@ -94,6 +94,36 @@ function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
   }
 }
 
+
+// 🆕 تشخیص خودکار کد واکسن/دارو از نام کالا
+function inferSourceCode(name: string): string {
+  const n = (name || '').toLowerCase();
+  if (/نیوکاسل|newcastle|(^|\W)nd(\W|$)/i.test(n)) return 'ND';
+  if (/برونشیت|bronchitis|(^|\W)ib(\W|$)/i.test(n)) return 'IB';
+  if (/گامبورو|gumboro|(^|\W)ibd(\W|$)/i.test(n)) return 'IBD';
+  if (/آنفلو|آنفولانزا|influenza|(^|\W)ai(\W|$)/i.test(n)) return 'AI';
+  if (/مارک|marek|(^|\W)md(\W|$)/i.test(n)) return 'MD';
+  if (/آبله|fowl\s*pox|(^|\W)fp(\W|$)/i.test(n)) return 'FP';
+  if (/انسه|encephalomyelitis|(^|\W)ae(\W|$)/i.test(n)) return 'AE';
+  if (/eds|کاهش.*تخم/i.test(n)) return 'EDS';
+  if (/mycoplasma|مایکوپلاسما|(^|\W)mg(\W|$)/i.test(n)) return 'MG';
+  if (/coccidiosis|کوکسیدیوز|(^|\W)cocc(\W|$)/i.test(n)) return 'COCC';
+  if (/هپاتیت|hepatitis/i.test(n)) return 'HEP';
+  if (/وبا|cholera/i.test(n)) return 'CHOL';
+  return 'GEN';
+}
+
+// 🆕 تولید شماره بچ استاندارد: CODE-YYYYMMDD-NN
+function generateBatchNo(inv: any, sample: any, whs: any): string {
+  const whsItem = (whs.items || []).find((x: any) => x.id === sample.stockItemId);
+  const sourceCode = whsItem?.sourceCode || inferSourceCode(whsItem?.name || sample.description || '');
+  const datePart = (inv.date || '').replace(/\//g, '').slice(0, 8) || '00000000';
+  const prefix = `${sourceCode}-${datePart}-`;
+  const existing = (whs.movements || []).filter((m: any) => m.batchNo && m.batchNo.startsWith(prefix));
+  const seq = String(existing.length + 1).padStart(2, '0');
+  return `${prefix}${seq}`;
+}
+
 export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
   console.info('[applyInvoiceStock] called:', { type: inv.type, itemsCount: inv.items?.length, categories: inv.items?.map(i => i.category || inv.category) });
   // 🆕 Sale: کاهش موجودی (self-contained)
@@ -221,7 +251,7 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
         
         expiryDate: sample.expiryDate,
         flockId: sample.flockId || '',
-        batchNo: 'B-' + (inv.number || inv.id).slice(-6) + '-' + Date.now().toString().slice(-4),
+        batchNo: sample.batchNo || generateBatchNo(inv, sample, whs),
       } as any);
     } catch (e) {
       console.error('[applyInvoiceStock] addMovement failed:', e);

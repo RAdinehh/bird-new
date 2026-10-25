@@ -33,6 +33,8 @@ export interface Item {
   supplierId: string;
   expireDate: string;
   withdrawalDays: number | null;  // فقط برای دارو
+  /** کد منبع برای شماره بچ خودکار (مثلاً ND برای نیوکاسل) */
+  sourceCode?: string;
   storage: string;                 // fridge | freezer | room
   notes: string;
   // ─── فیلدهای تجهیزات (اختیاری) ───
