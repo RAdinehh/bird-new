@@ -40,12 +40,9 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
     if (typingTimer.current) clearTimeout(typingTimer.current);
   }, []);
   useEffect(() => {
-    if (isTyping) { setShowError(false); return; }
     if (!error) { setShowError(false); return; }
     setShowError(true);
-    const t = setTimeout(() => setShowError(false), autoHideMs);
-    return () => clearTimeout(t);
-  }, [error, autoHideMs, isTyping]);
+  }, [error]);
   useEffect(() => {
     if (isTyping) { setShowWarning(false); return; }
     if (!warning) { setShowWarning(false); return; }
@@ -78,7 +75,13 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
         ) : null}
   {help && <HelpIcon text={help} />}
       </label>
-      {children}
+      <div style={{
+        borderRadius: 'var(--r-md)',
+        boxShadow: showError ? '0 0 0 1.5px var(--danger)' : 'none',
+        transition: 'box-shadow 0.2s ease-in-out',
+      }}>
+        {children}
+      </div>
       {(hint || autoFrom) && (
         <div style={{
           display: 'flex',

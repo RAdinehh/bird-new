@@ -145,7 +145,19 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
     <Modal
       open={open} onClose={() => setOpen(false)}
       title={form.id ? (isPurchase ? 'ویرایش خرید' : 'ویرایش فروش') : (isPurchase ? 'ثبت خرید' : 'ثبت فروش')}
-      footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره فاکتور</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
+      footer={
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', width: '100%' }}>
+          {err && (
+            <div style={{ marginBottom: 'var(--sp-1)' }}>
+              
+            </div>
+          )}
+          <BtnRow>
+            <Btn variant="primary" onClick={save}>ذخیره فاکتور</Btn>
+            <Btn onClick={() => setOpen(false)}>لغو</Btn>
+          </BtnRow>
+        </div>
+      }
     >
       {/* ====== اطلاعات پایه ====== */}
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
@@ -155,7 +167,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <Field label="تاریخ فاکتور" required error={showError('date')} onTouch={() => markTouched('date')}>
           <DatePicker value={form.date} onChange={v => setForm(f => ({ ...f, date: v}))}  autoToday />
         </Field>
-        <Field label="دسته">
+        <Field label="دسته" error={showError('category')} onTouch={() => markTouched('category')}>
           <Select value={form.category} onChange={e => {
             const newCat = e.target.value;
             const newUnit = getUnitForCategory(newCat);
@@ -299,6 +311,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     invoiceDate={form.date}
                     updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
                     isPurchase={isPurchase}
+                    showError={showError}
+                    markTouched={markTouched}
+                    itemIndex={idx}
                   />
                   
 
@@ -321,7 +336,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                               <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                             </Field>
                                                         {(cat === 'chick' || cat === 'adult') && isPurchase && (
-                                                          <Field label="تعداد سالم">
+                                                          <Field label="تعداد سالم" error={showError(`items.${idx}.healthyCount`)} onTouch={() => markTouched(`items.${idx}.healthyCount`)}>
                                                             <NumField placeholder="تعداد" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? toFa(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
                                                           </Field>
                                                         )}
@@ -332,7 +347,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                               <Field label="تعداد">
                                 <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                               </Field>
-                              <Field label="واحد">
+                              <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
                                 <Select value={currentUnit} onChange={e => updateItem(it.id, { unit: e.target.value, unitWeight: null })}>
                                   {uom.units.map((u: UOMUnit) => <option key={u.value} value={u.value}>{u.label}</option>)}
                                 </Select>
@@ -344,7 +359,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                         {(cat === 'chick' || cat === 'adult') && (
   <div style={{ display: (it.quantity || 0) > 0 ? 'contents' : 'none' }}>
     <Grid3>
-      <Field label="نر">
+      <Field label="نر" error={showError(`items.${idx}.maleCount`)} onTouch={() => markTouched(`items.${idx}.maleCount`)}>
         <NumField placeholder="نر" value={it.maleCount != null && it.maleCount > 0 ? toFa(String(it.maleCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
@@ -358,7 +373,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           updateItem(it.id, patch);
         }} min={0} max={it.quantity || undefined} />
       </Field>
-      <Field label="ماده">
+      <Field label="ماده" error={showError(`items.${idx}.femaleCount`)} onTouch={() => markTouched(`items.${idx}.femaleCount`)}>
         <NumField placeholder="ماده" value={it.femaleCount != null && it.femaleCount > 0 ? toFa(String(it.femaleCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
@@ -372,7 +387,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           updateItem(it.id, patch);
         }} min={0} max={it.quantity || undefined} />
       </Field>
-      <Field label="نامشخص" hint="برای جنسیت مخلوط">
+      <Field label="نامشخص" hint="برای جنسیت مخلوط" error={showError(`items.${idx}.unknownCount`)} onTouch={() => markTouched(`items.${idx}.unknownCount`)}>
         <NumField placeholder="نامشخص" value={it.unknownCount != null && it.unknownCount > 0 ? toFa(String(it.unknownCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
@@ -418,7 +433,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                 <Field label={`قیمت هر ${baseUnitLabel}`}>
                                   <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? toFa(String(it.unitPrice)) : ''} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                                 </Field>
-                                <Field label="هزینه حمل این قلم">
+                                <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
                                   <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
                                 </Field>
                               </Grid2>
@@ -460,7 +475,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   })()}
 
                   <Grid2>
-                    <Field label="تخفیف این قلم">
+                    <Field label="تخفیف این قلم" error={showError(`items.${idx}.discountValue`)} onTouch={() => markTouched(`items.${idx}.discountValue`)}>
                       <MoneyField placeholder="مبلغ" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                     </Field>
                     <Field label="مبلغ کل این قلم">
@@ -536,7 +551,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
       
       <Textarea placeholder="توضیحات این فاکتور" rows={3} minRows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value}))} />
-      <ErrorBox>{err}</ErrorBox>
     </Modal>
   );
 }

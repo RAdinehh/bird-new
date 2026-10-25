@@ -72,8 +72,11 @@ interface Props {
   item: ItemDetailFormData;
   updateItem: (patch: Partial<ItemDetailFormData>) => void;
   isPurchase?: boolean;
+  showError?: (path: string) => string | undefined;
+  markTouched?: (path: string) => void;
   invoiceDate?: string;
   sellerSlot?: React.ReactNode;
+itemIndex?: number;
 }
 
 const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
@@ -82,8 +85,11 @@ const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
   </div>
 );
 
-export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, invoiceDate, sellerSlot }: Props) {
+export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, invoiceDate, sellerSlot, showError, markTouched }: Props) {
   const [hatchOverride, setHatchOverride] = useState(false);
+  const itemIndex = 0; // fallback
+  const err = (field: string) => showError?.(`items.${itemIndex}.${field}`);
+  const touch = (field: string) => () => markTouched?.(`items.${itemIndex}.${field}`);
   const { birds, breeds } = useBrd();
   const { halls, zones, equipment: halEquipment = [] } = useHal();
   const { flocks } = useFlk();
@@ -275,7 +281,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۲: مکان --- */}
         {isPurchase && (
           <Grid2>
-            <Field label="سالن مقصد">
+            <Field label="سالن مقصد" error={err('hallId')} onTouch={touch('hallId')}>
               <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
             </Field>
             <Field label="بخش مقصد (اختیاری)">
@@ -400,7 +406,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         {/* --- بخش ۳: وزن و قیمت --- */}
         <Grid2>
-          <Field label="وزن زنده کل (کیلوگرم)" hint="برای محاسبه قیمت">
+          <Field label="وزن زنده کل (کیلوگرم)" hint="برای محاسبه قیمت" error={err('liveWeight')} onTouch={touch('liveWeight')}>
             <Input mode="number" value={item.liveWeight != null && item.liveWeight > 0 ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
           </Field>
           <Field 
@@ -417,7 +423,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۴: فروش (فقط فروش) --- */}
         {!isPurchase && (
           <Grid2>
-            <Field label="دلیل فروش">
+            <Field label="دلیل فروش" error={err('saleReason')} onTouch={touch('saleReason')}>
               <Select value={String(item.saleReason || '')} onChange={e => updateItem({ saleReason: e.target.value })}>
                 <option value="">— انتخاب —</option>
                 <option value="culling">حذف از گله (کالینگ)</option>
@@ -442,7 +448,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="🌾" title="اطلاعات دان" />
-        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "برای افزودن به موجودی" : "برای کاهش از موجودی"} help={isPurchase ? "اگر این کالا از قبل در انبار ثبت شده، از این لیست انتخابش کن تا موجودی به همان کالا اضافه شود (نه کالای تکراری). اگر خالی بگذاری، سیستم به‌طور خودکار یک کالای جدید در انبار می‌سازد." : "کالایی که از انبار کاهش می‌یابد. اگه انتخاب نکنی، سیستم بر اساس نام کالا جستجو می‌کند."}>
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} hint={isPurchase ? "برای افزودن به موجودی" : "برای کاهش از موجودی"} help={isPurchase ? "اگر این کالا از قبل در انبار ثبت شده، از این لیست انتخابش کن تا موجودی به همان کالا اضافه شود (نه کالای تکراری). اگر خالی بگذاری، سیستم به‌طور خودکار یک کالای جدید در انبار می‌سازد." : "کالایی که از انبار کاهش می‌یابد. اگه انتخاب نکنی، سیستم بر اساس نام کالا جستجو می‌کند."}>
           <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
               const wItem = whsItems.find(x => x.id === v);
               updateItem({
@@ -577,7 +583,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="📋" title="اطلاعات هزینه" />
         <Grid2>
           {isPurchase && (
-          <Field label="نوع هزینه" hint="برای گزارش‌های مالی" required>
+          <Field label="نوع هزینه" hint="برای گزارش‌های مالی" required error={err('costType')} onTouch={touch('costType')}>
             <Select value={String(item.costType || '')} onChange={e => updateItem({ costType: e.target.value })}>
               <option value="">— انتخاب —</option>
               <option value="transport">حمل و نقل</option>
