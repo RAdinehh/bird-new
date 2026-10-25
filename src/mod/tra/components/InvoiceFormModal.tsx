@@ -168,7 +168,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         <Field label="تاریخ فاکتور" required error={showError('date')} onTouch={() => markTouched('date')}>
           <DatePicker value={form.date} onChange={v => setForm(f => ({ ...f, date: v}))}  autoToday />
         </Field>
-        <Field label="دسته" error={showError('category')} onTouch={() => markTouched('category')}>
+        <Field label="دسته" required error={showError('category')} onTouch={() => markTouched('category')}>
           <Select value={form.category} onChange={e => {
             const newCat = e.target.value;
             const newUnit = getUnitForCategory(newCat);
@@ -447,7 +447,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           return (
                             <>
                               <Grid2>
-                                <Field label={`قیمت هر ${baseUnitLabel}`} error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
+                                <Field label={`قیمت هر ${baseUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
                                   <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? toFa(String(it.unitPrice)) : ''} onChange={e => {
                                     let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                                     if (maxPrice && val > maxPrice) val = maxPrice;

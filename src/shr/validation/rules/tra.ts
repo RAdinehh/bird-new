@@ -130,6 +130,12 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     if (!d.date || String(d.date).trim() === '') {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('تاریخ فاکتور'), path: ['date'] });
     }
+
+    // 🆕 تاریخ تحویل در پیش‌خرید اجباری است
+    if (d.isPreorder && (!d.deliveryDate || String(d.deliveryDate).trim() === '')) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('تاریخ تحویل'), path: ['deliveryDate'] });
+    }
+    
     // مجموع اقلام = total
     const itemsSum = (d.items || []).reduce((a: number, it: any) => a + (Number(it.total) || 0), 0);
     const expectedTotal = Math.max(0, itemsSum - (d.discount || 0) + (d.shipping || 0));
@@ -248,8 +254,8 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         const itCat = it.category || d.category;
         const p = (f: string) => ['items', String(i), f];
 
-        // ۱. فروش پرنده: گله مبدأ اجباری
-        if (it.birdId && !it.flockId) {
+        // ۱. فروش پرنده، کود و تخم شکسته: گله مبدأ اجباری
+        if ((it.birdId || itCat === 'manure' || itCat === 'broken') && !it.flockId) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.saleFlockRequired(), path: p('flockId') });
         }
 
