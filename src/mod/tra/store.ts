@@ -183,7 +183,7 @@ export const useTra = create<State>()(
         const newPPIds = new Set(syncedPayments.map((p: any) => p.partyPaymentId).filter(Boolean));
         for (const ppId of prevPPIds) {
           if (!newPPIds.has(ppId as string)) {
-            try { get().deletePartyPayment(ppId as string); } catch(e) {}
+            try { get().deletePartyPayment(ppId as string); } catch(e) { console.error('[tra delete] deletePartyPayment failed:', e); }
           }
         }
         for (const p of syncedPayments) {
@@ -295,7 +295,7 @@ export const useTra = create<State>()(
           const flkState = useFlk.getState();
           const linked = flkState.flocks.filter((f: any) => f.sourceInvoiceId === id);
           linked.forEach((f: any) => {
-            try { flkState.update(f.id, { sourceInvoiceId: '', sourceCategory: '' } as any); } catch {}
+            try { flkState.update(f.id, { sourceInvoiceId: '', sourceCategory: '' } as any); } catch (e) { console.error('[tra delete] flock unlink failed:', e); }
           });
           if (linked.length > 0) {
             // Merge info — no separate toast (single notification policy)
@@ -449,15 +449,15 @@ export const useTra = create<State>()(
             const incState = useInc.getState();
             const linkedEntries = (incState.eggEntries || []).filter((e: any) => e.sourceInvoiceId === id);
             for (const entry of linkedEntries) {
-              try { incState.deleteEntry(entry.id); } catch {}
+              try { incState.deleteEntry(entry.id); } catch (e) { console.error('[tra delete] inc.deleteEntry failed:', e); }
             }
-          } catch {}
+          } catch (e) { console.error('[tra delete] inc entries reversal failed:', e); }
       // 🆕 حذف Equipmentهای ساخته‌شده از این فاکتور
       try {
         const halState = useHal.getState();
         const linkedEq = halState.equipment.filter((e: any) => e.sourceInvoiceId === id);
         for (const eq of linkedEq) {
-          try { halState.deleteEquip(eq.id); } catch {}
+          try { halState.deleteEquip(eq.id); } catch (e) { console.error('[tra delete] hal.deleteEquip failed:', e); }
         }
       } catch (e) { console.error('[tra delete] equipment cleanup:', e); }
         }
@@ -497,12 +497,12 @@ export const useTra = create<State>()(
     if (inv) {
           const paymentIds = new Set((inv.payments || []).map((p: any) => p.partyPaymentId).filter(Boolean));
           for (const ppId of paymentIds) {
-            try { get().deletePartyPayment(ppId as string); } catch(e) {}
+            try { get().deletePartyPayment(ppId as string); } catch(e) { console.error('[tra delete] deletePartyPayment failed:', e); }
           }
         }
         set({ invoices: get().invoices.filter(x => x.id !== id) });
-    try { verifyInvariantsIfDev(); } catch(e) {}
-        try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices, get().allocations)); } catch(e) {}
+    try { verifyInvariantsIfDev(); } catch(e) { console.error('[tra delete] verifyInvariantsIfDev failed:', e); }
+        try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices, get().allocations)); } catch(e) { console.error('[tra delete] setPartyCredit failed:', e); }
       },
 
       // ═══ Phase 6: پرداخت‌های طرف حساب ═══

@@ -10,6 +10,8 @@
 94. Guard (Stock Guard for Sale) ✅
 5. Rollback Cascade ✅
 6. Cross-Module Reference ✅
+2. Cascade Fallback ✅
+4. On Delete Cascade ✅ (partial — buy events pending)
 
 ## ⚠️ PARTIAL
 
