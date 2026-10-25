@@ -291,7 +291,8 @@ export const CATEGORIES: Record<InvoiceType, [string, string][]> = {
     ['chick', 'جوجه یک‌روزه'],
     ['adult', 'پرنده بالغ'],
     ['feed', 'دان و مواد اولیه'],
-    ['medicine', 'دارو و واکسن'],
+    ['medicine', 'دارو'],
+    ['vaccine', 'واکسن'],
     ['herbal', 'داروی گیاهی'],
     ['equipment', 'تجهیزات'],
     ['other', 'سایر']

@@ -856,7 +856,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   }
 
   // ========== تخم شکسته (فقط فروش) ==========
-  if (category === 'broken') {
+  if (category === 'broken' && !isPurchase) {
     const brokenItems = (whsItems || []).filter(w =>
       w.category === 'broken' ||
       (w.category === 'egg' && (w.name === 'تخم مصرفی' || w.name === 'تخم شکسته'))
