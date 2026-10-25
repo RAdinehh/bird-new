@@ -400,7 +400,7 @@ export const useTra = create<State>()(
         const eggState = useEgg.getState();
         const linkedSales = (eggState.sales || []).filter((s: any) => s.sourceInvoiceId === id);
         for (const sale of linkedSales) {
-          try { eggState.deleteSale(sale.id); } catch {}
+          try { eggState.deleteSale(sale.id); } catch (e) { console.error('[tra delete] egg.deleteSale failed:', e); }
         }
       } catch (e) { console.error('[tra delete] egg sales reversal:', e); }
 

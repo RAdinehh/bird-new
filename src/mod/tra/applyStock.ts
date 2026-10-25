@@ -179,9 +179,18 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
         continue;
       }
 
+      // 🆕 Stock Guard (concept #94): prevent negative stock
+      const outQty = Math.abs(delta) * uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight);
+      const stockRow = whs.items.find((x: any) => x.id === itemId);
+      const availableStock = Number(stockRow?.currentStock) || 0;
+      if (availableStock < outQty) {
+        const stockName = stockRow?.name || sample.description || 'کالا';
+        throw new Error(`موجودی کافی نیست: ${stockName} — موجودی ${availableStock}، درخواستی ${outQty}`);
+      }
+
       try {
         whs.addMovement({
-          itemId, type: 'out', quantity: Math.abs(delta) * uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight),
+          itemId, type: 'out', quantity: outQty,
           unitPrice: Number(sample.unitPrice) || 0,
           reason: 'sale',
           date: inv.deliveryDate || inv.date || '',
