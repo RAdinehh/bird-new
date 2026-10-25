@@ -538,8 +538,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {nameFieldJsx}
           <SecTitle icon="⚙️" title="انتخاب تجهیز فروشی" />
-
-          {/* ردیف ۱: تجهیز موجود (تمام عرض) */}
           <Field label="تجهیز موجود" required hint="از سالن یا انبار انتخاب کنید">
             <SmartSelect
               value={String(item.equipmentId || '')}
@@ -568,8 +566,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               autoThreshold={6}
             />
           </Field>
-
-          {/* ردیف ۲: پیش‌نمایش (اگر انتخاب شده) */}
           {item.equipmentId && (() => {
             const eq = (halEquipment || []).find(e => e.id === item.equipmentId);
             if (!eq) return null;
@@ -582,17 +578,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               </div>
             );
           })()}
-
           {sellerSlot}
         </div>
       );
     }
 
     return (
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="⚙️" title="اطلاعات تجهیز" />
+        
+        {/* ردیف ۱: دسته + نوع */}
         <Grid2>
           <Field label="دسته تجهیزات" required>
             <SmartSelect
@@ -624,14 +620,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               autoThreshold={4}
             />
           </Field>
-          <Field label="نوع" required>
-            <Select value={String(item.equipmentKind || 'asset')} onChange={e => updateItem({ equipmentKind: e.target.value })}>
-              <option value="asset">🏗️ دارایی (نصب در سالن)</option>
-              <option value="consumable">📦 مصرفی (نگهداری در انبار)</option>
-            </Select>
-          </Field>
-        </Grid2>
-        <Grid2>
           <Field label="نوع تجهیز" required hint={!item.equipmentCategory ? 'اول دسته را انتخاب کنید' : undefined}>
             <SmartSelect
               value={String(item.equipmentType || '')}
@@ -649,6 +637,16 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               disabled={!item.equipmentCategory}
             />
           </Field>
+        </Grid2>
+
+        {/* ردیف ۲: کاربری + وضعیت */}
+        <Grid2>
+          <Field label="کاربری" required>
+            <Select value={String(item.equipmentKind || 'asset')} onChange={e => updateItem({ equipmentKind: e.target.value })}>
+              <option value="asset">🏗️ دارایی (نصب در سالن)</option>
+              <option value="consumable">📦 مصرفی (نگهداری در انبار)</option>
+            </Select>
+          </Field>
           <Field label="وضعیت تجهیز">
             <Select value={String(item.equipmentStatus || 'new')} onChange={e => updateItem({ equipmentStatus: e.target.value })}>
               <option value="new">نو (دست اول)</option>
@@ -657,16 +655,21 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Select>
           </Field>
         </Grid2>
+
+        {/* ردیف ۳: سالن + بخش (فقط برای دارایی) */}
+        {item.equipmentKind === 'asset' && (
+          <Grid2>
+            <Field label="سالن مقصد (اختیاری)" hint="قابل تغییر بعداً در سالن">
+              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
+            </Field>
+            <Field label="بخش مقصد (اختیاری)">
+              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" autoThreshold={6} />
+            </Field>
+          </Grid2>
+        )}
+
+        {/* ردیف ۴: برند + گارانتی */}
         <Grid2>
-          <Field label="سالن مقصد (اختیاری)" hint="قابل تغییر بعداً در سالن">
-            <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" autoThreshold={6} />
-          </Field>
-          <Field label="بخش مقصد (اختیاری)">
-            <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" autoThreshold={6} />
-          </Field>
-        </Grid2>
-        
-                <Grid2>
           <Field label="برند / سازنده">
             <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="پارس، آکو" />
           </Field>
@@ -687,7 +690,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     );
   }
 
-  // ========== داروی گیاهی ==========
   if (category === 'herbal') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
