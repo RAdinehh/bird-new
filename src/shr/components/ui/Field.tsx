@@ -75,13 +75,11 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
         ) : null}
   {help && <HelpIcon text={help} />}
       </label>
-      <div style={{
-        borderRadius: 'var(--r-md)',
-        boxShadow: showError ? '0 0 0 1.5px var(--danger)' : 'none',
-        transition: 'box-shadow 0.2s ease-in-out',
-      }}>
-        {children}
-      </div>
+      {React.isValidElement(children)
+        ? React.cloneElement(children as React.ReactElement<any>, {
+            error: showError ? (typeof error === 'string' ? error : 'error') : undefined,
+          })
+        : children}
       {(hint || autoFrom) && (
         <div style={{
           display: 'flex',
@@ -117,23 +115,6 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
               lineHeight: 1.5,
             }}>{hint}</span>
           )}
-        </div>
-      )}
-      {error && showError && (
-        <div style={{
-          fontSize: 'var(--fs-xs)',
-          color: 'var(--danger)',
-          fontWeight: 600,
-          paddingRight: 2,
-          lineHeight: 1.5,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          gap: 4,
-          textAlign: 'right',
-          width: '100%',
-        }} dir="rtl">
-          <span>{error}</span>
         </div>
       )}
       {!error && warning && (

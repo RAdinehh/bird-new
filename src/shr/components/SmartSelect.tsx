@@ -101,7 +101,7 @@ export default function SmartSelect({
           aria-label={placeholder}
           aria-invalid={!!error}
           aria-required={required}
-          style={{ borderColor, height, fontSize, opacity: disabled ? 0.55 : 1 }}
+          style={{ border: `1px solid ${borderColor}`, height, fontSize, opacity: disabled ? 0.55 : 1 }}
         >
           <option value="">{placeholder}</option>
           {options.map(o => (
@@ -111,11 +111,15 @@ export default function SmartSelect({
             </option>
           ))}
         </Select>
-        {(error || warn) && (
-          <div style={{ fontSize: 'var(--fs-xs)', color: error ? 'var(--danger)' : 'var(--warn)' }}>
-            {error ? `✕ ${error}` : `⚠ ${warn}`}
+        {error ? (
+          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--danger)', fontWeight: 600, marginTop: 4 }}>
+            {error}
           </div>
-        )}
+        ) : warn ? (
+          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 600, marginTop: 4 }}>
+            {warn}
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -179,11 +183,15 @@ export default function SmartSelect({
         </svg>
       </button>
 
-      {(error || warn) && (
-        <div style={{ fontSize: 'var(--fs-xs)', color: error ? 'var(--danger)' : 'var(--warn)' }}>
-          {error ? `✕ ${error}` : `⚠ ${warn}`}
+      {error ? (
+        <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--danger)', fontWeight: 600, marginTop: 4 }}>
+          {error}
         </div>
-      )}
+      ) : warn ? (
+        <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 600, marginTop: 4 }}>
+          {warn}
+        </div>
+      ) : null}
 
       <SelectSheetShell
         open={open}

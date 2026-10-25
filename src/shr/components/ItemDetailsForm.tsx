@@ -153,6 +153,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         'نام کالا / شرح'
       }
       required
+      error={err('description')}
+      onTouch={touch('description')}
     >
       <Input
         placeholder={
@@ -313,10 +315,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         {/* --- بخش ۱: هویت --- */}
         <Grid2>
-          <Field label="نوع پرنده" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
+          <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')} hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
             <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!!item.existingFlockId || (!isPurchase && !item.flockId)} />
           </Field>
-          <Field label="نژاد" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
+          <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')} hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
               const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
               const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);

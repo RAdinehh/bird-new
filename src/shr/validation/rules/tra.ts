@@ -2,6 +2,7 @@
  * validation/rules/tra.ts — فاکتور خرید/فروش
  */
 import { z } from 'zod';
+import { MSG } from '../errorMessages';
 import {
   requiredStr, optionalStr, optionalId, requiredId,
   floatNonNeg, floatPos, persianDateOpt, oneOf,
@@ -21,17 +22,17 @@ export const PaymentSchema = z.object({
 }).superRefine((data, ctx) => {
   const d = data as any;
   if (!d.date || String(d.date).trim() === '') {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'تاریخ پرداخت اجباری است', path: ['date'] });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('تاریخ پرداخت'), path: ['date'] });
   }
   if (d.method === 'check') {
     if (!d.checkNo || d.checkNo.trim().length === 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'شماره چک اجباری است', path: ['checkNo'] });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('شماره چک'), path: ['checkNo'] });
     }
     if (!d.dueDate) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'سرسید چک اجباری است', path: ['dueDate'] });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('سرسید چک'), path: ['dueDate'] });
     }
     if (!d.bank || d.bank.trim().length === 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'نام بانک اجباری است', path: ['bank'] });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('نام بانک'), path: ['bank'] });
     }
   }
 });
@@ -52,7 +53,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       unit: optionalStr(20),
       unitWeight: z.number().min(0).optional().nullable(),
       quantity: floatPos('تعداد', 1_000_000),
-      unitPrice: floatNonNeg('قیمت واحد', 1_000_000_000_000),
+      unitPrice: floatPos('قیمت واحد', 1_000_000_000_000),
       total: floatNonNeg('جمع قلم', 1_000_000_000_000_000),
       itemId: optionalId(),
       movementId: optionalId(),
@@ -127,7 +128,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
   }).superRefine((data, ctx) => {
     const d = data as any;
     if (!d.date || String(d.date).trim() === '') {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'تاریخ فاکتور اجباری است', path: ['date'] });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('تاریخ فاکتور'), path: ['date'] });
     }
     // مجموع اقلام = total
     const itemsSum = (d.items || []).reduce((a: number, it: any) => a + (Number(it.total) || 0), 0);
@@ -135,7 +136,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     if (Math.abs(expectedTotal - d.total) > 100) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `جمع کل (${d.total.toLocaleString('fa-IR')}) با محاسبه اقلام (${expectedTotal.toLocaleString('fa-IR')}) همخوانی ندارد`,
+        message: MSG.totalMismatch(d.total, expectedTotal),
         path: ['total'],
       });
     }
@@ -144,7 +145,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     if (paidSum > d.total) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `مجموع پرداخت‌ها (${paidSum.toLocaleString('fa-IR')}) از جمع کل (${d.total.toLocaleString('fa-IR')}) بیشتر است`,
+        message: MSG.paymentsOverTotal(paidSum, d.total),
         path: ['payments'],
       });
     }
@@ -161,7 +162,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
           if (qty > 0 && (m + fe + u) !== qty) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: `مجموع جنسیت‌ها (${m + fe + u}) با تعداد کل (${qty}) نمی‌خواند`,
+              message: MSG.genderSumMismatch(m + fe + u, qty),
               path: ['items', idx, 'maleCount'],
             });
           }
@@ -181,7 +182,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
           if (qty > 0 && (m + fe + u) !== qty) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: `مجموع جنسیت‌ها (${m + fe + u}) با تعداد کل (${qty}) نمی‌خواند`,
+              message: MSG.genderSumMismatch(m + fe + u, qty),
               path: ['items', idx, 'maleCount'],
             });
           }
@@ -216,7 +217,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         if (!it.birdId) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'انتخاب پرنده برای این دسته اجباری است',
+            message: MSG.birdRequired(),
             path: ['items', String(i), 'birdId'],
           });
         }
@@ -228,15 +229,15 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       const itCat = it.category || d.category;
       if (itCat === 'equipment') {
         if (!it.equipmentCategory) {
-          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'دسته تجهیزات اجباری است', path: ['items', String(i), 'equipmentCategory'] });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.equipmentCategory(), path: ['items', String(i), 'equipmentCategory'] });
         }
         if (!it.equipmentType) {
-          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'نوع تجهیز اجباری است', path: ['items', String(i), 'equipmentType'] });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.equipmentType(), path: ['items', String(i), 'equipmentType'] });
         }
       }
       // ۴. سایر: نوع هزینه اجباری — فقط خرید (در فروش field مخفی است)
       if (itCat === 'other' && d.type === 'purchase' && !it.costType) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'نوع هزینه اجباری است', path: ['items', String(i), 'costType'] });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.costType(), path: ['items', String(i), 'costType'] });
       }
     }
 
@@ -249,28 +250,28 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
 
         // ۱. فروش پرنده: گله مبدأ اجباری
         if (it.birdId && !it.flockId) {
-          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'برای فروش پرنده، انتخاب گله مبدأ اجباری است', path: p('flockId') });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.saleFlockRequired(), path: p('flockId') });
         }
 
         // ۲. adult sale: دلیل فروش اجباری
         if (itCat === 'adult' && !it.saleReason) {
-          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'دلیل فروش برای پرنده بالغ اجباری است', path: p('saleReason') });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.saleReason(), path: p('saleReason') });
         }
 
         // ۳. sale: stockItemId اجباری برای دسته‌های انباری
         const STOCK_NEEDED = ['feed', 'medicine', 'vaccine', 'herbal', 'manure', 'broken'];
         if (STOCK_NEEDED.includes(itCat) && !it.stockItemId) {
-          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'انتخاب کالای انبار برای فروش اجباری است', path: p('stockItemId') });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.stockItem(), path: p('stockItemId') });
         }
 
         // ۴. equipment sale: equipmentId اجباری
         if (itCat === 'equipment' && !it.equipmentId) {
-          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'انتخاب تجهیز موجود برای فروش اجباری است', path: p('equipmentId') });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.equipmentItem(), path: p('equipmentId') });
         }
 
         // ۵. withdrawalDays باید null در sale
         if (it.withdrawalDays != null && Number(it.withdrawalDays) > 0) {
-          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'دوره پرهیز فقط در خرید ثبت می‌شود', path: p('withdrawalDays') });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.withdrawalSale(), path: p('withdrawalDays') });
         }
       }
     }
@@ -279,7 +280,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     for (let i = 0; i < (d.items || []).length; i++) {
       const it = d.items[i];
       if (it.priceUnit === 'perKg' && (it.liveWeight == null || Number(it.liveWeight) <= 0)) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'برای قیمت به ازای کیلوگرم، وزن زنده اجباری است', path: ['items', String(i), 'liveWeight'] });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.liveWeightPerKg(), path: ['items', String(i), 'liveWeight'] });
       }
     }
     
