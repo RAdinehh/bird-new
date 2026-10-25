@@ -132,7 +132,7 @@ export default function DatePicker({
         aria-invalid={!!error}
         style={{
           width: '100%',
-          height,
+          height, boxSizing: 'border-box',
           background: 'var(--input-bg)',
           border: `1px solid ${borderColor}`,
           borderRadius: 'var(--r-md)',
@@ -161,12 +161,6 @@ export default function DatePicker({
           <path d="M16 2v4M8 2v4M3 10h18" />
         </svg>
       </button>
-
-      {(error || warn) && (
-        <div style={{ fontSize: 'var(--fs-xs)', color: error ? 'var(--danger)' : 'var(--warn)', marginTop: 4 }}>
-          {error ? `✕ ${error}` : `⚠ ${warn}`}
-        </div>
-      )}
 
       <Modal
         open={open}
