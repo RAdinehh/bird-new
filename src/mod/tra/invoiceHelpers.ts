@@ -437,7 +437,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
     if (!inv2) return m;
     for (const it of inv2.items || []) {
       if (!it.birdId) continue;
-      if (it.existingFlockId) continue; // 🆕 اتصال دستی
+      if (it.existingFlockId && prev) continue; // 🆕 اتصال دستی: فقط در ویرایش رد کن تا دوبار شمرده نشود، در ایجاد باید تعداد اضافه شود
       const cat = it.category || inv2.category;
       if (!BIRD_CATS.includes(cat)) continue;
       const k = keyOf(cat, it);

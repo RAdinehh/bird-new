@@ -190,14 +190,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت پرنده --- */}
         <Grid2>
           <Field label="نوع پرنده" required>
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
+            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
           </Field>
           <Field label="نژاد" required>
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
               const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
               const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
               return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
-            })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={isPurchase && !!item.existingFlockId} />
+            })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!!item.existingFlockId || (isPurchase && !!item.existingFlockId)} />
             {item.birdId && breedsForBird.length === 0 && (
               <div style={{ color: 'var(--warn)', fontSize: 11, marginTop: 4, fontWeight: 600 }}>
                 ⚠️ این پرنده هنوز نژادی ندارد. ابتدا از بخش «پرنده و نژاد» نژاد تعریف کنید.
@@ -308,14 +308,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت --- */}
         <Grid2>
           <Field label="نوع پرنده" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!isPurchase && !item.flockId} />
+            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!!item.existingFlockId || (!isPurchase && !item.flockId)} />
           </Field>
           <Field label="نژاد" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
             <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
               const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
               const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
               return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
-            })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!item.birdId || (!isPurchase && !!item.flockId)} />
+            })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!!item.existingFlockId || !item.birdId || (!isPurchase && !!item.flockId)} />
           </Field>
         </Grid2>
 
