@@ -13,7 +13,7 @@ const FIELD_LABELS: Record<string, string> = {
   'tra.price_medicine': 'قیمت دارو',
   'tra.price_equipment': 'قیمت تجهیزات',
   'tra.price_other': 'قیمت سایر',
-  'tra.price_broken': 'قیمت اقلام شکسته',
+  'tra.price_broken': 'قیمت تخم شکسته',
   'tra.price_manure': 'قیمت کود',
   'dlg.temperature': 'دمای سالن',
   'dlg.temperatureMin': 'حداقل دما',

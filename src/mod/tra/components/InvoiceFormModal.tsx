@@ -215,7 +215,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
       
       {form.isPreorder && (
-        <Field label="تاریخ تحویل" required>
+        <Field label="تاریخ تحویل" required error={showError('deliveryDate')} onTouch={() => markTouched('deliveryDate')}>
           <DatePicker value={form.deliveryDate} onChange={v => setForm(f => ({ ...f, deliveryDate: v}))}  autoToday />
         </Field>
       )}

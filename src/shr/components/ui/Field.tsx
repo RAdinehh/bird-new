@@ -117,6 +117,20 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
           )}
         </div>
       )}
+      {error && showError && (
+        <div style={{
+          fontSize: 'var(--fs-xs)',
+          color: 'var(--danger)',
+          fontWeight: 600,
+          paddingRight: 2,
+          marginTop: 2,
+          lineHeight: 1.5,
+          textAlign: 'right',
+        }} dir="rtl">
+          {error}
+        </div>
+      )}
+
       {!error && warning && (
         <div style={{
           fontSize: 'var(--fs-xs)',

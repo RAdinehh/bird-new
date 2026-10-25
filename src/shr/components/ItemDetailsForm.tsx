@@ -259,7 +259,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.existingFlockId || '')} onChange={v => updateItem({ existingFlockId: v, flockId: v })} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
           </Field>
         ) : (item.source || 'flock') === 'hatch' ? (
-          <Field label="هچ مبدأ" required hint="هچی که جوجه‌ها از آن آمده">
+          <Field label="هچ مبدأ" required error={err('hatchId')} onTouch={touch('hatchId')} hint="هچی که جوجه‌ها از آن آمده">
             <SmartSelect value={String(item.hatchId || '')} onChange={v => {
               const h = availableHatches.find(x => x.id === v);
               if (!h) return;
@@ -385,8 +385,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
             </Field>
           ) : (
-            <Field label="گله مبدأ" required>
-              <SmartSelect value={String(item.flockId || '')} onChange={v => {
+            <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
+              <SmartSelect value={String(item.flockId || '')} error={err('flockId')} onChange={v => {
                 const f = flocks.find(x => x.id === v);
                 updateItem({ flockId: v, birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: f ? getAgeDays(f) : item.ageDays, hatchDate: f?.hatchDate || item.hatchDate });
               }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
@@ -561,7 +561,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             autoThreshold={6}
           />
         </Field>
-        <Field label="گله مبدأ" hint="گله‌ای که کود از آن تولید شده">
+        <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')} hint="گله‌ای که کود از آن تولید شده">
           <SmartSelect value={String(item.flockId || '')} onChange={v => {
                 const f = flocks.find(x => x.id === v);
                 updateItem({
@@ -616,6 +616,24 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       </div>
     );
   }
+
+// ========== تخم (خرید) و تخم نطفه‌دار (فروش) ==========
+if (category === 'egg' || category === 'fertile_egg') {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {nameFieldJsx}
+      <SecTitle icon="🥚" title="اطلاعات تخم" />
+      <Grid2>
+        <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')}>
+          <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
+        </Field>
+        <Field label="نژاد" error={err('breedId')} onTouch={touch('breedId')}>
+          <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
+        </Field>
+      </Grid2>
+    </div>
+  );
+}
 
   // ========== سایر ==========
   if (category === 'other') {
@@ -695,7 +713,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         {/* ردیف ۱: گله + تاریخ */}
         <Grid2>
-          <Field label="گله مبدأ" required>
+          <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
             <SmartSelect value={String(item.flockId || '')} onChange={v => {
                 const f = flocks.find(x => x.id === v);
                 updateItem({

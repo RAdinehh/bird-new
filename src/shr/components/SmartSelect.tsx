@@ -111,15 +111,6 @@ export default function SmartSelect({
             </option>
           ))}
         </Select>
-        {error ? (
-          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--danger)', fontWeight: 600, marginTop: 4 }}>
-            {error}
-          </div>
-        ) : warn ? (
-          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 600, marginTop: 4 }}>
-            {warn}
-          </div>
-        ) : null}
       </div>
     );
   }
@@ -182,16 +173,6 @@ export default function SmartSelect({
           <path d="m6 9 6 6 6-6" />
         </svg>
       </button>
-
-      {error ? (
-        <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--danger)', fontWeight: 600, marginTop: 4 }}>
-          {error}
-        </div>
-      ) : warn ? (
-        <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 600, marginTop: 4 }}>
-          {warn}
-        </div>
-      ) : null}
 
       <SelectSheetShell
         open={open}

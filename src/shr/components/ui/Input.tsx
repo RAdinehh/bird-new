@@ -119,7 +119,7 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
             flex: '1 1 0%', width: '100%', minWidth: 0,
             background: 'none', border: 'none', outline: 'none',
             color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)',
-            textOverflow: 'ellipsis', ...style
+            textOverflow: 'ellipsis'
           }}
         />
         {unit && <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--dim)', flexShrink: 0 }}>{unit}</span>}
@@ -186,7 +186,8 @@ export function Textarea({ error, warn, style, rows = 2, autoGrow = true, minRow
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
       <textarea ref={ref} rows={rows} {...rest} style={{
-        width: '100%', minWidth: 0,
+
+        ...style,        width: '100%', minWidth: 0,
         background: 'var(--input-bg)',
         border: '1px solid ' + (error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)'),
         borderRadius: 'var(--r-md)', padding: '10px 12px',
@@ -196,8 +197,7 @@ export function Textarea({ error, warn, style, rows = 2, autoGrow = true, minRow
         overflowY: 'hidden',
         transition: 'height .1s',
         boxSizing: 'border-box',
-        lineHeight: 1.55,
-        ...style
+        lineHeight: 1.55
       }} />
     </div>
   );

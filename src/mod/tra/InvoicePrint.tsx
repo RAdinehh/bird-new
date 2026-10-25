@@ -27,7 +27,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
 
   const catLabel = (() => {
     const list = isSale
-      ? [['chick','جوجه'],['egg','تخم خوراکی'],['fertile_egg','تخم نطفه‌دار'],['adult','پرنده بالغ'],['manure','کود'],['feed','دان'],['equipment','وسایل'],['broken','اقلام شکسته'],['other','سایر']]
+      ? [['chick','جوجه'],['egg','تخم خوراکی'],['fertile_egg','تخم نطفه‌دار'],['adult','پرنده بالغ'],['manure','کود'],['feed','دان'],['equipment','وسایل'],['broken','تخم شکسته'],['other','سایر']]
       : [['egg','تخم نطفه‌دار'],['chick','جوجه یک‌روزه'],['adult','پرنده بالغ'],['feed','دان'],['medicine','دارو'],['equipment','تجهیزات'],['other','سایر']];
     return (list.find(x => x[0] === invoice.category) || ['', invoice.category])[1];
   })();

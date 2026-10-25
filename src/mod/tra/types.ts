@@ -304,7 +304,7 @@ export const CATEGORIES: Record<InvoiceType, [string, string][]> = {
     ['manure', 'کود'],
     ['feed', 'دان'],
     ['equipment', 'وسایل و تجهیزات'],
-    ['broken', 'اقلام شکسته'],
+    ['broken', 'تخم شکسته'],
     ['other', 'سایر']
   ]
 };
