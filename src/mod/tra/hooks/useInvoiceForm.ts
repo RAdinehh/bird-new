@@ -458,36 +458,66 @@ export function useInvoiceForm(params: {
       }
     }
 
-    // ═══ 🆕 VALIDATION: چک ظرفیت سالن/بخش (Over-stocking) ═══
+    // ═══ 🆕 VALIDATION: چک ظرفیت سالن/بخش (Over-stocking & Transfer) ═══
     if (kind === 'purchase') {
       const flkState = useFlk.getState();
       const halState = useHal.getState();
-      const breedStd = useBreedStandard(); // فرض بر در دسترس بودن هوک
+      const breedStd = useBreedStandard();
 
       for (const it of cleanedItems) {
         const cat = it.category || form.category;
         if (cat !== 'chick' && cat !== 'adult') continue;
-        if (it.existingFlockId) continue; // گله موجود هویت خودش را دارد و ظرفیتش قبلاً ثبت شده
-
-        const hallId = it.hallId || '';
-        const zoneId = it.zoneId || '';
-        const newCount = Number(it.healthyCount ?? it.quantity) || 0;
         
-        if (hallId && newCount > 0) {
-          const capCheck = checkHallCapacity(
-            hallId, zoneId, newCount, 
-            flkState.flocks, halState.halls, halState.zones, 
-            breedStd, undefined, it.breedId
-          );
+        const newCount = Number(it.healthyCount ?? it.quantity) || 0;
+        if (newCount <= 0) continue;
 
-          if (capCheck && !capCheck.ok) {
-            const scope = capCheck.scope === 'zone' ? `بخش ${capCheck.scopeName}` : `سالن ${capCheck.scopeName}`;
-            const msg = `ظرفیت ${scope} تکمیل است.\n` +
-                        `ظرفیت کل: ${toFa(capCheck.capacity)}\n` +
-                        `استفاده شده: ${toFa(capCheck.current)}\n` +
-                        `بیشبود: ${toFa(capCheck.over)} پرنده`;
-            setErr(msg);
-            return; // جلوگیری از ذخیره
+        if (it.existingFlockId) {
+          // جابه‌جایی یا افزایش گله موجود
+          const f = flkState.flocks.find(x => x.id === it.existingFlockId);
+          if (!f) continue;
+          
+          const targetHallId = it.hallId || f.hallId;
+          const targetZoneId = it.zoneId !== undefined ? it.zoneId : f.zoneId;
+          
+          if (targetHallId) {
+            const totalFutureCount = (f.currentCount || 0) + newCount;
+            const capCheck = checkHallCapacity(
+              targetHallId, targetZoneId, totalFutureCount, 
+              flkState.flocks, halState.halls, halState.zones, 
+              breedStd, it.existingFlockId, it.breedId || f.breedId // excludeFlockId: گله خودش را از ظرفیت قبلی کم می‌کند
+            );
+
+            if (capCheck && !capCheck.ok) {
+              const scope = capCheck.scope === 'zone' ? `بخش ${capCheck.scopeName}` : `سالن ${capCheck.scopeName}`;
+              const msg = `انتقال/افزایش گله به ${scope} ممکن نیست: ظرفیت تکمیل است.\n` +
+                          `ظرفیت کل: ${toFa(capCheck.capacity)}\n` +
+                          `استفاده شده (با احتساب انتقال): ${toFa(capCheck.current)}\n` +
+                          `بیشبود: ${toFa(capCheck.over)} پرنده`;
+              setErr(msg);
+              return;
+            }
+          }
+        } else {
+          // ایجاد گله جدید
+          const hallId = it.hallId || '';
+          const zoneId = it.zoneId || '';
+          
+          if (hallId) {
+            const capCheck = checkHallCapacity(
+              hallId, zoneId, newCount, 
+              flkState.flocks, halState.halls, halState.zones, 
+              breedStd, undefined, it.breedId
+            );
+
+            if (capCheck && !capCheck.ok) {
+              const scope = capCheck.scope === 'zone' ? `بخش ${capCheck.scopeName}` : `سالن ${capCheck.scopeName}`;
+              const msg = `ظرفیت ${scope} تکمیل است.\n` +
+                          `ظرفیت کل: ${toFa(capCheck.capacity)}\n` +
+                          `استفاده شده: ${toFa(capCheck.current)}\n` +
+                          `بیشبود: ${toFa(capCheck.over)} پرنده`;
+              setErr(msg);
+              return;
+            }
           }
         }
       }
