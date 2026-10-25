@@ -332,7 +332,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       <>
                         {isSingleUnit ? (
                           <Grid2>
-                                                        <Field label="تعداد">
+                                                        <Field label="تعداد" error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
                               <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                             </Field>
                                                         {(cat === 'chick' || cat === 'adult') && isPurchase && (
@@ -344,7 +344,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                         ) : (
                           <>
                                                         <Grid2>
-                              <Field label="تعداد">
+                              <Field label="تعداد" error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
                                 <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => updateItem(it.id, { quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} max={getQuantityMax(cat)} />
                               </Field>
                               <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
@@ -430,7 +430,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           return (
                             <>
                               <Grid2>
-                                <Field label={`قیمت هر ${baseUnitLabel}`}>
+                                <Field label={`قیمت هر ${baseUnitLabel}`} error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
                                   <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? toFa(String(it.unitPrice)) : ''} onChange={e => updateItem(it.id, { unitPrice: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
                                 </Field>
                                 <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>

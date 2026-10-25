@@ -195,11 +195,11 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         {/* --- بخش ۱: هویت پرنده --- */}
         <Grid2>
-          <Field label="نوع پرنده" required>
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
+          <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')}>
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
           </Field>
-          <Field label="نژاد" required>
-            <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
+          <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')}>
+            <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
               const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
               const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
               return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
@@ -215,7 +215,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* ردیف ۲: تاریخ هچ + سن */}
         <Grid2>
           {isPurchase ? (
-            <Field label="تاریخ هچ" required>
+            <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')}>
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
@@ -229,7 +229,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               </div>
             </Field>
           ) : (
-            <Field label="تاریخ هچ" required>
+            <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')}>
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
@@ -268,7 +268,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             }} options={availableHatches.map(h => ({ value: h.id, label: `${h.date} — ${h.hatched} جوجه` }))} placeholder="— انتخاب هچ —" modalTitle="انتخاب هچ" autoThreshold={6} />
           </Field>
         ) : (
-          <Field label="گله مبدأ" required hint="گله‌ای که جوجه از آن فروخته می‌شود">
+          <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')} hint="گله‌ای که جوجه از آن فروخته می‌شود">
             <SmartSelect value={String(item.flockId || '')} onChange={v => {
               const f = flocks.find(x => x.id === v);
               const age = computeAgeFromHatch(f?.hatchDate);
@@ -314,10 +314,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت --- */}
         <Grid2>
           <Field label="نوع پرنده" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
-            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!!item.existingFlockId || (!isPurchase && !item.flockId)} />
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!!item.existingFlockId || (!isPurchase && !item.flockId)} />
           </Field>
           <Field label="نژاد" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
-            <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
+            <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
               const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
               const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
               return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
@@ -327,7 +327,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         <Grid2>
           {isPurchase && !item.existingFlockId ? (
-            <Field label="تاریخ هچ" required>
+            <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')}>
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
@@ -341,7 +341,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               </div>
             </Field>
           ) : (
-            <Field label="تاریخ هچ" required>
+            <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')}>
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
@@ -571,6 +571,46 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" autoThreshold={6} />
         </Field>
         {sellerSlot}
+      </div>
+    );
+  }
+
+
+  // ========== تجهیزات ==========
+  if (category === 'equipment') {
+    const EQUIP_CATEGORIES = [
+      { value: 'heating', label: 'گرمایشی' },
+      { value: 'cooling', label: 'سرمایشی' },
+      { value: 'ventilation', label: 'تهویه' },
+      { value: 'feeding', label: 'تغذیه' },
+      { value: 'watering', label: 'آبخوری' },
+      { value: 'lighting', label: 'روشنایی' },
+      { value: 'cage', label: 'قفس و تجهیزات نگهداری' },
+      { value: 'other', label: 'سایر' },
+    ];
+    const EQUIP_TYPES = [
+      { value: 'asset', label: 'دارایی ثابت (Asset)' },
+      { value: 'consumable', label: 'مصرفی (Consumable)' },
+    ];
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {nameFieldJsx}
+        <SecTitle icon="⚙️" title="مشخصات تجهیزات" />
+        <Grid2>
+          <Field label="دسته تجهیزات" required error={err('equipmentCategory')} onTouch={touch('equipmentCategory')}>
+            <Select value={String(item.equipmentCategory || '')} onChange={e => updateItem({ equipmentCategory: e.target.value })}>
+              <option value="">— انتخاب —</option>
+              {EQUIP_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </Select>
+          </Field>
+          <Field label="نوع تجهیز" required error={err('equipmentType')} onTouch={touch('equipmentType')}>
+            <Select value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })}>
+              <option value="">— انتخاب —</option>
+              {EQUIP_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </Select>
+          </Field>
+        </Grid2>
       </div>
     );
   }
