@@ -149,8 +149,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       footer={
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', width: '100%' }}>
           {err && (
-            <div style={{ marginBottom: 'var(--sp-1)' }}>
-              
+            <div style={{ marginBottom: 'var(--sp-1)', padding: '10px 12px', background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, direction: 'rtl' }}>
+              <span aria-hidden="true">⚠</span> <span>{err}</span>
             </div>
           )}
           <BtnRow>
