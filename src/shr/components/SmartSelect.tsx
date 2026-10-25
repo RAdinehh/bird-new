@@ -152,7 +152,7 @@ export default function SmartSelect({
         aria-invalid={!!error}
         aria-required={required}
         style={{
-          width: '100%', height,
+          width: '100%', height, boxSizing: 'border-box',
           textAlign: 'right',
           padding: compact ? '0 10px' : '0 12px',
           background: 'var(--input-bg)',
