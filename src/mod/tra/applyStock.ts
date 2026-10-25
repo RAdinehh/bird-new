@@ -148,12 +148,22 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
     const prevMap = buildMap(prev);
     const newMap = buildMap(inv);
 
-    for (const [key, { qty: newQty, sample }] of newMap) {
-      const prevQty = prevMap.get(key)?.qty || 0;
-      const delta = newQty - prevQty;
-      if (delta <= 0) continue;
+    // 🆕 Phase 1 (#5 Rollback Cascade): collect deltas for ALL keys (incl. removed items)
+    type SaleDelta = { key: string; itemId: string; delta: number; sample: InvoiceItem };
+    const deltas: SaleDelta[] = [];
+    const allKeys = new Set<string>([...prevMap.keys(), ...newMap.keys()]);
 
-      let itemId = String((sample as any).stockItemId || '');
+    for (const key of allKeys) {
+      const prevQty = prevMap.get(key)?.qty || 0;
+      const newQty = newMap.get(key)?.qty || 0;
+      const delta = newQty - prevQty;
+      if (delta === 0) continue;
+
+      const rawSample = newMap.get(key)?.sample ?? prevMap.get(key)?.sample;
+      if (!rawSample) continue;
+      const sample: InvoiceItem = rawSample;
+
+      let itemId = String(sample.stockItemId || '');
       if (itemId && !whs.items.find((x: any) => x.id === itemId)) itemId = '';
       if (!itemId) {
         const name = String(sample.description || sample.model || '').trim();
@@ -163,8 +173,6 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
           x.name === name && (x.category === targetCat || x.category === cat)
         );
         if (existing) itemId = existing.id;
-        // 🆕 Fallback تخم‌مرغ — رفع Phantom
-        // (description تاریخ‌دار مثل «تخم خوراکی - ۱۴۰۵/۰۷/۲۰» با اسم انبار یکی نیست)
         if (!itemId && (cat === 'egg' || cat === 'fertile_egg' || cat === 'broken')) {
           const eggCat = cat === 'broken' ? 'broken' : 'egg';
           const eggItem = whs.items.find((x: any) => x.category === eggCat);
@@ -178,36 +186,63 @@ export function applyInvoiceStock(inv: Invoice, prev?: Invoice): InvoiceItem[] {
         console.warn('[applyInvoiceStock/sale] item not found, skip:', sample.description);
         continue;
       }
+      deltas.push({ key, itemId, delta, sample });
+    }
 
-      // 🆕 Stock Guard (concept #94): prevent negative stock
-      const outQty = Math.abs(delta) * uomFactor(sample.category || inv.category, sample.unit || '', (sample as any).unitWeight);
-      const stockRow = whs.items.find((x: any) => x.id === itemId);
-      const availableStock = Number(stockRow?.currentStock) || 0;
-      if (availableStock < outQty) {
-        const stockName = stockRow?.name || sample.description || 'کالا';
-        throw new Error(`موجودی کافی نیست: ${stockName} — موجودی ${availableStock}، درخواستی ${outQty}`);
+    // 🆕 Phase 2 (#94 Guard): atomic pre-check — sum outgoing per itemId BEFORE any movement
+    const outByItem = new Map<string, number>();
+    for (const d of deltas) {
+      if (d.delta > 0) {
+        const qty = d.delta * uomFactor(d.sample.category || inv.category, d.sample.unit || '', (d.sample as any).unitWeight);
+        outByItem.set(d.itemId, (outByItem.get(d.itemId) || 0) + qty);
       }
+    }
+    for (const [itemId, needed] of outByItem) {
+      const stockRow = whs.items.find((x: any) => x.id === itemId);
+      const available = Number(stockRow?.currentStock) || 0;
+      if (available < needed) {
+        const nm = stockRow?.name || itemId;
+        throw new Error(`موجودی کافی نیست: ${nm} — موجودی ${available}، درخواستی ${needed}`);
+      }
+    }
 
-      try {
+    // 🆕 Phase 3: apply movements — 'out' for +delta, 'in' for -delta (return to stock)
+    const applied: Array<{ itemId: string; reverseType: 'in' | 'out'; qty: number }> = [];
+    try {
+      for (const d of deltas) {
+        const qty = Math.abs(d.delta) * uomFactor(d.sample.category || inv.category, d.sample.unit || '', (d.sample as any).unitWeight);
+        const movementType: 'in' | 'out' = d.delta > 0 ? 'out' : 'in';
         whs.addMovement({
-          itemId, type: 'out', quantity: outQty,
-          unitPrice: Number(sample.unitPrice) || 0,
+          itemId: d.itemId, type: movementType, quantity: qty,
+          unitPrice: Number(d.sample.unitPrice) || 0,
           reason: 'sale',
           date: inv.deliveryDate || inv.date || '',
           partyId: inv.partyId || '',
           notes: `فروش — فاکتور ${inv.number || ''}`,
           sourceModule: 'tra', sourceId: inv.id,
         } as any);
-      } catch (e) {
-        console.error('[applyInvoiceStock/sale] addMovement failed:', e);
-        continue;
-      }
+        applied.push({ itemId: d.itemId, reverseType: movementType === 'out' ? 'in' : 'out', qty });
 
-      for (const it of outItems) {
-        if (isStockItem(it, inv) && stockKey(it) === key) {
-          (it as any).stockItemId = itemId;
+        for (const it of outItems) {
+          if (isStockItem(it, inv) && stockKey(it) === d.key) {
+            (it as any).stockItemId = d.itemId;
+          }
         }
       }
+    } catch (e) {
+      console.error('[applyInvoiceStock/sale] movement failed — rolling back', applied.length, 'movements:', e);
+      for (const a of applied) {
+        try {
+          whs.addMovement({
+            itemId: a.itemId, type: a.reverseType, quantity: a.qty,
+            unitPrice: 0, reason: 'adjustment',
+            date: inv.deliveryDate || inv.date || '',
+            notes: 'rollback بعد از خطا',
+            sourceModule: 'tra', sourceId: inv.id,
+          } as any);
+        } catch (e2) { console.error('[applyInvoiceStock/sale] rollback movement failed:', e2); }
+      }
+      throw e;
     }
 
     return outItems;

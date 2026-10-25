@@ -8,6 +8,7 @@
 ## ✅ DONE (1/205)
 1. Cascade Data ✅
 94. Guard (Stock Guard for Sale) ✅
+5. Rollback Cascade ✅
 
 ## ⚠️ PARTIAL
 
