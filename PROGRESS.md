@@ -9,6 +9,7 @@
 1. Cascade Data ✅
 94. Guard (Stock Guard for Sale) ✅
 5. Rollback Cascade ✅
+6. Cross-Module Reference ✅
 
 ## ⚠️ PARTIAL
 

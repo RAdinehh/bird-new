@@ -70,7 +70,7 @@ export function applyInvoiceEgg(inv: Invoice, prev?: Invoice): InvoiceItem[] {
     // 🆕 rebuild: پاک‌سازی sales قبلی این فاکتور، سپس افزودن مجدد
     const oldSales = egg.sales.filter((x: any) => x.sourceInvoiceId === inv.id);
     for (const s of oldSales) {
-      try { egg.deleteSale(s.id); } catch {}
+      try { egg.deleteSale(s.id); } catch (e) { console.error('[applyInvoiceEgg] deleteSale failed:', e); }
     }
     for (const it of outItems) {
       const cat = it.category || inv.category;

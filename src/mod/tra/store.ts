@@ -57,12 +57,12 @@ export const useTra = create<State>()(
         let items: InvoiceItem[] = newInv.items || [];
         if (!newInv.isPreorder) {
           // 🎯 ۱. اعمال روی گله‌ها (خرید/فروش پرنده)
-          try { items = applyInvoiceFlocks({ ...newInv, items }); } catch(e) {}
+          try { items = applyInvoiceFlocks({ ...newInv, items }); } catch(e) { console.error('[tra add] applyInvoiceFlocks failed:', e); }
           // 🎯 ۲. اتصال تجهیزات به فاکتور
           try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) { console.error('❌ [tra] applyInvoiceEquipment error:', e); }
           // 🎯 ۳. اتصال فروش تخم به ماژول egg
-          try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) {}
-          try { items = applyInvoiceStock({ ...newInv, items }); } catch(e) {}
+          try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) { console.error('[tra add] applyInvoiceEgg failed:', e); }
+          try { items = applyInvoiceStock({ ...newInv, items }); } catch(e) { console.error('[tra add] applyInvoiceStock failed:', e); const _msg = e instanceof Error ? e.message : String(e); showToast('⚠️ فاکتور ذخیره شد ولی حرکت انبار ثبت نشد — ' + _msg, 'error'); }
           // 🎯 ۴. اتصال به انبار از طریق Event Bus (حرکت‌ها + movementId)
           // ✅ آپدیت انبار فقط از طریق applyInvoiceStock انجام می‌شود
         }
@@ -94,7 +94,7 @@ export const useTra = create<State>()(
           });
         }
       } catch(e) { console.error('[addInvoice] alloc:', e); }
-        try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices, get().allocations)); } catch(e) {}
+        try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices, get().allocations)); } catch(e) { console.error('[tra add] setPartyCredit failed:', e); }
         return id;
       },
       updateInvoice: (id, patch) => {
@@ -417,9 +417,7 @@ export const useTra = create<State>()(
           const eq = halState.equipment.find((e: any) => e.id === eqId);
           if (eq) {
             // تجهیز هنوز هست → تعداد رو برگردون
-            try {
-              halState.updateEquip(eqId, { count: (eq.count || 0) + qty } as any);
-            } catch {}
+            try { halState.updateEquip(eqId, { count: (eq.count || 0) + qty } as any); } catch (e) { console.error('[tra delete] hal.updateEquip failed:', e); }
           } else {
             // تجهیز حذف شده بود → بازسازی
             try {
