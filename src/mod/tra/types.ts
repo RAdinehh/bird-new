@@ -111,6 +111,8 @@ export interface InvoiceItem extends ItemCategoryFields {
   chickWeight?: number | null;
   /** تاریخ انقضا دارو/دان (برای انتقال به Movement) */
   expiryDate?: string;
+  /** دوره پرهیز (روز) — برای دارو و واکسن */
+  withdrawalDays?: number | null;
   flockName?: string;
   storage?: string;
   usageType?: string;

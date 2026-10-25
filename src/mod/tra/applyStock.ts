@@ -79,7 +79,7 @@ function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
       minStock: 0, currentStock: 0,
       lastPrice: Number(it.unitPrice) || 0,
       supplierId: inv.partyId || '', expireDate: String(it.expiryDate || ''),
-      withdrawalDays: null,
+      withdrawalDays: Number(it.withdrawalDays) || null,
       storage: String((it as any).storage || 'room'),
       notes: `از فاکتور ${inv.number || ''}`,
       brand: (it as any).brand || '', hallId: (it as any).hallId || '',
