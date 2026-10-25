@@ -124,9 +124,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const allHatches: HatchResult[] = ((incStore as unknown as { hatches?: HatchResult[] }).hatches) || [];
   const availableHatches = allHatches.filter(h => h.generatedFlockId && (h.hatched || 0) > 0);
 
-  const breedsForBird = birds.filter(b => b.id === item.birdId).length
-    ? breeds.filter(b => b.birdId === item.birdId)
-    : breeds;
+  const breedsForBird = item.birdId ? breeds.filter(b => b.birdId === item.birdId) : [];
 
   const activeFlocks = flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }));
   const birdObj = birds.find(b => b.id === item.birdId);
@@ -309,28 +307,16 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         {/* --- بخش ۱: هویت --- */}
         <Grid2>
-          {(isPurchase || item.flockId) ? (
-            <Field label="نوع پرنده" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
-              <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
-            </Field>
-          ) : (
-            <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', fontSize: 'var(--fs-xs)', gap: 4 }}>
-              🔒 ابتدا گله را انتخاب کنید
-            </div>
-          )}
-          {item.birdId ? (
-            <Field label="نژاد" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
-              <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
-                const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
-                const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
-                return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
-              })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!isPurchase && !!item.flockId} />
-            </Field>
-          ) : (
-            <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', fontSize: 'var(--fs-xs)', gap: 4 }}>
-              🔒 ابتدا پرنده را انتخاب کنید
-            </div>
-          )}
+          <Field label="نوع پرنده" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
+            <SmartSelect value={String(item.birdId || '')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!isPurchase && !item.flockId} />
+          </Field>
+          <Field label="نژاد" required hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
+            <SmartSelect value={String(item.breedId || '')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
+              const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
+              const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
+              return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
+            })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!item.birdId || (!isPurchase && !!item.flockId)} />
+          </Field>
         </Grid2>
 
         <Grid2>
