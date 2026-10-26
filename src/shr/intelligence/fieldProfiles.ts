@@ -295,6 +295,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
   'tra.price_other': P('tra.price_other', 'price', 1_000, 5_000_000_000, { structuralBreakAware: true }),
   'tra.price_broken': P('tra.price_broken', 'price', 1_000, 5_000_000, { structuralBreakAware: true }),
   'tra.price_manure': P('tra.price_manure', 'price', 1_000, 5_000_000, { structuralBreakAware: true }),
+  'brd.fcr': P('brd.fcr', 'ratio', 0.5, 5, { expectedFrom: 'species', comparison: 'range' }),
 
   // ══════════════════════════════════════════════════════════════════
   // Q12 — شراکت (۵ فیلد)

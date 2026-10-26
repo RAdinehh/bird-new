@@ -7,6 +7,7 @@ import SourceBadge from '../../shr/components/SourceBadge';
 import OverrideHint from '../../shr/components/OverrideHint';
 import BreedNameField, { type BreedPick } from './BreedNameField';
 import SmartSelect from '../../shr/components/SmartSelect';
+import { FieldHint } from '../../shr/intelligence';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { Btn, BtnRow, Field, Modal, NumField, ErrorBox } from '../../shr/components/ui';
 import { toastMsg } from '../../cor/store/toast';
@@ -244,6 +245,11 @@ export default function BreedForm({ open, onClose, form, setForm, err, showError
           min={0.5} max={5} unit="FCR" autoClamp
         />
         <OverrideHint {...fcrHint} />
+        <FieldHint
+          fieldPath="brd.fcr"
+          value={form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null}
+          context={{ standardKey: form.standardKey }}
+        />
       </Field>
       <ErrorBox>{err}</ErrorBox>
     </Modal>
