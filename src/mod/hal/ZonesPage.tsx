@@ -35,6 +35,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   const draft = useFormDraft('hal-zone', form, (v: typeof form) => setForm(v));
   const [err, setErr] = useState('');
   const [saveAttempted, setSaveAttempted] = useState(false);
+  const [dupError, setDupError] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: Zone | Zone[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -139,9 +140,9 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     setUndoData(null);
   };
 
-  const openNew = () => { setForm({ id:'', hallId: halls[0]?.id || '', name:'', capacity:'', notes:'' }); setErr(''); setSaveAttempted(false); setOpen(true); };
+  const openNew = () => { setForm({ id:'', hallId: halls[0]?.id || '', name:'', capacity:'', notes:'' }); setErr(''); setDupError(null); setSaveAttempted(false); setOpen(true); };
   const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId,
-     name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setSaveAttempted(false); setOpen(true); };
+     name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setDupError(null); setSaveAttempted(false); setOpen(true); };
 
   const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
   const { errors: vErrors } = useValidation(
@@ -271,25 +272,20 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     setSaveAttempted(true);
 
     // 🆕 چک vErrors
-    if (Object.keys(vErrors).length > 0) {
-      const errs = Object.values(vErrors).slice(0, 3).join(' • ');
-      setErr(`لطفاً خطاها را برطرف کنید: ${errs}`);
-      return;
-    }
+    if (Object.keys(vErrors).length > 0) return;   // inline errors shown
 
     // 🔒 جلوگیری قاطع از نام تکراری بخش
     if (!form.id) {
       const _trimmed = form.name.trim();
       const _dup = zones.find((x: Zone) => x.hallId === form.hallId && x.name.trim() === _trimmed);
       if (_dup) {
-        setErr(`بخشی با نام «${_dup.name}» توی این سالن تکراریه`);
+        setDupError(`بخشی با نام «${_dup.name}» توی این سالن تکراریه`);
         return;
       }
     }
 
-    if (crossError) { setErr(crossError); return; }
+    if (crossError) return;   // shown inline in ZoneFormModal
 
-    if (!form.name.trim()) { setErr('نام بخش را وارد کنید'); return; }
     const data = { hallId: form.hallId, name: form.name.trim(), capacity: form.capacity ? parseInt(toEn(form.capacity)) || null : null,
        notes: form.notes.trim() };
     if (form.id) updateZone(form.id, data); else addZone(data);
@@ -430,8 +426,8 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         form={form}
         setForm={setForm}
         err={err}
-        onErrorClear={() => setErr('')}
-        vErrors={saveAttempted ? vErrors : {}}
+        onErrorClear={() => { setErr(''); setDupError(null); }}
+        vErrors={{ ...(saveAttempted ? vErrors : {}), ...(dupError ? { name: dupError } : {}) }}
         crossError={crossError}
         hallCap={hallCapForForm}
         hallRemaining={hallRemainingForForm}

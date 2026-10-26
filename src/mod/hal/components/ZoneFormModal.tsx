@@ -52,7 +52,7 @@ export default function ZoneFormModal({
         </BtnRow>
       }
     >
-      <Field label="سالن" required>
+      <Field label="سالن" required error={vErrors.hallId}>
         <SmartSelect
           value={form.hallId}
           onChange={v => setForm((f) => ({ ...f, hallId: v }))}
@@ -87,7 +87,7 @@ export default function ZoneFormModal({
       })()}
 
       <Grid2>
-        <Field label="نام بخش" required>
+        <Field label="نام بخش" required error={vErrors.name}>
           <Input
             placeholder="الف"
             value={form.name}
@@ -96,6 +96,7 @@ export default function ZoneFormModal({
         </Field>
         <Field
           label="ظرفیت"
+          error={vErrors.capacity || crossError || undefined}
           hint={
             hallCap != null
               ? hallRemaining != null && hallRemaining > 0
@@ -113,15 +114,6 @@ export default function ZoneFormModal({
             max={hallRemaining != null && hallRemaining > 0 ? hallRemaining : 100000}
             autoClamp
           />
-          {crossError && (
-            <div style={{
-              fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700,
-              paddingRight: 4, lineHeight: 1.5, display: 'flex',
-              alignItems: 'center', gap: 4, marginTop: 4,
-            }}>
-              {crossError}
-            </div>
-          )}
         </Field>
       </Grid2>
 
