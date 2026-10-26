@@ -189,6 +189,21 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const save = () => {
     setSaveAttempted(true);
 
+    // 🆕 Zod validation (تمام structural errors)
+    const zodResult = BreedSchema.safeParse({
+      birdId: form.birdId || '',
+      name: form.name || '',
+      fcr: form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null,
+      standardKey: form.standardKey || undefined,
+      purposes: form.purposes || [],
+    });
+
+    if (!zodResult.success) {
+      // خطاهای ساختاری از طریق useValidation و Field نمایش داده می‌شوند
+      // (ErrorBox فقط برای business logic است)
+      return;
+    }
+
     // 🔒 جلوگیری از نژاد تکراری (نام + هدف یکسان)
     if (!form.id) {
       const _trimmed = form.name.trim();
@@ -205,7 +220,6 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       }
     }
 
-    if (!form.name.trim()) { setErr('نام نژاد را وارد کنید'); return; }
 
     // 🆕 چک: نام باید با یک استاندارد match کنه (با احتساب overrides)
     const baseStandards: Record<string, any> = {};
