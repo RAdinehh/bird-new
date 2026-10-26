@@ -17,7 +17,6 @@ import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
 type BreedStd = ReturnType<typeof useBreedStandard>;
 import type { F } from '../types-flocks';
 import { emptyForm } from '../types-flocks';
-import { todayJ } from '../api/flocksCalc';
 
 export interface UseFlocksFormParams {
   birds: Bird[];
@@ -124,12 +123,7 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
 
     // 🆕 تعداد اولیه > ۰
 
-    const today = todayJ();
-    if (form.startDate.trim() && form.startDate > today) {
-      setErr('تاریخ شروع نگهداری نمی‌تواند در آینده باشد');
-      return;
-    }
-// 🆕 breeder: male + female > initial (block) — موجود
+    // 🆕 breeder: male + female > initial (block) — موجود
     // ⚠️ warning برای < initial در UI هست، اینجا بلاک نمی‌کنیم
 
     // 🆕 Backfill birdId/breedId from source invoice if empty

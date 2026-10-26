@@ -13,6 +13,7 @@
  * - FCR بین 1.0-5.0 (اگه پر شده)
  */
 import { z } from 'zod';
+import { format as formatJ } from 'date-fns-jalali';
 import {
   intPos, intNonNeg, intRange, floatNonNeg, floatRange,
   persianDatePast, persianDateOpt, requiredId, optionalId,
@@ -199,11 +200,8 @@ export function createFlkSchema(context: ValidationContext = {}) {
       });
     }
 
-    // تاریخ هچ در آینده نباشد
-    const today = (() => {
-      const dt = new Date();
-      return `${dt.getFullYear()}/${String(dt.getMonth() + 1).padStart(2, '0')}/${String(dt.getDate()).padStart(2, '0')}`;
-    })();
+    // تاریخ‌ها در آینده نباشند (Jalali comparison — fix: بود Gregorian)
+    const today = formatJ(new Date(), 'yyyy/MM/dd');
     if (d.hatchDate && d.hatchDate > today) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -216,6 +214,13 @@ export function createFlkSchema(context: ValidationContext = {}) {
         code: z.ZodIssueCode.custom,
         message: 'تاریخ خرید نمی‌تواند در آینده باشد',
         path: ['purchaseDate'],
+      });
+    }
+    if (d.startDate && d.startDate > today) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'تاریخ شروع نگهداری نمی‌تواند در آینده باشد',
+        path: ['startDate'],
       });
     }
 

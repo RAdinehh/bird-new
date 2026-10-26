@@ -362,11 +362,10 @@ export default function FlocksPage() {
         onSave={async () => {
           attemptSave();
 
-          // 🆕 بلاک قاطع: اگه vErrors داشت، ذخیره نکن
-          const errorKeys = Object.keys(vErrors);
-          if (errorKeys.length > 0) {
-            const firstErrors = errorKeys.slice(0, 2).map(k => vErrors[k]).join(' · ');
-            setErr(`لطفاً خطاها را برطرف کنید: ${firstErrors}`);
+          // 🆕 خطاهای Zod به صورت inline نمایش داده می‌شن — فقط ذخیره رو بلاک کن
+          // (کتاب قواعد، Anti-pattern #1 و #2: setErr + Zod همزمان نکن)
+          if (Object.keys(vErrors).length > 0) {
+            setErr('');
             return;
           }
 
