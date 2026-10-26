@@ -47,12 +47,18 @@ export interface Signal {
   detail: string;
 }
 
+export type ExpectedSourceKind = 'context' | 'cross_field' | 'pattern' | 'history';
+
 export interface Warning {
   level: AlertLevel;
   field: string;
   value: number;
   reason: string;
   expected?: number;
+  /** منبع مقدار مقایسه (برای متن دقیق در formatWarning) */
+  expectedSource?: ExpectedSourceKind;
+  /** برچسب دقیق منبع (مثلاً «استاندارد راس ۳۰۸») */
+  expectedLabel?: string;
   signals: Signal[];
 }
 
@@ -73,6 +79,10 @@ export interface AnalysisContext {
   /** برای مقایسه deviation (مثلاً partnerPercent) */
   userPatternMean?: number;
   userPatternStd?: number;
+  /** 🆕 منبع مقدار expected — برای متن دقیق */
+  expectedSource?: ExpectedSourceKind;
+  /** 🆕 برچسب منبع (مثلاً «استاندارد راس ۳۰۸») */
+  expectedLabel?: string;
   [key: string]: unknown;
 }
 

@@ -216,13 +216,20 @@ export function formatWarning(w: Warning): string {
         ? `${label} ${fmtNum(pct)}٪ بیشتر از استاندارد نژاد است`
         : `${label} ${fmtNum(pct)}٪ کمتر از استاندارد نژاد است`;
     }
+    // 🆕 تشخیص منبع برای متن دقیق (استاندارد نژاد / تاریخچه / cross-field / ...)
+    const sourceLabel = w.expectedLabel
+      ?? (w.expectedSource === 'context' ? 'مقدار مرجع'
+        : w.expectedSource === 'cross_field' ? crossFieldLabel(profile?.crossFieldRule)
+        : w.expectedSource === 'pattern' ? 'الگوی همیشگی شما'
+        : 'میانگین قبلی شما');
+    
     const ratio = value / expected;
     if (ratio >= 1) {
-      if (ratio >= 1.5) return `${label} ${fmtMult(ratio)} برابر میانگین همیشگی شماست`;
-      return `${label} ${fmtNum(Math.round((ratio - 1) * 100))}٪ بیشتر از میانگین قبلی شماست`;
+      if (ratio >= 1.5) return `${label} ${fmtMult(ratio)} برابر ${sourceLabel} است`;
+      return `${label} ${fmtNum(Math.round((ratio - 1) * 100))}٪ بیشتر از ${sourceLabel} است`;
     }
     const pctDown = Math.round((1 - ratio) * 100);
-    return `${label} ${fmtNum(pctDown)}٪ کمتر از میانگین قبلی شماست`;
+    return `${label} ${fmtNum(pctDown)}٪ کمتر از ${sourceLabel} است`;
   }
 
   // ═══ ۵. محدوده زیستی ═══

@@ -255,12 +255,26 @@ export function analyzeAnomaly(
   const level = decideLevel(signals, hist?.stats?.cv ?? null);
   if (!level) return null;
 
+  // 🆕 تشخیص منبع expected (برای متن دقیق در formatWarning)
+  let expectedSource: 'context' | 'cross_field' | 'pattern' | 'history' = 'history';
+  if (context.expectedSource) {
+    expectedSource = context.expectedSource;
+  } else if (typeof context.expected === 'number' && Number.isFinite(context.expected)) {
+    expectedSource = 'context';
+  } else if (profile.expectedFrom === 'cross_field' && profile.crossFieldRule) {
+    expectedSource = 'cross_field';
+  } else if (profile.expectedFrom === 'user_pattern') {
+    expectedSource = 'pattern';
+  }
+
   return {
     level,
     field: fieldPath,
     value,
     reason: signals[0]?.detail ?? 'ناهنجاری تشخیص داده شد',
     expected: expected ?? undefined,
+    expectedSource,
+    expectedLabel: context.expectedLabel,
     signals,
   };
 }
