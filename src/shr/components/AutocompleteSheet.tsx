@@ -36,6 +36,8 @@ interface Props {
   actionValues?: string[];
   /** 🆕 مخفی کردن بخش «افزودن دلخواه» */
   hideCustom?: boolean;
+  /** 🆕 مخفی کردن متن خطای داخلی — وقتی داخل <Field> است */
+  hideInternalError?: boolean;
 }
 
 const INITIAL_COUNT = 5;
@@ -46,6 +48,7 @@ export default function AutocompleteSheet({
   value, onChange, onSelect, onSubmit,
   options, placeholder, customLabel = 'افزودن مورد دلخواه',
   error, title = 'انتخاب کنید', emptyMessage, emptyHint, actionValues = [], hideCustom = false,
+  hideInternalError = false,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');
@@ -121,7 +124,7 @@ export default function AutocompleteSheet({
         display: 'flex', alignItems: 'stretch', width: '100%', minWidth: 0, maxWidth: '100%',
         position: 'relative',
         background: 'var(--input-bg)',
-        border: `1px solid ${typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--warn)' : 'var(--border)'}`,
+        border: `1px solid ${typedError ? 'var(--warn)' : matched ? 'var(--accent)' : error ? 'var(--danger)' : 'var(--border)'}`,
         borderRadius: 'var(--r-md, 8px)',
         transition: 'border-color .15s ease',
       }}>
@@ -207,9 +210,14 @@ export default function AutocompleteSheet({
         </button>
       </div>
 
-      {(error || typedError) && (
+      {typedError && (
         <div style={{ marginTop: 4, fontSize: 11, color: 'var(--warn)', display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span>⚠️</span> {typedError || error}
+          <span>⚠️</span> {typedError}
+        </div>
+      )}
+      {!hideInternalError && error && !typedError && (
+        <div style={{ marginTop: 4, fontSize: 11, color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span>✕</span> {error}
         </div>
       )}
 

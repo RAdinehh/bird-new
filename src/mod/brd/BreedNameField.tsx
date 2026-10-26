@@ -37,6 +37,8 @@ interface Props {
   customStandards?: Record<string, any>;
   /** 🆕 ویرایش‌های Diff-based */
   customOverrides?: Record<string, any>;
+  /** 🆕 مخفی کردن متن خطای داخلی */
+  hideInternalError?: boolean;
 }
 
 // ═══ گروه‌بندی بر اساس دسته‌بندی ═══
@@ -52,7 +54,7 @@ const KIND_EMOJI: Record<string, string> = {
 
 export default function BreedNameField({
   value, onChange, onPick, error, excludeNames = [],
-  parentBirdName, parentKind, customStandards = {}, customOverrides = {},
+  parentBirdName, parentKind, customStandards = {}, customOverrides = {}, hideInternalError = false,
 }: Props) {
   const navigate = useNavigate();
   const [notFound, setNotFound] = useState<string | null>(null);
@@ -257,6 +259,7 @@ export default function BreedNameField({
       placeholder={parentBirdName ? `نژاد ${parentBirdName}...` : 'مثلاً — لوهمن یا مرندی'}
       title={title}
       error={error}
+      hideInternalError={hideInternalError}
       emptyMessage={emptyMessage}
       emptyHint={emptyHint}
     />

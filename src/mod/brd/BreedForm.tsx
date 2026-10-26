@@ -207,6 +207,7 @@ export default function BreedForm({
             render={({ field }) => (
               <BreedNameField
                 error={errors.name?.message}
+                hideInternalError
                 value={field.value}
                 onChange={(v) => {
                   field.onChange(v);
