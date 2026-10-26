@@ -246,10 +246,10 @@ export function analyzeAnomaly(
     }
   }
 
-  // ═══ ۴. اگر structural break → وزن‌ها را کاهش بده ═══
-  if (profile.structuralBreakAware && hist?.stats?.structuralBreak) {
-    signals.forEach(s => { s.weight *= 0.3; });
-  }
+  // ═══ ۴. Structural Break (تورم) — استاندارد SAP ═══
+  // استاندارد (expected) در بلوک بالاتر به recentMean به‌روز شده است.
+  // نیازی به کاهش وزن سیگنال‌ها نیست — هشدارها با استاندارد جدید سنجیده می‌شوند.
+  // (کاهش × ۰.۳ باعث over-suppression و رفتار ناهماهنگ می‌شد)
 
   // ═══ ۵. تصمیم نهایی ═══
   const level = decideLevel(signals, hist?.stats?.cv ?? null);

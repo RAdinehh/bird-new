@@ -1,5 +1,11 @@
 /**
- * intelligence/formatWarning.ts — پیام کوتاه طبیعی
+ * intelligence/formatWarning.ts — پیام‌های استاندارد GOV.UK
+ *
+ * اصول:
+ *   - کوتاه (۳۰–۷۰ کاراکتر)
+ *   - دقیق (شامل عدد در صورت امکان)
+ *   - مثبت و قابل اقدام
+ *   - مقایسه با "میانگین شما" (مالکیت‌دار)
  */
 import type { Warning } from './types';
 import { getProfile } from './fieldProfiles';
@@ -64,10 +70,8 @@ const FIELD_LABELS: Record<string, string> = {
   'egg.softCount': 'تخم نرم',
   'egg.dirtyCount': 'تخم کثیف',
   'egg.avgWeight': 'وزن تخم',
-  // ─── رطوبت ───
   'dlg.humidityMin': 'حداقل رطوبت',
   'dlg.humidityMax': 'حداکثر رطوبت',
-  // ─── دان ───
   'feed.unitPrice': 'قیمت واحد دان',
   'feed.protein': 'پروتئین دان',
   'feed.fat': 'چربی دان',
@@ -81,15 +85,12 @@ const FIELD_LABELS: Record<string, string> = {
   'feed.perBirdGramsPerDay': 'مصرف روزانه هر پرنده',
   'feed.bagWeight': 'وزن کیسه',
   'feed.bagCount': 'تعداد کیسه',
-  // ─── گله (شاخص) ───
   'flk.fcr': 'ضریب تبدیل',
   'flk.adg': 'افزایش وزن روزانه',
-  // ─── تخم (درصد) ───
   'egg.hatchOfTotal': 'درصد هچ از کل',
   'egg.hatchOfFertile': 'درصد هچ از نطفه‌دار',
   'egg.chickYieldPercent': 'درصد جوجه‌دهی',
   'egg.henDayPercent': 'درصد تخم‌گذاری',
-  // ─── whs (انبار) ───
   'whs.qty_kg': 'مقدار (کیلوگرم)',
   'whs.qty_g': 'مقدار (گرم)',
   'whs.qty_L': 'مقدار (لیتر)',
@@ -175,58 +176,70 @@ export function formatWarning(w: Warning): string {
   const profile = getProfile(field);
   const kind = profile?.kind ?? 'count';
 
+  // ═══ ۱. سقف و کف سخت ═══
   if (signals.some(s => s.type === 'hard_min')) {
-    return `${label} کمتر از حداقل مجاز`;
+    const minVal = typeof profile?.hardMin === 'number' ? ` (${fmtNum(profile.hardMin)})` : '';
+    return `${label} از حداقل مجاز${minVal} کمتر است`;
   }
   if (signals.some(s => s.type === 'hard_max')) {
-    return `${label} بالاتر از سقف مجاز`;
+    const maxVal = typeof profile?.hardMax === 'number' ? ` (${fmtNum(profile.hardMax)})` : '';
+    return `${label} از سقف مجاز${maxVal} بیشتر است`;
   }
+
+  // ═══ ۲. بیش از موجودی/ظرفیت ═══
   if (signals.some(s => s.type === 'cross_absolute') && expected !== undefined) {
-    return `${label} بیش از ${crossFieldLabel(profile?.crossFieldRule)}`;
+    return `${label} از ${crossFieldLabel(profile?.crossFieldRule)} (${fmtNum(expected)}) بیشتر است`;
   }
 
-  // pattern باید قبل از ratio چک بشه (چون هر دو expected دارن)
+  // ═══ ۳. الگوی نامعمول (pattern) ═══
   if (signals.some(s => s.type === 'pattern')) {
-    return `${label} غیرمعمول — الگوی همیشگی نیست`;
+    return `${label} با الگوی همیشگی شما تفاوت دارد`;
   }
 
+  // ═══ ۴. مقایسه با expected (ratio) ═══
   if (expected !== undefined && expected > 0) {
     if (kind === 'temperature') {
       const diff = Math.round(value - expected);
       return diff > 0
-        ? `${label} ${fmtNum(diff)} درجه بالاتر از هدف`
-        : `${label} ${fmtNum(-diff)} درجه پایین‌تر از هدف`;
+        ? `${label} ${fmtNum(diff)} درجه از هدف (${fmtNum(expected)}) بالاتر است`
+        : `${label} ${fmtNum(-diff)} درجه از هدف (${fmtNum(expected)}) پایین‌تر است`;
     }
     if (kind === 'humidity') {
       const diff = Math.round(value - expected);
       return diff > 0
-        ? `${label} ${fmtNum(diff)}٪ بالاتر از هدف`
-        : `${label} ${fmtNum(-diff)}٪ پایین‌تر از هدف`;
+        ? `${label} ${fmtNum(diff)}٪ از هدف (${fmtNum(expected)}٪) بالاتر است`
+        : `${label} ${fmtNum(-diff)}٪ از هدف (${fmtNum(expected)}٪) پایین‌تر است`;
     }
     if (kind === 'weight') {
       const pct = Math.round(Math.abs(1 - value / expected) * 100);
       return value > expected
-        ? `${label} ${fmtNum(pct)}٪ بیشتر از استاندارد`
-        : `${label} ${fmtNum(pct)}٪ کمتر از استاندارد`;
+        ? `${label} ${fmtNum(pct)}٪ بیشتر از استاندارد نژاد است`
+        : `${label} ${fmtNum(pct)}٪ کمتر از استاندارد نژاد است`;
     }
     const ratio = value / expected;
     if (ratio >= 1) {
-      if (ratio >= 1.5) return `${label} ${fmtMult(ratio)} برابر شده`;
-      return `${label} ${fmtNum(Math.round((ratio - 1) * 100))}٪ بیشتر شده`;
+      if (ratio >= 1.5) return `${label} ${fmtMult(ratio)} برابر میانگین همیشگی شماست`;
+      return `${label} ${fmtNum(Math.round((ratio - 1) * 100))}٪ بیشتر از میانگین قبلی شماست`;
     }
     const pctDown = Math.round((1 - ratio) * 100);
-    return `${label} ${fmtNum(pctDown)}٪ کمتر شده`;
+    return `${label} ${fmtNum(pctDown)}٪ کمتر از میانگین قبلی شماست`;
   }
 
+  // ═══ ۵. محدوده زیستی ═══
   if (signals.some(s => s.type === 'biological') && profile?.biologicalRange) {
-    return `${label} بیرون از محدوده زیستی`;
-  }
-  if (signals.some(s => s.type === 'zscore')) {
-    return `${label} غیرعادی`;
-  }
-  if (signals.some(s => s.type === 'iqr')) {
-    return `${label} خارج از محدوده رایج`;
+    return `${label} خارج از محدوده طبیعی است`;
   }
 
-  return `${label} غیرعادی`;
+  // ═══ ۶. Z-Score ═══
+  if (signals.some(s => s.type === 'zscore')) {
+    return `این مقدار با ثبت‌های قبلی شما تفاوت چشمگیری دارد`;
+  }
+
+  // ═══ ۷. IQR ═══
+  if (signals.some(s => s.type === 'iqr')) {
+    return `این مقدار خارج از محدوده معمول شماست`;
+  }
+
+  // ═══ ۸. Fallback ═══
+  return `${label} نیاز به بررسی دارد`;
 }

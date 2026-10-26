@@ -229,7 +229,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="1405/07/26" autoToday />
+              }} placeholder="1405/07/26" />
             </Field>
           ) : (item.flockId || item.hatchId) && !hatchOverride ? (
             <Field label="تاریخ هچ (قفل)">
@@ -243,7 +243,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="1405/07/26" autoToday />
+              }} placeholder="1405/07/26" />
             </Field>
           )}
           <Field label="سن (روز)" hint="تاریخ هچ خودکار محاسبه می‌شود">
@@ -341,7 +341,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="1405/07/26" autoToday />
+              }} placeholder="1405/07/26" />
             </Field>
           ) : item.existingFlockId ? (
             <Field label="تاریخ هچ (قفل از گله)">
@@ -355,7 +355,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="1405/07/26" autoToday />
+              }} placeholder="1405/07/26" />
             </Field>
           )}
           <Field label="سن (روز)" hint="تاریخ هچ خودکار محاسبه می‌شود">

@@ -235,6 +235,12 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const markTouched = (f: string) => setTouchedFields((prev) => { const n = new Set(prev); n.add(f); return n; });
   const showError = (f: string) => (saveAttempted || touchedFields.has(f)) ? vErrors[f] : undefined;
 
+  // 🆕 ریست خطاها هنگام تغییر دسته (تا ذخیره زده نشده، فرم تمیز است)
+  useEffect(() => {
+    setSaveAttempted(false);
+    setTouchedFields(new Set());
+  }, [form.category]);
+
   const doTransfer = () => {
     if (!transferModal) return;
     const inv = invoices.find(i => i.id === transferModal.id);
