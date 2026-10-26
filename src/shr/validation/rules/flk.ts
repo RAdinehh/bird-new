@@ -174,6 +174,20 @@ export function createFlkSchema(context: ValidationContext = {}) {
       }
     }
 
+    // ═══ چک تناسب نژاد با نوع گله (سطح ۴: Conditional) ═══
+    const breeds = (context as any).breeds as Array<{ id: string; name: string; purposes?: string[] }> | undefined;
+    if (d.breedId && breeds) {
+      const breed = breeds.find(b => b.id === d.breedId);
+      if (breed?.purposes && breed.purposes.length > 0 && !breed.purposes.includes(d.type)) {
+        const purposeLabels: Record<string, string> = { layer: 'تخم‌گذار', broiler: 'گوشتی', breeder: 'مادر', ornamental: 'تزئینی' };
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `نژاد «${breed.name}» برای «${purposeLabels[d.type] || d.type}» مناسب نیست`,
+          path: ['breedId'],
+        });
+      }
+    }
+
     // ═══ تاریخ‌ها ترتیب منطقی ═══
     // هچ ≤ خرید
     if (d.hatchDate && d.purchaseDate && d.hatchDate > d.purchaseDate) {

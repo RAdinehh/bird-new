@@ -8,7 +8,6 @@ import { logAction } from '../../../cor/logger/auditLog';
 import { recordHistory } from '../../../shr/intelligence';
 import { DEFAULT_LAYING_START } from '../store';
 import type { Flock } from '../store';
-import { useBrd } from '../../brd/store';
 import { useTra } from '../../tra/store';
 import type { Bird, Breed } from '../../brd/store';
 import type { Hall } from '../../hal/store';
@@ -105,20 +104,7 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
 
 
 
-    if (form.breedId) {
-      const allBreeds = useBrd.getState().breeds;
-      const breed = allBreeds.find((b: Breed) => b.id === form.breedId);
-      if (breed?.purposes && breed.purposes.length > 0) {
-        if (!breed.purposes.includes(form.type)) {
-          const purposeLabels: Record<string, string> = { layer: 'تخم‌گذار', broiler: 'گوشتی', breeder: 'مادر', ornamental: 'تزئینی' };
-          setErr(
-            'نژاد «' + breed.name + '» برای «' + (purposeLabels[form.type] || form.type) + '» مناسب نیست. ' +
-            '(مناسب برای: ' + breed.purposes.map((p: string) => purposeLabels[p] || p).join('، ') + ')'
-          );
-          return;
-        }
-      }
-    }
+    // breed/purpose mismatch به Zod منتقل شد (rules/flk.ts superRefine)
     // 🆕 Deal validation
 
     // 🆕 تعداد اولیه > ۰

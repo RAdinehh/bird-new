@@ -89,8 +89,8 @@ export default function FlocksPage() {
 
   // ─── schema memo ───
   const flkSchema = useMemo(
-    () => createFlkSchema({ existingNames }),
-    [existingNames],
+    () => createFlkSchema({ existingNames, breeds }),
+    [existingNames, breeds],
   );
 
   // ─── validation ───
