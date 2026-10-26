@@ -1,8 +1,8 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- بخش: tra (فروش - Sale)
-- وضعیت: منطق و گاردهای موجودی تایید شد
+- بخش: hal (سالن)
+- وضعیت: شروع فاز ۶
 - فاز: verify
 
 ## ✅ DONE (1/205)
@@ -12,6 +12,13 @@
 6. Cross-Module Reference ✅
 2. Cascade Fallback ✅
 4. On Delete Cascade ✅ (partial — buy events pending)
+38. Zod Schema (BirdSchema + BreedSchema) ✅
+39. useValidation Hook (in brd, via useFormErrors) ✅
+40. Per-Field Validation ✅
+41. showError ✅
+42. markTouched ✅
+50. Save Attempt Validation ✅
+52. Inline Error ✅
 
 ## ⚠️ PARTIAL
 
