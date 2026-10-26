@@ -147,22 +147,6 @@ export function useInvoiceForm(params: {
   const [form, setForm] = useState<F>(empty(isPurchase));
   const [err, setErr] = useState('');
 
-  // ─── Draft auto-save (فقط برای form جدید) ───
-  const draftKey = `tra-draft-${kind}`;
-  useEffect(() => {
-    if (!open || form.id) return;
-    // فقط اگه چیز meaningful هست
-    const hasContent =
-      (form.items && form.items.length > 0) ||
-      form.partyId ||
-      form.notes;
-    if (!hasContent) return;
-
-    const timer = setTimeout(() => {
-      try { localStorage.setItem(draftKey, JSON.stringify(form)); } catch {}
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [form, open, draftKey]);
 
   // محاسبه‌ی parties بر اساس form.category
   const parties = (() => {
@@ -274,31 +258,10 @@ export function useInvoiceForm(params: {
   const openNew = () => {
     if (parties.length === 0) { toastMsg.error(isPurchase ? 'اول یک فروشنده بسازید' : 'اول یک مشتری بسازید'); return; }
     const today = formatJ(new Date(), 'yyyy/MM/dd');
-    // بررسی draft قبلی
-    let draft: F | null = null;
-    try {
-      const raw = localStorage.getItem(draftKey);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && ((parsed.items && parsed.items.length > 0) || parsed.partyId)) {
-          draft = parsed;
-        }
-      }
-    } catch {}
-    if (draft) {
-      setForm({
-        ...empty(isPurchase),
-        ...draft,
-        date: draft.date || today,
-        id: '',  // مطمئن شو id نداره
-      });
-      toastMsg.success('پیش‌نویس بازیابی شد');
-    } else {
-      setForm({
-        ...empty(isPurchase),
-        date: today,
-      });
-    }
+    setForm({
+      ...empty(isPurchase),
+      date: today,
+    });
     setErr(''); setOpen(true);
   };
 
@@ -585,7 +548,6 @@ export function useInvoiceForm(params: {
     } catch { /* silent */ }
 
     // پاک کردن draft بعد از ذخیره موفق
-    try { localStorage.removeItem(draftKey); } catch {}
     setOpen(false);
   };
 

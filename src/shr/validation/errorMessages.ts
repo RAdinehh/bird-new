@@ -10,6 +10,8 @@ export const MSG = {
   // اجباری‌ها
   required: (label: string) => `${label} را وارد کنید.`,
   select: (label: string) => `${label} را انتخاب کنید.`,
+  positiveNumber: (label: string) => `${label} باید بیشتر از صفر باشد.`,
+  nonNegativeNumber: (label: string) => `${label} نمی‌تواند منفی باشد.`,
   
   // منطقی و ریاضی
   totalMismatch: (entered: number, calculated: number) => 

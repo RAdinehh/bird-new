@@ -86,9 +86,8 @@ const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
   </div>
 );
 
-export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, invoiceDate, sellerSlot, showError, markTouched }: Props) {
+export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, invoiceDate, sellerSlot, showError, markTouched, itemIndex = 0 }: Props) {
   const [hatchOverride, setHatchOverride] = useState(false);
-  const itemIndex = 0; // fallback
   const err = (field: string) => {
     const kind = isPurchase ? 'purchase' : 'sale';
     if (!isFieldRequired(category, field, kind, item)) return undefined;
@@ -499,7 +498,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="💊" title="اطلاعات دارو و واکسن" />
 
         {/* ردیف ۱: کالای انبار (تمام عرض) - شامل دارو و واکسن */}
-        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "دارو/واکسن به انبار اضافه می‌شود" : "دارو/واکسن از انبار کاهش می‌یابد"}>
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} required={!isPurchase} hint={isPurchase ? "دارو/واکسن به انبار اضافه می‌شود" : "دارو/واکسن از انبار کاهش می‌یابد"}>
           <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
             const wItem = whsItems.find(x => x.id === v);
             updateItem({
@@ -552,7 +551,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="💩" title="اطلاعات کود" />
-        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} required={!isPurchase} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
           <SmartSelect
             value={String(item.stockItemId || '')}
             onChange={v => {
@@ -636,10 +635,46 @@ if (category === 'egg' || category === 'fertile_egg') {
         <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')}>
           <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
         </Field>
-        <Field label="نژاد" error={err('breedId')} onTouch={touch('breedId')}>
+        <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')}>
           <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
         </Field>
       </Grid2>
+    </div>
+  );
+}
+
+// ========== واکسن و داروی گیاهی ==========
+if (category === 'vaccine' || category === 'herbal') {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {nameFieldJsx}
+      <SecTitle icon="💊" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />
+      <Field
+        label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"}
+        required={!isPurchase}
+        error={err('stockItemId')}
+        onTouch={touch('stockItemId')}
+        hint={isPurchase ? "به موجودی اضافه می‌شود" : "از موجودی کاهش می‌یابد"}
+      >
+        <SmartSelect
+          value={String(item.stockItemId || '')}
+          error={err('stockItemId')}
+          onChange={v => {
+            const wItem = whsItems.find(x => x.id === v);
+            updateItem({
+              stockItemId: v,
+              unit: wItem?.unit || item.unit,
+              unitPrice: wItem?.lastPrice || item.unitPrice,
+              description: wItem?.name || item.description,
+            });
+          }}
+          options={(whsItems || []).filter(w => w.category === category).map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))}
+          placeholder="— انتخاب کالای انبار —"
+          modalTitle={category === 'vaccine' ? 'انتخاب واکسن' : 'انتخاب داروی گیاهی'}
+          autoThreshold={6}
+        />
+      </Field>
+      {sellerSlot}
     </div>
   );
 }
@@ -747,7 +782,7 @@ if (category === 'egg' || category === 'fertile_egg') {
         </Grid2>
 
         {/* ردیف ۳: انتخاب از انبار — تمام عرض */}
-        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
+        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} required={!isPurchase} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
           <SmartSelect
             value={String(item.stockItemId || '')}
             onChange={v => {

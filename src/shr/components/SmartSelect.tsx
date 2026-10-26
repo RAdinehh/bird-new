@@ -101,7 +101,7 @@ export default function SmartSelect({
           aria-label={placeholder}
           aria-invalid={!!error}
           aria-required={required}
-          style={{ border: `1px solid ${borderColor}`, height, fontSize, opacity: disabled ? 0.55 : 1 }}
+          style={{ border: error ? '1.5px solid var(--danger)' : `1px solid ${borderColor}`, height, fontSize, opacity: disabled ? 0.55 : 1 }}
         >
           <option value="">{placeholder}</option>
           {options.map(o => (

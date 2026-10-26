@@ -45,8 +45,8 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
   return z.object({
     type: oneOf('نوع فاکتور', ['purchase', 'sale'] as const),
     date: persianDateOpt('تاریخ'),
-    partyId: requiredId('طرف حساب'),
-    category: requiredStr('دسته', 1, 40),
+    partyId: optionalId(),
+    category: optionalStr(40),
     items: z.array(z.object({
       id: z.string(),
       description: optionalStr(200),
@@ -136,6 +136,30 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('تاریخ تحویل'), path: ['deliveryDate'] });
     }
     
+    // 🆕 چک‌های اجباری بالادستی
+    if (!d.partyId) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.select('طرف حساب'), path: ['partyId'] });
+    }
+    if (!d.category) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.select('دسته'), path: ['category'] });
+    }
+
+    // 🆕 چک‌های اجباری هر قلم
+    for (let i = 0; i < (d.items || []).length; i++) {
+      const it = d.items[i];
+      const p = (f: string) => ['items', String(i), f];
+      
+      if (!it.description || String(it.description).trim() === '') {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('نام کالا'), path: p('description') });
+      }
+      if (!it.quantity || Number(it.quantity) <= 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.positiveNumber('تعداد'), path: p('quantity') });
+      }
+      if (!it.unitPrice || Number(it.unitPrice) <= 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.positiveNumber('قیمت'), path: p('unitPrice') });
+      }
+    }
+
     // مجموع اقلام = total
     const itemsSum = (d.items || []).reduce((a: number, it: any) => a + (Number(it.total) || 0), 0);
     const expectedTotal = Math.max(0, itemsSum - (d.discount || 0) + (d.shipping || 0));
@@ -221,11 +245,13 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         (d.type === 'sale' && d.category === 'fertile_egg');
       if (isBirdOrEgg) {
         if (!it.birdId) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: MSG.birdRequired(),
-            path: ['items', String(i), 'birdId'],
-          });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.birdRequired(), path: ['items', String(i), 'birdId'] });
+        }
+        if (!it.breedId) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.select('نژاد'), path: ['items', String(i), 'breedId'] });
+        }
+        if (['chick', 'adult'].includes(d.category) && !it.hatchDate) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('تاریخ هچ'), path: ['items', String(i), 'hatchDate'] });
         }
       }
 
@@ -255,7 +281,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         const p = (f: string) => ['items', String(i), f];
 
         // ۱. فروش پرنده، کود و تخم شکسته: گله مبدأ اجباری
-        if ((it.birdId || itCat === 'manure' || itCat === 'broken') && !it.flockId) {
+        if ((it.birdId || itCat === 'manure' || itCat === 'broken') && !it.flockId && !it.hatchId) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.saleFlockRequired(), path: p('flockId') });
         }
 
