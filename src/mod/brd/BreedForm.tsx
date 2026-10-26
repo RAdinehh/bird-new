@@ -74,7 +74,7 @@ export default function BreedForm({
     reValidateMode: 'onChange',
     defaultValues: initialData,
   });
-  const { control, setValue, setError, handleSubmit, formState: { errors } } = methods;
+  const { control, setValue, setError, clearErrors, handleSubmit, formState: { errors } } = methods;
   const [businessError] = useState('');
 
   useEffect(() => {
@@ -293,16 +293,52 @@ export default function BreedForm({
             return <SourceBadge source={source} label={src.label} />;
           })()}
         </span>}
-        hint="کیلوگرم دان برای هر کیلوگرم رشد"
+        hint="کیلوگرم دان برای هر کیلوگرم رشد — بین ۰.۵ و ۵"
         error={errors.fcr?.message}
       >
         <Controller
           name="fcr"
           control={control}
-          render={({ field }) => (
-            <NumField placeholder="۲٫۰" value={field.value} onChange={field.onChange}
-              min={0.5} max={5} unit="FCR" autoClamp error={errors.fcr?.message} />
-          )}
+          render={({ field }) => {
+            const handleFcrChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+              const raw = e.target.value;
+              if (!raw.trim()) {
+                field.onChange(e);
+                if (errors.fcr?.type === 'manual') clearErrors('fcr');
+                return;
+              }
+              const en = toEn(raw).replace('٫', '.').replace(/[^\d.]/g, '');
+              const num = parseFloat(en);
+              if (!Number.isFinite(num)) {
+                field.onChange(e);
+                return;
+              }
+              if (num === 0) {
+                field.onChange(e);
+                if (errors.fcr?.type === 'manual') clearErrors('fcr');
+                return;
+              }
+              let clamped = num;
+              if (clamped < 0.5) clamped = 0.5;
+              if (clamped > 5) clamped = 5;
+              if (clamped !== num) {
+                const clampedStr = toFa(Number.isInteger(clamped) ? String(clamped) : clamped.toFixed(1));
+                field.onChange({ target: { value: clampedStr } });
+                setError('fcr', {
+                  type: 'manual',
+                  message: 'FCR باید بین ۰.۵ و ۵ باشد',
+                });
+              } else {
+                field.onChange(e);
+                if (errors.fcr?.type === 'manual') clearErrors('fcr');
+              }
+            };
+            return (
+              <NumField placeholder="۲٫۰" value={field.value}
+                onChange={handleFcrChange}
+                min={0.5} max={5} unit="FCR" error={errors.fcr?.message} />
+            );
+          }}
         />
         <OverrideHint {...fcrHint} />
         <FieldHint
