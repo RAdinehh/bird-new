@@ -35,7 +35,7 @@ export function useAnomalyHint(
       } catch {
         setWarning(null);
       }
-    }, 500);
+    }, 800);
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fieldPath, valueKey, ctxKey]);

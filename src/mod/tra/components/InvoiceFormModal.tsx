@@ -379,6 +379,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       <Field label="نر" error={showError(`items.${idx}.maleCount`)} onTouch={() => markTouched(`items.${idx}.maleCount`)}>
         <NumField placeholder="نر" value={it.maleCount != null && it.maleCount > 0 ? toFa(String(it.maleCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
+          if (v !== null && v < 0) v = 0;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
           const patch: Record<string, number | null> = { maleCount: v };
           // 🆕 اتوفیل فقط وقتی که هم نر (v) و هم ماده پر باشند
@@ -393,6 +394,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       <Field label="ماده" error={showError(`items.${idx}.femaleCount`)} onTouch={() => markTouched(`items.${idx}.femaleCount`)}>
         <NumField placeholder="ماده" value={it.femaleCount != null && it.femaleCount > 0 ? toFa(String(it.femaleCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
+          if (v !== null && v < 0) v = 0;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
           const patch: Record<string, number | null> = { femaleCount: v };
           // 🆕 اتوفیل فقط وقتی که هم ماده (v) و هم نر پر باشند
@@ -407,6 +409,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       <Field label="نامشخص" hint="برای جنسیت مخلوط" error={showError(`items.${idx}.unknownCount`)} onTouch={() => markTouched(`items.${idx}.unknownCount`)}>
         <NumField placeholder="نامشخص" value={it.unknownCount != null && it.unknownCount > 0 ? toFa(String(it.unknownCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
+          if (v !== null && v < 0) v = 0;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
           updateItem(it.id, { unknownCount: v });
         }} min={0} max={it.quantity || undefined} />
@@ -498,7 +501,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
                   <Grid2>
                     <Field label="تخفیف این قلم" error={showError(`items.${idx}.discountValue`)} onTouch={() => markTouched(`items.${idx}.discountValue`)}>
-                      <MoneyField placeholder="مبلغ" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} />
+                      <MoneyField placeholder="مبلغ" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: Math.max(0, parseFloat(toEn(e.target.value).replace('٫','.')) || 0) })} min={0} />
                     </Field>
                     <Field label="مبلغ کل این قلم">
                       <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
