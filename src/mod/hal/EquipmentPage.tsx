@@ -67,9 +67,18 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const [saveAttempted, setSaveAttempted] = useState(false);
-  const handleOpenNew = () => { setSaveAttempted(false); openNew(); };
-  const handleOpenEdit = (e: Equipment) => { setSaveAttempted(false); openEdit(e); };
-  const handleSave = () => { setSaveAttempted(true); if (Object.keys(vErrors).length > 0) { setErr(Object.values(vErrors).slice(0, 2).join(' • ')); return; } saveForm(equipment, addEquip, updateEquip); };
+  const [dupError, setDupError] = useState<string | null>(null);
+  const handleOpenNew = () => { setSaveAttempted(false); setDupError(null); openNew(); };
+  const handleOpenEdit = (e: Equipment) => { setSaveAttempted(false); setDupError(null); openEdit(e); };
+  const handleSave = () => {
+    setSaveAttempted(true);
+    if (Object.keys(vErrors).length > 0) return;   // inline errors shown
+    if (!form.id) {
+      const _dup = equipment.find((x: Equipment) => x.hallId === form.hallId && x.name.trim() === form.name.trim());
+      if (_dup) { setDupError(`تجهیزی با نام «${_dup.name}» توی این سالن هست`); return; }
+    }
+    saveForm(equipment, addEquip, updateEquip);
+  };
 
   useFab(active ? { label: 'افزودن تجهیز', onClick: handleOpenNew } : null);
 
@@ -334,8 +343,8 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         form={form}
         setForm={setForm}
         err={err}
-        onErrorClear={() => setErr('')}
-        vErrors={saveAttempted ? vErrors : {}}
+        onErrorClear={() => { setErr(''); setDupError(null); }}
+        vErrors={{ ...(saveAttempted ? vErrors : {}), ...(dupError ? { name: dupError } : {}) }}
         halls={halls}
         zones={zones}
         equipment={equipment}

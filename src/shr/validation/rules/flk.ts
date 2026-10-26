@@ -56,6 +56,10 @@ export function createFlkSchema(context: ValidationContext = {}) {
     notes: optionalStr(1000),
     // 🆕 اجاره
     dealType: z.enum(['own', 'partnership', 'consignment', 'rent', 'barter']).optional(),
+    partnerId: optionalId(),
+    partnerShare: z.number().min(0, 'سهم شریک نمی‌تواند منفی باشد').max(100, 'سهم شریک بیشتر از ۱۰۰٪ نمی‌شود').optional().nullable(),
+    consignorId: optionalId(),
+    lessorId: optionalId(),
     rentAmount: z.number().min(0).optional().nullable(),
     rentStartDate: persianDateOpt('شروع اجاره'),
     rentEndDate: persianDateOpt('پایان قرارداد'),
@@ -74,6 +78,34 @@ export function createFlkSchema(context: ValidationContext = {}) {
     barterEndDate: persianDateOpt('تاریخ پایان تهاتر'),
   }).superRefine((data, ctx) => {
     const d = data as any;
+
+    // ═══ حداقل یکی از تاریخ‌ها ═══
+    if (!d.hatchDate && !d.purchaseDate && !d.startDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'حداقل یکی از تاریخ‌های هچ، خرید یا شروع را وارد کنید',
+        path: ['startDate'],
+      });
+    }
+
+    // ═══ شروط مدل بهره‌برداری ═══
+    if (d.dealType === 'partnership' && !d.partnerId) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'شریک را انتخاب کنید', path: ['partnerId'] });
+    }
+    if (d.dealType === 'consignment' && !d.consignorId) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'امانت‌دهنده را انتخاب کنید', path: ['consignorId'] });
+    }
+    if (d.dealType === 'rent') {
+      if (!d.lessorId) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'موجر را انتخاب کنید', path: ['lessorId'] });
+      }
+      if (!d.rentAmount || d.rentAmount <= 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'مبلغ اجاره را وارد کنید', path: ['rentAmount'] });
+      }
+    }
+    if (d.dealType === 'barter' && !d.barterPartyId) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'طرف تهاتر را انتخاب کنید', path: ['barterPartyId'] });
+    }
 
     // نر + ماده = کل (اگه هر دو پر شده)
     const male = d.maleCount || 0;
