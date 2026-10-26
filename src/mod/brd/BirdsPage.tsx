@@ -8,6 +8,7 @@ import { useSet } from '../set/store';
 import { useMasterRedirect } from '../../shr/hooks/useMasterRedirect';
 import BirdForm, { EMPTY_BIRD_FORM, type BirdFormData } from './BirdForm';
 import { BirdSchema } from '../../shr/validation/rules/brd';
+import { useValidation } from '../../shr/validation/useValidation';
 import BirdCard from './BirdCard';
 import {
   Btn, Empty,
@@ -31,6 +32,14 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<BirdFormData>(EMPTY_BIRD_FORM);
   const [error, setError] = useState('');
+  const { errors: vErrors } = useValidation(
+    BirdSchema,
+    { name: form.name || '', standardKey: form.standardKey || undefined, birdKind: form.birdKind || undefined },
+  );
+  const [saveAttempted, setSaveAttempted] = useState(false);
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
+  const showError = (f: string) => (saveAttempted || touchedFields.has(f)) ? vErrors[f] : undefined;
+  const markTouched = (f: string) => setTouchedFields(prev => { const n = new Set(prev); n.add(f); return n; });
   const [openManageSignal, setOpenManageSignal] = useState(0);
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -102,7 +111,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   }, [ms.selectionMode]);
 
 
-  const openNew = () => { if (!draft.hasDraft) setForm(EMPTY_BIRD_FORM); setError(''); setOpen(true);  };
+  const openNew = () => { if (!draft.hasDraft) setForm(EMPTY_BIRD_FORM); setError(''); setSaveAttempted(false); setTouchedFields(new Set()); setOpen(true);  };
   const openEdit = (b: Bird) => {
     setForm({ id: b.id, name: b.name, standardKey: (b as any).standardKey || '', birdKind: (b as any).birdKind });
     
@@ -110,6 +119,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   };
   useFab(active ? { label: 'افزودن پرنده', onClick: openNew } : null);
   const save = () => {
+    setSaveAttempted(true);
 
     // 🔒 جلوگیری قاطع از نام تکراری پرنده
     if (!form.id) {

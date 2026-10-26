@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { Bird } from './store';
 import BirdNameField, { type BirdPresetPick } from './BirdNameField';
-import { Btn, BtnRow, Field, Modal } from '../../shr/components/ui';
+import { Btn, BtnRow, Field, Modal, ErrorBox } from '../../shr/components/ui';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { resolveStandard } from './_display-values';
 import { DEFAULT_SPECIES } from './species';
@@ -24,6 +24,8 @@ interface Props {
   form: BirdFormData;
   setForm: React.Dispatch<React.SetStateAction<BirdFormData>>;
   error: string;
+  showError?: (f: string) => string | undefined;
+  markTouched?: (f: string) => void;
   birds: Bird[];
   onSave: () => void;
   onErrorClear?: () => void;
@@ -54,7 +56,7 @@ function StatBox({ icon, label, value }: { icon: string; label: string; value: s
   );
 }
 
-export default function BirdForm({ open, onClose, form, setForm, error, birds, onSave, onErrorClear, openManageSignal }: Props) {
+export default function BirdForm({ open, onClose, form, setForm, error, showError, markTouched, birds, onSave, onErrorClear, openManageSignal }: Props) {
   const customSpecies = useSet((st: any) => st.customSpecies || []);
   const customStandards = useSet((st: any) => st.customStandards || {});
   const customOverrides = useSet((st: any) => st.customOverrides || {});
@@ -106,7 +108,7 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
   return (
     <Modal open={open} onClose={onClose} title={form.id ? 'ویرایش پرنده' : 'افزودن پرنده'} contentGap={14}
       footer={<BtnRow><Btn variant="primary" onClick={onSave}>ذخیره</Btn><Btn onClick={onClose}>لغو</Btn></BtnRow>}>
-      <Field label="نام پرنده" required hint="انتخاب یا تایپ">
+      <Field label="نام پرنده" required hint="انتخاب یا تایپ" error={showError?.('name')} onTouch={() => markTouched?.('name')}>
         <BirdNameField
           value={form.name}
           onChange={v => {
@@ -176,6 +178,7 @@ export default function BirdForm({ open, onClose, form, setForm, error, birds, o
       }}>
         💡 بعد از ذخیره، برو تب <b>نژادها</b> تا نژادهای این پرنده رو اضافه کنی.
       </div>
+      <ErrorBox>{error}</ErrorBox>
     </Modal>
   );
 }
