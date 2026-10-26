@@ -22,6 +22,8 @@ interface Props {
   disabled?: boolean;
   required?: boolean;
   error?: string;
+  /** 🆕 مخفی کردن متن خطای داخلی وقتی داخل <Field> است */
+  hideInternalError?: boolean;
   warn?: string;
   compact?: boolean;
   groupLabels?: Record<string, string>;
@@ -42,6 +44,7 @@ export default function DependentSelect({
   disabled = false,
   required = false,
   error,
+  hideInternalError = false,
   warn,
   compact = false,
   groupLabels = {},
@@ -70,7 +73,7 @@ export default function DependentSelect({
           >
             <option value="">— ابتدا {parentLabel} را انتخاب کنید —</option>
           </Select>
-          {error && (
+          {!hideInternalError && error && (
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 600, textAlign: 'right', paddingRight: 2 }} dir="rtl">
               ⚠️ {error}
             </div>
@@ -129,7 +132,7 @@ export default function DependentSelect({
             </option>
           ))}
         </Select>
-        {(error || warn) && (
+        {!hideInternalError && (error || warn) && (
           <div
             style={{
               fontSize: 'var(--fs-xs)',

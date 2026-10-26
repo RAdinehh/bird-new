@@ -47,6 +47,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const [form, setForm] = useState<HallFormData>(empty);
   const draft = useFormDraft('hal-hall', form, (v: HallFormData) => setForm(v));
   const [err, setErr] = useState('');
+  const [dupError, setDupError] = useState<string | null>(null);
   const [saveAttempted, setSaveAttempted] = useState(false);
   const [undoData, setUndoData] = useState<{ item: Hall | Hall[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -181,7 +182,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   };
 
   const openNew = () => {
-    setAutoFields(new Set()); setForm(empty); setErr(''); setSaveAttempted(false); setOpen(true); };
+    setAutoFields(new Set()); setForm(empty); setErr(''); setDupError(null); setSaveAttempted(false); setOpen(true); };
   const openEdit = (h: Hall) => {
     setAutoFields(new Set());
     setForm({
@@ -199,7 +200,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       birdId: h.birdId || '',
       breedId: h.breedId || ''
       });
-    setErr(''); setOpen(true);
+    setErr(''); setDupError(null); setSaveAttempted(false); setOpen(true);
   };
   useFab(active ? { label: 'افزودن سالن', onClick: openNew } : null);
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
@@ -233,22 +234,17 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const save = async () => {
     setSaveAttempted(true);
     // 🆕 اگه خطای اعتبارسنجی هست، نشون بده
-    if (Object.keys(vErrors).length > 0) {
-      const errs = Object.values(vErrors).slice(0, 3).join(' • ');
-      setErr(`لطفاً خطاها را برطرف کنید: ${errs}`);
-      return;
-    }
+    if (Object.keys(vErrors).length > 0) return;   // inline errors shown
     // 🔒 جلوگیری قاطع از نام تکراری سالن
     if (!form.id) {
       const _trimmed = form.name.trim();
       const _dup = halls.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
-        setErr(`سالنی با نام «${_dup.name}» تکراریه`);
+        setDupError(`سالنی با نام «${_dup.name}» تکراریه`);
         return;
       }
     }
 
-    if (!form.name.trim()) { setErr('نام سالن را وارد کنید'); return; }
 
     // 🆕 چک تناقض: سالن در تعمیر/ضدعفونی نباید گله فعال داشته باشد
     if (form.id && (form.status === 'maintenance' || form.status === 'sanitizing')) {
@@ -392,8 +388,8 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         form={form}
         setForm={setForm}
         err={err}
-        onErrorClear={() => setErr('')}
-        vErrors={saveAttempted ? vErrors : {}}
+        onErrorClear={() => { setErr(''); setDupError(null); }}
+        vErrors={{ ...(saveAttempted ? vErrors : {}), ...(dupError ? { name: dupError } : {}) }}
         birds={birds}
         breeds={breeds}
         stdCapacity={__suggestedCap}

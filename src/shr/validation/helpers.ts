@@ -185,7 +185,10 @@ export const persianDateMinMax = (label: string, min: string, max: string) =>
 export const requiredStr = (label: string, min = 1, max = 500) =>
   z.string({ required_error: `${label} را وارد کنید` })
     .trim()
-    .min(min, `${label} باید حداقل ${min} کاراکتر باشد`)
+    .min(1, `${label} را وارد کنید`)
+    .min(min, min > 1
+      ? `${label} باید حداقل ${min.toLocaleString('fa-IR')} کاراکتر باشد`
+      : `${label} را وارد کنید`)
     .max(max, `${label} بیش از حد طولانی است`);
 
 export const optionalStr = (max = 2000) =>

@@ -245,6 +245,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 emptyMode="select"
                 placeholder="— انتخاب نژاد —"
                 modalTitle="انتخاب نژاد"
+                hideInternalError
               />
             </Field>
         </Grid2>
@@ -268,7 +269,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           const calcCap = suggested;
           return (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-2)', alignItems: 'start' }}>
-              <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity} warning={warnMsg}>
+              <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity} warning={warnMsg} autoHideMs={0}>
                 <NumField placeholder="۵۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
               </Field>
               <Field label={<span style={{ visibility: 'hidden' }}>محاسبه</span>}>

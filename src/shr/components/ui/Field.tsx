@@ -44,11 +44,13 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
     setShowError(true);
   }, [error]);
   useEffect(() => {
-    if (isTyping) { setShowWarning(false); return; }
     if (!warning) { setShowWarning(false); return; }
+    if (autoHideMs > 0 && isTyping) { setShowWarning(false); return; }
     setShowWarning(true);
-    const t = setTimeout(() => setShowWarning(false), autoHideMs);
-    return () => clearTimeout(t);
+    if (autoHideMs > 0) {
+      const t = setTimeout(() => setShowWarning(false), autoHideMs);
+      return () => clearTimeout(t);
+    }
   }, [warning, autoHideMs, isTyping]);
   return (
     <div
