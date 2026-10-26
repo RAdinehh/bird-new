@@ -136,7 +136,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
       const dup = devices.find((x: any) => x.name.trim() === form.name.trim());
       if (dup) { setErr('دستگاهی با نام «' + dup.name + '» قبلاً ثبت شده'); return; }
     }
-    if (!form.name.trim()) { setErr('نام دستگاه اجباری است'); return; }
+    if (!form.name.trim()) { setErr('نام دستگاه را وارد کنید'); return; }
     const data = {
       name: form.name.trim(),
       code: '',
@@ -191,7 +191,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
   const addMaintenance = (deviceId: string) => {
     const dev = devices.find(d => d.id === deviceId);
     if (!dev) return;
-    if (!maintForm.date || !maintForm.type) { toastMsg.error('تاریخ و نوع تعمیر اجباری است'); return; }
+    if (!maintForm.date || !maintForm.type) { toastMsg.error('تاریخ و نوع تعمیر را وارد کنید'); return; }
     const log = {
       id: Date.now().toString(),
       date: maintForm.date,

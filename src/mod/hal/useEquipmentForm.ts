@@ -106,7 +106,7 @@ export function useEquipmentForm() {
         return;
       }
     }
-    if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
+    if (!form.name.trim()) { setErr('نام تجهیز را وارد کنید'); return; }
 
     const data = buildPayload();
     if (form.id) updateEquip(form.id, data); else addEquip(data);
@@ -115,7 +115,7 @@ export function useEquipmentForm() {
   };
 
   const saveAndNext = (addEquip: (e: Omit<Equipment, 'id' | 'createdAt' | 'updatedAt'>) => string) => {
-    if (!form.name.trim()) { setErr('نام تجهیز اجباری است'); return; }
+    if (!form.name.trim()) { setErr('نام تجهیز را وارد کنید'); return; }
     addEquip(buildPayload());
     toastMsg.added(form.name || 'تجهیز');
     setForm((f) => ({

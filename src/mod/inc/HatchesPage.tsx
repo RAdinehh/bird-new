@@ -124,7 +124,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
 
   const createFlock = () => {
     if (!flockModal) return;
-    if (!flockForm.name.trim()) { toastMsg.error('نام گله اجباری است'); return; }
+    if (!flockForm.name.trim()) { toastMsg.error('نام گله را وارد کنید'); return; }
     const h = hatches.find(x => x.id === flockModal.hatchId);
     if (!h) return;
     const entry = _entriesById[h.eggEntryId];
@@ -167,7 +167,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
 
   const doSell = () => {
     if (!sellModal) return;
-    if (!sellForm.buyerId) { toastMsg.error('خریدار اجباری است'); return; }
+    if (!sellForm.buyerId) { toastMsg.error('خریدار را انتخاب کنید'); return; }
     const count = parseInt(toEn(sellForm.count)) || 0;
     const unitPrice = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;
     if (count <= 0 || unitPrice <= 0) { toastMsg.error('مقادیر باید بیشتر از صفر'); return; }

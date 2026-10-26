@@ -110,8 +110,8 @@ export function useCandlingForm({
   const save = (
     entriesById: Record<string, any>,
   ): { ok: boolean; savedCount: number } => {
-    if (!modalDate.trim()) { setErr('تاریخ اجباری است'); return { ok: false, savedCount: 0 }; }
-    if (!modalDay.trim()) { setErr('روز انکوباسیون اجباری است'); return { ok: false, savedCount: 0 }; }
+    if (!modalDate.trim()) { setErr('تاریخ را وارد کنید'); return { ok: false, savedCount: 0 }; }
+    if (!modalDay.trim()) { setErr('روز انکوباسیون را وارد کنید'); return { ok: false, savedCount: 0 }; }
     const dayNum = parseInt(toEn(modalDay)) || 0;
     if (dayNum <= 0 || dayNum > 30) { setErr('روز باید بین ۱ تا ۳۰ باشد'); return { ok: false, savedCount: 0 }; }
     if (selectedIds.size === 0) { setErr('حداقل یک ورودی انتخاب کنید'); return { ok: false, savedCount: 0 }; }

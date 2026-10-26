@@ -88,7 +88,7 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
   };
 
   const save = async () => {
-    if (!form.name.trim()) { setErr('نام گله اجباری است'); return; }
+    if (!form.name.trim()) { setErr('نام گله را وارد کنید'); return; }
 
     const dup = flocks.find(f =>
       f.id !== form.id &&
@@ -114,7 +114,7 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       setErr(`مجموع خروس (${toFa(_male)})، مرغ (${toFa(_female)}) و نامشخص (${toFa(_unknown)}) بیشتر از تعداد اولیه است`);
       return;
     }
-    if (!form.birdId) { setErr('پرنده اجباری است'); return; }
+    if (!form.birdId) { setErr('پرنده را انتخاب کنید'); return; }
 
     if (form.breedId) {
       const allBreeds = useBrd.getState().breeds;
@@ -132,20 +132,20 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
     }
     // 🆕 Deal validation
     if (form.dealType === 'partnership' && !form.partnerId) {
-      setErr('انتخاب شریک برای گله شراکتی اجباری است');
+      setErr('شریک را برای گله شراکتی انتخاب کنید');
       return;
     }
     if (form.dealType === 'consignment' && !form.consignorId) {
-      setErr('انتخاب امانت‌دهنده برای گله امانی اجباری است');
+      setErr('امانت‌دهنده را برای گله امانی انتخاب کنید');
       return;
     }
     if (form.dealType === 'rent') {
       if (!form.lessorId) {
-        setErr('انتخاب موجر برای گله اجاره‌ای اجباری است');
+        setErr('موجر را برای گله اجاره‌ای انتخاب کنید');
         return;
       }
       if (!form.rentAmount || !num(form.rentAmount)) {
-        setErr('مبلغ اجاره اجباری است');
+        setErr('مبلغ اجاره را وارد کنید');
         return;
       }
     }

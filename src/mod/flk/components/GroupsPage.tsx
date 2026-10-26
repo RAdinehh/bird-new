@@ -191,7 +191,7 @@ export default function GroupsPage({ open, onClose }: Props) {
 
   const handleSave = () => {
     if (!form.name.trim()) {
-      toastMsg.error('نام گروه اجباری است');
+      toastMsg.error('نام گروه را وارد کنید');
       return;
     }
     const data = {

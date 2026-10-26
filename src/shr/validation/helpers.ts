@@ -43,8 +43,8 @@ export const intNonNeg = (label: string, max = 1_000_000) =>
   z.preprocess(
     sanitizeNumber,
     z.number({
-      required_error: `لطفاً ${label} را وارد کنید`,
-      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+      required_error: `${label} را وارد کنید`,
+      invalid_type_error: `${label} را وارد کنید`,
     })
     .int('مقدار باید عدد صحیح باشد')
     .min(0, `${label} نمی‌تواند منفی باشد`)
@@ -55,8 +55,8 @@ export const intPos = (label: string, max = 1_000_000) =>
   z.preprocess(
     sanitizeNumber,
     z.number({
-      required_error: `لطفاً ${label} را وارد کنید`,
-      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+      required_error: `${label} را وارد کنید`,
+      invalid_type_error: `${label} را وارد کنید`,
     })
     .int('مقدار باید عدد صحیح باشد')
     .min(1, `${label} باید بیشتر از صفر باشد`)
@@ -67,8 +67,8 @@ export const intRange = (label: string, min: number, max: number) =>
   z.preprocess(
     sanitizeNumber,
     z.number({
-      required_error: `لطفاً ${label} را وارد کنید`,
-      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+      required_error: `${label} را وارد کنید`,
+      invalid_type_error: `${label} را وارد کنید`,
     })
     .int('مقدار باید عدد صحیح باشد')
     .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
@@ -79,8 +79,8 @@ export const floatNonNeg = (label: string, max = 1_000_000) =>
   z.preprocess(
     sanitizeNumber,
     z.number({
-      required_error: `لطفاً ${label} را وارد کنید`,
-      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+      required_error: `${label} را وارد کنید`,
+      invalid_type_error: `${label} را وارد کنید`,
     })
     .min(0, `${label} نمی‌تواند منفی باشد`)
     .max(max, `${label} بیش از حد بزرگ است`),
@@ -90,8 +90,8 @@ export const floatPos = (label: string, max = 1_000_000) =>
   z.preprocess(
     sanitizeNumber,
     z.number({
-      required_error: `لطفاً ${label} را وارد کنید`,
-      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+      required_error: `${label} را وارد کنید`,
+      invalid_type_error: `${label} را وارد کنید`,
     })
     .min(0.0001, `${label} باید بیشتر از صفر باشد`)
     .max(max, `${label} بیش از حد بزرگ است`),
@@ -101,8 +101,8 @@ export const floatRange = (label: string, min: number, max: number) =>
   z.preprocess(
     sanitizeNumber,
     z.number({
-      required_error: `لطفاً ${label} را وارد کنید`,
-      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+      required_error: `${label} را وارد کنید`,
+      invalid_type_error: `${label} را وارد کنید`,
     })
     .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
     .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`),
@@ -113,8 +113,8 @@ export const requiredFloatRange = (label: string, min: number, max: number) =>
   z.preprocess(
     sanitizeNumber,
     z.number({
-      required_error: `لطفاً ${label} را وارد کنید`,
-      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+      required_error: `${label} را وارد کنید`,
+      invalid_type_error: `${label} را وارد کنید`,
     })
       .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
       .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`),
@@ -125,7 +125,7 @@ export const optionalFloatRange = (label: string, min: number, max: number) =>
   z.preprocess(
     sanitizeNumber,
     z.number({
-      invalid_type_error: `لطفاً ${label} را وارد کنید`,
+      invalid_type_error: `${label} را وارد کنید`,
     })
       .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
       .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`)

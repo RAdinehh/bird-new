@@ -94,10 +94,10 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
 
   const addRowToList = async () => {
     const cnt = parseInt(toEn(currentRow.count)) || 0;
-    if (!currentRow.count.trim()) { toastMsg.error('تعداد تخم اجباری است'); return; }
+    if (!currentRow.count.trim()) { toastMsg.error('تعداد تخم را وارد کنید'); return; }
     if (cnt <= 0) { toastMsg.error('تعداد باید بزرگتر از صفر باشد'); return; }
-    if (!currentRow.entryDate.trim()) { toastMsg.error('تاریخ ورود اجباری است'); return; }
-    if (currentRow.dealType === 'purchase' && !currentRow.dealData.sellerId) { toastMsg.error('فروشنده اجباری است'); return; }
+    if (!currentRow.entryDate.trim()) { toastMsg.error('تاریخ ورود را وارد کنید'); return; }
+    if (currentRow.dealType === 'purchase' && !currentRow.dealData.sellerId) { toastMsg.error('فروشنده را انتخاب کنید'); return; }
     if (currentRow.dealType === 'partnership' && !currentRow.dealData.partnerId) { toastMsg.error('شریک اجباری است'); return; }
     if (currentRow.dealType === 'own' && !currentRow.flockId) { toastMsg.error('گله اجباری است'); return; }
 

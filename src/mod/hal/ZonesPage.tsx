@@ -289,7 +289,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
 
     if (crossError) { setErr(crossError); return; }
 
-    if (!form.name.trim()) { setErr('نام بخش اجباری است'); return; }
+    if (!form.name.trim()) { setErr('نام بخش را وارد کنید'); return; }
     const data = { hallId: form.hallId, name: form.name.trim(), capacity: form.capacity ? parseInt(toEn(form.capacity)) || null : null,
        notes: form.notes.trim() };
     if (form.id) updateZone(form.id, data); else addZone(data);
