@@ -15,6 +15,7 @@ import { FieldHint } from '../../shr/intelligence';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { Btn, BtnRow, Field, Modal, NumField, ErrorBox } from '../../shr/components/ui';
 import { toastMsg } from '../../cor/store/toast';
+import { HELP } from '../../shr/help/helpTexts';
 
 export interface BreedFormData {
   id: string;
@@ -286,14 +287,16 @@ export default function BreedForm({
       )}
 
       <Field
-        label={<span style={{ display: 'inline-flex', alignItems: 'center' }}>FCR
+        label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          ضریب تبدیل غذایی (FCR)
           {(() => {
             const src = detectBreedFcrSource(fcrCurrent, watchedStandardKey, null);
             const source = fcrHint.overridden ? 'manual' : src.source;
             return <SourceBadge source={source} label={src.label} />;
           })()}
         </span>}
-        hint="کیلوگرم دان برای هر کیلوگرم رشد — بین ۰.۵ و ۵"
+        hint="دان مصرفی برای هر کیلوگرم رشد"
+        help={HELP.brd.breed.fcr}
         error={errors.fcr?.message}
       >
         <Controller
