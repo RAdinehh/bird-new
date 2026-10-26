@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 interface Props {
@@ -22,49 +22,46 @@ export function HelpIcon({ text }: Props) {
   const popoverRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<number | null>(null);
 
-  // موقعیت‌یابی دقیق برای جلوگیری از بیرون‌زدگی
-  useLayoutEffect(() => {
-    if (!open || !btnRef.current) return;
-    const btnRect = btnRef.current.getBoundingClientRect();
-    const popoverWidth = Math.min(240, window.innerWidth - 32);
-    const popoverHeight = 80; // تخمین ارتفاع
-    const margin = 8;
+  // ─── اندازه‌گیری و موقعیت‌یابی بعد از paint اولیه ───
+  useEffect(() => {
+    if (!open) { setCoords(null); return; }
+    const raf = requestAnimationFrame(() => {
+      if (!btnRef.current || !popoverRef.current) return;
+      const btnRect = btnRef.current.getBoundingClientRect();
+      const popRect = popoverRef.current.getBoundingClientRect();
+      const popW = popRect.width || Math.min(240, window.innerWidth - 32);
+      const popH = popRect.height || 120;
+      const margin = 8;
 
-    let left = btnRect.left - popoverWidth + btnRect.width;
-    let top = btnRect.bottom + 6;
+      let left = btnRect.left - popW + btnRect.width;
+      let top = btnRect.bottom + 6;
 
-    // جلوگیری از بیرون‌زدگی از سمت راست
-    if (left + popoverWidth > window.innerWidth - margin) {
-      left = window.innerWidth - popoverWidth - margin;
-    }
-    // جلوگیری از بیرون‌زدگی از سمت چپ
-    if (left < margin) left = margin;
-    // جلوگیری از بیرون‌زدگی از پایین
-    if (top + popoverHeight > window.innerHeight - margin) {
-      top = btnRect.top - popoverHeight - 6; // نمایش در بالای دکمه
-    }
+      // جلوگیری از بیرون‌زدگی راست/چپ
+      if (left + popW > window.innerWidth - margin) left = window.innerWidth - popW - margin;
+      if (left < margin) left = margin;
 
-    setCoords({ top, left });
+      // 🆕 اگر فضای زیر کافی نیست → بالای دکمه
+      if (top + popH > window.innerHeight - margin) {
+        const aboveTop = btnRect.top - popH - 6;
+        top = aboveTop >= margin ? aboveTop : margin;
+      }
+
+      setCoords({ top, left });
+    });
+    return () => cancelAnimationFrame(raf);
   }, [open]);
 
-  // بستن خودکار با تایمر (۵ ثانیه)
+  // ─── بستن خودکار ۵ ثانیه ───
   useEffect(() => {
     if (!open) return;
-
-    const startTimer = () => {
-      if (timerRef.current) window.clearTimeout(timerRef.current);
-      timerRef.current = window.setTimeout(() => {
-        setOpen(false);
-      }, 5000); // ۵ ثانیه استاندارد
-    };
-
-    startTimer();
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => setOpen(false), 5000);
     return () => {
       if (timerRef.current) window.clearTimeout(timerRef.current);
     };
   }, [open]);
 
-  // بستن با Escape (WCAG)
+  // ─── Escape ───
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -74,7 +71,7 @@ export function HelpIcon({ text }: Props) {
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
 
-  // بستن با کلیک بیرون
+  // ─── کلیک بیرون ───
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent | TouchEvent) => {
@@ -93,7 +90,6 @@ export function HelpIcon({ text }: Props) {
     };
   }, [open]);
 
-  // توقف تایمر هنگام هاور (برای دسکتاپ)
   const handleMouseEnter = () => {
     if (timerRef.current) {
       window.clearTimeout(timerRef.current);
@@ -113,6 +109,7 @@ export function HelpIcon({ text }: Props) {
         type="button"
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
         aria-label="راهنما"
+        aria-expanded={open}
         style={{
           width: 16, height: 16,
           background: 'transparent',
@@ -132,7 +129,7 @@ export function HelpIcon({ text }: Props) {
           userSelect: 'none',
         }}
       >?</button>
-      {open && coords && createPortal(
+      {open && createPortal(
         <div
           ref={popoverRef}
           role="tooltip"
@@ -140,8 +137,9 @@ export function HelpIcon({ text }: Props) {
           onMouseLeave={handleMouseLeave}
           style={{
             position: 'fixed',
-            top: coords.top,
-            left: coords.left,
+            top: coords?.top ?? 0,
+            left: coords?.left ?? 0,
+            visibility: coords ? 'visible' : 'hidden',
             zIndex: 9999,
             background: 'var(--card-solid)',
             border: '1px solid var(--border)',
@@ -152,6 +150,8 @@ export function HelpIcon({ text }: Props) {
             lineHeight: 1.6,
             maxWidth: 240,
             minWidth: 160,
+            maxHeight: 'min(320px, 55dvh)',
+            overflowY: 'auto',
             boxShadow: '0 6px 20px rgba(0,0,0,0.18)',
             textAlign: 'right',
             direction: 'rtl',
