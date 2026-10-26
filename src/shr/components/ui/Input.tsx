@@ -11,8 +11,10 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   autoClamp?: boolean; // اگر true باشد، در همان تایپ محدود می‌کند
   integer?: boolean; // فقط عدد صحیح (بدون اعشار)
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** 🆕 وقتی autoClamp فوراً clamp کرد */
+  onClamp?: (clampedTo: number) => void;
 }
-export function Input({ unit, error, warn, mode = 'text', showWords, min, max, autoClamp, height: customHeight, style, value, onChange, onBlur, disabled, ...rest }: InputProps) {
+export function Input({ unit, error, warn, mode = 'text', showWords, min, max, autoClamp, height: customHeight, style, value, onChange, onBlur, disabled, onClamp, ...rest }: InputProps) {
   // اگر inputMode عددی بود، خودکار حالت number فعال شود
   const effectiveMode = mode === 'text' && rest.inputMode === 'numeric' ? 'number' : mode;
 
