@@ -233,6 +233,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             />
           ) : (
             <DependentSelect
+              hideInternalError={true}
               disabled={isSourceLinked && !!form.breedId}
               value={form.breedId}
               onChange={v => { if (isSourceLinked) return;
@@ -293,6 +294,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         </Field>
         <Field label="بخش">
           <DependentSelect
+            hideInternalError={true}
             value={form.zoneId || ''}
             onChange={v => setForm(f => ({ ...f, zoneId: v }))}
             parentValue={form.hallId}
