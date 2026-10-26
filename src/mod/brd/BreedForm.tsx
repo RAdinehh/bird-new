@@ -248,7 +248,14 @@ export default function BreedForm({ open, onClose, form, setForm, err, showError
         <FieldHint
           fieldPath="brd.fcr"
           value={form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null}
-          context={{ standardKey: form.standardKey }}
+          context={{
+            standardKey: form.standardKey,
+            expected: fcrBaseline.value ?? undefined,
+            expectedSource: 'context',
+            expectedLabel: fcrBaseline.kind === 'standard'
+              ? `استاندارد ${fcrBaseline.label}`
+              : fcrBaseline.kind === 'parent' ? 'FCR والد' : undefined,
+          }}
         />
       </Field>
       <ErrorBox>{err}</ErrorBox>
