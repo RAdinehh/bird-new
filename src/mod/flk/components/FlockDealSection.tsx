@@ -184,7 +184,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             <Field label="تاریخ شروع تهاتر" error={showError?.('barterStartDate')} onTouch={() => markTouched?.('barterStartDate')}>
               <DatePicker value={form.barterStartDate || ''} onChange={v => setForm({ ...form, barterStartDate: v })} placeholder="از چه تاریخی؟" autoToday />
             </Field>
-            <Field label="تاریخ پایان تهاتر" error={form.barterStartDate && form.barterEndDate && form.barterStartDate >= form.barterEndDate ? 'باید بعد از شروع باشد' : undefined}>
+            <Field label="تاریخ پایان تهاتر" error={showError?.('barterEndDate') || (form.barterStartDate && form.barterEndDate && form.barterStartDate >= form.barterEndDate ? 'باید بعد از شروع باشد' : undefined)} onTouch={() => markTouched?.('barterEndDate')}>
               <DatePicker value={form.barterEndDate || ''} onChange={v => setForm({ ...form, barterEndDate: v })} placeholder="تا چه تاریخی؟" min={form.barterStartDate} />
             </Field>
           </Grid2>
@@ -202,7 +202,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             </Field>
             <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount} error={showError?.('rentAmount')} onTouch={() => markTouched?.('rentAmount')}>
               <MoneyField placeholder={form.rentPeriod === 'total' ? 'مبلغ کل دوره' : 'مبلغ هر دوره'} value={form.rentAmount || ''} onChange={e => setForm({ ...form, rentAmount: e.target.value })} />
-              {rentAmountNum > 0 && <FieldHint fieldPath="flk.rentAmount" value={rentAmountNum} />}
+              {rentAmountNum > 0 && !showError?.('rentAmount') && <FieldHint fieldPath="flk.rentAmount" value={rentAmountNum} />}
             </Field>
           </Grid2>
           {rentAmountNum > 0 && form.rentPeriod !== 'total' && calcDays > 0 && (
@@ -223,7 +223,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             </Field>
           </Grid2>
           {form.rentPeriod === 'total' && (
-            <Field label="پایان قرارداد" required help={HELP.flk.ownership.rentEndDate} error={form.rentStartDate && form.rentEndDate && form.rentStartDate >= form.rentEndDate ? 'باید بعد از شروع باشد' : undefined}>
+            <Field label="پایان قرارداد" required help={HELP.flk.ownership.rentEndDate} error={showError?.('rentEndDate') || (form.rentStartDate && form.rentEndDate && form.rentStartDate >= form.rentEndDate ? 'باید بعد از شروع باشد' : undefined)} onTouch={() => markTouched?.('rentEndDate')}>
               <DatePicker placeholder="تا چه تاریخی؟" value={form.rentEndDate || ''} onChange={v => setForm({ ...form, rentEndDate: v })} min={form.rentStartDate} />
               {rentEndWarn && (
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', paddingRight: 2, marginTop: 4 }}>

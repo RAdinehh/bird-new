@@ -88,7 +88,11 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
   };
 
   const save = async () => {
-    if (!form.name.trim()) { setErr('نام گله را وارد کنید'); return; }
+    // Validation منتقل‌شده به Zod (rules/flk.ts superRefine):
+    //   name، initialCount>0، currentCount>initialCount، breeder sum،
+    //   birdId، deal rules، at-least-one-date، cross-dates، future purchase/hatch.
+    // فقط store-dependent اینجا می‌مانند: نام تکراری در سالن، breed purpose mismatch،
+    // و startDate در آینده (این یکی هنوز در Zod نیست — TODO).
 
     const dup = flocks.find(f =>
       f.id !== form.id &&
@@ -100,21 +104,7 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       return;
     }
 
-    const _init = int(form.initialCount) || 0;
-    const _curr = int(form.currentCount) || _init;
-    const _male = int(form.maleCount) || 0;
-    const _female = int(form.femaleCount) || 0;
-    const _unknown = int(form.unknownCount || '') || 0;
 
-    if (_curr > _init) {
-      setErr(`تعداد فعلی (${toFa(_curr)}) نمی‌تواند بیشتر از تعداد اولیه (${toFa(_init)}) باشد`);
-      return;
-    }
-    if (form.type === 'breeder' && (_male + _female + _unknown) > _init) {
-      setErr(`مجموع خروس (${toFa(_male)})، مرغ (${toFa(_female)}) و نامشخص (${toFa(_unknown)}) بیشتر از تعداد اولیه است`);
-      return;
-    }
-    if (!form.birdId) { setErr('پرنده را انتخاب کنید'); return; }
 
     if (form.breedId) {
       const allBreeds = useBrd.getState().breeds;
@@ -131,67 +121,15 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
       }
     }
     // 🆕 Deal validation
-    if (form.dealType === 'partnership' && !form.partnerId) {
-      setErr('شریک را برای گله شراکتی انتخاب کنید');
-      return;
-    }
-    if (form.dealType === 'consignment' && !form.consignorId) {
-      setErr('امانت‌دهنده را برای گله امانی انتخاب کنید');
-      return;
-    }
-    if (form.dealType === 'rent') {
-      if (!form.lessorId) {
-        setErr('موجر را برای گله اجاره‌ای انتخاب کنید');
-        return;
-      }
-      if (!form.rentAmount || !num(form.rentAmount)) {
-        setErr('مبلغ اجاره را وارد کنید');
-        return;
-      }
-    }
-
-    if (!form.startDate.trim() && !form.hatchDate.trim() && !form.purchaseDate.trim()) {
-      setErr('حداقل یکی از تاریخ‌های هچ، خرید یا شروع را وارد کنید'); return;
-    }
 
     // 🆕 تعداد اولیه > ۰
-    if (_init <= 0) {
-      setErr('تعداد اولیه باید بیشتر از صفر باشد');
-      return;
-    }
 
-    // 🆕 Cross-date: hatch ≤ purchase
-    if (form.hatchDate.trim() && form.purchaseDate.trim() && form.hatchDate > form.purchaseDate) {
-      setErr('تاریخ هچ نمی‌تواند بعد از تاریخ خرید باشد');
-      return;
-    }
-    // 🆕 Cross-date: purchase ≤ start
-    if (form.purchaseDate.trim() && form.startDate.trim() && form.purchaseDate > form.startDate) {
-      setErr('تاریخ خرید نمی‌تواند بعد از تاریخ شروع نگهداری باشد');
-      return;
-    }
-    // 🆕 Cross-date: hatch ≤ start
-    if (form.hatchDate.trim() && form.startDate.trim() && form.hatchDate > form.startDate) {
-      setErr('تاریخ هچ نمی‌تواند بعد از تاریخ شروع نگهداری باشد');
-      return;
-    }
-
-    // 🆕 تاریخ‌های آینده
     const today = todayJ();
     if (form.startDate.trim() && form.startDate > today) {
       setErr('تاریخ شروع نگهداری نمی‌تواند در آینده باشد');
       return;
     }
-    if (form.purchaseDate.trim() && form.purchaseDate > today) {
-      setErr('تاریخ خرید نمی‌تواند در آینده باشد');
-      return;
-    }
-    if (form.hatchDate.trim() && form.hatchDate > today) {
-      setErr('تاریخ هچ نمی‌تواند در آینده باشد');
-      return;
-    }
-
-    // 🆕 breeder: male + female > initial (block) — موجود
+// 🆕 breeder: male + female > initial (block) — موجود
     // ⚠️ warning برای < initial در UI هست، اینجا بلاک نمی‌کنیم
 
     // 🆕 Backfill birdId/breedId from source invoice if empty
