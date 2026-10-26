@@ -7,6 +7,8 @@ import { useMasterRedirect } from '../../shr/hooks/useMasterRedirect';
 import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import BreedForm, { EMPTY_BREED_FORM, type BreedFormData } from './BreedForm';
+import { BreedSchema } from '../../shr/validation/rules/brd';
+import { useValidation } from '../../shr/validation/useValidation';
 import BreedCard from './BreedCard';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { resolveStandard } from './_display-values';
@@ -39,6 +41,20 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const customOverrides = useSet((st: any) => st.customOverrides);
   const { redirect: masterRedirect, MasterRedirectModal } = useMasterRedirect();
   const [err, setErr] = useState('');
+  const { errors: vErrors } = useValidation(
+    BreedSchema,
+    {
+      birdId: form.birdId || '',
+      name: form.name || '',
+      fcr: form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null,
+      standardKey: form.standardKey || undefined,
+      purposes: form.purposes || [],
+    },
+  );
+  const [saveAttempted, setSaveAttempted] = useState(false);
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
+  const showError = (f: string) => (saveAttempted || touchedFields.has(f)) ? vErrors[f] : undefined;
+  const markTouched = (f: string) => setTouchedFields(prev => { const n = new Set(prev); n.add(f); return n; });
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   // 🆕 focus از URL → باز کردن کارت
@@ -124,7 +140,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
   const openNew = () => {
     if (!draft.hasDraft) setForm({ id:'', birdId: birds[0].id, name:'', fcr:'', standardKey:'', purposes: [] });
-    setErr(''); setOpen(true);
+    setErr(''); setSaveAttempted(false); setTouchedFields(new Set()); setOpen(true);
   };
   useFab(active ? { label: 'افزودن نژاد', onClick: openNew } : null);
 
@@ -171,6 +187,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   };
 
   const save = () => {
+    setSaveAttempted(true);
 
     // 🔒 جلوگیری از نژاد تکراری (نام + هدف یکسان)
     if (!form.id) {

@@ -38,6 +38,8 @@ interface Props {
   form: BreedFormData;
   setForm: React.Dispatch<React.SetStateAction<BreedFormData>>;
   err: string;
+  showError?: (f: string) => string | undefined;
+  markTouched?: (f: string) => void;
   birds: Bird[];
   breeds: Breed[];
   onSave: () => void;
@@ -45,7 +47,7 @@ interface Props {
   customOverrides?: Record<string, any>;
 }
 
-export default function BreedForm({ open, onClose, form, setForm, err, birds, breeds, onSave, customStandards = {}, customOverrides = {} }: Props) {
+export default function BreedForm({ open, onClose, form, setForm, err, showError, markTouched, birds, breeds, onSave, customStandards = {}, customOverrides = {} }: Props) {
   const parentBird = birds.find(x => x.id === form.birdId);
   const fcrBaseline = getBreedFcrBaseline(form.standardKey, null);
   const fcrCurrent = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
@@ -82,8 +84,9 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
     <Modal open={open} onClose={onClose} title={form.id ? 'ویرایش نژاد' : 'افزودن نژاد'}
       footer={<BtnRow><Btn variant="primary" onClick={onSave}>ذخیره</Btn><Btn onClick={onClose}>لغو</Btn></BtnRow>}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-      <Field label="پرنده" required>
+      <Field label="پرنده" required error={showError?.('birdId')} onTouch={() => markTouched?.('birdId')}>
         <SmartSelect
+          error={showError?.('birdId')}
           value={form.birdId}
           onChange={v => {
             // وقتی پرنده عوض می‌شه، نژاد + هدف + FCR ریست شن
@@ -107,7 +110,7 @@ export default function BreedForm({ open, onClose, form, setForm, err, birds, br
         />
       </Field>
 
-      <Field label="نام نژاد" required hint="انتخاب یا تایپ">
+      <Field label="نام نژاد" required hint="انتخاب یا تایپ" error={showError?.('name')} onTouch={() => markTouched?.('name')}>
         <BreedNameField
           value={form.name}
           onChange={v => setForm(f => {
