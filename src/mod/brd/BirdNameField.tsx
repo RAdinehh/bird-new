@@ -133,6 +133,7 @@ export default function BirdNameField({ value, onChange, onPick, error, openMana
         placeholder="مثلاً — مرغ یا بوقلمون"
         title="انتخاب پرنده"
         error={error}
+        hideInternalError
       />
     </>
   );
