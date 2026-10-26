@@ -63,7 +63,7 @@ export default function BreedForm({
 }: Props) {
   const methods = useForm<BreedFormData>({
     resolver: zodResolver(BreedFormSchema),
-    mode: 'onBlur',
+    mode: 'onSubmit',
     reValidateMode: 'onChange',
     defaultValues: initialData,
   });
@@ -206,6 +206,7 @@ export default function BreedForm({
             control={control}
             render={({ field }) => (
               <BreedNameField
+                error={errors.name?.message}
                 value={field.value}
                 onChange={(v) => {
                   field.onChange(v);
