@@ -109,6 +109,7 @@ export default function FlocksPage() {
       currentCount: form.currentCount ? int(form.currentCount) : undefined,
       maleCount: int(form.maleCount) ?? 0,
       femaleCount: int(form.femaleCount) ?? 0,
+      unknownCount: int(form.unknownCount ?? '') ?? 0,
       layingStartDay: form.layingStartDay ? int(form.layingStartDay) : undefined,
       endOfCycleDay: form.endOfCycleDay ? int(form.endOfCycleDay) : undefined,
       vaccineScheduleId: form.vaccineScheduleId || '',

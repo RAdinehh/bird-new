@@ -138,14 +138,14 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
 
       {form.dealType === 'partnership' && (
         <>
-          <Field label="شریک" required help={HELP.flk.ownership.partner}>
+          <Field label="شریک" error={showError?.('partnerId')} onTouch={() => markTouched?.('partnerId')} required help={HELP.flk.ownership.partner}>
             <Select value={form.partnerId || ''} onChange={e => setForm({ ...form, partnerId: e.target.value })}>
               <option value="">— انتخاب —</option>
               {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </Select>
           </Field>
           <Grid2>
-            <Field label="سهم شریک" help={HELP.flk.ownership.partnerShare}>
+            <Field label="سهم شریک" error={showError?.('partnerShare')} onTouch={() => markTouched?.('partnerShare')} help={HELP.flk.ownership.partnerShare}>
               <NumField value={form.partnerShare || ''} onChange={e => setForm({ ...form, partnerShare: e.target.value })} unit="٪" min={0} max={100} />
             </Field>
             <Field label="سهم من" hint="خودکار">
@@ -156,7 +156,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
       )}
 
       {form.dealType === 'consignment' && (
-        <Field label="امانت‌دهنده" required help={HELP.flk.ownership.consignor}>
+        <Field label="امانت‌دهنده" error={showError?.('consignorId')} onTouch={() => markTouched?.('consignorId')} required help={HELP.flk.ownership.consignor}>
           <Select value={form.consignorId || ''} onChange={e => setForm({ ...form, consignorId: e.target.value })}>
             <option value="">— انتخاب —</option>
             {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -167,13 +167,13 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
       {form.dealType === 'barter' && (
         <>
           <Grid2>
-            <Field label="طرف تهاتر" required>
+            <Field label="طرف تهاتر" error={showError?.('barterPartyId')} onTouch={() => markTouched?.('barterPartyId')} required>
               <Select value={form.barterPartyId || ''} onChange={e => setForm({ ...form, barterPartyId: e.target.value })}>
                 <option value="">— انتخاب —</option>
                 {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </Select>
             </Field>
-            <Field label="ارزش ریالی تهاتر">
+            <Field label="ارزش ریالی تهاتر" error={showError?.('barterValue')} onTouch={() => markTouched?.('barterValue')}>
               <MoneyField placeholder="مبلغ معادل" value={form.barterValue || ''} onChange={e => setForm({ ...form, barterValue: e.target.value })} />
             </Field>
           </Grid2>
@@ -181,7 +181,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             <input type="text" value={form.barterDescription || ''} onChange={e => setForm({ ...form, barterDescription: e.target.value })} placeholder="مثلاً: ۵ تن دان" style={{ width: '100%', height: 38, padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-base)', fontFamily: 'inherit', textAlign: 'right', boxSizing: 'border-box' }} />
           </Field>
           <Grid2>
-            <Field label="تاریخ شروع تهاتر">
+            <Field label="تاریخ شروع تهاتر" error={showError?.('barterStartDate')} onTouch={() => markTouched?.('barterStartDate')}>
               <DatePicker value={form.barterStartDate || ''} onChange={v => setForm({ ...form, barterStartDate: v })} placeholder="از چه تاریخی؟" autoToday />
             </Field>
             <Field label="تاریخ پایان تهاتر" error={form.barterStartDate && form.barterEndDate && form.barterStartDate >= form.barterEndDate ? 'باید بعد از شروع باشد' : undefined}>
@@ -194,13 +194,13 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
       {form.dealType === 'rent' && (
         <>
           <Grid2>
-            <Field label="موجر (اجاره‌دهنده)" required help={HELP.flk.ownership.lessor}>
+            <Field label="موجر (اجاره‌دهنده)" error={showError?.('lessorId')} onTouch={() => markTouched?.('lessorId')} required help={HELP.flk.ownership.lessor}>
               <Select value={form.lessorId || ''} onChange={e => setForm({ ...form, lessorId: e.target.value })}>
                 <option value="">— انتخاب —</option>
                 {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </Select>
             </Field>
-            <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount} onTouch={() => markTouched?.('rentAmount')}>
+            <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount} error={showError?.('rentAmount')} onTouch={() => markTouched?.('rentAmount')}>
               <MoneyField placeholder={form.rentPeriod === 'total' ? 'مبلغ کل دوره' : 'مبلغ هر دوره'} value={form.rentAmount || ''} onChange={e => setForm({ ...form, rentAmount: e.target.value })} />
               {rentAmountNum > 0 && <FieldHint fieldPath="flk.rentAmount" value={rentAmountNum} />}
             </Field>
@@ -211,14 +211,14 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             </div>
           )}
           <Grid2>
-            <Field label="دوره" help={HELP.flk.ownership.rentPeriod}>
+            <Field label="دوره" error={showError?.('rentPeriod')} onTouch={() => markTouched?.('rentPeriod')} help={HELP.flk.ownership.rentPeriod}>
               <Select value={form.rentPeriod || 'monthly'} onChange={e => setForm({ ...form, rentPeriod: e.target.value })}>
                 <option value="monthly">ماهانه</option>
                 <option value="season">فصلی</option>
                 <option value="total">کل دوره</option>
               </Select>
             </Field>
-            <Field label="شروع اجاره" required help={HELP.flk.ownership.rentStartDate}>
+            <Field label="شروع اجاره" error={showError?.('rentStartDate')} onTouch={() => markTouched?.('rentStartDate')} required help={HELP.flk.ownership.rentStartDate}>
               <DatePicker placeholder="از چه تاریخی؟" value={form.rentStartDate || ''} onChange={v => setForm({ ...form, rentStartDate: v })} autoToday />
             </Field>
           </Grid2>

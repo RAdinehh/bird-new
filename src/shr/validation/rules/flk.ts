@@ -36,6 +36,7 @@ export function createFlkSchema(context: ValidationContext = {}) {
     currentCount: z.number().min(0, 'تعداد فعلی نمی‌تواند منفی باشد').optional().nullable(),
     maleCount: intNonNeg('تعداد نر', 100000),
     femaleCount: intNonNeg('تعداد ماده', 100000),
+    unknownCount: intNonNeg('تعداد نامشخص', 100000),
 
     // 🆕 این دو فیلد فقط برای layer/breeder معنی دارن — برای broiler skip می‌شن
     layingStartDay: z.number().min(0, 'سن تخم‌گذاری نمی‌تواند منفی باشد').optional().nullable(),
