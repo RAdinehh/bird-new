@@ -18,7 +18,7 @@ function renderBold(text: string) {
 export function HelpIcon({ text }: Props) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
-  const btnRef = useRef<HTMLButtonElement>(null);
+  const btnRef = useRef<HTMLSpanElement | HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<number | null>(null);
 
@@ -104,10 +104,18 @@ export function HelpIcon({ text }: Props) {
 
   return (
     <>
-      <button
-        ref={btnRef}
-        type="button"
+      <span
+        ref={btnRef as unknown as React.RefObject<HTMLSpanElement>}
+        role="button"
+        tabIndex={0}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(!open);
+          }
+        }}
         aria-label="راهنما"
         aria-expanded={open}
         style={{
@@ -116,6 +124,7 @@ export function HelpIcon({ text }: Props) {
           border: 'none',
           outline: 'none',
           padding: 0,
+          marginRight: 4,
           color: open ? 'var(--accent)' : 'var(--muted)',
           fontSize: 14, fontWeight: 700,
           lineHeight: 1,
@@ -123,12 +132,14 @@ export function HelpIcon({ text }: Props) {
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: 'inherit',
           flexShrink: 0,
-          marginRight: 4,
           opacity: open ? 1 : 0.65,
           transition: 'opacity 150ms',
           userSelect: 'none',
+          WebkitUserSelect: 'none',
+          WebkitTapHighlightColor: 'transparent',
+          touchAction: 'manipulation',
         }}
-      >?</button>
+      >?</span>
       {open && createPortal(
         <div
           ref={popoverRef}
