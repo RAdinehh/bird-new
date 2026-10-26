@@ -248,7 +248,16 @@ export default function FlocksModal(props: FlocksModalProps) {
               }}
               parentValue={form.birdId}
               parentLabel="پرنده"
-              options={breedsForBird.map(b => ({ value: b.id, label: b.name }))}
+              options={breedsForBird.map(b => {
+                const dupes = breedsForBird.filter(x => x.name === b.name);
+                let suffix = '';
+                if (dupes.length > 1) {
+                  const labels: Record<string, string> = { layer: 'تخم‌گذار', broiler: 'گوشتی', breeder: 'مادر', ornamental: 'تزئینی' };
+                  const purposeStr = b.purposes && b.purposes.length > 0 ? b.purposes.map((p: string) => labels[p] || p).join('، ') : '';
+                  if (purposeStr) suffix = ` (${purposeStr})`;
+                }
+                return { value: b.id, label: `${b.name}${suffix}` };
+              })}
               emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
               placeholder="— انتخاب نژاد —"
               modalTitle="انتخاب نژاد"
