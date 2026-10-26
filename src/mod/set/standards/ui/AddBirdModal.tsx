@@ -30,8 +30,8 @@ export function AddBirdModal({
   };
 
   const handleAdd = () => {
-    if (!customNameFa.trim()) { setErr('نام نژاد اجباری است'); return; }
-    if (!customBirdName.trim()) { setErr('نام پرنده مادر اجباری است'); return; }
+    if (!customNameFa.trim()) { setErr('نام نژاد را وارد کنید'); return; }
+    if (!customBirdName.trim()) { setErr('نام پرنده مادر را وارد کنید'); return; }
     const key = customNameFa.trim().toLowerCase().replace(/\s+/g, '-');
     if (allStandardKeys.includes(key) || existingKeys.includes(key)) {
       setErr('این نام قبلاً هست');

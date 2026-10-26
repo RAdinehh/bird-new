@@ -190,7 +190,7 @@ export function createFlkSchema(context: ValidationContext = {}) {
     if (d.source === 'hatch' && !d.hatchDate) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'برای منبع «جوجه‌کشی خودم» تاریخ هچ اجباری است',
+        message: 'برای منبع «جوجه‌کشی خودم» تاریخ هچ را وارد کنید',
         path: ['hatchDate'],
       });
     }
@@ -198,7 +198,7 @@ export function createFlkSchema(context: ValidationContext = {}) {
     if (d.source === 'purchase' && !d.purchaseDate) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'برای منبع «خریداری» تاریخ خرید اجباری است',
+        message: 'برای منبع «خریداری» تاریخ خرید را وارد کنید',
         path: ['purchaseDate'],
       });
     }

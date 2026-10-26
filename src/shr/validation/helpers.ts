@@ -147,7 +147,7 @@ export const intOpt = (label: string, max = 1_000_000) =>
 const JALALI_RE = /^14\d{2}[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12]\d|3[01])$/;
 
 export const persianDate = (label = 'تاریخ') =>
-  z.string({ required_error: `${label} اجباری است` })
+  z.string({ required_error: `${label} را وارد کنید` })
     .regex(JALALI_RE, `${label} باید به شکل ۱۴۰۵/۰۷/۱۱ باشد`);
 
 export const persianDateOpt = (label = 'تاریخ') =>
@@ -163,17 +163,17 @@ function todayJalali(): string {
 }
 
 export const persianDateNotFuture = (label = 'تاریخ') =>
-  z.string({ required_error: `${label} اجباری است` })
+  z.string({ required_error: `${label} را وارد کنید` })
     .regex(JALALI_RE, `${label} نامعتبر است`)
     .refine(v => v <= todayJalali(), `${label} نمی‌تواند در آینده باشد`);
 
 export const persianDatePast = (label = 'تاریخ') =>
-  z.string({ required_error: `${label} اجباری است` })
+  z.string({ required_error: `${label} را وارد کنید` })
     .regex(JALALI_RE, `${label} نامعتبر است`)
     .refine(v => v <= todayJalali(), `${label} باید امروز یا قبل‌تر باشد`);
 
 export const persianDateMinMax = (label: string, min: string, max: string) =>
-  z.string({ required_error: `${label} اجباری است` })
+  z.string({ required_error: `${label} را وارد کنید` })
     .regex(JALALI_RE, `${label} نامعتبر است`)
     .refine(v => v >= min, `${label} نمی‌تواند قبل از ${min} باشد`)
     .refine(v => v <= max, `${label} نمی‌تواند بعد از ${max} باشد`);
@@ -183,7 +183,7 @@ export const persianDateMinMax = (label: string, min: string, max: string) =>
 // ═══════════════════════════════════════════════
 
 export const requiredStr = (label: string, min = 1, max = 500) =>
-  z.string({ required_error: `${label} اجباری است` })
+  z.string({ required_error: `${label} را وارد کنید` })
     .trim()
     .min(min, `${label} باید حداقل ${min} کاراکتر باشد`)
     .max(max, `${label} بیش از حد طولانی است`);
@@ -192,8 +192,8 @@ export const optionalStr = (max = 2000) =>
   z.string().max(max, 'متن بیش از حد طولانی است').optional().default('');
 
 export const requiredId = (label: string) =>
-  z.string({ required_error: `${label} اجباری است` })
-    .min(1, `${label} اجباری است`);
+  z.string({ required_error: `${label} را انتخاب کنید` })
+    .min(1, `${label} را انتخاب کنید`);
 
 export const optionalId = () => z.string().optional().default('');
 

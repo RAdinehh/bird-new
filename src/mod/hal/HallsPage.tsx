@@ -248,7 +248,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       }
     }
 
-    if (!form.name.trim()) { setErr('نام سالن اجباری است'); return; }
+    if (!form.name.trim()) { setErr('نام سالن را وارد کنید'); return; }
 
     // 🆕 چک تناقض: سالن در تعمیر/ضدعفونی نباید گله فعال داشته باشد
     if (form.id && (form.status === 'maintenance' || form.status === 'sanitizing')) {

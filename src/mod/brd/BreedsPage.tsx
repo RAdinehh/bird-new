@@ -188,7 +188,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       }
     }
 
-    if (!form.name.trim()) { setErr('نام نژاد اجباری است'); return; }
+    if (!form.name.trim()) { setErr('نام نژاد را وارد کنید'); return; }
 
     // 🆕 چک: نام باید با یک استاندارد match کنه (با احتساب overrides)
     const baseStandards: Record<string, any> = {};

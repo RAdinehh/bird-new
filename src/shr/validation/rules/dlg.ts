@@ -185,7 +185,7 @@ export function createDlgSchema(context: ValidationContext = {}) {
       if (v.itemId && (!v.quantity || v.quantity <= 0)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `واکسن ${v.name || ''}: مقدار مصرفی اجباری است`,
+          message: `واکسن ${v.name || ''}: مقدار مصرفی را وارد کنید`,
           path: ['vaccines', String(i), 'quantity'],
         });
       }
@@ -197,7 +197,7 @@ export function createDlgSchema(context: ValidationContext = {}) {
       if (m.itemId && (!m.quantity || m.quantity <= 0)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `دارو ${m.name || ''}: مقدار مصرفی اجباری است`,
+          message: `دارو ${m.name || ''}: مقدار مصرفی را وارد کنید`,
           path: ['medications', String(i), 'quantity'],
         });
       }
