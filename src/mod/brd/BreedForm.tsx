@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react';
+import { useForm, Controller, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import type { Bird, Breed } from './store';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { detectBreedFcrSource, getBreedFcrBaseline } from './_source';
@@ -25,7 +29,6 @@ export const EMPTY_BREED_FORM: BreedFormData = {
   id: '', birdId: '', name: '', fcr: '', standardKey: '', purposes: [],
 };
 
-// ═══ چک‌باکس‌های هدف ═══
 const PURPOSE_OPTIONS = [
   { key: 'layer',      label: 'تخم‌گذار', icon: '🥚' },
   { key: 'breeder',    label: 'مادر',     icon: '🐣' },
@@ -33,179 +36,233 @@ const PURPOSE_OPTIONS = [
   { key: 'ornamental', label: 'تزئینی',   icon: '🎨' },
 ];
 
+const BreedFormSchema = z.object({
+  id: z.string(),
+  birdId: z.string().min(1, 'پرنده را انتخاب کنید'),
+  name: z.string().trim().min(1, 'نام نژاد را وارد کنید').max(100, 'نام نژاد بیش از حد طولانی است'),
+  fcr: z.string().optional().default(''),
+  standardKey: z.string().optional().default(''),
+  purposes: z.array(z.string()).optional().default([]),
+});
+
 interface Props {
   open: boolean;
   onClose: () => void;
-  form: BreedFormData;
-  setForm: React.Dispatch<React.SetStateAction<BreedFormData>>;
-  err: string;
-  showError?: (f: string) => string | undefined;
-  markTouched?: (f: string) => void;
+  initialData: BreedFormData;
   birds: Bird[];
   breeds: Breed[];
-  onSave: () => void;
+  onSaved: (data: BreedFormData) => void;
+  onRedirectToStandards?: (name: string) => void;
   customStandards?: Record<string, any>;
   customOverrides?: Record<string, any>;
 }
 
-export default function BreedForm({ open, onClose, form, setForm, err, showError, markTouched, birds, breeds, onSave, customStandards = {}, customOverrides = {} }: Props) {
-  const parentBird = birds.find(x => x.id === form.birdId);
-  const fcrBaseline = getBreedFcrBaseline(form.standardKey, null);
-  const fcrCurrent = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
+export default function BreedForm({
+  open, onClose, initialData, birds, breeds, onSaved, onRedirectToStandards,
+  customStandards = {}, customOverrides = {},
+}: Props) {
+  const methods = useForm<BreedFormData>({
+    resolver: zodResolver(BreedFormSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
+    defaultValues: initialData,
+  });
+  const { control, setValue, setError, handleSubmit, formState: { errors } } = methods;
+  const [businessError] = useState('');
+
+  useEffect(() => {
+    if (open) methods.reset(initialData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialData]);
+
+  const watchedStandardKey = useWatch({ control, name: 'standardKey' }) || '';
+  const watchedFcr = useWatch({ control, name: 'fcr' }) || '';
+  const watchedPurposes = useWatch({ control, name: 'purposes' }) || [];
+  const watchedBirdId = useWatch({ control, name: 'birdId' }) || '';
+
+  const parentBird = birds.find(x => x.id === watchedBirdId);
+  const fcrBaseline = getBreedFcrBaseline(watchedStandardKey, null);
+  const fcrCurrent = watchedFcr ? parseFloat(toEn(watchedFcr).replace('٫', '.')) || null : null;
   const { hint: fcrHint } = useOverride({
     current: fcrCurrent,
     stdValue: fcrBaseline.value,
-    onReset: () => setForm(f => ({ ...f, fcr: fcrBaseline.value != null ? toFa(fcrBaseline.value) : '' })),
+    onReset: () => setValue('fcr', fcrBaseline.value != null ? toFa(fcrBaseline.value) : ''),
     unit: 'FCR',
     decimals: 1,
   });
 
-  // اطلاعات استاندارد برای نمایش
-  const std = resolveStandard(form.standardKey, customStandards, customOverrides);
+  const std = resolveStandard(watchedStandardKey, customStandards, customOverrides);
 
   const togglePurpose = (key: string) => {
-    const current = form.purposes || [];
-    const has = current.includes(key);
-
-    // اعتبارسنجی بیرون از setForm (چون StrictMode دوبار صدا می‌زنه)
-    if (!has && current.length >= 2) {
+    const has = watchedPurposes.includes(key);
+    if (!has && watchedPurposes.length >= 2) {
       toastMsg.info('حداکثر ۲ هدف می‌تونی انتخاب کنی — یکی رو بردار');
       return;
     }
-
-    setForm(f => ({
-      ...f,
-      purposes: has
-        ? (f.purposes || []).filter(p => p !== key)
-        : [...(f.purposes || []), key],
-    }));
+    setValue('purposes', has
+      ? watchedPurposes.filter(p => p !== key)
+      : [...watchedPurposes, key], { shouldDirty: true });
   };
 
+  const onSubmit = handleSubmit((data) => {
+    const trimmed = data.name.trim();
+
+    if (!data.id) {
+      const newPurposes = (data.purposes || []).slice().sort().join(',');
+      const dup = breeds.find((x) => {
+        if (x.birdId !== data.birdId) return false;
+        if (x.name.trim() !== trimmed) return false;
+        return (x.purposes || []).slice().sort().join(',') === newPurposes;
+      });
+      if (dup) {
+        setError('name', { type: 'manual', message: 'این نژاد با این هدف قبلاً ثبت شده است' });
+        return;
+      }
+    }
+
+    if (!data.purposes || data.purposes.length === 0) {
+      setError('purposes', { type: 'manual', message: 'حداقل یک هدف انتخاب کنید' });
+      return;
+    }
+
+    const allStandardKeys = new Set([
+      ...Object.keys(DEFAULT_STANDARDS),
+      ...Object.keys(customStandards || {}),
+    ]);
+    const baseStandards: Record<string, any> = {};
+    for (const k of allStandardKeys) {
+      const s = resolveStandard(k, customStandards, customOverrides);
+      if (s) baseStandards[k] = s;
+    }
+    const allStandards: Record<string, any> = {};
+    for (const [k, v] of Object.entries(baseStandards)) {
+      const ov = customOverrides[k];
+      allStandards[k] = ov?.nameFa ? { ...(v as any), nameFa: ov.nameFa } : v;
+    }
+
+    const trimmedLower = trimmed.toLowerCase();
+    let finalKey = data.standardKey || '';
+    let finalName = trimmed;
+
+    const matchedByKey = finalKey ? allStandards[finalKey] : null;
+    if (matchedByKey) {
+      const stdName = matchedByKey.nameFa?.trim() || '';
+      if (stdName.toLowerCase() !== trimmedLower) {
+        const baseStd = resolveStandard(finalKey, customStandards, customOverrides);
+        if (baseStd?.nameFa?.trim().toLowerCase() === trimmedLower) {
+          finalName = stdName;
+        } else {
+          setError('name', { type: 'manual', message: `نام نژاد با استاندارد «${stdName}» هماهنگ نیست` });
+          return;
+        }
+      }
+    } else {
+      const matchedByName = Object.entries(allStandards).find(
+        ([_, s]: [string, any]) => s?.nameFa?.trim().toLowerCase() === trimmedLower
+      );
+      if (!matchedByName) {
+        onRedirectToStandards?.(trimmed);
+        return;
+      }
+      finalKey = matchedByName[0];
+    }
+
+    onSaved({ ...data, name: finalName, standardKey: finalKey });
+  });
+
   return (
-    <Modal open={open} onClose={onClose} title={form.id ? 'ویرایش نژاد' : 'افزودن نژاد'}
-      footer={<BtnRow><Btn variant="primary" onClick={onSave}>ذخیره</Btn><Btn onClick={onClose}>لغو</Btn></BtnRow>}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={initialData.id ? 'ویرایش نژاد' : 'افزودن نژاد'}
+      footer={<BtnRow><Btn variant="primary" onClick={onSubmit}>ذخیره</Btn><Btn onClick={onClose}>لغو</Btn></BtnRow>}
+    >
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-      <Field label="پرنده" required error={showError?.('birdId')} onTouch={() => markTouched?.('birdId')}>
-        <SmartSelect
-          error={showError?.('birdId')}
-          value={form.birdId}
-          onChange={v => {
-            // وقتی پرنده عوض می‌شه، نژاد + هدف + FCR ریست شن
-            setForm(f => ({
-              ...f,
-              birdId: v,
-              name: '',
-              standardKey: '',
-              fcr: '',
-              purposes: [],
-            }));
-          }}
-          options={birds.map(c => ({
-            value: c.id,
-            label: c.name,
-            subtitle: undefined,
-          }))}
-          placeholder="— انتخاب کنید —"
-          modalTitle="انتخاب پرنده"
-          autoThreshold={6}
-        />
-      </Field>
+        <Field label="پرنده" required error={errors.birdId?.message}>
+          <Controller
+            name="birdId"
+            control={control}
+            render={({ field }) => (
+              <SmartSelect
+                value={field.value}
+                onChange={(v) => {
+                  field.onChange(v);
+                  setValue('name', ''); setValue('standardKey', '');
+                  setValue('fcr', ''); setValue('purposes', []);
+                }}
+                error={errors.birdId?.message}
+                options={birds.map(c => ({ value: c.id, label: c.name }))}
+                placeholder="— انتخاب کنید —"
+                modalTitle="انتخاب پرنده"
+                autoThreshold={6}
+              />
+            )}
+          />
+        </Field>
 
-      <Field label="نام نژاد" required hint="انتخاب یا تایپ" error={showError?.('name')} onTouch={() => markTouched?.('name')}>
-        <BreedNameField
-          value={form.name}
-          onChange={v => setForm(f => {
-            // 🆕 همه‌ی استانداردها با overrides
-            const allStandards: Record<string, any> = {};
-            const allKeys = new Set([
-              ...Object.keys(DEFAULT_STANDARDS),
-              ...Object.keys(customStandards),
-            ]);
-            for (const k of allKeys) {
-              const s = resolveStandard(k, customStandards, customOverrides);
-              if (s) allStandards[k] = s;
-            }
-            const trimmed = v.trim().toLowerCase();
-            if (!trimmed) return { ...f, name: v, standardKey: '' };
-
-            // 🆕 تلاش برای match با استانداردها
-            const match = Object.entries(allStandards).find(
-              ([_, std]: [string, any]) =>
-                std?.nameFa?.trim().toLowerCase() === trimmed
-            ) as [string, any] | undefined;
-
-            if (match) {
-              const [key, std] = match;
-              const last = std?.growth?.weightByAge?.slice(-1)?.[0];
-              return {
-                ...f,
-                name: v,
-                standardKey: key,
-                fcr: last?.fcr != null ? toFa(last.fcr) : f.fcr,
-              };
-            }
-
-            return { ...f, name: v, standardKey: '' };
-          })}
-          onPick={(pick: BreedPick) => {
-            // کاربر خودش هدف رو انتخاب می‌کنه — بدون auto-fill
-            setForm(f => ({
-              ...f,
-              name: pick.name,
-              standardKey: pick.standardKey || f.standardKey,
-              fcr: pick.fcr !== null ? toFa(pick.fcr) : f.fcr,
-            }));
-          }}
-          parentBirdName={parentBird?.name}
-          parentKind={(parentBird as any)?.birdKind}
-          customStandards={customStandards}
-          customOverrides={customOverrides}
-        />
-      </Field>
+        <Field label="نام نژاد" required hint="انتخاب یا تایپ" error={errors.name?.message}>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <BreedNameField
+                value={field.value}
+                onChange={(v) => {
+                  field.onChange(v);
+                  const t = v.trim().toLowerCase();
+                  if (!t) { setValue('standardKey', ''); return; }
+                  const allStandards: Record<string, any> = {};
+                  const allKeys = new Set([...Object.keys(DEFAULT_STANDARDS), ...Object.keys(customStandards)]);
+                  for (const k of allKeys) {
+                    const s = resolveStandard(k, customStandards, customOverrides);
+                    if (s) allStandards[k] = s;
+                  }
+                  const match = Object.entries(allStandards).find(
+                    ([_, s]: [string, any]) => s?.nameFa?.trim().toLowerCase() === t
+                  );
+                  if (match) {
+                    setValue('standardKey', match[0]);
+                    const last = (match[1] as any)?.growth?.weightByAge?.slice(-1)?.[0];
+                    if (last?.fcr != null) setValue('fcr', toFa(last.fcr));
+                  }
+                }}
+                onPick={(pick: BreedPick) => {
+                  field.onChange(pick.name);
+                  if (pick.standardKey) setValue('standardKey', pick.standardKey);
+                  if (pick.fcr !== null) setValue('fcr', toFa(pick.fcr));
+                }}
+                parentBirdName={parentBird?.name}
+                parentKind={(parentBird as any)?.birdKind}
+                customStandards={customStandards}
+                customOverrides={customOverrides}
+              />
+            )}
+          />
+        </Field>
       </div>
 
-      {/* 🆕 هدف پرورش */}
-      <Field label="هدف پرورش" hint="می‌تونی چند تا انتخاب کنی">
+      <Field label="هدف پرورش" hint="می‌تونی چند تا انتخاب کنی" error={errors.purposes?.message}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
           {PURPOSE_OPTIONS.map(opt => {
-            const active = (form.purposes || []).includes(opt.key);
+            const active = watchedPurposes.includes(opt.key);
             return (
-              <button
-                key={opt.key}
-                aria-label={`هدف ${opt.label}`}
-                type="button"
-                onClick={() => togglePurpose(opt.key)}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                  padding: '7px 12px',
-                  background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
+              <button key={opt.key} type="button" onClick={() => togglePurpose(opt.key)}
+                style={{ padding: '7px 12px', background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
                   border: `1px solid ${active ? 'var(--accent)' : 'var(--border)'}`,
-                  borderRadius: 'var(--r-md)',
-                  color: active ? 'var(--accent)' : 'var(--muted)',
+                  borderRadius: 'var(--r-md)', color: active ? 'var(--accent)' : 'var(--muted)',
                   fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                  fontWeight: active ? 700 : 500,
-                  cursor: 'pointer',
-                }}
-              >
-                <span>{opt.icon}</span>
-                <span>{opt.label}</span>
+                  fontWeight: active ? 700 : 500, cursor: 'pointer' }}>
+                <span>{opt.icon}</span> <span>{opt.label}</span>
               </button>
             );
           })}
         </div>
       </Field>
 
-      {/* اطلاعات استاندارد (نمایش) */}
       {std && (
-        <div style={{
-          padding: 'var(--pad-normal)',
-          background: 'var(--accent-soft)',
-          border: '1px solid var(--accent-border)',
-          borderRadius: 'var(--r-sm)',
-          fontSize: 'var(--fs-xs)',
-          color: 'var(--muted)',
-          lineHeight: 1.5,
-        }}>
+        <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
+          border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)',
+          fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.5 }}>
           <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 2, fontSize: 'var(--fs-sm)' }}>
             📚 {std.nameFa}
           </div>
@@ -225,31 +282,30 @@ export default function BreedForm({ open, onClose, form, setForm, err, showError
       )}
 
       <Field
-        label={
-          <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-            FCR
-            {(() => {
-              const fcr = form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null;
-              const src = detectBreedFcrSource(fcr, form.standardKey, null);
-              const source = fcrHint.overridden ? 'manual' : src.source;
-              return <SourceBadge source={source} label={src.label} />;
-            })()}
-          </span>
-        }
+        label={<span style={{ display: 'inline-flex', alignItems: 'center' }}>FCR
+          {(() => {
+            const src = detectBreedFcrSource(fcrCurrent, watchedStandardKey, null);
+            const source = fcrHint.overridden ? 'manual' : src.source;
+            return <SourceBadge source={source} label={src.label} />;
+          })()}
+        </span>}
         hint="کیلوگرم دان برای هر کیلوگرم رشد"
+        error={errors.fcr?.message}
       >
-        <NumField
-          placeholder="۲٫۰"
-          value={form.fcr}
-          onChange={e => setForm({ ...form, fcr: e.target.value })}
-          min={0.5} max={5} unit="FCR" autoClamp
+        <Controller
+          name="fcr"
+          control={control}
+          render={({ field }) => (
+            <NumField placeholder="۲٫۰" value={field.value} onChange={field.onChange}
+              min={0.5} max={5} unit="FCR" autoClamp />
+          )}
         />
         <OverrideHint {...fcrHint} />
         <FieldHint
           fieldPath="brd.fcr"
-          value={form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null}
+          value={fcrCurrent}
           context={{
-            standardKey: form.standardKey,
+            standardKey: watchedStandardKey,
             expected: fcrBaseline.value ?? undefined,
             expectedSource: 'context',
             expectedLabel: fcrBaseline.kind === 'standard'
@@ -258,7 +314,8 @@ export default function BreedForm({ open, onClose, form, setForm, err, showError
           }}
         />
       </Field>
-      <ErrorBox>{err}</ErrorBox>
+
+      <ErrorBox>{businessError}</ErrorBox>
     </Modal>
   );
 }

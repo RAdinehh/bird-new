@@ -4,15 +4,11 @@ import { useBrd, type Breed } from './store';
 import { getBreedDisplayName } from './_display-name';
 import { useSet } from '../set/store';
 import { useMasterRedirect } from '../../shr/hooks/useMasterRedirect';
-import { useFormDraft } from '../../shr/hooks/useFormDraft';
 import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import BreedForm, { EMPTY_BREED_FORM, type BreedFormData } from './BreedForm';
-import { BreedSchema } from '../../shr/validation/rules/brd';
-import { useValidation } from '../../shr/validation/useValidation';
 import BreedCard from './BreedCard';
-import { DEFAULT_STANDARDS } from '../set/standards/data';
-import { resolveStandard } from './_display-values';
-import { Btn, Empty, PageContainer } from '../../shr/components/ui';import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
+import { Btn, Empty, PageContainer } from '../../shr/components/ui';
+import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { useFilterSort, FilterBar, getBrdBreedsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
@@ -21,50 +17,21 @@ import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 
-
-/** پیدا کردن کلید استاندارد از اسم نژاد — فقط match دقیق (طبق استاندارد) */
-function findStandardKey(name: string): string | undefined {
-  const clean = name.trim().toLowerCase();
-  if (!clean) return undefined;
-  for (const [key, std] of Object.entries(DEFAULT_STANDARDS as any) as [string, any][]) {
-    if (std.nameFa?.trim().toLowerCase() === clean) return key;
-    if (std.nameEn?.trim().toLowerCase() === clean) return key;
-  }
-  return undefined;
-}
-
 export default function BreedsPage({ active = true }: { active?: boolean } = {}) {
   const { birds, breeds: _breedsRaw, addBreed, updateBreed, deleteBreed } = useBrd();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<BreedFormData>(EMPTY_BREED_FORM);
+  const [initialData, setInitialData] = useState<BreedFormData>(EMPTY_BREED_FORM);
   const customStandards = useSet((st: any) => st.customStandards);
   const customOverrides = useSet((st: any) => st.customOverrides);
   const { redirect: masterRedirect, MasterRedirectModal } = useMasterRedirect();
-  const [err, setErr] = useState('');
-  const { errors: vErrors } = useValidation(
-    BreedSchema,
-    {
-      birdId: form.birdId || '',
-      name: form.name || '',
-      fcr: form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null,
-      standardKey: form.standardKey || undefined,
-      purposes: form.purposes || [],
-    },
-  );
-  const [saveAttempted, setSaveAttempted] = useState(false);
-  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
-  const showError = (f: string) => (saveAttempted || touchedFields.has(f)) ? vErrors[f] : undefined;
-  const markTouched = (f: string) => setTouchedFields(prev => { const n = new Set(prev); n.add(f); return n; });
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  // 🆕 focus از URL → باز کردن کارت
+
   const focusId = useFocusParam();
   useEffect(() => {
     if (focusId) setExpandedId(focusId);
   }, [focusId]);
-  const draft = useFormDraft('brd-breed', form, (v: any) => setForm(v));
 
-  // فیلتر تکرارها تو render (per bird + name)
   const _birdsUnique = useMemo(() => {
     const seen = new Set<string>();
     return birds.filter(b => {
@@ -78,7 +45,6 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const breeds = useMemo(() => {
     const seen = new Set<string>();
     return _breedsRaw.filter(b => {
-      // 🆕 کلید شامل purposes ئه — چند نژاد با هدف متفاوت مجاز
       const purposesKey = (b.purposes || []).slice().sort().join(',');
       const k = (b.birdId || '') + '|' + (b.name || '').trim().toLowerCase() + '|' + purposesKey;
       if (seen.has(k)) return false;
@@ -91,16 +57,15 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     const item = undoData;
     if (!item) return;
     try {
-      addBreed(item.item);
-      toastMsg.restored('نژاد')
-    } catch (err) {
-      toastMsg.error('بازگردانی ناموفق')
+      const arr = Array.isArray(item.item) ? item.item : [item.item];
+      arr.forEach((it: any) => addBreed(it));
+      toastMsg.restored(arr.length === 1 ? 'نژاد' : `${arr.length} نژاد`);
+    } catch {
+      toastMsg.error('بازگردانی ناموفق');
     }
     setUndoData(null);
   };
 
-
-  // فیلتر/مرتب
   const config = useMemo(() => getBrdBreedsConfig({ birds: _birdsUnique }), [_birdsUnique]);
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total, count } = useFilterSort<Breed>({
@@ -111,7 +76,6 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     initialSort: config.initialSort,
   });
 
-  // ─── Multi-Select ───
   const ms = useMultiSelect({
     items: list,
     getId: (x: any) => x.id,
@@ -129,7 +93,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 6000);
       }
-      toastMsg.deletedBulk(backups.length, 'مورد')
+      toastMsg.deletedBulk(backups.length, 'مورد');
     },
   });
 
@@ -137,197 +101,88 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
-
   const openNew = () => {
-    if (!draft.hasDraft) setForm({ id:'', birdId: birds[0].id, name:'', fcr:'', standardKey:'', purposes: [] });
-    setErr(''); setSaveAttempted(false); setTouchedFields(new Set()); setOpen(true);
+    setInitialData({ id: '', birdId: birds[0]?.id || '', name: '', fcr: '', standardKey: '', purposes: [] });
+    setOpen(true);
   };
   useFab(active ? { label: 'افزودن نژاد', onClick: openNew } : null);
-
 
   if (birds.length === 0) {
     return (
       <PageContainer>
-      <MasterRedirectModal />
-      <HelpBanner
-        id="brd-breeds-intro"
-        icon="🧬"
-        title="نژادها"
-        description="نژادهای هر پرنده را اینجا تعریف کنید. هر نژاد می‌تواند به استانداردهای علمی وصل شود. برای انتخاب چندتایی، روی یک کارت نگه دارید."
-        tone="info"
-      />
-      {undoData && (
-        <UndoBar
-          label="حذف شد"
-          onUndo={undoDelete}
-          onDismiss={() => setUndoData(null)}
-        />
-      )}
+        <MasterRedirectModal />
+        <HelpBanner id="brd-breeds-intro" icon="🧬" title="نژادها"
+          description="نژادهای هر پرنده را اینجا تعریف کنید. هر نژاد می‌تواند به استانداردهای علمی وصل شود. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+          tone="info" />
+        {undoData && <UndoBar label="حذف شد" onUndo={undoDelete} onDismiss={() => setUndoData(null)} />}
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
           title="اول باید پرنده بسازید"
-          desc="نژاد به پرنده متصل می‌شود. اول به تب «پرنده‌ها» بروید و یک پرنده بسازید."
-        />
+          desc="نژاد به پرنده متصل می‌شود. اول به تب «پرنده‌ها» بروید و یک پرنده بسازید." />
       </PageContainer>
     );
   }
 
   const openEdit = (b: Breed) => {
-    setForm({
-      id: b.id,
-      birdId: b.birdId,
-      // 🆕 نام پویا از استاندارد (اگه standardKey داره)
+    setInitialData({
+      id: b.id, birdId: b.birdId,
       name: getBreedDisplayName(b, { customStandards, customOverrides }),
       fcr: b.fcr ? toFa(b.fcr) : '',
       standardKey: b.standardKey || '',
       purposes: b.purposes || [],
     });
-    
-    setErr(''); setOpen(true);
+    setOpen(true);
   };
 
-  const save = () => {
-    setSaveAttempted(true);
-
-    // 🆕 Zod validation (تمام structural errors)
-    const zodResult = BreedSchema.safeParse({
-      birdId: form.birdId || '',
-      name: form.name || '',
-      fcr: form.fcr ? parseFloat(toEn(form.fcr).replace('٫', '.')) || null : null,
-      standardKey: form.standardKey || undefined,
-      purposes: form.purposes || [],
-    });
-
-    if (!zodResult.success) {
-      // خطاهای ساختاری از طریق useValidation و Field نمایش داده می‌شوند
-      // (ErrorBox فقط برای business logic است)
-      return;
-    }
-
-    // 🔒 جلوگیری از نژاد تکراری (نام + هدف یکسان)
-    if (!form.id) {
-      const _trimmed = form.name.trim();
-      const _newPurposes = (form.purposes || []).slice().sort().join(',');
-      const _dup = breeds.find((x) => {
-        if (x.birdId !== form.birdId) return false;
-        if (x.name.trim() !== _trimmed) return false;
-        const _xPurposes = (x.purposes || []).slice().sort().join(',');
-        return _xPurposes === _newPurposes;
-      });
-      if (_dup) {
-        setErr(`نژاد «${_dup.name}» با همین هدف‌ها قبلاً ثبت شده — هدف‌ها رو تغییر بده یا نژاد جدید بساز`);
-        return;
-      }
-    }
-
-
-    // 🆕 چک: نام باید با یک استاندارد match کنه (با احتساب overrides)
-    const baseStandards: Record<string, any> = {};
-    const allStandardKeys = new Set([
-      ...Object.keys(DEFAULT_STANDARDS),
-      ...Object.keys(customStandards || {}),
-    ]);
-    for (const k of allStandardKeys) {
-      const s = resolveStandard(k, customStandards, customOverrides);
-      if (s) baseStandards[k] = s;
-    }
-    const allStandards: Record<string, any> = {};
-    for (const [k, v] of Object.entries(baseStandards)) {
-      const ov = customOverrides[k];
-      allStandards[k] = ov?.nameFa ? { ...(v as any), nameFa: ov.nameFa } : v;
-    }
-
-    const trimmedName = form.name.trim().toLowerCase();
-    const matchedByKey = form.standardKey ? allStandards[form.standardKey] : null;
-
-    if (matchedByKey) {
-      // اگه standardKey داریم، نام باید با nameFa (با override) هماهنگ باشه
-      const stdName = matchedByKey.nameFa?.trim() || '';
-      if (stdName.toLowerCase() !== trimmedName) {
-        // 🆕 اگه نام فعلی فقط snapshot قدیمیه (از قبل ذخیره شده)، خودکار آپدیت کن
-        // چک: آیا نام فعلی با *base* استاندارد (بدون override) یکی ئه؟
-        const baseStd = resolveStandard(form.standardKey, customStandards, customOverrides);
-        const baseName = baseStd?.nameFa?.trim().toLowerCase();
-        if (baseName === trimmedName) {
-          // snapshot قدیمی → خودکار نام رو با override نهایی جایگزین کن
-          (form as any).name = stdName;
-        } else {
-          setErr(`نام نژاد با استاندارد «${stdName}» هماهنگ نیست — یا نام رو درست کن یا نژاد رو دوباره از لیست انتخاب کن`);
-          return;
-        }
-      }
-    } else {
-      // اگه standardKey نداریم، نام باید با یکی از استانداردها یکی باشه
-      const matchedByName = Object.entries(allStandards).find(
-        ([_, std]: [string, any]) =>
-          std?.nameFa?.trim().toLowerCase() === trimmedName
-      );
-      if (!matchedByName) {
-        masterRedirect('breedStandard', form.name.trim());
-        return;
-      }
-      // خودکار standardKey رو ست کن
-      (form as any).standardKey = matchedByName[0];
-    }
-
-    if (!form.purposes || form.purposes.length === 0) {
-      setErr('حداقل یک هدف پرورش انتخاب کن');
-      return;
-    }
+  const handleSaved = (data: BreedFormData) => {
     const payload = {
-      birdId: form.birdId,
-      name: form.name.trim(),
-      fcr: form.fcr ? parseFloat(toEn(form.fcr).replace('٫','.')) || null : null,
-      standardKey: form.standardKey || undefined,
-      purposes: form.purposes || [],
+      birdId: data.birdId,
+      name: data.name.trim(),
+      fcr: data.fcr ? parseFloat(toEn(String(data.fcr)).replace('٫', '.')) || null : null,
+      standardKey: data.standardKey || undefined,
+      purposes: data.purposes || [],
     };
-    if (form.id) updateBreed(form.id, payload); else addBreed(payload);
-    draft.clear();
+    if (data.id) updateBreed(data.id, payload);
+    else addBreed(payload);
     setOpen(false);
   };
 
-
   return (
     <PageContainer>
+      <MasterRedirectModal />
       <FilterBar
-        filterDefs={config.filterDefs}
-        sortDefs={config.sortDefs}
-        filterState={filters}
-        sortState={sort}
-        setFilter={setFilter}
-        clearFilter={clearFilter}
-        setSort={setSort}
-        toggleSort={toggleSort}
-        resetAll={resetAll}
-        hasActiveFilters={hasActiveFilters}
-        total={total}
-        count={count}
-      />
+        filterDefs={config.filterDefs} sortDefs={config.sortDefs}
+        filterState={filters} sortState={sort}
+        setFilter={setFilter} clearFilter={clearFilter}
+        setSort={setSort} toggleSort={toggleSort}
+        resetAll={resetAll} hasActiveFilters={hasActiveFilters}
+        total={total} count={count} />
 
-              {!ms.selectionMode && list.length > 1 && (
-          <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
-            برای انتخاب چندتایی، روی یک کارت نگه دارید
-          </div>
-        )}
+      {!ms.selectionMode && list.length > 1 && (
+        <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
+          برای انتخاب چندتایی، روی یک کارت نگه دارید
+        </div>
+      )}
 
-        {ms.selectionMode && list.length > 1 && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
-            <button type="button"
-              aria-label={ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
-              onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
-              style={{ padding: 'var(--pad-btn-sm)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-2xs)', fontWeight: 600, cursor: 'pointer' }}>
-              {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
-            </button>
-          </div>
-        )}
+      {ms.selectionMode && list.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <button type="button"
+            aria-label={ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+            onClick={ms.selectedIds.size === list.length ? ms.clearSelection : ms.selectAll}
+            style={{ padding: 'var(--pad-btn-sm)', background: 'var(--input-bg)', border: '1px solid var(--border)',
+              borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit',
+              fontSize: 'var(--fs-2xs)', fontWeight: 600, cursor: 'pointer' }}>
+            {ms.selectedIds.size === list.length ? 'لغو انتخاب همه' : 'انتخاب همه'}
+          </button>
+        </div>
+      )}
 
-        {list.length === 0 ? (
+      {list.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
           title="نژادی ثبت نشده"
           desc="برای هر پرنده می‌توانید چند نژاد بسازید — مثلاً لگهورن، بلاک استار."
-          action={<Btn variant="primary" onClick={openNew}>+ افزودن نژاد</Btn>}
-        />
+          action={<Btn variant="primary" onClick={openNew}>+ افزودن نژاد</Btn>} />
       ) : (
         <>
           {list.map((b, i) => {
@@ -335,45 +190,33 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
             const isOpen = !ms.selectionMode && expandedId === b.id;
             return (
               <BreedCard
-                key={b.id}
-                breed={b}
-                index={i}
-                bird={bird}
-                isOpen={isOpen}
+                key={b.id} breed={b} index={i} bird={bird} isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : b.id)}
-                ms={ms}
-                customStandards={customStandards}
-        customOverrides={customOverrides}
+                ms={ms} customStandards={customStandards} customOverrides={customOverrides}
                 onEdit={openEdit}
                 onDelete={(id, item) => {
                   setUndoData({ item });
                   setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
                   deleteBreed(id);
-                }}
-              />
+                }} />
             );
           })}
-          
         </>
       )}
 
       <MultiSelectBar ms={ms} deleteLabel="حذف" />
-
       {ms.selectionMode && <div style={{ height: 90 }} />}
 
       <BreedForm
         open={open}
         onClose={() => setOpen(false)}
-        customStandards={customStandards}
-        customOverrides={customOverrides}
-        form={form}
-        setForm={setForm}
-        err={err}
+        initialData={initialData}
         birds={birds}
         breeds={breeds}
-        onSave={save}
-      />
+        customStandards={customStandards}
+        customOverrides={customOverrides}
+        onSaved={handleSaved}
+        onRedirectToStandards={(name) => masterRedirect('breedStandard', name)} />
     </PageContainer>
   );
 }
-
