@@ -37,6 +37,7 @@ const CATEGORY_SVG: Record<string, (props: { size?: number }) => React.ReactElem
 };
 import { useValidation } from '../../shr/validation/useValidation';
 import { createItemSchema } from '../../shr/validation/rules/whs';
+import { useFormErrors } from '../../shr/hooks/useFormErrors';
 
 interface F {
   id?: string;
@@ -161,7 +162,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
 
   const openNew = () => {
     const lastR = items.filter(x => x.category).slice().reverse()[0];
-    setForm({ ...empty(), ...(lastR?.category ? { category: lastR.category } : {}) }); setErr(''); setOpen(true);
+    setForm({ ...empty(), ...(lastR?.category ? { category: lastR.category } : {}) }); setErr(''); reset(); setOpen(true);
   };
   useFab(active ? { label: 'افزودن کالا', onClick: openNew } : null);
 
@@ -234,7 +235,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       methionine: it.methionine ? toFa(it.methionine) : '',
       lysine: it.lysine ? toFa(it.lysine) : ''
     });
-    setErr(''); setOpen(true);
+    setErr(''); reset(); setOpen(true);
   };
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
@@ -258,18 +259,21 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
     },
   );
 
+  const { showError, markTouched, attemptSave, reset } = useFormErrors(vErrors);
+
   const save = () => {
+    attemptSave();
+    if (Object.keys(vErrors).length > 0) { setErr(''); return; }
+
     // 🔒 جلوگیری قاطع از نام تکراری کالا
     if (!form.id) {
       const _trimmed = form.name.trim();
       const _dup = items.find((x) => x.name.trim() === _trimmed);
       if (_dup) {
-        toastMsg.error(`کالاای با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`);
+        setErr(`کالایی با نام «${_dup.name}» قبلاً ثبت شده. لطفاً نام دیگری انتخاب کنید یا همان را ویرایش کنید.`);
         return;
       }
     }
-
-    if (form.name.trim() === '') { setErr('نام قلم اجباری است'); return; }
     const isMed = form.category === 'medicine' || form.category === 'vaccine';
     const hasExpiry = ['medicine', 'vaccine', 'herbal', 'egg'].includes(form.category);
 
@@ -475,6 +479,8 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         form={form}
         setForm={setForm}
         vErrors={vErrors}
+        showError={showError}
+        markTouched={markTouched}
         err={err}
         suppliers={suppliers}
         halls={halls}

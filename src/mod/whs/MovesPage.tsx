@@ -20,6 +20,7 @@ import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { useFilterSort, FilterBar, getWhsMovesConfig } from '../../shr/filter';
 import { createMovementSchema } from '../../shr/validation/rules/whs';
+import { useFormErrors } from '../../shr/hooks/useFormErrors';
 
 export interface F {
   id?: string;
@@ -114,7 +115,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
       itemId: items[0].id, type: 'in', quantity: '', unitPrice: '',
       reason: 'purchase', date: '', partyId: '', notes: ''
     });
-    setErr(''); setOpen(true);
+    setErr(''); reset(); setOpen(true);
   };
   useFab(active ? { label: 'ثبت تراکنش', onClick: openNew } : null);
 
@@ -126,7 +127,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
       reason: m.reason, date: m.date,
       partyId: m.partyId || '', notes: m.notes || ''
     });
-    setErr(''); setOpen(true);
+    setErr(''); reset(); setOpen(true);
   };
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
@@ -153,16 +154,13 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
   const selectedItem = items.find(i => i.id === form.itemId);
   const currentStock = selectedItem ? selectedItem.currentStock : 0;
 
-  const save = async () => {
-    if (form.reason === 'purchase' && !form.partyId) {
-      setErr('فروشنده اجباری است');
-      return;
-    }
+  const { showError, markTouched, attemptSave, reset } = useFormErrors(vErrors);
 
-    if (form.itemId === '') { setErr('کالا اجباری است'); return; }
-    if (form.date.trim() === '') { setErr('تاریخ اجباری است'); return; }
+  const save = async () => {
+    attemptSave();
+    if (Object.keys(vErrors).length > 0) { setErr(''); return; }
+
     const qty = num(form.quantity);
-    if (qty <= 0) { setErr('تعداد باید بیشتر از صفر باشد'); return; }
     if (form.type === 'out' && qty > currentStock) {
       const ok = await showConfirmAsync(
         '⚠️ موجودی کافی نیست',
@@ -363,6 +361,8 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
         setForm={setForm}
         err={err}
         vErrors={vErrors}
+        showError={showError}
+        markTouched={markTouched}
         items={items}
         filteredContacts={filteredContacts}
         onSave={save}

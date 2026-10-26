@@ -4,7 +4,7 @@
 import { z } from 'zod';
 import {
   requiredStr, optionalStr, optionalId, requiredId,
-  floatNonNeg, floatPos, intNonNeg, persianDateOpt, oneOf,
+  floatNonNeg, floatPos, intNonNeg, persianDate, persianDateOpt, oneOf,
 } from '../helpers';
 import type { ValidationContext } from '../types';
 
@@ -50,7 +50,7 @@ export function createMovementSchema(_ctx: ValidationContext = {}) {
     quantity: floatNonNeg('مقدار', 1_000_000_000),
     unitPrice: floatNonNeg('قیمت واحد', 1_000_000_000_000),
     reason: oneOf('دلیل', ['purchase', 'consumption', 'sale', 'gift', 'loss', 'adjustment', 'return'] as const),
-    date: persianDateOpt('تاریخ'),
+    date: persianDate('تاریخ'),
     partyId: optionalId(),
     notes: optionalStr(500),
     flockId: optionalId(),
@@ -63,6 +63,13 @@ export function createMovementSchema(_ctx: ValidationContext = {}) {
         code: z.ZodIssueCode.custom,
         message: 'مقدار باید بیشتر از صفر باشد',
         path: ['quantity'],
+      });
+    }
+    if ((data.reason === 'purchase' || data.reason === 'sale') && !data.partyId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'طرف معامله را انتخاب کنید',
+        path: ['partyId'],
       });
     }
   });

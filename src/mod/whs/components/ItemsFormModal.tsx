@@ -14,6 +14,8 @@ export interface ItemsFormModalProps {
   form: any;
   setForm: any;
   vErrors: Record<string, string>;
+  showError?: (field: string) => string | undefined;
+  markTouched?: (field: string) => void;
   err: string;
   suppliers: any[];
   halls: any[];
@@ -22,7 +24,7 @@ export interface ItemsFormModalProps {
 }
 
 export default function ItemsFormModal(props: ItemsFormModalProps) {
-  const { open, setOpen, form, setForm, vErrors, err, suppliers, halls, currentStockForEdit, save } = props;
+  const { open, setOpen, form, setForm, vErrors, showError, markTouched, err, suppliers, halls, currentStockForEdit, save } = props;
   const extras = (CATEGORY_DEFAULTS as any)[form.category];
   const isMedicine = form.category === 'medicine' || form.category === 'vaccine';
 
@@ -34,7 +36,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Grid2>
-          <Field label="نام قلم" required error={vErrors.name}>
+          <Field label="نام قلم" required error={showError?.('name')} onTouch={() => markTouched?.('name')}>
             <Input placeholder="ذرت، نیوکاسل، ویتامین..." value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </Field>
           <Field label="تأمین‌کننده" hint="فقط فروشنده‌ها">
@@ -54,7 +56,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
         </Grid2>
 
         <Grid2>
-          <Field label="دسته" required error={vErrors.category}>
+          <Field label="دسته" required error={showError?.('category')} onTouch={() => markTouched?.('category')}>
             <Select value={form.category} onChange={e => {
               const newCat = e.target.value as ItemCategory;
               const def = CATEGORY_DEFAULTS[newCat];
@@ -72,7 +74,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
               )}
             </Select>
           </Field>
-          <Field label="واحد">
+          <Field label="واحد" error={showError?.('unit')} onTouch={() => markTouched?.('unit')}>
             <Select value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value as ItemUnit })}>
               {(Object.keys(UNIT_LABEL) as ItemUnit[]).map(u =>
                 <option key={u} value={u}>{UNIT_LABEL[u]}</option>
@@ -84,14 +86,14 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
         {!form.id ? (
           <>
             <Grid2>
-              <Field label="موجودی اولیه" hint="فقط هنگام ایجاد">
+              <Field label="موجودی اولیه" hint="فقط هنگام ایجاد" error={showError?.('currentStock')} onTouch={() => markTouched?.('currentStock')}>
                 <NumField placeholder="مثلاً — ۱۰۰" value={form.initialStock} onChange={e => setForm({ ...form, initialStock: e.target.value })} unit={(UNIT_LABEL as any)[form.unit]} min={0} />
               </Field>
-              <Field label="حداقل موجودی" hint="هشدار کمبود">
+              <Field label="حداقل موجودی" hint="هشدار کمبود" error={showError?.('minStock')} onTouch={() => markTouched?.('minStock')}>
                 <NumField placeholder="مثلاً — ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
               </Field>
             </Grid2>
-            <Field label="قیمت موجودی اولیه" hint="اختیاری — برای محاسبه قیمت میانگین">
+            <Field label="قیمت موجودی اولیه" hint="اختیاری — برای محاسبه قیمت میانگین" error={showError?.('lastPrice')} onTouch={() => markTouched?.('lastPrice')}>
               <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={form.initialPrice} onChange={e => setForm({ ...form, initialPrice: e.target.value })} />
             </Field>
           </>
@@ -111,7 +113,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                 </span>
               </div>
             </Field>
-            <Field label="حداقل موجودی" hint="هشدار کمبود">
+            <Field label="حداقل موجودی" hint="هشدار کمبود" error={showError?.('minStock')} onTouch={() => markTouched?.('minStock')}>
               <NumField placeholder="مثلاً — ۱۰۰" unit={form.unit || "عدد"} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
             </Field>
           </Grid2>
@@ -122,7 +124,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
             <SectionTitle>{extras.title}</SectionTitle>
             {extras.needsExpiry && (
               <Grid2>
-                <Field label="تاریخ انقضا">
+                <Field label="تاریخ انقضا" error={showError?.('expireDate')} onTouch={() => markTouched?.('expireDate')}>
                   <DatePicker value={form.expireDate} onChange={v => setForm({ ...form, expireDate: v })}  autoToday />
                 </Field>
               </Grid2>
@@ -131,14 +133,14 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
               <Grid2>
                 {extras.needsWithdrawal && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-                    <Field label="دوره منع مصرف">
+                    <Field label="دوره منع مصرف" error={showError?.('withdrawalDays')} onTouch={() => markTouched?.('withdrawalDays')}>
                     <NumField placeholder="مثلاً — ۳" value={form.withdrawalDays} onChange={e => setForm({ ...form, withdrawalDays: e.target.value })} unit="روز" min={0} />
                   </Field>
-                    <FieldHint fieldPath="whs.withdrawalDays" value={form.withdrawalDays} />
+                    {!showError?.('withdrawalDays') && <FieldHint fieldPath="whs.withdrawalDays" value={form.withdrawalDays} />}
                   </div>
                 )}
                 {extras.needsStorage && (
-                  <Field label="نگهداری">
+                  <Field label="نگهداری" error={showError?.('storage')} onTouch={() => markTouched?.('storage')}>
                     <Select value={form.storage} onChange={e => setForm({ ...form, storage: e.target.value })}>
                       <option value="room">دمای اتاق</option>
                       <option value="fridge">یخچال (۲-۸°)</option>
@@ -162,10 +164,10 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                     </Select>
                   </Field>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-                    <Field label="دوز هر پرنده" hint="اختیاری">
+                    <Field label="دوز هر پرنده" hint="اختیاری" error={showError?.('dosePerBird')} onTouch={() => markTouched?.('dosePerBird')}>
                     <NumField placeholder="۰.۵" value={form.dosePerBird} onChange={e => setForm({ ...form, dosePerBird: e.target.value })} unit="ml" min={0} />
                   </Field>
-                    <FieldHint fieldPath="whs.dosePerBird" value={form.dosePerBird} />
+                    {!showError?.('dosePerBird') && <FieldHint fieldPath="whs.dosePerBird" value={form.dosePerBird} />}
                   </div>
                   <Field label="تاریخ تولید" hint="اختیاری">
                     <DatePicker value={form.productionDate} onChange={v => setForm({ ...form, productionDate: v })} />
@@ -283,11 +285,11 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
           </>
         )}
 
-        <Field label="یادداشت">
+        <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
-        <ErrorBox>{err}</ErrorBox>
+        {err && <ErrorBox>{err}</ErrorBox>}
       </Modal>
   );
 }

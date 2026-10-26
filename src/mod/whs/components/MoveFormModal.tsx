@@ -24,13 +24,15 @@ interface Props {
   setForm: React.Dispatch<React.SetStateAction<F>>;
   err: string;
   vErrors: Record<string, string>;
+  showError?: (field: string) => string | undefined;
+  markTouched?: (field: string) => void;
   items: Item[];
   filteredContacts: Person[];
   onSave: () => void;
 }
 
 export default function MoveFormModal(props: Props) {
-  const { open, setOpen, form, setForm, err, vErrors, items, filteredContacts, onSave } = props;
+  const { open, setOpen, form, setForm, err, vErrors, showError, markTouched, items, filteredContacts, onSave } = props;
 
   const selectedItem = items.find((i) => i.id === form.itemId);
   const currentStock = selectedItem?.currentStock || 0;
@@ -48,7 +50,7 @@ export default function MoveFormModal(props: Props) {
         footer={<BtnRow><Btn variant="primary" onClick={onSave}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Grid2>
-          <Field label="نوع گردش" required>
+          <Field label="نوع گردش" required error={showError?.('type')} onTouch={() => markTouched?.('type')}>
             <Select value={form.type} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
               const newType = e.target.value as MovementType;
               const validReasons = REASONS_BY_TYPE[newType];
@@ -59,7 +61,7 @@ export default function MoveFormModal(props: Props) {
               <option value="out">📤 خروج از انبار</option>
             </Select>
           </Field>
-          <Field label="دلیل" required error={vErrors.reason}>
+          <Field label="دلیل" required error={showError?.('reason')} onTouch={() => markTouched?.('reason')}>
             <Select value={form.reason} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, reason: e.target.value as MovementReason })}>
               {REASONS_BY_TYPE[form.type].map((r) =>
                 <option key={r} value={r}>{MOVEMENT_REASON[r]}</option>
@@ -68,7 +70,7 @@ export default function MoveFormModal(props: Props) {
           </Field>
         </Grid2>
 
-        <Field label="کالا" required hint={selectedItem ? `موجودی فعلی — ${toFa(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined}>
+        <Field label="کالا" required hint={selectedItem ? `موجودی فعلی — ${toFa(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined} error={showError?.('itemId')} onTouch={() => markTouched?.('itemId')}>
           <SmartSelect
             value={form.itemId}
             onChange={v => setForm({ ...form, itemId: v })}
@@ -92,18 +94,14 @@ export default function MoveFormModal(props: Props) {
 
         <Grid2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-            <Field label="تعداد" required error={vErrors.quantity}>
+            <Field label="تعداد" required error={showError?.('quantity')} onTouch={() => markTouched?.('quantity')}>
               <NumField placeholder="مثلاً — ۱۰۰"
                 value={form.quantity}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, quantity: e.target.value })}
                 unit={selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}
                 max={form.type === 'out' ? currentStock : undefined} min={0} />
             </Field>
-            <FieldHint
-              fieldPath={selectedItem ? `whs.qty_${selectedItem.unit}` : ''}
-              value={form.quantity}
-              context={{ itemId: form.itemId }}
-            />
+            {!showError?.('quantity') && <FieldHint fieldPath={selectedItem ? `whs.qty_${selectedItem.unit}` : ''} value={form.quantity} context={{ itemId: form.itemId }} />}
           </div>
           <Field label="قیمت واحد">
             <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={form.unitPrice} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, unitPrice: e.target.value })} />
@@ -112,13 +110,15 @@ export default function MoveFormModal(props: Props) {
 
         {!isAdjustment ? (
           <Grid2>
-            <Field label="تاریخ" required error={vErrors.date}>
+            <Field label="تاریخ" required error={showError?.('date')} onTouch={() => markTouched?.('date')}>
               <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
             </Field>
             <Field
               label={partyLabel}
               required={partyRequired}
               hint={partyRequired ? undefined : 'اختیاری'}
+              error={partyRequired ? showError?.('partyId') : undefined}
+              onTouch={() => partyRequired && markTouched?.('partyId')}
             >
               {filteredContacts.length === 0 ? (
                 <div style={{
@@ -151,16 +151,16 @@ export default function MoveFormModal(props: Props) {
             </Field>
           </Grid2>
         ) : (
-          <Field label="تاریخ" required error={vErrors.date}>
+          <Field label="تاریخ" required error={showError?.('date')} onTouch={() => markTouched?.('date')}>
             <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />
           </Field>
         )}
 
-        <Field label="یادداشت">
+        <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
             <Textarea placeholder="..." value={form.notes} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
-        <ErrorBox>{err}</ErrorBox>
+        {err && <ErrorBox>{err}</ErrorBox>}
       </Modal>
   );
 }
