@@ -10,7 +10,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --incremental --tsBuildInfoFile ./node_modules/.cache/.tsc-incremental",
     "test:ci": "vitest run --coverage",
     "ci": "npm run typecheck && npm run test:ci",
     "check:catch": "grep -rn 'catch (e) {}' src/mod --include='*.ts*' || true"
