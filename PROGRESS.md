@@ -2,7 +2,7 @@
 
 ## 🎯 CURRENT
 - بخش: hal (سالن)
-- وضعیت: شروع فاز ۶
+- وضعیت: HallsPage ✅ — ZonesPage در حال انجام
 - فاز: verify
 
 ## ✅ DONE (1/205)
@@ -19,6 +19,11 @@
 42. markTouched ✅
 50. Save Attempt Validation ✅
 52. Inline Error ✅
+43. Required vs Optional ✅
+44. Cross-Field Validation (hall duplicate, capacity warn) ✅
+45. Range Validation (min/max with Persian nums) ✅
+46. Date Validation (persianDateOpt) ✅
+53. Error Box (business errors only — inline preferred) ✅
 
 ## ⚠️ PARTIAL
 
