@@ -40,9 +40,16 @@ const BreedFormSchema = z.object({
   id: z.string(),
   birdId: z.string().min(1, 'پرنده را انتخاب کنید'),
   name: z.string().trim().min(1, 'نام نژاد را وارد کنید').max(100, 'نام نژاد بیش از حد طولانی است'),
-  fcr: z.string().optional().default(''),
+  fcr: z.string().optional().default('').refine(
+    (v) => {
+      if (!v) return true;
+      const n = parseFloat(String(v).replace('٫', '.').replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))));
+      return Number.isFinite(n) && n >= 0.5 && n <= 5;
+    },
+    { message: 'FCR باید بین ۰.۵ و ۵ باشد' }
+  ),
   standardKey: z.string().optional().default(''),
-  purposes: z.array(z.string()).optional().default([]),
+  purposes: z.array(z.string()).min(1, 'حداقل یک هدف انتخاب کنید').default([]),
 });
 
 interface Props {
@@ -101,7 +108,7 @@ export default function BreedForm({
     }
     setValue('purposes', has
       ? watchedPurposes.filter(p => p !== key)
-      : [...watchedPurposes, key], { shouldDirty: true });
+      : [...watchedPurposes, key], { shouldDirty: true, shouldValidate: true });
   };
 
   const onSubmit = handleSubmit((data) => {
@@ -118,11 +125,6 @@ export default function BreedForm({
         setError('name', { type: 'manual', message: 'این نژاد با این هدف قبلاً ثبت شده است' });
         return;
       }
-    }
-
-    if (!data.purposes || data.purposes.length === 0) {
-      setError('purposes', { type: 'manual', message: 'حداقل یک هدف انتخاب کنید' });
-      return;
     }
 
     const allStandardKeys = new Set([
@@ -299,7 +301,7 @@ export default function BreedForm({
           control={control}
           render={({ field }) => (
             <NumField placeholder="۲٫۰" value={field.value} onChange={field.onChange}
-              min={0.5} max={5} unit="FCR" autoClamp />
+              min={0.5} max={5} unit="FCR" autoClamp error={errors.fcr?.message} />
           )}
         />
         <OverrideHint {...fcrHint} />

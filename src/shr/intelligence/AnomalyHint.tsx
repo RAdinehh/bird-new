@@ -12,6 +12,10 @@ const TONES = {
 
 export function AnomalyHint({ warning }: { warning: Warning | null }) {
   if (!warning) return null;
+  // Hard min/max handled by Zod schema + Field error (no duplicate)
+  if (warning.signals?.some(s => s.type === 'hard_max' || s.type === 'hard_min')) {
+    return null;
+  }
   const c = TONES[warning.level];
   const msg = formatWarning(warning);
   const detail = formatWarningDetail(warning);
