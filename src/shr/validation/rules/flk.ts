@@ -25,7 +25,12 @@ import type { ValidationContext } from '../types';
 export function createFlkSchema(context: ValidationContext = {}) {
   const existingNames = context.existingNames;
   return z.object({
-    name: requiredStr('نام گله', 2, 50),
+    name: (existingNames && existingNames.length > 0)
+      ? requiredStr('نام گله', 2, 50).refine(
+          (v) => !existingNames.includes(v.trim().toLowerCase()),
+          { message: 'نام گله تکراری است — نام دیگری انتخاب کنید' }
+        )
+      : requiredStr('نام گله', 2, 50),
     type: z.enum(['layer', 'broiler', 'breeder']),
     birdId: requiredId('پرنده'),
     breedId: requiredId('نژاد'),
@@ -158,18 +163,6 @@ export function createFlkSchema(context: ValidationContext = {}) {
           code: z.ZodIssueCode.custom,
           message: `سن پایان چرخه (${d.endOfCycleDay}) باید بیشتر از سن تخم‌گذاری (${d.layingStartDay}) باشد`,
           path: ['endOfCycleDay'],
-        });
-      }
-    }
-
-    // ═══ چک نام تکراری ═══
-    if (existingNames && existingNames.length > 0) {
-      const trimmed = d.name.trim().toLowerCase();
-      if (existingNames.includes(trimmed)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `گله‌ای با نام «${d.name.trim()}» قبلاً ثبت شده`,
-          path: ['name'],
         });
       }
     }
