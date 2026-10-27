@@ -49,9 +49,9 @@ export function createFlkSchema(context: ValidationContext = {}) {
     endOfCycleDay: z.number().min(0, 'سن پایان چرخه نمی‌تواند منفی باشد').optional().nullable(),
     vaccineScheduleId: optionalId(),
 
-    hatchDate: persianDateOpt('تاریخ هچ'),
-    purchaseDate: persianDateOpt('تاریخ خرید'),
-    startDate: persianDateOpt('تاریخ شروع'),
+    hatchDate: persianDateOpt('تاریخ هچ').refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ هچ باید امروز یا قبل‌تر باشد' }),
+    purchaseDate: persianDateOpt('تاریخ خرید').refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ خرید باید امروز یا قبل‌تر باشد' }),
+    startDate: persianDateOpt('تاریخ شروع').refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ شروع باید امروز یا قبل‌تر باشد' }),
 
     source: z.enum(['purchase', 'hatch']).default('purchase'),
 
@@ -208,29 +208,6 @@ export function createFlkSchema(context: ValidationContext = {}) {
     }
 
     // تاریخ‌ها در آینده نباشند (Jalali comparison — fix: بود Gregorian)
-    const today = formatJ(new Date(), 'yyyy/MM/dd');
-    if (d.hatchDate && d.hatchDate > today) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'تاریخ هچ نمی‌تواند در آینده باشد',
-        path: ['hatchDate'],
-      });
-    }
-    if (d.purchaseDate && d.purchaseDate > today) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'تاریخ خرید نمی‌تواند در آینده باشد',
-        path: ['purchaseDate'],
-      });
-    }
-    if (d.startDate && d.startDate > today) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'تاریخ شروع نگهداری نمی‌تواند در آینده باشد',
-        path: ['startDate'],
-      });
-    }
-
     // منبع hatch → hatchDate اجباری
     if (d.source === 'hatch' && !d.hatchDate) {
       ctx.addIssue({
