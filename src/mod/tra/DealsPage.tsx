@@ -19,6 +19,9 @@ import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
 import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
+import { useValidation } from '../../shr/validation/useValidation';
+import { useFormErrors } from '../../shr/hooks/useFormErrors';
+import { DealSchema } from '../../shr/validation/rules/tra';
 
 interface F {
   id?: string;
@@ -135,10 +138,22 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
 
+  const { errors: vErrors } = useValidation(DealSchema, {
+    type: form.type,
+    date: form.date || '',
+    partyId: form.partyId || '',
+    description: form.description || '',
+    value: form.value.trim() ? num(form.value) : undefined,
+    percent: form.percent.trim() ? num(form.percent) : null,
+    dueDate: form.dueDate || '',
+    status: form.status,
+    notes: form.notes || '',
+  });
+  const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
+
   const save = () => {
-    if (form.partyId === '') { setErr('طرف معامله اجباری است'); return; }
-    if (form.date.trim() === '') { setErr('تاریخ اجباری است'); return; }
-    if (form.description.trim() === '') { setErr('توضیحات اجباری است'); return; }
+    attemptSave();
+    if (Object.keys(vErrors).length > 0) { setErr(''); return; }
 
     let pct: number | null = null;
     if (form.percent.trim() !== '') {
@@ -300,17 +315,17 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Grid2>
-          <Field label="نوع معامله" required>
+          <Field label="نوع معامله" required error={showError?.('type')} onTouch={() => markTouched?.('type')}>
             <Select value={form.type} onChange={e => setForm({...form, type: e.target.value as DealType})}>
               {(Object.keys(DEAL_LABEL) as DealType[]).map(t => <option key={t} value={t}>{DEAL_LABEL[t]}</option>)}
             </Select>
           </Field>
-          <Field label="تاریخ" required>
+          <Field label="تاریخ" required error={showError?.('date')} onTouch={() => markTouched?.('date')}>
             <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
           </Field>
         </Grid2>
 
-        <Field label="طرف معامله" required>
+        <Field label="طرف معامله" required error={showError?.('partyId')} onTouch={() => markTouched?.('partyId')}>
           <SmartSelect
               value={form.partyId}
               onChange={v => setForm({...form, partyId: v})}
@@ -325,15 +340,15 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
             />
         </Field>
 
-        <Field label="توضیحات" required>
+        <Field label="توضیحات" required error={showError?.('description')} onTouch={() => markTouched?.('description')}>
             <Textarea placeholder="توضیح معامله..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
           </Field>
 
         <Grid2>
-          <Field label="ارزش (تومان)">
+          <Field label="ارزش (تومان)" error={showError?.('value')} onTouch={() => markTouched?.('value')}>
             <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="تومان" min={0} />
           </Field>
-          <Field label="درصد" hint="۰ تا ۱۰۰">
+          <Field label="درصد" hint="۰ تا ۱۰۰" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
             <NumField placeholder="مثلاً ۱۰" value={form.percent} onChange={e => {
               const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
               const v = Math.max(0, Math.min(100, raw));
@@ -342,11 +357,11 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           </Field>
         </Grid2>
 
-        <Field label="سرسید">
+        <Field label="سرسید" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
           <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})}  autoToday />
         </Field>
 
-        <Field label="وضعیت">
+        <Field label="وضعیت" error={showError?.('status')} onTouch={() => markTouched?.('status')}>
           <Select value={form.status} onChange={e => setForm({...form, status: e.target.value as 'open' | 'settled' | 'cancelled'})}>
             <option value="open">باز</option>
             <option value="settled">تسویه‌شده</option>
@@ -354,11 +369,11 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           </Select>
         </Field>
 
-        <Field label="یادداشت">
+        <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
             <Textarea placeholder="یادداشت اختیاری" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
 
-        <ErrorBox>{err}</ErrorBox>
+        {err && <ErrorBox>{err}</ErrorBox>}
       </Modal>
     </PageContainer>
   );

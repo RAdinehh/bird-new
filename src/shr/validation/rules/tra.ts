@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { MSG } from '../errorMessages';
 import {
   requiredStr, optionalStr, optionalId, requiredId,
-  floatNonNeg, floatPos, persianDateOpt, oneOf,
+  floatNonNeg, floatPos, floatRange, persianDate, persianDateOpt, oneOf,
 } from '../helpers';
 import type { ValidationContext } from '../types';
 
@@ -449,6 +449,19 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     }
   });
 }
+
+export const DealSchema = z.object({
+  type: z.enum(['consignment', 'partnership', 'barter', 'conditional'] as const),
+  date: persianDate('تاریخ'),
+  partyId: requiredId('طرف معامله'),
+  description: requiredStr('توضیحات', 2, 300),
+  value: floatNonNeg('ارزش', 1_000_000_000_000).optional(),
+  percent: floatRange('درصد', 0, 100).nullable().optional(),
+  dueDate: persianDateOpt('سرسید'),
+  status: z.enum(['open', 'settled', 'cancelled'] as const),
+  notes: optionalStr(1000),
+});
+export type DealFormData = z.infer<typeof DealSchema>;
 
 export type PaymentFormData = z.infer<typeof PaymentSchema>;
 export type InvoiceFormData = z.infer<ReturnType<typeof createInvoiceSchema>>;
