@@ -221,6 +221,8 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         status: pp.status || 'pending',
       })),
       dueDate: form.dueDate || '',
+      deliveryDate: form.deliveryDate || '',
+      isPreorder: form.isPreorder ?? false,
       relatedFlockId: '',
       relatedEntryId: '',
       notes: form.notes || '',
