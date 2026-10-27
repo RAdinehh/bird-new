@@ -428,7 +428,11 @@ return (
         total={total}
         paid={paid}
         rem={rem}
-        save={() => { setSaveAttempted(true); save(); }}
+        save={() => {
+          setSaveAttempted(true);
+          if (Object.keys(vErrors).length > 0) { setErr(''); return; }
+          save();
+        }}
         addItem={addItem}
         updateItem={updateItem}
         removeItem={removeItem}
