@@ -342,12 +342,12 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
               {(Object.keys(DEAL_LABEL) as DealType[]).map(t => <option key={t} value={t}>{DEAL_LABEL[t]}</option>)}
             </Select>
           </Field>
-          <Field label="تاریخ" required error={showError?.('date')} onTouch={() => markTouched?.('date')}>
+          <Field label="تاریخ ایجاد" required error={showError?.('date')} onTouch={() => markTouched?.('date')}>
             <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
           </Field>
         </Grid2>
 
-        <Field label="طرف معامله" required error={showError?.('partyId')} onTouch={() => markTouched?.('partyId')}>
+        <Field label="طرف قرارداد" required error={showError?.('partyId')} onTouch={() => markTouched?.('partyId')}>
           <SmartSelect
               value={form.partyId}
               onChange={v => setForm({...form, partyId: v})}
@@ -388,7 +388,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
             <option value="barter_direct">🔄 تهاتر مستقیم</option>
             <option value="profit_sharing">🤝 شراکت در سود</option>
             <option value="rental_monthly">📅 اجاره ماهانه</option>
-            <option value="grower_fee_per_unit">🐔 دستمزد پروار</option>
+            <option value="grower_fee_per_unit">🐔 دستمزد پرورش</option>
           </Select>
         </Field>
       </Grid2>
@@ -407,7 +407,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       )}
 
         <Grid2>
-          <Field label="ارزش (تومان)" error={showError?.('value')} onTouch={() => markTouched?.('value')}>
+          <Field label="مبلغ قرارداد" error={showError?.('value')} onTouch={() => markTouched?.('value')}>
             <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="تومان" min={0} />
           </Field>
           <Field label="درصد" hint="۰ تا ۱۰۰" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
@@ -419,7 +419,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           </Field>
         </Grid2>
 
-        <Field label="سرسید" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
+        <Field label="مهلت پرداخت" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
           <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})}  autoToday />
         </Field>
 
