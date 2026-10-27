@@ -28,12 +28,15 @@ interface Props {
   addPayment: () => void;
   updatePayment: (id: string, patch: Partial<Payment>) => void;
   removePayment: (id: string) => void;
+  showError?: (field: string) => string | undefined;
+  markTouched?: (field: string) => void;
 }
 
 export default function PaymentsSection({
   form, setForm, total, paid, rem,
   expandedPaymentId, setExpandedPaymentId,
   addPayment, updatePayment, removePayment,
+  showError, markTouched,
 }: Props) {
   return (
     <>
@@ -241,10 +244,10 @@ export default function PaymentsSection({
                             </Field>
                           </Grid2>
                           <Grid2>
-                            <Field label="تاریخ پرداخت">
+                            <Field label="تاریخ پرداخت" error={showError?.('payments.' + idx + '.date')} onTouch={() => markTouched?.('payments.' + idx + '.date')}>
                               <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={toEn(form.date)} autoToday />
                             </Field>
-                            <Field label="مبلغ">
+                            <Field label="مبلغ" error={showError?.('payments.' + idx + '.amount')} onTouch={() => markTouched?.('payments.' + idx + '.amount')}>
                               <MoneyField showWords={false} placeholder="مبلغ" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0; const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw; updatePayment(p.id, { amount: val }); }} />
                               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '0 4px', gap: 4 }}>
                                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${toFa(rem.toLocaleString('fa-IR'))} تومان` : ''}</span>
@@ -255,11 +258,11 @@ export default function PaymentsSection({
                           {p.method === 'check' && (
                             <>
                               <Grid2>
-                                <Field label="شماره چک"><Input placeholder="شماره چک" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
-                                <Field label="بانک"><Input placeholder="نام بانک" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
+                                <Field label="شماره چک" error={showError?.('payments.' + idx + '.checkNo')} onTouch={() => markTouched?.('payments.' + idx + '.checkNo')}><Input placeholder="شماره چک" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
+                                <Field label="بانک" error={showError?.('payments.' + idx + '.bank')} onTouch={() => markTouched?.('payments.' + idx + '.bank')}><Input placeholder="نام بانک" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
                               </Grid2>
                               <Grid2>
-                                <Field label="سرسید"><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
+                                <Field label="سرسید" error={showError?.('payments.' + idx + '.dueDate')} onTouch={() => markTouched?.('payments.' + idx + '.dueDate')}><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
                                 <Field label="وضعیت چک" help={HELP.tra.payment.checkStatus}>
                                   <Select value={p.status || 'pending'} onChange={e => { const newStatus = e.target.value as CheckStatus; const patch: Partial<Payment> = { status: newStatus }; if (newStatus === 'bounced') { patch.bouncedDate = getTodayJalali(); patch.clearedDate = ''; } else if (newStatus === 'cleared') { patch.clearedDate = getTodayJalali(); patch.bouncedDate = ''; } else { patch.bouncedDate = ''; patch.clearedDate = ''; } updatePayment(p.id, patch); }}>
                                     <option value="pending">🟡 در جریان</option>

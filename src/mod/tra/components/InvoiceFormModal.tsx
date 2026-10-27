@@ -566,6 +566,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           addPayment={addPayment}
           updatePayment={updatePayment}
           removePayment={removePayment}
+          showError={showError}
+          markTouched={markTouched}
         />
         </div>
       )}
