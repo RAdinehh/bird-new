@@ -19,9 +19,11 @@ interface Props {
   flockAliveCount: number;
   vaccineEnabled: boolean;
   medicineEnabled: boolean;
+  showError: (field: string) => string | undefined;
+  markTouched: (field: string) => void;
 }
 
-export default function HealthSection({ form, setForm, vErrors, flockAliveCount, vaccineEnabled, medicineEnabled }: Props) {
+export default function HealthSection({ form, setForm, vErrors, flockAliveCount, vaccineEnabled, medicineEnabled, showError, markTouched }: Props) {
   const { items: whsItems } = useWhs();
   const vaccineItems = useMemo(() => whsItems.filter(x => x.category === 'vaccine'), [whsItems]);
   const medicineItems = useMemo(() => whsItems.filter(x => x.category === 'medicine' || x.category === 'herbal'), [whsItems]);
@@ -50,7 +52,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           </div>
           <Grid2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="تعداد" error={vErrors.deathsCount || vErrors.deaths}>
+              <Field label="تعداد" error={showError('deathsCount') || showError('deaths')} onTouch={() => markTouched('deathsCount')}>
                 <NumField placeholder="۰" value={String(d.count || '')}
                   onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
                   min={0} max={flockAliveCount || undefined} unit="پرنده" />

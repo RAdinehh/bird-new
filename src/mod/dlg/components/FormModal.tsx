@@ -87,10 +87,10 @@ export default function FormModal(props: FormModalProps) {
       )}
 
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 محیط و پرنده</div>
-      <EnvironmentSection form={form} setForm={setForm} vErrors={vErrors} />
+      <EnvironmentSection form={form} setForm={setForm} vErrors={vErrors} showError={showError} markTouched={markTouched} />
 
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🍽 تغذیه و آب</div>
-      <FeedSection form={form} setForm={setForm} vErrors={vErrors} />
+      <FeedSection form={form} setForm={setForm} vErrors={vErrors} showError={showError} markTouched={markTouched} />
 
       {isLayerType && !isFlockMature && selectedFlock && (
         <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', lineHeight: 1.7, marginBottom: 8 }}>
@@ -101,7 +101,7 @@ export default function FormModal(props: FormModalProps) {
       {isLayerFlock && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🥚 تخم و وزن</div>
-          <EggsWeightSection form={form} setForm={setForm} vErrors={vErrors} flockAliveCount={flockAliveCount} />
+          <EggsWeightSection form={form} setForm={setForm} vErrors={vErrors} flockAliveCount={flockAliveCount} showError={showError} markTouched={markTouched} />
         </>
       )}
 
@@ -110,8 +110,7 @@ export default function FormModal(props: FormModalProps) {
         form={form} setForm={setForm} vErrors={vErrors}
         flockAliveCount={flockAliveCount}
         vaccineEnabled={vaccineEnabled}
-        medicineEnabled={medicineEnabled}
-      />
+        medicineEnabled={medicineEnabled} showError={showError} markTouched={markTouched} />
 
       <ActivitiesSection form={form} setForm={setForm} />
 

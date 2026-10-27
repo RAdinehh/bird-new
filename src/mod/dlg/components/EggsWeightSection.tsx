@@ -13,9 +13,11 @@ interface Props {
   setForm: React.Dispatch<React.SetStateAction<F>>;
   vErrors: Record<string, string>;
   flockAliveCount: number;
+  showError: (field: string) => string | undefined;
+  markTouched: (field: string) => void;
 }
 
-export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCount }: Props) {
+export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCount, showError, markTouched }: Props) {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
 
   // context
@@ -27,30 +29,30 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
     <>
           <Grid2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="🥚 تخم خوراکی" error={vErrors.eatingEggs}>
+              <Field label="🥚 تخم خوراکی" error={showError('eatingEggs')}>
                 <NumField placeholder="۰" value={form.eatingEggs} onChange={e => setForm({...form, eatingEggs: e.target.value})} unit="عدد" min={0} max={flockAliveCount || undefined} />
               </Field>
-              <FieldHint fieldPath="dlg.eatingEggs" value={form.eatingEggs} context={{ femaleCount, flockSize: flockAliveCount }} />
+              {!showError('eatingEggs') && <FieldHint fieldPath="dlg.eatingEggs" value={form.eatingEggs} context={{ femaleCount, flockSize: flockAliveCount }} />}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="🌱 تخم نطفه‌دار" error={vErrors.fertileEggs}>
+              <Field label="🌱 تخم نطفه‌دار" error={showError('fertileEggs')}>
                 <NumField placeholder="۰" value={form.fertileEggs} onChange={e => setForm({...form, fertileEggs: e.target.value})} unit="عدد" min={0} />
               </Field>
-              <FieldHint fieldPath="dlg.fertileEggs" value={form.fertileEggs} context={{ femaleCount, flockSize: flockAliveCount }} />
+              {!showError('fertileEggs') && <FieldHint fieldPath="dlg.fertileEggs" value={form.fertileEggs} context={{ femaleCount, flockSize: flockAliveCount }} />}
             </div>
           </Grid2>
           <Grid2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="💔 شکسته" error={vErrors.brokenEggs}>
+              <Field label="💔 شکسته" error={showError('brokenEggs')}>
                 <NumField placeholder="۰" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} unit="عدد" min={0} />
               </Field>
-              <FieldHint fieldPath="dlg.brokenEggs" value={form.brokenEggs} context={{ femaleCount, flockSize: flockAliveCount }} />
+              {!showError('brokenEggs') && <FieldHint fieldPath="dlg.brokenEggs" value={form.brokenEggs} context={{ femaleCount, flockSize: flockAliveCount }} />}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="📦 سایر (نرم/کثیف)" error={vErrors.otherEggs}>
+              <Field label="📦 سایر (نرم/کثیف)" error={showError('otherEggs')}>
                 <NumField placeholder="۰" value={form.otherEggs} onChange={e => setForm({...form, otherEggs: e.target.value})} unit="عدد" min={0} />
               </Field>
-              <FieldHint fieldPath="dlg.otherEggs" value={form.otherEggs} context={{ femaleCount, flockSize: flockAliveCount }} />
+              {!showError('otherEggs') && <FieldHint fieldPath="dlg.otherEggs" value={form.otherEggs} context={{ femaleCount, flockSize: flockAliveCount }} />}
             </div>
           </Grid2>
       {form.weightSamples.length > 0 && (

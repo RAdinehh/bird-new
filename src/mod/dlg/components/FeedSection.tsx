@@ -18,9 +18,11 @@ interface Props {
   form: F;
   setForm: React.Dispatch<React.SetStateAction<F>>;
   vErrors: Record<string, string>;
+  showError: (field: string) => string | undefined;
+  markTouched: (field: string) => void;
 }
 
-export default function FeedSection({ form, setForm, vErrors }: Props) {
+export default function FeedSection({ form, setForm, vErrors, showError, markTouched }: Props) {
   const { formulas, ingredients } = useFed();
   const { items: whsItems } = useWhs();
   const feedItems = useMemo(() => whsItems.filter(x => x.category === 'feed'), [whsItems]);
@@ -125,13 +127,13 @@ export default function FeedSection({ form, setForm, vErrors }: Props) {
           <Field label="مقدار دان مصرفی">
             <NumField placeholder="۵۰" value={form.feedAmount} onChange={e => setForm({ ...form, feedAmount: e.target.value })} unit="kg" min={0} />
           </Field>
-          <FieldHint fieldPath="dlg.feedAmount" value={form.feedAmount} context={{ flockSize }} />
+          {!showError('feedAmount') && <FieldHint fieldPath="dlg.feedAmount" value={form.feedAmount} context={{ flockSize }} />}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
           <Field label="دان باقیمانده">
             <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
           </Field>
-          <FieldHint fieldPath="dlg.feedRemaining" value={form.feedRemaining} context={{ feedAmount: feedAmtNum ?? undefined, flockSize }} />
+          {!showError('feedRemaining') && <FieldHint fieldPath="dlg.feedRemaining" value={form.feedRemaining} context={{ feedAmount: feedAmtNum ?? undefined, flockSize }} />}
         </div>
       </Grid2>
 
@@ -145,13 +147,13 @@ export default function FeedSection({ form, setForm, vErrors }: Props) {
               <Field label="تعداد بار">
                 <NumField placeholder="۵" value={form.waterFillCount} onChange={e => setForm({ ...form, waterFillCount: e.target.value })} unit="بار" min={0} />
               </Field>
-              <FieldHint fieldPath="dlg.waterFillCount" value={form.waterFillCount} />
+              {!showError('waterFillCount') && <FieldHint fieldPath="dlg.waterFillCount" value={form.waterFillCount} />}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="حجم هر بار">
                 <NumField placeholder="۲۰" value={form.waterFillVolume} onChange={e => setForm({ ...form, waterFillVolume: e.target.value })} unit="L" min={0} />
               </Field>
-              <FieldHint fieldPath="dlg.waterFillVolume" value={form.waterFillVolume} />
+              {!showError('waterFillVolume') && <FieldHint fieldPath="dlg.waterFillVolume" value={form.waterFillVolume} />}
             </div>
           </Grid2>
           {(form.waterFillCount && form.waterFillVolume) && (
@@ -171,7 +173,7 @@ export default function FeedSection({ form, setForm, vErrors }: Props) {
             <Field label="مقدار آب مصرفی (تخمینی)">
               <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
             </Field>
-            <FieldHint fieldPath="dlg.waterAmount" value={form.waterAmount} context={{ flockSize }} />
+            {!showError('waterAmount') && <FieldHint fieldPath="dlg.waterAmount" value={form.waterAmount} context={{ flockSize }} />}
           </div>
         </>
       )}
