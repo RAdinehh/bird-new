@@ -33,6 +33,18 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
         for (const d of dot) v = v.split(d).join('');
       }
       v = formatNumWhileTyping(v);
+      // 🆕 autoClamp: فقط max روی تایپ (min روی blur)
+      if (autoClamp && v !== '' && v !== '-' && v !== '.') {
+        const __n = parseFaNum(v);
+        if (Number.isFinite(__n)) {
+          let __cn = __n;
+          if (max !== undefined) __cn = Math.min(max, __cn);
+          if (__cn !== __n) {
+            v = formatNumWhileTyping(String(__cn));
+            if (onClamp) onClamp(__cn);
+          }
+        }
+      }
     }
     setLocalValue(v);
     if (onChange) {

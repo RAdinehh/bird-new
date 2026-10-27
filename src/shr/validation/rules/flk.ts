@@ -49,9 +49,9 @@ export function createFlkSchema(context: ValidationContext = {}) {
     endOfCycleDay: z.number().min(0, 'سن پایان چرخه نمی‌تواند منفی باشد').optional().nullable(),
     vaccineScheduleId: optionalId(),
 
-    hatchDate: persianDateOpt('تاریخ هچ').refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ هچ باید امروز یا قبل‌تر باشد' }),
-    purchaseDate: persianDateOpt('تاریخ خرید').refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ خرید باید امروز یا قبل‌تر باشد' }),
-    startDate: persianDateOpt('تاریخ شروع').refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ شروع باید امروز یا قبل‌تر باشد' }),
+    hatchDate: persianDateOpt('تاریخ هچ').refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ هچ باید امروز یا قبل‌تر باشد' }).refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ هچ باید امروز یا قبل‌تر باشد' }),
+    purchaseDate: persianDateOpt('تاریخ خرید').refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ خرید باید امروز یا قبل‌تر باشد' }).refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ خرید باید امروز یا قبل‌تر باشد' }),
+    startDate: persianDateOpt('تاریخ شروع').refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ شروع باید امروز یا قبل‌تر باشد' }).refine((v) => !v || v <= formatJ(new Date(), 'yyyy/MM/dd'), { message: 'تاریخ شروع باید امروز یا قبل‌تر باشد' }),
 
     source: z.enum(['purchase', 'hatch']).default('purchase'),
 

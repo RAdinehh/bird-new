@@ -304,40 +304,10 @@ export default function BreedForm({
           control={control}
           render={({ field }) => {
             const handleFcrChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-              const raw = e.target.value;
-              if (!raw.trim()) {
-                field.onChange(e);
-                if (errors.fcr?.type === 'manual') clearErrors('fcr');
-                return;
-              }
-              const en = toEn(raw).replace('٫', '.').replace(/[^\d.]/g, '');
-              const num = parseFloat(en);
-              if (!Number.isFinite(num)) {
-                field.onChange(e);
-                return;
-              }
-              if (num === 0) {
-                field.onChange(e);
-                if (errors.fcr?.type === 'manual') clearErrors('fcr');
-                return;
-              }
-              let clamped = num;
-              if (clamped < 0.5) clamped = 0.5;
-              if (clamped > 5) clamped = 5;
-              if (clamped !== num) {
-                const clampedStr = toFa(Number.isInteger(clamped) ? String(clamped) : clamped.toFixed(1));
-                field.onChange({ target: { value: clampedStr } });
-                setError('fcr', {
-                  type: 'manual',
-                  message: 'FCR باید بین ۰.۵ و ۵ باشد',
-                });
-              } else {
-                field.onChange(e);
-                if (errors.fcr?.type === 'manual') clearErrors('fcr');
-              }
+              field.onChange(e);
             };
             return (
-              <NumField placeholder="۲٫۰" value={field.value}
+              <NumField placeholder="۲٫۰" value={field.value} autoClamp
                 onChange={handleFcrChange}
                 min={0.5} max={5} unit="FCR" error={errors.fcr?.message} />
             );

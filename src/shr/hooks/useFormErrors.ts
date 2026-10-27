@@ -70,7 +70,7 @@ function isRequiredError(msg: string): boolean {
   return (
     msg.includes('اجباری') ||
     msg.includes('را وارد کنید') ||
-    msg.includes('انتخاب کنید') ||
+    msg.includes('را انتخاب کنید') ||
     msg.includes('لطفاً')
   );
 }
