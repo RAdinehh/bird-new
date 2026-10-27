@@ -109,7 +109,12 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
         <Field label="نژاد" hint={!rule.breedId ? 'نژاد خاص — خالی = همه' : undefined}>
           <Select value={rule.breedId || ''} onChange={e => update({ breedId: e.target.value || undefined })}>
             <option value="">همه</option>
-            {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            {breeds.map(b => {
+              const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
+              const purposeLabels = ((b as any).purposes || []).map((p: string) => purposeMap[p] || p);
+              const label = purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name;
+              return <option key={b.id} value={b.id}>{label}</option>;
+            })}
           </Select>
         </Field>
       </Grid2>

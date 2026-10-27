@@ -330,7 +330,12 @@ export default function EggEntryModal(props: EggEntryModalProps) {
             <Field label="نژاد">
               <Select value={currentRow.breedId} onChange={e => setCurrentRow(f => ({ ...f, breedId: e.target.value }))}>
                 <option value="">—</option>
-                {breedsForBird.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                {breedsForBird.map(b => {
+                  const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
+                  const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
+                  const label = purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name;
+                  return <option key={b.id} value={b.id}>{label}</option>;
+                })}
               </Select>
             </Field>
           </Grid2>

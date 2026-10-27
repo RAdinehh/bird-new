@@ -636,7 +636,11 @@ if (category === 'egg' || category === 'fertile_egg') {
           <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} />
         </Field>
         <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')}>
-          <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
+          <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
+            const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
+            const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
+            return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
+          })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} />
         </Field>
       </Grid2>
     </div>
