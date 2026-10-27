@@ -233,7 +233,18 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const [saveAttempted, setSaveAttempted] = useState(false);
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
   const markTouched = (f: string) => setTouchedFields((prev) => { const n = new Set(prev); n.add(f); return n; });
-  const showError = (f: string) => (saveAttempted || touchedFields.has(f)) ? vErrors[f] : undefined;
+  const isRequiredError = (msg: string) =>
+    msg.includes('اجباری') ||
+    msg.includes('را وارد کنید') ||
+    msg.includes('را انتخاب کنید') ||
+    msg.includes('لطفاً');
+  const showError = (f: string) => {
+    if (!saveAttempted && !touchedFields.has(f)) return undefined;
+    const err = vErrors[f];
+    if (!err) return undefined;
+    if (!saveAttempted && isRequiredError(err)) return undefined;
+    return err;
+  };
 
   // 🆕 ریست خطاها هنگام تغییر دسته (تا ذخیره زده نشده، فرم تمیز است)
   useEffect(() => {
