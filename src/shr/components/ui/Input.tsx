@@ -33,18 +33,6 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
         for (const d of dot) v = v.split(d).join('');
       }
       v = formatNumWhileTyping(v);
-      // 🆕 autoClamp: فقط max روی تایپ (min روی blur)
-      if (autoClamp && v !== '' && v !== '-' && v !== '.') {
-        const __n = parseFaNum(v);
-        if (Number.isFinite(__n)) {
-          let __cn = __n;
-          if (max !== undefined) __cn = Math.min(max, __cn);
-          if (__cn !== __n) {
-            v = formatNumWhileTyping(String(__cn));
-            if (onClamp) onClamp(__cn);
-          }
-        }
-      }
     }
     setLocalValue(v);
     if (onChange) {
@@ -89,16 +77,6 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsEditing(false);
     // در blur: اگر مقدار خارج از محدوده بود، اصلاح کن
-    if ((min !== undefined || max !== undefined) && value) {
-      const n = parseFaNum(String(value));
-      let cn = n;
-      if (min !== undefined) cn = Math.max(min, cn);
-      if (max !== undefined) cn = Math.min(max, cn);
-      if (cn !== n && onChange) {
-        const fake = { ...e, target: { ...e.target, value: formatNumWhileTyping(String(cn)) } } as React.ChangeEvent<HTMLInputElement>;
-        onChange(fake);
-      }
-    }
     if (onBlur) onBlur(e);
   };
 
@@ -156,7 +134,7 @@ export function MoneyField({ value, showWords = true, ...props }: Omit<InputProp
   const displayValue = value !== undefined && value !== null && String(value) !== ''
     ? formatNumWhileTyping(String(value))
     : '';
-  return <Input mode="number" inputMode="numeric" unit="تومان" min={0} showWords={showWords} autoClamp value={displayValue} {...props} />;
+  return <Input mode="number" inputMode="numeric" unit="تومان" min={0} showWords={showWords} value={displayValue} {...props} />;
 }
 export function PhoneField({ maxLength = 11, ...props }: Omit<InputProps, 'unit' | 'inputMode'> & { maxLength?: number }) {
   return <Input dir="ltr" inputMode="numeric" maxLength={maxLength} {...props} />;
