@@ -251,9 +251,9 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📐 ابعاد و ظرفیت</div>
         <Grid3>
-          <Field label="طول" required error={vErrors.length}><NumField placeholder="۱۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} autoClamp /></Field>
-          <Field label="عرض" required error={vErrors.width}><NumField placeholder="۵" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} autoClamp /></Field>
-          <Field label="ارتفاع" required error={vErrors.height}><NumField placeholder="۳" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} autoClamp /></Field>
+          <Field label="طول" required error={vErrors.length}><NumField placeholder="۱۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} /></Field>
+          <Field label="عرض" required error={vErrors.width}><NumField placeholder="۵" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} /></Field>
+          <Field label="ارتفاع" required error={vErrors.height}><NumField placeholder="۳" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} /></Field>
         </Grid3>
         {(() => {
           const cap = parseFloat(toEn(form.capacity)) || 0;
@@ -332,7 +332,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
             <OverrideHint {...tempHint} />
           </Field>
           <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? (currentBreedName ? `استاندارد «${currentBreedName}»` : 'استاندارد') : undefined} help="این مقدار از استاندارد نژاد پرنده (در بخش تنظیمات) خوانده شده و قابل ویرایش است" error={vErrors.targetHumidity}>
-            <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={0} max={100} autoClamp />
+            <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={0} max={100} />
             <OverrideHint {...humHint} />
           </Field>
         </Grid2>

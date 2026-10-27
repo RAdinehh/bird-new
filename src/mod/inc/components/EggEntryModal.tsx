@@ -342,7 +342,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
     </div>
   )}
   <Field label={sourceLinked ? <span>تعداد تخم <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تعداد تخم'} required>
-                <NumField value={currentRow.count} onChange={e => !sourceLinked && setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} disabled={sourceLinked} autoClamp />
+                <NumField value={currentRow.count} onChange={e => !sourceLinked && setCurrentRow(f => ({ ...f, count: e.target.value }))} unit="عدد" min={0} max={999999} disabled={sourceLinked} />
               </Field>
               <FieldHint
                 fieldPath="inc.count"

@@ -366,10 +366,10 @@ export default function FlocksModal(props: FlocksModalProps) {
               initialCount: v,
               currentCount: (!f.currentCount || f.currentCount === f.initialCount) ? v : f.currentCount,
             }));
-          }} unit="پرنده" min={1} max={100000} autoClamp />
+          }} unit="پرنده" min={1} max={100000} />
         </Field>
         <Field label="تعداد فعلی" hint="اگه خالی بمونه = تعداد اولیه" error={showError('currentCount')} onTouch={() => markTouched('currentCount')}>
-          <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={1} max={100000} autoClamp />
+          <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => setForm({ ...form, currentCount: e.target.value })} unit="پرنده" min={1} max={100000} />
         </Field>
       </Grid2>
 
@@ -380,19 +380,19 @@ export default function FlocksModal(props: FlocksModalProps) {
           <Grid3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="تعداد خروس" error={showError('maleCount')} onTouch={() => markTouched('maleCount')}>
-                <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
+                <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} max={100000} unit="پرنده" />
               </Field>
               {!showError('maleCount') && <FieldHint fieldPath="flk.maleCount" value={form.maleCount} context={{ initialCount: form.initialCount }} />}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="تعداد مرغ" error={showError('femaleCount')} onTouch={() => markTouched('femaleCount')}>
-                <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
+                <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} max={100000} unit="پرنده" />
               </Field>
               {!showError('femaleCount') && <FieldHint fieldPath="flk.femaleCount" value={form.femaleCount} context={{ initialCount: form.initialCount }} />}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field label="تعداد نامشخص" error={showError('unknownCount')} onTouch={() => markTouched('unknownCount')}>
-              <NumField placeholder="۰" value={form.unknownCount || ''} onChange={e => setForm({ ...form, unknownCount: e.target.value })} min={0} max={100000} unit="پرنده" autoClamp />
+              <NumField placeholder="۰" value={form.unknownCount || ''} onChange={e => setForm({ ...form, unknownCount: e.target.value })} min={0} max={100000} unit="پرنده" />
             </Field>
             {!showError('unknownCount') && <FieldHint fieldPath="flk.unknownCount" value={form.unknownCount} context={{ initialCount: form.initialCount }} />}
           </div>

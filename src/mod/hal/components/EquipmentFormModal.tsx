@@ -161,7 +161,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <>
               <Grid2>
                 <Field label="تعداد" error={vErrors.count}>
-                  <NumField placeholder="۵" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={1} max={5000} autoClamp />
+                  <NumField placeholder="۵" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={1} max={5000} />
                 </Field>
                 {hasSec ? (
                   <Field
@@ -173,7 +173,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                     <NumField
                       placeholder={def.secondary!.defaultValue ? String(def.secondary!.defaultValue) : '۰'}
                       max={100000}
-                      autoClamp
                       value={form.capacity}
                       onChange={e => {
                         setForm({ ...form, capacity: e.target.value });
@@ -201,7 +200,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   })()} hint="۱۰٬۰۰۰ تا ۳ میلیارد تومان" error={vErrors.unitPrice}>
                     <MoneyField placeholder="۱۰٬۰۰۰" min={10000} max={3000000000} value={form.unitPrice} onChange={e => setForm({...form, unitPrice: e.target.value})} />
                   </Field>
-                  <Field label="گارانتی" error={vErrors.warranty}><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={60} autoClamp /></Field>
+                  <Field label="گارانتی" error={vErrors.warranty}><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={60} /></Field>
                 </Grid2>
               )}
 
@@ -220,7 +219,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               </Grid2>
               {!hasSec && (
                 <Grid2>
-                  <Field label="گارانتی" error={vErrors.warranty}><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={60} autoClamp /></Field>
+                  <Field label="گارانتی" error={vErrors.warranty}><NumField placeholder="۶" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={60} /></Field>
                   <div />
                 </Grid2>
               )}
