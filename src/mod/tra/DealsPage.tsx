@@ -3,7 +3,7 @@
  */
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
-import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType } from './store';
+import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealPayment } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Input,
   Grid2, Modal, NumField,
@@ -36,6 +36,9 @@ interface F {
   settlementType: SettlementType | '';
   settlementValue: string;
   cancelReason: string;
+  goods: DealGood[];
+  deliveries: DealDelivery[];
+  payments: DealPayment[];
 }
 
 const empty = (): F => ({
@@ -46,6 +49,7 @@ const empty = (): F => ({
   notes: '',
   dealNumber: '', startDate: '', endDate: '',
   settlementType: '', settlementValue: '', cancelReason: '',
+  goods: [], deliveries: [], payments: [],
 });
 
 const STATUS_LABEL: Record<string, string> = {
@@ -146,6 +150,9 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       settlementType: (d.settlementType || '') as SettlementType | '',
       settlementValue: d.settlementValue ? toFa(d.settlementValue) : '',
       cancelReason: d.cancelReason || '',
+      goods: d.goods || [],
+      deliveries: d.deliveries || [],
+      payments: d.payments || [],
     });
     setErr(''); setOpen(true);
   };
@@ -168,6 +175,9 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     settlementType: (form.settlementType || undefined) as SettlementType | undefined,
     settlementValue: form.settlementValue.trim() ? num(form.settlementValue) : null,
     cancelReason: form.cancelReason || '',
+    goods: form.goods,
+    deliveries: form.deliveries,
+    payments: form.payments,
   });
   const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
 
@@ -193,6 +203,9 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       settlementType: (form.settlementType || undefined) as SettlementType | undefined,
       settlementValue: form.settlementValue.trim() ? num(form.settlementValue) : null,
       cancelReason: form.cancelReason.trim() || undefined,
+      goods: form.goods,
+      deliveries: form.deliveries,
+      payments: form.payments,
     };
     if (form.id === undefined) {
       addDeal(data);

@@ -433,6 +433,32 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
   });
 }
 
+const DealGoodSchema = z.object({
+  id: z.string(),
+  name: requiredStr('نام کالا', 2, 100),
+  quantity: z.number().positive('مقدار باید بیشتر از صفر باشد'),
+  unit: z.enum(['pcs', 'kg', 'ton', 'bag', 'L', 'carton']),
+  estimatedPrice: z.number().nonnegative('قیمت نمی‌تواند منفی باشد'),
+  linkedItemId: optionalId(),
+});
+
+const DealDeliverySchema = z.object({
+  id: z.string(),
+  goodId: requiredId('کالا'),
+  date: persianDate('تاریخ تحویل'),
+  quantity: z.number().positive('مقدار تحویل باید بیشتر از صفر باشد'),
+  notes: optionalStr(200),
+  whsMovementId: optionalId(),
+});
+
+const DealPaymentSchema = z.object({
+  id: z.string(),
+  date: persianDate('تاریخ پرداخت'),
+  amount: z.number().positive('مبلغ پرداخت باید بیشتر از صفر باشد'),
+  method: z.enum(['cash', 'card', 'check']),
+  notes: optionalStr(200),
+});
+
 export const DealSchema = z.object({
   type: z.enum(['consignment', 'partnership', 'barter', 'conditional'] as const),
   date: persianDate('تاریخ'),
@@ -449,6 +475,9 @@ export const DealSchema = z.object({
   settlementType: z.enum(['commission_pct', 'commission_per_unit', 'fixed_amount', 'barter_direct', 'profit_sharing', 'rental_monthly', 'grower_fee_per_unit'] as const).optional(),
   settlementValue: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
   cancelReason: optionalStr(500),
+  goods: z.array(DealGoodSchema).default([]),
+  deliveries: z.array(DealDeliverySchema).default([]),
+  payments: z.array(DealPaymentSchema).default([]),
 }).superRefine((data, ctx) => {
   const d = data as any;
   if (d.startDate && d.endDate && d.startDate >= d.endDate) {
@@ -460,6 +489,19 @@ export const DealSchema = z.object({
   if (d.settlementType && d.settlementType !== 'barter_direct' && (d.settlementValue == null || d.settlementValue <= 0)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'مقدار تسویه را وارد کنید', path: ['settlementValue'] });
   }
+  // جمع تحویل هر کالا ≤ مقدار کل
+  (d.goods || []).forEach((good: any, gi: number) => {
+    const total = (d.deliveries || [])
+      .filter((dv: any) => dv.goodId === good.id)
+      .reduce((s: number, dv: any) => s + (dv.quantity || 0), 0);
+    if (total > (good.quantity || 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `جمع تحویل کالای «${good.name}» (${total}) بیش از مقدار کل (${good.quantity}) است`,
+        path: ['goods', gi, 'quantity'],
+      });
+    }
+  });
 });
 export type DealFormData = z.infer<typeof DealSchema>;
 

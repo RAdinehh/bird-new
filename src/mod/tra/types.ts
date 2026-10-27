@@ -231,6 +231,34 @@ export interface Invoice {
   remindersMuted?: boolean;
 }
 
+export type DealUnit = 'pcs' | 'kg' | 'ton' | 'bag' | 'L' | 'carton';
+
+export interface DealGood {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: DealUnit;
+  estimatedPrice: number;
+  linkedItemId?: string;
+}
+
+export interface DealDelivery {
+  id: string;
+  goodId: string;
+  date: string;
+  quantity: number;
+  notes?: string;
+  whsMovementId?: string;
+}
+
+export interface DealPayment {
+  id: string;
+  date: string;
+  amount: number;
+  method: 'cash' | 'card' | 'check';
+  notes?: string;
+}
+
 export type SettlementType =
   | 'commission_pct'
   | 'commission_per_unit'
@@ -257,6 +285,9 @@ export interface Deal {
   settlementType?: SettlementType;
   settlementValue?: number | null;
   cancelReason?: string;
+  goods?: DealGood[];
+  deliveries?: DealDelivery[];
+  payments?: DealPayment[];
   createdAt: string;
   updatedAt: string;
 }
