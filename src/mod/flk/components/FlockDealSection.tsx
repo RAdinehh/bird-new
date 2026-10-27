@@ -116,6 +116,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
     if (form.dealType === 'partnership') return d.type === 'partnership';
     if (form.dealType === 'consignment') return d.type === 'consignment';
     if (form.dealType === 'barter') return d.type === 'barter';
+    if (form.dealType === 'conditional') return d.type === 'conditional';
     return false;
   });
 

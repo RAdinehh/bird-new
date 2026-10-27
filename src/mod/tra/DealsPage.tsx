@@ -3,9 +3,9 @@
  */
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
-import { useTra, DEAL_LABEL, type Deal, type DealType } from './store';
+import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType } from './store';
 import { useCtc } from '../ctc/store';
-import { Btn, BtnRow, Empty, Field,
+import { Btn, BtnRow, Empty, Field, Input,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
@@ -30,6 +30,12 @@ interface F {
   dueDate: string;
   status: 'open' | 'settled' | 'cancelled';
   notes: string;
+  dealNumber: string;
+  startDate: string;
+  endDate: string;
+  settlementType: SettlementType | '';
+  settlementValue: string;
+  cancelReason: string;
 }
 
 const empty = (): F => ({
@@ -37,7 +43,9 @@ const empty = (): F => ({
   description: '', value: '', percent: '',
   dueDate: '',
   status: 'open',
-  notes: ''
+  notes: '',
+  dealNumber: '', startDate: '', endDate: '',
+  settlementType: '', settlementValue: '', cancelReason: '',
 });
 
 const STATUS_LABEL: Record<string, string> = {
@@ -131,7 +139,13 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       percent: d.percent === null || d.percent === undefined ? '' : toFa(d.percent),
       dueDate: d.dueDate || '',
       status: d.status,
-      notes: d.notes || ''
+      notes: d.notes || '',
+      dealNumber: d.dealNumber || '',
+      startDate: d.startDate || '',
+      endDate: d.endDate || '',
+      settlementType: (d.settlementType || '') as SettlementType | '',
+      settlementValue: d.settlementValue ? toFa(d.settlementValue) : '',
+      cancelReason: d.cancelReason || '',
     });
     setErr(''); setOpen(true);
   };
@@ -148,6 +162,12 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     dueDate: form.dueDate || '',
     status: form.status,
     notes: form.notes || '',
+    dealNumber: form.dealNumber || '',
+    startDate: form.startDate || '',
+    endDate: form.endDate || '',
+    settlementType: (form.settlementType || undefined) as SettlementType | undefined,
+    settlementValue: form.settlementValue.trim() ? num(form.settlementValue) : null,
+    cancelReason: form.cancelReason || '',
   });
   const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
 
@@ -155,11 +175,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     attemptSave();
     if (Object.keys(vErrors).length > 0) { setErr(''); return; }
 
-    let pct: number | null = null;
-    if (form.percent.trim() !== '') {
-      const raw = num(form.percent);
-      pct = Math.max(0, Math.min(100, raw));
-    }
+    const pct: number | null = form.percent.trim() !== '' ? num(form.percent) : null;
 
     const data = {
       type: form.type,
@@ -170,7 +186,13 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       percent: pct,
       dueDate: form.dueDate.trim(),
       status: form.status,
-      notes: form.notes.trim()
+      notes: form.notes.trim(),
+      dealNumber: form.dealNumber.trim() || undefined,
+      startDate: form.startDate.trim() || undefined,
+      endDate: form.endDate.trim() || undefined,
+      settlementType: (form.settlementType || undefined) as SettlementType | undefined,
+      settlementValue: form.settlementValue.trim() ? num(form.settlementValue) : null,
+      cancelReason: form.cancelReason.trim() || undefined,
     };
     if (form.id === undefined) {
       addDeal(data);
@@ -344,6 +366,46 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
             <Textarea placeholder="توضیح معامله..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
           </Field>
 
+      <Grid2>
+        <Field label="شماره قرارداد" hint="اختیاری" error={showError?.('dealNumber')} onTouch={() => markTouched?.('dealNumber')}>
+          <Input placeholder="مثلاً ۱۴۰۴-۰۰۱" value={form.dealNumber} onChange={e => setForm({...form, dealNumber: e.target.value})} />
+        </Field>
+        <Field label="تاریخ پایان" hint="اختیاری" error={showError?.('endDate')} onTouch={() => markTouched?.('endDate')}>
+          <DatePicker value={form.endDate} onChange={v => setForm({...form, endDate: v})} placeholder="اختیاری" />
+        </Field>
+      </Grid2>
+
+      <Grid2>
+        <Field label="تاریخ شروع" hint="اختیاری" error={showError?.('startDate')} onTouch={() => markTouched?.('startDate')}>
+          <DatePicker value={form.startDate} onChange={v => setForm({...form, startDate: v})} placeholder="اختیاری" />
+        </Field>
+        <Field label="نوع تسویه" hint="اختیاری" error={showError?.('settlementType')} onTouch={() => markTouched?.('settlementType')}>
+          <Select value={form.settlementType || ''} onChange={e => setForm({...form, settlementType: e.target.value as SettlementType | ''})}>
+            <option value="">— انتخاب —</option>
+            <option value="commission_pct">💰 کمیسیون درصدی</option>
+            <option value="commission_per_unit">💵 کمیسیون هر واحد</option>
+            <option value="fixed_amount">📋 مبلغ ثابت</option>
+            <option value="barter_direct">🔄 تهاتر مستقیم</option>
+            <option value="profit_sharing">🤝 شراکت در سود</option>
+            <option value="rental_monthly">📅 اجاره ماهانه</option>
+            <option value="grower_fee_per_unit">🐔 دستمزد پروار</option>
+          </Select>
+        </Field>
+      </Grid2>
+
+      {form.settlementType && form.settlementType !== 'barter_direct' && (
+        <Field label={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? 'درصد تسویه' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
+          <NumField
+            placeholder={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? '۱۰' : '۵۰۰۰۰۰۰'}
+            value={form.settlementValue}
+            onChange={e => setForm({...form, settlementValue: e.target.value})}
+            unit={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? '٪' : 'تومان'}
+            min={0}
+            max={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? 100 : undefined}
+          />
+        </Field>
+      )}
+
         <Grid2>
           <Field label="ارزش (تومان)" error={showError?.('value')} onTouch={() => markTouched?.('value')}>
             <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="تومان" min={0} />
@@ -368,6 +430,12 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
             <option value="cancelled">لغوشده</option>
           </Select>
         </Field>
+
+      {form.status === 'cancelled' && (
+        <Field label="دلیل لغو" required error={showError?.('cancelReason')} onTouch={() => markTouched?.('cancelReason')}>
+          <Textarea placeholder="چرا لغو شد؟" value={form.cancelReason} onChange={e => setForm({...form, cancelReason: e.target.value})} />
+        </Field>
+      )}
 
         <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
             <Textarea placeholder="یادداشت اختیاری" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />

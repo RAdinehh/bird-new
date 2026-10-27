@@ -443,6 +443,23 @@ export const DealSchema = z.object({
   dueDate: persianDateOpt('سرسید'),
   status: z.enum(['open', 'settled', 'cancelled'] as const),
   notes: optionalStr(1000),
+  dealNumber: optionalStr(30),
+  startDate: persianDateOpt('تاریخ شروع'),
+  endDate: persianDateOpt('تاریخ پایان'),
+  settlementType: z.enum(['commission_pct', 'commission_per_unit', 'fixed_amount', 'barter_direct', 'profit_sharing', 'rental_monthly', 'grower_fee_per_unit'] as const).optional(),
+  settlementValue: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
+  cancelReason: optionalStr(500),
+}).superRefine((data, ctx) => {
+  const d = data as any;
+  if (d.startDate && d.endDate && d.startDate >= d.endDate) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'تاریخ پایان باید بعد از تاریخ شروع باشد', path: ['endDate'] });
+  }
+  if (d.status === 'cancelled' && (!d.cancelReason || String(d.cancelReason).trim() === '')) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('دلیل لغو'), path: ['cancelReason'] });
+  }
+  if (d.settlementType && d.settlementType !== 'barter_direct' && (d.settlementValue == null || d.settlementValue <= 0)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'مقدار تسویه را وارد کنید', path: ['settlementValue'] });
+  }
 });
 export type DealFormData = z.infer<typeof DealSchema>;
 

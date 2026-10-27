@@ -231,6 +231,15 @@ export interface Invoice {
   remindersMuted?: boolean;
 }
 
+export type SettlementType =
+  | 'commission_pct'
+  | 'commission_per_unit'
+  | 'fixed_amount'
+  | 'barter_direct'
+  | 'profit_sharing'
+  | 'rental_monthly'
+  | 'grower_fee_per_unit';
+
 export interface Deal {
   id: string;
   type: DealType;
@@ -242,6 +251,12 @@ export interface Deal {
   dueDate: string;
   status: 'open' | 'settled' | 'cancelled';
   notes: string;
+  dealNumber?: string;
+  startDate?: string;
+  endDate?: string;
+  settlementType?: SettlementType;
+  settlementValue?: number | null;
+  cancelReason?: string;
   createdAt: string;
   updatedAt: string;
 }
