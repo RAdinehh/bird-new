@@ -166,13 +166,89 @@
 
 ---
 
+---
+
+## 🔒 ۱۴) AutoClamp Policy (۷۱-۷۵)
+
+> **قانون آهنین** — معادل L14 در `docs/CONSTITUTION.md`
+> **افزوده‌شده:** ۱۴۰۴/۰۸/۰۵ — طبق استاندارد جهانی (NN/g، Chakra UI، Ant Design، Mantine)
+
+### 🎯 اصل
+
+**هرگز** `autoClamp` حین تایپ (`onChange`). اصلاح خودکار فقط در `onBlur` مجاز است.
+
+**دلیل:** کاربر باید آزادانه تایپ کند (`25`، `1.5`، `-10`). Clamp حین تایپ مقدار را وسط ورودی به زور تغییر می‌دهد و کاربر نمی‌تواند عدد را کامل کند.
+
+### 📜 ۵ دستور
+
+| # | دستور |
+|---|---|
+| ۷۱ | **هرگز** `autoClamp` حین تایپ — ممنوع مطلق |
+| ۷۲ | اصلاح خودکار فقط `clampOnBlur` و فقط برای G2 |
+| ۷۳ | برای G1 (مبلغ/تعداد/حجم) → فقط خطای Zod (نه clamp) |
+| ۷۴ | کد: `<NumField clampOnBlur />` برای G2، `<NumField />` برای G1 |
+| ۷۵ | هر فیلد عددی جدید → ابتدا گروه (G1/G2/G3) را در همین سند ثبت کن |
+
+### 📊 گروه‌بندی قطعی (بعد از Audit کامل)
+
+#### 🟢 G2 — `clampOnBlur` مجاز (درصد / FCR / دما / رطوبت / روشنایی)
+
+| ماژول | فیلد | بازه | دسته |
+|---|---|---|---|
+| brd | `fcr` | ۰.۵-۵ | FCR |
+| flk | `partnerShare` | ۰-۱۰۰ | درصد |
+| flk | `fcr` (BreedSchema) | ۰.۵-۵ | FCR |
+| dlg | `temperature`, `temperatureMin`, `temperatureMax` | ‎-۱۰..۵۰ | دما |
+| dlg | `humidity`, `humidityMin`, `humidityMax` | ۰-۱۰۰ | رطوبت |
+| fed | `protein`, `fat`, `fiber` | ۰-۱۰۰ | درصد |
+| fed | `calcium`, `phosphorus` | ۰-۵۰ | درصد |
+| fed | `methionine`, `lysine` | ۰-۱۰ | درصد |
+| fed | `minPercent`, `maxPercent`, `lines.percent` | ۰-۱۰۰ | درصد |
+| hal | `targetTemp` | ‎-۱۰..۵۰ | دما |
+| hal | `targetHumidity` | ۰-۱۰۰ | رطوبت |
+| hal | `light` | ۰-۵۰۰ | روشنایی |
+
+#### 🔴 G1 — فقط Zod error (مبلغ / تعداد / حجم / وزن / ظرفیت)
+
+- **مبلغ:** `unitPrice`, `totalPrice`, `shippingCost`, `purchasePrice`, `deliveryCost`, `rentAmount`
+- **تعداد:** `initialCount`, `maleCount`, `femaleCount`, `unknownCount`, `cycleDays`, `count`, `alive`, `dead`, `eatingEggs`, `fertileEggs`, `brokenEggs`, `otherEggs`, `deathsCount`, `hatched`, ...
+- **حجم/مقدار:** `feedAmount`, `waterAmount`, `waterFillVolume`
+- **وزن:** `sampleWeightInitial`, `sampleWeightCurrent`
+- **ظرفیت:** `capacity`, `ventilation`
+- **سایر:** `stage`, `warranty`, `efficiency`
+
+**دلیل:** کاربر ممکن است مقدار اشتباه وارد کند (۱ میلیون به جای ۱۰ میلیون). Zod error واضح است؛ clamp بی‌صدا داده را تحریف می‌کند.
+
+#### ⚪ G3 — بدون clamp (متن / تاریخ / انتخاب)
+
+- **متن:** `name`, `notes`, `brand`, `address`
+- **تاریخ:** `hatchDate`, `purchaseDate`, `rentStartDate`, ...
+- **انتخاب:** `birdId`, `breedId`, `category`, `supplierId`
+
+### 🔍 چک ratchet (`CONSTITUTION L14`)
+
+~~~
+grep -rn "autoClamp=" src/ --include="*.tsx" | wc -l
+# سقف امروز: <baseline> | هدف: صفر
+~~~
+
+### 📚 مرجع جهانی
+
+- **Nielsen Norman Group:** "validate on blur, not on change"
+- **Chakra UI:** `clampValueOnBlur` (default `true`)
+- **Ant Design:** `changeOnBlur`
+- **Mantine:** `clampOnBlur`
+- **React Spectrum:** accepts out-of-range, clamps on submit
+
+---
+
 ## 📌 نحوه استفاده
 
 قبل از هر کار روی ماژول جدید (flk، dlg، fed، egg، ...) این ۷۰ دستور رو مرور کن.
 
 **اولویت‌بندی کاربردی:**
 
-1. **دستورات ۶۵-۷۰** (روش کار) — قبل از هر تغییر
+1. **دستورات ۶۵-۷۵** (روش کار + AutoClamp) — قبل از هر تغییر
 2. **دستورات ۱۲-۲۲** (Error + پیام پویا) — مهم‌ترین UX
 3. **دستورات ۳۱-۳۵** (Sync + Single Source) — جلوگیری از باگ
 4. **دستورات ۳۶-۴۱** (Layout) — یکدستی بصری
@@ -182,4 +258,4 @@
 
 ---
 
-*آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ — جلسه ۷*
+*آخرین به‌روزرسانی: ۱۴۰۴/۰۸/۰۵ — AutoClamp Policy + baseline=0*

@@ -187,3 +187,22 @@ git status --short
 ---
 
 *این فایل زنده است. بازبینی: هر ۳ جلسه.*
+
+---
+
+### L14 — AutoClamp Policy
+
+هرگز `autoClamp` حین تایپ. اصلاح خودکار فقط `clampOnBlur` برای درصد/FCR/دما/رطوبت.
+
+- **G2** (clamp مجاز): درصد، FCR، دما، رطوبت، روشنایی → `clampOnBlur`
+- **G1** (فقط Zod error): مبلغ، تعداد، حجم، وزن، ظرفیت
+- **G3** (بدون clamp): متن، تاریخ، انتخاب
+
+جزئیات کامل: `docs/UX-FORM-RULES.md` بخش ۱۴
+
+**چک (ratchet — عدد امروز = سقف فردا):**
+~~~
+grep -rn "autoClamp=" src/ --include="*.tsx" | wc -l
+# سقف امروز: 0 | هدف: صفر
+~~~
+

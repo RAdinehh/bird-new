@@ -24,6 +24,7 @@ verify (grep/sed) → implement (≤۵ فایل) → test → تایید کار�
 - commit بدون آپدیت PROGRESS.md
 - silent catch (قانون ۷)
 - as any بدون کامنت (قانون ۶)
+- `autoClamp` حین تایپ — فقط `clampOnBlur` برای درصد/FCR/دما (L14)
 
 ## 📋 قالب گزارش (اجباری)
 CURRENT: #X نام — فاز: [verify|implement|test|approve]
