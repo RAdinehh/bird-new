@@ -125,6 +125,8 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     notes: optionalStr(2000),
     paymentTerms: oneOf('شرایط پرداخت', ['cash', 'installment', 'custom'] as const).optional(),
     workflowStatus: oneOf('وضعیت', ['draft', 'confirmed', 'received', 'paid'] as const).optional(),
+    isPreorder: z.boolean().optional(),
+    deliveryDate: persianDateOpt('تاریخ تحویل'),
   }).superRefine((data, ctx) => {
     const d = data as any;
     if (!d.date || String(d.date).trim() === '') {
@@ -199,26 +201,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         }
       });
     }
-
-    // 🆕 چک مجموع جنسیت برای جوجه (خرید)
-    if (d.type === 'purchase') {
-      (d.items || []).forEach((it: any, idx: number) => {
-        const cat = it.category || d.category;
-        if (cat === 'chick' || cat === 'adult') {
-          const qty = Number(it.quantity) || 0;
-          const m = Number(it.maleCount) || 0;
-          const fe = Number(it.femaleCount) || 0;
-          const u = Number(it.unknownCount) || 0;
-          if (qty > 0 && (m + fe + u) !== qty) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: MSG.genderSumMismatch(m + fe + u, qty),
-              path: ['items', idx, 'maleCount'],
-            });
-          }
-        }
-      });
-    }
+    
     // هر قلم: total = quantity × unitPrice − تخفیف + حمل
     for (let i = 0; i < (d.items || []).length; i++) {
       const it = d.items[i];
