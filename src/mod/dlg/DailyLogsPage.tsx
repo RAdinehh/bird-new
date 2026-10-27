@@ -13,6 +13,7 @@ import { useEgg } from '../egg/store';
 import { useFormat } from '../../shr/units';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import { useValidation } from '../../shr/validation/useValidation';
+import { useFormErrors } from '../../shr/hooks/useFormErrors';
 import { createDlgSchema } from '../../shr/validation/rules/dlg';
 import { getDlgLogsConfig } from '../../shr/filter';
 import { toFa } from '../../shr/utils/fa';
@@ -128,6 +129,7 @@ export default function DailyLogsPage() {
       notes: form.notes || '',
     },
   );
+  const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
 
   // ─── carousel ───
   const tabIds: TabId[] = ['today', 'history', 'archive'];
@@ -136,6 +138,11 @@ export default function DailyLogsPage() {
     tab,
     (id) => setTab(id as TabId),
   );
+
+  const handleSave = () => {
+    attemptSave();
+    save();
+  };
 
   const tabCount = (t: TabId) =>
     t === 'today' ? todaysLogs.length :
@@ -259,10 +266,12 @@ export default function DailyLogsPage() {
         onClose={() => setOpen(false)}
         form={form}
         setForm={setForm}
-        save={save}
+        save={handleSave}
         saving={saving}
         err={err}
         vErrors={vErrors}
+        showError={showError}
+        markTouched={markTouched}
         selectedFlock={selectedFlock}
         flockAliveCount={flockAliveCount}
         isLayerFlock={isLayerFlock}

@@ -37,11 +37,14 @@ export interface FormModalProps {
   vaccineEnabled: boolean;
   medicineEnabled: boolean;
   onFlockChange: (id: string) => void;
+  showError: (field: string) => string | undefined;
+  markTouched: (field: string) => void;
 }
 
 export default function FormModal(props: FormModalProps) {
   const {
     open, onClose, form, setForm, save, err, vErrors,
+    showError, markTouched,
     selectedFlock, flockAliveCount, isLayerFlock, isLayerType,
     isFlockMature, vaccineEnabled, medicineEnabled, onFlockChange,
   } = props;
@@ -54,7 +57,7 @@ export default function FormModal(props: FormModalProps) {
     <Modal open={open} onClose={onClose} title={form.id ? 'ویرایش ثبت روزانه' : 'ثبت روزانه جدید'}
       footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={onClose}>لغو</Btn></BtnRow>}>
       <Grid2>
-        <Field label="تاریخ" required>
+        <Field label="تاریخ" required error={showError('date')} onTouch={() => markTouched('date')}>
           <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })} autoToday />
         </Field>
         <Field label="ساعت ورود">
@@ -62,7 +65,7 @@ export default function FormModal(props: FormModalProps) {
         </Field>
       </Grid2>
 
-      <Field label="گله" required>
+      <Field label="گله" required error={showError('flockId')} onTouch={() => markTouched('flockId')}>
         <SmartSelect
           value={form.flockId}
           onChange={onFlockChange}
@@ -112,7 +115,7 @@ export default function FormModal(props: FormModalProps) {
 
       <ActivitiesSection form={form} setForm={setForm} />
 
-      <ErrorBox>{err}</ErrorBox>
+      {err && <ErrorBox>{err}</ErrorBox>}
     </Modal>
   );
 }

@@ -51,7 +51,7 @@ function addJalaliDays(dateStr: string, days: number): string {
 
 export function useDlgSave(params: UseDlgSaveParams) {
   const {
-    form, saving, setSaving, setErr, setOpen,
+    form, saving, setSaving, setOpen,
     selectedFlock, flockAliveCount, isLayerFlock, num, int,
   } = params;
 
@@ -83,16 +83,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
       if (!ok) { setSaving(false); return false; }
     }
 
-    // ۲) اعتبارسنجی
-    if (!form.flockId) { setErr('گله اجباری است'); setSaving(false); return false; }
-    if (!form.date.trim()) { setErr('تاریخ اجباری است'); setSaving(false); return false; }
-
-    const dCount = form.deaths.reduce((a, x) => a + (x.count || 0), 0);
-    if (flockAliveCount && dCount > flockAliveCount) {
-      setErr(`مجموع تلفات (${toFa(dCount)}) از تعداد زنده گله (${toFa(flockAliveCount)}) بیشتر است`);
-      setSaving(false);
-      return false;
-    }
+    // ۲) اعتبارسنجی — به Zod منتقل شد (rules/dlg.ts)
 
     const feedAmt = num(form.feedAmount);
     const newMovementIds: string[] = [];
