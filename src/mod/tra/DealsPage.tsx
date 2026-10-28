@@ -225,6 +225,23 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     return 'warn';
   };
 
+  const calc = useMemo(() => {
+    const out = form.deliveries.filter(d => d.type === 'out').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
+    const ret = form.deliveries.filter(d => d.type === 'return').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
+    const loss = form.deliveries.filter(d => d.type === 'loss').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
+    const totalDelivered = out - ret - loss;
+    const totalSold = form.sales.reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+    const inHand = totalDelivered - totalSold;
+    const totalSales = form.sales.reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
+    const pct = Number(form.settlementValue) || 0;
+    const commission = (form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing') ? Math.round(totalSales * pct / 100) : 0;
+    const myShare = totalSales - commission;
+    const paidIn = form.payments.filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0);
+    const paidOut = form.payments.filter(p => p.direction === 'out').reduce((s, p) => s + (Number(p.amount) || 0), 0);
+    const balance = myShare - paidIn + paidOut;
+    return { totalDelivered, totalSold, inHand, totalSales, commission, myShare, paidIn, paidOut, balance };
+  }, [form.deliveries, form.sales, form.payments, form.settlementType, form.settlementValue]);
+
   return (
     <PageContainer>
       {undoData && (
@@ -454,7 +471,178 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         </Field>
       )}
 
-        <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
+              {/* کالاهای تحویلی */}
+      <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📦 کالاهای تحویلی</div>
+
+      {form.goods.map((g, gi) => (
+        <div key={g.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>کالای {toFa(gi + 1)}</span>
+            <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.filter(x => x.id !== g.id), deliveries: f.deliveries.filter(x => x.goodId !== g.id), sales: f.sales.filter(x => x.goodId !== g.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
+          </div>
+          <Grid2>
+            <Field label="نام کالا" required error={showError?.(`goods.${gi}.name`)} onTouch={() => markTouched?.(`goods.${gi}.name`)}>
+              <Input placeholder="جوجه یک‌روزه" value={g.name} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, name: e.target.value } : x) }))} />
+            </Field>
+            <Field label="واحد" error={showError?.(`goods.${gi}.unit`)} onTouch={() => markTouched?.(`goods.${gi}.unit`)}>
+              <Select value={g.unit} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, unit: e.target.value as any } : x) }))}>
+                <option value="pcs">عدد</option>
+                <option value="kg">کیلوگرم</option>
+                <option value="ton">تن</option>
+                <option value="bag">کیسه</option>
+                <option value="L">لیتر</option>
+                <option value="carton">کارتن</option>
+              </Select>
+            </Field>
+          </Grid2>
+          <Grid2>
+            <Field label="مقدار" required error={showError?.(`goods.${gi}.quantity`)} onTouch={() => markTouched?.(`goods.${gi}.quantity`)}>
+              <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={0} />
+            </Field>
+            <Field label="قیمت تخمینی" error={showError?.(`goods.${gi}.estimatedPrice`)} onTouch={() => markTouched?.(`goods.${gi}.estimatedPrice`)}>
+              <NumField placeholder="۱۵۰۰۰" value={String(g.estimatedPrice || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, estimatedPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} />
+            </Field>
+          </Grid2>
+        </div>
+      ))}
+      <Btn size="sm" full onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0 }] }))}>+ افزودن کالا</Btn>
+
+      {/* تحویل‌ها */}
+      {form.goods.length > 0 && (
+        <>
+          <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📤 تحویل‌ها</div>
+
+          {form.deliveries.map((dv, di) => (
+            <div key={dv.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>تحویل {toFa(di + 1)}</span>
+                <button type="button" onClick={() => setForm(f => ({ ...f, deliveries: f.deliveries.filter(x => x.id !== dv.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
+              </div>
+              <Grid2>
+                <Field label="تاریخ" required error={showError?.(`deliveries.${di}.date`)} onTouch={() => markTouched?.(`deliveries.${di}.date`)}>
+                  <DatePicker value={dv.date} onChange={v => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, date: v } : x) }))} autoToday />
+                </Field>
+                <Field label="نوع" required error={showError?.(`deliveries.${di}.type`)} onTouch={() => markTouched?.(`deliveries.${di}.type`)}>
+                  <Select value={dv.type} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, type: e.target.value as any } : x) }))}>
+                    <option value="out">تحویل به طرف</option>
+                    <option value="return">برگشت از طرف</option>
+                    <option value="loss">تلفات</option>
+                  </Select>
+                </Field>
+              </Grid2>
+              <Grid2>
+                <Field label="کالا" required error={showError?.(`deliveries.${di}.goodId`)} onTouch={() => markTouched?.(`deliveries.${di}.goodId`)}>
+                  <Select value={dv.goodId} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, goodId: e.target.value } : x) }))}>
+                    <option value="">— انتخاب —</option>
+                    {form.goods.map(g => <option key={g.id} value={g.id}>{g.name || '—'}</option>)}
+                  </Select>
+                </Field>
+                <Field label="مقدار" required error={showError?.(`deliveries.${di}.quantity`)} onTouch={() => markTouched?.(`deliveries.${di}.quantity`)}>
+                  <NumField placeholder="۵۰۰" value={String(dv.quantity || '')} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={0} />
+                </Field>
+              </Grid2>
+            </div>
+          ))}
+          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deliveries: [...f.deliveries, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', type: 'out', quantity: 0, notes: '' }] }))}>+ افزودن تحویل</Btn>
+        </>
+      )}
+
+      {/* فروش‌ها */}
+      {form.goods.length > 0 && (
+        <>
+          <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>💰 فروش‌ها</div>
+
+          {form.sales.map((s, si) => {
+            const total = (Number(s.quantity) || 0) * (Number(s.unitPrice) || 0);
+            return (
+              <div key={s.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>فروش {toFa(si + 1)} — {toFa(total.toLocaleString('fa-IR'))} تومان</span>
+                  <button type="button" onClick={() => setForm(f => ({ ...f, sales: f.sales.filter(x => x.id !== s.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
+                </div>
+                <Grid2>
+                  <Field label="تاریخ" required error={showError?.(`sales.${si}.date`)} onTouch={() => markTouched?.(`sales.${si}.date`)}>
+                    <DatePicker value={s.date} onChange={v => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, date: v } : x) }))} autoToday />
+                  </Field>
+                  <Field label="کالا" required error={showError?.(`sales.${si}.goodId`)} onTouch={() => markTouched?.(`sales.${si}.goodId`)}>
+                    <Select value={s.goodId} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, goodId: e.target.value } : x) }))}>
+                      <option value="">— انتخاب —</option>
+                      {form.goods.map(g => <option key={g.id} value={g.id}>{g.name || '—'}</option>)}
+                    </Select>
+                  </Field>
+                </Grid2>
+                <Grid2>
+                  <Field label="مقدار" required error={showError?.(`sales.${si}.quantity`)} onTouch={() => markTouched?.(`sales.${si}.quantity`)}>
+                    <NumField placeholder="۳۰۰" value={String(s.quantity || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={0} />
+                  </Field>
+                  <Field label="قیمت واحد" required error={showError?.(`sales.${si}.unitPrice`)} onTouch={() => markTouched?.(`sales.${si}.unitPrice`)}>
+                    <NumField placeholder="۲۰۰۰۰" value={String(s.unitPrice || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, unitPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} />
+                  </Field>
+                </Grid2>
+              </div>
+            );
+          })}
+          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, sales: [...f.sales, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', quantity: 0, unitPrice: 0 }] }))}>+ افزودن فروش</Btn>
+        </>
+      )}
+
+      {/* پرداخت‌ها */}
+      <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>💳 پرداخت‌ها</div>
+
+      {form.payments.map((p, pi) => (
+        <div key={p.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: p.direction === 'in' ? 'var(--accent)' : 'var(--warn)', fontWeight: 700 }}>
+              {p.direction === 'in' ? '↑ دریافت' : '↓ پرداخت'} {toFa(pi + 1)}
+            </span>
+            <button type="button" onClick={() => setForm(f => ({ ...f, payments: f.payments.filter(x => x.id !== p.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
+          </div>
+          <Grid2>
+            <Field label="تاریخ" required error={showError?.(`payments.${pi}.date`)} onTouch={() => markTouched?.(`payments.${pi}.date`)}>
+              <DatePicker value={p.date} onChange={v => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, date: v } : x) }))} autoToday />
+            </Field>
+            <Field label="مبلغ" required error={showError?.(`payments.${pi}.amount`)} onTouch={() => markTouched?.(`payments.${pi}.amount`)}>
+              <NumField placeholder="۵۰۰۰۰۰۰" value={String(p.amount || '')} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, amount: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} />
+            </Field>
+          </Grid2>
+          <Grid2>
+            <Field label="جهت" error={showError?.(`payments.${pi}.direction`)} onTouch={() => markTouched?.(`payments.${pi}.direction`)}>
+              <Select value={p.direction} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, direction: e.target.value as any } : x) }))}>
+                <option value="in">↑ دریافت از طرف</option>
+                <option value="out">↓ پرداخت به طرف</option>
+              </Select>
+            </Field>
+            <Field label="روش" error={showError?.(`payments.${pi}.method`)} onTouch={() => markTouched?.(`payments.${pi}.method`)}>
+              <Select value={p.method} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, method: e.target.value as any } : x) }))}>
+                <option value="cash">💵 نقدی</option>
+                <option value="card">💳 کارت</option>
+                <option value="check">📄 چک</option>
+              </Select>
+            </Field>
+          </Grid2>
+        </div>
+      ))}
+      <Btn size="sm" full onClick={() => setForm(f => ({ ...f, payments: [...f.payments, { id: crypto.randomUUID(), date: form.date || '', amount: 0, direction: 'in', method: 'cash', notes: '' }] }))}>+ افزودن پرداخت</Btn>
+
+      {/* خلاصه مالی */}
+      {(form.goods.length > 0 || form.sales.length > 0) && (
+        <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4, fontSize: 'var(--fs-sm)', marginTop: 8 }}>
+          <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 4 }}>🧮 خلاصه مالی</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>کل تحویلی:</span><span style={{ fontWeight: 700 }}>{toFa(calc.totalDelivered.toLocaleString('fa-IR'))}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>فروش کل (تعداد):</span><span style={{ fontWeight: 700 }}>{toFa(calc.totalSold.toLocaleString('fa-IR'))}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>در دست طرف:</span><span style={{ fontWeight: 700 }}>{toFa(calc.inHand.toLocaleString('fa-IR'))}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 4, marginTop: 4 }}><span>فروش کل (مبلغ):</span><span style={{ fontWeight: 700 }}>{toFa(calc.totalSales.toLocaleString('fa-IR'))} ت</span></div>
+          {calc.commission > 0 && <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>کمیسیون:</span><span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(calc.commission.toLocaleString('fa-IR'))} ت</span></div>}
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>سهم من:</span><span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(calc.myShare.toLocaleString('fa-IR'))} ت</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>دریافتی:</span><span style={{ fontWeight: 700 }}>{toFa(calc.paidIn.toLocaleString('fa-IR'))} ت</span></div>
+          {calc.paidOut > 0 && <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>پرداختی:</span><span style={{ fontWeight: 700 }}>{toFa(calc.paidOut.toLocaleString('fa-IR'))} ت</span></div>}
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 4, marginTop: 4, fontWeight: 700, color: calc.balance > 0 ? 'var(--danger)' : 'var(--accent)' }}>
+            <span>مانده:</span><span>{toFa(calc.balance.toLocaleString('fa-IR'))} ت</span>
+          </div>
+        </div>
+      )}
+
+      <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
             <Textarea placeholder="یادداشت اختیاری" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
 
