@@ -583,7 +583,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           <Field label="درصد" hint="۰ تا ۱۰۰" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
             <NumField placeholder="مثلاً ۱۰" value={form.percent} onChange={e => {
               const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-              const v = Math.max(0, Math.min(100, raw));
+              const v = raw; // L14: no clamp on typing
               setForm({...form, percent: v === 0 ? '' : String(v)});
             }} unit="٪" min={0} />
           </Field>

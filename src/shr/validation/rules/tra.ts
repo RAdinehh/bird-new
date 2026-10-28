@@ -496,6 +496,7 @@ export const DealSchema = z.object({
   const d = data as any;
   if (d.startDate && d.endDate && d.startDate >= d.endDate) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'تاریخ پایان باید بعد از تاریخ شروع باشد', path: ['endDate'] });
+    }
   
     // ═══ Phase 2C: Cross-checks ═══
     const _goodIds = new Set((d.goods || []).map((g: any) => g.id));
@@ -522,7 +523,6 @@ export const DealSchema = z.object({
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'موجودی در دست طرف برای «' + good.name + '» منفی است', path: ['deliveries'] });
       }
     });
-  }
   if (d.status === 'cancelled' && (!d.cancelReason || String(d.cancelReason).trim() === '')) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('دلیل لغو'), path: ['cancelReason'] });
   }
