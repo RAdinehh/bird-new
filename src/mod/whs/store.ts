@@ -51,6 +51,10 @@ export interface Item {
   initialStock?: number;
   /** قیمت موجودی اولیه (برای میانگین موزون) */
   initialPrice?: number;
+  /** 🆕 Phase G-1: موجودی جاری به تفکیک موقعیت */
+  stockByLocation?: Record<string, number>;
+  /** 🆕 Phase G-1: موجودی اولیه به تفکیک موقعیت */
+  initialStockByLocation?: Record<string, number>;
   createdAt: string;
   updatedAt: string;
 }
@@ -72,6 +76,8 @@ export interface Movement {
   sourceModule?: 'egg' | 'dlg' | 'tra' | 'inc' | 'fed' | 'manual' | 'deal';
   /** 🆕 رهگیری: ID رکورد مبدأ */
   sourceId?: string;
+  /** 🆕 Phase G-1: موقعیت انبار (پیش‌فرض 'stock', برای امانی 'consignment:partyId') */
+  locationId?: string;
   /** 🆕 شماره دسته (Batch) — برای تخم و دارو */
   /** 🆕 تاریخ انقضا (برای دارو) */
   expiryDate?: string;
@@ -172,6 +178,38 @@ export function recalcStock(
 }
 
 /**
+ * 🆕 Phase G-1: recalcStockByLocation — بازمحاسبه موجودی به تفکیک موقعیت از تاریخچه
+ */
+export function recalcStockByLocation(
+  item: Item,
+  movements: Movement[]
+): { byLoc: Record<string, number>; total: number } {
+  const sorted = movements
+    .filter(m => m.itemId === item.id)
+    .sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+  const byLoc: Record<string, number> = {
+    ...(item.initialStockByLocation ?? { stock: item.initialStock ?? 0 })
+  };
+  for (const m of sorted) {
+    const loc = m.locationId || 'stock';
+    const cur = byLoc[loc] ?? 0;
+    if (m.type === 'in') byLoc[loc] = cur + m.quantity;
+    else if (m.type === 'out') byLoc[loc] = cur - m.quantity;
+    else byLoc[loc] = m.quantity;
+  }
+  const total = Object.values(byLoc).reduce((a, b) => a + b, 0);
+  return { byLoc, total };
+}
+
+/**
+ * 🆕 Phase G-1: getStockAt — موجودی یک قلم در یک موقعیت
+ */
+export function getStockAt(item: Item, locationId: string = 'stock'): number {
+  if (item.stockByLocation) return item.stockByLocation[locationId] ?? 0;
+  return locationId === 'stock' ? (item.currentStock ?? 0) : 0;
+}
+
+/**
  * checkIntegrity — چک همه اقلام برای مغایرت
  */
 export function checkIntegrity(
@@ -200,9 +238,11 @@ export const useWhs = create<State>()(
         set({ items: [...get().items, {
           ...i,
           id,
-          initialStock: (i as any).currentStock || 0,
-          initialPrice: (i as any).initialPrice || 0,
-          avgPrice: (i as any).initialPrice || (i as any).lastPrice || 0,
+          initialStock: i.currentStock ?? 0,
+          initialPrice: i.initialPrice ?? 0,
+          avgPrice: i.avgPrice ?? i.lastPrice ?? 0,
+          stockByLocation: i.stockByLocation ?? { stock: i.currentStock ?? 0 },
+          initialStockByLocation: i.initialStockByLocation ?? { stock: i.currentStock ?? 0 },
           createdAt: now(),
           updatedAt: now()
         }] });
@@ -222,12 +262,16 @@ export const useWhs = create<State>()(
         assertMovement(m);
         const item = get().items.find(x => x.id === m.itemId);
         if (item === undefined) return '';
-
-        let newStock = item.currentStock;
-        if (m.type === 'in') newStock += m.quantity;
-        else if (m.type === 'out') newStock = newStock - m.quantity;  // soft: اجازه منفی (UI هشدار می‌ده)
-        else newStock = m.quantity;
-
+        // 🆕 Phase G-1: per-location update
+        const loc = m.locationId || 'stock';
+        const byLoc = item.stockByLocation ?? { stock: item.currentStock ?? 0 };
+        const locStock = byLoc[loc] ?? 0;
+        let newLocStock = locStock;
+        if (m.type === 'in') newLocStock += m.quantity;
+        else if (m.type === 'out') newLocStock -= m.quantity;
+        else newLocStock = m.quantity;
+        const newByLoc = { ...byLoc, [loc]: newLocStock };
+        const newStock = Object.values(newByLoc).reduce((a, b) => a + b, 0);
         // میانگین موزون: فقط برای in با قیمت > 0
         let newAvg = getAvgPrice(item);
         if (m.type === 'in' && m.unitPrice > 0) {
@@ -240,12 +284,12 @@ export const useWhs = create<State>()(
           }
           newAvg = Math.round(newAvg * 100) / 100;
         }
-
         const newId = uuid();
         set({
-          movements: [...get().movements, { ...m, id: newId, createdAt: now() }],
+          movements: [...get().movements, { ...m, locationId: loc, id: newId, createdAt: now() }],
           items: get().items.map(x => x.id === m.itemId ? {
             ...x,
+            stockByLocation: newByLoc,
             currentStock: newStock,
             lastPrice: m.unitPrice > 0 ? m.unitPrice : x.lastPrice,
             avgPrice: newAvg,
@@ -263,14 +307,15 @@ export const useWhs = create<State>()(
 
         // 🎯 محاسبه مجدد از تاریخچه بعد از حذف — درست برای همه انواع (in/out/adjust)
         const remaining = get().movements.filter(x => x.id !== id);
-        const recalc = recalcStock(item, remaining);
-        const newStock = recalc.expected;  // soft: اجازه منفی
+        const recalc = recalcStockByLocation(item, remaining);
+        const newStock = recalc.total;  // soft: اجازه منفی
         const recalcAvg = recalcAvgPrice({ ...item, currentStock: newStock }, remaining);
 
         set({
           movements: remaining,
           items: get().items.map(x => x.id === mv.itemId ? {
             ...x,
+            stockByLocation: recalc.byLoc,
             currentStock: newStock,
             avgPrice: recalcAvg.avg,
             updatedAt: now()
@@ -278,7 +323,32 @@ export const useWhs = create<State>()(
         });
       }
     }),
-    { name: 'pm-whs' }
+    {
+      name: 'pm-whs',
+      version: 1,
+      migrate: (persisted: unknown, version: number) => {
+        if (version >= 1) return persisted;
+        if (!persisted || typeof persisted !== 'object') return persisted;
+        const p = persisted as { items?: unknown; movements?: unknown };
+        if (Array.isArray(p.items)) {
+          p.items = p.items.map((raw) => {
+            const it = raw as Item;
+            return {
+              ...it,
+              stockByLocation: it.stockByLocation ?? { stock: it.currentStock ?? 0 },
+              initialStockByLocation: it.initialStockByLocation ?? { stock: it.initialStock ?? it.currentStock ?? 0 },
+            };
+          });
+        }
+        if (Array.isArray(p.movements)) {
+          p.movements = p.movements.map((raw) => {
+            const mv = raw as Movement;
+            return { ...mv, locationId: mv.locationId ?? 'stock' };
+          });
+        }
+        return persisted;
+      },
+    }
   )
 );
 
