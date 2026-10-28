@@ -249,6 +249,8 @@ export interface DealDelivery {
   id: string;
   goodId: string;
   date: string;
+  /** ساعت تحویل به فرمت HH:MM (لاتین) — برای تمایز چند تحویل هم‌روز */
+  time?: string;
   type: DealDeliveryType;
   quantity: number;
   notes?: string;

@@ -17,6 +17,7 @@ import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import { useFilterSort, FilterBar, getTraDealsConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
+import TimePicker from '../../shr/components/TimePicker';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -234,7 +235,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       if (!dv.whsEnabled || !dv.whsMovementId) continue;
       const old = oldDeliveries.find(d => d.id === dv.id);
       if (!old) continue;
-      if (old.quantity === dv.quantity && old.type === dv.type && old.date === dv.date) continue;
+      if (old.quantity === dv.quantity && old.type === dv.type && old.date === dv.date && (old.time || '') === (dv.time || '')) continue;
       try { whs.deleteMovement(dv.whsMovementId); } catch (e) { console.error('[deals->whs] deleteMovement failed:', e); }
       dv.whsMovementId = undefined;
     }
@@ -734,6 +735,11 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                 <Field label="تاریخ" required error={showError?.(`deliveries.${di}.date`)} onTouch={() => markTouched?.(`deliveries.${di}.date`)}>
                   <DatePicker value={dv.date} onChange={v => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, date: v } : x) }))} autoToday />
                 </Field>
+                <Field label="ساعت" hint="اختیاری — برای تمایز چند تحویل هم‌روز" error={showError?.(`deliveries.${di}.time`)} onTouch={() => markTouched?.(`deliveries.${di}.time`)}>
+                  <TimePicker value={dv.time || ''} onChange={v => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, time: v } : x) }))} />
+                </Field>
+              </Grid2>
+              <Grid2>
                 <Field label="نوع" required error={showError?.(`deliveries.${di}.type`)} onTouch={() => markTouched?.(`deliveries.${di}.type`)}>
                   <Select value={dv.type} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, type: e.target.value as any } : x) }))}>
                     <option value="out">تحویل به طرف</option>
@@ -741,19 +747,17 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                     <option value="loss">تلفات</option>
                   </Select>
                 </Field>
-              </Grid2>
-              <Grid2>
                 <Field label="کالا" required error={showError?.(`deliveries.${di}.goodId`)} onTouch={() => markTouched?.(`deliveries.${di}.goodId`)}>
                   <Select value={dv.goodId} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, goodId: e.target.value } : x) }))}>
                     <option value="">— انتخاب —</option>
                     {form.goods.map(g => <option key={g.id} value={g.id}>{g.name || '—'}</option>)}
                   </Select>
                 </Field>
-                <Field label="مقدار" required error={showError?.(`deliveries.${di}.quantity`)} onTouch={() => markTouched?.(`deliveries.${di}.quantity`)}>
-                  <NumField placeholder="۵۰۰" value={String(dv.quantity || '')} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
-                {Number(dv.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={dv.quantity} />}
-                </Field>
               </Grid2>
+              <Field label="مقدار" required error={showError?.(`deliveries.${di}.quantity`)} onTouch={() => markTouched?.(`deliveries.${di}.quantity`)}>
+                <NumField placeholder="۵۰۰" value={String(dv.quantity || '')} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
+                {Number(dv.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={dv.quantity} />}
+              </Field>
               {(() => {
                 const linkedGood = form.goods.find(x => x.id === dv.goodId);
                 if (!linkedGood?.linkedItemId) return null;
