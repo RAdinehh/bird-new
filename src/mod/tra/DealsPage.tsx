@@ -350,8 +350,18 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     const paidIn = form.payments.filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0);
     const paidOut = form.payments.filter(p => p.direction === 'out').reduce((s, p) => s + (Number(p.amount) || 0), 0);
     const balance = myShare - paidIn + paidOut;
-    return { totalDelivered, totalSold, inHand, totalSales, commission, myShare, paidIn, paidOut, balance };
-  }, [form.deliveries, form.sales, form.payments, form.settlementType, form.settlementValue]);
+    // Phase C — per-good breakdown (به تفکیک کالا)
+    const perGood: Record<string, { name: string; delivered: number; sold: number; inHand: number }> = {};
+    for (const g of form.goods) {
+      const gOut = form.deliveries.filter(d => d.goodId === g.id && d.type === 'out').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
+      const gRet = form.deliveries.filter(d => d.goodId === g.id && d.type === 'return').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
+      const gLoss = form.deliveries.filter(d => d.goodId === g.id && d.type === 'loss').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
+      const gSold = form.sales.filter(x => x.goodId === g.id).reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+      const gDelivered = gOut - gRet - gLoss;
+      perGood[g.id] = { name: g.name || '—', delivered: gDelivered, sold: gSold, inHand: gDelivered - gSold };
+    }
+    return { totalDelivered, totalSold, inHand, totalSales, commission, myShare, paidIn, paidOut, balance, perGood };
+  }, [form.deliveries, form.sales, form.payments, form.settlementType, form.settlementValue, form.goods]);
 
   const stats = useMemo(() => {
     let active = 0, settled = 0, cancelled = 0, totalBalance = 0;
@@ -885,6 +895,30 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>کل تحویلی:</span><span style={{ fontWeight: 700 }}>{toFa(calc.totalDelivered.toLocaleString('fa-IR'))}</span></div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>فروش کل (تعداد):</span><span style={{ fontWeight: 700 }}>{toFa(calc.totalSold.toLocaleString('fa-IR'))}</span></div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>در دست طرف:</span><span style={{ fontWeight: 700 }}>{toFa(calc.inHand.toLocaleString('fa-IR'))}</span></div>
+          {form.goods.length > 0 && (() => {
+            const rows = form.goods
+              .map(g => ({ g, pg: calc.perGood[g.id] }))
+              .filter(r => r.pg && (r.pg.delivered !== 0 || r.pg.sold !== 0));
+            if (rows.length === 0) return null;
+            return (
+              <div style={{ paddingTop: 6, marginTop: 4, borderTop: '1px dashed var(--accent-border)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--accent)' }}>به تفکیک کالا</div>
+                {rows.map(({ g, pg }) => {
+                  if (!pg) return null;
+                  return (
+                    <div key={g.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)', fontSize: 'var(--fs-xs)' }}>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{pg.name}</span>
+                      <span style={{ display: 'flex', gap: 'var(--sp-3)', flexShrink: 0 }}>
+                        <span>تحویل {toFa(pg.delivered)}</span>
+                        <span style={{ opacity: 0.75 }}>فروش {toFa(pg.sold)}</span>
+                        <span style={{ fontWeight: 700, minWidth: 60, textAlign: 'left', color: pg.inHand < 0 ? 'var(--danger)' : 'var(--accent)' }}>مانده {toFa(pg.inHand)}</span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
           <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 4, marginTop: 4 }}><span>فروش کل (مبلغ):</span><span style={{ fontWeight: 700 }}>{toFa(calc.totalSales.toLocaleString('fa-IR'))} ت</span></div>
           {calc.commission > 0 && <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>کمیسیون:</span><span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(calc.commission.toLocaleString('fa-IR'))} ت</span></div>}
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>سهم من:</span><span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(calc.myShare.toLocaleString('fa-IR'))} ت</span></div>
