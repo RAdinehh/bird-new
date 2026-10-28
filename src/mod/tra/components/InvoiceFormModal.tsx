@@ -31,6 +31,7 @@ export interface InvoiceFormModalProps {
   parties: any[];
   flocks: any[];
   whsItems: any[];
+  deals?: any[];
   vErrors: Record<string, string>;
   err: string;
   showError: (field: string) => string | undefined;
@@ -214,6 +215,21 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       </Grid2>
 
       
+      {/* قرارداد مرتبط */}
+      <Field label="قرارداد مرتبط" hint="اختیاری — اتصال به معامله خاص">
+        <Select
+          value={form.relatedDealId || ''}
+          onChange={e => setForm(f => ({ ...f, relatedDealId: e.target.value }))}
+        >
+          <option value="">— بدون اتصال —</option>
+          {(props.deals || []).map((d: any) => (
+            <option key={d.id} value={d.id}>
+              {d.dealNumber ? `#${d.dealNumber}` : `#${d.id.slice(0, 6)}`} — {d.description || '—'}
+            </option>
+          ))}
+        </Select>
+      </Field>
+
       {form.isPreorder && (
         <Field label="تاریخ تحویل" required error={showError('deliveryDate')} onTouch={() => markTouched('deliveryDate')}>
           <DatePicker value={form.deliveryDate} onChange={v => setForm(f => ({ ...f, deliveryDate: v}))}  autoToday />
