@@ -54,7 +54,8 @@ export function createMovementSchema(_ctx: ValidationContext = {}) {
     partyId: optionalId(),
     notes: optionalStr(500),
     flockId: optionalId(),
-    sourceModule: oneOf('ماژول مبدأ', ['egg', 'dlg', 'tra', 'inc', 'fed', 'manual'] as const).optional(),
+    sourceModule: oneOf('ماژول مبدأ', ['egg', 'dlg', 'tra', 'inc', 'fed', 'manual', 'deal'] as const).optional(),
+    locationId: optionalStr(100),
     sourceId: optionalId(),
   }).superRefine((data, ctx) => {
     // فقط adjust می‌تونه صفر باشه (تنظیم به صفر)
