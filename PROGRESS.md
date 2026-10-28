@@ -234,6 +234,14 @@
 
 ---
 
+## ✅ Deals Phase G-1 — DONE (commit a8f1bd8f)
+- `Item.stockByLocation` + `initialStockByLocation`
+- `Movement.locationId` (default 'stock')
+- helpers: `recalcStockByLocation` + `getStockAt`
+- migration v0→v1 (backfill از `currentStock`)
+- bug fix: `sourceModule: 'deal'` در Zod enum
+- 40 فایل مصرف‌کننده بدون تغییر
+
 ## ✅ Deals Phase A — DONE (commit d039a2c1)
 - `DealDelivery.time?: string` + `TimePicker` در فرم
 - Zod regex `HH:MM` + مقایسه `time` در `applyDealMovements`
