@@ -7,7 +7,7 @@ import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type
 import { useCtc } from '../ctc/store';
 import { useFlk } from '../flk/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
-import { Btn, BtnRow, Empty, Field, Input,
+import { Btn, BtnRow, Empty, Field, Input, MoneyField,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
 import { FieldHint } from '../../shr/intelligence';;
@@ -586,7 +586,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
 
         <Grid2>
           <Field label="مبلغ قرارداد" hint="اختیاری" error={showError?.('value')} onTouch={() => markTouched?.('value')}>
-            <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="تومان" min={0} max={1_000_000_000_000_000} />
+            <MoneyField value={form.value} onChange={e => setForm({...form, value: e.target.value})} min={0} max={1_000_000_000_000_000} />
             {Number(form.value) > 0 && <FieldHint fieldPath="tra.deal.value" value={form.value} />}
           </Field>
           <Field label="مهلت پرداخت" hint="اختیاری" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
@@ -607,21 +607,33 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
               <option value="grower_fee_per_unit">🐔 دستمزد پرورش</option>
             </Select>
           </Field>
-          <Field label="درصد" hint="۰ تا ۱۰۰ — سهم درصدی" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
-            <NumField placeholder="مثلاً ۱۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} unit="٪" min={0} max={100} />
-          </Field>
+          {form.type === 'partnership' && (
+            <Field label="درصد" hint="۰ تا ۱۰۰ — سهم شریک" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
+              <NumField placeholder="مثلاً ۱۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} unit="٪" min={0} max={100} />
+            </Field>
+          )}
         </Grid2>
 
         {form.settlementType && form.settlementType !== 'barter_direct' && (
           <Field label={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? 'درصد تسویه' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
-            <NumField
-              placeholder={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? '۱۰' : '۵۰۰۰۰۰۰'}
-              value={form.settlementValue}
-              onChange={e => setForm({...form, settlementValue: e.target.value})}
-              unit={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? '٪' : 'تومان'}
-              min={0}
-              max={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? 100 : undefined}
-            />
+            {form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? (
+              <NumField
+                placeholder="۱۰"
+                value={form.settlementValue}
+                onChange={e => setForm({...form, settlementValue: e.target.value})}
+                unit="٪"
+                min={0}
+                max={100}
+              />
+            ) : (
+              <MoneyField
+                placeholder="۵۰۰۰۰۰۰"
+                value={form.settlementValue}
+                onChange={e => setForm({...form, settlementValue: e.target.value})}
+                min={0}
+                max={1_000_000_000_000}
+              />
+            )}
           </Field>
         )}
 
