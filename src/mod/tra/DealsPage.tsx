@@ -115,7 +115,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         const it = deals.find(x => x.id === id);
         if (!it) continue;
         backups.push(it);
-        try { deleteDeal(id); } catch {}
+        try { handleDeleteDeal(id); } catch {}
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });
@@ -187,6 +187,19 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     payments: form.payments,
   });
   const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
+
+  const handleDeleteDeal = (id: string): void => {
+    const deal = deals.find(d => d.id === id);
+    if (deal?.deliveries && deal.deliveries.length > 0) {
+      const whs = useWhs.getState();
+      for (const dv of deal.deliveries) {
+        if (dv.whsMovementId) {
+          try { whs.deleteMovement(dv.whsMovementId); } catch (e) { console.error('[deals->whs] deleteMovement (delete) failed:', e); }
+        }
+      }
+    }
+    deleteDeal(id);
+  };
 
   const applyDealMovements = (formState: F, oldDeal?: Deal): void => {
     const whs = useWhs.getState();
@@ -412,7 +425,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                   <Btn size="sm" onClick={async () => {
                           const ok = await showConfirmAsync('تأیید حذف', 'این معامله حذف شود؟', { danger: true });
                           if (!ok) return;
-                          deleteDeal(d.id);
+                          handleDeleteDeal(d.id);
                           logAction('delete', 'tra', 'حذف از معاملات');
                           toastMsg.deleted('معامله')
                         }} style={{ flex: 1 }}>حذف</Btn>
