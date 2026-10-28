@@ -5,6 +5,7 @@ import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment } from './store';
 import { useCtc } from '../ctc/store';
+import { useFlk } from '../flk/store';
 import { Btn, BtnRow, Empty, Field, Input,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
@@ -58,7 +59,8 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
-  const { deals, addDeal, updateDeal, deleteDeal } = useTra();
+  const { deals, invoices, addDeal, updateDeal, deleteDeal } = useTra();
+  const { flocks } = useFlk();
   const { contacts } = useCtc();
 
   const [open, setOpen] = useState(false);
@@ -293,6 +295,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         <>
           {list.map((d, i) => {
             const party = contacts.find(c => c.id === d.partyId);
+            const relatedInvoices = invoices.filter((inv: any) => inv.relatedDealId === d.id);
+            const relatedFlocks = flocks.filter((f: any) => f.dealData?.dealId === d.id);
             const accent = accentFor(d.status);
             const isOpen = !ms.selectionMode && expandedId === d.id;
             return (
@@ -313,6 +317,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                     {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(d.value.toLocaleString('fa-IR'))} تومان</b></span>}
                     {d.percent !== null && d.percent !== undefined && <span>درصد: <b style={{ color: 'var(--text)' }}>{toFa(d.percent)}٪</b></span>}
                     {d.dueDate ? <span>سرسید: <b style={{ color: 'var(--text)' }}>{toFa(d.dueDate)}</b></span> : null}
+              {relatedInvoices.length > 0 && <span>📄 {toFa(relatedInvoices.length)} فاکتور</span>}
+              {relatedFlocks.length > 0 && <span>🐔 {toFa(relatedFlocks.length)} گله</span>}
                   </>
                 }
               >
