@@ -25,6 +25,7 @@ import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { useFormErrors } from '../../shr/hooks/useFormErrors';
 import { DealSchema } from '../../shr/validation/rules/tra';
+import { HELP } from '../../shr/help/helpTexts';
 
 interface F {
   id?: string;
@@ -595,7 +596,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         </Grid2>
 
         <Grid2>
-          <Field label="نوع تسویه" error={showError?.('settlementType')} onTouch={() => markTouched?.('settlementType')}>
+          <Field label="نوع تسویه" help={HELP.tra.deal.settlementType} error={showError?.('settlementType')} onTouch={() => markTouched?.('settlementType')}>
             <Select value={form.settlementType || ''} onChange={e => setForm({...form, settlementType: e.target.value as SettlementType | ''})}>
               <option value="">— انتخاب —</option>
               <option value="commission_pct">💰 کمیسیون درصدی</option>
@@ -640,7 +641,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         {/* ═══ 📊 وضعیت ═══ */}
         <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📊 وضعیت</div>
 
-        <Field label="وضعیت" error={showError?.('status')} onTouch={() => markTouched?.('status')}>
+        <Field label="وضعیت" help={HELP.tra.deal.status} error={showError?.('status')} onTouch={() => markTouched?.('status')}>
           <Select value={form.status} onChange={e => setForm({...form, status: e.target.value as 'open' | 'settled' | 'cancelled'})}>
             <option value="open">باز</option>
             <option value="settled">تسویه‌شده</option>
