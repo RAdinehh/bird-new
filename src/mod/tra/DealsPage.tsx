@@ -6,6 +6,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment } from './store';
 import { useCtc } from '../ctc/store';
 import { useFlk } from '../flk/store';
+import { useWhs, UNIT_LABEL } from '../whs/store';
 import { Btn, BtnRow, Empty, Field, Input,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
@@ -61,6 +62,7 @@ const STATUS_LABEL: Record<string, string> = {
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const { deals, invoices, addDeal, updateDeal, deleteDeal } = useTra();
   const { flocks } = useFlk();
+  const whsItems = useWhs(s => s.items);
   const { contacts } = useCtc();
 
   const [open, setOpen] = useState(false);
@@ -509,6 +511,16 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
               <NumField placeholder="۱۵۰۰۰" value={String(g.estimatedPrice || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, estimatedPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} />
             </Field>
           </Grid2>
+          <Field label="کالای انبار" hint="اختیاری — برای کاهش از موجودی">
+            <Select value={g.linkedItemId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, linkedItemId: e.target.value || undefined } : x) }))}>
+              <option value="">— بدون اتصال —</option>
+              {whsItems.map((it: any) => (
+                <option key={it.id} value={it.id}>
+                  {it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}
+                </option>
+              ))}
+            </Select>
+          </Field>
         </div>
       ))}
       <Btn size="sm" full onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0 }] }))}>+ افزودن کالا</Btn>
@@ -547,6 +559,21 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                   <NumField placeholder="۵۰۰" value={String(dv.quantity || '')} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={0} />
                 </Field>
               </Grid2>
+              {(() => {
+                const linkedGood = form.goods.find(x => x.id === dv.goodId);
+                if (!linkedGood?.linkedItemId) return null;
+                return (
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 'var(--fs-sm)', color: 'var(--muted)', fontWeight: 600, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={!!dv.whsEnabled}
+                      onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, whsEnabled: e.target.checked } : x) }))}
+                      style={{ width: 18, height: 18, accentColor: 'var(--accent)' }}
+                    />
+                    کاهش از موجودی انبار
+                  </label>
+                );
+              })()}
             </div>
           ))}
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deliveries: [...f.deliveries, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', type: 'out', quantity: 0, notes: '' }] }))}>+ افزودن تحویل</Btn>

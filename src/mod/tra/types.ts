@@ -253,6 +253,7 @@ export interface DealDelivery {
   quantity: number;
   notes?: string;
   whsMovementId?: string;
+  whsEnabled?: boolean;
 }
 
 export interface DealPayment {

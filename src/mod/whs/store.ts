@@ -69,7 +69,7 @@ export interface Movement {
   /** 🆕 رهگیری: کدوم گله */
   flockId?: string;
   /** 🆕 رهگیری: از کدوم ماژول اومده */
-  sourceModule?: 'egg' | 'dlg' | 'tra' | 'inc' | 'fed' | 'manual';
+  sourceModule?: 'egg' | 'dlg' | 'tra' | 'inc' | 'fed' | 'manual' | 'deal';
   /** 🆕 رهگیری: ID رکورد مبدأ */
   sourceId?: string;
   /** 🆕 شماره دسته (Batch) — برای تخم و دارو */

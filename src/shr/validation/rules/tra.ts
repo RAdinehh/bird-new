@@ -449,6 +449,7 @@ const DealDeliverySchema = z.object({
   date: persianDate('تاریخ تحویل'),
   type: z.enum(['out', 'return', 'loss']).default('out'),
   quantity: z.number().positive('مقدار تحویل باید بیشتر از صفر باشد'),
+  whsEnabled: z.boolean().optional(),
   notes: optionalStr(200),
   whsMovementId: optionalId(),
 });
