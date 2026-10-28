@@ -110,6 +110,16 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     onDelete: async (ids: string[]) => {
       const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' معامله حذف شوند؟', { danger: true });
       if (!ok) return;
+      const _lInvC = ids.filter(id => invoices.some((inv: any) => inv.relatedDealId === id)).length;
+      const _lFlkC = ids.filter(id => flocks.some((f: any) => f.dealData?.dealId === id)).length;
+      if (_lInvC > 0 || _lFlkC > 0) {
+        const _ptB: string[] = [];
+        if (_lInvC > 0) _ptB.push(toFa(_lInvC) + ' معامله به فاکتور');
+        if (_lFlkC > 0) _ptB.push(toFa(_lFlkC) + ' معامله به گله');
+        const ok2 = await showConfirmAsync('هشدار', _ptB.join(' و ') + ' وصله. با حذف، این ارتباط قطع می‌شه. ادامه؟', { danger: true });
+        if (!ok2) return;
+      }
+
       const backups: any[] = [];
       for (const id of ids) {
         const it = deals.find(x => x.id === id);
@@ -271,6 +281,15 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const save = () => {
     attemptSave();
     if (Object.keys(vErrors).length > 0) { setErr(''); return; }
+
+    // 🆕 Duplicate dealNumber check
+    if (form.dealNumber.trim()) {
+      const _dup = deals.find(d => d.id !== form.id && (d.dealNumber || '').trim() === form.dealNumber.trim());
+      if (_dup) {
+        setErr('شماره قرارداد «' + form.dealNumber.trim() + '» قبلاً استفاده شده — شماره دیگری انتخاب کنید');
+        return;
+      }
+    }
 
     const pct: number | null = form.percent.trim() !== '' ? num(form.percent) : null;
 
@@ -483,7 +502,16 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                   ) : null}
                   <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
-                          const ok = await showConfirmAsync('تأیید حذف', 'این معامله حذف شود؟', { danger: true });
+                          const _lInvS = invoices.filter((inv: any) => inv.relatedDealId === d.id).length;
+                          const _lFlkS = flocks.filter((f: any) => f.dealData?.dealId === d.id).length;
+                          let _exM = '';
+                          if (_lInvS > 0 || _lFlkS > 0) {
+                            const _ptS: string[] = [];
+                            if (_lInvS > 0) _ptS.push(toFa(_lInvS) + ' فاکتور');
+                            if (_lFlkS > 0) _ptS.push(toFa(_lFlkS) + ' گله');
+                            _exM = '\n\n⚠️ این معامله به ' + _ptS.join(' و ') + ' وصله. با حذف، این ارتباط قطع می‌شه.';
+                          }
+                          const ok = await showConfirmAsync('تأیید حذف', 'این معامله حذف شود؟' + _exM, { danger: true });
                           if (!ok) return;
                           handleDeleteDeal(d.id);
                           logAction('delete', 'tra', 'حذف از معاملات');
