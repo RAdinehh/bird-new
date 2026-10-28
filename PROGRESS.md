@@ -234,6 +234,15 @@
 
 ---
 
+## ✅ Deals Phase A — DONE (commit d039a2c1)
+- `DealDelivery.time?: string` + `TimePicker` در فرم
+- Zod regex `HH:MM` + مقایسه `time` در `applyDealMovements`
+
+## ✅ Deals Phase C — DONE (commit 6f6dbcb6)
+- `calc.perGood: Record<goodId, {name, delivered, sold, inHand}>`
+- بخش «به تفکیک کالا» در خلاصه مالی (الگوی FlockCapacityCard)
+- مانده منفی → `var(--danger)`
+
 ## ✅ Phase 4 (tra/deals) — DONE
 
 **تاریخ:** ۱۴۰۴/۰۸/۰۷
