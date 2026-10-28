@@ -705,7 +705,16 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       {/* تحویل‌ها */}
       {form.goods.length > 0 && (
         <>
-          <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📤 تحویل‌ها</div>
+          <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>📤 تحویل‌ها</span>
+            {(() => {
+              const outs = form.deliveries.filter(d => d.type === 'out').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
+              const rets = form.deliveries.filter(d => d.type === 'return').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
+              const loss = form.deliveries.filter(d => d.type === 'loss').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
+              const net = outs - rets - loss;
+              return net !== 0 ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>خالص: {toFa(net.toLocaleString('fa-IR'))}</span> : null;
+            })()}
+          </div>
 
           {form.deliveries.map((dv, di) => (
             <div key={dv.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -754,14 +763,20 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
               })()}
             </div>
           ))}
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deliveries: [...f.deliveries, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', type: 'out', quantity: 0, notes: '' }] }))}>+ افزودن تحویل</Btn>
+          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deliveries: [...f.deliveries, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', type: 'out', quantity: 0, notes: '' }] }))}>{form.deliveries.length === 0 ? '+ ثبت اولین تحویل' : '+ افزودن تحویل دیگر'}</Btn>
         </>
       )}
 
       {/* فروش‌ها */}
       {form.goods.length > 0 && (
         <>
-          <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>💰 فروش‌ها</div>
+          <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>💰 فروش‌ها</span>
+            {(() => {
+              const tot = form.sales.reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
+              return tot > 0 ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>{toFa(tot.toLocaleString('fa-IR'))} ت</span> : null;
+            })()}
+          </div>
 
           {form.sales.map((s, si) => {
             const total = (Number(s.quantity) || 0) * (Number(s.unitPrice) || 0);
@@ -795,12 +810,25 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
               </div>
             );
           })}
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, sales: [...f.sales, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', quantity: 0, unitPrice: 0 }] }))}>+ افزودن فروش</Btn>
+          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, sales: [...f.sales, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', quantity: 0, unitPrice: 0 }] }))}>{form.sales.length === 0 ? '+ ثبت اولین فروش' : '+ افزودن فروش دیگر'}</Btn>
         </>
       )}
 
       {/* پرداخت‌ها */}
-      <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>💳 پرداخت‌ها</div>
+      <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span>💳 پرداخت‌ها</span>
+        {(() => {
+          const pin = form.payments.filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0);
+          const pout = form.payments.filter(p => p.direction === 'out').reduce((s, p) => s + (Number(p.amount) || 0), 0);
+          if (pin === 0 && pout === 0) return null;
+          return (
+            <span style={{ display: 'flex', gap: 8, fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
+              {pin > 0 && <span style={{ color: 'var(--accent)' }}>↑ {toFa(pin.toLocaleString('fa-IR'))}</span>}
+              {pout > 0 && <span style={{ color: 'var(--warn)' }}>↓ {toFa(pout.toLocaleString('fa-IR'))}</span>}
+            </span>
+          );
+        })()}
+      </div>
 
       {form.payments.map((p, pi) => (
         <div key={p.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -815,7 +843,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
               <DatePicker value={p.date} onChange={v => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, date: v } : x) }))} autoToday />
             </Field>
             <Field label="مبلغ" required error={showError?.(`payments.${pi}.amount`)} onTouch={() => markTouched?.(`payments.${pi}.amount`)}>
-              <NumField placeholder="۵۰۰۰۰۰۰" value={String(p.amount || '')} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, amount: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} max={1_000_000_000_000} />
+              <MoneyField showWords={false} placeholder="مبلغ" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0; setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, amount: raw } : x) })); }} />
               {Number(p.amount) > 0 && <FieldHint fieldPath="tra.deal.payment" value={p.amount} />}
             </Field>
           </Grid2>
@@ -836,7 +864,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           </Grid2>
         </div>
       ))}
-      <Btn size="sm" full onClick={() => setForm(f => ({ ...f, payments: [...f.payments, { id: crypto.randomUUID(), date: form.date || '', amount: 0, direction: 'in', method: 'cash', notes: '' }] }))}>+ افزودن پرداخت</Btn>
+      <Btn size="sm" full onClick={() => setForm(f => ({ ...f, payments: [...f.payments, { id: crypto.randomUUID(), date: form.date || '', amount: 0, direction: 'in', method: 'cash', notes: '' }] }))}>{form.payments.length === 0 ? '+ ثبت اولین پرداخت' : '+ افزودن پرداخت دیگر'}</Btn>
 
       {/* خلاصه مالی */}
       {(form.goods.length > 0 || form.sales.length > 0) && (
