@@ -9,7 +9,8 @@ import { useFlk } from '../flk/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { Btn, BtnRow, Empty, Field, Input,
   Grid2, Modal, NumField,
-  PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';;
+  PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
+import { FieldHint } from '../../shr/intelligence';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import { useFilterSort, FilterBar, getTraDealsConfig } from '../../shr/filter';
@@ -585,7 +586,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
 
         <Grid2>
           <Field label="مبلغ قرارداد" hint="اختیاری" error={showError?.('value')} onTouch={() => markTouched?.('value')}>
-            <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="تومان" min={0} />
+            <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="تومان" min={0} max={1_000_000_000_000_000} />
+            {Number(form.value) > 0 && <FieldHint fieldPath="tra.deal.value" value={form.value} />}
           </Field>
           <Field label="مهلت پرداخت" hint="اختیاری" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
             <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})} autoToday />
@@ -666,10 +668,12 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           </Grid2>
           <Grid2>
             <Field label="مقدار" required error={showError?.(`goods.${gi}.quantity`)} onTouch={() => markTouched?.(`goods.${gi}.quantity`)}>
-              <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={0} />
+              <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
+              {Number(g.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={g.quantity} />}
             </Field>
             <Field label="قیمت تخمینی" error={showError?.(`goods.${gi}.estimatedPrice`)} onTouch={() => markTouched?.(`goods.${gi}.estimatedPrice`)}>
-              <NumField placeholder="۱۵۰۰۰" value={String(g.estimatedPrice || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, estimatedPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} />
+              <NumField placeholder="۱۵۰۰۰" value={String(g.estimatedPrice || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, estimatedPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} max={1_000_000_000_000} />
+              {Number(g.estimatedPrice) > 0 && <FieldHint fieldPath="tra.deal.unitPrice" value={g.estimatedPrice} />}
             </Field>
           </Grid2>
           <Field label="کالای انبار" hint="اختیاری — برای کاهش از موجودی">
@@ -717,7 +721,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                   </Select>
                 </Field>
                 <Field label="مقدار" required error={showError?.(`deliveries.${di}.quantity`)} onTouch={() => markTouched?.(`deliveries.${di}.quantity`)}>
-                  <NumField placeholder="۵۰۰" value={String(dv.quantity || '')} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={0} />
+                  <NumField placeholder="۵۰۰" value={String(dv.quantity || '')} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
+                {Number(dv.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={dv.quantity} />}
                 </Field>
               </Grid2>
               {(() => {
@@ -767,10 +772,12 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                 </Grid2>
                 <Grid2>
                   <Field label="مقدار" required error={showError?.(`sales.${si}.quantity`)} onTouch={() => markTouched?.(`sales.${si}.quantity`)}>
-                    <NumField placeholder="۳۰۰" value={String(s.quantity || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={0} />
+                    <NumField placeholder="۳۰۰" value={String(s.quantity || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
+                    {Number(s.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={s.quantity} />}
                   </Field>
                   <Field label="قیمت واحد" required error={showError?.(`sales.${si}.unitPrice`)} onTouch={() => markTouched?.(`sales.${si}.unitPrice`)}>
-                    <NumField placeholder="۲۰۰۰۰" value={String(s.unitPrice || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, unitPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} />
+                    <NumField placeholder="۲۰۰۰۰" value={String(s.unitPrice || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, unitPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} max={1_000_000_000_000} />
+                    {Number(s.unitPrice) > 0 && <FieldHint fieldPath="tra.deal.unitPrice" value={s.unitPrice} />}
                   </Field>
                 </Grid2>
               </div>
@@ -796,7 +803,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
               <DatePicker value={p.date} onChange={v => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, date: v } : x) }))} autoToday />
             </Field>
             <Field label="مبلغ" required error={showError?.(`payments.${pi}.amount`)} onTouch={() => markTouched?.(`payments.${pi}.amount`)}>
-              <NumField placeholder="۵۰۰۰۰۰۰" value={String(p.amount || '')} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, amount: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} />
+              <NumField placeholder="۵۰۰۰۰۰۰" value={String(p.amount || '')} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, amount: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} max={1_000_000_000_000} />
+              {Number(p.amount) > 0 && <FieldHint fieldPath="tra.deal.payment" value={p.amount} />}
             </Field>
           </Grid2>
           <Grid2>

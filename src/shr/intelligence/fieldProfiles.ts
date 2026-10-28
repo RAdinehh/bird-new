@@ -312,6 +312,22 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
   'inc.rentAmount': P('inc.rentAmount', 'price', 1_000, 50_000_000_000, {
     expectedFrom: 'history', structuralBreakAware: true,
   }),
+
+  // ══════════════════════════════════════════════════════════════════
+  // tra.deal — معاملات خاص (contract-based)
+  // ══════════════════════════════════════════════════════════════════
+  'tra.deal.value': P('tra.deal.value', 'price', 0, 1_000_000_000_000_000, {
+    expectedFrom: 'history_refbook', structuralBreakAware: true,
+  }),
+  'tra.deal.quantity': P('tra.deal.quantity', 'count', 1, 1_000_000, {
+    expectedFrom: 'history_refbook',
+  }),
+  'tra.deal.unitPrice': P('tra.deal.unitPrice', 'price', 0, 1_000_000_000_000, {
+    expectedFrom: 'history_refbook', structuralBreakAware: true,
+  }),
+  'tra.deal.payment': P('tra.deal.payment', 'price', 0, 1_000_000_000_000, {
+    expectedFrom: 'history_refbook', structuralBreakAware: true,
+  }),
 };
 
 export function getProfile(fieldPath: string): FieldProfile | null {
