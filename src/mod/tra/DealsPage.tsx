@@ -188,6 +188,58 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   });
   const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
 
+  const applyDealMovements = (formState: F, oldDeal?: Deal): void => {
+    const whs = useWhs.getState();
+    const oldDeliveries = oldDeal?.deliveries || [];
+
+    // 1. Delete movements for removed/disabled deliveries
+    for (const old of oldDeliveries) {
+      if (!old.whsMovementId) continue;
+      const current = formState.deliveries.find(d => d.id === old.id);
+      if (!current || !current.whsEnabled) {
+        try { whs.deleteMovement(old.whsMovementId); } catch (e) { console.error('[deals->whs] deleteMovement failed:', e); }
+        if (current) current.whsMovementId = undefined;
+      }
+    }
+
+    // 2. Delete movements for changed deliveries (will be re-added below)
+    for (const dv of formState.deliveries) {
+      if (!dv.whsEnabled || !dv.whsMovementId) continue;
+      const old = oldDeliveries.find(d => d.id === dv.id);
+      if (!old) continue;
+      if (old.quantity === dv.quantity && old.type === dv.type && old.date === dv.date) continue;
+      try { whs.deleteMovement(dv.whsMovementId); } catch (e) { console.error('[deals->whs] deleteMovement failed:', e); }
+      dv.whsMovementId = undefined;
+    }
+
+    // 3. Add movements for new enabled deliveries
+    for (const dv of formState.deliveries) {
+      if (!dv.whsEnabled) continue;
+      if (dv.whsMovementId) continue;
+      if (dv.type === 'loss') continue;
+      const good = formState.goods.find(g => g.id === dv.goodId);
+      if (!good?.linkedItemId) continue;
+
+      try {
+        const mid = whs.addMovement({
+          itemId: good.linkedItemId,
+          type: dv.type === 'out' ? 'out' : 'in',
+          quantity: dv.quantity,
+          unitPrice: 0,
+          reason: dv.type === 'out' ? 'consumption' : 'return',
+          date: dv.date || formState.date || '',
+          partyId: formState.partyId || '',
+          notes: `Deal ${formState.dealNumber || ''} - ${good.name}`,
+          sourceModule: 'deal',
+          sourceId: dv.id,
+        });
+        if (mid) dv.whsMovementId = mid;
+      } catch (e) {
+        console.error('[deals->whs] addMovement failed:', e);
+      }
+    }
+  };
+
   const save = () => {
     attemptSave();
     if (Object.keys(vErrors).length > 0) { setErr(''); return; }
@@ -215,6 +267,9 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       sales: form.sales,
       payments: form.payments,
     };
+    const oldDeal = form.id ? deals.find(d => d.id === form.id) : undefined;
+    applyDealMovements(form, oldDeal);
+
     if (form.id === undefined) {
       addDeal(data);
     } else {
