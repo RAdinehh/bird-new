@@ -534,92 +534,97 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         title={form.id ? 'ویرایش معامله' : 'ثبت معامله خاص'}
         footer={<BtnRow><Btn variant="primary" onClick={save}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
+        {/* ═══ 📋 اطلاعات قرارداد ═══ */}
+        <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📋 اطلاعات قرارداد</div>
+
         <Grid2>
+          <Field label="شماره قرارداد" hint="اختیاری" error={showError?.('dealNumber')} onTouch={() => markTouched?.('dealNumber')}>
+            <Input placeholder="مثلاً ۱۴۰۴-۰۰۱" value={form.dealNumber} onChange={e => setForm({...form, dealNumber: e.target.value})} />
+          </Field>
           <Field label="نوع معامله" required error={showError?.('type')} onTouch={() => markTouched?.('type')}>
             <Select value={form.type} onChange={e => setForm({...form, type: e.target.value as DealType})}>
               {(Object.keys(DEAL_LABEL) as DealType[]).map(t => <option key={t} value={t}>{DEAL_LABEL[t]}</option>)}
             </Select>
           </Field>
-          <Field label="تاریخ ایجاد" required error={showError?.('date')} onTouch={() => markTouched?.('date')}>
-            <DatePicker value={form.date} onChange={v => setForm({...form, date: v})}  autoToday />
-          </Field>
         </Grid2>
 
-        <Field label="طرف قرارداد" required error={showError?.('partyId')} onTouch={() => markTouched?.('partyId')}>
-          <SmartSelect
+        <Grid2>
+          <Field label="تاریخ ایجاد" required error={showError?.('date')} onTouch={() => markTouched?.('date')}>
+            <DatePicker value={form.date} onChange={v => setForm({...form, date: v})} autoToday />
+          </Field>
+          <Field label="طرف قرارداد" required error={showError?.('partyId')} onTouch={() => markTouched?.('partyId')}>
+            <SmartSelect
               value={form.partyId}
               onChange={v => setForm({...form, partyId: v})}
-              options={contacts.map(c => ({
-                value: c.id,
-                label: c.name,
-                subtitle: c.phone || undefined,
-              }))}
+              options={contacts.map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب طرف معامله"
               autoThreshold={6}
             />
-        </Field>
-
-        <Field label="توضیحات" required error={showError?.('description')} onTouch={() => markTouched?.('description')}>
-            <Textarea placeholder="توضیح معامله..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
-          </Field>
-
-      <Grid2>
-        <Field label="شماره قرارداد" hint="اختیاری" error={showError?.('dealNumber')} onTouch={() => markTouched?.('dealNumber')}>
-          <Input placeholder="مثلاً ۱۴۰۴-۰۰۱" value={form.dealNumber} onChange={e => setForm({...form, dealNumber: e.target.value})} />
-        </Field>
-        <Field label="تاریخ پایان" hint="اختیاری" error={showError?.('endDate')} onTouch={() => markTouched?.('endDate')}>
-          <DatePicker value={form.endDate} onChange={v => setForm({...form, endDate: v})} placeholder="اختیاری" />
-        </Field>
-      </Grid2>
-
-      <Grid2>
-        <Field label="تاریخ شروع" hint="اختیاری" error={showError?.('startDate')} onTouch={() => markTouched?.('startDate')}>
-          <DatePicker value={form.startDate} onChange={v => setForm({...form, startDate: v})} placeholder="اختیاری" />
-        </Field>
-        <Field label="نوع تسویه" hint="اختیاری" error={showError?.('settlementType')} onTouch={() => markTouched?.('settlementType')}>
-          <Select value={form.settlementType || ''} onChange={e => setForm({...form, settlementType: e.target.value as SettlementType | ''})}>
-            <option value="">— انتخاب —</option>
-            <option value="commission_pct">💰 کمیسیون درصدی</option>
-            <option value="commission_per_unit">💵 کمیسیون هر واحد</option>
-            <option value="fixed_amount">📋 مبلغ ثابت</option>
-            <option value="barter_direct">🔄 تهاتر مستقیم</option>
-            <option value="profit_sharing">🤝 شراکت در سود</option>
-            <option value="rental_monthly">📅 اجاره ماهانه</option>
-            <option value="grower_fee_per_unit">🐔 دستمزد پرورش</option>
-          </Select>
-        </Field>
-      </Grid2>
-
-      {form.settlementType && form.settlementType !== 'barter_direct' && (
-        <Field label={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? 'درصد تسویه' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
-          <NumField
-            placeholder={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? '۱۰' : '۵۰۰۰۰۰۰'}
-            value={form.settlementValue}
-            onChange={e => setForm({...form, settlementValue: e.target.value})}
-            unit={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? '٪' : 'تومان'}
-            min={0}
-            max={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? 100 : undefined}
-          />
-        </Field>
-      )}
-
-        <Grid2>
-          <Field label="مبلغ قرارداد" error={showError?.('value')} onTouch={() => markTouched?.('value')}>
-            <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="تومان" min={0} />
-          </Field>
-          <Field label="درصد" hint="۰ تا ۱۰۰" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
-            <NumField placeholder="مثلاً ۱۰" value={form.percent} onChange={e => {
-              const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-              const v = raw; // L14: no clamp on typing
-              setForm({...form, percent: v === 0 ? '' : String(v)});
-            }} unit="٪" min={0} />
           </Field>
         </Grid2>
 
-        <Field label="مهلت پرداخت" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
-          <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})}  autoToday />
+        <Field label="توضیحات" required error={showError?.('description')} onTouch={() => markTouched?.('description')}>
+          <Textarea placeholder="توضیح معامله..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
         </Field>
+
+        {/* ═══ 📅 محدوده زمانی ═══ */}
+        <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📅 محدوده زمانی</div>
+
+        <Grid2>
+          <Field label="تاریخ شروع" hint="اختیاری" error={showError?.('startDate')} onTouch={() => markTouched?.('startDate')}>
+            <DatePicker value={form.startDate} onChange={v => setForm({...form, startDate: v})} placeholder="اختیاری" />
+          </Field>
+          <Field label="تاریخ پایان" hint="اختیاری" error={showError?.('endDate')} onTouch={() => markTouched?.('endDate')}>
+            <DatePicker value={form.endDate} onChange={v => setForm({...form, endDate: v})} placeholder="اختیاری" />
+          </Field>
+        </Grid2>
+
+        {/* ═══ 💰 مالی و تسویه ═══ */}
+        <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>💰 مالی و تسویه</div>
+
+        <Grid2>
+          <Field label="مبلغ قرارداد" hint="اختیاری" error={showError?.('value')} onTouch={() => markTouched?.('value')}>
+            <NumField value={form.value} onChange={e => setForm({...form, value: e.target.value})} unit="تومان" min={0} />
+          </Field>
+          <Field label="مهلت پرداخت" hint="اختیاری" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
+            <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})} autoToday />
+          </Field>
+        </Grid2>
+
+        <Grid2>
+          <Field label="نوع تسویه" hint="اختیاری" error={showError?.('settlementType')} onTouch={() => markTouched?.('settlementType')}>
+            <Select value={form.settlementType || ''} onChange={e => setForm({...form, settlementType: e.target.value as SettlementType | ''})}>
+              <option value="">— انتخاب —</option>
+              <option value="commission_pct">💰 کمیسیون درصدی</option>
+              <option value="commission_per_unit">💵 کمیسیون هر واحد</option>
+              <option value="fixed_amount">📋 مبلغ ثابت</option>
+              <option value="barter_direct">🔄 تهاتر مستقیم</option>
+              <option value="profit_sharing">🤝 شراکت در سود</option>
+              <option value="rental_monthly">📅 اجاره ماهانه</option>
+              <option value="grower_fee_per_unit">🐔 دستمزد پرورش</option>
+            </Select>
+          </Field>
+          <Field label="درصد" hint="۰ تا ۱۰۰ — سهم درصدی" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
+            <NumField placeholder="مثلاً ۱۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} unit="٪" min={0} max={100} />
+          </Field>
+        </Grid2>
+
+        {form.settlementType && form.settlementType !== 'barter_direct' && (
+          <Field label={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? 'درصد تسویه' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
+            <NumField
+              placeholder={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? '۱۰' : '۵۰۰۰۰۰۰'}
+              value={form.settlementValue}
+              onChange={e => setForm({...form, settlementValue: e.target.value})}
+              unit={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? '٪' : 'تومان'}
+              min={0}
+              max={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? 100 : undefined}
+            />
+          </Field>
+        )}
+
+        {/* ═══ 📊 وضعیت ═══ */}
+        <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📊 وضعیت</div>
 
         <Field label="وضعیت" error={showError?.('status')} onTouch={() => markTouched?.('status')}>
           <Select value={form.status} onChange={e => setForm({...form, status: e.target.value as 'open' | 'settled' | 'cancelled'})}>
@@ -629,11 +634,11 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           </Select>
         </Field>
 
-      {form.status === 'cancelled' && (
-        <Field label="دلیل لغو" required error={showError?.('cancelReason')} onTouch={() => markTouched?.('cancelReason')}>
-          <Textarea placeholder="چرا لغو شد؟" value={form.cancelReason} onChange={e => setForm({...form, cancelReason: e.target.value})} />
-        </Field>
-      )}
+        {form.status === 'cancelled' && (
+          <Field label="دلیل لغو" required error={showError?.('cancelReason')} onTouch={() => markTouched?.('cancelReason')}>
+            <Textarea placeholder="چرا لغو شد؟" value={form.cancelReason} onChange={e => setForm({...form, cancelReason: e.target.value})} />
+          </Field>
+        )}
 
               {/* کالاهای تحویلی */}
       <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📦 کالاهای تحویلی</div>
