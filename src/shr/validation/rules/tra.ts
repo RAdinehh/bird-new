@@ -494,6 +494,32 @@ export const DealSchema = z.object({
   const d = data as any;
   if (d.startDate && d.endDate && d.startDate >= d.endDate) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'تاریخ پایان باید بعد از تاریخ شروع باشد', path: ['endDate'] });
+  
+    // ═══ Phase 2C: Cross-checks ═══
+    const _goodIds = new Set((d.goods || []).map((g: any) => g.id));
+    (d.deliveries || []).forEach((dv: any, di: number) => {
+      if (dv.goodId && !_goodIds.has(dv.goodId)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'کالای مرجع یافت نشد', path: ['deliveries', di, 'goodId'] });
+      }
+    });
+    (d.sales || []).forEach((s: any, si: number) => {
+      if (s.goodId && !_goodIds.has(s.goodId)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'کالای مرجع یافت نشد', path: ['sales', si, 'goodId'] });
+      }
+    });
+    (d.goods || []).forEach((good: any) => {
+      const _out = (d.deliveries || []).filter((dv: any) => dv.goodId === good.id && dv.type === 'out').reduce((s: number, dv: any) => s + (dv.quantity || 0), 0);
+      const _ret = (d.deliveries || []).filter((dv: any) => dv.goodId === good.id && dv.type === 'return').reduce((s: number, dv: any) => s + (dv.quantity || 0), 0);
+      const _loss = (d.deliveries || []).filter((dv: any) => dv.goodId === good.id && dv.type === 'loss').reduce((s: number, dv: any) => s + (dv.quantity || 0), 0);
+      const _inHand = _out - _ret - _loss;
+      const _sold = (d.sales || []).filter((s: any) => s.goodId === good.id).reduce((sum: number, s: any) => sum + (s.quantity || 0), 0);
+      if (_sold > _inHand) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'فروش کالای «' + good.name + '» (' + _sold + ') بیش از موجودی در دست طرف (' + _inHand + ') است', path: ['sales'] });
+      }
+      if (_inHand < 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'موجودی در دست طرف برای «' + good.name + '» منفی است', path: ['deliveries'] });
+      }
+    });
   }
   if (d.status === 'cancelled' && (!d.cancelReason || String(d.cancelReason).trim() === '')) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('دلیل لغو'), path: ['cancelReason'] });
