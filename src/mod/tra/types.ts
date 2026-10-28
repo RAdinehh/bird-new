@@ -232,6 +232,8 @@ export interface Invoice {
 }
 
 export type DealUnit = 'pcs' | 'kg' | 'ton' | 'bag' | 'L' | 'carton';
+export type DealDeliveryType = 'out' | 'return' | 'loss';
+export type DealPaymentDirection = 'in' | 'out';
 
 export interface DealGood {
   id: string;
@@ -246,6 +248,7 @@ export interface DealDelivery {
   id: string;
   goodId: string;
   date: string;
+  type: DealDeliveryType;
   quantity: number;
   notes?: string;
   whsMovementId?: string;
@@ -255,7 +258,17 @@ export interface DealPayment {
   id: string;
   date: string;
   amount: number;
+  direction: DealPaymentDirection;
   method: 'cash' | 'card' | 'check';
+  notes?: string;
+}
+
+export interface DealSale {
+  id: string;
+  goodId: string;
+  date: string;
+  quantity: number;
+  unitPrice: number;
   notes?: string;
 }
 
@@ -287,6 +300,7 @@ export interface Deal {
   cancelReason?: string;
   goods?: DealGood[];
   deliveries?: DealDelivery[];
+  sales?: DealSale[];
   payments?: DealPayment[];
   createdAt: string;
   updatedAt: string;

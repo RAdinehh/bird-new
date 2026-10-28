@@ -446,15 +446,26 @@ const DealDeliverySchema = z.object({
   id: z.string(),
   goodId: requiredId('کالا'),
   date: persianDate('تاریخ تحویل'),
+  type: z.enum(['out', 'return', 'loss']).default('out'),
   quantity: z.number().positive('مقدار تحویل باید بیشتر از صفر باشد'),
   notes: optionalStr(200),
   whsMovementId: optionalId(),
+});
+
+const DealSaleSchema = z.object({
+  id: z.string(),
+  goodId: requiredId('کالا'),
+  date: persianDate('تاریخ فروش'),
+  quantity: z.number().positive('مقدار فروش باید بیشتر از صفر باشد'),
+  unitPrice: z.number().nonnegative('قیمت واحد نمی‌تواند منفی باشد'),
+  notes: optionalStr(200),
 });
 
 const DealPaymentSchema = z.object({
   id: z.string(),
   date: persianDate('تاریخ پرداخت'),
   amount: z.number().positive('مبلغ پرداخت باید بیشتر از صفر باشد'),
+  direction: z.enum(['in', 'out']).default('in'),
   method: z.enum(['cash', 'card', 'check']),
   notes: optionalStr(200),
 });
@@ -477,6 +488,7 @@ export const DealSchema = z.object({
   cancelReason: optionalStr(500),
   goods: z.array(DealGoodSchema).default([]),
   deliveries: z.array(DealDeliverySchema).default([]),
+  sales: z.array(DealSaleSchema).default([]),
   payments: z.array(DealPaymentSchema).default([]),
 }).superRefine((data, ctx) => {
   const d = data as any;

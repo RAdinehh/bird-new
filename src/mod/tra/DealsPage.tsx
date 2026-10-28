@@ -3,7 +3,7 @@
  */
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
-import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealPayment } from './store';
+import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, BtnRow, Empty, Field, Input,
   Grid2, Modal, NumField,
@@ -38,6 +38,7 @@ interface F {
   cancelReason: string;
   goods: DealGood[];
   deliveries: DealDelivery[];
+  sales: DealSale[];
   payments: DealPayment[];
 }
 
@@ -49,7 +50,7 @@ const empty = (): F => ({
   notes: '',
   dealNumber: '', startDate: '', endDate: '',
   settlementType: '', settlementValue: '', cancelReason: '',
-  goods: [], deliveries: [], payments: [],
+  goods: [], deliveries: [], sales: [], payments: [],
 });
 
 const STATUS_LABEL: Record<string, string> = {
@@ -152,6 +153,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       cancelReason: d.cancelReason || '',
       goods: d.goods || [],
       deliveries: d.deliveries || [],
+      sales: d.sales || [],
       payments: d.payments || [],
     });
     setErr(''); setOpen(true);
@@ -177,6 +179,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     cancelReason: form.cancelReason || '',
     goods: form.goods,
     deliveries: form.deliveries,
+    sales: form.sales,
     payments: form.payments,
   });
   const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
@@ -205,6 +208,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       cancelReason: form.cancelReason.trim() || undefined,
       goods: form.goods,
       deliveries: form.deliveries,
+      sales: form.sales,
       payments: form.payments,
     };
     if (form.id === undefined) {
