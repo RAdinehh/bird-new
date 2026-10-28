@@ -231,3 +231,51 @@
 203
 204
 205
+
+---
+
+## ✅ Phase 4 (tra/deals) — DONE
+
+**تاریخ:** ۱۴۰۴/۰۸/۰۷
+**Commits:** `a6f7ed47` (Phase 1), `aa7d59f3` (Phase 2A), `6e5a1141` (Phase 2B), `8499e833` (Phase 2C)
+
+### ساختار
+- `DealsPage.tsx` — صفحه معاملات خاص
+- `rules/tra.ts` — `DealSchema` با ۴ زیر-schema
+- `types.ts` — `Deal`, `DealGood`, `DealDelivery`, `DealSale`, `DealPayment`
+
+### فیلدهای Deal (Phase 1)
+- `dealNumber`, `startDate`, `endDate` — قرارداد
+- `settlementType` (۷ نوع), `settlementValue` — تسویه
+- `cancelReason` (اجباری اگر cancelled)
+
+### اقلام قرارداد (Phase 2A/2B)
+- **DealGood**: name, quantity, unit (pcs/kg/ton/bag/L/carton), estimatedPrice
+- **DealDelivery**: goodId, date, type (out/return/loss), quantity
+- **DealSale**: goodId, date, quantity, unitPrice
+- **DealPayment**: date, amount, direction (in/out), method (cash/card/check)
+
+### محاسبات زنده (Phase 2B)
+- `totalDelivered = out - return - loss`
+- `inHand = totalDelivered - totalSold`
+- `totalSales = Σ (quantity × unitPrice)`
+- `commission = totalSales × pct (اگر commission_pct/profit_sharing)`
+- `myShare = totalSales - commission`
+- `balance = myShare - paidIn + paidOut`
+
+### اعتبارسنجی (Phase 2C)
+- `goodId` در deliveries/sales به `goods[]` موجود اشاره می‌کنه
+- `sold ≤ inHand` برای هر کالا
+- `inHand` نمی‌تونه منفی باشه
+- `startDate < endDate` (Phase 1)
+
+### الگو
+- **بدون cascade به whs/flk** — Deal فقط ثبت قرارداده
+- `sourceModule: 'deal'` قابل اضافه شدن در آینده
+- اتصال معکوس: `Flock.dealData.dealId` (از قبل)
+
+### مرجع (نقشه راه بعدی)
+- **Phase 3 (بعدی):** اتصال به فاکتورها + گله‌ها (`linkedInvoiceIds`, `linkedFlockIds`)
+- **Phase 4 (بعدی):** whs cascade اختیاری (با تأیید کاربر)
+- **Phase 5 (بعدی):** گزارش/KPI per Deal + Aging analysis
+
