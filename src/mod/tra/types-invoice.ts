@@ -23,6 +23,7 @@ export interface F {
   dueDate: string;
   payments: Payment[];
   relatedFlockId: string;
+  relatedDealId?: string;
   notes: string;
   installments: Installment[];
   /** 🆕 فاکتور مختلط — فروشنده هر قلم متفاوت */

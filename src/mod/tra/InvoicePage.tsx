@@ -225,6 +225,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
       isPreorder: form.isPreorder ?? false,
       relatedFlockId: '',
       relatedEntryId: '',
+      relatedDealId: '',
       notes: form.notes || '',
       paymentTerms: form.paymentTerms,
       workflowStatus: 'draft',

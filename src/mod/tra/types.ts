@@ -195,6 +195,7 @@ export interface Invoice {
   dueDate: string;
   relatedFlockId: string;
   relatedEntryId: string;
+  relatedDealId?: string;
   notes: string;
   createdAt: string;
   updatedAt: string;

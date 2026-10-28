@@ -289,6 +289,7 @@ export function useInvoiceForm(params: {
       dueDate: inv.dueDate || '',
       payments: inv.payments || [],
       relatedFlockId: (inv as any).relatedFlockId || '',
+      relatedDealId: (inv as any).relatedDealId || '',
       notes: inv.notes || '',
       installments: inv.installments || [],
     });
@@ -329,6 +330,7 @@ export function useInvoiceForm(params: {
       dueDate: form.dueDate || '',
       relatedFlockId: form.relatedFlockId || '',
       relatedEntryId: '',
+      relatedDealId: (form as any).relatedDealId || '',
       notes: form.notes?.trim() || '',
       paymentTerms: form.paymentTerms,
       isPreorder: form.isPreorder,

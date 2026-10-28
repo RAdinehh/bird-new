@@ -122,6 +122,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     dueDate: persianDateOpt('سرسید'),
     relatedFlockId: optionalId(),
     relatedEntryId: optionalId(),
+    relatedDealId: optionalId(),
     notes: optionalStr(2000),
     paymentTerms: oneOf('شرایط پرداخت', ['cash', 'installment', 'custom'] as const).optional(),
     workflowStatus: oneOf('وضعیت', ['draft', 'confirmed', 'received', 'paid'] as const).optional(),
