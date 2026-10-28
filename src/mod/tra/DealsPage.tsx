@@ -19,7 +19,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
-import { format as formatJ } from 'date-fns-jalali';
+import { parse as parseJ, format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { useFormErrors } from '../../shr/hooks/useFormErrors';
@@ -253,6 +253,21 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     }
   };
 
+  const dealAging = (d: Deal): { days: number; tone: 'ok' | 'warn' | 'danger' } | null => {
+    if (d.status === 'settled' || d.status === 'cancelled') return null;
+    const target = d.dueDate || d.startDate || d.date;
+    if (!target) return null;
+    try {
+      const en = target.replace(/[۰-۹]/g, (c: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));
+      const t = parseJ(en, 'yyyy/MM/dd', new Date());
+      if (isNaN(t.getTime())) return null;
+      const days = Math.floor((Date.now() - t.getTime()) / 86400000);
+      if (days <= 0) return null;
+      const tone: 'ok' | 'warn' | 'danger' = days < 30 ? 'ok' : days < 60 ? 'warn' : 'danger';
+      return { days, tone };
+    } catch { return null; }
+  };
+
   const save = () => {
     attemptSave();
     if (Object.keys(vErrors).length > 0) { setErr(''); return; }
@@ -387,6 +402,13 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                     {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(d.value.toLocaleString('fa-IR'))} تومان</b></span>}
                     {d.percent !== null && d.percent !== undefined && <span>درصد: <b style={{ color: 'var(--text)' }}>{toFa(d.percent)}٪</b></span>}
                     {d.dueDate ? <span>سرسید: <b style={{ color: 'var(--text)' }}>{toFa(d.dueDate)}</b></span> : null}
+              {(() => {
+                const ag = dealAging(d);
+                if (!ag) return null;
+                const bg = ag.tone === 'ok' ? 'var(--accent-soft)' : ag.tone === 'warn' ? 'var(--warn-soft)' : 'var(--danger-soft)';
+                const fg = ag.tone === 'ok' ? 'var(--accent)' : ag.tone === 'warn' ? 'var(--warn)' : 'var(--danger)';
+                return <span style={{ padding: '2px 8px', borderRadius: 4, background: bg, color: fg, fontWeight: 700, fontSize: 'var(--fs-xs)' }}>⏳ {toFa(ag.days)} روز</span>;
+              })()}
               {relatedInvoices.length > 0 && <span>📄 {toFa(relatedInvoices.length)} فاکتور</span>}
               {relatedFlocks.length > 0 && <span>🐔 {toFa(relatedFlocks.length)} گله</span>}
                   </>
