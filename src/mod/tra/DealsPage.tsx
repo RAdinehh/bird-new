@@ -329,6 +329,23 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     return { totalDelivered, totalSold, inHand, totalSales, commission, myShare, paidIn, paidOut, balance };
   }, [form.deliveries, form.sales, form.payments, form.settlementType, form.settlementValue]);
 
+  const stats = useMemo(() => {
+    let active = 0, settled = 0, cancelled = 0, totalBalance = 0;
+    for (const d of deals) {
+      if (d.status === 'cancelled') { cancelled++; continue; }
+      if (d.status === 'settled') { settled++; continue; }
+      active++;
+      const sales = (d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
+      const pct = Number(d.settlementValue) || 0;
+      const comm = (d.settlementType === 'commission_pct' || d.settlementType === 'profit_sharing') ? Math.round(sales * pct / 100) : 0;
+      const myShare = sales - comm;
+      const paidIn = (d.payments || []).filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0);
+      const paidOut = (d.payments || []).filter(p => p.direction === 'out').reduce((s, p) => s + (Number(p.amount) || 0), 0);
+      totalBalance += myShare - paidIn + paidOut;
+    }
+    return { active, settled, cancelled, totalBalance };
+  }, [deals]);
+
   return (
     <PageContainer>
       {undoData && (
@@ -338,6 +355,27 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           onDismiss={() => setUndoData(null)}
         />
       )}
+      {/* KPI row */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 8 }}>
+        <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', borderRadius: 'var(--r-md)', textAlign: 'center' }}>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>فعال</div>
+          <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(stats.active)}</div>
+        </div>
+        <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', borderRadius: 'var(--r-md)', textAlign: 'center' }}>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>تسویه‌شده</div>
+          <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--info)' }}>{toFa(stats.settled)}</div>
+        </div>
+        <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', borderRadius: 'var(--r-md)', textAlign: 'center' }}>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>لغو‌شده</div>
+          <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--danger)' }}>{toFa(stats.cancelled)}</div>
+        </div>
+      </div>
+      {stats.totalBalance !== 0 && (
+        <div style={{ padding: 'var(--pad-normal)', background: stats.totalBalance > 0 ? 'var(--warn-soft)' : 'var(--accent-soft)', borderRadius: 'var(--r-md)', textAlign: 'center', marginBottom: 8, fontSize: 'var(--fs-sm)' }}>
+          مجموع مانده‌های فعال: <b style={{ color: stats.totalBalance > 0 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(Math.abs(stats.totalBalance).toLocaleString('fa-IR'))} تومان</b>
+        </div>
+      )}
+
       <FilterBar
         filterDefs={config.filterDefs}
         sortDefs={config.sortDefs}
