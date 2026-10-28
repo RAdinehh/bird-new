@@ -1,7 +1,8 @@
 /**
  * index.tsx — بخش tra
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import PurchasesPage from './PurchasesPage';
 import SalesPage from './SalesPage';
@@ -20,7 +21,18 @@ type TabId = typeof tabs[number]['id'];
 const TAB_IDS = ['purchases', 'sales', 'deals', 'receivables'];
 
 export default function Tra() {
-  const [tab, setTab] = useState<TabId>('purchases');
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [tab, setTab] = useState<TabId>(() => {
+    const valid: TabId[] = ['purchases', 'sales', 'deals', 'receivables'];
+    return (tabParam && (valid as string[]).includes(tabParam)) ? (tabParam as TabId) : 'purchases';
+  });
+  useEffect(() => {
+    if (tabParam && ['purchases','sales','deals','receivables'].includes(tabParam) && tabParam !== tab) {
+      setTab(tabParam as TabId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabParam]);
   const { containerRef, trackRef, setInstant } = useCarousel(
     TAB_IDS,
     tab,

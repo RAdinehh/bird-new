@@ -38,7 +38,7 @@ import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
   const isPurchase = kind === 'purchase';
-  const { invoices, deals, addInvoice, updateInvoice, deleteInvoice, reopenInvoice, allocations } = useTra();
+  const { invoices: _allInvoices, deals, addInvoice, updateInvoice, deleteInvoice, reopenInvoice, allocations } = useTra();
   const { contacts } = useCtc();
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
@@ -54,6 +54,16 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const [transferNote, setTransferNote] = useState('');
   const [transferDate, setTransferDate] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
+  const relatedDealIdFilter = searchParams.get('relatedDealId') || '';
+  const invoices = useMemo(() => {
+    if (!relatedDealIdFilter) return _allInvoices;
+    return _allInvoices.filter((inv: any) => inv.relatedDealId === relatedDealIdFilter);
+  }, [_allInvoices, relatedDealIdFilter]);
+  const clearRelatedDealId = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete('relatedDealId');
+    setSearchParams(next, { replace: true });
+  };
 
   // ⭐ hook فرم فاکتور
   const {
@@ -314,6 +324,22 @@ return (
       />
 
 
+      {/* 🆕 Deep Link banner */}
+      {relatedDealIdFilter && (
+        <div style={{
+          padding: 'var(--pad-normal)', marginBottom: 8,
+          background: 'var(--accent-soft)', border: '1px solid var(--accent-border)',
+          borderRadius: 'var(--r-md)', display: 'flex',
+          justifyContent: 'space-between', alignItems: 'center',
+          fontSize: 'var(--fs-sm)', fontWeight: 600,
+        }}>
+          <span>🔍 فیلتر: فاکتورهای مربوط به معامله</span>
+          <button type="button" onClick={clearRelatedDealId}
+            style={{ background: 'transparent', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, padding: '4px 8px' }}>
+            ✕ پاک کردن
+          </button>
+        </div>
+      )}
       {/* FilterBar */}
       <FilterBar
         filterDefs={config.filterDefs}

@@ -4,6 +4,7 @@
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment } from './store';
+import { useNavigate } from 'react-router-dom';
 import { useCtc } from '../ctc/store';
 import { useFlk } from '../flk/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
@@ -62,6 +63,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
+  const navigate = useNavigate();
   const { deals, invoices, addDeal, updateDeal, deleteDeal } = useTra();
   const { flocks } = useFlk();
   const whsItems = useWhs(s => s.items);
@@ -468,7 +470,15 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                 const fg = ag.tone === 'ok' ? 'var(--accent)' : ag.tone === 'warn' ? 'var(--warn)' : 'var(--danger)';
                 return <span style={{ padding: '2px 8px', borderRadius: 4, background: bg, color: fg, fontWeight: 700, fontSize: 'var(--fs-xs)' }}>⏳ {toFa(ag.days)} روز</span>;
               })()}
-              {relatedInvoices.length > 0 && <span>📄 {toFa(relatedInvoices.length)} فاکتور</span>}
+              {relatedInvoices.length > 0 && (
+                <button type="button" onClick={(e) => {
+                  e.stopPropagation();
+                  const tab = relatedInvoices[0]?.type === 'sale' ? 'sales' : 'purchases';
+                  navigate(`/tra?tab=${tab}&relatedDealId=${d.id}`);
+                }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit', padding: 0, fontWeight: 600 }}>
+                  📄 {toFa(relatedInvoices.length)} فاکتور
+                </button>
+              )}
               {relatedFlocks.length > 0 && <span>🐔 {toFa(relatedFlocks.length)} گله</span>}
                   </>
                 }
