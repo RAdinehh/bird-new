@@ -103,7 +103,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
                   />
                 </Field>
                 {v.itemId && (
-                  <Field label="مقدار مصرفی">
+                  <Field label="مقدار مصرفی" error={showError(`vaccines.${i}.quantity`)} onTouch={() => markTouched(`vaccines.${i}.quantity`)}>
                     <NumField
                       value={v.quantity !== null && v.quantity !== undefined ? String(v.quantity) : ''}
                       onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 } : x) }))}
@@ -154,7 +154,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
                   />
                 </Field>
                 {m.itemId && (
-                  <Field label="مقدار مصرفی">
+                  <Field label="مقدار مصرفی" error={showError(`medications.${i}.quantity`)} onTouch={() => markTouched(`medications.${i}.quantity`)}>
                     <NumField
                       value={m.quantity !== null && m.quantity !== undefined ? String(m.quantity) : ''}
                       onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 } : x) }))}

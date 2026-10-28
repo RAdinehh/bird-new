@@ -75,20 +75,22 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
         </Grid2>
       )}
 
-      {form.weightSamples.map((w) => (
+      {form.weightSamples.map((w, i) => (
         <div key={w.id} style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             <div style={{ flex: 1 }}>
               <NumField
                 placeholder="وزن (kg)"
                 value={w.weight}
+                error={showError(`weightSamples.${i}.weight`)}
+                onBlur={() => markTouched(`weightSamples.${i}.weight`)}
                 onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
                 unit="kg" min={0} />
             </div>
             <button type="button" onClick={() => setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) }))}
               style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
           </div>
-          <FieldHint fieldPath="dlg.weightSamples" value={w.weight} context={{ species: selectedFlock?.breedId }} />
+          {!showError(`weightSamples.${i}.weight`) && <FieldHint fieldPath="dlg.weightSamples" value={w.weight} context={{ species: selectedFlock?.breedId }} />}
         </div>
       ))}
 
