@@ -7,7 +7,7 @@ import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type
 import { useCtc } from '../ctc/store';
 import { useFlk } from '../flk/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
-import { Btn, BtnRow, Empty, Field, Input, MoneyField,
+import { Btn, BtnRow, Empty, Field, Input, MoneyField, PercentField,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
 import { FieldHint } from '../../shr/intelligence';;
@@ -610,7 +610,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           </Field>
           {form.type === 'partnership' && (
             <Field label="درصد" hint="۰ تا ۱۰۰" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
-              <NumField placeholder="۱۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} unit="٪" min={0} max={100} />
+              <PercentField placeholder="۱۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} />
             </Field>
           )}
         </Grid2>
@@ -618,13 +618,10 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         {form.settlementType && form.settlementType !== 'barter_direct' && (
           <Field label={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? 'درصد تسویه' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
             {form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? (
-              <NumField
+              <PercentField
                 placeholder="۱۰"
                 value={form.settlementValue}
                 onChange={e => setForm({...form, settlementValue: e.target.value})}
-                unit="٪"
-                min={0}
-                max={100}
               />
             ) : (
               <MoneyField
