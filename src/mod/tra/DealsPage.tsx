@@ -539,8 +539,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📋 اطلاعات قرارداد</div>
 
         <Grid2>
-          <Field label="شماره قرارداد" hint="اختیاری" error={showError?.('dealNumber')} onTouch={() => markTouched?.('dealNumber')}>
-            <Input placeholder="مثلاً ۱۴۰۴-۰۰۱" value={form.dealNumber} onChange={e => setForm({...form, dealNumber: e.target.value})} />
+          <Field label="شماره قرارداد" error={showError?.('dealNumber')} onTouch={() => markTouched?.('dealNumber')}>
+            <Input placeholder="۱۴۰۴-۰۰۱" value={form.dealNumber} onChange={e => setForm({...form, dealNumber: e.target.value})} />
           </Field>
           <Field label="نوع معامله" required error={showError?.('type')} onTouch={() => markTouched?.('type')}>
             <Select value={form.type} onChange={e => setForm({...form, type: e.target.value as DealType})}>
@@ -573,11 +573,11 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📅 محدوده زمانی</div>
 
         <Grid2>
-          <Field label="تاریخ شروع" hint="اختیاری" error={showError?.('startDate')} onTouch={() => markTouched?.('startDate')}>
-            <DatePicker value={form.startDate} onChange={v => setForm({...form, startDate: v})} placeholder="اختیاری" />
+          <Field label="تاریخ شروع" error={showError?.('startDate')} onTouch={() => markTouched?.('startDate')}>
+            <DatePicker value={form.startDate} onChange={v => setForm({...form, startDate: v})} placeholder="از چه تاریخی؟" />
           </Field>
-          <Field label="تاریخ پایان" hint="اختیاری" error={showError?.('endDate')} onTouch={() => markTouched?.('endDate')}>
-            <DatePicker value={form.endDate} onChange={v => setForm({...form, endDate: v})} placeholder="اختیاری" />
+          <Field label="تاریخ پایان" error={showError?.('endDate')} onTouch={() => markTouched?.('endDate')}>
+            <DatePicker value={form.endDate} onChange={v => setForm({...form, endDate: v})} placeholder="تا چه تاریخی؟" />
           </Field>
         </Grid2>
 
@@ -585,17 +585,17 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>💰 مالی و تسویه</div>
 
         <Grid2>
-          <Field label="مبلغ قرارداد" hint="اختیاری" error={showError?.('value')} onTouch={() => markTouched?.('value')}>
+          <Field label="مبلغ قرارداد" error={showError?.('value')} onTouch={() => markTouched?.('value')}>
             <MoneyField value={form.value} onChange={e => setForm({...form, value: e.target.value})} min={0} max={1_000_000_000_000_000} />
             {Number(form.value) > 0 && <FieldHint fieldPath="tra.deal.value" value={form.value} />}
           </Field>
-          <Field label="مهلت پرداخت" hint="اختیاری" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
+          <Field label="مهلت پرداخت" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
             <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})} autoToday />
           </Field>
         </Grid2>
 
         <Grid2>
-          <Field label="نوع تسویه" hint="اختیاری" error={showError?.('settlementType')} onTouch={() => markTouched?.('settlementType')}>
+          <Field label="نوع تسویه" error={showError?.('settlementType')} onTouch={() => markTouched?.('settlementType')}>
             <Select value={form.settlementType || ''} onChange={e => setForm({...form, settlementType: e.target.value as SettlementType | ''})}>
               <option value="">— انتخاب —</option>
               <option value="commission_pct">💰 کمیسیون درصدی</option>
@@ -608,8 +608,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
             </Select>
           </Field>
           {form.type === 'partnership' && (
-            <Field label="درصد" hint="۰ تا ۱۰۰ — سهم شریک" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
-              <NumField placeholder="مثلاً ۱۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} unit="٪" min={0} max={100} />
+            <Field label="درصد" hint="۰ تا ۱۰۰" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
+              <NumField placeholder="۱۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} unit="٪" min={0} max={100} />
             </Field>
           )}
         </Grid2>
@@ -688,7 +688,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
               {Number(g.estimatedPrice) > 0 && <FieldHint fieldPath="tra.deal.unitPrice" value={g.estimatedPrice} />}
             </Field>
           </Grid2>
-          <Field label="کالای انبار" hint="اختیاری — برای کاهش از موجودی">
+          <Field label="کالای انبار" hint="برای کاهش از موجودی">
             <Select value={g.linkedItemId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, linkedItemId: e.target.value || undefined } : x) }))}>
               <option value="">— بدون اتصال —</option>
               {whsItems.map((it: any) => (
@@ -857,7 +857,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       )}
 
       <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
-            <Textarea placeholder="یادداشت اختیاری" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+            <Textarea placeholder="توضیحات..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
 
         {err && <ErrorBox>{err}</ErrorBox>}
