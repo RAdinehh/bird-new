@@ -234,6 +234,15 @@
 
 ---
 
+## ✅ Deals Phase B — DONE (commit 4f5a33b6)
+- `DealDelivery.ownership: 'none' | 'mine' | 'theirs'`
+- ownership='mine': Internal Transfer (stock -X → consignment:partyId +X)
+  → currentStock ثابت (Odoo Consignment / SAP Special Stock K)
+- ownership='theirs': Move out (stock -X) → currentStock کم می‌شود
+- `whsMovementIdIn` جدید
+- UI: تیک → 3 دکمه (بدون اثر / امانت / فروش)
+- backward compat: whsEnabled (deprecated) → 'theirs'
+
 ## ✅ Deals Phase G-1 — DONE (commit a8f1bd8f)
 - `Item.stockByLocation` + `initialStockByLocation`
 - `Movement.locationId` (default 'stock')
