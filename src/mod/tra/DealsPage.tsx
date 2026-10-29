@@ -1084,7 +1084,7 @@ const save = () => {
           </Grid2>
           <Grid2>
             <Field label="مقدار" required error={showError?.(`goods.${gi}.quantity`)} onTouch={() => markTouched?.(`goods.${gi}.quantity`)}>
-              <Input mode="number" type="number" placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(e.target.value) || 0 } : x) }))} min={1} />
+              <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
               {(() => {
                 const srcInfo = getSourceInfo(g);
                 if (!srcInfo) return null;
