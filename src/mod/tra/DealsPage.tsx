@@ -673,27 +673,45 @@ const save = () => {
                   </>
                 }
               >
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات معامله</SectionTitle>
+                {(d.dealNumber || d.startDate || d.settlementType) && (
+                  <>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات قرارداد</SectionTitle>
+                    <Grid2>
+                      {d.dealNumber ? <Row l="شماره قرارداد" v={toFa(d.dealNumber)} /> : <div />}
+                      {d.startDate ? <Row l="دوره" v={d.endDate ? `${toFa(d.startDate)} تا ${toFa(d.endDate)}` : toFa(d.startDate)} /> : <div />}
+                      {d.settlementType ? <Row l="نوع تسویه" v={d.settlementType === 'commission_pct' ? 'کمیسیون درصدی' : d.settlementType === 'barter_direct' ? 'تهاتر مستقیم' : d.settlementType} /> : <div />}
+                      {d.settlementValue ? <Row l="مقدار تسویه" v={toFa(d.settlementValue)} /> : <div />}
+                    </Grid2>
+                  </>
+                )}
+
+                {(d.goods && d.goods.length > 0) && (
+                  <>
+                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> کالاها و موجودی</SectionTitle>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      {d.goods.map(g => {
+                        const out = (d.deliveries || []).filter(dv => dv.goodId === g.id && dv.type === 'out').reduce((s, dv) => s + (Number(dv.quantity) || 0), 0);
+                        const ret = (d.deliveries || []).filter(dv => dv.goodId === g.id && dv.type === 'return').reduce((s, dv) => s + (Number(dv.quantity) || 0), 0);
+                        const loss = (d.deliveries || []).filter(dv => dv.goodId === g.id && dv.type === 'loss').reduce((s, dv) => s + (Number(dv.quantity) || 0), 0);
+                        const delivered = out - ret - loss;
+                        const sold = (d.sales || []).filter(s => s.goodId === g.id).reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+                        const inHand = delivered - sold;
+                        return (
+                          <Row key={g.id} l={g.name} v={`تحویل: ${toFa(delivered)} | فروش: ${toFa(sold)} | مانده: ${toFa(inHand)}`} />
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+
+                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> خلاصه مالی</SectionTitle>
                 <Grid2>
-                  <Row l="نوع" v={DEAL_LABEL[d.type]} />
-                  <Row l="طرف معامله" v={party?.name || '—'} />
-                  <Row l="تاریخ" v={toFa(d.date)} />
-                  {d.dueDate ? <Row l="سرسید" v={toFa(d.dueDate)} /> : <div />}
-                  <Row l="وضعیت" v={STATUS_LABEL[d.status]} />
+                  <Row l="فروش کل" v={`${toFa((d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0).toLocaleString('fa-IR'))} ت`} />
+                  <Row l="دریافت‌شده" v={`${toFa((d.payments || []).filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0).toLocaleString('fa-IR'))} ت`} />
                 </Grid2>
 
                 <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> توضیحات</SectionTitle>
                 <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.description}</div>
-
-                {(d.value > 0 || (d.percent !== null && d.percent !== undefined)) ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
-                    <Grid2>
-                      {d.value > 0 ? <Row l="ارزش کل" v={`${toFa(d.value.toLocaleString('fa-IR'))} تومان`} /> : <div />}
-                      {d.percent !== null && d.percent !== undefined ? <Row l="درصد" v={`${toFa(d.percent)}٪`} /> : <div />}
-                    </Grid2>
-                  </>
-                ) : null}
 
                 {d.notes ? (
                   <>
