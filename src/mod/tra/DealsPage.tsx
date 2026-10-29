@@ -216,7 +216,12 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     const today = formatJ(new Date(), 'yyyy/MM/dd');
 
     if (contacts.length === 0) { toastMsg.error('اول یک مخاطب بسازید'); return; }
-    setForm({ ...empty(), partyId: defaultX || contacts[0].id, date: today });
+    const defaultDue = (() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 30);
+      return formatJ(d, 'yyyy/MM/dd');
+    })();
+    setForm({ ...empty(), partyId: defaultX || contacts[0].id, date: today, dueDate: defaultDue });
     setErr(''); setOpen(true);
   };
   useFab(active ? { label: 'افزودن معامله', onClick: openNew } : null);
@@ -487,6 +492,16 @@ const save = () => {
     };
     const oldDeal = form.id ? deals.find(d => d.id === form.id) : undefined;
     try {
+      if (form.settlementType !== 'barter_direct' && form.dueDate) {
+        if (form.date && form.dueDate < form.date) {
+          setErr('سرسید نمی‌تواند قبل از تاریخ ایجاد باشد');
+          return;
+        }
+        if (form.endDate && form.dueDate > form.endDate) {
+          // warning only — not blocking, but reasonable to have dueDate >= endDate
+          // Skip for now — will add as warning later
+        }
+      }
       for (const _g of form.goods) {
         const _si = getSourceInfo(_g);
         if (_si && Number(_g.quantity) > _si.available) {
@@ -827,9 +842,11 @@ const save = () => {
             <MoneyField value={form.value} onChange={e => setForm({...form, value: e.target.value})} min={0} max={1_000_000_000_000_000} />
             {Number(form.value) > 0 && <FieldHint fieldPath="tra.deal.value" value={form.value} />}
           </Field>
-          <Field label="مهلت پرداخت" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
-            <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})} autoToday />
-          </Field>
+          {form.settlementType !== 'barter_direct' ? (
+            <Field label="مهلت پرداخت (سرسید)" hint="تاریخی که طرف باید پول را پرداخت کند" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
+              <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})} autoToday />
+            </Field>
+          ) : <div />}
         </Grid2>
 
         <Grid2>
