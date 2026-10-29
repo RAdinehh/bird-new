@@ -900,7 +900,14 @@ const save = () => {
                   </div>
                 </Field>
                 {g.source === 'flock' && (
-                  <Field label="گله مبدأ" required>
+                  <Field label="گله مبدأ" required hint={g.existingFlockId ? (() => {
+                    const f = flocks.find(x => x.id === g.existingFlockId);
+                    if (!f) return undefined;
+                    const age = getAgeDays(f);
+                    const lc = getLifecycle(f.type, age, f.endOfCycleDay ?? null, null, f.layingStartDay ?? null);
+                    const fType = f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر';
+                    return '📊 موجودی: ' + toFa(f.currentCount || 0) + ' | سن: ' + toFa(age) + ' روز | ' + fType + ' | ' + lc.label;
+                  })() : undefined}>
                     <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
                       <option value="">— انتخاب —</option>
                       {flocks.filter(f => f.status === 'active' && (f.currentCount || 0) > 0).map(f => (
@@ -910,7 +917,11 @@ const save = () => {
                   </Field>
                 )}
                 {g.source === 'hatch' && (
-                  <Field label="هچ مبدأ" required>
+                  <Field label="هچ مبدأ" required hint={g.hatchId ? (() => {
+                    const h = hatches.find(x => x.id === g.hatchId);
+                    if (!h) return undefined;
+                    return '📊 هچ موفق: ' + toFa(h.hatched || 0) + ' جوجه | نطفه‌داری نشده: ' + toFa(h.unhatched || 0);
+                  })() : undefined}>
                     <Select value={g.hatchId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, hatchId: e.target.value || undefined } : x) }))}>
                       <option value="">— انتخاب —</option>
                       {hatches.filter(h => (h.hatched || 0) > 0).map(h => (
@@ -976,22 +987,7 @@ const save = () => {
                 </Select>
               </Field>
             )}
-          {(() => {
-            const srcInfo = getSourceInfo(g);
-            if (!srcInfo) return null;
-            const isEmptyCard = srcInfo.available === 0;
-            return (
-              <div style={{ padding: 'var(--pad-tight)', background: isEmptyCard ? 'var(--danger-soft)' : 'var(--accent-soft)', border: '1px solid ' + (isEmptyCard ? 'var(--danger)' : 'var(--accent-border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
-                <div style={{ fontWeight: 700, color: isEmptyCard ? 'var(--danger)' : 'var(--accent)', marginBottom: 4 }}>📊 {srcInfo.label} — موجودی: {toFa(srcInfo.available)}{isEmptyCard ? ' (ناموجود)' : ''}</div>
-                {srcInfo.rows.map(([k, v], idx) => (
-                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '1px 0' }}>
-                    <span style={{ color: 'var(--muted)' }}>{k}:</span>
-                    <span style={{ fontWeight: 600 }}>{v}</span>
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
+
           <Grid2>
             <Field label="نام کالا" required error={showError?.(`goods.${gi}.name`)} onTouch={() => markTouched?.(`goods.${gi}.name`)}>
               <Input placeholder="جوجه یک‌روزه" value={g.name} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, name: e.target.value } : x) }))} />
