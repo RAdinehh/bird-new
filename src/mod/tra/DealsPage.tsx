@@ -1311,7 +1311,7 @@ const save = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>سهم من:</span><span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(calc.myShare.toLocaleString('fa-IR'))} ت</span></div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>دریافتی:</span><span style={{ fontWeight: 700 }}>{toFa(calc.paidIn.toLocaleString('fa-IR'))} ت</span></div>
           {calc.paidOut > 0 && <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>پرداختی:</span><span style={{ fontWeight: 700 }}>{toFa(calc.paidOut.toLocaleString('fa-IR'))} ت</span></div>}
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 4, marginTop: 4, fontWeight: 700, color: calc.balance > 0 ? 'var(--danger)' : 'var(--accent)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 4, marginTop: 4, fontWeight: 700, color: Math.abs(calc.balance) < 0.01 ? 'var(--accent)' : calc.balance > 0 ? 'var(--warn)' : 'var(--danger)' }}>
             <span>مانده:</span><span>{toFa(calc.balance.toLocaleString('fa-IR'))} ت</span>
           </div>
         </div>

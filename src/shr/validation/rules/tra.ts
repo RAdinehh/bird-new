@@ -527,14 +527,17 @@ export const DealSchema = z.object({
       if (s.goodId && !_goodIds.has(s.goodId)) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'کالای مرجع یافت نشد', path: ['sales', si, 'goodId'] });
       }
-      // 🆕 Phase 1.1: منبع اجباری — کالای فروش باید به انبار متصل باشد
+      // 🆕 Phase 1.3.5: منبع اجباری — انبار، گله یا هچری
       const saleGood = (d.goods || []).find((g: any) => g.id === s.goodId);
-      if (saleGood && !saleGood.linkedItemId) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'برای فروش، کالای «' + (saleGood.name || '—') + '» باید به انبار متصل باشد (کالای انبار را انتخاب کنید)',
-          path: ['sales', si, 'goodId'],
-        });
+      if (saleGood) {
+        const hasSource = saleGood.linkedItemId || saleGood.stockItemId || saleGood.existingFlockId || saleGood.hatchId;
+        if (!hasSource) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'برای فروش، ابتدا منبع کالا (گله، هچری یا انبار) را انتخاب کنید',
+            path: ['sales', si, 'goodId'],
+          });
+        }
       }
     });
     (d.goods || []).forEach((good: any) => {
