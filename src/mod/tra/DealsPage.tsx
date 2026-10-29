@@ -879,7 +879,19 @@ const save = () => {
             <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.filter(x => x.id !== g.id), deliveries: f.deliveries.filter(x => x.goodId !== g.id), sales: f.sales.filter(x => x.goodId !== g.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
           </div>
           <Field label="دسته کالا" hint="انتخاب دسته، منبع کالا را تعیین می‌کند" error={showError?.(`goods.${gi}.category`)} onTouch={() => markTouched?.(`goods.${gi}.category`)}>
-            <Select value={g.category || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, category: (e.target.value || undefined) as any } : x) }))}>
+            <Select value={g.category || ''} onChange={e => {
+              const newCat = (e.target.value || undefined) as any;
+              const DEFAULT_NAMES: Record<string, string> = {
+                chick: 'جوجه یک‌روزه', adult: 'پرنده بالغ', egg: 'تخم خوراکی', fertile_egg: 'تخم نطفه‌دار',
+                feed: 'دان', medicine: 'دارو', equipment: 'تجهیزات', other: ''
+              };
+              setForm(f => ({ ...f, goods: f.goods.map(x => {
+                if (x.id !== g.id) return x;
+                const prevDef = x.category ? (DEFAULT_NAMES[x.category] || '') : '';
+                const shouldUpdate = !x.name.trim() || x.name === prevDef;
+                return { ...x, category: newCat, name: shouldUpdate ? (DEFAULT_NAMES[newCat || ''] || '') : x.name };
+              }) }));
+            }}>
               <option value="">— بدون دسته (کالای عمومی) —</option>
               <option value="chick">🐣 جوجه یک‌روزه</option>
               <option value="adult">🐔 پرنده بالغ</option>
@@ -910,9 +922,14 @@ const save = () => {
                   })() : undefined}>
                     <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
                       <option value="">— انتخاب —</option>
-                      {flocks.filter(f => f.status === 'active' && (f.currentCount || 0) > 0).map(f => (
-                        <option key={f.id} value={f.id}>{f.name} — {toFa(f.currentCount || 0)} پرنده</option>
-                      ))}
+                      {flocks.filter(f => f.status === 'active').map(f => {
+                        const hasStock = (f.currentCount || 0) > 0;
+                        return (
+                          <option key={f.id} value={f.id} disabled={!hasStock}>
+                            {f.name} — {toFa(f.currentCount || 0)} پرنده{!hasStock ? ' (ناموجود)' : ''}
+                          </option>
+                        );
+                      })}
                     </Select>
                   </Field>
                 )}
@@ -924,9 +941,14 @@ const save = () => {
                   })() : undefined}>
                     <Select value={g.hatchId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, hatchId: e.target.value || undefined } : x) }))}>
                       <option value="">— انتخاب —</option>
-                      {hatches.filter(h => (h.hatched || 0) > 0).map(h => (
-                        <option key={h.id} value={h.id}>{toFa(h.date)} — {toFa(h.hatched || 0)} جوجه</option>
-                      ))}
+                      {hatches.map(h => {
+                        const hasStock = (h.hatched || 0) > 0;
+                        return (
+                          <option key={h.id} value={h.id} disabled={!hasStock}>
+                            {toFa(h.date)} — {toFa(h.hatched || 0)} جوجه{!hasStock ? ' (ناموجود)' : ''}
+                          </option>
+                        );
+                      })}
                     </Select>
                   </Field>
                 )}
@@ -936,9 +958,14 @@ const save = () => {
               <Field label="گله مبدأ" required>
                 <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
                   <option value="">— انتخاب —</option>
-                  {flocks.filter(f => f.status === 'active' && (f.currentCount || 0) > 0).map(f => (
-                    <option key={f.id} value={f.id}>{f.name} — {toFa(f.currentCount || 0)} پرنده</option>
-                  ))}
+                  {flocks.filter(f => f.status === 'active').map(f => {
+                        const hasStock = (f.currentCount || 0) > 0;
+                        return (
+                          <option key={f.id} value={f.id} disabled={!hasStock}>
+                            {f.name} — {toFa(f.currentCount || 0)} پرنده{!hasStock ? ' (ناموجود)' : ''}
+                          </option>
+                        );
+                      })}
                 </Select>
               </Field>
             )}
@@ -947,9 +974,14 @@ const save = () => {
                 <Field label="گله مبدأ" required>
                   <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
                     <option value="">— انتخاب —</option>
-                    {flocks.filter(f => f.status === 'active' && (f.currentCount || 0) > 0 && (f.type === 'layer' || f.type === 'breeder')).map(f => (
-                      <option key={f.id} value={f.id}>{f.name} — {toFa(f.currentCount || 0)} پرنده</option>
-                    ))}
+                    {flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder')).map(f => {
+                      const hasStock = (f.currentCount || 0) > 0;
+                      return (
+                        <option key={f.id} value={f.id} disabled={!hasStock}>
+                          {f.name} — {toFa(f.currentCount || 0)} پرنده{!hasStock ? ' (ناموجود)' : ''}
+                        </option>
+                      );
+                    })}
                   </Select>
                 </Field>
                 <Field label="کالای انبار (تخم)">
