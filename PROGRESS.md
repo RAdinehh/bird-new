@@ -246,18 +246,26 @@
 - علت: addMovement بدون partyId (Zod requirement) + intelligence پیام‌ها
 - تسک آینده: Phase 12 (تست‌ها) — رفع و حذف skip
 
-## ✅ Deals Phase E.1 — DONE (commit 2f0cef92)
+## ✅ Deals Phase D — DONE (commit 2e37c062)
+- `DealDeliveryType` + `'in'` (دریافت از طرف در تهاتر)
+- `DealDelivery.linkedDeliveryId` (لینک به تحویل `out`)
+- UI: dropdown «در عوض تحویل» برای نوع `in`
+- منطق انبار: `in` → `whs in` (موجودی زیاد می‌شود)
+- `getOwnership` برای `'in'` → force `'theirs'` (بدون انتخاب امانت)
+
+## ✅ Deals Phase E — DONE (commits 2f0cef92..6a14af87)
+- **E.1**: `Settlement` entity + `State.settlements` + migration v6→v7
+- **E.2a**: `computeSettlement` helper (snapshot از deliveries/sales/payments)
+- **E.2b**: `SettlementModal` (پیش‌نمایش زنده، انتخاب بازه)
+- **E.2c**: دکمه «📅 تسویه» در کارت + wiring در `DealsPage`
+- **E.2d**: `createInvoiceFromSettlement` (تبدیل به فاکتور draft)
+- چرخه: Deal → Settlement → Invoice → Edit/Reopen/Recycle Bin
+ (commit 2f0cef92)
 - types.ts: Settlement interface + SettlementStatus
 - types.ts: State.settlements + 3 action signatures
 - rules/tra.ts: SettlementSchema + 4 sub-schemas
 - store.ts: addSettlement/updateSettlement/deleteSettlement
 - persist version 6 → 7 (migration: settlements[])
-
-## 🟡 Deals Phase E.2 — PENDING (UI)
-- helper: computeSettlement(deal, periodStart, periodEnd)
-- SettlementModal در DealsPage
-- نمایش تسویه‌ها در کارت معامله
-- دکمه «تبدیل به فاکتور»
 
 ## ✅ Deals Phase B — DONE (commit 4f5a33b6)
 - `DealDelivery.ownership: 'none' | 'mine' | 'theirs'`
