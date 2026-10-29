@@ -582,7 +582,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                   </>
                 ) : null}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 6, paddingTop: 4 }}>
                   {d.status !== 'settled' ? (
                     <Btn size="sm" onClick={() => updateDeal(d.id, { status: 'settled' })} style={{ flex: 1 }}>تسویه شد</Btn>
                   ) : null}
@@ -966,9 +966,14 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       {(form.goods.length > 0 || form.sales.length > 0) && (
         <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4, fontSize: 'var(--fs-sm)', marginTop: 8 }}>
           <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 4 }}>🧮 خلاصه مالی</div>
+          {calc.inHand < 0 && (
+            <div style={{ padding: 'var(--pad-tight)', background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', fontWeight: 700, marginBottom: 6 }}>
+              ⚠️ هشدار: فروش از موجودی در دست طرف بیشتر است. امکان ذخیره وجود ندارد.
+            </div>
+          )}
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>کل تحویلی:</span><span style={{ fontWeight: 700 }}>{toFa(calc.totalDelivered.toLocaleString('fa-IR'))}</span></div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>فروش کل (تعداد):</span><span style={{ fontWeight: 700 }}>{toFa(calc.totalSold.toLocaleString('fa-IR'))}</span></div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>در دست طرف:</span><span style={{ fontWeight: 700 }}>{toFa(calc.inHand.toLocaleString('fa-IR'))}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>در دست طرف:</span><span style={{ fontWeight: 700, color: calc.inHand < 0 ? 'var(--danger)' : 'inherit' }}>{toFa(calc.inHand.toLocaleString('fa-IR'))}</span></div>
           {form.goods.length > 0 && (() => {
             const rows = form.goods
               .map(g => ({ g, pg: calc.perGood[g.id] }))
