@@ -295,6 +295,27 @@ export type SettlementType =
   | 'rental_monthly'
   | 'grower_fee_per_unit';
 
+export type SettlementStatus = 'draft' | 'confirmed' | 'invoiced';
+
+export interface Settlement {
+  id: string;
+  dealId: string;
+  periodStart: string;
+  periodEnd: string;
+  deliveriesSnapshot: DealDelivery[];
+  salesSnapshot: DealSale[];
+  paymentsSnapshot: DealPayment[];
+  grossSales: number;
+  commission: number;
+  netPayable: number;
+  paidAmount: number;
+  status: SettlementStatus;
+  invoiceId?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Deal {
   id: string;
   type: DealType;
@@ -333,6 +354,10 @@ export interface State {
   reopenInvoice: (id: string) => void;
   invoices: Invoice[];
   deals: Deal[];
+  settlements: Settlement[];
+  addSettlement: (s: Omit<Settlement, 'id' | 'createdAt' | 'updatedAt'>) => string;
+  updateSettlement: (id: string, patch: Partial<Settlement>) => void;
+  deleteSettlement: (id: string) => void;
   allocations: PaymentAllocation[];
   addAllocation: (a: Omit<PaymentAllocation, 'id'>) => string;
   updateAllocation: (id: string, patch: Partial<PaymentAllocation>) => void;

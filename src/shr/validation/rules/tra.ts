@@ -546,6 +546,63 @@ export const DealSchema = z.object({
     }
   });
 });
+const SettlementDeliverySchema = z.object({
+  id: z.string(),
+  goodId: requiredId('کالا'),
+  date: persianDate('تاریخ'),
+  time: z.string().optional().or(z.literal('')),
+  type: z.enum(['out', 'return', 'loss']),
+  quantity: z.number().nonnegative(),
+  notes: optionalStr(200),
+  whsEnabled: z.boolean().optional(),
+  ownership: z.enum(['none', 'mine', 'theirs']).optional(),
+  whsMovementId: optionalId(),
+  whsMovementIdIn: optionalId(),
+});
+
+const SettlementSaleSchema = z.object({
+  id: z.string(),
+  goodId: requiredId('کالا'),
+  date: persianDate('تاریخ'),
+  quantity: z.number().nonnegative(),
+  unitPrice: z.number().nonnegative(),
+  notes: optionalStr(200),
+});
+
+const SettlementPaymentSchema = z.object({
+  id: z.string(),
+  date: persianDate('تاریخ'),
+  amount: z.number().nonnegative(),
+  direction: z.enum(['in', 'out']),
+  method: z.enum(['cash', 'card', 'check']),
+  notes: optionalStr(200),
+});
+
+export const SettlementSchema = z.object({
+  id: z.string(),
+  dealId: requiredId('معامله'),
+  periodStart: persianDate('شروع دوره'),
+  periodEnd: persianDate('پایان دوره'),
+  deliveriesSnapshot: z.array(SettlementDeliverySchema).default([]),
+  salesSnapshot: z.array(SettlementSaleSchema).default([]),
+  paymentsSnapshot: z.array(SettlementPaymentSchema).default([]),
+  grossSales: z.number().nonnegative(),
+  commission: z.number().nonnegative(),
+  netPayable: z.number(),
+  paidAmount: z.number().nonnegative(),
+  status: z.enum(['draft', 'confirmed', 'invoiced'] as const),
+  invoiceId: optionalId(),
+  notes: optionalStr(500),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+}).superRefine((data, ctx) => {
+  if (data.periodEnd < data.periodStart) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'پایان دوره باید بعد از شروع باشد', path: ['periodEnd'] });
+  }
+});
+
+export type SettlementFormData = z.infer<typeof SettlementSchema>;
+
 export type DealFormData = z.infer<typeof DealSchema>;
 
 export type PaymentFormData = z.infer<typeof PaymentSchema>;

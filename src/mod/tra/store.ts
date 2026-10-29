@@ -11,7 +11,7 @@ import { useWhs } from '../whs/store';
 import { useHal } from '../hal/store';
 import { bus } from '../../cor/events';
 
-import type { Invoice, InvoiceItem, State, DeletedInvoiceSnapshot } from './types';
+import type { Invoice, InvoiceItem, State, DeletedInvoiceSnapshot, Settlement } from './types';
 import { saveToRecycleBin, removeFromRecycleBin, listRecycleBin } from '../../shr/utils/recycleBin';
 import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount } from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
@@ -34,7 +34,7 @@ export const useTra = create<State>()(
     (set, get) => ({
       invoices: [],
       partyPayments: [],
-      deals: [],
+      deals: [], settlements: [],
       allocations: [],
       reopenInvoice: (id) => {
         const prev = get().invoices.find(x => x.id === id);
@@ -569,6 +569,17 @@ export const useTra = create<State>()(
       addDeal: (d) => set({ deals: [...get().deals, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       updateDeal: (id, patch) => set({ deals: get().deals.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
       deleteDeal: (id) => set({ deals: get().deals.filter(x => x.id !== id) }),
+      addSettlement: (s) => {
+        const id = uuid();
+        set({ settlements: [...get().settlements, { ...s, id, createdAt: now(), updatedAt: now() }] });
+        return id;
+      },
+      updateSettlement: (id, patch) => {
+        set({ settlements: get().settlements.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) });
+      },
+      deleteSettlement: (id) => {
+        set({ settlements: get().settlements.filter(x => x.id !== id) });
+      },
       addAllocation: (a) => {
         const id = uuid();
         set({ allocations: [...get().allocations, { ...a, id }] });
@@ -583,12 +594,15 @@ export const useTra = create<State>()(
     }),
     {
       name: 'pm-tra',
-      version: 6,
+      version: 7,
       migrate: (persisted: any, version: number) => {
         if (!persisted?.invoices) return persisted;
 
         // v5 → v6: build allocations from existing payments
-      if (version < 6) {
+      if (version < 7) {
+          persisted.settlements = persisted.settlements || [];
+        }
+        if (version < 6) {
         persisted.allocations = [];
         for (const inv of (persisted.invoices || [])) {
           for (const p of (inv.payments || [])) {
