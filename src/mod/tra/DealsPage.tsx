@@ -774,7 +774,6 @@ const save = () => {
               {/* کالاهای تحویلی */}
       <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📦 کالاهای تحویلی</span>
-        <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0 }] }))} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--accent, var(--text))', fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 32, padding: '0 10px', fontSize: 'var(--fs-xs)', fontWeight: 600 }}>+ افزودن کالا</button>
       </div>
 
       {form.goods.map((g, gi) => (
@@ -826,13 +825,14 @@ const save = () => {
         </div>
       )}
 
+      <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0 }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.goods.length === 0 ? 'افزودن اولین کالا' : 'افزودن کالای دیگر'}</button>
+
       {/* تحویل‌ها */}
       {form.goods.length > 0 && (
         <>
           <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <span>📤 تحویل‌ها</span>
-            <button type="button" onClick={() => setForm(f => ({ ...f, deliveries: [...f.deliveries, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', type: 'out', quantity: 0, notes: '' }] }))} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--accent, var(--text))', fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 32, padding: '0 10px', fontSize: 'var(--fs-xs)', fontWeight: 600 }}>+ افزودن</button>
           </div>
             {(() => {
               const outs = form.deliveries.filter(d => d.type === 'out').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
@@ -910,6 +910,7 @@ const save = () => {
               })()}
             </div>
           ))}
+          <button type="button" onClick={() => setForm(f => ({ ...f, deliveries: [...f.deliveries, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', type: 'out', quantity: 0, notes: '' }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.deliveries.length === 0 ? 'افزودن اولین تحویل' : 'افزودن تحویل دیگر'}</button>
         </>
       )}
 
@@ -919,7 +920,6 @@ const save = () => {
           <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <span>💰 فروش‌ها</span>
-            <button type="button" onClick={() => setForm(f => ({ ...f, sales: [...f.sales, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', quantity: 0, unitPrice: 0 }] }))} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--accent, var(--text))', fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 32, padding: '0 10px', fontSize: 'var(--fs-xs)', fontWeight: 600 }}>+ افزودن</button>
           </div>
             {(() => {
               const tot = form.sales.reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
@@ -959,6 +959,7 @@ const save = () => {
               </div>
             );
           })}
+          <button type="button" onClick={() => setForm(f => ({ ...f, sales: [...f.sales, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', quantity: 0, unitPrice: 0 }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.sales.length === 0 ? 'افزودن اولین فروش' : 'افزودن فروش دیگر'}</button>
         </>
       )}
 
