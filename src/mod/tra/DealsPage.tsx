@@ -3,7 +3,7 @@
  */
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
-import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment } from './store';
+import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment, type Settlement } from './store';
 import { useNavigate } from 'react-router-dom';
 import { useCtc } from '../ctc/store';
 import { useFlk } from '../flk/store';
