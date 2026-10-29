@@ -73,10 +73,10 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
       </div>
 
       <Field label="از تاریخ" required>
-        <DatePicker value={periodStart} onChange={setPeriodStart} autoToday />
+        <DatePicker value={periodStart} onChange={v => { setPeriodStart(v); if (periodEnd && v > periodEnd) setPeriodEnd(v); }} max={periodEnd} autoToday />
       </Field>
       <Field label="تا تاریخ" required>
-        <DatePicker value={periodEnd} onChange={setPeriodEnd} autoToday />
+        <DatePicker value={periodEnd} onChange={setPeriodEnd} min={periodStart} autoToday />
       </Field>
 
       <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>
