@@ -522,6 +522,15 @@ export const DealSchema = z.object({
       if (s.goodId && !_goodIds.has(s.goodId)) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'کالای مرجع یافت نشد', path: ['sales', si, 'goodId'] });
       }
+      // 🆕 Phase 1.1: منبع اجباری — کالای فروش باید به انبار متصل باشد
+      const saleGood = (d.goods || []).find((g: any) => g.id === s.goodId);
+      if (saleGood && !saleGood.linkedItemId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'برای فروش، کالای «' + (saleGood.name || '—') + '» باید به انبار متصل باشد (کالای انبار را انتخاب کنید)',
+          path: ['sales', si, 'goodId'],
+        });
+      }
     });
     (d.goods || []).forEach((good: any) => {
       const _out = (d.deliveries || []).filter((dv: any) => dv.goodId === good.id && dv.type === 'out').reduce((s: number, dv: any) => s + (dv.quantity || 0), 0);
