@@ -448,13 +448,14 @@ const DealDeliverySchema = z.object({
   goodId: requiredId('کالا'),
   date: persianDate('تاریخ تحویل'),
   time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'ساعت باید به فرمت HH:MM باشد').optional().or(z.literal('')),
-  type: z.enum(['out', 'return', 'loss']).default('out'),
+  type: z.enum(['out', 'return', 'loss', 'in']).default('out'),
   quantity: z.number().positive('مقدار تحویل باید بیشتر از صفر باشد'),
   whsEnabled: z.boolean().optional(),
   ownership: z.enum(['none', 'mine', 'theirs']).optional(),
   notes: optionalStr(200),
   whsMovementId: optionalId(),
   whsMovementIdIn: optionalId(),
+  linkedDeliveryId: optionalId(),
 });
 
 const DealSaleSchema = z.object({

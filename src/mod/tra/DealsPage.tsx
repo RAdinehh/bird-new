@@ -226,6 +226,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const consignmentLoc = partyId ? `consignment:${partyId}` : 'stock';
 
   const getOwnership = (dv: DealDelivery): 'none' | 'mine' | 'theirs' => {
+    if (dv.type === 'in') return 'theirs';
     if (dv.ownership) return dv.ownership;
     return dv.whsEnabled === true ? 'theirs' : 'none';
   };
@@ -834,6 +835,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                     <option value="out">تحویل به طرف</option>
                     <option value="return">برگشت از طرف</option>
                     <option value="loss">تلفات</option>
+                    <option value="in">📥 دریافت از طرف (تهاتر)</option>
                   </Select>
                 </Field>
                 <Field label="کالا" required error={showError?.(`deliveries.${di}.goodId`)} onTouch={() => markTouched?.(`deliveries.${di}.goodId`)}>
@@ -847,9 +849,25 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                 <NumField placeholder="۵۰۰" value={String(dv.quantity || '')} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
                 {Number(dv.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={dv.quantity} />}
               </Field>
+              {dv.type === 'in' && (
+                <Field label="در عوض تحویل" hint="این دریافت، در عوض کدام تحویل است؟ (تهاتر)">
+                  <Select value={dv.linkedDeliveryId || ''} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, linkedDeliveryId: e.target.value || undefined } : x) }))}>
+                    <option value="">— بدون لینک —</option>
+                    {form.deliveries.filter(x => x.id !== dv.id && x.type === 'out').map(x => {
+                      const idx = form.deliveries.findIndex(y => y.id === x.id);
+                      const linkedGoodName = form.goods.find(g => g.id === x.goodId)?.name || '—';
+                      return (
+                        <option key={x.id} value={x.id}>
+                          تحویل {toFa(idx + 1)} — {linkedGoodName} ({toFa(x.quantity)})
+                        </option>
+                      );
+                    })}
+                  </Select>
+                </Field>
+              )}
               {(() => {
                 const linkedGood = form.goods.find(x => x.id === dv.goodId);
-                if (!linkedGood?.linkedItemId) return null;
+                if (!linkedGood?.linkedItemId || dv.type === 'in') return null;
                 return (
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 'var(--fs-sm)', color: 'var(--muted)', fontWeight: 600, cursor: 'pointer' }}>
                     <input

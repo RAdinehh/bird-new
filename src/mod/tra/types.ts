@@ -233,7 +233,7 @@ export interface Invoice {
 }
 
 export type DealUnit = 'pcs' | 'kg' | 'ton' | 'bag' | 'L' | 'carton';
-export type DealDeliveryType = 'out' | 'return' | 'loss';
+export type DealDeliveryType = 'out' | 'return' | 'loss' | 'in';
 export type DealPaymentDirection = 'in' | 'out';
 
 export interface DealGood {
@@ -266,6 +266,8 @@ export interface DealDelivery {
   ownership?: 'none' | 'mine' | 'theirs';
   /** 🆕 Phase B: movement ورود به موقعیت امانی (فقط ownership='mine') */
   whsMovementIdIn?: string;
+  /** Phase D: لینک به تحویل دیگر برای تهاتر */
+  linkedDeliveryId?: string;
 }
 
 export interface DealPayment {
