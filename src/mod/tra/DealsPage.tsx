@@ -18,6 +18,7 @@ import { useFilterSort, FilterBar, getTraDealsConfig } from '../../shr/filter';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
+import SettlementModal from './components/SettlementModal';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -65,7 +66,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
-  const { deals, invoices, addDeal, updateDeal, deleteDeal } = useTra();
+  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement } = useTra();
   const { flocks } = useFlk();
   const whsItems = useWhs(s => s.items);
   const { contacts } = useCtc();
@@ -75,6 +76,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [settlementOpen, setSettlementOpen] = useState(false);
+  const [settlementDeal, setSettlementDeal] = useState<Deal | null>(null);
 
   // فیلتر/مرتب
   const config = useMemo(() => {
@@ -607,6 +610,16 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         </>
       )}
 
+      <SettlementModal
+        open={settlementOpen}
+        deal={settlementDeal}
+        onClose={() => { setSettlementOpen(false); setSettlementDeal(null); }}
+        onSave={(s) => {
+          addSettlement(s);
+          setSettlementOpen(false);
+          setSettlementDeal(null);
+        }}
+      />
       <MultiSelectBar ms={ms} deleteLabel="حذف" />
 
       {ms.selectionMode && <div style={{ height: 90 }} />}
