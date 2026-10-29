@@ -140,7 +140,13 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
   const breedsForBird = item.birdId ? breeds.filter(b => b.birdId === item.birdId) : [];
 
-  const activeFlocks = flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }));
+  const activeFlocks = flocks.filter(f => f.status === 'active').map(f => {
+    const parts: string[] = [];
+    if (typeof f.currentCount === 'number') parts.push('🐔 ' + toFa(f.currentCount) + ' پرنده');
+    const age = getAgeDays(f);
+    if (age != null && age > 0) parts.push(toFa(age) + ' روز');
+    return { value: f.id, label: f.name, subtitle: parts.join(' · ') || undefined };
+  });
   const birdObj = birds.find(b => b.id === item.birdId);
   const breedObj = breeds.find(b => b.id === item.breedId);
     const isEggCategory = isPurchase ? category === 'egg' : category === 'fertile_egg';
