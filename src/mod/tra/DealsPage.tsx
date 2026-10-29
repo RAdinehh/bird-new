@@ -66,7 +66,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
-  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement } = useTra();
+  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, reopenDeal } = useTra();
   const { flocks } = useFlk();
   const whsItems = useWhs(s => s.items);
   const { contacts } = useCtc();
@@ -347,7 +347,26 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     } catch { return null; }
   };
 
-  const save = () => {
+  const handleReopenDeal = async (deal: Deal) => {
+  const statusLabel = deal.status === 'settled' ? 'تسویه‌شده' : 'لغو‌شده';
+  const ok = await showConfirmAsync(
+    'بازگشایی معامله',
+    'این معامله از حالت «' + statusLabel + '» به «باز» برگردانده شود؟',
+    { danger: false }
+  );
+  if (!ok) return;
+  const success = reopenDeal(deal.id, 'بازگشایی توسط کاربر');
+  if (!success) {
+    toastMsg.error('بازگشایی ناموفق');
+    return;
+  }
+  logAction('update', 'tra', 'بازگشایی معامله ' + (deal.dealNumber || deal.id));
+  setTimeout(() => {
+    openEdit({ ...deal, status: 'open' } as Deal);
+  }, 100);
+};
+
+const save = () => {
     attemptSave();
     if (Object.keys(vErrors).length > 0) { setErr(''); return; }
 
@@ -584,11 +603,15 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                 ) : null}
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 6, paddingTop: 4 }}>
-                  {d.status !== 'settled' ? (
+                  {d.status === 'open' ? (
                     <Btn size="sm" onClick={() => updateDeal(d.id, { status: 'settled' })} style={{ flex: 1 }}>تسویه شد</Btn>
-                  ) : null}
+                  ) : (
+                    <Btn size="sm" variant="primary" onClick={() => handleReopenDeal(d)} style={{ flex: 1 }}>🔓 بازگشایی</Btn>
+                  )}
                   <Btn size="sm" onClick={() => { setSettlementDeal(d); setSettlementOpen(true); }} style={{ flex: 1 }}>📅 تسویه</Btn>
-                  <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
+                  {d.status === 'open' ? (
+                    <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
+                  ) : null}
                   <Btn size="sm" onClick={async () => {
                           const _lInvS = invoices.filter((inv: any) => inv.relatedDealId === d.id).length;
                           const _lFlkS = flocks.filter((f: any) => f.dealData?.dealId === d.id).length;
