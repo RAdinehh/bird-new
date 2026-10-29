@@ -1183,7 +1183,7 @@ const save = () => {
               })()}
             </div>
           ))}
-          <button type="button" onClick={() => setForm(f => ({ ...f, deliveries: [...f.deliveries, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', type: 'out', quantity: 0, notes: '' }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.deliveries.length === 0 ? 'افزودن اولین تحویل' : 'افزودن تحویل دیگر'}</button>
+          <button type="button" onClick={() => setForm(f => ({ ...f, deliveries: [...f.deliveries, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || formatJ(new Date(), 'yyyy/MM/dd'), time: formatJ(new Date(), 'HH:mm'), type: 'out', quantity: 0, notes: '' }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.deliveries.length === 0 ? 'افزودن اولین تحویل' : 'افزودن تحویل دیگر'}</button>
         </>
       )}
 
@@ -1232,7 +1232,7 @@ const save = () => {
               </div>
             );
           })}
-          <button type="button" onClick={() => setForm(f => ({ ...f, sales: [...f.sales, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', quantity: 0, unitPrice: 0 }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.sales.length === 0 ? 'افزودن اولین فروش' : 'افزودن فروش دیگر'}</button>
+          <button type="button" onClick={() => setForm(f => ({ ...f, sales: [...f.sales, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || formatJ(new Date(), 'yyyy/MM/dd'), time: formatJ(new Date(), 'HH:mm'), quantity: 0, unitPrice: 0 }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.sales.length === 0 ? 'افزودن اولین فروش' : 'افزودن فروش دیگر'}</button>
         </>
       )}
 
