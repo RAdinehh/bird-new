@@ -13,8 +13,6 @@ import type { Deal, Settlement } from '../types';
 interface Props {
   open: boolean;
   deal: Deal | null;
-  initialStart?: string;
-  initialEnd?: string;
   onClose: () => void;
   onSave: (s: Omit<Settlement, 'id' | 'createdAt' | 'updatedAt'>) => void;
 }
@@ -23,21 +21,21 @@ function todayJ(): string {
   return formatJ(new Date(), 'yyyy/MM/dd');
 }
 
-export default function SettlementModal({ open, deal, initialStart, initialEnd, onClose, onSave }: Props) {
+export default function SettlementModal({ open, deal, onClose, onSave }: Props) {
   const [periodStart, setPeriodStart] = useState('');
   const [periodEnd, setPeriodEnd] = useState('');
   const [err, setErr] = useState('');
 
   useEffect(() => {
     if (open && deal) {
-      const start = initialStart || deal.startDate || deal.date || todayJ();
-      let end = initialEnd || deal.endDate || todayJ();
+      const start = deal.startDate || deal.date || todayJ();
+      let end = deal.endDate || todayJ();
       if (end < start) end = start;
       setPeriodStart(start);
       setPeriodEnd(end);
       setErr('');
     }
-  }, [open, deal, initialStart, initialEnd]);
+  }, [open, deal?.id, deal?.startDate, deal?.endDate, deal?.date]);
 
   const computed = useMemo(() => {
     if (!deal || !periodStart || !periodEnd) return null;

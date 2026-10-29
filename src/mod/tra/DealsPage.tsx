@@ -770,10 +770,9 @@ const save = () => {
       )}
 
       <SettlementModal
+        key={settlementDeal?.id || 'none'}
         open={settlementOpen}
         deal={settlementDeal}
-        initialStart={settlementDeal?.startDate}
-        initialEnd={settlementDeal?.endDate}
         onClose={() => { setSettlementOpen(false); setSettlementDeal(null); }}
         onSave={(s) => {
           addSettlement(s);
