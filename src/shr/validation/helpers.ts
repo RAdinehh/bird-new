@@ -2,6 +2,7 @@
  * validation/helpers.ts — اسکیماهای پایه و ابزارها
  */
 import { z } from 'zod';
+import { format as formatJ } from 'date-fns-jalali';
 import type { ValidationResult, ValidationIssue } from './types';
 
 // ═══════════════════════════════════════════════
@@ -146,9 +147,16 @@ export const intOpt = (label: string, max = 1_000_000) =>
 
 const JALALI_RE = /^14\d{2}[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12]\d|3[01])$/;
 
+const normalizeJalali = (v: unknown): unknown =>
+  typeof v === 'string'
+    ? v.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
+    : v;
+
 export const persianDate = (label = 'تاریخ') =>
-  z.string({ required_error: `${label} را وارد کنید` })
-    .regex(JALALI_RE, `${label} باید به شکل ۱۴۰۵/۰۷/۱۱ باشد`);
+  z.preprocess(normalizeJalali,
+    z.string({ required_error: `${label} را وارد کنید` })
+      .regex(JALALI_RE, `${label} باید به شکل ۱۴۰۵/۰۷/۱۱ باشد`)
+  );
 
 export const persianDateOpt = (label = 'تاریخ') =>
   z.union([
@@ -158,19 +166,22 @@ export const persianDateOpt = (label = 'تاریخ') =>
   ]).transform(v => v ?? '');
 
 function todayJalali(): string {
-  const d = new Date();
-  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+  return formatJ(new Date(), 'yyyy/MM/dd');
 }
 
 export const persianDateNotFuture = (label = 'تاریخ') =>
-  z.string({ required_error: `${label} را وارد کنید` })
-    .regex(JALALI_RE, `${label} نامعتبر است`)
-    .refine(v => v <= todayJalali(), `${label} نمی‌تواند در آینده باشد`);
+  z.preprocess(normalizeJalali,
+    z.string({ required_error: `${label} را وارد کنید` })
+      .regex(JALALI_RE, `${label} نامعتبر است`)
+      .refine(v => v <= todayJalali(), `${label} نمی‌تواند در آینده باشد`)
+  );
 
 export const persianDatePast = (label = 'تاریخ') =>
-  z.string({ required_error: `${label} را وارد کنید` })
-    .regex(JALALI_RE, `${label} نامعتبر است`)
-    .refine(v => v <= todayJalali(), `${label} باید امروز یا قبل‌تر باشد`);
+  z.preprocess(normalizeJalali,
+    z.string({ required_error: `${label} را وارد کنید` })
+      .regex(JALALI_RE, `${label} نامعتبر است`)
+      .refine(v => v <= todayJalali(), `${label} باید امروز یا قبل‌تر باشد`)
+  );
 
 export const persianDateMinMax = (label: string, min: string, max: string) =>
   z.string({ required_error: `${label} را وارد کنید` })
