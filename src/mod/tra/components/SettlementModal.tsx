@@ -84,8 +84,8 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
       </div>
 
       {computed === null ? (
-        <div style={{ padding: 'var(--pad-comfy)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', textAlign: 'center' }}>
-          ⚠️ در این بازه‌ی زمانی هیچ تحویل، فروش یا پرداختی ثبت نشده است
+        <div style={{ padding: 'var(--pad-comfy)', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--muted)', textAlign: 'center' }}>
+          داده‌ای برای پیش‌نمایش نیست
         </div>
       ) : (
         <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4, fontSize: 'var(--fs-sm)' }}>
