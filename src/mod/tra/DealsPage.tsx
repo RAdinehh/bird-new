@@ -903,7 +903,7 @@ const save = () => {
                   <Field label="گله مبدأ" required>
                     <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
                       <option value="">— انتخاب —</option>
-                      {flocks.filter(f => f.status === 'active').map(f => (
+                      {flocks.filter(f => f.status === 'active' && (f.currentCount || 0) > 0).map(f => (
                         <option key={f.id} value={f.id}>{f.name} — {toFa(f.currentCount || 0)} پرنده</option>
                       ))}
                     </Select>
@@ -925,7 +925,7 @@ const save = () => {
               <Field label="گله مبدأ" required>
                 <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
                   <option value="">— انتخاب —</option>
-                  {flocks.filter(f => f.status === 'active').map(f => (
+                  {flocks.filter(f => f.status === 'active' && (f.currentCount || 0) > 0).map(f => (
                     <option key={f.id} value={f.id}>{f.name} — {toFa(f.currentCount || 0)} پرنده</option>
                   ))}
                 </Select>
@@ -936,7 +936,7 @@ const save = () => {
                 <Field label="گله مبدأ" required>
                   <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
                     <option value="">— انتخاب —</option>
-                    {flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder')).map(f => (
+                    {flocks.filter(f => f.status === 'active' && (f.currentCount || 0) > 0 && (f.type === 'layer' || f.type === 'breeder')).map(f => (
                       <option key={f.id} value={f.id}>{f.name} — {toFa(f.currentCount || 0)} پرنده</option>
                     ))}
                   </Select>
@@ -979,9 +979,10 @@ const save = () => {
           {(() => {
             const srcInfo = getSourceInfo(g);
             if (!srcInfo) return null;
+            const isEmptyCard = srcInfo.available === 0;
             return (
-              <div style={{ padding: 'var(--pad-tight)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
-                <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 4 }}>📊 {srcInfo.label} — موجودی: {toFa(srcInfo.available)}</div>
+              <div style={{ padding: 'var(--pad-tight)', background: isEmptyCard ? 'var(--danger-soft)' : 'var(--accent-soft)', border: '1px solid ' + (isEmptyCard ? 'var(--danger)' : 'var(--accent-border)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
+                <div style={{ fontWeight: 700, color: isEmptyCard ? 'var(--danger)' : 'var(--accent)', marginBottom: 4 }}>📊 {srcInfo.label} — موجودی: {toFa(srcInfo.available)}{isEmptyCard ? ' (ناموجود)' : ''}</div>
                 {srcInfo.rows.map(([k, v], idx) => (
                   <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '1px 0' }}>
                     <span style={{ color: 'var(--muted)' }}>{k}:</span>
@@ -1008,18 +1009,20 @@ const save = () => {
           </Grid2>
           <Grid2>
             <Field label="مقدار" required error={showError?.(`goods.${gi}.quantity`)} onTouch={() => markTouched?.(`goods.${gi}.quantity`)}>
-              {(() => {
-                const srcInfo = getSourceInfo(g);
-                const maxVal = srcInfo ? Math.max(1, srcInfo.available) : 1_000_000;
-                return <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={maxVal} />;
-              })()}
+              <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
               {(() => {
                 const srcInfo = getSourceInfo(g);
                 if (!srcInfo) return null;
+                const isEmpty = srcInfo.available === 0;
                 const over = Number(g.quantity) > srcInfo.available;
+                const danger = over || isEmpty;
                 return (
-                  <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4, fontWeight: 600, color: over ? 'var(--danger)' : 'var(--accent)' }}>
-                    {over ? '🔴 بیش از موجودی ' + srcInfo.label + ': ' + toFa(srcInfo.available) : '📊 موجودی ' + srcInfo.label + ': ' + toFa(srcInfo.available)}
+                  <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4, fontWeight: 600, color: danger ? 'var(--danger)' : 'var(--accent)' }}>
+                    {isEmpty
+                      ? '🔴 ' + srcInfo.label + ' ناموجود است'
+                      : over
+                        ? '🔴 بیش از موجودی ' + srcInfo.label + ': ' + toFa(srcInfo.available)
+                        : '📊 موجودی ' + srcInfo.label + ': ' + toFa(srcInfo.available)}
                   </div>
                 );
               })()}
