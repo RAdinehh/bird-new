@@ -217,56 +217,116 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   };
 
   const applyDealMovements = (formState: F, oldDeal?: Deal): void => {
-    const whs = useWhs.getState();
-    const oldDeliveries = oldDeal?.deliveries || [];
+  const whs = useWhs.getState();
+  const oldDeliveries = oldDeal?.deliveries || [];
+  const partyId = formState.partyId || '';
+  const consignmentLoc = partyId ? `consignment:${partyId}` : 'stock';
 
-    // 1. Delete movements for removed/disabled deliveries
-    for (const old of oldDeliveries) {
-      if (!old.whsMovementId) continue;
-      const current = formState.deliveries.find(d => d.id === old.id);
-      if (!current || !current.whsEnabled) {
-        try { whs.deleteMovement(old.whsMovementId); } catch (e) { console.error('[deals->whs] deleteMovement failed:', e); }
-        if (current) current.whsMovementId = undefined;
+  const getOwnership = (dv: DealDelivery): 'none' | 'mine' | 'theirs' => {
+    if (dv.ownership) return dv.ownership;
+    return dv.whsEnabled === true ? 'theirs' : 'none';
+  };
+
+  // 1. Delete movements for removed/disabled deliveries
+  for (const old of oldDeliveries) {
+    const cur = formState.deliveries.find(d => d.id === old.id);
+    const shouldRemove = !cur || getOwnership(cur) === 'none';
+    if (shouldRemove) {
+      if (old.whsMovementId) {
+        try { whs.deleteMovement(old.whsMovementId); } catch (e) { console.error('[deals->whs] delete out failed:', e); }
       }
+      if (old.whsMovementIdIn) {
+        try { whs.deleteMovement(old.whsMovementIdIn); } catch (e) { console.error('[deals->whs] delete in failed:', e); }
+      }
+      if (cur) { cur.whsMovementId = undefined; cur.whsMovementIdIn = undefined; }
     }
+  }
 
-    // 2. Delete movements for changed deliveries (will be re-added below)
-    for (const dv of formState.deliveries) {
-      if (!dv.whsEnabled || !dv.whsMovementId) continue;
-      const old = oldDeliveries.find(d => d.id === dv.id);
-      if (!old) continue;
-      if (old.quantity === dv.quantity && old.type === dv.type && old.date === dv.date && (old.time || '') === (dv.time || '')) continue;
-      try { whs.deleteMovement(dv.whsMovementId); } catch (e) { console.error('[deals->whs] deleteMovement failed:', e); }
+  // 2. Delete movements for changed deliveries (will be re-added below)
+  for (const dv of formState.deliveries) {
+    const old = oldDeliveries.find(d => d.id === dv.id);
+    if (!old) continue;
+    const ownChanged = getOwnership(old) !== getOwnership(dv);
+    const fieldsChanged = old.quantity !== dv.quantity || old.type !== dv.type || old.date !== dv.date || (old.time || '') !== (dv.time || '');
+    if (!ownChanged && !fieldsChanged) continue;
+    if (old.whsMovementId) {
+      try { whs.deleteMovement(old.whsMovementId); } catch (e) { console.error('[deals->whs] delete out failed:', e); }
       dv.whsMovementId = undefined;
     }
-
-    // 3. Add movements for new enabled deliveries
-    for (const dv of formState.deliveries) {
-      if (!dv.whsEnabled) continue;
-      if (dv.whsMovementId) continue;
-      if (dv.type === 'loss') continue;
-      const good = formState.goods.find(g => g.id === dv.goodId);
-      if (!good?.linkedItemId) continue;
-
-      try {
-        const mid = whs.addMovement({
-          itemId: good.linkedItemId,
-          type: dv.type === 'out' ? 'out' : 'in',
-          quantity: dv.quantity,
-          unitPrice: 0,
-          reason: dv.type === 'out' ? 'consumption' : 'return',
-          date: dv.date || formState.date || '',
-          partyId: formState.partyId || '',
-          notes: `Deal ${formState.dealNumber || ''} - ${good.name}`,
-          sourceModule: 'deal',
-          sourceId: dv.id,
-        });
-        if (mid) dv.whsMovementId = mid;
-      } catch (e) {
-        console.error('[deals->whs] addMovement failed:', e);
-      }
+    if (old.whsMovementIdIn) {
+      try { whs.deleteMovement(old.whsMovementIdIn); } catch (e) { console.error('[deals->whs] delete in failed:', e); }
+      dv.whsMovementIdIn = undefined;
     }
-  };
+  }
+
+  // 3. Add movements for enabled deliveries
+  for (const dv of formState.deliveries) {
+    const own = getOwnership(dv);
+    if (own === 'none') continue;
+    if (dv.type === 'loss') continue;
+    const good = formState.goods.find(g => g.id === dv.goodId);
+    if (!good?.linkedItemId) continue;
+
+    try {
+      if (own === 'mine') {
+        // Internal Transfer: stock -X + consignment +X
+        if (!dv.whsMovementId) {
+          const midOut = whs.addMovement({
+            itemId: good.linkedItemId,
+            type: 'out',
+            quantity: dv.quantity,
+            unitPrice: 0,
+            reason: dv.type === 'out' ? 'consumption' : 'return',
+            date: dv.date || formState.date || '',
+            locationId: 'stock',
+            partyId,
+            notes: `Deal ${formState.dealNumber || ''} - ${good.name} → امانت`,
+            sourceModule: 'deal',
+            sourceId: dv.id,
+          });
+          if (midOut) dv.whsMovementId = midOut;
+        }
+        if (!dv.whsMovementIdIn) {
+          const midIn = whs.addMovement({
+            itemId: good.linkedItemId,
+            type: 'in',
+            quantity: dv.quantity,
+            unitPrice: 0,
+            reason: 'adjustment',
+            date: dv.date || formState.date || '',
+            locationId: consignmentLoc,
+            partyId,
+            notes: `Deal ${formState.dealNumber || ''} - ${good.name} ← امانت`,
+            sourceModule: 'deal',
+            sourceId: dv.id,
+          });
+          if (midIn) dv.whsMovementIdIn = midIn;
+        }
+      } else {
+        // ownership === 'theirs': Move out (stock -X) or in (return)
+        if (!dv.whsMovementId) {
+          const mid = whs.addMovement({
+            itemId: good.linkedItemId,
+            type: dv.type === 'out' ? 'out' : 'in',
+            quantity: dv.quantity,
+            unitPrice: 0,
+            reason: dv.type === 'out' ? 'consumption' : 'return',
+            date: dv.date || formState.date || '',
+            locationId: 'stock',
+            partyId,
+            notes: `Deal ${formState.dealNumber || ''} - ${good.name}`,
+            sourceModule: 'deal',
+            sourceId: dv.id,
+          });
+          if (mid) dv.whsMovementId = mid;
+        }
+      }
+    } catch (e) {
+      console.error('[deals->whs] addMovement failed:', e);
+    }
+  }
+};
+
 
   const dealAging = (d: Deal): { days: number; tone: 'ok' | 'warn' | 'danger' } | null => {
     if (d.status === 'settled' || d.status === 'cancelled') return null;

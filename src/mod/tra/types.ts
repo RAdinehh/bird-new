@@ -255,7 +255,17 @@ export interface DealDelivery {
   quantity: number;
   notes?: string;
   whsMovementId?: string;
+  /** @deprecated — از ownership استفاده کنید */
   whsEnabled?: boolean;
+  /**
+   * 🆕 Phase B: مالکیت کالای تحویل‌شده
+   * - 'none'   — بدون اثر انباری
+   * - 'mine'   — امانت: کالا از stock به consignment:partyId می‌ره (currentStock ثابت)
+   * - 'theirs' — فروش: کالا از stock کم می‌شه
+   */
+  ownership?: 'none' | 'mine' | 'theirs';
+  /** 🆕 Phase B: movement ورود به موقعیت امانی (فقط ownership='mine') */
+  whsMovementIdIn?: string;
 }
 
 export interface DealPayment {

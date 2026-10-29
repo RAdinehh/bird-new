@@ -451,8 +451,10 @@ const DealDeliverySchema = z.object({
   type: z.enum(['out', 'return', 'loss']).default('out'),
   quantity: z.number().positive('مقدار تحویل باید بیشتر از صفر باشد'),
   whsEnabled: z.boolean().optional(),
+  ownership: z.enum(['none', 'mine', 'theirs']).optional(),
   notes: optionalStr(200),
   whsMovementId: optionalId(),
+  whsMovementIdIn: optionalId(),
 });
 
 const DealSaleSchema = z.object({
