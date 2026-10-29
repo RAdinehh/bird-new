@@ -772,7 +772,10 @@ const save = () => {
         )}
 
               {/* کالاهای تحویلی */}
-      <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📦 کالاهای تحویلی</div>
+      <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📦 کالاهای تحویلی</span>
+        <Btn size="sm" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0 }] }))}>+ افزودن کالا</Btn>
+      </div>
 
       {form.goods.map((g, gi) => (
         <div key={g.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -817,7 +820,6 @@ const save = () => {
           </Field>
         </div>
       ))}
-      <Btn size="sm" full onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0 }] }))}>+ افزودن کالا</Btn>
       {form.goods.length === 0 && (
         <div style={{ padding: 'var(--pad-comfy)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', textAlign: 'center', marginTop: 8 }}>
           ⚠️ برای شروع، اولین کالا را اضافه کنید تا بخش‌های تحویل، فروش و پرداخت فعال شوند.
@@ -828,7 +830,10 @@ const save = () => {
       {form.goods.length > 0 && (
         <>
           <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <span>📤 تحویل‌ها</span>
+            <Btn size="sm" onClick={() => setForm(f => ({ ...f, deliveries: [...f.deliveries, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', type: 'out', quantity: 0, notes: '' }] }))}>+ افزودن</Btn>
+          </div>
             {(() => {
               const outs = form.deliveries.filter(d => d.type === 'out').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
               const rets = form.deliveries.filter(d => d.type === 'return').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
@@ -905,7 +910,6 @@ const save = () => {
               })()}
             </div>
           ))}
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deliveries: [...f.deliveries, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', type: 'out', quantity: 0, notes: '' }] }))}>{form.deliveries.length === 0 ? '+ ثبت اولین تحویل' : '+ افزودن تحویل دیگر'}</Btn>
         </>
       )}
 
@@ -913,7 +917,10 @@ const save = () => {
       {form.goods.length > 0 && (
         <>
           <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <span>💰 فروش‌ها</span>
+            <Btn size="sm" onClick={() => setForm(f => ({ ...f, sales: [...f.sales, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', quantity: 0, unitPrice: 0 }] }))}>+ افزودن</Btn>
+          </div>
             {(() => {
               const tot = form.sales.reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
               return tot > 0 ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>{toFa(tot.toLocaleString('fa-IR'))} ت</span> : null;
@@ -952,7 +959,6 @@ const save = () => {
               </div>
             );
           })}
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, sales: [...f.sales, { id: crypto.randomUUID(), goodId: f.goods[0]?.id || '', date: form.date || '', quantity: 0, unitPrice: 0 }] }))}>{form.sales.length === 0 ? '+ ثبت اولین فروش' : '+ افزودن فروش دیگر'}</Btn>
         </>
       )}
 
