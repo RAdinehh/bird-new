@@ -6,7 +6,7 @@ import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment, type Settlement } from './store';
 import { useNavigate } from 'react-router-dom';
 import { useCtc } from '../ctc/store';
-import { useFlk } from '../flk/store';
+import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
 import { useInc } from '../inc/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { Btn, BtnRow, Empty, Field, Input, MoneyField, PercentField,
@@ -70,6 +70,67 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, reopenDeal } = useTra();
   const { flocks } = useFlk();
   const { hatches } = useInc();
+
+  const getSourceInfo = (g: DealGood) => {
+    if (g.existingFlockId) {
+      const f = flocks.find(x => x.id === g.existingFlockId);
+      if (f) {
+        const age = getAgeDays(f);
+        const lc = getLifecycle(f.type, age, f.endOfCycleDay ?? null, null, f.layingStartDay ?? null);
+        const typeLabel = f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر';
+        return {
+          available: Number(f.currentCount || 0),
+          label: 'گله ' + f.name,
+          rows: [
+            ['نوع', typeLabel],
+            ['سن', toFa(age) + ' روز'],
+            ['فاز', lc.label],
+            ['وضعیت', f.status === 'active' ? 'فعال' : 'غیرفعال'],
+          ] as Array<[string, string]>,
+        };
+      }
+    }
+    if (g.hatchId) {
+      const h = hatches.find(x => x.id === g.hatchId);
+      if (h) {
+        return {
+          available: Number(h.hatched || 0),
+          label: 'هچ ' + h.date,
+          rows: [
+            ['تاریخ هچ', toFa(h.date)],
+            ['هچ موفق', toFa(h.hatched || 0) + ' جوجه'],
+            ['نطفه‌داری نشده', toFa(h.unhatched || 0)],
+          ] as Array<[string, string]>,
+        };
+      }
+    }
+    if (g.stockItemId) {
+      const it = whsItems.find(x => x.id === g.stockItemId);
+      if (it) {
+        return {
+          available: Number(it.currentStock || 0),
+          label: 'انبار ' + it.name,
+          rows: [
+            ['واحد', (UNIT_LABEL as any)[it.unit] || it.unit],
+            ['قیمت آخرین', (it.lastPrice || 0) > 0 ? toFa(Number(it.lastPrice).toLocaleString('fa-IR')) + ' ت' : '—'],
+          ] as Array<[string, string]>,
+        };
+      }
+    }
+    if (g.linkedItemId) {
+      const it = whsItems.find(x => x.id === g.linkedItemId);
+      if (it) {
+        return {
+          available: Number(it.currentStock || 0),
+          label: 'انبار ' + it.name,
+          rows: [
+            ['واحد', (UNIT_LABEL as any)[it.unit] || it.unit],
+          ] as Array<[string, string]>,
+        };
+      }
+    }
+    return null;
+  };
   const whsItems = useWhs(s => s.items);
   const { contacts } = useCtc();
 
@@ -426,6 +487,13 @@ const save = () => {
     };
     const oldDeal = form.id ? deals.find(d => d.id === form.id) : undefined;
     try {
+      for (const _g of form.goods) {
+        const _si = getSourceInfo(_g);
+        if (_si && Number(_g.quantity) > _si.available) {
+          setErr('موجودی «' + _g.name + '» در ' + _si.label + ' کافی نیست — موجودی: ' + _si.available + '، درخواستی: ' + _g.quantity);
+          return;
+        }
+      }
       applyDealMovements(form, oldDeal);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -908,6 +976,21 @@ const save = () => {
                 </Select>
               </Field>
             )}
+          {(() => {
+            const srcInfo = getSourceInfo(g);
+            if (!srcInfo) return null;
+            return (
+              <div style={{ padding: 'var(--pad-tight)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
+                <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 4 }}>📊 {srcInfo.label} — موجودی: {toFa(srcInfo.available)}</div>
+                {srcInfo.rows.map(([k, v], idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '1px 0' }}>
+                    <span style={{ color: 'var(--muted)' }}>{k}:</span>
+                    <span style={{ fontWeight: 600 }}>{v}</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
           <Grid2>
             <Field label="نام کالا" required error={showError?.(`goods.${gi}.name`)} onTouch={() => markTouched?.(`goods.${gi}.name`)}>
               <Input placeholder="جوجه یک‌روزه" value={g.name} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, name: e.target.value } : x) }))} />
@@ -925,7 +1008,21 @@ const save = () => {
           </Grid2>
           <Grid2>
             <Field label="مقدار" required error={showError?.(`goods.${gi}.quantity`)} onTouch={() => markTouched?.(`goods.${gi}.quantity`)}>
-              <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
+              {(() => {
+                const srcInfo = getSourceInfo(g);
+                const maxVal = srcInfo ? Math.max(1, srcInfo.available) : 1_000_000;
+                return <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={maxVal} />;
+              })()}
+              {(() => {
+                const srcInfo = getSourceInfo(g);
+                if (!srcInfo) return null;
+                const over = Number(g.quantity) > srcInfo.available;
+                return (
+                  <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4, fontWeight: 600, color: over ? 'var(--danger)' : 'var(--accent)' }}>
+                    {over ? '🔴 بیش از موجودی ' + srcInfo.label + ': ' + toFa(srcInfo.available) : '📊 موجودی ' + srcInfo.label + ': ' + toFa(srcInfo.available)}
+                  </div>
+                );
+              })()}
               {Number(g.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={g.quantity} />}
             </Field>
             <Field label="قیمت تخمینی" error={showError?.(`goods.${gi}.estimatedPrice`)} onTouch={() => markTouched?.(`goods.${gi}.estimatedPrice`)}>
