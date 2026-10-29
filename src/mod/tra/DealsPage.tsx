@@ -794,6 +794,11 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         </div>
       ))}
       <Btn size="sm" full onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0 }] }))}>+ افزودن کالا</Btn>
+      {form.goods.length === 0 && (
+        <div style={{ padding: 'var(--pad-comfy)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', textAlign: 'center', marginTop: 8 }}>
+          ⚠️ برای شروع، اولین کالا را اضافه کنید تا بخش‌های تحویل، فروش و پرداخت فعال شوند.
+        </div>
+      )}
 
       {/* تحویل‌ها */}
       {form.goods.length > 0 && (
@@ -910,7 +915,9 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         </>
       )}
 
-      {/* پرداخت‌ها */}
+      {/* پرداخت‌ها — شرطی */}
+      {form.settlementType !== 'barter_direct' && (form.sales.length > 0 || form.payments.length > 0 || form.type === 'conditional') && (
+        <>
       <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span>💳 پرداخت‌ها</span>
         {(() => {
@@ -961,6 +968,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         </div>
       ))}
       <Btn size="sm" full onClick={() => setForm(f => ({ ...f, payments: [...f.payments, { id: crypto.randomUUID(), date: form.date || '', amount: 0, direction: 'in', method: 'cash', notes: '' }] }))}>{form.payments.length === 0 ? '+ ثبت اولین پرداخت' : '+ افزودن پرداخت دیگر'}</Btn>
+        </>
+      )}
 
       {/* خلاصه مالی */}
       {(form.goods.length > 0 || form.sales.length > 0) && (
