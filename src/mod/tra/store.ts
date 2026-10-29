@@ -567,8 +567,46 @@ export const useTra = create<State>()(
       },
 
       addDeal: (d) => set({ deals: [...get().deals, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
-      updateDeal: (id, patch) => set({ deals: get().deals.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
+      updateDeal: (id, patch) => {
+        const prev = get().deals.find(x => x.id === id);
+        if (!prev) return;
+        const merged = { ...prev, ...patch, updatedAt: now() };
+        if (patch.status && patch.status !== prev.status) {
+          if (patch.status === 'settled') merged.settledAt = now();
+          else if (patch.status === 'cancelled') merged.cancelledAt = now();
+          else if (patch.status === 'open') { merged.settledAt = undefined; merged.cancelledAt = undefined; }
+        }
+        set({ deals: get().deals.map(x => x.id === id ? merged : x) });
+      },
       deleteDeal: (id) => set({ deals: get().deals.filter(x => x.id !== id) }),
+      reopenDeal: (id, reason) => {
+        const prev = get().deals.find(x => x.id === id);
+        if (!prev) return false;
+        if (prev.status === 'open') return false;
+        if (!reason || !reason.trim()) return false;
+        const history = [...(prev.reopenHistory || []), {
+          from: prev.status as 'settled' | 'cancelled',
+          to: 'open' as const,
+          reason: reason.trim(),
+          at: now(),
+        }];
+        set({
+          deals: get().deals.map(x => x.id === id
+            ? { ...x, status: 'open' as const, settledAt: undefined, cancelledAt: undefined, reopenHistory: history, updatedAt: now() }
+            : x),
+        });
+        try {
+          void import('../../cor/logger/auditLog').then(m => {
+            m.logAction('update', 'tra', 'بازگشایی معامله ' + (prev.dealNumber || id) + ' — دلیل: ' + reason.trim());
+          }).catch(() => {});
+        } catch (e) { console.error('[reopenDeal] audit failed:', e); }
+        return true;
+      },
+      restoreDeal: (deal) => {
+        if (get().deals.some(x => x.id === deal.id)) return false;
+        set({ deals: [...get().deals, deal] });
+        return true;
+      },
       addSettlement: (s) => {
         const id = uuid();
         set({ settlements: [...get().settlements, { ...s, id, createdAt: now(), updatedAt: now() }] });

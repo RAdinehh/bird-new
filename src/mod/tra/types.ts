@@ -339,6 +339,12 @@ export interface Deal {
   deliveries?: DealDelivery[];
   sales?: DealSale[];
   payments?: DealPayment[];
+  /** 🆕 undo/reopen: زمان تسویه */
+  settledAt?: string;
+  /** 🆕 undo/reopen: زمان لغو */
+  cancelledAt?: string;
+  /** 🆕 undo/reopen: تاریخچه بازگشایی */
+  reopenHistory?: Array<{ from: 'settled' | 'cancelled'; to: 'open'; reason: string; at: string }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -372,6 +378,8 @@ export interface State {
   addDeal: (d: Omit<Deal, 'id'|'createdAt'|'updatedAt'>) => void;
   updateDeal: (id: string, patch: Partial<Deal>) => void;
   deleteDeal: (id: string) => void;
+  reopenDeal: (id: string, reason: string) => boolean;
+  restoreDeal: (deal: Deal) => boolean;
   /** پرداخت‌های سطح طرف حساب (Phase 6) */
   partyPayments: PartyPayment[];
   addPartyPayment: (p: Omit<PartyPayment, 'id'|'createdAt'|'updatedAt'>) => string;
