@@ -586,6 +586,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
                   {d.status !== 'settled' ? (
                     <Btn size="sm" onClick={() => updateDeal(d.id, { status: 'settled' })} style={{ flex: 1 }}>تسویه شد</Btn>
                   ) : null}
+                  <Btn size="sm" onClick={() => { setSettlementDeal(d); setSettlementOpen(true); }} style={{ flex: 1 }}>📅 تسویه</Btn>
                   <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                           const _lInvS = invoices.filter((inv: any) => inv.relatedDealId === d.id).length;
