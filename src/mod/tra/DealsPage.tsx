@@ -7,6 +7,7 @@ import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type
 import { useNavigate } from 'react-router-dom';
 import { useCtc } from '../ctc/store';
 import { useFlk } from '../flk/store';
+import { useInc } from '../inc/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { Btn, BtnRow, Empty, Field, Input, MoneyField, PercentField,
   Grid2, Modal, NumField,
@@ -68,6 +69,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const navigate = useNavigate();
   const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, reopenDeal } = useTra();
   const { flocks } = useFlk();
+  const { hatches } = useInc();
   const whsItems = useWhs(s => s.items);
   const { contacts } = useCtc();
 
@@ -846,16 +848,91 @@ const save = () => {
               {Number(g.estimatedPrice) > 0 && <FieldHint fieldPath="tra.deal.unitPrice" value={g.estimatedPrice} />}
             </Field>
           </Grid2>
-          <Field label="کالای انبار" hint="برای کاهش از موجودی">
-            <Select value={g.linkedItemId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, linkedItemId: e.target.value || undefined } : x) }))}>
-              <option value="">— بدون اتصال —</option>
-              {whsItems.map((it: any) => (
-                <option key={it.id} value={it.id}>
-                  {it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}
-                </option>
-              ))}
-            </Select>
-          </Field>
+          {(g.category === 'chick') && (
+              <>
+                <Field label="منبع جوجه" required>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                    <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, source: 'flock', hatchId: undefined } : x) }))} style={{ padding: '8px', background: g.source === 'flock' ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (g.source === 'flock' ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', color: g.source === 'flock' ? 'var(--accent)' : 'var(--muted)', fontWeight: g.source === 'flock' ? 700 : 500, fontFamily: 'inherit', fontSize: 'var(--fs-xs)', cursor: 'pointer' }}>🐔 گله موجود</button>
+                    <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, source: 'hatch', existingFlockId: undefined } : x) }))} style={{ padding: '8px', background: g.source === 'hatch' ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (g.source === 'hatch' ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', color: g.source === 'hatch' ? 'var(--accent)' : 'var(--muted)', fontWeight: g.source === 'hatch' ? 700 : 500, fontFamily: 'inherit', fontSize: 'var(--fs-xs)', cursor: 'pointer' }}>🐣 هچری</button>
+                  </div>
+                </Field>
+                {g.source === 'flock' && (
+                  <Field label="گله مبدأ" required>
+                    <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
+                      <option value="">— انتخاب —</option>
+                      {flocks.filter(f => f.status === 'active').map(f => (
+                        <option key={f.id} value={f.id}>{f.name} — {toFa(f.currentCount || 0)} پرنده</option>
+                      ))}
+                    </Select>
+                  </Field>
+                )}
+                {g.source === 'hatch' && (
+                  <Field label="هچ مبدأ" required>
+                    <Select value={g.hatchId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, hatchId: e.target.value || undefined } : x) }))}>
+                      <option value="">— انتخاب —</option>
+                      {hatches.filter(h => (h.hatched || 0) > 0).map(h => (
+                        <option key={h.id} value={h.id}>{toFa(h.date)} — {toFa(h.hatched || 0)} جوجه</option>
+                      ))}
+                    </Select>
+                  </Field>
+                )}
+              </>
+            )}
+            {g.category === 'adult' && (
+              <Field label="گله مبدأ" required>
+                <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
+                  <option value="">— انتخاب —</option>
+                  {flocks.filter(f => f.status === 'active').map(f => (
+                    <option key={f.id} value={f.id}>{f.name} — {toFa(f.currentCount || 0)} پرنده</option>
+                  ))}
+                </Select>
+              </Field>
+            )}
+            {(g.category === 'egg' || g.category === 'fertile_egg') && (
+              <>
+                <Field label="گله مبدأ" required>
+                  <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
+                    <option value="">— انتخاب —</option>
+                    {flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder')).map(f => (
+                      <option key={f.id} value={f.id}>{f.name} — {toFa(f.currentCount || 0)} پرنده</option>
+                    ))}
+                  </Select>
+                </Field>
+                <Field label="کالای انبار (تخم)">
+                  <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }}>
+                    <option value="">— بدون اتصال —</option>
+                    {whsItems.filter((w: any) => w.category === 'egg').map((it: any) => (
+                      <option key={it.id} value={it.id}>{it.name} — {toFa(it.currentStock)}</option>
+                    ))}
+                  </Select>
+                </Field>
+              </>
+            )}
+            {(g.category === 'feed' || g.category === 'medicine' || g.category === 'equipment' || g.category === 'other') && (
+              <Field label="کالای انبار" required>
+                <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }}>
+                  <option value="">— انتخاب —</option>
+                  {whsItems.filter((w: any) => {
+                    if (g.category === 'feed') return w.category === 'feed';
+                    if (g.category === 'medicine') return w.category === 'medicine' || w.category === 'vaccine';
+                    if (g.category === 'equipment') return w.category === 'equipment';
+                    return true;
+                  }).map((it: any) => (
+                    <option key={it.id} value={it.id}>{it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}</option>
+                  ))}
+                </Select>
+              </Field>
+            )}
+            {!g.category && (
+              <Field label="کالای انبار" hint="برای کاهش از موجودی">
+                <Select value={g.linkedItemId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, linkedItemId: e.target.value || undefined } : x) }))}>
+                  <option value="">— بدون اتصال —</option>
+                  {whsItems.map((it: any) => (
+                    <option key={it.id} value={it.id}>{it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}</option>
+                  ))}
+                </Select>
+              </Field>
+            )}
         </div>
       ))}
       {form.goods.length === 0 && (

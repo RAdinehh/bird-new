@@ -449,6 +449,11 @@ const DealGoodSchema = z.object({
   quantity: z.number().positive('مقدار باید بیشتر از صفر باشد'),
   unit: z.enum(['pcs', 'kg', 'ton', 'bag', 'L', 'carton']),
   estimatedPrice: z.number().nonnegative('قیمت نمی‌تواند منفی باشد'),
+  category: z.enum(['chick', 'adult', 'egg', 'fertile_egg', 'feed', 'medicine', 'equipment', 'other']).optional(),
+  source: z.enum(['flock', 'hatch', 'whs']).optional(),
+  existingFlockId: optionalId(),
+  hatchId: optionalId(),
+  stockItemId: optionalId(),
   linkedItemId: optionalId(),
 });
 
