@@ -808,6 +808,19 @@ const save = () => {
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>کالای {toFa(gi + 1)}</span>
             <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.filter(x => x.id !== g.id), deliveries: f.deliveries.filter(x => x.goodId !== g.id), sales: f.sales.filter(x => x.goodId !== g.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
           </div>
+          <Field label="دسته کالا" hint="انتخاب دسته، منبع کالا را تعیین می‌کند" error={showError?.(`goods.${gi}.category`)} onTouch={() => markTouched?.(`goods.${gi}.category`)}>
+            <Select value={g.category || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, category: (e.target.value || undefined) as any } : x) }))}>
+              <option value="">— بدون دسته (کالای عمومی) —</option>
+              <option value="chick">🐣 جوجه یک‌روزه</option>
+              <option value="adult">🐔 پرنده بالغ</option>
+              <option value="egg">🥚 تخم خوراکی</option>
+              <option value="fertile_egg">🥚 تخم نطفه‌دار</option>
+              <option value="feed">🌾 دان و خوراک</option>
+              <option value="medicine">💊 دارو / واکسن</option>
+              <option value="equipment">🔧 تجهیزات</option>
+              <option value="other">📋 سایر</option>
+            </Select>
+          </Field>
           <Grid2>
             <Field label="نام کالا" required error={showError?.(`goods.${gi}.name`)} onTouch={() => markTouched?.(`goods.${gi}.name`)}>
               <Input placeholder="جوجه یک‌روزه" value={g.name} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, name: e.target.value } : x) }))} />
@@ -851,7 +864,7 @@ const save = () => {
         </div>
       )}
 
-      <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0 }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.goods.length === 0 ? 'افزودن اولین کالا' : 'افزودن کالای دیگر'}</button>
+      <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0, category: undefined }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.goods.length === 0 ? 'افزودن اولین کالا' : 'افزودن کالای دیگر'}</button>
 
       {/* تحویل‌ها */}
       {form.goods.length > 0 && (
