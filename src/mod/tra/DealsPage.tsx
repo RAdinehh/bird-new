@@ -216,7 +216,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     const today = formatJ(new Date(), 'yyyy/MM/dd');
 
     if (contacts.length === 0) { toastMsg.error('اول یک مخاطب بسازید'); return; }
-    setForm({ ...empty(), partyId: contacts[0].id });
+    setForm({ ...empty(), partyId: defaultX || contacts[0].id, date: today });
     setErr(''); setOpen(true);
   };
   useFab(active ? { label: 'افزودن معامله', onClick: openNew } : null);
