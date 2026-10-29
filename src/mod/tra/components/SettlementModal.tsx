@@ -28,8 +28,12 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
 
   useEffect(() => {
     if (open && deal) {
-      setPeriodStart(deal.startDate || deal.date || todayJ());
-      setPeriodEnd(todayJ());
+      const start = deal.startDate || deal.date || todayJ();
+      const today = todayJ();
+      // 🆕 اگر امروز قبل از شروع قرارداد است، تاریخ پایان را حداقل برابر شروع قرار بده
+      const end = today < start ? start : today;
+      setPeriodStart(start);
+      setPeriodEnd(end);
       setErr('');
     }
   }, [open, deal]);
