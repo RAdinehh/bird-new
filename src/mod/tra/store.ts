@@ -62,7 +62,7 @@ export const useTra = create<State>()(
           try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) { console.error('❌ [tra] applyInvoiceEquipment error:', e); }
           // 🎯 ۳. اتصال فروش تخم به ماژول egg
           try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) { console.error('[tra add] applyInvoiceEgg failed:', e); }
-          try { items = applyInvoiceStock({ ...newInv, items }); } catch(e) { console.error('[tra add] applyInvoiceStock failed:', e); const _msg = e instanceof Error ? e.message : String(e); showToast('⚠️ فاکتور ذخیره شد ولی حرکت انبار ثبت نشد — ' + _msg, 'error'); }
+          try { items = applyInvoiceStock({ ...newInv, items }); } catch(e) { const _msg = e instanceof Error ? e.message : String(e); console.error('[tra add] applyInvoiceStock failed:', e); throw new Error('حرکت انبار ناموفق — ' + _msg); }
           // 🎯 ۴. اتصال به انبار از طریق Event Bus (حرکت‌ها + movementId)
           // ✅ آپدیت انبار فقط از طریق applyInvoiceStock انجام می‌شود
         }

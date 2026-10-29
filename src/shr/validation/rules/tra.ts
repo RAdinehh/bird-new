@@ -263,6 +263,15 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         const it = d.items[i];
         const itCat = it.category || d.category;
         const p = (f: string) => ['items', String(i), f];
+        // 🆕 NEEDS_SOURCE_FOR_SALE: منبع اجباری برای فروش
+        const NEEDS_SOURCE_FOR_SALE = ['chick', 'adult', 'egg', 'fertile_egg', 'broken'];
+        if (d.type === 'sale' && NEEDS_SOURCE_FOR_SALE.includes(itCat) && !it.flockId && !it.stockItemId) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'برای فروش «' + (it.description || itCat) + '»، ابتدا گله یا کالای انبار را انتخاب کنید',
+            path: p('stockItemId'),
+          });
+        }
 
         // ۱. فروش پرنده، کود و تخم شکسته: گله مبدأ اجباری
         if ((it.birdId || itCat === 'manure' || itCat === 'broken') && !it.flockId && !it.hatchId) {
@@ -414,7 +423,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
           }
         }
 
-        // موجودی انبار
+        // موجودی انبار (همه دسته‌ها — شامل egg, broken)
         if (it.stockItemId && vWhsItems) {
           const w = vWhsItems.find((x: any) => x.id === it.stockItemId);
           if (w) {

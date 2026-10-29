@@ -533,7 +533,13 @@ export function useInvoiceForm(params: {
       verifyInvariantsIfDev();
       verifyInvariantsIfDev();
     } else {
-      addInvoice(data);
+      try {
+        addInvoice(data);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        setErr('ذخیره ناموفق: ' + msg);
+        return;
+      }
       verifyInvariantsIfDev();
       verifyInvariantsIfDev();
     }
