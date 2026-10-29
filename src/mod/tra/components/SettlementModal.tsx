@@ -3,6 +3,7 @@
  * مودال تسویه دوره‌ای — انتخاب بازه + پیش‌نمایش زنده
  */
 import { useState, useMemo, useEffect } from 'react';
+import { format as formatJ } from 'date-fns-jalali';
 import { Btn, BtnRow, Modal, Field, ErrorBox } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import { toFa } from '../../../shr/utils/fa';
@@ -17,11 +18,7 @@ interface Props {
 }
 
 function todayJ(): string {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return y + '/' + m + '/' + day;
+  return formatJ(new Date(), 'yyyy/MM/dd');
 }
 
 export default function SettlementModal({ open, deal, onClose, onSave }: Props) {
