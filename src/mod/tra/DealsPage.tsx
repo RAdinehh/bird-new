@@ -1232,6 +1232,26 @@ const save = () => {
         })()}
       </div>
 
+      {calc.myShare > 0 && (
+        <div style={{ padding: 'var(--sp-2) 0', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+            <span style={{ color: 'var(--muted)' }}>جمع کل (سهم من):</span>
+            <span style={{ fontWeight: 700 }}>{toFa(calc.myShare.toLocaleString('fa-IR'))} تومان</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+            <span style={{ color: 'var(--muted)' }}>دریافت‌شده:</span>
+            <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(calc.paidIn.toLocaleString('fa-IR'))} تومان</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+            <span style={{ color: 'var(--muted)' }}>مانده نهایی:</span>
+            {Math.max(0, calc.myShare - calc.paidIn + calc.paidOut) > 0.5 ? (
+              <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(Math.max(0, calc.myShare - calc.paidIn + calc.paidOut).toLocaleString('fa-IR'))} تومان</span>
+            ) : (
+              <span style={{ fontWeight: 700, color: 'var(--accent)' }}>✓ تسویه شده</span>
+            )}
+          </div>
+        </div>
+      )}
       {form.payments.map((p, pi) => (
         <div key={p.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1245,7 +1265,29 @@ const save = () => {
               <DatePicker value={p.date} onChange={v => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, date: v } : x) }))} autoToday />
             </Field>
             <Field label="مبلغ" required error={showError?.(`payments.${pi}.amount`)} onTouch={() => markTouched?.(`payments.${pi}.amount`)}>
-              <MoneyField showWords={false} placeholder="مبلغ" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0; setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, amount: raw } : x) })); }} />
+              <MoneyField showWords={false} placeholder="مبلغ" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { 
+                const raw = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0; 
+                const otherPaidIn = form.payments.filter(x => x.direction === 'in' && x.id !== p.id).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                const otherPaidOut = form.payments.filter(x => x.direction === 'out' && x.id !== p.id).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                const rem = calc.myShare - otherPaidIn + otherPaidOut;
+                const val = (p.direction === 'in' && rem > 0) ? Math.min(raw, rem) : raw;
+                setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, amount: val } : x) })); 
+              }} />
+              {(() => {
+                if (p.direction !== 'in') return null;
+                const otherPaidIn = form.payments.filter(x => x.direction === 'in' && x.id !== p.id).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                const otherPaidOut = form.payments.filter(x => x.direction === 'out' && x.id !== p.id).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                const rem = calc.myShare - otherPaidIn + otherPaidOut;
+                if (rem <= 0.5) return null;
+                return (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>باقی‌مانده: {toFa(rem.toLocaleString('fa-IR'))} تومان</span>
+                    <button type="button" onClick={() => {
+                      setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, amount: rem } : x) }));
+                    }} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>
+                  </div>
+                );
+              })()}
               {Number(p.amount) > 0 && <FieldHint fieldPath="tra.deal.payment" value={p.amount} />}
             </Field>
           </Grid2>
