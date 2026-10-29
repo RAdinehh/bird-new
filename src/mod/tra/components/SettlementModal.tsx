@@ -29,9 +29,9 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
   useEffect(() => {
     if (open && deal) {
       const start = deal.startDate || deal.date || todayJ();
-      const today = todayJ();
-      // 🆕 اگر امروز قبل از شروع قرارداد است، تاریخ پایان را حداقل برابر شروع قرار بده
-      const end = today < start ? start : today;
+      // 🆕 استفاده از endDate معامله (نه تاریخ امروز)
+      let end = deal.endDate || todayJ();
+      if (end < start) end = start;
       setPeriodStart(start);
       setPeriodEnd(end);
       setErr('');
