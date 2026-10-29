@@ -263,7 +263,27 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     }
   }
 
-  // 3. Add movements for enabled deliveries
+  // 3. Pre-flight: چک موجودی برای همه movementها (atomic — قبل از هر حرکتی)
+  for (const dv of formState.deliveries) {
+    const own = getOwnership(dv);
+    if (own === 'none') continue;
+    if (dv.type === 'loss') continue;
+    const good = formState.goods.find(g => g.id === dv.goodId);
+    if (own === 'mine' && !good?.linkedItemId) {
+      throw new Error('برای امانت، کالا باید به انبار متصل باشد: «' + (good?.name || '—') + '»');
+    }
+    if (good?.linkedItemId && (own === 'mine' || dv.type === 'out')) {
+      const item = whs.items.find(i => i.id === good.linkedItemId);
+      if (item) {
+        const available = item.stockByLocation?.['stock'] ?? item.currentStock ?? 0;
+        if (available < dv.quantity) {
+          throw new Error('موجودی «' + good.name + '» کافی نیست — موجودی: ' + available + '، درخواستی: ' + dv.quantity);
+        }
+      }
+    }
+  }
+
+  // 4. Add movements for enabled deliveries
   for (const dv of formState.deliveries) {
     const own = getOwnership(dv);
     if (own === 'none') continue;
@@ -403,7 +423,13 @@ const save = () => {
       payments: form.payments,
     };
     const oldDeal = form.id ? deals.find(d => d.id === form.id) : undefined;
-    applyDealMovements(form, oldDeal);
+    try {
+      applyDealMovements(form, oldDeal);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setErr('ذخیره ناموفق: ' + msg);
+      return;
+    }
 
     if (form.id === undefined) {
       addDeal(data);
