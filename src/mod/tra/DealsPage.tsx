@@ -4,6 +4,7 @@
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment, type Settlement } from './store';
+import { generateDealNumber } from './calc';
 import { useNavigate } from 'react-router-dom';
 import { useCtc } from '../ctc/store';
 import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
@@ -221,7 +222,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       d.setDate(d.getDate() + 30);
       return formatJ(d, 'yyyy/MM/dd');
     })();
-    setForm({ ...empty(), partyId: defaultX || contacts[0].id, date: today, dueDate: defaultDue });
+    setForm({ ...empty(), partyId: defaultX || contacts[0].id, date: today, dueDate: defaultDue, dealNumber: generateDealNumber(today, deals) });
     setErr(''); setOpen(true);
   };
   useFab(active ? { label: 'افزودن معامله', onClick: openNew } : null);

@@ -29,6 +29,28 @@ export function generateInvoiceNumber(
   return `${pattern}${nextNum}`;
 }
 
+
+export function generateDealNumber(
+  date: string,
+  existingDeals: Array<{ dealNumber?: string }>
+): string {
+  const norm = (date || '').replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+  const parts = norm.split('/');
+  const year = parts[0] || '1400';
+  const pattern = `${year}-`;
+
+  let maxNum = 0;
+  existingDeals.forEach(d => {
+    if (!d.dealNumber || !d.dealNumber.startsWith(pattern)) return;
+    const suffix = d.dealNumber.slice(pattern.length);
+    const normSuffix = suffix.replace(/[۰-۹]/g, x => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(x)));
+    const num = parseInt(normSuffix, 10);
+    if (!isNaN(num) && num > maxNum) maxNum = num;
+  });
+
+  return `${year}-${String(maxNum + 1).padStart(3, '0')}`;
+}
+
 export function calcDueDate(
   terms: PaymentTerms | undefined,
   invoiceDate: string,
