@@ -242,6 +242,23 @@ export interface DealGood {
   quantity: number;
   unit: DealUnit;
   estimatedPrice: number;
+  
+  /** 🆕 Phase 1.0: دسته کالا — تعیین‌کننده منبع */
+  category?: 'chick' | 'adult' | 'egg' | 'fertile_egg' | 'feed' | 'medicine' | 'equipment' | 'other';
+  
+  /** 🆕 Phase 1.0: منبع کالا */
+  source?: 'flock' | 'hatch' | 'whs';
+  
+  /** 🆕 Phase 1.0: گله موجود (chick/adult) */
+  existingFlockId?: string;
+  
+  /** 🆕 Phase 1.0: هچری (chick) */
+  hatchId?: string;
+  
+  /** 🆕 Phase 1.0: کالای انبار (feed/medicine/egg/equipment) */
+  stockItemId?: string;
+  
+  /** @deprecated — استفاده از stockItemId */
   linkedItemId?: string;
 }
 
