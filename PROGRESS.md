@@ -246,6 +246,19 @@
 - علت: addMovement بدون partyId (Zod requirement) + intelligence پیام‌ها
 - تسک آینده: Phase 12 (تست‌ها) — رفع و حذف skip
 
+## ✅ Deals Phase E.1 — DONE (commit 2f0cef92)
+- types.ts: Settlement interface + SettlementStatus
+- types.ts: State.settlements + 3 action signatures
+- rules/tra.ts: SettlementSchema + 4 sub-schemas
+- store.ts: addSettlement/updateSettlement/deleteSettlement
+- persist version 6 → 7 (migration: settlements[])
+
+## 🟡 Deals Phase E.2 — PENDING (UI)
+- helper: computeSettlement(deal, periodStart, periodEnd)
+- SettlementModal در DealsPage
+- نمایش تسویه‌ها در کارت معامله
+- دکمه «تبدیل به فاکتور»
+
 ## ✅ Deals Phase B — DONE (commit 4f5a33b6)
 - `DealDelivery.ownership: 'none' | 'mine' | 'theirs'`
 - ownership='mine': Internal Transfer (stock -X → consignment:partyId +X)
