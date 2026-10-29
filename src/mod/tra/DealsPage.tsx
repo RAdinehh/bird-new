@@ -882,14 +882,16 @@ const save = () => {
             <Select value={g.category || ''} onChange={e => {
               const newCat = (e.target.value || undefined) as any;
               const DEFAULT_NAMES: Record<string, string> = {
-                chick: 'جوجه یک‌روزه', adult: 'پرنده بالغ', egg: 'تخم خوراکی', fertile_egg: 'تخم نطفه‌دار',
-                feed: 'دان', medicine: 'دارو', equipment: 'تجهیزات', other: ''
+                chick: 'جوجه یک‌روزه', adult: 'پرنده بالغ', egg: 'تخم خوراکی', fertile_egg: 'تخم نطفه‌دار'
               };
               setForm(f => ({ ...f, goods: f.goods.map(x => {
                 if (x.id !== g.id) return x;
                 const prevDef = x.category ? (DEFAULT_NAMES[x.category] || '') : '';
                 const shouldUpdate = !x.name.trim() || x.name === prevDef;
-                return { ...x, category: newCat, name: shouldUpdate ? (DEFAULT_NAMES[newCat || ''] || '') : x.name };
+                const newName = shouldUpdate ? (DEFAULT_NAMES[newCat || ''] || '') : x.name;
+                // برای feed/medicine/equipment: اگه نام خالی، خالی بمونه (کاربر خودش تایپ می‌کنه)
+                const keepEmpty = ['feed', 'medicine', 'equipment', 'other'].includes(newCat || '');
+                return { ...x, category: newCat, name: keepEmpty && shouldUpdate ? '' : newName };
               }) }));
             }}>
               <option value="">— بدون دسته (کالای عمومی) —</option>
@@ -970,29 +972,25 @@ const save = () => {
               </Field>
             )}
             {(g.category === 'egg' || g.category === 'fertile_egg') && (
-              <>
-                <Field label="گله مبدأ" required>
-                  <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
-                    <option value="">— انتخاب —</option>
-                    {flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder')).map(f => {
-                      const hasStock = (f.currentCount || 0) > 0;
-                      return (
-                        <option key={f.id} value={f.id} disabled={!hasStock}>
-                          {f.name} — {toFa(f.currentCount || 0)} پرنده{!hasStock ? ' (ناموجود)' : ''}
-                        </option>
-                      );
-                    })}
-                  </Select>
-                </Field>
-                <Field label="کالای انبار (تخم)">
-                  <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }}>
-                    <option value="">— بدون اتصال —</option>
-                    {whsItems.filter((w: any) => w.category === 'egg').map((it: any) => (
-                      <option key={it.id} value={it.id}>{it.name} — {toFa(it.currentStock)}</option>
-                    ))}
-                  </Select>
-                </Field>
-              </>
+              <Field label="گله مبدأ" required hint={g.existingFlockId ? (() => {
+                const f = flocks.find(x => x.id === g.existingFlockId);
+                if (!f) return undefined;
+                const age = getAgeDays(f);
+                const lc = getLifecycle(f.type, age, f.endOfCycleDay ?? null, null, f.layingStartDay ?? null);
+                return '📊 ' + toFa(f.currentCount || 0) + ' پرنده | سن: ' + toFa(age) + ' روز | ' + lc.label;
+              })() : undefined}>
+                <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
+                  <option value="">— انتخاب —</option>
+                  {flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder')).map(f => {
+                    const hasStock = (f.currentCount || 0) > 0;
+                    return (
+                      <option key={f.id} value={f.id} disabled={!hasStock}>
+                        {f.name} — {toFa(f.currentCount || 0)} پرنده{!hasStock ? ' (ناموجود)' : ''}
+                      </option>
+                    );
+                  })}
+                </Select>
+              </Field>
             )}
             {(g.category === 'feed' || g.category === 'medicine' || g.category === 'equipment' || g.category === 'other') && (
               <Field label="کالای انبار" required>
