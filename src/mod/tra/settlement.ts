@@ -4,6 +4,7 @@
  * طبق الگوی SAP MRKO: snapshot از داده‌های دوره
  */
 import type { Deal, Settlement, DealDelivery, DealSale, DealPayment, Invoice, InvoiceItem, Payment } from './types';
+import { useFlk } from '../flk/store';
 
 function inPeriod(date: string, start: string, end: string): boolean {
   if (!date) return false;
@@ -82,10 +83,16 @@ export function createInvoiceFromSettlement(
   deal: Deal,
   settlement: Settlement
 ): Omit<Invoice, 'id' | 'createdAt' | 'updatedAt'> {
+  const flkState = useFlk.getState();
   const items: InvoiceItem[] = settlement.salesSnapshot.map((s) => {
     const good = (deal.goods || []).find(g => g.id === s.goodId);
     const qty = Number(s.quantity) || 0;
     const price = Number(s.unitPrice) || 0;
+    // 🆕 استخراج فیلدهای گله (chick/adult)
+    const flock = good?.existingFlockId
+      ? flkState.flocks.find(f => f.id === good.existingFlockId)
+      : null;
+    const cat = good?.category;
     return {
       id: s.id,
       description: good?.name || 'کالا',
@@ -93,6 +100,14 @@ export function createInvoiceFromSettlement(
       quantity: qty,
       unitPrice: price,
       total: qty * price,
+      category: cat,
+      // 🆕 پرندگان — از گله
+      birdId: flock?.birdId || '',
+      breedId: flock?.breedId || '',
+      flockId: good?.existingFlockId || '',
+      flockName: flock?.name || '',
+      // 🆕 توزیع تعداد — همه نامشخص (کاربر بعداً ویرایش می‌کنه)
+      unknownCount: (cat === 'chick' || cat === 'adult') ? qty : null,
     };
   });
   
