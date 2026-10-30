@@ -7,6 +7,7 @@ import { useTra } from '../mod/tra/store';
 import { useWhs } from '../mod/whs/store';
 import { useFlk } from '../mod/flk/store';
 import { computeSettlement, createInvoiceFromSettlement } from '../mod/tra/settlement';
+import { applyDealMovements } from '../mod/tra/applyDeal';
 import type { Deal, Settlement, DealGood, DealSale, DealPayment } from '../mod/tra/types';
 
 // ─── Builders ───
@@ -166,5 +167,67 @@ describe('Recycle Bin — Deal', () => {
     useTra.setState({ deals: [...useTra.getState().deals, d] });
     const ok = useTra.getState().restoreDealFromBin(d.id);
     expect(ok).toBe(false);
+  });
+});
+
+
+// ─── applyDealMovements (flock deduction) ───
+describe('applyDealMovements — flock deduction', () => {
+  const mkFlock = (o: any = {}) => ({
+    id: 'flock-1', name: 'مرندی', type: 'layer',
+    birdId: 'b1', breedId: 'br1', hallId: '', zoneId: '',
+    initialCount: 455, currentCount: 455,
+    maleCount: 0, femaleCount: 0, unknownCount: 455,
+    layingStartDay: 140, endOfCycleDay: null,
+    vaccineScheduleId: '', hatchDate: '', purchaseDate: '', startDate: '',
+    source: '', purchasePrice: '', deliveryCost: '', otherCosts: '',
+    status: 'active', notes: '',
+    createdAt: '2025-01-01', updatedAt: '2025-01-01',
+    ...o,
+  } as any);
+
+  it('chick از گله → flock.currentCount 455 → 375', () => {
+    useFlk.setState({ flocks: [mkFlock()] });
+    const formState = {
+      partyId: 'party-1', dealNumber: '1405-001', date: '1405/08/09',
+      goods: [{ id: 'good-1', name: 'جوجه', quantity: 1000, unit: 'pcs', estimatedPrice: 15000, category: 'chick', existingFlockId: 'flock-1' } as any],
+      deliveries: [{ id: 'dv-1', goodId: 'good-1', date: '1405/08/09', type: 'out', quantity: 80, ownership: 'mine' } as any],
+    };
+    applyDealMovements(formState);
+    expect(useFlk.getState().flocks[0].currentCount).toBe(375);
+  });
+
+  it('pre-flight: stock ناکافی → throw', () => {
+    useFlk.setState({ flocks: [mkFlock({ currentCount: 50, initialCount: 50, unknownCount: 50 })] });
+    const formState = {
+      partyId: 'party-1', dealNumber: '1405-001', date: '1405/08/09',
+      goods: [{ id: 'good-1', name: 'جوجه', quantity: 1000, unit: 'pcs', estimatedPrice: 15000, category: 'chick', existingFlockId: 'flock-1' } as any],
+      deliveries: [{ id: 'dv-1', goodId: 'good-1', date: '1405/08/09', type: 'out', quantity: 100, ownership: 'mine' } as any],
+    };
+    expect(() => applyDealMovements(formState)).toThrow(/موجودی گله/);
+  });
+
+  it('حذف delivery → flock 375 → 455', () => {
+    useFlk.setState({ flocks: [mkFlock({ currentCount: 375, unknownCount: 375 })] });
+    const oldDeal = mkDeal({
+      deliveries: [{ id: 'dv-1', goodId: 'good-1', date: '1405/08/09', type: 'out', quantity: 80, ownership: 'mine', flockDeductedQuantity: -80, flockSourceId: 'flock-1' }],
+    });
+    const formState = { partyId: 'party-1', dealNumber: '1405-001', date: '1405/08/09', goods: [], deliveries: [] };
+    applyDealMovements(formState, oldDeal);
+    expect(useFlk.getState().flocks[0].currentCount).toBe(455);
+  });
+
+  it('تغییر quantity 80→50 → flock 375 → 405', () => {
+    useFlk.setState({ flocks: [mkFlock({ currentCount: 375, unknownCount: 375 })] });
+    const oldDeal = mkDeal({
+      deliveries: [{ id: 'dv-1', goodId: 'good-1', date: '1405/08/09', type: 'out', quantity: 80, ownership: 'mine', flockDeductedQuantity: -80, flockSourceId: 'flock-1' }],
+    });
+    const formState = {
+      partyId: 'party-1', dealNumber: '1405-001', date: '1405/08/09',
+      goods: [{ id: 'good-1', name: 'جوجه', quantity: 1000, unit: 'pcs', estimatedPrice: 15000, category: 'chick', existingFlockId: 'flock-1' } as any],
+      deliveries: [{ id: 'dv-1', goodId: 'good-1', date: '1405/08/09', type: 'out', quantity: 50, ownership: 'mine' } as any],
+    };
+    applyDealMovements(formState, oldDeal);
+    expect(useFlk.getState().flocks[0].currentCount).toBe(405);
   });
 });
