@@ -1330,48 +1330,84 @@ const save = () => {
 
       {/* خلاصه مالی */}
       {(form.goods.length > 0 || form.sales.length > 0) && (
-        <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 'var(--fs-xs)', marginTop: 8 }}>
+        <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+          
           <div style={{ fontWeight: 700, color: 'var(--accent)', fontSize: 'var(--fs-sm)' }}>🧮 خلاصه مالی</div>
+          
           {calc.inHand < 0 && (
-            <div style={{ padding: 'var(--pad-tight)', background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+            <div style={{ padding: 'var(--pad-tight)', background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', fontWeight: 700, textAlign: 'center' }}>
               ⚠️ فروش از موجودی بیشتر است — ذخیره ممکن نیست.
             </div>
           )}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, paddingBottom: 6, borderBottom: '1px dashed var(--accent-border)' }}>
-            <div><div style={{ color: 'var(--muted)' }}>کل تحویلی</div><div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(calc.totalDelivered.toLocaleString('fa-IR'))}</div></div>
-            <div><div style={{ color: 'var(--muted)' }}>فروش کل</div><div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(calc.totalSold.toLocaleString('fa-IR'))}</div></div>
-            <div><div style={{ color: 'var(--muted)' }}>در دست طرف</div><div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: calc.inHand < 0 ? 'var(--danger)' : 'inherit' }}>{toFa(calc.inHand.toLocaleString('fa-IR'))}</div></div>
+
+          {/* بخش عملیاتی: 3 ستون */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, paddingBottom: 8, borderBottom: '1px dashed var(--accent-border)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>کل تحویلی</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-base)' }}>{toFa(calc.totalDelivered.toLocaleString('fa-IR'))}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, borderRight: '1px dashed var(--accent-border)', borderLeft: '1px dashed var(--accent-border)' }}>
+              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>فروش کل</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-base)' }}>{toFa(calc.totalSold.toLocaleString('fa-IR'))}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>در دست طرف</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: calc.inHand < 0 ? 'var(--danger)' : 'inherit' }}>{toFa(calc.inHand.toLocaleString('fa-IR'))}</span>
+            </div>
           </div>
+
+          {/* بخش تفکیک کالاها */}
           {form.goods.length > 0 && (() => {
             const rows = form.goods
               .map(g => ({ g, pg: calc.perGood[g.id] }))
               .filter(r => r.pg && (r.pg.delivered !== 0 || r.pg.sold !== 0));
             if (rows.length === 0) return null;
             return (
-              <div style={{ paddingBottom: 6, borderBottom: '1px dashed var(--accent-border)', display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingBottom: 8, borderBottom: '1px dashed var(--accent-border)' }}>
                 {rows.map(({ g, pg }) => {
                   if (!pg) return null;
                   return (
                     <div key={g.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{pg.name}</span>
-                      <span style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                        <span style={{ color: 'var(--muted)' }}>تحویل {toFa(pg.delivered)}</span>
-                        <span style={{ color: 'var(--muted)' }}>فروش {toFa(pg.sold)}</span>
-                        <span style={{ fontWeight: 700, color: pg.inHand < 0 ? 'var(--danger)' : 'var(--accent)' }}>مانده {toFa(pg.inHand)}</span>
-                      </span>
+                      <span style={{ fontWeight: 600, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{pg.name}</span>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>تحویل {toFa(pg.delivered)}</span>
+                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>فروش {toFa(pg.sold)}</span>
+                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: pg.inHand < 0 ? 'var(--danger)' : 'var(--accent)' }}>مانده {toFa(pg.inHand)}</span>
+                      </div>
                     </div>
                   );
                 })}
               </div>
             );
           })()}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--muted)' }}>فروش (مبلغ):</span><span style={{ fontWeight: 700 }}>{toFa(calc.totalSales.toLocaleString('fa-IR'))}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--muted)' }}>سهم من:</span><span style={{ fontWeight: 700 }}>{toFa(calc.myShare.toLocaleString('fa-IR'))}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--muted)' }}>دریافتی:</span><span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(calc.paidIn.toLocaleString('fa-IR'))}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--muted)' }}>مانده:</span><span style={{ fontWeight: 700, color: Math.abs(calc.balance) < 0.01 ? 'var(--accent)' : calc.balance > 0 ? 'var(--warn)' : 'var(--danger)' }}>{toFa(Math.abs(calc.balance).toLocaleString('fa-IR'))}</span></div>
+
+          {/* بخش مالی: 2x2 */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>فروش (مبلغ):</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(calc.totalSales.toLocaleString('fa-IR'))}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>سهم من:</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(calc.myShare.toLocaleString('fa-IR'))}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>دریافتی:</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--accent)' }}>{toFa(calc.paidIn.toLocaleString('fa-IR'))}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>مانده:</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: Math.abs(calc.balance) < 0.01 ? 'var(--accent)' : calc.balance > 0 ? 'var(--warn)' : 'var(--danger)' }}>{toFa(Math.abs(calc.balance).toLocaleString('fa-IR'))}</span>
+            </div>
           </div>
-          {calc.commission > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 4, borderTop: '1px dashed var(--accent-border)' }}><span style={{ color: 'var(--muted)' }}>کمیسیون:</span><span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(calc.commission.toLocaleString('fa-IR'))}</span></div>}
+
+          {calc.commission > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 6, borderTop: '1px dashed var(--accent-border)' }}>
+              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>کمیسیون:</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--warn)' }}>{toFa(calc.commission.toLocaleString('fa-IR'))}</span>
+            </div>
+          )}
+
         </div>
       )}
 
