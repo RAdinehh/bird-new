@@ -24,6 +24,8 @@ export interface F {
   payments: Payment[];
   relatedFlockId: string;
   relatedDealId?: string;
+  relatedSettlementId?: string;
+  sourceType?: 'manual' | 'deal' | 'settlement' | 'flock';
   notes: string;
   installments: Installment[];
   /** 🆕 فاکتور مختلط — فروشنده هر قلم متفاوت */

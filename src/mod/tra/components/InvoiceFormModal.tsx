@@ -166,11 +166,11 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
       
       <Grid2>
-        <Field label="تاریخ فاکتور" error={showError('date')} onTouch={() => markTouched('date')}>
-          <DatePicker value={form.date} onChange={v => setForm(f => ({ ...f, date: v}))}  autoToday />
+        <Field label={form.relatedSettlementId ? '🔒 تاریخ فاکتور' : 'تاریخ فاکتور'} hint={form.relatedSettlementId ? '🔒 از تسویه — برای تغییر، تسویه را ویرایش کنید' : undefined} error={showError('date')} onTouch={() => markTouched('date')}>
+          <DatePicker value={form.date} onChange={v => setForm(f => ({ ...f, date: v}))} disabled={!!form.relatedSettlementId} autoToday />
         </Field>
-        <Field label="دسته" required error={showError('category')} onTouch={() => markTouched('category')}>
-          <Select value={form.category} onChange={e => {
+        <Field label={form.relatedSettlementId ? '🔒 دسته' : 'دسته'} hint={form.relatedSettlementId ? '🔒 از تسویه — برای تغییر، تسویه را ویرایش کنید' : undefined} required error={showError('category')} onTouch={() => markTouched('category')}>
+          <Select value={form.category} disabled={!!form.relatedSettlementId} onChange={e => {
             const newCat = e.target.value;
             const newUnit = getUnitForCategory(newCat);
             const newItems = form.items.map(it => {
@@ -204,7 +204,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             )}
           </Select>
         </Field>
-        <Field label={isPurchase ? 'فروشنده' : 'مشتری'} required error={showError('partyId')} onTouch={() => markTouched('partyId')}>
+        <Field label={isPurchase ? (form.relatedSettlementId ? '🔒 فروشنده' : 'فروشنده') : (form.relatedSettlementId ? '🔒 مشتری' : 'مشتری')} hint={form.relatedSettlementId ? '🔒 از تسویه — برای تغییر، تسویه را ویرایش کنید' : undefined} required error={showError('partyId')} onTouch={() => markTouched('partyId')}>
           <SmartSelect
             value={form.partyId}
             onChange={v => setForm(f => ({ ...f, partyId: v}))}
@@ -216,9 +216,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
       
       {/* قرارداد مرتبط */}
-      <Field label="قرارداد مرتبط" hint="اختیاری — اتصال به معامله خاص">
+      <Field label={form.relatedSettlementId ? '🔒 قرارداد مرتبط' : 'قرارداد مرتبط'} hint={form.relatedSettlementId ? '🔒 از تسویه — برای تغییر، تسویه را ویرایش کنید' : 'اختیاری — اتصال به معامله خاص'}>
         <Select
           value={form.relatedDealId || ''}
+          disabled={!!form.relatedSettlementId}
           onChange={e => setForm(f => ({ ...f, relatedDealId: e.target.value }))}
         >
           <option value="">— بدون اتصال —</option>
@@ -231,8 +232,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       </Field>
 
       {form.isPreorder && (
-        <Field label="تاریخ تحویل" required error={showError('deliveryDate')} onTouch={() => markTouched('deliveryDate')}>
-          <DatePicker value={form.deliveryDate} onChange={v => setForm(f => ({ ...f, deliveryDate: v}))}  autoToday />
+        <Field label={form.relatedSettlementId ? '🔒 تاریخ تحویل' : 'تاریخ تحویل'} hint={form.relatedSettlementId ? '🔒 از تسویه — برای تغییر، تسویه را ویرایش کنید' : undefined} required error={showError('deliveryDate')} onTouch={() => markTouched('deliveryDate')}>
+          <DatePicker value={form.deliveryDate} onChange={v => setForm(f => ({ ...f, deliveryDate: v}))} disabled={!!form.relatedSettlementId} autoToday />
         </Field>
       )}
 
@@ -252,7 +253,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       </SectionTitle>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--sp-1)', marginBottom: 'var(--sp-2)', paddingRight: 4, lineHeight: 1.4 }}>کالا یا خدمت اضافه کنید</div>
       
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)', pointerEvents: form.relatedSettlementId ? 'none' : 'auto', opacity: form.relatedSettlementId ? 0.7 : 1 }}>
         
         
         {form.items.map((it, idx) => {

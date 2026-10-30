@@ -290,6 +290,8 @@ export function useInvoiceForm(params: {
       payments: inv.payments || [],
       relatedFlockId: (inv as any).relatedFlockId || '',
       relatedDealId: (inv as any).relatedDealId || '',
+      relatedSettlementId: (inv as any).relatedSettlementId,
+      sourceType: (inv as any).sourceType,
       notes: inv.notes || '',
       installments: inv.installments || [],
     });
@@ -331,6 +333,8 @@ export function useInvoiceForm(params: {
       relatedFlockId: form.relatedFlockId || '',
       relatedEntryId: '',
       relatedDealId: (form as any).relatedDealId || '',
+      relatedSettlementId: (form as any).relatedSettlementId,
+      sourceType: (form as any).sourceType,
       notes: form.notes?.trim() || '',
       paymentTerms: form.paymentTerms,
       isPreorder: form.isPreorder,
