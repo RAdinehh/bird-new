@@ -1111,11 +1111,6 @@ const save = () => {
           </Grid2>
         </div>
       ))}
-      {form.goods.length === 0 && (
-        <div style={{ padding: 'var(--pad-comfy)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', textAlign: 'center', marginTop: 8 }}>
-          ⚠️ برای شروع، اولین کالا را اضافه کنید تا بخش‌های تحویل، فروش و پرداخت فعال شوند.
-        </div>
-      )}
 
       <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0, category: undefined }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.goods.length === 0 ? 'افزودن اولین کالا' : 'افزودن کالای دیگر'}</button>
 
@@ -1274,21 +1269,21 @@ const save = () => {
       </div>
 
       {calc.myShare > 0 && (
-        <div style={{ padding: 'var(--sp-2) 0', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 6 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-            <span style={{ color: 'var(--muted)' }}>جمع کل (سهم من):</span>
-            <span style={{ fontWeight: 700 }}>{toFa(calc.myShare.toLocaleString('fa-IR'))} تومان</span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, padding: 'var(--pad-tight)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', marginBottom: 8 }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>سهم من</div>
+            <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(calc.myShare.toLocaleString('fa-IR'))}</div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-            <span style={{ color: 'var(--muted)' }}>دریافت‌شده:</span>
-            <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(calc.paidIn.toLocaleString('fa-IR'))} تومان</span>
+          <div style={{ textAlign: 'center', borderRight: '1px dashed var(--accent-border)', borderLeft: '1px dashed var(--accent-border)' }}>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>دریافتی</div>
+            <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--accent)' }}>{toFa(calc.paidIn.toLocaleString('fa-IR'))}</div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-            <span style={{ color: 'var(--muted)' }}>مانده نهایی:</span>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>مانده</div>
             {Math.max(0, calc.myShare - calc.paidIn + calc.paidOut) > 0.5 ? (
-              <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(Math.max(0, calc.myShare - calc.paidIn + calc.paidOut).toLocaleString('fa-IR'))} تومان</span>
+              <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--danger)' }}>{toFa(Math.max(0, calc.myShare - calc.paidIn + calc.paidOut).toLocaleString('fa-IR'))}</div>
             ) : (
-              <span style={{ fontWeight: 700, color: 'var(--accent)' }}>✓ تسویه شده</span>
+              <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--accent)' }}>✓</div>
             )}
           </div>
         </div>
@@ -1391,12 +1386,7 @@ const save = () => {
           })()}
           <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 4, marginTop: 4 }}><span>فروش کل (مبلغ):</span><span style={{ fontWeight: 700 }}>{toFa(calc.totalSales.toLocaleString('fa-IR'))} ت</span></div>
           {calc.commission > 0 && <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>کمیسیون:</span><span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(calc.commission.toLocaleString('fa-IR'))} ت</span></div>}
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>سهم من:</span><span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(calc.myShare.toLocaleString('fa-IR'))} ت</span></div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>دریافتی:</span><span style={{ fontWeight: 700 }}>{toFa(calc.paidIn.toLocaleString('fa-IR'))} ت</span></div>
-          {calc.paidOut > 0 && <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>پرداختی:</span><span style={{ fontWeight: 700 }}>{toFa(calc.paidOut.toLocaleString('fa-IR'))} ت</span></div>}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 4, marginTop: 4, fontWeight: 700, color: Math.abs(calc.balance) < 0.01 ? 'var(--accent)' : calc.balance > 0 ? 'var(--warn)' : 'var(--danger)' }}>
-            <span>مانده:</span><span>{toFa(calc.balance.toLocaleString('fa-IR'))} ت</span>
-          </div>
+          {/* داده‌های مالی (سهم، دریافتی، مانده) به بخش پرداخت‌ها منتقل شد تا تکراری نباشد */}
         </div>
       )}
 
