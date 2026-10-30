@@ -1369,10 +1369,10 @@ const save = () => {
                   return (
                     <div key={g.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontWeight: 600, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{pg.name}</span>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>تحویل {toFa(pg.delivered)}</span>
-                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>فروش {toFa(pg.sold)}</span>
-                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-xs)', color: pg.inHand < 0 ? 'var(--danger)' : 'var(--accent)' }}>مانده {toFa(pg.inHand)}</span>
+                      <div style={{ display: 'flex', gap: 'var(--sp-3)', alignItems: 'center', flexShrink: 0 }}>
+                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', minWidth: 48, textAlign: 'center' }}>تحویل {toFa(pg.delivered)}</span>
+                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', minWidth: 48, textAlign: 'center' }}>فروش {toFa(pg.sold)}</span>
+                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-xs)', color: pg.inHand < 0 ? 'var(--danger)' : 'var(--accent)', minWidth: 48, textAlign: 'left' }}>مانده {toFa(pg.inHand)}</span>
                       </div>
                     </div>
                   );
