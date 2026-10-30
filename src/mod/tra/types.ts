@@ -285,6 +285,10 @@ export interface DealDelivery {
   whsMovementIdIn?: string;
   /** Phase D: لینک به تحویل دیگر برای تهاتر */
   linkedDeliveryId?: string;
+  /** 🆕 Phase 1.6: مقدار کم/زیاد شده از گله */
+  flockDeductedQuantity?: number;
+  /** 🆕 Phase 1.6: گله مبدأ که تغییر کرد */
+  flockSourceId?: string;
 }
 
 export interface DealPayment {

@@ -279,9 +279,16 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     const deal = deals.find(d => d.id === id);
     if (deal?.deliveries && deal.deliveries.length > 0) {
       const whs = useWhs.getState();
+      const flkState = useFlk.getState();
       for (const dv of deal.deliveries) {
         if (dv.whsMovementId) {
           try { whs.deleteMovement(dv.whsMovementId); } catch (e) { console.error('[deals->whs] deleteMovement (delete) failed:', e); }
+        }
+        if (dv.flockDeductedQuantity && dv.flockSourceId) {
+          const flock = flkState.flocks.find(f => f.id === dv.flockSourceId);
+          if (flock) {
+            try { flkState.update(flock.id, { currentCount: (flock.currentCount || 0) - dv.flockDeductedQuantity }); } catch (e) { console.error('[deals->flk] reverse failed:', e); }
+          }
         }
       }
     }
@@ -311,7 +318,13 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       if (old.whsMovementIdIn) {
         try { whs.deleteMovement(old.whsMovementIdIn); } catch (e) { console.error('[deals->whs] delete in failed:', e); }
       }
-      if (cur) { cur.whsMovementId = undefined; cur.whsMovementIdIn = undefined; }
+      if (old.flockDeductedQuantity && old.flockSourceId) {
+        const flock = useFlk.getState().flocks.find(f => f.id === old.flockSourceId);
+        if (flock) {
+          try { useFlk.getState().update(flock.id, { currentCount: (flock.currentCount || 0) - old.flockDeductedQuantity }); } catch (e) { console.error('[deals->flk] reverse failed:', e); }
+        }
+      }
+      if (cur) { cur.whsMovementId = undefined; cur.whsMovementIdIn = undefined; cur.flockDeductedQuantity = undefined; cur.flockSourceId = undefined; }
     }
   }
 
@@ -330,6 +343,17 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       try { whs.deleteMovement(old.whsMovementIdIn); } catch (e) { console.error('[deals->whs] delete in failed:', e); }
       dv.whsMovementIdIn = undefined;
     }
+      
+      // 🆕 Phase 1.6: reverse flock for changed
+      if (old.flockDeductedQuantity && old.flockSourceId) {
+        const flock = useFlk.getState().flocks.find(f => f.id === old.flockSourceId);
+        if (flock) {
+          try { useFlk.getState().update(flock.id, { currentCount: (flock.currentCount || 0) - old.flockDeductedQuantity }); } catch (e) { console.error('[deals->flk] reverse failed:', e); }
+        }
+      }
+      dv.flockDeductedQuantity = undefined;
+      dv.flockSourceId = undefined;
+
   }
 
   // 3. Pre-flight: چک موجودی برای همه movementها (atomic — قبل از هر حرکتی)
@@ -418,6 +442,62 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       console.error('[deals->whs] addMovement failed:', e);
     }
   }
+
+    // 🆕 Phase 1.6: Apply flock/hatch deductions
+    for (const dv of formState.deliveries) {
+      const own = getOwnership(dv);
+      if (own === 'none') continue;
+      if (dv.type === 'loss') continue;
+      if (dv.flockDeductedQuantity !== undefined) continue;
+      const good = formState.goods.find(g => g.id === dv.goodId);
+      if (!good) continue;
+
+      let targetFlockId: string | null = null;
+      if (good.existingFlockId) {
+        targetFlockId = good.existingFlockId;
+      } else if (good.hatchId) {
+        const hatch = useInc.getState().hatches.find(h => h.id === good.hatchId);
+        if (hatch?.generatedFlockId) targetFlockId = hatch.generatedFlockId;
+        else throw new Error('هچ «' + good.name + '» هنوز گله ندارد — ابتدا هچ را نهایی کنید');
+      }
+      if (!targetFlockId) continue;
+
+      const flock = useFlk.getState().flocks.find(f => f.id === targetFlockId);
+      if (!flock) throw new Error('گله «' + good.name + '» یافت نشد');
+
+      if (dv.type === 'out') {
+        const current = flock.currentCount || 0;
+        if (current < dv.quantity) {
+          throw new Error('موجودی گله «' + flock.name + '» کافی نیست — موجودی: ' + current + '، درخواستی: ' + dv.quantity);
+        }
+      }
+
+      const delta = dv.type === 'out' ? -dv.quantity : dv.quantity;
+      const current = flock.currentCount || 0;
+      const newCount = current + delta;
+
+      if (delta < 0) {
+        const m = flock.maleCount ?? 0;
+        const fe = flock.femaleCount ?? 0;
+        const u = flock.unknownCount ?? 0;
+        const reduceBy = Math.abs(delta);
+        const newU = Math.max(0, u - reduceBy);
+        const remaining = Math.max(0, reduceBy - u);
+        let newM = m, newFe = fe;
+        if (remaining > 0 && (m + fe) > 0) {
+          const reduceM = Math.min(m, Math.round(remaining * m / (m + fe)));
+          const reduceFe = Math.min(fe, remaining - reduceM);
+          newM = m - reduceM;
+          newFe = fe - reduceFe;
+        }
+        useFlk.getState().update(flock.id, { currentCount: Math.max(0, newCount), maleCount: newM, femaleCount: newFe, unknownCount: newU });
+      } else {
+        useFlk.getState().update(flock.id, { currentCount: newCount, unknownCount: (flock.unknownCount ?? 0) + delta });
+      }
+
+      dv.flockDeductedQuantity = delta;
+      dv.flockSourceId = flock.id;
+    }
 };
 
 
