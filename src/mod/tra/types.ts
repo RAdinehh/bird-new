@@ -175,6 +175,10 @@ export interface Payment {
   partyId?: string;
 }
 
+export interface DeletedDealSnapshot {
+  deal: Deal;
+}
+
 export interface DeletedInvoiceSnapshot {
   invoice: Invoice;
   linkedFlocks: Array<{ id: string; sourceCategory: string; birdId?: string | null; breedId?: string | null }>;
@@ -397,6 +401,8 @@ export interface State {
   addDeal: (d: Omit<Deal, 'id'|'createdAt'|'updatedAt'>) => void;
   updateDeal: (id: string, patch: Partial<Deal>) => void;
   deleteDeal: (id: string) => void;
+  restoreDealFromBin: (id: string) => boolean;
+  listDeletedDeals: () => DeletedDealSnapshot[];
   reopenDeal: (id: string, reason: string) => boolean;
   restoreDeal: (deal: Deal) => boolean;
   /** پرداخت‌های سطح طرف حساب (Phase 6) */

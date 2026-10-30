@@ -11,7 +11,7 @@ import { useWhs } from '../whs/store';
 import { useHal } from '../hal/store';
 import { bus } from '../../cor/events';
 
-import type { Invoice, InvoiceItem, State, DeletedInvoiceSnapshot, Settlement } from './types';
+import type { Invoice, InvoiceItem, State, DeletedInvoiceSnapshot, DeletedDealSnapshot, Deal, Settlement } from './types';
 import { saveToRecycleBin, removeFromRecycleBin, listRecycleBin } from '../../shr/utils/recycleBin';
 import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount } from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
@@ -578,7 +578,34 @@ export const useTra = create<State>()(
         }
         set({ deals: get().deals.map(x => x.id === id ? merged : x) });
       },
-      deleteDeal: (id) => set({ deals: get().deals.filter(x => x.id !== id) }),
+      deleteDeal: (id) => {
+        const deal = get().deals.find(x => x.id === id);
+        if (deal) {
+          saveToRecycleBin<DeletedDealSnapshot>('tra-deals', { deal }, (existing) => existing.deal.id === id);
+        }
+        set({ deals: get().deals.filter(x => x.id !== id) });
+      },
+      restoreDealFromBin: (id: string) => {
+        const snapshot = removeFromRecycleBin<DeletedDealSnapshot>(
+          'tra-deals',
+          (existing) => existing.deal.id === id,
+        );
+        if (!snapshot) return false;
+        if (get().deals.some(x => x.id === id)) return false;
+        const cleanDeal: Deal = {
+          ...snapshot.deal,
+          deliveries: (snapshot.deal.deliveries || []).map(dv => ({
+            ...dv,
+            whsMovementId: undefined,
+            whsMovementIdIn: undefined,
+            flockDeductedQuantity: undefined,
+            flockSourceId: undefined,
+          })),
+        };
+        set({ deals: [...get().deals, cleanDeal] });
+        return true;
+      },
+      listDeletedDeals: () => listRecycleBin<DeletedDealSnapshot>('tra-deals').map(e => e.item),
       reopenDeal: (id, reason) => {
         const prev = get().deals.find(x => x.id === id);
         if (!prev) return false;
