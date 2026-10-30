@@ -124,6 +124,8 @@ export function createInvoiceFromSettlement(
     relatedFlockId: '',
     relatedEntryId: '',
     relatedDealId: deal.id,
+    relatedSettlementId: settlement.id,
+    sourceType: 'settlement',
     notes: 'تسویه دوره‌ای ' + settlement.periodStart + ' تا ' + settlement.periodEnd + ' — کمیسیون: ' + settlement.commission + ' ت',
     workflowStatus: 'draft',
   };

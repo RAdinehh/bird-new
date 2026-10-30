@@ -290,6 +290,20 @@ export const useTra = create<State>()(
           );
           console.info('[deleteInvoice] 🗑️ saved to recycle bin:', id);
         }
+        // Cascade: reset settlement if linked
+        if (inv?.relatedSettlementId) {
+          const st = get().settlements.find(x => x.id === inv.relatedSettlementId);
+          if (st) {
+            set({
+              settlements: get().settlements.map(x =>
+                x.id === st.id
+                  ? { ...x, status: 'confirmed', invoiceId: undefined, updatedAt: now() }
+                  : x
+              ),
+            });
+            try { console.info('[deleteInvoice] settlement reset to confirmed:', st.id); } catch {}
+          }
+        }
         // 🆕 auto-unlink: گله‌های متصل بدون سند می‌شن (حذف نمی‌شن)
         if (inv) {
           const flkState = useFlk.getState();
@@ -652,6 +666,10 @@ export const useTra = create<State>()(
         set({ settlements: get().settlements.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) });
       },
       deleteSettlement: (id) => {
+        const st = get().settlements.find(x => x.id === id);
+        if (st?.invoiceId) {
+          throw new Error('این تسویه دارای فاکتور است. ابتدا فاکتور را حذف کنید.');
+        }
         set({ settlements: get().settlements.filter(x => x.id !== id) });
       },
       addAllocation: (a) => {

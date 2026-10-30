@@ -200,6 +200,8 @@ export interface Invoice {
   relatedFlockId: string;
   relatedEntryId: string;
   relatedDealId?: string;
+  relatedSettlementId?: string;
+  sourceType?: 'manual' | 'deal' | 'settlement' | 'flock';
   notes: string;
   createdAt: string;
   updatedAt: string;
