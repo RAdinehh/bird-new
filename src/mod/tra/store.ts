@@ -267,6 +267,21 @@ export const useTra = create<State>()(
           }
         }
         console.info('[restoreInvoice] ♻️ restored:', id, '| flocks:', snapshot.linkedFlocks.length);
+
+        // Cascade restore: settlement
+        if (snapshot.linkedSettlement) {
+          const _st = get().settlements.find(x => x.id === snapshot.linkedSettlement!.id);
+          if (_st) {
+            set({
+              settlements: get().settlements.map(x =>
+                x.id === _st.id
+                  ? { ...x, status: 'invoiced', invoiceId: id, updatedAt: now() }
+                  : x
+              ),
+            });
+            try { console.info('[restoreInvoice] settlement re-linked:', _st.id); } catch (e) { console.error('[restoreInvoice] settlement relink:', e); }
+          }
+        }
         console.warn('[restoreInvoice] ⚠️ موجودی گله/انبار را دستی بررسی کنید');
         return true;
       },
@@ -285,7 +300,7 @@ export const useTra = create<State>()(
             }));
           saveToRecycleBin<DeletedInvoiceSnapshot>(
             'tra',
-            { invoice: inv, linkedFlocks },
+            { invoice: inv, linkedFlocks, linkedSettlement: inv.relatedSettlementId ? (() => { const _st = get().settlements.find(x => x.id === inv.relatedSettlementId); return _st ? { id: _st.id, periodStart: _st.periodStart, periodEnd: _st.periodEnd } : undefined; })() : undefined },
             (existing) => existing.invoice.id === id,
           );
           console.info('[deleteInvoice] 🗑️ saved to recycle bin:', id);

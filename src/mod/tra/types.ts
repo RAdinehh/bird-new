@@ -182,6 +182,7 @@ export interface DeletedDealSnapshot {
 export interface DeletedInvoiceSnapshot {
   invoice: Invoice;
   linkedFlocks: Array<{ id: string; sourceCategory: string; birdId?: string | null; breedId?: string | null }>;
+  linkedSettlement?: { id: string; periodStart: string; periodEnd: string };
 }
 
 export interface Invoice {
