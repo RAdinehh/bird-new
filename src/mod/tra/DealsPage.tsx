@@ -942,38 +942,13 @@ const save = () => {
 
         <Grid2>
           <Field label="نوع تسویه" help={HELP.tra.deal.settlementType} error={showError?.('settlementType')} onTouch={() => markTouched?.('settlementType')}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-              {([
-                { v: 'percent', l: '💰 درصدی' },
-                { v: 'per_unit', l: '💵 هر واحد' },
-                { v: 'fixed', l: '📋 مبلغ ثابت' },
-                { v: 'rental', l: '📅 ماهانه' },
-                { v: 'barter', l: '🔄 تهاتر' },
-              ] as const).map(opt => {
-                const active = form.settlementType === opt.v;
-                return (
-                  <button
-                    key={opt.v}
-                    type="button"
-                    onClick={() => setForm({ ...form, settlementType: opt.v })}
-                    style={{
-                      padding: '8px',
-                      background: active ? 'var(--accent-soft)' : 'var(--input-bg)',
-                      border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                      borderRadius: 'var(--r-sm)',
-                      color: active ? 'var(--accent)' : 'var(--muted)',
-                      fontWeight: active ? 700 : 500,
-                      fontFamily: 'inherit',
-                      fontSize: 'var(--fs-xs)',
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                    }}
-                  >
-                    {opt.l}
-                  </button>
-                );
-              })}
-            </div>
+            <Select value={form.settlementType || 'percent'} onChange={e => setForm({...form, settlementType: e.target.value as SettlementType})}>
+              <option value="percent">💰 درصدی</option>
+              <option value="per_unit">💵 به ازای هر واحد</option>
+              <option value="fixed">📋 مبلغ ثابت</option>
+              <option value="rental">📅 ماهانه</option>
+              <option value="barter">🔄 تهاتر</option>
+            </Select>
           </Field>
           {form.settlementType && form.settlementType !== 'barter' && (
           <Field label={form.settlementType === 'percent' ? 'درصد تسویه' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
