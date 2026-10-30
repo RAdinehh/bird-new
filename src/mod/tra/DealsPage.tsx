@@ -718,6 +718,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
         toggleSort={toggleSort} sortStack={sortStack} appendSort={appendSort}
         recycleCount={listDeletedDeals().length}
         onOpenRecycleBin={() => setRecycleOpen(true)}
+        recycleLabel="معامله"
         resetAll={resetAll}
         hasActiveFilters={hasActiveFilters}
         total={total}

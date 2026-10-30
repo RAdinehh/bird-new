@@ -28,6 +28,7 @@ interface Props<T> {
   setGroupBy?: (val: string) => void;
   recycleCount?: number;
   onOpenRecycleBin?: () => void;
+  recycleLabel?: string;
   hasActiveFilters: boolean;
   total: number;
   count: number;
@@ -44,6 +45,7 @@ export function FilterBar<T>({
   setGroupBy,
   recycleCount = 0,
   onOpenRecycleBin,
+  recycleLabel = 'فاکتور',
 }: Props<T>) {
   const [openFilters, setOpenFilters] = useState(false);
   const [openSort, setOpenSort] = useState(false);
@@ -178,7 +180,7 @@ export function FilterBar<T>({
               position: 'relative',
               cursor: 'pointer',
             }}
-            title={`${toFa(recycleCount)} فاکتور در سبد بازیابی`}
+            title={`${toFa(recycleCount)} ${recycleLabel} در سبد بازیابی`}
           >
             <span>🗑️</span>
             <span>بازیابی ({toFa(recycleCount)})</span>
