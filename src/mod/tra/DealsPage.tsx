@@ -877,7 +877,7 @@ const save = () => {
           <Field label="شماره قرارداد" error={showError?.('dealNumber')} onTouch={() => markTouched?.('dealNumber')}>
             <Input placeholder="۱۴۰۴-۰۰۱" value={form.dealNumber} onChange={e => setForm({...form, dealNumber: e.target.value})} />
           </Field>
-          <Field label="نوع معامله" required error={showError?.('type')} onTouch={() => markTouched?.('type')}>
+          <Field label="نوع معامله" required help={HELP.tra.deal.type} error={showError?.('type')} onTouch={() => markTouched?.('type')}>
             <Select value={form.type} onChange={e => {
                 const newType = e.target.value as DealType;
                 const updates: Partial<F> = { type: newType };
