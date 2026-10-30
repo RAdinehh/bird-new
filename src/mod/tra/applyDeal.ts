@@ -83,8 +83,9 @@ export interface DealFormState {
     if (own === 'none') continue;
     if (dv.type === 'loss') continue;
     const good = formState.goods.find(g => g.id === dv.goodId);
-    if (own === 'mine' && !good?.linkedItemId) {
-      throw new Error('برای امانت، کالا باید به انبار متصل باشد: «' + (good?.name || '—') + '»');
+    const hasFlockSource = !!(good?.existingFlockId || good?.hatchId);
+    if (own === 'mine' && !good?.linkedItemId && !hasFlockSource) {
+      throw new Error('برای امانت، کالا باید منبع مشخص داشته باشد (گله، هچری یا انبار): «' + (good?.name || '—') + '»');
     }
     if (good?.linkedItemId && (own === 'mine' || dv.type === 'out')) {
       const item = whs.items.find(i => i.id === good.linkedItemId);
