@@ -22,8 +22,8 @@ function todayJ(): string {
 }
 
 export default function SettlementModal({ open, deal, onClose, onSave }: Props) {
-  const [periodStart, setPeriodStart] = useState('');
-  const [periodEnd, setPeriodEnd] = useState('');
+  const [periodStart, setPeriodStart] = useState<string>(() => deal?.startDate || deal?.date || todayJ());
+  const [periodEnd, setPeriodEnd] = useState<string>(() => deal?.endDate || todayJ());
   const [err, setErr] = useState('');
 
   useEffect(() => {
@@ -31,16 +31,21 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
       const start = deal.startDate || deal.date || todayJ();
       let end = deal.endDate || todayJ();
       if (end < start) end = start;
+      console.log('[SettlementModal] deal:', deal.id, 'startDate:', deal.startDate, '→ using:', start, '| endDate:', deal.endDate, '→ using:', end);
       setPeriodStart(start);
       setPeriodEnd(end);
       setErr('');
     }
   }, [open, deal?.id, deal?.startDate, deal?.endDate, deal?.date]);
 
+  // 🆕 Effective values — fallback اگر state خالی بود
+  const effectiveStart = periodStart || deal?.startDate || deal?.date || todayJ();
+  const effectiveEnd = periodEnd || deal?.endDate || todayJ();
+
   const computed = useMemo(() => {
-    if (!deal || !periodStart || !periodEnd) return null;
-    return computeSettlement(deal, periodStart, periodEnd);
-  }, [deal, periodStart, periodEnd]);
+    if (!deal || !effectiveStart || !effectiveEnd) return null;
+    return computeSettlement(deal, effectiveStart, effectiveEnd);
+  }, [deal, effectiveStart, effectiveEnd]);
 
   const handleSave = () => {
     if (!computed) {
@@ -72,10 +77,10 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
       </div>
 
       <Field label="از تاریخ" required>
-        <DatePicker value={periodStart} onChange={v => { setPeriodStart(v); setErr(''); if (periodEnd && v > periodEnd) setPeriodEnd(v); }} max={periodEnd} autoToday />
+        <DatePicker value={effectiveStart} onChange={v => { setPeriodStart(v); setErr(''); if (periodEnd && v > periodEnd) setPeriodEnd(v); }} max={effectiveEnd} autoToday />
       </Field>
       <Field label="تا تاریخ" required>
-        <DatePicker value={periodEnd} onChange={v => { setPeriodEnd(v); setErr(''); }} min={periodStart} autoToday />
+        <DatePicker value={effectiveEnd} onChange={v => { setPeriodEnd(v); setErr(''); }} min={effectiveStart} autoToday />
       </Field>
 
       <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>
