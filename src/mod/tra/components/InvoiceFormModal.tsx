@@ -162,6 +162,28 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       }
     >
       {/* ====== اطلاعات پایه ====== */}
+      {form.relatedSettlementId && (
+        <div style={{
+          padding: 'var(--pad-tight) var(--pad-normal)',
+          background: 'var(--info-soft)',
+          border: '1px solid var(--info)',
+          borderRadius: 'var(--r-sm)',
+          marginBottom: 'var(--sp-3)',
+          fontSize: 'var(--fs-sm)',
+          lineHeight: 1.6,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+        }}>
+          <div style={{ fontWeight: 700, color: 'var(--info)', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span>ℹ️</span> این فاکتور از تسویه دوره‌ای ساخته شده
+          </div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+            برای اصلاح فیلدهای قفل‌شده (🔒)، از بخش «معاملات خاص» اقدام کنید.
+          </div>
+        </div>
+      )}
+
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
 
       
