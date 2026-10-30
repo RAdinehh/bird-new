@@ -53,7 +53,7 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
       return;
     }
     onSave(computed);
-    onClose();
+    // بستن مودال در DealsPage.onSave انجام می‌شه (بعد از موفقیت)
   };
 
   if (!deal) return null;

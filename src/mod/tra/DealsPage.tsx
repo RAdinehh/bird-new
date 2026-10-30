@@ -720,9 +720,13 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
         deal={settlementDeal}
         onClose={() => { setSettlementOpen(false); setSettlementDeal(null); }}
         onSave={(s) => {
-          addSettlement(s);
-          setSettlementOpen(false);
-          setSettlementDeal(null);
+          try {
+            addSettlement(s);
+            setSettlementOpen(false);
+            setSettlementDeal(null);
+          } catch (e) {
+            toastMsg.error(e instanceof Error ? e.message : 'خطا در ذخیره تسویه');
+          }
         }}
       />
       <MultiSelectBar ms={ms} deleteLabel="حذف" />
