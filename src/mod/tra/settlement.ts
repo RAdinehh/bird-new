@@ -3,7 +3,7 @@
  * محاسبه‌ی سند تسویه از یک Deal در بازه‌ی زمانی مشخص
  * طبق الگوی SAP MRKO: snapshot از داده‌های دوره
  */
-import type { Deal, Settlement, DealDelivery, DealSale, DealPayment } from './types';
+import type { Deal, Settlement, DealDelivery, DealSale, DealPayment, Invoice, InvoiceItem, Payment } from './types';
 
 function inPeriod(date: string, start: string, end: string): boolean {
   if (!date) return false;
@@ -74,5 +74,57 @@ export function computeSettlement(
     netPayable,
     paidAmount,
     status: 'draft',
+  };
+}
+
+
+export function createInvoiceFromSettlement(
+  deal: Deal,
+  settlement: Settlement
+): Omit<Invoice, 'id' | 'createdAt' | 'updatedAt'> {
+  const items: InvoiceItem[] = settlement.salesSnapshot.map((s) => {
+    const good = (deal.goods || []).find(g => g.id === s.goodId);
+    const qty = Number(s.quantity) || 0;
+    const price = Number(s.unitPrice) || 0;
+    return {
+      id: s.id,
+      description: good?.name || 'کالا',
+      unit: good?.unit || 'pcs',
+      quantity: qty,
+      unitPrice: price,
+      total: qty * price,
+    };
+  });
+  
+  const payments: Payment[] = settlement.paidAmount > 0
+    ? [{
+        id: 'inv-pay-' + settlement.id,
+        date: settlement.periodEnd,
+        amount: settlement.paidAmount,
+        method: 'cash',
+        checkNo: '',
+        bank: '',
+        dueDate: '',
+        notes: 'از تسویه دوره‌ای',
+        type: 'settlement',
+      }]
+    : [];
+  
+  return {
+    type: 'sale',
+    date: settlement.periodEnd,
+    partyId: deal.partyId,
+    category: 'other',
+    items,
+    discount: 0,
+    shipping: 0,
+    total: settlement.netPayable,
+    payments,
+    dueDate: settlement.periodEnd,
+    relatedFlockId: '',
+    relatedEntryId: '',
+    relatedDealId: deal.id,
+    notes: 'تسویه دوره‌ای ' + settlement.periodStart + ' تا ' + settlement.periodEnd + ' — کمیسیون: ' + settlement.commission + ' ت',
+    workflowStatus: 'draft',
   };
 }

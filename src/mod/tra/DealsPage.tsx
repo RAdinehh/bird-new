@@ -21,6 +21,7 @@ import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
 import SettlementModal from './components/SettlementModal';
+import { createInvoiceFromSettlement } from './settlement';
 import DealRecycleBinModal from './components/DealRecycleBinModal';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -69,7 +70,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
-  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, reopenDeal, listDeletedDeals } = useTra();
+  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, updateSettlement, settlements, addInvoice, reopenDeal, listDeletedDeals } = useTra();
   const { flocks } = useFlk();
   const { hatches } = useInc();
 
@@ -537,7 +538,26 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   }, 100);
 };
 
-const save = () => {
+const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
+    if (settlement.invoiceId) {
+      navigate('/tra?tab=sales&relatedDealId=' + deal.id);
+      return;
+    }
+    const okConfirm = await showConfirmAsync('تبدیل به فاکتور', 'تسویه دوره‌ی ' + settlement.periodStart + ' تا ' + settlement.periodEnd + ' به فاکتور فروش تبدیل شود؟', { danger: false });
+    if (!okConfirm) return;
+    try {
+      const invoiceData = createInvoiceFromSettlement(deal, settlement);
+      const invId = addInvoice(invoiceData);
+      updateSettlement(settlement.id, { status: 'invoiced', invoiceId: invId });
+      toastMsg.success('فاکتور با موفقیت صادر شد');
+    } catch (e) {
+      console.error('[deals] convert settlement failed:', e);
+      const msg = e instanceof Error ? e.message : String(e);
+      toastMsg.error('خطا در تبدیل: ' + msg);
+    }
+  };
+
+  const save = () => {
     attemptSave();
     if (Object.keys(vErrors).length > 0) { setErr(''); return; }
 
@@ -829,7 +849,35 @@ const save = () => {
                     <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
                   </>
                 ) : null}
-
+                {(() => {
+                  const dealSettlements = settlements.filter(s => s.dealId === d.id);
+                  if (dealSettlements.length === 0) return null;
+                  return (
+                    <>
+                      <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تسویه‌های دوره‌ای ({toFa(dealSettlements.length)})</SectionTitle>
+                      {dealSettlements.map((st: any) => {
+                        const statusLabel = st.status === 'draft' ? 'پیش‌نویس' : st.status === 'confirmed' ? 'تأییدشده' : 'فاکتورشده';
+                        const statusColor = st.status === 'draft' ? 'var(--muted)' : st.status === 'confirmed' ? 'var(--info)' : 'var(--accent)';
+                        const netTxt = toFa(Number(st.netPayable || 0).toLocaleString('fa-IR'));
+                        return (
+                          <div key={st.id} style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 4, fontSize: 'var(--fs-xs)', marginBottom: 4 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ color: 'var(--muted)' }}>{toFa(st.periodStart)} — {toFa(st.periodEnd)}</span>
+                              <span style={{ fontWeight: 700, color: statusColor }}>{statusLabel}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontWeight: 700, color: 'var(--accent)' }}>خالص: {netTxt} ت</span>
+                              <Btn size="sm" onClick={() => handleConvertSettlement(st, d)}>
+                                {st.invoiceId ? '📄 مشاهده فاکتور' : '🧾 تبدیل به فاکتور'}
+                              </Btn>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </>
+                  );
+                })()}
+                
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 6, paddingTop: 4 }}>
                   {d.status === 'open' ? (
                     <Btn size="sm" onClick={() => updateDeal(d.id, { status: 'settled' })} style={{ flex: 1 }}>تسویه شد</Btn>
