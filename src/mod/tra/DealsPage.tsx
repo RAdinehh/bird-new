@@ -955,12 +955,23 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   </Field>
                 )}
                 {g.source === 'hatch' && (
+                  <>
+                  {hatches.length === 0 && (
+                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginBottom: 4 }}>
+                      ⚠️ هیچ هچری‌ای ثبت نشده — ابتدا از «جوجه‌کشی» جوجه تولید کنید
+                    </div>
+                  )}
+                  {hatches.length > 0 && !hatches.some(h => (h.hatched || 0) > 0) && (
+                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, marginBottom: 4 }}>
+                      ⚠️ همه هچ‌ها خالی هستن (هچ موفق صفر) — ابتدا از «جوجه‌کشی» ثبت کنید
+                    </div>
+                  )}
                   <Field label="هچ مبدأ" required hint={g.hatchId ? (() => {
                     const h = hatches.find(x => x.id === g.hatchId);
                     if (!h) return undefined;
                     return '📊 هچ موفق: ' + toFa(h.hatched || 0) + ' جوجه | نطفه‌داری نشده: ' + toFa(h.unhatched || 0);
                   })() : undefined}>
-                    <Select value={g.hatchId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, hatchId: e.target.value || undefined } : x) }))}>
+                    <Select value={g.hatchId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, hatchId: e.target.value || undefined } : x) }))} disabled={hatches.length === 0}>
                       <option value="">— انتخاب —</option>
                       {hatches.map(h => {
                         const hasStock = (h.hatched || 0) > 0;
@@ -972,6 +983,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                       })}
                     </Select>
                   </Field>
+                  </>
                 )}
               </>
             )}
