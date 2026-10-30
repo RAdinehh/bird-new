@@ -707,18 +707,6 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
         </div>
       )}
 
-            {(() => {
-        try {
-          const count = listDeletedDeals().length;
-          if (count === 0) return null;
-          return (
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
-              <Btn size="sm" onClick={() => setRecycleOpen(true)}>🗑️ سبد بازیافت ({toFa(count)})</Btn>
-            </div>
-          );
-        } catch { return null; }
-      })()}
-      
       <FilterBar
         filterDefs={config.filterDefs}
         sortDefs={config.sortDefs}
@@ -728,6 +716,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
         clearFilter={clearFilter}
         setSort={setSort}
         toggleSort={toggleSort} sortStack={sortStack} appendSort={appendSort}
+        recycleCount={listDeletedDeals().length}
+        onOpenRecycleBin={() => setRecycleOpen(true)}
         resetAll={resetAll}
         hasActiveFilters={hasActiveFilters}
         total={total}

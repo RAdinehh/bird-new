@@ -42,25 +42,34 @@ export default function DealRecycleBinModal({ open, onClose }: Props) {
     if (ok) {
       toastMsg.success('معامله بازیابی شد');
       setEntries(prev => prev.filter(e => e.item.deal.id !== id));
+      onClose();
     } else {
       toastMsg.error('بازیابی ناموفق — معامله از قبل موجود است');
     }
   };
 
   const handleDeleteForever = async (id: string) => {
-    const ok = await showConfirmAsync('حذف دائمی', 'این معامله برای همیشه حذف شود؟', { danger: true });
+    const ok = await showConfirmAsync(
+      'حذف دائمی',
+      'این معامله برای همیشه حذف شود؟ این عمل غیرقابل بازگشت است.',
+      { danger: true, confirmText: 'حذف کن', cancelText: 'انصراف' }
+    );
     if (!ok) return;
     removeFromRecycleBin<DeletedDealSnapshot>('tra-deals', (e) => e.deal.id === id);
     setEntries(prev => prev.filter(e => e.item.deal.id !== id));
-    toastMsg.success('برای همیشه حذف شد');
+    toastMsg.success('معامله برای همیشه حذف شد');
   };
 
   const handleClearAll = async () => {
-    const ok = await showConfirmAsync('حذف همه', 'همه معاملات بازیافت‌شده برای همیشه حذف شوند؟', { danger: true });
+    const ok = await showConfirmAsync(
+      '⛔ حذف دائمی همه',
+      'با این کار:\n• ارتباط معاملات با گله، هچری و انبار برای همیشه قطع می‌شود.\n• موجودی گله و انبار اصلاح‌شده باقی می‌ماند (معامله قابل بازگشت نیست).\n• گزارشات مالی/آماری ناقص می‌شوند.\n\nآیا مطمئنید؟',
+      { danger: true, confirmText: 'بله، همه را حذف کن', cancelText: 'انصراف' }
+    );
     if (!ok) return;
     clearRecycleBin('tra-deals');
     setEntries([]);
-    toastMsg.success('همه حذف شدند');
+    toastMsg.success('سبد بازیابی برای همیشه خالی شد');
   };
 
   return (
