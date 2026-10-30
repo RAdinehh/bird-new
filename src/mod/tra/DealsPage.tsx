@@ -23,6 +23,7 @@ import TimePicker from '../../shr/components/TimePicker';
 import SettlementModal from './components/SettlementModal';
 import { createInvoiceFromSettlement } from './settlement';
 import DealRecycleBinModal from './components/DealRecycleBinModal';
+import SettlementPrint from './components/SettlementPrint';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -144,6 +145,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [settlementOpen, setSettlementOpen] = useState(false);
   const [recycleOpen, setRecycleOpen] = useState(false);
+  const [printSettlement, setPrintSettlement] = useState<{ settlement: Settlement; deal: Deal } | null>(null);
   const [settlementDeal, setSettlementDeal] = useState<Deal | null>(null);
 
   // فیلتر/مرتب
@@ -856,11 +858,14 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                               <span style={{ color: 'var(--muted)' }}>{toFa(st.periodStart)} — {toFa(st.periodEnd)}</span>
                               <span style={{ fontWeight: 700, color: statusColor }}>{statusLabel}</span>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 4 }}>
                               <span style={{ fontWeight: 700, color: 'var(--accent)' }}>خالص: {netTxt} ت</span>
-                              <Btn size="sm" onClick={() => handleConvertSettlement(st, d)}>
-                                {st.invoiceId ? '📄 مشاهده فاکتور' : '🧾 تبدیل به فاکتور'}
-                              </Btn>
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <Btn size="sm" onClick={() => setPrintSettlement({ settlement: st, deal: d })}>🖨️</Btn>
+                                <Btn size="sm" onClick={() => handleConvertSettlement(st, d)}>
+                                  {st.invoiceId ? '📄 مشاهده فاکتور' : '🧾 تبدیل به فاکتور'}
+                                </Btn>
+                              </div>
                             </div>
                           </div>
                         );
@@ -903,6 +908,13 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
       )}
 
             <DealRecycleBinModal open={recycleOpen} onClose={() => setRecycleOpen(false)} />
+      {printSettlement && (
+        <SettlementPrint
+          settlement={printSettlement.settlement}
+          deal={printSettlement.deal}
+          onClose={() => setPrintSettlement(null)}
+        />
+      )}
       
       <SettlementModal
         key={settlementDeal?.id || 'none'}
