@@ -652,11 +652,10 @@ export const useTra = create<State>()(
         const dup = get().settlements.find(x =>
           x.dealId === s.dealId &&
           x.periodStart === s.periodStart &&
-          x.periodEnd === s.periodEnd &&
-          x.status === 'draft'
+          x.periodEnd === s.periodEnd
         );
         if (dup) {
-          throw new Error('پیش‌نویس تسویه با این بازه برای این معامله قبلاً ثبت شده است');
+          throw new Error('برای این بازه در این معامله قبلاً تسویه‌ای (پیش‌نویس یا تأییدشده) ثبت شده است.');
         }
         const id = uuid();
         set({ settlements: [...get().settlements, { ...s, id, createdAt: now(), updatedAt: now() }] });
