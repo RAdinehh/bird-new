@@ -975,14 +975,7 @@ const save = () => {
               })}
             </div>
           </Field>
-          {form.type === 'partnership' && (
-            <Field label="درصد" hint="۰ تا ۱۰۰" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
-              <PercentField placeholder="۱۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} />
-            </Field>
-          )}
-        </Grid2>
-
-        {form.settlementType && form.settlementType !== 'barter' && (
+          {form.settlementType && form.settlementType !== 'barter' && (
           <Field label={form.settlementType === 'percent' ? 'درصد تسویه' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
             {form.settlementType === 'percent' ? (
               <PercentField
@@ -1001,6 +994,15 @@ const save = () => {
             )}
           </Field>
         )}
+
+          {form.type === 'partnership' && (
+            <Field label="درصد" hint="۰ تا ۱۰۰" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
+              <PercentField placeholder="۱۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} />
+            </Field>
+          )}
+        </Grid2>
+
+        
 
         {/* ═══ 📊 وضعیت ═══ */}
         <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>📊 وضعیت</div>
