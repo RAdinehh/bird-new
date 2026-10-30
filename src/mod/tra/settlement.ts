@@ -110,10 +110,22 @@ export function createInvoiceFromSettlement(
       }]
     : [];
   
+  // 🆕 اگر کمیسیون وجود دارد، به عنوان یک آیتم منفی اضافه می‌کنیم
+  if (settlement.commission > 0) {
+    items.push({
+      id: 'comm-' + settlement.id,
+      description: 'کمیسیون تسویه دوره‌ای',
+      unit: 'service',
+      quantity: 1,
+      unitPrice: -settlement.commission,
+      total: -settlement.commission,
+    });
+  }
+
   return {
     type: 'sale',
     date: settlement.periodEnd,
-    partyId: deal.partyId,
+    partyId: deal.partyId || '',
     category: 'other',
     items,
     discount: 0,
