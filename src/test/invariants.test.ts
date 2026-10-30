@@ -40,7 +40,7 @@ describe.skip('invariants: healthy state', () => {
     } as any);
     useWhs.getState().addMovement({
       itemId, type: 'in', quantity: 100, unitPrice: 1000,
-      reason: 'purchase', date: '1405/07/29', partyId: '', notes: '',
+      reason: 'purchase', date: '1405/07/29', partyId: 'test-party', notes: '',
     } as any);
     // Check specifically for whs issues (other issues may exist if setup incomplete)
     const issues = verifyInvariants();
@@ -59,7 +59,7 @@ describe('invariants: detect whs mismatch', () => {
     } as any);
     useWhs.getState().addMovement({
       itemId, type: 'in', quantity: 100, unitPrice: 1000,
-      reason: 'purchase', date: '1405/07/29', partyId: '', notes: '',
+      reason: 'purchase', date: '1405/07/29', partyId: 'test-party', notes: '',
     } as any);
     const issues = verifyInvariants();
     expect(issues.length).toBeGreaterThan(0);
@@ -151,7 +151,7 @@ describe('invariants: multiple issues', () => {
     } as any);
     useWhs.getState().addMovement({
       itemId, type: 'in', quantity: 100, unitPrice: 0,
-      reason: 'purchase', date: '1405/07/29', partyId: '', notes: '',
+      reason: 'purchase', date: '1405/07/29', partyId: 'test-party', notes: '',
     } as any);
 
     // orphan flock

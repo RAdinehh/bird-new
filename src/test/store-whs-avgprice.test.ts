@@ -20,7 +20,7 @@ const mkItem = (o: any = {}) => ({
 });
 const mkMove = (o: any = {}) => ({
   itemId: '', type: 'in', quantity: 0, unitPrice: 0,
-  reason: 'purchase', date: '1405/07/09', partyId: '', notes: '',
+  reason: 'purchase', date: '1405/07/09', partyId: 'test-party', notes: '',
   ...o,
 });
 const ai = (o: any = {}) => useWhs.getState().addItem(mkItem(o));
