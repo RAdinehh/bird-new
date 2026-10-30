@@ -878,7 +878,16 @@ const save = () => {
             <Input placeholder="۱۴۰۴-۰۰۱" value={form.dealNumber} onChange={e => setForm({...form, dealNumber: e.target.value})} />
           </Field>
           <Field label="نوع معامله" required error={showError?.('type')} onTouch={() => markTouched?.('type')}>
-            <Select value={form.type} onChange={e => setForm({...form, type: e.target.value as DealType})}>
+            <Select value={form.type} onChange={e => {
+                const newType = e.target.value as DealType;
+                const updates: Partial<F> = { type: newType };
+                if (!form.settlementType) {
+                  if (newType === 'consignment') updates.settlementType = 'commission_pct';
+                  else if (newType === 'barter') updates.settlementType = 'barter_direct';
+                  else if (newType === 'partnership') updates.settlementType = 'profit_sharing';
+                }
+                setForm(f => ({ ...f, ...updates }));
+              }}>
               {(Object.keys(DEAL_LABEL) as DealType[]).map(t => <option key={t} value={t}>{DEAL_LABEL[t]}</option>)}
             </Select>
           </Field>
@@ -1282,7 +1291,7 @@ const save = () => {
       )}
 
       {/* فروش‌ها */}
-      {form.goods.length > 0 && (
+      {form.goods.length > 0 && form.settlementType !== 'barter_direct' && (
         <>
           <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -1409,7 +1418,7 @@ const save = () => {
       )}
 
       {/* خلاصه مالی */}
-      {(form.goods.length > 0 || form.sales.length > 0) && (
+      {(calc.totalDelivered > 0 || calc.totalSold > 0 || calc.totalSales > 0 || calc.paidIn > 0 || calc.paidOut > 0) && (
         <div style={{ padding: '10px 12px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
           
           <div style={{ fontWeight: 700, color: 'var(--accent)', fontSize: 'var(--fs-sm)' }}>🧮 خلاصه مالی</div>
