@@ -21,6 +21,7 @@ import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
 import SettlementModal from './components/SettlementModal';
+import DealRecycleBinModal from './components/DealRecycleBinModal';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -68,7 +69,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
-  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, reopenDeal } = useTra();
+  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, reopenDeal, listDeletedDeals } = useTra();
   const { flocks } = useFlk();
   const { hatches } = useInc();
 
@@ -141,6 +142,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [settlementOpen, setSettlementOpen] = useState(false);
+  const [recycleOpen, setRecycleOpen] = useState(false);
   const [settlementDeal, setSettlementDeal] = useState<Deal | null>(null);
 
   // فیلتر/مرتب
@@ -685,6 +687,18 @@ const save = () => {
         </div>
       )}
 
+            {(() => {
+        try {
+          const count = listDeletedDeals().length;
+          if (count === 0) return null;
+          return (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
+              <Btn size="sm" onClick={() => setRecycleOpen(true)}>🗑️ سبد بازیافت ({toFa(count)})</Btn>
+            </div>
+          );
+        } catch { return null; }
+      })()}
+      
       <FilterBar
         filterDefs={config.filterDefs}
         sortDefs={config.sortDefs}
@@ -849,6 +863,8 @@ const save = () => {
         </>
       )}
 
+            <DealRecycleBinModal open={recycleOpen} onClose={() => setRecycleOpen(false)} />
+      
       <SettlementModal
         key={settlementDeal?.id || 'none'}
         open={settlementOpen}
