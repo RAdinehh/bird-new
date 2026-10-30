@@ -5,6 +5,95 @@
 - وضعیت: HallsPage ✅ — ZonesPage در حال انجام
 - فاز: verify
 
+## 🎯 جلسه ۱۴۰۵/۰۸/۰۹ — Deals Marathon (~۳۲ commit)
+
+### وضعیت کلی
+Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Invoice → Print
+آخرین commit: ad9c842c (SettlementPrint)
+
+### ✅ Deals Phase A-G (DONE)
+- **Phase A** — `DealDelivery.time` + TimePicker (چند تحویل هم‌روز)
+- **Phase B** — `ownership: 'none'|'mine'|'theirs'` (امانت/فروش/بدون اثر)
+- **Phase C** — `inHand` per-good در خلاصه مالی
+- **Phase D** — بارتر ساده: `type='in'` + `linkedDeliveryId`
+- **Phase E.1** — `Settlement` entity + `addSettlement/updateSettlement/deleteSettlement`
+- **Phase E.2a** — `computeSettlement(deal, periodStart, periodEnd)`
+- **Phase E.2b** — `SettlementModal` (پیش‌نمایش زنده)
+- **Phase E.2c** — دکمه 📅 تسویه در کارت
+- **Phase E.2d** — `createInvoiceFromSettlement` + دکمه «تبدیل به فاکتور»
+- **Phase E.2e** — `SettlementPrint` (چاپ سند، استاندارد SAP MRKO)
+- **Phase G-1** — `Item.stockByLocation` + `Movement.locationId` + migration v6→v7
+
+### ✅ DealGood — منبع کالا
+- `category` + `source` + `existingFlockId` + `hatchId` + `stockItemId`
+- UI آبشاری: chick → گله/هچ، egg → whs، feed/medicine/equipment → whs
+- Auto-fill نام کالا بر اساس category
+- Pre-flight check: موجودی از منبع واقعی
+- Category grouping: 🌱 دام و طیور / 📦 فروش (optgroup)
+- حذف «— بدون دسته —»، پیش‌فرض `chick`
+
+### ✅ Real Flock Deduction (Phase 1.6)
+- `applyDealMovements` واقعاً `flock.currentCount` رو کم می‌کنه
+- `DealDelivery.flockDeductedQuantity` + `flockSourceId` (tracking)
+- Reverse در delete/edit
+- Hatch → `generatedFlockId`
+- Hatch gender counts reduce proportionally
+
+### ✅ Settlement Merge (۷→۵ نوع)
+- `SettlementType` → `percent | per_unit | fixed | rental | barter`
+- Migration v7→v8 (map ۷ قدیم → ۵ جدید)
+- `monthsBetween` برای `rental` (تعداد ماه از startDate/endDate)
+- Dropdown ۵ گزینه با help tooltip
+- Default = `percent`
+
+### ✅ Recycle Bin (کامل)
+- `DeletedDealSnapshot` + `restoreDealFromBin` + `listDeletedDeals`
+- `DealRecycleBinModal` (دقیقاً هماهنگ با `RecycleBinModal` فاکتور)
+- دکمه در `FilterBar` + `recycleLabel` prop («معامله» vs «فاکتور»)
+- Pulse indicator (`flkDotPulse`, ۵ ثانیه بعد از حذف جدید)
+- `onClose()` بعد restore + `logAction`
+
+### ✅ UI/UX Fixes
+- Card بازشده ۲ ستونه (Row text-wrap + Grid2)
+- دکمه‌های add به پایین بخش (هماهنگ با InvoiceFormModal)
+- خلاصه مالی: حذف KPI تکراری، Grid فشرده
+- حذف بنر نارنجی «اول کالا اضافه کنید»
+- نوع تسویه + مقدار کنار هم (Grid2)
+
+### ✅ Validation
+- Commission % max 100 (Zod superRefine)
+- Live preview زیر درصد (کمیسیون طرف / سهم شما)
+- Date Zod normalize (فارسی ↔ لاتین) در `persianDate*`
+- `todayJalali` fix — شمسی (نه میلادی)
+
+### 📝 نکات مهم برای AI بعدی
+
+1. **`whs` تنها منبع تخمه** — listener `egg:production:created` در `whs/handlers.ts:154` → `whs.addMovement`. در Deals فقط `stockItemId` (filter category='egg') بدید. **از گله تخم نگیرید.**
+2. **`flk.currentCount` از `existingFlockId` کم می‌شه** — `flockDeductedQuantity` track می‌کنه.
+3. **`barter` cascade** — `sales` + `payments` + `dueDate` مخفی.
+4. **`percent` = کمیسیون طرف** — نه سهم من. Label: «درصد کمیسیون طرف».
+5. **Migration v7→v8** — deals قدیمی خودکار map می‌شن. `category` undefined → `chick`.
+6. **`pre-auto-*` tags** — پاکسازی: `git tag -l "pre-auto-*" | head -n -5 | xargs -r git tag -d`.
+7. **`apply.py`** — tag + patch + tsc + commit + push + rollback خودکار. استفاده: `python3 scripts/apply.py "msg" << 'PATCH' ... PATCH`
+
+### ⏸ PENDING (کارهای باقی‌مانده)
+
+- ⏳ **DealPrint** — چاپ قرارداد (الگو: SettlementPrint)
+- ⏳ **Installments** — اقساط برای Deal
+- ⏳ **undo/reopen Settlement** — invoiced → confirmed
+- ⏳ **Lot Tracking (Phase F)** — Batch/Serial، ۴-۶ ساعت
+- ⏳ **Vendor Consignment** — `owner` روی Movement (کالای طرف پیش من)
+- ⏳ **Phase G-2** — مهاجرت ۴۰ فایل از `currentStock` به `getStockAt`
+- ⏳ **hal** — دکمه «انتقال تجهیزات به انبار» (برای فروش/اجاره تجهیزات نصب‌شده)
+- ⏳ **dlg / hal / inc** — audit سراسری
+- ⏳ **قرارداد پرورش (FCR/EPEF)** — تخصصی
+
+### 🧪 توصیه جلسه بعد
+
+**قبل از هر پچی، تست واقعی:** ۳-۴ معامله بساز (chick/flock، egg/whs، feed/whs)، تسویه + چاپ + تبدیل به فاکتور، حذف + Recycle + Restore. **هر جا گیر کردی → لیست بنویس.** ۳۲ commit پشت سر هم، ممکنه باگ پنهان داشته باشه.
+
+---
+
 ## ✅ DONE (1/205)
 1. Cascade Data ✅
 94. Guard (Stock Guard for Sale) ✅
