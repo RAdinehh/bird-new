@@ -967,7 +967,7 @@ const save = () => {
             </Select>
           </Field>
           {form.settlementType && form.settlementType !== 'barter' && (
-          <Field label={form.settlementType === 'percent' ? 'درصد کمیسیون طرف' : 'مقدار تسویه'} hint={form.settlementType === 'percent' ? 'طرف مقابل این درصد از فروش را برمی‌دارد. شما بقیه را دریافت می‌کنید.' : undefined} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
+          <Field label={form.settlementType === 'percent' ? 'درصد کمیسیون طرف' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
             {form.settlementType === 'percent' ? (
               <PercentField
                 placeholder="۱۰"
