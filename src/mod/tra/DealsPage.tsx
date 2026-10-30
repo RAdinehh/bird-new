@@ -1062,14 +1062,18 @@ const save = () => {
               }) }));
             }}>
               <option value="">— بدون دسته (کالای عمومی) —</option>
-              <option value="chick">🐣 جوجه یک‌روزه</option>
-              <option value="adult">🐔 پرنده بالغ</option>
-              <option value="egg">🥚 تخم خوراکی</option>
-              <option value="fertile_egg">🥚 تخم نطفه‌دار</option>
-              <option value="feed">🌾 دان و خوراک</option>
-              <option value="medicine">💊 دارو / واکسن</option>
-              <option value="equipment">🔧 تجهیزات</option>
-              <option value="other">📋 سایر</option>
+              <optgroup label="🌱 دام و طیور — پیگیری چند مرحله‌ای">
+                <option value="chick">🐣 جوجه یک‌روزه</option>
+                <option value="adult">🐔 پرنده بالغ</option>
+                <option value="egg">🥚 تخم خوراکی</option>
+                <option value="fertile_egg">🥚 تخم نطفه‌دار</option>
+              </optgroup>
+              <optgroup label="📦 کالاهای فروش و مصرف انبار">
+                <option value="feed">🌾 دان و خوراک</option>
+                <option value="medicine">💊 دارو / واکسن</option>
+                <option value="equipment">🔧 تجهیزات</option>
+                <option value="other">📋 سایر</option>
+              </optgroup>
             </Select>
           </Field>
           {(g.category === 'chick') && (
