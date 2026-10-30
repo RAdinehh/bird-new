@@ -1020,21 +1020,43 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               );
             })()}
             
-                        {(g.category === 'feed' || g.category === 'medicine' || g.category === 'equipment' || g.category === 'other') && (
-              <Field label="کالای انبار" required>
-                <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }}>
-                  <option value="">— انتخاب —</option>
-                  {whsItems.filter((w: any) => {
-                    if (g.category === 'feed') return w.category === 'feed';
-                    if (g.category === 'medicine') return w.category === 'medicine' || w.category === 'vaccine';
-                    if (g.category === 'equipment') return w.category === 'equipment';
-                    return true;
-                  }).map((it: any) => (
-                    <option key={it.id} value={it.id}>{it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}</option>
-                  ))}
-                </Select>
-              </Field>
-            )}
+                        {(g.category === 'feed' || g.category === 'medicine' || g.category === 'equipment' || g.category === 'other') && (() => {
+              const filteredItems = whsItems.filter((w: any) => {
+                if (g.category === 'feed') return w.category === 'feed';
+                if (g.category === 'medicine') return w.category === 'medicine' || w.category === 'vaccine' || w.category === 'herbal';
+                if (g.category === 'equipment') return w.category === 'equipment';
+                return true;
+              });
+              const noItems = filteredItems.length === 0;
+              const noStock = !noItems && !filteredItems.some((it: any) => Number(it.currentStock) > 0);
+              const catLabelMap: Record<string, string> = { feed: 'دان', medicine: 'دارو/واکسن', equipment: 'تجهیزات', other: 'کالای انباری' };
+              const catName = catLabelMap[g.category || 'other'] || 'کالا';
+              const showEmptyWarning = noItems && g.category !== 'other';
+              return (
+                <>
+                  {showEmptyWarning && (
+                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginBottom: 4 }}>
+                      ⚠️ هیچ «{catName}»ی در انبار موجود نیست — ابتدا از «خرید» ثبت کنید
+                    </div>
+                  )}
+                  {noStock && (
+                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, marginBottom: 4 }}>
+                      ⚠️ موجودی «{catName}» صفر است — ابتدا از «خرید» ثبت کنید
+                    </div>
+                  )}
+                  <Field label="کالای انبار" required>
+                    <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }} disabled={showEmptyWarning}>
+                      <option value="">{showEmptyWarning ? '— هیچ کالایی موجود نیست —' : '— انتخاب —'}</option>
+                      {filteredItems.map((it: any) => (
+                        <option key={it.id} value={it.id} disabled={Number(it.currentStock) <= 0}>
+                          {it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}{Number(it.currentStock) <= 0 ? ' (ناموجود)' : ''}
+                        </option>
+                      ))}
+                    </Select>
+                  </Field>
+                </>
+              );
+            })()}
             {!g.category && (
               <Field label="کالای انبار" hint="برای کاهش از موجودی">
                 <Select value={g.linkedItemId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, linkedItemId: e.target.value || undefined } : x) }))}>
