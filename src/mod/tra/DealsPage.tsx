@@ -1061,7 +1061,6 @@ const save = () => {
                 };
               }) }));
             }}>
-              <option value="">— بدون دسته (کالای عمومی) —</option>
               <optgroup label="🌱 دام و طیور — پیگیری چند مرحله‌ای">
                 <option value="chick">🐣 جوجه یک‌روزه</option>
                 <option value="adult">🐔 پرنده بالغ</option>
@@ -1143,27 +1142,17 @@ const save = () => {
               </Field>
             )}
             {(g.category === 'egg' || g.category === 'fertile_egg') && (
-              <Field label="گله مبدأ" required hint={g.existingFlockId ? (() => {
-                const f = flocks.find(x => x.id === g.existingFlockId);
-                if (!f) return undefined;
-                const age = getAgeDays(f);
-                const lc = getLifecycle(f.type, age, f.endOfCycleDay ?? null, null, f.layingStartDay ?? null);
-                return '📊 ' + toFa(f.currentCount || 0) + ' پرنده | سن: ' + toFa(age) + ' روز | ' + lc.label;
-              })() : undefined}>
-                <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
+              <Field label="کالای تخم (انبار)" required hint={g.stockItemId ? '📊 تخم تولیدشده از گله — کاهش از انبار' : undefined}>
+                <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }}>
                   <option value="">— انتخاب —</option>
-                  {flocks.filter(f => f.status === 'active' && (f.type === 'layer' || f.type === 'breeder')).map(f => {
-                    const hasStock = (f.currentCount || 0) > 0;
-                    return (
-                      <option key={f.id} value={f.id} disabled={!hasStock}>
-                        {f.name} — {toFa(f.currentCount || 0)} پرنده{!hasStock ? ' (ناموجود)' : ''}
-                      </option>
-                    );
-                  })}
+                  {whsItems.filter((w: any) => w.category === 'egg').map((it: any) => (
+                    <option key={it.id} value={it.id}>{it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}</option>
+                  ))}
                 </Select>
               </Field>
             )}
-            {(g.category === 'feed' || g.category === 'medicine' || g.category === 'equipment' || g.category === 'other') && (
+            
+                        {(g.category === 'feed' || g.category === 'medicine' || g.category === 'equipment' || g.category === 'other') && (
               <Field label="کالای انبار" required>
                 <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }}>
                   <option value="">— انتخاب —</option>
@@ -1233,7 +1222,7 @@ const save = () => {
         </div>
       ))}
 
-      <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: '', quantity: 0, unit: 'pcs', estimatedPrice: 0, category: undefined }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.goods.length === 0 ? 'افزودن اولین کالا' : 'افزودن کالای دیگر'}</button>
+      <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: 'جوجه یک‌روزه', quantity: 0, unit: 'pcs', estimatedPrice: 0, category: 'chick' }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.goods.length === 0 ? 'افزودن اولین کالا' : 'افزودن کالای دیگر'}</button>
 
       {/* تحویل‌ها */}
       {form.goods.length > 0 && (
