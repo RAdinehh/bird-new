@@ -5,6 +5,40 @@
 - وضعیت: HallsPage ✅ — ZonesPage در حال انجام
 - فاز: verify
 
+## 🎯 جلسه ۱۴۰۵/۰۸/۰۹ (ادامه) — ۳۴ commit + ۱۷ test
+
+### کارهای انجام‌شده
+- **Phase 1.6**: real flock deduction + pre-flight fix (test-verified)
+- **applyDealMovements**: استخراج به `applyDeal.ts` + ۴ تست
+- **SettlementPrint.tsx**: چاپ سند تسویه (SAP MRKO)
+- **Recycle Bin**: هماهنگ کامل با InvoicePage
+- **Warning فوری**: egg + feed + medicine + equipment (وقتی انبار خالیه)
+- **۱۷/۱۷ تست** در `src/test/deal-journey.test.ts`
+
+### 🚨 باگ حیاتی کشف‌شده (تست‌ها گرفتن)
+`applyDealMovements` pre-flight فقط `linkedItemId` رو قبول می‌کرد → 
+chick از گله، flock کم نمی‌شد. **fix شده** (اکنون flock/hatch/whs همه قبول).
+
+### ✅ تست‌های دائمی (۱۳ → ۱۷)
+- computeSettlement (۷ سناریو)
+- createInvoiceFromSettlement (۲)
+- Recycle Bin (۴)
+- applyDealMovements — flock deduction (۴)
+
+### ⏸ PENDING (جلسه بعد — بعد از لیست درد)
+- DealPrint (قرارداد)
+- Installments
+- undo/reopen Settlement
+- Lot Tracking (Phase F)
+- Vendor Consignment
+- hal → whs (تجهیزات نصب‌شده)
+
+### 🧪 توصیه جلسه بعد
+**اول تست دستی** (۴ سناریو: chick/flock، egg/whs، feed/whs، warning empty).
+**بعد لیست درد** بنویس. بعد پچ.
+
+---
+
 ## 🎯 جلسه ۱۴۰۵/۰۸/۰۹ — Deals Marathon (~۳۲ commit)
 
 ### وضعیت کلی
