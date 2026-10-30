@@ -693,10 +693,10 @@ const save = () => {
                   <>
                     <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات قرارداد</SectionTitle>
                     <Grid2>
-                      {d.dealNumber ? <Row l="شماره قرارداد" v={toFa(d.dealNumber)} /> : <div />}
-                      {d.startDate ? <Row l="دوره" v={d.endDate ? `${toFa(d.startDate)} تا ${toFa(d.endDate)}` : toFa(d.startDate)} /> : <div />}
-                      {d.settlementType ? <Row l="نوع تسویه" v={d.settlementType === 'commission_pct' ? 'کمیسیون درصدی' : d.settlementType === 'barter_direct' ? 'تهاتر مستقیم' : d.settlementType} /> : <div />}
-                      {d.settlementValue ? <Row l="مقدار تسویه" v={toFa(d.settlementValue)} /> : <div />}
+                      {d.dealNumber ? <Row l="شماره قرارداد" v={toFa(d.dealNumber)} /> : null}
+                      {d.startDate ? <Row l="دوره" v={d.endDate ? `${toFa(d.startDate)} تا ${toFa(d.endDate)}` : toFa(d.startDate)} /> : null}
+                      {d.settlementType ? <Row l="نوع تسویه" v={d.settlementType === 'commission_pct' ? 'کمیسیون درصدی' : d.settlementType === 'barter_direct' ? 'تهاتر مستقیم' : d.settlementType} /> : null}
+                      {d.settlementValue ? <Row l="مقدار تسویه" v={toFa(d.settlementValue)} /> : null}
                     </Grid2>
                   </>
                 )}
@@ -1412,9 +1412,9 @@ const save = () => {
 
 function Row({ l, v }: { l: string; v: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-      <span style={{ color: 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', minWidth: 0 }}>
+      <span style={{ color: 'var(--muted)', flexShrink: 0 }}>{l}:</span>
+      <span style={{ fontWeight: 600, color: 'var(--text)', textAlign: 'left', wordBreak: 'break-word', overflowWrap: 'anywhere', minWidth: 0 }}>{v}</span>
     </div>
   );
 }
