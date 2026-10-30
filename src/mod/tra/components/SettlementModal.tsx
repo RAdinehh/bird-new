@@ -92,40 +92,56 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
           داده‌ای برای پیش‌نمایش نیست
         </div>
       ) : (
-        <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4, fontSize: 'var(--fs-sm)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>تعداد تحویل:</span>
-            <span style={{ fontWeight: 700 }}>{toFa(computed.deliveriesSnapshot.length)}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>تعداد فروش:</span>
-            <span style={{ fontWeight: 700 }}>{toFa(computed.salesSnapshot.length)}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>تعداد پرداخت:</span>
-            <span style={{ fontWeight: 700 }}>{toFa(computed.paymentsSnapshot.length)}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 4, marginTop: 4 }}>
-            <span>فروش کل:</span>
-            <span style={{ fontWeight: 700 }}>{toFa(computed.grossSales.toLocaleString('fa-IR'))} ت</span>
-          </div>
-          {computed.commission > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>کمیسیون:</span>
-              <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(computed.commission.toLocaleString('fa-IR'))} ت</span>
+        <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 'var(--fs-sm)' }}>
+          
+          {/* KPI: تعداد عملیات */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, paddingBottom: 8, borderBottom: '1px dashed var(--accent-border)' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>تحویل</div>
+              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>{toFa(computed.deliveriesSnapshot.length)}</div>
             </div>
-          )}
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>خالص قابل پرداخت:</span>
-            <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(computed.netPayable.toLocaleString('fa-IR'))} ت</span>
+            <div style={{ textAlign: 'center', borderRight: '1px dashed var(--accent-border)', borderLeft: '1px dashed var(--accent-border)' }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>فروش</div>
+              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>{toFa(computed.salesSnapshot.length)}</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>پرداخت</div>
+              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>{toFa(computed.paymentsSnapshot.length)}</div>
+            </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>دریافت‌شده:</span>
-            <span style={{ fontWeight: 700 }}>{toFa(computed.paidAmount.toLocaleString('fa-IR'))} ت</span>
+
+          {/* خلاصه مالی */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: 'var(--muted)' }}>فروش کل</span>
+              <span style={{ fontWeight: 700, color: 'var(--text)' }}>{toFa(computed.grossSales.toLocaleString('fa-IR'))} ت</span>
+            </div>
+            {computed.commission > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: 'var(--muted)' }}>کمیسیون</span>
+                <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(computed.commission.toLocaleString('fa-IR'))} ت</span>
+              </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: 'var(--muted)' }}>دریافت‌شده</span>
+              <span style={{ fontWeight: 700, color: 'var(--text)' }}>{toFa(computed.paidAmount.toLocaleString('fa-IR'))} ت</span>
+            </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 4, marginTop: 4, fontWeight: 700, color: (computed.netPayable - computed.paidAmount) > 0 ? 'var(--danger)' : 'var(--accent)' }}>
-            <span>مانده:</span>
-            <span>{toFa(Math.abs(computed.netPayable - computed.paidAmount).toLocaleString('fa-IR'))} ت</span>
+
+          {/* جمع‌بندی نهایی */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 8, marginTop: 2, borderTop: '1px dashed var(--accent-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>خالص قابل پرداخت</span>
+              <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 800, color: 'var(--accent)', lineHeight: 1 }}>
+                {toFa(computed.netPayable.toLocaleString('fa-IR'))} <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600 }}>ت</span>
+              </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>مانده نهایی</span>
+              <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: (computed.netPayable - computed.paidAmount) > 0 ? 'var(--danger)' : 'var(--accent)' }}>
+                {toFa(Math.abs(computed.netPayable - computed.paidAmount).toLocaleString('fa-IR'))} ت
+              </span>
+            </div>
           </div>
         </div>
       )}
