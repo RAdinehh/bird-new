@@ -990,16 +990,35 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 </Select>
               </Field>
             )}
-            {(g.category === 'egg' || g.category === 'fertile_egg') && (
-              <Field label="کالای تخم (انبار)" required hint={g.stockItemId ? '📊 تخم تولیدشده از گله — کاهش از انبار' : undefined}>
-                <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }}>
-                  <option value="">— انتخاب —</option>
-                  {whsItems.filter((w: any) => w.category === 'egg').map((it: any) => (
-                    <option key={it.id} value={it.id}>{it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}</option>
-                  ))}
-                </Select>
-              </Field>
-            )}
+            {(g.category === 'egg' || g.category === 'fertile_egg') && (() => {
+              const eggItems = whsItems.filter((w: any) => w.category === 'egg');
+              const noEgg = eggItems.length === 0;
+              const noStock = !noEgg && !eggItems.some((it: any) => Number(it.currentStock) > 0);
+              return (
+                <>
+                  {noEgg && (
+                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginBottom: 4 }}>
+                      ⚠️ هیچ تخمی در انبار موجود نیست — ابتدا از «ثبت روزانه» تخم‌گذاری را ثبت کنید یا از «خرید» تخم بخرید
+                    </div>
+                  )}
+                  {noStock && (
+                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, marginBottom: 4 }}>
+                      ⚠️ موجودی تخم در انبار صفر است — ابتدا از «ثبت روزانه» تخم ثبت کنید
+                    </div>
+                  )}
+                  <Field label="کالای تخم (انبار)" required hint={g.stockItemId ? '📊 تخم تولیدشده از گله — کاهش از انبار' : undefined}>
+                    <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }} disabled={noEgg}>
+                      <option value="">{noEgg ? '— هیچ تخمی موجود نیست —' : '— انتخاب —'}</option>
+                      {eggItems.map((it: any) => (
+                        <option key={it.id} value={it.id} disabled={Number(it.currentStock) <= 0}>
+                          {it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}{Number(it.currentStock) <= 0 ? ' (ناموجود)' : ''}
+                        </option>
+                      ))}
+                    </Select>
+                  </Field>
+                </>
+              );
+            })()}
             
                         {(g.category === 'feed' || g.category === 'medicine' || g.category === 'equipment' || g.category === 'other') && (
               <Field label="کالای انبار" required>
