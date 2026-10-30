@@ -967,7 +967,7 @@ const save = () => {
             </Select>
           </Field>
           {form.settlementType && form.settlementType !== 'barter' && (
-          <Field label={form.settlementType === 'percent' ? 'درصد تسویه' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
+          <Field label={form.settlementType === 'percent' ? 'درصد کمیسیون طرف' : 'مقدار تسویه'} hint={form.settlementType === 'percent' ? 'طرف مقابل این درصد از فروش را برمی‌دارد. شما بقیه را دریافت می‌کنید.' : undefined} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
             {form.settlementType === 'percent' ? (
               <PercentField
                 placeholder="۱۰"
@@ -984,6 +984,19 @@ const save = () => {
               />
             )}
           </Field>
+        )}
+
+        {form.settlementType === 'percent' && Number(form.settlementValue) > 0 && calc.totalSales > 0 && (
+          <div style={{ padding: '8px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--muted)' }}>📊 کمیسیون طرف:</span>
+              <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(Math.round(calc.totalSales * Number(form.settlementValue) / 100).toLocaleString('fa-IR'))} ت</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--muted)' }}>💰 سهم شما:</span>
+              <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(Math.round(calc.totalSales * (100 - Number(form.settlementValue)) / 100).toLocaleString('fa-IR'))} ت</span>
+            </div>
+          </div>
         )}
 
           {form.type === 'partnership' && (

@@ -553,7 +553,16 @@ export const DealSchema = z.object({
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'موجودی در دست طرف برای «' + good.name + '» منفی است', path: ['deliveries'] });
       }
     });
-  if (d.status === 'cancelled' && (!d.cancelReason || String(d.cancelReason).trim() === '')) {
+  // 🆕 درصد کمیسیون: 0-100
+    if (d.settlementType === 'percent' && d.settlementValue != null) {
+      if (d.settlementValue > 100) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'درصد کمیسیون نمی‌تواند بیشتر از ۱۰۰ باشد', path: ['settlementValue'] });
+      }
+      if (d.settlementValue < 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'درصد کمیسیون نمی‌تواند منفی باشد', path: ['settlementValue'] });
+      }
+    }
+    if (d.status === 'cancelled' && (!d.cancelReason || String(d.cancelReason).trim() === '')) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('دلیل لغو'), path: ['cancelReason'] });
   }
   if (d.settlementType && d.settlementType !== 'barter_direct' && (d.settlementValue == null || d.settlementValue <= 0)) {
