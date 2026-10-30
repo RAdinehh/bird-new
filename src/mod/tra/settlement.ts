@@ -11,6 +11,18 @@ function inPeriod(date: string, start: string, end: string): boolean {
   return date >= start && date <= end;
 }
 
+function monthsBetween(start: string, end: string): number {
+  if (!start || !end) return 1;
+  try {
+    const norm = (s: string) => s.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const s = new Date(norm(start).replace(/\//g, '-'));
+    const e = new Date(norm(end).replace(/\//g, '-'));
+    if (isNaN(s.getTime()) || isNaN(e.getTime())) return 1;
+    const months = (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+    return Math.max(1, months);
+  } catch { return 1; }
+}
+
 export function computeSettlement(
   deal: Deal,
   periodStart: string,
@@ -34,12 +46,15 @@ export function computeSettlement(
   const settlementValue = Number(deal.settlementValue) || 0;
   const totalQty = sales.reduce((s, x) => s + (Number(x.quantity) || 0), 0);
   let commission = 0;
-  if (deal.settlementType === 'commission_pct' || deal.settlementType === 'profit_sharing') {
+  if (deal.settlementType === 'percent') {
     commission = Math.round(grossSales * settlementValue / 100);
-  } else if (deal.settlementType === 'commission_per_unit') {
+  } else if (deal.settlementType === 'per_unit') {
     commission = Math.round(totalQty * settlementValue);
-  } else if (deal.settlementType === 'fixed_amount') {
+  } else if (deal.settlementType === 'fixed') {
     commission = Math.round(settlementValue);
+  } else if (deal.settlementType === 'rental') {
+    const months = monthsBetween(periodStart, periodEnd);
+    commission = Math.round(settlementValue * months);
   }
 
   const netPayable = grossSales - commission;

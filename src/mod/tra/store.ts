@@ -632,12 +632,29 @@ export const useTra = create<State>()(
     }),
     {
       name: 'pm-tra',
-      version: 7,
+      version: 8,
       migrate: (persisted: any, version: number) => {
         if (!persisted?.invoices) return persisted;
 
         // v5 → v6: build allocations from existing payments
-      if (version < 7) {
+      // v7 → v8: merge settlement types (7 → 5)
+      if (version < 8) {
+        const typeMap: Record<string, string> = {
+          commission_pct: 'percent',
+          profit_sharing: 'percent',
+          commission_per_unit: 'per_unit',
+          grower_fee_per_unit: 'per_unit',
+          fixed_amount: 'fixed',
+          rental_monthly: 'rental',
+          barter_direct: 'barter',
+        };
+        for (const deal of (persisted.deals || [])) {
+          if (deal.settlementType && typeMap[deal.settlementType]) {
+            deal.settlementType = typeMap[deal.settlementType];
+          }
+        }
+      }
+            if (version < 7) {
           persisted.settlements = persisted.settlements || [];
         }
         if (version < 6) {

@@ -310,13 +310,11 @@ export interface DealSale {
 }
 
 export type SettlementType =
-  | 'commission_pct'
-  | 'commission_per_unit'
-  | 'fixed_amount'
-  | 'barter_direct'
-  | 'profit_sharing'
-  | 'rental_monthly'
-  | 'grower_fee_per_unit';
+  | 'percent'
+  | 'per_unit'
+  | 'fixed'
+  | 'rental'
+  | 'barter';
 
 export type SettlementStatus = 'draft' | 'confirmed' | 'invoiced';
 

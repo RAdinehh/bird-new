@@ -503,7 +503,7 @@ export const DealSchema = z.object({
   dealNumber: optionalStr(30),
   startDate: persianDateOpt('تاریخ شروع'),
   endDate: persianDateOpt('تاریخ پایان'),
-  settlementType: z.enum(['commission_pct', 'commission_per_unit', 'fixed_amount', 'barter_direct', 'profit_sharing', 'rental_monthly', 'grower_fee_per_unit'] as const).optional(),
+  settlementType: z.enum(['percent', 'per_unit', 'fixed', 'rental', 'barter'] as const).optional(),
   settlementValue: z.union([z.literal(''), z.null(), z.undefined(), z.coerce.number().min(0)]).optional().transform(v => (v === '' || v === null || v === undefined) ? null : Number(v)),
   cancelReason: optionalStr(500),
   goods: z.array(DealGoodSchema).default([]),

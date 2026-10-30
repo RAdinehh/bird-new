@@ -573,7 +573,7 @@ const save = () => {
     };
     const oldDeal = form.id ? deals.find(d => d.id === form.id) : undefined;
     try {
-      if (form.settlementType !== 'barter_direct' && form.dueDate) {
+      if (form.settlementType !== 'barter' && form.dueDate) {
         if (form.date && form.dueDate < form.date) {
           setErr('سرسید نمی‌تواند قبل از تاریخ ایجاد باشد');
           return;
@@ -620,7 +620,7 @@ const save = () => {
     const inHand = totalDelivered - totalSold;
     const totalSales = form.sales.reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
     const pct = Number(form.settlementValue) || 0;
-    const commission = (form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing') ? Math.round(totalSales * pct / 100) : 0;
+    const commission = (form.settlementType === 'percent') ? Math.round(totalSales * pct / 100) : 0;
     const myShare = totalSales - commission;
     const paidIn = form.payments.filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0);
     const paidOut = form.payments.filter(p => p.direction === 'out').reduce((s, p) => s + (Number(p.amount) || 0), 0);
@@ -646,7 +646,7 @@ const save = () => {
       active++;
       const sales = (d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
       const pct = Number(d.settlementValue) || 0;
-      const comm = (d.settlementType === 'commission_pct' || d.settlementType === 'profit_sharing') ? Math.round(sales * pct / 100) : 0;
+      const comm = (d.settlementType === 'percent') ? Math.round(sales * pct / 100) : 0;
       const myShare = sales - comm;
       const paidIn = (d.payments || []).filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0);
       const paidOut = (d.payments || []).filter(p => p.direction === 'out').reduce((s, p) => s + (Number(p.amount) || 0), 0);
@@ -775,7 +775,7 @@ const save = () => {
                     <Grid2>
                       {d.dealNumber ? <Row l="شماره قرارداد" v={toFa(d.dealNumber)} /> : null}
                       {d.startDate ? <Row l="دوره" v={d.endDate ? `${toFa(d.startDate)} تا ${toFa(d.endDate)}` : toFa(d.startDate)} /> : null}
-                      {d.settlementType ? <Row l="نوع تسویه" v={d.settlementType === 'commission_pct' ? 'کمیسیون درصدی' : d.settlementType === 'barter_direct' ? 'تهاتر مستقیم' : d.settlementType} /> : null}
+                      {d.settlementType ? <Row l="نوع تسویه" v={d.settlementType === 'percent' ? 'کمیسیون درصدی' : d.settlementType === 'barter' ? 'تهاتر مستقیم' : d.settlementType} /> : null}
                       {d.settlementValue ? <Row l="مقدار تسویه" v={toFa(d.settlementValue)} /> : null}
                     </Grid2>
                   </>
@@ -882,9 +882,9 @@ const save = () => {
                 const newType = e.target.value as DealType;
                 const updates: Partial<F> = { type: newType };
                 if (!form.settlementType) {
-                  if (newType === 'consignment') updates.settlementType = 'commission_pct';
-                  else if (newType === 'barter') updates.settlementType = 'barter_direct';
-                  else if (newType === 'partnership') updates.settlementType = 'profit_sharing';
+                  if (newType === 'consignment') updates.settlementType = 'percent';
+                  else if (newType === 'barter') updates.settlementType = 'barter';
+                  else if (newType === 'partnership') updates.settlementType = 'percent';
                 }
                 setForm(f => ({ ...f, ...updates }));
               }}>
@@ -933,7 +933,7 @@ const save = () => {
             <MoneyField value={form.value} onChange={e => setForm({...form, value: e.target.value})} min={0} max={1_000_000_000_000_000} />
             {Number(form.value) > 0 && <FieldHint fieldPath="tra.deal.value" value={form.value} />}
           </Field>
-          {form.settlementType !== 'barter_direct' ? (
+          {form.settlementType !== 'barter' ? (
             <Field label="مهلت پرداخت (سرسید)" hint="تاریخی که طرف باید پول را پرداخت کند" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
               <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})} autoToday />
             </Field>
@@ -944,13 +944,11 @@ const save = () => {
           <Field label="نوع تسویه" help={HELP.tra.deal.settlementType} error={showError?.('settlementType')} onTouch={() => markTouched?.('settlementType')}>
             <Select value={form.settlementType || ''} onChange={e => setForm({...form, settlementType: e.target.value as SettlementType | ''})}>
               <option value="">— انتخاب —</option>
-              <option value="commission_pct">💰 کمیسیون درصدی</option>
-              <option value="commission_per_unit">💵 کمیسیون هر واحد</option>
-              <option value="fixed_amount">📋 مبلغ ثابت</option>
-              <option value="barter_direct">🔄 تهاتر مستقیم</option>
-              <option value="profit_sharing">🤝 شراکت در سود</option>
-              <option value="rental_monthly">📅 اجاره ماهانه</option>
-              <option value="grower_fee_per_unit">🐔 دستمزد پرورش</option>
+              <option value="percent">💰 درصدی</option>
+                    <option value="per_unit">💵 به ازای هر واحد</option>
+                    <option value="fixed">📋 مبلغ ثابت</option>
+                    <option value="rental">📅 ماهانه</option>
+                    <option value="barter">🔄 تهاتر</option>
             </Select>
           </Field>
           {form.type === 'partnership' && (
@@ -960,9 +958,9 @@ const save = () => {
           )}
         </Grid2>
 
-        {form.settlementType && form.settlementType !== 'barter_direct' && (
-          <Field label={form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? 'درصد تسویه' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
-            {form.settlementType === 'commission_pct' || form.settlementType === 'profit_sharing' ? (
+        {form.settlementType && form.settlementType !== 'barter' && (
+          <Field label={form.settlementType === 'percent' ? 'درصد تسویه' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
+            {form.settlementType === 'percent' ? (
               <PercentField
                 placeholder="۱۰"
                 value={form.settlementValue}
@@ -1291,7 +1289,7 @@ const save = () => {
       )}
 
       {/* فروش‌ها */}
-      {form.goods.length > 0 && form.settlementType !== 'barter_direct' && (
+      {form.goods.length > 0 && form.settlementType !== 'barter' && (
         <>
           <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -1340,7 +1338,7 @@ const save = () => {
       )}
 
       {/* پرداخت‌ها — شرطی */}
-      {form.settlementType !== 'barter_direct' && (form.sales.length > 0 || form.payments.length > 0 || form.type === 'conditional') && (
+      {form.settlementType !== 'barter' && (form.sales.length > 0 || form.payments.length > 0 || form.type === 'conditional') && (
         <>
       <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span>💳 پرداخت‌ها</span>
