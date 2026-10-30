@@ -107,7 +107,7 @@ export default function SettlementPrint({ settlement, deal, onClose }: Props) {
       style={{
         position: 'fixed', inset: 0,
         background: 'var(--overlay)',
-        zIndex: 110,
+        zIndex: 500,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 16,
       }}

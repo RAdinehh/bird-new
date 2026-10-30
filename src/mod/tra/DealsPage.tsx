@@ -659,8 +659,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 4 }}>
                               <span style={{ fontWeight: 700, color: 'var(--accent)' }}>خالص: {netTxt} ت</span>
                               <div style={{ display: 'flex', gap: 4 }}>
-                                <Btn size="sm" onClick={() => setPrintSettlement({ settlement: st, deal: d })}>🖨️</Btn>
-                                <Btn size="sm" onClick={() => handleConvertSettlement(st, d)}>
+                                <Btn size="sm" onClick={(e) => { e.stopPropagation(); setPrintSettlement({ settlement: st, deal: d }); }}>🖨️</Btn>
+                                <Btn size="sm" onClick={(e) => { e.stopPropagation(); handleConvertSettlement(st, d); }}>
                                   {st.invoiceId ? '📄 مشاهده فاکتور' : '🧾 تبدیل به فاکتور'}
                                 </Btn>
                               </div>
@@ -674,13 +674,13 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 6, paddingTop: 4 }}>
                   {d.status === 'open' ? (
-                    <Btn size="sm" onClick={() => updateDeal(d.id, { status: 'settled' })} style={{ flex: 1 }}>تسویه شد</Btn>
+                    <Btn size="sm" onClick={(e) => { e.stopPropagation(); updateDeal(d.id, { status: 'settled' }); }} style={{ flex: 1 }}>تسویه شد</Btn>
                   ) : (
-                    <Btn size="sm" variant="primary" onClick={() => handleReopenDeal(d)} style={{ flex: 1 }}>🔓 بازگشایی</Btn>
+                    <Btn size="sm" variant="primary" onClick={(e) => { e.stopPropagation(); handleReopenDeal(d); }} style={{ flex: 1 }}>🔓 بازگشایی</Btn>
                   )}
-                  <Btn size="sm" onClick={() => { setSettlementDeal(d); setSettlementOpen(true); }} style={{ flex: 1 }}>📅 تسویه</Btn>
+                  <Btn size="sm" onClick={(e) => { e.stopPropagation(); setSettlementDeal(d); setSettlementOpen(true); }} style={{ flex: 1 }}>📅 تسویه</Btn>
                   {d.status === 'open' ? (
-                    <Btn size="sm" onClick={() => openEdit(d)} style={{ flex: 1 }}>ویرایش</Btn>
+                    <Btn size="sm" onClick={(e) => { e.stopPropagation(); openEdit(d); }} style={{ flex: 1 }}>ویرایش</Btn>
                   ) : null}
                   <Btn size="sm" onClick={async () => {
                           const _lInvS = invoices.filter((inv: any) => inv.relatedDealId === d.id).length;
