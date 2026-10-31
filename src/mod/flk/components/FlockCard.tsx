@@ -234,9 +234,7 @@ export default function FlockCard(props: FlockCardProps) {
           const events = ((f as any).events || []).filter((e: any) => !e.revoked);
           const eventSales = events.filter((e: any) => e.type === 'sell').reduce((s: number, e: any) => s + (e.count || 0), 0);
           const eventDeaths = events.filter((e: any) => e.type === 'death' || e.type === 'cull').reduce((s: number, e: any) => s + (e.count || 0), 0);
-          const totalDiff = (f.initialCount ?? 0) - (f.currentCount ?? 0);
-          const unmatched = Math.max(0, totalDiff - eventSales - eventDeaths);
-          const deaths = eventDeaths + unmatched;
+          const deaths = eventDeaths;
           const deathsPct = (f.initialCount ?? 0) > 0 ? (deaths / (f.initialCount ?? 1)) * 100 : 0;
           const danger = deathsPct > 5;
           if (eventSales === 0 && deaths === 0) return null;
