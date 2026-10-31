@@ -996,13 +996,14 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             </Select>
           </Field>
           {(g.category === 'chick') && (
-              <>
+              <Grid2>
                 <Field label="منبع جوجه" required>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                     <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, source: 'flock', hatchId: undefined } : x) }))} style={{ padding: '8px', background: g.source === 'flock' ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (g.source === 'flock' ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', color: g.source === 'flock' ? 'var(--accent)' : 'var(--muted)', fontWeight: g.source === 'flock' ? 700 : 500, fontFamily: 'inherit', fontSize: 'var(--fs-xs)', cursor: 'pointer' }}>🐔 گله موجود</button>
                     <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, source: 'hatch', existingFlockId: undefined } : x) }))} style={{ padding: '8px', background: g.source === 'hatch' ? 'var(--accent-soft)' : 'var(--input-bg)', border: '1px solid ' + (g.source === 'hatch' ? 'var(--accent-border)' : 'var(--border)'), borderRadius: 'var(--r-sm)', color: g.source === 'hatch' ? 'var(--accent)' : 'var(--muted)', fontWeight: g.source === 'hatch' ? 700 : 500, fontFamily: 'inherit', fontSize: 'var(--fs-xs)', cursor: 'pointer' }}>🐣 هچری</button>
                   </div>
                 </Field>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {g.source === 'flock' && (
                   <Field label="گله مبدأ" required hint={g.existingFlockId ? (() => {
                     const f = flocks.find(x => x.id === g.existingFlockId);
@@ -1056,7 +1057,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   </Field>
                   </>
                 )}
-              </>
+              </div>
+              </Grid2>
             )}
             {g.category === 'adult' && (
               <Field label="گله مبدأ" required>
