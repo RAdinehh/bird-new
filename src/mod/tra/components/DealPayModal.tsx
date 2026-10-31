@@ -101,7 +101,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
           <DatePicker value={date} onChange={setDate} />
         </Field>
         <Field label="مبلغ" required>
-          <MoneyField value={amount} onChange={(e) => setAmount(e.target.value)} showWords={false} />
+          <MoneyField value={amount} onChange={(e) => setAmount(e.target.value)} />
         </Field>
       </Grid2>
 
