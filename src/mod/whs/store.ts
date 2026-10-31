@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 import { validate } from '../../shr/validation/helpers';
 import { createItemSchema, createMovementSchema } from '../../shr/validation/rules/whs';
+import { getBaseUnit } from '../../shr/units/uom';
 
 export type ItemCategory = 'feed' | 'medicine' | 'vaccine' | 'herbal' | 'equipment' | 'consumable' | 'egg' | 'manure' | 'broken';
 export type ItemUnit = 'kg' | 'g' | 'L' | 'l' | 'ml' | 'pcs' | 'vial' | 'pack' | 'ton' | 'bag' | 'dose';
@@ -389,15 +390,15 @@ export const CATEGORY_DEFAULTS: Record<ItemCategory, {
   needsEquipment: boolean;
   title: string;
 }> = {
-  egg:        { unit: 'pcs',  storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🥚 اطلاعات تخم' },
-  feed:       { unit: 'kg',   storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: true,  needsStorage: false, needsEquipment: false, title: '' },
-  medicine:   { unit: 'ml',   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: '💊 اطلاعات دارویی' },
-  vaccine:    { unit: 'vial', storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: '💉 اطلاعات واکسن' },
-  herbal:     { unit: 'g',    storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🌿 اطلاعات گیاهی' },
-  equipment:  { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: true,  title: '' },
-  consumable: { unit: 'pcs',  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '' },
-  manure:     { unit: 'kg',   storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🌱 اطلاعات کود' },
-  broken:     { unit: 'pcs',  storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '💔 تخم شکسته' },
+  egg:        { unit: getBaseUnit('egg'),  storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🥚 اطلاعات تخم' },
+  feed:       { unit: getBaseUnit('feed'),   storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: true,  needsStorage: false, needsEquipment: false, title: '' },
+  medicine:   { unit: getBaseUnit('medicine'),   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: '💊 اطلاعات دارویی' },
+  vaccine:    { unit: getBaseUnit('vaccine'), storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: '💉 اطلاعات واکسن' },
+  herbal:     { unit: getBaseUnit('herbal'),    storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🌿 اطلاعات گیاهی' },
+  equipment:  { unit: getBaseUnit('equipment'),  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: true,  title: '' },
+  consumable: { unit: getBaseUnit('consumable'),  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '' },
+  manure:     { unit: getBaseUnit('manure'),   storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🌱 اطلاعات کود' },
+  broken:     { unit: getBaseUnit('broken'),  storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '💔 تخم شکسته' },
 };
 
 export const UNIT_LABEL: Record<ItemUnit, string> = {
