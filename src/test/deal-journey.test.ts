@@ -107,7 +107,11 @@ describe('createInvoiceFromSettlement', () => {
     expect(inv.relatedDealId).toBe('deal-x');
     expect(inv.workflowStatus).toBe('draft');
     expect(inv.total).toBe(1800000);
-    expect(inv.items).toHaveLength(1);
+    expect(inv.items).toHaveLength(2); // جوجه + کمیسیون
+        // آیتم دوم = کمیسیون با مقدار منفی (طبق استاندارد Odoo)
+        const commItem = inv.items.find(it => it.description.includes('کمیسیون'));
+        expect(commItem).toBeDefined();
+        expect(commItem!.total).toBe(-200000);
     expect(inv.items[0].quantity).toBe(100);
   });
 
