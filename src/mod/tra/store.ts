@@ -269,6 +269,51 @@ export const useTra = create<State>()(
         }
         console.info('[restoreInvoice] ♻️ restored:', id, '| flocks:', snapshot.linkedFlocks.length);
 
+        // 🆕 Restore flock counts (reverse of deleteInvoice revert)
+        if (snapshot.invoice.items) {
+          const flkState = useFlk.getState();
+          const inv = snapshot.invoice;
+          for (const it of inv.items) {
+            const item = it as any;
+            if (!item.birdId || !item.flockId) continue;
+            if (!BIRD_CATS.includes(item.category || inv.category)) continue;
+            const qty = (item.healthyCount ?? item.quantity) || 0;
+            if (qty <= 0) continue;
+            const f = flkState.flocks.find(x => x.id === item.flockId);
+            if (!f) continue;
+
+            // Opposite of deleteInvoice: purchase → +qty, sale → -qty
+            const cur = f.currentCount ?? 0;
+            const sign = inv.type === 'purchase' ? 1 : -1;
+            const patch: any = {
+              currentCount: inv.type === 'purchase' ? cur + qty : Math.max(0, cur - qty),
+            };
+
+            const mDelta = Number(item.maleCount || 0);
+            const fDelta = Number(item.femaleCount || 0);
+            const uDelta = Number(item.unknownCount || 0);
+            const gSum = mDelta + fDelta + uDelta;
+            if (gSum > 0) {
+              if (mDelta > 0) patch.maleCount = Math.max(0, (f.maleCount ?? 0) + sign * mDelta);
+              if (fDelta > 0) patch.femaleCount = Math.max(0, (f.femaleCount ?? 0) + sign * fDelta);
+              if (uDelta > 0) patch.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * uDelta);
+              const rem = qty - gSum;
+              if (rem > 0) {
+                const base = (uDelta > 0) ? (patch.unknownCount ?? f.unknownCount ?? 0) : (f.unknownCount ?? 0);
+                patch.unknownCount = Math.max(0, base + sign * rem);
+              }
+            } else {
+              patch.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * qty);
+            }
+            try {
+              flkState.update(item.flockId, patch);
+              console.info('[restoreInvoice] flock counts restored:', item.flockId, 'currentCount:', patch.currentCount);
+            } catch (e) {
+              console.error('[restoreInvoice] restore flock counts:', item.flockId, e);
+            }
+          }
+        }
+
         // Cascade restore: settlement
         if (snapshot.linkedSettlement) {
           const _st = get().settlements.find(x => x.id === snapshot.linkedSettlement!.id);
