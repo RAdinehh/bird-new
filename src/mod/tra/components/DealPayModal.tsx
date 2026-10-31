@@ -9,7 +9,7 @@ import { toEn, toFa } from '../../../shr/utils/fa';
 import { getTodayJalali, computeDealBalance } from '../calc';
 import { toastMsg } from '../../../cor/store/toast';
 import { getDealPaymentFormSchema } from '../../../shr/validation/rules/tra';
-import { FieldHint } from '../../../shr/intelligence';
+import { FieldHint, recordHistory } from '../../../shr/intelligence';
 import { useTra } from '../store';
 import type { Deal, DealPayment } from '../types';
 
@@ -90,6 +90,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
       dueDate: method === 'check' ? checkDue : undefined,
     };
     updateDeal(effectiveDeal.id, { payments: [...(effectiveDeal.payments || []), newPayment] });
+    if (entered > 0) recordHistory('tra.deal.payment', entered, {});
     toastMsg.saved();
     onClose();
   };
