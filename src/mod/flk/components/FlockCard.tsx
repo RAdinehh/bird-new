@@ -242,7 +242,7 @@ export default function FlockCard(props: FlockCardProps) {
             <>
               {eventSales > 0 && (
                 <span style={{ color: 'var(--purple)', fontWeight: 500 }} title="تعداد فروخته‌شده">
-                  💰 <b>{fmt.int(eventSales)}</b>
+                  🏷 <b>{fmt.int(eventSales)}</b>
                 </span>
               )}
               {deaths > 0 && (
