@@ -246,8 +246,8 @@ export default function FlockCard(props: FlockCardProps) {
                 </span>
               )}
               {deaths > 0 && (
-                <span style={{ color: danger ? 'var(--danger)' : 'var(--warn)', fontWeight: danger ? 700 : 500 }} title="تلفات + کاهش‌های نامشخص">
-                  💀 <b>{fmt.int(deaths)}</b>{danger ? ` (${fmt.int(Math.round(deathsPct))}٪)` : ''}
+                <span style={{ color: danger ? 'var(--danger)' : 'var(--warn)', fontWeight: danger ? 700 : 500 }} title="تلفات">
+                  💀 <b>{fmt.int(deaths)}</b>{deathsPct > 0 ? ` (${toFa(deathsPct.toFixed(1))}٪)` : ''}
                 </span>
               )}
             </>
