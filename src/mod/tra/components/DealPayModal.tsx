@@ -8,6 +8,8 @@ import DatePicker from '../../../shr/components/DatePicker';
 import { toEn, toFa } from '../../../shr/utils/fa';
 import { getTodayJalali, computeDealBalance } from '../calc';
 import { toastMsg } from '../../../cor/store/toast';
+import { getDealPaymentFormSchema } from '../../../shr/validation/rules/tra';
+import { FieldHint } from '../../../shr/intelligence';
 import { useTra } from '../store';
 import type { Deal, DealPayment } from '../types';
 
@@ -49,14 +51,31 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
   const remaining = bal - entered;
   const quickSet = (pct: number) => setAmount(String(Math.round(bal * pct)));
 
+  const formErrors = useMemo(() => {
+    const result = getDealPaymentFormSchema(bal).safeParse({
+      date,
+      amount: entered,
+      direction,
+      method,
+      notes: notes.trim(),
+      checkNo: checkNo.trim(),
+      bank: bank.trim(),
+      dueDate: checkDue,
+    });
+    if (result.success) return {};
+    const errs: Record<string, string> = {};
+    for (const issue of result.error.issues) {
+      const key = String(issue.path[0] || '');
+      if (key && !errs[key]) errs[key] = issue.message;
+    }
+    return errs;
+  }, [date, entered, direction, method, notes, checkNo, bank, checkDue, bal]);
+
   const handleSave = () => {
     if (!effectiveDeal) return;
-    if (!entered || entered <= 0) {
-      toastMsg.warn('مبلغ معتبر وارد کنید');
-      return;
-    }
-    if (method === 'check' && !checkNo.trim()) {
-      toastMsg.warn('شماره چک الزامی است');
+    if (Object.keys(formErrors).length > 0) {
+      const firstErr = Object.values(formErrors)[0];
+      toastMsg.warn(firstErr || 'لطفاً خطاها را برطرف کنید');
       return;
     }
     const newPayment: DealPayment = {
@@ -97,13 +116,15 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
       </div>
 
       <Grid2>
-        <Field label="تاریخ" required>
+        <Field label="تاریخ" required error={formErrors.date}>
           <DatePicker value={date} onChange={setDate} />
         </Field>
-        <Field label="مبلغ" required>
+        <Field label="مبلغ" required error={formErrors.amount}>
           <MoneyField value={amount} onChange={(e) => setAmount(e.target.value)} />
         </Field>
       </Grid2>
+
+      {entered > 0 && <FieldHint fieldPath="tra.deal.payment" value={entered} />}
 
       <div style={{ display: 'flex', gap: 4, marginTop: 6, marginBottom: 8, flexWrap: 'wrap' }}>
         {[25, 50, 75, 100].map(pct => (
@@ -164,7 +185,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
       {method === 'check' && (
         <>
           <Grid2>
-            <Field label="شماره چک" required>
+            <Field label="شماره چک" required error={formErrors.checkNo}>
               <input
                 value={checkNo}
                 onChange={e => setCheckNo(e.target.value)}
@@ -181,7 +202,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
                 }}
               />
             </Field>
-            <Field label="بانک">
+            <Field label="بانک" error={formErrors.bank}>
               <input
                 value={bank}
                 onChange={e => setBank(e.target.value)}
@@ -199,7 +220,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
               />
             </Field>
           </Grid2>
-          <Field label="سرسید چک">
+          <Field label="سرسید چک" error={formErrors.dueDate}>
             <DatePicker value={checkDue} onChange={setCheckDue} />
           </Field>
         </>
