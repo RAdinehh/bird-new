@@ -1170,28 +1170,9 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               </Field>
             )}
 
-          <Grid2>
-            <Field label="نام کالا" required error={showError?.(`goods.${gi}.name`)} onTouch={() => markTouched?.(`goods.${gi}.name`)}>
+          <Field label="نام کالا" required error={showError?.(`goods.${gi}.name`)} onTouch={() => markTouched?.(`goods.${gi}.name`)}>
               <Input placeholder="جوجه یک‌روزه" value={g.name} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, name: e.target.value } : x) }))} />
             </Field>
-            <Field label="واحد" error={showError?.(`goods.${gi}.unit`)} onTouch={() => markTouched?.(`goods.${gi}.unit`)}>
-              {(() => {
-                const units = getUOM(g.category)?.units || getUOM('other')?.units || [];
-                // اگه فقط ۱ گزینه داره (جوجه/بالغ/تخم) → نمایش ثابت
-                if (units.length === 1) {
-                  return <Input value={units[0].label} disabled />;
-                }
-                // چند گزینه → dropdown
-                return (
-                  <Select value={g.unit || getDefaultUnit(g.category)} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, unit: e.target.value as any } : x) }))}>
-                    {units.map(u => (
-                      <option key={u.value} value={u.value}>{u.label}</option>
-                    ))}
-                  </Select>
-                );
-              })()}
-            </Field>
-          </Grid2>
           <Grid2>
             <Field label="مقدار" required error={showError?.(`goods.${gi}.quantity`)} onTouch={() => markTouched?.(`goods.${gi}.quantity`)}>
               <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={(() => { const cap = getSourceInfo(g)?.available; return cap !== undefined ? Math.max(cap, g.quantity || 0) : 1_000_000; })()} />
@@ -1213,15 +1194,26 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               })()}
               {Number(g.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={g.quantity} />}
             </Field>
-            <Field label="قیمت مرجع (اختیاری)" hint="فقط برای مقایسه — در محاسبات استفاده نمی‌شه" error={showError?.(`goods.${gi}.estimatedPrice`)} onTouch={() => markTouched?.(`goods.${gi}.estimatedPrice`)}>
-              <NumField placeholder="۱۵۰۰۰" value={String(g.estimatedPrice || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, estimatedPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} max={1_000_000_000_000} />
-              {Number(g.estimatedPrice) > 0 && <FieldHint fieldPath="tra.deal.unitPrice" value={g.estimatedPrice} />}
+            <Field label="واحد" error={showError?.(`goods.${gi}.unit`)} onTouch={() => markTouched?.(`goods.${gi}.unit`)}>
+              {(() => {
+                const units = getUOM(g.category)?.units || getUOM('other')?.units || [];
+                if (units.length === 1) {
+                  return <Input value={units[0].label} disabled />;
+                }
+                return (
+                  <Select value={g.unit || getDefaultUnit(g.category)} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, unit: e.target.value as any } : x) }))}>
+                    {units.map(u => (
+                      <option key={u.value} value={u.value}>{u.label}</option>
+                    ))}
+                  </Select>
+                );
+              })()}
             </Field>
           </Grid2>
         </div>
       ))}
 
-      <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: 'جوجه یک‌روزه', quantity: 0, unit: 'pcs', estimatedPrice: 0, category: 'chick', source: 'flock' }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.goods.length === 0 ? 'افزودن اولین کالا' : 'افزودن کالای دیگر'}</button>
+      <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: 'جوجه یک‌روزه', quantity: 0, unit: 'pcs', category: 'chick', source: 'flock' }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.goods.length === 0 ? 'افزودن اولین کالا' : 'افزودن کالای دیگر'}</button>
 
       {/* تحویل‌ها */}
       {form.goods.length > 0 && (

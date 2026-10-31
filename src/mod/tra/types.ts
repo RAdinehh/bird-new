@@ -248,7 +248,7 @@ export interface DealGood {
   name: string;
   quantity: number;
   unit: DealUnit;
-  estimatedPrice: number;
+  estimatedPrice?: number;
   
   /** 🆕 Phase 1.0: دسته کالا — تعیین‌کننده منبع */
   category?: 'chick' | 'adult' | 'egg' | 'fertile_egg' | 'feed' | 'medicine' | 'equipment' | 'other';
