@@ -82,7 +82,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const { hatches } = useInc();
 
   const getSourceInfo = (g: DealGood) => {
-    if (g.source === 'flock' && g.existingFlockId) {
+    if ((g.source || 'flock') === 'flock' && g.existingFlockId) {
       const f = flocks.find(x => x.id === g.existingFlockId);
       if (f) {
         const age = getAgeDays(f);
@@ -1018,7 +1018,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   </Select>
                 </Field>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {g.source === 'flock' && (
+                {(g.source || 'flock') === 'flock' && (
                   <Field label="گله مبدأ" required hint={g.existingFlockId ? (() => {
                     const f = flocks.find(x => x.id === g.existingFlockId);
                     if (!f) return undefined;
