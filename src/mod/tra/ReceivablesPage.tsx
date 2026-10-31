@@ -133,7 +133,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         <button onClick={() => setKind('purchase')} style={tab(kind === 'purchase')}>
           📤 بدهی
         </button>
-        <button onClick={() => setKind('deal')} style={{ ...tab(kind === 'deal'), ...(kind === 'deal' ? { color: 'var(--purple)', borderColor: 'var(--purple)' } : {}) }}>
+        <button onClick={() => setKind('deal')} style={tab(kind === 'deal')}>
           🤝 معاملات
         </button>
       </div>
