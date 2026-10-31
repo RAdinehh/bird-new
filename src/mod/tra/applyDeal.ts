@@ -6,6 +6,8 @@ import { useWhs } from '../whs/store';
 import { useFlk } from '../flk/store';
 import { useInc } from '../inc/store';
 import type { Deal, DealGood, DealDelivery } from './types';
+import { getUOMUnit } from '../../shr/units/uom';
+import type { Item } from '../whs/store';
 
 /** فقط فیلدهای موردنیاز از فرم معامله */
 export interface DealFormState {
@@ -15,6 +17,18 @@ export interface DealFormState {
   goods: DealGood[];
   deliveries: DealDelivery[];
 }
+
+
+  function getBaseQuantity(good: DealGood, qty: number, whsItems: Item[]): number {
+    const item = whsItems.find(i => i.id === good.linkedItemId);
+    const cat = good.category || item?.category;
+    if (!cat) return qty;
+    const uom = getUOMUnit(cat, good.unit);
+    if (uom && uom.factor !== null) {
+      return qty * uom.factor;
+    }
+    return qty;
+  }
 
   export function applyDealMovements(formState: DealFormState, oldDeal?: Deal): void {
   const whs = useWhs.getState();
@@ -91,8 +105,9 @@ export interface DealFormState {
       const item = whs.items.find(i => i.id === good.linkedItemId);
       if (item) {
         const available = item.stockByLocation?.['stock'] ?? item.currentStock ?? 0;
-        if (available < dv.quantity) {
-          throw new Error('موجودی «' + good.name + '» کافی نیست — موجودی: ' + available + '، درخواستی: ' + dv.quantity);
+        const reqBase = getBaseQuantity(good, dv.quantity, whs.items);
+        if (available < reqBase) {
+          throw new Error('موجودی «' + good.name + '» کافی نیست — موجودی: ' + available + '، درخواستی: ' + reqBase);
         }
       }
     }
@@ -113,7 +128,7 @@ export interface DealFormState {
           const midOut = whs.addMovement({
             itemId: good.linkedItemId,
             type: 'out',
-            quantity: dv.quantity,
+            quantity: getBaseQuantity(good, dv.quantity, whs.items),
             unitPrice: 0,
             reason: dv.type === 'out' ? 'consumption' : 'return',
             date: dv.date || formState.date || '',
@@ -129,7 +144,7 @@ export interface DealFormState {
           const midIn = whs.addMovement({
             itemId: good.linkedItemId,
             type: 'in',
-            quantity: dv.quantity,
+            quantity: getBaseQuantity(good, dv.quantity, whs.items),
             unitPrice: 0,
             reason: 'adjustment',
             date: dv.date || formState.date || '',
@@ -147,7 +162,7 @@ export interface DealFormState {
           const mid = whs.addMovement({
             itemId: good.linkedItemId,
             type: dv.type === 'out' ? 'out' : 'in',
-            quantity: dv.quantity,
+            quantity: getBaseQuantity(good, dv.quantity, whs.items),
             unitPrice: 0,
             reason: dv.type === 'out' ? 'consumption' : 'return',
             date: dv.date || formState.date || '',
