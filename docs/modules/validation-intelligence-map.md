@@ -640,61 +640,106 @@ ${label} نیاز به بررسی دارد
 
 ---
 
-## Gaps شناسایی‌شده (بدون حدس — از کد)
+## Gaps واقعی (اصلاح‌شده — بر اساس کد)
 
-### Gap ۱ — Intelligence فقط در ۲ ماژول UI
-- brd/BreedForm.tsx — FieldHint
-- flk/components/* (۴ فایل) — FieldHint
-- ۱۰ ماژول دیگر از Intelligence استفاده نمی‌کنن (tra, whs, inc, hal, egg, dlg, fed, ctc, alt, set)
+### ⚠️ اصلاح ۳ ادعای غلط قبلی این سند
 
-### Gap ۲ — tra.deal.* profile هست ولی UI وصل نیست
-- ۴ profile برای معاملات خاص: tra.deal.value, tra.deal.quantity, tra.deal.unitPrice, tra.deal.payment
-- UI: DealsPage.tsx — FieldHint import نشده
-- نتیجه: زیرساخت آماده، UI وصل نیست
+در نسخه‌ی اولیه، این سند ۳ ادعای غلط داشت که با verify کد اصلاح شدن:
 
-### Gap ۳ — MSG فقط در tra.ts
-- tra.ts: ۲۷ بار MSG.*
-- whs.ts, flk.ts, inc.ts, hal.ts, egg.ts, dlg.ts, fed.ts, brd.ts: ۰ بار
+| ادعای قبلی (غلط) | واقعیت کد |
+|-------------------|-----------|
+| Intelligence در tra وصل نیست | tra.deal.* در ۷ جا وصل (DealsPage:868, 1186, 1190, 1246, 1320, 1324, 1388) |
+| AnomalyHint استفاده نمی‌شه | از طریق FieldHint (wrapper) کار می‌کنه — FieldHint → useAnomalyHint → AnomalyHint |
+| getHistory/computeStats استفاده نمی‌شن | getHistory در anomalyDetector.ts:156, 202 استفاده می‌شه |
+
+---
+
+### Gap ۱ — tra.price_* بدون FieldHint (فقط hard clamp)
+
+**وضعیت فعلی:**
+- recordHistory(`tra.price_${cat}`) در `useInvoiceForm.ts:555` ✅
+- getProfile (فقط hardMax) برای clamp در `InvoiceFormModal.tsx:279,487` ✅
+- FieldHint ❌ نیست
+
+**نتیجه:** سیستم تورمی قیمت رو یاد می‌گیره ولی هشدار نرم نشون نمی‌ده.
+اگر کاربر قیمت ۱۰ برابر میانگین قبلی وارد کنه (ولی زیر hardMax)، هیچ هشداری نمی‌بینه.
+
+**فایل‌های درگیر:**
+- `src/mod/tra/components/InvoiceFormModal.tsx`
+- `src/shr/intelligence/fieldProfiles.ts` (profile آماده)
+- `src/shr/intelligence/formatWarning.ts` (لیبل آماده — قیمت جوجه، قیمت تخم، ...)
+
+**Fix پیشنهادی:** اضافه کردن `<FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />` کنار فیلد قیمت — دقیقاً مثل `tra.deal.unitPrice` در `DealsPage:1324`
+
+---
+
+### Gap ۲ — MSG فقط در tra.ts
+
+- tra.ts: ۲۷ بار MSG.* ✅
+- whs.ts, flk.ts, inc.ts, hal.ts, egg.ts, dlg.ts, fed.ts, brd.ts: ۰ بار ❌
 - بقیه از helper (requiredStr, requiredId) یا hardcoded
 
-### Gap ۴ — hardcoded پیام در flk.ts
-- خط ۹۳: message: حداقل یکی از تاریخ‌های هچ، خرید یا شروع را وارد کنید
-- خط ۱۱۰: message: مبلغ اجاره را وارد کنید
-- خط ۲۱۵: message: برای منبع جوجه‌کشی خودم تاریخ هچ را وارد کنید
-- خط ۲۲۳: message: برای منبع خریداری تاریخ خرید را وارد کنید
-- این‌ها باید در MSG باشن.
+---
 
-### Gap ۵ — لیبل‌های ناهمسان
+### Gap ۳ — hardcoded پیام در flk.ts
+
+- خط ۹۳: `message: 'حداقل یکی از تاریخ‌های هچ، خرید یا شروع را وارد کنید'`
+- خط ۱۱۰: `message: 'مبلغ اجاره را وارد کنید'`
+- خط ۲۱۵: `message: 'برای منبع «جوجه‌کشی خودم» تاریخ هچ را وارد کنید'`
+- خط ۲۲۳: `message: 'برای منبع «خریداری» تاریخ خرید را وارد کنید'`
+- این‌ها باید در MSG باشن
+
+---
+
+### Gap ۴ — لیبل‌های ناهمسان
 
 | مفهوم | FIELD_LABELS | InvoiceFormModal | DealsPage |
 |-------|----------------|--------------------|----|
-| chick price | قیمت جوجه | قیمت هر جوجه | 🐣 جوجه یک‌روزه |
+| chick price | قیمت جوجه | قیمت هر جوجه (خط ۷۰) | 🐣 جوجه یک‌روزه (خط ۹۸۳) |
 | feed price | قیمت دان | قیمت هر... | - |
 | medicine price | قیمت دارو | قیمت هر... | - |
 
-### Gap ۶ — chickWeight بدون پیشوند
-- در FIELD_LABELS: chickWeight (بدون tra. یا inc.)
-- در profiles: احتمالاً chickWeight (نیاز به verify)
+---
 
-### Gap ۷ — inc.temperature در bio range ندارد
-- Q3 (دما و رطوبت): dlg.temperature bio range داره، ولی inc.temperature نداره
-- (طبق خروجی، فقط ۱۲ فیلد bio دارند و inc.temperature نیست)
+### Gap ۵ — Intelligence در whs/inc/hal/egg
+
+- whs: فقط `recordHistory` در ItemsPage و MovesPage — بدون FieldHint
+- inc: فقط `recordHistory` در useEggEntriesForm — بدون FieldHint
+- hal: هیچ connection
+- egg: هیچ connection
+
+**نکته:** این ماژول‌ها `recordHistory` دارن (یاد می‌گیرن) ولی FieldHint ندارن (نشون نمی‌دن).
 
 ---
 
-## اولویت‌بندی Gap ها
+### Gap ۶ — inc.temperature بدون biologicalRange
 
-| # | Gap | اهمیت | پیچیدگی |
-|---|-----|--------|---------|
-| ۱ | Intelligence در tra وصل نیست | بالا | متوسط |
-| ۲ | MSG فقط در tra | بالا | متوسط |
-| ۳ | لیبل ناهمسان | متوسط | کم (فقط متن) |
-| ۴ | hardcoded در flk | متوسط | کم |
-| ۵ | Intelligence در whs/inc/hal/egg | پایین | بالا |
-| ۶ | inc.temperature bio range | پایین | کم |
-| ۷ | chickWeight پیشوند | خیلی پایین | صفر |
+- dlg.temperature: bio range 15-35 ✅
+- inc.temperature: bio range ❌ (فقط hard limits)
+- منطق: دمای دستگاه جوجه‌کشی هم محدوده زیستی داره (37.5-38 درجه)
 
 ---
+
+### Gap ۷ — chickWeight بدون پیشوند ماژول
+
+- در FIELD_LABELS: `'chickWeight'` (بدون `tra.` یا `inc.`)
+- در profiles: احتمالاً `'chickWeight'` (همین الگو)
+- بقیه همه با پیشوند (`tra.`, `flk.`, `whs.`, ...)
+- این یک exception هست
+
+---
+
+## اولویت‌بندی Gap ها (اصلاح‌شده)
+
+| # | Gap | اهمیت | پیچیدگی | اثر |
+|---|-----|--------|---------|-----|
+| ۱ | tra.price_* بدون FieldHint | 🔴 بالا | کم | سیستم تورمی قیمت‌ها غیرفعال |
+| ۲ | MSG فقط در tra | 🟠 متوسط | متوسط | پیام‌های ناهمسان |
+| ۳ | hardcoded در flk | 🟠 متوسط | کم | پیام‌های پراکنده |
+| ۴ | لیبل‌های ناهمسان | 🟠 متوسط | کم | کاربر گیج |
+| ۵ | Intelligence در whs/inc/hal/egg | 🟡 پایین | بالا | feature آماده ولی غیرفعال |
+| ۶ | inc.temperature bio range | 🟡 پایین | کم | محدوده زیستی ناقص |
+| ۷ | chickWeight پیشوند | 🟢 خیلی پایین | صفر | exception |
 
 ## قوانین برای AI بعدی
 
