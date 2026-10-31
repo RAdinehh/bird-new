@@ -239,7 +239,7 @@ export interface Invoice {
   remindersMuted?: boolean;
 }
 
-export type DealUnit = 'pcs' | 'kg' | 'ton' | 'bag' | 'L' | 'carton';
+export type DealUnit = 'kg' | 'g' | 'L' | 'l' | 'ml' | 'pcs' | 'vial' | 'pack' | 'ton' | 'bag' | 'dose';
 export type DealDeliveryType = 'out' | 'return' | 'loss' | 'in';
 export type DealPaymentDirection = 'in' | 'out';
 
