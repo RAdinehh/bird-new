@@ -236,6 +236,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       return formatJ(d, 'yyyy/MM/dd');
     })();
     setForm({ ...empty(), partyId: defaultX || contacts[0].id, date: today, dueDate: defaultDue, dealNumber: generateDealNumber(today, deals) });
+    resetErrors();
     setErr(''); setOpen(true);
   };
   useFab(active ? { label: 'افزودن معامله', onClick: openNew } : null);
@@ -260,7 +261,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       sales: d.sales || [],
       payments: d.payments || [],
     });
-    setErr(''); setOpen(true);
+    setErr(''); resetErrors();
+    setOpen(true);
   };
 
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || 0 : 0;
@@ -286,7 +288,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     sales: form.sales,
     payments: form.payments,
   });
-  const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
+  const { showError, markTouched, attemptSave, reset: resetErrors } = useFormErrors(vErrors);
 
   const handleDeleteFromCard = async (d: Deal) => {
     const invCount = invoices.filter((inv: any) => inv.relatedDealId === d.id).length;
@@ -1211,7 +1213,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               })()}
               {Number(g.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={g.quantity} />}
             </Field>
-            <Field label="قیمت تخمینی" error={showError?.(`goods.${gi}.estimatedPrice`)} onTouch={() => markTouched?.(`goods.${gi}.estimatedPrice`)}>
+            <Field label="قیمت مرجع (اختیاری)" hint="فقط برای مقایسه — در محاسبات استفاده نمی‌شه" error={showError?.(`goods.${gi}.estimatedPrice`)} onTouch={() => markTouched?.(`goods.${gi}.estimatedPrice`)}>
               <NumField placeholder="۱۵۰۰۰" value={String(g.estimatedPrice || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, estimatedPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} max={1_000_000_000_000} />
               {Number(g.estimatedPrice) > 0 && <FieldHint fieldPath="tra.deal.unitPrice" value={g.estimatedPrice} />}
             </Field>
