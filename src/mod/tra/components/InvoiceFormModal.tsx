@@ -226,14 +226,28 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             )}
           </Select>
         </Field>
-        <Field label={isPurchase ? (form.relatedSettlementId ? '🔒 فروشنده' : 'فروشنده') : (form.relatedSettlementId ? '🔒 مشتری' : 'مشتری')} hint={form.relatedSettlementId ? '🔒 از تسویه — برای تغییر، تسویه را ویرایش کنید' : undefined} required error={showError('partyId')} onTouch={() => markTouched('partyId')}>
-          <SmartSelect
-            value={form.partyId}
-            onChange={v => setForm(f => ({ ...f, partyId: v}))}
-            options={parties.map(cc => ({ value: cc.id, label: cc.name, subtitle: cc.phone || undefined }))}
-            placeholder="— انتخاب کنید —" modalTitle={isPurchase ? 'انتخاب فروشنده' : 'انتخاب مشتری'} autoThreshold={6}
-          />
-        </Field>
+                {(() => {
+          const isPartyLocked = !!form.relatedSettlementId && !!form.partyId;
+          return (
+            <Field 
+              label={isPurchase 
+                ? (isPartyLocked ? '🔒 فروشنده' : 'فروشنده') 
+                : (isPartyLocked ? '🔒 مشتری' : 'مشتری')} 
+              hint={isPartyLocked ? '🔒 از تسویه — برای تغییر، تسویه را ویرایش کنید' : undefined} 
+              required error={showError('partyId')} onTouch={() => markTouched('partyId')}
+            >
+              <SmartSelect
+                value={form.partyId}
+                onChange={v => setForm(f => ({ ...f, partyId: v}))}
+                options={parties.map(cc => ({ value: cc.id, label: cc.name, subtitle: cc.phone || undefined }))} 
+                placeholder="— انتخاب کنید —" 
+                modalTitle={isPurchase ? 'انتخاب فروشنده' : 'انتخاب مشتری'} 
+                autoThreshold={6}
+                disabled={isPartyLocked}
+              />
+            </Field>
+          );
+        })()}
       </Grid2>
 
       
