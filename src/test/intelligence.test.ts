@@ -260,32 +260,32 @@ describe('formatWarning — کوتاه و طبیعی', () => {
     const w = { level: 'red' as const, field: 'tra.price_chick', value: 500,
       reason: 'x', signals: [{ type: 'hard_min', weight: 10, detail: '' }] };
     const s = formatWarning(w);
-    expect(s).toContain('کمتر از');
+    expect(s).toContain('از حداقل مجاز');
     expect(s).toContain('قیمت جوجه');
   });
   it('hard_max', () => {
     const w = { level: 'red' as const, field: 'tra.price_chick', value: 50_000_000,
       reason: 'x', signals: [{ type: 'hard_max', weight: 10, detail: '' }] };
-    expect(formatWarning(w)).toContain('بالاتر از سقف');
+    expect(formatWarning(w)).toContain('از سقف مجاز');
   });
   it('ratio بالا price — "برابر شده"', () => {
     const w = { level: 'orange' as const, field: 'tra.price_chick', value: 500_000, expected: 100_000,
       reason: 'x', signals: [{ type: 'ratio', weight: 2, detail: '' }] };
     const s = formatWarning(w);
     expect(s).toContain('قیمت جوجه');
-    expect(s).toContain('برابر شده');
+    expect(s).toContain('برابر میانگین');
     expect(s.length).toBeLessThan(40);
   });
   it('ratio پایین', () => {
     const w = { level: 'yellow' as const, field: 'tra.price_chick', value: 30_000, expected: 100_000,
       reason: 'x', signals: [{ type: 'ratio', weight: 2, detail: '' }] };
-    expect(formatWarning(w)).toContain('کمتر شده');
+    expect(formatWarning(w)).toContain('کمتر از میانگین');
   });
   it('دما — "درجه بالاتر از هدف"', () => {
     const w = { level: 'yellow' as const, field: 'dlg.temperature', value: 50, expected: 32,
       reason: 'x', signals: [{ type: 'ratio', weight: 1, detail: '' }] };
     const s = formatWarning(w);
-    expect(s).toContain('درجه بالاتر از هدف');
+    expect(s).toContain('از هدف');
     expect(s).toContain('دمای سالن');
   });
   it('وزن — "درصد کمتر از استاندارد"', () => {
@@ -315,7 +315,7 @@ describe('formatWarning — کوتاه و طبیعی', () => {
   it('biological', () => {
     const w = { level: 'yellow' as const, field: 'dlg.temperature', value: 50,
       reason: 'x', signals: [{ type: 'biological', weight: 1, detail: '' }] };
-    expect(formatWarning(w)).toContain('بیرون از محدوده');
+    expect(formatWarning(w)).toContain('خارج از محدوده');
   });
 });
 
