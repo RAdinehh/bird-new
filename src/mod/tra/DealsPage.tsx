@@ -13,6 +13,7 @@ import { useWhs, UNIT_LABEL } from '../whs/store';
 import { Btn, BtnRow, Empty, Field, Input, MoneyField, PercentField,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
+import EntityLink from '../../shr/components/EntityLink';
 import { FieldHint } from '../../shr/intelligence';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -665,6 +666,9 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                                 </Btn>
                               </div>
                             </div>
+                            {st.invoiceId && (
+                              <Row l="فاکتور فروش" v={<EntityLink type="invoice" id={st.invoiceId} label="مشاهده" />} />
+                            )}
                           </div>
                         );
                       })}
@@ -1437,7 +1441,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
   );
 }
 
-function Row({ l, v }: { l: string; v: string }) {
+function Row({ l, v }: { l: string; v: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', minWidth: 0 }}>
       <span style={{ color: 'var(--muted)', flexShrink: 0 }}>{l}:</span>
