@@ -12,6 +12,7 @@ import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
 import { useInc } from '../inc/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { getUOM, getDefaultUnit } from '../../shr/units/uom';
+import { computeGoodsCap } from './caps';
 import { Btn, BtnRow, CardActions, Empty, Field, Input, MoneyField, PercentField,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
@@ -89,7 +90,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         const lc = getLifecycle(f.type, age, f.endOfCycleDay ?? null, null, f.layingStartDay ?? null);
         const typeLabel = f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر';
         return {
-          available: Number(f.currentCount || 0),
+          available: computeGoodsCap(g, form.id || 'new', deals, Number(f.currentCount || 0)),
           label: 'گله ' + f.name,
           rows: [
             ['نوع', typeLabel],
@@ -104,7 +105,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       const h = hatches.find(x => x.id === g.hatchId);
       if (h) {
         return {
-          available: Number(h.hatched || 0),
+          available: computeGoodsCap(g, form.id || 'new', deals, Number(h.hatched || 0)),
           label: 'هچ ' + h.date,
           rows: [
             ['تاریخ هچ', toFa(h.date)],
@@ -1191,7 +1192,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           </Grid2>
           <Grid2>
             <Field label="مقدار" required error={showError?.(`goods.${gi}.quantity`)} onTouch={() => markTouched?.(`goods.${gi}.quantity`)}>
-              <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
+              <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={(() => { const cap = getSourceInfo(g)?.available; return cap !== undefined ? Math.max(cap, g.quantity || 0) : 1_000_000; })()} />
               {(() => {
                 const srcInfo = getSourceInfo(g);
                 if (!srcInfo) return null;

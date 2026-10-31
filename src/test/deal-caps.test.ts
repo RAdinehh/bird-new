@@ -103,6 +103,23 @@ describe('computeGoodsCap — ATP', () => {
     expect(cap).toBe(0);
   });
 
+  it('دو good در یک deal → good دوم cap = source - good اول', () => {
+    const goodA = mkGood({ id: 'g1', quantity: 100 });
+    const goodB = mkGood({ id: 'g2', quantity: 0 });
+    const deal = mkDeal({ id: 'd1', goods: [goodA, goodB] });
+    const cap = computeGoodsCap(goodB, 'd1', [deal], 185);
+    expect(cap).toBe(85);
+  });
+
+  it('سه good در یک deal', () => {
+    const g1 = mkGood({ id: 'g1', quantity: 100 });
+    const g2 = mkGood({ id: 'g2', quantity: 50 });
+    const g3 = mkGood({ id: 'g3', quantity: 0 });
+    const deal = mkDeal({ id: 'd1', goods: [g1, g2, g3] });
+    const cap = computeGoodsCap(g3, 'd1', [deal], 185);
+    expect(cap).toBe(35);
+  });
+
   it('منبع undefined → پیش‌فرض flock', () => {
     const good = mkGood({ source: undefined });
     const other = mkDeal({ id: 'd2', goods: [mkGood({ id: 'g2', quantity: 100 })] });

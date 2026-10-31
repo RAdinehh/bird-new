@@ -51,6 +51,8 @@ export function computeGoodsCap(
   sourceAvailable: number
 ): number {
   let otherAllocations = 0;
+
+  // ۱. سایر معاملات (ATP)
   for (const deal of allDeals) {
     if (deal.id === currentDealId) continue;
     if (deal.status === 'cancelled') continue;
@@ -60,6 +62,17 @@ export function computeGoodsCap(
       otherAllocations += Math.max(0, (g.quantity || 0) - delivered);
     }
   }
+
+  // ۲. اقلام دیگر در همین معامله (به‌جز خودِ این قلم)
+  const currentDeal = allDeals.find(d => d.id === currentDealId);
+  if (currentDeal) {
+    for (const g of currentDeal.goods || []) {
+      if (g.id === good.id) continue;
+      if (!sameSource(g, good)) continue;
+      otherAllocations += g.quantity || 0;
+    }
+  }
+
   return Math.max(0, sourceAvailable - otherAllocations);
 }
 
