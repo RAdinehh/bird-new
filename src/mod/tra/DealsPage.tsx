@@ -999,9 +999,9 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               <Grid2>
                 <Field label="منبع جوجه" required>
                   <Select
-                    value={g.source || ''}
+                    value={g.source || 'flock'}
                     onChange={e => {
-                      const v = (e.target.value || undefined) as 'flock' | 'hatch' | undefined;
+                      const v = (e.target.value || 'flock') as 'flock' | 'hatch';
                       setForm(f => ({
                         ...f,
                         goods: f.goods.map(x => x.id === g.id ? {
@@ -1013,7 +1013,6 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                       }));
                     }}
                   >
-                    <option value="">— انتخاب —</option>
                     <option value="flock">🐔 گله موجود</option>
                     <option value="hatch">🐣 هچری</option>
                   </Select>
@@ -1219,7 +1218,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
         </div>
       ))}
 
-      <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: 'جوجه یک‌روزه', quantity: 0, unit: 'pcs', estimatedPrice: 0, category: 'chick' }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.goods.length === 0 ? 'افزودن اولین کالا' : 'افزودن کالای دیگر'}</button>
+      <button type="button" onClick={() => setForm(f => ({ ...f, goods: [...f.goods, { id: crypto.randomUUID(), name: 'جوجه یک‌روزه', quantity: 0, unit: 'pcs', estimatedPrice: 0, category: 'chick', source: 'flock' }] }))} style={{ width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>+ {form.goods.length === 0 ? 'افزودن اولین کالا' : 'افزودن کالای دیگر'}</button>
 
       {/* تحویل‌ها */}
       {form.goods.length > 0 && (
