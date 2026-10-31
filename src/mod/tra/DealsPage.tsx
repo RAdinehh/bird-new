@@ -1319,7 +1319,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     <NumField placeholder="۳۰۰" value={String(s.quantity || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
                     {Number(s.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={s.quantity} />}
                   </Field>
-                  <Field label="قیمت واحد" required error={showError?.(`sales.${si}.unitPrice`)} onTouch={() => markTouched?.(`sales.${si}.unitPrice`)}>
+                  <Field label="قیمت هر واحد" required error={showError?.(`sales.${si}.unitPrice`)} onTouch={() => markTouched?.(`sales.${si}.unitPrice`)}>
                     <NumField placeholder="۲۰۰۰۰" value={String(s.unitPrice || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, unitPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} max={1_000_000_000_000} />
                     {Number(s.unitPrice) > 0 && <FieldHint fieldPath="tra.deal.unitPrice" value={s.unitPrice} />}
                   </Field>
