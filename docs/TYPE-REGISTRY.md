@@ -1,7 +1,7 @@
 # 📚 TYPE-REGISTRY.md — جدول تایپ‌های پروژه Bird-new
 
 > **هدف:** جلوگیری از `any`. قبل از نوشتن `any` → اینجا رو ببین.
-> آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۱۲) — استخراج‌شده از store‌های واقعی
+> آخرین به‌روزرسانی: ۱۴۰۵/۰۸/۰۹ — افزودن تایپ‌های تسویه/اقساط/Deal*
 
 ## 🎯 قانون طلایی
 
@@ -27,7 +27,14 @@
 | **hal** | `HallSource` · `Hall` · `Zone` · `EquipmentKind` · `EquipmentStatus` · `EquipmentCategory` · `EquipmentUnit` · `Equipment` | `@mod/hal/store` |
 | **inc** | `DeviceMode` · `DeviceStatus` · `DealType` · `DealStatus` · `EntryStatus` · `MaintenanceLog` · `DeviceCapacity` · `DeviceReading` · `Device` · `HatchGroup` · `EggEntry` · `Candling` · `HatchResult` | `@mod/inc/store` |
 | **set** | `Settings` | `@mod/set/store` |
-| **tra** | `InvoiceType` · `PaymentMethod` · `InvoiceStatus` · `DealType` · `PaymentTerms` · `WorkflowStatus` · `CheckStatus` · `Installment` · `Deferral` · `InvoiceItem` · `Payment` · `Invoice` · `Deal` · `State` | `@mod/tra/types` |
+| **tra** | `InvoiceType` · `PaymentMethod` · `InvoiceStatus` · `PaymentTerms` · `WorkflowStatus` · `CheckStatus` · `PaymentDirection` · `DealType` · `DealUnit` · `DealDeliveryType` · `SettlementType` · `SettlementStatus` · `Installment` · `Deferral` · `PaymentAllocation` · `InvoiceItem` · `Payment` · `Invoice` · `DealGood` · `DealDelivery` · `DealSale` · `DealPayment` · `Deal` · `Settlement` · `State` | `@mod/tra/types` |
+
+> **🆕 فیلدهای این جلسه (جلسه ۱۵ — تسویه → فاکتور):**
+> - `Invoice.relatedSettlementId?: string` — اتصال فاکتور به تسویه
+> - `Invoice.sourceType?: 'manual' | 'deal' | 'settlement' | 'flock'` — منبع
+> - `Settlement.status: 'draft' | 'confirmed' | 'invoiced'` — وضعیت چرخه
+> - `Settlement.invoiceId?: string` — اتصال معکوس به فاکتور
+
 | **whs** | `ItemCategory` · `ItemUnit` · `MovementType` · `MovementReason` · `Item` · `Movement` | `@mod/whs/store` |
 
 ## 🏷 تایپ‌های Payload vs FormData (قانون ۱۸)
@@ -220,4 +227,4 @@ const qr = new QRCode(el, opts as any);
 ---
 
 *این سند زنده است — با هر تایپ جدید تکمیل می‌شه.*
-*آخرین به‌روزرسانی: ۱۴۰۴/۰۷/۲۱ (جلسه ۱۲)*
+*آخرین به‌روزرسانی: ۱۴۰۵/۰۸/۰۹*
