@@ -305,6 +305,10 @@ export interface DealPayment {
   direction: DealPaymentDirection;
   method: 'cash' | 'card' | 'check';
   notes?: string;
+  /** Phase 2: check details (اختیاری) */
+  checkNo?: string;
+  bank?: string;
+  dueDate?: string;
 }
 
 export interface DealSale {
