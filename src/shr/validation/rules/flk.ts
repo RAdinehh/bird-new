@@ -21,6 +21,7 @@ import {
 } from '../helpers';
 import { EGG, GROWTH } from '../biological';
 import type { ValidationContext } from '../types';
+import { MSG } from '../errorMessages';
 
 export function createFlkSchema(context: ValidationContext = {}) {
   const existingNames = context.existingNames;
@@ -97,21 +98,21 @@ export function createFlkSchema(context: ValidationContext = {}) {
 
     // ═══ شروط مدل بهره‌برداری ═══
     if (d.dealType === 'partnership' && !d.partnerId) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'شریک را انتخاب کنید', path: ['partnerId'] });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.select('شریک'), path: ['partnerId'] });
     }
     if (d.dealType === 'consignment' && !d.consignorId) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'امانت‌دهنده را انتخاب کنید', path: ['consignorId'] });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.select('امانت‌دهنده'), path: ['consignorId'] });
     }
     if (d.dealType === 'rent') {
       if (!d.lessorId) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'موجر را انتخاب کنید', path: ['lessorId'] });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.select('موجر'), path: ['lessorId'] });
       }
       if (!d.rentAmount || d.rentAmount <= 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'مبلغ اجاره را وارد کنید', path: ['rentAmount'] });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('مبلغ اجاره'), path: ['rentAmount'] });
       }
     }
     if (d.dealType === 'barter' && !d.barterPartyId) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'طرف تهاتر را انتخاب کنید', path: ['barterPartyId'] });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.select('طرف تهاتر'), path: ['barterPartyId'] });
     }
 
     // نر + ماده = کل (اگه هر دو پر شده)
