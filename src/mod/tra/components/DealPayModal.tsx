@@ -1,11 +1,11 @@
 /**
- * DealPayModal.tsx — ثبت پرداخت/دریافت برای یک معامله
- * استاندارد Odoo/SAP: ثبت پرداخت مستقل از فرم ویرایش
+ * DealPayModal.tsx v2 — ثبت پرداخت/دریافت برای یک معامله
+ * استاندارد Odoo/SAP: quick amounts + partial hint + check details
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, MoneyField, Select, Textarea } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
-import { toEn } from '../../../shr/utils/fa';
+import { toEn, toFa } from '../../../shr/utils/fa';
 import { getTodayJalali, computeDealBalance } from '../calc';
 import { toastMsg } from '../../../cor/store/toast';
 import { useTra } from '../store';
@@ -24,43 +24,76 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
   const [method, setMethod] = useState<'cash' | 'card' | 'check'>('cash');
   const [direction, setDirection] = useState<'in' | 'out'>('in');
   const [notes, setNotes] = useState('');
+  const [checkNo, setCheckNo] = useState('');
+  const [bank, setBank] = useState('');
+  const [checkDue, setCheckDue] = useState('');
+
+  const bal = useMemo(() => (deal ? Math.abs(computeDealBalance(deal).balance) : 0), [deal]);
 
   useEffect(() => {
     if (!deal || !open) return;
-    const bal = computeDealBalance(deal).balance;
-    setAmount(String(Math.abs(bal)));
-    setDirection(bal >= 0 ? 'in' : 'out');
+    const balance = computeDealBalance(deal).balance;
+    setAmount(String(Math.abs(balance)));
+    setDirection(balance >= 0 ? 'in' : 'out');
     setDate(getTodayJalali());
     setMethod('cash');
     setNotes('');
+    setCheckNo('');
+    setBank('');
+    setCheckDue('');
   }, [deal, open]);
+
+  const entered = parseFloat(toEn(amount)) || 0;
+  const remaining = bal - entered;
+  const quickSet = (pct: number) => setAmount(String(Math.round(bal * pct)));
 
   const handleSave = () => {
     if (!deal) return;
-    const amt = parseFloat(toEn(amount));
-    if (!amt || amt <= 0) {
-      toastMsg.error('مبلغ معتبر وارد کنید');
+    if (!entered || entered <= 0) {
+      toastMsg.warn('مبلغ معتبر وارد کنید');
+      return;
+    }
+    if (method === 'check' && !checkNo.trim()) {
+      toastMsg.warn('شماره چک الزامی است');
       return;
     }
     const newPayment: DealPayment = {
       id: crypto.randomUUID(),
       date,
-      amount: amt,
+      amount: entered,
       direction,
       method,
       notes: notes.trim() || undefined,
+      checkNo: method === 'check' ? checkNo.trim() : undefined,
+      bank: method === 'check' ? bank.trim() : undefined,
+      dueDate: method === 'check' ? checkDue : undefined,
     };
-    updateDeal(deal.id, {
-      payments: [...(deal.payments || []), newPayment],
-    });
-    toastMsg.success('پرداخت ثبت شد');
+    updateDeal(deal.id, { payments: [...(deal.payments || []), newPayment] });
+    toastMsg.saved();
     onClose();
   };
 
   if (!deal) return null;
 
+  const isIn = direction === 'in';
+  const title = isIn ? '💳 ثبت دریافت' : '💳 ثبت پرداخت';
+
   return (
-    <Modal open={open} onClose={onClose} title="💳 ثبت پرداخت معامله" size="md">
+    <Modal open={open} onClose={onClose} title={title} size="md">
+      <div style={{
+        padding: 'var(--pad-normal)',
+        background: 'var(--input-bg)',
+        borderRadius: 'var(--r-sm)',
+        marginBottom: 'var(--sp-3)',
+        fontSize: 'var(--fs-sm)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}>
+        <span style={{ color: 'var(--muted)' }}>بدهی فعلی</span>
+        <b style={{ fontVariantNumeric: 'tabular-nums' }}>{toFa(bal.toLocaleString('fa-IR'))} ت</b>
+      </div>
+
       <Grid2>
         <Field label="تاریخ" required>
           <DatePicker value={date} onChange={setDate} />
@@ -69,6 +102,42 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
           <MoneyField value={amount} onChange={(e) => setAmount(e.target.value)} />
         </Field>
       </Grid2>
+
+      <div style={{ display: 'flex', gap: 4, marginTop: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+        {[25, 50, 75, 100].map(pct => (
+          <button
+            key={pct}
+            type="button"
+            onClick={() => quickSet(pct / 100)}
+            style={{
+              flex: 1,
+              minWidth: 56,
+              padding: '6px 4px',
+              fontSize: 'var(--fs-xs)',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-sm)',
+              color: 'var(--text)',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            {pct === 100 ? 'کل' : `${toFa(pct)}٪`}
+          </button>
+        ))}
+      </div>
+
+      {entered > 0 && entered < bal && (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8 }}>
+          ↳ باقی‌مانده: <b>{toFa(remaining.toLocaleString('fa-IR'))} ت</b>
+        </div>
+      )}
+      {entered >= bal && bal > 0 && (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginBottom: 8 }}>
+          ✓ این پرداخت کل بدهی را تسویه می‌کند
+        </div>
+      )}
+
       <Grid2>
         <Field label="جهت">
           <Select value={direction} onChange={e => setDirection(e.target.value as 'in' | 'out')}>
@@ -84,9 +153,55 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
           </Select>
         </Field>
       </Grid2>
+
+      {method === 'check' && (
+        <>
+          <Grid2>
+            <Field label="شماره چک" required>
+              <input
+                value={checkNo}
+                onChange={e => setCheckNo(e.target.value)}
+                placeholder="۱۲۳۴۵۶"
+                style={{
+                  width: '100%',
+                  padding: 'var(--pad-normal)',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-sm)',
+                  fontSize: 'var(--fs-sm)',
+                  fontFamily: 'inherit',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </Field>
+            <Field label="بانک">
+              <input
+                value={bank}
+                onChange={e => setBank(e.target.value)}
+                placeholder="ملی، صادرات..."
+                style={{
+                  width: '100%',
+                  padding: 'var(--pad-normal)',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-sm)',
+                  fontSize: 'var(--fs-sm)',
+                  fontFamily: 'inherit',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </Field>
+          </Grid2>
+          <Field label="سرسید چک">
+            <DatePicker value={checkDue} onChange={setCheckDue} />
+          </Field>
+        </>
+      )}
+
       <Field label="توضیحات">
         <Textarea value={notes} onChange={e => setNotes(e.target.value)} />
       </Field>
+
       <BtnRow>
         <Btn variant="outline" onClick={onClose}>انصراف</Btn>
         <Btn variant="primary" onClick={handleSave}>ثبت</Btn>
