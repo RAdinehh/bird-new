@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { daysUntilDue, dueTone, dueLabel } from './helpers';
 import DeferModal from './components/DeferModal';
-import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSumAllocated, WORKFLOW_LABEL, type Invoice, type Deferral } from './store';
+import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSumAllocated, WORKFLOW_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
@@ -20,7 +20,7 @@ import { agingBucketFromDue } from './formulas';
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
-  const { invoices, updateInvoice, allocations } = useTra();
+  const { invoices, deals, updateInvoice, allocations } = useTra();
   const { contacts } = useCtc();
   const [multiPayOpen, setMultiPayOpen] = useState(false);
   const [kind, setKind] = useState<'sale' | 'purchase' | 'deal'>('sale');
@@ -34,6 +34,11 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0),
     [invoices, kind]
+  );
+
+  const openDeals = useMemo(
+    () => deals.filter(d => isDealOpen(d, invoices)),
+    [deals, invoices]
   );
 
 
@@ -91,6 +96,20 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
     const d = daysUntilDue(i);
     return d !== null && d >= 0 && d <= 7;
   }).length;
+
+  // Deal computations (Phase 1)
+  const dealTotalOpen = openDeals.reduce((s, d) => s + Math.abs(computeDealBalance(d).balance), 0);
+  const dealOverdueCount = openDeals.filter(d => {
+    const days = dealDaysUntilDue(d);
+    return days !== null && days < 0;
+  }).length;
+  const dealSoonCount = openDeals.filter(d => {
+    const days = dealDaysUntilDue(d);
+    return days !== null && days >= 0 && days <= 7;
+  }).length;
+  const effectiveTotal = kind === 'deal' ? dealTotalOpen : totalOpen;
+  const effectiveOverdueCount = kind === 'deal' ? dealOverdueCount : overdueCount;
+  const effectiveSoonCount = kind === 'deal' ? dealSoonCount : soonCount;
 
   const toggleBucket = (key: BucketKey) => {
     setExpandedBucket(expandedBucket === key ? null : key);
@@ -151,7 +170,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       )}
 
       {/* خلاصه — یه خط */}
-      <SummaryBox kind={kind} totalOpen={totalOpen} openCount={openInvoices.length} overdueCount={overdueCount} soonCount={soonCount} />
+      <SummaryBox kind={kind} totalOpen={effectiveTotal} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} overdueCount={effectiveOverdueCount} soonCount={effectiveSoonCount} />
 
       {/* ⏰ سرسیدهای نزدیک — collapsible */}
       <UpcomingDueSection upcoming={upcoming} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} onDefer={openDefer} />
@@ -173,16 +192,54 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       />
 
       {/* خالی */}
-      {totalOpen === 0 ? (
+      {effectiveTotal === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>}
-          title={kind === 'sale' ? 'طلبی وجود ندارد' : kind === 'deal' ? 'معامله بازی وجود ندارد' : 'بدهی وجود ندارد'}
+          title={kind === 'sale' ? 'طلبی وجود ندارد' : kind === 'deal' ? 'معامله باز وجود ندارد' : 'بدهی وجود ندارد'}
           desc={kind === 'deal' ? 'همه‌ی معاملات تسویه شده‌اند.' : 'همه‌ی فاکتورها تسویه شده‌اند.'}
         />
       ) : null}
 
+      {/* Deal list (Phase 1 — simple) */}
+      {kind === 'deal' && effectiveTotal > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}>
+          {openDeals.map(d => {
+            const bal = computeDealBalance(d);
+            const party = contacts.find(c => c.id === d.partyId);
+            const days = dealDaysUntilDue(d);
+            return (
+              <div
+                key={d.id}
+                style={{
+                  padding: 'var(--pad-normal)',
+                  background: 'var(--card)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-sm)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {party?.name || '—'}
+                    </div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {d.description || d.type}
+                      {days !== null ? ` • ${dueLabel(days)}` : ''}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                    {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+
+
       {/* Buckets — فقط اگه پر باشن */}
-      {totalOpen > 0 ? (
+      {kind !== 'deal' && effectiveTotal > 0 ? (
         <>
           {AGING_BUCKETS.map(({ key, label, color }) => {
             const items = byBucket[key] || [];

@@ -468,21 +468,25 @@ export function calcInvoiceTotal(items: any[]): number {
  * dealOverdueDays — روزهای overdue معامله (positive)
  * منطبق با overdueDays(inv) در formulas.ts
  */
-function dealOverdueDays(d: Deal): number {
-  if (!d.dueDate) return 0;
+export function dealDaysUntilDue(d: Deal): number | null {
+  if (!d.dueDate) return null;
   try {
     const en = d.dueDate.replace(/[۰-۹]/g, (x: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(x)));
     const dueDate = parseJ(en, 'yyyy/MM/dd', new Date());
-    if (isNaN(dueDate.getTime())) return 0;
+    if (isNaN(dueDate.getTime())) return null;
     dueDate.setHours(0, 0, 0, 0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const diff = diffDaysJ(today, dueDate);
-    return diff > 0 ? diff : 0;
+    return diffDaysJ(dueDate, today);
   } catch (e) {
-    console.error('[dealOverdueDays]', e);
-    return 0;
+    console.error('[dealDaysUntilDue]', e);
+    return null;
   }
+}
+
+function dealOverdueDays(d: Deal): number {
+  const diff = dealDaysUntilDue(d);
+  return diff !== null && diff < 0 ? -diff : 0;
 }
 
 /**
