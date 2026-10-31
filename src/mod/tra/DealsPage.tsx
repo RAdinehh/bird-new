@@ -76,6 +76,17 @@ const STATUS_LABEL: Record<string, string> = {
   open: 'باز', settled: 'تسویه‌شده', cancelled: 'لغوشده'
 };
 
+function isSameIdentity(a: DealGood, b: DealGood): boolean {
+  return (
+    (a.category || '') === (b.category || '') &&
+    (a.source || 'flock') === (b.source || 'flock') &&
+    (a.existingFlockId || '') === (b.existingFlockId || '') &&
+    (a.hatchId || '') === (b.hatchId || '') &&
+    (a.stockItemId || '') === (b.stockItemId || '') &&
+    (a.unit || '') === (b.unit || '')
+  );
+}
+
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
   const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, updateSettlement, deleteSettlement, undoSettlement, reopenSettlement, settlements, addInvoice, reopenDeal, listDeletedDeals } = useTra();
@@ -147,6 +158,28 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty());
+
+  const handleSourceChange = (goodId: string, updates: Partial<DealGood>) => {
+    const current = form.goods.find(g => g.id === goodId);
+    if (!current) return;
+
+    const updated = { ...current, ...updates };
+    const duplicate = form.goods.find(g => g.id !== goodId && isSameIdentity(g, updated));
+
+    if (duplicate) {
+      setForm(f => ({
+        ...f,
+        goods: f.goods
+          .filter(g => g.id !== goodId)
+          .map(g => g.id === duplicate.id
+            ? { ...g, quantity: (g.quantity || 0) + (current.quantity || 0) }
+            : g),
+      }));
+      toastMsg.info('کالای تکراری ادغام شد — مقدار جمع شد');
+    } else {
+      setForm(f => ({ ...f, goods: f.goods.map(g => g.id === goodId ? updated : g) }));
+    }
+  };
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -955,7 +988,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
       {form.goods.map((g, gi) => (
         <div key={g.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>کالای {toFa(gi + 1)}</span>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>کالای {toFa(gi + 1)}{getSourceInfo(g)?.label ? ' — ' + getSourceInfo(g)?.label : ''}</span>
             <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.filter(x => x.id !== g.id), deliveries: f.deliveries.filter(x => x.goodId !== g.id), sales: f.sales.filter(x => x.goodId !== g.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
           </div>
           <Field label="دسته کالا" hint="انتخاب دسته، منبع کالا را تعیین می‌کند" error={showError?.(`goods.${gi}.category`)} onTouch={() => markTouched?.(`goods.${gi}.category`)}>
@@ -1030,7 +1063,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     const fType = f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر';
                     return '📊 موجودی: ' + toFa(f.currentCount || 0) + ' | سن: ' + toFa(age) + ' روز | ' + fType + ' | ' + lc.label;
                   })() : undefined}>
-                    <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
+                    <Select value={g.existingFlockId || ''} onChange={e => handleSourceChange(g.id, { existingFlockId: e.target.value || undefined })}>
                       <option value="">— انتخاب —</option>
                       {flocks.filter(f => f.status === 'active').map(f => {
                         const hasStock = (f.currentCount || 0) > 0;
@@ -1050,7 +1083,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     if (!h) return undefined;
                     return '📊 هچ موفق: ' + toFa(h.hatched || 0) + ' جوجه | نطفه‌داری نشده: ' + toFa(h.unhatched || 0);
                   })() : undefined}>
-                    <Select value={g.hatchId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, hatchId: e.target.value || undefined } : x) }))} disabled={hatches.length === 0}>
+                    <Select value={g.hatchId || ''} onChange={e => handleSourceChange(g.id, { hatchId: e.target.value || undefined })} disabled={hatches.length === 0}>
                       <option value="">— انتخاب —</option>
                       {hatches.map(h => {
                         const hasStock = (h.hatched || 0) > 0;
@@ -1079,7 +1112,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             )}
             {g.category === 'adult' && (
               <Field label="گله مبدأ" required>
-                <Select value={g.existingFlockId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, existingFlockId: e.target.value || undefined } : x) }))}>
+                <Select value={g.existingFlockId || ''} onChange={e => handleSourceChange(g.id, { existingFlockId: e.target.value || undefined })}>
                   <option value="">— انتخاب —</option>
                   {flocks.filter(f => f.status === 'active').map(f => {
                         const hasStock = (f.currentCount || 0) > 0;
@@ -1109,7 +1142,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     </div>
                   )}
                   <Field label="کالای تخم (انبار)" required hint={g.stockItemId ? '📊 تخم تولیدشده از گله — کاهش از انبار' : undefined}>
-                    <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }} disabled={noEgg}>
+                    <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; handleSourceChange(g.id, { stockItemId: v, linkedItemId: v }) }} disabled={noEgg}>
                       <option value="">{noEgg ? '— هیچ تخمی موجود نیست —' : '— انتخاب —'}</option>
                       {eggItems.map((it: any) => (
                         <option key={it.id} value={it.id} disabled={Number(it.currentStock) <= 0}>
@@ -1147,7 +1180,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     </div>
                   )}
                   <Field label="کالای انبار" required>
-                    <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, stockItemId: v, linkedItemId: v } : x) })) }} disabled={showEmptyWarning}>
+                    <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; handleSourceChange(g.id, { stockItemId: v, linkedItemId: v }) }} disabled={showEmptyWarning}>
                       <option value="">{showEmptyWarning ? '— هیچ کالایی موجود نیست —' : '— انتخاب —'}</option>
                       {filteredItems.map((it: any) => (
                         <option key={it.id} value={it.id} disabled={Number(it.currentStock) <= 0}>
