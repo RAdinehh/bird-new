@@ -111,7 +111,8 @@ export function computeDeliveryCap(
 export function computeSaleCap(
   goodId: string,
   deliveries: DealDelivery[],
-  sales: DealSale[]
+  sales: DealSale[],
+  excludeSaleId?: string
 ): number {
   const dvs = deliveries.filter(d => d.goodId === goodId);
   const out = dvs.filter(d => d.type === 'out').reduce((s, d) => s + (d.quantity || 0), 0);
@@ -119,7 +120,8 @@ export function computeSaleCap(
   const loss = dvs.filter(d => d.type === 'loss').reduce((s, d) => s + (d.quantity || 0), 0);
   const netDelivered = out - ret - loss;
 
-  const totalSold = sales
+  const filtered = excludeSaleId ? sales.filter(s => s.id !== excludeSaleId) : sales;
+  const totalSold = filtered
     .filter(s => s.goodId === goodId)
     .reduce((s, x) => s + (x.quantity || 0), 0);
 

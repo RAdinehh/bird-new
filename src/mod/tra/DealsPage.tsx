@@ -1385,7 +1385,20 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 </Grid2>
                 <Grid2>
                   <Field label="مقدار" required error={showError?.(`sales.${si}.quantity`)} onTouch={() => markTouched?.(`sales.${si}.quantity`)}>
-                    <NumField placeholder="۳۰۰" value={String(s.quantity || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
+                    <NumField placeholder="۳۰۰" value={String(s.quantity || '')} onChange={e => {
+                      const raw = Number(toEn(e.target.value)) || 0;
+                      const cap = computeSaleCap(s.goodId, form.deliveries, form.sales, s.id);
+                      const val = Math.min(raw, cap);
+                      setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, quantity: val } : x) }));
+                    }} min={1} max={1_000_000} />
+                    {(() => {
+                      const cap = computeSaleCap(s.goodId, form.deliveries, form.sales, s.id);
+                      return (
+                        <div style={{ fontSize: 'var(--fs-xs)', color: cap === 0 ? 'var(--danger)' : 'var(--muted)', marginTop: 4, fontWeight: 600 }}>
+                          {cap === 0 ? '🔴 فروش بیشتری ممکن نیست' : '📊 حداکثر فروش: ' + toFa(cap)}
+                        </div>
+                      );
+                    })()}
                     {Number(s.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={s.quantity} />}
                   </Field>
                   <Field label="قیمت هر واحد" required error={showError?.(`sales.${si}.unitPrice`)} onTouch={() => markTouched?.(`sales.${si}.unitPrice`)}>
