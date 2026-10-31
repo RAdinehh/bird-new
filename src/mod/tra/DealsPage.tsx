@@ -5,6 +5,7 @@ import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment, type Settlement } from './store';
 import { generateDealNumber } from './calc';
+import { Row, SectionTitle, chip } from './helpers';
 import { useNavigate } from 'react-router-dom';
 import { useCtc } from '../ctc/store';
 import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
@@ -1475,33 +1476,4 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
       </Modal>
     </PageContainer>
   );
-}
-
-function Row({ l, v }: { l: string; v: React.ReactNode }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', minWidth: 0 }}>
-      <span style={{ color: 'var(--muted)', flexShrink: 0 }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)', textAlign: 'left', wordBreak: 'break-word', overflowWrap: 'anywhere', minWidth: 0 }}>{v}</span>
-    </div>
-  );
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{
-      paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px'
-    }}>{children}</div>
-  );
-}
-
-function chip(active: boolean): React.CSSProperties {
-  return {
-    padding: '6px 11px', fontSize: 'var(--fs-sm)',
-    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
-    border: `1px solid ${active ? 'var(--accent-border)' : 'var(--border)'}`,
-    borderRadius: 'var(--r-sm)',
-    color: active ? 'var(--accent)' : 'var(--muted)',
-    fontWeight: active ? 600 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap'
-  };
 }
