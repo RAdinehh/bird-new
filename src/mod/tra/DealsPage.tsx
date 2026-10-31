@@ -770,6 +770,12 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               open={!!paymentsModalDeal}
               onClose={() => setPaymentsModalDeal(null)}
               payments={paymentsModalDeal?.payments || []}
+              onUpdate={(newPayments) => {
+                if (paymentsModalDeal) {
+                  updateDeal(paymentsModalDeal.id, { payments: newPayments });
+                  setPaymentsModalDeal({ ...paymentsModalDeal, payments: newPayments });
+                }
+              }}
             />
       {printSettlement && (
         <SettlementPrint
