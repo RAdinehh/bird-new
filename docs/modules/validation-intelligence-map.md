@@ -247,6 +247,94 @@
 
 ---
 
+---
+
+## structuralBreakAware — تورمی (۱۸ فیلد)
+
+تعریف: فیلدهایی که قیمتشون با تورم تغییر می‌کنه. سیستم هوشمند یاد می‌گیره که قیمت جدید، خطای کاربر نیست، بلکه تورم هست.
+
+| # | fieldPath | جایگاه |
+|---|-----------|--------|
+| ۱ | feed.unitPrice | Q1 |
+| ۲ | flk.purchasePrice | Q11 |
+| ۳ | flk.deliveryCost | Q11 |
+| ۴ | (فیلد سوم Q11) | Q11 |
+| ۵ | (فیلد چهارم Q11) | Q11 |
+| ۶ | tra.price_chick | Q11 |
+| ۷ | tra.price_adult | Q11 |
+| ۸ | tra.price_egg | Q11 |
+| ۹ | tra.price_fertile_egg | Q11 |
+| ۱۰ | tra.price_medicine | Q11 |
+| ۱۱ | tra.price_equipment | Q11 |
+| ۱۲ | tra.price_other | Q11 |
+| ۱۳ | tra.price_broken | Q11 |
+| ۱۴ | tra.price_manure | Q11 |
+| ۱۵ | inc.rentAmount | Q13 |
+| ۱۶ | tra.deal.value | Q13 |
+| ۱۷ | tra.deal.unitPrice | Q13 |
+| ۱۸ | tra.deal.payment | Q13 |
+
+منطق (از types.ts):
+
+~~~
+structuralBreakAware?: boolean;
+// اگر true: هنگام بررسی ratio، اگر تغییر بزرگ باشه (تورم)، هشدار نده
+// اگر false: هر تغییر بزرگ = ناهنجاری
+~~~
+
+منبع یادگیری (از historyStore.ts):
+- localStorage، TTL=۱۸۰ روز
+- تا ۱۰۰ رکورد per field
+- structuralBreak flag در FieldStats
+
+---
+
+## crossFieldRule — قواعد مقایسه با فیلد دیگر (۲۳ فیلد، ۹ قاعده)
+
+| قاعده | تعداد فیلد | معنی |
+|-------|-----------|------|
+| lte_female | ۹ | باید کمتر یا مساوی تعداد ماده گله |
+| lte_egg_count | ۵ | باید کمتر یا مساوی تعداد کل تخم |
+| lte_initial_sum | ۳ | باید کمتر یا مساوی جمع نر+ماده+نامشخص |
+| feed_vs_flock | ۱ | نسبت دان به تعداد گله |
+| remaining_vs_feed | ۱ | دان باقی‌مانده کمتر یا مساوی دان داده‌شده |
+| water_vs_flock | ۱ | نسبت آب به تعداد گله |
+| lte_current | ۱ | باید کمتر یا مساوی موجودی فعلی گله |
+| lte_hall | ۱ | ظرفیت بخش کمتر یا مساوی ظرفیت سالن |
+| dose_vs_flock | ۱ | دوز دارو نسبت به تعداد گله |
+
+پیام در formatWarning.ts (خط ۳۹):
+
+~~~
+if (signals.some(s => s.type === 'cross_absolute') && expected !== undefined) {
+  return label + ' از ' + crossFieldLabel(profile?.crossFieldRule) + ' (' + fmtNum(expected) + ') بیشتر است';
+}
+~~~
+
+---
+
+## biologicalRange — محدوده زیستی (۱۲ فیلد)
+
+| فیلد | محدوده | واحد |
+|------|--------|------|
+| feed.energy | 2000-4000 | kcal |
+| dlg.temperature | 15-35 | درجه |
+| dlg.temperatureMin | 5-45 | درجه |
+| dlg.temperatureMax | 5-45 | درجه |
+| dlg.humidity | 15-35 | درصد |
+| dlg.humidityMin | 34-39 | درصد |
+| dlg.humidityMax | 30-75 | درصد |
+| (۴ فیلد دیگر) | ... | ... |
+
+منطق (خط ۹۶ از formatWarning):
+
+~~~
+if (signals.some(s => s.type === 'biological') && profile?.biologicalRange) {
+  return label + ' خارج از محدوده طبیعی است';
+}
+~~~
+
+
 ## FIELD_LABELS — منبع یکتای لیبل‌ها
 
 منبع: intelligence/formatWarning.ts (~۹۵ لیبل)
