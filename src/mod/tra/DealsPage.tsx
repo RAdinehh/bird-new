@@ -645,6 +645,10 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   <>
                     {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(d.value.toLocaleString('fa-IR'))} تومان</b></span>}
                     {d.percent !== null && d.percent !== undefined && <span>درصد: <b style={{ color: 'var(--text)' }}>{toFa(d.percent)}٪</b></span>}
+                    {(() => {
+                      const salesTotal = (d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
+                      return salesTotal > 0 ? <span>🏷 فروش: <b style={{ color: 'var(--text)' }}>{toFa(salesTotal.toLocaleString('fa-IR'))} ت</b></span> : null;
+                    })()}
                     {d.dueDate ? <span>سرسید: <b style={{ color: 'var(--text)' }}>{toFa(d.dueDate)}</b></span> : null}
                   </>
                 }
