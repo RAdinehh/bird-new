@@ -11,7 +11,7 @@ import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import ItemDetailsForm from '../../../shr/components/ItemDetailsForm';
 import { HELP } from '../../../shr/help/helpTexts';
-import { getProfile } from '../../../shr/intelligence';
+import { getProfile, FieldHint } from '../../../shr/intelligence';
 import InvoiceSmartSummary from './InvoiceSmartSummary';
 import PaymentsSection from './PaymentsSection';
 import { type CheckStatus } from '../store';
@@ -488,6 +488,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                     if (val < 0) val = 0;
                                     updateItem(it.id, { unitPrice: val });
                                   }} />
+                                  {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
                                 </Field>
                                 <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
                                   <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
