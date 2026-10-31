@@ -23,7 +23,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const { invoices, updateInvoice, allocations } = useTra();
   const { contacts } = useCtc();
   const [multiPayOpen, setMultiPayOpen] = useState(false);
-  const [kind, setKind] = useState<'sale' | 'purchase'>('sale');
+  const [kind, setKind] = useState<'sale' | 'purchase' | 'deal'>('sale');
   const [expandedBucket, setExpandedBucket] = useState<BucketKey | null>(null);
   const [expandedInvoice, setExpandedInvoice] = useState<string | null>(null);
   const [deferModal, setDeferModal] = useState<{ id: string; oldDate: string } | null>(null);
@@ -133,6 +133,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         <button onClick={() => setKind('purchase')} style={tab(kind === 'purchase')}>
           📤 بدهی
         </button>
+        <button onClick={() => setKind('deal')} style={tab(kind === 'deal')}>
+          🤝 معاملات
+        </button>
       </div>
 
       {/* 🆕 دکمه پرداخت گروهی */}
@@ -171,7 +174,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       {totalOpen === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>}
-          title={kind === 'sale' ? 'طلبی وجود ندارد' : 'بدهی وجود ندارد'}
+          title={kind === 'sale' ? 'طلبی وجود ندارد' : kind === 'deal' ? 'معامله بازی وجود ندارد' : 'بدهی وجود ندارد'}
           desc="همه‌ی فاکتورها تسویه شده‌اند."
         />
       ) : null}
@@ -329,11 +332,13 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         setDeferReason={setDeferReason}
         onConfirm={doDefer}
       />
-          <MultiPayModal
-        open={multiPayOpen}
-        onClose={() => setMultiPayOpen(false)}
-        kind={kind}
-      />
+          {kind !== 'deal' && (
+            <MultiPayModal
+              open={multiPayOpen}
+              onClose={() => setMultiPayOpen(false)}
+              kind={kind}
+            />
+          )}
     </PageContainer>
   );
 }
