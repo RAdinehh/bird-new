@@ -129,6 +129,21 @@ export default function FlockCard(props: FlockCardProps) {
     return total;
   }, [f.id, deals]);
 
+  // آیا این گله امانی، تلفات از محل طرف داره؟
+  const hasConsignmentLosses = useMemo(() => {
+    if (dealType !== 'consignment') return false;
+    let totalLoss = 0;
+    for (const deal of deals) {
+      if (deal.status === 'cancelled') continue;
+      for (const good of deal.goods || []) {
+        if (good.existingFlockId !== f.id) continue;
+        const dvs = (deal.deliveries || []).filter((dv: any) => dv.goodId === good.id && dv.type === 'loss');
+        totalLoss += dvs.reduce((s: number, dv: any) => s + (dv.quantity || 0), 0);
+      }
+    }
+    return totalLoss > 0;
+  }, [f.id, deals, dealType]);
+
   const allBadges: Array<{ key: string; node: React.ReactNode }> = [];
 
   if (!isArchived && !f.sourceInvoiceId && !f.hatchId) {
@@ -402,7 +417,7 @@ export default function FlockCard(props: FlockCardProps) {
             ) : (
               <Row l="جمع کل" v={fmt.money(costs.total)} accent />
             )}
-            {costs.perBird > 0 && <Row l="هر پرنده" v={fmt.money(Math.round(costs.perBird))} accent />}
+            {costs.perBird > 0 && !hasConsignmentLosses && <Row l="هر پرنده" v={fmt.money(Math.round(costs.perBird))} accent />}
           </RowGrid>
         </>
       )}
