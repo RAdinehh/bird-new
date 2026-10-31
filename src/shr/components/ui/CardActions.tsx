@@ -24,7 +24,7 @@ export function CardActions({ actions }: { actions: CardAction[] }) {
           key={i}
           size="sm"
           variant={action.variant || 'outline'}
-          onClick={action.onClick}
+          onClick={(e) => { e.stopPropagation(); action.onClick(); }}
           style={{
             width: '100%',
             justifyContent: 'center',

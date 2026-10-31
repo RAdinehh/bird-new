@@ -10,7 +10,7 @@ import { useCtc } from '../ctc/store';
 import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
 import { useInc } from '../inc/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
-import { Btn, BtnRow, Empty, Field, Input, MoneyField, PercentField,
+import { Btn, BtnRow, CardActions, Empty, Field, Input, MoneyField, PercentField,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
 import EntityLink from '../../shr/components/EntityLink';
@@ -281,6 +281,23 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     payments: form.payments,
   });
   const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
+
+  const handleDeleteFromCard = async (d: Deal) => {
+    const invCount = invoices.filter((inv: any) => inv.relatedDealId === d.id).length;
+    const flkCount = flocks.filter((f: any) => f.dealData?.dealId === d.id).length;
+    let extraMsg = '';
+    if (invCount > 0 || flkCount > 0) {
+      const parts: string[] = [];
+      if (invCount > 0) parts.push(toFa(invCount) + ' فاکتور');
+      if (flkCount > 0) parts.push(toFa(flkCount) + ' گله');
+      extraMsg = '\n\n⚠️ این معامله به ' + parts.join(' و ') + ' وصله. با حذف، این ارتباط قطع می‌شه.';
+    }
+    const ok = await showConfirmAsync('تأیید حذف', 'این معامله حذف شود؟' + extraMsg, { danger: true });
+    if (!ok) return;
+    handleDeleteDeal(d.id);
+    logAction('delete', 'tra', 'حذف از معاملات');
+    toastMsg.deleted('معامله');
+  };
 
   const handleDeleteDeal = (id: string): void => {
     const deal = deals.find(d => d.id === id);
@@ -660,8 +677,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 4 }}>
                               <span style={{ fontWeight: 700, color: 'var(--accent)' }}>خالص: {netTxt} ت</span>
                               <div style={{ display: 'flex', gap: 4 }}>
-                                <Btn size="sm" onClick={(e) => { e.stopPropagation(); setPrintSettlement({ settlement: st, deal: d }); }}>🖨️</Btn>
-                                <Btn size="sm" onClick={(e) => { e.stopPropagation(); handleConvertSettlement(st, d); }}>
+                                <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setPrintSettlement({ settlement: st, deal: d }); }}>🖨️ چاپ</Btn>
+                                <Btn size="sm" variant={st.invoiceId ? 'outline' : 'primary'} onClick={(e) => { e.stopPropagation(); handleConvertSettlement(st, d); }}>
                                   {st.invoiceId ? '📄 مشاهده فاکتور' : '🧾 تبدیل به فاکتور'}
                                 </Btn>
                               </div>
@@ -670,7 +687,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                               <Row l="فاکتور فروش" v={<EntityLink type="invoice" id={st.invoiceId} label="مشاهده" />} />
                             )}
                             {st.status === 'invoiced' && (
-                              <Btn size="sm" onClick={async (e) => {
+                              <BtnRow><Btn size="sm" variant="danger" onClick={async (e) => {
                                 e.stopPropagation();
                                 const ok = await showConfirmAsync('لغو تبدیل به فاکتور', 'فاکتور مربوطه حذف می‌شه و تسویه به «تأییدشده» برمی‌گرده. ادامه؟', { danger: true });
                                 if (!ok) return;
@@ -680,10 +697,10 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                                 } catch (err) {
                                   toastMsg.error(err instanceof Error ? err.message : 'خطا در لغو');
                                 }
-                              }}>↩️ لغو تبدیل</Btn>
+                              }}>↩️ لغو تبدیل</Btn></BtnRow>
                             )}
                             {st.status === 'confirmed' && (
-                              <Btn size="sm" onClick={async (e) => {
+                              <BtnRow><Btn size="sm" variant="outline" onClick={async (e) => {
                                 e.stopPropagation();
                                 const ok = await showConfirmAsync('بازگشت به پیش‌نویس', 'این تسویه به پیش‌نویس برمی‌گرده و قابل ویرایش می‌شه. ادامه؟', { danger: false });
                                 if (!ok) return;
@@ -693,7 +710,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                                 } catch (err) {
                                   toastMsg.error(err instanceof Error ? err.message : 'خطا');
                                 }
-                              }}>✏️ بازگشت به پیش‌نویس</Btn>
+                              }}>✏️ بازگشت به پیش‌نویس</Btn></BtnRow>
                             )}
                           </div>
                         );
@@ -702,33 +719,29 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   );
                 })()}
                 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 6, paddingTop: 4 }}>
-                  {d.status === 'open' ? (
-                    <Btn size="sm" onClick={(e) => { e.stopPropagation(); updateDeal(d.id, { status: 'settled' }); }} style={{ flex: 1 }}>تسویه شد</Btn>
-                  ) : (
-                    <Btn size="sm" variant="primary" onClick={(e) => { e.stopPropagation(); handleReopenDeal(d); }} style={{ flex: 1 }}>🔓 بازگشایی</Btn>
-                  )}
-                  <Btn size="sm" onClick={(e) => { e.stopPropagation(); setSettlementDeal(d); setSettlementOpen(true); }} style={{ flex: 1 }}>📅 تسویه</Btn>
-                  {d.status === 'open' ? (
-                    <Btn size="sm" onClick={(e) => { e.stopPropagation(); openEdit(d); }} style={{ flex: 1 }}>ویرایش</Btn>
-                  ) : null}
-                  <Btn size="sm" onClick={async () => {
-                          const _lInvS = invoices.filter((inv: any) => inv.relatedDealId === d.id).length;
-                          const _lFlkS = flocks.filter((f: any) => f.dealData?.dealId === d.id).length;
-                          let _exM = '';
-                          if (_lInvS > 0 || _lFlkS > 0) {
-                            const _ptS: string[] = [];
-                            if (_lInvS > 0) _ptS.push(toFa(_lInvS) + ' فاکتور');
-                            if (_lFlkS > 0) _ptS.push(toFa(_lFlkS) + ' گله');
-                            _exM = '\n\n⚠️ این معامله به ' + _ptS.join(' و ') + ' وصله. با حذف، این ارتباط قطع می‌شه.';
-                          }
-                          const ok = await showConfirmAsync('تأیید حذف', 'این معامله حذف شود؟' + _exM, { danger: true });
-                          if (!ok) return;
-                          handleDeleteDeal(d.id);
-                          logAction('delete', 'tra', 'حذف از معاملات');
-                          toastMsg.deleted('معامله')
-                        }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
+                <CardActions actions={[
+                  {
+                    label: d.status === 'open' ? 'تسویه شد' : '🔓 بازگشایی',
+                    variant: d.status === 'open' ? 'outline' : 'primary',
+                    onClick: () => d.status === 'open' ? updateDeal(d.id, { status: 'settled' }) : handleReopenDeal(d),
+                  },
+                  {
+                    label: '📅 تسویه',
+                    variant: 'outline',
+                    onClick: () => { setSettlementDeal(d); setSettlementOpen(true); },
+                  },
+                  {
+                    label: 'ویرایش',
+                    variant: 'outline',
+                    hidden: d.status !== 'open',
+                    onClick: () => openEdit(d),
+                  },
+                  {
+                    label: 'حذف',
+                    variant: 'danger',
+                    onClick: () => { void handleDeleteFromCard(d); },
+                  },
+                ]} />
               </ExpandableCard>
             );
           })}
