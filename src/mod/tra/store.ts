@@ -686,6 +686,31 @@ export const useTra = create<State>()(
         }
         set({ settlements: get().settlements.filter(x => x.id !== id) });
       },
+      undoSettlement: (id) => {
+        const st = get().settlements.find(x => x.id === id);
+        if (!st) throw new Error('تسویه یافت نشد');
+        if (st.status !== 'invoiced') {
+          throw new Error('فقط تسویه‌های فاکتور‌شده قابل لغو هستند');
+        }
+        if (st.invoiceId) {
+          get().deleteInvoice(st.invoiceId);
+        }
+        return true;
+      },
+      reopenSettlement: (id) => {
+        const st = get().settlements.find(x => x.id === id);
+        if (!st) return false;
+        if (st.status === 'invoiced') {
+          throw new Error('این تسویه دارای فاکتور است. ابتدا فاکتور را لغو کنید');
+        }
+        if (st.status !== 'confirmed') return false;
+        set({
+          settlements: get().settlements.map(x =>
+            x.id === id ? { ...x, status: 'draft', updatedAt: now() } : x
+          ),
+        });
+        return true;
+      },
       addAllocation: (a) => {
         const id = uuid();
         set({ allocations: [...get().allocations, { ...a, id }] });

@@ -73,7 +73,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
-  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, updateSettlement, settlements, addInvoice, reopenDeal, listDeletedDeals } = useTra();
+  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, updateSettlement, undoSettlement, reopenSettlement, settlements, addInvoice, reopenDeal, listDeletedDeals } = useTra();
   const { flocks } = useFlk();
   const { hatches } = useInc();
 
@@ -668,6 +668,32 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                             </div>
                             {st.invoiceId && (
                               <Row l="فاکتور فروش" v={<EntityLink type="invoice" id={st.invoiceId} label="مشاهده" />} />
+                            )}
+                            {st.status === 'invoiced' && (
+                              <Btn size="sm" onClick={async (e) => {
+                                e.stopPropagation();
+                                const ok = await showConfirmAsync('لغو تبدیل به فاکتور', 'فاکتور مربوطه حذف می‌شه و تسویه به «تأییدشده» برمی‌گرده. ادامه؟', { danger: true });
+                                if (!ok) return;
+                                try {
+                                  undoSettlement(st.id);
+                                  toastMsg.success('تسویه به تأییدشده برگشت');
+                                } catch (err) {
+                                  toastMsg.error(err instanceof Error ? err.message : 'خطا در لغو');
+                                }
+                              }}>↩️ لغو تبدیل</Btn>
+                            )}
+                            {st.status === 'confirmed' && (
+                              <Btn size="sm" onClick={async (e) => {
+                                e.stopPropagation();
+                                const ok = await showConfirmAsync('بازگشت به پیش‌نویس', 'این تسویه به پیش‌نویس برمی‌گرده و قابل ویرایش می‌شه. ادامه؟', { danger: false });
+                                if (!ok) return;
+                                try {
+                                  reopenSettlement(st.id);
+                                  toastMsg.success('تسویه به پیش‌نویس برگشت');
+                                } catch (err) {
+                                  toastMsg.error(err instanceof Error ? err.message : 'خطا');
+                                }
+                              }}>✏️ بازگشت به پیش‌نویس</Btn>
                             )}
                           </div>
                         );

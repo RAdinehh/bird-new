@@ -390,6 +390,8 @@ export interface State {
   deals: Deal[];
   settlements: Settlement[];
   addSettlement: (s: Omit<Settlement, 'id' | 'createdAt' | 'updatedAt'>) => string;
+  undoSettlement: (id: string) => boolean;
+  reopenSettlement: (id: string) => boolean;
   updateSettlement: (id: string, patch: Partial<Settlement>) => void;
   deleteSettlement: (id: string) => void;
   allocations: PaymentAllocation[];
