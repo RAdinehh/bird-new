@@ -134,17 +134,15 @@ export function computeSaleCap(
  */
 export function computePaymentCap(
   myShare: number,
-  payments: DealPayment[]
+  payments: DealPayment[],
+  excludePaymentId?: string
 ): number {
   let paidIn = 0;
-  let refunds = 0;
+  let paidOut = 0;
   for (const p of payments) {
-    const type = (p as { type?: string }).type;
-    if (type === 'refund') {
-      refunds += p.amount || 0;
-    } else if (p.direction === 'in') {
-      paidIn += p.amount || 0;
-    }
+    if (excludePaymentId && p.id === excludePaymentId) continue;
+    if (p.direction === 'in') paidIn += p.amount || 0;
+    else if (p.direction === 'out') paidOut += p.amount || 0;
   }
-  return Math.max(0, myShare - paidIn + refunds);
+  return Math.max(0, myShare - paidIn + paidOut);
 }

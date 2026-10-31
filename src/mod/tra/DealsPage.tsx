@@ -12,7 +12,7 @@ import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
 import { useInc } from '../inc/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { getUOM, getDefaultUnit } from '../../shr/units/uom';
-import { computeGoodsCap, computeDeliveryCap, computeSaleCap } from './caps';
+import { computeGoodsCap, computeDeliveryCap, computeSaleCap, computePaymentCap } from './caps';
 import { Btn, BtnRow, CardActions, Empty, Field, Input, MoneyField, PercentField,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
@@ -1446,12 +1446,18 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             <Field label="مبلغ" required error={showError?.(`payments.${pi}.amount`)} onTouch={() => markTouched?.(`payments.${pi}.amount`)}>
               <MoneyField showWords={false} placeholder="مبلغ" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { 
                 const raw = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0; 
-                const otherPaidIn = form.payments.filter(x => x.direction === 'in' && x.id !== p.id).reduce((s, x) => s + (Number(x.amount) || 0), 0);
-                const otherPaidOut = form.payments.filter(x => x.direction === 'out' && x.id !== p.id).reduce((s, x) => s + (Number(x.amount) || 0), 0);
-                const rem = calc.myShare - otherPaidIn + otherPaidOut;
-                const val = (p.direction === 'in' && rem > 0) ? Math.min(raw, rem) : raw;
+                const cap = computePaymentCap(calc.myShare, form.payments, p.id);
+                const val = (p.direction === 'in') ? Math.min(raw, cap) : raw;
                 setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, amount: val } : x) })); 
               }} />
+                {p.direction === 'in' && (() => {
+                  const cap = computePaymentCap(calc.myShare, form.payments, p.id);
+                  return (
+                    <div style={{ fontSize: 'var(--fs-xs)', color: cap <= 0 ? 'var(--danger)' : 'var(--muted)', marginTop: 4, fontWeight: 600 }}>
+                      {cap <= 0 ? '🔴 ظرفیت پرداخت تکمیل' : '📊 حداکثر: ' + toFa(cap.toLocaleString('fa-IR')) + ' ت'}
+                    </div>
+                  );
+                })()}
               {(() => {
                 if (p.direction !== 'in') return null;
                 const otherPaidIn = form.payments.filter(x => x.direction === 'in' && x.id !== p.id).reduce((s, x) => s + (Number(x.amount) || 0), 0);

@@ -265,17 +265,10 @@ describe('computePaymentCap — Remaining Amount', () => {
     expect(cap).toBe(500_000);
   });
 
-  it('refund → cap افزایش', () => {
-    const cap = computePaymentCap(1_000_000, [
-      mkPay({ id: 'p1', amount: 300_000, direction: 'in' }),
-      mkPay({ id: 'p2', amount: 100_000, direction: 'in', type: 'refund' } as any),
-    ]);
-    expect(cap).toBe(800_000);  // 1M - 300K + 100K refund
-  });
 
-  it('پرداخت out (به طرف) → نامربوط', () => {
+  it('پرداخت out (به طرف) → افزوده به myShare', () => {
     const cap = computePaymentCap(1_000_000, [mkPay({ amount: 300_000, direction: 'out' })]);
-    expect(cap).toBe(1_000_000);
+    expect(cap).toBe(1_300_000);
   });
 
   it('پرداخت بیش از myShare → cap = 0', () => {
