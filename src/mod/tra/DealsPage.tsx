@@ -586,29 +586,26 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 subtitle={`${party?.name || '—'} • ${toFa(d.date)}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : d.id)}
-                badge={<Tag tone={d.status === 'settled' ? 'green' : d.status === 'cancelled' ? 'gray' : 'amber'}>{STATUS_LABEL[d.status]}</Tag>}
+                badge={<>
+                  <Tag tone={d.status === 'settled' ? 'green' : d.status === 'cancelled' ? 'gray' : 'amber'}>{STATUS_LABEL[d.status]}</Tag>
+                  {(() => {
+                    const ag = dealAging(d);
+                    if (!ag) return null;
+                    const tone = ag.tone === 'ok' ? 'green' : ag.tone === 'warn' ? 'amber' : 'danger';
+                    return <Tag tone={tone as any}>⏳ {toFa(ag.days)} روز</Tag>;
+                  })()}
+                  {relatedInvoices.length > 0 && (
+                    <Tag tone="info">📄 {toFa(relatedInvoices.length)} فاکتور</Tag>
+                  )}
+                  {relatedFlocks.length > 0 && (
+                    <Tag tone="green">🐔 {toFa(relatedFlocks.length)} گله</Tag>
+                  )}
+                </>}
                 stats={
                   <>
                     {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(d.value.toLocaleString('fa-IR'))} تومان</b></span>}
                     {d.percent !== null && d.percent !== undefined && <span>درصد: <b style={{ color: 'var(--text)' }}>{toFa(d.percent)}٪</b></span>}
                     {d.dueDate ? <span>سرسید: <b style={{ color: 'var(--text)' }}>{toFa(d.dueDate)}</b></span> : null}
-              {(() => {
-                const ag = dealAging(d);
-                if (!ag) return null;
-                const bg = ag.tone === 'ok' ? 'var(--accent-soft)' : ag.tone === 'warn' ? 'var(--warn-soft)' : 'var(--danger-soft)';
-                const fg = ag.tone === 'ok' ? 'var(--accent)' : ag.tone === 'warn' ? 'var(--warn)' : 'var(--danger)';
-                return <span style={{ padding: '2px 8px', borderRadius: 4, background: bg, color: fg, fontWeight: 700, fontSize: 'var(--fs-xs)' }}>⏳ {toFa(ag.days)} روز</span>;
-              })()}
-              {relatedInvoices.length > 0 && (
-                <button type="button" onClick={(e) => {
-                  e.stopPropagation();
-                  const tab = relatedInvoices[0]?.type === 'sale' ? 'sales' : 'purchases';
-                  navigate(`/tra?tab=${tab}&relatedDealId=${d.id}`);
-                }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit', padding: 0, fontWeight: 600 }}>
-                  📄 {toFa(relatedInvoices.length)} فاکتور
-                </button>
-              )}
-              {relatedFlocks.length > 0 && <span>🐔 {toFa(relatedFlocks.length)} گله</span>}
                   </>
                 }
               >
