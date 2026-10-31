@@ -14,8 +14,9 @@ import ExpandableCard from '../../../shr/components/ExpandableCard';
 import EntityLink from '../../../shr/components/EntityLink';
 import { Row, RowGrid } from '../helpers';
 import { useFlk, type FlockGroupType } from '../store';
+import { useTra } from '../../tra/store';
 import LifecycleBar from './LifecycleBar';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { BadgeOverflow } from '../../../shr/components/ui/BadgeOverflow';
 
 import FlockHistoryModal from './FlockHistoryModal';
@@ -110,6 +111,24 @@ export default function FlockCard(props: FlockCardProps) {
   const accentColor: 'accent' | 'dim' = isArchived ? 'dim' : 'accent';
 
   // 🆕 N Counter: ساخت آرایه badge با اولویت
+  const deals = useTra(s => s.deals);
+  const consignmentCount = useMemo(() => {
+    let total = 0;
+    for (const deal of deals) {
+      if (deal.status === 'cancelled') continue;
+      for (const good of deal.goods || []) {
+        if (good.existingFlockId !== f.id) continue;
+        const dvs = (deal.deliveries || []).filter((dv: any) => dv.goodId === good.id);
+        const out = dvs.filter((dv: any) => dv.type === 'out').reduce((s: number, dv: any) => s + (dv.quantity || 0), 0);
+        const ret = dvs.filter((dv: any) => dv.type === 'return').reduce((s: number, dv: any) => s + (dv.quantity || 0), 0);
+        const loss = dvs.filter((dv: any) => dv.type === 'loss').reduce((s: number, dv: any) => s + (dv.quantity || 0), 0);
+        const sold = (deal.sales || []).filter((s: any) => s.goodId === good.id).reduce((s: number, x: any) => s + (x.quantity || 0), 0);
+        total += Math.max(0, out - ret - loss - sold);
+      }
+    }
+    return total;
+  }, [f.id, deals]);
+
   const allBadges: Array<{ key: string; node: React.ReactNode }> = [];
 
   if (!isArchived && !f.sourceInvoiceId && !f.hatchId) {
@@ -195,6 +214,7 @@ export default function FlockCard(props: FlockCardProps) {
       stats={<>
         {ageDays > 0 && <span>🎂 <b style={{ color: 'var(--text)' }}>{fmt.int(ageDays)} روز</b></span>}
         {f.currentCount != null && <span>🐔 <b style={{ color: 'var(--text)' }}>{fmt.int(f.currentCount)}</b></span>}
+        {consignmentCount > 0 && <span style={{ color: 'var(--purple)', fontWeight: 600 }} title="در دست طرف">📤 <b>{fmt.int(consignmentCount)}</b></span>}
         {f.initialCount != null && f.currentCount != null && (() => {
           const events = ((f as any).events || []).filter((e: any) => !e.revoked);
           const eventSales = events.filter((e: any) => e.type === 'sell').reduce((s: number, e: any) => s + (e.count || 0), 0);
@@ -220,7 +240,7 @@ export default function FlockCard(props: FlockCardProps) {
             </>
           );
         })()}
-        {costs.perBird > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{fmt.money(Math.round(costs.perBird))}</b></span>}
+        
       </>}
     >
 
