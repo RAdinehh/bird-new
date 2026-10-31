@@ -133,20 +133,22 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         <button onClick={() => setKind('purchase')} style={tab(kind === 'purchase')}>
           📤 بدهی
         </button>
-        <button onClick={() => setKind('deal')} style={tab(kind === 'deal')}>
+        <button onClick={() => setKind('deal')} style={{ ...tab(kind === 'deal'), ...(kind === 'deal' ? { color: 'var(--purple)', borderColor: 'var(--purple)' } : {}) }}>
           🤝 معاملات
         </button>
       </div>
 
       {/* 🆕 دکمه پرداخت گروهی */}
-      <Btn
-        size="sm"
-        variant="primary"
-        onClick={() => setMultiPayOpen(true)}
-        style={{ marginBottom: 8, width: '100%' }}
-      >
-        💳 {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
-      </Btn>
+      {kind !== 'deal' && (
+        <Btn
+          size="sm"
+          variant="primary"
+          onClick={() => setMultiPayOpen(true)}
+          style={{ marginBottom: 8, width: '100%' }}
+        >
+          💳 {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
+        </Btn>
+      )}
 
       {/* خلاصه — یه خط */}
       <SummaryBox kind={kind} totalOpen={totalOpen} openCount={openInvoices.length} overdueCount={overdueCount} soonCount={soonCount} />
@@ -175,7 +177,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>}
           title={kind === 'sale' ? 'طلبی وجود ندارد' : kind === 'deal' ? 'معامله بازی وجود ندارد' : 'بدهی وجود ندارد'}
-          desc="همه‌ی فاکتورها تسویه شده‌اند."
+          desc={kind === 'deal' ? 'همه‌ی معاملات تسویه شده‌اند.' : 'همه‌ی فاکتورها تسویه شده‌اند.'}
         />
       ) : null}
 
