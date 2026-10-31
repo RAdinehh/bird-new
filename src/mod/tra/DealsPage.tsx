@@ -770,7 +770,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             <SmartSelect
               value={form.partyId}
               onChange={v => setForm({...form, partyId: v})}
-              options={contacts.map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
+              options={contacts.filter(c => c.roles?.includes('customer')).map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب طرف معامله"
               autoThreshold={6}
