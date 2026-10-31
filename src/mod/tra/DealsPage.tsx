@@ -1156,11 +1156,21 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               <Input placeholder="جوجه یک‌روزه" value={g.name} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, name: e.target.value } : x) }))} />
             </Field>
             <Field label="واحد" error={showError?.(`goods.${gi}.unit`)} onTouch={() => markTouched?.(`goods.${gi}.unit`)}>
-              <Select value={g.unit || getDefaultUnit(g.category)} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, unit: e.target.value as any } : x) }))}>
-                {(getUOM(g.category)?.units || getUOM('other')?.units || []).map(u => (
-                  <option key={u.value} value={u.value}>{u.label}</option>
-                ))}
-              </Select>
+              {(() => {
+                const units = getUOM(g.category)?.units || getUOM('other')?.units || [];
+                // اگه فقط ۱ گزینه داره (جوجه/بالغ/تخم) → نمایش ثابت
+                if (units.length === 1) {
+                  return <Input value={units[0].label} disabled />;
+                }
+                // چند گزینه → dropdown
+                return (
+                  <Select value={g.unit || getDefaultUnit(g.category)} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, unit: e.target.value as any } : x) }))}>
+                    {units.map(u => (
+                      <option key={u.value} value={u.value}>{u.label}</option>
+                    ))}
+                  </Select>
+                );
+              })()}
             </Field>
           </Grid2>
           <Grid2>
