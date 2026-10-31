@@ -461,3 +461,46 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 - **Phase 4 (بعدی):** whs cascade اختیاری (با تأیید کاربر)
 - **Phase 5 (بعدی):** گزارش/KPI per Deal + Aging analysis
 
+
+
+---
+
+## 📅 جلسه ۱۴۰۵/۰۸/۰۹ (شماره ۲ — بعد از 873847b2)
+
+### ✅ DONE — تسویه → فاکتور کامل شد
+
+| # | Feature | commit |
+|---|---------|--------|
+| 1 | Origin tracking (relatedSettlementId, sourceType) | 4b1bd0f8 |
+| 2 | Cascade delete + toast | 4b1bd0f8 |
+| 3 | UI Lock (required fields) | 9a02a98b |
+| 4 | Duplicate guard (بدون status) | c6d45574 |
+| 5 | Restore cascade (restore فاکتور → تسویه invoiced) | a996162b |
+| 6 | bird/breed از گله + کمیسیون line item | a7916ddd |
+| 7 | فیلتر مخاطبین (customers only در معاملات خاص) | 0a63bf24 |
+| 8 | حذف بنر + آزاد relatedDealId (الگوی گله) | 07f60166 |
+| 9 | EntityLink کارت تسویه (لینک به فاکتور) | 49448706 |
+| 10 | L11 tests گارد تسویه (۹ تست) | 2361fea0 |
+| 11 | Undo/Reopen Settlement | 4e0adc2c |
+| 12 | CardActions/BtnRow استاندارد | 42ac59e2 |
+| 13 | Badge/Stats استاندارد (بدون interactive در stats) | e812978e |
+| 14 | BadgeOverflow مشترک (DRY) | e5d37541 |
+
+### 📊 تست‌ها
+- **26 tests passed** (17 deal-journey + 9 store-tra-settlement)
+
+### 🆕 الگوهای جدید
+- **BadgeOverflow** در `src/shr/components/ui/BadgeOverflow.tsx`
+- **CardActions** با `stopPropagation` داخلی
+- **تفکیک Badge (metadata) از Stats (financial)**
+- **origin tracking** (`relatedSettlementId` + `sourceType`)
+
+### ⏸ PENDING
+- Installments (اقساط) — ۱ ساعت
+- Lot Tracking (Phase F) — ۴-۶ ساعت
+- Vendor Consignment — ۲-۳ ساعت
+- Phase G-2 (مهاجرت ۴۰ فایل) — ۴-۵ ساعت
+- hal → whs (تجهیزات نصب‌شده) — ۱-۲ ساعت
+- قرارداد پرورش (FCR/EPEF) — ۴-۵ ساعت
+- `+N` overflow برای InvoiceCard (اگه لازم شد)
+- هماهنگ‌سازی Badge/Stats بقیه کارت‌ها (bird/hall/zone)

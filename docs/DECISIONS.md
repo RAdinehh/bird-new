@@ -22,6 +22,88 @@
 
 ---
 
+### [1405/08/09] Origin Tracking — relatedSettlementId + sourceType
+- **تصمیم:** `Invoice` دارای `relatedSettlementId?: string` و `sourceType?: 'manual' | 'deal' | 'settlement' | 'flock'`.
+- **دلیل:** ردیابی دوطرفه (تسویه ↔ فاکتور) مشابه الگوی گله (`Flock.sourceInvoiceId`). امکان undo/reopen.
+- **جایگزین رد شده:** فقط `relatedDealId` — رد شد، چون نمی‌شد فاکتور را دقیقاً به تسویه‌ی خاص نسبت داد.
+- **عواقب:** فاکتورهای قدیمی (بدون relatedSettlementId) lock نمی‌شن ولی cascade restore کار می‌کند (از `Settlement.invoiceId`).
+- **فایل‌های متاثر:** `types.ts`, `store.ts`, `settlement.ts`, `InvoiceFormModal.tsx`, `DealsPage.tsx`.
+
+---
+
+### [1405/08/09] کمیسیون تسویه — line item جداگانه
+- **تصمیم:** `createInvoiceFromSettlement` کمیسیون را به‌عنوان آیتم منفی در `items[]` اضافه می‌کند. `total = netPayable` بدون تغییر می‌ماند.
+- **دلیل:** استاندارد Odoo/SAP — شفافیت در چاپ فاکتور («کمیسیون نماینده: -X تومان»).
+- **جایگزین رد شده:** قرار دادن در `discount` — رد شد، شفافیت چاپ فاکتور از دست می‌رفت.
+- **عواقب:** تعداد `items` در تست‌ها از ۱ به ۲. کاربر در فرم ویرایش فاکتور، آیتم کمیسیون را می‌بیند (قفل).
+- **فایل‌های متاثر:** `settlement.ts`, `deal-journey.test.ts`.
+
+---
+
+### [1405/08/09] bird/breed از گله استخراج می‌شود
+- **تصمیم:** اگر `DealGood.existingFlockId` وجود دارد، `createInvoiceFromSettlement` فیلدهای `birdId`, `breedId`, `flockId`, `flockName` را از Flock می‌خواند.
+- **دلیل:** `DealGood` این فیلدها را ندارد و Zod روی ذخیره fail می‌دهد.
+- **جایگزین رد شده:** اضافه کردن فیلدها به DealGood + UI — رد شد، ۴-۶ ساعت کار و overlap با گله.
+- **عواقب:** استخراج یک‌طرفه (Deal→Flock). تغییر بعدی گله، فاکتور را تغییر نمی‌دهد.
+- **فایل‌های متاثر:** `settlement.ts`.
+
+---
+
+### [1405/08/09] گارد تسویه تکراری — بدون بررسی status
+- **تصمیم:** `addSettlement` فقط با `dealId + periodStart + periodEnd` بررسی می‌کند، بدون `status`.
+- **دلیل:** باگ قبلی (`status === 'draft'`) اجازه می‌داد تسویه‌ی invoiced → تسویه‌ی جدید ساخته شود.
+- **جایگزین رد شده:** allow-if-not-draft — رد شد، همان باگ.
+- **عواقب:** کاربر برای ساخت تسویه‌ی جدید در همان بازه، باید اول undo/حذف کند.
+- **فایل‌های متاثر:** `store.ts`.
+
+---
+
+### [1405/08/09] UI Lock فیلدهای required در فاکتورهای از تسویه
+- **تصمیم:** `date`, `category`, `partyId`, `deliveryDate`, `items[]` قفل می‌شوند اگر `relatedSettlementId` یا `sourceType === 'settlement'`. `relatedDealId` آزاد می‌ماند.
+- **دلیل:** داده‌های مالی از تسویه آمده، تغییرشان باعث ناسازگاری می‌شود. الگوی گله (`FlockDetailsSection`) مرجع.
+- **جایگزین رد شده:** قفل کامل شامل `relatedDealId` — رد شد، الگوی گله لینک را آزاد می‌گذارد.
+- **عواقب:** کاربر برای اصلاح فیلدهای قفل، باید undo و دوباره convert کند.
+- **فایل‌های متاثر:** `InvoiceFormModal.tsx`.
+
+---
+
+### [1405/08/09] فیلتر مخاطبین در معاملات خاص — فقط customers
+- **تصمیم:** `SmartSelect` در فرم معامله فقط مخاطبین با `roles.includes('customer')` را نشان می‌دهد.
+- **دلیل:** معاملات خاص خرید ندارد. طرف مقابل همیشه گیرنده است (مشتری/شریک/آمانت‌گیر).
+- **جایگزین رد شده:** همه مخاطبین — رد شد، انتخاب فروشنده/کارگر خطا می‌داد.
+- **عواقب:** اگر شریک/آمانت‌گیر با نقش «فروشنده» ثبت شده، دیده نمی‌شود (کاربر باید نقشش را اضافه کند).
+- **فایل‌های متاثر:** `DealsPage.tsx`.
+
+---
+
+### [1405/08/09] BadgeOverflow — کامپوننت مشترک برای +N
+- **تصمیم:** استخراج `BadgeOverflow` به `src/shr/components/ui/BadgeOverflow.tsx`. FlockCard و DealsPage از آن استفاده می‌کنند. InvoiceCard (فقط ۲ بج) نیاز ندارد.
+- **دلیل:** DRY. کاهش ۹۶ خط از FlockCard. هماهنگی بین کارت‌ها.
+- **جایگزین رد شده:** کپی منطق در هر فایل — رد شد، maintenance cost.
+- **عواقب:** تغییر آینده‌ی overflow logic فقط در یک فایل.
+- **فایل‌های متاثر:** `BadgeOverflow.tsx` (جدید), `FlockCard.tsx`, `DealsPage.tsx`.
+
+---
+
+### [1405/08/09] تفکیک Badge (metadata) از Stats (financial)
+- **تصمیم:** Badge = metadata (status, age, count). Stats = financial/read-only (value, percent, dueDate). Interactive elements در stats ممنوع.
+- **دلیل:** استاندارد FlockCard/InvoiceCard. جلوگیری از click conflict.
+- **جایگزین رد شده:** دکمه در stats (DealsPage قبلی) — رد شد.
+- **عواقب:** اکشن‌های interactive در بدنه (وقتی باز) یا headerAction.
+- **فایل‌های متاثر:** `DealsPage.tsx`, `UI-PATTERNS.md` (باید به‌روز شود).
+
+---
+
+### [1405/08/09] CardActions — استاندارد کارت‌های اصلی
+- **تصمیم:** `CardActions` از `src/shr/components/ui/CardActions.tsx` — grid auto-fit، هر دکمه `flex:1`. `stopPropagation` داخلی. اکشن اصلی `primary`، حذف `danger`، ثانویه `outline`.
+- **دلیل:** هماهنگی با FlockCard (استاندارد طلایی). جلوگیری از event bubbling.
+- **جایگزین رد شده:** grid دستی — رد شد، کد تکراری.
+- **عواقب:** همه کارت‌های اصلی از CardActions استفاده می‌کنند.
+- **فایل‌های متاثر:** `CardActions.tsx`, `DealsPage.tsx`.
+
+---
+
+
 ### [1404/07/28] DevicesPage — استثنا در L7
 
 - **تصمیم:** `inc/DevicesPage.tsx` (۵۰۶ خط) به‌عنوان استثنای L7 می‌ماند. split نمی‌شود.
