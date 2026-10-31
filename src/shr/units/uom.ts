@@ -25,7 +25,7 @@ export interface UOMRule {
 }
 
 /** آیا واحد انتخابی نیاز به unitWeight (ضریب دستی) دارد؟ */
-export const UOM_RULES: Record<Category, UOMRule> = {
+export const UOM_RULES: Record<string, UOMRule> = {
   // ═══ دام و طیور — تک واحدی ═══
   chick:       { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1, dimension: 'count' }], default: 'pcs' },
   adult:       { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1, dimension: 'count' }], default: 'pcs' },

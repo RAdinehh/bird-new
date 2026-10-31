@@ -20,91 +20,11 @@ import { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
 
 
 // ═══ نقشه استاندارد واحدها (UoM) بر اساس دسته‌بندی ═══
-export type UOMUnit = { value: string; label: string; factor: number | null };
-export const UOM_CATEGORIES: Record<string, { baseUnit: string; units: UOMUnit[]; default: string }> = {
-  // تک‌واحدی‌ها (بدون تبدیل)
-  egg: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
-  fertile_egg: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
-  chick: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
-  adult: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
-  broken: { baseUnit: 'pcs', units: [{ value: 'pcs', label: 'عدد', factor: 1 }], default: 'pcs' },
-  // ═══ تجهیزات: منبع حقیقت = HAL EquipmentUnit (pcs, kg, m2, m, L) ═══
-  equipment: {
-    baseUnit: 'pcs',
-    units: [
-      { value: 'pcs', label: 'عدد', factor: 1 },
-      { value: 'kg', label: 'کیلوگرم', factor: 1 },
-      { value: 'm2', label: 'متر مربع', factor: 1 },
-      { value: 'm', label: 'متر', factor: 1 },
-      { value: 'L', label: 'لیتر', factor: 1 },
-    ],
-    default: 'pcs',
-  },
-  
-  // چندواحدی‌ها (با تبدیل به واحد پایه)
-  // ─── دان: پایه = کیلوگرم ───
-  feed: {
-    baseUnit: 'kg',
-    units: [
-      { value: 'kg', label: 'کیلوگرم', factor: 1 },
-      { value: 'g', label: 'گرم', factor: 0.001 },
-      { value: 'ton', label: 'تن', factor: 1000 },
-      { value: 'bag', label: 'کیسه (۲۵ کیلو)', factor: 25 },
-    ],
-    default: 'kg',
-  },
-  // ─── دارو: پایه = میلی‌لیتر ───
-  medicine: {
-    baseUnit: 'ml',
-    units: [
-      { value: 'ml', label: 'میلی‌لیتر', factor: 1 },
-      { value: 'l', label: 'لیتر', factor: 1000 },
-      { value: 'vial', label: 'ویال', factor: null },   // وزن هر ویال باید داده شود
-      { value: 'pack', label: 'بسته', factor: null },   // وزن هر بسته باید داده شود
-    ],
-    default: 'ml',
-  },
-  // ─── داروی گیاهی: پایه = گرم ───
-  herbal: {
-    baseUnit: 'g',
-    units: [
-      { value: 'g', label: 'گرم', factor: 1 },
-      { value: 'kg', label: 'کیلوگرم', factor: 1000 },
-      { value: 'l', label: 'لیتر (معادل گرم)', factor: 1000 },
-      { value: 'pack', label: 'بسته', factor: null },   // وزن هر بسته باید داده شود
-    ],
-    default: 'g',
-  },
-  // ─── واکسن: پایه = دوز ───
-  vaccine: {
-    baseUnit: 'dose',
-    units: [
-      { value: 'dose', label: 'دوز', factor: 1 },
-      { value: 'vial', label: 'ویال', factor: null },   // تعداد دوز هر ویال
-      { value: 'pack', label: 'بسته', factor: null },   // تعداد دوز هر بسته
-    ],
-    default: 'dose',
-  },
-  // ─── کود: پایه = کیلوگرم ───
-  manure: {
-    baseUnit: 'kg',
-    units: [
-      { value: 'kg', label: 'کیلوگرم', factor: 1 },
-      { value: 'ton', label: 'تن', factor: 1000 },
-    ],
-    default: 'kg',
-  },
-  // ─── سایر: پایه = عدد ───
-  other: {
-    baseUnit: 'pcs',
-    units: [
-      { value: 'pcs', label: 'عدد', factor: 1 },
-      { value: 'kg', label: 'کیلوگرم', factor: 1 },
-      { value: 'pack', label: 'بسته', factor: null },
-    ],
-    default: 'pcs',
-  },
-};
+import { UOM_RULES, getDefaultUnit as _getDefaultUnit } from '../../../shr/units/uom';
+export type { UOMUnit } from '../../../shr/units/uom';
+
+// 🆕 منبع یکتای UOM — alias به shr/units/uom.ts
+export const UOM_CATEGORIES = UOM_RULES;
 
 /** آیا واحد انتخابی نیاز به ضریب دستی (unitWeight) دارد؟ */
 export function unitNeedsWeight(cat: string, unit: string): boolean {
