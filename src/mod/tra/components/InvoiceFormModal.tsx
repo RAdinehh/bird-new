@@ -51,31 +51,23 @@ export interface InvoiceFormModalProps {
 
 const getDescriptionPlaceholder = (cat: string): string => {
   switch (cat) {
-    case 'chick':       return 'مثلاً: جوجه یک‌روزه راس ۳۰۸';
-    case 'adult':       return 'مثلاً: مرغ مادر بالغ';
-    case 'egg':         return 'مثلاً: تخم نطفه‌دار نژاد راس';
-    case 'fertile_egg': return 'مثلاً: تخم نطفه‌دار نژاد راس';
-    case 'feed':        return 'مثلاً: دان استارتر پیشگامان';
-    case 'medicine':    return 'مثلاً: داکسی‌سایکلین ۱۰۰ml';
-    case 'equipment':   return 'مثلاً: فن تونلی ۱۲۰';
-    case 'broken':      return 'مثلاً: تخم‌های شکسته';
-    case 'manure':      return 'مثلاً: کود مرغی خشک';
-    case 'other':       return 'مثلاً: هزینه حمل بار';
+    case 'chick':       return 'نژاد و سن';
+    case 'adult':       return 'نژاد و مشخصات';
+    case 'egg':         return 'نژاد و درجه';
+    case 'fertile_egg': return 'نژاد و کیفیت';
+    case 'feed':        return 'برند و نوع';
+    case 'medicine':    return 'نام و دوز';
+    case 'equipment':   return 'نوع و مدل';
+    case 'broken':      return 'دلیل و مقدار';
+    case 'manure':      return 'نوع و کیفیت';
+    case 'other':       return 'مشخصات';
     default:            return 'توضیح';
   }
 };
 
-const getPricePlaceholder = (cat: string): string => {
-  switch (cat) {
-    case 'chick':       return 'قیمت هر جوجه';
-    case 'adult':       return 'قیمت هر پرنده';
-    case 'egg':         return 'قیمت هر تخم';
-    case 'fertile_egg': return 'قیمت هر تخم';
-    case 'feed':        return 'قیمت هر کیلو';
-    case 'medicine':    return 'قیمت هر بسته';
-    case 'equipment':   return 'قیمت هر عدد';
-    default:            return 'مثلاً — ۱۰٬۰۰۰';
-  }
+const getPricePlaceholder = (_cat: string): string => {
+  // Label قبلاً «قیمت هر {واحد}» نشون می‌ده — placeholder فقط واحد پول
+  return 'تومان';
 };
 
 const getUnitForCategory = (cat: string): string => {
