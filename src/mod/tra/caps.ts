@@ -90,8 +90,15 @@ export function computeGoodsCap(
  * سقف تحویل — Free Qty
  * = goods.quantity − netDelivered
  */
-export function computeDeliveryCap(good: DealGood, deliveries: DealDelivery[]): number {
-  const netDelivered = netDeliveredForGood(good, deliveries);
+export function computeDeliveryCap(
+  good: DealGood,
+  deliveries: DealDelivery[],
+  excludeDeliveryId?: string
+): number {
+  const filtered = excludeDeliveryId
+    ? deliveries.filter(d => d.id !== excludeDeliveryId)
+    : deliveries;
+  const netDelivered = netDeliveredForGood(good, filtered);
   return Math.max(0, (good.quantity || 0) - netDelivered);
 }
 

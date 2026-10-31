@@ -1262,7 +1262,23 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 </Field>
               </Grid2>
               <Field label="مقدار" required error={showError?.(`deliveries.${di}.quantity`)} onTouch={() => markTouched?.(`deliveries.${di}.quantity`)}>
-                <NumField placeholder="۵۰۰" value={String(dv.quantity || '')} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={1_000_000} />
+                <NumField placeholder="۵۰۰" value={String(dv.quantity || '')} onChange={e => {
+                  const raw = Number(toEn(e.target.value)) || 0;
+                  const good = form.goods.find(x => x.id === dv.goodId);
+                  const cap = good ? computeDeliveryCap(good, form.deliveries, dv.id) : raw;
+                  const val = Math.min(raw, cap);
+                  setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, quantity: val } : x) }));
+                }} min={1} max={1_000_000} />
+                {(() => {
+                  const good = form.goods.find(x => x.id === dv.goodId);
+                  if (!good) return null;
+                  const cap = computeDeliveryCap(good, form.deliveries, dv.id);
+                  return (
+                    <div style={{ fontSize: 'var(--fs-xs)', color: cap === 0 ? 'var(--danger)' : 'var(--muted)', marginTop: 4, fontWeight: 600 }}>
+                      {cap === 0 ? '🔴 ظرفیت تکمیل — تحویل بیشتری ممکن نیست' : '📊 باقیمانده: ' + toFa(cap) + ' از ' + toFa(good.quantity || 0)}
+                    </div>
+                  );
+                })()}
                 {Number(dv.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={dv.quantity} />}
               </Field>
               {dv.type === 'in' && (
