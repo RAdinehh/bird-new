@@ -14,6 +14,7 @@ import { Btn, BtnRow, CardActions, Empty, Field, Input, MoneyField, PercentField
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
 import EntityLink from '../../shr/components/EntityLink';
+import { BadgeOverflow, type BadgeItem } from '../../shr/components/ui/BadgeOverflow';
 import { FieldHint } from '../../shr/intelligence';;
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
@@ -574,6 +575,19 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             const relatedFlocks = flocks.filter((f: any) => f.dealData?.dealId === d.id);
             const accent = accentFor(d.status);
             const isOpen = !ms.selectionMode && expandedId === d.id;
+            const dealBadges: BadgeItem[] = [];
+            dealBadges.push({ key: 'status', node: <Tag tone={d.status === 'settled' ? 'green' : d.status === 'cancelled' ? 'gray' : 'amber'}>{STATUS_LABEL[d.status]}</Tag> });
+            const _ag = dealAging(d);
+            if (_ag) {
+              const _tone = _ag.tone === 'ok' ? 'green' : _ag.tone === 'warn' ? 'amber' : 'danger';
+              dealBadges.push({ key: 'age', node: <Tag tone={_tone as any}>⏳ {toFa(_ag.days)} روز</Tag> });
+            }
+            if (relatedInvoices.length > 0) {
+              dealBadges.push({ key: 'inv', node: <Tag tone="info">📄 {toFa(relatedInvoices.length)} فاکتور</Tag> });
+            }
+            if (relatedFlocks.length > 0) {
+              dealBadges.push({ key: 'flk', node: <Tag tone="green">🐔 {toFa(relatedFlocks.length)} گله</Tag> });
+            }
             return (
               <ExpandableCard
                 key={d.id}
@@ -586,21 +600,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 subtitle={`${party?.name || '—'} • ${toFa(d.date)}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : d.id)}
-                badge={<>
-                  <Tag tone={d.status === 'settled' ? 'green' : d.status === 'cancelled' ? 'gray' : 'amber'}>{STATUS_LABEL[d.status]}</Tag>
-                  {(() => {
-                    const ag = dealAging(d);
-                    if (!ag) return null;
-                    const tone = ag.tone === 'ok' ? 'green' : ag.tone === 'warn' ? 'amber' : 'danger';
-                    return <Tag tone={tone as any}>⏳ {toFa(ag.days)} روز</Tag>;
-                  })()}
-                  {relatedInvoices.length > 0 && (
-                    <Tag tone="info">📄 {toFa(relatedInvoices.length)} فاکتور</Tag>
-                  )}
-                  {relatedFlocks.length > 0 && (
-                    <Tag tone="green">🐔 {toFa(relatedFlocks.length)} گله</Tag>
-                  )}
-                </>}
+                badge={<BadgeOverflow badges={dealBadges} max={2} modalTitle={`برچسب‌های معامله #${d.dealNumber || '—'}`} />}
                 stats={
                   <>
                     {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(d.value.toLocaleString('fa-IR'))} تومان</b></span>}

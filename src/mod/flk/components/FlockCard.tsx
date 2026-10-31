@@ -16,7 +16,8 @@ import { Row, RowGrid } from '../helpers';
 import { useFlk, type FlockGroupType } from '../store';
 import LifecycleBar from './LifecycleBar';
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
+import { BadgeOverflow } from '../../../shr/components/ui/BadgeOverflow';
+
 import FlockHistoryModal from './FlockHistoryModal';
 import type { Bird, Breed } from '../../brd/store';
 import type { Hall, Zone } from '../../hal/store';
@@ -81,7 +82,6 @@ export default function FlockCard(props: FlockCardProps) {
   } = props;
 
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [showAllBadges, setShowAllBadges] = useState(false);
 
   const getGroupsForFlock = useFlk(s => s.getGroupsForFlock);
   const flockGroups = getGroupsForFlock(f.id).slice().sort(
@@ -118,7 +118,7 @@ export default function FlockCard(props: FlockCardProps) {
       node: (
         <button
           type="button"
-          onClick={(e) => { e.stopPropagation(); onEdit(); setShowAllBadges(false); }}
+          onClick={(e) => { e.stopPropagation(); onEdit(); }}
           title="این گله به هیچ سند لینک نیست — کلیک برای اتصال"
           aria-label="اتصال گله به سند"
           style={{
@@ -161,7 +161,7 @@ export default function FlockCard(props: FlockCardProps) {
       key: 'group-' + g.id,
       node: (
         <span
-          onClick={(e) => { e.stopPropagation(); onOpenGroups(); setShowAllBadges(false); }}
+          onClick={(e) => { e.stopPropagation(); onOpenGroups(); }}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 2,
             padding: '2px 6px', background: c.bg,
@@ -177,9 +177,7 @@ export default function FlockCard(props: FlockCardProps) {
     });
   });
 
-  const MAX_VISIBLE = 2;
-  const visibleBadges = allBadges.slice(0, MAX_VISIBLE);
-  const hiddenBadges = allBadges.slice(MAX_VISIBLE);
+
 
   return (
     <>
@@ -193,32 +191,7 @@ export default function FlockCard(props: FlockCardProps) {
       subtitle={[bird?.name || '—', breed?.name || (f.breedKind === 'mixed' ? f.breedLabel : ''), hall?.name].filter(Boolean).join(' • ')}
       isOpen={isOpen}
       onToggle={onToggle}
-      badge={<>
-        {visibleBadges.map(b => <span key={b.key}>{b.node}</span>)}
-        {hiddenBadges.length > 0 && (
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); setShowAllBadges(true); }}
-            title={'نمایش ' + toFa(hiddenBadges.length) + ' برچسب دیگر'}
-            aria-label={'نمایش ' + toFa(hiddenBadges.length) + ' برچسب دیگر'}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              padding: '2px 7px',
-              background: 'var(--input-bg)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--r-sm)',
-              fontSize: 10,
-              fontWeight: 700,
-              color: 'var(--muted)',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-            }}
-          >
-            +{toFa(hiddenBadges.length)}
-          </button>
-        )}
-      </>}
+      badge={<BadgeOverflow badges={allBadges} max={2} modalTitle={`برچسب‌های «${f.name}»`} />}
       stats={<>
         {ageDays > 0 && <span>🎂 <b style={{ color: 'var(--text)' }}>{fmt.int(ageDays)} روز</b></span>}
         {f.currentCount != null && <span>🐔 <b style={{ color: 'var(--text)' }}>{fmt.int(f.currentCount)}</b></span>}
@@ -478,54 +451,7 @@ export default function FlockCard(props: FlockCardProps) {
         flock={f}
       />
     </ExpandableCard>
-    {showAllBadges && typeof document !== 'undefined' && createPortal(
-      <div
-        onClick={() => setShowAllBadges(false)}
-        style={{
-          position: 'fixed', inset: 0,
-          background: 'rgba(0,0,0,0.5)',
-          zIndex: 5000,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: 16,
-        }}
-      >
-        <div
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            background: 'var(--card-solid)',
-            borderRadius: 'var(--r-lg)',
-            padding: 16,
-            maxWidth: 360,
-            width: '100%',
-            maxHeight: '80vh',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)' }}>برچسب‌های «{f.name}»</div>
-            <button
-              type="button"
-              onClick={() => setShowAllBadges(false)}
-              aria-label="بستن"
-              style={{
-                width: 32, height: 32, borderRadius: 8,
-                background: 'var(--input-bg)', border: '1px solid var(--border)',
-                cursor: 'pointer', fontFamily: 'inherit',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--text)', fontSize: 16,
-              }}
-            >✕</button>
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {allBadges.map(b => <span key={b.key}>{b.node}</span>)}
-          </div>
-        </div>
-      </div>,
-      document.body
-    )}
+    
     </>
   );
 }
