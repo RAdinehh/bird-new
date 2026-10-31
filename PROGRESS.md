@@ -556,3 +556,29 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 - ⏸ **ParadigmProfile + registry** — پیاده‌سازی پارادایم درمانی (طرح در PARADIGM.md هست)
   - اولویت: پایین
   - مرجع: docs/PARADIGM.md بخش «پیاده‌سازی»
+
+---
+
+## 📅 جلسه ۱۴۰۵/۱۱/۰۱ (شماره ۴ — UOM + restoreInvoice + Inline Payments)
+
+### ✅ DONE — ۲ باگ data-critical + ۴ feature
+
+| # | کار | commit |
+|---|-----|--------|
+| ۱ | icon 💰→🏷 در DealsPage (رفع گمراهی) | 2d91f466 |
+| ۲ | 🚨 **UOM fix در applyDeal** — ۱۰۰ کیسه ≠ ۱۰۰ کیلو | eeaba2d1 |
+| ۳ | 🚨 **restoreInvoice** — گله بعد از بازیابی فاکتور برمی‌گرده | aa6b0d26 |
+| ۴ | پرداخت‌های Deal → inline (مثل InvoiceCard) | cc53d56d |
+| ۵ | «فروش کل» در stats کارت Deal | 555b6abf |
+
+### ✅ hal/ZonesPage — DONE
+- آخرین commit: ff6763de (inline errors + silent Zod + dup name)
+- بدون TODO، 440 خط، Store actions کامل
+- ⚠️ نقض L11: store-hal.test.ts نیست (defer به تسک جدا)
+
+### ⏸ PENDING (اولویت‌بندی‌شده)
+1. 🟠 **مطالبات فاز ۱** — یکپارچگی (فاکتور + Deal در یک لیست)
+2. 🟠 **مطالبات فاز ۲** — Register Payment (DealMultiPayModal)
+3. 🟠 **مطالبات فاز ۳** — Statement + Aging PDF
+4. 🟡 **store-hal.test.ts** — Zone CRUD تست (L11)
+5. 🟡 **RHF Pilot** — تصمیم نگرفته (بحث در جلسه ۱۴۰۵/۱۱/۰۱)
