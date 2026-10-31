@@ -24,6 +24,7 @@ import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import DatePicker from '../../shr/components/DatePicker';
 import TimePicker from '../../shr/components/TimePicker';
 import SettlementModal from './components/SettlementModal';
+import SettlementDetailModal from './components/SettlementDetailModal';
 import { createInvoiceFromSettlement } from './settlement';
 import { applyDealMovements } from './applyDeal';
 import DealRecycleBinModal from './components/DealRecycleBinModal';
@@ -75,7 +76,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
-  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, updateSettlement, undoSettlement, reopenSettlement, settlements, addInvoice, reopenDeal, listDeletedDeals } = useTra();
+  const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, updateSettlement, deleteSettlement, undoSettlement, reopenSettlement, settlements, addInvoice, reopenDeal, listDeletedDeals } = useTra();
   const { flocks } = useFlk();
   const { hatches } = useInc();
 
@@ -151,6 +152,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const [recycleOpen, setRecycleOpen] = useState(false);
   const [printSettlement, setPrintSettlement] = useState<{ settlement: Settlement; deal: Deal } | null>(null);
   const [settlementDeal, setSettlementDeal] = useState<Deal | null>(null);
+  const [viewSettlement, setViewSettlement] = useState<{ settlement: Settlement; deal: Deal } | null>(null);
 
   // فیلتر/مرتب
   const config = useMemo(() => {
@@ -664,53 +666,23 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                       <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تسویه‌های دوره‌ای ({toFa(dealSettlements.length)})</SectionTitle>
                       {dealSettlements.map((st: any) => {
                         const statusLabel = st.status === 'draft' ? 'پیش‌نویس' : st.status === 'confirmed' ? 'تأییدشده' : 'فاکتور شده';
-                        const statusColor = st.status === 'draft' ? 'var(--muted)' : st.status === 'confirmed' ? 'var(--info)' : 'var(--accent)';
+                        const statusTone: 'amber' | 'info' | 'green' = st.status === 'draft' ? 'amber' : st.status === 'confirmed' ? 'info' : 'green';
                         const netTxt = toFa(Number(st.netPayable || 0).toLocaleString('fa-IR'));
                         return (
-                          <div key={st.id} style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 'var(--fs-xs)', marginBottom: 8 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 4 }}>
-                              <span style={{ color: 'var(--muted)' }}>{toFa(st.periodStart)} — {toFa(st.periodEnd)}</span>
-                              <span style={{ fontWeight: 700, color: statusColor }}>{statusLabel}</span>
-                            </div>
-                            <div style={{ fontWeight: 700, color: 'var(--accent)', paddingBottom: 4 }}>
-                              خالص: {netTxt} ت
-                            </div>
-                            <BtnRow>
-                              <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setPrintSettlement({ settlement: st, deal: d }); }}>🖨️ چاپ</Btn>
-                              <Btn size="sm" variant={st.invoiceId ? 'outline' : 'primary'} onClick={(e) => { e.stopPropagation(); handleConvertSettlement(st, d); }}>
-                                {st.invoiceId ? '📄 مشاهده فاکتور' : '🧾 تبدیل به فاکتور'}
-                              </Btn>
-                            </BtnRow>
-                            {st.status === 'invoiced' && (
-                              <BtnRow>
-                                <Btn size="sm" variant="danger" onClick={async (e) => {
-                                  e.stopPropagation();
-                                  const ok = await showConfirmAsync('لغو تبدیل به فاکتور', 'فاکتور مربوطه حذف می‌شه و تسویه به «تأییدشده» برمی‌گرده. ادامه؟', { danger: true });
-                                  if (!ok) return;
-                                  try {
-                                    undoSettlement(st.id);
-                                    toastMsg.success('تسویه به تأییدشده برگشت');
-                                  } catch (err) {
-                                    toastMsg.error(err instanceof Error ? err.message : 'خطا در لغو');
-                                  }
-                                }}>↩️ لغو تبدیل</Btn>
-                              </BtnRow>
-                            )}
-                            {st.status === 'confirmed' && (
-                              <BtnRow>
-                                <Btn size="sm" variant="outline" onClick={async (e) => {
-                                  e.stopPropagation();
-                                  const ok = await showConfirmAsync('بازگشت به پیش‌نویس', 'این تسویه به پیش‌نویس برمی‌گرده و قابل ویرایش می‌شه. ادامه؟', { danger: false });
-                                  if (!ok) return;
-                                  try {
-                                    reopenSettlement(st.id);
-                                    toastMsg.success('تسویه به پیش‌نویس برگشت');
-                                  } catch (err) {
-                                    toastMsg.error(err instanceof Error ? err.message : 'خطا');
-                                  }
-                                }}>✏️ بازگشت به پیش‌نویس</Btn>
-                              </BtnRow>
-                            )}
+                          <div
+                            key={st.id}
+                            onClick={(e) => { e.stopPropagation(); setViewSettlement({ settlement: st, deal: d }); }}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <Row
+                              l={`${toFa(st.periodStart)} — ${toFa(st.periodEnd)}`}
+                              v={
+                                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                  <span style={{ fontWeight: 700, color: 'var(--accent)' }}>خالص: {netTxt} ت</span>
+                                  <Tag tone={statusTone}>{statusLabel}</Tag>
+                                </div>
+                              }
+                            />
                           </div>
                         );
                       })}
@@ -771,6 +743,57 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           }
         }}
       />
+
+      {viewSettlement && (
+        <SettlementDetailModal
+          open={!!viewSettlement}
+          settlement={viewSettlement.settlement}
+          deal={viewSettlement.deal}
+          onClose={() => setViewSettlement(null)}
+          onPrint={() => setPrintSettlement(viewSettlement)}
+          onConvert={() => {
+            handleConvertSettlement(viewSettlement.settlement, viewSettlement.deal);
+            setViewSettlement(null);
+          }}
+          onUndo={async () => {
+            const ok = await showConfirmAsync('لغو تبدیل به فاکتور', 'فاکتور مربوطه حذف می‌شه و تسویه به «تأییدشده» برمی‌گرده. ادامه؟', { danger: true });
+            if (!ok) return;
+            try {
+              undoSettlement(viewSettlement.settlement.id);
+              toastMsg.success('تسویه به تأییدشده برگشت');
+              setViewSettlement(null);
+            } catch (err) {
+              toastMsg.error(err instanceof Error ? err.message : 'خطا در لغو');
+            }
+          }}
+          onReopen={async () => {
+            const ok = await showConfirmAsync('بازگشت به پیش‌نویس', 'این تسویه به پیش‌نویس برمی‌گرده و قابل ویرایش می‌شه. ادامه؟', { danger: false });
+            if (!ok) return;
+            try {
+              reopenSettlement(viewSettlement.settlement.id);
+              toastMsg.success('تسویه به پیش‌نویس برگشت');
+              setViewSettlement(null);
+            } catch (err) {
+              toastMsg.error(err instanceof Error ? err.message : 'خطا');
+            }
+          }}
+          onViewInvoice={() => {
+            navigate('/tra?tab=sales&relatedDealId=' + viewSettlement.deal.id);
+            setViewSettlement(null);
+          }}
+          onDelete={async () => {
+            const ok = await showConfirmAsync('حذف تسویه', 'این تسویه حذف شود؟', { danger: true });
+            if (!ok) return;
+            try {
+              deleteSettlement(viewSettlement.settlement.id);
+              toastMsg.deleted('تسویه');
+              setViewSettlement(null);
+            } catch (err) {
+              toastMsg.error(err instanceof Error ? err.message : 'خطا در حذف');
+            }
+          }}
+        />
+      )}
       <MultiSelectBar ms={ms} deleteLabel="حذف" />
 
       {ms.selectionMode && <div style={{ height: 90 }} />}
