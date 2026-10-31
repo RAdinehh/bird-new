@@ -663,52 +663,53 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     <>
                       <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تسویه‌های دوره‌ای ({toFa(dealSettlements.length)})</SectionTitle>
                       {dealSettlements.map((st: any) => {
-                        const statusLabel = st.status === 'draft' ? 'پیش‌نویس' : st.status === 'confirmed' ? 'تأییدشده' : 'فاکتورشده';
+                        const statusLabel = st.status === 'draft' ? 'پیش‌نویس' : st.status === 'confirmed' ? 'تأییدشده' : 'فاکتور شده';
                         const statusColor = st.status === 'draft' ? 'var(--muted)' : st.status === 'confirmed' ? 'var(--info)' : 'var(--accent)';
                         const netTxt = toFa(Number(st.netPayable || 0).toLocaleString('fa-IR'));
                         return (
-                          <div key={st.id} style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 4, fontSize: 'var(--fs-xs)', marginBottom: 4 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div key={st.id} style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 'var(--fs-xs)', marginBottom: 8 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 4 }}>
                               <span style={{ color: 'var(--muted)' }}>{toFa(st.periodStart)} — {toFa(st.periodEnd)}</span>
                               <span style={{ fontWeight: 700, color: statusColor }}>{statusLabel}</span>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 4 }}>
-                              <span style={{ fontWeight: 700, color: 'var(--accent)' }}>خالص: {netTxt} ت</span>
-                              <div style={{ display: 'flex', gap: 4 }}>
-                                <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setPrintSettlement({ settlement: st, deal: d }); }}>🖨️ چاپ</Btn>
-                                <Btn size="sm" variant={st.invoiceId ? 'outline' : 'primary'} onClick={(e) => { e.stopPropagation(); handleConvertSettlement(st, d); }}>
-                                  {st.invoiceId ? '📄 مشاهده فاکتور' : '🧾 تبدیل به فاکتور'}
-                                </Btn>
-                              </div>
+                            <div style={{ fontWeight: 700, color: 'var(--accent)', paddingBottom: 4 }}>
+                              خالص: {netTxt} ت
                             </div>
-                            {st.invoiceId && (
-                              <Row l="فاکتور فروش" v={<EntityLink type="invoice" id={st.invoiceId} label="مشاهده" />} />
-                            )}
+                            <BtnRow>
+                              <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setPrintSettlement({ settlement: st, deal: d }); }}>🖨️ چاپ</Btn>
+                              <Btn size="sm" variant={st.invoiceId ? 'outline' : 'primary'} onClick={(e) => { e.stopPropagation(); handleConvertSettlement(st, d); }}>
+                                {st.invoiceId ? '📄 مشاهده فاکتور' : '🧾 تبدیل به فاکتور'}
+                              </Btn>
+                            </BtnRow>
                             {st.status === 'invoiced' && (
-                              <BtnRow><Btn size="sm" variant="danger" onClick={async (e) => {
-                                e.stopPropagation();
-                                const ok = await showConfirmAsync('لغو تبدیل به فاکتور', 'فاکتور مربوطه حذف می‌شه و تسویه به «تأییدشده» برمی‌گرده. ادامه؟', { danger: true });
-                                if (!ok) return;
-                                try {
-                                  undoSettlement(st.id);
-                                  toastMsg.success('تسویه به تأییدشده برگشت');
-                                } catch (err) {
-                                  toastMsg.error(err instanceof Error ? err.message : 'خطا در لغو');
-                                }
-                              }}>↩️ لغو تبدیل</Btn></BtnRow>
+                              <BtnRow>
+                                <Btn size="sm" variant="danger" onClick={async (e) => {
+                                  e.stopPropagation();
+                                  const ok = await showConfirmAsync('لغو تبدیل به فاکتور', 'فاکتور مربوطه حذف می‌شه و تسویه به «تأییدشده» برمی‌گرده. ادامه؟', { danger: true });
+                                  if (!ok) return;
+                                  try {
+                                    undoSettlement(st.id);
+                                    toastMsg.success('تسویه به تأییدشده برگشت');
+                                  } catch (err) {
+                                    toastMsg.error(err instanceof Error ? err.message : 'خطا در لغو');
+                                  }
+                                }}>↩️ لغو تبدیل</Btn>
+                              </BtnRow>
                             )}
                             {st.status === 'confirmed' && (
-                              <BtnRow><Btn size="sm" variant="outline" onClick={async (e) => {
-                                e.stopPropagation();
-                                const ok = await showConfirmAsync('بازگشت به پیش‌نویس', 'این تسویه به پیش‌نویس برمی‌گرده و قابل ویرایش می‌شه. ادامه؟', { danger: false });
-                                if (!ok) return;
-                                try {
-                                  reopenSettlement(st.id);
-                                  toastMsg.success('تسویه به پیش‌نویس برگشت');
-                                } catch (err) {
-                                  toastMsg.error(err instanceof Error ? err.message : 'خطا');
-                                }
-                              }}>✏️ بازگشت به پیش‌نویس</Btn></BtnRow>
+                              <BtnRow>
+                                <Btn size="sm" variant="outline" onClick={async (e) => {
+                                  e.stopPropagation();
+                                  const ok = await showConfirmAsync('بازگشت به پیش‌نویس', 'این تسویه به پیش‌نویس برمی‌گرده و قابل ویرایش می‌شه. ادامه؟', { danger: false });
+                                  if (!ok) return;
+                                  try {
+                                    reopenSettlement(st.id);
+                                    toastMsg.success('تسویه به پیش‌نویس برگشت');
+                                  } catch (err) {
+                                    toastMsg.error(err instanceof Error ? err.message : 'خطا');
+                                  }
+                                }}>✏️ بازگشت به پیش‌نویس</Btn>
+                              </BtnRow>
                             )}
                           </div>
                         );
