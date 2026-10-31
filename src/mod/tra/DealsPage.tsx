@@ -1028,16 +1028,6 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 )}
                 {g.source === 'hatch' && (
                   <>
-                  {hatches.length === 0 && (
-                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginBottom: 4 }}>
-                      ⚠️ هیچ هچری‌ای ثبت نشده — ابتدا از «جوجه‌کشی» جوجه تولید کنید
-                    </div>
-                  )}
-                  {hatches.length > 0 && !hatches.some(h => (h.hatched || 0) > 0) && (
-                    <div style={{ padding: 'var(--pad-tight)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, marginBottom: 4 }}>
-                      ⚠️ همه هچ‌ها خالی هستن (هچ موفق صفر) — ابتدا از «جوجه‌کشی» ثبت کنید
-                    </div>
-                  )}
                   <Field label="هچ مبدأ" required hint={g.hatchId ? (() => {
                     const h = hatches.find(x => x.id === g.hatchId);
                     if (!h) return undefined;
@@ -1058,6 +1048,16 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   </>
                 )}
               </div>
+                  {g.source === 'hatch' && hatches.length === 0 && (
+                    <div style={{ gridColumn: '1 / -1', padding: 'var(--pad-tight)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, marginBottom: 4 }}>
+                      ⚠️ هیچ هچری‌ای ثبت نشده — ابتدا از «جوجه‌کشی» جوجه تولید کنید
+                    </div>
+                  )}
+                  {g.source === 'hatch' && hatches.length > 0 && !hatches.some(h => (h.hatched || 0) > 0) && (
+                    <div style={{ gridColumn: '1 / -1', padding: 'var(--pad-tight)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700, marginBottom: 4 }}>
+                      ⚠️ همه هچ‌ها خالی هستن (هچ موفق صفر) — ابتدا از «جوجه‌کشی» ثبت کنید
+                    </div>
+                  )}
               </Grid2>
             )}
             {g.category === 'adult' && (
