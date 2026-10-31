@@ -20,6 +20,61 @@
 
 ## تاریخچه
 
+### [1405/08/09] Placeholder استاندارد (SAP Fiori / Odoo)
+- **تصمیم:** Placeholder != Label. Placeholder = راهنمای فرمت/واحد. Placeholder != "مثلاً داده".
+- **دلیل:** SAP Fiori Design Guidelines + Odoo UX. کاربر داده‌ی نمونه را با داده‌ی واردشده اشتباه می‌گیرد.
+- **جایگزین رد شده:** Placeholder = Label (تکرار) — رد شد. Placeholder = "مثلاً X" (اشتباه کاربر) — رد شد.
+- **عواقب:** `getPricePlaceholder` حالا "تومان" برمی‌گرداند. `getDescriptionPlaceholder` راهنمای محتوا.
+- **فایل‌های متاثر:** `tra/components/InvoiceFormModal.tsx`.
+
+---
+
+### [1405/08/09] «قیمت هر واحد» یکدست
+- **تصمیم:** Form fields = `قیمت هر واحد`. Table headers (چاپ) = `قیمت واحد`. Hint labels (FIELD_LABELS) = `قیمت {category}`.
+- **دلیل:** هر ۳ مفهوم متفاوت‌اند، نه ناهمسانی.
+- **جایگزین رد شده:** همه یکسان — رد شد، context هر کدام متفاوت است.
+- **عواقب:** `DealsPage:1322` تغییر کرد. بقیه دست نخوردن.
+- **فایل‌های متاثر:** `tra/DealsPage.tsx`.
+
+---
+
+### [1405/08/09] MSG helper = استاندارد پیام خطا
+- **تصمیم:** پیام جدید → اول در `MSG`، بعد استفاده. hardcode فقط در پیام‌های شرطی خاص.
+- **دلیل:** یکدستی پیام‌ها. جلوگیری از تکرار.
+- **جایگزین رد شده:** hardcode در همه‌جا — رد شد.
+- **عواقب:** flk.ts ۵ پیام به MSG. tra.ts از قبل ۲۷ بار.
+- **فایل‌های متاثر:** `validation/rules/flk.ts`.
+
+---
+
+### [1405/08/09] Gap ۶ (species_temp) رها به آخر
+- **تصمیم:** `species_temp` resolver و `biologicalRange` signal در anomalyDetector رها می‌شود به آخر پروژه.
+- **دلیل:** `set/standards/` از قبل incubation standards دارد (setterTemp: 37.7, hatcherTemp: 37.2). `fieldProfiles.ts` static است و به store دسترسی ندارد. نیاز به معماری استانداردها.
+- **جایگزین رد شده:** هاردکد در profile — رد شد، چون standards از قبل هست.
+- **عواقب:** `inc.temperature` و `inc.humidity` فعلاً bio range ندارند. `dlg.temperature` هم signal biological تولید نمی‌کند.
+- **فایل‌های متاثر:** `intelligence/fieldProfiles.ts`, `intelligence/anomalyDetector.ts`.
+
+---
+
+### [1405/08/09] chickWeight بدون پیشوند (نه Gap)
+- **تصمیم:** `chickWeight` پیشوند `tra.` یا `inc.` نمی‌گیرد.
+- **دلیل:** در ۳ ماژول استفاده می‌شود (flk, inc, tra). مفهوم بین‌ماژولی است.
+- **جایگزین رد شده:** تغییر به `inc.chickWeight` — رد شد.
+- **عواقب:** `chickWeight` exception در naming convention.
+- **فایل‌های متاثر:** ندارد (بدون تغییر).
+
+---
+
+### [1405/08/09] سیستم standards/ از قبل بالغ است
+- **تصمیم:** هر Gap مربوط به استانداردها (دمای جوجه‌کشی، FCR، ADG، وزن استاندارد) باید `set/standards/` را ببیند، نه هاردکد در profile.
+- **دلیل:** `set/standards/` از قبل `BirdStandard` interface، `data.ts` (شامل CHICKEN_INCUBATION)، `data-breeds/` و `_override.ts` را دارد.
+- **جایگزین رد شده:** هاردکد مقادیر استاندارد در `fieldProfiles.ts` — رد شد.
+- **عواقب:** هر AI بعدی باید قبل از افزودن bio range، `set/standards/` را بررسی کند.
+- **فایل‌های متاثر:** همه Gap های مرتبط با standards.
+
+---
+
+
 ---
 
 ### [1405/08/09] Origin Tracking — relatedSettlementId + sourceType

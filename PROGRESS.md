@@ -504,3 +504,45 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 - قرارداد پرورش (FCR/EPEF) — ۴-۵ ساعت
 - `+N` overflow برای InvoiceCard (اگه لازم شد)
 - هماهنگ‌سازی Badge/Stats بقیه کارت‌ها (bird/hall/zone)
+
+
+---
+
+## جلسه ۱۴۰۵/۰۸/۰۹ (شماره ۳ — Validation & Intelligence)
+
+### DONE
+
+| # | کار | commit |
+|---|-----|--------|
+| ۱ | سند `docs/modules/validation-intelligence-map.md` (۸۴۲ خط) | 48eea668 |
+| ۲ | اصلاح ۳ ادعای غلط در سند | 48eea668 |
+| ۳ | FieldHint به `tra.price_*` (Gap ۱) | 30403883 |
+| ۴ | آپدیت ۶ تست intelligence (GOV.UK standard) | c6306246 |
+| ۵ | «قیمت هر واحد» یکدست در DealsPage (Gap ۴) | c39fc4a2 |
+| ۶ | Placeholder استاندارد (حذف تکرار) | c03af01d |
+| ۷ | ۵ پیام flk → MSG (Gap ۳ جزئی) | 9111ca7e |
+
+### سیستم Intelligence کشف و مستند شد
+
+- ۵ لایه: Zod → Profiles → Detector → History → UI
+- ۱۳۵ field profile در ۱۳ دسته Q
+- ۱۸ فیلد structuralBreakAware (تورمی)
+- ۲۳ crossFieldRule (۸ قاعده)
+- ۱۲ biologicalRange
+- ۱۲ الگوی پیام در formatWarning (GOV.UK)
+- ۹۵ لیبل در FIELD_LABELS
+
+### تست‌ها
+- ۶۳ passed + ۳ skipped
+
+### PENDING (Gap ‌های باز)
+
+| # | Gap | زمان |
+|---|-----|------|
+| ۲ | MSG در ماژول‌ها (whs, egg, inc, hal, dlg, fed) | ۳۰ دقیقه per module |
+| ۳ | ۱۲ پیام شرطی خاص flk | ۳۰ دقیقه |
+| ۵ | Intelligence UI در whs/inc/hal/egg | ۳۰ دقیقه |
+| ۶ | species_temp resolver + biological signal | ۲-۳ ساعت |
+
+### درس کلیدی
+قبل از هر ادعا در سند، grep بزن. کد = تنها معیار.
