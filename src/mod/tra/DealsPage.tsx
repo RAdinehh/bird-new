@@ -11,6 +11,7 @@ import { useCtc } from '../ctc/store';
 import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
 import { useInc } from '../inc/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
+import { getUOM, getDefaultUnit } from '../../shr/units/uom';
 import { Btn, BtnRow, CardActions, Empty, Field, Input, MoneyField, PercentField,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
@@ -970,6 +971,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 return { 
                   ...x, 
                   category: newCat, 
+                  unit: getDefaultUnit(newCat) as any,
                   source: undefined,
                   existingFlockId: undefined,
                   hatchId: undefined,
@@ -1154,13 +1156,10 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               <Input placeholder="جوجه یک‌روزه" value={g.name} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, name: e.target.value } : x) }))} />
             </Field>
             <Field label="واحد" error={showError?.(`goods.${gi}.unit`)} onTouch={() => markTouched?.(`goods.${gi}.unit`)}>
-              <Select value={g.unit} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, unit: e.target.value as any } : x) }))}>
-                <option value="pcs">عدد</option>
-                <option value="kg">کیلوگرم</option>
-                <option value="ton">تن</option>
-                <option value="bag">کیسه</option>
-                <option value="L">لیتر</option>
-                <option value="carton">کارتن</option>
+              <Select value={g.unit || getDefaultUnit(g.category)} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, unit: e.target.value as any } : x) }))}>
+                {(getUOM(g.category)?.units || getUOM('other')?.units || []).map(u => (
+                  <option key={u.value} value={u.value}>{u.label}</option>
+                ))}
               </Select>
             </Field>
           </Grid2>
