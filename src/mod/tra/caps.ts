@@ -48,7 +48,8 @@ export function computeGoodsCap(
   good: DealGood,
   currentDealId: string,
   allDeals: Deal[],
-  sourceAvailable: number
+  sourceAvailable: number,
+  formGoods?: DealGood[]
 ): number {
   let otherAllocations = 0;
 
@@ -67,6 +68,15 @@ export function computeGoodsCap(
   const currentDeal = allDeals.find(d => d.id === currentDealId);
   if (currentDeal) {
     for (const g of currentDeal.goods || []) {
+      if (g.id === good.id) continue;
+      if (!sameSource(g, good)) continue;
+      otherAllocations += g.quantity || 0;
+    }
+  }
+
+  // ۳. 🆕 آیتم‌های دیگر در فرم فعلی (برای deal جدید)
+  if (formGoods) {
+    for (const g of formGoods) {
       if (g.id === good.id) continue;
       if (!sameSource(g, good)) continue;
       otherAllocations += g.quantity || 0;

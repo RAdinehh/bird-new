@@ -71,6 +71,7 @@ function isRequiredError(msg: string): boolean {
     msg.includes('اجباری') ||
     msg.includes('را وارد کنید') ||
     msg.includes('را انتخاب کنید') ||
-    msg.includes('لطفاً')
+    msg.includes('لطفاً') ||
+    msg.includes('بیشتر از صفر')
   );
 }

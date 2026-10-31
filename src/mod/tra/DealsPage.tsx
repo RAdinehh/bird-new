@@ -12,7 +12,7 @@ import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
 import { useInc } from '../inc/store';
 import { useWhs, UNIT_LABEL } from '../whs/store';
 import { getUOM, getDefaultUnit } from '../../shr/units/uom';
-import { computeGoodsCap } from './caps';
+import { computeGoodsCap, computeDeliveryCap, computeSaleCap } from './caps';
 import { Btn, BtnRow, CardActions, Empty, Field, Input, MoneyField, PercentField,
   Grid2, Modal, NumField,
   PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
@@ -90,7 +90,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         const lc = getLifecycle(f.type, age, f.endOfCycleDay ?? null, null, f.layingStartDay ?? null);
         const typeLabel = f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر';
         return {
-          available: computeGoodsCap(g, form.id || 'new', deals, Number(f.currentCount || 0)),
+          available: computeGoodsCap(g, form.id || 'new', deals, Number(f.currentCount || 0), form.id ? undefined : form.goods),
           label: 'گله ' + f.name,
           rows: [
             ['نوع', typeLabel],
@@ -105,7 +105,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       const h = hatches.find(x => x.id === g.hatchId);
       if (h) {
         return {
-          available: computeGoodsCap(g, form.id || 'new', deals, Number(h.hatched || 0)),
+          available: computeGoodsCap(g, form.id || 'new', deals, Number(h.hatched || 0), form.id ? undefined : form.goods),
           label: 'هچ ' + h.date,
           rows: [
             ['تاریخ هچ', toFa(h.date)],
