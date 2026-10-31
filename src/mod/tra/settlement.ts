@@ -137,11 +137,16 @@ export function createInvoiceFromSettlement(
     });
   }
 
+  // 🆕 محاسبه category از items (نه hardcode)
+  const itemCats = items.map(it => it.category).filter(Boolean) as string[];
+  const uniqueCats = [...new Set(itemCats)];
+  const primaryCategory = uniqueCats.length === 1 ? uniqueCats[0] : 'other';
+
   return {
     type: 'sale',
     date: settlement.periodEnd,
     partyId: deal.partyId || '',
-    category: 'other',
+    category: primaryCategory,
     items,
     discount: 0,
     shipping: 0,
