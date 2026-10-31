@@ -1356,7 +1356,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
         <>
           <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span>💰 فروش‌ها</span>
+            <span>🏷 فروش‌ها</span>
           </div>
             {(() => {
               const tot = form.sales.reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
