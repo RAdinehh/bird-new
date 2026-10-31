@@ -455,6 +455,14 @@ const DealGoodSchema = z.object({
   hatchId: optionalId(),
   stockItemId: optionalId(),
   linkedItemId: optionalId(),
+}).superRefine((data, ctx) => {
+  if (data.unit === 'pcs' && !Number.isInteger(data.quantity)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'تعداد باید عدد صحیح باشد (واحد شمارشی)',
+      path: ['quantity'],
+    });
+  }
 });
 
 const DealDeliverySchema = z.object({
