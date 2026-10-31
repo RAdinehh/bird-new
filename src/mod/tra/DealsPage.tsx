@@ -998,10 +998,25 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           {(g.category === 'chick') && (
               <Grid2>
                 <Field label="منبع جوجه" required>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, padding: 4, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', height: 42 }}>
-                    <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, source: 'flock', hatchId: undefined } : x) }))} style={{ padding: 0, background: g.source === 'flock' ? 'var(--accent)' : 'transparent', border: 'none', borderRadius: 'var(--r-sm)', color: g.source === 'flock' ? 'white' : 'var(--muted)', fontWeight: g.source === 'flock' ? 700 : 500, fontFamily: 'inherit', fontSize: 'var(--fs-sm)', cursor: 'pointer', transition: 'all 0.15s' }}>🐔 گله موجود</button>
-                    <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, source: 'hatch', existingFlockId: undefined } : x) }))} style={{ padding: 0, background: g.source === 'hatch' ? 'var(--accent)' : 'transparent', border: 'none', borderRadius: 'var(--r-sm)', color: g.source === 'hatch' ? 'white' : 'var(--muted)', fontWeight: g.source === 'hatch' ? 700 : 500, fontFamily: 'inherit', fontSize: 'var(--fs-sm)', cursor: 'pointer', transition: 'all 0.15s' }}>🐣 هچری</button>
-                  </div>
+                  <Select
+                    value={g.source || ''}
+                    onChange={e => {
+                      const v = (e.target.value || undefined) as 'flock' | 'hatch' | undefined;
+                      setForm(f => ({
+                        ...f,
+                        goods: f.goods.map(x => x.id === g.id ? {
+                          ...x,
+                          source: v,
+                          hatchId: v === 'flock' ? undefined : x.hatchId,
+                          existingFlockId: v === 'hatch' ? undefined : x.existingFlockId,
+                        } : x)
+                      }));
+                    }}
+                  >
+                    <option value="">— انتخاب —</option>
+                    <option value="flock">🐔 گله موجود</option>
+                    <option value="hatch">🐣 هچری</option>
+                  </Select>
                 </Field>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {g.source === 'flock' && (
