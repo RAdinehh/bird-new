@@ -618,3 +618,30 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 5. 🟡 **RHF Pilot** — تصمیم نگرفته (بحث در جلسه: Pilot Deal vs useValidation fix)
 6. 🟡 **باگ‌های مشکوک باقی‌مانده**: hatch چندگله + Deal restore با existingFlockId حذف‌شده
 
+---
+
+## 📅 جلسه ۱۴۰۵/۱۱/۰۱ (شماره ۴ — UOM + restoreInvoice + L11 hal)
+
+### ✅ DONE — ۲ باگ data-critical + ۶ commit
+
+| # | کار | commit |
+|---|-----|--------|
+| ۱ | icon 💰→🏷 در DealsPage (رفع گمراهی) | 2d91f466 |
+| ۲ | 🚨 **UOM fix** — ۱۰۰ کیسه (۲۵۰۰ کیلو) ≠ ۱۰۰ کیلو | eeaba2d1 |
+| ۳ | 🚨 **restoreInvoice** — گله بعد از بازیابی فاکتور برمی‌گرده | aa6b0d26 |
+| ۴ | پرداخت‌های Deal → inline (هماهنگ با InvoiceCard) | cc53d56d |
+| ۵ | «فروش کل» در stats کارت Deal | 555b6abf |
+| ۶ | L11 tests hal store (۱۱ تست) | b638b348 |
+
+### ✅ hal/ZonesPage — DONE
+- 440 خط، بدون TODO
+- L11: `src/test/store-hal.test.ts` (۱۱ تست — جدید)
+
+### ⏸ PENDING (اولویت‌بندی‌شده)
+1. 🟠 **مطالبات فاز ۱** — یکپارچگی (فاکتور + Deal در یک لیست)
+2. 🟠 **مطالبات فاز ۲** — Register Payment (DealMultiPayModal)
+3. 🟠 **مطالبات فاز ۳** — Statement + Aging PDF
+4. 🟡 **L11 tests** — ۱۲ store بدون تست (flk/whs/brd/ctc/inc/egg/dlg/fed/alt/set/cal/doc)
+5. 🟡 **RHF Pilot** — تصمیم نگرفته
+6. 🚨 **`addPartyPayment: (p: any)`** — نقض L12 (بعد از مطالبات)
+
