@@ -651,3 +651,44 @@ export type DealFormData = z.infer<typeof DealSchema>;
 
 export type PaymentFormData = z.infer<typeof PaymentSchema>;
 export type InvoiceFormData = z.infer<ReturnType<typeof createInvoiceSchema>>;
+
+/**
+ * DealPaymentForm schema (Phase 2 — Live validation)
+ * استاندارد: Cross-field validation (amount ≤ balance)
+ * L3: فقط در shr/validation/rules/ — نه در components
+ */
+export function getDealPaymentFormSchema(maxAmount: number) {
+  return z.object({
+    date: persianDateOpt('تاریخ'),
+    amount: z
+      .number()
+      .positive('مبلغ باید بیشتر از صفر باشد')
+      .max(
+        maxAmount,
+        `مبلغ نمی‌تواند بیشتر از بدهی فعلی (${maxAmount.toLocaleString('fa-IR')} تومان) باشد`,
+      ),
+    direction: oneOf('جهت', ['in', 'out'] as const),
+    method: oneOf('روش', ['cash', 'card', 'check'] as const),
+    notes: optionalStr(300),
+    checkNo: optionalStr(50),
+    bank: optionalStr(80),
+    dueDate: persianDateOpt('سرسید'),
+  }).superRefine((data, ctx) => {
+    const d = data as any;
+    if (!d.date || String(d.date).trim() === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('تاریخ'), path: ['date'] });
+    }
+    if (d.method === 'check') {
+      if (!d.checkNo || d.checkNo.trim().length === 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('شماره چک'), path: ['checkNo'] });
+      }
+      if (!d.bank || d.bank.trim().length === 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('نام بانک'), path: ['bank'] });
+      }
+      if (!d.dueDate) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('سرسید چک'), path: ['dueDate'] });
+      }
+    }
+  });
+}
+
