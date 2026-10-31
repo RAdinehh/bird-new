@@ -7,8 +7,8 @@ import type { ReactNode } from 'react';
 export function Row({ l, v }: { l: string; v: ReactNode }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', minWidth: 0 }}>
-      <span style={{ color: 'var(--muted)', flexShrink: 0 }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)', textAlign: 'left', wordBreak: 'break-word', overflowWrap: 'anywhere', minWidth: 0 }}>{v}</span>
+      <span style={{ color: 'var(--muted)', flex: 1, wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{l}:</span>
+      <span style={{ fontWeight: 600, color: 'var(--text)', textAlign: 'left', whiteSpace: 'nowrap', flexShrink: 0 }}>{v}</span>
     </div>
   );
 }
