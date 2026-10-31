@@ -107,8 +107,12 @@ export function computePaymentCap(
   let paidIn = 0;
   let refunds = 0;
   for (const p of payments) {
-    if (p.direction === 'in') paidIn += p.amount || 0;
-    if ((p as { type?: string }).type === 'refund') refunds += p.amount || 0;
+    const type = (p as { type?: string }).type;
+    if (type === 'refund') {
+      refunds += p.amount || 0;
+    } else if (p.direction === 'in') {
+      paidIn += p.amount || 0;
+    }
   }
   return Math.max(0, myShare - paidIn + refunds);
 }
