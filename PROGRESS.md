@@ -699,3 +699,39 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 5. 🟡 **RHF Pilot** — تصمیم نگرفته
 6. 🚨 **`addPartyPayment: (p: any)`** — نقض L12
 
+---
+
+## 📅 جلسه ۱۴۰۵/۱۱/۰۱ (شماره ۵ — مطالبات فاز ۱ DONE)
+
+### ✅ فاز ۱ — یکپارچگی مطالبات (Foundation)
+
+| # | کار | commit |
+|---|-----|--------|
+| ۱ | `computeDealBalance` + `isDealOpen` + `agingBucketFromDeal` + `dealDaysUntilDue` در `calc.ts` | 2d3ea78e |
+| ۲ | `SummaryBox` — پشتیبانی `kind: 'deal'` (بنفش soft) | 52fa54f4 |
+| ۳ | تب سوم `🤝 معاملات` در `ReceivablesPage` | 7c64eddf |
+| ۴ | تب هم‌رنگ بقیه + hide bulk-pay + typo fix | 49e1ca5b |
+| ۵ | لیست deals (party + desc + dueLabel + balance) | ff48fb5e |
+| ۶ | ۱۳ تست L11 (`receivables-deals.test.ts`) | 09213422 |
+
+### ✅ DONE
+- یکپارچگی: فاکتور + Deal در یک صفحه
+- جلوگیری از دوبار شمردن (relatedDealId)
+- فقط Deals با `status='open'` + `balance≠0`
+- SummaryBox بنفش soft برای deals
+- Empty state مخصوص deals
+- ۱۳ تست L11 سبز
+
+### ⏸ PENDING — مطالبات
+1. 🟠 **فاز ۲** — Register Payment (`DealMultiPayModal`)
+2. 🟠 **فاز ۳** — Statement PDF + Aging CSV
+3. 🟠 **فاز ۴** — Credit Limit + Dunning + Write-off
+4. 🟡 **فاز ۵** — Cash Flow Forecast + DSO
+5. 🟡 **فاز ۶** — Risk Score + Predictive
+
+### ⏸ PENDING — کلی پروژه
+- L11 tests: ۱۲ store (flk/whs/brd/ctc/inc/egg/dlg/fed/alt/set/cal/doc)
+- RHF Pilot (بحث جلسه ۱۴۰۵/۱۱/۰۱)
+- `addPartyPayment: (p: any)` — نقض L12
+- hatch چندگله + Deal restore با existingFlockId حذف‌شده (باگ‌های مشکوک)
+
