@@ -30,6 +30,7 @@ import SettlementDetailModal from './components/SettlementDetailModal';
 import { createInvoiceFromSettlement } from './settlement';
 import { applyDealMovements } from './applyDeal';
 import DealRecycleBinModal from './components/DealRecycleBinModal';
+import DealPaymentsModal from './components/DealPaymentsModal';
 import SettlementPrint from './components/SettlementPrint';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -90,6 +91,7 @@ function isSameIdentity(a: DealGood, b: DealGood): boolean {
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
   const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, updateSettlement, deleteSettlement, undoSettlement, reopenSettlement, settlements, addInvoice, reopenDeal, listDeletedDeals } = useTra();
+  const [paymentsModalDeal, setPaymentsModalDeal] = useState<Deal | null>(null);
   const { flocks } = useFlk();
   const { hatches } = useInc();
 
@@ -685,6 +687,13 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   <Row l="فروش کل" v={`${toFa((d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0).toLocaleString('fa-IR'))} ت`} />
                   <Row l="دریافت‌شده" v={`${toFa((d.payments || []).filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0).toLocaleString('fa-IR'))} ت`} />
                 </Grid2>
+                {(d.payments?.length ?? 0) > 0 && (
+                  <div style={{ marginTop: 8 }}>
+                    <Btn size="sm" onClick={() => setPaymentsModalDeal(d)} style={{ fontSize: 12 }}>
+                      📥 پرداخت‌ها ({toFa((d.payments || []).length)})
+                    </Btn>
+                  </div>
+                )}
 
                 <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> توضیحات</SectionTitle>
                 <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.description}</div>
@@ -757,6 +766,11 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
       )}
 
             <DealRecycleBinModal open={recycleOpen} onClose={() => setRecycleOpen(false)} />
+            <DealPaymentsModal
+              open={!!paymentsModalDeal}
+              onClose={() => setPaymentsModalDeal(null)}
+              payments={paymentsModalDeal?.payments || []}
+            />
       {printSettlement && (
         <SettlementPrint
           settlement={printSettlement.settlement}
