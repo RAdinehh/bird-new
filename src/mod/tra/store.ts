@@ -21,6 +21,7 @@ import { showToast } from '../../cor/store/toast';
 import { useInc } from '../inc/store';
 import { setPartyCredit } from '../ctc/store';
 import { partyBalance } from './formulas';
+import { applyDealMovements } from './applyDeal';
 
 const now = () => new Date().toISOString();
 
@@ -609,9 +610,22 @@ export const useTra = create<State>()(
       },
       deleteDeal: (id) => {
         const deal = get().deals.find(x => x.id === id);
-        if (deal) {
-          saveToRecycleBin<DeletedDealSnapshot>('tra-deals', { deal }, (existing) => existing.deal.id === id);
+        if (!deal) return;
+
+        // Backup به سبد زباله قبل از هر تغییر
+        saveToRecycleBin<DeletedDealSnapshot>('tra-deals', { deal }, (existing) => existing.deal.id === id);
+
+        // 🆕 Reverse تمام movements (flock + whs)
+        // formState خالی + oldDeal = deal → reverse همه
+        try {
+          applyDealMovements(
+            { partyId: '', goods: [], deliveries: [], sales: [], payments: [] } as any,
+            deal
+          );
+        } catch (e) {
+          console.error('[deleteDeal] reverse movements failed:', e);
         }
+
         set({ deals: get().deals.filter(x => x.id !== id) });
       },
       restoreDealFromBin: (id: string) => {
@@ -621,6 +635,8 @@ export const useTra = create<State>()(
         );
         if (!snapshot) return false;
         if (get().deals.some(x => x.id === id)) return false;
+
+        // پاک‌سازی tracking fields قدیمی (که به movement های حذف‌شده اشاره می‌کنن)
         const cleanDeal: Deal = {
           ...snapshot.deal,
           deliveries: (snapshot.deal.deliveries || []).map(dv => ({
@@ -631,6 +647,14 @@ export const useTra = create<State>()(
             flockSourceId: undefined,
           })),
         };
+
+        // 🆕 Re-apply movements (creates new whs.Movement + updates flock.currentCount)
+        try {
+          applyDealMovements(cleanDeal as any, undefined);
+        } catch (e) {
+          console.error('[restoreDealFromBin] re-apply movements failed:', e);
+        }
+
         set({ deals: [...get().deals, cleanDeal] });
         return true;
       },
