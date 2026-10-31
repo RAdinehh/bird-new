@@ -203,7 +203,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
                 }}
               />
             </Field>
-            <Field label="بانک" error={formErrors.bank}>
+            <Field label="بانک">
               <input
                 value={bank}
                 onChange={e => setBank(e.target.value)}
@@ -221,7 +221,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
               />
             </Field>
           </Grid2>
-          <Field label="سرسید چک" error={formErrors.dueDate}>
+          <Field label="سرسید چک">
             <DatePicker value={checkDue} onChange={setCheckDue} />
           </Field>
         </>
