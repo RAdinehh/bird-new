@@ -1274,7 +1274,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 <Field label="تاریخ" required error={showError?.(`deliveries.${di}.date`)} onTouch={() => markTouched?.(`deliveries.${di}.date`)}>
                   <DatePicker value={dv.date} onChange={v => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, date: v } : x) }))} autoToday />
                 </Field>
-                <Field label="ساعت" hint="اختیاری — برای تمایز چند تحویل هم‌روز" error={showError?.(`deliveries.${di}.time`)} onTouch={() => markTouched?.(`deliveries.${di}.time`)}>
+                <Field label="ساعت" hint="برای تمایز چند تحویل هم‌روز" error={showError?.(`deliveries.${di}.time`)} onTouch={() => markTouched?.(`deliveries.${di}.time`)}>
                   <TimePicker value={dv.time || ''} onChange={v => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, time: v } : x) }))} />
                 </Field>
               </Grid2>
