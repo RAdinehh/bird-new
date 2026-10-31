@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { daysUntilDue, dueTone, dueLabel } from './helpers';
 import DeferModal from './components/DeferModal';
-import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSumAllocated, WORKFLOW_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deferral } from './store';
+import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSumAllocated, WORKFLOW_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
@@ -13,6 +13,7 @@ import { showSuccess } from '../../cor/store/dialog';
 import { Line, tab } from './helpers';
 import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/filter';
 import MultiPayModal from './components/MultiPayModal';
+import DealPayModal from './components/DealPayModal';
 import SummaryBox from './components/SummaryBox';
 import UpcomingDueSection from './components/UpcomingDueSection';
 import { agingBucketFromDue } from './formulas';
@@ -30,6 +31,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [deferDate, setDeferDate] = useState('');
   const [deferReason, setDeferReason] = useState('');
   const [showUpcoming, setShowUpcoming] = useState(false);
+  const [dealPayTarget, setDealPayTarget] = useState<Deal | null>(null);
 
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0),
@@ -227,8 +229,11 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                       {days !== null ? ` • ${dueLabel(days)}` : ''}
                     </div>
                   </div>
-                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+                                      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)', fontVariantNumeric: 'tabular-nums' }}>
                     {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
+                    </div>
+                    <Btn size="sm" variant="outline" onClick={() => setDealPayTarget(d)} style={{ fontSize: 11, padding: '2px 8px', minHeight: 24, height: 24 }}>💳 ثبت</Btn>
                   </div>
                 </div>
               </div>
@@ -390,6 +395,11 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         deferReason={deferReason}
         setDeferReason={setDeferReason}
         onConfirm={doDefer}
+      />
+      <DealPayModal
+        open={!!dealPayTarget}
+        onClose={() => setDealPayTarget(null)}
+        deal={dealPayTarget}
       />
           {kind !== 'deal' && (
             <MultiPayModal
