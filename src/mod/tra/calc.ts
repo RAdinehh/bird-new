@@ -3,7 +3,7 @@
  */
 import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ, addDays } from 'date-fns-jalali';
 import type { PaymentAllocation } from './types';
-import type { Invoice, InvoiceItem, Payment, WorkflowStatus, CheckStatus, InvoiceStatus, InvoiceType, PaymentTerms, Installment } from './types';
+import type { Invoice, InvoiceItem, Payment, WorkflowStatus, CheckStatus, InvoiceStatus, InvoiceType, PaymentTerms, Installment, Deal } from './types';
 
 export function generateInvoiceNumber(
   type: InvoiceType,
@@ -463,3 +463,77 @@ export function applyPaymentsToInstallments(
 export function calcInvoiceTotal(items: any[]): number {
   return Math.round((items || []).reduce((sum, it) => sum + (it.total ?? ((it.quantity || 0) * (it.unitPrice || 0))), 0));
 }
+
+/**
+ * dealOverdueDays — روزهای overdue معامله (positive)
+ * منطبق با overdueDays(inv) در formulas.ts
+ */
+function dealOverdueDays(d: Deal): number {
+  if (!d.dueDate) return 0;
+  try {
+    const en = d.dueDate.replace(/[۰-۹]/g, (x: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(x)));
+    const dueDate = parseJ(en, 'yyyy/MM/dd', new Date());
+    if (isNaN(dueDate.getTime())) return 0;
+    dueDate.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diff = diffDaysJ(today, dueDate);
+    return diff > 0 ? diff : 0;
+  } catch (e) {
+    console.error('[dealOverdueDays]', e);
+    return 0;
+  }
+}
+
+/**
+ * computeDealBalance — محاسبه مالی معامله (DRY از DealsPage:504-507)
+ * منطبق با استاندارد Odoo: totalSales - commission - paidIn + paidOut
+ */
+export function computeDealBalance(d: Deal): {
+  totalSales: number;
+  commission: number;
+  myShare: number;
+  paidIn: number;
+  paidOut: number;
+  balance: number;
+} {
+  const totalSales = (d.sales || []).reduce(
+    (s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)),
+    0,
+  );
+  const pct = Number(d.settlementValue) || 0;
+  const commission = d.settlementType === 'percent' ? Math.round(totalSales * pct / 100) : 0;
+  const myShare = totalSales - commission;
+  const paidIn = (d.payments || [])
+    .filter(p => p.direction === 'in')
+    .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  const paidOut = (d.payments || [])
+    .filter(p => p.direction === 'out')
+    .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  return { totalSales, commission, myShare, paidIn, paidOut, balance: myShare - paidIn + paidOut };
+}
+
+/**
+ * agingBucketFromDeal — aging از dueDate معامله
+ */
+export function agingBucketFromDeal(d: Deal): '0-15' | '16-30' | '31-60' | '61-90' | '+90' {
+  const days = dealOverdueDays(d);
+  if (days <= 15) return '0-15';
+  if (days <= 30) return '16-30';
+  if (days <= 60) return '31-60';
+  if (days <= 90) return '61-90';
+  return '+90';
+}
+
+/**
+ * isDealOpen — آیا معامله باید در مطالبات نمایش داده شود؟
+ * - status باید 'open' باشد
+ * - نباید به Invoice تبدیل شده باشد (relatedDealId در Invoice)
+ * - balance != 0 (بدهی یا طلب دارد)
+ */
+export function isDealOpen(d: Deal, invoices: Array<{ relatedDealId?: string }>): boolean {
+  if (d.status !== 'open') return false;
+  if (invoices.some(inv => inv.relatedDealId === d.id)) return false;
+  return computeDealBalance(d).balance !== 0;
+}
+
