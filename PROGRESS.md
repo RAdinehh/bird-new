@@ -545,4 +545,14 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 | ۶ | species_temp resolver + biological signal | ۲-۳ ساعت |
 
 ### درس کلیدی
+
+### موارد از NEXT.md (منتقل‌شده — چون NEXT.md حذف شد)
+
+- ⏸ **StandardHint** — کامپوننت نمایش استاندارد در فرم‌ها (پیشنهاد سال ۱۴۰۴، انجام نشده)
+  - اولویت: پایین
+  - وابسته به: تکمیل معماری standards + ParadigmProfile
+- ⏸ **ParadigmProfile + registry** — پیاده‌سازی پارادایم درمانی (طرح در PARADIGM.md هست)
+  - اولویت: پایین
+  - مرجع: docs/PARADIGM.md بخش «پیاده‌سازی»
+
 قبل از هر ادعا در سند، grep بزن. کد = تنها معیار.
