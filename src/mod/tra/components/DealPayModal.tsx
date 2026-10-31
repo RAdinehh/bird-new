@@ -18,7 +18,9 @@ interface Props {
 }
 
 export default function DealPayModal({ open, onClose, deal }: Props) {
-  const { updateDeal } = useTra();
+  const { deals, updateDeal } = useTra();
+  const liveDeal = deal ? deals.find(d => d.id === deal.id) : null;
+  const effectiveDeal = liveDeal || deal;
   const [date, setDate] = useState(getTodayJalali());
   const [amount, setAmount] = useState('');
   const [method, setMethod] = useState<'cash' | 'card' | 'check'>('cash');
@@ -28,11 +30,11 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
   const [bank, setBank] = useState('');
   const [checkDue, setCheckDue] = useState('');
 
-  const bal = useMemo(() => (deal ? Math.abs(computeDealBalance(deal).balance) : 0), [deal]);
+  const bal = useMemo(() => (effectiveDeal ? Math.abs(computeDealBalance(effectiveDeal).balance) : 0), [effectiveDeal]);
 
   useEffect(() => {
-    if (!deal || !open) return;
-    const balance = computeDealBalance(deal).balance;
+    if (!effectiveDeal || !open) return;
+    const balance = computeDealBalance(effectiveDeal).balance;
     setAmount(String(Math.abs(balance)));
     setDirection(balance >= 0 ? 'in' : 'out');
     setDate(getTodayJalali());
@@ -41,14 +43,14 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
     setCheckNo('');
     setBank('');
     setCheckDue('');
-  }, [deal, open]);
+  }, [effectiveDeal, open]);
 
   const entered = parseFloat(toEn(amount)) || 0;
   const remaining = bal - entered;
   const quickSet = (pct: number) => setAmount(String(Math.round(bal * pct)));
 
   const handleSave = () => {
-    if (!deal) return;
+    if (!effectiveDeal) return;
     if (!entered || entered <= 0) {
       toastMsg.warn('مبلغ معتبر وارد کنید');
       return;
@@ -68,12 +70,12 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
       bank: method === 'check' ? bank.trim() : undefined,
       dueDate: method === 'check' ? checkDue : undefined,
     };
-    updateDeal(deal.id, { payments: [...(deal.payments || []), newPayment] });
+    updateDeal(effectiveDeal.id, { payments: [...(effectiveDeal.payments || []), newPayment] });
     toastMsg.saved();
     onClose();
   };
 
-  if (!deal) return null;
+  if (!effectiveDeal) return null;
 
   const isIn = direction === 'in';
   const title = isIn ? '💳 ثبت دریافت' : '💳 ثبت پرداخت';
@@ -99,7 +101,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
           <DatePicker value={date} onChange={setDate} />
         </Field>
         <Field label="مبلغ" required>
-          <MoneyField value={amount} onChange={(e) => setAmount(e.target.value)} />
+          <MoneyField value={amount} onChange={(e) => setAmount(e.target.value)} showWords={false} />
         </Field>
       </Grid2>
 
@@ -132,7 +134,12 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
           ↳ باقی‌مانده: <b>{toFa(remaining.toLocaleString('fa-IR'))} ت</b>
         </div>
       )}
-      {entered >= bal && bal > 0 && (
+      {entered > bal && bal > 0 && (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginBottom: 8 }}>
+          ⚠ مبلغ وارد شده بیشتر از بدهی است
+        </div>
+      )}
+      {entered === bal && bal > 0 && (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginBottom: 8 }}>
           ✓ این پرداخت کل بدهی را تسویه می‌کند
         </div>
