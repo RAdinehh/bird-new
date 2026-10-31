@@ -347,12 +347,21 @@ export default function FlockCard(props: FlockCardProps) {
 
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات</div>
       <RowGrid>
-        {ageDays > 0 && <Row l="سن" v={`${fmt.int(ageDays)} روز`} />}
         {f.initialCount != null && <Row l="تعداد اولیه" v={toFa(f.initialCount)} />}
-        {f.currentCount != null && <Row l="تعداد فعلی" v={fmt.int(f.currentCount)} />}
-        {f.initialCount != null && f.currentCount != null && f.initialCount !== f.currentCount && (
-          <Row l="تلفات" v={`${fmt.int(f.initialCount - f.currentCount)} (${toFa(((f.initialCount - f.currentCount) / f.initialCount * 100).toFixed(1))}٪)`} />
-        )}
+        {f.initialCount != null && (() => {
+          const evs = ((f as any).events || []).filter((e: any) => !e.revoked);
+          const evSales = evs.filter((e: any) => e.type === 'sell').reduce((s: number, e: any) => s + (e.count || 0), 0);
+          const evDeaths = evs.filter((e: any) => e.type === 'death' || e.type === 'cull').reduce((s: number, e: any) => s + (e.count || 0), 0);
+          const unmatched = Math.max(0, (f.initialCount ?? 0) - (f.currentCount ?? 0) - evSales - evDeaths - consignmentCount);
+          return (
+            <>
+              {evDeaths > 0 && <Row l="تلفات" v={`${fmt.int(evDeaths)} (${toFa(((evDeaths / (f.initialCount || 1)) * 100).toFixed(1))}٪)`} />}
+              {evSales > 0 && <Row l="فروش" v={fmt.int(evSales)} />}
+              {consignmentCount > 0 && <Row l="در دست طرف" v={fmt.int(consignmentCount)} />}
+              {unmatched > 0 && <Row l="تعدیل نامشخص" v={`${fmt.int(unmatched)} (بررسی کنید)`} accent />}
+            </>
+          );
+        })()}
         {f.type === 'breeder' && ((f.maleCount ?? 0) + (f.femaleCount ?? 0) + (f.unknownCount ?? 0) > 0) && (
           <>
             {(f.maleCount ?? 0) > 0 && <Row l="تعداد نر" v={fmt.int(f.maleCount)} />}
