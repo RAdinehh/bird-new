@@ -161,27 +161,32 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         </button>
       </div>
 
-      {/* 🆕 دکمه پرداخت گروهی */}
-      {kind !== 'deal' && (
+      {/* Actions: دریافت گروهی + صورت‌حساب */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: kind === 'deal' ? '1fr' : '1fr 1fr',
+          gap: 8,
+          marginBottom: 8,
+        }}
+      >
+        {kind !== 'deal' && (
+          <Btn
+            size="sm"
+            variant="outline"
+            onClick={() => setMultiPayOpen(true)}
+          >
+            💳 {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
+          </Btn>
+        )}
         <Btn
           size="sm"
-          variant="primary"
-          onClick={() => setMultiPayOpen(true)}
-          style={{ marginBottom: 8, width: '100%' }}
+          variant="outline"
+          onClick={() => setStatementOpen(true)}
         >
-          💳 {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
+          📄 صورت‌حساب
         </Btn>
-      )}
-
-      {/* دکمه صورت‌حساب */}
-      <Btn
-        size="sm"
-        variant="outline"
-        onClick={() => setStatementOpen(true)}
-        style={{ marginBottom: 8, width: '100%' }}
-      >
-        📄 صورت‌حساب طرف حساب
-      </Btn>
+      </div>
 
       {/* خلاصه — یه خط */}
       <SummaryBox kind={kind} totalOpen={effectiveTotal} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} overdueCount={effectiveOverdueCount} soonCount={effectiveSoonCount} />
