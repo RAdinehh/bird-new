@@ -75,7 +75,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
     if (!effectiveDeal) return;
     if (Object.keys(formErrors).length > 0) {
       const firstErr = Object.values(formErrors)[0];
-      toastMsg.warn(firstErr || 'لطفاً خطاها را برطرف کنید');
+      toastMsg.error(firstErr || 'لطفاً خطاها را برطرف کنید');
       return;
     }
     const newPayment: DealPayment = {
