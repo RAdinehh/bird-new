@@ -789,3 +789,20 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 - RHF Pilot
 
 *آخرین به‌روزرسانی: جلسه ۱۵ — ۱۴۰۵/۱۱/۰۱*
+
+---
+
+## 📅 جلسه ۱۴۰۵/۱۱/۰۱ (شماره ۱۶ — Statement Redesign + Global Sticky Footers)
+
+### ✅ DONE
+- **Statement Redesign:** گروه‌بندی روزانه، Grid مقاوم برای موبایل، بج‌های بدهکار/بستانکار، اصلاح ترتیب RTL و تراز مبالغ.
+- **Global Modal Standard:** کشف نقض استاندارد در `ModalFooter` (قرارگیری در Body به جای prop اختصاصی). اصلاح سراسری در `StatementModal` و `AgingReportModal`.
+- **Verify:** `grep` تایید کرد که هیچ `<ModalFooter>` خارج از `footer={...}` در کل `src/mod/` باقی نمانده است.
+
+### ⏸ PENDING (بروزرسانی شده)
+- L11 tests برای `getDealPaymentFormSchema`
+- Refactor DealPayModal → useFormErrors
+- RHF Pilot (بحث جلسه ۱۴۰۵/۱۱/۰۱)
+- باگ snapshot `dealPayTarget`
+
+*آخرین به‌روزرسانی: جلسه ۱۶ — ۱۴۰۵/۱۱/۰۱*
