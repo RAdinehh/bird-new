@@ -171,7 +171,9 @@ export default function StatementModal({ open, onClose }: Props) {
   const buildHTML = (): string => {
     const farmName = settings?.farm?.name || 'مرغداری';
     const farmAddr = settings?.farm?.address || '';
+    const farmCity = settings?.farm?.city || '';
     const farmPhone = settings?.farm?.phone || '';
+    const farmPostal = settings?.farm?.postalCode || '';
 
     const rows = lines.map((l, index) => {
       const isDebit = l.debit > 0;
@@ -272,16 +274,18 @@ export default function StatementModal({ open, onClose }: Props) {
       <div class="title">مشخصات فروشنده</div>
       <div class="info">
         <strong>${farmName}</strong><br>
-        نشانی: ${farmAddr || '—'}<br>
-        تلفن: ${farmPhone || '—'}
+        نشانی: ${farmAddr || '—'} ${farmCity ? `(${farmCity})` : ''}<br>
+        ${farmPostal ? `کد پستی: ${toFa(farmPostal)}<br>` : ''}
+        تلفن: ${farmPhone ? toFa(farmPhone) : '—'}
       </div>
     </div>
     <div class="party-box">
       <div class="title">مشخصات خریدار (طرف حساب)</div>
       <div class="info">
         <strong>${party?.name || '—'}</strong><br>
-        نشانی: ${(party as any)?.address || '—'}<br>
-        تلفن: ${party?.phone || '—'}
+        نشانی: ${party?.address || '—'} ${party?.city ? `(${party.city})` : ''}<br>
+        ${party?.nationalId ? `کد ملی: ${toFa(party.nationalId)}<br>` : ''}
+        تلفن: ${party?.phone ? toFa(party.phone) : '—'}
       </div>
     </div>
   </div>
