@@ -6,15 +6,16 @@
 
 ---
 
-## 🚨 پنج فایل مقدس — قبل از هر کار
+## 🚨 شش فایل مقدس — قبل از هر کار
 
-**بدون خواندن این ۵ فایل، هیچ تغییری مجاز نیست.**
+**بدون خواندن این ۶ فایل، هیچ تغییری مجاز نیست.**
 
 ۱. `docs/CONSTITUTION.md` — ۱۳ قانون کد + ratchet
 ۲. `docs/UI-PATTERNS.md` — ۱۳ بخش الگوهای UI
 ۳. `docs/DECISIONS.md` — تاریخچه تصمیمات (۳۰ خط اول)
 ۴. `docs/PARADIGM.md` — پارادایم‌های درمانی (مدرن/سنتی)
 ۵. `docs/COMPLEX-SCENARIOS.md` — سناریوهای پیچیده
+۶. `docs/modules/validation-intelligence-map.md` — نقشه Intelligence (۹۵۰+ خط، ۵ لایه، ۱۳۵ profile)
 
 **قبل از هر commit:**
 ~~~bash
