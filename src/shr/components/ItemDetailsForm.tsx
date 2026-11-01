@@ -232,11 +232,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} options={availableHatches.map(h => ({ value: h.id, label: `${h.date} — ${h.hatched} جوجه` }))} placeholder="— انتخاب هچ —" modalTitle="انتخاب هچ" autoThreshold={6} />
             </Field>
           ) : (
-            <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')} hint={
-              (item.birdId || item.breedId) && flocksForItem(item).length === 0
-                ? '⚠️ گله‌ای با این پرنده/نژاد یافت نشد — ابتدا از بخش «گله» گله بسازید'
-                : 'گله‌ای که جوجه از آن فروخته می‌شود'
-            }>
+            <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
               <SmartSelect value={String(item.flockId || '')} onChange={v => {
                 const f = flocks.find(x => x.id === v);
                 const age = computeAgeFromHatch(f?.hatchDate);
@@ -246,6 +242,16 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
           )}
           </Grid2>
+        )}
+        {!isPurchase && (item.source || 'flock') === 'hatch' && availableHatches.length === 0 && (
+          <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4, fontWeight: 600, color: 'var(--danger)' }}>
+            ابتدا از بخش «جوجه‌کشی» یک هچ بسازید
+          </div>
+        )}
+        {!isPurchase && (item.source || 'flock') !== 'hatch' && (activeFlocks.length === 0 || ((item.birdId || item.breedId) && flocksForItem(item).length === 0)) && (
+          <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4, fontWeight: 600, color: 'var(--danger)' }}>
+            ابتدا از بخش «گله» یک گله بسازید
+          </div>
         )}
 
         {/* --- بخش ۱: هویت پرنده --- */}
