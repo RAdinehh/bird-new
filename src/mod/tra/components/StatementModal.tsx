@@ -179,7 +179,7 @@ export default function StatementModal({ open, onClose }: Props) {
       const info = isOutP ? { label: 'پرداخت' } : KIND_INFO[l.kind];
       
       const metaParts = [info.label];
-      if (l.docNumber && !isOutP) metaParts.push(l.docNumber);
+      if (l.docNumber && !isOutP && l.kind !== 'payment_cash' && l.kind !== 'payment_card' && l.kind !== 'payment_check') metaParts.push(l.docNumber);
       if (l.kind === 'payment_check' && l.checkNo) metaParts.push('#' + l.checkNo);
       if (l.kind === 'payment_check' && l.bank) metaParts.push(l.bank);
       if (l.kind === 'payment_check' && l.dueDate) metaParts.push('سرسید ' + toFa(l.dueDate));
@@ -207,7 +207,11 @@ export default function StatementModal({ open, onClose }: Props) {
     @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
     @page { size: A4; margin: 15mm; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Vazirmatn, sans-serif; direction: rtl; color: #1e293b; font-size: 12px; background: #fff; line-height: 1.5; }
+    body { 
+      font-family: Vazirmatn, sans-serif; direction: rtl; color: #1e293b; font-size: 12px; background: #fff; line-height: 1.5; 
+      display: flex; flex-direction: column; min-height: 100vh; margin: 0;
+    }
+    .content-wrapper { flex: 1 0 auto; }
     
     .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; }
     .header h1 { font-size: 22px; color: #16a34a; margin-bottom: 8px; }
@@ -233,12 +237,13 @@ export default function StatementModal({ open, onClose }: Props) {
     .summary-row:last-child { border-bottom: none; }
     .summary-total { font-weight: 700; font-size: 15px; color: #0f172a; border-top: 2px solid #cbd5e1; padding-top: 12px; margin-top: 4px; }
     
-    .footer { display: flex; justify-content: space-between; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+    .footer { display: flex; justify-content: space-between; padding-top: 20px; border-top: 1px solid #e2e8f0; flex-shrink: 0; margin-top: auto; padding-bottom: 20px; }
     .signature { text-align: center; color: #64748b; font-size: 12px; width: 200px; }
     .signature-box { height: 70px; margin-bottom: 8px; border: 1px dashed #cbd5e1; border-radius: 4px; }
   </style>
 </head>
 <body>
+  <div class="content-wrapper">
   <div class="header">
     <div>
       <h1>${farmName}</h1>
@@ -280,6 +285,7 @@ export default function StatementModal({ open, onClose }: Props) {
         <span style="direction: ltr;">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</span>
       </div>
     </div>
+  </div>
   </div>
   
   <div class="footer">
