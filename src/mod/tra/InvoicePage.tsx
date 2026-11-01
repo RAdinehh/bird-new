@@ -458,7 +458,7 @@ return (
         rem={rem}
         save={() => {
           setSaveAttempted(true);
-          if (Object.keys(vErrors).length > 0) { setErr(''); return; }
+          if (Object.keys(vErrors).length > 0) return;
           save();
         }}
         addItem={addItem}
