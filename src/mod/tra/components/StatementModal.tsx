@@ -3,7 +3,7 @@
  * استاندارد: SAP FBL5N (Customer Line Item Display)
  */
 import { useState, useMemo } from 'react';
-import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
+import { Modal, Btn, BtnRow, ModalFooter, Field, Grid2, Select } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import { useTra, computeDealBalance, DEAL_LABEL } from '../store';
 import { useCtc } from '../../ctc/store';
@@ -265,12 +265,10 @@ export default function StatementModal({ open, onClose }: Props) {
       )}
 
       <div style={{ marginTop: 'var(--sp-4)' }}>
-        <BtnRow>
-          <Btn variant="outline" onClick={onClose}>بستن</Btn>
-          <Btn variant="primary" onClick={handlePrint} disabled={!partyId || lines.length === 0}>
-            📄 چاپ / PDF
-          </Btn>
-        </BtnRow>
+        <ModalFooter actions={[
+          { label: '📄 چاپ / PDF', role: 'primary', onClick: handlePrint, disabled: !partyId || lines.length === 0 },
+          { label: 'بستن', role: 'secondary', onClick: onClose },
+        ]} />
       </div>
     </Modal>
   );
