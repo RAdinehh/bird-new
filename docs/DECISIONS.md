@@ -367,3 +367,40 @@
 - سند: `docs/modules/validation-intelligence-map.md`
 
 *آخرین تصمیم: 1405/11/02*
+
+## جلسه ۱۴۰۵/۱۱/۰۲ — مستندسازی Intelligence (بدون کد)
+
+### تصمیم
+- `validation-intelligence-map.md`: بازسازی ساختاری (نه بازنویسی) — ۵ تناقض تصحیح + ۵ بخش جدید (~۳۰۰ خط)
+- `AI-BOOT.md`: پنج فایل مقدس → شش فایل
+
+### چرا
+- AI قبلی ۱ ساعت برای فهم Intelligence کد خواند — این سند جلوی تکرار را می‌گیرد
+- ۵ تناقض داخلی AI را گمراه می‌کرد:
+  ۱. structuralBreak «۱۸ فیلد» vs جدول ۱۶ + ۲ placeholder
+  ۲. biologicalRange «۱۲ فیلد» vs ۹ یکتا
+  ۳. Coverage Matrix: flk MSG=خیر (کد ۵) + tra FieldHint=خیر (کد ۳)
+  ۴. inc.rentAmount ماژول: Q13 → Q12
+  ۵. chickWeight بدون prefix
+
+### محتوای جدید
+1. **الگوریتم structuralBreak**: کد واقعی + ۵ محدودیت + مثال ایران ۳۶٪
+2. **۱۴ سناریو**: تنوع تأمین‌کننده، تخفیف حجمی، فصلی، typo، ... — فاز ۱/۲/۳
+3. **Gap ۸**: Unit normalization (۱L vs 500ml → هشدار کاذب)
+4. **Gap ۹**: Rule mode n≥2 (تجهیزات ۵M→۱۰M)
+5. **Gap ۱۰**: Dedup + Time-span (۶ رکورد در ۲ دقیقه = trigger)
+6. **Gap ۱۱**: الگوی فرم tra (wrapper setErr، خلاف HallsPage)
+7. **Gap ۱۲ (بحرانی)**: AI-BOOT بدون لینک به سند
+8. **چک‌لیست v2** (۵ بخش: Profile, Unit+History, UI, پیام, AI Discovery, تست)
+9. **Known Naming Issues** (chickWeight، tra.price_chick با ۳ اسم مختلف)
+
+### Deferred
+- فاز ۱ کد (unit + dedup + time-span + rule mode + form pattern) — جلسه جدا
+- فاز ۲ و ۳ سناریوها (فصلی، الگوی کاربر، وارداتی، ...)
+- ۴ فیلد biologicalRange تکراری در کد (باگ کد، خارج از scope)
+
+### مرجع
+- commits: 796abdaf, ee3d24a7, 3392aa3c, 05505b2d, 3b6c7763
+- سند: `docs/modules/validation-intelligence-map.md`
+
+*آخرین تصمیم: 1405/11/02*
