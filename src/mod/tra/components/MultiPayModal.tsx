@@ -75,14 +75,19 @@ export default function MultiPayModal({ open, onClose, kind }: Props) {
     setSelectedIds(new Set()); setErr('');
   };
 
+  const fail = (msg: string) => {
+    setErr(msg);
+    toastMsg.error(msg);
+  };
+
   const handleConfirm = () => {
     setErr('');
-    if (!partyId) { setErr('طرف حساب را انتخاب کنید'); return; }
-    if (!date) { setErr('تاریخ را انتخاب کنید'); return; }
-    if (totalAmount <= 0) { setErr('مبلغ را وارد کنید'); return; }
-    if (selectedIds.size === 0) { setErr('حداقل یک فاکتور انتخاب کنید'); return; }
-    if (totalAllocated <= 0) { setErr('مبلغ توزیع‌شده صفر است'); return; }
-    if (method === 'check' && !checkNo.trim()) { setErr('شماره چک الزامی است'); return; }
+    if (!partyId) return fail('طرف حساب را انتخاب کنید');
+    if (!date) return fail('تاریخ را انتخاب کنید');
+    if (totalAmount <= 0) return fail('مبلغ را وارد کنید');
+    if (selectedIds.size === 0) return fail('حداقل یک فاکتور انتخاب کنید');
+    if (totalAllocated <= 0) return fail('مبلغ توزیع‌شده صفر است');
+    if (method === 'check' && !checkNo.trim()) return fail('شماره چک الزامی است');
 
     try {
       // ۱. ساخت PartyPayment
@@ -127,7 +132,7 @@ export default function MultiPayModal({ open, onClose, kind }: Props) {
       onClose();
     } catch (e: any) {
       console.error('[MultiPay]', e);
-      setErr(e?.message || 'خطا در ثبت پرداخت');
+      fail(e?.message || 'خطا در ثبت پرداخت');
     }
   };
 
