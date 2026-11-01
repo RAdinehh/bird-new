@@ -230,7 +230,7 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
 
   return (
     <Modal open={open} onClose={onClose} title="📄 صورت‌حساب طرف حساب" size="lg">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 8, paddingTop: 12 }}>
         <Field label="طرف حساب" required>
           <Select value={partyId} onChange={e => setPartyId(e.target.value)}>
             <option value="">— انتخاب —</option>
@@ -240,7 +240,7 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
           </Select>
         </Field>
         
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, direction: 'rtl' }}>
           <Field label="از تاریخ">
             <DatePicker value={fromDate} onChange={setFromDate} />
           </Field>
@@ -325,11 +325,11 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
                           </div>
                         </div>
                         
-                        <div style={{ minWidth: '110px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                        <div style={{ minWidth: '110px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
                            <span style={{ fontSize: '13px', fontWeight: 700, color: isDebit ? 'var(--danger)' : 'var(--accent)', fontVariantNumeric: 'tabular-nums', direction: 'ltr' }}>
                               {isDebit ? '+' : '-'}{toFa(amount.toLocaleString('fa-IR'))}
                            </span>
-                           <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px', fontWeight: 500, background: isDebit ? 'var(--danger-soft)' : 'var(--accent-soft)', color: isDebit ? 'var(--danger)' : 'var(--accent)', alignSelf: 'flex-start' }}>
+                           <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px', fontWeight: 500, background: isDebit ? 'var(--danger-soft)' : 'var(--accent-soft)', color: isDebit ? 'var(--danger)' : 'var(--accent)' }}>
                               {isDebit ? 'بدهکار' : 'بستانکار'}
                            </span>
                         </div>
