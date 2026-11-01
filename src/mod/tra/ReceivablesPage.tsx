@@ -16,6 +16,7 @@ import MultiPayModal from './components/MultiPayModal';
 import DealPayModal from './components/DealPayModal';
 import SummaryBox from './components/SummaryBox';
 import UpcomingDueSection from './components/UpcomingDueSection';
+import StatementModal from './components/StatementModal';
 import { agingBucketFromDue } from './formulas';
 
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
@@ -32,6 +33,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [deferReason, setDeferReason] = useState('');
   const [showUpcoming, setShowUpcoming] = useState(false);
   const [dealPayTarget, setDealPayTarget] = useState<Deal | null>(null);
+  const [statementOpen, setStatementOpen] = useState(false);
 
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0),
@@ -170,6 +172,16 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
           💳 {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
         </Btn>
       )}
+
+      {/* دکمه صورت‌حساب */}
+      <Btn
+        size="sm"
+        variant="outline"
+        onClick={() => setStatementOpen(true)}
+        style={{ marginBottom: 8, width: '100%' }}
+      >
+        📄 صورت‌حساب طرف حساب
+      </Btn>
 
       {/* خلاصه — یه خط */}
       <SummaryBox kind={kind} totalOpen={effectiveTotal} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} overdueCount={effectiveOverdueCount} soonCount={effectiveSoonCount} />
@@ -408,6 +420,10 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
               kind={kind}
             />
           )}
+      <StatementModal
+        open={statementOpen}
+        onClose={() => setStatementOpen(false)}
+      />
     </PageContainer>
   );
 }
