@@ -239,7 +239,7 @@ export default function StatementModal({ open, onClose }: Props) {
     .td-right { text-align: right; }
     .td-left { text-align: left; direction: ltr; font-variant-numeric: tabular-nums; }
     
-    .summary-wrapper { display: flex; justify-content: flex-start; margin-bottom: 24px; }
+    .summary-wrapper { display: flex; justify-content: flex-end; margin-bottom: 24px; }
     .summary-table { width: 320px; border-collapse: collapse; table-layout: fixed; }
     .summary-table td { border: 1px solid #cbd5e1; padding: 8px 10px; font-size: 11px; }
     .summary-table .col-lbl { text-align: right; color: #334155; font-weight: 600; }
