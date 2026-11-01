@@ -523,6 +523,17 @@ if (signals.some(s => s.type === 'biological') && profile?.biologicalRange) {
 
 ناهمسانی کشف‌شده: chickWeight بدون پیشوند ماژول! بقیه همه با پیشوند (tra., flk., ...).
 
+### ⚠️ Known Naming Issues (نیازمند تصمیم آینده)
+
+| # | مشکل | مکان‌ها | راه‌حل پیشنهادی |
+|---|------|--------|-----------------|
+| ۱ | `chickWeight` بدون prefix | `FIELD_LABELS`, `FIELD_PROFILES` | rename به `tra.chickWeight` یا `inc.chickWeight` |
+| ۲ | `tra.price_chick` = ۳ اسم | `FIELD_LABELS`: `قیمت جوجه`<br>`InvoiceFormModal.tsx:70`: `قیمت هر جوجه`<br>`DealsPage.tsx:983`: `🐣 جوجه یک‌روزه` | همه باید از `FIELD_LABELS[fieldPath]` استفاده کنند — نه string دستی |
+| ۳ | `tra.price_feed` = ۲ اسم | `FIELD_LABELS`: `قیمت دان`<br>`InvoiceFormModal`: `قیمت هر...` | (همان بالا) |
+| ۴ | `tra.price_medicine` = ۲ اسم | `FIELD_LABELS`: `قیمت دارو`<br>`InvoiceFormModal`: `قیمت هر...` | (همان بالا) |
+
+**قانون:** UI باید از `getLabel(fieldPath)` استفاده کند — نه string دستی. اگر لیبل جدید لازم است، اول در `formatWarning.ts:FIELD_LABELS` تعریف شود.
+
 ---
 
 ## ۱۲ الگوی پیام — formatWarning()
@@ -986,17 +997,46 @@ const save = () => {
 
 ---
 
-## چک‌لیست قبل از پچ
+## چک‌لیست قبل از پچ (نسخه ۲ — 2026/11)
 
-- [ ] آیا fieldPath در FIELD_PROFILES هست؟
-- [ ] آیا FIELD_LABELS[fieldPath] تعریف شده؟
-- [ ] اگر قیمت هست، structuralBreakAware: true؟
-- [ ] اگر دما/رطوبت هست، biologicalRange؟
-- [ ] اگر مقایسه با فیلد دیگه هست، crossFieldRule؟
-- [ ] آیا FieldHint در UI هست؟ (اگر نه، profile بی‌فایده)
+### A. ساختار Profile
+
+- [ ] آیا fieldPath در `FIELD_PROFILES` هست؟
+- [ ] آیا `FIELD_LABELS[fieldPath]` تعریف شده؟
+- [ ] اگر قیمت هست، `structuralBreakAware: true`؟
+- [ ] اگر دما/رطوبت هست، `biologicalRange`؟
+- [ ] اگر مقایسه با فیلد دیگه هست، `crossFieldRule`؟
+- [ ] اگر خرید نادر (equipment/rent) هست، `mode: 'rule'`؟ (Gap 9 — بعد از پیاده‌سازی)
+
+### B. Unit + History (Gap 8, 10)
+
+- [ ] آیا `recordHistory` برای قیمت، **نرمال‌سازی به baseUnit** دارد؟
+  - `basePrice = unitPrice / unitDef.factor` (از `uom.ts`)
+- [ ] آیا `recordHistory` dedup دارد؟ (same day+value → no-op)
+- [ ] آیا `structuralBreak` **time-span guard** دارد؟ (`timespan >= 7d`)
+
+### C. UI Wiring
+
+- [ ] آیا `FieldHint` در UI هست؟ (اگر نه، profile بی‌فایده)
+- [ ] آیا `showError` از `useFormErrors` به فیلد وصل است؟ (نه `setErr` دستی)
+- [ ] آیا `attemptSave()` قبل از `save()` صدا زده می‌شود؟
+- [ ] آیا wrapper save فقط `if (vErrors) return;` است؟ (بدون `setErr('')`)
+
+### D. پیام‌ها
+
 - [ ] آیا MSG استفاده شده؟ (نه hardcoded)
-- [ ] npx tsc --noEmit سبزه؟
-- [ ] npx vitest run src/test/intelligence.test.ts سبزه؟
+- [ ] آیا لیبل از `FIELD_LABELS` می‌آید؟ (نه string دستی)
+
+### E. AI Discovery (Gap 12)
+
+- [ ] آیا `docs/AI-BOOT.md` لینک به این سند دارد؟
+- [ ] آیا این سند با تغییرات جدید آپدیت شده است؟
+
+### F. تست
+
+- [ ] `npx tsc --noEmit` سبز؟
+- [ ] `npx vitest run src/test/intelligence.test.ts` سبز؟
+- [ ] تست دستی: ۵ سناریوی فاز ۱ (خرید عادی، جهش، تغییر واحد، خرید نادر، typo)
 
 ---
 
@@ -1038,12 +1078,19 @@ grep -n fieldPath src/shr/intelligence/formatWarning.ts
 
 ۲ کلمه کلیدی:
 - structuralBreakAware = تورمی (۱۸ فیلد قیمت)
-- crossFieldRule = مقایسه با فیلد دیگر (۲۳ فیلد، ۸ قاعده)
+  - الگوریتم: `n≥6 AND rMean > olderMean×1.3 AND all recent > olderMean×1.1`
+  - محدودیت: بدون زمان، فقط صعودی، mean نه median (بخش ۱۴)
+- crossFieldRule = مقایسه با فیلد دیگر (۲۳ فیلد، ۹ قاعده)
 
 ۳ قانون طلایی:
 ۱. Zod != Intelligence (بلاک vs هشدار)
 ۲. FIELD_LABELS = Source of Truth لیبل‌ها
 ۳. MSG = استاندارد پیام خطا
+
+۲ نکته حیاتی (2026/11):
+- **Gap 12 بحرانی:** AI-BOOT باید به این سند لینک بدهد (شش فایل مقدس — نه پنج)
+- **۱۴ سناریو:** تنوع تأمین‌کننده، تخفیف حجمی، فصلی، typo، ... → فاز ۱ فقط ۳ سناریو، ۱۱ سناریو deferred
+- **Gap 8-10:** unit normalization + dedup + time-span — قبل از فاز ۲
 
 ---
 
