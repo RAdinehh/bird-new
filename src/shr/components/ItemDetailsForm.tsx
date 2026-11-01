@@ -147,6 +147,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     if (age != null && age > 0) parts.push(toFa(age) + ' روز');
     return { value: f.id, label: f.name, subtitle: parts.join(' · ') || undefined };
   });
+
+  // 🎯 فیلتر آبشاری گله‌ها: فقط گله‌هایی که با پرنده/نژاد انتخاب‌شده مطابقت دارند
+  const flocksForItem = (it: ItemDetailFormData) => {
+    return activeFlocks.filter(opt => {
+      const flock = flocks.find((f: any) => f.id === opt.value);
+      if (!flock) return false;
+      if (it.birdId && flock.birdId !== it.birdId) return false;
+      if (it.breedId && flock.breedId !== it.breedId) return false;
+      return true;
+    });
+  };
   const birdObj = birds.find(b => b.id === item.birdId);
   const breedObj = breeds.find(b => b.id === item.breedId);
     const isEggCategory = isPurchase ? category === 'egg' : category === 'fertile_egg';
@@ -284,13 +295,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             }} options={availableHatches.map(h => ({ value: h.id, label: `${h.date} — ${h.hatched} جوجه` }))} placeholder="— انتخاب هچ —" modalTitle="انتخاب هچ" autoThreshold={6} />
           </Field>
         ) : (
-          <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')} hint="گله‌ای که جوجه از آن فروخته می‌شود">
+          <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')} hint={
+            (item.birdId || item.breedId) && flocksForItem(item).length === 0
+              ? '⚠️ گله‌ای با این پرنده/نژاد یافت نشد — ابتدا از بخش «گله» گله بسازید'
+              : 'گله‌ای که جوجه از آن فروخته می‌شود'
+          }>
             <SmartSelect value={String(item.flockId || '')} onChange={v => {
               const f = flocks.find(x => x.id === v);
               const age = computeAgeFromHatch(f?.hatchDate);
               updateItem({ flockId: v, source: 'flock', hatchId: '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age != null ? age : (f ? getAgeDays(f) : item.ageDays), hatchDate: f?.hatchDate || item.hatchDate });
               setHatchOverride(false);
-            }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+            }} options={flocksForItem(item)} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
         )}
 
