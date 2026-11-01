@@ -208,42 +208,39 @@ export default function StatementModal({ open, onClose }: Props) {
     @page { size: A4; margin: 15mm; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
-      font-family: Vazirmatn, sans-serif; direction: rtl; color: #1e293b; font-size: 12px; background: #fff; line-height: 1.5; 
-      display: flex; flex-direction: column; min-height: 100vh; margin: 0;
+      font-family: Vazirmatn, sans-serif; direction: rtl; color: #1e293b; font-size: 11px; background: #fff; line-height: 1.4; 
     }
-    .content-wrapper { flex: 1 0 auto; }
     
-    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #16a34a; padding-bottom: 12px; margin-bottom: 16px; }
     .header h1 { font-size: 22px; color: #16a34a; margin-bottom: 8px; }
     .header h2 { font-size: 16px; color: #0f172a; margin-bottom: 8px; }
     .text-muted { color: #64748b; }
     .text-sm { font-size: 11px; }
     .fw-bold { font-weight: 700; }
     
-    .meta-info { display: flex; justify-content: space-between; background: #f8fafc; padding: 14px 16px; border-radius: 8px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
+    .meta-info { display: flex; justify-content: space-between; background: #f8fafc; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #e2e8f0; }
     
-    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-    th { background: #f1f5f9; color: #334155; padding: 12px 8px; text-align: right; font-weight: 700; border-bottom: 2px solid #cbd5e1; font-size: 12px; }
-    td { padding: 12px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    th { background: #f1f5f9; color: #334155; padding: 8px 6px; text-align: right; font-weight: 700; border-bottom: 2px solid #cbd5e1; font-size: 11px; }
+    td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
     tr:nth-child(even) { background: #f8fafc; }
     .center { text-align: center; }
     .amount { text-align: left; font-variant-numeric: tabular-nums; direction: ltr; }
     .text-danger { color: #dc2626; }
     .text-success { color: #16a34a; }
     
-    .summary { display: flex; justify-content: flex-end; margin-bottom: 40px; }
+    .summary { display: flex; justify-content: flex-end; margin-bottom: 24px; }
     .summary-box { width: 320px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
     .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #cbd5e1; font-size: 13px; }
     .summary-row:last-child { border-bottom: none; }
     .summary-total { font-weight: 700; font-size: 15px; color: #0f172a; border-top: 2px solid #cbd5e1; padding-top: 12px; margin-top: 4px; }
     
-    .footer { display: flex; justify-content: space-between; padding-top: 20px; border-top: 1px solid #e2e8f0; flex-shrink: 0; margin-top: auto; padding-bottom: 20px; }
+    .footer { display: flex; justify-content: space-between; padding-top: 16px; border-top: 1px solid #e2e8f0; margin-top: 24px; padding-bottom: 10px; }
     .signature { text-align: center; color: #64748b; font-size: 12px; width: 200px; }
     .signature-box { height: 70px; margin-bottom: 8px; border: 1px dashed #cbd5e1; border-radius: 4px; }
   </style>
 </head>
 <body>
-  <div class="content-wrapper">
   <div class="header">
     <div>
       <h1>${farmName}</h1>
@@ -285,7 +282,6 @@ export default function StatementModal({ open, onClose }: Props) {
         <span style="direction: ltr;">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</span>
       </div>
     </div>
-  </div>
   </div>
   
   <div class="footer">
