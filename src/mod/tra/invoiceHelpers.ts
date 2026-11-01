@@ -510,6 +510,25 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
   const allKeys = new Set<string>([...prevMap.keys(), ...newMap.keys()]);
   const updatedFlockIds = new Set<string>(); // 🆕 فیکس Double Counting
 
+  // 🆕 Pre-flight: sales — over-sale check BEFORE mutation
+  if (inv.type === 'sale') {
+    for (const k of allKeys) {
+      const p0 = prevMap.get(k);
+      const n0 = newMap.get(k);
+      const delta = (n0?.qty || 0) - (p0?.qty || 0);
+      if (delta <= 0) continue;
+      const ref = n0 || p0;
+      if (!ref) continue;
+      const explicitFlockId = (inv as any).relatedFlockId || ref.item.flockId || '';
+      if (!explicitFlockId) continue;
+      const f = flk.flocks.find(x => x.id === explicitFlockId);
+      if (!f) continue;
+      if ((f.currentCount ?? 0) < delta) {
+        throw new Error(`موجودی کافی نیست: ${f.name} — موجودی ${f.currentCount}، درخواستی ${delta}`);
+      }
+    }
+  }
+
   for (const k of allKeys) {
     const p0 = prevMap.get(k);
     const n0 = newMap.get(k);

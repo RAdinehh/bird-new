@@ -36,6 +36,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
   const vWhsItems = (ctx as any).whsItems as any[] | undefined;
   const vContacts = (ctx as any).contacts as any[] | undefined;
   const vIsEdit = !!(ctx as any).isEdit;
+  const vPrevInvoice = (ctx as any).prevInvoice as any | undefined;
   return z.object({
     type: oneOf('نوع فاکتور', ['purchase', 'sale'] as const),
     date: persianDateOpt('تاریخ'),
@@ -383,55 +384,104 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       }
     }
 
-    // 2. فروش: موجودی گله/انبار + دوره پرهیز (فقط ایجاد، نه ویرایش)
-    if (d.type === 'sale' && !vIsEdit) {
+    // 2. فروش: موجودی گله/انبار + دوره پرهیز
+    if (d.type === 'sale') {
       const todayParts = new Intl.DateTimeFormat('en-u-ca-persian', { year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
       const todayJ = `${todayParts.find(x => x.type === 'year')?.value || '0'}/${todayParts.find(x => x.type === 'month')?.value || '01'}/${todayParts.find(x => x.type === 'day')?.value || '01'}`;
 
+      // ─── گروه‌بندی گله (chick/adult) ───
+      if (vFlocks) {
+        const groupedByFlock: Record<string, { qty: number; firstIdx: number }> = {};
+        (d.items || []).forEach((it: any, i: number) => {
+          const itCat = it.category || d.category;
+          if (['chick', 'adult'].includes(itCat) && it.flockId) {
+            if (!groupedByFlock[it.flockId]) groupedByFlock[it.flockId] = { qty: 0, firstIdx: i };
+            groupedByFlock[it.flockId].qty += Number(it.quantity) || 0;
+          }
+        });
+
+        // مقدار قبلی این فاکتور (برای ویرایش)
+        const prevGrouped: Record<string, number> = {};
+        if (vPrevInvoice) {
+          (vPrevInvoice.items || []).forEach((it: any) => {
+            const itCat = it.category || vPrevInvoice.category;
+            if (['chick', 'adult'].includes(itCat) && it.flockId) {
+              prevGrouped[it.flockId] = (prevGrouped[it.flockId] || 0) + (Number(it.quantity) || 0);
+            }
+          });
+        }
+
+        // چک هر گله (مجموع قلم‌ها)
+        Object.entries(groupedByFlock).forEach(([flockId, info]) => {
+          const flock = vFlocks.find((f: any) => f.id === flockId);
+          if (!flock) return;
+          const cur = Number(flock.currentCount ?? 0);
+          const prev = prevGrouped[flockId] || 0;
+          const available = cur + prev;
+          if (info.qty > available) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `تعداد فروش (${info.qty}) بیش از موجودی گله (${available}) است`,
+              path: ['items', String(info.firstIdx), 'quantity'],
+            });
+          }
+        });
+      }
+
+      // ─── دوره پرهیز (per flock) ───
+      const seenFlocks = new Set<string>();
       for (let i = 0; i < (d.items || []).length; i++) {
         const it = d.items[i];
         const itCat = it.category || d.category;
-        const p = (f: string) => ['items', String(i), f];
-
-        // موجودی گله + دوره پرهیز (chick / adult)
-        if (['chick', 'adult'].includes(itCat) && it.flockId && vFlocks) {
+        if (['chick', 'adult'].includes(itCat) && it.flockId && vFlocks && !seenFlocks.has(it.flockId)) {
+          seenFlocks.add(it.flockId);
           const flock = vFlocks.find((f: any) => f.id === it.flockId);
           if (flock) {
-            const qty = Number(it.quantity) || 0;
-            const cur = Number(flock.currentCount ?? 0);
-            if (qty > cur) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `تعداد فروش (${qty}) بیش از موجودی گله (${cur}) است`,
-                path: p('quantity'),
-              });
-            }
             const aw = flock.activeWithdrawal;
             if (aw && aw.until && String(aw.until) >= todayJ) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 message: `گله در دوره پرهیز دارویی است (تا ${aw.until}) — فروش ممنوع`,
-                path: p('flockId'),
+                path: ['items', String(i), 'flockId'],
               });
             }
           }
+        }
+      }
+
+      // ─── موجودی انبار (گروه‌بندی per stockItemId) ───
+      if (vWhsItems) {
+        const groupedByStock: Record<string, { qty: number; firstIdx: number }> = {};
+        (d.items || []).forEach((it: any, i: number) => {
+          if (it.stockItemId) {
+            if (!groupedByStock[it.stockItemId]) groupedByStock[it.stockItemId] = { qty: 0, firstIdx: i };
+            groupedByStock[it.stockItemId].qty += Number(it.quantity) || 0;
+          }
+        });
+
+        const prevStockGrouped: Record<string, number> = {};
+        if (vPrevInvoice) {
+          (vPrevInvoice.items || []).forEach((it: any) => {
+            if (it.stockItemId) {
+              prevStockGrouped[it.stockItemId] = (prevStockGrouped[it.stockItemId] || 0) + (Number(it.quantity) || 0);
+            }
+          });
         }
 
-        // موجودی انبار (همه دسته‌ها — شامل egg, broken)
-        if (it.stockItemId && vWhsItems) {
-          const w = vWhsItems.find((x: any) => x.id === it.stockItemId);
-          if (w) {
-            const qty = Number(it.quantity) || 0;
-            const cur = Number(w.currentStock ?? 0);
-            if (qty > cur) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `تعداد فروش (${qty}) بیش از موجودی انبار (${cur}) است`,
-                path: p('quantity'),
-              });
-            }
+        Object.entries(groupedByStock).forEach(([stockId, info]) => {
+          const w = vWhsItems.find((x: any) => x.id === stockId);
+          if (!w) return;
+          const cur = Number(w.currentStock ?? 0);
+          const prev = prevStockGrouped[stockId] || 0;
+          const available = cur + prev;
+          if (info.qty > available) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `تعداد فروش (${info.qty}) بیش از موجودی انبار (${available}) است`,
+              path: ['items', String(info.firstIdx), 'quantity'],
+            });
           }
-        }
+        });
       }
     }
   });
