@@ -151,6 +151,23 @@ export default function StatementModal({ open, onClose }: Props) {
   const totalCredit = lines.reduce((s, l) => s + l.credit, 0);
   const netBalance = totalDebit - totalCredit;
 
+  const groupedLines = useMemo(() => {
+    const days: Record<string, StatementLine[]> = {};
+    lines.forEach(l => {
+      if (!days[l.date]) days[l.date] = [];
+      days[l.date].push(l);
+    });
+    return Object.entries(days).map(([date, dayLines]) => {
+      const lastLine = dayLines[dayLines.length - 1];
+      return {
+        date,
+        lines: dayLines,
+        endBalance: lastLine.balance
+      };
+    }).sort((a, b) => a.date.localeCompare(b.date));
+  }, [lines]);
+
+
   const buildHTML = (): string => {
     const farmName = settings?.farm?.name || 'مرغداری';
     const farmAddr = settings?.farm?.address || '';
@@ -238,6 +255,7 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
 
       {partyId && lines.length > 0 && (
         <>
+          {/* خلاصه حساب */}
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8,
             padding: 'var(--pad-normal)', background: 'var(--input-bg)',
@@ -259,72 +277,76 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {lines.map((l, i) => {
-              const info = (l.debit > 0 && (l.kind === 'payment_cash' || l.kind === 'payment_card' || l.kind === 'payment_check')) ? { icon: '💸', label: 'پرداخت', color: 'var(--danger)' } : KIND_INFO[l.kind];
-              const checkInfo = l.checkStatus ? CHECK_INFO[l.checkStatus] : null;
-              const amountColor = l.debit > 0 ? 'var(--danger)' : l.credit > 0 ? 'var(--accent)' : 'var(--text)';
-              const amountSign = l.debit > 0 ? '+' : l.credit > 0 ? '-' : '';
-              const amountValue = l.debit > 0 ? l.debit : l.credit;
-
-              return (
-                <div
-                  key={i}
-                  style={{
-                    display: 'flex', flexDirection: 'column', gap: 6,
-                    padding: '10px 8px', borderBottom: '1px solid var(--border)',
-                  }}
-                >
-                  {/* ─── خط ۱: نوع سند + تاریخ ─── */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: info.color }}>
-                      {info.icon} {info.label}
-                    </span>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0 }}>
-                      {toFa(l.date)}
-                    </span>
-                  </div>
-
-                  {/* ─── خط ۲: شرح + مبلغ ─── */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', flex: 1, wordBreak: 'break-word', lineHeight: 1.4 }}>
-                      {l.description || '—'}
-                      {l.kind === 'payment_check' && (l.checkNo || l.bank) && (
-                        <span style={{ color: 'var(--muted)' }}> • #{l.checkNo} {l.bank}</span>
-                      )}
-                    </span>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: amountColor, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
-                      {amountSign}{toFa(amountValue.toLocaleString('fa-IR'))} ت
-                    </span>
-                  </div>
-
-                  {/* ─── خط ۳: شماره سند + مانده ─── */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 6, alignItems: 'center' }}>
-                      {l.docNumber && (l.kind === 'invoice_sale' || l.kind === 'invoice_purchase' || l.kind === 'deal') && (
-                        <span>سند: {l.docNumber}</span>
-                      )}
-                      {checkInfo && (
-                        <span style={{
-                          padding: '1px 6px', borderRadius: 'var(--r-sm)',
-                          background: checkInfo.bg, color: checkInfo.color,
-                          fontSize: '10px', fontWeight: 600,
-                        }}>
-                          {checkInfo.label}
-                        </span>
-                      )}
-                    </span>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>
-                      مانده: <b style={{ color: 'var(--text)', fontSize: 'var(--fs-sm)' }}>{toFa(l.balance.toLocaleString('fa-IR'))}</b> ت
-                    </span>
-                  </div>
+          {/* کارت‌های روزانه */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {groupedLines.map((day, dIdx) => (
+              <div key={dIdx} style={{ background: 'var(--card)', borderRadius: 'var(--r-lg)', border: '1px solid var(--border)', overflow: 'hidden' }}>
+                
+                {/* هدر روز */}
+                <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '2px solid var(--border)', background: 'var(--bg)' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700 }}>{toFa(day.date)}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{day.lines.length} تراکنش</div>
                 </div>
-              );
-            })}
+                
+                {/* ردیف‌های تراکنش */}
+                <div style={{ padding: '0 16px 8px' }}>
+                  {day.lines.map((l, i) => {
+                    const isPaymentOut = l.debit > 0 && (l.kind === 'payment_cash' || l.kind === 'payment_card' || l.kind === 'payment_check');
+                    const info = isPaymentOut ? { icon: '💸', label: 'پرداخت', color: 'var(--danger)' } : KIND_INFO[l.kind];
+                    const checkInfo = l.checkStatus ? CHECK_INFO[l.checkStatus] : null;
+                    const isDebit = l.debit > 0;
+                    const amount = isDebit ? l.debit : l.credit;
+                    
+                    return (
+                      <div key={i} style={{
+                        display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto',
+                        alignItems: 'center', gap: 12, padding: '10px 0',
+                        borderTop: i > 0 ? '1px dashed var(--border)' : 'none'
+                      }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+                          <div style={{ fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                            <span style={{ flexShrink: 0 }}>{info.icon}</span>
+                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{info.label}</span>
+                            {l.docNumber && <span style={{ fontSize: '11px', color: 'var(--dim)', fontWeight: 400 }}>({l.docNumber})</span>}
+                          </div>
+                          <div style={{ fontSize: '10.5px', color: 'var(--muted)', paddingRight: 22, display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
+                            {l.description ? <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{l.description}</span> : null}
+                            {l.kind === 'payment_check' && (l.checkNo || l.bank) && (
+                               <span style={{ color: 'var(--dim)' }}> • #{l.checkNo} {l.bank}</span>
+                            )}
+                            {checkInfo && (
+                              <span style={{ padding: '1px 4px', borderRadius: 'var(--r-sm)', background: checkInfo.bg, color: checkInfo.color, fontSize: '9px', fontWeight: 600, flexShrink: 0 }}>
+                                {checkInfo.label}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div style={{ textAlign: 'left', minWidth: '100px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+                           <span style={{ fontSize: '13px', fontWeight: 700, color: isDebit ? 'var(--danger)' : 'var(--accent)', fontVariantNumeric: 'tabular-nums' }}>
+                              {isDebit ? '+' : '-'}{toFa(amount.toLocaleString('fa-IR'))}
+                           </span>
+                           <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px', fontWeight: 500, background: isDebit ? 'var(--danger-soft)' : 'var(--accent-soft)', color: isDebit ? 'var(--danger)' : 'var(--accent)' }}>
+                              {isDebit ? 'بدهکار' : 'بستانکار'}
+                           </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* فوتر روز */}
+                <div style={{ padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)', borderTop: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--muted)' }}>مانده پایان روز</span>
+                  <span style={{ fontSize: '13px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                    {toFa(day.endBalance.toLocaleString('fa-IR'))} ت
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </>
       )}
-
       <div style={{ marginTop: 'var(--sp-4)' }}>
         <ModalFooter actions={[
           { label: '📄 چاپ / PDF', role: 'primary', onClick: handlePrint, disabled: !partyId || lines.length === 0 },
