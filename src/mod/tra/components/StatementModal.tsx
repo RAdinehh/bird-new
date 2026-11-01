@@ -253,7 +253,6 @@ export default function StatementModal({ open, onClose }: Props) {
   <div class="header">
     <div class="brand">
       <h1>${farmName}</h1>
-      <p>${farmAddr}<br>تلفن: ${farmPhone}</p>
     </div>
     
     <div class="center-title">
@@ -273,14 +272,16 @@ export default function StatementModal({ open, onClose }: Props) {
       <div class="title">مشخصات فروشنده</div>
       <div class="info">
         <strong>${farmName}</strong><br>
-        نشانی: ${farmAddr}
+        نشانی: ${farmAddr || '—'}<br>
+        تلفن: ${farmPhone || '—'}
       </div>
     </div>
     <div class="party-box">
       <div class="title">مشخصات خریدار (طرف حساب)</div>
       <div class="info">
         <strong>${party?.name || '—'}</strong><br>
-        ${party?.phone ? `تلفن: ${party.phone}` : ''}
+        نشانی: ${(party as any)?.address || '—'}<br>
+        تلفن: ${party?.phone || '—'}
       </div>
     </div>
   </div>
