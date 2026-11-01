@@ -6,7 +6,7 @@
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { clampPercent, complement } from '../../../shr/utils/smart';
 import {
-  Btn, BtnRow, Field, Grid2, Input, Modal, MoneyField,
+  Btn, BtnRow, ErrorBox, Field, Grid2, Input, Modal, MoneyField,
   NumField, Select, Textarea,
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -28,6 +28,7 @@ export interface EggEntryModalProps {
   setHideHatchTip: (v: boolean) => void;
   multiDeviceId: string;
   setMultiDeviceId: (v: string) => void;
+  err?: string;
   draftRows: DraftRow[];
   currentRow: DraftRow;
   setCurrentRow: React.Dispatch<React.SetStateAction<DraftRow>>;
@@ -51,6 +52,7 @@ export interface EggEntryModalProps {
 }
 
 export default function EggEntryModal(props: EggEntryModalProps) {
+  const err = props.err;
   const {
     open, onClose, editingRowId,
     hideHatchTip, setHideHatchTip,
@@ -80,6 +82,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
         </BtnRow>
       }
     >
+      {err && <ErrorBox>{err}</ErrorBox>}
       {/* بنر راهنما */}
       {!hideHatchTip && (
         <div style={{ position: 'relative', padding: 'var(--pad-normal) 32px var(--pad-normal) var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 600, lineHeight: 1.8 }}>

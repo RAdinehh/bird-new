@@ -95,6 +95,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
   };
 
   const addRowToList = async () => {
+    setRowErr('');
     const cnt = parseInt(toEn(currentRow.count)) || 0;
     if (!currentRow.count.trim()) { setRowErr(MSG.required('تعداد تخم')); return; }
     if (cnt <= 0) { setRowErr(MSG.positiveNumber('تعداد')); return; }

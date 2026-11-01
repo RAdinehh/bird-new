@@ -71,6 +71,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
     editingRowId, setEditingRowId,
     setD, openMulti, addRowToList, editRow, removeRow, undoRemoveRow,
     saveAll, openEdit, deleteEntryWithCascade,
+    rowErr,
     num, int,
   } = useEggEntriesForm({
     devices, birds, eggEntries, flocks, initialDevice,
@@ -308,6 +309,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
         liveUsage={liveUsage}
         setD={setD}
         addRowToList={addRowToList}
+        err={rowErr}
         editRow={editRow}
         removeRow={removeRow}
         saveAll={saveAll}
