@@ -258,8 +258,8 @@
 | ۱ | feed.unitPrice | Q1 |
 | ۲ | flk.purchasePrice | Q11 |
 | ۳ | flk.deliveryCost | Q11 |
-| ۴ | (فیلد سوم Q11) | Q11 |
-| ۵ | (فیلد چهارم Q11) | Q11 |
+| ۴ | flk.otherCosts | Q11 |
+| ۵ | flk.rentAmount | Q11 |
 | ۶ | tra.price_chick | Q11 |
 | ۷ | tra.price_adult | Q11 |
 | ۸ | tra.price_egg | Q11 |
@@ -269,7 +269,7 @@
 | ۱۲ | tra.price_other | Q11 |
 | ۱۳ | tra.price_broken | Q11 |
 | ۱۴ | tra.price_manure | Q11 |
-| ۱۵ | inc.rentAmount | Q13 |
+| ۱۵ | inc.rentAmount | Q12 |
 | ۱۶ | tra.deal.value | Q13 |
 | ۱۷ | tra.deal.unitPrice | Q13 |
 | ۱۸ | tra.deal.payment | Q13 |
@@ -313,7 +313,7 @@ if (signals.some(s => s.type === 'cross_absolute') && expected !== undefined) {
 
 ---
 
-## biologicalRange — محدوده زیستی (۱۲ فیلد)
+## biologicalRange — محدوده زیستی (۹ فیلد یکتا — ۱۱ خط در کد، ۲ تکراری = باگ)
 
 | فیلد | محدوده | واحد |
 |------|--------|------|
@@ -626,8 +626,8 @@ ${label} نیاز به بررسی دارد
 |-------|--------------|------------|---------------------|--------------------------|
 | feed | بله (۱۳ فیلد) | rules/fed.ts | خیر (۰) | خیر |
 | dlg | بله (۲۰+ فیلد) | rules/dlg.ts | خیر (۰) | خیر |
-| flk | بله (۱۴ فیلد) | rules/flk.ts | خیر (۰) | بله (۴ فایل) |
-| tra | بله (۱۴ فیلد) | rules/tra.ts | بله (۲۷ بار) | خیر |
+| flk | بله (۱۴ فیلد) | rules/flk.ts | بله (۵ بار) | بله (۴ فایل) |
+| tra | بله (۱۴ فیلد) | rules/tra.ts | بله (۲۷ بار) | بله (۳ فایل) |
 | whs | بله (۹ فیلد) | rules/whs.ts | خیر (۰) | خیر |
 | inc | بله (۱۱ فیلد) | rules/inc.ts | خیر (۰) | خیر |
 | hal | بله (۵ فیلد) | rules/hal.ts | خیر (۰) | خیر |
