@@ -271,46 +271,48 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
                 <div
                   key={i}
                   style={{
-                    display: 'flex', flexDirection: 'column', gap: 4,
+                    display: 'flex', flexDirection: 'column', gap: 6,
                     padding: '10px 8px', borderBottom: '1px solid var(--border)',
                   }}
                 >
+                  {/* ─── خط ۱: نوع سند + تاریخ ─── */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: info.color, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: info.color }}>
                       {info.icon} {info.label}
-                      {l.docNumber && (l.kind === 'invoice_sale' || l.kind === 'invoice_purchase' || l.kind === 'deal') && <span style={{ color: 'var(--muted)', fontWeight: 400, marginRight: 4 }}>({l.docNumber})</span>}
                     </span>
                     <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0 }}>
                       {toFa(l.date)}
                     </span>
                   </div>
 
-                  {l.description && (
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', wordBreak: 'break-word', lineHeight: 1.5 }}>
-                      {l.description}
-                    </div>
-                  )}
+                  {/* ─── خط ۲: شرح + مبلغ ─── */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', flex: 1, wordBreak: 'break-word', lineHeight: 1.4 }}>
+                      {l.description || '—'}
+                      {l.kind === 'payment_check' && (l.checkNo || l.bank) && (
+                        <span style={{ color: 'var(--muted)' }}> • #{l.checkNo} {l.bank}</span>
+                      )}
+                    </span>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: amountColor, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                      {amountSign}{toFa(amountValue.toLocaleString('fa-IR'))} ت
+                    </span>
+                  </div>
 
-                  {l.kind === 'payment_check' && (l.checkNo || l.bank || l.dueDate || checkInfo) && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', alignItems: 'center' }}>
-                      {l.checkNo && <span>#{l.checkNo}</span>}
-                      {l.bank && <span>• {l.bank}</span>}
-                      {l.dueDate && <span>• سرسید {toFa(l.dueDate)}</span>}
+                  {/* ─── خط ۳: شماره سند + مانده ─── */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 6, alignItems: 'center' }}>
+                      {l.docNumber && (l.kind === 'invoice_sale' || l.kind === 'invoice_purchase' || l.kind === 'deal') && (
+                        <span>سند: {l.docNumber}</span>
+                      )}
                       {checkInfo && (
                         <span style={{
                           padding: '1px 6px', borderRadius: 'var(--r-sm)',
                           background: checkInfo.bg, color: checkInfo.color,
-                          fontWeight: 600,
+                          fontSize: '10px', fontWeight: 600,
                         }}>
                           {checkInfo.label}
                         </span>
                       )}
-                    </div>
-                  )}
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: amountColor, fontVariantNumeric: 'tabular-nums' }}>
-                      {amountSign}{toFa(amountValue.toLocaleString('fa-IR'))} <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 400 }}>ت</span>
                     </span>
                     <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums' }}>
                       مانده: <b style={{ color: 'var(--text)', fontSize: 'var(--fs-sm)' }}>{toFa(l.balance.toLocaleString('fa-IR'))}</b> ت
