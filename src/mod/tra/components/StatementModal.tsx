@@ -220,24 +220,25 @@ export default function StatementModal({ open, onClose }: Props) {
     
     .meta-info { display: flex; justify-content: space-between; background: #f8fafc; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #e2e8f0; }
     
-    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-    th { background: #f1f5f9; color: #334155; padding: 8px 6px; text-align: right; font-weight: 700; border-bottom: 2px solid #cbd5e1; font-size: 11px; }
-    td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
-    tr:nth-child(even) { background: #f8fafc; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 24px; }
+    th { background: #f8fafc; color: #0f172a; padding: 10px 12px; text-align: right; font-weight: 700; border-bottom: 1px solid #e2e8f0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #fcfdfe; }
     .center { text-align: center; }
     .amount { text-align: left; font-variant-numeric: tabular-nums; direction: ltr; }
     .text-danger { color: #dc2626; }
     .text-success { color: #16a34a; }
     
-    .summary { display: flex; justify-content: flex-end; margin-bottom: 24px; }
-    .summary-box { width: 320px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
-    .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #cbd5e1; font-size: 13px; }
-    .summary-row:last-child { border-bottom: none; }
-    .summary-total { font-weight: 700; font-size: 15px; color: #0f172a; border-top: 2px solid #cbd5e1; padding-top: 12px; margin-top: 4px; }
+    .summary { display: flex; justify-content: flex-end; margin-bottom: 32px; }
+    .summary-box { width: 100%; max-width: 340px; background: #f8fafc; border-radius: 12px; padding: 16px 20px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 12px; color: #64748b; }
+    .summary-row span:last-child { color: #0f172a; font-weight: 600; }
+    .summary-total { font-size: 14px; font-weight: 700; color: #0f172a; border-top: 1px solid #cbd5e1; padding-top: 12px; margin-top: 8px; }
     
-    .footer { display: flex; justify-content: space-between; padding-top: 16px; border-top: 1px solid #e2e8f0; margin-top: 24px; padding-bottom: 10px; }
-    .signature { text-align: center; color: #64748b; font-size: 12px; width: 200px; }
-    .signature-box { height: 70px; margin-bottom: 8px; border: 1px dashed #cbd5e1; border-radius: 4px; }
+    .footer { display: flex; justify-content: space-between; padding-top: 24px; margin-top: 16px; padding-bottom: 10px; }
+    .signature { text-align: center; color: #94a3b8; font-size: 11px; width: 150px; }
+    .signature-box { height: 60px; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; }
   </style>
 </head>
 <body>
@@ -254,8 +255,8 @@ export default function StatementModal({ open, onClose }: Props) {
   </div>
   
   <div class="meta-info">
-    <div><strong>طرف حساب:</strong> ${party?.name || '—'} ${party?.phone ? `(${party.phone})` : ''}</div>
-    <div><strong>بازه:</strong> ${toFa(fromDate || '—')} تا ${toFa(toDate || '—')}</div>
+    <div><span style="color: #94a3b8; font-size: 11px;">طرف حساب</span><br><strong style="font-size: 13px;">${party?.name || '—'}</strong> ${party?.phone ? `<span style="color: #64748b; font-size: 11px;">(${party.phone})</span>` : ''}</div>
+    <div style="text-align: left;"><span style="color: #94a3b8; font-size: 11px;">بازه زمانی</span><br><strong style="font-size: 13px;">${toFa(fromDate || '—')} تا ${toFa(toDate || '—')}</strong></div>
   </div>
   
   <table>
