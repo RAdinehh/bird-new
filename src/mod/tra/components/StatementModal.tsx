@@ -173,7 +173,7 @@ export default function StatementModal({ open, onClose }: Props) {
     const farmAddr = settings?.farm?.address || '';
     const farmPhone = settings?.farm?.phone || '';
 
-    const rows = lines.map(l => {
+    const rows = lines.map((l, index) => {
       const isDebit = l.debit > 0;
       const isOutP = isDebit && (l.kind === 'payment_cash' || l.kind === 'payment_card' || l.kind === 'payment_check');
       const info = isOutP ? { label: 'پرداخت' } : KIND_INFO[l.kind];
@@ -181,19 +181,18 @@ export default function StatementModal({ open, onClose }: Props) {
       const metaParts = [info.label];
       if (l.docNumber && !isOutP) metaParts.push(l.docNumber);
       if (l.kind === 'payment_check' && l.checkNo) metaParts.push('#' + l.checkNo);
-      if (l.kind === 'payment_check' && l.bank) metaParts.push(l.bank);
-      if (l.kind === 'payment_check' && l.dueDate) metaParts.push('سرسید ' + toFa(l.dueDate));
       
       return `
         <tr>
-          <td class="center text-muted" style="width: 80px;">${toFa(l.date)}</td>
-          <td>
-            <div class="fw-bold text-main">${metaParts.join(' • ')}</div>
-            ${l.description ? `<div class="text-muted text-sm">${l.description}</div>` : ''}
+          <td style="text-align: center; width: 30px;">${toFa(index + 1)}</td>
+          <td style="text-align: center; width: 80px;">${toFa(l.date)}</td>
+          <td style="text-align: right;">
+            <strong>${metaParts.join(' - ')}</strong>
+            ${l.description ? `<div style="font-size: 10px; color: #64748b; margin-top: 2px;">${l.description}</div>` : ''}
           </td>
-          <td class="amount ${l.debit > 0 ? 'text-danger' : 'text-muted'}">${l.debit > 0 ? toFa(l.debit.toLocaleString('fa-IR')) : '—'}</td>
-          <td class="amount ${l.credit > 0 ? 'text-success' : 'text-muted'}">${l.credit > 0 ? toFa(l.credit.toLocaleString('fa-IR')) : '—'}</td>
-          <td class="amount fw-bold text-main">${toFa(Math.abs(l.balance).toLocaleString('fa-IR'))}</td>
+          <td class="amount" style="color: #dc2626;">${l.debit > 0 ? toFa(l.debit.toLocaleString('fa-IR')) : '—'}</td>
+          <td class="amount" style="color: #16a34a;">${l.credit > 0 ? toFa(l.credit.toLocaleString('fa-IR')) : '—'}</td>
+          <td class="amount" style="font-weight: 700;">${toFa(Math.abs(l.balance).toLocaleString('fa-IR'))}</td>
         </tr>
       `;
     }).join('');
@@ -205,129 +204,123 @@ export default function StatementModal({ open, onClose }: Props) {
   <title>صورت‌حساب ${party?.name || ''}</title>
   <style>
     @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
-    @page { size: A4; margin: 15mm; }
+    @page { size: A4; margin: 10mm; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Vazirmatn, sans-serif; background: #fff; color: #0f172a; padding: 10px; font-size: 11px; line-height: 1.5; }
     
-    body { 
-      font-family: Vazirmatn, sans-serif; direction: rtl; color: #0f172a; font-size: 12px; background: #fff; line-height: 1.6; 
-    }
+    .invoice-box { max-width: 800px; margin: auto; border: 1px solid #cbd5e1; padding: 16px; border-radius: 4px; }
     
-    /* Typography Helpers */
-    .text-main { color: #0f172a; }
-    .text-muted { color: #64748b; }
-    .text-sm { font-size: 11px; }
-    .text-danger { color: #dc2626; }
-    .text-success { color: #16a34a; }
-    .fw-bold { font-weight: 700; }
-    .center { text-align: center; }
+    /* هدر */
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 16px; }
+    .header .brand h1 { font-size: 18px; color: #0284c7; margin-bottom: 4px; font-weight: 800; }
+    .header .brand p { font-size: 10px; color: #64748b; line-height: 1.6; }
+    
+    .header .center-title { text-align: center; }
+    .header .center-title .arq { font-size: 20px; font-weight: 900; color: #16a34a; letter-spacing: 1px; }
+    .header .center-title .desc { font-size: 10px; color: #64748b; font-weight: 600; margin-top: 2px; }
+    
+    .header .doc-info { text-align: left; }
+    .header .doc-info h2 { font-size: 18px; margin-bottom: 4px; color: #0f172a; font-weight: 700; }
+    .header .doc-info .meta { font-size: 10px; color: #64748b; margin-bottom: 2px; }
+    
+    /* بخش طرف حساب‌ها */
+    .parties { display: flex; gap: 12px; margin-bottom: 16px; }
+    .party-box { flex: 1; border: 1px solid #cbd5e1; border-radius: 4px; padding: 8px 12px; background: #f8fafc; }
+    .party-box .title { font-size: 10px; color: #64748b; font-weight: 700; margin-bottom: 6px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
+    .party-box .info { font-size: 11px; line-height: 1.8; color: #0f172a; }
+    
+    /* جدول */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    th { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; text-align: center; font-weight: 700; font-size: 10px; color: #334155; }
+    td { border: 1px solid #cbd5e1; padding: 8px; text-align: center; vertical-align: middle; }
     .amount { text-align: left; font-variant-numeric: tabular-nums; direction: ltr; }
-
-    /* Header Layout */
-    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; }
-    .header .brand h1 { font-size: 22px; color: #16a34a; margin-bottom: 4px; font-weight: 800; }
-    .header .doc-title { text-align: left; }
-    .header .doc-title h2 { font-size: 20px; color: #0f172a; margin-bottom: 4px; font-weight: 700; letter-spacing: -0.5px; }
     
-    /* Meta Info (Customer & Range) */
-    .meta-grid { display: flex; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; }
-    .meta-block { display: flex; flex-direction: column; gap: 4px; }
-    .meta-label { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .meta-value { font-size: 14px; font-weight: 700; color: #0f172a; }
-    .meta-sub { font-size: 11px; color: #64748b; }
+    /* خلاصه */
+    .summary { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+    .summary-table { width: 320px; border-collapse: collapse; }
+    .summary-table td { border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 11px; }
+    .summary-table .total { background: #f8fafc; font-weight: 700; font-size: 13px; color: #0f172a; }
     
-    /* Table */
-    table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 24px; }
-    th { background: #f1f5f9; color: #334155; padding: 12px 10px; text-align: right; font-weight: 700; border-bottom: 2px solid #cbd5e1; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-    td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr:nth-child(even) td { background: #f8fafc; }
-    
-    /* Summary Box */
-    .summary-wrapper { display: flex; justify-content: flex-end; margin-bottom: 40px; }
-    .summary-box { 
-      width: 340px; 
-      background: #ffffff; 
-      border: 1px solid #e2e8f0; 
-      border-radius: 10px; 
-      padding: 16px 20px; 
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    }
-    .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; color: #475569; }
-    .summary-total { font-size: 16px; font-weight: 800; color: #0f172a; border-top: 2px solid #cbd5e1; padding-top: 12px; margin-top: 8px; }
-    
-    /* Footer / Signatures */
-    .footer { display: flex; justify-content: space-between; padding-top: 24px; margin-top: 20px; border-top: 1px solid #e2e8f0; }
-    .signature { text-align: center; color: #94a3b8; font-size: 11px; width: 160px; }
-    .signature-box { height: 60px; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; }
+    /* فوتر (امضا) */
+    .footer { display: flex; justify-content: space-between; margin-top: 24px; padding-top: 12px; border-top: 1px dashed #cbd5e1; }
+    .sign-box { width: 180px; text-align: center; font-size: 10px; color: #64748b; }
+    .sign-space { height: 60px; }
   </style>
 </head>
 <body>
+<div class="invoice-box">
+  
   <div class="header">
     <div class="brand">
       <h1>${farmName}</h1>
-      <div class="text-muted text-sm">${farmAddr}</div>
-      <div class="text-muted text-sm">${farmPhone}</div>
+      <p>${farmAddr}<br>تلفن: ${farmPhone}</p>
     </div>
     
-    <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-      <div style="font-size: 22px; font-weight: 900; color: #16a34a; letter-spacing: 1px;">هو الرزاق</div>
-      <div style="font-size: 11px; color: #64748b; margin-top: 4px; font-weight: 600;">او روزی‌دهنده است</div>
+    <div class="center-title">
+      <div class="arq">هو الرزاق</div>
+      <div class="desc">او روزی‌دهنده است</div>
     </div>
 
-    <div class="doc-title">
+    <div class="doc-info">
       <h2>صورت‌حساب</h2>
-      <div class="text-muted text-sm">تاریخ چاپ: ${toFa(getTodayJalali())}</div>
+      <div class="meta">تاریخ چاپ: ${toFa(getTodayJalali())}</div>
+      <div class="meta">بازه: ${toFa(fromDate || '—')} تا ${toFa(toDate || '—')}</div>
     </div>
   </div>
-  
-  <div class="meta-grid">
-    <div class="meta-block">
-      <div class="meta-label">طرف حساب</div>
-      <div class="meta-value">${party?.name || '—'}</div>
-      <div class="meta-sub">${party?.phone ? `تلفن: ${party.phone}` : ''}</div>
+
+  <div class="parties">
+    <div class="party-box">
+      <div class="title">مشخصات فروشنده</div>
+      <div class="info">
+        <strong>${farmName}</strong><br>
+        نشانی: ${farmAddr}
+      </div>
     </div>
-    <div class="meta-block" style="text-align: left;">
-      <div class="meta-label">بازه زمانی</div>
-      <div class="meta-value" style="direction: rtl;">${toFa(fromDate || '—')} تا ${toFa(toDate || '—')}</div>
+    <div class="party-box">
+      <div class="title">مشخصات خریدار (طرف حساب)</div>
+      <div class="info">
+        <strong>${party?.name || '—'}</strong><br>
+        ${party?.phone ? `تلفن: ${party.phone}` : ''}
+      </div>
     </div>
   </div>
-  
+
   <table>
     <thead>
       <tr>
-        <th style="width: 80px; text-align: center;">تاریخ</th>
-        <th>شرح عملیات</th>
-        <th style="width: 110px; text-align: left;">بدهی (تومان)</th>
-        <th style="width: 110px; text-align: left;">پرداخت (تومان)</th>
-        <th style="width: 110px; text-align: left;">مانده (تومان)</th>
+        <th style="width: 30px;">ردیف</th>
+        <th style="width: 80px;">تاریخ</th>
+        <th style="text-align: right;">شرح عملیات</th>
+        <th style="width: 100px; text-align: left;">بدهی (تومان)</th>
+        <th style="width: 100px; text-align: left;">پرداخت (تومان)</th>
+        <th style="width: 100px; text-align: left;">مانده (تومان)</th>
       </tr>
     </thead>
     <tbody>
       ${rows}
     </tbody>
   </table>
-  
-  <div class="summary-wrapper">
-    <div class="summary-box">
-      <div class="summary-row"><span>مجموع بدهی:</span><span class="fw-bold text-main">${toFa(totalDebit.toLocaleString('fa-IR'))}</span></div>
-      <div class="summary-row"><span>مجموع پرداخت:</span><span class="fw-bold text-main">${toFa(totalCredit.toLocaleString('fa-IR'))}</span></div>
-      <div class="summary-row summary-total">
-        <span>مانده نهایی:</span>
-        <span class="${netBalance > 0 ? 'text-danger' : 'text-success'}" style="direction: ltr;">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</span>
-      </div>
-    </div>
+
+  <div class="summary">
+    <table class="summary-table">
+      <tr><td>جمع کل بدهی:</td><td class="amount">${toFa(totalDebit.toLocaleString('fa-IR'))}</td></tr>
+      <tr><td>مجموع پرداخت:</td><td class="amount">${toFa(totalCredit.toLocaleString('fa-IR'))}</td></tr>
+      <tr class="total"><td>مانده نهایی:</td><td class="amount" style="color: ${netBalance > 0 ? '#dc2626' : '#16a34a'}">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</td></tr>
+    </table>
   </div>
-  
+
   <div class="footer">
-    <div class="signature">
-      <div class="signature-box"></div>
-      مهر و امضا فروشنده
+    <div class="sign-box">
+      <div>مهر و امضای فروشنده</div>
+      <div class="sign-space"></div>
     </div>
-    <div class="signature">
-      <div class="signature-box"></div>
-      مهر و امضا خریدار
+    <div class="sign-box">
+      <div>امضای خریدار</div>
+      <div class="sign-space"></div>
     </div>
   </div>
+
+</div>
 </body>
 </html>`;
   };
