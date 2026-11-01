@@ -239,14 +239,14 @@ export default function StatementModal({ open, onClose }: Props) {
     .td-right { text-align: right; }
     .td-left { text-align: left; direction: ltr; font-variant-numeric: tabular-nums; }
     
-    .summary-wrapper { display: flex; justify-content: flex-end; margin-bottom: 24px; }
-    .summary-table { width: 330px; border-collapse: collapse; table-layout: fixed; }
+    .summary-container { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 24px; }
+    .summary-table { width: 330px; border-collapse: collapse; table-layout: fixed; margin-bottom: 8px; }
     .summary-table td { border: 1px solid #cbd5e1; padding: 8px 10px; font-size: 11px; }
     .summary-table .col-lbl { text-align: right; color: #334155; font-weight: 600; }
     .summary-table .col-val { text-align: left; direction: ltr; font-variant-numeric: tabular-nums; }
     .summary-table .total-row { background: #f1f5f9; font-weight: 700; color: #0f172a; }
     
-    .amount-words { font-size: 11px; font-weight: 600; margin-bottom: 24px; padding: 10px 12px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 4px; text-align: right; color: #0f172a; line-height: 1.6; }
+    .amount-words { width: 330px; font-size: 11px; font-weight: 600; padding: 8px 10px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 4px; text-align: right; color: #0f172a; line-height: 1.6; box-sizing: border-box; }
     .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; padding-top: 16px; border-top: 1px dashed #cbd5e1; }
     .sign-box { text-align: center; font-size: 10px; color: #64748b; }
     .sign-space { height: 60px; }
@@ -307,16 +307,15 @@ export default function StatementModal({ open, onClose }: Props) {
     </tbody>
   </table>
 
-  <div class="summary-wrapper">
+  <div class="summary-container">
     <table class="summary-table">
       <tr><td class="col-lbl">جمع کل بدهی:</td><td class="col-val">${toFa(totalDebit.toLocaleString('fa-IR'))}</td></tr>
       <tr><td class="col-lbl">مجموع پرداخت:</td><td class="col-val">${toFa(totalCredit.toLocaleString('fa-IR'))}</td></tr>
       <tr class="total-row"><td class="col-lbl">مانده نهایی:</td><td class="col-val" style="color: ${netBalance > 0 ? '#dc2626' : '#16a34a'}">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</td></tr>
     </table>
-  </div>
-
-  <div class="amount-words">
-    <strong>مانده نهایی به حروف:</strong> ${numberToWords(Math.abs(netBalance))} تومان ${netBalance < 0 ? '(بستانکار)' : ''}
+    <div class="amount-words">
+      <strong>مانده نهایی به حروف:</strong> ${numberToWords(Math.abs(netBalance))} تومان ${netBalance < 0 ? '(بستانکار)' : ''}
+    </div>
   </div>
 
   <div class="footer">
