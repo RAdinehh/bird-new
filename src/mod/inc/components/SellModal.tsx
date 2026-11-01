@@ -3,7 +3,7 @@
  */
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
-  Btn, BtnRow, Field, Grid2, Modal, MoneyField, NumField, Select,
+  Btn, BtnRow, ErrorBox, Field, Grid2, Modal, MoneyField, NumField, Select,
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 
@@ -22,10 +22,11 @@ export interface SellModalProps {
   contacts: { id: string; name: string; roles?: string[] }[];
   onSell: () => void;
   onClose: () => void;
+  err?: string;
 }
 
 export default function SellModal(props: SellModalProps) {
-  const { open, maxCount, form, setForm, contacts, onSell, onClose } = props;
+  const { open, maxCount, form, setForm, contacts, onSell, onClose, err } = props;
 
   const customers = contacts.filter(c => (c.roles || []).includes('customer'));
 
@@ -45,6 +46,7 @@ export default function SellModal(props: SellModalProps) {
         </BtnRow>
       }
     >
+      {err && <ErrorBox>{err}</ErrorBox>}
       <Field label="خریدار" required>
         {customers.length === 0 ? (
           <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>

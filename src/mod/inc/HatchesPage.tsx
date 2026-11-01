@@ -44,6 +44,8 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deviceFilter, setDeviceFilter] = useState('');
 
+  const [flockErr, setFlockErr] = useState('');
+  const [sellErr, setSellErr] = useState('');
   const [flockModal, setFlockModal] = useState<{ hatchId: string; count: number } | null>(null);
   const [flockForm, setFlockForm] = useState<FlockForm>({ name:'', type:'layer', hallId:'', zoneId:'' });
   const breedStd = useBreedStandard();
@@ -124,12 +126,12 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
 
   const createFlock = () => {
     if (!flockModal) return;
-    if (!flockForm.name.trim()) { toastMsg.error('نام گله را وارد کنید'); return; }
+    if (!flockForm.name.trim()) { setFlockErr('نام گله را وارد کنید'); return; }
     const h = hatches.find(x => x.id === flockModal.hatchId);
     if (!h) return;
     const entry = _entriesById[h.eggEntryId];
     const bird = entry ? _birdsById[entry.birdId] : null;
-    if (!bird) { toastMsg.error('پرنده پیدا نشد'); return; }
+    if (!bird) { setFlockErr('پرنده پیدا نشد'); return; }
     const std = entry?.breedId ? breedStd.byBreedId(entry.breedId) : null;
     // 🆕 محاسبه از form (کاربر ممکنه ویرایش کرده باشه)
     const eggCount = entry?.count || 0;
@@ -167,10 +169,10 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
 
   const doSell = () => {
     if (!sellModal) return;
-    if (!sellForm.buyerId) { toastMsg.error('خریدار را انتخاب کنید'); return; }
+    if (!sellForm.buyerId) { setSellErr('خریدار را انتخاب کنید'); return; }
     const count = parseInt(toEn(sellForm.count)) || 0;
     const unitPrice = parseFloat(toEn(sellForm.unitPrice).replace('٫','.')) || 0;
-    if (count <= 0 || unitPrice <= 0) { toastMsg.error('مقادیر باید بیشتر از صفر'); return; }
+    if (count <= 0 || unitPrice <= 0) { setSellErr('مقادیر باید بیشتر از صفر'); return; }
     const h = hatches.find(x => x.id === sellModal.hatchId);
     if (!h) return;
     const data = buildSaleInvoiceFromHatch({
@@ -337,7 +339,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
                 onOpenFlock={() => {
   const _e = _entriesById[h.eggEntryId];
   const _s = _e?.breedId ? breedStd.byBreedId(_e.breedId) : null;
-  setFlockModal({ hatchId: h.id, count: h.hatched || 0 });
+  setFlockErr(''); setFlockModal({ hatchId: h.id, count: h.hatched || 0 });
   setFlockForm({
     name: 'گله ' + (bird?.name || '') + ' ' + toFa(formatJ(new Date(), 'yyyy')),
     type: 'layer',
@@ -351,7 +353,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
     layingStartDay: _s?.biology?.layingStartDay ? String(_s.biology.layingStartDay) : '',
   });
 }}
-                onOpenSell={() => { setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}
+                onOpenSell={() => { setSellErr(''); setSellModal({ hatchId: h.id, count: h.hatched || 0 }); setSellForm({ buyerId:'', count: String(h.hatched || 0), unitPrice:'', date: h.date }); }}
               />
             );
           })}
@@ -415,6 +417,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
               eggCount: _e?.count,
             }}
             onCreate={createFlock}
+            err={flockErr}
             onClose={() => setFlockModal(null)}
           />
         );
@@ -428,6 +431,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
         setForm={setSellForm}
         contacts={contacts}
         onSell={doSell}
+          err={sellErr}
         onClose={() => setSellModal(null)}
       />
 

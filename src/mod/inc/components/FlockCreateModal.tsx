@@ -1,7 +1,7 @@
 /**
  * FlockCreateModal.tsx — ساخت گله‌ی جدید از نتیجه‌ی هچ
  */
-import { Btn, BtnRow, Field, Grid2, Input, Modal, Select } from '../../../shr/components/ui';
+import { Btn, BtnRow, Field, Grid2, Input, Modal, Select, ErrorBox } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 
 export interface FlockForm {
@@ -40,10 +40,11 @@ export interface FlockCreateModalProps {
   sourceData?: FlockSourceData;
   onCreate: () => void;
   onClose: () => void;
+  err?: string;
 }
 
 export default function FlockCreateModal(props: FlockCreateModalProps) {
-  const { open, count, form, setForm, halls, zones, sourceData, onCreate, onClose } = props;
+  const { open, count, form, setForm, halls, zones, sourceData, onCreate, onClose, err } = props;
 
   return (
     <Modal
@@ -57,6 +58,7 @@ export default function FlockCreateModal(props: FlockCreateModalProps) {
         </BtnRow>
       }
     >
+      {err && <ErrorBox>{err}</ErrorBox>}
       <Field label="نام گله" required>
         <Input
           placeholder="مثلاً — گله بهار ۱۴۰۵"
