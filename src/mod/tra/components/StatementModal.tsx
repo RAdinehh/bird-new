@@ -240,24 +240,33 @@ export default function StatementModal({ open, onClose }: Props) {
               <div
                 key={i}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '6px 8px', borderBottom: '1px solid var(--border)',
-                  fontSize: 'var(--fs-xs)',
+                  display: 'flex', flexDirection: 'column', gap: 4,
+                  padding: '8px', borderBottom: '1px solid var(--border)',
+                  fontSize: 'var(--fs-sm)',
                 }}
               >
-                <span style={{ color: 'var(--muted)', width: 70, flexShrink: 0 }}>{toFa(l.date)}</span>
-                <span style={{ flex: 1, textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {l.description}
-                </span>
-                <span style={{ width: 80, textAlign: 'left', color: 'var(--danger)', fontVariantNumeric: 'tabular-nums' }}>
-                  {l.debit > 0 ? '+' + toFa(l.debit.toLocaleString('fa-IR')) : ''}
-                </span>
-                <span style={{ width: 80, textAlign: 'left', color: 'var(--accent)', fontVariantNumeric: 'tabular-nums' }}>
-                  {l.credit > 0 ? '-' + toFa(l.credit.toLocaleString('fa-IR')) : ''}
-                </span>
-                <span style={{ width: 80, textAlign: 'left', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                  {toFa(l.balance.toLocaleString('fa-IR'))}
-                </span>
+                {/* خط اول: شرح + تاریخ */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text)', flex: 1, wordBreak: 'break-word' }}>
+                    {l.description}
+                  </span>
+                  <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0 }}>
+                    {toFa(l.date)}
+                  </span>
+                </div>
+
+                {/* خط دوم: بدهی، پرداخت، مانده */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
+                  <span style={{ color: 'var(--danger)', fontVariantNumeric: 'tabular-nums', width: 80 }}>
+                    {l.debit > 0 ? '+' + toFa(l.debit.toLocaleString('fa-IR')) : ''}
+                  </span>
+                  <span style={{ color: 'var(--accent)', fontVariantNumeric: 'tabular-nums', width: 80, textAlign: 'center' }}>
+                    {l.credit > 0 ? '-' + toFa(l.credit.toLocaleString('fa-IR')) : ''}
+                  </span>
+                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', width: 80, textAlign: 'left' }}>
+                    {toFa(l.balance.toLocaleString('fa-IR'))}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
