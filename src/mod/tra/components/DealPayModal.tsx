@@ -9,6 +9,8 @@ import { toEn, toFa } from '../../../shr/utils/fa';
 import { getTodayJalali, computeDealBalance } from '../calc';
 import { toastMsg } from '../../../cor/store/toast';
 import { getDealPaymentFormSchema } from '../../../shr/validation/rules/tra';
+import { useValidation } from '../../../shr/validation/useValidation';
+import { useFormErrors } from '../../../shr/hooks/useFormErrors';
 import { FieldHint, recordHistory } from '../../../shr/intelligence';
 import { useTra } from '../store';
 import type { Deal, DealPayment } from '../types';
@@ -51,29 +53,27 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
   const remaining = bal - entered;
   const quickSet = (pct: number) => setAmount(String(Math.round(bal * pct)));
 
-  const formErrors = useMemo(() => {
-    const result = getDealPaymentFormSchema(bal).safeParse({
-      date,
-      amount: entered,
-      direction,
-      method,
-      notes: notes.trim(),
-      checkNo: checkNo.trim(),
-      bank: bank.trim(),
-      dueDate: checkDue,
-    });
-    if (result.success) return {};
-    const errs: Record<string, string> = {};
-    for (const issue of result.error.issues) {
-      const key = String(issue.path[0] || '');
-      if (key && !errs[key]) errs[key] = issue.message;
-    }
-    return errs;
-  }, [date, entered, direction, method, notes, checkNo, bank, checkDue, bal]);
+  const schema = useMemo(() => getDealPaymentFormSchema(bal), [bal]);
+  const { errors: vErrors } = useValidation(schema, {
+    date,
+    amount: entered,
+    direction,
+    method,
+    notes: notes.trim(),
+    checkNo: checkNo.trim(),
+    bank: bank.trim(),
+    dueDate: checkDue,
+  });
+  const { showError, markTouched, attemptSave, reset: resetErrors } = useFormErrors(vErrors);
+
+  useEffect(() => {
+    if (open) resetErrors();
+  }, [open, resetErrors]);
 
   const handleSave = () => {
     if (!effectiveDeal) return;
-    if (Object.keys(formErrors).length > 0) return;
+    attemptSave();
+    if (Object.keys(vErrors).length > 0) return;
     const newPayment: DealPayment = {
       id: crypto.randomUUID(),
       date,
@@ -113,10 +113,10 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
       </div>
 
       <Grid2>
-        <Field label="تاریخ" required error={formErrors.date}>
+        <Field label="تاریخ" required error={showError('date')} onTouch={() => markTouched('date')}>
           <DatePicker value={date} onChange={setDate} />
         </Field>
-        <Field label="مبلغ" required error={formErrors.amount}>
+        <Field label="مبلغ" required error={showError('amount')} onTouch={() => markTouched('amount')}>
           <MoneyField value={amount} onChange={(e) => setAmount(e.target.value)} />
         </Field>
       </Grid2>
@@ -182,7 +182,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
       {method === 'check' && (
         <>
           <Grid2>
-            <Field label="شماره چک" required error={formErrors.checkNo}>
+            <Field label="شماره چک" required error={showError('checkNo')} onTouch={() => markTouched('checkNo')}>
               <input
                 value={checkNo}
                 onChange={e => setCheckNo(e.target.value)}
