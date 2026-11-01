@@ -281,3 +281,26 @@
 ---
 
 *آخرین تصمیم: [1404/07/28] — جلسه ۱۴*
+
+---
+
+### [1405/11/01] استاندارد مدیریت خطا (4-Layer)
+
+**تصمیم:** خطاها در ۴ لایه نمایش داده می‌شن.
+
+| نوع | روش |
+|---|---|
+| Field validation | inline (Field error) |
+| Business error | ErrorBox |
+| Prerequisite | toastMsg.error |
+| System error | toastMsg.error |
+
+**دلیل:** NN/g + Material 3 + Fluent 2 — خطای inline نزدیک فیلد، بقیه toast. متن‌ها از MSG helper (نه دستی).
+
+**Anti-pattern (حذف‌شده):**
+- toastMsg.error برای validation
+- «X اجباری است» به جای MSG.select('X')
+
+**مرجع:** docs/ERROR-HANDLING.md
+
+*آخرین تصمیم: [1405/11/01] — جلسه ۱۵*

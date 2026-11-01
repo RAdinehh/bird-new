@@ -753,3 +753,39 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 5. 🚨 **باگ snapshot:** `dealPayTarget` snapshot قدیمی — کارت ۲۵۸B ولی modal ۴.۲M
 6. 🟠 **مطالبات فاز ۳:** Statement PDF + Aging CSV
 
+
+---
+
+## جلسه ۱۴۰۵/۱۱/۰۱ — شماره ۱۵ (Error Handling Standardization)
+
+### DONE — ۹ commit
+
+| # | کار | commit |
+|---|---|---|
+| ۱ | حذف toast.validation از DealPayModal + MultiPayModal | 91441d2c |
+| ۲ | GroupsPage → setErr + ErrorBox | 45d94ff5 |
+| ۳ | HallEquipSection → err prop | 31322e1f |
+| ۴ | DevicesPage → MaintenanceModal err | 35ecc896 |
+| ۵ | HatchesPage → Flock/Sell err | 39d4fc6f |
+| ۶ | useEggEntriesForm → MSG + rowErr | c563a8f0 |
+| ۷ | EggEntryModal → ErrorBox wiring | 72a1fa88 |
+| ۸ | ERROR-HANDLING.md | [این commit] |
+| ۹ | DECISIONS entry | [این commit] |
+
+### استاندارد جدید (۴ لایه)
+
+- Field validation → inline (Field error)
+- Business error → ErrorBox
+- Prerequisite → toastMsg.error
+- System error → toastMsg.error
+- همه متن‌ها از MSG helper
+
+### PENDING
+
+- Phase D — Audit نهایی SettlementModal و بقیه
+- Phase E — PaymentsSection + FieldHint
+- L11 tests برای getDealPaymentFormSchema
+- Refactor DealPayModal → useFormErrors
+- RHF Pilot
+
+*آخرین به‌روزرسانی: جلسه ۱۵ — ۱۴۰۵/۱۱/۰۱*
