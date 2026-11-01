@@ -186,15 +186,15 @@ export default function StatementModal({ open, onClose }: Props) {
       
       return `
         <tr>
-          <td style="text-align: center; width: 30px;">${toFa(index + 1)}</td>
-          <td style="text-align: center; width: 80px;">${toFa(l.date)}</td>
-          <td style="text-align: right;">
-            <strong>${metaParts.join(' - ')}</strong>
-            ${l.description ? `<div style="font-size: 10px; color: #64748b; margin-top: 2px;">${l.description}</div>` : ''}
+          <td class="col-center">${toFa(index + 1)}</td>
+          <td class="col-center">${toFa(l.date)}</td>
+          <td class="col-right">
+            <div style="font-weight: 600;">${metaParts.join(' - ')}</div>
+            ${l.description ? `<div style="font-size: 10px; color: #64748b; margin-top: 2px; font-weight: 400;">${l.description}</div>` : ''}
           </td>
-          <td class="amount" style="color: #dc2626;">${l.debit > 0 ? toFa(l.debit.toLocaleString('fa-IR')) : '—'}</td>
-          <td class="amount" style="color: #16a34a;">${l.credit > 0 ? toFa(l.credit.toLocaleString('fa-IR')) : '—'}</td>
-          <td class="amount" style="font-weight: 700;">${toFa(Math.abs(l.balance).toLocaleString('fa-IR'))}</td>
+          <td class="col-left" style="color: #dc2626;">${l.debit > 0 ? toFa(l.debit.toLocaleString('fa-IR')) : '—'}</td>
+          <td class="col-left" style="color: #16a34a;">${l.credit > 0 ? toFa(l.credit.toLocaleString('fa-IR')) : '—'}</td>
+          <td class="col-left" style="font-weight: 700;">${toFa(Math.abs(l.balance).toLocaleString('fa-IR'))}</td>
         </tr>
       `;
     }).join('');
