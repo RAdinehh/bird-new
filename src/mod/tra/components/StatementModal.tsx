@@ -174,53 +174,126 @@ export default function StatementModal({ open, onClose }: Props) {
     const farmPhone = settings?.farm?.phone || '';
 
     const rows = lines.map(l => {
-      const isOutP = l.debit > 0 && (l.kind === 'payment_cash' || l.kind === 'payment_card' || l.kind === 'payment_check');
-      const info = isOutP ? { icon: '💸', label: 'پرداخت', color: '#dc2626' } : KIND_INFO[l.kind];
+      const isDebit = l.debit > 0;
+      const isOutP = isDebit && (l.kind === 'payment_cash' || l.kind === 'payment_card' || l.kind === 'payment_check');
+      const info = isOutP ? { label: 'پرداخت' } : KIND_INFO[l.kind];
+      
       const metaParts = [info.label];
-      if (l.docNumber) metaParts.push(l.docNumber);
+      if (l.docNumber && !isOutP) metaParts.push(l.docNumber);
       if (l.kind === 'payment_check' && l.checkNo) metaParts.push('#' + l.checkNo);
       if (l.kind === 'payment_check' && l.bank) metaParts.push(l.bank);
       if (l.kind === 'payment_check' && l.dueDate) metaParts.push('سرسید ' + toFa(l.dueDate));
-      const statusTag = l.checkStatus ? ` [${CHECK_INFO[l.checkStatus].label}]` : '';
-
-      return `<tr>
-        <td style="white-space:nowrap">${toFa(l.date)}</td>
-        <td>
-          <div style="font-weight:600">${info.icon} ${metaParts.join(' • ')}${statusTag}</div>
-          ${l.description ? `<div style="font-size:10px;color:#64748b;margin-top:2px">${l.description}</div>` : ''}
-        </td>
-        <td style="color:#dc2626;text-align:left">${l.debit > 0 ? '+' + toFa(l.debit.toLocaleString('fa-IR')) : ''}</td>
-        <td style="color:#16a34a;text-align:left">${l.credit > 0 ? '-' + toFa(l.credit.toLocaleString('fa-IR')) : ''}</td>
-        <td style="text-align:left;font-weight:600">${toFa(l.balance.toLocaleString('fa-IR'))}</td>
-      </tr>`;
+      
+      return `
+        <tr>
+          <td class="center">${toFa(l.date)}</td>
+          <td>
+            <div class="fw-bold">${metaParts.join(' • ')}</div>
+            ${l.description ? `<div class="text-muted text-sm">${l.description}</div>` : ''}
+          </td>
+          <td class="amount text-danger">${l.debit > 0 ? toFa(l.debit.toLocaleString('fa-IR')) : '—'}</td>
+          <td class="amount text-success">${l.credit > 0 ? toFa(l.credit.toLocaleString('fa-IR')) : '—'}</td>
+          <td class="amount fw-bold">${toFa(Math.abs(l.balance).toLocaleString('fa-IR'))} ${l.balance < 0 ? '(بستانکار)' : ''}</td>
+        </tr>
+      `;
     }).join('');
 
     return `<!DOCTYPE html>
-<html dir="rtl" lang="fa"><head><meta charset="UTF-8"><title>صورت‌حساب ${party?.name || ''}</title>
-<style>
-@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
-* { box-sizing: border-box; }
-body { font-family: Vazirmatn, sans-serif; direction: rtl; padding: 24px; font-size: 12px; color: #0f172a; }
-h1 { font-size: 18px; margin: 0 0 4px; color: #16a34a; }
-h2 { font-size: 14px; margin: 16px 0 4px; }
-.header { border-bottom: 2px solid #16a34a; padding-bottom: 10px; margin-bottom: 16px; }
-.meta { font-size: 11px; color: #64748b; }
-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-th { background: #f1f5f9; padding: 8px; text-align: right; border-bottom: 2px solid #cbd5e1; font-weight: 700; }
-td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
-.summary { margin-top: 16px; padding: 12px; background: #f1f5f9; border-radius: 8px; }
-.summary-row { display: flex; justify-content: space-between; padding: 4px 0; }
-.summary-total { font-weight: 700; font-size: 14px; border-top: 2px solid #cbd5e1; padding-top: 8px; margin-top: 8px; }
-</style></head><body>
-<div class="header"><h1>${farmName}</h1><div class="meta">${farmAddr}${farmPhone ? ' • ' + farmPhone : ''}</div></div>
-<h2>صورت‌حساب: ${party?.name || ''}</h2>
-<div class="meta">بازه: ${toFa(fromDate || '—')} تا ${toFa(toDate || '—')}${party?.phone ? ' • تلفن: ' + party.phone : ''}</div>
-<table><thead><tr><th>تاریخ</th><th>شرح</th><th>بدهی</th><th>پرداخت</th><th>مانده</th></tr></thead><tbody>${rows}</tbody></table>
-<div class="summary">
-<div class="summary-row"><span>مجموع بدهی:</span><span>${toFa(totalDebit.toLocaleString('fa-IR'))} تومان</span></div>
-<div class="summary-row"><span>مجموع پرداخت:</span><span>${toFa(totalCredit.toLocaleString('fa-IR'))} تومان</span></div>
-<div class="summary-row summary-total"><span>مانده نهایی:</span><span>${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} تومان</span></div>
-</div></body></html>`;
+<html dir="rtl" lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>صورت‌حساب ${party?.name || ''}</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+    @page { size: A4; margin: 15mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Vazirmatn, sans-serif; direction: rtl; color: #1e293b; font-size: 12px; background: #fff; line-height: 1.5; }
+    
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; }
+    .header h1 { font-size: 22px; color: #16a34a; margin-bottom: 8px; }
+    .header h2 { font-size: 16px; color: #0f172a; margin-bottom: 8px; }
+    .text-muted { color: #64748b; }
+    .text-sm { font-size: 11px; }
+    .fw-bold { font-weight: 700; }
+    
+    .meta-info { display: flex; justify-content: space-between; background: #f8fafc; padding: 14px 16px; border-radius: 8px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
+    
+    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    th { background: #f1f5f9; color: #334155; padding: 12px 8px; text-align: right; font-weight: 700; border-bottom: 2px solid #cbd5e1; font-size: 12px; }
+    td { padding: 12px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+    tr:nth-child(even) { background: #f8fafc; }
+    .center { text-align: center; }
+    .amount { text-align: left; font-variant-numeric: tabular-nums; direction: ltr; }
+    .text-danger { color: #dc2626; }
+    .text-success { color: #16a34a; }
+    
+    .summary { display: flex; justify-content: flex-end; margin-bottom: 40px; }
+    .summary-box { width: 320px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #cbd5e1; font-size: 13px; }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-total { font-weight: 700; font-size: 15px; color: #0f172a; border-top: 2px solid #cbd5e1; padding-top: 12px; margin-top: 4px; }
+    
+    .footer { display: flex; justify-content: space-between; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+    .signature { text-align: center; color: #64748b; font-size: 12px; width: 200px; }
+    .signature-box { height: 70px; margin-bottom: 8px; border: 1px dashed #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>${farmName}</h1>
+      <div class="text-muted text-sm">${farmAddr}</div>
+      <div class="text-muted text-sm">${farmPhone}</div>
+    </div>
+    <div style="text-align: left;">
+      <h2>صورت‌حساب طرف حساب</h2>
+      <div class="text-muted text-sm">تاریخ چاپ: ${toFa(getTodayJalali())}</div>
+    </div>
+  </div>
+  
+  <div class="meta-info">
+    <div><strong>طرف حساب:</strong> ${party?.name || '—'} ${party?.phone ? `(${party.phone})` : ''}</div>
+    <div><strong>بازه:</strong> ${toFa(fromDate || '—')} تا ${toFa(toDate || '—')}</div>
+  </div>
+  
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 80px; text-align: center;">تاریخ</th>
+        <th>شرح</th>
+        <th style="width: 120px; text-align: left;">بدهی (تومان)</th>
+        <th style="width: 120px; text-align: left;">پرداخت (تومان)</th>
+        <th style="width: 120px; text-align: left;">مانده (تومان)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows}
+    </tbody>
+  </table>
+  
+  <div class="summary">
+    <div class="summary-box">
+      <div class="summary-row"><span>مجموع بدهی:</span><span class="fw-bold">${toFa(totalDebit.toLocaleString('fa-IR'))}</span></div>
+      <div class="summary-row"><span>مجموع پرداخت:</span><span class="fw-bold">${toFa(totalCredit.toLocaleString('fa-IR'))}</span></div>
+      <div class="summary-row summary-total">
+        <span>مانده نهایی:</span>
+        <span style="direction: ltr;">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <div class="signature">
+      <div class="signature-box"></div>
+      مهر و امضا فروشنده
+    </div>
+    <div class="signature">
+      <div class="signature-box"></div>
+      مهر و امضا خریدار
+    </div>
+  </div>
+</body>
+</html>`;
   };
 
   const handlePrint = () => {
