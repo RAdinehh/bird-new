@@ -223,7 +223,7 @@ export default function StatementModal({ open, onClose }: Props) {
     .amount { text-align: left; font-variant-numeric: tabular-nums; direction: ltr; }
 
     /* Header Layout */
-    .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; }
     .header .brand h1 { font-size: 22px; color: #16a34a; margin-bottom: 4px; font-weight: 800; }
     .header .doc-title { text-align: left; }
     .header .doc-title h2 { font-size: 20px; color: #0f172a; margin-bottom: 4px; font-weight: 700; letter-spacing: -0.5px; }
@@ -268,6 +268,12 @@ export default function StatementModal({ open, onClose }: Props) {
       <div class="text-muted text-sm">${farmAddr}</div>
       <div class="text-muted text-sm">${farmPhone}</div>
     </div>
+    
+    <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+      <div style="font-size: 22px; font-weight: 900; color: #16a34a; letter-spacing: 1px;">هو الرزاق</div>
+      <div style="font-size: 11px; color: #64748b; margin-top: 4px; font-weight: 600;">او روزی‌دهنده است</div>
+    </div>
+
     <div class="doc-title">
       <h2>صورت‌حساب</h2>
       <div class="text-muted text-sm">تاریخ چاپ: ${toFa(getTodayJalali())}</div>
